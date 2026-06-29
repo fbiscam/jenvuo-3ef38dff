@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Mic, MicOff, X, Pause, Play } from "lucide-react";
+import { Mic, X, Plus, Sliders } from "lucide-react";
 import { SignalCard } from "@/components/SignalCard";
 import { useSpeech } from "@/hooks/useSpeech";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
@@ -51,8 +51,7 @@ function Home() {
   const [timeframe, setTimeframe] = useState<string>("15m");
   const [signal, setSignal] = useState<GoldSignal | null>(null);
   const [loading, setLoading] = useState(false);
-  const [lastUser, setLastUser] = useState("");
-  const [active, setActive] = useState(false);
+  const [text, setText] = useState("");
   const speech = useSpeech();
   const lastHandled = useRef("");
   const loadingRef = useRef(false);
@@ -66,20 +65,20 @@ function Home() {
         ? "listening"
         : "idle";
 
-  async function handleCommand(text: string) {
-    if (loadingRef.current) return;
+  async function handleCommand(query: string) {
+    if (loadingRef.current || !query.trim()) return;
     loadingRef.current = true;
     setLoading(true);
     speech.pauseListening();
-    const tf = parseTimeframe(text, timeframe);
+    const tf = parseTimeframe(query, timeframe);
     if (tf !== timeframe) setTimeframe(tf);
     try {
-      const result = await analyze({ data: { timeframe: tf, query: text } });
+      const result = await analyze({ data: { timeframe: tf, query } });
       setSignal(result);
       speech.speak(result.spokenSummary, () => speech.resumeIfWanted());
     } catch (e: any) {
       toast.error(e?.message || "Analysis failed");
-      speech.speak("Sorry, the analysis failed. Please try again.", () => speech.resumeIfWanted());
+      speech.speak("Sorry, the analysis failed.", () => speech.resumeIfWanted());
     } finally {
       loadingRef.current = false;
       setLoading(false);
@@ -90,213 +89,199 @@ function Home() {
     const t = speech.transcript;
     if (t && t !== lastHandled.current) {
       lastHandled.current = t;
-      setLastUser(t);
       handleCommand(t);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speech.transcript]);
 
-  const startConversation = () => {
-    if (!speech.supported) {
-      toast.error("Voice not supported. Please use Chrome.");
-      return;
-    }
-    setActive(true);
+  const toggleMic = () => {
+    if (!speech.supported) { toast.error("Voice not supported. Use Chrome."); return; }
+    if (speech.listening) { speech.stopListening(); return; }
     if (!greetedRef.current) {
       greetedRef.current = true;
-      speech.speak(
-        "GoldGPT online. I'm listening — ask me anything about gold.",
-        () => speech.startListening(),
-      );
+      speech.speak("GoldGPT online. I'm listening.", () => speech.startListening());
     } else {
       speech.startListening();
     }
   };
 
-  const endConversation = () => {
-    setActive(false);
+  const submitText = () => {
+    const t = text.trim();
+    if (!t) return;
+    setText("");
+    handleCommand(t);
+  };
+
+  const endAll = () => {
     speech.stopListening();
     speech.stopSpeaking();
   };
 
-  const togglePause = () => {
-    if (speech.listening) speech.pauseListening();
-    else speech.startListening();
-  };
-
   return (
     <div className="min-h-screen bg-white text-neutral-900 relative overflow-hidden flex flex-col">
-      {/* soft ambient backdrop */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[900px] rounded-full bg-gradient-to-br from-violet-100/60 via-sky-100/40 to-rose-100/40 blur-3xl" />
-      </div>
-
       {/* Header */}
-      <header className="relative z-10 px-6 py-5 flex items-center justify-between">
+      <header className="relative z-10 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-700 shadow-sm" />
+          <div className="h-7 w-7 rounded-full bg-gradient-to-br from-amber-400 to-amber-700 shadow-sm" />
           <div>
-            <h1 className="text-[15px] font-semibold tracking-tight text-neutral-900">
-              GoldGPT
-            </h1>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-400">
-              Live voice · XAU/USD
-            </p>
+            <h1 className="text-sm font-semibold tracking-tight text-neutral-900">GoldGPT</h1>
+            <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-400">Live voice · XAU/USD</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-[11px] font-medium">
-          <span className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1 rounded-full border",
-            speech.listening
-              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-              : "border-neutral-200 bg-neutral-50 text-neutral-500",
-          )}>
-            <span className={cn(
-              "h-1.5 w-1.5 rounded-full",
-              speech.listening ? "bg-emerald-500 animate-pulse" : "bg-neutral-300",
-            )} />
-            {speech.listening ? "Live" : "Standby"}
-          </span>
-          <span className="px-2.5 py-1 rounded-full bg-neutral-900 text-white font-mono text-[10px]">
-            {timeframe.toUpperCase()}
-          </span>
+        <div className="flex items-center gap-2">
+          <button className="h-9 w-9 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-500">
+            <Sliders className="h-4 w-4" />
+          </button>
         </div>
       </header>
 
-      {/* Main */}
-      <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-center px-6 gap-10 pb-12">
-        <div className="flex flex-col items-center gap-10 flex-1">
-          <Orb status={status} />
-
-          {/* Status + transcript */}
-          <div className="text-center min-h-[4.5rem]">
-            <div className="text-[11px] font-medium uppercase tracking-[0.3em] text-neutral-400 mb-3">
+      {/* Main: orb centerpiece */}
+      <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-center px-6 gap-10 pb-40">
+        <div className="flex flex-col items-center gap-6 flex-1">
+          <CloudOrb status={status} />
+          <div className="text-center min-h-[2.5rem]">
+            <div className="text-[11px] font-medium uppercase tracking-[0.3em] text-neutral-400">
               {status === "listening" && "Listening"}
               {status === "thinking" && "Thinking…"}
               {status === "speaking" && "Speaking"}
-              {status === "idle" && (active ? "Paused" : "Tap to start")}
+              {status === "idle" && "Tap mic or type"}
             </div>
-            <div className="text-base text-neutral-700 max-w-lg font-light min-h-[1.5rem] leading-relaxed">
-              {speech.interim
-                ? <span className="text-neutral-400 italic">{speech.interim}</span>
-                : lastUser || (!active && <span className="text-neutral-400">Speak naturally — I'll handle the rest.</span>)}
-            </div>
+            {speech.interim && (
+              <div className="mt-2 text-sm text-neutral-400 italic max-w-md">{speech.interim}</div>
+            )}
           </div>
-
-          {/* Bottom controls — ChatGPT style */}
-          {!active ? (
-            <div className="flex flex-col items-center gap-4">
-              <button
-                onClick={startConversation}
-                className="h-14 px-8 rounded-full bg-neutral-900 text-white font-medium text-sm flex items-center gap-2.5 shadow-lg shadow-neutral-900/15 hover:bg-neutral-800 transition active:scale-[0.98]"
-              >
-                <Mic className="h-4 w-4" />
-                Start voice conversation
-              </button>
-              <div className="flex flex-wrap gap-2 justify-center max-w-xl">
-                {["Analyze gold 15m", "A+ setup on 1H", "Bias on 4H?", "London killzone"].map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => { setActive(true); greetedRef.current = true; handleCommand(q); speech.startListening(); }}
-                    className="text-xs rounded-full border border-neutral-200 bg-white text-neutral-600 px-3.5 py-1.5 hover:border-neutral-300 hover:text-neutral-900 transition"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <button
-                onClick={togglePause}
-                className="h-12 w-12 rounded-full bg-white border border-neutral-200 shadow-sm flex items-center justify-center hover:bg-neutral-50 transition"
-                aria-label={speech.listening ? "Pause" : "Resume"}
-              >
-                {speech.listening ? <Pause className="h-4 w-4 text-neutral-700" /> : <Play className="h-4 w-4 text-neutral-700" />}
-              </button>
-              <button
-                onClick={endConversation}
-                className="h-12 w-12 rounded-full bg-neutral-900 text-white flex items-center justify-center shadow-lg shadow-neutral-900/20 hover:bg-neutral-800 transition"
-                aria-label="End conversation"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-          )}
         </div>
 
-        {/* Signal card */}
         {signal && (
-          <aside className="w-full lg:w-[400px] lg:max-w-[400px] shrink-0">
+          <aside className="w-full lg:w-[380px] lg:max-w-[380px] shrink-0">
             <SignalCard signal={signal} />
           </aside>
         )}
       </main>
+
+      {/* Bottom composer — ChatGPT style */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t from-white via-white to-transparent">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] pl-2 pr-1.5 py-1.5">
+            <button className="h-9 w-9 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-500 shrink-0">
+              <Plus className="h-5 w-5" />
+            </button>
+            <input
+              type="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submitText()}
+              placeholder="Type"
+              disabled={loading}
+              className="flex-1 bg-transparent text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none px-1 py-1"
+            />
+            <button
+              onClick={toggleMic}
+              className={cn(
+                "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition",
+                speech.listening
+                  ? "bg-emerald-500 text-white"
+                  : "hover:bg-neutral-100 text-neutral-600",
+              )}
+              aria-label="Toggle microphone"
+            >
+              <Mic className="h-4.5 w-4.5" />
+            </button>
+            <button
+              onClick={endAll}
+              className="h-9 w-9 rounded-full bg-neutral-900 text-white flex items-center justify-center shrink-0 hover:bg-neutral-800 transition"
+              aria-label="End"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="text-center text-[11px] text-neutral-400 mt-2">
+            GoldGPT can make mistakes. Verify important trades.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
 
-function Orb({ status }: { status: "idle" | "listening" | "thinking" | "speaking" }) {
-  const intensity =
-    status === "speaking" ? 1.15 :
-    status === "listening" ? 1.05 :
-    status === "thinking" ? 1.0 : 0.95;
+function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "speaking" }) {
+  const scale =
+    status === "speaking" ? 1.06 :
+    status === "listening" ? 1.03 :
+    status === "thinking" ? 1.0 : 0.98;
+
+  const spinDuration =
+    status === "speaking" ? "8s" :
+    status === "thinking" ? "4s" :
+    status === "listening" ? "14s" : "22s";
 
   return (
     <div className="relative h-72 w-72 sm:h-80 sm:w-80 flex items-center justify-center">
-      {/* outer halo rings */}
+      {/* soft outer halo */}
+      <div className="absolute inset-0 rounded-full bg-sky-200/30 blur-3xl" />
       {(status === "listening" || status === "speaking") && (
-        <>
-          <span className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-300/30 via-sky-300/30 to-rose-300/30 blur-2xl animate-pulse" />
-          <span className="absolute -inset-6 rounded-full border border-violet-200/60 animate-ping" style={{ animationDuration: "2.4s" }} />
-          <span className="absolute -inset-12 rounded-full border border-sky-200/40 animate-ping" style={{ animationDuration: "3.2s" }} />
-        </>
+        <span className="absolute -inset-4 rounded-full border border-sky-200/60 animate-ping" style={{ animationDuration: "2.6s" }} />
       )}
 
-      {/* core orb — multilayer gradient sphere */}
+      {/* Cloud sphere */}
       <div
-        className="orb-core relative h-64 w-64 sm:h-72 sm:w-72 rounded-full"
+        className="relative h-60 w-60 sm:h-64 sm:w-64 rounded-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(56,189,248,0.45)]"
         style={{
-          transform: `scale(${intensity})`,
-          transition: "transform 600ms cubic-bezier(0.4,0,0.2,1)",
+          transform: `scale(${scale})`,
+          transition: "transform 700ms cubic-bezier(0.4,0,0.2,1)",
         }}
       >
-        {/* base sphere */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-400 via-sky-400 to-rose-300 shadow-[0_20px_80px_-10px_rgba(139,92,246,0.45)]" />
-        {/* swirl layer */}
+        {/* base sky gradient: light top, deeper blue bottom */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-sky-100 to-sky-500" />
+
+        {/* swirling cloud layer 1 */}
         <div
-          className={cn(
-            "absolute inset-0 rounded-full mix-blend-screen opacity-80",
-            status !== "idle" && "animate-spin",
-          )}
+          className="absolute -inset-1/4 animate-spin"
           style={{
+            animationDuration: spinDuration,
             background:
-              "conic-gradient(from 0deg, rgba(167,139,250,0.9), rgba(56,189,248,0.9), rgba(244,114,182,0.9), rgba(251,191,36,0.7), rgba(167,139,250,0.9))",
-            filter: "blur(20px)",
-            animationDuration: status === "speaking" ? "6s" : status === "thinking" ? "3s" : "12s",
+              "radial-gradient(60% 40% at 30% 35%, rgba(255,255,255,0.95), transparent 60%), radial-gradient(50% 35% at 70% 55%, rgba(255,255,255,0.7), transparent 70%), radial-gradient(45% 30% at 50% 80%, rgba(255,255,255,0.55), transparent 65%)",
+            filter: "blur(6px)",
           }}
         />
-        {/* counter-swirl */}
+
+        {/* swirling cloud layer 2 (counter) */}
         <div
-          className={cn(
-            "absolute inset-4 rounded-full mix-blend-overlay opacity-70",
-            status !== "idle" && "animate-spin",
-          )}
+          className="absolute -inset-1/4 animate-spin opacity-90"
           style={{
-            background:
-              "conic-gradient(from 180deg, rgba(255,255,255,0.9), transparent 40%, rgba(244,114,182,0.6), transparent 80%)",
-            filter: "blur(16px)",
-            animationDuration: "9s",
+            animationDuration: "18s",
             animationDirection: "reverse",
+            background:
+              "radial-gradient(45% 30% at 60% 25%, rgba(255,255,255,0.85), transparent 65%), radial-gradient(40% 28% at 25% 70%, rgba(186,230,253,0.8), transparent 70%), radial-gradient(35% 25% at 80% 75%, rgba(56,189,248,0.5), transparent 70%)",
+            filter: "blur(8px)",
           }}
         />
-        {/* glossy highlight */}
-        <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_32%_28%,rgba(255,255,255,0.55),transparent_45%)]" />
-        {/* inner darken for depth */}
-        <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_70%_75%,rgba(20,10,40,0.25),transparent_55%)]" />
+
+        {/* deep blue undercurrents at bottom */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(80% 40% at 50% 105%, rgba(14,116,184,0.7), transparent 70%)",
+          }}
+        />
+
+        {/* top sheen */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_22%,rgba(255,255,255,0.6),transparent_45%)]" />
+
+        {/* inner edge shading for sphere depth */}
+        <div className="absolute inset-0 rounded-full shadow-[inset_-20px_-30px_60px_rgba(7,89,133,0.35),inset_15px_20px_50px_rgba(255,255,255,0.4)]" />
+
         {/* thinking shimmer */}
         {status === "thinking" && (
-          <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent,rgba(255,255,255,0.6),transparent_30%)] animate-spin" style={{ animationDuration: "1.4s" }} />
+          <div
+            className="absolute inset-0 animate-spin"
+            style={{
+              background: "conic-gradient(from 0deg, transparent, rgba(255,255,255,0.7), transparent 25%)",
+              animationDuration: "1.3s",
+              mixBlendMode: "overlay",
+            }}
+          />
         )}
       </div>
     </div>
