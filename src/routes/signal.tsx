@@ -171,6 +171,73 @@ function SignalPage() {
     setPlaying(false);
   };
 
+  /* ---------- LIVE TRADE TRACKER ---------- */
+  const fetchTick = useServerFn(getLiveTick);
+  const [livePrice, setLivePrice] = useState<number | null>(null);
+  const [trackerStatus, setTrackerStatus] = useState<"PENDING" | "RUNNING" | "WIN" | "LOSS">("PENDING");
+  const [sparkline, setSparkline] = useState<number[]>([]);
+  const eventsFiredRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!plan || plan.trade.direction === "WAIT") return;
+    eventsFiredRef.current = new Set();
+    setTrackerStatus("PENDING");
+    setSparkline([plan.currentPrice]);
+    setLivePrice(plan.currentPrice);
+
+    let stopped = false;
+    const poll = async () => {
+      try {
+        const tick = await fetchTick({ data: { symbol: plan.instrument.symbol } });
+        if (stopped) return;
+        setLivePrice(tick.price);
+        setSparkline((arr) => [...arr.slice(-59), tick.price]);
+
+        const tr = plan.trade;
+        const dir = tr.direction;
+        const fire = (key: string, msg: string) => {
+          if (eventsFiredRef.current.has(key)) return;
+          eventsFiredRef.current.add(key);
+          toast.success(msg);
+          speech.speak(msg);
+        };
+        // Entry fill
+        const tol = plan.currentPrice * 0.0003;
+        if (dir === "BUY") {
+          if (tick.price <= tr.entry + tol && trackerStatus === "PENDING") {
+            fire("filled", `Entry filled at ${tick.price.toFixed(plan.instrument.decimals)}`);
+            setTrackerStatus("RUNNING");
+          }
+          if (tick.price <= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stopped = true; }
+          if (tick.price >= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stopped = true; }
+        } else if (dir === "SELL") {
+          if (tick.price >= tr.entry - tol && trackerStatus === "PENDING") {
+            fire("filled", `Entry filled at ${tick.price.toFixed(plan.instrument.decimals)}`);
+            setTrackerStatus("RUNNING");
+          }
+          if (tick.price >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stopped = true; }
+          if (tick.price <= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stopped = true; }
+        }
+      } catch {
+        // silent — keep last price
+      }
+    };
+    poll();
+    const id = setInterval(poll, 15000);
+    return () => { stopped = true; clearInterval(id); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan]);
+
+  /* ---------- R-MULTIPLE ---------- */
+  const rMultiple = useMemo(() => {
+    if (!plan || !livePrice || plan.trade.direction === "WAIT") return 0;
+    const { entry, sl } = plan.trade;
+    const risk = Math.abs(entry - sl);
+    if (!risk) return 0;
+    const pnl = plan.trade.direction === "BUY" ? livePrice - entry : entry - livePrice;
+    return pnl / risk;
+  }, [livePrice, plan]);
+
   if (!authReady) return <div className="fixed inset-0 bg-white" />;
 
   const t = plan?.trade;
