@@ -2,8 +2,10 @@ import { useEffect, useImperativeHandle, useRef, forwardRef } from "react";
 import {
   createChart,
   CandlestickSeries,
+  createSeriesMarkers,
   type IChartApi,
   type ISeriesApi,
+  type ISeriesMarkersPluginApi,
   type Time,
   type IPriceLine,
   type SeriesMarker,
