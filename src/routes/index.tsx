@@ -162,7 +162,7 @@ function HomePage() {
         <div className="border-t border-zinc-100 overflow-hidden">
           <div className="mx-auto max-w-6xl px-6">
             <div className={`flex gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap overflow-hidden`}>
-              {[...TICKER, ...TICKER].map(([s, p, d], i) => (
+              {[...ticker, ...ticker].map(([s, p, d], i) => (
                 <span key={i} className="flex items-center gap-2">
                   <span className="text-zinc-900 font-medium">{s}</span>
                   <span>{p}</span>
