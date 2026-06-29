@@ -95,7 +95,7 @@ function Home() {
   useEffect(() => { interimRef.current = speech.interim; }, [speech.interim]);
   useEffect(() => { transcriptRef.current = speech.transcript; }, [speech.transcript]);
 
-  const [dark, setDark] = useState<boolean>(true);
+  const [dark, setDark] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
     const v = window.localStorage.getItem("jenvu.theme");
