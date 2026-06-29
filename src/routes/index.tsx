@@ -7,17 +7,17 @@ export const Route = createFileRoute("/")({
     meta: [
       {
         title:
-          "JENVU AI — World's First Voice-Powered Institutional Trading Intelligence",
+          "World's First Voice-Powered Institutional Trading Intelligence",
       },
       {
         name: "description",
         content:
-          "JENVU AI is the world's first voice-native trading intelligence built on 25+ years of ICT, SMC and institutional market logic. Live A+ setups, real-time analysis and spoken execution for Gold, Crypto, FX and Indices.",
+          "The world's first voice-native trading intelligence built on 25+ years of ICT, SMC and institutional market logic. Live A+ setups, real-time analysis and spoken execution for Gold, Crypto, FX and Indices.",
       },
       {
         property: "og:title",
         content:
-          "JENVU AI — World's First Voice-Powered Institutional Trading Intelligence",
+          "World's First Voice-Powered Institutional Trading Intelligence",
       },
       {
         property: "og:description",
