@@ -159,7 +159,7 @@ function Hero() {
               </span>
             </h1>
 
-            <p className="mt-8 max-w-2xl text-[17px] leading-relaxed text-[color:var(--ink)]/75">
+            <p className="mt-8 max-w-2xl text-[17px] leading-relaxed" style={{ color: VOID }}>
               Jenvu is a voice-native AI analyst trained on 25 years of institutional logic — ICT,
               SMC, liquidity, killzones. Speak the asset. Hear the setup. Watch the chart draw itself.
             </p>
