@@ -424,7 +424,7 @@ function HomePage() {
             <div>
               <SectionLabel>{"\n"}</SectionLabel>
               <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight">
-                Four steps. One voice. Zero friction.
+                Four steps. One voice.
               </h2>
             </div>
             <p className="max-w-md text-zinc-900 leading-relaxed">
