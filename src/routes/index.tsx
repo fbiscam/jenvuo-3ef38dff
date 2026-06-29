@@ -824,15 +824,14 @@ function HomePage() {
 
       {/* FOOTER */}
       <footer className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-900">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10 flex flex-col md:flex-row items-center justify-between gap-5 text-sm text-zinc-900">
           <div className="flex items-center gap-2.5">
             <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded object-contain" />
-
             <span className="text-zinc-900 font-semibold">JENVU AI</span>
             <span className="text-zinc-300">·</span>
             <span>© {new Date().getFullYear()}</span>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             <Link to="/about" className="hover:text-zinc-900">About</Link>
             <Link to="/terms" className="hover:text-zinc-900">Terms</Link>
             <Link to="/privacy" className="hover:text-zinc-900">Privacy</Link>
