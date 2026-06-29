@@ -544,8 +544,24 @@ function SignalPage() {
               {/* A+ Setup Score */}
               {plan && <SetupScoreCard plan={plan} />}
 
+              {/* Market closed notice — replaces tracker/trade card */}
+              {marketClosed && plan && (
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 space-y-2">
+                  <div className={`flex items-center gap-1.5 text-[10px] ${MONO} tracking-widest uppercase text-zinc-700`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                    Market Closed
+                  </div>
+                  <p className="text-[11px] text-zinc-700 leading-snug">
+                    {plan.instrument.symbol} session band hai. AI ne live entry / SL / TP issue nahi kiya — sirf last session ke key levels, FVG aur OB reference ke liye dikha rahe hain. Session open hote hi plan auto-revalidate hoga.
+                  </p>
+                  <p className={`text-[10px] ${MONO} text-zinc-500 uppercase tracking-wider`}>
+                    {isCryptoSymbol(plan.instrument.symbol) ? "24/7" : "Opens Sun 22:00 UTC"}
+                  </p>
+                </div>
+              )}
+
               {/* Live trade tracker */}
-              {plan && t && t.direction !== "WAIT" && (
+              {plan && t && t.direction !== "WAIT" && !marketClosed && (
                 <TradeTrackerCard
                   plan={plan}
                   livePrice={livePrice}
@@ -554,6 +570,7 @@ function SignalPage() {
                   sparkline={sparkline}
                 />
               )}
+
 
 
               {/* News risk */}
