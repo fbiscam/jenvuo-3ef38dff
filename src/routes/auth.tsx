@@ -53,66 +53,66 @@ function AuthPage() {
       {/* LEFT — Login */}
       <div className="relative z-10 flex-1 flex items-center justify-center p-6 lg:p-16">
 
-        <div className="relative w-full max-w-md">
+        <div className="relative w-full max-w-xl">
           {/* glass card */}
           <div className="relative rounded-3xl bg-transparent p-8 sm:p-10">
             {/* logo badge */}
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-11 h-11 flex items-center justify-center">
-                <img src={faviconUrl} alt="Jenvu AI" className="w-11 h-11 object-contain" />
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-14 h-14 flex items-center justify-center">
+                <img src={faviconUrl} alt="Jenvu AI" className="w-14 h-14 object-contain" />
               </div>
               <div className="leading-tight">
                 <h1
-                  className="text-2xl font-black uppercase tracking-tight text-black"
+                  className="text-3xl font-black uppercase tracking-tight text-black"
                   style={{ fontFamily: "'Urbanist', sans-serif" }}
                 >
                   Jenvu AI
                 </h1>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-black/50 font-semibold">
+                <p className="text-[13px] uppercase tracking-[0.18em] text-black/50 font-semibold">
                   Voice Intelligence
                 </p>
               </div>
             </div>
 
-            <h2 className="text-3xl font-bold text-black tracking-tight mb-2">
+            <h2 className="text-4xl sm:text-5xl font-bold text-black tracking-tight mb-3">
               Welcome back
             </h2>
-            <p className="text-sm text-black/80 mb-8 font-medium">
+            <p className="text-base text-black/80 mb-10 font-medium">
               Sign in to continue your conversation.
             </p>
 
-            <form onSubmit={signIn} className="space-y-3.5">
+            <form onSubmit={signIn} className="space-y-5">
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-black/80 mb-1.5 ml-1">
+                <label className="block text-[13px] font-semibold uppercase tracking-wider text-black/80 mb-2 ml-1">
                   Email
                 </label>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black/40 group-focus-within:text-fuchsia-500 transition" />
+                  <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-black/40 group-focus-within:text-fuchsia-500 transition" />
                   <input
                     type="email"
                     autoComplete="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl bg-white border border-black/10 pl-11 pr-4 py-3.5 text-sm text-black outline-none focus:border-black focus:ring-4 focus:ring-black/5 transition placeholder:text-black/35"
+                    className="w-full rounded-xl bg-white border border-black/10 pl-12 pr-4 py-4 text-base text-black outline-none focus:border-black focus:ring-4 focus:ring-black/5 transition placeholder:text-black/35"
                     placeholder="you@example.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-black/80 mb-1.5 ml-1">
+                <label className="block text-[13px] font-semibold uppercase tracking-wider text-black/80 mb-2 ml-1">
                   Password
                 </label>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black/40 group-focus-within:text-sky-500 transition" />
+                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-black/40 group-focus-within:text-sky-500 transition" />
                   <input
                     type="password"
                     autoComplete="current-password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl bg-white border border-black/10 pl-11 pr-4 py-3.5 text-sm text-black outline-none focus:border-black focus:ring-4 focus:ring-black/5 transition placeholder:text-black/35"
+                    className="w-full rounded-xl bg-white border border-black/10 pl-12 pr-4 py-4 text-base text-black outline-none focus:border-black focus:ring-4 focus:ring-black/5 transition placeholder:text-black/35"
                     placeholder="••••••••"
                   />
                 </div>
@@ -121,21 +121,21 @@ function AuthPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full mt-2 rounded-xl py-3.5 text-sm font-semibold text-white bg-black hover:bg-neutral-900 disabled:opacity-60 transition inline-flex items-center justify-center gap-2 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] overflow-hidden"
+                className="group relative w-full mt-3 rounded-xl py-4 text-base font-semibold text-white bg-black hover:bg-neutral-900 disabled:opacity-60 transition inline-flex items-center justify-center gap-2 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] overflow-hidden"
               >
                 <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-neutral-900" />
                 <span className="relative inline-flex items-center gap-2">
-                  {loading ? "Signing in…" : (<>Sign in <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" /></>)}
+                  {loading ? "Signing in…" : (<>Sign in <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition" /></>)}
                 </span>
               </button>
             </form>
 
-            <div className="mt-8 flex items-center gap-3">
+            <div className="mt-10 flex items-center gap-3">
               <div className="h-px flex-1 bg-black/10" />
-              <span className="text-[10px] uppercase tracking-[0.18em] text-black/80 font-semibold">Invite Only</span>
+              <span className="text-xs uppercase tracking-[0.18em] text-black/80 font-semibold">Invite Only</span>
               <div className="h-px flex-1 bg-black/10" />
             </div>
-            <p className="mt-4 text-xs text-black/60 text-center">
+            <p className="mt-4 text-sm text-black/60 text-center">
               Contact the admin to request access.
             </p>
           </div>
