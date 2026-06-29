@@ -58,10 +58,43 @@ export function CloudOrb({ status = "idle", pulse = 0 }: { status?: OrbStatus; p
               mixBlendMode: "screen",
             }}
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_42%_18%,rgba(255,255,255,0.95),transparent_48%)]" />
+          {/* Glossy top highlight */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_38%_16%,rgba(255,255,255,1),transparent_42%)]" />
+          {/* Crescent specular highlight */}
           <div
             className="absolute inset-0 rounded-full"
-            style={{ boxShadow: "inset 0 0 26px rgba(160,210,255,0.6)" }}
+            style={{
+              background:
+                "radial-gradient(ellipse 55% 18% at 50% 14%, rgba(255,255,255,0.95), transparent 70%)",
+              filter: "blur(2px)",
+            }}
+          />
+          {/* Small bright spec dot */}
+          <div
+            className="absolute rounded-full"
+            style={{
+              top: "14%",
+              left: "30%",
+              width: "14%",
+              height: "10%",
+              background: "radial-gradient(circle, rgba(255,255,255,1) 0%, transparent 70%)",
+              filter: "blur(1px)",
+            }}
+          />
+          {/* Bottom reflective bounce light */}
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 16% at 50% 92%, rgba(180,220,255,0.55), transparent 70%)",
+              filter: "blur(3px)",
+              mixBlendMode: "screen",
+            }}
+          />
+          {/* Soft sky rim */}
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{ boxShadow: "inset 0 0 30px rgba(200,230,255,0.8)" }}
           />
           {speaking && (
             <div
