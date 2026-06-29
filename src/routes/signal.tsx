@@ -201,6 +201,9 @@ function SignalPage() {
         if (stopped) return;
         setLivePrice(tick.price);
         setSparkline((arr) => [...arr.slice(-59), tick.price]);
+        try { htfRef.current?.updateLivePrice(tick.price); } catch {}
+        try { ltfRef.current?.updateLivePrice(tick.price); } catch {}
+
 
         const tr = plan.trade;
         const dir = tr.direction;
@@ -232,7 +235,7 @@ function SignalPage() {
       }
     };
     poll();
-    const id = setInterval(poll, 15000);
+    const id = setInterval(poll, 5000);
     return () => { stopped = true; clearInterval(id); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan]);
@@ -253,7 +256,9 @@ function SignalPage() {
   const isBuy = t?.direction === "BUY";
   const isSell = t?.direction === "SELL";
   const sym = plan?.instrument.display ?? (symbol || "—");
-  const priceStr = plan ? `${plan.instrument.kind === "crypto" ? "" : "$"}${plan.currentPrice.toFixed(plan.instrument.decimals)}` : "—";
+  const displayPrice = livePrice ?? plan?.currentPrice;
+  const priceStr = plan && displayPrice != null ? `${plan.instrument.kind === "crypto" ? "" : "$"}${displayPrice.toFixed(plan.instrument.decimals)}` : "—";
+
 
   return (
     <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased">
