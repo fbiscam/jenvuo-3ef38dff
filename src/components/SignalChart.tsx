@@ -17,7 +17,7 @@ import type { CandleDTO, Marking } from "@/lib/gold-analysis.functions";
 export type SignalChartHandle = {
   drawMarking: (m: Marking) => void;
   clear: () => void;
-  updateLivePrice: (price: number) => void;
+  updateLivePrice: (price: number, tSeconds?: number) => void;
 };
 
 
@@ -64,6 +64,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   // Box overlays drawn via DOM div absolutely positioned over chart
   const overlayRef = useRef<HTMLDivElement>(null);
   const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement }[]>([]);
+  // Live tick state — mutable, survives across ticks within the same bar
+  const liveBarRef = useRef<{ time: number; open: number; high: number; low: number; close: number } | null>(null);
+  const bucketSecRef = useRef<number>(60);
+  const lastPriceLineRef = useRef<IPriceLine | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -95,6 +99,14 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     chartRef.current = chart;
     seriesRef.current = series;
     markersPluginRef.current = createSeriesMarkers(series, []);
+
+    // Seed live-bar state from the latest candle and infer bar duration.
+    const lastC = candles[candles.length - 1];
+    const prevC = candles[candles.length - 2];
+    if (lastC && prevC) bucketSecRef.current = Math.max(1, lastC.time - prevC.time);
+    liveBarRef.current = lastC
+      ? { time: lastC.time, open: lastC.open, high: lastC.high, low: lastC.low, close: lastC.close }
+      : null;
 
     const redrawBoxes = () => {
       if (!overlayRef.current || !seriesRef.current || !chartRef.current) return;
@@ -147,24 +159,50 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       linesRef.current = [];
       markersRef.current = [];
       boxesRef.current = [];
+      liveBarRef.current = null;
+      lastPriceLineRef.current = null;
       if (overlayRef.current) overlayRef.current.innerHTML = "";
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [candles, dark]);
 
   useImperativeHandle(ref, () => ({
-    updateLivePrice: (price: number) => {
+    updateLivePrice: (price: number, tSeconds?: number) => {
       const s = seriesRef.current;
       if (!s) return;
-      const last = candles[candles.length - 1];
-      if (!last) return;
+      const bar = liveBarRef.current;
+      if (!bar) return;
+      const bucket = bucketSecRef.current || 60;
+      const nowSec = typeof tSeconds === "number" && Number.isFinite(tSeconds)
+        ? Math.floor(tSeconds)
+        : Math.floor(Date.now() / 1000);
+      // Align the incoming time to the same bucket grid as the seeded bar.
+      const aligned = bar.time + Math.floor((nowSec - bar.time) / bucket) * bucket;
       try {
-        s.update({
-          time: last.time as Time,
-          open: last.open,
-          high: Math.max(last.high, price),
-          low: Math.min(last.low, price),
-          close: price,
+        if (aligned > bar.time) {
+          // Roll forward: open a fresh bar at the next bucket boundary.
+          const next = { time: aligned, open: price, high: price, low: price, close: price };
+          liveBarRef.current = next;
+          s.update({ time: next.time as Time, open: next.open, high: next.high, low: next.low, close: next.close });
+        } else {
+          // Same bar: extend high/low, set close.
+          bar.high = Math.max(bar.high, price);
+          bar.low = Math.min(bar.low, price);
+          bar.close = price;
+          s.update({ time: bar.time as Time, open: bar.open, high: bar.high, low: bar.low, close: bar.close });
+        }
+        // Sticky "LAST" price marker on the axis — recreated each tick.
+        if (lastPriceLineRef.current) {
+          try { s.removePriceLine(lastPriceLineRef.current); } catch {}
+          lastPriceLineRef.current = null;
+        }
+        lastPriceLineRef.current = s.createPriceLine({
+          price,
+          color: "#0ea5e9",
+          lineWidth: 1,
+          lineStyle: LineStyle.Solid,
+          axisLabelVisible: true,
+          title: "LAST",
         });
       } catch {}
     },
@@ -178,6 +216,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       markersPluginRef.current?.setMarkers([]);
       boxesRef.current.forEach((b) => b.el.remove());
       boxesRef.current = [];
+      if (lastPriceLineRef.current) {
+        try { s.removePriceLine(lastPriceLineRef.current); } catch {}
+        lastPriceLineRef.current = null;
+      }
     },
     drawMarking: (m: Marking) => {
       const s = seriesRef.current;
