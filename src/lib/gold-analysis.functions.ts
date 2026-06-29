@@ -662,7 +662,6 @@ export const getLiveTick = createServerFn({ method: "POST" })
     return tick;
   });
 
-function _noop_marker() {
 
 export const getSignalPlan = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
