@@ -329,7 +329,40 @@ function SignalPage() {
                 </div>
               )}
 
-              {/* Confluences */}
+              {/* Why this signal */}
+              {plan.whyThisSignal && plan.whyThisSignal.length > 0 && (
+                <div className="rounded-2xl p-4 border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-white to-white shadow-sm">
+                  <div className="text-[10px] uppercase tracking-widest text-amber-700 mb-2 font-bold flex items-center gap-1.5"><Brain className="h-3.5 w-3.5" /> Why this signal?</div>
+                  <ul className="space-y-2">
+                    {plan.whyThisSignal.map((w, i) => (
+                      <li key={i} className="text-xs text-neutral-800 flex gap-2 leading-snug">
+                        <span className="shrink-0 mt-0.5 h-4 w-4 rounded-full bg-amber-500 text-white text-[9px] font-black flex items-center justify-center">{i + 1}</span>
+                        <span>{w}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {plan.reasoning && (
+                    <p className="text-xs text-neutral-700 mt-3 pt-3 border-t border-amber-200/60 leading-relaxed italic">
+                      {plan.reasoning}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Risk factors */}
+              {plan.riskFactors && plan.riskFactors.length > 0 && (
+                <div className="rounded-2xl p-4 border border-red-200 bg-gradient-to-br from-red-50/60 to-white shadow-sm">
+                  <div className="text-[10px] uppercase tracking-widest text-red-700 mb-2 font-bold flex items-center gap-1.5"><ShieldAlert className="h-3.5 w-3.5" /> Risk Factors</div>
+                  <ul className="space-y-1.5">
+                    {plan.riskFactors.map((r, i) => (
+                      <li key={i} className="text-xs text-neutral-800 flex gap-2 leading-snug">
+                        <span className="text-red-500 font-black">!</span>{r}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {plan.confluences.length > 0 && (
                 <div className="rounded-2xl p-4 border border-neutral-200 bg-white shadow-sm">
                   <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-bold flex items-center gap-1"><Zap className="h-3 w-3" /> Confluences</div>
