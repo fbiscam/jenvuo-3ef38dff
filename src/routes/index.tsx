@@ -420,8 +420,8 @@ function HomePage() {
           </div>
 
           {/* status bar */}
-          <div className="px-6 py-2 border-t border-zinc-100 bg-white flex justify-between items-center">
-            <div className="flex gap-6 items-center">
+          <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-white flex justify-between items-center gap-3">
+            <div className="flex gap-4 sm:gap-6 items-center">
               <div className="flex items-center gap-1.5">
                 <span className={`text-[10px] ${MONO} text-zinc-900`}>CPU</span>
                 <span className={`text-[10px] ${MONO}`}>04%</span>
@@ -431,7 +431,7 @@ function HomePage() {
                 <span className={`text-[10px] ${MONO}`}>1.2GB</span>
               </div>
             </div>
-            <span className={`text-[10px] ${MONO} text-zinc-900 tracking-tighter`}>
+            <span className={`hidden sm:inline text-[10px] ${MONO} text-zinc-900 tracking-tighter truncate`}>
               PRO_VERSION_2.04.1 // SECURE_ENCRYPTION_ENABLED
             </span>
           </div>
