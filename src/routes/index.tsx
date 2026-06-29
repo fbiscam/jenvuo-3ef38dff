@@ -199,7 +199,7 @@ function Home() {
       {/* Main: orb centerpiece */}
       <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-center px-6 gap-10 pb-28 pt-16">
         <div className="flex flex-col items-center gap-6 flex-1">
-          <CloudOrb status={status} />
+          <CloudOrb status={status} pulse={speech.wordPulse} />
           {!speech.supported && (
             <div className="text-center text-sm text-red-500">
               Voice not supported in this browser. Please open in Chrome (desktop) or use the text box below.
