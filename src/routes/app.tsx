@@ -401,19 +401,6 @@ function Home() {
             </button>
           </div>
         </div>
-        {/* ticker strip */}
-        <div className="border-t border-zinc-100 overflow-hidden">
-          <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap animate-ticker`}>
-            {[...ticker, ...ticker].map(([s, p, d], i) => (
-              <span key={i} className="flex items-center gap-2">
-                <span className="text-zinc-900 font-medium">{s}</span>
-                <span>{p}</span>
-                <span className={d.startsWith("-") ? "text-red-500" : "text-emerald-600"}>{d}</span>
-                <span className="text-zinc-200">•</span>
-              </span>
-            ))}
-          </div>
-        </div>
       </header>
 
       {/* MAIN: voice agent surface */}
