@@ -177,10 +177,12 @@ function SignalPage() {
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </button>
-          <Link to="/" className="hidden sm:flex justify-center items-center gap-2.5 min-w-0">
-            <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded-md object-contain" />
-            <span className="font-semibold tracking-tight text-sm">JENVU AI</span>
-          </Link>
+          <div className="flex justify-center items-center gap-2.5 min-w-0">
+            <Link to="/" aria-label="JENVU AI home" className="shrink-0 inline-flex items-center justify-center rounded-md hover:opacity-80 transition">
+              <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded-md object-contain" />
+            </Link>
+            <span className="font-semibold tracking-tight text-sm select-none">JENVU AI</span>
+          </div>
           <div className="flex items-center gap-2 justify-end">
             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase`}>
               <span className="relative flex h-1.5 w-1.5">
