@@ -391,7 +391,7 @@ function HomePage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="grid gap-10 lg:grid-cols-12">
             <div className="lg:col-span-4">
-              <SectionLabel>Coverage</SectionLabel>
+              
               <h2 className="mt-4 text-3xl font-semibold tracking-tight">
                 One terminal. Every major market.
               </h2>
