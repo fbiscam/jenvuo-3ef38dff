@@ -64,8 +64,9 @@ function AuthPage() {
 
   return (
     <>
-    <style>{`@media (min-width: 1024px){.jenvu-auth-zoom{zoom:1.1}}`}</style>
+    <style>{`@media (min-width: 1280px) and (min-height: 800px){.jenvu-auth-zoom{zoom:1.05}}`}</style>
     <div className={`jenvu-auth-zoom h-dvh w-full overflow-hidden bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
+
 
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
@@ -101,11 +102,11 @@ function AuthPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 sm:p-6 overflow-hidden">
-        <div className="w-full max-w-6xl">
+      <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 sm:p-4 overflow-hidden">
+        <div className="w-full max-w-6xl max-h-full">
           <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
             {/* terminal header */}
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex gap-1.5 shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
@@ -123,17 +124,19 @@ function AuthPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
               {/* LEFT — FORM */}
-              <div className="lg:col-span-7 bg-white p-5 sm:p-8 lg:p-10">
+              <div className="lg:col-span-7 bg-white p-5 sm:p-6 lg:p-8">
+
                 <div className="max-w-md mx-auto lg:mx-0">
                   
                   <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
                     Sign in to your desk.
                   </h1>
-                  <p className="mt-3 text-sm text-zinc-600 leading-relaxed">
+                  <p className="mt-2 text-sm text-zinc-600 leading-relaxed">
                     Voice-native institutional intelligence, on call.
                   </p>
 
-                  <form onSubmit={signIn} className="mt-6 space-y-4">
+                  <form onSubmit={signIn} className="mt-5 space-y-3">
+
                     <div>
                       <label className={`block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5 ${MONO}`}>
                         User Identification
@@ -177,17 +180,18 @@ function AuthPage() {
                     </button>
                   </form>
 
-                  <div className="mt-6 pt-4 border-t border-zinc-100">
+                  <div className="mt-4 pt-3 border-t border-zinc-100">
                     <p className="text-xs text-zinc-500 leading-relaxed">
                       This terminal is invite-only. Contact your account administrator for credentials.
                     </p>
                   </div>
+
                 </div>
               </div>
 
               {/* RIGHT — VISUAL */}
-              <div className="hidden lg:flex lg:col-span-5 bg-white flex-col p-6 lg:p-10 border-t lg:border-t-0 lg:border-l border-zinc-100">
-                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[240px]">
+              <div className="hidden lg:flex lg:col-span-5 bg-white flex-col p-5 lg:p-6 border-t lg:border-t-0 lg:border-l border-zinc-100">
+                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[200px]">
                   <div
                     className="absolute inset-0 opacity-[0.04] pointer-events-none"
                     style={{
@@ -196,15 +200,16 @@ function AuthPage() {
                     }}
                   />
                   <div className="relative z-10 flex flex-col items-center">
-                    <div className="relative h-40 w-40 lg:h-48 lg:w-48">
+                    <div className="relative h-32 w-32 lg:h-36 lg:w-36">
                       <div className="absolute inset-0 rounded-full border border-zinc-100 animate-[spin_18s_linear_infinite]" />
-                      <div className="absolute inset-5 rounded-full border border-zinc-200/60 animate-[spin_24s_linear_infinite_reverse]" />
-                      <div className="absolute inset-9">
+                      <div className="absolute inset-4 rounded-full border border-zinc-200/60 animate-[spin_24s_linear_infinite_reverse]" />
+                      <div className="absolute inset-7">
                         <CloudOrb status="speaking" pulse={1} />
                       </div>
                     </div>
+
                     
-                    <div className="mt-6 text-center space-y-2">
+                    <div className="mt-4 text-center space-y-2">
                       <div className={`flex items-center justify-center gap-2 ${MONO} text-[10px] tracking-[0.2em] text-zinc-400 uppercase`}>
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
                         LIVE_NARRATION
