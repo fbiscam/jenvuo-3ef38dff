@@ -201,6 +201,9 @@ function SignalPage() {
         if (stopped) return;
         setLivePrice(tick.price);
         setSparkline((arr) => [...arr.slice(-59), tick.price]);
+        try { htfRef.current?.updateLivePrice(tick.price); } catch {}
+        try { ltfRef.current?.updateLivePrice(tick.price); } catch {}
+
 
         const tr = plan.trade;
         const dir = tr.direction;
