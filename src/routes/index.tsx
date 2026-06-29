@@ -835,5 +835,6 @@ function HomePage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
