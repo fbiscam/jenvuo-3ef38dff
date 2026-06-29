@@ -174,7 +174,7 @@ function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-neutral-100 relative overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-white text-neutral-900 relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center" />
@@ -208,7 +208,7 @@ function Home() {
       </main>
 
       {/* Bottom composer — ChatGPT style */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t from-black via-black to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t from-white via-white to-transparent">
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white shadow-[0_8px_30px_-8px_rgba(0,0,0,0.5)] pl-2 pr-1.5 py-1.5">
             <button className="h-9 w-9 rounded-full hover:bg-black/5 flex items-center justify-center text-neutral-700 shrink-0">
