@@ -48,15 +48,6 @@ function AuthPage() {
       className="relative min-h-screen w-full bg-white text-black flex flex-col lg:flex-row overflow-hidden"
       style={{ fontFamily: "Urbanist, sans-serif" }}
     >
-      {/* Soft aurora background tint */}
-      <div className="pointer-events-none absolute inset-0 -z-0">
-        <div className="absolute -top-32 -left-32 h-[40rem] w-[40rem] rounded-full opacity-25 blur-3xl"
-          style={{ background: "radial-gradient(circle, #ff3ea5 0%, transparent 70%)" }} />
-        <div className="absolute top-1/3 -right-32 h-[36rem] w-[36rem] rounded-full opacity-20 blur-3xl"
-          style={{ background: "radial-gradient(circle, #38bdf8 0%, transparent 70%)" }} />
-        <div className="absolute -bottom-40 left-1/4 h-[44rem] w-[44rem] rounded-full opacity-20 blur-3xl"
-          style={{ background: "radial-gradient(circle, #a855f7 0%, transparent 70%)" }} />
-      </div>
 
       {/* LEFT — Login */}
       <div className="relative z-10 flex-1 flex items-center justify-center p-6 lg:p-16">
