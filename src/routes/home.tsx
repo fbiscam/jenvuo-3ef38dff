@@ -1,5 +1,51 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Mic, ArrowRight } from "lucide-react";
+import featVoice from "@/assets/feat-voice.jpg";
+import featSignal from "@/assets/feat-signal.jpg";
+import featAssets from "@/assets/feat-assets.jpg";
+import featNews from "@/assets/feat-news.jpg";
+import featBrain from "@/assets/feat-brain.jpg";
+import featTarget from "@/assets/feat-target.jpg";
+
+const FEATURES = [
+  {
+    img: featVoice,
+    tag: "Voice Agent",
+    title: "Speak. Hear. Trade.",
+    body: "Push-to-talk Jarvis-style agent that listens, reasons and narrates institutional setups in real time.",
+  },
+  {
+    img: featSignal,
+    tag: "Signal Engine",
+    title: "ICT & SMC, drawn live.",
+    body: "Fair value gaps, order blocks, liquidity sweeps, BOS/CHoCH and OTE entries rendered on the chart.",
+  },
+  {
+    img: featAssets,
+    tag: "Multi-Asset",
+    title: "Any market. A to Z.",
+    body: "Gold, Crypto, Forex majors, Indices and global equities — one engine, every session.",
+  },
+  {
+    img: featNews,
+    tag: "News & Killzones",
+    title: "Context that matters.",
+    body: "High-impact economic events, DXY context and London / New York killzone awareness baked into every call.",
+  },
+  {
+    img: featBrain,
+    tag: "Reasoning",
+    title: "25-year desk logic.",
+    body: "An institutional reasoning model trained on bias, structure, premium/discount and liquidity playbooks.",
+  },
+  {
+    img: featTarget,
+    tag: "A+ Setups",
+    title: "Entry. Stop. Three TPs.",
+    body: "Honest output with invalidation levels — when conditions are weak, the agent tells you to stand aside.",
+  },
+];
+
 
 export const Route = createFileRoute("/home")({
   head: () => ({
