@@ -327,8 +327,7 @@ function FeatureGrid() {
             icon={<Brain className="h-3 w-3" />}
             tag="Reasoning"
             title={<>Desk-grade logic,<br />not chat fluff.</>}
-            body="Bias, premium/discount, BOS/CHoCH, DXY correlation — fused in under a second."
-            tone="dark"
+            body={<>Bias, premium/discount, BOS/CHoCH,<br />DXY correlation — fused in under a second.</>}
           />
 
           <SmallCard
@@ -385,7 +384,7 @@ function SmallCard({
   icon: React.ReactNode;
   tag: string;
   title: React.ReactNode;
-  body: string;
+  body: React.ReactNode;
   image?: string;
   tone?: "light" | "dark";
 }) {
