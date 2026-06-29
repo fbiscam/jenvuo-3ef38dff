@@ -292,7 +292,7 @@ function HomePage() {
       {/* FINAL CTA — TRY NOW with the orb */}
       <section className="mx-auto max-w-[1280px] px-6 pt-16 pb-32 text-center">
         <div className="mx-auto h-40 w-40 mb-10">
-          <CloudOrb speaking={false} />
+          <CloudOrb />
         </div>
         <h2 className="font-['Newsreader',serif] tracking-[-0.02em] text-[48px] md:text-[80px] leading-[1.02]">
           Try JENVU now.
