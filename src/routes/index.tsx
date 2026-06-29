@@ -422,7 +422,7 @@ function HomePage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
-              <SectionLabel>Workflow</SectionLabel>
+              <SectionLabel>{"\n"}</SectionLabel>
               <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight">
                 Four steps. One voice. Zero friction.
               </h2>
