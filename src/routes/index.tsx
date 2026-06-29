@@ -227,7 +227,7 @@ function Home() {
             />
             {awake ? "Awake" : 'Say "Hey Jenvu"'}
           </span>
-          <button className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400">
+          <button className="h-9 w-9 rounded-full hover:bg-black/5 flex items-center justify-center text-neutral-600">
             <Sliders className="h-4 w-4" />
           </button>
         </div>
