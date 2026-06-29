@@ -1,13 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target } from "lucide-react";
 import { toast } from "sonner";
 import { getSignalPlan, type SignalPlan } from "@/lib/gold-analysis.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/signal")({
   head: () => ({
