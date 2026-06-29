@@ -417,6 +417,38 @@ function HomePage() {
         </div>
       </section>
 
+      {/* CHANGELOG */}
+      <section className="border-t border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <h2 className="text-3xl font-semibold tracking-tight">Recent shipments</h2>
+            </div>
+            <span className={`${MONO} text-[11px] text-zinc-900`}>v2.04.1 · stable</span>
+          </div>
+          <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+            {[
+              ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions."],
+              ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts."],
+              ["2026.05.30", "v2.02", "Forex Factory red-folder context injected into every plan."],
+              ["2026.05.12", "v2.01", "Push-to-talk replaces always-on; cleaner mic control."],
+              ["2026.04.28", "v2.00", "Voice-native rewrite. New orb. New signal engine."],
+            ].map(([d, v, n], i) => (
+              <div
+                key={v}
+                className={`grid grid-cols-12 items-center px-6 py-4 ${
+                  i !== 0 ? "border-t border-zinc-100" : ""
+                }`}
+              >
+                <span className={`col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
+                <span className={`col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900`}>{v}</span>
+                <span className="col-span-7 text-sm text-zinc-900">{n}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
       <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-6 py-20">
@@ -517,37 +549,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* CHANGELOG */}
-      <section className="border-t border-zinc-100 bg-zinc-50/40">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <h2 className="text-3xl font-semibold tracking-tight">Recent shipments</h2>
-            </div>
-            <span className={`${MONO} text-[11px] text-zinc-900`}>v2.04.1 · stable</span>
-          </div>
-          <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
-            {[
-              ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions."],
-              ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts."],
-              ["2026.05.30", "v2.02", "Forex Factory red-folder context injected into every plan."],
-              ["2026.05.12", "v2.01", "Push-to-talk replaces always-on; cleaner mic control."],
-              ["2026.04.28", "v2.00", "Voice-native rewrite. New orb. New signal engine."],
-            ].map(([d, v, n], i) => (
-              <div
-                key={v}
-                className={`grid grid-cols-12 items-center px-6 py-4 ${
-                  i !== 0 ? "border-t border-zinc-100" : ""
-                }`}
-              >
-                <span className={`col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
-                <span className={`col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900`}>{v}</span>
-                <span className="col-span-7 text-sm text-zinc-900">{n}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
 
 
