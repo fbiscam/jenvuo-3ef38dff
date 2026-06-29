@@ -143,11 +143,17 @@
     border-color: var(--color-border);
   }
 
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: "Urbanist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   }
+
 }
 
 /* Orb flowing color animations */
