@@ -245,36 +245,9 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
         </>
       )}
 
-      {/* iridescent ring (the main attraction) */}
+      {/* iridescent ring removed */}
       <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
-        <div
-          className="absolute inset-0 rounded-full animate-spin"
-          style={{
-            animationDuration: ringSpin,
-            background: iridescent,
-            WebkitMask:
-              "radial-gradient(circle, transparent 56%, #000 60%, #000 90%, transparent 100%)",
-            mask:
-              "radial-gradient(circle, transparent 56%, #000 60%, #000 90%, transparent 100%)",
-            filter: "blur(2px) saturate(1.15)",
-          }}
-        />
 
-        {/* secondary counter-spin ring for depth */}
-        <div
-          className="absolute inset-1 rounded-full animate-spin opacity-70"
-          style={{
-            animationDuration: "14s",
-            animationDirection: "reverse",
-            background: iridescent,
-            WebkitMask:
-              "radial-gradient(circle, transparent 60%, #000 64%, #000 86%, transparent 96%)",
-            mask:
-              "radial-gradient(circle, transparent 60%, #000 64%, #000 86%, transparent 96%)",
-            filter: "blur(10px)",
-            mixBlendMode: "screen",
-          }}
-        />
 
         {/* inner pearl sphere */}
         <div
