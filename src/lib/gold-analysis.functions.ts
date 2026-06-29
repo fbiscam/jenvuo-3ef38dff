@@ -683,7 +683,102 @@ Produce the A+ ICT/SMC trade plan for ${a.short} now.`;
       symbol: a.key,
       symbolLabel: a.short,
       precision: a.precision,
+      audit: {
+        verdict: "CAUTION",
+        agreement: 0,
+        auditedConfidence: 0,
+        summary: "",
+        issues: [],
+        strengths: [],
+        auditorModel: "google/gemini-2.5-pro",
+      },
     };
+
+    // === AUDITOR: independent second opinion using a different model family ===
+    try {
+      const auditSystem = `You are a senior risk-desk AUDITOR with 25+ years reviewing institutional trade plans (ICT/SMC, FX/Metals/Crypto). You DO NOT propose new trades — you independently audit a junior trader's plan against the same raw data and call out any flaw a risk manager would flag.
+
+Score the plan strictly. Check:
+- Direction alignment with HTF bias, structure (BOS/CHOCH), premium/discount.
+- Entry / SL / TP geometry: is SL beyond a real invalidation? Is TP at real liquidity? Is RR honest?
+- Stop placement vs ATR / recent wicks (not too tight, not absurdly wide).
+- Liquidity logic: are we buying into supply / selling into demand? Sweep before entry?
+- Killzone & session timing alignment.
+- News risk: any High-impact event within 60m must force WAIT.
+- Confidence calibration: does the stated confidence match the evidence?
+- Math sanity: RR = |TP-Entry| / |Entry-SL|, must match ±0.2.
+
+Return ONLY JSON:
+{
+  "verdict": "APPROVED" | "CAUTION" | "REJECTED",
+  "agreement": 0-100,
+  "auditedConfidence": 0-95,
+  "summary": "1-2 sentence risk-desk verdict in plain English.",
+  "issues": ["specific concrete issues, cite numbers; empty array if none"],
+  "strengths": ["2-4 specific things the plan got right"]
+}
+
+Rules:
+- APPROVED only if no material issues and confidence is fair.
+- CAUTION if minor issues or aggressive sizing/RR.
+- REJECTED if direction contradicts HTF, SL/TP geometry is broken, news risk ignored, or RR math is wrong.
+- auditedConfidence must be <= original confidence unless plan is exceptional.`;
+
+      const auditUser = `ASSET: ${a.short} | PRICE: ${fixp(last.c)} | SESSION: ${session} / ${killzone}
+HTF BIAS DATA: swingHigh=${fixp(swingHigh)} swingLow=${fixp(swingLow)} equilibrium=${fixp(equilibrium)} priceIn=${inPremium ? "PREMIUM" : "DISCOUNT"} PDH=${fixp(pdh)} PDL=${fixp(pdl)}
+NEWS: ${newsBlock}${imminentHigh ? `\nIMMINENT HIGH-IMPACT: ${imminentHigh.title} in ${imminentHigh.minutesUntil}m` : ""}
+
+PLAN UNDER REVIEW:
+${JSON.stringify({
+  htfBias: plan.htfBias,
+  trade: plan.trade,
+  confluences: plan.confluences,
+  whyThisSignal: plan.whyThisSignal,
+  riskFactors: plan.riskFactors,
+  reasoning: plan.reasoning,
+}, null, 2)}
+
+Audit this plan now.`;
+
+      const auditRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-pro",
+          messages: [
+            { role: "system", content: auditSystem },
+            { role: "user", content: auditUser },
+          ],
+          response_format: { type: "json_object" },
+        }),
+      });
+
+      if (auditRes.ok) {
+        const aj: any = await auditRes.json();
+        const ac = aj?.choices?.[0]?.message?.content ?? "{}";
+        let ap: any;
+        try { ap = JSON.parse(ac); } catch { const m = ac.match(/\{[\s\S]*\}/); ap = m ? JSON.parse(m[0]) : {}; }
+        const verdict = ap.verdict === "APPROVED" ? "APPROVED" : ap.verdict === "REJECTED" ? "REJECTED" : "CAUTION";
+        plan.audit = {
+          verdict,
+          agreement: Math.max(0, Math.min(100, Number(ap.agreement ?? 0))),
+          auditedConfidence: Math.max(0, Math.min(100, Number(ap.auditedConfidence ?? plan.trade.confidence))),
+          summary: String(ap.summary ?? ""),
+          issues: Array.isArray(ap.issues) ? ap.issues.map(String).slice(0, 8) : [],
+          strengths: Array.isArray(ap.strengths) ? ap.strengths.map(String).slice(0, 6) : [],
+          auditorModel: "google/gemini-2.5-pro",
+        };
+        // If auditor rejects, downgrade trade to WAIT
+        if (verdict === "REJECTED") {
+          plan.trade.direction = "WAIT";
+          plan.trade.confidence = Math.min(plan.trade.confidence, plan.audit.auditedConfidence, 45);
+        } else if (verdict === "CAUTION") {
+          plan.trade.confidence = Math.min(plan.trade.confidence, plan.audit.auditedConfidence);
+        }
+      }
+    } catch (e) {
+      // auditor failure should not break the primary plan
+    }
 
     return plan;
   });
