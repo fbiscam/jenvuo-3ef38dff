@@ -46,11 +46,7 @@ export function PageShell({
         {/* HERO */}
         <section className="border-b border-zinc-100">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
-            <div className={`flex items-center gap-3 ${MONO} text-[10px] tracking-[0.22em] uppercase text-zinc-900`}>
-              <span className="h-px w-6 bg-zinc-300" />
-              {eyebrow}
-            </div>
-            <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
+            <h1 className="max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
               {title}
             </h1>
             {intro && (
