@@ -343,33 +343,34 @@ function HomePage() {
               {
                 k: "01",
                 t: "Voice-Native Workflow",
-                d: "Push-to-talk into a real institutional analyst. JENVU listens, reasons through ICT/SMC, and replies in natural English.",
+                d: "Push-to-talk a real institutional analyst that reasons through ICT/SMC live.",
               },
               {
                 k: "02",
                 t: "ICT & SMC Signal Engine",
-                d: "Live FVG, Order Block, BOS, CHoCH and liquidity sweep detection — marked directly on multi-timeframe charts.",
+                d: "Live FVG, Order Block, BOS, CHoCH and liquidity sweeps marked on charts.",
               },
               {
                 k: "03",
                 t: "Market Intelligence",
-                d: "Session bias, DXY context, Forex Factory news and killzones merged into every trade plan.",
+                d: "Session bias, DXY, Forex Factory news and killzones merged into every plan.",
               },
               {
                 k: "04",
                 t: "A+ Setups Only",
-                d: "Confluence-graded entries with structured risk: entry, SL, TP and R:R — never a guess.",
+                d: "Confluence-graded entries with structured entry, SL, TP and R:R — never guessed.",
               },
               {
                 k: "05",
                 t: "Cross-Market Coverage",
-                d: "Gold, FX majors, BTC, ETH, top alts, indices and energy — one terminal, one voice.",
+                d: "Gold, FX majors, BTC, ETH, alts, indices and energy — one terminal, one voice.",
               },
               {
                 k: "06",
                 t: "Narrated Chart Reviews",
-                d: "Open a chart and JENVU walks the structure aloud: highs, lows, mitigations, displacement.",
+                d: "JENVU walks the structure aloud: highs, lows, mitigations and displacement.",
               },
+
             ].map((f) => (
               <div key={f.k} className="bg-white p-7 hover:bg-zinc-50/60 transition-colors">
                 <div className={`flex items-center justify-between ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
