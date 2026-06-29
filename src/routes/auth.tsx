@@ -135,7 +135,7 @@ function AuthPage() {
               <span className="text-xs uppercase tracking-[0.18em] text-black/80 font-semibold">Invite Only</span>
               <div className="h-px flex-1 bg-black/10" />
             </div>
-            <p className="mt-4 text-sm text-black/60 text-center">
+            <p className="mt-4 text-sm text-black/90 text-center font-medium">
               Contact the admin to request access.
             </p>
           </div>
