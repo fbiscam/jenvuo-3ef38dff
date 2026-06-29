@@ -254,7 +254,7 @@ function HomePage() {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="grid grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200">
               {[
                 ["Markets", "32+"],
                 ["Frameworks", "ICT, SMC"],

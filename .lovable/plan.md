@@ -1,62 +1,46 @@
-# JENVU AI — Marketing Homepage
+## Mobile alignment fixes — Homepage (`src/routes/index.tsx`)
 
-A standalone landing page that introduces JENVU AI, showcases its capabilities (voice agent + institutional signal engine), and routes visitors into the live experience.
+Sections look misaligned/overflow on phones because several layouts use fixed multi-column grids, `whitespace-nowrap` headings, and rows designed for desktop only. I'll patch each problem area so the page reads cleanly at 390px width while desktop stays identical.
 
-## Route & Structure
+### What I'll fix
 
-- New route: `src/routes/home.tsx` (URL `/home`) — keeps `/` as the live voice agent so existing flow is untouched.
-- Add `head()` meta: title, description, og:title, og:description.
-- A small "Enter JENVU" CTA on the homepage routes to `/` (voice agent) and "See a Live Signal" routes to `/signal`.
+1. **Hero stats** (`Markets / Frameworks / Avg R:R`)
+   - Currently `grid-cols-3` always → very cramped on phones.
+   - Switch to `grid-cols-1 sm:grid-cols-3`.
 
-(If you'd rather have `/` become the marketing page and move the voice agent to `/app`, say so and I'll swap.)
+2. **Hero heading**
+   - "vocalized in real time." sits fine; keep sizes but tighten leading on mobile and remove extra `mt-5` gap.
 
-## Visual Direction — "Elite Class"
+3. **Capabilities heading** (line 445)
+   - `whitespace-nowrap` on a long sentence overflows the viewport on mobile → remove `whitespace-nowrap`, keep on `md+` only.
 
-Pure white canvas with deep-black inner panels and restrained accent color, mirroring the `/signal` aesthetic.
+4. **Terminal workstation header** (line 277)
+   - "JENVU AI // SYSTEM_ACTIVE" + "LIVE FEED · LATENCY 14MS" row is too wide on mobile → stack on mobile (`flex-col gap-2 sm:flex-row`) and hide the latency chip on `<sm`.
 
-- **Background**: pure white (`#FFFFFF`) with faint grid/noise texture.
-- **Inner cards / hero panel**: pure black (`#0A0A0A`) with subtle inner glow + thin hairline border.
-- **Accent**: single amber/gold spark (`#E8B84A`) — same family as the signal page — used sparingly on numbers, underlines, and the orb halo.
-- **Typography**: Urbanist (already global) — display weights for headlines, tight tracking, oversized numerals.
-- **Motion**: framer-motion subtle reveals; the existing `CloudOrb` reused as the hero centerpiece, scaled large with a soft floating animation.
+5. **Terminal status bar** (line 423)
+   - Long "PRO_VERSION_2.04.1 // SECURE_ENCRYPTION_ENABLED" overflows → hide on mobile, show from `sm:` up.
 
-## Sections (top → bottom)
+6. **Recent shipments rows** (line 543)
+   - `grid-cols-12` fixed → on mobile stack: date+version on one row, note below. Use `grid-cols-1 sm:grid-cols-12`.
 
-1. **Hero**
-   - Left: oversized headline "Trade like the 1%. Powered by JENVU AI." + sub-line + two CTAs ("Launch Voice Agent", "See Live Signal").
-   - Right: black inner panel containing the `CloudOrb` with iridescent shimmer.
-   - Top nav: JENVU AI wordmark, links (Features, How it Works, Signals, Sign in).
+7. **Comparison table** (lines 671 & 687)
+   - 4 columns crammed into 390px → switch to a stacked card layout on mobile (label + 3 status pills) and keep the 4-col table from `md:` up.
 
-2. **Trust strip** — thin black bar with rotating tags: "ICT • SMC • Killzones • Liquidity • Order Blocks • Premium/Discount".
+8. **CTA bottom section** (line 776)
+   - On mobile the orb sits below text but takes too much height. Center text and constrain orb to ~160px on mobile.
 
-3. **Feature grid (4 cards)** — black cards on white:
-   - Live Voice Agent (Jarvis-style)
-   - Institutional Signal Engine (ICT/SMC)
-   - Multi-Asset Coverage (Gold, Crypto, FX, Indices, Stocks)
-   - News & Killzone Awareness
+9. **Footer** (line 808)
+   - Items are centered on mobile but legal links wrap awkwardly → add `flex-wrap justify-center` and tighter gap on mobile.
 
-4. **How it Works** — 3-step horizontal flow: Speak → Analyze → Execute. Numbered (01/02/03) in oversized amber.
+10. **Ticker strip alignment**
+    - Already a marquee — fine. Just make sure the outer container has no leftover `max-w-6xl px-6` that constrained it (already removed).
 
-5. **Live Signal Preview** — a screenshot-style mock of the signal dashboard inside a black frame (uses real components scaled down) with a "Open Live Signal" button.
+### Out of scope
 
-6. **Expertise band** — "25+ years of institutional trading logic, in every setup" with bullet list of concepts (FVG, OTE, BOS/CHoCH, Liquidity Sweeps, DXY context, Session bias).
+- No content/copy changes.
+- No color, font, or section reorder changes.
+- Desktop layout (≥`md`/`lg`) stays exactly as-is — fixes are mobile-only via responsive prefixes.
 
-7. **Asset coverage** — pill grid of supported tickers (XAU/USD, BTC, ETH, EUR/USD, NAS100, etc).
+### Verification
 
-8. **Final CTA** — full-width black band: "Ready when you are." + Launch button.
-
-9. **Footer** — minimal: wordmark, year, small links.
-
-## Technical Notes
-
-- New file only: `src/routes/home.tsx`. No changes to existing routes or analysis logic.
-- Reuse `CloudOrb` from current dashboard for hero centerpiece.
-- All colors via existing semantic tokens in `src/styles.css`; add a `--accent-gold` token if not already present.
-- framer-motion already in project — use for entrance fades and orb float.
-- Fully responsive (mobile stacks hero, single-column feature grid).
-- SEO: route-specific head() meta.
-
-## Out of Scope
-
-- No backend, no auth changes, no analysis engine changes.
-- No pricing/testimonials section unless you ask (kept lean and elite).
+After build, I'll spot-check the homepage at 390×844 (iPhone) and 768×1024 (tablet) via Playwright screenshots to confirm nothing overflows and sections read top-to-bottom cleanly.
