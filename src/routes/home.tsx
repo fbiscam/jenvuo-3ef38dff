@@ -208,6 +208,136 @@ function HomePage() {
         </div>
       </section>
 
+      {/* HOW IT WORKS */}
+      <section className="w-full border-t border-black/10 bg-[#f8f9fa]">
+        <div className="mx-auto max-w-7xl px-6 py-24">
+          <div className="text-[11px] uppercase tracking-[0.3em] text-black/45 font-bold">How it works</div>
+          <h2 className="mt-4 text-4xl sm:text-5xl font-black tracking-[-0.03em] leading-[1.05] max-w-3xl">
+            Three steps. <span className="text-black/35">Zero friction.</span>
+          </h2>
+
+          <div className="mt-14 grid md:grid-cols-3 gap-6">
+            {[
+              { n: "01", c: "#4285F4", t: "Speak the asset", b: "Tap the mic and say 'Analyze Gold' or 'Show me Bitcoin'. Natural language, no commands." },
+              { n: "02", c: "#EA4335", t: "Engine reasons", b: "Live candles, DXY context, killzone bias and ICT/SMC confluences fused in under a second." },
+              { n: "03", c: "#34A853", t: "Hear the setup", b: "Entry, stop, three TPs and invalidation narrated aloud while the chart draws the levels." },
+            ].map((s) => (
+              <div key={s.n} className="rounded-2xl bg-white border border-black/10 p-8 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition">
+                <div className="text-6xl font-black tracking-tighter" style={{ color: s.c }}>{s.n}</div>
+                <h3 className="mt-4 text-xl font-black">{s.t}</h3>
+                <p className="mt-2 text-[15px] text-black/60 leading-relaxed">{s.b}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* STATS BAND */}
+      <section className="w-full border-t border-black/10 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-20 grid grid-cols-2 md:grid-cols-4 gap-8">
+          {[
+            { v: "25+", l: "Years of desk logic", c: "#4285F4" },
+            { v: "<1s", l: "Voice latency", c: "#EA4335" },
+            { v: "A→Z", l: "Asset coverage", c: "#FBBC05" },
+            { v: "24/7", l: "Session aware", c: "#34A853" },
+          ].map((s) => (
+            <div key={s.l} className="text-center">
+              <div className="text-5xl sm:text-6xl font-black tracking-tighter" style={{ color: s.c }}>{s.v}</div>
+              <div className="mt-2 text-xs uppercase tracking-[0.25em] font-semibold text-black/55">{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ASSET COVERAGE */}
+      <section className="w-full border-t border-black/10 bg-[#f8f9fa]">
+        <div className="mx-auto max-w-7xl px-6 py-24">
+          <div className="text-[11px] uppercase tracking-[0.3em] text-black/45 font-bold">Coverage</div>
+          <h2 className="mt-4 text-4xl sm:text-5xl font-black tracking-[-0.03em] leading-[1.05] max-w-3xl">
+            One engine. <span className="text-black/35">Every market.</span>
+          </h2>
+
+          <div className="mt-12 flex flex-wrap gap-3">
+            {[
+              { s: "XAU/USD", c: "#FBBC05" },
+              { s: "BTC/USD", c: "#FBBC05" },
+              { s: "ETH/USD", c: "#4285F4" },
+              { s: "SOL/USD", c: "#34A853" },
+              { s: "EUR/USD", c: "#4285F4" },
+              { s: "GBP/USD", c: "#EA4335" },
+              { s: "USD/JPY", c: "#EA4335" },
+              { s: "NAS100", c: "#34A853" },
+              { s: "SPX500", c: "#4285F4" },
+              { s: "DXY", c: "#EA4335" },
+              { s: "AAPL", c: "#34A853" },
+              { s: "TSLA", c: "#EA4335" },
+              { s: "NVDA", c: "#34A853" },
+            ].map((p) => (
+              <span
+                key={p.s}
+                className="inline-flex items-center gap-2 rounded-full bg-white border border-black/10 px-4 py-2 text-sm font-semibold text-black/75 hover:shadow-sm transition"
+              >
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: p.c }} />
+                {p.s}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="w-full border-t border-black/10 bg-white">
+        <div className="mx-auto max-w-4xl px-6 py-24">
+          <div className="text-[11px] uppercase tracking-[0.3em] text-black/45 font-bold text-center">FAQ</div>
+          <h2 className="mt-4 text-4xl sm:text-5xl font-black tracking-[-0.03em] leading-[1.05] text-center">
+            Questions, <span className="text-black/35">answered.</span>
+          </h2>
+
+          <div className="mt-14 space-y-4">
+            {[
+              { c: "#4285F4", q: "Is JENVU financial advice?", a: "No. JENVU is an analytical companion. Every signal is educational and you are responsible for execution and risk." },
+              { c: "#EA4335", q: "What markets are supported?", a: "Gold, all major Crypto, Forex majors, Indices and large-cap equities — anything resolvable through our data adapters." },
+              { c: "#FBBC05", q: "Does it work on mobile?", a: "Yes. The voice agent works on iOS and Android browsers with microphone permission." },
+              { c: "#34A853", q: "Where does the data come from?", a: "Live candles via Binance for crypto, Yahoo Finance for traditional markets, and an economic calendar feed for news." },
+            ].map((f) => (
+              <details key={f.q} className="group rounded-2xl border border-black/10 bg-[#f8f9fa] p-6 open:bg-white open:shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition">
+                <summary className="flex items-center gap-3 cursor-pointer list-none">
+                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: f.c }} />
+                  <span className="font-black text-lg flex-1">{f.q}</span>
+                  <span className="text-2xl text-black/40 group-open:rotate-45 transition">+</span>
+                </summary>
+                <p className="mt-4 pl-6 text-[15px] text-black/65 leading-relaxed">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="w-full bg-black text-white">
+        <div className="mx-auto max-w-7xl px-6 py-24 text-center">
+          <h2 className="text-5xl sm:text-7xl font-black tracking-[-0.04em]">
+            <span style={{ color: "#4285F4" }}>R</span>
+            <span style={{ color: "#EA4335" }}>e</span>
+            <span style={{ color: "#FBBC05" }}>a</span>
+            <span style={{ color: "#4285F4" }}>d</span>
+            <span style={{ color: "#34A853" }}>y</span>
+            <span className="text-white/80"> when you are.</span>
+          </h2>
+          <p className="mt-5 text-white/55 max-w-xl mx-auto">
+            Launch the agent, speak an asset, and let the desk speak back.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <Link to="/" className="rounded-md text-white px-6 py-3 text-sm font-semibold hover:opacity-90 transition" style={{ backgroundColor: "#4285F4" }}>
+              Launch Voice Agent
+            </Link>
+            <Link to="/signal" className="rounded-md bg-white/10 hover:bg-white/15 border border-white/15 px-6 py-3 text-sm font-semibold text-white transition">
+              See a Live Signal
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer — Google style */}
       <footer className="border-t border-black/10 bg-[#f2f2f2]">
 
