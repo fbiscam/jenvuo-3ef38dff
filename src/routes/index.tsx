@@ -331,62 +331,74 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
         </>
       )}
 
-      {/* Soft white-blue cloudy sphere */}
+      {/* Ocean-layered sky-blue sphere */}
       <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
         <div
           className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
           style={{
             background:
-              "radial-gradient(circle at 50% 25%, #ffffff 0%, #eaf6ff 30%, #b8def8 55%, #5fb0ea 80%, #1a5a92 100%)",
+              "radial-gradient(circle at 50% 20%, #f0faff 0%, #cfeaff 25%, #7cc4f5 55%, #2f8fd6 80%, #0b3a66 100%)",
             boxShadow:
-              "inset -8px -18px 42px rgba(11,58,102,0.5), inset 10px 12px 36px rgba(255,255,255,0.75)",
+              "inset -10px -22px 50px rgba(7,40,76,0.65), inset 12px 14px 38px rgba(255,255,255,0.7)",
           }}
         >
-          {/* drifting white cloud layer 1 */}
+          {/* ocean wave layer 1 — sweeping */}
           <div
             className="absolute -inset-1/3 animate-spin"
             style={{
-              animationDuration: status === "speaking" ? "8s" : status === "thinking" ? "5s" : "22s",
+              animationDuration: status === "speaking" ? "7s" : status === "thinking" ? "4s" : "18s",
               background:
-                "radial-gradient(45% 30% at 30% 35%, rgba(255,255,255,0.95), transparent 65%), radial-gradient(40% 26% at 70% 30%, rgba(255,255,255,0.9), transparent 65%), radial-gradient(45% 30% at 55% 78%, rgba(255,255,255,0.9), transparent 65%)",
+                "repeating-radial-gradient(circle at 50% 60%, rgba(255,255,255,0.55) 0px, rgba(255,255,255,0) 14px, rgba(125,196,245,0.45) 22px, rgba(47,143,214,0.0) 38px)",
+              filter: "blur(6px)",
+              mixBlendMode: "screen",
+            }}
+          />
+
+          {/* ocean wave layer 2 — counter, colliding */}
+          <div
+            className="absolute -inset-1/4 animate-spin"
+            style={{
+              animationDuration: status === "speaking" ? "9s" : "22s",
+              animationDirection: "reverse",
+              background:
+                "repeating-radial-gradient(circle at 40% 70%, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0) 18px, rgba(95,176,234,0.55) 28px, rgba(11,90,146,0.0) 44px)",
               filter: "blur(8px)",
               mixBlendMode: "screen",
             }}
           />
 
-          {/* drifting white cloud layer 2 — counter rotating */}
+          {/* foamy crest layer — where waves collide */}
           <div
-            className="absolute -inset-1/4 animate-spin opacity-80"
+            className="absolute -inset-1/4 animate-spin opacity-90"
             style={{
-              animationDuration: status === "speaking" ? "11s" : "28s",
-              animationDirection: "reverse",
+              animationDuration: status === "speaking" ? "5s" : "14s",
               background:
-                "radial-gradient(40% 26% at 65% 25%, rgba(255,255,255,0.9), transparent 65%), radial-gradient(36% 22% at 25% 65%, rgba(255,255,255,0.85), transparent 65%), radial-gradient(45% 30% at 75% 80%, rgba(225,242,255,0.8), transparent 65%)",
+                "radial-gradient(50% 18% at 50% 48%, rgba(255,255,255,0.85), transparent 70%), radial-gradient(55% 14% at 50% 62%, rgba(220,240,255,0.7), transparent 70%)",
               filter: "blur(10px)",
               mixBlendMode: "screen",
             }}
           />
 
-          {/* deep blue base shadow */}
+          {/* deep ocean floor shadow */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(circle at 50% 110%, rgba(11,58,102,0.8), transparent 55%)",
+                "radial-gradient(circle at 50% 115%, rgba(7,40,76,0.85), transparent 55%)",
               mixBlendMode: "multiply",
             }}
           />
 
-          {/* glossy top highlight */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_38%_22%,rgba(255,255,255,0.85),transparent_55%)]" />
+          {/* sky reflection top */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_18%,rgba(255,255,255,0.85),transparent_55%)]" />
 
-          {/* speaking pulse */}
+          {/* speaking ripple */}
           {status === "speaking" && (
             <div
               className="absolute inset-0 animate-pulse"
               style={{
                 background:
-                  "radial-gradient(circle at 50% 70%, rgba(58,155,224,0.55), transparent 55%)",
+                  "radial-gradient(circle at 50% 60%, rgba(47,143,214,0.55), transparent 60%)",
                 animationDuration: "0.9s",
                 mixBlendMode: "multiply",
               }}
