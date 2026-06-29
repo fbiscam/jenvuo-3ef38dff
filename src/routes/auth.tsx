@@ -107,7 +107,7 @@ function AuthPage() {
 
 
       {/* RIGHT — Live Voice Agent orb */}
-      <div className="relative z-10 flex-1 min-h-[45vh] lg:min-h-screen overflow-hidden flex items-center justify-center bg-black lg:border-l border-white/10">
+      <div className="relative z-10 flex-1 min-h-screen overflow-hidden hidden lg:flex items-center justify-center bg-black lg:border-l border-white/10">
         <div className="absolute inset-0 flex items-center justify-center">
           <CloudOrb status="speaking" pulse={0} />
         </div>
