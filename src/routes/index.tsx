@@ -353,7 +353,7 @@ function FeatureGrid() {
             icon={<Target className="h-3 w-3" />}
             tag="A+ Only"
             title="Entry. Stop. Three TPs. Invalidation."
-            body="When the read is weak, the desk says stand aside. No noise, no FOMO."
+            body={<>When the read is weak, the desk says stand aside.<br />No noise, no FOMO.</>}
             tone="dark"
           />
         </div>
@@ -412,7 +412,7 @@ function SmallCard({
         <h3 className="mt-5 font-display font-semibold tracking-[-0.03em] text-[24px] leading-[1.1]">
           {title}
         </h3>
-        <p className={`mt-3 text-[14px] leading-relaxed ${dark ? "text-[color:var(--paper)]/60" : "text-[color:var(--void)] font-medium"}`}>
+        <p className={`mt-3 text-[14px] leading-relaxed ${dark ? "text-[color:var(--paper)]" : "text-[color:var(--void)] font-medium"}`}>
           {body}
         </p>
       </div>
