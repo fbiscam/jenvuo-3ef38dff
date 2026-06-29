@@ -880,9 +880,57 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       { label: "HTF Swing Low", price: swingLow, kind: "support" },
     ];
 
+    // ============ LOCAL ENRICHMENTS ============
+    const aiMarkings: Marking[] = Array.isArray(parsed.markings) ? parsed.markings : [];
+    const pdOte = buildPremiumDiscountAndOTE(htf, "htf", last.c);
+    const eqHL = [...detectEqualLevels(htf, "htf", dec), ...detectEqualLevels(ltf, "ltf", dec)];
+    const liqPools = [...detectLiquidityPools(htf, "htf"), ...detectLiquidityPools(ltf, "ltf")];
+    const allMarkings: Marking[] = [...pdOte, ...liqPools, ...eqHL, ...aiMarkings];
+
+    const htfBiasLocal: SignalPlan["htfBias"] =
+      parsed.htfBias === "bearish" ? "bearish" : parsed.htfBias === "bullish" ? "bullish" : "neutral";
+
+    const tradeFromAi = {
+      direction: (parsed?.trade?.direction === "SELL" ? "SELL" : parsed?.trade?.direction === "BUY" ? "BUY" : "WAIT") as "BUY" | "SELL" | "WAIT",
+      entry: Number(parsed?.trade?.entry ?? 0),
+      sl: Number(parsed?.trade?.sl ?? 0),
+      tp: Number(parsed?.trade?.tp ?? 0),
+      rr: Number(parsed?.trade?.rr ?? 0),
+      confidence: Math.max(0, Math.min(100, Number(parsed?.trade?.confidence ?? 0))),
+      summary: String(parsed?.trade?.summary ?? ""),
+      invalidation: String(parsed?.trade?.invalidation ?? ""),
+    };
+
+    // Multi-TF bias
+    const multiTf: TfBias[] = [
+      computeTfBias(h4Raw.length ? h4Raw : htf, "4H"),
+      computeTfBias(htf, "1H"),
+      computeTfBias(ltf, "15M"),
+      computeTfBias(m5Raw.length ? m5Raw : ltf, "5M"),
+    ];
+    const avgScore = Math.round(multiTf.reduce((s, b) => s + b.score, 0) / multiTf.length);
+    const alignmentScore = avgScore;
+    const alignmentLabel =
+      avgScore >= 70 ? "Strong Bullish Alignment" :
+      avgScore >= 58 ? "Mild Bullish Alignment" :
+      avgScore <= 30 ? "Strong Bearish Alignment" :
+      avgScore <= 42 ? "Mild Bearish Alignment" :
+      "Mixed / Choppy";
+
+    // Setup score
+    const { score: setupScore, grade: setupGrade, checks: setupChecks } = computeSetupScore({
+      trade: tradeFromAi,
+      htfBias: htfBiasLocal,
+      killzone,
+      markings: allMarkings,
+      lastPrice: last.c,
+      htfEq: equilibrium,
+      imminentHighNews: !!imminentHigh,
+    });
+
     const plan: SignalPlan = {
-      htfBias: parsed.htfBias === "bearish" ? "bearish" : parsed.htfBias === "bullish" ? "bullish" : "neutral",
-      intro: String(parsed.intro ?? "Let's break down the live gold chart together."),
+      htfBias: htfBiasLocal,
+      intro: String(parsed.intro ?? "Let's break down the live chart together."),
       htfNarrative: String(parsed.htfNarrative ?? ""),
       ltfNarrative: String(parsed.ltfNarrative ?? ""),
       confluences: Array.isArray(parsed.confluences) ? parsed.confluences.map(String).slice(0, 12) : [],
@@ -900,20 +948,17 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
             tf: n?.tf === "htf" ? "htf" : "ltf",
           }))
         : [],
-      markings: Array.isArray(parsed.markings) ? parsed.markings : [],
-      trade: {
-        direction: parsed?.trade?.direction === "SELL" ? "SELL" : parsed?.trade?.direction === "BUY" ? "BUY" : "WAIT",
-        entry: Number(parsed?.trade?.entry ?? 0),
-        sl: Number(parsed?.trade?.sl ?? 0),
-        tp: Number(parsed?.trade?.tp ?? 0),
-        rr: Number(parsed?.trade?.rr ?? 0),
-        confidence: Math.max(0, Math.min(100, Number(parsed?.trade?.confidence ?? 0))),
-        summary: String(parsed?.trade?.summary ?? ""),
-        invalidation: String(parsed?.trade?.invalidation ?? ""),
-      },
+      markings: allMarkings,
+      trade: tradeFromAi,
       session,
       killzone,
       newsRisk: { severity: newsSeverity, warning: newsWarning, events: upcomingNews },
+      multiTf,
+      alignmentScore,
+      alignmentLabel,
+      setupScore,
+      setupGrade,
+      setupChecks,
       generatedAt: new Date().toISOString(),
       htfCandles: htf.map(toDTO),
       ltfCandles: ltf.map(toDTO),
