@@ -54,14 +54,17 @@ function AuthPage() {
     };
   }, [navigate]);
 
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
+    setErrorMsg(null);
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      toast.error(error.message);
+      setErrorMsg(error.message);
       return;
     }
     navigate({ to: "/app", replace: true });
