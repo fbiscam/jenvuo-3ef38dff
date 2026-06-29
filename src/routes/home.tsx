@@ -11,40 +11,47 @@ const FEATURES = [
   {
     img: featVoice,
     tag: "Voice Agent",
+    color: "#4285F4",
     title: "Speak. Hear. Trade.",
     body: "Push-to-talk Jarvis-style agent that listens, reasons and narrates institutional setups in real time.",
   },
   {
     img: featSignal,
     tag: "Signal Engine",
+    color: "#EA4335",
     title: "ICT & SMC, drawn live.",
     body: "Fair value gaps, order blocks, liquidity sweeps, BOS/CHoCH and OTE entries rendered on the chart.",
   },
   {
     img: featAssets,
     tag: "Multi-Asset",
+    color: "#FBBC05",
     title: "Any market. A to Z.",
     body: "Gold, Crypto, Forex majors, Indices and global equities — one engine, every session.",
   },
   {
     img: featNews,
     tag: "News & Killzones",
+    color: "#34A853",
     title: "Context that matters.",
     body: "High-impact economic events, DXY context and London / New York killzone awareness baked into every call.",
   },
   {
     img: featBrain,
     tag: "Reasoning",
+    color: "#4285F4",
     title: "25-year desk logic.",
     body: "An institutional reasoning model trained on bias, structure, premium/discount and liquidity playbooks.",
   },
   {
     img: featTarget,
     tag: "A+ Setups",
+    color: "#EA4335",
     title: "Entry. Stop. Three TPs.",
     body: "Honest output with invalidation levels — when conditions are weak, the agent tells you to stand aside.",
   },
 ];
+
 
 
 export const Route = createFileRoute("/home")({
@@ -83,7 +90,12 @@ function HomePage() {
       <main className="flex flex-col items-center justify-center px-6 min-h-[calc(100dvh-72px)]">
 
         <h1 className="text-7xl sm:text-8xl lg:text-9xl font-black tracking-[-0.04em] text-center">
-          JENVU<span className="text-black/30"> AI</span>
+          <span style={{ color: "#4285F4" }}>J</span>
+          <span style={{ color: "#EA4335" }}>E</span>
+          <span style={{ color: "#FBBC05" }}>N</span>
+          <span style={{ color: "#4285F4" }}>V</span>
+          <span style={{ color: "#34A853" }}>U</span>
+          <span className="text-black/30"> AI</span>
         </h1>
         <p className="mt-5 text-center text-black/55 text-base sm:text-lg max-w-xl">
           Speak the asset. Hear the setup. Institutional voice intelligence.
@@ -92,9 +104,15 @@ function HomePage() {
         {/* Search-style CTA */}
         <Link
           to="/"
-          className="mt-10 group w-full max-w-xl flex items-center gap-3 rounded-full border border-black/15 bg-white px-5 py-4 shadow-[0_1px_6px_rgba(32,33,36,0.08)] hover:shadow-[0_2px_12px_rgba(32,33,36,0.18)] transition"
+          className="mt-10 group w-full max-w-xl flex items-center gap-3 rounded-full border border-black/15 bg-white px-5 py-4 shadow-[0_1px_6px_rgba(32,33,36,0.08)] hover:shadow-[0_2px_12px_rgba(32,33,36,0.18)] hover:border-transparent transition relative"
+          style={{
+            backgroundImage:
+              "linear-gradient(white, white), linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853)",
+            backgroundOrigin: "border-box",
+            backgroundClip: "padding-box, border-box",
+          }}
         >
-          <Mic className="h-5 w-5 text-black/60" />
+          <Mic className="h-5 w-5" style={{ color: "#4285F4" }} />
           <span className="flex-1 text-black/55 text-base">
             Ask Jenvu — "Analyze Gold", "Show me Bitcoin"…
           </span>
@@ -104,7 +122,8 @@ function HomePage() {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
             to="/"
-            className="rounded-md bg-[#f8f9fa] hover:bg-white hover:shadow-sm border border-transparent hover:border-black/15 px-5 py-2.5 text-sm font-medium text-black/80 transition"
+            className="rounded-md text-white px-5 py-2.5 text-sm font-medium hover:shadow-md transition"
+            style={{ backgroundColor: "#4285F4" }}
           >
             Launch Voice Agent
           </Link>
@@ -116,17 +135,18 @@ function HomePage() {
           </Link>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] uppercase tracking-[0.25em] text-black/40 font-semibold">
-          <span>ICT</span>
-          <span>·</span>
-          <span>SMC</span>
-          <span>·</span>
-          <span>Killzones</span>
-          <span>·</span>
-          <span>Liquidity</span>
-          <span>·</span>
-          <span>Multi-Asset</span>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] uppercase tracking-[0.25em] font-semibold">
+          <span style={{ color: "#4285F4" }}>ICT</span>
+          <span className="text-black/30">·</span>
+          <span style={{ color: "#EA4335" }}>SMC</span>
+          <span className="text-black/30">·</span>
+          <span style={{ color: "#FBBC05" }}>Killzones</span>
+          <span className="text-black/30">·</span>
+          <span style={{ color: "#34A853" }}>Liquidity</span>
+          <span className="text-black/30">·</span>
+          <span style={{ color: "#4285F4" }}>Multi-Asset</span>
         </div>
+
       </main>
 
       {/* FEATURES */}
@@ -155,9 +175,14 @@ function HomePage() {
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
                   />
                 </div>
-                <div className="mt-5 text-[11px] uppercase tracking-[0.25em] font-bold text-black/45">
+                <div
+                  className="mt-5 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] font-bold"
+                  style={{ color: f.color }}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: f.color }} />
                   {f.tag}
                 </div>
+
                 <h3 className="mt-2 text-xl font-black tracking-tight">
                   {f.title}
                 </h3>
