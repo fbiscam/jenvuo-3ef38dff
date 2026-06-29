@@ -400,6 +400,8 @@ export type SignalPlan = {
   htfCandles: CandleDTO[];
   ltfCandles: CandleDTO[];
   currentPrice: number;
+  instrument: { symbol: string; display: string; kind: InstrumentKind; decimals: number };
+
 };
 
 
