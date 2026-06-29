@@ -8,6 +8,7 @@ import { getSignalPlan, getLiveTick, getNewsRisk, type SignalPlan } from "@/lib/
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
+import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { cn } from "@/lib/utils";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
