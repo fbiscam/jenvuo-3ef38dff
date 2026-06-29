@@ -129,6 +129,15 @@ function Home() {
 
   const handleCommand = useCallback(async (query: string) => {
     if (loadingRef.current || !query.trim()) return;
+
+    // Signal/setup/trade intent → navigate to /signal page
+    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analy[sz]e\s*gold|gold\s*(signal|setup|entry|trade|plan)|live\s*chart|show\s*chart|new\s*signal)\b/i.test(query)) {
+      speech.stopSpeaking();
+      speech.pauseListening();
+      navigate({ to: "/signal" });
+      return;
+    }
+
     loadingRef.current = true;
     setLoading(true);
     speech.pauseListening();
@@ -151,7 +160,7 @@ function Home() {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [analyze, speech, timeframe]);
+  }, [analyze, speech, timeframe, navigate]);
 
   // Accumulate final transcripts into a buffer while listening (do NOT send yet)
   useEffect(() => {
