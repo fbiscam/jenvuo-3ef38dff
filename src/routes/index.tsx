@@ -285,7 +285,7 @@ function HomePage() {
       </section>
 
       {/* TERMINAL WORKSTATION */}
-      <section className="mx-auto max-w-6xl px-5 pt-0 pb-14 sm:px-6 sm:pt-0 sm:pb-20">
+      <section className="mx-auto max-w-6xl px-5 -mt-4 pb-14 sm:px-6 sm:-mt-6 sm:pb-20">
         <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
           {/* terminal header */}
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
