@@ -47,7 +47,7 @@ function AuthPage() {
   return (
     <div
       className="relative min-h-screen w-full flex flex-col lg:flex-row overflow-hidden"
-      style={{ fontFamily: "'Manrope', system-ui, sans-serif", background: "#f5f3ee", color: "#2d2d2d" }}
+      style={{ fontFamily: "'Manrope', system-ui, sans-serif", background: "#ffffff", color: "#2d2d2d" }}
     >
 
       {/* LEFT — Login (Paper & Ink) */}
@@ -67,7 +67,7 @@ function AuthPage() {
         <div className="relative flex items-center justify-between">
           <a href="/" className="flex items-center gap-2.5">
             <span
-              className="grid place-items-center h-7 w-7 rounded-md text-[#f5f3ee] font-black"
+              className="grid place-items-center h-7 w-7 rounded-md text-[#ffffff] font-black"
               style={{ background: "#0d0d0d", fontSize: 13, letterSpacing: "-0.05em", fontFamily: "'Sora', sans-serif" }}
             >
               J
@@ -84,7 +84,7 @@ function AuthPage() {
         {/* form */}
         <div className="relative flex-1 flex items-center">
           <div className="w-full max-w-md mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#2d2d2d]/15 bg-[#f5f3ee] text-[11px] uppercase tracking-[0.22em] font-bold text-[#2d2d2d]/70">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#2d2d2d]/15 bg-[#ffffff] text-[11px] uppercase tracking-[0.22em] font-bold text-[#2d2d2d]/70">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-60" />
                 <span className="relative rounded-full bg-emerald-500 h-1.5 w-1.5" />
@@ -117,7 +117,7 @@ function AuthPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-2xl bg-[#f5f3ee] border border-[#2d2d2d]/15 pl-11 pr-4 py-3.5 text-[15px] text-[#0d0d0d] outline-none focus:border-[#0d0d0d] focus:bg-white transition placeholder:text-[#2d2d2d]/35"
+                    className="w-full rounded-2xl bg-[#ffffff] border border-[#2d2d2d]/15 pl-11 pr-4 py-3.5 text-[15px] text-[#0d0d0d] outline-none focus:border-[#0d0d0d] focus:bg-white transition placeholder:text-[#2d2d2d]/35"
                     placeholder="you@example.com"
                   />
                 </div>
@@ -135,7 +135,7 @@ function AuthPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-2xl bg-[#f5f3ee] border border-[#2d2d2d]/15 pl-11 pr-4 py-3.5 text-[15px] text-[#0d0d0d] outline-none focus:border-[#0d0d0d] focus:bg-white transition placeholder:text-[#2d2d2d]/35"
+                    className="w-full rounded-2xl bg-[#ffffff] border border-[#2d2d2d]/15 pl-11 pr-4 py-3.5 text-[15px] text-[#0d0d0d] outline-none focus:border-[#0d0d0d] focus:bg-white transition placeholder:text-[#2d2d2d]/35"
                     placeholder="••••••••"
                   />
                 </div>
@@ -144,7 +144,7 @@ function AuthPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group w-full mt-2 rounded-full py-4 text-[14px] font-semibold text-[#f5f3ee] bg-[#0d0d0d] hover:opacity-90 disabled:opacity-60 transition inline-flex items-center justify-center gap-2"
+                className="group w-full mt-2 rounded-full py-4 text-[14px] font-semibold text-[#ffffff] bg-[#0d0d0d] hover:opacity-90 disabled:opacity-60 transition inline-flex items-center justify-center gap-2"
               >
                 {loading ? "Signing in…" : (<>Sign in <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" /></>)}
               </button>
