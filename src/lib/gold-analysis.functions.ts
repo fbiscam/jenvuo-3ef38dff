@@ -32,32 +32,95 @@ const YAHOO_INTERVAL: Record<string, { interval: string; range: string }> = {
   "1d": { interval: "1d", range: "1y" },
 };
 
-async function fetchGoldCandles(tf: string): Promise<Candle[]> {
+const candleCache = new Map<string, { at: number; data: Candle[] }>();
+const CACHE_TTL = 60_000; // 1 minute
+
+async function fetchFromYahoo(tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=${cfg.interval}&range=${cfg.range}`;
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-    },
+  const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
+  const symbols = ["GC=F", "XAUUSD=X"];
+  let lastErr: any = null;
+  for (const host of hosts) {
+    for (const sym of symbols) {
+      try {
+        const url = `https://${host}/v8/finance/chart/${sym}?interval=${cfg.interval}&range=${cfg.range}`;
+        const res = await fetch(url, {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+            Accept: "application/json",
+          },
+        });
+        if (!res.ok) {
+          lastErr = new Error(`Yahoo ${host}/${sym}: ${res.status}`);
+          continue;
+        }
+        const json: any = await res.json();
+        const result = json?.chart?.result?.[0];
+        if (!result) {
+          lastErr = new Error("No price data");
+          continue;
+        }
+        const ts: number[] = result.timestamp ?? [];
+        const q = result.indicators?.quote?.[0] ?? {};
+        const candles: Candle[] = [];
+        for (let i = 0; i < ts.length; i++) {
+          const o = q.open?.[i],
+            h = q.high?.[i],
+            l = q.low?.[i],
+            c = q.close?.[i],
+            v = q.volume?.[i] ?? 0;
+          if (o == null || h == null || l == null || c == null) continue;
+          candles.push({ t: ts[i] * 1000, o, h, l, c, v });
+        }
+        if (candles.length >= 10) return candles.slice(-120);
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+  }
+  throw lastErr ?? new Error("Yahoo unavailable");
+}
+
+async function fetchFromStooq(): Promise<Candle[]> {
+  // Daily fallback only
+  const res = await fetch("https://stooq.com/q/d/l/?s=xauusd&i=d", {
+    headers: { "User-Agent": "Mozilla/5.0" },
   });
-  if (!res.ok) throw new Error(`Price feed failed: ${res.status}`);
-  const json: any = await res.json();
-  const result = json?.chart?.result?.[0];
-  if (!result) throw new Error("No price data returned");
-  const ts: number[] = result.timestamp ?? [];
-  const q = result.indicators?.quote?.[0] ?? {};
+  if (!res.ok) throw new Error(`Stooq: ${res.status}`);
+  const text = await res.text();
+  const lines = text.trim().split("\n").slice(1);
   const candles: Candle[] = [];
-  for (let i = 0; i < ts.length; i++) {
-    const o = q.open?.[i],
-      h = q.high?.[i],
-      l = q.low?.[i],
-      c = q.close?.[i],
-      v = q.volume?.[i] ?? 0;
-    if (o == null || h == null || l == null || c == null) continue;
-    candles.push({ t: ts[i] * 1000, o, h, l, c, v });
+  for (const line of lines) {
+    const [date, o, h, l, c, v] = line.split(",");
+    const t = new Date(date).getTime();
+    const oN = +o, hN = +h, lN = +l, cN = +c;
+    if (!isFinite(oN) || !isFinite(cN)) continue;
+    candles.push({ t, o: oN, h: hN, l: lN, c: cN, v: +v || 0 });
   }
   return candles.slice(-120);
+}
+
+async function fetchGoldCandles(tf: string): Promise<Candle[]> {
+  const cached = candleCache.get(tf);
+  const now = Date.now();
+  if (cached && now - cached.at < CACHE_TTL) return cached.data;
+  try {
+    const data = await fetchFromYahoo(tf);
+    candleCache.set(tf, { at: now, data });
+    return data;
+  } catch (e) {
+    // Stale cache fallback
+    if (cached) return cached.data;
+    // Last-resort daily fallback
+    try {
+      const data = await fetchFromStooq();
+      candleCache.set(tf, { at: now, data });
+      return data;
+    } catch {
+      throw e;
+    }
+  }
 }
 
 export const analyzeGold = createServerFn({ method: "POST" })
