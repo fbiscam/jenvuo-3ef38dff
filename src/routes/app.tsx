@@ -367,11 +367,14 @@ function Home() {
     <div className={cn(`h-dvh w-full overflow-hidden flex flex-col ${SANS} antialiased`, "bg-white text-zinc-900")}>
       {/* HEADER (matches homepage) */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md shrink-0">
-        <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
+        <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:grid-cols-[1fr_auto_1fr] md:gap-4">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
             <span className="truncate font-semibold tracking-tight">JENVU AI</span>
           </Link>
+          <div className="hidden md:flex justify-center">
+            <StatusPill status={status} supported={speech.supported} dark={false} />
+          </div>
           <div className="flex shrink-0 items-center gap-2">
             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase text-zinc-900`}>
               <span className="relative flex h-1.5 w-1.5">
