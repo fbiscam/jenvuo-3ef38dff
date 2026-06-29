@@ -200,7 +200,7 @@ function Home() {
 
         </div>
 
-        {signal && (
+        {signal && signal.direction !== "WAIT" && signal.confidence > 0 && (
           <aside className="w-full lg:w-[380px] lg:max-w-[380px] shrink-0 space-y-4">
             <SignalCard signal={signal} />
           </aside>
