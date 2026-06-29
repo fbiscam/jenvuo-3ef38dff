@@ -455,8 +455,7 @@ function HomePage() {
       {/* DESK LOGIC */}
       <section className="border-t border-zinc-100 bg-zinc-50/40">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <SectionLabel>{"\n"}</SectionLabel>
-          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
             The frameworks JENVU thinks in.
           </h2>
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
