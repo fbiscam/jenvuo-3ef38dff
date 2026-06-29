@@ -243,7 +243,7 @@ Respond conversationally in spokenSummary. Set direction to "WAIT" and confidenc
       spokenSummary: String(parsed.spokenSummary ?? "Analysis complete."),
       fullAnalysis: String(parsed.fullAnalysis ?? ""),
       timeframe: data.timeframe,
-      currentPrice: last.c,
+      currentPrice: last?.c ?? 0,
       generatedAt: new Date().toISOString(),
     };
 
