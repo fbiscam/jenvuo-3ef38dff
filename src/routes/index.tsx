@@ -722,6 +722,15 @@ function HomePage() {
                   q: "Does it work on mobile?",
                   a: "Yes. The voice loop, signal engine and charts are fully responsive on phones and tablets.",
                 },
+                {
+                  q: "How accurate are the signals?",
+                  a: "Every setup is confluence-graded across ICT, SMC, liquidity and news context. JENVU only narrates A+ setups — when conditions don't align, it stays silent instead of forcing trades.",
+                },
+                {
+                  q: "Do I need trading experience to use it?",
+                  a: "No. JENVU explains its reasoning in plain English — bias, structure, entry, stop and target — so beginners learn the logic while pros get an institutional second opinion.",
+                },
+
               ].map((f) => (
                 <details key={f.q} className="group py-5">
                   <summary className="flex items-center justify-between cursor-pointer list-none">
