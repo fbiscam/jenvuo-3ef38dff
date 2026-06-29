@@ -212,31 +212,52 @@ function FeatureList() {
 
   return (
     <section>
-      <div className="mx-auto max-w-[1100px] px-6 py-28">
+      <div className="mx-auto max-w-[1320px] px-6 py-28">
         <SectionHead title={<><span className="block">An entire trading floor,</span><span className="block">condensed into a voice.</span></>} />
 
-        <div className="mt-20 space-y-16">
+        <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((f, i) => (
-            <div key={f.tag} className="grid lg:grid-cols-12 gap-6 lg:gap-10 items-baseline">
-              <div className="lg:col-span-3 flex items-center gap-3" style={{ color: VOID }}>
-                <span className="font-mono text-[12px] opacity-50" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+            <div
+              key={f.tag}
+              className="group relative rounded-3xl border border-black/10 bg-white p-7 hover:border-black/30 transition shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]"
+            >
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-[color:var(--void)] text-white">
+                  {f.icon}
+                </span>
+                <span className="font-mono text-[11px] opacity-50" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                   0{i + 1}
                 </span>
-                <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-bold">
-                  {f.icon}
-                  {f.tag}
-                </span>
               </div>
-              <div className="lg:col-span-9">
-                <h3 className="font-display font-semibold tracking-[-0.03em] text-[28px] lg:text-[34px] leading-[1.1]" style={{ color: VOID }}>
-                  {f.title}
-                </h3>
-                <p className="mt-3 text-[15px] leading-relaxed max-w-2xl" style={{ color: VOID }}>
-                  {f.body}
-                </p>
+              <div className="mt-6 text-[10px] uppercase tracking-[0.25em] font-bold" style={{ color: VOID }}>
+                {f.tag}
               </div>
+              <h3 className="mt-3 font-display font-semibold tracking-[-0.025em] text-[22px] leading-[1.15]" style={{ color: VOID }}>
+                {f.title}
+              </h3>
+              <p className="mt-3 text-[14px] leading-relaxed" style={{ color: VOID }}>
+                {f.body}
+              </p>
             </div>
           ))}
+
+          <Link
+            to="/app"
+            className="group relative rounded-3xl p-7 bg-[color:var(--void)] text-white flex flex-col justify-between min-h-[240px] hover:opacity-95 transition"
+          >
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-white text-[color:var(--void)]">
+                <ArrowUpRight className="h-4 w-4" />
+              </span>
+              <span className="font-mono text-[11px] opacity-50" style={{ fontFamily: "'JetBrains Mono', monospace" }}>→</span>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.25em] font-bold opacity-70">Try it</div>
+              <h3 className="mt-3 font-display font-semibold tracking-[-0.025em] text-[22px] leading-[1.15]">
+                Launch the voice agent.
+              </h3>
+            </div>
+          </Link>
         </div>
       </div>
     </section>
@@ -255,13 +276,13 @@ function Manifesto() {
           Most AI guesses. <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>This one reasons.</span>
         </h2>
 
-        <div className="mt-16 grid lg:grid-cols-3 gap-12">
+        <div className="mt-16 grid lg:grid-cols-3 gap-5">
           {[
             { n: "01", t: "Voice-native, not chatbot-bolted", b: "Designed for spoken conversation — the rhythm of a real desk analyst beside you." },
             { n: "02", t: "Institutional logic, not retail noise", b: "ICT, SMC, Wyckoff, liquidity and killzones — the playbooks proprietary desks run." },
             { n: "03", t: "Honest by design", b: "When confluences are weak, Jenvu tells you to wait. No invented setups, no FOMO." },
           ].map((row) => (
-            <div key={row.n}>
+            <div key={row.n} className="rounded-3xl border border-black/10 bg-white p-7 hover:border-black/30 transition shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]">
               <div className="font-mono text-[12px] font-bold tracking-[0.25em]" style={{ color: VOID, fontFamily: "'JetBrains Mono', monospace" }}>{row.n}</div>
               <h3 className="mt-4 font-display text-[22px] font-semibold tracking-tight" style={{ color: VOID }}>{row.t}</h3>
               <p className="mt-3 text-[15px] leading-relaxed" style={{ color: VOID }}>{row.b}</p>
@@ -288,12 +309,12 @@ function Process() {
       <div className="mx-auto max-w-[1100px] px-6 py-28">
         <SectionHead title={<>Three steps. <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>Zero friction.</span></>} />
 
-        <div className="mt-16 grid lg:grid-cols-3 gap-12">
+        <div className="mt-16 grid lg:grid-cols-3 gap-5">
           {steps.map((s) => (
-            <div key={s.n}>
+            <div key={s.n} className="rounded-3xl border border-black/10 bg-white p-8 hover:border-black/30 transition shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]">
               <div className="font-mono text-[12px] font-bold tracking-[0.25em]" style={{ color: VOID, fontFamily: "'JetBrains Mono', monospace" }}>{s.n}</div>
               <h3 className="mt-4 font-display font-semibold tracking-[-0.03em] text-[36px] leading-none" style={{ color: VOID }}>{s.t}</h3>
-              <p className="mt-5 text-[15px] leading-relaxed max-w-xs" style={{ color: VOID }}>{s.b}</p>
+              <p className="mt-5 text-[15px] leading-relaxed" style={{ color: VOID }}>{s.b}</p>
             </div>
           ))}
         </div>
@@ -316,11 +337,11 @@ function Coverage() {
           Crypto via Binance, traditional markets via Yahoo Finance, news via an economic calendar feed.
           Symbol coverage expands continuously.
         </p>
-        <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3">
+        <div className="mt-12 flex flex-wrap gap-2.5">
           {assets.map((a) => (
             <span
               key={a}
-              className="inline-flex items-center gap-2 text-[13px] font-semibold tracking-tight"
+              className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-[13px] font-semibold tracking-tight hover:border-black/30 transition"
               style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.01em", color: VOID }}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
