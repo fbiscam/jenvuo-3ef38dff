@@ -280,7 +280,7 @@ function SignalPage() {
 
   const livePrice = useLivePriceStream(plan?.instrument.symbol, plan?.currentPrice ?? null, handleStreamTick);
 
-  }, [plan]);
+
 
   /* ---------- R-MULTIPLE ---------- */
   const rMultiple = useMemo(() => {
