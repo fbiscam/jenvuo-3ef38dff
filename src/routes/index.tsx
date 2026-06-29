@@ -598,7 +598,7 @@ function HomePage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <h3 className="text-xl font-semibold tracking-tight text-zinc-900">
-                Wired into the venues that move price.
+                Wired into the venues&nbsp;
               </h3>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3">
