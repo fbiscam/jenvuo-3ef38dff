@@ -297,7 +297,7 @@ function SignalPage() {
               </ul>
             </div>
           )}
-          {!plan && !loading && <div className="text-sm opacity-60 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading live gold data…</div>}
+          {!plan && !loading && <div className="text-sm opacity-60 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading live {currentAsset.short} data…</div>}
 
 
           {plan && (
