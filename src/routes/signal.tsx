@@ -27,6 +27,20 @@ export const Route = createFileRoute("/signal")({
 });
 
 /* ---------- helpers ---------- */
+function isCryptoSymbol(sym: string): boolean {
+  const s = sym.toUpperCase();
+  return /(BTC|ETH|SOL|XRP|DOGE|BNB|ADA|USDT|USDC|LTC|AVAX|MATIC|DOT|LINK|TRX|SHIB|TON)/.test(s);
+}
+function isMarketOpen(sym: string, d: Date = new Date()): boolean {
+  if (isCryptoSymbol(sym)) return true;
+  // Forex / metals / indices: closed Fri 21:00 UTC → Sun 22:00 UTC
+  const day = d.getUTCDay(); // 0 Sun .. 6 Sat
+  const h = d.getUTCHours();
+  if (day === 6) return false;
+  if (day === 5 && h >= 21) return false;
+  if (day === 0 && h < 22) return false;
+  return true;
+}
 function tagOf(text: string): { tag: string; tone: "violet" | "blue" | "emerald" | "amber" | "rose" | "zinc" } {
   const t = text.toLowerCase();
   if (/\bfvg|fair\s*value\s*gap\b/.test(t)) return { tag: "FVG", tone: "violet" };
