@@ -602,7 +602,7 @@ function HomePage() {
               </h3>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              {["Binance", "Yahoo Finance", "Stooq", "Forex Factory", "TradingView", "PAXG", "OANDA", "DXY"].map((n) => (
+              {["Binance", "Yahoo Finance", "Forex Factory", "TradingView", "OANDA", "DXY"].map((n) => (
                 <span
                   key={n}
                   className={`rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider text-zinc-900`}
@@ -622,7 +622,7 @@ function HomePage() {
           <div className="grid gap-10 lg:grid-cols-12">
             <div className="lg:col-span-4">
               <h2 className="text-3xl font-semibold tracking-tight">Asked often.</h2>
-              <p className="mt-3 text-zinc-900">Everything else lives in the docs and disclaimer.</p>
+              <p className="mt-3 text-zinc-900">Everything else lives in the docs&nbsp;</p>
             </div>
             <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
               {[
