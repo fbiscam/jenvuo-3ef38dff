@@ -6,26 +6,44 @@ export function useSpeech() {
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [transcriptId, setTranscriptId] = useState(0);
   const [interim, setInterim] = useState("");
   const [supported, setSupported] = useState(true);
+  const [needsGesture, setNeedsGesture] = useState(false);
   const recognitionRef = useRef<SR | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const wantListeningRef = useRef(false);
   const startingRef = useRef(false);
+  const pausedRef = useRef(false);
+  const restartTimerRef = useRef<number | null>(null);
 
-  const safeStart = useCallback(() => {
+  const safeStart = useCallback((deferred = false) => {
     if (startingRef.current) return;
     startingRef.current = true;
-    window.setTimeout(() => {
+    const run = () => {
       try {
         recognitionRef.current?.start();
+        setNeedsGesture(false);
         setListening(true);
-      } catch {
-        /* already started or permission pending */
+      } catch (error: any) {
+        const name = String(error?.name || error?.message || "").toLowerCase();
+        if (name.includes("notallowed") || name.includes("permission")) {
+          wantListeningRef.current = false;
+          setNeedsGesture(true);
+          setListening(false);
+        }
+        // InvalidStateError means it is already running — keep the UI active.
+        if (name.includes("invalidstate")) setListening(true);
       } finally {
         startingRef.current = false;
       }
-    }, 120);
+    };
+    if (deferred) {
+      restartTimerRef.current = window.setTimeout(run, 220);
+    } else {
+      // Initial start must happen inside the direct click/tap handler.
+      run();
+    }
   }, []);
 
   useEffect(() => {
@@ -54,14 +72,15 @@ export function useSpeech() {
       if (finalText.trim()) {
         setInterim("");
         setTranscript(finalText.trim());
+        setTranscriptId((id) => id + 1);
       }
     };
     rec.onstart = () => setListening(true);
     rec.onend = () => {
       // auto-restart if user still wants to listen (continuous mode)
-      if (wantListeningRef.current) {
+      if (wantListeningRef.current && !pausedRef.current) {
         // keep UI in "listening" — don't flicker to Standby between restarts
-        safeStart();
+        safeStart(true);
       } else {
         setListening(false);
       }
@@ -69,6 +88,7 @@ export function useSpeech() {
     rec.onerror = (e: any) => {
       if (e?.error === "not-allowed" || e?.error === "service-not-allowed") {
         wantListeningRef.current = false;
+        setNeedsGesture(true);
         setListening(false);
       } else if (e?.error === "no-speech" || e?.error === "aborted" || e?.error === "network") {
         // transient — let onend handle restart
@@ -92,32 +112,39 @@ export function useSpeech() {
 
     return () => {
       wantListeningRef.current = false;
+      if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
       try { rec.stop(); } catch { /* ignore */ }
     };
-  }, []);
+  }, [safeStart]);
 
   const startListening = useCallback(() => {
     wantListeningRef.current = true;
+    pausedRef.current = false;
+    setNeedsGesture(false);
     setTranscript("");
     setInterim("");
-    safeStart();
+    safeStart(false);
   }, [safeStart]);
 
   const stopListening = useCallback(() => {
     wantListeningRef.current = false;
+    pausedRef.current = false;
+    if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
     try { recognitionRef.current?.stop(); } catch { /* ignore */ }
     setListening(false);
   }, []);
 
   // Pause listening during TTS, then resume if continuous mode was on
   const pauseListening = useCallback(() => {
+    pausedRef.current = true;
     try { recognitionRef.current?.stop(); } catch { /* ignore */ }
     setListening(false);
   }, []);
 
   const resumeIfWanted = useCallback(() => {
     if (wantListeningRef.current) {
-      safeStart();
+      pausedRef.current = false;
+      safeStart(true);
     }
   }, [safeStart]);
 
@@ -141,7 +168,7 @@ export function useSpeech() {
   }, []);
 
   return {
-    listening, speaking, transcript, interim, supported,
+    listening, speaking, transcript, transcriptId, interim, supported, needsGesture,
     startListening, stopListening, pauseListening, resumeIfWanted,
     speak, stopSpeaking, setTranscript,
     isContinuous: () => wantListeningRef.current,
