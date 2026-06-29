@@ -109,20 +109,28 @@ function SignalPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setPipeline(0);
     abortRef.current = true;
     speech.stopSpeaking();
+    // Animate pipeline while AI is thinking
+    const pipeTimer = setInterval(() => {
+      setPipeline((s) => (s < PIPELINE_STEPS.length - 1 ? s + 1 : s));
+    }, 700);
     try {
-      const p = await fetchPlan({ data: {} });
+      const p = await fetchPlan({ data: { htfTf, ltfTf } });
+      setPipeline(PIPELINE_STEPS.length);
       setPlan(p);
-      // run narration after small delay so chart mounts
+      setLivePrice(p.currentPrice);
       setTimeout(() => runNarration(p), 400);
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
+      setPipeline(-1);
     } finally {
+      clearInterval(pipeTimer);
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchPlan, runNarration]);
+  }, [fetchPlan, runNarration, htfTf, ltfTf]);
 
   useEffect(() => {
     if (authReady && !plan && !loading) load();
@@ -132,6 +140,29 @@ function SignalPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authReady]);
+
+  // Live price ticker (polls every 30s via Binance PAXG)
+  useEffect(() => {
+    if (!plan) return;
+    let alive = true;
+    const tick = async () => {
+      try {
+        const r = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT");
+        if (!r.ok) return;
+        const j = await r.json();
+        const p = parseFloat(j.price);
+        if (!isFinite(p) || !alive) return;
+        setLivePrice((prev) => {
+          if (prev != null) setPriceDelta(p - prev);
+          return p;
+        });
+      } catch {}
+    };
+    tick();
+    const id = setInterval(tick, 30000);
+    return () => { alive = false; clearInterval(id); };
+  }, [plan]);
+
 
   const stop = () => {
     abortRef.current = true;
