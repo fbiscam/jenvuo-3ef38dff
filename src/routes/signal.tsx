@@ -38,13 +38,22 @@ function tagOf(text: string): { tag: string; tone: "violet" | "blue" | "emerald"
   return { tag: "NOTE", tone: "zinc" };
 }
 const toneClass: Record<string, string> = {
-  violet: "bg-violet-100 text-violet-700",
-  blue: "bg-sky-100 text-sky-700",
-  emerald: "bg-emerald-100 text-emerald-700",
-  amber: "bg-amber-100 text-amber-700",
-  rose: "bg-rose-100 text-rose-700",
-  zinc: "bg-zinc-100 text-zinc-700",
+  violet: "bg-emerald-500 text-white",
+  blue: "bg-zinc-900 text-white",
+  emerald: "bg-zinc-100 text-zinc-700 border border-zinc-200",
+  amber: "bg-zinc-900 text-white",
+  rose: "bg-zinc-900 text-white",
+  zinc: "bg-zinc-100 text-zinc-700 border border-zinc-200",
 };
+const toneCardClass: Record<string, string> = {
+  violet: "bg-emerald-50/60 border-emerald-100",
+  blue: "bg-white border-zinc-200",
+  emerald: "bg-white border-zinc-200",
+  amber: "bg-white border-zinc-200",
+  rose: "bg-white border-zinc-200",
+  zinc: "bg-white border-zinc-200",
+};
+
 function hhmmss(d = new Date()): string {
   return d.toTimeString().slice(0, 8);
 }
