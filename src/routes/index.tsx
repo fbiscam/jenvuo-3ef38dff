@@ -281,16 +281,16 @@ function StatusPill({ status, supported }: { status: "idle" | "listening" | "thi
   );
 }
 
-function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "speaking" }) {
-  const scale =
+function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "thinking" | "speaking"; pulse?: number }) {
+  const speaking = status === "speaking";
+  // each word bumps `pulse` → cycle a hue offset and a tiny scale kick
+  const hueShift = (pulse * 47) % 360;
+  const kick = speaking ? 1 + ((pulse % 2) === 0 ? 0.04 : 0.07) : 1;
+  const baseScale =
     status === "speaking" ? 1.05 :
     status === "listening" ? 1.02 :
     status === "thinking" ? 1.0 : 0.97;
-
-  const ringSpin =
-    status === "speaking" ? "6s" :
-    status === "thinking" ? "3s" :
-    status === "listening" ? "10s" : "18s";
+  const scale = baseScale * kick;
 
   const iridescent =
     "conic-gradient(from 200deg, #ff6ba6 0%, #ff9966 12%, #ffd86b 24%, #6ee7b7 38%, #38bdf8 52%, #a78bfa 68%, #f472b6 84%, #ff6ba6 100%)";
