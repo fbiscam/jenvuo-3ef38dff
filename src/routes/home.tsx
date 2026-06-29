@@ -47,6 +47,17 @@ function HomePage() {
           backgroundSize: "56px 56px",
         }}
       />
+      {/* hero gradient mesh */}
+      <div className="pointer-events-none absolute top-0 left-0 right-0 h-[820px] overflow-hidden">
+        <div
+          className="absolute -top-40 -left-40 h-[36rem] w-[36rem] rounded-full blur-3xl opacity-40"
+          style={{ background: `radial-gradient(circle, ${ACCENT}55, transparent 70%)` }}
+        />
+        <div
+          className="absolute top-20 -right-40 h-[40rem] w-[40rem] rounded-full blur-3xl opacity-25"
+          style={{ background: "radial-gradient(circle, #000, transparent 70%)" }}
+        />
+      </div>
 
       <Nav />
 
