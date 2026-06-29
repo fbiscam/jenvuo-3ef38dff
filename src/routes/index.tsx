@@ -181,7 +181,7 @@ function Hero() {
               </Link>
             </div>
 
-            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-[0.25em] font-bold text-[color:var(--ink)]/55">
+            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-[0.25em] font-bold text-[color:var(--void)]">
               <span>ICT</span><Dot /><span>SMC</span><Dot /><span>Killzones</span><Dot /><span>Liquidity</span><Dot /><span>OTE</span>
             </div>
           </div>
