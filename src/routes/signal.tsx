@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { getSignalPlan, type SignalPlan } from "@/lib/gold-analysis.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
@@ -9,6 +9,7 @@ import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
+const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
 type SignalSearch = { symbol?: string };
 export const Route = createFileRoute("/signal")({
@@ -24,6 +25,30 @@ export const Route = createFileRoute("/signal")({
   component: SignalPage,
 });
 
+/* ---------- helpers ---------- */
+function tagOf(text: string): { tag: string; tone: "violet" | "blue" | "emerald" | "amber" | "rose" | "zinc" } {
+  const t = text.toLowerCase();
+  if (/\bfvg|fair\s*value\s*gap\b/.test(t)) return { tag: "FVG", tone: "violet" };
+  if (/\border\s*block|\bob\b/.test(t)) return { tag: "OB", tone: "blue" };
+  if (/\bbos\b|break\s*of\s*structure/.test(t)) return { tag: "BOS", tone: "emerald" };
+  if (/\bchoch\b|change\s*of\s*character/.test(t)) return { tag: "CHoCH", tone: "rose" };
+  if (/\bsweep|liquidity\s*grab|stop\s*hunt\b/.test(t)) return { tag: "SWEEP", tone: "amber" };
+  if (/\bentry|tp|sl|target|stop\b/.test(t)) return { tag: "EXEC", tone: "zinc" };
+  return { tag: "NOTE", tone: "zinc" };
+}
+const toneClass: Record<string, string> = {
+  violet: "bg-violet-100 text-violet-700",
+  blue: "bg-sky-100 text-sky-700",
+  emerald: "bg-emerald-100 text-emerald-700",
+  amber: "bg-amber-100 text-amber-700",
+  rose: "bg-rose-100 text-rose-700",
+  zinc: "bg-zinc-100 text-zinc-700",
+};
+function hhmmss(d = new Date()): string {
+  return d.toTimeString().slice(0, 8);
+}
+
+/* ---------- page ---------- */
 function SignalPage() {
   const navigate = useNavigate();
   const { symbol } = Route.useSearch();
@@ -40,6 +65,7 @@ function SignalPage() {
   const htfRef = useRef<SignalChartHandle>(null);
   const ltfRef = useRef<SignalChartHandle>(null);
   const abortRef = useRef(false);
+  const feedScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -78,7 +104,6 @@ function SignalPage() {
           await speakWait(n.say);
           await new Promise((r) => setTimeout(r, 250));
         }
-        // Draw entry/sl/tp regardless if not already
         if (!abortRef.current) {
           for (const m of p.markings) {
             if (m.type === "entry" || m.type === "sl" || m.type === "tp") {
@@ -119,6 +144,14 @@ function SignalPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authReady, symbol]);
 
+  // auto-scroll narration feed
+  useEffect(() => {
+    const el = feedScrollRef.current;
+    if (!el || step < 0) return;
+    const active = el.querySelector<HTMLElement>(`[data-step="${step}"]`);
+    active?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [step]);
+
   const stop = () => {
     abortRef.current = true;
     speech.stopSpeaking();
@@ -130,210 +163,308 @@ function SignalPage() {
   const t = plan?.trade;
   const isBuy = t?.direction === "BUY";
   const isSell = t?.direction === "SELL";
+  const sym = plan?.instrument.display ?? (symbol || "—");
+  const priceStr = plan ? `${plan.instrument.kind === "crypto" ? "" : "$"}${plan.currentPrice.toFixed(plan.instrument.decimals)}` : "—";
 
   return (
-    <div className="fixed inset-0 flex flex-col overflow-hidden bg-gradient-to-br from-white via-slate-50 to-amber-50/40 text-neutral-900">
-      {/* Decorative glow */}
-      <div className="pointer-events-none absolute -top-40 -right-40 h-[480px] w-[480px] rounded-full bg-amber-200/30 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-40 -left-40 h-[480px] w-[480px] rounded-full bg-sky-200/30 blur-3xl" />
-
-      {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-5 py-3 border-b border-neutral-200/70 backdrop-blur-md bg-white/70 shrink-0">
-        <button
-          onClick={() => { stop(); navigate({ to: "/" }); }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition bg-white border border-neutral-200 hover:bg-neutral-50 shadow-sm"
-        >
-          <ArrowLeft className="h-4 w-4" /> Back
-        </button>
-        <div className="text-center">
-          <div className="text-[10px] uppercase tracking-[0.3em] text-amber-700/80 font-bold">Jenvu AI · Institutional Desk</div>
-          <div className="text-base font-black tracking-tight flex items-center justify-center gap-2">
-            {plan?.instrument.display ?? "Loading…"} {plan && <span className="text-amber-600 tabular-nums">{plan.instrument.kind === "crypto" ? "" : "$"}{plan.currentPrice.toFixed(plan.instrument.decimals)}</span>}
-            {plan && (
-              <span className="ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-900 text-white tracking-wider">
-                {plan.killzone}
+    <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased">
+      {/* HEADER */}
+      <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <div className="mx-auto grid max-w-6xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4">
+          <button
+            onClick={() => { stop(); navigate({ to: "/" }); }}
+            className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Back
+          </button>
+          <Link to="/" className="hidden sm:flex justify-center items-center gap-2.5 min-w-0">
+            <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded-md object-contain" />
+            <span className="font-semibold tracking-tight text-sm">JENVU AI</span>
+          </Link>
+          <div className="flex items-center gap-2 justify-end">
+            <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase`}>
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="relative rounded-full bg-emerald-500 h-1.5 w-1.5" />
               </span>
+              SIGNAL_DESK // ONLINE
+            </div>
+            {playing ? (
+              <button onClick={stop} className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-red-200 bg-red-50 text-[12px] font-medium text-red-700 hover:bg-red-100 transition">
+                <Pause className="h-3.5 w-3.5" /> Stop
+              </button>
+            ) : (
+              <button onClick={load} disabled={loading} className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50 transition">
+                {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                Re-analyze
+              </button>
             )}
           </div>
         </div>
-        <div className="flex gap-2">
-          {playing ? (
-            <button onClick={stop} className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition bg-red-50 text-red-700 hover:bg-red-100 border border-red-200">
-              <Pause className="h-4 w-4" /> Stop
-            </button>
-          ) : (
-            <button onClick={load} disabled={loading} className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition disabled:opacity-50 bg-neutral-900 text-white hover:bg-neutral-800 shadow-sm">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Re-analyze
-            </button>
-          )}
-        </div>
       </header>
 
-      {/* Body */}
-      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-[1fr_360px] overflow-hidden">
-        {/* Charts */}
-        <div className="flex flex-col overflow-hidden p-3 gap-3">
-          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden">
-            {plan && <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF · 1 Hour · Bias" />}
-            {!plan && <ChartSkeleton dark={dark} />}
-          </div>
-          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden">
-            {plan && <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF · 15 Minute · Execution" />}
-            {!plan && <ChartSkeleton dark={dark} />}
-          </div>
-        </div>
-
-        {/* Sidebar */}
-        <aside className="border-l border-neutral-200 overflow-y-auto p-4 space-y-4 bg-white/60 backdrop-blur-md">
-          {!plan && <div className="text-sm opacity-60 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading live gold data…</div>}
-
-          {plan && (
-            <>
-              {/* News Risk */}
-              <div className={cn(
-                "rounded-2xl p-3 border shadow-sm flex items-start gap-3",
-                plan.newsRisk.severity === "high" ? "border-red-300 bg-gradient-to-br from-red-50 to-white" :
-                plan.newsRisk.severity === "medium" ? "border-amber-300 bg-gradient-to-br from-amber-50 to-white" :
-                "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white",
-              )}>
-                {plan.newsRisk.severity === "high" ? <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" /> : <Newspaper className="h-5 w-5 text-neutral-700 shrink-0 mt-0.5" />}
-                <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-widest font-bold text-neutral-500">News Risk · {plan.session}</div>
-                  <p className="text-xs text-neutral-800 leading-snug mt-1">{plan.newsRisk.warning}</p>
-                  {plan.newsRisk.events.length > 0 && (
-                    <ul className="mt-2 space-y-0.5">
-                      {plan.newsRisk.events.slice(0, 4).map((e, i) => (
-                        <li key={i} className="text-[11px] text-neutral-700 flex items-center gap-1.5">
-                          <span className={cn("w-1.5 h-1.5 rounded-full", e.impact === "High" ? "bg-red-500" : "bg-amber-500")} />
-                          <span className="font-semibold">{e.country}</span>
-                          <span className="truncate">{e.title}</span>
-                          <span className="ml-auto tabular-nums text-neutral-500">{e.minutesUntil >= 0 ? `in ${e.minutesUntil}m` : `${-e.minutesUntil}m ago`}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+      {/* TERMINAL CARD */}
+      <section className="mx-auto max-w-6xl px-5 py-5 sm:px-6 sm:py-8">
+        <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
+          {/* terminal header */}
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex gap-1.5 shrink-0">
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
               </div>
-
-              {/* HTF Bias */}
-              <div className="rounded-2xl p-4 border border-neutral-200 bg-white shadow-sm">
-                <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-bold flex items-center gap-1"><Activity className="h-3 w-3" /> HTF Bias · 1H</div>
-                <div className={cn("text-xl font-black flex items-center gap-2", plan.htfBias === "bullish" ? "text-emerald-600" : plan.htfBias === "bearish" ? "text-red-600" : "text-neutral-500")}>
-                  {plan.htfBias === "bullish" ? <TrendingUp className="h-5 w-5" /> : plan.htfBias === "bearish" ? <TrendingDown className="h-5 w-5" /> : null}
-                  {plan.htfBias.toUpperCase()}
-                </div>
-                {plan.htfNarrative && <p className="text-xs text-neutral-700 mt-2 leading-relaxed">{plan.htfNarrative}</p>}
-                {plan.ltfNarrative && <p className="text-xs text-neutral-700 mt-2 leading-relaxed border-t border-neutral-200/60 pt-2"><span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">LTF · </span>{plan.ltfNarrative}</p>}
+              <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
+                JENVU AI // SIGNAL_DESK · {sym}
+              </span>
+            </div>
+            <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+              <span className={`text-[11px] ${MONO} tabular-nums text-zinc-900`}>{priceStr}</span>
+              <div className="hidden sm:block h-4 w-px bg-zinc-200" />
+              {plan && (
+                <span className={`hidden sm:inline text-[10px] ${MONO} tracking-widest uppercase px-2 py-0.5 rounded bg-zinc-900 text-white`}>
+                  {plan.killzone}
+                </span>
+              )}
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
               </div>
+            </div>
+          </div>
 
-              {/* Trade Card */}
-              {t && (
-                <div className={cn(
-                  "rounded-2xl p-4 border-2 shadow-sm",
-                  isBuy ? "border-emerald-400 bg-gradient-to-br from-emerald-50 to-white" : isSell ? "border-red-400 bg-gradient-to-br from-red-50 to-white" : "border-neutral-200 bg-white",
-                )}>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className={cn("text-2xl font-black tracking-tight flex items-center gap-2", isBuy ? "text-emerald-600" : isSell ? "text-red-600" : "text-neutral-500")}>
-                      <Target className="h-5 w-5" /> {t.direction}
+          {/* body grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
+            {/* LEFT — ICT execution feed */}
+            <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-4 min-h-[280px]">
+              <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
+                ICT Execution Feed
+              </h3>
+              {!plan && (
+                <div className="text-xs text-zinc-500 flex items-center gap-2">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading narration…
+                </div>
+              )}
+              <div ref={feedScrollRef} className="space-y-2.5 overflow-y-auto pr-1 max-h-[520px]">
+                {plan?.narration.map((n, i) => {
+                  const { tag, tone } = tagOf(n.say);
+                  const active = i === step;
+                  const past = i < step;
+                  return (
+                    <div
+                      key={i}
+                      data-step={i}
+                      className={cn(
+                        "p-3 rounded-lg border transition-colors",
+                        active
+                          ? "border-zinc-900/60 bg-zinc-50 shadow-sm"
+                          : past
+                            ? "border-zinc-100 bg-white opacity-70"
+                            : "border-zinc-100 bg-white/60 opacity-60",
+                      )}
+                    >
+                      <div className="flex items-center justify-between gap-3 mb-1.5">
+                        <span className="text-[11px] font-semibold tracking-tight">{sym}</span>
+                        <span className={`text-[10px] ${MONO} text-zinc-500 tabular-nums`}>{hhmmss()}</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={cn(
+                          "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider",
+                          toneClass[tone],
+                        )}>
+                          {tag}
+                        </span>
+                        <span className={`text-[10px] ${MONO} uppercase tracking-wider text-zinc-500`}>
+                          {n.tf}
+                        </span>
+                        <span className="text-xs text-zinc-800 leading-snug w-full">{n.say}</span>
+                      </div>
                     </div>
-                    <div className="text-[11px] text-neutral-500">Confidence <span className="font-black text-neutral-900">{t.confidence}%</span></div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <Stat label="Entry" value={t.entry.toFixed(plan.instrument.decimals)} />
-                    <Stat label="R:R" value={`1:${t.rr.toFixed(2)}`} />
-                    <Stat label="Stop Loss" value={t.sl.toFixed(plan.instrument.decimals)} tone="bad" />
-                    <Stat label="Take Profit" value={t.tp.toFixed(plan.instrument.decimals)} tone="good" />
-                  </div>
-                  {t.summary && <p className="text-xs text-neutral-700 mt-3 leading-relaxed border-t border-neutral-200/60 pt-3">{t.summary}</p>}
-                  {t.invalidation && (
-                    <p className="text-[11px] text-red-700 mt-2 leading-snug bg-red-50/60 rounded-lg px-2 py-1.5 border border-red-100">
-                      <span className="font-bold uppercase tracking-wider text-[9px]">Invalidation · </span>{t.invalidation}
-                    </p>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* CENTER — charts */}
+            <div className="lg:col-span-6 bg-white flex flex-col gap-px">
+              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
+                    HTF // 1H · Bias
+                  </span>
+                  {plan && (
+                    <span className={cn(
+                      "text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded",
+                      plan.htfBias === "bullish" ? "bg-emerald-100 text-emerald-700" :
+                      plan.htfBias === "bearish" ? "bg-rose-100 text-rose-700" :
+                      "bg-zinc-100 text-zinc-700",
+                    )}>
+                      {plan.htfBias}
+                    </span>
                   )}
+                </div>
+                <div className="rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px]">
+                  {plan ? <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF" /> : <ChartSkeleton />}
+                </div>
+              </div>
+              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100">
+                <div className="flex items-center justify-between">
+                  <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
+                    LTF // 15M · Execution
+                  </span>
+                  {t && (
+                    <span className={cn(
+                      "text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded",
+                      isBuy ? "bg-emerald-100 text-emerald-700" :
+                      isSell ? "bg-rose-100 text-rose-700" :
+                      "bg-zinc-100 text-zinc-700",
+                    )}>
+                      {t.direction}
+                    </span>
+                  )}
+                </div>
+                <div className="rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px]">
+                  {plan ? <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF" /> : <ChartSkeleton />}
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT — intelligence */}
+            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 space-y-6 overflow-y-auto max-h-[820px]">
+              <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
+                Intelligence Dashboard
+              </h3>
+
+              {/* News risk */}
+              {plan && (
+                <div className={cn(
+                  "rounded-lg border p-3 flex items-start gap-2.5",
+                  plan.newsRisk.severity === "high" ? "border-rose-200 bg-rose-50/40" :
+                  plan.newsRisk.severity === "medium" ? "border-amber-200 bg-amber-50/40" :
+                  "border-emerald-200 bg-emerald-50/30",
+                )}>
+                  {plan.newsRisk.severity === "high"
+                    ? <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0 mt-0.5" />
+                    : <span className="h-1.5 w-1.5 mt-1.5 rounded-full bg-emerald-500 shrink-0" />}
+                  <div className="min-w-0">
+                    <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>News · {plan.session}</div>
+                    <p className="text-[11px] text-zinc-800 leading-snug mt-1">{plan.newsRisk.warning}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Trade card */}
+              {t && plan && (
+                <div className="space-y-3">
+                  <div className="flex items-end justify-between">
+                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Trade Plan</span>
+                    <span className="text-[11px] text-zinc-500">
+                      Conf <span className="font-bold text-zinc-900">{t.confidence}%</span>
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-lg overflow-hidden border border-zinc-100">
+                    <KV label="Entry" value={t.entry.toFixed(plan.instrument.decimals)} />
+                    <KV label="R:R" value={`1:${t.rr.toFixed(2)}`} />
+                    <KV label="Stop" value={t.sl.toFixed(plan.instrument.decimals)} tone="bad" />
+                    <KV label="Target" value={t.tp.toFixed(plan.instrument.decimals)} tone="good" />
+                  </div>
+                  <div className="w-full h-1 bg-zinc-100 rounded-full overflow-hidden">
+                    <div
+                      className={cn("h-full", isBuy ? "bg-emerald-500" : isSell ? "bg-rose-500" : "bg-zinc-400")}
+                      style={{ width: `${Math.max(8, Math.min(100, t.confidence))}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Key levels */}
+              {plan && plan.keyLevels.length > 0 && (
+                <div className="space-y-2">
+                  <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Key Levels</span>
+                  <div className="space-y-1">
+                    {plan.keyLevels.map((k, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-zinc-100 last:border-0">
+                        <span className="flex items-center gap-1.5">
+                          <span className={cn("w-1.5 h-1.5 rounded-full",
+                            k.kind === "resistance" ? "bg-rose-500" :
+                            k.kind === "support" ? "bg-emerald-500" :
+                            k.kind === "equilibrium" ? "bg-amber-500" : "bg-sky-500",
+                          )} />
+                          <span className="text-zinc-700">{k.label}</span>
+                        </span>
+                        <span className={`${MONO} font-medium tabular-nums text-zinc-900`}>
+                          {plan.instrument.kind === "crypto" ? "" : "$"}{k.price.toFixed(plan.instrument.decimals)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
               {/* Confluences */}
-              {plan.confluences.length > 0 && (
-                <div className="rounded-2xl p-4 border border-neutral-200 bg-white shadow-sm">
-                  <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-bold flex items-center gap-1"><Zap className="h-3 w-3" /> Confluences</div>
-                  <ul className="space-y-1.5">
+              {plan && plan.confluences.length > 0 && (
+                <div className="space-y-2">
+                  <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Confluences</span>
+                  <ul className="space-y-1">
                     {plan.confluences.map((c, i) => (
-                      <li key={i} className="text-xs text-neutral-800 flex gap-2 leading-snug">
-                        <span className="text-amber-600 font-black">+</span>{c}
+                      <li key={i} className="text-[11px] text-zinc-800 leading-snug flex gap-1.5">
+                        <span className="text-zinc-400">+</span>{c}
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
 
-              {/* Key Levels */}
-              {plan.keyLevels.length > 0 && (
-                <div className="rounded-2xl p-4 border border-neutral-200 bg-white shadow-sm">
-                  <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-bold">Key Levels</div>
-                  <div className="space-y-1">
-                    {plan.keyLevels.map((k, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs">
-                        <span className="flex items-center gap-1.5">
-                          <span className={cn("w-1.5 h-1.5 rounded-full",
-                            k.kind === "resistance" ? "bg-red-500" :
-                            k.kind === "support" ? "bg-emerald-500" :
-                            k.kind === "equilibrium" ? "bg-amber-500" : "bg-sky-500",
-                          )} />
-                          <span className="text-neutral-700">{k.label}</span>
-                        </span>
-                        <span className="font-mono font-bold tabular-nums text-neutral-900">{plan.instrument.kind === "crypto" ? "" : "$"}{k.price.toFixed(plan.instrument.decimals)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <Link
+                to="/app"
+                className="w-full inline-flex items-center justify-center py-3 bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-800 transition-colors uppercase"
+              >
+                Execute Voice Trade
+              </Link>
+            </div>
+          </div>
 
-              {/* Walkthrough */}
-              <div>
-                <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 px-1 font-bold">Live Walkthrough</div>
-                <div className="space-y-2">
-                  {plan.narration.map((n, i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        "rounded-xl p-3 text-sm border transition-all duration-300",
-                        i === step
-                          ? "border-amber-400 bg-gradient-to-r from-amber-50 to-white shadow-md scale-[1.02]"
-                          : i < step
-                            ? "border-neutral-200 bg-white opacity-70"
-                            : "border-neutral-200 bg-white/60 opacity-50",
-                      )}
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className={cn("text-[10px] font-mono mt-0.5 px-1.5 py-0.5 rounded font-bold", n.tf === "htf" ? "bg-sky-100 text-sky-700" : "bg-amber-100 text-amber-700")}>{n.tf.toUpperCase()}</span>
-                        <span className="text-neutral-800 leading-snug">{n.say}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          {/* status bar */}
+          <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-white flex justify-center sm:justify-between items-center gap-3">
+            <div className="flex gap-4 sm:gap-6 items-center">
+              <div className="flex items-center gap-1.5">
+                <span className={`text-[10px] ${MONO} text-zinc-900`}>STATE</span>
+                <span className={`text-[10px] ${MONO}`}>{playing ? "NARRATING" : loading ? "ANALYZING" : "READY"}</span>
               </div>
-            </>
-          )}
-        </aside>
-      </div>
+              <div className="flex items-center gap-1.5">
+                <span className={`text-[10px] ${MONO} text-zinc-900`}>STEP</span>
+                <span className={`text-[10px] ${MONO} tabular-nums`}>
+                  {plan ? `${Math.max(0, step + 1)}/${plan.narration.length}` : "0/0"}
+                </span>
+              </div>
+            </div>
+            <span className={`hidden sm:inline text-[10px] ${MONO} text-zinc-900 tracking-tighter truncate`}>
+              PRO_VERSION_2.04.1 // ICT_SMC_ENGINE
+            </span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone?: "good" | "bad" }) {
+/* ---------- bits ---------- */
+function KV({ label, value, tone }: { label: string; value: string; tone?: "good" | "bad" }) {
   return (
-    <div>
-      <div className="text-[10px] uppercase tracking-wider opacity-50">{label}</div>
-      <div className={cn("font-bold", tone === "good" ? "text-emerald-500" : tone === "bad" ? "text-red-500" : "")}>{value}</div>
+    <div className="bg-white p-2.5">
+      <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>{label}</div>
+      <div className={cn(
+        "text-sm font-semibold tabular-nums mt-0.5",
+        tone === "good" ? "text-emerald-600" : tone === "bad" ? "text-rose-600" : "text-zinc-900",
+      )}>{value}</div>
     </div>
   );
 }
 
-function ChartSkeleton({ dark }: { dark: boolean }) {
+function ChartSkeleton() {
   return (
-    <div className={cn("w-full h-full flex items-center justify-center", dark ? "bg-neutral-900/30" : "bg-neutral-100")}>
-      <Loader2 className="h-6 w-6 animate-spin opacity-40" />
+    <div className="w-full h-full flex items-center justify-center bg-zinc-50">
+      <Loader2 className="h-5 w-5 animate-spin opacity-40" />
     </div>
   );
 }
