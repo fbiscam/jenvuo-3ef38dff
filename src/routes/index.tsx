@@ -226,7 +226,7 @@ function HomePage() {
       </header>
 
       {/* HERO */}
-      <section className="mx-auto max-w-6xl px-6 pt-16 pb-10">
+      <section className="mx-auto max-w-6xl px-5 sm:px-6 pt-10 sm:pt-16 pb-10">
         <div className="grid gap-10 lg:grid-cols-12 items-end">
           <div className="lg:col-span-7">
             
