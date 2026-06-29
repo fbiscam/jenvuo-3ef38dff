@@ -131,11 +131,12 @@ function AuthPage() {
                   <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
                     Sign in to your desk.
                   </h1>
-                  <p className="mt-3 text-sm text-zinc-600 leading-relaxed">
+                  <p className="mt-2 text-sm text-zinc-600 leading-relaxed">
                     Voice-native institutional intelligence, on call.
                   </p>
 
-                  <form onSubmit={signIn} className="mt-6 space-y-4">
+                  <form onSubmit={signIn} className="mt-5 space-y-3">
+
                     <div>
                       <label className={`block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5 ${MONO}`}>
                         User Identification
