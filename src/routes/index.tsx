@@ -456,7 +456,7 @@ function HomePage() {
       {/* DESK LOGIC */}
       <section className="border-t border-zinc-100 bg-zinc-50/40">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <SectionLabel>Desk Logic</SectionLabel>
+          <SectionLabel>{"\n"}</SectionLabel>
           <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
             The frameworks JENVU thinks in.
           </h2>
