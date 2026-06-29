@@ -358,7 +358,7 @@ function HomePage() {
               {
                 k: "04",
                 t: "A+ Setups Only",
-                d: "Confluence-graded entries with structured entry, SL, TP and R:R — never guessed.",
+                d: "Confluence-graded entries with structured entry, SL, TP never guessed.",
               },
               {
                 k: "05",
