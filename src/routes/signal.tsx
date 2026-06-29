@@ -393,7 +393,7 @@ function SignalPage() {
 
 
             {/* CENTER — charts + multi-tf strip */}
-            <div className="lg:col-span-8 bg-white flex flex-col gap-px">
+            <div className="lg:col-span-7 bg-white flex flex-col gap-px">
               {/* Multi-TF alignment strip */}
               {plan && (
                 <div className="bg-white px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-3 border-b border-zinc-100">
