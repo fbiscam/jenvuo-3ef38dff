@@ -10,6 +10,7 @@ export function useSpeech() {
   const [interim, setInterim] = useState("");
   const [supported, setSupported] = useState(true);
   const [needsGesture, setNeedsGesture] = useState(false);
+  const [wordPulse, setWordPulse] = useState(0);
   const recognitionRef = useRef<SR | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const wantListeningRef = useRef(false);
