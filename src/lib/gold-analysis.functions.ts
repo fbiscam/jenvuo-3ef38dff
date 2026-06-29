@@ -329,8 +329,13 @@ export type SignalPlan = {
   keyLevels: KeyLevel[];
   htfNarrative: string;
   ltfNarrative: string;
+  reasoning: string;
+  whyThisSignal: string[];
+  riskFactors: string[];
   session: string;
   killzone: string;
+  htfTf: string;
+  ltfTf: string;
   newsRisk: {
     severity: "low" | "medium" | "high";
     warning: string;
@@ -341,6 +346,7 @@ export type SignalPlan = {
   ltfCandles: CandleDTO[];
   currentPrice: number;
 };
+
 
 
 function toDTO(c: Candle): CandleDTO {
@@ -393,14 +399,17 @@ async function fetchGoldNewsInline(): Promise<NewsItem[]> {
 }
 
 export const getSignalPlan = createServerFn({ method: "POST" })
-  .inputValidator((_d: unknown) => ({}))
-  .handler(async () => {
+  .inputValidator((d: any) => ({
+    htfTf: ["1h", "4h", "1d"].includes(String(d?.htfTf)) ? String(d.htfTf) : "1h",
+    ltfTf: ["5m", "15m", "30m"].includes(String(d?.ltfTf)) ? String(d.ltfTf) : "15m",
+  }))
+  .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
     const [htfRaw, ltfRaw, news] = await Promise.all([
-      fetchGoldCandles("1h").catch(() => [] as Candle[]),
-      fetchGoldCandles("15m").catch(() => [] as Candle[]),
+      fetchGoldCandles(data.htfTf).catch(() => [] as Candle[]),
+      fetchGoldCandles(data.ltfTf).catch(() => [] as Candle[]),
       fetchGoldNewsInline(),
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
@@ -409,6 +418,7 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
     const last = ltf[ltf.length - 1];
+
 
     const { session, killzone } = detectKillzone(new Date());
 
