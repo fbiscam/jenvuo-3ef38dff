@@ -442,7 +442,7 @@ function HomePage() {
       <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-6 py-20">
           
-          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight whitespace-nowrap">
+          <h2 className="mt-4 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight md:whitespace-nowrap">
             Built like a trading desk, spoken like a partner.
           </h2>
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
