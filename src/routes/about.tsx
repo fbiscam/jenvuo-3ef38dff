@@ -18,7 +18,7 @@ function AboutPage() {
   return (
     <PageShell
       eyebrow="About"
-      title="Built for traders who refuse to guess."
+      title={"Built for traders\u00a0\nwho refuse to guess."}
       intro="JENVU AI was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned 25 years of ICT and SMC playbooks into a voice-first agent any serious trader can talk to."
     >
       <section className="space-y-3">
