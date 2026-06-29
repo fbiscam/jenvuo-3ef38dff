@@ -1,27 +1,66 @@
 ## Goal
-Wrap `/app` (voice agent) with the same chrome as homepage `/` — header (logo + AUTH_TERMINAL pill + live ticker) and footer — while keeping the voice agent UI, orb, signals, and all functionality untouched in the middle.
 
-## Changes (single file: `src/routes/app.tsx`)
+Re-skin the `/signal` page so its layout & visuals match the homepage "Terminal Workstation" block (the section the user highlighted: `JENVU AI // SYSTEM_ACTIVE`, ICT Execution Feed, Intelligence Dashboard, status pills, mono labels). All existing functionality stays exactly the same — only the chrome, frame, and panel styling change.
 
-1. **Add header** (sticky, white, mono labels) matching homepage:
-   - Left: `/favicon.png` + "JENVU AI" linking to `/`
-   - Right: status pill `APP_TERMINAL // ONLINE` (green dot)
-   - Ticker strip below using the same `useLiveTicker` logic (extract pricing fetch into a shared hook or copy the same effect from index.tsx)
+## Scope
 
-2. **Add footer** matching homepage:
-   - "JENVU AI · © year" left, `v1.0 // VOICE_EDITION` right
+- File: `src/routes/signal.tsx` only.
+- No changes to:
+  - Chart logic (lightweight-charts setup, candles, markers, FVG/OB/BOS drawings)
+  - AI narration / voice (`useSpeech`, narration loop, text composer)
+  - Server functions (`analyzeGold`, news, prices)
+  - Routes, auth, navigation
 
-3. **Wrap existing voice-agent content** in `<main className="flex-1 min-h-0 ...">` so layout becomes `h-dvh flex flex-col` (header / main / footer). No scroll, fits viewport like `/auth`.
+## Design changes
 
-4. **Typography**: apply `font-['Inter']` to root and `font-['JetBrains_Mono']` to chrome labels — same constants as index/auth.
+1. **Page frame** — wrap in the same white "terminal" shell used on the homepage section:
+   - Outer card: white bg, hairline border `border-zinc-100`, rounded-2xl, subtle shadow.
+   - Top status bar: left = `JENVU AI // SYSTEM_ACTIVE` with green pulse dot; right = `LIVE FEED · LATENCY · 14MS` in JetBrains Mono uppercase tracking-wider.
 
-5. **Preserve everything else** in `/app`: orb, mic button, send composer, signal cards, news panel, theme toggle, logout — no functional changes.
+2. **Layout** — 12-col grid on `lg+`, stacked on mobile:
+   ```text
+   ┌─────────────────────────────────────────────────────┐
+   │  status bar (symbol · timeframe · session · price)  │
+   ├──────────────────────────────┬──────────────────────┤
+   │  HTF chart  (1H)             │  Intelligence panel  │
+   │                              │   - Bias / Direction │
+   │                              │   - Entry / SL / TP  │
+   ├──────────────────────────────┤   - RR / Confidence  │
+   │  LTF chart  (15m)            │   - Session          │
+   │                              ├──────────────────────┤
+   │                              │  Narration feed      │
+   │                              │  (timestamped lines, │
+   │                              │   ICT-style chips:   │
+   │                              │   FVG / OB / BOS /   │
+   │                              │   SWEEP / CHoCH)     │
+   └──────────────────────────────┴──────────────────────┘
+   │  composer pill (mic + text)  +  footer mono strip   │
+   ```
 
-## Technical notes
-- Reuse the ticker pattern from `src/routes/index.tsx` (Binance + gold-api). To avoid duplication, extract `useLiveTicker` and `INITIAL_TICKER` into `src/hooks/useLiveTicker.ts` and import in both `index.tsx` and `app.tsx`.
-- Match auth.tsx's compact chrome sizing (`py-3 sm:py-4`) so the voice area keeps maximum room.
-- Dark-mode aware: homepage chrome is white-only; keep it white on `/app` even when user toggles dark theme for the voice surface — chrome stays consistent across routes.
+3. **Panels** — each block becomes a labeled terminal card:
+   - Header row: tiny uppercase mono label + faint hairline divider.
+   - Body: white bg, zinc-900 text, emerald/red accents only on direction & deltas.
+   - Chart containers: thin border, rounded-xl, label badge top-left (`HTF // 1H`, `LTF // 15M`).
+
+4. **Narration feed** — restyle the existing AI narration log as the "ICT Execution Feed":
+   - Rows: `SYMBOL  HH:MM:SS  [CHIP]  message`
+   - Chips colored by tag (FVG=violet, OB=blue, BOS=emerald, SWEEP=amber, CHoCH=rose).
+   - Auto-scroll to newest, same data source as today.
+
+5. **Composer** — replace current input with the rounded white pill used on `/app` (mic button + text + send arrow).
+
+6. **Typography & tokens** — JetBrains Mono for labels/timestamps, Inter for body; only semantic zinc / emerald / red / amber utilities, no new colors.
+
+7. **Mobile** — single column, charts full-width, intelligence + feed stack below; composer sticky at bottom.
 
 ## Out of scope
-- No changes to voice agent logic, signal generation, or `/signal` route.
-- No homepage hero/sections added to `/app`.
+
+- No new data, no new indicators, no chart-library swap.
+- No backend changes.
+- No theme toggle / dark mode rework on this page (stays white terminal like the reference).
+
+## Acceptance
+
+- `/signal?symbol=...` still loads, charts render, AI still narrates and speaks, signals still appear.
+- Visual matches the homepage terminal block (same status bar, same panel chrome, same mono labels, same feed row format).
+- No regressions on mobile width (320–414px).
