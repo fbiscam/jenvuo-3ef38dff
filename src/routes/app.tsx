@@ -14,7 +14,7 @@ import { getGoldNews } from "@/lib/news.functions";
 import { cn } from "@/lib/utils";
 
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
       { title: "GoldGPT — Live AI Voice Agent for Gold Trading" },
