@@ -100,6 +100,14 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     seriesRef.current = series;
     markersPluginRef.current = createSeriesMarkers(series, []);
 
+    // Seed live-bar state from the latest candle and infer bar duration.
+    const lastC = candles[candles.length - 1];
+    const prevC = candles[candles.length - 2];
+    if (lastC && prevC) bucketSecRef.current = Math.max(1, lastC.time - prevC.time);
+    liveBarRef.current = lastC
+      ? { time: lastC.time, open: lastC.open, high: lastC.high, low: lastC.low, close: lastC.close }
+      : null;
+
     const redrawBoxes = () => {
       if (!overlayRef.current || !seriesRef.current || !chartRef.current) return;
       const ts = chartRef.current.timeScale();
