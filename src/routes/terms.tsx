@@ -7,9 +7,9 @@ export const Route = createFileRoute("/terms")({
       { title: "Terms of Use — JENVU AI" },
       { name: "description", content: "The terms that govern your use of JENVU AI." },
       { property: "og:title", content: "Terms of Use — JENVU AI" },
-      { property: "og:url", content: "https://greetings-gentle-flow.lovable.app/terms" },
+      { property: "og:url", content: "https://jenvu.com/terms" },
     ],
-    links: [{ rel: "canonical", href: "https://greetings-gentle-flow.lovable.app/terms" }],
+    links: [{ rel: "canonical", href: "https://jenvu.com/terms" }],
   }),
   component: TermsPage,
 });

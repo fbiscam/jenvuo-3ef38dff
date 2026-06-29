@@ -7,9 +7,9 @@ export const Route = createFileRoute("/development")({
       { title: "Development — JENVU AI" },
       { name: "description", content: "The stack, architecture, and engineering principles behind JENVU AI." },
       { property: "og:title", content: "Development — JENVU AI" },
-      { property: "og:url", content: "https://greetings-gentle-flow.lovable.app/development" },
+      { property: "og:url", content: "https://jenvu.com/development" },
     ],
-    links: [{ rel: "canonical", href: "https://greetings-gentle-flow.lovable.app/development" }],
+    links: [{ rel: "canonical", href: "https://jenvu.com/development" }],
   }),
   component: DevPage,
 });

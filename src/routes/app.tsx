@@ -103,13 +103,17 @@ function useLiveTicker(): TickerRow[] {
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "GoldGPT — Live AI Voice Agent for Gold Trading" },
+      { title: "Voice Terminal — Jenvu AI" },
       {
         name: "description",
         content:
-          "Real-time AI voice assistant for XAU/USD. Speak naturally — get instant ICT/SMC analysis and A+ trade setups.",
+          "Talk to Jenvu. Live institutional ICT/SMC analysis for Gold, Crypto, FX and Indices — spoken in real time.",
       },
+      { property: "og:title", content: "Voice Terminal — Jenvu AI" },
+      { property: "og:description", content: "Live institutional ICT/SMC analysis for Gold, Crypto, FX and Indices." },
+      { property: "og:url", content: "https://jenvu.com/app" },
     ],
+    links: [{ rel: "canonical", href: "https://jenvu.com/app" }],
   }),
   component: Home,
 });

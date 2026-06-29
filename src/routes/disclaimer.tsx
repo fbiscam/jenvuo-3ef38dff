@@ -7,9 +7,9 @@ export const Route = createFileRoute("/disclaimer")({
       { title: "Trading Disclaimer — JENVU AI" },
       { name: "description", content: "Risk disclosure and disclaimer for JENVU AI signals and analysis." },
       { property: "og:title", content: "Trading Disclaimer — JENVU AI" },
-      { property: "og:url", content: "https://greetings-gentle-flow.lovable.app/disclaimer" },
+      { property: "og:url", content: "https://jenvu.com/disclaimer" },
     ],
-    links: [{ rel: "canonical", href: "https://greetings-gentle-flow.lovable.app/disclaimer" }],
+    links: [{ rel: "canonical", href: "https://jenvu.com/disclaimer" }],
   }),
   component: DisclaimerPage,
 });

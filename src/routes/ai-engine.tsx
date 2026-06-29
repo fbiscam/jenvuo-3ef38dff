@@ -7,9 +7,9 @@ export const Route = createFileRoute("/ai-engine")({
       { title: "The AI Engine — JENVU AI" },
       { name: "description", content: "How the JENVU AI agent listens, reasons, and narrates institutional trade setups." },
       { property: "og:title", content: "The AI Engine — JENVU AI" },
-      { property: "og:url", content: "https://greetings-gentle-flow.lovable.app/ai-engine" },
+      { property: "og:url", content: "https://jenvu.com/ai-engine" },
     ],
-    links: [{ rel: "canonical", href: "https://greetings-gentle-flow.lovable.app/ai-engine" }],
+    links: [{ rel: "canonical", href: "https://jenvu.com/ai-engine" }],
   }),
   component: AIPage,
 });

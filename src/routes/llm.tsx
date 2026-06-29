@@ -7,9 +7,9 @@ export const Route = createFileRoute("/llm")({
       { title: "Large Language Models — JENVU AI" },
       { name: "description", content: "What LLMs are, why they matter for trading analysis, and how JENVU uses them responsibly." },
       { property: "og:title", content: "Large Language Models — JENVU AI" },
-      { property: "og:url", content: "https://greetings-gentle-flow.lovable.app/llm" },
+      { property: "og:url", content: "https://jenvu.com/llm" },
     ],
-    links: [{ rel: "canonical", href: "https://greetings-gentle-flow.lovable.app/llm" }],
+    links: [{ rel: "canonical", href: "https://jenvu.com/llm" }],
   }),
   component: LLMPage,
 });

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalRouteImport } from './routes/signal'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LlmRouteImport } from './routes/llm'
@@ -25,6 +26,11 @@ import { Route as ApiSeedAdminRouteImport } from './routes/api/seed-admin'
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignalRoute = SignalRouteImport.update({
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
 }
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
 }
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
 }
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/llm'
     | '/privacy'
     | '/signal'
+    | '/sitemap.xml'
     | '/terms'
     | '/api/seed-admin'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/llm'
     | '/privacy'
     | '/signal'
+    | '/sitemap.xml'
     | '/terms'
     | '/api/seed-admin'
   id:
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/llm'
     | '/privacy'
     | '/signal'
+    | '/sitemap.xml'
     | '/terms'
     | '/api/seed-admin'
   fileRoutesById: FileRoutesById
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   LlmRoute: typeof LlmRoute
   PrivacyRoute: typeof PrivacyRoute
   SignalRoute: typeof SignalRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   ApiSeedAdminRoute: typeof ApiSeedAdminRoute
 }
@@ -193,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signal': {
@@ -286,6 +306,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmRoute: LlmRoute,
   PrivacyRoute: PrivacyRoute,
   SignalRoute: SignalRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   ApiSeedAdminRoute: ApiSeedAdminRoute,
 }
