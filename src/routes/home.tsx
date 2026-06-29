@@ -598,7 +598,7 @@ function FakeChart() {
           x2="600"
           y1={y}
           y2={y}
-          stroke="rgba(255,255,255,0.05)"
+          stroke="rgba(0,0,0,0.07)"
         />
       ))}
       <path
