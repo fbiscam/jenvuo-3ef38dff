@@ -11,7 +11,7 @@ export function PageShell({
   children,
 }: {
   eyebrow: string;
-  title: string;
+  title: ReactNode;
   intro?: string;
   children: ReactNode;
 }) {
@@ -46,7 +46,7 @@ export function PageShell({
         {/* HERO */}
         <section className="border-b border-zinc-100">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
-            <h1 className="max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
+            <h1 className="max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl whitespace-pre-line">
               {title}
             </h1>
             {intro && (
