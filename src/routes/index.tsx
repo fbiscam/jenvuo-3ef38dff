@@ -226,7 +226,7 @@ function HomePage() {
       </header>
 
       {/* HERO */}
-      <section className="mx-auto max-w-6xl px-6 pt-16 pb-10">
+      <section className="mx-auto max-w-6xl px-5 sm:px-6 pt-10 sm:pt-16 pb-10">
         <div className="grid gap-10 lg:grid-cols-12 items-end">
           <div className="lg:col-span-7">
             
@@ -254,7 +254,7 @@ function HomePage() {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="grid grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200">
               {[
                 ["Markets", "32+"],
                 ["Frameworks", "ICT, SMC"],
@@ -271,27 +271,27 @@ function HomePage() {
       </section>
 
       {/* TERMINAL WORKSTATION */}
-      <section className="mx-auto max-w-6xl px-6 pb-20">
+      <section className="mx-auto max-w-6xl px-5 sm:px-6 pb-20">
         <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
           {/* terminal header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-100 bg-white">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex gap-1.5 shrink-0">
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
               </div>
-              <span className={`ml-4 text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase`}>
+              <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
                 JENVU AI // SYSTEM_ACTIVE
               </span>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
+                <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
               </div>
-              <div className="h-4 w-px bg-zinc-200" />
-              <span className={`text-[11px] ${MONO} text-zinc-900`}>LATENCY · 14MS</span>
+              <div className="hidden sm:block h-4 w-px bg-zinc-200" />
+              <span className={`hidden sm:inline text-[11px] ${MONO} text-zinc-900`}>LATENCY · 14MS</span>
             </div>
           </div>
 
@@ -420,8 +420,8 @@ function HomePage() {
           </div>
 
           {/* status bar */}
-          <div className="px-6 py-2 border-t border-zinc-100 bg-white flex justify-between items-center">
-            <div className="flex gap-6 items-center">
+          <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-white flex justify-between items-center gap-3">
+            <div className="flex gap-4 sm:gap-6 items-center">
               <div className="flex items-center gap-1.5">
                 <span className={`text-[10px] ${MONO} text-zinc-900`}>CPU</span>
                 <span className={`text-[10px] ${MONO}`}>04%</span>
@@ -431,7 +431,7 @@ function HomePage() {
                 <span className={`text-[10px] ${MONO}`}>1.2GB</span>
               </div>
             </div>
-            <span className={`text-[10px] ${MONO} text-zinc-900 tracking-tighter`}>
+            <span className={`hidden sm:inline text-[10px] ${MONO} text-zinc-900 tracking-tighter truncate`}>
               PRO_VERSION_2.04.1 // SECURE_ENCRYPTION_ENABLED
             </span>
           </div>
@@ -442,7 +442,7 @@ function HomePage() {
       <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-6 py-20">
           
-          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight whitespace-nowrap">
+          <h2 className="mt-4 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight md:whitespace-nowrap">
             Built like a trading desk, spoken like a partner.
           </h2>
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
@@ -543,13 +543,13 @@ function HomePage() {
             ].map(([d, v, n], i) => (
               <div
                 key={v}
-                className={`grid grid-cols-12 items-center px-6 py-4 ${
+                className={`grid grid-cols-2 sm:grid-cols-12 gap-y-1 sm:gap-y-0 sm:items-center px-5 sm:px-6 py-4 ${
                   i !== 0 ? "border-t border-zinc-100" : ""
                 }`}
               >
-                <span className={`col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
-                <span className={`col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900`}>{v}</span>
-                <span className="col-span-7 text-sm text-zinc-900">{n}</span>
+                <span className={`sm:col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
+                <span className={`sm:col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900 text-right sm:text-left`}>{v}</span>
+                <span className="col-span-2 sm:col-span-7 text-sm text-zinc-900">{n}</span>
               </div>
             ))}
           </div>
@@ -668,7 +668,7 @@ function HomePage() {
             Why traders move to JENVU.
           </h2>
           <div className="mt-10 rounded-2xl border border-zinc-200 bg-white overflow-hidden">
-            <div className={`grid grid-cols-4 px-6 py-4 border-b border-zinc-200 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
+            <div className={`hidden md:grid grid-cols-4 px-6 py-4 border-b border-zinc-200 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
               <span>Capability</span>
               <span className="text-center">Generic AI</span>
               <span className="text-center">Signal Group</span>
@@ -684,14 +684,33 @@ function HomePage() {
             ].map(([cap, a, b, c], i) => (
               <div
                 key={String(cap)}
-                className={`grid grid-cols-4 items-center px-6 py-4 text-sm ${
-                  i !== 0 ? "border-t border-zinc-100" : ""
-                }`}
+                className={`px-5 sm:px-6 py-4 text-sm ${i !== 0 ? "border-t border-zinc-100" : ""}`}
               >
-                <span className="text-zinc-900 font-medium">{cap}</span>
-                <span className="text-center text-zinc-900">{a ? "●" : "—"}</span>
-                <span className="text-center text-zinc-900">{b ? "●" : "—"}</span>
-                <span className="text-center text-zinc-900 font-bold">{c ? "●" : "—"}</span>
+                {/* desktop row */}
+                <div className="hidden md:grid grid-cols-4 items-center">
+                  <span className="text-zinc-900 font-medium">{cap}</span>
+                  <span className="text-center text-zinc-900">{a ? "●" : "—"}</span>
+                  <span className="text-center text-zinc-900">{b ? "●" : "—"}</span>
+                  <span className="text-center text-zinc-900 font-bold">{c ? "●" : "—"}</span>
+                </div>
+                {/* mobile stacked */}
+                <div className="md:hidden space-y-2">
+                  <div className="text-zinc-900 font-medium">{cap}</div>
+                  <div className={`grid grid-cols-3 gap-2 ${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
+                    <div className="flex flex-col items-center gap-1">
+                      <span>Generic</span>
+                      <span className="text-zinc-900 text-sm">{a ? "●" : "—"}</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <span>Signals</span>
+                      <span className="text-zinc-900 text-sm">{b ? "●" : "—"}</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-zinc-900">JENVU</span>
+                      <span className="text-zinc-900 text-sm font-bold">{c ? "●" : "—"}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -772,16 +791,16 @@ function HomePage() {
         </div>
       </section>
       <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-6 pt-6 pb-24">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
-            <div className="max-w-xl">
-              <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
+            <div className="max-w-xl text-center md:text-left">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal. Speak to the market now.
               </h2>
               <p className="mt-3 text-zinc-900">
                 Your voice agent is one tap away listening<br />reasoning, thinking, research & narrating.
               </p>
-              <div className="mt-7 flex gap-3">
+              <div className="mt-7 flex flex-wrap justify-center md:justify-start gap-3">
                 <Link
                   to="/app"
                   className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
@@ -796,7 +815,7 @@ function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="relative">
+            <div className="relative h-40 w-40 sm:h-56 sm:w-56 shrink-0">
               <CloudOrb status="speaking" pulse={1} />
             </div>
           </div>
@@ -805,15 +824,14 @@ function HomePage() {
 
       {/* FOOTER */}
       <footer className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-900">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10 flex flex-col md:flex-row items-center justify-between gap-5 text-sm text-zinc-900">
           <div className="flex items-center gap-2.5">
             <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded object-contain" />
-
             <span className="text-zinc-900 font-semibold">JENVU AI</span>
             <span className="text-zinc-300">·</span>
             <span>© {new Date().getFullYear()}</span>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             <Link to="/about" className="hover:text-zinc-900">About</Link>
             <Link to="/terms" className="hover:text-zinc-900">Terms</Link>
             <Link to="/privacy" className="hover:text-zinc-900">Privacy</Link>
