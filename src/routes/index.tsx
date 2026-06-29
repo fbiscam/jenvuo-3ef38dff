@@ -274,24 +274,24 @@ function HomePage() {
       <section className="mx-auto max-w-6xl px-6 pb-20">
         <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
           {/* terminal header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-100 bg-white">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex gap-1.5 shrink-0">
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
               </div>
-              <span className={`ml-4 text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase`}>
+              <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
                 JENVU AI // SYSTEM_ACTIVE
               </span>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
+                <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
               </div>
-              <div className="h-4 w-px bg-zinc-200" />
-              <span className={`text-[11px] ${MONO} text-zinc-900`}>LATENCY · 14MS</span>
+              <div className="hidden sm:block h-4 w-px bg-zinc-200" />
+              <span className={`hidden sm:inline text-[11px] ${MONO} text-zinc-900`}>LATENCY · 14MS</span>
             </div>
           </div>
 
