@@ -595,6 +595,194 @@ function HomePage() {
         </div>
       </section>
 
+      {/* STATS BAR */}
+      <section className="border-t border-zinc-100 bg-zinc-900 text-white">
+        <div className="mx-auto max-w-6xl px-6 py-14 grid grid-cols-2 md:grid-cols-4 gap-px bg-zinc-800">
+          {[
+            ["A+ Setups / wk", "37"],
+            ["Avg. R:R", "1 : 3.2"],
+            ["Voice Latency", "14 ms"],
+            ["Markets Covered", "32+"],
+          ].map(([k, v]) => (
+            <div key={k} className="bg-zinc-900 p-6">
+              <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-400`}>{k}</div>
+              <div className="mt-2 text-3xl font-semibold tracking-tight">{v}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* BUILT FOR */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <SectionLabel>Built For</SectionLabel>
+          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
+            One terminal, many seats at the desk.
+          </h2>
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
+            {[
+              { k: "Prop Traders", d: "Pass funded challenges with disciplined ICT/SMC entries and pre-defined risk." },
+              { k: "Day Traders", d: "Live London & NY killzone narration with sub-15ms voice loop." },
+              { k: "Swing Desks", d: "1H/4H structure reviews with macro and Forex Factory overlay." },
+              { k: "Family Offices", d: "Institutional-grade Gold and FX coverage with audit-ready signal logs." },
+            ].map((b) => (
+              <div key={b.k} className="bg-white p-7">
+                <div className="h-10 w-10 grid place-items-center rounded-lg bg-zinc-900 text-white">
+                  <span className={`${MONO} text-xs`}>JV</span>
+                </div>
+                <h3 className="mt-5 text-base font-semibold tracking-tight text-zinc-900">{b.k}</h3>
+                <p className="mt-2 text-sm text-zinc-900 leading-relaxed">{b.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* COMPARISON */}
+      <section className="border-t border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <SectionLabel>Comparison</SectionLabel>
+          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight">
+            Why traders move to JENVU.
+          </h2>
+          <div className="mt-10 rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+            <div className={`grid grid-cols-4 px-6 py-4 border-b border-zinc-200 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
+              <span>Capability</span>
+              <span className="text-center">Generic AI</span>
+              <span className="text-center">Signal Group</span>
+              <span className="text-center text-zinc-900 font-bold">JENVU AI</span>
+            </div>
+            {[
+              ["Voice-native interface", false, false, true],
+              ["ICT / SMC framework", false, true, true],
+              ["Auto chart markup", false, false, true],
+              ["Killzone & session bias", false, false, true],
+              ["Forex Factory context", false, false, true],
+              ["Sub-20ms latency", false, false, true],
+            ].map(([cap, a, b, c], i) => (
+              <div
+                key={String(cap)}
+                className={`grid grid-cols-4 items-center px-6 py-4 text-sm ${
+                  i !== 0 ? "border-t border-zinc-100" : ""
+                }`}
+              >
+                <span className="text-zinc-900 font-medium">{cap}</span>
+                <span className="text-center text-zinc-900">{a ? "●" : "—"}</span>
+                <span className="text-center text-zinc-900">{b ? "●" : "—"}</span>
+                <span className="text-center text-zinc-900 font-bold">{c ? "●" : "—"}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PRICING */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <SectionLabel>Pricing</SectionLabel>
+              <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight">
+                Invite-only access. Transparent tiers.
+              </h2>
+            </div>
+            <p className="max-w-sm text-zinc-900">Every plan ships the same engine. You choose the seat.</p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                t: "Analyst",
+                p: "$49",
+                sub: "/ month",
+                f: ["Voice agent · Gold only", "ICT/SMC signal engine", "1H + 15m markup", "Email support"],
+                hl: false,
+              },
+              {
+                t: "Trader",
+                p: "$129",
+                sub: "/ month",
+                f: ["All markets · FX · Crypto · Indices", "Killzone & session bias", "Forex Factory overlay", "Priority voice latency"],
+                hl: true,
+              },
+              {
+                t: "Desk",
+                p: "Custom",
+                sub: "/ team",
+                f: ["Multi-seat access", "Audit-ready signal logs", "Dedicated success manager", "SLA & onboarding"],
+                hl: false,
+              },
+            ].map((p) => (
+              <div
+                key={p.t}
+                className={`rounded-2xl border p-7 flex flex-col gap-6 ${
+                  p.hl
+                    ? "border-zinc-900 bg-zinc-900 text-white shadow-[0_24px_60px_-24px_rgba(0,0,0,0.35)]"
+                    : "border-zinc-200 bg-white"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className={`${MONO} text-[10px] uppercase tracking-widest ${p.hl ? "text-zinc-300" : "text-zinc-900"}`}>
+                    {p.t}
+                  </span>
+                  {p.hl && (
+                    <span className={`${MONO} text-[10px] uppercase tracking-widest rounded-full bg-white text-zinc-900 px-2 py-0.5`}>
+                      Popular
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-end gap-1">
+                  <span className="text-4xl font-semibold tracking-tight">{p.p}</span>
+                  <span className={`text-sm ${p.hl ? "text-zinc-300" : "text-zinc-900"} mb-1.5`}>{p.sub}</span>
+                </div>
+                <ul className="space-y-2.5 text-sm">
+                  {p.f.map((x) => (
+                    <li key={x} className="flex items-start gap-2">
+                      <span className={`${MONO} mt-0.5 ${p.hl ? "text-white" : "text-zinc-900"}`}>→</span>
+                      <span className={p.hl ? "text-zinc-100" : "text-zinc-900"}>{x}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/auth"
+                  className={`mt-auto inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-medium ${
+                    p.hl
+                      ? "bg-white text-zinc-900 hover:bg-zinc-100"
+                      : "bg-zinc-900 text-white hover:bg-zinc-800"
+                  }`}
+                >
+                  Request Access
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* INTEGRATIONS */}
+      <section className="border-t border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <SectionLabel>Data Feeds</SectionLabel>
+              <h3 className="mt-3 text-xl font-semibold tracking-tight text-zinc-900">
+                Wired into the venues that move price.
+              </h3>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {["Binance", "Yahoo Finance", "Stooq", "Forex Factory", "TradingView", "PAXG", "OANDA", "DXY"].map((n) => (
+                <span
+                  key={n}
+                  className={`rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider text-zinc-900`}
+                >
+                  {n}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-6 py-24">
