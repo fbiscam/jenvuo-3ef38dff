@@ -313,7 +313,7 @@ function SignalPage() {
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="mx-auto grid max-w-[1600px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4">
           <button
-            onClick={() => { stop(); navigate({ to: "/" }); }}
+            onClick={() => { stop(); navigate({ to: "/app" }); }}
             className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back
