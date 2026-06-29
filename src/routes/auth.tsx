@@ -266,7 +266,7 @@ function RotatingStatus() {
   ];
   
   useEffect(() => {
-    const itv = setInterval(() => setIdx(i => (i + 1) % phrases.length), 3000);
+    const itv = setInterval(() => setIdx((i: number) => (i + 1) % phrases.length), 3000);
     return () => clearInterval(itv);
   }, []);
 
