@@ -80,7 +80,8 @@ function HomePage() {
       </header>
 
       {/* Center stage */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 -mt-10">
+      <main className="flex flex-col items-center justify-center px-6 min-h-[calc(100dvh-72px)]">
+
         <h1 className="text-7xl sm:text-8xl lg:text-9xl font-black tracking-[-0.04em] text-center">
           JENVU<span className="text-black/30"> AI</span>
         </h1>
