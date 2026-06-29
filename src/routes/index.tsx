@@ -301,38 +301,38 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
               "inset -8px -14px 40px rgba(40,100,180,0.45), inset 8px 12px 32px rgba(255,255,255,0.9), 0 0 50px rgba(120,180,240,0.45)",
           }}
         >
-          {/* Primary swirling current — clockwise */}
+          {/* Primary swirling current — clockwise (multi-color) */}
           <div
             className="absolute -inset-1/3 animate-spin"
             style={{
               animationDuration: status === "speaking" ? "8s" : status === "thinking" ? "6s" : "16s",
               background:
-                "conic-gradient(from 0deg, rgba(255,255,255,0.85) 0%, rgba(168,210,255,0.0) 18%, rgba(120,180,240,0.7) 38%, rgba(255,255,255,0.0) 55%, rgba(186,225,255,0.85) 75%, rgba(94,168,238,0.0) 92%, rgba(255,255,255,0.85) 100%)",
+                "conic-gradient(from 0deg, rgba(255,180,220,0.75) 0%, rgba(180,220,255,0.0) 14%, rgba(255,225,150,0.75) 28%, rgba(255,255,255,0.0) 42%, rgba(160,255,210,0.75) 56%, rgba(220,235,255,0.0) 70%, rgba(190,170,255,0.8) 84%, rgba(255,180,220,0.75) 100%)",
               filter: "blur(14px)",
               mixBlendMode: "screen",
             }}
           />
 
-          {/* Counter current — collides with primary */}
+          {/* Counter current — collides with primary (multi-color) */}
           <div
             className="absolute -inset-1/3 animate-spin"
             style={{
               animationDuration: status === "speaking" ? "10s" : "20s",
               animationDirection: "reverse",
               background:
-                "conic-gradient(from 180deg, rgba(255,255,255,0.0) 0%, rgba(220,235,255,0.9) 20%, rgba(120,180,240,0.0) 40%, rgba(255,255,255,0.85) 60%, rgba(168,210,255,0.0) 80%, rgba(255,255,255,0.9) 100%)",
+                "conic-gradient(from 180deg, rgba(120,200,255,0.0) 0%, rgba(255,170,200,0.85) 18%, rgba(255,255,255,0.0) 34%, rgba(140,235,200,0.8) 50%, rgba(180,210,255,0.0) 66%, rgba(255,210,140,0.85) 82%, rgba(180,160,255,0.7) 100%)",
               filter: "blur(16px)",
               mixBlendMode: "screen",
             }}
           />
 
-          {/* Foamy crest where waves meet */}
+          {/* Foamy crest where waves meet (iridescent) */}
           <div
             className="absolute -inset-1/4 animate-spin"
             style={{
               animationDuration: status === "speaking" ? "6s" : "14s",
               background:
-                "radial-gradient(38% 14% at 50% 50%, rgba(255,255,255,0.95), transparent 70%), radial-gradient(28% 10% at 32% 58%, rgba(220,238,255,0.85), transparent 70%), radial-gradient(30% 11% at 68% 46%, rgba(235,245,255,0.9), transparent 70%)",
+                "radial-gradient(38% 14% at 50% 50%, rgba(255,255,255,0.95), transparent 70%), radial-gradient(28% 10% at 32% 58%, rgba(255,210,235,0.85), transparent 70%), radial-gradient(30% 11% at 68% 46%, rgba(200,245,255,0.9), transparent 70%)",
               filter: "blur(6px)",
               mixBlendMode: "screen",
             }}
