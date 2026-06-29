@@ -190,8 +190,8 @@ function AuthPage() {
               </div>
 
               {/* RIGHT — VISUAL */}
-              <div className="hidden lg:flex lg:col-span-5 bg-white flex-col p-6 lg:p-10 border-t lg:border-t-0 lg:border-l border-zinc-100">
-                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[240px]">
+              <div className="hidden lg:flex lg:col-span-5 bg-white flex-col p-5 lg:p-6 border-t lg:border-t-0 lg:border-l border-zinc-100">
+                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[200px]">
                   <div
                     className="absolute inset-0 opacity-[0.04] pointer-events-none"
                     style={{
@@ -200,13 +200,14 @@ function AuthPage() {
                     }}
                   />
                   <div className="relative z-10 flex flex-col items-center">
-                    <div className="relative h-40 w-40 lg:h-48 lg:w-48">
+                    <div className="relative h-32 w-32 lg:h-36 lg:w-36">
                       <div className="absolute inset-0 rounded-full border border-zinc-100 animate-[spin_18s_linear_infinite]" />
-                      <div className="absolute inset-5 rounded-full border border-zinc-200/60 animate-[spin_24s_linear_infinite_reverse]" />
-                      <div className="absolute inset-9">
+                      <div className="absolute inset-4 rounded-full border border-zinc-200/60 animate-[spin_24s_linear_infinite_reverse]" />
+                      <div className="absolute inset-7">
                         <CloudOrb status="speaking" pulse={1} />
                       </div>
                     </div>
+
                     
                     <div className="mt-6 text-center space-y-2">
                       <div className={`flex items-center justify-center gap-2 ${MONO} text-[10px] tracking-[0.2em] text-zinc-400 uppercase`}>
