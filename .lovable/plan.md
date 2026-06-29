@@ -1,93 +1,45 @@
-# Live Signal Page with Chart Markings & Voice Narration
+## Goal
 
-Jab user voice/text mein "signal", "setup", "trade idea", "analyze gold" jaisa kuch bole — app naye `/signal` route pe navigate karega, real XAU/USD candles load karega, AI us pe ICT + SMC markings draw karega, aur Jenvu voice step-by-step samjhayegi ke "yeh dekho, yahan FVG hai, yahan se entry, yahan SL…".
+Right now the signal page already supports every asset (Gold, Silver, BTC, ETH, SOL, BNB, XRP, DOGE, EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD, USDCHF, NZDUSD) with the same ICT/SMC engine, charts, killzone, news risk, auditor, and chart markings. The gap is the **handoff from the voice agent on the home page** — it always opens the signal page with Gold, no matter what asset the user asked for, and only triggers on words like "signal/setup/chart".
 
-## User Flow
+This plan closes that gap so every pair behaves exactly like Gold end-to-end.
 
-```text
-Home (orb)
-   │  user: "Jenvu, give me a gold signal"
-   ▼
-intent detector picks up "signal/setup/trade"
-   │  navigate("/signal")
-   ▼
-/signal page
-   ├─ Top: HTF chart (1H) with bias markings
-   ├─ Main: LTF chart (15m) with entry/SL/TP + zones
-   ├─ Right: live narration log + signal card
-   └─ Voice: speaks each step as it gets drawn
-        "Loading gold price… HTF bias bullish… FVG mil gaya 2645–2648…
-         Order block yahan… Entry 2646, SL 2642, TP 2655, RR 1:2.25"
-   ▼
-Back button → home orb
-```
+## What changes
 
-## What Gets Built
+### 1. Symbol extraction from voice/text (home page)
+Add a helper that scans the user's command for any supported asset and returns its key. Recognizes:
 
-### 1. New route `src/routes/signal.tsx`
-- Two stacked charts (HTF 1H + LTF 15m) using `lightweight-charts` (TradingView OSS).
-- Right sidebar: live narration feed (each AI step as a chip), final `SignalCard`, "Back to Jenvu" button.
-- Auto-runs analysis on mount; re-run button for refresh.
-- Reuses dark/light theme from home.
+- Crypto: `bitcoin|btc`, `ethereum|eth`, `solana|sol`, `bnb|binance coin`, `xrp|ripple`, `doge|dogecoin`
+- Forex: `eur|euro|eurusd`, `gbp|pound|cable|gbpusd`, `usdjpy|jpy|yen`, `audusd|aussie`, `usdcad|loonie`, `usdchf|swissie`, `nzdusd|kiwi`
+- Metals: `gold|xau|xauusd` (default), `silver|xag|xagusd`
 
-### 2. Chart component `src/components/SignalChart.tsx`
-- Wraps lightweight-charts candlestick series.
-- Exposes imperative API to draw:
-  - **FVG** → colored rectangle (price range across N candles)
-  - **Order Block** → filled box on the OB candle
-  - **Liquidity** → horizontal dashed line + "BSL/SSL" label
-  - **BOS/CHOCH** → trendline + text marker
-  - **Supply/Demand zones** → semi-transparent boxes
-  - **Entry / SL / TP** → 3 priceLines with R:R box overlay
-- Each draw call animates in (fade) so user dekhta hai "kya draw ho raha hai".
+### 2. Broader intent detection
+Expand the trigger regex so any of these also opens the signal page:
 
-### 3. Live data `src/lib/market-data.functions.ts`
-- Server function fetches XAU/USD candles from Twelve Data free API.
-- Returns 1H (last 200 candles) + 15m (last 300 candles).
-- Cached 60s to respect rate limit.
-- **Requires:** Twelve Data API key (free tier, user signup).
+- explicit verbs: `signal | setup | trade idea | plan | analyze | analysis | chart | live chart`
+- asset name alone + action: `btc ka signal`, `analyze ethereum`, `eurusd chart`, `solana setup`
+- direction words: `buy | sell | long | short` together with an asset
 
-### 4. AI analysis upgrade `src/lib/gold-analysis.functions.ts`
-- Extends current Gemini call to return a **structured** plan:
-  ```json
-  {
-    "htfBias": "bullish",
-    "narration": ["Step 1…", "Step 2…", …],
-    "markings": [
-      {"type":"fvg","tf":"15m","from":2645,"to":2648,"startIdx":120,"endIdx":135,"label":"Bullish FVG"},
-      {"type":"orderBlock","tf":"1h","candleIdx":85,"label":"Demand OB"},
-      {"type":"liquidity","tf":"15m","price":2652,"side":"buy","label":"BSL sweep target"},
-      {"type":"bos","tf":"1h","fromIdx":60,"toIdx":90,"price":2640,"label":"Bullish BOS"}
-    ],
-    "trade": {"direction":"BUY","entry":2646,"sl":2642,"tp":2655,"rr":2.25,"confidence":87}
-  }
-  ```
-- Sends both HTF + LTF candle arrays to Gemini 2.5 Flash with strict ICT/SMC prompt.
+When an asset is detected but no explicit verb, default to opening the signal page for that asset (this matches the user's intent: "BTC ka analyze kar").
 
-### 5. Voice narration sequencer (in `signal.tsx`)
-- Iterates over `narration[]` array.
-- For each step: speak the line, simultaneously trigger the matching `markings[]` draw on chart.
-- ~1.5s pause between steps so user can see + hear.
-- Final step: read out the trade levels.
+### 3. Pass the asset through the route
+Navigate as `/signal?symbol=BTCUSD` (or whichever key was extracted). The signal route reads the `symbol` search param and uses it as the initial symbol instead of the hardcoded `XAUUSD` default. Re-analyze runs automatically on first load just like today.
 
-### 6. Intent routing (home page)
-- In `src/routes/index.tsx`, after AI reply, if `signal.direction !== "WAIT"` OR user text matches `/signal|setup|trade idea|analyze/i`, navigate to `/signal` instead of just speaking.
+### 4. Spoken handoff
+Before navigating, the agent briefly says "Opening live <ASSET> analysis" so the user knows the command landed on the right pair.
 
-## Files Touched
+### 5. Symbol picker on signal page (already exists, kept as-is)
+The picker stays — users can still switch pair on the signal page itself and a re-analysis fires.
 
-```text
-NEW  src/routes/signal.tsx
-NEW  src/components/SignalChart.tsx
-NEW  src/lib/market-data.functions.ts
-EDIT src/lib/gold-analysis.functions.ts  (structured markings output)
-EDIT src/routes/index.tsx                (intent → navigate)
-DEPS bun add lightweight-charts
-SECRET TWELVE_DATA_API_KEY
-```
+## Files touched
 
-## What I Need From You Before Building
+- `src/routes/index.tsx` — add `extractSymbol()` + `extractIntent()` helpers, update `handleCommand` to detect asset, speak the handoff line, and `navigate({ to: "/signal", search: { symbol } })`.
+- `src/routes/signal.tsx` — declare a typed `validateSearch` for `?symbol=`, seed `useState<string>(search.symbol ?? "XAUUSD")` for the initial symbol.
 
-1. **Twelve Data API key** — free signup at twelvedata.com (800 req/day free). I'll request it via secret prompt when you approve.
-2. **Confirm OK** to add `lightweight-charts` library (~40kb, MIT).
+No changes to the analysis engine, chart component, auditor, or news pipeline — they're already multi-asset.
 
-Once you approve, I'll build it end-to-end and you can say "Jenvu, gold signal" to see it live.
+## Out of scope
+
+- No new assets added to the registry.
+- No changes to the chart visuals or AI prompt.
+- Voice replies on the home page still use the existing `analyzeGold` function for general chat; only routing to `/signal` becomes asset-aware.
