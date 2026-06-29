@@ -28,22 +28,113 @@ const YAHOO_INTERVAL: Record<string, { interval: string; range: string }> = {
   "15m": { interval: "15m", range: "10d" },
   "30m": { interval: "30m", range: "20d" },
   "1h": { interval: "60m", range: "30d" },
-  "4h": { interval: "1h", range: "60d" }, // aggregated client-side conceptually
+  "4h": { interval: "1h", range: "60d" },
   "1d": { interval: "1d", range: "1y" },
 };
 
-const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 60_000; // 1 minute
+// ============================================================
+// UNIVERSAL INSTRUMENT RESOLVER
+// ============================================================
 
-async function fetchFromYahoo(tf: string): Promise<Candle[]> {
+export type InstrumentKind = "crypto" | "metal" | "forex" | "index" | "stock";
+
+export type ResolvedInstrument = {
+  raw: string;
+  key: string;
+  display: string;
+  kind: InstrumentKind;
+  decimals: number;
+  binanceSymbols?: string[];
+  yahooSymbols?: string[];
+  quote: string;
+  needsUsdNews: boolean;
+};
+
+const CRYPTO_BASES = new Set([
+  "BTC","ETH","BNB","SOL","XRP","ADA","DOGE","AVAX","DOT","MATIC","POL","LINK","TRX","LTC","BCH","ATOM","NEAR","ARB","OP","APT","SUI","TON","SHIB","PEPE","INJ","RNDR","TIA","FIL","ICP","ETC","HBAR","UNI","AAVE","MKR","XLM","ALGO","FTM","SAND","MANA","AXS","GRT","STX","IMX","KAS","RUNE","WLD","SEI","JUP","ORDI","ENA","FET",
+]);
+const G10_FX = new Set(["EUR","GBP","JPY","AUD","NZD","CAD","CHF","USD"]);
+const INDEX_MAP: Record<string, { yahoo: string; display: string; decimals: number }> = {
+  SPX: { yahoo: "^GSPC", display: "S&P 500", decimals: 2 },
+  SPX500: { yahoo: "^GSPC", display: "S&P 500", decimals: 2 },
+  US500: { yahoo: "^GSPC", display: "S&P 500", decimals: 2 },
+  NDX: { yahoo: "^NDX", display: "Nasdaq 100", decimals: 2 },
+  NAS100: { yahoo: "^NDX", display: "Nasdaq 100", decimals: 2 },
+  US100: { yahoo: "^NDX", display: "Nasdaq 100", decimals: 2 },
+  DJI: { yahoo: "^DJI", display: "Dow Jones", decimals: 2 },
+  US30: { yahoo: "^DJI", display: "Dow Jones", decimals: 2 },
+  DAX: { yahoo: "^GDAXI", display: "DAX", decimals: 2 },
+  FTSE: { yahoo: "^FTSE", display: "FTSE 100", decimals: 2 },
+  N225: { yahoo: "^N225", display: "Nikkei 225", decimals: 2 },
+  DXY: { yahoo: "DX-Y.NYB", display: "Dollar Index", decimals: 2 },
+};
+
+export function resolveInstrument(input: string): ResolvedInstrument {
+  const raw = (input || "").trim();
+  if (!raw) return resolveInstrument("XAUUSD");
+  const cleaned = raw.toUpperCase().replace(/[\s_\-]/g, "").replace(/PERP$/, "");
+
+  if (/^XAU(USD)?$/.test(cleaned) || cleaned === "GOLD") {
+    return {
+      raw, key: "METAL:XAUUSD", display: "XAU/USD", kind: "metal", decimals: 2,
+      binanceSymbols: ["PAXGUSDT", "XAUTUSDT"],
+      yahooSymbols: ["GC=F", "XAUUSD=X"],
+      quote: "USD", needsUsdNews: true,
+    };
+  }
+  if (/^XAG(USD)?$/.test(cleaned) || cleaned === "SILVER") {
+    return {
+      raw, key: "METAL:XAGUSD", display: "XAG/USD", kind: "metal", decimals: 3,
+      yahooSymbols: ["SI=F", "XAGUSD=X"], quote: "USD", needsUsdNews: true,
+    };
+  }
+  if (INDEX_MAP[cleaned]) {
+    const m = INDEX_MAP[cleaned];
+    return {
+      raw, key: `INDEX:${cleaned}`, display: m.display, kind: "index",
+      decimals: m.decimals, yahooSymbols: [m.yahoo], quote: "USD", needsUsdNews: true,
+    };
+  }
+  const fxMatch = cleaned.match(/^([A-Z]{3})\/?([A-Z]{3})$/);
+  if (fxMatch && G10_FX.has(fxMatch[1]) && G10_FX.has(fxMatch[2])) {
+    const [, b, q] = fxMatch;
+    return {
+      raw, key: `FX:${b}${q}`, display: `${b}/${q}`, kind: "forex",
+      decimals: q === "JPY" ? 3 : 5,
+      yahooSymbols: [`${b}${q}=X`],
+      quote: q, needsUsdNews: b === "USD" || q === "USD",
+    };
+  }
+  const cryptoMatch = cleaned.match(/^([A-Z0-9]{2,10})(USDT|USD|USDC|BUSD)?$/);
+  if (cryptoMatch && CRYPTO_BASES.has(cryptoMatch[1])) {
+    const base = cryptoMatch[1];
+    return {
+      raw, key: `CRYPTO:${base}USDT`, display: `${base}/USDT`, kind: "crypto",
+      decimals: base === "BTC" || base === "ETH" ? 2 : base === "SHIB" || base === "PEPE" ? 8 : 4,
+      binanceSymbols: [`${base}USDT`, `${base}USD`],
+      quote: "USDT", needsUsdNews: false,
+    };
+  }
+  if (/^[A-Z]{2,6}$/.test(cleaned)) {
+    return {
+      raw, key: `STOCK:${cleaned}`, display: cleaned, kind: "stock",
+      decimals: 2, yahooSymbols: [cleaned], quote: "USD", needsUsdNews: true,
+    };
+  }
+  return resolveInstrument("XAUUSD");
+}
+
+const candleCache = new Map<string, { at: number; data: Candle[] }>();
+const CACHE_TTL = 60_000;
+
+async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-  const symbols = ["GC=F", "XAUUSD=X"];
   let lastErr: any = null;
   for (const host of hosts) {
     for (const sym of symbols) {
       try {
-        const url = `https://${host}/v8/finance/chart/${sym}?interval=${cfg.interval}&range=${cfg.range}`;
+        const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${cfg.interval}&range=${cfg.range}`;
         const res = await fetch(url, {
           headers: {
             "User-Agent":
@@ -51,105 +142,74 @@ async function fetchFromYahoo(tf: string): Promise<Candle[]> {
             Accept: "application/json",
           },
         });
-        if (!res.ok) {
-          lastErr = new Error(`Yahoo ${host}/${sym}: ${res.status}`);
-          continue;
-        }
+        if (!res.ok) { lastErr = new Error(`Yahoo ${sym}: ${res.status}`); continue; }
         const json: any = await res.json();
         const result = json?.chart?.result?.[0];
-        if (!result) {
-          lastErr = new Error("No price data");
-          continue;
-        }
+        if (!result) { lastErr = new Error("No price data"); continue; }
         const ts: number[] = result.timestamp ?? [];
         const q = result.indicators?.quote?.[0] ?? {};
         const candles: Candle[] = [];
         for (let i = 0; i < ts.length; i++) {
-          const o = q.open?.[i],
-            h = q.high?.[i],
-            l = q.low?.[i],
-            c = q.close?.[i],
-            v = q.volume?.[i] ?? 0;
+          const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i], v = q.volume?.[i] ?? 0;
           if (o == null || h == null || l == null || c == null) continue;
           candles.push({ t: ts[i] * 1000, o, h, l, c, v });
         }
-        if (candles.length >= 10) return candles.slice(-120);
-      } catch (e) {
-        lastErr = e;
-      }
+        if (candles.length >= 10) return candles.slice(-200);
+      } catch (e) { lastErr = e; }
     }
   }
   throw lastErr ?? new Error("Yahoo unavailable");
 }
 
-async function fetchFromBinance(tf: string): Promise<Candle[]> {
+async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const map: Record<string, string> = {
     "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m",
     "1h": "1h", "4h": "4h", "1d": "1d",
   };
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
-  const symbols = ["PAXGUSDT", "XAUTUSDT"];
   let lastErr: any = null;
   for (const host of hosts) {
     for (const sym of symbols) {
       try {
         const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
         const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) { lastErr = new Error(`Binance ${host}/${sym}: ${res.status}`); continue; }
+        if (!res.ok) { lastErr = new Error(`Binance ${sym}: ${res.status}`); continue; }
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
           t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
         })).filter((c) => isFinite(c.c));
-        if (candles.length >= 10) return candles.slice(-180);
+        if (candles.length >= 10) return candles.slice(-200);
       } catch (e) { lastErr = e; }
     }
   }
   throw lastErr ?? new Error("Binance unavailable");
 }
 
-async function fetchFromStooq(): Promise<Candle[]> {
-  const res = await fetch("https://stooq.com/q/d/l/?s=xauusd&i=d", {
-    headers: { "User-Agent": "Mozilla/5.0" },
-  });
-  if (!res.ok) throw new Error(`Stooq: ${res.status}`);
-  const text = await res.text();
-  const lines = text.trim().split("\n").slice(1);
-  const candles: Candle[] = [];
-  for (const line of lines) {
-    const [date, o, h, l, c, v] = line.split(",");
-    const t = new Date(date).getTime();
-    const oN = +o, hN = +h, lN = +l, cN = +c;
-    if (!isFinite(oN) || !isFinite(cN)) continue;
-    candles.push({ t, o: oN, h: hN, l: lN, c: cN, v: +v || 0 });
+async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Promise<Candle[]> {
+  const cacheKey = `${inst.key}:${tf}`;
+  const cached = candleCache.get(cacheKey);
+  const now = Date.now();
+  if (cached && now - cached.at < CACHE_TTL) return cached.data;
+
+  const tries: Array<() => Promise<Candle[]>> = [];
+  if (inst.binanceSymbols?.length) tries.push(() => fetchFromBinanceSymbols(inst.binanceSymbols!, tf));
+  if (inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
+
+  let lastErr: any = null;
+  for (const f of tries) {
+    try {
+      const data = await f();
+      candleCache.set(cacheKey, { at: now, data });
+      return data;
+    } catch (e) { lastErr = e; }
   }
-  return candles.slice(-120);
+  if (cached) return cached.data;
+  throw lastErr ?? new Error(`No data source available for ${inst.display}`);
 }
 
 async function fetchGoldCandles(tf: string): Promise<Candle[]> {
-  const cached = candleCache.get(tf);
-  const now = Date.now();
-  if (cached && now - cached.at < CACHE_TTL) return cached.data;
-  // Binance PAXG (tokenized gold, tracks XAU/USD closely) — most edge-friendly
-  try {
-    const data = await fetchFromBinance(tf);
-    candleCache.set(tf, { at: now, data });
-    return data;
-  } catch {}
-  try {
-    const data = await fetchFromYahoo(tf);
-    candleCache.set(tf, { at: now, data });
-    return data;
-  } catch (e) {
-    if (cached) return cached.data;
-    try {
-      const data = await fetchFromStooq();
-      candleCache.set(tf, { at: now, data });
-      return data;
-    } catch {
-      throw e;
-    }
-  }
+  return fetchInstrumentCandles(resolveInstrument("XAUUSD"), tf);
 }
 
 export const analyzeGold = createServerFn({ method: "POST" })
@@ -340,6 +400,8 @@ export type SignalPlan = {
   htfCandles: CandleDTO[];
   ltfCandles: CandleDTO[];
   currentPrice: number;
+  instrument: { symbol: string; display: string; kind: InstrumentKind; decimals: number };
+
 };
 
 
@@ -393,18 +455,23 @@ async function fetchGoldNewsInline(): Promise<NewsItem[]> {
 }
 
 export const getSignalPlan = createServerFn({ method: "POST" })
-  .inputValidator((_d: unknown) => ({}))
-  .handler(async () => {
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { symbol?: string };
+    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
+  })
+  .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
+    const inst = resolveInstrument(data.symbol);
+
     const [htfRaw, ltfRaw, news] = await Promise.all([
-      fetchGoldCandles("1h").catch(() => [] as Candle[]),
-      fetchGoldCandles("15m").catch(() => [] as Candle[]),
-      fetchGoldNewsInline(),
+      fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
+      fetchInstrumentCandles(inst, "15m").catch(() => [] as Candle[]),
+      inst.needsUsdNews ? fetchGoldNewsInline() : Promise.resolve([] as NewsItem[]),
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
-      throw new Error("Live gold feed unavailable. Try again in a moment.");
+      throw new Error(`Live ${inst.display} feed unavailable. Try again in a moment.`);
     }
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
@@ -427,18 +494,32 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     const upcomingNews = news.filter((n) => n.minutesUntil >= -15 && n.minutesUntil <= 240);
     const imminentHigh = news.find((n) => n.impact === "High" && n.minutesUntil >= -15 && n.minutesUntil <= 60);
 
+    const dec = inst.decimals;
     const fmt = (arr: Candle[]) =>
       arr
-        .map((c) => `${Math.floor(c.t / 1000)}|${c.o.toFixed(2)},${c.h.toFixed(2)},${c.l.toFixed(2)},${c.c.toFixed(2)}`)
+        .map((c) => `${Math.floor(c.t / 1000)}|${c.o.toFixed(dec)},${c.h.toFixed(dec)},${c.l.toFixed(dec)},${c.c.toFixed(dec)}`)
         .join("\n");
 
-    const newsBlock = upcomingNews.length
+    const newsBlock = !inst.needsUsdNews
+      ? "Crypto market — no traditional USD economic calendar applied. Focus on on-chain liquidity, funding, and BTC dominance."
+      : upcomingNews.length
       ? upcomingNews
           .map((n) => `- [${n.impact}] ${n.country} ${n.title} in ${n.minutesUntil}m (forecast ${n.forecast ?? "-"}, prev ${n.previous ?? "-"})`)
           .join("\n")
-      : "No High/Medium USD or XAU events in the next 4 hours.";
+      : "No High/Medium USD events in the next 4 hours.";
 
-    const system = `You are Jenvu — an elite institutional XAU/USD trader with 25+ years on real bank/prop desks. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
+    const macroBlock =
+      inst.kind === "crypto"
+        ? "- BTC dominance, ETH/BTC ratio, total crypto market cap, stablecoin flows\n- Funding rates, open interest, liquidation clusters, exchange reserves\n- On-chain: whale wallets, miner outflows, ETF flows (BTC/ETH)\n- Macro risk-on/off, DXY inverse correlation on majors"
+        : inst.kind === "forex"
+          ? "- Central bank policy divergence, rate differentials, yields\n- DXY for USD pairs, risk-on/off flows, carry dynamics\n- High-impact data: NFP, CPI, FOMC, ECB, BoE, BoJ"
+          : inst.kind === "index"
+            ? "- Earnings season, breadth (advancers/decliners), sector rotation\n- VIX regime, yields (US10Y), Fed policy, mega-cap leadership"
+            : inst.kind === "stock"
+              ? "- Earnings, guidance, sector beta, index correlation, options flow\n- Macro: rates, risk-on/off, sector rotation"
+              : "- DXY inverse correlation, US10Y yields, real yields, risk on/off, COT positioning\n- News: NFP, CPI, FOMC, PPI, retail sales, geopolitical risk";
+
+    const system = `You are Jenvu — an elite institutional trader with 25+ years on bank/prop desks. You are a master of EVERY liquid market: gold, FX majors, indices, crypto, equities. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
 - Market structure: BOS, CHOCH, internal vs external structure, MSS
 - Premium / Discount arrays around equilibrium of the dealing range
 - Order Blocks (bullish/bearish), Breaker Blocks, Mitigation Blocks, Rejection Blocks
@@ -446,12 +527,12 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 - Liquidity: BSL/SSL, equal highs/lows, trendline liquidity, Asian range, PDH/PDL, weekly open, inducement
 - Liquidity sweeps, judas swing, turtle soup, stop runs
 - OTE (Optimal Trade Entry 62-79% Fib), standard deviations, symmetrical price delivery
-- Killzones (London 07-10 GMT, NY AM 12-15 GMT, NY PM 17-20 GMT, Asia 00-04 GMT)
+- Killzones (London 07-10 GMT, NY AM 12-15 GMT, NY PM 17-20 GMT, Asia 00-04 GMT) — crypto runs 24/7 but still respects these flows
 - Power of Three (Accumulation, Manipulation, Distribution)
-- DXY inverse correlation, US10Y yields, real yields, risk on/off, COT positioning
-- News/fundamental impact: NFP, CPI, FOMC, PPI, retail sales, geopolitical risk
+Macro context for ${inst.display} (${inst.kind.toUpperCase()}):
+${macroBlock}
 
-You are analyzing LIVE gold candles and must deliver an A+ institutional plan that gets drawn on a chart and narrated step-by-step by voice. Be specific, decisive, and pro — like a senior trader walking a junior through the chart. Reference the actual prices, structure, and times you see.
+You are analyzing LIVE ${inst.display} candles and must deliver an A+ institutional plan that gets drawn on a chart and narrated step-by-step by voice. Be specific, decisive, and pro — like a senior trader walking a junior through the chart. Reference the actual prices, structure, and times you see.
 
 LANGUAGE: ALL output text (intro, every narration "say", labels, summary, narratives, confluences) MUST be clear professional ENGLISH only. No Hindi/Urdu/Hinglish/Roman Urdu.
 
@@ -498,18 +579,19 @@ Rules:
   11) Confluence with killzone/DXY, 12) Entry trigger, 13) SL logic, 14) TP & invalidation.
 - ALWAYS include at minimum: 1 HTF BOS or CHOCH, 1 HTF OB or zone, 1 LTF FVG, 1 LTF OB, 1 liquidity level, plus entry/sl/tp markings.
 - Mention the current session/killzone (${session} / ${killzone}) and premium-vs-discount read explicitly.
-- If a HIGH impact USD/XAU news event is within 60 minutes, set direction="WAIT", confidence<=50, and clearly call out the news risk in summary and invalidation.
+- If a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, set direction="WAIT", confidence<=50, and clearly call out the news risk in summary and invalidation.
 - If conditions are not A+ set direction="WAIT", confidence<=55, explain what's missing in summary.`;
 
-    const user = `LIVE GOLD CANDLES (unix-seconds | O,H,L,C)
-CURRENT PRICE: ${last.c.toFixed(2)}
+    const user = `LIVE ${inst.display} CANDLES (unix-seconds | O,H,L,C)
+INSTRUMENT: ${inst.display} (${inst.kind})
+CURRENT PRICE: ${last.c.toFixed(dec)}
 SESSION: ${session} | KILLZONE: ${killzone}
-HTF SWING HIGH (160h): ${swingHigh.toFixed(2)} | SWING LOW: ${swingLow.toFixed(2)} | EQUILIBRIUM: ${equilibrium.toFixed(2)} | PRICE IS IN: ${inPremium ? "PREMIUM" : "DISCOUNT"}
-PDH (last 24h): ${pdh.toFixed(2)} | PDL: ${pdl.toFixed(2)}
+HTF SWING HIGH (160): ${swingHigh.toFixed(dec)} | SWING LOW: ${swingLow.toFixed(dec)} | EQUILIBRIUM: ${equilibrium.toFixed(dec)} | PRICE IS IN: ${inPremium ? "PREMIUM" : "DISCOUNT"}
+PDH (last 24h): ${pdh.toFixed(dec)} | PDL: ${pdl.toFixed(dec)}
 
-UPCOMING USD/XAU NEWS (next 4h):
+UPCOMING MACRO/NEWS (next 4h):
 ${newsBlock}
-${imminentHigh ? `\n⚠ HIGH IMPACT EVENT WITHIN 60 MIN: ${imminentHigh.title} in ${imminentHigh.minutesUntil}m — recommend WAIT.` : ""}
+${imminentHigh && inst.needsUsdNews ? `\n⚠ HIGH IMPACT EVENT WITHIN 60 MIN: ${imminentHigh.title} in ${imminentHigh.minutesUntil}m — recommend WAIT.` : ""}
 
 === HTF (1 HOUR, last ${htf.length} candles) ===
 ${fmt(htf)}
@@ -517,7 +599,7 @@ ${fmt(htf)}
 === LTF (15 MIN, last ${ltf.length} candles) ===
 ${fmt(ltf)}
 
-Produce the A+ ICT/SMC trade plan now.`;
+Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -609,6 +691,7 @@ Produce the A+ ICT/SMC trade plan now.`;
       htfCandles: htf.map(toDTO),
       ltfCandles: ltf.map(toDTO),
       currentPrice: last.c,
+      instrument: { symbol: inst.raw || inst.key, display: inst.display, kind: inst.kind, decimals: inst.decimals },
     };
 
     return plan;

@@ -10,11 +10,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 
+type SignalSearch = { symbol?: string };
 export const Route = createFileRoute("/signal")({
+  validateSearch: (s: Record<string, unknown>): SignalSearch => ({
+    symbol: typeof s.symbol === "string" ? s.symbol : undefined,
+  }),
   head: () => ({
     meta: [
-      { title: "Live Gold Signal — Jenvu AI" },
-      { name: "description", content: "Live ICT/SMC trade plan for XAU/USD with chart markings and voice narration." },
+      { title: "Live Trade Signal — Jenvu AI" },
+      { name: "description", content: "Live ICT/SMC trade plan with chart markings and voice narration for any market." },
     ],
   }),
   component: SignalPage,
@@ -22,6 +26,7 @@ export const Route = createFileRoute("/signal")({
 
 function SignalPage() {
   const navigate = useNavigate();
+  const { symbol } = Route.useSearch();
   const fetchPlan = useServerFn(getSignalPlan);
   const speech = useSpeech();
 
@@ -94,9 +99,8 @@ function SignalPage() {
     abortRef.current = true;
     speech.stopSpeaking();
     try {
-      const p = await fetchPlan({ data: {} });
+      const p = await fetchPlan({ data: { symbol: symbol || "XAUUSD" } });
       setPlan(p);
-      // run narration after small delay so chart mounts
       setTimeout(() => runNarration(p), 400);
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
@@ -104,16 +108,16 @@ function SignalPage() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchPlan, runNarration]);
+  }, [fetchPlan, runNarration, symbol]);
 
   useEffect(() => {
-    if (authReady && !plan && !loading) load();
+    if (authReady) load();
     return () => {
       abortRef.current = true;
       speech.stopSpeaking();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authReady]);
+  }, [authReady, symbol]);
 
   const stop = () => {
     abortRef.current = true;
@@ -144,7 +148,7 @@ function SignalPage() {
         <div className="text-center">
           <div className="text-[10px] uppercase tracking-[0.3em] text-amber-700/80 font-bold">Jenvu AI · Institutional Desk</div>
           <div className="text-base font-black tracking-tight flex items-center justify-center gap-2">
-            XAU/USD {plan && <span className="text-amber-600 tabular-nums">${plan.currentPrice.toFixed(2)}</span>}
+            {plan?.instrument.display ?? "Loading…"} {plan && <span className="text-amber-600 tabular-nums">{plan.instrument.kind === "crypto" ? "" : "$"}{plan.currentPrice.toFixed(plan.instrument.decimals)}</span>}
             {plan && (
               <span className="ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-900 text-white tracking-wider">
                 {plan.killzone}
@@ -235,10 +239,10 @@ function SignalPage() {
                     <div className="text-[11px] text-neutral-500">Confidence <span className="font-black text-neutral-900">{t.confidence}%</span></div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <Stat label="Entry" value={t.entry.toFixed(2)} />
+                    <Stat label="Entry" value={t.entry.toFixed(plan.instrument.decimals)} />
                     <Stat label="R:R" value={`1:${t.rr.toFixed(2)}`} />
-                    <Stat label="Stop Loss" value={t.sl.toFixed(2)} tone="bad" />
-                    <Stat label="Take Profit" value={t.tp.toFixed(2)} tone="good" />
+                    <Stat label="Stop Loss" value={t.sl.toFixed(plan.instrument.decimals)} tone="bad" />
+                    <Stat label="Take Profit" value={t.tp.toFixed(plan.instrument.decimals)} tone="good" />
                   </div>
                   {t.summary && <p className="text-xs text-neutral-700 mt-3 leading-relaxed border-t border-neutral-200/60 pt-3">{t.summary}</p>}
                   {t.invalidation && (
@@ -278,7 +282,7 @@ function SignalPage() {
                           )} />
                           <span className="text-neutral-700">{k.label}</span>
                         </span>
-                        <span className="font-mono font-bold tabular-nums text-neutral-900">${k.price.toFixed(2)}</span>
+                        <span className="font-mono font-bold tabular-nums text-neutral-900">{plan.instrument.kind === "crypto" ? "" : "$"}{k.price.toFixed(plan.instrument.decimals)}</span>
                       </div>
                     ))}
                   </div>

@@ -52,6 +52,41 @@ function parseTimeframe(text: string, fallback: string): string {
   return fallback;
 }
 
+const SYMBOL_KEYWORDS: Array<{ rx: RegExp; sym: string }> = [
+  { rx: /\b(gold|xau(?:\/?usd)?)\b/i, sym: "XAUUSD" },
+  { rx: /\b(silver|xag(?:\/?usd)?)\b/i, sym: "XAGUSD" },
+  { rx: /\b(bitcoin|btc)\b/i, sym: "BTC" },
+  { rx: /\b(ethereum|eth)\b/i, sym: "ETH" },
+  { rx: /\b(solana|sol)\b/i, sym: "SOL" },
+  { rx: /\b(ripple|xrp)\b/i, sym: "XRP" },
+  { rx: /\b(cardano|ada)\b/i, sym: "ADA" },
+  { rx: /\b(dogecoin|doge)\b/i, sym: "DOGE" },
+  { rx: /\b(bnb|binance\s*coin)\b/i, sym: "BNB" },
+  { rx: /\b(avalanche|avax)\b/i, sym: "AVAX" },
+  { rx: /\b(polkadot|dot)\b/i, sym: "DOT" },
+  { rx: /\b(chainlink|link)\b/i, sym: "LINK" },
+  { rx: /\b(litecoin|ltc)\b/i, sym: "LTC" },
+  { rx: /\b(toncoin|\bton\b)\b/i, sym: "TON" },
+  { rx: /\b(shiba|shib)\b/i, sym: "SHIB" },
+  { rx: /\bpepe\b/i, sym: "PEPE" },
+  { rx: /\b(nasdaq|nas100|ndx|us100)\b/i, sym: "NAS100" },
+  { rx: /\b(s\s*&\s*p\s*500|sp500|spx|us500)\b/i, sym: "SPX" },
+  { rx: /\b(dow\s*jones|us30|dji)\b/i, sym: "US30" },
+  { rx: /\bdxy\b/i, sym: "DXY" },
+  { rx: /\bdax\b/i, sym: "DAX" },
+];
+
+function detectSymbol(query: string): string {
+  // Explicit FX pair like "EUR/USD" or "EURUSD"
+  const fx = query.toUpperCase().match(/\b(EUR|GBP|JPY|AUD|NZD|CAD|CHF|USD)\s*\/?\s*(EUR|GBP|JPY|AUD|NZD|CAD|CHF|USD)\b/);
+  if (fx && fx[1] !== fx[2]) return `${fx[1]}${fx[2]}`;
+  for (const { rx, sym } of SYMBOL_KEYWORDS) if (rx.test(query)) return sym;
+  // Bare crypto/stock ticker (3-5 caps)
+  const t = query.toUpperCase().match(/\b([A-Z]{2,5})(?:\s*\/\s*USDT?)?\b/);
+  if (t && !/^(BUY|SELL|LONG|SHORT|TP|SL|WAIT|THE|AND|FOR|NOW|YES|ICT|SMC|HTF|LTF|BOS|FVG|OB|RR)$/.test(t[1])) return t[1];
+  return "XAUUSD";
+}
+
 function Home() {
   const navigate = useNavigate();
   const [authReady, setAuthReady] = useState(false);
@@ -130,11 +165,12 @@ function Home() {
   const handleCommand = useCallback(async (query: string) => {
     if (loadingRef.current || !query.trim()) return;
 
-    // Signal/setup/trade intent → navigate to /signal page
-    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analy[sz]e\s*gold|gold\s*(signal|setup|entry|trade|plan)|live\s*chart|show\s*chart|new\s*signal)\b/i.test(query)) {
+    // Signal/setup/trade intent → navigate to /signal page for ANY instrument the user names
+    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analy[sz]e|live\s*chart|show\s*chart|new\s*signal|chart\s*open|open\s*chart|view\s*chart)\b/i.test(query)) {
+      const symbol = detectSymbol(query);
       speech.stopSpeaking();
       speech.pauseListening();
-      navigate({ to: "/signal" });
+      navigate({ to: "/signal", search: { symbol } });
       return;
     }
 
