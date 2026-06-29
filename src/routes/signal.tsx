@@ -806,4 +806,4 @@ function TradeTrackerCard({
     </motion.div>
   );
 }
-}
+
