@@ -123,19 +123,6 @@ function AuthPage() {
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
 
-        <div className="absolute bottom-10 left-8 right-8 lg:left-14 lg:right-14 text-white">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/25 backdrop-blur-md mb-5">
-            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-            <span className="text-[11px] uppercase tracking-[0.25em]">Live</span>
-          </div>
-          <h2 className="text-4xl lg:text-6xl font-black uppercase tracking-tight leading-[0.95]">
-            Hello, <br className="hidden lg:block" />I'm Jenvu.
-          </h2>
-          <p className="mt-4 text-base lg:text-lg text-white/75 max-w-md leading-relaxed">
-            Your personal AI voice assistant — ready to talk, analyse the markets,
-            and guide your next move.
-          </p>
-        </div>
       </div>
     </div>
   );
