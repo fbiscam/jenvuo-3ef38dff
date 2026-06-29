@@ -3,13 +3,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Mic, X, Plus, Sliders, Moon, Sun } from "lucide-react";
+import { Mic, X, Plus, Sliders, Moon, Sun, LogOut } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import { SignalCard } from "@/components/SignalCard";
 import { NewsPanel } from "@/components/NewsPanel";
 import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { getGoldNews } from "@/lib/news.functions";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -50,7 +53,31 @@ function parseTimeframe(text: string, fallback: string): string {
 }
 
 function Home() {
+  const navigate = useNavigate();
+  const [authReady, setAuthReady] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!alive) return;
+      if (!data.session) {
+        navigate({ to: "/auth", replace: true });
+      } else {
+        setAuthReady(true);
+      }
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (!session) navigate({ to: "/auth", replace: true });
+    });
+    return () => { alive = false; sub.subscription.unsubscribe(); };
+  }, [navigate]);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
+
   const analyze = useServerFn(analyzeGold);
+
   const fetchNews = useServerFn(getGoldNews);
   const [timeframe, setTimeframe] = useState<string>("15m");
   const [signal, setSignal] = useState<GoldSignal | null>(null);
@@ -199,7 +226,12 @@ function Home() {
   };
 
 
+  if (!authReady) {
+    return <div className="fixed inset-0 bg-black" />;
+  }
+
   return (
+
     <div className={cn("fixed inset-0 w-screen overflow-hidden overscroll-none flex flex-col transition-colors duration-300", dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900")}>
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between shrink-0">
@@ -223,7 +255,21 @@ function Home() {
           >
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
+          <button
+            onClick={signOut}
+            className={cn(
+              "h-9 w-9 rounded-full flex items-center justify-center transition border",
+              dark
+                ? "bg-neutral-900 border-neutral-700 text-neutral-300 hover:bg-neutral-800"
+                : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-100",
+            )}
+            aria-label="Sign out"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
+
       </header>
 
       {/* Main: orb centerpiece */}
