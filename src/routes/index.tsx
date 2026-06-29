@@ -395,8 +395,7 @@ function HomePage() {
                 One terminal. Every major market.
               </h2>
               <p className="mt-4 text-zinc-900 leading-relaxed">
-                JENVU AI routes liquidity, structure and news context across asset classes —
-                with a specialist edge in Gold.
+                JENVU AI routes liquidity, structure and news context across asset classes
               </p>
             </div>
             <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
