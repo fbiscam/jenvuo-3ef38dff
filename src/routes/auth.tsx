@@ -64,7 +64,7 @@ function AuthPage() {
 
   return (
     <>
-    <style>{`@media (min-width: 1024px) and (min-height: 700px){.jenvu-auth-zoom{zoom:1.12}}`}</style>
+    <style>{`@media (min-width: 1280px) and (min-height: 800px){.jenvu-auth-zoom{zoom:1.05}}`}</style>
     <div className={`jenvu-auth-zoom h-dvh w-full overflow-hidden bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
 
 
@@ -238,6 +238,19 @@ function AuthPage() {
         </div>
       </main>
 
+      {/* FOOTER */}
+      <footer className="border-t border-zinc-100 shrink-0">
+        <div className="mx-auto max-w-6xl px-5 py-3 flex items-center justify-between gap-5">
+          <div className="flex items-center gap-2 text-[11px] text-zinc-400">
+            <span className="font-semibold text-zinc-900">JENVU AI</span>
+            <span>·</span>
+            <span>© {new Date().getFullYear()}</span>
+          </div>
+          <div className={`${MONO} text-[10px] text-zinc-400 uppercase tracking-widest`}>
+            v1.0 // AUTH_EDITION
+          </div>
+        </div>
+      </footer>
     </div>
     </>
   );
