@@ -566,7 +566,14 @@ function SignalPage() {
                     ? <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0 mt-0.5" />
                     : <span className="h-1.5 w-1.5 mt-1.5 rounded-full bg-emerald-500 shrink-0" />}
                   <div className="min-w-0">
-                    <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>News · {plan.session}</div>
+                    <div className={`flex items-center justify-between gap-2 text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+                      <span>News · {plan.session}</span>
+                      {newsUpdatedAt && (
+                        <span className="text-[9px] normal-case tracking-normal text-zinc-400">
+                          upd {new Date(newsUpdatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[11px] text-zinc-800 leading-snug mt-1">{plan.newsRisk.warning}</p>
                   </div>
                 </div>
