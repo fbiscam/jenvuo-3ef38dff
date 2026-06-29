@@ -16,7 +16,7 @@ export function PageShell({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-dvh w-full bg-white text-black font-[Urbanist,sans-serif]">
+    <div className="min-h-dvh w-full bg-white text-black font-[Outfit,Roboto,sans-serif]">
       <div
         className="pointer-events-none fixed inset-0 opacity-[0.035]"
         style={{
