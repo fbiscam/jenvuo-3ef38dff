@@ -5,13 +5,13 @@ import { CloudOrb } from "@/components/CloudOrb";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "JENVU AI — Voice-Native Trading Intelligence for Gold, FX Jenvu AI — Voice-Powered Trading Intelligence Crypto" },
+      { title: "JENVU AI — Voice-Native Trading Intelligence for Gold, FX & Crypto" },
       {
         name: "description",
         content:
           "Voice-native AI trading terminal for Gold, Crypto, FX & Indices. Live ICT/SMC analysis, A+ setups and spoken execution built on 25+ years of institutional logic.",
       },
-      { property: "og:title", content: "JENVU AI — Voice-Native Trading Intelligence for Gold, FX Jenvu AI — Voice-Powered Trading Intelligence Crypto" },
+      { property: "og:title", content: "JENVU AI — Voice-Native Trading Intelligence for Gold, FX & Crypto" },
       {
         property: "og:description",
         content: "Speak. Analyze. Execute. The voice terminal that turns market noise into institutional-grade signals.",
