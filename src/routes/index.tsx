@@ -245,34 +245,67 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
         </>
       )}
 
-      {/* iridescent ring removed */}
+      {/* ChatGPT-style blue cloudy sphere */}
       <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
-
-
-        {/* inner pearl sphere */}
         <div
           className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
           style={{
             background:
-              "radial-gradient(circle at 35% 30%, #ffffff 0%, #e0f2fe 25%, #c7d2fe 55%, #fbcfe8 85%, #fde68a 100%)",
+              "radial-gradient(circle at 50% 30%, #f0f9ff 0%, #bae6fd 35%, #60a5fa 75%, #1d4ed8 100%)",
             boxShadow:
-              "inset -18px -22px 50px rgba(124,58,237,0.25), inset 14px 16px 40px rgba(255,255,255,0.7), 0 20px 50px -10px rgba(167,139,250,0.4)",
+              "inset -10px -20px 50px rgba(30,58,138,0.55), inset 12px 14px 40px rgba(255,255,255,0.55), 0 10px 40px -10px rgba(59,130,246,0.5)",
           }}
         >
-          {/* drifting color wash inside the pearl */}
+          {/* drifting cloud layer 1 */}
           <div
-            className="absolute -inset-1/4 animate-spin opacity-70"
+            className="absolute -inset-1/3 animate-spin"
             style={{
-              animationDuration: "16s",
+              animationDuration: status === "speaking" ? "8s" : status === "thinking" ? "5s" : "20s",
               background:
-                "radial-gradient(40% 30% at 30% 40%, rgba(244,114,182,0.7), transparent 65%), radial-gradient(35% 25% at 70% 55%, rgba(56,189,248,0.7), transparent 65%), radial-gradient(40% 30% at 55% 80%, rgba(251,191,36,0.6), transparent 65%)",
-              filter: "blur(14px)",
+                "radial-gradient(45% 30% at 30% 35%, rgba(255,255,255,0.9), transparent 60%), radial-gradient(40% 28% at 70% 55%, rgba(255,255,255,0.75), transparent 65%), radial-gradient(35% 25% at 50% 80%, rgba(191,219,254,0.85), transparent 60%)",
+              filter: "blur(8px)",
               mixBlendMode: "screen",
             }}
           />
 
+          {/* drifting cloud layer 2 — counter rotating */}
+          <div
+            className="absolute -inset-1/4 animate-spin opacity-80"
+            style={{
+              animationDuration: status === "speaking" ? "11s" : "26s",
+              animationDirection: "reverse",
+              background:
+                "radial-gradient(40% 28% at 60% 30%, rgba(255,255,255,0.85), transparent 60%), radial-gradient(35% 22% at 25% 65%, rgba(219,234,254,0.8), transparent 65%), radial-gradient(45% 30% at 75% 75%, rgba(147,197,253,0.7), transparent 60%)",
+              filter: "blur(10px)",
+              mixBlendMode: "screen",
+            }}
+          />
+
+          {/* deep shadow base (gives the dark blue bottom) */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 110%, rgba(29,78,216,0.7), transparent 55%)",
+              mixBlendMode: "multiply",
+            }}
+          />
+
           {/* glossy top highlight */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.85),transparent_45%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_20%,rgba(255,255,255,0.7),transparent_50%)]" />
+
+          {/* speaking pulse — shadow that moves as AI talks */}
+          {status === "speaking" && (
+            <div
+              className="absolute inset-0 animate-pulse"
+              style={{
+                background:
+                  "radial-gradient(circle at 50% 70%, rgba(30,64,175,0.55), transparent 55%)",
+                animationDuration: "0.9s",
+                mixBlendMode: "multiply",
+              }}
+            />
+          )}
 
           {/* thinking shimmer sweep */}
           {status === "thinking" && (
@@ -280,7 +313,7 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
               className="absolute inset-0 animate-spin"
               style={{
                 background:
-                  "conic-gradient(from 0deg, transparent, rgba(255,255,255,0.9), transparent 25%)",
+                  "conic-gradient(from 0deg, transparent, rgba(255,255,255,0.85), transparent 25%)",
                 animationDuration: "1.2s",
                 mixBlendMode: "overlay",
               }}
@@ -288,6 +321,7 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
           )}
         </div>
       </div>
+
     </div>
   );
 }
