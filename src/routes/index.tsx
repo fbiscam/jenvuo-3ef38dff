@@ -62,11 +62,13 @@ function Home() {
   const greetedRef = useRef(false);
   const alertedRef = useRef<Set<string>>(new Set());
   const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [dark, setDark] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
+  const bufferRef = useRef("");
+  const [dark, setDark] = useState<boolean>(true);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     const v = window.localStorage.getItem("jenvu.theme");
-    return v ? v === "dark" : true;
-  });
+    if (v) setDark(v === "dark");
+  }, []);
   useEffect(() => {
     if (typeof window !== "undefined") window.localStorage.setItem("jenvu.theme", dark ? "dark" : "light");
   }, [dark]);
