@@ -149,8 +149,15 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 /* ---------- page ---------- */
 function HomePage() {
   const ticker = useLiveTicker();
+  const [zoom, setZoom] = React.useState<number | undefined>(undefined);
+  React.useEffect(() => {
+    const update = () => setZoom(window.innerWidth >= 1024 ? 1.5 : 1);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
   return (
-    <div style={{ zoom: 1.5 }} className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+    <div style={zoom ? { zoom } : undefined} className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
