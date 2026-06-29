@@ -170,7 +170,7 @@ function SignalPage() {
     <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased">
       {/* HEADER */}
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
-        <div className="mx-auto grid max-w-6xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4">
+        <div className="mx-auto grid max-w-[1600px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4">
           <button
             onClick={() => { stop(); navigate({ to: "/" }); }}
             className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
@@ -204,7 +204,7 @@ function SignalPage() {
       </header>
 
       {/* TERMINAL CARD */}
-      <section className="mx-auto max-w-6xl px-5 py-5 sm:px-6 sm:py-8">
+      <section className="mx-auto max-w-[1600px] px-5 py-5 sm:px-6 sm:py-8">
         <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
           {/* terminal header */}
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
@@ -236,7 +236,7 @@ function SignalPage() {
           {/* body grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
             {/* LEFT — ICT execution feed */}
-            <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-4 min-h-[280px]">
+            <div className="lg:col-span-2 bg-white p-5 sm:p-6 flex flex-col gap-4 min-h-[280px]">
               <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
                 ICT Execution Feed
               </h3>
@@ -286,7 +286,7 @@ function SignalPage() {
             </div>
 
             {/* CENTER — charts */}
-            <div className="lg:col-span-6 bg-white flex flex-col gap-px">
+            <div className="lg:col-span-8 bg-white flex flex-col gap-px">
               <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
@@ -330,7 +330,7 @@ function SignalPage() {
             </div>
 
             {/* RIGHT — intelligence */}
-            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 space-y-6 overflow-y-auto max-h-[820px]">
+            <div className="lg:col-span-2 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 space-y-6 overflow-y-auto max-h-[820px]">
               <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
                 Intelligence Dashboard
               </h3>
