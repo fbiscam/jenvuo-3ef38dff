@@ -298,43 +298,43 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
           className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
           style={{
             background:
-              "radial-gradient(circle at 50% 25%, #ffffff 0%, #dbeeff 22%, #a8d2ff 50%, #5ea8ee 78%, #2f7bc8 100%)",
+              "radial-gradient(circle at 50% 25%, #f4faff 0%, #b8dcff 28%, #5ea8ee 60%, #1f5fb0 90%, #0b3a7a 100%)",
             boxShadow:
-              "inset -8px -14px 40px rgba(40,100,180,0.45), inset 8px 12px 32px rgba(255,255,255,0.9), 0 0 50px rgba(120,180,240,0.45)",
+              "inset -10px -16px 44px rgba(20,60,140,0.6), inset 8px 12px 32px rgba(255,255,255,0.85), 0 0 60px rgba(120,180,240,0.55)",
           }}
         >
-          {/* Primary swirling current — clockwise (multi-color) */}
+          {/* Vivid colored blobs swirling — clockwise */}
           <div
             className="absolute -inset-1/3 animate-spin"
             style={{
               animationDuration: status === "speaking" ? "8s" : status === "thinking" ? "6s" : "16s",
               background:
-                "conic-gradient(from 0deg, rgba(255,180,220,0.75) 0%, rgba(180,220,255,0.0) 14%, rgba(255,225,150,0.75) 28%, rgba(255,255,255,0.0) 42%, rgba(160,255,210,0.75) 56%, rgba(220,235,255,0.0) 70%, rgba(190,170,255,0.8) 84%, rgba(255,180,220,0.75) 100%)",
-              filter: "blur(14px)",
+                "radial-gradient(28% 22% at 28% 30%, rgba(244,114,182,0.85), transparent 70%), radial-gradient(26% 20% at 72% 28%, rgba(251,191,36,0.8), transparent 70%), radial-gradient(30% 24% at 30% 72%, rgba(52,211,153,0.85), transparent 70%), radial-gradient(28% 22% at 74% 74%, rgba(167,139,250,0.85), transparent 70%)",
+              filter: "blur(18px)",
               mixBlendMode: "screen",
             }}
           />
 
-          {/* Counter current — collides with primary (multi-color) */}
+          {/* Counter-rotating color swirl */}
           <div
             className="absolute -inset-1/3 animate-spin"
             style={{
-              animationDuration: status === "speaking" ? "10s" : "20s",
+              animationDuration: status === "speaking" ? "10s" : "22s",
               animationDirection: "reverse",
               background:
-                "conic-gradient(from 180deg, rgba(120,200,255,0.0) 0%, rgba(255,170,200,0.85) 18%, rgba(255,255,255,0.0) 34%, rgba(140,235,200,0.8) 50%, rgba(180,210,255,0.0) 66%, rgba(255,210,140,0.85) 82%, rgba(180,160,255,0.7) 100%)",
-              filter: "blur(16px)",
+                "conic-gradient(from 90deg, rgba(244,114,182,0.6) 0%, rgba(56,189,248,0.0) 18%, rgba(251,191,36,0.6) 35%, rgba(255,255,255,0.0) 50%, rgba(52,211,153,0.6) 65%, rgba(56,189,248,0.0) 80%, rgba(167,139,250,0.6) 100%)",
+              filter: "blur(20px)",
               mixBlendMode: "screen",
             }}
           />
 
-          {/* Foamy crest where waves meet (iridescent) */}
+          {/* Foamy crest where waves meet */}
           <div
             className="absolute -inset-1/4 animate-spin"
             style={{
               animationDuration: status === "speaking" ? "6s" : "14s",
               background:
-                "radial-gradient(38% 14% at 50% 50%, rgba(255,255,255,0.95), transparent 70%), radial-gradient(28% 10% at 32% 58%, rgba(255,210,235,0.85), transparent 70%), radial-gradient(30% 11% at 68% 46%, rgba(200,245,255,0.9), transparent 70%)",
+                "radial-gradient(36% 12% at 50% 50%, rgba(255,255,255,0.9), transparent 70%), radial-gradient(26% 9% at 36% 58%, rgba(255,210,235,0.7), transparent 70%), radial-gradient(28% 10% at 66% 46%, rgba(200,245,255,0.8), transparent 70%)",
               filter: "blur(6px)",
               mixBlendMode: "screen",
             }}
