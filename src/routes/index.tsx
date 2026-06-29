@@ -337,9 +337,9 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
           className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
           style={{
             background:
-              "radial-gradient(circle at 50% 20%, #f0faff 0%, #cfeaff 25%, #7cc4f5 55%, #2f8fd6 80%, #0b3a66 100%)",
+              "radial-gradient(circle at 50% 22%, #ffffff 0%, #e0f2ff 22%, #a8d5f5 45%, #7cc4f5 70%, #bfe2fa 100%)",
             boxShadow:
-              "inset -10px -22px 50px rgba(7,40,76,0.65), inset 12px 14px 38px rgba(255,255,255,0.7)",
+              "inset -8px -16px 40px rgba(125,196,245,0.45), inset 12px 14px 38px rgba(255,255,255,0.85)",
           }}
         >
           {/* ocean wave layer 1 — sweeping */}
