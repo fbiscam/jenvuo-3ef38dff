@@ -146,7 +146,7 @@ function DownloadPage() {
             in your pocket.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-zinc-900 md:text-lg">
-            Jenvu on iOS, Android and desktop — same voice agent, same institutional engine, same A+ setups. Download links are being prepared and will appear here shortly.
+            Jenvu on iOS, Android and desktop — same voice agent, same institutional engine, same A+ setups. Download links are being prepared and will appear here shortly
           </p>
         </section>
 
