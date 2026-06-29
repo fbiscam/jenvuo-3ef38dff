@@ -663,7 +663,7 @@ function HomePage() {
                 Boot the terminal. Speak to the market.
               </h2>
               <p className="mt-3 text-zinc-900">
-                Your voice agent is one tap away — listening, reasoning, narrating.
+                Your voice agent is one tap away listening<br />reasoning, thinking, research & narrating.
               </p>
               <div className="mt-7 flex gap-3">
                 <Link
