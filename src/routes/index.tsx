@@ -215,134 +215,114 @@ function Home() {
 
 function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "speaking" }) {
   const scale =
-    status === "speaking" ? 1.06 :
-    status === "listening" ? 1.03 :
-    status === "thinking" ? 1.0 : 0.98;
+    status === "speaking" ? 1.05 :
+    status === "listening" ? 1.02 :
+    status === "thinking" ? 1.0 : 0.97;
 
-  const spinDuration =
-    status === "speaking" ? "8s" :
-    status === "thinking" ? "4s" :
-    status === "listening" ? "14s" : "22s";
+  const ringSpin =
+    status === "speaking" ? "6s" :
+    status === "thinking" ? "3s" :
+    status === "listening" ? "10s" : "18s";
+
+  const iridescent =
+    "conic-gradient(from 200deg, #ff6ba6 0%, #ff9966 12%, #ffd86b 24%, #6ee7b7 38%, #38bdf8 52%, #a78bfa 68%, #f472b6 84%, #ff6ba6 100%)";
 
   return (
-    <div className="relative h-72 w-72 sm:h-80 sm:w-80 flex items-center justify-center">
-      {/* rainbow outer halo */}
+    <div
+      className="relative h-[22rem] w-[22rem] sm:h-[26rem] sm:w-[26rem] flex items-center justify-center"
+      style={{
+        transform: `scale(${scale})`,
+        transition: "transform 900ms cubic-bezier(0.4,0,0.2,1)",
+      }}
+    >
+      {/* outer soft halo */}
       <div
-        className="absolute inset-0 rounded-full blur-3xl opacity-70 animate-spin"
+        className="absolute inset-0 rounded-full blur-3xl opacity-60 animate-spin"
         style={{
-          animationDuration: "16s",
-          background:
-            "conic-gradient(from 0deg, #f472b6, #a78bfa, #38bdf8, #34d399, #fbbf24, #fb7185, #f472b6)",
+          animationDuration: "22s",
+          background: iridescent,
         }}
       />
 
-      {/* rotating colorful ring shadow around the circle */}
-      <div
-        className="absolute -inset-6 rounded-full animate-spin"
-        style={{
-          animationDuration: "6s",
-          background:
-            "conic-gradient(from 0deg, #f472b6, #a78bfa, #38bdf8, #34d399, #fbbf24, #fb7185, #f472b6)",
-          WebkitMask:
-            "radial-gradient(circle, transparent 58%, #000 60%, #000 70%, transparent 72%)",
-          mask:
-            "radial-gradient(circle, transparent 58%, #000 60%, #000 70%, transparent 72%)",
-          filter: "blur(8px)",
-          opacity: 0.9,
-        }}
-      />
-
-      {/* orbiting colored glow dots */}
-      <div
-        className="absolute inset-0 animate-spin"
-        style={{ animationDuration: "7s" }}
-      >
-        <span className="absolute left-1/2 -top-2 -translate-x-1/2 h-6 w-6 rounded-full bg-fuchsia-400 blur-xl opacity-90" />
-        <span className="absolute left-1/2 -bottom-2 -translate-x-1/2 h-6 w-6 rounded-full bg-sky-400 blur-xl opacity-90" />
-        <span className="absolute top-1/2 -left-2 -translate-y-1/2 h-6 w-6 rounded-full bg-emerald-400 blur-xl opacity-90" />
-        <span className="absolute top-1/2 -right-2 -translate-y-1/2 h-6 w-6 rounded-full bg-amber-400 blur-xl opacity-90" />
-      </div>
-
+      {/* faint expanding rings */}
       {(status === "listening" || status === "speaking") && (
         <>
-          <span className="absolute -inset-2 rounded-full border border-fuchsia-200/70 animate-ping" style={{ animationDuration: "2.4s" }} />
-          <span className="absolute -inset-8 rounded-full border border-sky-200/60 animate-ping" style={{ animationDuration: "3.2s" }} />
+          <span className="absolute inset-6 rounded-full border border-white/20 animate-ping" style={{ animationDuration: "3s" }} />
+          <span className="absolute inset-2 rounded-full border border-white/10 animate-ping" style={{ animationDuration: "4s" }} />
         </>
       )}
 
-
-      {/* Colorful sphere */}
-      <div
-        className="relative h-60 w-60 sm:h-64 sm:w-64 rounded-full overflow-hidden shadow-[0_25px_70px_-10px_rgba(167,139,250,0.55)]"
-        style={{
-          transform: `scale(${scale})`,
-          transition: "transform 700ms cubic-bezier(0.4,0,0.2,1)",
-        }}
-      >
-        {/* base aurora */}
+      {/* iridescent ring (the main attraction) */}
+      <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 rounded-full animate-spin"
           style={{
-            background:
-              "linear-gradient(135deg, #c4b5fd 0%, #93c5fd 25%, #5eead4 50%, #fcd34d 75%, #fb7185 100%)",
+            animationDuration: ringSpin,
+            background: iridescent,
+            WebkitMask:
+              "radial-gradient(circle, transparent 56%, #000 60%, #000 90%, transparent 100%)",
+            mask:
+              "radial-gradient(circle, transparent 56%, #000 60%, #000 90%, transparent 100%)",
+            filter: "blur(2px) saturate(1.15)",
           }}
         />
 
-        {/* swirling color layer 1 */}
+        {/* secondary counter-spin ring for depth */}
         <div
-          className="absolute -inset-1/3 animate-spin"
+          className="absolute inset-1 rounded-full animate-spin opacity-70"
           style={{
-            animationDuration: spinDuration,
-            background:
-              "conic-gradient(from 0deg, rgba(244,114,182,0.9), rgba(167,139,250,0.9), rgba(56,189,248,0.9), rgba(52,211,153,0.9), rgba(251,191,36,0.9), rgba(244,114,182,0.9))",
-            filter: "blur(22px)",
-            mixBlendMode: "screen",
-          }}
-        />
-
-        {/* swirling color layer 2 (counter, softer) */}
-        <div
-          className="absolute -inset-1/4 animate-spin opacity-80"
-          style={{
-            animationDuration: "20s",
+            animationDuration: "14s",
             animationDirection: "reverse",
-            background:
-              "radial-gradient(45% 35% at 25% 30%, rgba(244,114,182,0.85), transparent 65%), radial-gradient(40% 30% at 75% 35%, rgba(56,189,248,0.85), transparent 65%), radial-gradient(50% 35% at 50% 80%, rgba(167,139,250,0.85), transparent 65%), radial-gradient(35% 25% at 80% 75%, rgba(251,191,36,0.7), transparent 70%)",
-            filter: "blur(14px)",
-            mixBlendMode: "screen",
-          }}
-        />
-
-        {/* drifting bright spots */}
-        <div
-          className="absolute -inset-1/4 animate-spin opacity-90"
-          style={{
-            animationDuration: "11s",
-            background:
-              "radial-gradient(20% 15% at 35% 40%, rgba(255,255,255,0.9), transparent 70%), radial-gradient(18% 14% at 65% 55%, rgba(255,255,255,0.7), transparent 70%)",
+            background: iridescent,
+            WebkitMask:
+              "radial-gradient(circle, transparent 60%, #000 64%, #000 86%, transparent 96%)",
+            mask:
+              "radial-gradient(circle, transparent 60%, #000 64%, #000 86%, transparent 96%)",
             filter: "blur(10px)",
             mixBlendMode: "screen",
           }}
         />
 
-        {/* glossy top sheen */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_32%_22%,rgba(255,255,255,0.55),transparent_50%)]" />
-
-        {/* inner edge depth */}
-        <div className="absolute inset-0 rounded-full shadow-[inset_-25px_-35px_70px_rgba(76,29,149,0.4),inset_15px_20px_50px_rgba(255,255,255,0.35)]" />
-
-        {/* thinking shimmer */}
-        {status === "thinking" && (
+        {/* inner pearl sphere */}
+        <div
+          className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
+          style={{
+            background:
+              "radial-gradient(circle at 35% 30%, #ffffff 0%, #e0f2fe 25%, #c7d2fe 55%, #fbcfe8 85%, #fde68a 100%)",
+            boxShadow:
+              "inset -18px -22px 50px rgba(124,58,237,0.25), inset 14px 16px 40px rgba(255,255,255,0.7), 0 20px 50px -10px rgba(167,139,250,0.4)",
+          }}
+        >
+          {/* drifting color wash inside the pearl */}
           <div
-            className="absolute inset-0 animate-spin"
+            className="absolute -inset-1/4 animate-spin opacity-70"
             style={{
-              background: "conic-gradient(from 0deg, transparent, rgba(255,255,255,0.8), transparent 25%)",
-              animationDuration: "1.3s",
-              mixBlendMode: "overlay",
+              animationDuration: "16s",
+              background:
+                "radial-gradient(40% 30% at 30% 40%, rgba(244,114,182,0.7), transparent 65%), radial-gradient(35% 25% at 70% 55%, rgba(56,189,248,0.7), transparent 65%), radial-gradient(40% 30% at 55% 80%, rgba(251,191,36,0.6), transparent 65%)",
+              filter: "blur(14px)",
+              mixBlendMode: "screen",
             }}
           />
-        )}
+
+          {/* glossy top highlight */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.85),transparent_45%)]" />
+
+          {/* thinking shimmer sweep */}
+          {status === "thinking" && (
+            <div
+              className="absolute inset-0 animate-spin"
+              style={{
+                background:
+                  "conic-gradient(from 0deg, transparent, rgba(255,255,255,0.9), transparent 25%)",
+                animationDuration: "1.2s",
+                mixBlendMode: "overlay",
+              }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
