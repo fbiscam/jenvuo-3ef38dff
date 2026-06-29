@@ -279,19 +279,28 @@ function HomePage() {
           ].map((s) => (
             <div
               key={s.n}
-              className="relative rounded-2xl bg-[#0A0A0A] text-white p-8 overflow-hidden group hover:-translate-y-1 transition"
+              className="group relative rounded-2xl bg-white border border-black/10 p-8 overflow-hidden hover:-translate-y-1 hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.25)] transition"
             >
               <div
-                className="absolute -top-6 -right-2 text-[7rem] font-black leading-none opacity-20"
-                style={{ color: ACCENT }}
+                className="absolute -top-6 -right-2 text-[7rem] font-black leading-none opacity-[0.08] group-hover:opacity-20 transition"
+                style={{ color: "#000" }}
               >
                 {s.n}
               </div>
-              <s.icon className="h-7 w-7" style={{ color: ACCENT }} />
+              <div
+                className="inline-flex h-12 w-12 items-center justify-center rounded-xl"
+                style={{ background: `${ACCENT}1f`, color: "#7a5a10" }}
+              >
+                <s.icon className="h-6 w-6" />
+              </div>
               <div className="mt-6 text-2xl font-black tracking-tight">
                 {s.title}
               </div>
-              <p className="mt-3 text-white/65 leading-relaxed">{s.body}</p>
+              <p className="mt-3 text-black/65 leading-relaxed">{s.body}</p>
+              <div
+                className="absolute bottom-0 left-0 h-[3px] w-0 group-hover:w-full transition-all duration-500"
+                style={{ background: ACCENT }}
+              />
             </div>
           ))}
         </div>
