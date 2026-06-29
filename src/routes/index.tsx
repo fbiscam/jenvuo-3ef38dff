@@ -1,256 +1,241 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-
-/**
- * JENVU AI — Homepage
- * Direction: Modular Technical Journal
- * Palette: Paper & Ink (#f5f3ee paper · #e8e4dd warm · #2d2d2d ink · #0d0d0d void)
- * Type: Sora display + Manrope body
- * Layout: Magazine — modular grid with hairline ink rules
- */
+import { CloudOrb } from "@/components/CloudOrb";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "JENVU AI — Institutional Voice Intelligence for Markets" },
+      { title: "JENVU AI — Your institutional voice agent for the markets." },
       {
         name: "description",
         content:
-          "A Jarvis-style voice agent powered by 25+ years of ICT & SMC institutional logic. Live signals for Gold, Crypto, Forex, Indices and Stocks.",
+          "JENVU is a Jarvis-style voice agent built on 25+ years of ICT & SMC institutional trading logic. Live signals for Gold, Crypto, FX, Indices.",
       },
-      { property: "og:title", content: "JENVU AI — Institutional Voice Intelligence for Markets" },
+      { property: "og:title", content: "JENVU AI — Your institutional voice agent for the markets." },
       {
         property: "og:description",
         content:
-          "A Jarvis-style voice agent powered by 25+ years of ICT & SMC institutional logic. Live signals across global markets.",
+          "A voice agent that listens, reasons and narrates A+ setups across global markets.",
       },
     ],
   }),
   component: HomePage,
 });
 
-const SECONDARY_FEATURES = [
-  {
-    kicker: "01 / Voice",
-    title: "Speak. Hear. Trade.",
-    body: "A push-to-talk Jarvis agent that listens, reasons and narrates institutional setups in real time.",
-  },
-  {
-    kicker: "02 / Multi-Asset",
-    title: "Gold, Crypto, FX, Indices, Stocks.",
-    body: "One reasoning engine, every session — from XAUUSD to majors, alts, and global equities.",
-  },
-  {
-    kicker: "03 / News & Killzones",
-    title: "Context that matters.",
-    body: "High-impact macro events, DXY context and London / New York killzone awareness baked into every call.",
-  },
-  {
-    kicker: "04 / A+ Setups",
-    title: "Entry. Stop. Three TPs.",
-    body: "Invalidation explicit. When conditions are weak, the agent tells you to stand aside.",
-  },
-];
-
 function HomePage() {
   return (
-    <div className="min-h-dvh w-full bg-[#f5f3ee] text-[#2d2d2d] font-['Manrope'] selection:bg-[#0d0d0d] selection:text-[#f5f3ee]">
-      <div className="mx-auto max-w-[1440px] p-6 md:p-12 lg:p-16">
-        {/* Masthead */}
-        <header className="border-b border-[#2d2d2d]/10 pb-8 mb-12 flex flex-col md:flex-row justify-between items-end gap-8">
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase tracking-[0.25em] font-bold mb-4 opacity-60">
-              Intelligence / Volume 02 / 2026
-            </span>
-            <h1 className="text-6xl md:text-8xl font-['Sora'] font-extrabold tracking-tighter leading-none text-[#0d0d0d]">
-              JENVU AI
-            </h1>
-          </div>
-          <div className="max-w-xs md:text-right space-y-4">
-            <p className="text-sm leading-relaxed font-medium">
-              A technical investigation into 25+ years of ICT &amp; SMC institutional logic,
-              spoken aloud by a voice agent built for traders.
-            </p>
-            <nav className="flex md:justify-end gap-5 text-[10px] font-bold uppercase tracking-[0.2em]">
-              <Link to="/about" className="hover:text-[#0d0d0d] hover:underline underline-offset-4">About</Link>
-              <Link to="/ai-engine" className="hover:text-[#0d0d0d] hover:underline underline-offset-4">Engine</Link>
-              <Link to="/signal" className="hover:text-[#0d0d0d] hover:underline underline-offset-4">Signals</Link>
-              <Link to="/auth" className="hover:text-[#0d0d0d] hover:underline underline-offset-4">Sign in</Link>
-            </nav>
-          </div>
-        </header>
-
-        {/* Editorial Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 border-t border-l border-[#2d2d2d]/10">
-          {/* Main Feature — left, high density */}
-          <Link
-            to="/"
-            className="md:col-span-7 border-r border-b border-[#2d2d2d]/10 p-8 md:p-12 flex flex-col justify-between group min-h-[460px] hover:bg-[#e8e4dd]/30 transition-colors"
-          >
-            <div className="mb-20">
-              <span className="inline-block px-2 py-1 bg-[#e8e4dd] text-[10px] font-bold uppercase tracking-widest mb-6">
-                Featured Report
-              </span>
-              <h2 className="text-4xl md:text-5xl font-['Sora'] font-semibold leading-[1.05] tracking-tight text-[#0d0d0d]">
-                The voice agent that thinks in liquidity, structure and institutional intent.
-              </h2>
-            </div>
-            <div className="flex flex-wrap gap-6 justify-between items-end">
-              <div className="max-w-md">
-                <p className="text-lg opacity-80 leading-relaxed">
-                  Press the orb. Speak a pair. JENVU narrates bias, order blocks, fair value gaps
-                  and OTE entries in real time — the way a 25-year desk lead would brief you.
-                </p>
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] border-b border-[#2d2d2d] pb-1 group-hover:border-[#0d0d0d] group-hover:text-[#0d0d0d]">
-                Launch Voice Agent →
-              </span>
-            </div>
+    <div className="min-h-dvh w-full bg-white text-[#0a0a0a] font-['Inter',system-ui,sans-serif] antialiased selection:bg-black selection:text-white">
+      {/* NAV */}
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-black/[0.06]">
+        <div className="mx-auto max-w-[1280px] px-6 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
+            <span className="inline-block h-5 w-5 rounded-[5px] bg-black" />
+            <span className="text-[15px]">JENVU</span>
           </Link>
-
-          {/* Right Column Stack */}
-          <div className="md:col-span-5 grid grid-rows-2">
-            {/* Upper — Signal Engine */}
+          <nav className="hidden md:flex items-center gap-8 text-[14px] text-black/70">
+            <Link to="/ai-engine" className="hover:text-black transition-colors">Product</Link>
+            <Link to="/signal" className="hover:text-black transition-colors">Signals</Link>
+            <Link to="/about" className="hover:text-black transition-colors">About</Link>
+            <Link to="/llm" className="hover:text-black transition-colors">Engine</Link>
+          </nav>
+          <div className="flex items-center gap-2">
             <Link
-              to="/signal"
-              className="border-r border-b border-[#2d2d2d]/10 p-8 md:p-10 bg-[#e8e4dd]/40 group hover:bg-[#e8e4dd]/70 transition-colors"
+              to="/auth"
+              className="hidden sm:inline-flex text-[14px] text-black/70 hover:text-black px-3 py-1.5"
             >
-              <div className="flex justify-between mb-8">
-                <span className="text-[10px] font-bold opacity-40 tracking-widest">01 / SIGNAL ENGINE</span>
-                <span className="text-[10px] font-bold opacity-40 tracking-widest">ICT · SMC</span>
-              </div>
-              <h3 className="text-2xl font-['Sora'] font-semibold mb-4 leading-tight text-[#0d0d0d]">
-                FVG, order blocks &amp; liquidity drawn live on the chart.
-              </h3>
-              <p className="text-sm opacity-70 mb-6 leading-relaxed">
-                BOS, CHoCH and OTE entries rendered on dual timeframes — narrated as they form.
-              </p>
-              <div className="h-px w-12 bg-[#2d2d2d] group-hover:w-24 transition-all duration-300"></div>
+              Sign in
             </Link>
+            <Link
+              to="/auth"
+              className="hidden sm:inline-flex items-center text-[13px] font-medium px-3.5 py-1.5 rounded-full border border-black/15 hover:border-black/40 transition-colors"
+            >
+              Request access
+            </Link>
+            <Link
+              to="/app"
+              className="inline-flex items-center text-[13px] font-medium px-3.5 py-1.5 rounded-full bg-black text-white hover:bg-black/85 transition-colors"
+            >
+              Launch
+            </Link>
+          </div>
+        </div>
+      </header>
 
-            {/* Lower — Live Terminal (void accent) */}
-            <div className="border-r border-b border-[#2d2d2d]/10 p-8 md:p-10 bg-[#0d0d0d] text-[#f5f3ee]">
-              <div className="flex justify-between mb-8">
-                <span className="text-[10px] font-bold opacity-60 tracking-widest">02 / DESK LOGIC</span>
-                <div className="flex gap-2 items-center">
-                  <span className="w-2 h-2 rounded-full bg-[#c9a84c] animate-pulse"></span>
-                  <span className="text-[10px] font-bold opacity-60 tracking-widest">LIVE</span>
-                </div>
+      {/* HERO */}
+      <section className="mx-auto max-w-[1280px] px-6 pt-24 md:pt-36 pb-16">
+        <h1 className="font-['Newsreader','Times_New_Roman',serif] text-[44px] md:text-[64px] lg:text-[76px] leading-[1.02] tracking-[-0.02em] max-w-[18ch] text-black">
+          JENVU is your voice agent for trading ambitious markets.
+        </h1>
+
+        <div className="mt-12 flex flex-wrap items-center gap-3">
+          <Link
+            to="/app"
+            className="inline-flex items-center gap-2 rounded-full bg-black text-white px-5 py-3 text-[14px] font-medium hover:bg-black/85 transition-colors"
+          >
+            Launch voice agent
+            <span aria-hidden>↓</span>
+          </Link>
+          <Link
+            to="/signal"
+            className="inline-flex items-center gap-2 rounded-full bg-black/[0.04] text-black px-5 py-3 text-[14px] font-medium hover:bg-black/[0.08] transition-colors"
+          >
+            Open signal engine
+            <span aria-hidden>→</span>
+          </Link>
+          <Link
+            to="/auth"
+            className="inline-flex items-center gap-2 rounded-full text-black/70 hover:text-black px-3 py-3 text-[14px] font-medium"
+          >
+            Request a demo <span aria-hidden>→</span>
+          </Link>
+        </div>
+      </section>
+
+      {/* PRODUCT VISUAL */}
+      <section className="mx-auto max-w-[1280px] px-6 pb-24">
+        <div className="relative rounded-[28px] overflow-hidden bg-[#f5f3ee] border border-black/[0.06] shadow-[0_30px_80px_-40px_rgba(0,0,0,0.25)]">
+          <div className="aspect-[16/9] w-full relative flex items-center justify-center">
+            {/* Soft brand wash */}
+            <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_0%,#efe9dc_0%,#f5f3ee_60%,#ece6d6_100%)]" />
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="scale-90 md:scale-100">
+                <CloudOrb status="speaking" pulse={2} />
               </div>
-              <h3 className="text-2xl font-['Sora'] font-semibold mb-4 leading-snug">
-                25 years of institutional reasoning, spoken in plain English.
-              </h3>
-              <p className="text-sm opacity-60 leading-relaxed">
-                Bias · structure · premium and discount · liquidity playbooks — the way the desk talks.
-              </p>
+              <div className="mt-6 text-[13px] tracking-[0.18em] uppercase text-black/55 font-medium">
+                Live · Voice Agent · ICT / SMC
+              </div>
+            </div>
+
+            {/* Floating mock panels */}
+            <div className="hidden md:block absolute left-8 top-8 rounded-xl bg-white/90 backdrop-blur border border-black/[0.06] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] px-4 py-3 text-[12px]">
+              <div className="text-black/45 tracking-[0.15em] uppercase text-[10px] mb-1">Bias · XAUUSD</div>
+              <div className="font-semibold text-black">Bullish · OTE 62%</div>
+            </div>
+            <div className="hidden md:block absolute right-8 top-12 rounded-xl bg-white/90 backdrop-blur border border-black/[0.06] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] px-4 py-3 text-[12px]">
+              <div className="text-black/45 tracking-[0.15em] uppercase text-[10px] mb-1">Killzone</div>
+              <div className="font-semibold text-black">London Open · Active</div>
+            </div>
+            <div className="hidden md:block absolute left-12 bottom-10 rounded-xl bg-black text-white px-4 py-3 text-[12px] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.4)]">
+              <div className="opacity-60 tracking-[0.15em] uppercase text-[10px] mb-1">Setup</div>
+              <div className="font-semibold">FVG fill → BOS confirm → 3 TPs</div>
+            </div>
+            <div className="hidden md:block absolute right-10 bottom-8 rounded-xl bg-white/90 backdrop-blur border border-black/[0.06] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] px-4 py-3 text-[12px]">
+              <div className="text-black/45 tracking-[0.15em] uppercase text-[10px] mb-1">Invalidation</div>
+              <div className="font-semibold text-black">Below 2,318.40</div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Bottom Row — Secondary Features (4 columns) */}
-          {SECONDARY_FEATURES.map((f, i) => (
+      {/* MANIFESTO */}
+      <section className="mx-auto max-w-[1280px] px-6 py-24 border-t border-black/[0.06]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-5">
+            <div className="text-[12px] tracking-[0.22em] uppercase text-black/45 font-medium mb-4">
+              The desk
+            </div>
+            <h2 className="font-['Newsreader',serif] text-[36px] md:text-[44px] leading-[1.05] tracking-[-0.02em] text-black">
+              Markets are changing. We are a small group of traders, engineers and researchers building the agent we always wanted on the desk.
+            </h2>
+          </div>
+          <div className="lg:col-span-6 lg:col-start-7 self-end">
+            <p className="text-[17px] leading-relaxed text-black/70 max-w-[52ch]">
+              JENVU listens, reasons in ICT &amp; SMC, watches the session, the killzone and the news — then narrates the plan out loud. Bias. Levels. Entry. Invalidation. Three targets. If the setup isn't A+, it tells you to stand aside.
+            </p>
+            <div className="mt-8 flex gap-6 text-[13px] font-medium">
+              <Link to="/about" className="underline underline-offset-4 decoration-black/30 hover:decoration-black">
+                See the methodology →
+              </Link>
+              <Link to="/ai-engine" className="underline underline-offset-4 decoration-black/30 hover:decoration-black">
+                Inside the engine →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TIMELINE — Cursor-style table */}
+      <section className="mx-auto max-w-[1280px] px-6 pb-24">
+        <div className="text-[12px] tracking-[0.22em] uppercase text-black/45 font-medium mb-6">
+          Capabilities
+        </div>
+        <div className="border-t border-black/10">
+          {[
+            ["LIVE", "Voice agent · push-to-talk", "Shipped"],
+            ["LIVE", "ICT & SMC analysis · multi-timeframe", "Shipped"],
+            ["LIVE", "FVG, order blocks, liquidity drawn on chart", "Shipped"],
+            ["LIVE", "Killzones · London / New York session logic", "Shipped"],
+            ["LIVE", "High-impact news + DXY context", "Shipped"],
+            ["LIVE", "Gold · Crypto · FX · Indices · Equities", "Shipped"],
+            ["SOON", "Personal trade journal + voice review", "In build"],
+            ["SOON", "Broker-side execution bridge", "In build"],
+          ].map(([tag, label, status]) => (
             <div
-              key={f.kicker}
-              className={`md:col-span-3 border-r border-b border-[#2d2d2d]/10 p-8 md:p-10 min-h-[240px] ${
-                i % 2 === 1 ? "bg-[#e8e4dd]/40" : ""
-              }`}
+              key={label}
+              className="grid grid-cols-12 gap-4 border-b border-black/10 py-4 text-[15px] items-baseline"
             >
-              <span className="text-[10px] font-bold uppercase tracking-[0.25em] opacity-40 mb-4 block">
-                {f.kicker}
-              </span>
-              <h4 className="font-['Sora'] font-semibold text-xl mb-4 leading-tight text-[#0d0d0d]">
-                {f.title}
-              </h4>
-              <p className="text-sm opacity-70 leading-relaxed">{f.body}</p>
+              <div className="col-span-2 md:col-span-1 text-[11px] tracking-[0.2em] font-semibold text-black/50">
+                {tag}
+              </div>
+              <div className="col-span-7 md:col-span-9 text-black">{label}</div>
+              <div className="col-span-3 md:col-span-2 text-right text-black/55 text-[13px]">
+                {status}
+              </div>
             </div>
           ))}
         </div>
+      </section>
 
-        {/* Manifesto strip */}
-        <section className="grid grid-cols-1 md:grid-cols-12 border-l border-b border-r border-[#2d2d2d]/10">
-          <div className="md:col-span-4 p-8 md:p-10 border-r border-[#2d2d2d]/10">
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] opacity-40 mb-4 block">
-              Methodology
-            </span>
-            <h3 className="font-['Sora'] font-semibold text-2xl leading-tight text-[#0d0d0d]">
-              No noise. No hype.<br />Only setups that justify the risk.
-            </h3>
-          </div>
-          <div className="md:col-span-8 p-8 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              ["Listen", "Push the orb, say a ticker. The agent records, transcribes, and routes."],
-              ["Reason", "ICT & SMC analysis runs across multiple timeframes with session context."],
-              ["Narrate", "The plan is spoken aloud: bias, levels, entries, invalidation, three TPs."],
-            ].map(([t, b], i) => (
-              <div key={t}>
-                <span className="text-[10px] font-bold tracking-[0.25em] opacity-40">0{i + 1}</span>
-                <h4 className="font-['Sora'] font-semibold text-lg mt-2 mb-3 text-[#0d0d0d]">{t}</h4>
-                <p className="text-sm opacity-70 leading-relaxed">{b}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      {/* COVERAGE STRIP */}
+      <section className="border-t border-black/[0.06]">
+        <div className="mx-auto max-w-[1280px] px-6 py-12 flex flex-wrap items-center gap-x-10 gap-y-3 text-[13px] tracking-[0.18em] uppercase text-black/55">
+          <span className="text-black/35">Coverage —</span>
+          {["XAUUSD", "BTC", "ETH", "EURUSD", "GBPUSD", "USDJPY", "NAS100", "SPX500", "DXY", "Equities A–Z"].map((a) => (
+            <span key={a} className="font-medium text-black/70">{a}</span>
+          ))}
+        </div>
+      </section>
 
-        {/* Asset Coverage */}
-        <section className="border-l border-r border-b border-[#2d2d2d]/10 p-8 md:p-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="max-w-md">
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] opacity-40 block mb-3">
-              Asset Coverage
-            </span>
-            <h3 className="font-['Sora'] font-semibold text-2xl leading-tight text-[#0d0d0d]">
-              Gold first. Then everything else that moves.
-            </h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {["XAUUSD", "BTC", "ETH", "EURUSD", "GBPUSD", "USDJPY", "NAS100", "SPX500", "DXY", "Equities A–Z"].map((a) => (
-              <span
-                key={a}
-                className="px-3 py-1.5 border border-[#2d2d2d]/20 text-xs font-bold tracking-widest uppercase hover:bg-[#0d0d0d] hover:text-[#f5f3ee] hover:border-[#0d0d0d] transition-colors cursor-default"
-              >
-                {a}
-              </span>
-            ))}
-          </div>
-        </section>
-
-        {/* Dual CTA */}
-        <section className="grid grid-cols-1 md:grid-cols-2 border-l border-r border-b border-[#2d2d2d]/10">
+      {/* CTA */}
+      <section className="mx-auto max-w-[1280px] px-6 py-28 text-center">
+        <h3 className="font-['Newsreader',serif] text-[40px] md:text-[56px] leading-[1.05] tracking-[-0.02em] max-w-[20ch] mx-auto">
+          Press the orb. Speak a pair. Trade with conviction.
+        </h3>
+        <div className="mt-10 flex justify-center gap-3 flex-wrap">
           <Link
-            to="/"
-            className="p-8 md:p-12 border-r border-[#2d2d2d]/10 bg-[#0d0d0d] text-[#f5f3ee] group hover:bg-[#1a1a1a] transition-colors"
+            to="/app"
+            className="inline-flex items-center gap-2 rounded-full bg-black text-white px-6 py-3.5 text-[14px] font-medium hover:bg-black/85 transition-colors"
           >
-            <span className="text-[10px] font-bold tracking-[0.25em] opacity-60 block mb-6">
-              CHANNEL 01
-            </span>
-            <h3 className="font-['Sora'] font-semibold text-3xl md:text-4xl leading-tight mb-6">
-              Launch the voice agent.
-            </h3>
-            <span className="text-[10px] font-bold tracking-[0.25em] border-b border-[#f5f3ee] pb-1 group-hover:tracking-[0.35em] transition-all">
-              SPEAK NOW →
-            </span>
+            Launch JENVU
           </Link>
-          <Link to="/signal" className="p-8 md:p-12 group hover:bg-[#e8e4dd]/40 transition-colors">
-            <span className="text-[10px] font-bold tracking-[0.25em] opacity-60 block mb-6">
-              CHANNEL 02
-            </span>
-            <h3 className="font-['Sora'] font-semibold text-3xl md:text-4xl leading-tight mb-6 text-[#0d0d0d]">
-              Open the signal engine.
-            </h3>
-            <span className="text-[10px] font-bold tracking-[0.25em] border-b border-[#2d2d2d] pb-1 group-hover:tracking-[0.35em] transition-all">
-              READ THE CHART →
-            </span>
+          <Link
+            to="/signal"
+            className="inline-flex items-center gap-2 rounded-full bg-black/[0.04] text-black px-6 py-3.5 text-[14px] font-medium hover:bg-black/[0.08] transition-colors"
+          >
+            Open signals
           </Link>
-        </section>
+        </div>
+      </section>
 
-        {/* Footer Colophon */}
-        <footer className="mt-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-[10px] font-bold tracking-[0.25em] opacity-50">
-          <div className="flex flex-wrap gap-6">
-            <Link to="/about" className="hover:opacity-100">ABOUT</Link>
-            <Link to="/ai-engine" className="hover:opacity-100">METHODOLOGY</Link>
-            <Link to="/signal" className="hover:opacity-100">SIGNALS</Link>
-            <Link to="/auth" className="hover:opacity-100">SIGN IN</Link>
+      {/* FOOTER */}
+      <footer className="border-t border-black/[0.06]">
+        <div className="mx-auto max-w-[1280px] px-6 py-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <span className="inline-block h-5 w-5 rounded-[5px] bg-black" />
+            <span className="font-semibold tracking-tight">JENVU</span>
           </div>
-          <div>© 2026 JENVU AI — BUILT FOR THE INSTITUTIONAL DESK</div>
-        </footer>
-      </div>
+          <nav className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-black/60">
+            <Link to="/about" className="hover:text-black">About</Link>
+            <Link to="/ai-engine" className="hover:text-black">Engine</Link>
+            <Link to="/llm" className="hover:text-black">LLM</Link>
+            <Link to="/development" className="hover:text-black">Build</Link>
+            <Link to="/signal" className="hover:text-black">Signals</Link>
+            <Link to="/privacy" className="hover:text-black">Privacy</Link>
+            <Link to="/terms" className="hover:text-black">Terms</Link>
+            <Link to="/disclaimer" className="hover:text-black">Disclaimer</Link>
+          </nav>
+          <div className="text-[12px] text-black/40">© {new Date().getFullYear()} JENVU AI</div>
+        </div>
+      </footer>
     </div>
   );
 }
