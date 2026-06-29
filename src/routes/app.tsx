@@ -103,19 +103,19 @@ function useLiveTicker(): TickerRow[] {
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "Voice Trading Terminal — JENVU AI" },
+      { title: "Voice Trading Terminal — Jenvu - AI" },
       {
         name: "description",
         content:
-          "Speak to JENVU AI and get live institutional ICT/SMC analysis for Gold, Crypto, FX and Indices — A+ setups, structured entries, stops and targets narrated in real time.",
+          "Speak to Jenvu - AI and get live institutional ICT/SMC analysis for Gold, Crypto, FX and Indices — A+ setups, structured entries, stops and targets narrated in real time.",
       },
       { name: "keywords", content: "voice trading agent, AI trading terminal, gold voice analysis, ICT voice agent, SMC trading AI, XAUUSD voice signals" },
-      { property: "og:title", content: "Voice Trading Terminal — JENVU AI" },
+      { property: "og:title", content: "Voice Trading Terminal — Jenvu - AI" },
       { property: "og:description", content: "Voice-native institutional trading agent for Gold, Crypto, FX and Indices." },
       { property: "og:url", content: "https://jenvu.com/app" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Voice Trading Terminal — JENVU AI" },
+      { name: "twitter:title", content: "Voice Trading Terminal — Jenvu - AI" },
       { name: "twitter:description", content: "Speak. Analyze. Execute. Institutional ICT/SMC narrated live." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/app" }],
@@ -125,7 +125,7 @@ export const Route = createFileRoute("/app")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          name: "JENVU AI Voice Terminal",
+          name: "Jenvu - AI Voice Terminal",
           url: "https://jenvu.com/app",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
@@ -394,8 +394,8 @@ function Home() {
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md shrink-0">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:grid-cols-[1fr_auto_1fr] md:gap-4">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
-            <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
-            <span className="truncate font-semibold tracking-tight">JENVU AI</span>
+            <img src="/favicon.png" alt="Jenvu - AI" className="h-6 w-6 rounded-md object-contain" />
+            <span className="truncate font-semibold tracking-tight">Jenvu - AI</span>
           </Link>
           <div className="hidden md:flex justify-center">
             <StatusPill status={status} supported={speech.supported} dark={false} />

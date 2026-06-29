@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/download")({
   head: () => ({
     meta: [
-      { title: "Download Our Application — JENVU AI" },
+      { title: "Download Our Application — Jenvu - AI" },
       {
         name: "description",
         content:
-          "Get JENVU AI on your device. Native iOS, Android APK and desktop PWA — the institutional voice trading agent for Gold, Crypto, FX & Indices in your pocket.",
+          "Get Jenvu - AI on your device. Native iOS, Android APK and desktop PWA — the institutional voice trading agent for Gold, Crypto, FX & Indices in your pocket.",
       },
-      { property: "og:title", content: "Download Our Application — JENVU AI" },
+      { property: "og:title", content: "Download Our Application — Jenvu - AI" },
       {
         property: "og:description",
         content:
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/download")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          name: "JENVU AI",
+          name: "Jenvu - AI",
           applicationCategory: "FinanceApplication",
           operatingSystem: "iOS, Android, Web",
           description:
@@ -112,8 +112,8 @@ function DownloadPage() {
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
-              <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
-              <span className="truncate font-semibold tracking-tight">JENVU AI</span>
+              <img src="/favicon.png" alt="Jenvu - AI" className="h-6 w-6 rounded-md object-contain" />
+              <span className="truncate font-semibold tracking-tight">Jenvu - AI</span>
             </Link>
             <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900">
               <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
@@ -146,7 +146,7 @@ function DownloadPage() {
             in your pocket.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-zinc-900 md:text-lg">
-            JENVU AI on iOS, Android and desktop — same voice agent, same institutional engine, same A+ setups. Download links are being prepared and will appear here shortly.
+            Jenvu - AI on iOS, Android and desktop — same voice agent, same institutional engine, same A+ setups. Download links are being prepared and will appear here shortly.
           </p>
         </section>
 
@@ -258,8 +258,8 @@ function DownloadPage() {
         <footer className="border-t border-zinc-100">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10 flex flex-col md:flex-row items-center justify-between gap-5 text-sm text-zinc-900">
             <div className="flex items-center gap-2.5">
-              <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded object-contain" />
-              <span className="text-zinc-900 font-semibold">JENVU AI</span>
+              <img src="/favicon.png" alt="Jenvu - AI" className="h-5 w-5 rounded object-contain" />
+              <span className="text-zinc-900 font-semibold">Jenvu - AI</span>
               <span className="text-zinc-300">·</span>
               <span>© {new Date().getFullYear()}</span>
             </div>
