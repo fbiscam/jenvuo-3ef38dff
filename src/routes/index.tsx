@@ -4,14 +4,17 @@ import { CloudOrb } from "@/components/CloudOrb";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "JENVU // Institutional voice agent for the markets" },
+      { title: "JENVU AI — Institutional Voice Terminal for the Markets" },
       {
         name: "description",
         content:
-          "JENVU is a Jarvis-style voice trading terminal built on 25+ years of ICT & SMC logic. Live A+ setups for Gold, Crypto, FX, Indices.",
+          "JENVU AI is a voice-native trading terminal built on 25+ years of ICT & SMC market logic. Live A+ setups for Gold, Crypto, FX and Indices.",
       },
-      { property: "og:title", content: "JENVU // Institutional voice terminal" },
-      { property: "og:description", content: "A voice agent that listens, reasons and narrates A+ setups across global markets." },
+      { property: "og:title", content: "JENVU AI // Voice-native trading terminal" },
+      {
+        property: "og:description",
+        content: "Speak. Listen. Execute. Institutional intelligence delivered through a voice agent.",
+      },
     ],
   }),
   component: HomePage,
@@ -19,9 +22,15 @@ export const Route = createFileRoute("/")({
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Inter',system-ui,sans-serif]";
-const AMBER = "#e0a447";
 
-/* ---------- ticker ---------- */
+/* ---------- mock data ---------- */
+const SIGNALS = [
+  { pair: "XAUUSD", t: "14:20:02", tag: "SWEEP", note: "Liquidity grab @ 2,418.30", tone: "ink" },
+  { pair: "BTCUSD", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
+  { pair: "EURUSD", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
+  { pair: "NAS100", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
+] as const;
+
 const TICKER = [
   ["XAU/USD", "2,418.30", "+0.42%"],
   ["BTC/USDT", "71,204.10", "+1.18%"],
@@ -33,378 +42,435 @@ const TICKER = [
   ["WTI", "78.42", "+0.84%"],
 ];
 
+/* ---------- atoms ---------- */
+function TagPill({ tag, tone }: { tag: string; tone: "ink" | "green" | "muted" }) {
+  const cls =
+    tone === "green"
+      ? "bg-emerald-500 text-white"
+      : tone === "muted"
+      ? "bg-zinc-200 text-zinc-700"
+      : "bg-zinc-900 text-white";
+  return (
+    <span className={`text-[10px] px-1.5 py-0.5 rounded ${MONO} uppercase tracking-wider ${cls}`}>
+      {tag}
+    </span>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className={`flex items-center gap-3 ${MONO} text-[10px] tracking-[0.22em] uppercase text-zinc-400`}>
+      <span className="h-px w-6 bg-zinc-300" />
+      {children}
+    </div>
+  );
+}
+
+/* ---------- page ---------- */
 function HomePage() {
   return (
-    <div className={`min-h-dvh w-full bg-[#050505] text-[#e6e6e6] ${SANS} antialiased selection:bg-[${AMBER}] selection:text-black`}>
+    <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
-      <header className="sticky top-0 z-50 border-b border-[#1a1a1a] bg-[#050505]/85 backdrop-blur-md">
-        <div className="mx-auto max-w-[1400px] px-6 h-14 flex items-center justify-between">
-          <Link to="/" className={`flex items-center gap-2 ${MONO} text-[13px] tracking-[0.18em] font-medium`}>
-            <span className="inline-block h-2 w-2 rounded-full" style={{ background: AMBER, boxShadow: `0 0 12px ${AMBER}` }} />
-            <span>JENVU</span>
-            <span className="text-[#666]">// TERMINAL v1.4</span>
+      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link to="/" className="flex items-center gap-2.5">
+            <span className="grid h-6 w-6 place-items-center rounded-md bg-zinc-900">
+              <span className="block h-1.5 w-1.5 rotate-45 bg-white" />
+            </span>
+            <span className="font-semibold tracking-tight">JENVU AI</span>
           </Link>
-          <nav className={`hidden md:flex items-center gap-8 ${MONO} text-[12px] tracking-[0.14em] text-[#888] uppercase`}>
-            <Link to="/ai-engine" className="hover:text-[#e6e6e6]">Product</Link>
-            <Link to="/signal" className="hover:text-[#e6e6e6]">Signals</Link>
-            <Link to="/about" className="hover:text-[#e6e6e6]">Desk</Link>
-            <Link to="/llm" className="hover:text-[#e6e6e6]">Engine</Link>
+          <nav className={`hidden md:flex items-center gap-7 text-sm text-zinc-500`}>
+            <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
+            <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
+            <Link to="/about" className="hover:text-zinc-900">About</Link>
+            <Link to="/terms" className="hover:text-zinc-900">Terms</Link>
           </nav>
           <div className="flex items-center gap-2">
-            <Link to="/auth" className={`hidden sm:inline-flex ${MONO} text-[12px] tracking-[0.12em] uppercase text-[#888] hover:text-[#e6e6e6] px-3 py-1.5`}>
-              [ sign_in ]
+            <Link
+              to="/auth"
+              className="hidden sm:inline-flex px-3 py-1.5 text-sm text-zinc-700 hover:text-zinc-900"
+            >
+              Sign in
             </Link>
             <Link
               to="/app"
-              className={`${MONO} inline-flex items-center text-[12px] tracking-[0.14em] uppercase font-medium px-4 py-2 border`}
-              style={{ borderColor: AMBER, color: AMBER, background: "rgba(224,164,71,0.06)" }}
+              className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-3.5 py-1.5 text-sm font-medium text-white hover:bg-zinc-800"
             >
-              ▸ launch_terminal
+              Launch Agent
+              <span className={`${MONO} text-[10px] opacity-70`}>↗</span>
             </Link>
           </div>
         </div>
-        {/* TICKER */}
-        <div className="border-t border-[#141414] bg-[#080808] overflow-hidden">
-          <div className={`${MONO} flex gap-10 py-2 px-6 text-[11px] whitespace-nowrap animate-[ticker_60s_linear_infinite]`}>
-            {[...TICKER, ...TICKER, ...TICKER].map((row, i) => (
-              <span key={i} className="flex items-center gap-3">
-                <span className="text-[#666]">{row[0]}</span>
-                <span className="text-[#e6e6e6]">{row[1]}</span>
-                <span className={row[2].startsWith("-") ? "text-[#ff5b5b]" : "text-[#7ee787]"}>{row[2]}</span>
-                <span className="text-[#222]">│</span>
-              </span>
-            ))}
+        {/* ticker strip */}
+        <div className="border-t border-zinc-100 overflow-hidden">
+          <div className="mx-auto max-w-6xl px-6">
+            <div className={`flex gap-8 py-2 ${MONO} text-[11px] text-zinc-500 whitespace-nowrap overflow-hidden`}>
+              {[...TICKER, ...TICKER].map(([s, p, d], i) => (
+                <span key={i} className="flex items-center gap-2">
+                  <span className="text-zinc-900 font-medium">{s}</span>
+                  <span>{p}</span>
+                  <span className={d.startsWith("-") ? "text-red-500" : "text-emerald-600"}>{d}</span>
+                  <span className="text-zinc-200">•</span>
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-        <style>{`@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-33.33%)}}`}</style>
       </header>
 
       {/* HERO */}
-      <section className="relative overflow-hidden border-b border-[#141414]">
-        {/* grid bg */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.35]"
-             style={{
-               backgroundImage:
-                 "linear-gradient(#1a1a1a 1px,transparent 1px),linear-gradient(90deg,#1a1a1a 1px,transparent 1px)",
-               backgroundSize: "56px 56px",
-               maskImage: "radial-gradient(ellipse 80% 60% at 50% 30%,#000 40%,transparent 100%)",
-             }} />
-        {/* glow */}
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[600px] w-[900px] rounded-full pointer-events-none"
-             style={{ background: `radial-gradient(closest-side, ${AMBER}22, transparent 70%)` }} />
-
-        <div className="relative mx-auto max-w-[1400px] px-6 pt-24 md:pt-32 pb-24 grid md:grid-cols-12 gap-10 items-center">
-          <div className="md:col-span-7">
-            <div className={`${MONO} text-[11px] tracking-[0.32em] uppercase`} style={{ color: AMBER }}>
-              ● live · ict / smc · institutional voice
-            </div>
-            <h1 className={`${MONO} mt-6 font-medium tracking-[-0.01em] text-[44px] sm:text-[60px] md:text-[78px] leading-[1.02] uppercase`}>
-              The terminal<br />
-              that <span style={{ color: AMBER }}>speaks</span> the<br />
-              market back.
+      <section className="mx-auto max-w-6xl px-6 pt-16 pb-10">
+        <div className="grid gap-10 lg:grid-cols-12 items-end">
+          <div className="lg:col-span-7">
+            <SectionLabel>Institutional Voice Terminal · v2.04</SectionLabel>
+            <h1 className="mt-5 text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
+              Institutional intelligence,{" "}
+              <span className="text-zinc-400">vocalized in real time.</span>
             </h1>
-            <p className="mt-8 max-w-[560px] text-[15px] leading-[1.7] text-[#9a9a9a]">
-              JENVU is a Jarvis-style voice agent built on 25+ years of institutional
-              ICT &amp; SMC logic. Push to talk. It reads killzones, draws the chart,
-              calls the A+ setup — and narrates the bias in plain English.
+            <p className="mt-6 max-w-xl text-lg text-zinc-500 leading-relaxed">
+              JENVU AI is a voice-native trading terminal that reads the tape through 25+ years of
+              ICT &amp; SMC logic — and narrates A+ setups the moment they form.
             </p>
-
-            <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Link to="/app"
-                    className={`${MONO} inline-flex items-center gap-2 px-5 py-3 text-[13px] tracking-[0.18em] uppercase font-medium border`}
-                    style={{ background: AMBER, color: "#0a0a0a", borderColor: AMBER, boxShadow: `0 0 0 1px ${AMBER}, 0 12px 40px -10px ${AMBER}66` }}>
-                ▸ launch_voice_agent
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link
+                to="/app"
+                className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+              >
+                Launch Voice Agent
+                <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
-              <Link to="/signal"
-                    className={`${MONO} inline-flex items-center gap-2 px-5 py-3 text-[13px] tracking-[0.18em] uppercase font-medium border border-[#2a2a2a] text-[#e6e6e6] hover:border-[#444]`}>
-                open_signal_engine →
+              <Link
+                to="/signal"
+                className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+              >
+                See Signal Engine
               </Link>
             </div>
-
-            <div className={`${MONO} mt-12 grid grid-cols-3 gap-6 max-w-[520px]`}>
+          </div>
+          <div className="lg:col-span-5">
+            <div className="grid grid-cols-3 gap-px bg-zinc-100 rounded-xl overflow-hidden border border-zinc-100">
               {[
-                ["24/7", "killzone coverage"],
-                ["A+", "setups only"],
-                ["~1.2s", "voice latency"],
+                ["Markets", "32+"],
+                ["Frameworks", "ICT · SMC"],
+                ["Avg. R:R", "1 : 3.2"],
               ].map(([k, v]) => (
-                <div key={k} className="border-l border-[#222] pl-4">
-                  <div className="text-[24px]" style={{ color: AMBER }}>{k}</div>
-                  <div className="text-[11px] tracking-[0.14em] uppercase text-[#666] mt-1">{v}</div>
+                <div key={k} className="bg-white p-5">
+                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-400`}>{k}</div>
+                  <div className="mt-2 text-xl font-semibold tracking-tight">{v}</div>
                 </div>
               ))}
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* terminal card */}
-          <div className="md:col-span-5">
-            <TerminalCard />
+      {/* TERMINAL WORKSTATION */}
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
+          {/* terminal header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-zinc-50/60">
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+              </div>
+              <span className={`ml-4 text-[11px] ${MONO} tracking-widest text-zinc-400 uppercase`}>
+                JENVU AI // SYSTEM_ACTIVE
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
+              </div>
+              <div className="h-4 w-px bg-zinc-200" />
+              <span className={`text-[11px] ${MONO} text-zinc-400`}>LATENCY · 14MS</span>
+            </div>
+          </div>
+
+          {/* body */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
+            {/* LEFT — ICT feed */}
+            <div className="lg:col-span-3 bg-white p-6 flex flex-col gap-6">
+              <h3 className={`text-[10px] font-bold ${MONO} text-zinc-400 tracking-widest uppercase`}>
+                ICT Execution Feed
+              </h3>
+              <div className="space-y-3">
+                {SIGNALS.map((s) => (
+                  <div
+                    key={s.pair + s.t}
+                    className={`p-3 rounded-lg border ${
+                      s.tone === "green"
+                        ? "border-emerald-100/70 bg-emerald-50/30"
+                        : "border-zinc-100 bg-zinc-50/40"
+                    } space-y-2`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-semibold">{s.pair}</span>
+                      <span className={`text-[10px] ${MONO} text-zinc-400`}>{s.t}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TagPill tag={s.tag} tone={s.tone} />
+                      <span className={`text-xs ${s.tone === "green" ? "text-emerald-700" : "text-zinc-600"}`}>
+                        {s.note}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CENTER — Orb */}
+            <div className="lg:col-span-6 bg-white flex flex-col items-center justify-center p-12 relative overflow-hidden min-h-[440px]">
+              <div
+                className="absolute inset-0 opacity-[0.04] pointer-events-none"
+                style={{
+                  backgroundImage: "radial-gradient(#000 0.6px, transparent 0.6px)",
+                  backgroundSize: "24px 24px",
+                }}
+              />
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="relative h-56 w-56">
+                  <div className="absolute inset-0 rounded-full border border-zinc-100 animate-[spin_18s_linear_infinite]" />
+                  <div className="absolute inset-5 rounded-full border border-zinc-200/60 animate-[spin_24s_linear_infinite_reverse]" />
+                  <div className="absolute inset-9">
+                    <CloudOrb speaking listening size={160} />
+                  </div>
+                </div>
+                <div className="mt-10 text-center">
+                  <p className={`text-xs font-medium tracking-[0.25em] ${MONO} text-zinc-400 uppercase mb-3`}>
+                    Listening for commands
+                  </p>
+                  <div className="flex items-end justify-center gap-1 h-6">
+                    {[2, 4, 5, 3, 4, 2, 2].map((h, i) => (
+                      <div
+                        key={i}
+                        className={`w-1 rounded-full ${i < 5 ? "bg-zinc-900" : "bg-zinc-200"}`}
+                        style={{
+                          height: `${h * 4}px`,
+                          animation: i < 5 ? `bounce 1s infinite ${i * 0.12}s` : undefined,
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT — intelligence */}
+            <div className="lg:col-span-3 bg-white p-6 border-l border-zinc-100">
+              <h3 className={`text-[10px] font-bold ${MONO} text-zinc-400 tracking-widest uppercase mb-4`}>
+                Intelligence Dashboard
+              </h3>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-end">
+                    <span className={`text-[10px] ${MONO} text-zinc-400 uppercase`}>DXY Index</span>
+                    <span className="text-xs font-semibold">104.22</span>
+                  </div>
+                  <div className="h-16 w-full bg-zinc-50 rounded border border-zinc-100 flex items-end p-2 gap-0.5">
+                    {[50, 66, 75, 33, 50, 66, 50, 80, 40].map((h, i) => (
+                      <div
+                        key={i}
+                        className={`flex-1 rounded-t-sm ${
+                          h > 70 ? "bg-zinc-900" : h > 50 ? "bg-zinc-400" : "bg-zinc-200"
+                        }`}
+                        style={{ height: `${h}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-zinc-500">Institutional Sentiment</span>
+                    <span className="text-xs font-medium text-emerald-600">Bullish</span>
+                  </div>
+                  <div className="w-full h-1 bg-zinc-100 rounded-full overflow-hidden flex">
+                    <div className="w-3/4 bg-emerald-500" />
+                    <div className="w-1/4 bg-zinc-200" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-3">
+                    <div className="p-2 border border-zinc-100 rounded-lg">
+                      <p className={`text-[10px] ${MONO} text-zinc-400`}>PDH</p>
+                      <p className={`text-xs ${MONO} font-medium`}>1.0922</p>
+                    </div>
+                    <div className="p-2 border border-zinc-100 rounded-lg">
+                      <p className={`text-[10px] ${MONO} text-zinc-400`}>PDL</p>
+                      <p className={`text-xs ${MONO} font-medium`}>1.0810</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Link
+                  to="/app"
+                  className={`w-full inline-flex items-center justify-center mt-2 py-3 bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-800 transition-colors uppercase`}
+                >
+                  Execute Voice Trade
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* status bar */}
+          <div className="px-6 py-2 border-t border-zinc-100 bg-white flex justify-between items-center">
+            <div className="flex gap-6 items-center">
+              <div className="flex items-center gap-1.5">
+                <span className={`text-[10px] ${MONO} text-zinc-400`}>CPU</span>
+                <span className={`text-[10px] ${MONO}`}>04%</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className={`text-[10px] ${MONO} text-zinc-400`}>MEM</span>
+                <span className={`text-[10px] ${MONO}`}>1.2GB</span>
+              </div>
+            </div>
+            <span className={`text-[10px] ${MONO} text-zinc-400 tracking-tighter`}>
+              PRO_VERSION_2.04.1 // SECURE_ENCRYPTION_ENABLED
+            </span>
           </div>
         </div>
       </section>
 
-      {/* COVERAGE STRIP */}
-      <section className="border-b border-[#141414]">
-        <div className="mx-auto max-w-[1400px] px-6 py-6 flex items-center gap-6 overflow-x-auto">
-          <span className={`${MONO} text-[11px] tracking-[0.22em] uppercase text-[#666] whitespace-nowrap`}>coverage //</span>
-          {["xau/usd", "btc", "eth", "sol", "eur/usd", "gbp/jpy", "usdjpy", "nas100", "spx500", "dxy", "wti"].map((s) => (
-            <span key={s} className={`${MONO} text-[12px] text-[#aaa] whitespace-nowrap border border-[#222] px-2.5 py-1 uppercase tracking-wider`}>{s}</span>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURE ROWS */}
-      <Row
-        n="01"
-        eyebrow="voice agent"
-        title="A trader that listens, reasons, speaks."
-        body="Push to talk. JENVU listens with low-latency STT, runs the read through institutional context (sessions, killzones, news, structure), and narrates the bias back through a calibrated voice — not a chatbot."
-        cta={{ label: "open voice agent", to: "/app" }}
-        bullets={["wake word ‘hey jenvu’", "english-only narration", "interruptible mid-sentence"]}
-      />
-      <Row
-        n="02"
-        eyebrow="signal engine"
-        title="A+ setups, drawn live on the chart."
-        body="Ask for a signal. The engine opens the chart, marks FVGs, order blocks, liquidity sweeps and walks you through the thesis — entry, invalidation, partials, target — out loud."
-        cta={{ label: "run signal engine", to: "/signal" }}
-        bullets={["ict / smc native", "killzone aware", "always speaks the invalidation"]}
-      />
-      <Row
-        n="03"
-        eyebrow="market context"
-        title="Macro, news and structure in one window."
-        body="JENVU stitches Forex Factory, session bias, DXY correlation and price structure into a single context envelope before it ever opens its mouth."
-        cta={{ label: "see the engine", to: "/llm" }}
-        bullets={["live news routing", "session + killzone weighting", "multi-timeframe structure"]}
-      />
-
-      {/* TICKER QUOTES */}
-      <section className="border-y border-[#141414] bg-[#070707]">
-        <div className="mx-auto max-w-[1400px] px-6 py-20">
-          <div className={`${MONO} text-[11px] tracking-[0.28em] uppercase mb-10`} style={{ color: AMBER }}>// the desk says</div>
-          <div className="grid md:grid-cols-3 gap-px bg-[#141414]">
-            {QUOTES.map((q) => (
-              <figure key={q.name} className="bg-[#070707] p-8">
-                <blockquote className="text-[18px] leading-[1.5] text-[#e6e6e6]">“{q.quote}”</blockquote>
-                <figcaption className={`${MONO} mt-6 text-[11px] tracking-[0.16em] uppercase text-[#888]`}>
-                  <span className="text-[#e6e6e6]">{q.name}</span> · {q.role}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CAPABILITY TABLE */}
-      <section className="border-b border-[#141414]">
-        <div className="mx-auto max-w-[1400px] px-6 py-24">
-          <h2 className={`${MONO} uppercase tracking-[-0.01em] text-[32px] md:text-[48px] leading-[1.05]`}>
-            Capability <span style={{ color: AMBER }}>ledger</span>
+      {/* CAPABILITIES */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <SectionLabel>Capabilities</SectionLabel>
+          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
+            Built like a trading desk, spoken like a partner.
           </h2>
-          <div className={`${MONO} mt-10 border-t border-[#1a1a1a]`}>
-            {CAPS.map((c) => (
-              <div key={c.k} className="grid grid-cols-12 items-center border-b border-[#141414] py-5 text-[13px]">
-                <span className="col-span-2 text-[#666]">{c.id}</span>
-                <span className="col-span-4 uppercase tracking-wider text-[#e6e6e6]">{c.k}</span>
-                <span className="col-span-5 text-[#9a9a9a]">{c.v}</span>
-                <span className="col-span-1 text-right" style={{ color: AMBER }}>● live</span>
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
+            {[
+              {
+                k: "01",
+                t: "Voice-Native Workflow",
+                d: "Push-to-talk into a real institutional analyst. JENVU listens, reasons through ICT/SMC, and replies in natural English.",
+              },
+              {
+                k: "02",
+                t: "ICT & SMC Signal Engine",
+                d: "Live FVG, Order Block, BOS, CHoCH and liquidity sweep detection — marked directly on multi-timeframe charts.",
+              },
+              {
+                k: "03",
+                t: "Market Intelligence",
+                d: "Session bias, DXY context, Forex Factory news and killzones merged into every trade plan.",
+              },
+              {
+                k: "04",
+                t: "A+ Setups Only",
+                d: "Confluence-graded entries with structured risk: entry, SL, TP and R:R — never a guess.",
+              },
+              {
+                k: "05",
+                t: "Cross-Market Coverage",
+                d: "Gold, FX majors, BTC, ETH, top alts, indices and energy — one terminal, one voice.",
+              },
+              {
+                k: "06",
+                t: "Narrated Chart Reviews",
+                d: "Open a chart and JENVU walks the structure aloud: highs, lows, mitigations, displacement.",
+              },
+            ].map((f) => (
+              <div key={f.k} className="bg-white p-7 hover:bg-zinc-50/60 transition-colors">
+                <div className={`flex items-center justify-between ${MONO} text-[10px] uppercase tracking-widest text-zinc-400`}>
+                  <span>{f.k}</span>
+                  <span>→</span>
+                </div>
+                <h3 className="mt-5 text-lg font-semibold tracking-tight">{f.t}</h3>
+                <p className="mt-2 text-sm text-zinc-500 leading-relaxed">{f.d}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CHANGELOG */}
-      <section className="border-b border-[#141414]">
-        <div className="mx-auto max-w-[1400px] px-6 py-24 grid md:grid-cols-12 gap-10">
-          <div className="md:col-span-4">
-            <h2 className={`${MONO} uppercase tracking-[-0.01em] text-[32px] md:text-[44px] leading-[1.05]`}>
-              Change<br /><span style={{ color: AMBER }}>log</span>
-            </h2>
-            <p className={`${SANS} mt-4 text-[14px] text-[#888] max-w-[300px]`}>
-              The desk ships fast and writes it down.
-            </p>
+      {/* COVERAGE */}
+      <section className="border-t border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="grid gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <SectionLabel>Coverage</SectionLabel>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight">
+                One terminal. Every major market.
+              </h2>
+              <p className="mt-4 text-zinc-500 leading-relaxed">
+                JENVU AI routes liquidity, structure and news context across asset classes —
+                with a specialist edge in Gold.
+              </p>
+            </div>
+            <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
+              {[
+                ["Metals", "XAU · XAG · PAXG"],
+                ["FX Majors", "EUR · GBP · JPY"],
+                ["Crypto", "BTC · ETH · SOL"],
+                ["Indices", "NAS100 · SPX · DAX"],
+                ["Energy", "WTI · BRENT"],
+                ["DXY & Macro", "DXY · Yields"],
+              ].map(([k, v]) => (
+                <div key={k} className="bg-white p-5">
+                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-400`}>{k}</div>
+                  <div className="mt-2 text-sm font-medium tracking-tight">{v}</div>
+                </div>
+              ))}
+            </div>
           </div>
-          <ul className={`${MONO} md:col-span-8 border-t border-[#1a1a1a]`}>
-            {CHANGELOG.map((c) => (
-              <li key={c.t} className="grid grid-cols-12 items-baseline border-b border-[#141414] py-5 text-[13px] gap-3">
-                <span className="col-span-2" style={{ color: AMBER }}>v{c.v}</span>
-                <span className="col-span-3 text-[#666]">{c.d}</span>
-                <span className="col-span-7 text-[#e6e6e6]">{c.t}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
-      {/* FINAL CTA */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none opacity-[0.35]"
-             style={{
-               backgroundImage:
-                 "linear-gradient(#1a1a1a 1px,transparent 1px),linear-gradient(90deg,#1a1a1a 1px,transparent 1px)",
-               backgroundSize: "56px 56px",
-               maskImage: "radial-gradient(ellipse 60% 60% at 50% 50%,#000 30%,transparent 100%)",
-             }} />
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full pointer-events-none"
-             style={{ background: `radial-gradient(closest-side, ${AMBER}33, transparent 70%)` }} />
-        <div className="relative mx-auto max-w-[1400px] px-6 py-32 text-center">
-          <div className="mx-auto h-32 w-32 mb-10">
-            <CloudOrb />
-          </div>
-          <h2 className={`${MONO} uppercase tracking-[-0.01em] text-[44px] md:text-[72px] leading-[1.02]`}>
-            Boot the<br /><span style={{ color: AMBER }}>terminal.</span>
-          </h2>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/app"
-                  className={`${MONO} inline-flex items-center gap-2 px-5 py-3 text-[13px] tracking-[0.18em] uppercase font-medium`}
-                  style={{ background: AMBER, color: "#0a0a0a", boxShadow: `0 12px 40px -10px ${AMBER}66` }}>
-              ▸ launch_voice_agent
-            </Link>
-            <Link to="/signal"
-                  className={`${MONO} inline-flex items-center gap-2 px-5 py-3 text-[13px] tracking-[0.18em] uppercase font-medium border border-[#2a2a2a] text-[#e6e6e6] hover:border-[#444]`}>
-              open_signal_engine →
-            </Link>
+      {/* CTA */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-24">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
+            <div className="max-w-xl">
+              <SectionLabel>Initialize</SectionLabel>
+              <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight">
+                Boot the terminal. Speak to the market.
+              </h2>
+              <p className="mt-3 text-zinc-500">
+                Your voice agent is one tap away — listening, reasoning, narrating.
+              </p>
+              <div className="mt-7 flex gap-3">
+                <Link
+                  to="/app"
+                  className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                >
+                  Launch Voice Agent
+                </Link>
+                <Link
+                  to="/signal"
+                  className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+                >
+                  Open Signal Engine
+                </Link>
+              </div>
+            </div>
+            <div className="relative">
+              <CloudOrb speaking listening size={200} />
+            </div>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-[#141414]">
-        <div className="mx-auto max-w-[1400px] px-6 py-12 grid grid-cols-2 md:grid-cols-5 gap-8 text-[13px]">
-          <div className="col-span-2">
-            <div className={`${MONO} flex items-center gap-2 text-[13px] tracking-[0.18em]`}>
-              <span className="inline-block h-2 w-2 rounded-full" style={{ background: AMBER }} />
-              JENVU // TERMINAL
-            </div>
-            <p className="mt-4 text-[#777] max-w-[320px] text-[13px]">
-              An institutional voice agent for ambitious traders. Built quietly, shipped daily.
-            </p>
+      <footer className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-5 w-5 place-items-center rounded bg-zinc-900">
+              <span className="block h-1 w-1 rotate-45 bg-white" />
+            </span>
+            <span className="text-zinc-900 font-semibold">JENVU AI</span>
+            <span className="text-zinc-300">·</span>
+            <span>© {new Date().getFullYear()}</span>
           </div>
-          <FootCol title="product" links={[["voice agent", "/app"], ["signal engine", "/signal"], ["ai engine", "/ai-engine"]]} />
-          <FootCol title="desk" links={[["about", "/about"], ["llm", "/llm"], ["sign in", "/auth"]]} />
-          <FootCol title="legal" links={[["privacy", "/privacy"], ["terms", "/terms"], ["disclaimer", "/disclaimer"]]} />
-        </div>
-        <div className="border-t border-[#141414]">
-          <div className={`${MONO} mx-auto max-w-[1400px] px-6 py-5 flex flex-col md:flex-row justify-between gap-2 text-[11px] tracking-[0.16em] uppercase text-[#555]`}>
-            <span>© {new Date().getFullYear()} jenvu ai · all rights reserved</span>
-            <span>markets carry risk · jenvu provides analysis, not advice</span>
+          <div className="flex items-center gap-6">
+            <Link to="/about" className="hover:text-zinc-900">About</Link>
+            <Link to="/terms" className="hover:text-zinc-900">Terms</Link>
+            <Link to="/privacy" className="hover:text-zinc-900">Privacy</Link>
+            <Link to="/disclaimer" className="hover:text-zinc-900">Disclaimer</Link>
           </div>
         </div>
       </footer>
     </div>
   );
 }
-
-/* ---------- terminal card ---------- */
-function TerminalCard() {
-  return (
-    <div className="border border-[#1f1f1f] bg-[#0a0a0a] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8)]">
-      <div className="flex items-center gap-2 border-b border-[#1a1a1a] px-3 h-8">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#3a3a3a]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#3a3a3a]" />
-        <span className="h-2.5 w-2.5 rounded-full" style={{ background: AMBER }} />
-        <span className={`${MONO} ml-3 text-[11px] text-[#666] tracking-wider`}>jenvu@desk: ~ /xauusd</span>
-      </div>
-      <div className={`${MONO} text-[12.5px] leading-[1.7] p-5 space-y-2 min-h-[420px]`}>
-        <Line p="$" t="jenvu --pair xauusd --session london" />
-        <Line c="#666" t="// loading killzone context..." />
-        <Line c="#7ee787" t="✓ session=london · bias=bullish · dxy=weak" />
-        <Line c="#7ee787" t="✓ 4h structure: bos confirmed @ 2410.4" />
-        <Line c="#7ee787" t="✓ 15m fvg unmitigated: 2414.2 → 2415.1" />
-        <Line p=">" t="setup A+ detected" amber />
-        <div className="border border-[#222] mt-3 p-3 space-y-1 text-[12px]">
-          <KV k="entry" v="2414.40" amber />
-          <KV k="invalidation" v="2411.80" warn />
-          <KV k="tp1" v="2422.10" />
-          <KV k="tp2" v="2428.60" />
-          <KV k="r:r" v="1 : 3.2" amber />
-        </div>
-        <Line c="#666" t="// narrating bias through voice channel..." />
-        <Line p="●" t="speaking · 1.2s latency · english" amber />
-      </div>
-    </div>
-  );
-}
-
-function Line({ p, t, c, amber }: { p?: string; t: string; c?: string; amber?: boolean }) {
-  return (
-    <div className="flex gap-2">
-      {p && <span style={{ color: amber ? AMBER : "#555" }}>{p}</span>}
-      <span style={{ color: amber ? AMBER : c || "#cfcfcf" }}>{t}</span>
-    </div>
-  );
-}
-function KV({ k, v, amber, warn }: { k: string; v: string; amber?: boolean; warn?: boolean }) {
-  return (
-    <div className="flex justify-between">
-      <span className="text-[#666] uppercase tracking-wider text-[11px]">{k}</span>
-      <span style={{ color: warn ? "#ff8a6a" : amber ? AMBER : "#e6e6e6" }}>{v}</span>
-    </div>
-  );
-}
-
-/* ---------- row ---------- */
-function Row({ n, eyebrow, title, body, cta, bullets }: { n: string; eyebrow: string; title: string; body: string; cta: { label: string; to: string }; bullets: string[] }) {
-  return (
-    <section className="border-b border-[#141414]">
-      <div className="mx-auto max-w-[1400px] px-6 py-24 grid md:grid-cols-12 gap-10">
-        <div className="md:col-span-1">
-          <span className={`${MONO} text-[42px] leading-none`} style={{ color: AMBER }}>{n}</span>
-        </div>
-        <div className="md:col-span-5">
-          <div className={`${MONO} text-[11px] tracking-[0.28em] uppercase text-[#666]`}>// {eyebrow}</div>
-          <h3 className={`${MONO} mt-4 uppercase tracking-[-0.01em] text-[28px] md:text-[40px] leading-[1.08]`}>{title}</h3>
-        </div>
-        <div className="md:col-span-6">
-          <p className="text-[15px] leading-[1.75] text-[#9a9a9a] max-w-[520px]">{body}</p>
-          <ul className={`${MONO} mt-6 space-y-2 text-[12.5px]`}>
-            {bullets.map((b) => (
-              <li key={b} className="flex gap-3"><span style={{ color: AMBER }}>▸</span><span className="text-[#cfcfcf] uppercase tracking-wider">{b}</span></li>
-            ))}
-          </ul>
-          <Link to={cta.to} className={`${MONO} mt-8 inline-flex items-center gap-2 px-4 py-2.5 text-[12px] tracking-[0.18em] uppercase border border-[#2a2a2a] hover:border-[#444]`} style={{ color: AMBER }}>
-            ▸ {cta.label}
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FootCol({ title, links }: { title: string; links: [string, string][] }) {
-  return (
-    <div>
-      <h5 className={`${MONO} text-[11px] uppercase tracking-[0.22em] text-[#555] mb-3`}>{title}</h5>
-      <ul className="space-y-2">
-        {links.map(([l, t]) => (
-          <li key={l}><Link to={t} className={`${MONO} text-[12.5px] uppercase tracking-wider text-[#aaa] hover:text-[#e6e6e6]`}>{l}</Link></li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-/* ---------- data ---------- */
-const QUOTES = [
-  { quote: "JENVU reads the killzone like a 25-year prop trader. The first agent that actually understands ICT in plain English.", name: "M. Saleh", role: "Head of FX, Meridian" },
-  { quote: "We use it as a second pair of eyes. It catches liquidity sweeps before the juniors do — and narrates the bias live.", name: "Diana Cho", role: "PM, Northwind" },
-  { quote: "Uncomfortably good on Gold. A+ only, with the invalidation always spoken out loud.", name: "R. Karpathy", role: "Quant, Altair" },
-];
-
-const CAPS = [
-  { id: "C-01", k: "voice in / voice out", v: "Push-to-talk STT + calibrated TTS, interruptible mid-sentence" },
-  { id: "C-02", k: "ict + smc native", v: "FVG, OB, BOS/CHoCH, liquidity sweeps, premium/discount" },
-  { id: "C-03", k: "killzone awareness", v: "London / New York / Asia bias weighting in real time" },
-  { id: "C-04", k: "macro routing", v: "Forex Factory news ingestion + DXY correlation context" },
-  { id: "C-05", k: "a+ filter", v: "Setups only when bias, structure and liquidity align" },
-  { id: "C-06", k: "private by design", v: "Invite-only, no public training on your prompts" },
-];
-
-const CHANGELOG = [
-  { v: "1.4", d: "JUN 22, 2026", t: "Customize narration voices and pacing" },
-  { v: "1.3", d: "JUN 18, 2026", t: "Improved A+ filter — fewer, sharper signals" },
-  { v: "1.2", d: "JUN 17, 2026", t: "Live news routing through Forex Factory" },
-  { v: "1.1", d: "JUN 10, 2026", t: "Signal engine is 3× faster and 22% cheaper" },
-  { v: "1.0", d: "JUN 01, 2026", t: "Public terminal launch" },
-];
