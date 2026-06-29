@@ -662,6 +662,43 @@ export const getLiveTick = createServerFn({ method: "POST" })
     return tick;
   });
 
+export const getNewsRisk = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { symbol?: string };
+    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
+  })
+  .handler(async ({ data }) => {
+    const inst = resolveInstrument(data.symbol);
+    if (!inst.needsUsdNews) {
+      return {
+        severity: "low" as const,
+        warning: "No USD-driven news exposure for this instrument.",
+        events: [] as NewsItem[],
+        generatedAt: new Date().toISOString(),
+      };
+    }
+    const news = await fetchGoldNewsInline();
+    const upcoming = news.filter((n) => n.minutesUntil >= -15 && n.minutesUntil <= 240);
+    const imminentHigh = upcoming.find((n) => n.impact === "High" && n.minutesUntil >= -15 && n.minutesUntil <= 60);
+    const severity: "low" | "medium" | "high" = imminentHigh
+      ? "high"
+      : upcoming.some((n) => n.impact === "High")
+        ? "medium"
+        : upcoming.length
+          ? "medium"
+          : "low";
+    const warning = imminentHigh
+      ? `High-impact event in ${imminentHigh.minutesUntil}m: ${imminentHigh.title}. Consider standing aside.`
+      : upcoming.some((n) => n.impact === "High")
+        ? "High-impact USD/XAU news within the next 4 hours — manage risk, expect volatility."
+        : upcoming.length
+          ? "Medium-impact news scheduled — minor volatility possible."
+          : "News window clear for the next 4 hours.";
+    return { severity, warning, events: upcoming, generatedAt: new Date().toISOString() };
+  });
+
+
+
 
 export const getSignalPlan = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
