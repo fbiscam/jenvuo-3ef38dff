@@ -451,6 +451,21 @@ function SignalPage() {
                 Intelligence Dashboard
               </h3>
 
+              {/* A+ Setup Score */}
+              {plan && <SetupScoreCard plan={plan} />}
+
+              {/* Live trade tracker */}
+              {plan && t && t.direction !== "WAIT" && (
+                <TradeTrackerCard
+                  plan={plan}
+                  livePrice={livePrice}
+                  rMultiple={rMultiple}
+                  status={trackerStatus}
+                  sparkline={sparkline}
+                />
+              )}
+
+
               {/* News risk */}
               {plan && (
                 <div className={cn(
