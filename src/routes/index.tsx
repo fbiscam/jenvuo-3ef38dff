@@ -771,9 +771,8 @@ function HomePage() {
       <footer className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-900">
           <div className="flex items-center gap-2.5">
-            <span className="grid h-5 w-5 place-items-center rounded bg-zinc-900">
-              <span className="block h-1 w-1 rotate-45 bg-white" />
-            </span>
+            <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded object-contain" />
+
             <span className="text-zinc-900 font-semibold">JENVU AI</span>
             <span className="text-zinc-300">·</span>
             <span>© {new Date().getFullYear()}</span>
