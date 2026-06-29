@@ -111,13 +111,13 @@ function SignalPage() {
   }, [fetchPlan, runNarration, symbol]);
 
   useEffect(() => {
-    if (authReady && !plan && !loading) load();
+    if (authReady) load();
     return () => {
       abortRef.current = true;
       speech.stopSpeaking();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authReady]);
+  }, [authReady, symbol]);
 
   const stop = () => {
     abortRef.current = true;
