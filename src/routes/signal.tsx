@@ -25,10 +25,7 @@ function SignalPage() {
   const speech = useSpeech();
 
   const [authReady, setAuthReady] = useState(false);
-  const [dark, setDark] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    return localStorage.getItem("jenvu_theme") !== "light";
-  });
+  const dark = false;
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(-1);
