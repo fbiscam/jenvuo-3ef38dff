@@ -329,8 +329,13 @@ export type SignalPlan = {
   keyLevels: KeyLevel[];
   htfNarrative: string;
   ltfNarrative: string;
+  reasoning: string;
+  whyThisSignal: string[];
+  riskFactors: string[];
   session: string;
   killzone: string;
+  htfTf: string;
+  ltfTf: string;
   newsRisk: {
     severity: "low" | "medium" | "high";
     warning: string;
@@ -341,6 +346,7 @@ export type SignalPlan = {
   ltfCandles: CandleDTO[];
   currentPrice: number;
 };
+
 
 
 function toDTO(c: Candle): CandleDTO {
@@ -393,14 +399,17 @@ async function fetchGoldNewsInline(): Promise<NewsItem[]> {
 }
 
 export const getSignalPlan = createServerFn({ method: "POST" })
-  .inputValidator((_d: unknown) => ({}))
-  .handler(async () => {
+  .inputValidator((d: any) => ({
+    htfTf: ["1h", "4h", "1d"].includes(String(d?.htfTf)) ? String(d.htfTf) : "1h",
+    ltfTf: ["5m", "15m", "30m"].includes(String(d?.ltfTf)) ? String(d.ltfTf) : "15m",
+  }))
+  .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
     const [htfRaw, ltfRaw, news] = await Promise.all([
-      fetchGoldCandles("1h").catch(() => [] as Candle[]),
-      fetchGoldCandles("15m").catch(() => [] as Candle[]),
+      fetchGoldCandles(data.htfTf).catch(() => [] as Candle[]),
+      fetchGoldCandles(data.ltfTf).catch(() => [] as Candle[]),
       fetchGoldNewsInline(),
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
@@ -409,6 +418,7 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
     const last = ltf[ltf.length - 1];
+
 
     const { session, killzone } = detectKillzone(new Date());
 
@@ -486,8 +496,12 @@ Return ONLY valid JSON (no markdown) with this exact shape:
     "confidence": 0-95,
     "summary":"Final spoken summary in English — direction, entry, SL, TP, R:R, confidence and the one-line reason.",
     "invalidation":"One sentence explaining exactly what price action invalidates this setup."
-  }
+  },
+  "reasoning": "4-6 sentence deep institutional explanation of WHY this exact signal was generated — narrative connecting HTF bias, liquidity logic, smart-money intent, killzone timing, and the precise trigger. Written like a desk memo.",
+  "whyThisSignal": ["5-8 punchy bullet points each starting with a verb (e.g. 'HTF printed bullish BOS at 2378.40 confirming demand control', 'Price swept PDL liquidity at 2371.20 then reclaimed'). These are the standalone reasons a junior trader could defend the trade with."],
+  "riskFactors": ["3-5 honest risk callouts (e.g. 'High-impact CPI in 45 min', 'Price still in HTF premium', 'Thin Asia liquidity'). If none, return one item: 'No material risks detected on the calendar.'"]
 }
+
 
 Rules:
 - fromTime/toTime MUST be unix-seconds taken EXACTLY from the provided candles.
@@ -504,20 +518,21 @@ Rules:
     const user = `LIVE GOLD CANDLES (unix-seconds | O,H,L,C)
 CURRENT PRICE: ${last.c.toFixed(2)}
 SESSION: ${session} | KILLZONE: ${killzone}
-HTF SWING HIGH (160h): ${swingHigh.toFixed(2)} | SWING LOW: ${swingLow.toFixed(2)} | EQUILIBRIUM: ${equilibrium.toFixed(2)} | PRICE IS IN: ${inPremium ? "PREMIUM" : "DISCOUNT"}
+HTF SWING HIGH (${htf.length}c): ${swingHigh.toFixed(2)} | SWING LOW: ${swingLow.toFixed(2)} | EQUILIBRIUM: ${equilibrium.toFixed(2)} | PRICE IS IN: ${inPremium ? "PREMIUM" : "DISCOUNT"}
 PDH (last 24h): ${pdh.toFixed(2)} | PDL: ${pdl.toFixed(2)}
 
 UPCOMING USD/XAU NEWS (next 4h):
 ${newsBlock}
 ${imminentHigh ? `\n⚠ HIGH IMPACT EVENT WITHIN 60 MIN: ${imminentHigh.title} in ${imminentHigh.minutesUntil}m — recommend WAIT.` : ""}
 
-=== HTF (1 HOUR, last ${htf.length} candles) ===
+=== HTF (${data.htfTf.toUpperCase()}, last ${htf.length} candles) ===
 ${fmt(htf)}
 
-=== LTF (15 MIN, last ${ltf.length} candles) ===
+=== LTF (${data.ltfTf.toUpperCase()}, last ${ltf.length} candles) ===
 ${fmt(ltf)}
 
 Produce the A+ ICT/SMC trade plan now.`;
+
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -602,8 +617,13 @@ Produce the A+ ICT/SMC trade plan now.`;
         summary: String(parsed?.trade?.summary ?? ""),
         invalidation: String(parsed?.trade?.invalidation ?? ""),
       },
+      reasoning: String(parsed.reasoning ?? ""),
+      whyThisSignal: Array.isArray(parsed.whyThisSignal) ? parsed.whyThisSignal.map(String).slice(0, 10) : [],
+      riskFactors: Array.isArray(parsed.riskFactors) ? parsed.riskFactors.map(String).slice(0, 6) : [],
       session,
       killzone,
+      htfTf: data.htfTf,
+      ltfTf: data.ltfTf,
       newsRisk: { severity: newsSeverity, warning: newsWarning, events: upcomingNews },
       generatedAt: new Date().toISOString(),
       htfCandles: htf.map(toDTO),

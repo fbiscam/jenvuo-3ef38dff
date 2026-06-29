@@ -1,13 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target, Brain, ShieldAlert, CheckCircle2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { getSignalPlan, type SignalPlan } from "@/lib/gold-analysis.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+
 
 
 export const Route = createFileRoute("/signal")({
@@ -31,6 +32,22 @@ function SignalPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(-1);
   const [playing, setPlaying] = useState(false);
+  const [htfTf, setHtfTf] = useState<"1h" | "4h" | "1d">("1h");
+  const [ltfTf, setLtfTf] = useState<"5m" | "15m" | "30m">("15m");
+  const [pipeline, setPipeline] = useState<number>(-1);
+  const [livePrice, setLivePrice] = useState<number | null>(null);
+  const [priceDelta, setPriceDelta] = useState<number>(0);
+
+  const PIPELINE_STEPS = [
+    "Fetching live gold candles",
+    "Mapping HTF market structure",
+    "Detecting BOS / CHOCH shifts",
+    "Locating liquidity pools (PDH/PDL/EQH/EQL)",
+    "Scanning Order Blocks & FVGs",
+    "Computing premium/discount & OTE",
+    "Cross-checking news & killzone risk",
+    "Building A+ execution plan",
+  ];
 
   const htfRef = useRef<SignalChartHandle>(null);
   const ltfRef = useRef<SignalChartHandle>(null);
@@ -42,6 +59,7 @@ function SignalPage() {
       else setAuthReady(true);
     });
   }, [navigate]);
+
 
   const speakWait = useCallback(
     (text: string) =>
@@ -91,20 +109,28 @@ function SignalPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setPipeline(0);
     abortRef.current = true;
     speech.stopSpeaking();
+    // Animate pipeline while AI is thinking
+    const pipeTimer = setInterval(() => {
+      setPipeline((s) => (s < PIPELINE_STEPS.length - 1 ? s + 1 : s));
+    }, 700);
     try {
-      const p = await fetchPlan({ data: {} });
+      const p = await fetchPlan({ data: { htfTf, ltfTf } });
+      setPipeline(PIPELINE_STEPS.length);
       setPlan(p);
-      // run narration after small delay so chart mounts
+      setLivePrice(p.currentPrice);
       setTimeout(() => runNarration(p), 400);
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
+      setPipeline(-1);
     } finally {
+      clearInterval(pipeTimer);
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchPlan, runNarration]);
+  }, [fetchPlan, runNarration, htfTf, ltfTf]);
 
   useEffect(() => {
     if (authReady && !plan && !loading) load();
@@ -114,6 +140,29 @@ function SignalPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authReady]);
+
+  // Live price ticker (polls every 30s via Binance PAXG)
+  useEffect(() => {
+    if (!plan) return;
+    let alive = true;
+    const tick = async () => {
+      try {
+        const r = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT");
+        if (!r.ok) return;
+        const j = await r.json();
+        const p = parseFloat(j.price);
+        if (!isFinite(p) || !alive) return;
+        setLivePrice((prev) => {
+          if (prev != null) setPriceDelta(p - prev);
+          return p;
+        });
+      } catch {}
+    };
+    tick();
+    const id = setInterval(tick, 30000);
+    return () => { alive = false; clearInterval(id); };
+  }, [plan]);
+
 
   const stop = () => {
     abortRef.current = true;
@@ -144,7 +193,15 @@ function SignalPage() {
         <div className="text-center">
           <div className="text-[10px] uppercase tracking-[0.3em] text-amber-700/80 font-bold">Jenvu AI · Institutional Desk</div>
           <div className="text-base font-black tracking-tight flex items-center justify-center gap-2">
-            XAU/USD {plan && <span className="text-amber-600 tabular-nums">${plan.currentPrice.toFixed(2)}</span>}
+            XAU/USD
+            {(livePrice ?? plan?.currentPrice) != null && (
+              <span className="text-amber-600 tabular-nums">${(livePrice ?? plan!.currentPrice).toFixed(2)}</span>
+            )}
+            {priceDelta !== 0 && (
+              <span className={cn("text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded", priceDelta > 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700")}>
+                {priceDelta > 0 ? "▲" : "▼"} {Math.abs(priceDelta).toFixed(2)}
+              </span>
+            )}
             {plan && (
               <span className="ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-900 text-white tracking-wider">
                 {plan.killzone}
@@ -152,6 +209,7 @@ function SignalPage() {
             )}
           </div>
         </div>
+
         <div className="flex gap-2">
           {playing ? (
             <button onClick={stop} className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition bg-red-50 text-red-700 hover:bg-red-100 border border-red-200">
@@ -166,22 +224,44 @@ function SignalPage() {
       </header>
 
       {/* Body */}
-      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-[1fr_360px] overflow-hidden">
+      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-[1fr_380px] overflow-hidden">
         {/* Charts */}
         <div className="flex flex-col overflow-hidden p-3 gap-3">
-          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden">
-            {plan && <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF · 1 Hour · Bias" />}
-            {!plan && <ChartSkeleton dark={dark} />}
+          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col">
+            <TfTabs label="HTF · Bias" value={htfTf} options={["1h", "4h", "1d"]} onChange={(v) => { setHtfTf(v as any); }} onApply={load} disabled={loading} />
+            <div className="flex-1 min-h-0 relative">
+              {plan && <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title={`HTF · ${plan.htfTf?.toUpperCase() ?? htfTf.toUpperCase()} · Bias`} />}
+              {!plan && <ChartSkeleton dark={dark} />}
+            </div>
           </div>
-          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden">
-            {plan && <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF · 15 Minute · Execution" />}
-            {!plan && <ChartSkeleton dark={dark} />}
+          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col">
+            <TfTabs label="LTF · Execution" value={ltfTf} options={["5m", "15m", "30m"]} onChange={(v) => { setLtfTf(v as any); }} onApply={load} disabled={loading} />
+            <div className="flex-1 min-h-0 relative">
+              {plan && <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title={`LTF · ${plan.ltfTf?.toUpperCase() ?? ltfTf.toUpperCase()} · Execution`} />}
+              {!plan && <ChartSkeleton dark={dark} />}
+            </div>
           </div>
         </div>
 
         {/* Sidebar */}
         <aside className="border-l border-neutral-200 overflow-y-auto p-4 space-y-4 bg-white/60 backdrop-blur-md">
-          {!plan && <div className="text-sm opacity-60 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading live gold data…</div>}
+          {loading && (
+            <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
+              <div className="text-[10px] uppercase tracking-widest font-bold text-amber-700 mb-2 flex items-center gap-1.5"><Brain className="h-3.5 w-3.5" /> Live Analysis Pipeline</div>
+              <ul className="space-y-1.5">
+                {PIPELINE_STEPS.map((s, i) => (
+                  <li key={i} className="flex items-center gap-2 text-xs">
+                    {i < pipeline ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" /> :
+                      i === pipeline ? <Loader2 className="h-3.5 w-3.5 text-amber-600 animate-spin shrink-0" /> :
+                      <Clock className="h-3.5 w-3.5 text-neutral-300 shrink-0" />}
+                    <span className={cn("leading-snug", i < pipeline ? "text-neutral-500 line-through" : i === pipeline ? "text-neutral-900 font-semibold" : "text-neutral-400")}>{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {!plan && !loading && <div className="text-sm opacity-60 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading live gold data…</div>}
+
 
           {plan && (
             <>
@@ -249,7 +329,40 @@ function SignalPage() {
                 </div>
               )}
 
-              {/* Confluences */}
+              {/* Why this signal */}
+              {plan.whyThisSignal && plan.whyThisSignal.length > 0 && (
+                <div className="rounded-2xl p-4 border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-white to-white shadow-sm">
+                  <div className="text-[10px] uppercase tracking-widest text-amber-700 mb-2 font-bold flex items-center gap-1.5"><Brain className="h-3.5 w-3.5" /> Why this signal?</div>
+                  <ul className="space-y-2">
+                    {plan.whyThisSignal.map((w, i) => (
+                      <li key={i} className="text-xs text-neutral-800 flex gap-2 leading-snug">
+                        <span className="shrink-0 mt-0.5 h-4 w-4 rounded-full bg-amber-500 text-white text-[9px] font-black flex items-center justify-center">{i + 1}</span>
+                        <span>{w}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {plan.reasoning && (
+                    <p className="text-xs text-neutral-700 mt-3 pt-3 border-t border-amber-200/60 leading-relaxed italic">
+                      {plan.reasoning}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Risk factors */}
+              {plan.riskFactors && plan.riskFactors.length > 0 && (
+                <div className="rounded-2xl p-4 border border-red-200 bg-gradient-to-br from-red-50/60 to-white shadow-sm">
+                  <div className="text-[10px] uppercase tracking-widest text-red-700 mb-2 font-bold flex items-center gap-1.5"><ShieldAlert className="h-3.5 w-3.5" /> Risk Factors</div>
+                  <ul className="space-y-1.5">
+                    {plan.riskFactors.map((r, i) => (
+                      <li key={i} className="text-xs text-neutral-800 flex gap-2 leading-snug">
+                        <span className="text-red-500 font-black">!</span>{r}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {plan.confluences.length > 0 && (
                 <div className="rounded-2xl p-4 border border-neutral-200 bg-white shadow-sm">
                   <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-bold flex items-center gap-1"><Zap className="h-3 w-3" /> Confluences</div>
@@ -312,6 +425,29 @@ function SignalPage() {
             </>
           )}
         </aside>
+      </div>
+    </div>
+  );
+}
+
+function TfTabs({ label, value, options, onChange, onApply, disabled }: { label: string; value: string; options: string[]; onChange: (v: string) => void; onApply: () => void; disabled?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-2 px-3 pt-2 pb-1 border-b border-neutral-100">
+      <span className="text-[10px] uppercase tracking-widest font-bold text-neutral-500">{label}</span>
+      <div className="flex items-center gap-1">
+        {options.map((o) => (
+          <button
+            key={o}
+            disabled={disabled}
+            onClick={() => { if (o !== value) { onChange(o); setTimeout(onApply, 50); } }}
+            className={cn(
+              "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider transition disabled:opacity-40",
+              o === value ? "bg-neutral-900 text-white shadow-sm" : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200",
+            )}
+          >
+            {o}
+          </button>
+        ))}
       </div>
     </div>
   );
