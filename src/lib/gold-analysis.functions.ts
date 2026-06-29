@@ -28,22 +28,113 @@ const YAHOO_INTERVAL: Record<string, { interval: string; range: string }> = {
   "15m": { interval: "15m", range: "10d" },
   "30m": { interval: "30m", range: "20d" },
   "1h": { interval: "60m", range: "30d" },
-  "4h": { interval: "1h", range: "60d" }, // aggregated client-side conceptually
+  "4h": { interval: "1h", range: "60d" },
   "1d": { interval: "1d", range: "1y" },
 };
 
-const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 60_000; // 1 minute
+// ============================================================
+// UNIVERSAL INSTRUMENT RESOLVER
+// ============================================================
 
-async function fetchFromYahoo(tf: string): Promise<Candle[]> {
+export type InstrumentKind = "crypto" | "metal" | "forex" | "index" | "stock";
+
+export type ResolvedInstrument = {
+  raw: string;
+  key: string;
+  display: string;
+  kind: InstrumentKind;
+  decimals: number;
+  binanceSymbols?: string[];
+  yahooSymbols?: string[];
+  quote: string;
+  needsUsdNews: boolean;
+};
+
+const CRYPTO_BASES = new Set([
+  "BTC","ETH","BNB","SOL","XRP","ADA","DOGE","AVAX","DOT","MATIC","POL","LINK","TRX","LTC","BCH","ATOM","NEAR","ARB","OP","APT","SUI","TON","SHIB","PEPE","INJ","RNDR","TIA","FIL","ICP","ETC","HBAR","UNI","AAVE","MKR","XLM","ALGO","FTM","SAND","MANA","AXS","GRT","STX","IMX","KAS","RUNE","WLD","SEI","JUP","ORDI","ENA","FET",
+]);
+const G10_FX = new Set(["EUR","GBP","JPY","AUD","NZD","CAD","CHF","USD"]);
+const INDEX_MAP: Record<string, { yahoo: string; display: string; decimals: number }> = {
+  SPX: { yahoo: "^GSPC", display: "S&P 500", decimals: 2 },
+  SPX500: { yahoo: "^GSPC", display: "S&P 500", decimals: 2 },
+  US500: { yahoo: "^GSPC", display: "S&P 500", decimals: 2 },
+  NDX: { yahoo: "^NDX", display: "Nasdaq 100", decimals: 2 },
+  NAS100: { yahoo: "^NDX", display: "Nasdaq 100", decimals: 2 },
+  US100: { yahoo: "^NDX", display: "Nasdaq 100", decimals: 2 },
+  DJI: { yahoo: "^DJI", display: "Dow Jones", decimals: 2 },
+  US30: { yahoo: "^DJI", display: "Dow Jones", decimals: 2 },
+  DAX: { yahoo: "^GDAXI", display: "DAX", decimals: 2 },
+  FTSE: { yahoo: "^FTSE", display: "FTSE 100", decimals: 2 },
+  N225: { yahoo: "^N225", display: "Nikkei 225", decimals: 2 },
+  DXY: { yahoo: "DX-Y.NYB", display: "Dollar Index", decimals: 2 },
+};
+
+export function resolveInstrument(input: string): ResolvedInstrument {
+  const raw = (input || "").trim();
+  if (!raw) return resolveInstrument("XAUUSD");
+  const cleaned = raw.toUpperCase().replace(/[\s_\-]/g, "").replace(/PERP$/, "");
+
+  if (/^XAU(USD)?$/.test(cleaned) || cleaned === "GOLD") {
+    return {
+      raw, key: "METAL:XAUUSD", display: "XAU/USD", kind: "metal", decimals: 2,
+      binanceSymbols: ["PAXGUSDT", "XAUTUSDT"],
+      yahooSymbols: ["GC=F", "XAUUSD=X"],
+      quote: "USD", needsUsdNews: true,
+    };
+  }
+  if (/^XAG(USD)?$/.test(cleaned) || cleaned === "SILVER") {
+    return {
+      raw, key: "METAL:XAGUSD", display: "XAG/USD", kind: "metal", decimals: 3,
+      yahooSymbols: ["SI=F", "XAGUSD=X"], quote: "USD", needsUsdNews: true,
+    };
+  }
+  if (INDEX_MAP[cleaned]) {
+    const m = INDEX_MAP[cleaned];
+    return {
+      raw, key: `INDEX:${cleaned}`, display: m.display, kind: "index",
+      decimals: m.decimals, yahooSymbols: [m.yahoo], quote: "USD", needsUsdNews: true,
+    };
+  }
+  const fxMatch = cleaned.match(/^([A-Z]{3})\/?([A-Z]{3})$/);
+  if (fxMatch && G10_FX.has(fxMatch[1]) && G10_FX.has(fxMatch[2])) {
+    const [, b, q] = fxMatch;
+    return {
+      raw, key: `FX:${b}${q}`, display: `${b}/${q}`, kind: "forex",
+      decimals: q === "JPY" ? 3 : 5,
+      yahooSymbols: [`${b}${q}=X`],
+      quote: q, needsUsdNews: b === "USD" || q === "USD",
+    };
+  }
+  const cryptoMatch = cleaned.match(/^([A-Z0-9]{2,10})(USDT|USD|USDC|BUSD)?$/);
+  if (cryptoMatch && CRYPTO_BASES.has(cryptoMatch[1])) {
+    const base = cryptoMatch[1];
+    return {
+      raw, key: `CRYPTO:${base}USDT`, display: `${base}/USDT`, kind: "crypto",
+      decimals: base === "BTC" || base === "ETH" ? 2 : base === "SHIB" || base === "PEPE" ? 8 : 4,
+      binanceSymbols: [`${base}USDT`, `${base}USD`],
+      quote: "USDT", needsUsdNews: false,
+    };
+  }
+  if (/^[A-Z]{2,6}$/.test(cleaned)) {
+    return {
+      raw, key: `STOCK:${cleaned}`, display: cleaned, kind: "stock",
+      decimals: 2, yahooSymbols: [cleaned], quote: "USD", needsUsdNews: true,
+    };
+  }
+  return resolveInstrument("XAUUSD");
+}
+
+const candleCache = new Map<string, { at: number; data: Candle[] }>();
+const CACHE_TTL = 60_000;
+
+async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-  const symbols = ["GC=F", "XAUUSD=X"];
   let lastErr: any = null;
   for (const host of hosts) {
     for (const sym of symbols) {
       try {
-        const url = `https://${host}/v8/finance/chart/${sym}?interval=${cfg.interval}&range=${cfg.range}`;
+        const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${cfg.interval}&range=${cfg.range}`;
         const res = await fetch(url, {
           headers: {
             "User-Agent":
@@ -51,105 +142,74 @@ async function fetchFromYahoo(tf: string): Promise<Candle[]> {
             Accept: "application/json",
           },
         });
-        if (!res.ok) {
-          lastErr = new Error(`Yahoo ${host}/${sym}: ${res.status}`);
-          continue;
-        }
+        if (!res.ok) { lastErr = new Error(`Yahoo ${sym}: ${res.status}`); continue; }
         const json: any = await res.json();
         const result = json?.chart?.result?.[0];
-        if (!result) {
-          lastErr = new Error("No price data");
-          continue;
-        }
+        if (!result) { lastErr = new Error("No price data"); continue; }
         const ts: number[] = result.timestamp ?? [];
         const q = result.indicators?.quote?.[0] ?? {};
         const candles: Candle[] = [];
         for (let i = 0; i < ts.length; i++) {
-          const o = q.open?.[i],
-            h = q.high?.[i],
-            l = q.low?.[i],
-            c = q.close?.[i],
-            v = q.volume?.[i] ?? 0;
+          const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i], v = q.volume?.[i] ?? 0;
           if (o == null || h == null || l == null || c == null) continue;
           candles.push({ t: ts[i] * 1000, o, h, l, c, v });
         }
-        if (candles.length >= 10) return candles.slice(-120);
-      } catch (e) {
-        lastErr = e;
-      }
+        if (candles.length >= 10) return candles.slice(-200);
+      } catch (e) { lastErr = e; }
     }
   }
   throw lastErr ?? new Error("Yahoo unavailable");
 }
 
-async function fetchFromBinance(tf: string): Promise<Candle[]> {
+async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const map: Record<string, string> = {
     "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m",
     "1h": "1h", "4h": "4h", "1d": "1d",
   };
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
-  const symbols = ["PAXGUSDT", "XAUTUSDT"];
   let lastErr: any = null;
   for (const host of hosts) {
     for (const sym of symbols) {
       try {
         const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
         const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) { lastErr = new Error(`Binance ${host}/${sym}: ${res.status}`); continue; }
+        if (!res.ok) { lastErr = new Error(`Binance ${sym}: ${res.status}`); continue; }
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
           t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
         })).filter((c) => isFinite(c.c));
-        if (candles.length >= 10) return candles.slice(-180);
+        if (candles.length >= 10) return candles.slice(-200);
       } catch (e) { lastErr = e; }
     }
   }
   throw lastErr ?? new Error("Binance unavailable");
 }
 
-async function fetchFromStooq(): Promise<Candle[]> {
-  const res = await fetch("https://stooq.com/q/d/l/?s=xauusd&i=d", {
-    headers: { "User-Agent": "Mozilla/5.0" },
-  });
-  if (!res.ok) throw new Error(`Stooq: ${res.status}`);
-  const text = await res.text();
-  const lines = text.trim().split("\n").slice(1);
-  const candles: Candle[] = [];
-  for (const line of lines) {
-    const [date, o, h, l, c, v] = line.split(",");
-    const t = new Date(date).getTime();
-    const oN = +o, hN = +h, lN = +l, cN = +c;
-    if (!isFinite(oN) || !isFinite(cN)) continue;
-    candles.push({ t, o: oN, h: hN, l: lN, c: cN, v: +v || 0 });
+async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Promise<Candle[]> {
+  const cacheKey = `${inst.key}:${tf}`;
+  const cached = candleCache.get(cacheKey);
+  const now = Date.now();
+  if (cached && now - cached.at < CACHE_TTL) return cached.data;
+
+  const tries: Array<() => Promise<Candle[]>> = [];
+  if (inst.binanceSymbols?.length) tries.push(() => fetchFromBinanceSymbols(inst.binanceSymbols!, tf));
+  if (inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
+
+  let lastErr: any = null;
+  for (const f of tries) {
+    try {
+      const data = await f();
+      candleCache.set(cacheKey, { at: now, data });
+      return data;
+    } catch (e) { lastErr = e; }
   }
-  return candles.slice(-120);
+  if (cached) return cached.data;
+  throw lastErr ?? new Error(`No data source available for ${inst.display}`);
 }
 
 async function fetchGoldCandles(tf: string): Promise<Candle[]> {
-  const cached = candleCache.get(tf);
-  const now = Date.now();
-  if (cached && now - cached.at < CACHE_TTL) return cached.data;
-  // Binance PAXG (tokenized gold, tracks XAU/USD closely) — most edge-friendly
-  try {
-    const data = await fetchFromBinance(tf);
-    candleCache.set(tf, { at: now, data });
-    return data;
-  } catch {}
-  try {
-    const data = await fetchFromYahoo(tf);
-    candleCache.set(tf, { at: now, data });
-    return data;
-  } catch (e) {
-    if (cached) return cached.data;
-    try {
-      const data = await fetchFromStooq();
-      candleCache.set(tf, { at: now, data });
-      return data;
-    } catch {
-      throw e;
-    }
-  }
+  return fetchInstrumentCandles(resolveInstrument("XAUUSD"), tf);
 }
 
 export const analyzeGold = createServerFn({ method: "POST" })
