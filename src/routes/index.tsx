@@ -1,3 +1,4 @@
+import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CloudOrb } from "@/components/CloudOrb";
 
@@ -31,7 +32,8 @@ const SIGNALS = [
   { pair: "NAS100", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
 ] as const;
 
-const TICKER = [
+type TickerRow = [string, string, string];
+const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "2,418.30", "+0.42%"],
   ["BTC/USDT", "71,204.10", "+1.18%"],
   ["EUR/USD", "1.0832", "-0.07%"],
@@ -41,6 +43,60 @@ const TICKER = [
   ["GBP/USD", "1.2671", "+0.09%"],
   ["WTI", "78.42", "+0.84%"],
 ];
+
+// Maps display symbol -> Binance ticker symbol (where available)
+const BINANCE_MAP: Record<string, string> = {
+  "XAU/USD": "PAXGUSDT",
+  "BTC/USDT": "BTCUSDT",
+  "ETH/USDT": "ETHUSDT",
+  "EUR/USD": "EURUSDT",
+};
+
+function fmtPrice(n: number): string {
+  if (n >= 1000) return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (n >= 10) return n.toFixed(2);
+  return n.toFixed(4);
+}
+
+function useLiveTicker(): TickerRow[] {
+  const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
+  React.useEffect(() => {
+    let alive = true;
+    const symbols = Object.values(BINANCE_MAP);
+    const fetchPrices = async () => {
+      try {
+        const url = `https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(symbols))}`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data: Array<{ symbol: string; lastPrice: string; priceChangePercent: string }> = await res.json();
+        if (!alive) return;
+        const bySym = new Map(data.map((d) => [d.symbol, d]));
+        setRows((prev) =>
+          prev.map(([label, price, delta]) => {
+            const bsym = BINANCE_MAP[label];
+            if (!bsym) return [label, price, delta];
+            const d = bySym.get(bsym);
+            if (!d) return [label, price, delta];
+            const p = parseFloat(d.lastPrice);
+            const pct = parseFloat(d.priceChangePercent);
+            const sign = pct >= 0 ? "+" : "";
+            return [label, fmtPrice(p), `${sign}${pct.toFixed(2)}%`];
+          })
+        );
+      } catch {
+        /* ignore */
+      }
+    };
+    fetchPrices();
+    const id = setInterval(fetchPrices, 10_000);
+    return () => {
+      alive = false;
+      clearInterval(id);
+    };
+  }, []);
+  return rows;
+}
+
 
 /* ---------- atoms ---------- */
 function TagPill({ tag, tone }: { tag: string; tone: "ink" | "green" | "muted" }) {
@@ -68,6 +124,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 /* ---------- page ---------- */
 function HomePage() {
+  const ticker = useLiveTicker();
   return (
     <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
@@ -105,7 +162,7 @@ function HomePage() {
         <div className="border-t border-zinc-100 overflow-hidden">
           <div className="mx-auto max-w-6xl px-6">
             <div className={`flex gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap overflow-hidden`}>
-              {[...TICKER, ...TICKER].map(([s, p, d], i) => (
+              {[...ticker, ...ticker].map(([s, p, d], i) => (
                 <span key={i} className="flex items-center gap-2">
                   <span className="text-zinc-900 font-medium">{s}</span>
                   <span>{p}</span>
