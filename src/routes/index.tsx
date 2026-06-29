@@ -128,7 +128,7 @@ function HomePage() {
               <span className="text-zinc-900">vocalized in real time.</span>
             </h1>
             <p className="mt-6 max-w-4xl text-base md:text-lg text-zinc-900 leading-relaxed">
-              A voice-native trading terminal powered by 25+ years of ICT &amp; SMC market logic narrating live A+ setups across Gold, FX, Crypto
+              A voice-native trading terminal powered by 25+ years of ICT &amp; SMC market logic narrating live A+ setups across Gold &amp; Crypto
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
