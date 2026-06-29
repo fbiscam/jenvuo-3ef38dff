@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/disclaimer")({
   head: () => ({
     meta: [
-      { title: "Our Legal Disclaimer — Jenvu - AI" },
-      { name: "description", content: "Risk disclosure and disclaimer for Jenvu - AI signals and analysis." },
-      { property: "og:title", content: "Our Legal Disclaimer — Jenvu - AI" },
+      { title: "Our Legal Disclaimer — Jenvu" },
+      { name: "description", content: "Risk disclosure and disclaimer for Jenvu signals and analysis." },
+      { property: "og:title", content: "Our Legal Disclaimer — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/disclaimer" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/disclaimer" }],
@@ -19,7 +19,7 @@ function DisclaimerPage() {
     <PageShell
       eyebrow="Important"
       title="Trading Disclaimer"
-      intro="Jenvu - AI is an educational analysis tool. Nothing produced by the agent constitutes financial, investment, legal, or tax advice."
+      intro="Jenvu is an educational analysis tool. Nothing produced by the agent constitutes financial, investment, legal, or tax advice."
     >
       <section className="space-y-3">
         <H2>Risk of Loss</H2>

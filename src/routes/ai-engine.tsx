@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/ai-engine")({
   head: () => ({
     meta: [
-      { title: "Artificial Intelligence Engine — Jenvu - AI" },
-      { name: "description", content: "How the Jenvu - AI agent listens, reasons, and narrates institutional trade setups." },
-      { property: "og:title", content: "Artificial Intelligence Engine — Jenvu - AI" },
+      { title: "Artificial Intelligence Engine — Jenvu" },
+      { name: "description", content: "How the Jenvu agent listens, reasons, and narrates institutional trade setups." },
+      { property: "og:title", content: "Artificial Intelligence Engine — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/ai-engine" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/ai-engine" }],
@@ -19,7 +19,7 @@ function AIPage() {
     <PageShell
       eyebrow="Technology"
       title="The AI Engine"
-      intro="Jenvu - AI is more than a chatbot. It's a multi-stage reasoning pipeline that fuses live market data, institutional concepts, and natural-language synthesis into one fluid agent."
+      intro="Jenvu is more than a chatbot. It's a multi-stage reasoning pipeline that fuses live market data, institutional concepts, and natural-language synthesis into one fluid agent."
     >
       <section className="space-y-3">
         <H2>Perception Layer</H2>

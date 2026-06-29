@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms & Conditions — Jenvu - AI" },
-      { name: "description", content: "The terms that govern your use of Jenvu - AI." },
-      { property: "og:title", content: "Terms & Conditions — Jenvu - AI" },
+      { title: "Terms & Conditions — Jenvu" },
+      { name: "description", content: "The terms that govern your use of Jenvu." },
+      { property: "og:title", content: "Terms & Conditions — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/terms" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/terms" }],
@@ -19,7 +19,7 @@ function TermsPage() {
     <PageShell
       eyebrow="Legal"
       title="Terms of Use"
-      intro="By accessing or using Jenvu - AI you agree to the following terms. Please read them carefully."
+      intro="By accessing or using Jenvu you agree to the following terms. Please read them carefully."
     >
       <section className="space-y-3">
         <H2>1. Eligibility</H2>
@@ -46,7 +46,7 @@ function TermsPage() {
       <section className="space-y-3">
         <H2>4. Intellectual Property</H2>
         <P>
-          Jenvu - AI, its branding, software, models, and content are owned by JENVU or its
+          Jenvu, its branding, software, models, and content are owned by JENVU or its
           licensors. You retain ownership of content you submit, and grant us a limited
           license to process it solely to deliver the service.
         </P>
@@ -54,7 +54,7 @@ function TermsPage() {
       <section className="space-y-3">
         <H2>5. No Financial Advice</H2>
         <P>
-          Jenvu - AI produces educational analysis and informational trade ideas — not
+          Jenvu produces educational analysis and informational trade ideas — not
           investment, legal, tax, or financial advice. See the Disclaimer for full detail.
         </P>
       </section>
@@ -62,13 +62,13 @@ function TermsPage() {
         <H2>6. Termination</H2>
         <P>
           We may suspend or terminate access for breach of these terms or to protect the
-          integrity of the service. You may stop using Jenvu - AI at any time.
+          integrity of the service. You may stop using Jenvu at any time.
         </P>
       </section>
       <section className="space-y-3">
         <H2>7. Limitation of Liability</H2>
         <P>
-          To the maximum extent permitted by law, Jenvu - AI is provided "as is" without
+          To the maximum extent permitted by law, Jenvu is provided "as is" without
           warranties of any kind, and we are not liable for indirect, incidental, or
           consequential damages including trading losses.
         </P>

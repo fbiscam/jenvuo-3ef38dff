@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "Partner With Us — Jenvu - AI" },
-      { name: "description", content: "The mission, philosophy, and team behind Jenvu - AI." },
-      { property: "og:title", content: "Partner With Us — Jenvu - AI" },
+      { title: "Partner With Us — Jenvu" },
+      { name: "description", content: "The mission, philosophy, and team behind Jenvu." },
+      { property: "og:title", content: "Partner With Us — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/about" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/about" }],
@@ -19,7 +19,7 @@ function AboutPage() {
     <PageShell
       eyebrow="About"
       title={"Built for traders\u00a0\nwho refuse to guess."}
-      intro="Jenvu - AI was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned 25 years of ICT and SMC playbooks into a voice-first agent any serious trader can talk to."
+      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned 25 years of ICT and SMC playbooks into a voice-first agent any serious trader can talk to."
     >
       <section className="space-y-3">
         <H2>The Mission</H2>
