@@ -110,8 +110,8 @@ function Hero() {
           className="font-display font-semibold tracking-[-0.045em] leading-[0.95] text-[clamp(56px,9vw,160px)]"
           style={{ color: VOID }}
         >
-          <span className="block whitespace-nowrap">The trading desk</span>
-          <span className="block whitespace-nowrap">that speaks back.</span>
+          <span className="block">The trading desk</span>
+          <span className="block">that speaks back.</span>
         </h1>
 
         <p className="mt-10 mx-auto max-w-2xl text-[17px] leading-relaxed" style={{ color: VOID }}>
