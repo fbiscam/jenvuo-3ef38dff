@@ -303,7 +303,7 @@ function FeatureGrid() {
                     Push-to-talk.<br />
                     <span className="opacity-50">Hear the desk think.</span>
                   </h3>
-                  <p className="mt-5 text-[15px] leading-relaxed text-[color:var(--ink)]/70 max-w-md">
+                  <p className="mt-5 text-[15px] leading-relaxed text-[color:var(--void)] max-w-md">
                     A natural conversation with a 25-year analyst. Bias, structure, sweeps, entries —
                     narrated in real time as the chart draws every confluence.
                   </p>
