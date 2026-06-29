@@ -105,6 +105,18 @@ function Home() {
     }
   };
 
+  // Auto-start mic on page load
+  useEffect(() => {
+    if (!speech.supported) return;
+    const t = setTimeout(() => {
+      if (greetedRef.current) return;
+      greetedRef.current = true;
+      speech.speak("GoldGPT online. I'm listening.", () => speech.startListening());
+    }, 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [speech.supported]);
+
   const submitText = () => {
     const t = text.trim();
     if (!t) return;
@@ -217,67 +229,88 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
 
   return (
     <div className="relative h-72 w-72 sm:h-80 sm:w-80 flex items-center justify-center">
-      {/* soft outer halo */}
-      <div className="absolute inset-0 rounded-full bg-sky-200/30 blur-3xl" />
+      {/* rainbow outer halo */}
+      <div
+        className="absolute inset-0 rounded-full blur-3xl opacity-70 animate-spin"
+        style={{
+          animationDuration: "16s",
+          background:
+            "conic-gradient(from 0deg, #f472b6, #a78bfa, #38bdf8, #34d399, #fbbf24, #fb7185, #f472b6)",
+        }}
+      />
       {(status === "listening" || status === "speaking") && (
-        <span className="absolute -inset-4 rounded-full border border-sky-200/60 animate-ping" style={{ animationDuration: "2.6s" }} />
+        <>
+          <span className="absolute -inset-2 rounded-full border border-fuchsia-200/70 animate-ping" style={{ animationDuration: "2.4s" }} />
+          <span className="absolute -inset-8 rounded-full border border-sky-200/60 animate-ping" style={{ animationDuration: "3.2s" }} />
+        </>
       )}
 
-      {/* Cloud sphere */}
+      {/* Colorful sphere */}
       <div
-        className="relative h-60 w-60 sm:h-64 sm:w-64 rounded-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(56,189,248,0.45)]"
+        className="relative h-60 w-60 sm:h-64 sm:w-64 rounded-full overflow-hidden shadow-[0_25px_70px_-10px_rgba(167,139,250,0.55)]"
         style={{
           transform: `scale(${scale})`,
           transition: "transform 700ms cubic-bezier(0.4,0,0.2,1)",
         }}
       >
-        {/* base sky gradient: light top, deeper blue bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-sky-100 to-sky-500" />
-
-        {/* swirling cloud layer 1 */}
-        <div
-          className="absolute -inset-1/4 animate-spin"
-          style={{
-            animationDuration: spinDuration,
-            background:
-              "radial-gradient(60% 40% at 30% 35%, rgba(255,255,255,0.95), transparent 60%), radial-gradient(50% 35% at 70% 55%, rgba(255,255,255,0.7), transparent 70%), radial-gradient(45% 30% at 50% 80%, rgba(255,255,255,0.55), transparent 65%)",
-            filter: "blur(6px)",
-          }}
-        />
-
-        {/* swirling cloud layer 2 (counter) */}
-        <div
-          className="absolute -inset-1/4 animate-spin opacity-90"
-          style={{
-            animationDuration: "18s",
-            animationDirection: "reverse",
-            background:
-              "radial-gradient(45% 30% at 60% 25%, rgba(255,255,255,0.85), transparent 65%), radial-gradient(40% 28% at 25% 70%, rgba(186,230,253,0.8), transparent 70%), radial-gradient(35% 25% at 80% 75%, rgba(56,189,248,0.5), transparent 70%)",
-            filter: "blur(8px)",
-          }}
-        />
-
-        {/* deep blue undercurrents at bottom */}
+        {/* base aurora */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(80% 40% at 50% 105%, rgba(14,116,184,0.7), transparent 70%)",
+              "linear-gradient(135deg, #c4b5fd 0%, #93c5fd 25%, #5eead4 50%, #fcd34d 75%, #fb7185 100%)",
           }}
         />
 
-        {/* top sheen */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_22%,rgba(255,255,255,0.6),transparent_45%)]" />
+        {/* swirling color layer 1 */}
+        <div
+          className="absolute -inset-1/3 animate-spin"
+          style={{
+            animationDuration: spinDuration,
+            background:
+              "conic-gradient(from 0deg, rgba(244,114,182,0.9), rgba(167,139,250,0.9), rgba(56,189,248,0.9), rgba(52,211,153,0.9), rgba(251,191,36,0.9), rgba(244,114,182,0.9))",
+            filter: "blur(22px)",
+            mixBlendMode: "screen",
+          }}
+        />
 
-        {/* inner edge shading for sphere depth */}
-        <div className="absolute inset-0 rounded-full shadow-[inset_-20px_-30px_60px_rgba(7,89,133,0.35),inset_15px_20px_50px_rgba(255,255,255,0.4)]" />
+        {/* swirling color layer 2 (counter, softer) */}
+        <div
+          className="absolute -inset-1/4 animate-spin opacity-80"
+          style={{
+            animationDuration: "20s",
+            animationDirection: "reverse",
+            background:
+              "radial-gradient(45% 35% at 25% 30%, rgba(244,114,182,0.85), transparent 65%), radial-gradient(40% 30% at 75% 35%, rgba(56,189,248,0.85), transparent 65%), radial-gradient(50% 35% at 50% 80%, rgba(167,139,250,0.85), transparent 65%), radial-gradient(35% 25% at 80% 75%, rgba(251,191,36,0.7), transparent 70%)",
+            filter: "blur(14px)",
+            mixBlendMode: "screen",
+          }}
+        />
+
+        {/* drifting bright spots */}
+        <div
+          className="absolute -inset-1/4 animate-spin opacity-90"
+          style={{
+            animationDuration: "11s",
+            background:
+              "radial-gradient(20% 15% at 35% 40%, rgba(255,255,255,0.9), transparent 70%), radial-gradient(18% 14% at 65% 55%, rgba(255,255,255,0.7), transparent 70%)",
+            filter: "blur(10px)",
+            mixBlendMode: "screen",
+          }}
+        />
+
+        {/* glossy top sheen */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_32%_22%,rgba(255,255,255,0.55),transparent_50%)]" />
+
+        {/* inner edge depth */}
+        <div className="absolute inset-0 rounded-full shadow-[inset_-25px_-35px_70px_rgba(76,29,149,0.4),inset_15px_20px_50px_rgba(255,255,255,0.35)]" />
 
         {/* thinking shimmer */}
         {status === "thinking" && (
           <div
             className="absolute inset-0 animate-spin"
             style={{
-              background: "conic-gradient(from 0deg, transparent, rgba(255,255,255,0.7), transparent 25%)",
+              background: "conic-gradient(from 0deg, transparent, rgba(255,255,255,0.8), transparent 25%)",
               animationDuration: "1.3s",
               mixBlendMode: "overlay",
             }}
