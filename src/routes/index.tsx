@@ -326,7 +326,7 @@ function FeatureGrid() {
             colSpan="lg:col-span-4"
             icon={<Brain className="h-3 w-3" />}
             tag="Reasoning"
-            title="Desk-grade logic, not chat fluff."
+            title={<>Desk-grade logic,<br />not chat fluff.</>}
             body="Bias, premium/discount, BOS/CHoCH, DXY correlation — fused in under a second."
             tone="dark"
           />
