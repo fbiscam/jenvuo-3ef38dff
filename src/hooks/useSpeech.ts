@@ -2,6 +2,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 type SR = any;
 
+export type VoicePresetKey = "aria" | "orion" | "nova" | "atlas";
+
+export const VOICE_PRESETS: {
+  key: VoicePresetKey;
+  label: string;
+  desc: string;
+  match: RegExp;
+  lang: RegExp;
+  pitch: number;
+  rate: number;
+}[] = [
+  { key: "aria",  label: "Aria",  desc: "Warm female · US",   match: /samantha|google us english|aria|jenny|zira|female/i, lang: /en-US/i, pitch: 1.05, rate: 1.0 },
+  { key: "nova",  label: "Nova",  desc: "Soft female · UK",   match: /karen|serena|kate|google uk english female|female/i, lang: /en-GB/i, pitch: 1.1,  rate: 0.98 },
+  { key: "orion", label: "Orion", desc: "Deep male · UK",     match: /daniel|google uk english male|oliver|male/i,         lang: /en-GB/i, pitch: 0.9,  rate: 1.0 },
+  { key: "atlas", label: "Atlas", desc: "Confident male · US",match: /alex|david|fred|google us english male|male/i,        lang: /en-US/i, pitch: 0.95, rate: 1.04 },
+];
+
 export function useSpeech() {
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
@@ -11,8 +28,10 @@ export function useSpeech() {
   const [supported, setSupported] = useState(true);
   const [needsGesture, setNeedsGesture] = useState(false);
   const [wordPulse, setWordPulse] = useState(0);
+  const [voicePreset, setVoicePresetState] = useState<VoicePresetKey>("orion");
   const recognitionRef = useRef<SR | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
+  const voicePresetRef = useRef<VoicePresetKey>("orion");
   const wantListeningRef = useRef(false);
   const startingRef = useRef(false);
   const pausedRef = useRef(false);
