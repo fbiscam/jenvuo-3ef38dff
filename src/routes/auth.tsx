@@ -209,7 +209,7 @@ function AuthPage() {
                     </div>
 
                     
-                    <div className="mt-6 text-center space-y-2">
+                    <div className="mt-4 text-center space-y-2">
                       <div className={`flex items-center justify-center gap-2 ${MONO} text-[10px] tracking-[0.2em] text-zinc-400 uppercase`}>
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
                         LIVE_NARRATION
