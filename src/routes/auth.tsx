@@ -38,10 +38,10 @@ function AuthPage() {
   React.useEffect(() => {
     let alive = true;
     supabase.auth.getSession().then(({ data }) => {
-      if (alive && data.session) navigate({ to: "/", replace: true });
+      if (alive && data.session) navigate({ to: "/app", replace: true });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
-      if (session) navigate({ to: "/", replace: true });
+      if (session) navigate({ to: "/app", replace: true });
     });
     return () => {
       alive = false;
@@ -59,7 +59,7 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    navigate({ to: "/", replace: true });
+    navigate({ to: "/app", replace: true });
   };
 
   return (
