@@ -235,7 +235,7 @@ function SignalPage() {
       }
     };
     poll();
-    const id = setInterval(poll, 15000);
+    const id = setInterval(poll, 5000);
     return () => { stopped = true; clearInterval(id); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan]);
