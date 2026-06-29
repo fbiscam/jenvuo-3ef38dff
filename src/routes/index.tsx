@@ -308,8 +308,8 @@ function FeatureGrid() {
                     narrated in real time as the chart draws every confluence.
                   </p>
                 </div>
-                <div className="mt-8 flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.2em] text-[color:var(--ink)]/55">
-                  <Link to="/app" className="inline-flex items-center gap-1.5 hover:text-[color:var(--void)]">
+                <div className="mt-8 flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.2em] text-[color:var(--void)]">
+                  <Link to="/app" className="inline-flex items-center gap-1.5 text-[color:var(--void)] hover:opacity-70">
                     Try the agent <ArrowUpRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
