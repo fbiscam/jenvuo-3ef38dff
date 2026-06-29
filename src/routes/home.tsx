@@ -123,9 +123,17 @@ function HomePage() {
             transition={{ duration: 0.9, delay: 0.1 }}
             className="relative"
           >
-            <div className="relative rounded-[2rem] bg-[#0A0A0A] p-8 lg:p-10 overflow-hidden border border-black shadow-[0_40px_120px_-30px_rgba(0,0,0,0.55)]">
+            <div className="relative rounded-[2rem] bg-white p-8 lg:p-10 overflow-hidden border border-black/10 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.25)]">
+              <div
+                className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl opacity-40"
+                style={{ background: `radial-gradient(circle, ${ACCENT}55, transparent 70%)` }}
+              />
+              <div
+                className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full blur-3xl opacity-30"
+                style={{ background: "radial-gradient(circle, #000000aa, transparent 70%)" }}
+              />
               {/* corner ticker labels */}
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-white/40 font-semibold">
+              <div className="relative flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-black/50 font-semibold">
                 <span>JENVU // LIVE</span>
                 <span className="flex items-center gap-1.5">
                   <span
@@ -136,7 +144,7 @@ function HomePage() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-center py-10 lg:py-14">
+              <div className="relative flex items-center justify-center py-10 lg:py-14">
                 <motion.div
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -145,7 +153,7 @@ function HomePage() {
                 </motion.div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="relative grid grid-cols-3 gap-3 text-center">
                 {[
                   { k: "PAIRS", v: "A–Z" },
                   { k: "BIAS", v: "ICT/SMC" },
@@ -153,14 +161,14 @@ function HomePage() {
                 ].map((s) => (
                   <div
                     key={s.k}
-                    className="rounded-xl border border-white/10 bg-white/[0.03] py-3"
+                    className="rounded-xl border border-black/10 bg-black/[0.02] py-3"
                   >
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold">
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-black/50 font-semibold">
                       {s.k}
                     </div>
                     <div
                       className="mt-1 text-lg font-black"
-                      style={{ color: ACCENT }}
+                      style={{ color: "#000" }}
                     >
                       {s.v}
                     </div>
@@ -271,19 +279,28 @@ function HomePage() {
           ].map((s) => (
             <div
               key={s.n}
-              className="relative rounded-2xl bg-[#0A0A0A] text-white p-8 overflow-hidden group hover:-translate-y-1 transition"
+              className="group relative rounded-2xl bg-white border border-black/10 p-8 overflow-hidden hover:-translate-y-1 hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.25)] transition"
             >
               <div
-                className="absolute -top-6 -right-2 text-[7rem] font-black leading-none opacity-20"
-                style={{ color: ACCENT }}
+                className="absolute -top-6 -right-2 text-[7rem] font-black leading-none opacity-[0.08] group-hover:opacity-20 transition"
+                style={{ color: "#000" }}
               >
                 {s.n}
               </div>
-              <s.icon className="h-7 w-7" style={{ color: ACCENT }} />
+              <div
+                className="inline-flex h-12 w-12 items-center justify-center rounded-xl"
+                style={{ background: `${ACCENT}1f`, color: "#7a5a10" }}
+              >
+                <s.icon className="h-6 w-6" />
+              </div>
               <div className="mt-6 text-2xl font-black tracking-tight">
                 {s.title}
               </div>
-              <p className="mt-3 text-white/65 leading-relaxed">{s.body}</p>
+              <p className="mt-3 text-black/65 leading-relaxed">{s.body}</p>
+              <div
+                className="absolute bottom-0 left-0 h-[3px] w-0 group-hover:w-full transition-all duration-500"
+                style={{ background: ACCENT }}
+              />
             </div>
           ))}
         </div>
@@ -294,8 +311,12 @@ function HomePage() {
         eyebrow="Live Signal"
         title="A trading desk in a single screen."
       >
-        <div className="relative rounded-[2rem] bg-[#0A0A0A] p-6 lg:p-10 overflow-hidden">
-          <div className="flex items-center justify-between text-white/50 text-xs uppercase tracking-[0.25em] font-semibold mb-6">
+        <div className="relative rounded-[2rem] bg-white border border-black/10 p-6 lg:p-10 overflow-hidden shadow-[0_40px_120px_-40px_rgba(0,0,0,0.25)]">
+          <div
+            className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full blur-3xl opacity-30"
+            style={{ background: `radial-gradient(circle, ${ACCENT}66, transparent 70%)` }}
+          />
+          <div className="relative flex items-center justify-between text-black/55 text-xs uppercase tracking-[0.25em] font-semibold mb-6">
             <span>XAU/USD · 1H + 15M</span>
             <span className="flex items-center gap-2">
               <Activity className="h-3.5 w-3.5" style={{ color: ACCENT }} />
@@ -303,8 +324,8 @@ function HomePage() {
             </span>
           </div>
 
-          <div className="grid lg:grid-cols-[2fr_1fr] gap-5">
-            <div className="rounded-xl bg-gradient-to-br from-black to-[#111] border border-white/10 p-5 h-72 relative overflow-hidden">
+          <div className="relative grid lg:grid-cols-[2fr_1fr] gap-5">
+            <div className="rounded-xl bg-gradient-to-br from-white to-[#FAF7EE] border border-black/10 p-5 h-72 relative overflow-hidden">
               <FakeChart />
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
@@ -316,14 +337,13 @@ function HomePage() {
               ].map(([k, v]) => (
                 <div
                   key={k}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
+                  className="rounded-xl border border-black/10 bg-black/[0.02] p-4"
                 >
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold">
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-black/50 font-semibold">
                     {k}
                   </div>
                   <div
-                    className="mt-1 font-black text-lg"
-                    style={{ color: ACCENT }}
+                    className="mt-1 font-black text-lg text-black"
                   >
                     {v}
                   </div>
@@ -332,10 +352,10 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="mt-8 flex justify-center">
+          <div className="relative mt-8 flex justify-center">
             <Link
               to="/signal"
-              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-7 py-3.5 font-bold hover:bg-white/90 transition"
+              className="inline-flex items-center gap-2 rounded-full bg-black text-white px-7 py-3.5 font-bold hover:bg-black/85 transition"
             >
               Open Live Signal <ArrowRight className="h-4 w-4" />
             </Link>
@@ -394,7 +414,8 @@ function HomePage() {
           ].map((a) => (
             <span
               key={a}
-              className="rounded-full bg-black text-white px-5 py-2.5 text-sm font-bold tracking-wide"
+              className="rounded-full bg-white border-2 border-black/10 text-black px-5 py-2.5 text-sm font-bold tracking-wide hover:border-black hover:-translate-y-0.5 transition"
+              style={{ boxShadow: `inset 0 -2px 0 ${ACCENT}` }}
             >
               {a}
             </span>
@@ -404,25 +425,29 @@ function HomePage() {
 
       {/* FINAL CTA */}
       <section className="relative mx-auto max-w-7xl px-6 pb-24">
-        <div className="relative rounded-[2rem] bg-[#0A0A0A] text-white p-12 lg:p-20 overflow-hidden">
+        <div className="relative rounded-[2rem] bg-white border border-black/10 p-12 lg:p-20 overflow-hidden shadow-[0_50px_140px_-40px_rgba(0,0,0,0.3)]">
           <div
-            className="absolute -top-20 -right-20 h-80 w-80 rounded-full blur-3xl opacity-30"
-            style={{ background: ACCENT }}
+            className="pointer-events-none absolute -top-32 -right-32 h-[28rem] w-[28rem] rounded-full blur-3xl opacity-40"
+            style={{ background: `radial-gradient(circle, ${ACCENT}77, transparent 70%)` }}
+          />
+          <div
+            className="pointer-events-none absolute -bottom-32 -left-32 h-[24rem] w-[24rem] rounded-full blur-3xl opacity-20"
+            style={{ background: "radial-gradient(circle, #000, transparent 70%)" }}
           />
           <div className="relative grid lg:grid-cols-[1fr_auto] gap-10 items-center">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-white/40 font-semibold">
+              <div className="text-[11px] uppercase tracking-[0.3em] text-black/50 font-semibold">
                 Ready when you are
               </div>
               <h2 className="mt-4 text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[0.95]">
                 Stop guessing.
                 <br />
-                Start <span style={{ color: ACCENT }}>executing.</span>
+                Start <span style={{ color: "#000", borderBottom: `4px solid ${ACCENT}` }}>executing.</span>
               </h2>
             </div>
             <Link
               to="/"
-              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-9 py-5 font-black tracking-wide hover:bg-white/90 transition"
+              className="inline-flex items-center gap-2 rounded-full bg-black text-white px-9 py-5 font-black tracking-wide hover:bg-black/85 transition"
             >
               Launch JENVU <ArrowRight className="h-5 w-5" />
             </Link>
@@ -531,22 +556,26 @@ function FeatureCard({
   body: string;
 }) {
   return (
-    <div className="group relative rounded-2xl bg-[#0A0A0A] text-white p-7 overflow-hidden hover:-translate-y-1 transition">
+    <div className="group relative rounded-2xl bg-white border border-black/10 p-7 overflow-hidden hover:-translate-y-1 hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.2)] transition">
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition"
         style={{
-          background: `radial-gradient(400px circle at 50% 0%, ${ACCENT}22, transparent 60%)`,
+          background: `radial-gradient(400px circle at 50% 0%, ${ACCENT}26, transparent 60%)`,
         }}
       />
       <div className="relative">
         <div
           className="inline-flex h-11 w-11 items-center justify-center rounded-xl"
-          style={{ background: `${ACCENT}1a`, color: ACCENT }}
+          style={{ background: `${ACCENT}26`, color: "#7a5a10" }}
         >
           <Icon className="h-5 w-5" />
         </div>
-        <div className="mt-5 text-xl font-black tracking-tight">{title}</div>
-        <p className="mt-2 text-white/65 leading-relaxed text-sm">{body}</p>
+        <div className="mt-5 text-xl font-black tracking-tight text-black">{title}</div>
+        <p className="mt-2 text-black/65 leading-relaxed text-sm">{body}</p>
+        <div
+          className="absolute bottom-[-28px] left-[-28px] h-[3px] w-0 group-hover:w-full transition-all duration-500"
+          style={{ background: ACCENT }}
+        />
       </div>
     </div>
   );
@@ -569,7 +598,7 @@ function FakeChart() {
           x2="600"
           y1={y}
           y2={y}
-          stroke="rgba(255,255,255,0.05)"
+          stroke="rgba(0,0,0,0.07)"
         />
       ))}
       <path
@@ -602,11 +631,11 @@ function FakeChart() {
         x2="600"
         y1="95"
         y2="95"
-        stroke="white"
-        strokeOpacity="0.6"
+        stroke="black"
+        strokeOpacity="0.55"
         strokeDasharray="2 4"
       />
-      <text x="8" y="90" fill="white" fillOpacity="0.7" fontSize="10">
+      <text x="8" y="90" fill="black" fillOpacity="0.65" fontSize="10" fontWeight="700">
         ENTRY
       </text>
     </svg>
