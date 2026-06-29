@@ -8,19 +8,19 @@ import { CloudOrb } from "@/components/CloudOrb";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — JENVU AI Voice Trading Terminal" },
+      { title: "Sign In Your Account — JENVU AI" },
       {
         name: "description",
         content:
           "Sign in to your JENVU AI account to access the voice-native institutional trading terminal — live ICT/SMC analysis for Gold, Crypto, FX and Indices.",
       },
       { name: "robots", content: "noindex, follow" },
-      { property: "og:title", content: "Sign in — JENVU AI" },
+      { property: "og:title", content: "Sign In Your Account — JENVU AI" },
       { property: "og:description", content: "Access your voice-native institutional trading terminal." },
       { property: "og:url", content: "https://jenvu.com/auth" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Sign in — JENVU AI" },
+      { name: "twitter:title", content: "Sign In Your Account — JENVU AI" },
       { name: "twitter:description", content: "Access your voice-native institutional trading terminal." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/auth" }],
