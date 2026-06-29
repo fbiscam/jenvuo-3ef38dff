@@ -436,7 +436,7 @@ function ManifestoSplit() {
       <div className="mx-auto max-w-[1320px] px-6 py-28 grid lg:grid-cols-12 gap-12">
         <div className="lg:col-span-5">
           <h2 className="mt-5 font-display font-semibold tracking-[-0.035em] text-[clamp(36px,4.5vw,64px)] leading-[1.02]">
-            Most AI guesses.<br /><span className="opacity-50">This one reasons.</span>
+            Most AI guesses.<br /><span>This one reasons.</span>
           </h2>
         </div>
 
