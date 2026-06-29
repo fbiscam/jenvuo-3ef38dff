@@ -134,8 +134,8 @@ function Home() {
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center">
-          <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(245,191,90,0.35)]">
-            Jenvu AI
+          <h1 className="text-2xl font-extrabold tracking-[0.15em] text-white uppercase">
+            JENVU AI
           </h1>
         </div>
         <div className="flex items-center gap-2">
