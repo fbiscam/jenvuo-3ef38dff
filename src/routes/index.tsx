@@ -122,7 +122,7 @@ function HomePage() {
       <section className="mx-auto max-w-6xl px-6 pt-16 pb-10">
         <div className="grid gap-10 lg:grid-cols-12 items-end">
           <div className="lg:col-span-7">
-            <SectionLabel>Institutional Voice Terminal · v2.04</SectionLabel>
+            
             <h1 className="mt-5 text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
               Institutional intelligence,{" "}
               <span className="text-zinc-900">vocalized in real time.</span>
