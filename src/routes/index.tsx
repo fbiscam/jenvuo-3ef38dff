@@ -197,7 +197,7 @@ function Home() {
       </header>
 
       {/* Main: orb centerpiece */}
-      <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-center px-6 gap-10 pb-40">
+      <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-center px-6 gap-10 pb-20 pt-24">
         <div className="flex flex-col items-center gap-6 flex-1">
           <CloudOrb status={status} />
           <div className="text-center min-h-[2.5rem]">
