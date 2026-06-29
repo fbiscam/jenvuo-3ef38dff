@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Mic, X, Plus, Sliders } from "lucide-react";
+import { Mic, X, Plus, Sliders, Moon, Sun } from "lucide-react";
 import { SignalCard } from "@/components/SignalCard";
 import { NewsPanel } from "@/components/NewsPanel";
 import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech";
@@ -62,6 +62,14 @@ function Home() {
   const greetedRef = useRef(false);
   const alertedRef = useRef<Set<string>>(new Set());
   const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [dark, setDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const v = window.localStorage.getItem("jenvu.theme");
+    return v ? v === "dark" : true;
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem("jenvu.theme", dark ? "dark" : "light");
+  }, [dark]);
 
   const news = useQuery({
     queryKey: ["gold-news"],
@@ -189,8 +197,28 @@ function Home() {
           <StatusPill status={status} supported={speech.supported} />
         </div>
 
+  return (
+    <div className={cn("h-screen w-screen relative overflow-hidden flex flex-col transition-colors duration-300", dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900")}>
+      {/* Header */}
+      <header className="relative z-10 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="flex items-center">
+          <StatusPill status={status} supported={speech.supported} dark={dark} />
+        </div>
+
         <div className="flex items-center gap-3">
-          <VoicePicker value={speech.voicePreset} onChange={speech.setVoicePreset} />
+          <button
+            onClick={() => setDark((d) => !d)}
+            className={cn(
+              "h-9 w-9 rounded-full flex items-center justify-center transition border",
+              dark
+                ? "bg-neutral-900 border-neutral-700 text-amber-300 hover:bg-neutral-800"
+                : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-100",
+            )}
+            aria-label="Toggle theme"
+            title={dark ? "Switch to light" : "Switch to dark"}
+          >
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
         </div>
       </header>
 
@@ -215,9 +243,15 @@ function Home() {
       </main>
 
       {/* Bottom composer — ChatGPT style */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t from-white via-white to-transparent">
+      <div className={cn(
+        "fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t to-transparent",
+        dark ? "from-neutral-950 via-neutral-950" : "from-white via-white",
+      )}>
         <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white shadow-[0_8px_30px_-8px_rgba(0,0,0,0.5)] pl-4 pr-1.5 py-1.5">
+          <div className={cn(
+            "flex items-center gap-2 rounded-full border pl-4 pr-1.5 py-1.5 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.5)]",
+            dark ? "bg-neutral-900 border-neutral-800" : "bg-white border-white/20",
+          )}>
             <input
               type="text"
               value={text}
@@ -225,7 +259,10 @@ function Home() {
               onKeyDown={(e) => e.key === "Enter" && submitText()}
               placeholder="Type"
               disabled={loading}
-              className="flex-1 bg-transparent text-[15px] text-neutral-900 placeholder:text-neutral-500 focus:outline-none px-1 py-1"
+              className={cn(
+                "flex-1 bg-transparent text-[15px] focus:outline-none px-1 py-1",
+                dark ? "text-neutral-100 placeholder:text-neutral-500" : "text-neutral-900 placeholder:text-neutral-500",
+              )}
             />
             <button
               onClick={toggleMic}
@@ -233,7 +270,7 @@ function Home() {
                 "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition",
                 speech.listening
                   ? "bg-emerald-500 text-white"
-                  : "hover:bg-black/5 text-neutral-700",
+                  : dark ? "hover:bg-white/10 text-neutral-200" : "hover:bg-black/5 text-neutral-700",
               )}
               aria-label="Toggle microphone"
             >
@@ -241,7 +278,10 @@ function Home() {
             </button>
             <button
               onClick={endAll}
-              className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center shrink-0 hover:bg-neutral-800 transition"
+              className={cn(
+                "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition",
+                dark ? "bg-white text-black hover:bg-neutral-200" : "bg-black text-white hover:bg-neutral-800",
+              )}
               aria-label="End"
             >
               <X className="h-4 w-4" />
@@ -253,7 +293,7 @@ function Home() {
   );
 }
 
-function StatusPill({ status, supported }: { status: "idle" | "listening" | "thinking" | "speaking"; supported: boolean }) {
+function StatusPill({ status, supported, dark }: { status: "idle" | "listening" | "thinking" | "speaking"; supported: boolean; dark?: boolean }) {
   if (!supported) {
     return (
       <div className="inline-flex items-center gap-2 rounded-full bg-neutral-100 border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600 whitespace-nowrap">
