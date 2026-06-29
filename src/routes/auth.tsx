@@ -180,11 +180,12 @@ function AuthPage() {
                     </button>
                   </form>
 
-                  <div className="mt-6 pt-4 border-t border-zinc-100">
+                  <div className="mt-4 pt-3 border-t border-zinc-100">
                     <p className="text-xs text-zinc-500 leading-relaxed">
                       This terminal is invite-only. Contact your account administrator for credentials.
                     </p>
                   </div>
+
                 </div>
               </div>
 
