@@ -136,12 +136,12 @@ function Home() {
         <div className="flex items-center gap-2.5">
           <div className="h-7 w-7 rounded-full bg-gradient-to-br from-amber-400 to-amber-700 shadow-sm" />
           <div>
-            <h1 className="text-sm font-semibold tracking-tight text-neutral-900">GoldGPT</h1>
-            <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-400">Live voice · XAU/USD</p>
+            <h1 className="text-sm font-semibold tracking-tight text-white">GoldGPT</h1>
+            <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-500">Live voice · XAU/USD</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="h-9 w-9 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-500">
+          <button className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400">
             <Sliders className="h-4 w-4" />
           </button>
         </div>
