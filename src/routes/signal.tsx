@@ -10,11 +10,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 
+type SignalSearch = { symbol?: string };
 export const Route = createFileRoute("/signal")({
+  validateSearch: (s: Record<string, unknown>): SignalSearch => ({
+    symbol: typeof s.symbol === "string" ? s.symbol : undefined,
+  }),
   head: () => ({
     meta: [
-      { title: "Live Gold Signal — Jenvu AI" },
-      { name: "description", content: "Live ICT/SMC trade plan for XAU/USD with chart markings and voice narration." },
+      { title: "Live Trade Signal — Jenvu AI" },
+      { name: "description", content: "Live ICT/SMC trade plan with chart markings and voice narration for any market." },
     ],
   }),
   component: SignalPage,
