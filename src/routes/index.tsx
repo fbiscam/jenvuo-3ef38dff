@@ -146,19 +146,26 @@ function Home() {
 
   const toggleMic = () => {
     if (!speech.supported) { toast.error("Voice not supported. Use Chrome."); return; }
-    if (speech.listening) { speech.stopListening(); return; }
+    if (speech.listening) {
+      try { localStorage.setItem("jenvu.voiceOn", "0"); } catch {}
+      speech.stopListening();
+      return;
+    }
+    try { localStorage.setItem("jenvu.voiceOn", "1"); } catch {}
     speech.startListening();
   };
 
-  // Auto-start mic on page load.
+  // Always-on voice: persist preference, auto-start on load & after refresh
   useEffect(() => {
     if (!speech.supported) return;
-    const t = setTimeout(() => {
-      if (greetedRef.current) return;
-      greetedRef.current = true;
-      speech.startListening();
-    }, 600);
-    return () => clearTimeout(t);
+    if (greetedRef.current) return;
+    greetedRef.current = true;
+    const pref = typeof window !== "undefined" ? localStorage.getItem("jenvu.voiceOn") : null;
+    const wantOn = pref === null ? true : pref === "1"; // default ON
+    if (wantOn) {
+      const t = setTimeout(() => speech.startListening(), 500);
+      return () => clearTimeout(t);
+    }
   }, [speech]);
 
   const submitText = () => {
@@ -177,12 +184,12 @@ function Home() {
     <div className="min-h-screen bg-white text-neutral-900 relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center" />
+        <div className="flex items-center">
+          <StatusPill status={status} supported={speech.supported} />
+        </div>
 
         <div className="flex items-center gap-3">
-
-
-          <button className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400">
+          <button className="h-9 w-9 rounded-full hover:bg-black/5 flex items-center justify-center text-neutral-500">
             <Sliders className="h-4 w-4" />
           </button>
         </div>
@@ -245,6 +252,33 @@ function Home() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function StatusPill({ status, supported }: { status: "idle" | "listening" | "thinking" | "speaking"; supported: boolean }) {
+  if (!supported) {
+    return (
+      <div className="flex items-center gap-2 rounded-full bg-neutral-100 border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600">
+        <span className="h-2 w-2 rounded-full bg-neutral-400" />
+        Voice not supported
+      </div>
+    );
+  }
+  const map = {
+    idle:      { dot: "bg-neutral-400",   label: "Standby",    pulse: false },
+    listening: { dot: "bg-emerald-500",   label: "Listening",  pulse: true  },
+    thinking:  { dot: "bg-amber-500",     label: "Thinking",   pulse: true  },
+    speaking:  { dot: "bg-sky-500",       label: "Speaking",   pulse: true  },
+  } as const;
+  const s = map[status];
+  return (
+    <div className="flex items-center gap-2 rounded-full bg-white border border-neutral-200 shadow-sm px-3 py-1.5 text-xs font-medium text-neutral-700">
+      <span className="relative flex h-2 w-2">
+        {s.pulse && <span className={cn("absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping", s.dot)} />}
+        <span className={cn("relative inline-flex h-2 w-2 rounded-full", s.dot)} />
+      </span>
+      Voice · {s.label}
     </div>
   );
 }
