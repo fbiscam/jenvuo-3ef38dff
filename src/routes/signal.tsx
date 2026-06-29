@@ -239,10 +239,10 @@ function SignalPage() {
                     <div className="text-[11px] text-neutral-500">Confidence <span className="font-black text-neutral-900">{t.confidence}%</span></div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <Stat label="Entry" value={t.entry.toFixed(2)} />
+                    <Stat label="Entry" value={t.entry.toFixed(plan.instrument.decimals)} />
                     <Stat label="R:R" value={`1:${t.rr.toFixed(2)}`} />
-                    <Stat label="Stop Loss" value={t.sl.toFixed(2)} tone="bad" />
-                    <Stat label="Take Profit" value={t.tp.toFixed(2)} tone="good" />
+                    <Stat label="Stop Loss" value={t.sl.toFixed(plan.instrument.decimals)} tone="bad" />
+                    <Stat label="Take Profit" value={t.tp.toFixed(plan.instrument.decimals)} tone="good" />
                   </div>
                   {t.summary && <p className="text-xs text-neutral-700 mt-3 leading-relaxed border-t border-neutral-200/60 pt-3">{t.summary}</p>}
                   {t.invalidation && (
