@@ -384,7 +384,7 @@ function SmallCard({
   icon: React.ReactNode;
   tag: string;
   title: React.ReactNode;
-  body: string;
+  body: React.ReactNode;
   image?: string;
   tone?: "light" | "dark";
 }) {
