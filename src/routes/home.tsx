@@ -11,40 +11,47 @@ const FEATURES = [
   {
     img: featVoice,
     tag: "Voice Agent",
+    color: "#4285F4",
     title: "Speak. Hear. Trade.",
     body: "Push-to-talk Jarvis-style agent that listens, reasons and narrates institutional setups in real time.",
   },
   {
     img: featSignal,
     tag: "Signal Engine",
+    color: "#EA4335",
     title: "ICT & SMC, drawn live.",
     body: "Fair value gaps, order blocks, liquidity sweeps, BOS/CHoCH and OTE entries rendered on the chart.",
   },
   {
     img: featAssets,
     tag: "Multi-Asset",
+    color: "#FBBC05",
     title: "Any market. A to Z.",
     body: "Gold, Crypto, Forex majors, Indices and global equities — one engine, every session.",
   },
   {
     img: featNews,
     tag: "News & Killzones",
+    color: "#34A853",
     title: "Context that matters.",
     body: "High-impact economic events, DXY context and London / New York killzone awareness baked into every call.",
   },
   {
     img: featBrain,
     tag: "Reasoning",
+    color: "#4285F4",
     title: "25-year desk logic.",
     body: "An institutional reasoning model trained on bias, structure, premium/discount and liquidity playbooks.",
   },
   {
     img: featTarget,
     tag: "A+ Setups",
+    color: "#EA4335",
     title: "Entry. Stop. Three TPs.",
     body: "Honest output with invalidation levels — when conditions are weak, the agent tells you to stand aside.",
   },
 ];
+
 
 
 export const Route = createFileRoute("/home")({
