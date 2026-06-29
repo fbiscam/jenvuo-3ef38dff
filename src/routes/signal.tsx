@@ -219,6 +219,10 @@ function SignalPage() {
         try { ltfRef.current?.updateLivePrice(tick.price); } catch {}
 
 
+        // Skip TP/SL/entry-fill events when market is closed (weekends for FX/metals/indices).
+        // Stale feed prices during closure can spuriously trigger notifications.
+        if (!isMarketOpen(plan.instrument.symbol)) return;
+
         const tr = plan.trade;
         const dir = tr.direction;
         const fire = (key: string, msg: string) => {
@@ -244,7 +248,6 @@ function SignalPage() {
           if (tick.price >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stopped = true; }
           if (tick.price <= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stopped = true; }
         }
-      } catch {
         // silent — keep last price
       }
     };
