@@ -185,22 +185,52 @@ function SignalPage() {
 
           {plan && (
             <>
+              {/* News Risk */}
+              <div className={cn(
+                "rounded-2xl p-3 border shadow-sm flex items-start gap-3",
+                plan.newsRisk.severity === "high" ? "border-red-300 bg-gradient-to-br from-red-50 to-white" :
+                plan.newsRisk.severity === "medium" ? "border-amber-300 bg-gradient-to-br from-amber-50 to-white" :
+                "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white",
+              )}>
+                {plan.newsRisk.severity === "high" ? <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" /> : <Newspaper className="h-5 w-5 text-neutral-700 shrink-0 mt-0.5" />}
+                <div className="min-w-0">
+                  <div className="text-[10px] uppercase tracking-widest font-bold text-neutral-500">News Risk · {plan.session}</div>
+                  <p className="text-xs text-neutral-800 leading-snug mt-1">{plan.newsRisk.warning}</p>
+                  {plan.newsRisk.events.length > 0 && (
+                    <ul className="mt-2 space-y-0.5">
+                      {plan.newsRisk.events.slice(0, 4).map((e, i) => (
+                        <li key={i} className="text-[11px] text-neutral-700 flex items-center gap-1.5">
+                          <span className={cn("w-1.5 h-1.5 rounded-full", e.impact === "High" ? "bg-red-500" : "bg-amber-500")} />
+                          <span className="font-semibold">{e.country}</span>
+                          <span className="truncate">{e.title}</span>
+                          <span className="ml-auto tabular-nums text-neutral-500">{e.minutesUntil >= 0 ? `in ${e.minutesUntil}m` : `${-e.minutesUntil}m ago`}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              {/* HTF Bias */}
               <div className="rounded-2xl p-4 border border-neutral-200 bg-white shadow-sm">
-                <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-bold">HTF Bias · 1H</div>
+                <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-bold flex items-center gap-1"><Activity className="h-3 w-3" /> HTF Bias · 1H</div>
                 <div className={cn("text-xl font-black flex items-center gap-2", plan.htfBias === "bullish" ? "text-emerald-600" : plan.htfBias === "bearish" ? "text-red-600" : "text-neutral-500")}>
                   {plan.htfBias === "bullish" ? <TrendingUp className="h-5 w-5" /> : plan.htfBias === "bearish" ? <TrendingDown className="h-5 w-5" /> : null}
                   {plan.htfBias.toUpperCase()}
                 </div>
+                {plan.htfNarrative && <p className="text-xs text-neutral-700 mt-2 leading-relaxed">{plan.htfNarrative}</p>}
+                {plan.ltfNarrative && <p className="text-xs text-neutral-700 mt-2 leading-relaxed border-t border-neutral-200/60 pt-2"><span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">LTF · </span>{plan.ltfNarrative}</p>}
               </div>
 
+              {/* Trade Card */}
               {t && (
                 <div className={cn(
                   "rounded-2xl p-4 border-2 shadow-sm",
                   isBuy ? "border-emerald-400 bg-gradient-to-br from-emerald-50 to-white" : isSell ? "border-red-400 bg-gradient-to-br from-red-50 to-white" : "border-neutral-200 bg-white",
                 )}>
                   <div className="flex items-center justify-between mb-3">
-                    <div className={cn("text-2xl font-black tracking-tight", isBuy ? "text-emerald-600" : isSell ? "text-red-600" : "text-neutral-500")}>
-                      {t.direction}
+                    <div className={cn("text-2xl font-black tracking-tight flex items-center gap-2", isBuy ? "text-emerald-600" : isSell ? "text-red-600" : "text-neutral-500")}>
+                      <Target className="h-5 w-5" /> {t.direction}
                     </div>
                     <div className="text-[11px] text-neutral-500">Confidence <span className="font-black text-neutral-900">{t.confidence}%</span></div>
                   </div>
@@ -211,9 +241,51 @@ function SignalPage() {
                     <Stat label="Take Profit" value={t.tp.toFixed(2)} tone="good" />
                   </div>
                   {t.summary && <p className="text-xs text-neutral-700 mt-3 leading-relaxed border-t border-neutral-200/60 pt-3">{t.summary}</p>}
+                  {t.invalidation && (
+                    <p className="text-[11px] text-red-700 mt-2 leading-snug bg-red-50/60 rounded-lg px-2 py-1.5 border border-red-100">
+                      <span className="font-bold uppercase tracking-wider text-[9px]">Invalidation · </span>{t.invalidation}
+                    </p>
+                  )}
                 </div>
               )}
 
+              {/* Confluences */}
+              {plan.confluences.length > 0 && (
+                <div className="rounded-2xl p-4 border border-neutral-200 bg-white shadow-sm">
+                  <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-bold flex items-center gap-1"><Zap className="h-3 w-3" /> Confluences</div>
+                  <ul className="space-y-1.5">
+                    {plan.confluences.map((c, i) => (
+                      <li key={i} className="text-xs text-neutral-800 flex gap-2 leading-snug">
+                        <span className="text-amber-600 font-black">+</span>{c}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Key Levels */}
+              {plan.keyLevels.length > 0 && (
+                <div className="rounded-2xl p-4 border border-neutral-200 bg-white shadow-sm">
+                  <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-bold">Key Levels</div>
+                  <div className="space-y-1">
+                    {plan.keyLevels.map((k, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-1.5">
+                          <span className={cn("w-1.5 h-1.5 rounded-full",
+                            k.kind === "resistance" ? "bg-red-500" :
+                            k.kind === "support" ? "bg-emerald-500" :
+                            k.kind === "equilibrium" ? "bg-amber-500" : "bg-sky-500",
+                          )} />
+                          <span className="text-neutral-700">{k.label}</span>
+                        </span>
+                        <span className="font-mono font-bold tabular-nums text-neutral-900">${k.price.toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Walkthrough */}
               <div>
                 <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 px-1 font-bold">Live Walkthrough</div>
                 <div className="space-y-2">
