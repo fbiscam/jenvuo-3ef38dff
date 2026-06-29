@@ -51,10 +51,6 @@ function AuthPage() {
       {/* LEFT — Login */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-16">
         <div className="w-full max-w-sm">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-black/15 mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-black" />
-            <span className="text-[11px] uppercase tracking-[0.25em] text-black/70">Voice Intelligence</span>
-          </div>
 
           <h1 className="text-5xl font-black uppercase tracking-tight mb-3 leading-none text-black">
             Jenvu AI
