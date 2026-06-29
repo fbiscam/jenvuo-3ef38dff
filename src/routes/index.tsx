@@ -522,8 +522,7 @@ function HomePage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <SectionLabel>{""}</SectionLabel>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight">Recent shipments</h2>
+              <h2 className="text-3xl font-semibold tracking-tight">Recent shipments</h2>
             </div>
             <span className={`${MONO} text-[11px] text-zinc-900`}>v2.04.1 · stable</span>
           </div>
