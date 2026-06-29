@@ -20,13 +20,38 @@ export const Route = createFileRoute("/signal")({
   }),
   head: () => ({
     meta: [
-      { title: "Live Signal Desk — Jenvu AI" },
-      { name: "description", content: "Real-time ICT/SMC signal desk with multi-timeframe bias, A+ setup scoring, chart markings, voice narration and live trade tracking." },
-      { property: "og:title", content: "Live Signal Desk — Jenvu AI" },
-      { property: "og:description", content: "Multi-timeframe ICT/SMC analysis with A+ setup scoring and live trade tracking." },
+      { title: "Live Signal Desk — ICT/SMC A+ Setups | JENVU AI" },
+      {
+        name: "description",
+        content:
+          "Real-time ICT & SMC signal desk for Gold, Crypto, FX and Indices. Multi-timeframe bias, A+ setup scoring, annotated charts, voice narration and live trade tracking — all in one institutional terminal.",
+      },
+      { name: "keywords", content: "ICT signals, SMC trading, gold signals, XAUUSD analysis, A+ setup, smart money concepts, voice trading agent, live signal desk" },
+      { property: "og:title", content: "Live Signal Desk — ICT/SMC A+ Setups | JENVU AI" },
+      { property: "og:description", content: "Multi-timeframe ICT/SMC analysis with A+ setup scoring, annotated charts and live trade tracking." },
       { property: "og:url", content: "https://jenvu.com/signal" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Live Signal Desk — ICT/SMC A+ Setups | JENVU AI" },
+      { name: "twitter:description", content: "Real-time institutional signal desk with voice narration and A+ setup scoring." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/signal" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "JENVU AI Signal Desk",
+          url: "https://jenvu.com/signal",
+          applicationCategory: "FinanceApplication",
+          operatingSystem: "Web",
+          description:
+            "Institutional ICT/SMC signal desk with multi-timeframe bias, A+ setup grading, annotated TradingView-style charts and voice narration.",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        }),
+      },
+    ],
   }),
   component: SignalPage,
 });

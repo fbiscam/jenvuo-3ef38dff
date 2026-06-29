@@ -103,17 +103,38 @@ function useLiveTicker(): TickerRow[] {
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "Voice Terminal — Jenvu AI" },
+      { title: "Voice Trading Terminal — Talk to JENVU AI" },
       {
         name: "description",
         content:
-          "Talk to Jenvu. Live institutional ICT/SMC analysis for Gold, Crypto, FX and Indices — spoken in real time.",
+          "Speak to JENVU AI and get live institutional ICT/SMC analysis for Gold, Crypto, FX and Indices — A+ setups, structured entries, stops and targets narrated in real time.",
       },
-      { property: "og:title", content: "Voice Terminal — Jenvu AI" },
-      { property: "og:description", content: "Live institutional ICT/SMC analysis for Gold, Crypto, FX and Indices." },
+      { name: "keywords", content: "voice trading agent, AI trading terminal, gold voice analysis, ICT voice agent, SMC trading AI, XAUUSD voice signals" },
+      { property: "og:title", content: "Voice Trading Terminal — Talk to JENVU AI" },
+      { property: "og:description", content: "Voice-native institutional trading agent for Gold, Crypto, FX and Indices." },
       { property: "og:url", content: "https://jenvu.com/app" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Voice Trading Terminal — Talk to JENVU AI" },
+      { name: "twitter:description", content: "Speak. Analyze. Execute. Institutional ICT/SMC narrated live." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/app" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "JENVU AI Voice Terminal",
+          url: "https://jenvu.com/app",
+          applicationCategory: "FinanceApplication",
+          operatingSystem: "Web",
+          description:
+            "Voice-native AI trading terminal that narrates institutional ICT/SMC analysis for Gold, Crypto, FX and Indices in real time.",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        }),
+      },
+    ],
   }),
   component: Home,
 });
