@@ -508,29 +508,7 @@ function SignalPage() {
                 </div>
               )}
 
-              {/* Key levels */}
-              {plan && plan.keyLevels.length > 0 && (
-                <div className="space-y-2">
-                  <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Key Levels</span>
-                  <div className="space-y-1">
-                    {plan.keyLevels.map((k, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-zinc-100 last:border-0">
-                        <span className="flex items-center gap-1.5">
-                          <span className={cn("w-1.5 h-1.5 rounded-full",
-                            k.kind === "resistance" ? "bg-rose-500" :
-                            k.kind === "support" ? "bg-emerald-500" :
-                            k.kind === "equilibrium" ? "bg-amber-500" : "bg-sky-500",
-                          )} />
-                          <span className="text-zinc-700">{k.label}</span>
-                        </span>
-                        <span className={`${MONO} font-medium tabular-nums text-zinc-900`}>
-                          {plan.instrument.kind === "crypto" ? "" : "$"}{k.price.toFixed(plan.instrument.decimals)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+
 
               {/* Confluences */}
               {plan && plan.confluences.length > 0 && (
