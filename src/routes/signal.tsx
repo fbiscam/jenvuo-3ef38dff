@@ -26,6 +26,7 @@ export const Route = createFileRoute("/signal")({
 
 function SignalPage() {
   const navigate = useNavigate();
+  const { symbol } = Route.useSearch();
   const fetchPlan = useServerFn(getSignalPlan);
   const speech = useSpeech();
 
