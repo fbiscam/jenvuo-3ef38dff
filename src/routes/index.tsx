@@ -353,7 +353,7 @@ function FeatureGrid() {
             icon={<Target className="h-3 w-3" />}
             tag="A+ Only"
             title="Entry. Stop. Three TPs. Invalidation."
-            body="When the read is weak, the desk says stand aside. No noise, no FOMO."
+            body={<>When the read is weak, the desk says stand aside.<br />No noise, no FOMO.</>}
             tone="dark"
           />
         </div>
