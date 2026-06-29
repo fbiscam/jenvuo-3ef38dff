@@ -150,7 +150,7 @@ function HomePage() {
             <div className="grid grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200">
               {[
                 ["Markets", "32+"],
-                ["Frameworks", "ICT · SMC"],
+                ["Frameworks", "ICT, SMC"],
                 ["Avg. R:R", "1 : 3.2"],
               ].map(([k, v]) => (
                 <div key={k} className="bg-white text-zinc-900 p-5">
