@@ -442,7 +442,7 @@ function ManifestoSplit() {
 
         <div className="lg:col-span-7 space-y-10">
           {[
-            { n: "01", t: "Voice-native, not chatbot-bolted", b: "Designed for spoken conversation — the latency, intonation and rhythm of a real desk analyst beside you." },
+            { n: "01", t: "Voice-native, not chatbot-bolted", b: "Designed for spoken conversation — the rhythm of a real desk analyst beside you." },
             { n: "02", t: "Institutional logic, not retail noise", b: "ICT, SMC, Wyckoff, liquidity, premium/discount, killzones — the playbooks proprietary desks actually run." },
             { n: "03", t: "Honest by design", b: "When confluences are weak, Jenvu tells you to wait. No invented setups, no FOMO bias, no flattery." },
           ].map((row) => (
