@@ -51,14 +51,26 @@ function parseTimeframe(text: string, fallback: string): string {
 
 function Home() {
   const analyze = useServerFn(analyzeGold);
+  const fetchNews = useServerFn(getGoldNews);
   const [timeframe, setTimeframe] = useState<string>("15m");
   const [signal, setSignal] = useState<GoldSignal | null>(null);
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState("");
+  const [awake, setAwake] = useState(false);
   const speech = useSpeech();
   const lastHandled = useRef("");
   const loadingRef = useRef(false);
   const greetedRef = useRef(false);
+  const alertedRef = useRef<Set<string>>(new Set());
+  const awakeRef = useRef(false);
+  const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const news = useQuery({
+    queryKey: ["gold-news"],
+    queryFn: () => fetchNews(),
+    refetchInterval: 1000 * 60 * 5, // 5 min
+    staleTime: 1000 * 60 * 2,
+  });
 
   const status: "idle" | "listening" | "thinking" | "speaking" = loading
     ? "thinking"
@@ -67,6 +79,14 @@ function Home() {
       : speech.listening
         ? "listening"
         : "idle";
+
+  function armSleep() {
+    if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current);
+    sleepTimerRef.current = setTimeout(() => {
+      awakeRef.current = false;
+      setAwake(false);
+    }, 45_000); // go back to standby after 45s of silence
+  }
 
   async function handleCommand(query: string) {
     if (loadingRef.current || !query.trim()) return;
@@ -78,43 +98,91 @@ function Home() {
     try {
       const result = await analyze({ data: { timeframe: tf, query } });
       setSignal(result);
-      speech.speak(result.spokenSummary, () => speech.resumeIfWanted());
+      speech.speak(result.spokenSummary, () => {
+        speech.resumeIfWanted();
+        armSleep();
+      });
     } catch (e: any) {
       toast.error(e?.message || "Analysis failed");
-      speech.speak("Sorry, the analysis failed.", () => speech.resumeIfWanted());
+      speech.speak("Sorry, the analysis failed.", () => {
+        speech.resumeIfWanted();
+        armSleep();
+      });
     } finally {
       loadingRef.current = false;
       setLoading(false);
     }
   }
 
+  // Wake-word + command router
   useEffect(() => {
     const t = speech.transcript;
-    if (t && t !== lastHandled.current) {
-      lastHandled.current = t;
-      handleCommand(t);
+    if (!t || t === lastHandled.current) return;
+    lastHandled.current = t;
+    const lower = t.toLowerCase();
+    const wakeMatch = lower.match(/\b(hey|hi|ok|okay)?\s*(jenvu|janvu|jarvis|jen view|jen vu)\b[\s,.!?]*(.*)/i);
+
+    if (!awakeRef.current) {
+      if (wakeMatch) {
+        awakeRef.current = true;
+        setAwake(true);
+        const tail = wakeMatch[3]?.trim();
+        if (tail && tail.length > 2) {
+          handleCommand(tail);
+        } else {
+          speech.speak("Yes, I'm listening.", () => {
+            speech.resumeIfWanted();
+            armSleep();
+          });
+        }
+      }
+      // else: ignore, still in standby
+      return;
     }
+    // Awake → treat as command (strip wake word if present)
+    const cmd = wakeMatch?.[3]?.trim() || t;
+    if (cmd.length > 1) handleCommand(cmd);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speech.transcript]);
+
+  // News alert: announce high-impact events <=15 min away
+  useEffect(() => {
+    const events = news.data;
+    if (!events || !events.length) return;
+    for (const e of events) {
+      if (e.impact !== "High") continue;
+      if (e.minutesUntil < 0 || e.minutesUntil > 15) continue;
+      const key = e.date + e.title;
+      if (alertedRef.current.has(key)) continue;
+      alertedRef.current.add(key);
+      const line = `Heads up. High-impact ${e.country} news in ${e.minutesUntil} minutes: ${e.title}. Expect volatility on gold.`;
+      toast.warning(line);
+      if (!loadingRef.current) {
+        speech.pauseListening();
+        speech.speak(line, () => speech.resumeIfWanted());
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [news.data]);
 
   const toggleMic = () => {
     if (!speech.supported) { toast.error("Voice not supported. Use Chrome."); return; }
     if (speech.listening) { speech.stopListening(); return; }
     if (!greetedRef.current) {
       greetedRef.current = true;
-      speech.speak("GoldGPT online. I'm listening.", () => speech.startListening());
+      speech.speak("Jenvu AI online. Say 'Hey Jenvu' anytime.", () => speech.startListening());
     } else {
       speech.startListening();
     }
   };
 
-  // Auto-start mic on page load
+  // Auto-start mic on page load (standby — waits for wake word)
   useEffect(() => {
     if (!speech.supported) return;
     const t = setTimeout(() => {
       if (greetedRef.current) return;
       greetedRef.current = true;
-      speech.speak("GoldGPT online. I'm listening.", () => speech.startListening());
+      speech.speak("Jenvu AI online. Say 'Hey Jenvu' anytime.", () => speech.startListening());
     }, 600);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,12 +192,16 @@ function Home() {
     const t = text.trim();
     if (!t) return;
     setText("");
+    awakeRef.current = true;
+    setAwake(true);
     handleCommand(t);
   };
 
   const endAll = () => {
     speech.stopListening();
     speech.stopSpeaking();
+    awakeRef.current = false;
+    setAwake(false);
   };
 
   return (
