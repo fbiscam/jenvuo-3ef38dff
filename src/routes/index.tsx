@@ -290,95 +290,72 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
       {/* halo and ring waves removed */}
 
 
-      {/* Ocean-layered sky-blue sphere */}
+      {/* Light sky-blue sphere with swirling water-wave currents */}
       <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
-
-
-
         <div
           className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
           style={{
             background:
-              "radial-gradient(circle at 50% 15%, #eaf4ff 0%, #8ec6ff 25%, #2a7ee0 55%, #0a3a8a 80%, #04183f 100%)",
+              "radial-gradient(circle at 50% 25%, #ffffff 0%, #dbeeff 22%, #a8d2ff 50%, #5ea8ee 78%, #2f7bc8 100%)",
             boxShadow:
-              "inset -10px -18px 50px rgba(2,12,40,0.75), inset 10px 14px 36px rgba(255,255,255,0.85), 0 0 60px rgba(20,90,200,0.45)",
+              "inset -8px -14px 40px rgba(40,100,180,0.45), inset 8px 12px 32px rgba(255,255,255,0.9), 0 0 50px rgba(120,180,240,0.45)",
           }}
         >
-          {/* deep ocean surge from below */}
+          {/* Primary swirling current — clockwise */}
           <div
-            className="absolute inset-0"
+            className="absolute -inset-1/3 animate-spin"
             style={{
+              animationDuration: status === "speaking" ? "8s" : status === "thinking" ? "6s" : "16s",
               background:
-                "radial-gradient(80% 60% at 50% 105%, #021a5c 0%, #0a3aa8 35%, rgba(58,130,255,0.45) 65%, transparent 82%)",
-            }}
-          />
-
-          {/* swirling aurora tint */}
-          <div
-            className="absolute -inset-1/4 animate-spin"
-            style={{
-              animationDuration: status === "speaking" ? "9s" : "22s",
-              background:
-                "conic-gradient(from 120deg, rgba(99,102,241,0.55), rgba(14,165,233,0.0) 25%, rgba(168,85,247,0.5) 50%, rgba(14,165,233,0.0) 75%, rgba(34,211,238,0.55))",
+                "conic-gradient(from 0deg, rgba(255,255,255,0.85) 0%, rgba(168,210,255,0.0) 18%, rgba(120,180,240,0.7) 38%, rgba(255,255,255,0.0) 55%, rgba(186,225,255,0.85) 75%, rgba(94,168,238,0.0) 92%, rgba(255,255,255,0.85) 100%)",
               filter: "blur(14px)",
               mixBlendMode: "screen",
             }}
           />
 
-          {/* foamy crest highlights */}
+          {/* Counter current — collides with primary */}
           <div
-            className="absolute -inset-1/4 animate-spin"
+            className="absolute -inset-1/3 animate-spin"
             style={{
-              animationDuration: status === "speaking" ? "7s" : status === "thinking" ? "5s" : "18s",
+              animationDuration: status === "speaking" ? "10s" : "20s",
               animationDirection: "reverse",
               background:
-                "radial-gradient(36% 12% at 50% 48%, rgba(255,255,255,0.95), transparent 70%), radial-gradient(26% 9% at 36% 56%, rgba(186,225,255,0.85), transparent 70%), radial-gradient(30% 10% at 66% 53%, rgba(220,235,255,0.9), transparent 70%)",
-              filter: "blur(5px)",
+                "conic-gradient(from 180deg, rgba(255,255,255,0.0) 0%, rgba(220,235,255,0.9) 20%, rgba(120,180,240,0.0) 40%, rgba(255,255,255,0.85) 60%, rgba(168,210,255,0.0) 80%, rgba(255,255,255,0.9) 100%)",
+              filter: "blur(16px)",
               mixBlendMode: "screen",
             }}
           />
 
-          {/* deep current wisps */}
+          {/* Foamy crest where waves meet */}
           <div
-            className="absolute -inset-1/3 animate-spin opacity-90"
+            className="absolute -inset-1/4 animate-spin"
             style={{
-              animationDuration: status === "speaking" ? "12s" : "28s",
+              animationDuration: status === "speaking" ? "6s" : "14s",
               background:
-                "radial-gradient(35% 18% at 28% 72%, rgba(10,40,140,0.7), transparent 70%), radial-gradient(40% 20% at 72% 78%, rgba(14,80,200,0.65), transparent 70%), radial-gradient(50% 22% at 50% 92%, rgba(2,15,60,0.85), transparent 70%)",
-              filter: "blur(12px)",
-              mixBlendMode: "multiply",
+                "radial-gradient(38% 14% at 50% 50%, rgba(255,255,255,0.95), transparent 70%), radial-gradient(28% 10% at 32% 58%, rgba(220,238,255,0.85), transparent 70%), radial-gradient(30% 11% at 68% 46%, rgba(235,245,255,0.9), transparent 70%)",
+              filter: "blur(6px)",
+              mixBlendMode: "screen",
             }}
           />
 
-          {/* glossy top sky highlight */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_14%,rgba(255,255,255,0.95),transparent_45%)]" />
+          {/* Glossy top highlight */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_42%_18%,rgba(255,255,255,0.95),transparent_48%)]" />
 
-          {/* cyan rim glow */}
-          <div className="absolute inset-0 rounded-full" style={{ boxShadow: "inset 0 0 30px rgba(56,189,248,0.6)" }} />
+          {/* Soft sky rim */}
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{ boxShadow: "inset 0 0 26px rgba(160,210,255,0.6)" }}
+          />
 
-
-          {/* speaking ripple */}
+          {/* Speaking ripple */}
           {status === "speaking" && (
             <div
               className="absolute inset-0 animate-pulse"
               style={{
                 background:
-                  "radial-gradient(circle at 50% 60%, rgba(47,143,214,0.55), transparent 60%)",
+                  "radial-gradient(circle at 50% 55%, rgba(120,180,240,0.45), transparent 60%)",
                 animationDuration: "0.9s",
-                mixBlendMode: "multiply",
-              }}
-            />
-          )}
-
-          {/* thinking shimmer sweep */}
-          {status === "thinking" && (
-            <div
-              className="absolute inset-0 animate-spin"
-              style={{
-                background:
-                  "conic-gradient(from 0deg, transparent, rgba(255,255,255,0.85), transparent 25%)",
-                animationDuration: "1.2s",
-                mixBlendMode: "overlay",
+                mixBlendMode: "screen",
               }}
             />
           )}
