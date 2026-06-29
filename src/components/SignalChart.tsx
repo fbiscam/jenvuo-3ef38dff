@@ -198,7 +198,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
           shape: m.kind === "bullish" ? "arrowUp" : "arrowDown",
           text: m.type.toUpperCase(),
         });
-        s.setMarkers(markersRef.current);
+        markersPluginRef.current?.setMarkers(markersRef.current);
       } else if (m.type === "entry") {
         price = m.price;
         color = COLORS.entry;
