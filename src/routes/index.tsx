@@ -48,7 +48,7 @@ function TagPill({ tag, tone }: { tag: string; tone: "ink" | "green" | "muted" }
     tone === "green"
       ? "bg-emerald-500 text-white"
       : tone === "muted"
-      ? "bg-zinc-200 text-zinc-700"
+      ? "bg-zinc-200 text-zinc-900"
       : "bg-zinc-900 text-white";
   return (
     <span className={`text-[10px] px-1.5 py-0.5 rounded ${MONO} uppercase tracking-wider ${cls}`}>
@@ -59,7 +59,7 @@ function TagPill({ tag, tone }: { tag: string; tone: "ink" | "green" | "muted" }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`flex items-center gap-3 ${MONO} text-[10px] tracking-[0.22em] uppercase text-zinc-400`}>
+    <div className={`flex items-center gap-3 ${MONO} text-[10px] tracking-[0.22em] uppercase text-zinc-900`}>
       <span className="h-px w-6 bg-zinc-300" />
       {children}
     </div>
@@ -79,7 +79,7 @@ function HomePage() {
             </span>
             <span className="font-semibold tracking-tight">JENVU AI</span>
           </Link>
-          <nav className={`hidden md:flex items-center gap-7 text-sm text-zinc-500`}>
+          <nav className={`hidden md:flex items-center gap-7 text-sm text-zinc-900`}>
             <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
             <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
             <Link to="/about" className="hover:text-zinc-900">About</Link>
@@ -88,7 +88,7 @@ function HomePage() {
           <div className="flex items-center gap-2">
             <Link
               to="/auth"
-              className="hidden sm:inline-flex px-3 py-1.5 text-sm text-zinc-700 hover:text-zinc-900"
+              className="hidden sm:inline-flex px-3 py-1.5 text-sm text-zinc-900 hover:text-zinc-900"
             >
               Sign in
             </Link>
@@ -104,7 +104,7 @@ function HomePage() {
         {/* ticker strip */}
         <div className="border-t border-zinc-100 overflow-hidden">
           <div className="mx-auto max-w-6xl px-6">
-            <div className={`flex gap-8 py-2 ${MONO} text-[11px] text-zinc-500 whitespace-nowrap overflow-hidden`}>
+            <div className={`flex gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap overflow-hidden`}>
               {[...TICKER, ...TICKER].map(([s, p, d], i) => (
                 <span key={i} className="flex items-center gap-2">
                   <span className="text-zinc-900 font-medium">{s}</span>
@@ -125,9 +125,9 @@ function HomePage() {
             <SectionLabel>Institutional Voice Terminal · v2.04</SectionLabel>
             <h1 className="mt-5 text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
               Institutional intelligence,{" "}
-              <span className="text-zinc-400">vocalized in real time.</span>
+              <span className="text-zinc-900">vocalized in real time.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-zinc-500 leading-relaxed">
+            <p className="mt-6 max-w-xl text-lg text-zinc-900 leading-relaxed">
               JENVU AI is a voice-native trading terminal that reads the tape through 25+ years of
               ICT &amp; SMC logic — and narrates A+ setups the moment they form.
             </p>
@@ -155,7 +155,7 @@ function HomePage() {
                 ["Avg. R:R", "1 : 3.2"],
               ].map(([k, v]) => (
                 <div key={k} className="bg-white p-5">
-                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-400`}>{k}</div>
+                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
                   <div className="mt-2 text-xl font-semibold tracking-tight">{v}</div>
                 </div>
               ))}
@@ -175,7 +175,7 @@ function HomePage() {
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
               </div>
-              <span className={`ml-4 text-[11px] ${MONO} tracking-widest text-zinc-400 uppercase`}>
+              <span className={`ml-4 text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase`}>
                 JENVU AI // SYSTEM_ACTIVE
               </span>
             </div>
@@ -185,7 +185,7 @@ function HomePage() {
                 <span className="text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
               </div>
               <div className="h-4 w-px bg-zinc-200" />
-              <span className={`text-[11px] ${MONO} text-zinc-400`}>LATENCY · 14MS</span>
+              <span className={`text-[11px] ${MONO} text-zinc-900`}>LATENCY · 14MS</span>
             </div>
           </div>
 
@@ -193,7 +193,7 @@ function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
             {/* LEFT — ICT feed */}
             <div className="lg:col-span-3 bg-white p-6 flex flex-col gap-6">
-              <h3 className={`text-[10px] font-bold ${MONO} text-zinc-400 tracking-widest uppercase`}>
+              <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
                 ICT Execution Feed
               </h3>
               <div className="space-y-3">
@@ -208,11 +208,11 @@ function HomePage() {
                   >
                     <div className="flex justify-between items-center">
                       <span className="text-xs font-semibold">{s.pair}</span>
-                      <span className={`text-[10px] ${MONO} text-zinc-400`}>{s.t}</span>
+                      <span className={`text-[10px] ${MONO} text-zinc-900`}>{s.t}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <TagPill tag={s.tag} tone={s.tone} />
-                      <span className={`text-xs ${s.tone === "green" ? "text-emerald-700" : "text-zinc-600"}`}>
+                      <span className={`text-xs ${s.tone === "green" ? "text-zinc-900" : "text-zinc-900"}`}>
                         {s.note}
                       </span>
                     </div>
@@ -239,7 +239,7 @@ function HomePage() {
                   </div>
                 </div>
                 <div className="mt-10 text-center">
-                  <p className={`text-xs font-medium tracking-[0.25em] ${MONO} text-zinc-400 uppercase mb-3`}>
+                  <p className={`text-xs font-medium tracking-[0.25em] ${MONO} text-zinc-900 uppercase mb-3`}>
                     Listening for commands
                   </p>
                   <div className="flex items-end justify-center gap-1 h-6">
@@ -260,13 +260,13 @@ function HomePage() {
 
             {/* RIGHT — intelligence */}
             <div className="lg:col-span-3 bg-white p-6 border-l border-zinc-100">
-              <h3 className={`text-[10px] font-bold ${MONO} text-zinc-400 tracking-widest uppercase mb-4`}>
+              <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase mb-4`}>
                 Intelligence Dashboard
               </h3>
               <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
-                    <span className={`text-[10px] ${MONO} text-zinc-400 uppercase`}>DXY Index</span>
+                    <span className={`text-[10px] ${MONO} text-zinc-900 uppercase`}>DXY Index</span>
                     <span className="text-xs font-semibold">104.22</span>
                   </div>
                   <div className="h-16 w-full bg-zinc-50 rounded border border-zinc-100 flex items-end p-2 gap-0.5">
@@ -284,7 +284,7 @@ function HomePage() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-zinc-500">Institutional Sentiment</span>
+                    <span className="text-xs text-zinc-900">Institutional Sentiment</span>
                     <span className="text-xs font-medium text-emerald-600">Bullish</span>
                   </div>
                   <div className="w-full h-1 bg-zinc-100 rounded-full overflow-hidden flex">
@@ -293,11 +293,11 @@ function HomePage() {
                   </div>
                   <div className="grid grid-cols-2 gap-2 mt-3">
                     <div className="p-2 border border-zinc-100 rounded-lg">
-                      <p className={`text-[10px] ${MONO} text-zinc-400`}>PDH</p>
+                      <p className={`text-[10px] ${MONO} text-zinc-900`}>PDH</p>
                       <p className={`text-xs ${MONO} font-medium`}>1.0922</p>
                     </div>
                     <div className="p-2 border border-zinc-100 rounded-lg">
-                      <p className={`text-[10px] ${MONO} text-zinc-400`}>PDL</p>
+                      <p className={`text-[10px] ${MONO} text-zinc-900`}>PDL</p>
                       <p className={`text-xs ${MONO} font-medium`}>1.0810</p>
                     </div>
                   </div>
@@ -317,15 +317,15 @@ function HomePage() {
           <div className="px-6 py-2 border-t border-zinc-100 bg-white flex justify-between items-center">
             <div className="flex gap-6 items-center">
               <div className="flex items-center gap-1.5">
-                <span className={`text-[10px] ${MONO} text-zinc-400`}>CPU</span>
+                <span className={`text-[10px] ${MONO} text-zinc-900`}>CPU</span>
                 <span className={`text-[10px] ${MONO}`}>04%</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className={`text-[10px] ${MONO} text-zinc-400`}>MEM</span>
+                <span className={`text-[10px] ${MONO} text-zinc-900`}>MEM</span>
                 <span className={`text-[10px] ${MONO}`}>1.2GB</span>
               </div>
             </div>
-            <span className={`text-[10px] ${MONO} text-zinc-400 tracking-tighter`}>
+            <span className={`text-[10px] ${MONO} text-zinc-900 tracking-tighter`}>
               PRO_VERSION_2.04.1 // SECURE_ENCRYPTION_ENABLED
             </span>
           </div>
@@ -373,12 +373,12 @@ function HomePage() {
               },
             ].map((f) => (
               <div key={f.k} className="bg-white p-7 hover:bg-zinc-50/60 transition-colors">
-                <div className={`flex items-center justify-between ${MONO} text-[10px] uppercase tracking-widest text-zinc-400`}>
+                <div className={`flex items-center justify-between ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
                   <span>{f.k}</span>
                   <span>→</span>
                 </div>
                 <h3 className="mt-5 text-lg font-semibold tracking-tight">{f.t}</h3>
-                <p className="mt-2 text-sm text-zinc-500 leading-relaxed">{f.d}</p>
+                <p className="mt-2 text-sm text-zinc-900 leading-relaxed">{f.d}</p>
               </div>
             ))}
           </div>
@@ -394,7 +394,7 @@ function HomePage() {
               <h2 className="mt-4 text-3xl font-semibold tracking-tight">
                 One terminal. Every major market.
               </h2>
-              <p className="mt-4 text-zinc-500 leading-relaxed">
+              <p className="mt-4 text-zinc-900 leading-relaxed">
                 JENVU AI routes liquidity, structure and news context across asset classes —
                 with a specialist edge in Gold.
               </p>
@@ -409,9 +409,186 @@ function HomePage() {
                 ["DXY & Macro", "DXY · Yields"],
               ].map(([k, v]) => (
                 <div key={k} className="bg-white p-5">
-                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-400`}>{k}</div>
+                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
                   <div className="mt-2 text-sm font-medium tracking-tight">{v}</div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <SectionLabel>Workflow</SectionLabel>
+              <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight">
+                Four steps. One voice. Zero friction.
+              </h2>
+            </div>
+            <p className="max-w-md text-zinc-900 leading-relaxed">
+              From spoken intent to executable plan — JENVU compresses an entire trading desk
+              into a single voice loop.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
+            {[
+              { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English — pair, bias, news, anything." },
+              { k: "02", t: "Reason", d: "JENVU pulls live structure, ICT/SMC context, DXY and Forex Factory feeds." },
+              { k: "03", t: "Mark Up", d: "Charts auto-annotate FVG, OB, BOS, CHoCH and liquidity sweeps." },
+              { k: "04", t: "Narrate", d: "You hear a structured A+ plan: entry, SL, TP, R:R and confluence score." },
+            ].map((s) => (
+              <div key={s.k} className="bg-white p-7">
+                <div className={`flex items-center justify-between ${MONO} text-[10px] tracking-widest uppercase text-zinc-900`}>
+                  <span>{s.k}</span>
+                  <span className="h-px w-10 bg-zinc-900" />
+                </div>
+                <h3 className="mt-5 text-lg font-semibold tracking-tight">{s.t}</h3>
+                <p className="mt-2 text-sm text-zinc-900 leading-relaxed">{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DESK LOGIC */}
+      <section className="border-t border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <SectionLabel>Desk Logic</SectionLabel>
+          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
+            The frameworks JENVU thinks in.
+          </h2>
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["ICT", "Killzones, judas swings, PD arrays, OTE."],
+              ["SMC", "Structure shifts, mitigations, equilibrium."],
+              ["Liquidity", "EQH/EQL, sweeps, internal vs external."],
+              ["Order Flow", "Displacement, imbalance, institutional candles."],
+              ["Risk", "Fixed-R sizing, max daily drawdown, kill-switch."],
+              ["Confluence", "Multi-TF alignment scored A / A+ / A++."],
+              ["Macro", "DXY, yields, Forex Factory red folder."],
+              ["Sessions", "Asia · London · NY killzone bias."],
+            ].map(([k, v]) => (
+              <div key={k} className="bg-white p-6">
+                <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
+                <p className="mt-3 text-sm text-zinc-900 leading-relaxed">{v}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <SectionLabel>Field Notes</SectionLabel>
+          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
+            Trusted by traders who run real size.
+          </h2>
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
+            {[
+              {
+                q: "Feels like sitting next to a 25-year desk trader. The narration alone changed how I read structure.",
+                n: "A. Rahman",
+                r: "Prop Desk · Dubai",
+              },
+              {
+                q: "ICT setups marked live on the chart, with voice — I stopped second-guessing my entries.",
+                n: "M. Chen",
+                r: "Independent · Singapore",
+              },
+              {
+                q: "Gold execution is on another level. The killzone + sweep logic is exactly how I trade.",
+                n: "S. Patel",
+                r: "Family Office · London",
+              },
+            ].map((t) => (
+              <figure key={t.n} className="bg-white p-7 flex flex-col gap-6">
+                <blockquote className="text-zinc-900 leading-relaxed">"{t.q}"</blockquote>
+                <figcaption className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-zinc-900">{t.n}</div>
+                    <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{t.r}</div>
+                  </div>
+                  <span className={`${MONO} text-[10px] text-zinc-900`}>↗</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CHANGELOG */}
+      <section className="border-t border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <SectionLabel>Changelog</SectionLabel>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight">Recent shipments</h2>
+            </div>
+            <span className={`${MONO} text-[11px] text-zinc-900`}>v2.04.1 · stable</span>
+          </div>
+          <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+            {[
+              ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions."],
+              ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts."],
+              ["2026.05.30", "v2.02", "Forex Factory red-folder context injected into every plan."],
+              ["2026.05.12", "v2.01", "Push-to-talk replaces always-on; cleaner mic control."],
+              ["2026.04.28", "v2.00", "Voice-native rewrite. New orb. New signal engine."],
+            ].map(([d, v, n], i) => (
+              <div
+                key={v}
+                className={`grid grid-cols-12 items-center px-6 py-4 ${
+                  i !== 0 ? "border-t border-zinc-100" : ""
+                }`}
+              >
+                <span className={`col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
+                <span className={`col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900`}>{v}</span>
+                <span className="col-span-7 text-sm text-zinc-900">{n}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="grid gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <SectionLabel>FAQ</SectionLabel>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight">Asked often.</h2>
+              <p className="mt-3 text-zinc-900">Everything else lives in the docs and disclaimer.</p>
+            </div>
+            <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
+              {[
+                {
+                  q: "Is JENVU only for Gold?",
+                  a: "Gold is its specialty, but JENVU covers FX majors, BTC, ETH, indices and energy with the same ICT/SMC engine.",
+                },
+                {
+                  q: "Does it execute trades automatically?",
+                  a: "No. JENVU narrates A+ setups with structured entries, stops and targets — execution stays in your hands.",
+                },
+                {
+                  q: "What model powers the voice agent?",
+                  a: "A low-latency Gemini-class model wired through Lovable AI, tuned for institutional trading reasoning.",
+                },
+                {
+                  q: "Does it work on mobile?",
+                  a: "Yes. The voice loop, signal engine and charts are fully responsive on phones and tablets.",
+                },
+              ].map((f) => (
+                <details key={f.q} className="group py-5">
+                  <summary className="flex items-center justify-between cursor-pointer list-none">
+                    <span className="text-base font-medium text-zinc-900">{f.q}</span>
+                    <span className={`${MONO} text-zinc-900 group-open:rotate-45 transition-transform`}>+</span>
+                  </summary>
+                  <p className="mt-3 text-sm text-zinc-900 leading-relaxed max-w-2xl">{f.a}</p>
+                </details>
               ))}
             </div>
           </div>
@@ -427,7 +604,7 @@ function HomePage() {
               <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal. Speak to the market.
               </h2>
-              <p className="mt-3 text-zinc-500">
+              <p className="mt-3 text-zinc-900">
                 Your voice agent is one tap away — listening, reasoning, narrating.
               </p>
               <div className="mt-7 flex gap-3">
@@ -454,7 +631,7 @@ function HomePage() {
 
       {/* FOOTER */}
       <footer className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
+        <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-900">
           <div className="flex items-center gap-2.5">
             <span className="grid h-5 w-5 place-items-center rounded bg-zinc-900">
               <span className="block h-1 w-1 rotate-45 bg-white" />
