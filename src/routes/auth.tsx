@@ -46,64 +46,96 @@ function AuthPage() {
 
   return (
     <div
-      className="relative min-h-screen w-full bg-white text-black flex flex-col lg:flex-row overflow-hidden"
-      style={{ fontFamily: "Urbanist, sans-serif" }}
+      className="relative min-h-screen w-full flex flex-col lg:flex-row overflow-hidden"
+      style={{ fontFamily: "'Manrope', system-ui, sans-serif", background: "#f5f3ee", color: "#2d2d2d" }}
     >
 
-      {/* LEFT — Login */}
-      <div className="relative z-10 flex-1 flex items-center justify-center p-6 lg:p-16">
+      {/* LEFT — Login (Paper & Ink) */}
+      <div className="relative z-10 flex-1 flex flex-col p-8 lg:p-14">
+        {/* paper grain */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-50 mix-blend-multiply"
+          style={{
+            backgroundImage: "radial-gradient(#2d2d2d22 1px, transparent 1px)",
+            backgroundSize: "3px 3px",
+            maskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+          }}
+        />
 
-        <div className="relative w-full max-w-xl">
-          {/* glass card */}
-          <div className="relative rounded-3xl bg-transparent p-8 sm:p-10">
-            {/* logo badge */}
-            <div className="flex items-center gap-3.5 mb-9 invisible" aria-hidden="true">
-              <div className="w-14 h-14" />
-              <div className="leading-tight">
-                <h1 className="text-[28px] font-black uppercase tracking-tight">Jenvu AI</h1>
-                <p className="text-[13px] uppercase tracking-[0.18em] font-semibold">Voice Intelligence</p>
-              </div>
+        {/* top bar */}
+        <div className="relative flex items-center justify-between">
+          <a href="/" className="flex items-center gap-2.5">
+            <span
+              className="grid place-items-center h-7 w-7 rounded-md text-[#f5f3ee] font-black"
+              style={{ background: "#0d0d0d", fontSize: 13, letterSpacing: "-0.05em", fontFamily: "'Sora', sans-serif" }}
+            >
+              J
+            </span>
+            <span className="font-bold uppercase tracking-[-0.02em] text-[15px]" style={{ fontFamily: "'Sora', sans-serif" }}>
+              Jenvu<span className="opacity-50">/ai</span>
+            </span>
+          </a>
+          <a href="/" className="text-[12px] font-semibold text-[#2d2d2d]/60 hover:text-[#0d0d0d]">
+            ← Back home
+          </a>
+        </div>
+
+        {/* form */}
+        <div className="relative flex-1 flex items-center">
+          <div className="w-full max-w-md mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#2d2d2d]/15 bg-[#f5f3ee] text-[11px] uppercase tracking-[0.22em] font-bold text-[#2d2d2d]/70">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-60" />
+                <span className="relative rounded-full bg-emerald-500 h-1.5 w-1.5" />
+              </span>
+              Invite only · v1.0
             </div>
 
-            <h2 className="text-4xl sm:text-[40px] font-bold text-black tracking-tight mb-2.5">
-              Welcome back
-            </h2>
-            <p className="text-[15px] text-black/80 mb-9 font-medium">
-              Sign in to continue your conversation.
+            <h1
+              className="mt-7 font-semibold tracking-[-0.04em] leading-[0.95] text-[clamp(44px,5.5vw,68px)]"
+              style={{ color: "#0d0d0d", fontFamily: "'Sora', sans-serif" }}
+            >
+              Welcome
+              <br />
+              <span className="italic font-light opacity-70">back.</span>
+            </h1>
+            <p className="mt-5 text-[15px] leading-relaxed text-[#2d2d2d]/70 max-w-sm">
+              Sign in to continue your conversation with the desk.
             </p>
 
-            <form onSubmit={signIn} className="space-y-5">
+            <form onSubmit={signIn} className="mt-9 space-y-5">
               <div>
-                <label className="block text-[13px] font-semibold uppercase tracking-wider text-black/80 mb-2 ml-1">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#2d2d2d]/55 mb-2.5">
                   Email
                 </label>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black/40 group-focus-within:text-fuchsia-500 transition" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2d2d2d]/40" />
                   <input
                     type="email"
                     autoComplete="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl bg-white border border-black/10 pl-12 pr-4 py-3.5 text-[15px] text-black outline-none focus:border-black focus:ring-4 focus:ring-black/5 transition placeholder:text-black/35"
+                    className="w-full rounded-2xl bg-[#f5f3ee] border border-[#2d2d2d]/15 pl-11 pr-4 py-3.5 text-[15px] text-[#0d0d0d] outline-none focus:border-[#0d0d0d] focus:bg-white transition placeholder:text-[#2d2d2d]/35"
                     placeholder="you@example.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[13px] font-semibold uppercase tracking-wider text-black/80 mb-2 ml-1">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#2d2d2d]/55 mb-2.5">
                   Password
                 </label>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black/40 group-focus-within:text-sky-500 transition" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2d2d2d]/40" />
                   <input
                     type="password"
                     autoComplete="current-password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl bg-white border border-black/10 pl-12 pr-4 py-3.5 text-[15px] text-black outline-none focus:border-black focus:ring-4 focus:ring-black/5 transition placeholder:text-black/35"
+                    className="w-full rounded-2xl bg-[#f5f3ee] border border-[#2d2d2d]/15 pl-11 pr-4 py-3.5 text-[15px] text-[#0d0d0d] outline-none focus:border-[#0d0d0d] focus:bg-white transition placeholder:text-[#2d2d2d]/35"
                     placeholder="••••••••"
                   />
                 </div>
@@ -112,26 +144,30 @@ function AuthPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full mt-2 rounded-xl py-3.5 text-[15px] font-semibold text-white bg-black hover:bg-neutral-900 disabled:opacity-60 transition inline-flex items-center justify-center gap-2 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] overflow-hidden"
+                className="group w-full mt-2 rounded-full py-4 text-[14px] font-semibold text-[#f5f3ee] bg-[#0d0d0d] hover:opacity-90 disabled:opacity-60 transition inline-flex items-center justify-center gap-2"
               >
-                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-neutral-900" />
-                <span className="relative inline-flex items-center gap-2">
-                  {loading ? "Signing in…" : (<>Sign in <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition" /></>)}
-                </span>
+                {loading ? "Signing in…" : (<>Sign in <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" /></>)}
               </button>
             </form>
 
             <div className="mt-9 flex items-center gap-3">
-              <div className="h-px flex-1 bg-black/10" />
-              <span className="text-[12px] uppercase tracking-[0.18em] text-black/80 font-semibold">Invite Only</span>
-              <div className="h-px flex-1 bg-black/10" />
+              <div className="h-px flex-1 bg-[#2d2d2d]/15" />
+              <span className="text-[10px] uppercase tracking-[0.25em] text-[#2d2d2d]/55 font-bold">Invite Only</span>
+              <div className="h-px flex-1 bg-[#2d2d2d]/15" />
             </div>
-            <p className="mt-3 text-[13px] text-black/90 text-center font-medium">
+            <p className="mt-3 text-[13px] text-[#2d2d2d]/60 text-center">
               Contact the admin to request access.
             </p>
           </div>
         </div>
+
+        {/* footer */}
+        <div className="relative flex items-center justify-between text-[11px] text-[#2d2d2d]/50 font-medium">
+          <span>© {new Date().getFullYear()} JENVU AI</span>
+          <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>v1.0 · paper edition</span>
+        </div>
       </div>
+
 
 
 
