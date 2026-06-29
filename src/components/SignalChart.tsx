@@ -51,6 +51,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const linesRef = useRef<IPriceLine[]>([]);
   const markersRef = useRef<SeriesMarker<Time>[]>([]);
+  const markersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   // Box overlays drawn via DOM div absolutely positioned over chart
   const overlayRef = useRef<HTMLDivElement>(null);
   const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement }[]>([]);
