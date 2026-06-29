@@ -190,7 +190,7 @@ function Home() {
       const tryFlush = (attempt = 0) => {
         const captured = (bufferRef.current + " " + (interimRef.current || "") + " " + (transcriptRef.current || "")).trim();
         if (!captured && attempt < 6) {
-          window.setTimeout(() => tryFlush(attempt + 1), 200);
+          window.setTimeout(() => tryFlush(attempt + 1), 90);
           return;
         }
         bufferRef.current = "";
@@ -203,7 +203,7 @@ function Home() {
         const cmd = (wakeMatch?.[3]?.trim() || captured).trim();
         if (cmd.length > 0) handleCommand(cmd);
       };
-      window.setTimeout(() => tryFlush(0), 250);
+      window.setTimeout(() => tryFlush(0), 100);
       return;
     }
     bufferRef.current = "";
