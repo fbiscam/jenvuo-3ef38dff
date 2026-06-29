@@ -45,42 +45,57 @@ function AuthPage() {
 
   return (
     <div
-      className="min-h-screen w-full bg-white text-black flex flex-col lg:flex-row"
-      style={{ fontFamily: "Urbanist, sans-serif" }}
+      className="relative min-h-screen w-full text-white flex flex-col lg:flex-row overflow-hidden"
+      style={{ fontFamily: "Urbanist, sans-serif", background: "#0a0612" }}
     >
+      {/* Aurora background */}
+      <div className="pointer-events-none absolute inset-0 -z-0">
+        <div className="absolute -top-32 -left-32 h-[40rem] w-[40rem] rounded-full opacity-60 blur-3xl"
+          style={{ background: "radial-gradient(circle, #ff3ea5 0%, transparent 70%)" }} />
+        <div className="absolute top-1/3 -right-32 h-[36rem] w-[36rem] rounded-full opacity-55 blur-3xl"
+          style={{ background: "radial-gradient(circle, #38bdf8 0%, transparent 70%)" }} />
+        <div className="absolute -bottom-40 left-1/4 h-[44rem] w-[44rem] rounded-full opacity-50 blur-3xl"
+          style={{ background: "radial-gradient(circle, #a855f7 0%, transparent 70%)" }} />
+        <div className="absolute top-10 right-1/3 h-[24rem] w-[24rem] rounded-full opacity-40 blur-3xl"
+          style={{ background: "radial-gradient(circle, #fbbf24 0%, transparent 70%)" }} />
+      </div>
+
       {/* LEFT — Login */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-16">
+      <div className="relative z-10 flex-1 flex items-center justify-center p-6 lg:p-16">
         <div className="w-full max-w-sm">
 
-          <h1 className="text-5xl font-black uppercase tracking-tight mb-3 leading-none text-black">
+          <h1
+            className="text-5xl font-black uppercase tracking-tight mb-3 leading-none bg-clip-text text-transparent"
+            style={{ backgroundImage: "linear-gradient(135deg,#ff6ba6 0%,#fbbf24 35%,#38bdf8 70%,#a78bfa 100%)" }}
+          >
             Jenvu AI
           </h1>
-          <p className="text-sm text-black/60 mb-10">
+          <p className="text-sm text-white/65 mb-10">
             Welcome back. Sign in to talk to your AI.
           </p>
 
           <form onSubmit={signIn} className="space-y-4">
             <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black/40 group-focus-within:text-black transition" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50 group-focus-within:text-white transition" />
               <input
                 type="email"
                 autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-2xl bg-white border border-black/15 pl-11 pr-4 py-3.5 text-sm outline-none focus:border-black transition placeholder:text-black/30"
+                className="w-full rounded-2xl bg-white/5 border border-white/15 pl-11 pr-4 py-3.5 text-sm text-white outline-none focus:border-fuchsia-400/70 focus:bg-white/10 transition placeholder:text-white/35 backdrop-blur-md"
                 placeholder="you@example.com"
               />
             </div>
             <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black/40 group-focus-within:text-black transition" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50 group-focus-within:text-white transition" />
               <input
                 type="password"
                 autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-2xl bg-white border border-black/15 pl-11 pr-4 py-3.5 text-sm outline-none focus:border-black transition placeholder:text-black/30"
+                className="w-full rounded-2xl bg-white/5 border border-white/15 pl-11 pr-4 py-3.5 text-sm text-white outline-none focus:border-sky-400/70 focus:bg-white/10 transition placeholder:text-white/35 backdrop-blur-md"
                 placeholder="••••••••"
               />
             </div>
@@ -88,17 +103,19 @@ function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-2xl py-3.5 text-sm font-semibold bg-black text-white hover:bg-black/85 disabled:opacity-60 transition inline-flex items-center justify-center gap-2"
+              className="w-full rounded-2xl py-3.5 text-sm font-semibold text-white shadow-[0_10px_40px_-10px_rgba(236,72,153,0.7)] hover:shadow-[0_14px_50px_-10px_rgba(56,189,248,0.8)] disabled:opacity-60 transition inline-flex items-center justify-center gap-2"
+              style={{ backgroundImage: "linear-gradient(135deg,#ec4899 0%,#a855f7 50%,#38bdf8 100%)" }}
             >
               {loading ? "Signing in…" : (<>Sign in <ArrowRight className="w-4 h-4" /></>)}
             </button>
           </form>
 
-          <p className="mt-8 text-xs text-black/50 text-center">
+          <p className="mt-8 text-xs text-white/55 text-center">
             Access is invite-only. Contact the admin for an account.
           </p>
         </div>
       </div>
+
 
       {/* RIGHT — Live Voice Agent orb */}
       <div className="relative flex-1 min-h-[45vh] lg:min-h-screen overflow-hidden bg-black border-l border-black/10 flex items-center justify-center">
