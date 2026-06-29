@@ -147,13 +147,15 @@ function SignalPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authReady]);
 
-  // Live price ticker (polls every 30s via Binance PAXG)
+  // Live price ticker (polls every 20s — Binance if available for the symbol)
   useEffect(() => {
     if (!plan) return;
+    const binanceSym = ASSETS[plan.symbol]?.binance;
+    if (!binanceSym) return;
     let alive = true;
     const tick = async () => {
       try {
-        const r = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT");
+        const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${binanceSym}`);
         if (!r.ok) return;
         const j = await r.json();
         const p = parseFloat(j.price);
@@ -165,7 +167,7 @@ function SignalPage() {
       } catch {}
     };
     tick();
-    const id = setInterval(tick, 30000);
+    const id = setInterval(tick, 20000);
     return () => { alive = false; clearInterval(id); };
   }, [plan]);
 
