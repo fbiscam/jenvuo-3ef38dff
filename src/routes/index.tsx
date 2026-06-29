@@ -226,7 +226,12 @@ function Home() {
   };
 
 
+  if (!authReady) {
+    return <div className="fixed inset-0 bg-black" />;
+  }
+
   return (
+
     <div className={cn("fixed inset-0 w-screen overflow-hidden overscroll-none flex flex-col transition-colors duration-300", dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900")}>
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between shrink-0">
