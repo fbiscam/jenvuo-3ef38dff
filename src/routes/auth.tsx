@@ -1,28 +1,41 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import * as React from "react";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { CloudOrb } from "@/components/CloudOrb";
-import faviconUrl from "@/assets/favicon.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Jenvu AI" },
-      { name: "description", content: "Sign in to your Jenvu AI voice assistant." },
+      { name: "description", content: "Sign in to your Jenvu AI voice terminal." },
     ],
   }),
   component: AuthPage,
 });
 
+const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const SANS = "font-['Inter',system-ui,sans-serif]";
+
+/* ---------- mock data for ticker ---------- */
+type TickerRow = [string, string, string];
+const INITIAL_TICKER: TickerRow[] = [
+  ["XAU/USD", "2,418.30", "+0.42%"],
+  ["BTC/USDT", "71,204.10", "+1.18%"],
+  ["ETH/USDT", "3,841.20", "+2.04%"],
+  ["EUR/USD", "1.0832", "-0.07%"],
+  ["DXY", "104.21", "-0.12%"],
+  ["SOL/USDT", "168.40", "+3.12%"],
+];
+
 function AuthPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let alive = true;
     supabase.auth.getSession().then(({ data }) => {
       if (alive && data.session) navigate({ to: "/", replace: true });
@@ -30,7 +43,10 @@ function AuthPage() {
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
       if (session) navigate({ to: "/", replace: true });
     });
-    return () => { alive = false; sub.subscription.unsubscribe(); };
+    return () => {
+      alive = false;
+      sub.subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const signIn = async (e: React.FormEvent) => {
@@ -39,146 +55,220 @@ function AuthPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) { toast.error(error.message); return; }
-    
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     navigate({ to: "/", replace: true });
   };
 
   return (
-    <div
-      className="relative min-h-screen w-full flex flex-col lg:flex-row overflow-hidden"
-      style={{ fontFamily: "'Manrope', system-ui, sans-serif", background: "#ffffff", color: "#2d2d2d" }}
-    >
+    <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
+      {/* NAV */}
+      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
+          <Link to="/" className="flex min-w-0 items-center gap-2.5">
+            <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
+            <span className="truncate font-semibold tracking-tight">JENVU AI</span>
+          </Link>
 
-      {/* LEFT — Login (Paper & Ink) */}
-      <div className="relative z-10 flex-1 flex flex-col p-8 lg:p-14">
-        {/* paper grain */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-50 mix-blend-multiply"
-          style={{
-            backgroundImage: "radial-gradient(#2d2d2d22 1px, transparent 1px)",
-            backgroundSize: "3px 3px",
-            maskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)",
-          }}
-        />
-
-        {/* top bar */}
-        <div className="relative flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2.5">
-            <span
-              className="grid place-items-center h-7 w-7 rounded-md text-[#ffffff] font-black"
-              style={{ background: "#0d0d0d", fontSize: 13, letterSpacing: "-0.05em", fontFamily: "'Sora', sans-serif" }}
-            >
-              J
-            </span>
-            <span className="font-bold uppercase tracking-[-0.02em] text-[15px]" style={{ fontFamily: "'Sora', sans-serif" }}>
-              Jenvu<span className="opacity-50">/ai</span>
-            </span>
-          </a>
-          <a href="/" className="text-[12px] font-semibold text-[#2d2d2d]/60 hover:text-[#0d0d0d]">
-            ← Back home
-          </a>
-        </div>
-
-        {/* form */}
-        <div className="relative flex-1 flex items-center">
-          <div className="w-full max-w-md mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#2d2d2d]/15 bg-[#ffffff] text-[11px] uppercase tracking-[0.22em] font-bold text-[#2d2d2d]/70">
+          <div className="flex shrink-0 items-center gap-2">
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase text-zinc-900`}>
               <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-60" />
+                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="relative rounded-full bg-emerald-500 h-1.5 w-1.5" />
               </span>
-              Invite only · v1.0
+              AUTH_TERMINAL // ONLINE
             </div>
-
-            <h1
-              className="mt-7 font-semibold tracking-[-0.04em] leading-[0.95] text-[clamp(44px,5.5vw,68px)]"
-              style={{ color: "#0d0d0d", fontFamily: "'Sora', sans-serif" }}
-            >
-              Welcome
-              <br />
-              <span className="italic font-light opacity-70">back.</span>
-            </h1>
-            <p className="mt-5 text-[15px] leading-relaxed text-[#2d2d2d]/70 max-w-sm">
-              Sign in to continue your conversation with the desk.
-            </p>
-
-            <form onSubmit={signIn} className="mt-9 space-y-5">
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#2d2d2d]/55 mb-2.5">
-                  Email
-                </label>
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2d2d2d]/40" />
-                  <input
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-2xl bg-[#ffffff] border border-[#2d2d2d]/15 pl-11 pr-4 py-3.5 text-[15px] text-[#0d0d0d] outline-none focus:border-[#0d0d0d] focus:bg-white transition placeholder:text-[#2d2d2d]/35"
-                    placeholder="you@example.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#2d2d2d]/55 mb-2.5">
-                  Password
-                </label>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2d2d2d]/40" />
-                  <input
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-2xl bg-[#ffffff] border border-[#2d2d2d]/15 pl-11 pr-4 py-3.5 text-[15px] text-[#0d0d0d] outline-none focus:border-[#0d0d0d] focus:bg-white transition placeholder:text-[#2d2d2d]/35"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="group w-full mt-2 rounded-full py-4 text-[14px] font-semibold text-[#ffffff] bg-[#0d0d0d] hover:opacity-90 disabled:opacity-60 transition inline-flex items-center justify-center gap-2"
-              >
-                {loading ? "Signing in…" : (<>Sign in <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" /></>)}
-              </button>
-            </form>
-
-            <div className="mt-9 flex items-center gap-3">
-              <div className="h-px flex-1 bg-[#2d2d2d]/15" />
-              <span className="text-[10px] uppercase tracking-[0.25em] text-[#2d2d2d]/55 font-bold">Invite Only</span>
-              <div className="h-px flex-1 bg-[#2d2d2d]/15" />
-            </div>
-            <p className="mt-3 text-[13px] text-[#2d2d2d]/60 text-center">
-              Contact the admin to request access.
-            </p>
           </div>
         </div>
-
-        {/* footer */}
-        <div className="relative flex items-center justify-between text-[11px] text-[#2d2d2d]/50 font-medium">
-          <span>© {new Date().getFullYear()} JENVU AI</span>
-          <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>v1.0 · paper edition</span>
+        {/* ticker strip */}
+        <div className="border-t border-zinc-100 overflow-hidden">
+          <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap animate-ticker`}>
+            {[...INITIAL_TICKER, ...INITIAL_TICKER].map(([s, p, d], i) => (
+              <span key={i} className="flex items-center gap-2">
+                <span className="text-zinc-900 font-medium">{s}</span>
+                <span>{p}</span>
+                <span className={d.startsWith("-") ? "text-red-500" : "text-emerald-600"}>{d}</span>
+                <span className="text-zinc-200">•</span>
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      </header>
 
+      {/* MAIN CONTENT */}
+      <main className="flex-1 flex flex-col items-center justify-center p-5 sm:p-10">
+        <div className="w-full max-w-6xl">
+          <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
+            {/* terminal header */}
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex gap-1.5 shrink-0">
+                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                </div>
+                <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
+                  JENVU AI // AUTH_SESSION
+                </span>
+              </div>
+              <div className="flex shrink-0 items-center gap-4">
+                <span className={`text-[11px] ${MONO} text-zinc-400`}>ENCRYPTION · AES-256</span>
+              </div>
+            </div>
 
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
+              {/* LEFT — FORM */}
+              <div className="lg:col-span-7 bg-white p-6 sm:p-10 lg:p-14">
+                <div className="max-w-md mx-auto lg:mx-0">
+                  <div className={`flex items-center gap-3 ${MONO} text-[10px] tracking-[0.22em] uppercase text-zinc-900`}>
+                    <span className="h-px w-6 bg-zinc-300" />
+                    SECURE ACCESS
+                  </div>
+                  
+                  <h1 className="mt-7 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+                    Sign in to<br />the desk.
+                  </h1>
+                  <p className="mt-5 text-base text-zinc-600 leading-relaxed">
+                    Voice-native institutional intelligence, on call. Log in to access live ICT & SMC market narrations.
+                  </p>
 
+                  <form onSubmit={signIn} className="mt-10 space-y-6">
+                    <div>
+                      <label className={`block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2.5 ${MONO}`}>
+                        User Identification
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                          placeholder="Institutional email..."
+                        />
+                      </div>
+                    </div>
 
-      {/* RIGHT — Live Voice Agent orb */}
-      <div className="relative z-10 flex-1 min-h-screen overflow-hidden hidden lg:flex items-center justify-center bg-black lg:border-l border-white/10">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <CloudOrb status="speaking" pulse={0} />
+                    <div>
+                      <label className={`block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2.5 ${MONO}`}>
+                        Access Key
+                      </label>
+                      <div className="relative">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <input
+                          type="password"
+                          required
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                          placeholder="Enter password..."
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="group w-full rounded-lg bg-zinc-900 px-5 py-4 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2"
+                    >
+                      {loading ? "Authenticating..." : (<>Authenticate <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                    </button>
+                  </form>
+
+                  <div className="mt-12 pt-10 border-t border-zinc-100">
+                    <div className={`flex items-center gap-3 ${MONO} text-[10px] tracking-[0.22em] uppercase text-zinc-400`}>
+                      <span className="h-px w-6 bg-zinc-200" />
+                      RESTRICTED ENVIRONMENT
+                    </div>
+                    <p className="mt-4 text-xs text-zinc-500 leading-relaxed">
+                      This terminal is invite-only. If you do not have credentials, contact your account administrator or system head.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT — VISUAL */}
+              <div className="lg:col-span-5 bg-white flex flex-col p-6 sm:p-10 lg:p-14 border-t lg:border-t-0 lg:border-l border-zinc-100">
+                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[300px]">
+                  <div
+                    className="absolute inset-0 opacity-[0.04] pointer-events-none"
+                    style={{
+                      backgroundImage: "radial-gradient(#000 0.6px, transparent 0.6px)",
+                      backgroundSize: "24px 24px",
+                    }}
+                  />
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="relative h-44 w-44 sm:h-56 sm:w-56">
+                      <div className="absolute inset-0 rounded-full border border-zinc-100 animate-[spin_18s_linear_infinite]" />
+                      <div className="absolute inset-5 rounded-full border border-zinc-200/60 animate-[spin_24s_linear_infinite_reverse]" />
+                      <div className="absolute inset-9">
+                        <CloudOrb status="speaking" pulse={1} />
+                      </div>
+                    </div>
+                    
+                    <div className="mt-10 text-center space-y-4">
+                      <div className={`flex items-center justify-center gap-2 ${MONO} text-[10px] tracking-[0.2em] text-zinc-400 uppercase`}>
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
+                        LIVE_NARRATION
+                      </div>
+                      <div className={`h-12 flex items-center justify-center ${MONO} text-[11px] text-zinc-900 text-center max-w-[200px] leading-relaxed`}>
+                        <RotatingStatus />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-auto grid grid-cols-2 gap-px bg-zinc-100 rounded-xl overflow-hidden border border-zinc-100">
+                  {[
+                    ["Markets", "32+"],
+                    ["Latency", "14ms"],
+                  ].map(([k, v]) => (
+                    <div key={k} className="bg-white p-4 text-center">
+                      <div className={`${MONO} text-[9px] uppercase tracking-widest text-zinc-400`}>{k}</div>
+                      <div className="mt-1 text-sm font-semibold text-zinc-900">{v}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
+      </main>
 
-      </div>
+      {/* FOOTER */}
+      <footer className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-5 py-8 flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div className="flex items-center gap-2 text-xs text-zinc-400">
+            <span className="font-semibold text-zinc-900">JENVU AI</span>
+            <span>·</span>
+            <span>© {new Date().getFullYear()}</span>
+          </div>
+          <div className={`${MONO} text-[10px] text-zinc-400 uppercase tracking-widest`}>
+            v1.0 // AUTH_EDITION
+          </div>
+        </div>
+      </footer>
     </div>
   );
+}
+
+function RotatingStatus() {
+  const [idx, setIdx] = React.useState(0);
+  const phrases = [
+    "Mapping liquidity on XAUUSD...",
+    "FVG detected on BTC 15m...",
+    "Monitoring London Killzone...",
+    "Analyzing institutional bias...",
+    "Scanning SMT divergence..."
+  ];
+  
+  React.useEffect(() => {
+    const itv = setInterval(() => setIdx((i: number) => (i + 1) % phrases.length), 3000);
+    return () => clearInterval(itv);
+  }, [phrases.length]);
+
+  return <span className="animate-pulse">{phrases[idx]}</span>;
 }
