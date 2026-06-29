@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Mic, X, Plus, Sliders } from "lucide-react";
 import { SignalCard } from "@/components/SignalCard";
@@ -56,13 +56,11 @@ function Home() {
   const [signal, setSignal] = useState<GoldSignal | null>(null);
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState("");
-  const [awake, setAwake] = useState(false);
   const speech = useSpeech();
   const lastHandled = useRef("");
   const loadingRef = useRef(false);
   const greetedRef = useRef(false);
   const alertedRef = useRef<Set<string>>(new Set());
-  const awakeRef = useRef(false);
   const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const news = useQuery({
@@ -83,12 +81,11 @@ function Home() {
   function armSleep() {
     if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current);
     sleepTimerRef.current = setTimeout(() => {
-      awakeRef.current = false;
-      setAwake(false);
+      speech.stopListening();
     }, 45_000); // go back to standby after 45s of silence
   }
 
-  async function handleCommand(query: string) {
+  const handleCommand = useCallback(async (query: string) => {
     if (loadingRef.current || !query.trim()) return;
     loadingRef.current = true;
     setLoading(true);
@@ -112,7 +109,7 @@ function Home() {
       loadingRef.current = false;
       setLoading(false);
     }
-  }
+  }, [analyze, speech, timeframe]);
 
   // Every final transcript becomes a command (no wake word required)
   useEffect(() => {
@@ -123,12 +120,9 @@ function Home() {
     const wakeMatch = lower.match(/\b(hey|hi|ok|okay)?\s*(jenvu|janvu|jarvis|jen view|jen vu)\b[\s,.!?]*(.*)/i);
     const cmd = (wakeMatch?.[3]?.trim() || t).trim();
     if (cmd.length > 1) {
-      awakeRef.current = true;
-      setAwake(true);
       handleCommand(cmd);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [speech.transcript]);
+  }, [handleCommand, speech.transcript]);
 
   // News alert: announce high-impact events <=15 min away
   useEffect(() => {
@@ -153,40 +147,30 @@ function Home() {
   const toggleMic = () => {
     if (!speech.supported) { toast.error("Voice not supported. Use Chrome."); return; }
     if (speech.listening) { speech.stopListening(); return; }
-    if (!greetedRef.current) {
-      greetedRef.current = true;
-      speech.speak("Jenvu AI online. Say 'Hey Jenvu' anytime.", () => speech.startListening());
-    } else {
-      speech.startListening();
-    }
+    speech.startListening();
   };
 
-  // Auto-start mic on page load (standby — waits for wake word)
+  // Auto-start mic on page load.
   useEffect(() => {
     if (!speech.supported) return;
     const t = setTimeout(() => {
       if (greetedRef.current) return;
       greetedRef.current = true;
-      speech.speak("Jenvu AI online. Say 'Hey Jenvu' anytime.", () => speech.startListening());
+      speech.startListening();
     }, 600);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [speech.supported]);
+  }, [speech]);
 
   const submitText = () => {
     const t = text.trim();
     if (!t) return;
     setText("");
-    awakeRef.current = true;
-    setAwake(true);
     handleCommand(t);
   };
 
   const endAll = () => {
     speech.stopListening();
     speech.stopSpeaking();
-    awakeRef.current = false;
-    setAwake(false);
   };
 
   return (
