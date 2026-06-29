@@ -59,7 +59,7 @@ function AuthPage() {
             {/* logo badge */}
             <div className="flex items-center gap-3 mb-8">
               <div className="w-11 h-11 flex items-center justify-center">
-                <img src="/favicon.png" alt="Jenvu AI" className="w-11 h-11 object-contain" />
+                <img src={faviconUrl} alt="Jenvu AI" className="w-11 h-11 object-contain" />
               </div>
               <div className="leading-tight">
                 <h1
