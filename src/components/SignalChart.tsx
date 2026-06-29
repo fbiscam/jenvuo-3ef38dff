@@ -97,17 +97,29 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     const redrawBoxes = () => {
       if (!overlayRef.current || !seriesRef.current || !chartRef.current) return;
       const ts = chartRef.current.timeScale();
+      const containerWidth = overlayRef.current.clientWidth;
       for (const b of boxesRef.current) {
         const m: any = b.marking;
-        if (m.fromTime == null || m.toTime == null) continue;
-        const x1 = ts.timeToCoordinate(m.fromTime as Time);
-        const x2 = ts.timeToCoordinate(m.toTime as Time);
         const y1 = seriesRef.current.priceToCoordinate(m.priceHigh);
         const y2 = seriesRef.current.priceToCoordinate(m.priceLow);
-        if (x1 == null || x2 == null || y1 == null || y2 == null) {
-          b.el.style.display = "none";
+        if (y1 == null || y2 == null) { b.el.style.display = "none"; continue; }
+
+        // Full-width zones (premium / discount / OTE) — no fromTime
+        if (m.type === "premiumZone" || m.type === "discountZone" || m.type === "oteZone") {
+          b.el.style.display = "block";
+          b.el.style.left = "0px";
+          b.el.style.width = `${containerWidth}px`;
+          const top = Math.min(y1, y2);
+          const height = Math.max(2, Math.abs(y2 - y1));
+          b.el.style.top = `${top}px`;
+          b.el.style.height = `${height}px`;
           continue;
         }
+
+        if (m.fromTime == null || m.toTime == null) { b.el.style.display = "none"; continue; }
+        const x1 = ts.timeToCoordinate(m.fromTime as Time);
+        const x2 = ts.timeToCoordinate(m.toTime as Time);
+        if (x1 == null || x2 == null) { b.el.style.display = "none"; continue; }
         b.el.style.display = "block";
         const left = Math.min(x1, x2);
         const width = Math.max(2, Math.abs(x2 - x1));
