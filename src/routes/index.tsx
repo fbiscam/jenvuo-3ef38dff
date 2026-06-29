@@ -556,8 +556,7 @@ function HomePage() {
       {/* COMPARISON */}
       <section className="border-t border-zinc-100 bg-zinc-50/40">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <SectionLabel>{"\n"}</SectionLabel>
-          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
             Why traders move to JENVU.
           </h2>
           <div className="mt-10 rounded-2xl border border-zinc-200 bg-white overflow-hidden">
