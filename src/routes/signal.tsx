@@ -194,6 +194,29 @@ function SignalPage() {
     setPlaying(false);
   };
 
+  /* ---------- NEWS AUTO-REFRESH (every 3 min) ---------- */
+  const fetchNews = useServerFn(getNewsRisk);
+  const [newsUpdatedAt, setNewsUpdatedAt] = useState<string | null>(null);
+  useEffect(() => {
+    if (!plan) return;
+    let stopped = false;
+    const symbol = plan.instrument.symbol;
+    const tick = async () => {
+      try {
+        const next = await fetchNews({ data: { symbol } });
+        if (stopped) return;
+        setPlan((prev) => prev ? { ...prev, newsRisk: { severity: next.severity, warning: next.warning, events: next.events } } : prev);
+        setNewsUpdatedAt(next.generatedAt);
+      } catch {}
+    };
+    const id = setInterval(tick, 3 * 60 * 1000);
+    tick();
+    return () => { stopped = true; clearInterval(id); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan?.instrument.symbol]);
+
+
+
   /* ---------- LIVE TRADE TRACKER ---------- */
   const fetchTick = useServerFn(getLiveTick);
   const [livePrice, setLivePrice] = useState<number | null>(null);
