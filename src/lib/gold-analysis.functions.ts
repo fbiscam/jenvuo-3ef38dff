@@ -373,6 +373,15 @@ export type SignalPlan = {
   symbol: string;
   symbolLabel: string;
   precision: number;
+  audit: {
+    verdict: "APPROVED" | "CAUTION" | "REJECTED";
+    agreement: number;
+    auditedConfidence: number;
+    summary: string;
+    issues: string[];
+    strengths: string[];
+    auditorModel: string;
+  };
 };
 
 
