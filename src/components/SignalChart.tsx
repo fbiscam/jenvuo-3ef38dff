@@ -167,49 +167,72 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (!s || !chart) return;
       if (m.tf !== tf) return;
 
-      // Box-style markings (FVG, OB, zone)
-      if (m.type === "fvg" || m.type === "orderBlock" || m.type === "zone") {
+      // Box-style markings (FVG, OB, zone, breaker)
+      if (m.type === "fvg" || m.type === "orderBlock" || m.type === "zone" || m.type === "breaker") {
         if (!overlayRef.current) return;
         const el = document.createElement("div");
-        const color =
-          m.type === "fvg"
-            ? m.kind === "bullish"
-              ? COLORS.fvgBull
-              : COLORS.fvgBear
-            : m.type === "orderBlock"
-              ? m.kind === "demand"
-                ? COLORS.obDemand
-                : COLORS.obSupply
-              : m.kind === "demand"
-                ? COLORS.zoneDemand
-                : COLORS.zoneSupply;
-        const border =
-          m.kind === "bullish" || m.kind === "demand" ? "#22c55e" : "#ef4444";
+        let color: string;
+        let border: string;
+        if (m.type === "fvg") {
+          color = m.kind === "bullish" ? COLORS.fvgBull : COLORS.fvgBear;
+          border = m.kind === "bullish" ? "#22c55e" : "#ef4444";
+        } else if (m.type === "orderBlock") {
+          color = m.kind === "demand" ? COLORS.obDemand : COLORS.obSupply;
+          border = m.kind === "demand" ? "#3b82f6" : "#f472b6";
+        } else if (m.type === "zone") {
+          color = m.kind === "demand" ? COLORS.zoneDemand : COLORS.zoneSupply;
+          border = m.kind === "demand" ? "#10b981" : "#f43f5e";
+        } else {
+          color = m.kind === "bullish" ? COLORS.breakerBull : COLORS.breakerBear;
+          border = m.kind === "bullish" ? "#14b8a6" : "#d946ef";
+        }
         el.style.cssText = `position:absolute;background:${color};border:1px dashed ${border};border-radius:3px;pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:10px;color:${dark ? "#fff" : "#000"};padding:2px 4px;font-weight:600;`;
         el.textContent = m.label;
         overlayRef.current.appendChild(el);
         boxesRef.current.push({ marking: m, el });
         (chart as any).__redrawBoxes?.();
-        requestAnimationFrame(() => {
-          el.style.opacity = "1";
-        });
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
         return;
       }
 
-      // Line markings (liquidity, BOS/CHOCH, entry/sl/tp)
+      // Full-width zones (Premium/Discount/OTE)
+      if (m.type === "premiumZone" || m.type === "discountZone" || m.type === "oteZone") {
+        if (!overlayRef.current) return;
+        const el = document.createElement("div");
+        const color =
+          m.type === "premiumZone" ? COLORS.premium :
+          m.type === "discountZone" ? COLORS.discount : COLORS.ote;
+        const border =
+          m.type === "premiumZone" ? "rgba(244,63,94,0.4)" :
+          m.type === "discountZone" ? "rgba(16,185,129,0.4)" : "rgba(234,179,8,0.6)";
+        el.style.cssText = `position:absolute;background:${color};border-top:1px dashed ${border};border-bottom:1px dashed ${border};pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:9px;color:${dark ? "#fff" : "#000"};padding:1px 6px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;`;
+        el.textContent = m.label;
+        overlayRef.current.appendChild(el);
+        boxesRef.current.push({ marking: m, el });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
+        return;
+      }
+
+      // Line markings (liquidity, EQH/EQL, BOS/CHOCH, entry/sl/tp)
       let color = COLORS.entry;
       let style: LineStyle = LineStyle.Solid;
       let price = 0;
-      let title = m.label;
+      let lineWidth: 1 | 2 | 3 | 4 = 2;
+      const title = m.label;
       if (m.type === "liquidity") {
         price = m.price;
         color = m.side === "buy" ? COLORS.liqBuy : COLORS.liqSell;
         style = LineStyle.Dashed;
+      } else if (m.type === "eqh" || m.type === "eql") {
+        price = m.price;
+        color = m.type === "eqh" ? COLORS.eqh : COLORS.eql;
+        style = LineStyle.Dotted;
+        lineWidth = 1;
       } else if (m.type === "bos" || m.type === "choch") {
         price = m.price;
         color = m.kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
         style = LineStyle.LargeDashed;
-        // also add a marker at fromTime
         markersRef.current.push({
           time: m.fromTime as Time,
           position: m.kind === "bullish" ? "belowBar" : "aboveBar",
@@ -219,23 +242,16 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         });
         markersPluginRef.current?.setMarkers(markersRef.current);
       } else if (m.type === "entry") {
-        price = m.price;
-        color = COLORS.entry;
+        price = m.price; color = COLORS.entry; lineWidth = 3;
       } else if (m.type === "sl") {
-        price = m.price;
-        color = COLORS.sl;
+        price = m.price; color = COLORS.sl; lineWidth = 3;
       } else if (m.type === "tp") {
-        price = m.price;
-        color = COLORS.tp;
+        price = m.price; color = COLORS.tp; lineWidth = 3;
       }
 
       const line = s.createPriceLine({
-        price,
-        color,
-        lineWidth: 2,
-        lineStyle: style,
-        axisLabelVisible: true,
-        title,
+        price, color, lineWidth, lineStyle: style,
+        axisLabelVisible: true, title,
       });
       linesRef.current.push(line);
     },
