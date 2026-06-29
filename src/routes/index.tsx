@@ -190,9 +190,7 @@ function Home() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="h-9 w-9 rounded-full hover:bg-black/5 flex items-center justify-center text-neutral-500">
-            <Sliders className="h-4 w-4" />
-          </button>
+          <VoicePicker value={speech.voicePreset} onChange={speech.setVoicePreset} />
         </div>
       </header>
 
