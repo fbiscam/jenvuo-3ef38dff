@@ -595,22 +595,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* STATS BAR */}
-      <section className="border-t border-zinc-100 bg-zinc-900 text-white">
-        <div className="mx-auto max-w-6xl px-6 py-14 grid grid-cols-2 md:grid-cols-4 gap-px bg-zinc-800">
-          {[
-            ["A+ Setups / wk", "37"],
-            ["Avg. R:R", "1 : 3.2"],
-            ["Voice Latency", "14 ms"],
-            ["Markets Covered", "32+"],
-          ].map(([k, v]) => (
-            <div key={k} className="bg-zinc-900 p-6">
-              <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-400`}>{k}</div>
-              <div className="mt-2 text-3xl font-semibold tracking-tight">{v}</div>
-            </div>
-          ))}
-        </div>
-      </section>
 
 
       {/* COMPARISON */}
