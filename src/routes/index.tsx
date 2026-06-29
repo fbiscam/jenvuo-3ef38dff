@@ -114,15 +114,16 @@ function Home() {
   // Every final transcript becomes a command (no wake word required)
   useEffect(() => {
     const t = speech.transcript;
-    if (!t || t === lastHandled.current) return;
-    lastHandled.current = t;
+    const key = `${speech.transcriptId}:${t}`;
+    if (!t || key === lastHandled.current) return;
+    lastHandled.current = key;
     const lower = t.toLowerCase();
     const wakeMatch = lower.match(/\b(hey|hi|ok|okay)?\s*(jenvu|janvu|jarvis|jen view|jen vu)\b[\s,.!?]*(.*)/i);
     const cmd = (wakeMatch?.[3]?.trim() || t).trim();
     if (cmd.length > 1) {
       handleCommand(cmd);
     }
-  }, [handleCommand, speech.transcript]);
+  }, [handleCommand, speech.transcript, speech.transcriptId]);
 
   // News alert: announce high-impact events <=15 min away
   useEffect(() => {
