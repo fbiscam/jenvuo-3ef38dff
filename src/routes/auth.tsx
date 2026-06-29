@@ -9,8 +9,13 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Jenvu AI" },
-      { name: "description", content: "Sign in to your Jenvu AI voice terminal." },
+      { name: "description", content: "Access your Jenvu AI voice trading terminal." },
+      { name: "robots", content: "noindex, follow" },
+      { property: "og:title", content: "Sign in — Jenvu AI" },
+      { property: "og:description", content: "Access your Jenvu AI voice trading terminal." },
+      { property: "og:url", content: "https://jenvu.com/auth" },
     ],
+    links: [{ rel: "canonical", href: "https://jenvu.com/auth" }],
   }),
   component: AuthPage,
 });

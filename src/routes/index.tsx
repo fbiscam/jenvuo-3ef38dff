@@ -5,24 +5,34 @@ import { CloudOrb } from "@/components/CloudOrb";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      {
-        title:
-          "World's First Voice-Powered Institutional Trading Intelligence",
-      },
+      { title: "Jenvu AI — Voice-Powered Trading Intelligence" },
       {
         name: "description",
         content:
-          "The world's first voice-native trading intelligence built on 25+ years of ICT, SMC and institutional market logic. Live A+ setups, real-time analysis and spoken execution for Gold, Crypto, FX and Indices.",
+          "Voice-native AI trading terminal for Gold, Crypto, FX & Indices. Live ICT/SMC analysis, A+ setups and spoken execution built on 25+ years of institutional logic.",
       },
-      {
-        property: "og:title",
-        content:
-          "World's First Voice-Powered Institutional Trading Intelligence",
-      },
+      { property: "og:title", content: "Jenvu AI — Voice-Powered Trading Intelligence" },
       {
         property: "og:description",
-        content:
-          "Speak. Analyze. Execute. The voice terminal that turns market noise into institutional-grade signals.",
+        content: "Speak. Analyze. Execute. The voice terminal that turns market noise into institutional-grade signals.",
+      },
+      { property: "og:url", content: "https://jenvu.com/" },
+      { property: "og:type", content: "website" },
+    ],
+    links: [{ rel: "canonical", href: "https://jenvu.com/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "Jenvu AI",
+          applicationCategory: "FinanceApplication",
+          operatingSystem: "Web",
+          description:
+            "Voice-native AI trading terminal with institutional ICT/SMC analysis for Gold, Crypto, FX and Indices.",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        }),
       },
     ],
   }),
