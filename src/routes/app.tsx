@@ -419,9 +419,6 @@ function Home() {
         dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900",
       )}>
         <div className="flex flex-col items-center justify-center gap-4 flex-1 min-h-0 w-full">
-          <div className="pt-2">
-            <StatusPill status={status} supported={speech.supported} dark={dark} />
-          </div>
           <div className="flex-1 min-h-0 flex items-center justify-center w-full">
             <CloudOrb status={status} pulse={speech.wordPulse} />
           </div>
