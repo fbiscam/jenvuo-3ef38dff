@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/llm")({
   head: () => ({
     meta: [
-      { title: "Large Language Models — JENVU AI" },
+      { title: "Large Language Models (LLM) — JENVU AI" },
       { name: "description", content: "What LLMs are, why they matter for trading analysis, and how JENVU uses them responsibly." },
-      { property: "og:title", content: "Large Language Models — JENVU AI" },
+      { property: "og:title", content: "Large Language Models (LLM) — JENVU AI" },
       { property: "og:url", content: "https://jenvu.com/llm" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/llm" }],

@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/download")({
   head: () => ({
     meta: [
-      { title: "Download JENVU AI — iOS, Android & Desktop" },
+      { title: "Download Our Application — JENVU AI" },
       {
         name: "description",
         content:
           "Get JENVU AI on your device. Native iOS, Android APK and desktop PWA — the institutional voice trading agent for Gold, Crypto, FX & Indices in your pocket.",
       },
-      { property: "og:title", content: "Download JENVU AI — iOS, Android & Desktop" },
+      { property: "og:title", content: "Download Our Application — JENVU AI" },
       {
         property: "og:description",
         content:
