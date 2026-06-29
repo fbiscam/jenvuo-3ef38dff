@@ -309,12 +309,12 @@ function Process() {
       <div className="mx-auto max-w-[1100px] px-6 py-28">
         <SectionHead title={<>Three steps. <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>Zero friction.</span></>} />
 
-        <div className="mt-16 grid lg:grid-cols-3 gap-12">
+        <div className="mt-16 grid lg:grid-cols-3 gap-5">
           {steps.map((s) => (
-            <div key={s.n}>
+            <div key={s.n} className="rounded-3xl border border-black/10 bg-white p-8 hover:border-black/30 transition shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]">
               <div className="font-mono text-[12px] font-bold tracking-[0.25em]" style={{ color: VOID, fontFamily: "'JetBrains Mono', monospace" }}>{s.n}</div>
               <h3 className="mt-4 font-display font-semibold tracking-[-0.03em] text-[36px] leading-none" style={{ color: VOID }}>{s.t}</h3>
-              <p className="mt-5 text-[15px] leading-relaxed max-w-xs" style={{ color: VOID }}>{s.b}</p>
+              <p className="mt-5 text-[15px] leading-relaxed" style={{ color: VOID }}>{s.b}</p>
             </div>
           ))}
         </div>
