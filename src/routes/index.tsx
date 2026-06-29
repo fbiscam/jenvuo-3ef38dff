@@ -383,11 +383,11 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
           <div
             className="absolute inset-0"
             style={{
-              background:
-                "radial-gradient(circle at 50% 115%, rgba(7,40,76,0.85), transparent 55%)",
-              mixBlendMode: "multiply",
-            }}
-          />
+            background:
+              "radial-gradient(circle at 50% 115%, rgba(125,196,245,0.6), transparent 55%)",
+            mixBlendMode: "multiply",
+          }}
+        />
 
           {/* sky reflection top */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_18%,rgba(255,255,255,0.85),transparent_55%)]" />
