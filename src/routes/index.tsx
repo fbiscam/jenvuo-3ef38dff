@@ -204,9 +204,9 @@ function Home() {
             {!speech.listening && !speech.speaking && !loading && speech.supported && (
               <button
                 onClick={toggleMic}
-                className="rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-neutral-800 animate-pulse"
+                className="rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-neutral-800"
               >
-                🎤 Tap to start talking
+                Tap to start talking
               </button>
             )}
             {!speech.supported && (
