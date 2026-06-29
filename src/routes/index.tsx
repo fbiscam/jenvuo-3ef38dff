@@ -269,6 +269,7 @@ function HomePage() {
 
 
       <section className="mx-auto max-w-[1280px] px-6 pb-24">
+      <section className="mx-auto max-w-[1280px] px-6 pb-24 border-t border-black/[0.06] pt-16">
         <div className="text-[12px] tracking-[0.22em] uppercase text-black/45 font-medium mb-6">
           Capabilities
         </div>
