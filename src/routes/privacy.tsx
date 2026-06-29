@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Our Policy Concerns — Jenvu - AI" },
-      { name: "description", content: "How Jenvu - AI collects, uses, and protects your data." },
-      { property: "og:title", content: "Our Policy Concerns — Jenvu - AI" },
+      { title: "Our Policy Concerns — Jenvu" },
+      { name: "description", content: "How Jenvu collects, uses, and protects your data." },
+      { property: "og:title", content: "Our Policy Concerns — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/privacy" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/privacy" }],
@@ -19,12 +19,12 @@ function PrivacyPage() {
     <PageShell
       eyebrow="Legal"
       title="Privacy Policy"
-      intro="This page is maintained by the Jenvu - AI team to explain what data the product handles, how it is used, and the choices available to you."
+      intro="This page is maintained by the Jenvu team to explain what data the product handles, how it is used, and the choices available to you."
     >
       <section className="space-y-3">
         <H2>1. Information We Collect</H2>
         <P>
-          When you use Jenvu - AI we may process: account details (email, display name), voice
+          When you use Jenvu we may process: account details (email, display name), voice
           transcripts captured while the microphone is active, text prompts you submit, and
           usage telemetry such as routes visited and feature events. We do not record continuous
           background audio — capture only runs while you have explicitly activated the agent.
@@ -44,7 +44,7 @@ function PrivacyPage() {
       <section className="space-y-3">
         <H2>3. Third-Party Processors</H2>
         <P>
-          Jenvu - AI relies on infrastructure and AI inference providers (including managed
+          Jenvu relies on infrastructure and AI inference providers (including managed
           cloud backends and large-language-model gateways) to deliver core functionality.
           These processors handle data strictly to perform the services we request and are
           bound by their own contractual safeguards.

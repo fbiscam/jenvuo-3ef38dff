@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/development")({
   head: () => ({
     meta: [
-      { title: "Development & Engineering — Jenvu - AI" },
-      { name: "description", content: "The stack, architecture, and engineering principles behind Jenvu - AI." },
-      { property: "og:title", content: "Development & Engineering — Jenvu - AI" },
+      { title: "Development & Engineering — Jenvu" },
+      { name: "description", content: "The stack, architecture, and engineering principles behind Jenvu." },
+      { property: "og:title", content: "Development & Engineering — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/development" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/development" }],

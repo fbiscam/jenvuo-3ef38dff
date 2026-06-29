@@ -8,19 +8,19 @@ import { CloudOrb } from "@/components/CloudOrb";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign In Your Account — Jenvu - AI" },
+      { title: "Sign In Your Account — Jenvu" },
       {
         name: "description",
         content:
-          "Sign in to your Jenvu - AI account to access the voice-native institutional trading terminal — live ICT/SMC analysis for Gold, Crypto, FX and Indices.",
+          "Sign in to your Jenvu account to access the voice-native institutional trading terminal — live ICT/SMC analysis for Gold, Crypto, FX and Indices.",
       },
       { name: "robots", content: "noindex, follow" },
-      { property: "og:title", content: "Sign In Your Account — Jenvu - AI" },
+      { property: "og:title", content: "Sign In Your Account — Jenvu" },
       { property: "og:description", content: "Access your voice-native institutional trading terminal." },
       { property: "og:url", content: "https://jenvu.com/auth" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Sign In Your Account — Jenvu - AI" },
+      { name: "twitter:title", content: "Sign In Your Account — Jenvu" },
       { name: "twitter:description", content: "Access your voice-native institutional trading terminal." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/auth" }],
@@ -88,8 +88,8 @@ function AuthPage() {
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
-            <img src="/favicon.png" alt="Jenvu - AI" className="h-6 w-6 rounded-md object-contain" />
-            <span className="truncate font-semibold tracking-tight">Jenvu - AI</span>
+            <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded-md object-contain" />
+            <span className="truncate font-semibold tracking-tight">Jenvu</span>
           </Link>
 
           <div className="flex shrink-0 items-center gap-2">
@@ -130,7 +130,7 @@ function AuthPage() {
                   <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
                 </div>
                 <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
-                  Jenvu - AI // AUTH_SESSION
+                  Jenvu // AUTH_SESSION
                 </span>
               </div>
               <div className="flex shrink-0 items-center gap-4">
@@ -265,7 +265,7 @@ function AuthPage() {
       <footer className="border-t border-zinc-100 shrink-0">
         <div className="mx-auto max-w-6xl px-5 py-3 flex items-center justify-between gap-5">
           <div className="flex items-center gap-2 text-[11px] text-zinc-400">
-            <span className="font-semibold text-zinc-900">Jenvu - AI</span>
+            <span className="font-semibold text-zinc-900">Jenvu</span>
             <span>·</span>
             <span>© {new Date().getFullYear()}</span>
           </div>
