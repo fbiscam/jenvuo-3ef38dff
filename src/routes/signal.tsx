@@ -282,7 +282,7 @@ function SignalPage() {
                           )} />
                           <span className="text-neutral-700">{k.label}</span>
                         </span>
-                        <span className="font-mono font-bold tabular-nums text-neutral-900">${k.price.toFixed(2)}</span>
+                        <span className="font-mono font-bold tabular-nums text-neutral-900">{plan.instrument.kind === "crypto" ? "" : "$"}{k.price.toFixed(plan.instrument.decimals)}</span>
                       </div>
                     ))}
                   </div>
