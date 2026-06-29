@@ -253,7 +253,7 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
             background:
               "radial-gradient(circle at 50% 30%, #ffffff 0%, #fbcfe8 25%, #a78bfa 55%, #38bdf8 80%, #1e1b4b 100%)",
             boxShadow:
-              "inset -10px -20px 50px rgba(30,27,75,0.55), inset 12px 14px 40px rgba(255,255,255,0.55), 0 10px 50px -8px rgba(167,139,250,0.6)",
+              "inset -10px -20px 50px rgba(30,27,75,0.55), inset 12px 14px 40px rgba(255,255,255,0.55)",
           }}
         >
           {/* rainbow cloud layer 1 */}
