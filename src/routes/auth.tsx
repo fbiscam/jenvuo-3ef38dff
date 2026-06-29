@@ -40,7 +40,7 @@ function AuthPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Welcome back");
+    
     navigate({ to: "/", replace: true });
   };
 
