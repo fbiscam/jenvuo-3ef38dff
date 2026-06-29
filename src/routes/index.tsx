@@ -1,35 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Activity, Sparkles, Zap } from "lucide-react";
-import { TradingViewChart } from "@/components/TradingViewChart";
-import { VoiceOrb } from "@/components/VoiceOrb";
+import { Mic, MicOff, Loader2, Volume2, Sparkles, X } from "lucide-react";
 import { SignalCard } from "@/components/SignalCard";
-import { CommandInput } from "@/components/CommandInput";
 import { useSpeech } from "@/hooks/useSpeech";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GoldGPT — Jarvis AI Gold Trading Assistant" },
+      { title: "GoldGPT — Jarvis AI Voice Agent for Gold" },
       {
         name: "description",
         content:
-          "Voice-controlled AI trading assistant for XAU/USD with live TradingView charts, ICT & SMC analysis, and A+ setup signals.",
-      },
-      { property: "og:title", content: "GoldGPT — Jarvis AI Gold Trading Assistant" },
-      {
-        property: "og:description",
-        content: "Voice + text AI assistant for gold trading. ICT/SMC analysis, live charts, A+ signals.",
+          "Always-on Jarvis-style voice AI for XAU/USD. Just speak — get ICT/SMC analysis and A+ setups instantly.",
       },
     ],
   }),
   component: Home,
 });
-
-const TIMEFRAMES = ["1m", "5m", "15m", "30m", "1h", "4h", "1d"] as const;
 
 const TF_REGEX =
   /\b(1\s*m(?:in)?|5\s*m(?:in)?|15\s*m(?:in)?|30\s*m(?:in)?|1\s*h(?:our)?|4\s*h(?:our)?|1\s*d(?:ay)?|one\s+minute|five\s+minute|fifteen\s+minute|thirty\s+minute|one\s+hour|four\s+hour|daily)\b/i;
@@ -59,13 +50,14 @@ function Home() {
   const analyze = useServerFn(analyzeGold);
   const [timeframe, setTimeframe] = useState<string>("15m");
   const [signal, setSignal] = useState<GoldSignal | null>(null);
-  const [history, setHistory] = useState<GoldSignal[]>([]);
   const [loading, setLoading] = useState(false);
-  const [transcriptOverride, setTranscriptOverride] = useState("");
+  const [lastUser, setLastUser] = useState("");
   const speech = useSpeech();
-  const autoSubmitRef = useRef("");
+  const lastHandled = useRef("");
+  const loadingRef = useRef(false);
+  const greetedRef = useRef(false);
 
-  const status = loading
+  const status: "idle" | "listening" | "thinking" | "speaking" = loading
     ? "thinking"
     : speech.speaking
       ? "speaking"
@@ -73,190 +65,245 @@ function Home() {
         ? "listening"
         : "idle";
 
-  // auto submit when STT transcript arrives
-  useEffect(() => {
-    if (speech.transcript && speech.transcript !== autoSubmitRef.current) {
-      autoSubmitRef.current = speech.transcript;
-      setTranscriptOverride(speech.transcript);
-      handleCommand(speech.transcript);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [speech.transcript]);
-
   async function handleCommand(text: string) {
-    if (loading) return;
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setLoading(true);
+    speech.pauseListening();
     const tf = parseTimeframe(text, timeframe);
     if (tf !== timeframe) setTimeframe(tf);
-    setLoading(true);
     try {
       const result = await analyze({ data: { timeframe: tf, query: text } });
       setSignal(result);
-      setHistory((h) => [result, ...h].slice(0, 8));
-      speech.speak(result.spokenSummary);
+      speech.speak(result.spokenSummary, () => speech.resumeIfWanted());
     } catch (e: any) {
       toast.error(e?.message || "Analysis failed");
+      speech.speak("Apologies sir, the analysis failed. Please try again.", () => speech.resumeIfWanted());
     } finally {
+      loadingRef.current = false;
       setLoading(false);
     }
   }
 
-  const greeting = useMemo(
-    () => "Systems online. GoldGPT ready. Awaiting your command, sir.",
-    [],
-  );
-  const greetedRef = useRef(false);
+  // Auto-handle final transcripts
   useEffect(() => {
-    if (greetedRef.current) return;
-    greetedRef.current = true;
-    const t = setTimeout(() => speech.speak(greeting), 800);
-    return () => clearTimeout(t);
+    const t = speech.transcript;
+    if (t && t !== lastHandled.current) {
+      lastHandled.current = t;
+      setLastUser(t);
+      handleCommand(t);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [speech.transcript]);
+
+  const startConversation = () => {
+    if (!speech.supported) {
+      toast.error("Voice not supported. Please use Chrome.");
+      return;
+    }
+    if (!greetedRef.current) {
+      greetedRef.current = true;
+      speech.speak(
+        "Systems online. GoldGPT ready. I'm listening, sir.",
+        () => speech.startListening(),
+      );
+    } else {
+      speech.startListening();
+    }
+  };
+
+  const endConversation = () => {
+    speech.stopListening();
+    speech.stopSpeaking();
+  };
+
+  const active = speech.listening || speech.speaking || loading || greetedRef.current;
 
   return (
-    <div className="min-h-screen bg-[#05070f] text-[color:var(--gold)] relative overflow-hidden">
-      {/* ambient grid */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.07] bg-[linear-gradient(rgba(212,175,55,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.5)_1px,transparent_1px)] bg-[size:50px_50px]" />
-      <div className="pointer-events-none absolute -top-40 -right-40 h-96 w-96 rounded-full bg-[color:var(--gold)]/10 blur-[120px]" />
-      <div className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-[color:var(--cyan)]/10 blur-[120px]" />
+    <div className="min-h-screen bg-[#04060d] text-[color:var(--gold)] relative overflow-hidden flex flex-col">
+      {/* ambient glow */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[linear-gradient(rgba(212,175,55,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.5)_1px,transparent_1px)] bg-[size:60px_60px]" />
+      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[700px] w-[700px] rounded-full bg-[color:var(--gold)]/[0.04] blur-[120px]" />
 
       {/* Header */}
-      <header className="relative border-b border-[color:var(--gold)]/15 bg-black/40 backdrop-blur">
-        <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[color:var(--gold)] to-amber-700 flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.5)]">
-              <Sparkles className="h-5 w-5 text-black" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-wider bg-gradient-to-r from-[color:var(--gold)] to-amber-300 bg-clip-text text-transparent">
-                GOLDGPT
-              </h1>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-[color:var(--cyan)]/80">
-                ICT / SMC AI · XAU/USD
-              </p>
-            </div>
+      <header className="relative z-10 px-6 py-5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[color:var(--gold)] to-amber-700 flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.5)]">
+            <Sparkles className="h-4 w-4 text-black" />
           </div>
-          <div className="flex items-center gap-4 text-xs font-mono">
-            <span className="flex items-center gap-1.5 text-emerald-400">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              LIVE
-            </span>
-            <span className="text-[color:var(--gold)]/70 flex items-center gap-1">
-              <Activity className="h-3 w-3" /> GEMINI 3
-            </span>
-            <span className="text-[color:var(--cyan)] flex items-center gap-1">
-              <Zap className="h-3 w-3" /> {timeframe.toUpperCase()}
-            </span>
+          <div>
+            <h1 className="text-lg font-bold tracking-[0.25em] bg-gradient-to-r from-[color:var(--gold)] to-amber-300 bg-clip-text text-transparent">
+              GOLDGPT
+            </h1>
+            <p className="text-[9px] uppercase tracking-[0.3em] text-[color:var(--cyan)]/70">
+              Jarvis Voice · XAU/USD
+            </p>
           </div>
+        </div>
+        <div className="flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.2em]">
+          <span className={cn(
+            "flex items-center gap-1.5",
+            speech.listening ? "text-emerald-400" : "text-[color:var(--gold)]/40",
+          )}>
+            <span className={cn(
+              "h-1.5 w-1.5 rounded-full",
+              speech.listening ? "bg-emerald-400 animate-pulse" : "bg-[color:var(--gold)]/30",
+            )} />
+            {speech.listening ? "LIVE" : "STANDBY"}
+          </span>
+          <span className="text-[color:var(--cyan)]">{timeframe.toUpperCase()}</span>
         </div>
       </header>
 
-      <main className="relative max-w-[1600px] mx-auto px-4 lg:px-6 py-4 grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-4">
-        {/* LEFT: chart + controls */}
-        <section className="flex flex-col gap-4 min-h-0">
-          {/* Timeframe pills */}
-          <div className="flex items-center gap-1 rounded-xl border border-[color:var(--gold)]/20 bg-black/40 p-1 self-start">
-            {TIMEFRAMES.map((tf) => (
-              <button
-                key={tf}
-                onClick={() => setTimeframe(tf)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-semibold tracking-wider transition-all ${
-                  timeframe === tf
-                    ? "bg-[color:var(--gold)] text-black shadow-[0_0_15px_rgba(212,175,55,0.5)]"
-                    : "text-[color:var(--gold)]/60 hover:text-[color:var(--gold)]"
-                }`}
-              >
-                {tf.toUpperCase()}
-              </button>
-            ))}
-          </div>
+      {/* Main: centered Jarvis orb */}
+      <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-center px-6 gap-8 pb-8">
+        <div className="flex flex-col items-center gap-8 flex-1">
+          <JarvisOrb status={status} onClick={active ? endConversation : startConversation} />
 
-          {/* Chart */}
-          <div className="rounded-xl border border-[color:var(--gold)]/25 bg-[#080a14] overflow-hidden shadow-[0_0_40px_-15px_rgba(212,175,55,0.5)] h-[520px]">
-            <TradingViewChart timeframe={timeframe} />
+          {/* Status text */}
+          <div className="text-center min-h-[3rem]">
+            <div className="text-[10px] uppercase tracking-[0.4em] text-[color:var(--cyan)]/80 mb-2">
+              {status === "listening" && "LISTENING"}
+              {status === "thinking" && "ANALYZING MARKETS"}
+              {status === "speaking" && "SPEAKING"}
+              {status === "idle" && (active ? "PAUSED" : "TAP TO BEGIN")}
+            </div>
+            <div className="text-sm text-[color:var(--gold)]/80 max-w-md font-light italic min-h-[1.25rem]">
+              {speech.interim || lastUser || (!active && "Speak naturally. I'll handle the rest.")}
+            </div>
           </div>
-
-          {/* Command input */}
-          <CommandInput
-            onSubmit={handleCommand}
-            disabled={loading}
-            externalValue={transcriptOverride}
-          />
 
           {/* Quick prompts */}
-          <div className="flex flex-wrap gap-2">
-            {[
-              "Analyze gold 15m",
-              "Give me A+ setup on 1H",
-              "What's the bias on 4H?",
-              "London killzone setup",
-              "Liquidity sweep on 5m",
-            ].map((q) => (
-              <button
-                key={q}
-                onClick={() => handleCommand(q)}
-                disabled={loading}
-                className="text-xs rounded-full border border-[color:var(--cyan)]/30 bg-[color:var(--cyan)]/5 text-[color:var(--cyan)] px-3 py-1 hover:bg-[color:var(--cyan)]/15 disabled:opacity-40"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* RIGHT: Jarvis panel */}
-        <aside className="flex flex-col gap-4">
-          <div className="rounded-xl border border-[color:var(--gold)]/25 bg-[#0a0d1f]/80 backdrop-blur p-6 flex flex-col items-center shadow-[0_0_30px_-10px_rgba(212,175,55,0.4)]">
-            <VoiceOrb
-              status={status as any}
-              onToggle={() => {
-                if (!speech.supported) {
-                  toast.error("Voice not supported in this browser. Use Chrome.");
-                  return;
-                }
-                if (speech.listening) speech.stopListening();
-                else if (speech.speaking) speech.stopSpeaking();
-                else speech.startListening();
-              }}
-            />
-            <div className="mt-4 text-center text-[10px] uppercase tracking-[0.25em] text-[color:var(--gold)]/50">
-              25+ Years Expertise · Gold Specialist
+          {!active && (
+            <div className="flex flex-wrap gap-2 justify-center max-w-xl">
+              {[
+                "Analyze gold 15m",
+                "A+ setup on 1H",
+                "Bias on 4H?",
+                "London killzone",
+              ].map((q) => (
+                <button
+                  key={q}
+                  onClick={() => { greetedRef.current = true; handleCommand(q); speech.startListening(); }}
+                  className="text-xs rounded-full border border-[color:var(--cyan)]/30 bg-[color:var(--cyan)]/5 text-[color:var(--cyan)] px-4 py-2 hover:bg-[color:var(--cyan)]/15 transition"
+                >
+                  {q}
+                </button>
+              ))}
             </div>
-          </div>
+          )}
 
-          {signal ? (
+          {active && (
+            <button
+              onClick={endConversation}
+              className="flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-[color:var(--gold)]/60 hover:text-red-400 transition"
+            >
+              <X className="h-3 w-3" /> End conversation
+            </button>
+          )}
+        </div>
+
+        {/* Signal card (compact, right side on desktop) */}
+        {signal && (
+          <aside className="w-full lg:w-[400px] lg:max-w-[400px] shrink-0">
             <SignalCard signal={signal} />
-          ) : (
-            <div className="rounded-xl border border-dashed border-[color:var(--gold)]/20 bg-black/30 p-6 text-center text-sm text-[color:var(--gold)]/60">
-              Speak or type a command. I'll deliver an A+ setup with ICT &amp; SMC confluences.
-            </div>
-          )}
-
-          {history.length > 1 && (
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.25em] text-[color:var(--gold)]/50 mb-2 px-1">
-                Session History
-              </div>
-              <div className="space-y-2 max-h-[300px] overflow-auto pr-1">
-                {history.slice(1).map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSignal(s)}
-                    className="w-full text-left rounded-lg border border-[color:var(--gold)]/15 bg-black/30 hover:border-[color:var(--gold)]/40 p-2 text-xs font-mono flex justify-between"
-                  >
-                    <span className="text-[color:var(--gold)]/80">
-                      {s.timeframe.toUpperCase()} · {s.direction}
-                    </span>
-                    <span className="text-[color:var(--gold)]/50">
-                      {new Date(s.generatedAt).toLocaleTimeString()}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </aside>
+          </aside>
+        )}
       </main>
     </div>
+  );
+}
+
+function JarvisOrb({
+  status,
+  onClick,
+}: {
+  status: "idle" | "listening" | "thinking" | "speaking";
+  onClick: () => void;
+}) {
+  const color =
+    status === "listening" ? "var(--cyan)" :
+    status === "speaking" ? "var(--gold)" :
+    status === "thinking" ? "var(--gold)" : "var(--gold)";
+
+  return (
+    <button
+      onClick={onClick}
+      className="group relative h-64 w-64 sm:h-72 sm:w-72 rounded-full flex items-center justify-center"
+      aria-label="Toggle voice agent"
+    >
+      {/* outer pulse rings */}
+      {(status === "listening" || status === "speaking") && (
+        <>
+          <span
+            className="absolute inset-0 rounded-full border animate-ping"
+            style={{ borderColor: `color-mix(in oklab, ${color} 40%, transparent)`, animationDuration: "2.2s" }}
+          />
+          <span
+            className="absolute -inset-6 rounded-full border animate-ping"
+            style={{ borderColor: `color-mix(in oklab, ${color} 20%, transparent)`, animationDuration: "3s" }}
+          />
+        </>
+      )}
+
+      {/* rotating gradient ring */}
+      <span
+        className={cn(
+          "absolute inset-0 rounded-full",
+          status !== "idle" && "animate-spin",
+        )}
+        style={{
+          background: `conic-gradient(from 0deg, transparent, ${color === "var(--gold)" ? "rgba(212,175,55,0.6)" : "rgba(0,229,255,0.6)"}, transparent 60%)`,
+          animationDuration: "4s",
+          mask: "radial-gradient(circle, transparent 60%, black 62%, black 100%)",
+          WebkitMask: "radial-gradient(circle, transparent 60%, black 62%, black 100%)",
+        }}
+      />
+
+      {/* core sphere */}
+      <span
+        className={cn(
+          "relative h-52 w-52 sm:h-60 sm:w-60 rounded-full transition-all duration-500",
+          "bg-[radial-gradient(circle_at_30%_30%,rgba(255,220,140,0.25),rgba(10,13,31,0.95)_55%,#04060d_80%)]",
+          "border",
+          status === "listening" && "border-[color:var(--cyan)]/60 shadow-[0_0_80px_-5px_rgba(0,229,255,0.6),inset_0_0_60px_rgba(0,229,255,0.15)]",
+          status === "speaking" && "border-[color:var(--gold)]/70 shadow-[0_0_90px_-5px_rgba(212,175,55,0.75),inset_0_0_60px_rgba(212,175,55,0.2)] scale-[1.02]",
+          status === "thinking" && "border-[color:var(--gold)]/50 shadow-[0_0_70px_-5px_rgba(212,175,55,0.5)]",
+          status === "idle" && "border-[color:var(--gold)]/25 shadow-[0_0_40px_-10px_rgba(212,175,55,0.4)] group-hover:border-[color:var(--gold)]/50",
+        )}
+      >
+        {/* inner core glow */}
+        <span
+          className={cn(
+            "absolute inset-8 rounded-full",
+            status === "speaking" && "animate-pulse",
+            status === "listening" && "animate-pulse",
+          )}
+          style={{
+            background:
+              status === "listening"
+                ? "radial-gradient(circle, rgba(0,229,255,0.35), transparent 70%)"
+                : status === "speaking"
+                  ? "radial-gradient(circle, rgba(212,175,55,0.45), transparent 70%)"
+                  : status === "thinking"
+                    ? "radial-gradient(circle, rgba(212,175,55,0.3), transparent 70%)"
+                    : "radial-gradient(circle, rgba(212,175,55,0.15), transparent 70%)",
+          }}
+        />
+
+        {/* center icon */}
+        <span className="absolute inset-0 flex items-center justify-center">
+          {status === "thinking" ? (
+            <Loader2 className="h-12 w-12 animate-spin text-[color:var(--gold)]" />
+          ) : status === "speaking" ? (
+            <Volume2 className="h-12 w-12 text-[color:var(--gold)] animate-pulse" />
+          ) : status === "listening" ? (
+            <Mic className="h-12 w-12 text-[color:var(--cyan)]" />
+          ) : (
+            <MicOff className="h-12 w-12 text-[color:var(--gold)]/60 group-hover:text-[color:var(--gold)] transition" />
+          )}
+        </span>
+      </span>
+    </button>
   );
 }
