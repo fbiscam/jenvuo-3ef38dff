@@ -248,6 +248,7 @@ function SignalPage() {
           if (tick.price >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stopped = true; }
           if (tick.price <= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stopped = true; }
         }
+      } catch {
         // silent — keep last price
       }
     };
