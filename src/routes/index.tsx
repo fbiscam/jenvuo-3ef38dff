@@ -46,7 +46,6 @@ const INITIAL_TICKER: TickerRow[] = [
 
 // Maps display symbol -> Binance ticker symbol (where available)
 const BINANCE_MAP: Record<string, string> = {
-  "XAU/USD": "PAXGUSDT",
   "BTC/USDT": "BTCUSDT",
   "ETH/USDT": "ETHUSDT",
   "EUR/USD": "EURUSDT",
@@ -63,16 +62,40 @@ function useLiveTicker(): TickerRow[] {
   React.useEffect(() => {
     let alive = true;
     const symbols = Object.values(BINANCE_MAP);
+
+    const fetchGold = async (): Promise<{ price: number; pct: number } | null> => {
+      try {
+        const r = await fetch("https://api.gold-api.com/price/XAU");
+        if (!r.ok) return null;
+        const j = await r.json();
+        const price = Number(j.price);
+        if (!isFinite(price)) return null;
+        // gold-api doesn't return 24h change; derive from previous render
+        return { price, pct: NaN };
+      } catch {
+        return null;
+      }
+    };
+
     const fetchPrices = async () => {
       try {
-        const url = `https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(symbols))}`;
-        const res = await fetch(url);
-        if (!res.ok) return;
-        const data: Array<{ symbol: string; lastPrice: string; priceChangePercent: string }> = await res.json();
+        const [binRes, gold] = await Promise.all([
+          fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(symbols))}`).then((r) => (r.ok ? r.json() : null)),
+          fetchGold(),
+        ]);
         if (!alive) return;
+        const data: Array<{ symbol: string; lastPrice: string; priceChangePercent: string }> = Array.isArray(binRes) ? binRes : [];
         const bySym = new Map(data.map((d) => [d.symbol, d]));
         setRows((prev) =>
           prev.map(([label, price, delta]) => {
+            if (label === "XAU/USD" && gold) {
+              // approximate % change vs previous shown price
+              const prevN = parseFloat(price.replace(/,/g, ""));
+              const pct = isFinite(prevN) && prevN > 0 ? ((gold.price - prevN) / prevN) * 100 : 0;
+              const sign = pct >= 0 ? "+" : "";
+              const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
+              return [label, fmtPrice(gold.price), deltaOut];
+            }
             const bsym = BINANCE_MAP[label];
             if (!bsym) return [label, price, delta];
             const d = bySym.get(bsym);
@@ -96,6 +119,7 @@ function useLiveTicker(): TickerRow[] {
   }, []);
   return rows;
 }
+
 
 
 /* ---------- atoms ---------- */
