@@ -185,8 +185,9 @@ export function useSpeech() {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     if (voiceRef.current) u.voice = voiceRef.current;
-    u.rate = 1.02;
-    u.pitch = 0.95;
+    const preset = VOICE_PRESETS.find((p) => p.key === voicePresetRef.current) ?? VOICE_PRESETS[0];
+    u.rate = preset.rate;
+    u.pitch = preset.pitch;
     u.volume = 1;
     u.onstart = () => { setSpeaking(true); setWordPulse((n) => n + 1); };
     u.onboundary = (ev: any) => {
@@ -202,8 +203,29 @@ export function useSpeech() {
     setSpeaking(false);
   }, []);
 
+  const setVoicePreset = useCallback((key: VoicePresetKey) => {
+    voicePresetRef.current = key;
+    setVoicePresetState(key);
+    try { localStorage.setItem("jenvu.voicePreset", key); } catch { /* ignore */ }
+    try { (window as any).__jenvuPickVoice?.(); } catch { /* ignore */ }
+    // preview the chosen voice
+    try {
+      window.speechSynthesis.cancel();
+      const preset = VOICE_PRESETS.find((p) => p.key === key) ?? VOICE_PRESETS[0];
+      const u = new SpeechSynthesisUtterance(`Voice set to ${preset.label}.`);
+      const voices = window.speechSynthesis.getVoices();
+      const v = voices.find((vv) => preset.lang.test(vv.lang) && preset.match.test(vv.name))
+        || voices.find((vv) => preset.match.test(vv.name))
+        || voices.find((vv) => preset.lang.test(vv.lang));
+      if (v) u.voice = v;
+      u.rate = preset.rate; u.pitch = preset.pitch;
+      window.speechSynthesis.speak(u);
+    } catch { /* ignore */ }
+  }, []);
+
   return {
     listening, speaking, transcript, transcriptId, interim, supported, needsGesture, wordPulse,
+    voicePreset, setVoicePreset,
     startListening, stopListening, pauseListening, resumeIfWanted,
     speak, stopSpeaking, setTranscript,
     isContinuous: () => wantListeningRef.current,
