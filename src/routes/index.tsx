@@ -207,9 +207,6 @@ function Home() {
               <X className="h-4 w-4" />
             </button>
           </div>
-          <p className="text-center text-[11px] text-neutral-400 mt-2">
-            GoldGPT can make mistakes. Verify important trades.
-          </p>
         </div>
       </div>
     </div>
