@@ -15,7 +15,7 @@ export function useSpeech() {
   const wantListeningRef = useRef(false);
   const startingRef = useRef(false);
   const pausedRef = useRef(false);
-  const restartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const restartTimerRef = useRef<number | null>(null);
 
   const safeStart = useCallback((deferred = false) => {
     if (startingRef.current) return;

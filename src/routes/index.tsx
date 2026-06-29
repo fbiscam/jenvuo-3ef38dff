@@ -201,6 +201,14 @@ function Home() {
         <div className="flex flex-col items-center gap-6 flex-1">
           <CloudOrb status={status} />
           <div className="text-center min-h-[2.5rem]">
+            {speech.needsGesture && (
+              <button
+                onClick={toggleMic}
+                className="rounded-full bg-black px-4 py-2 text-sm font-medium text-white shadow-lg hover:bg-neutral-800"
+              >
+                Tap to enable voice
+              </button>
+            )}
             {speech.interim && (
               <div className="mt-2 text-sm text-neutral-400 italic max-w-md">{speech.interim}</div>
             )}
