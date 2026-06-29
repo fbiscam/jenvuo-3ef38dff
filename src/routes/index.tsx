@@ -251,9 +251,9 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
           className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
           style={{
             background:
-              "radial-gradient(circle at 50% 30%, #f0f9ff 0%, #bae6fd 35%, #60a5fa 75%, #1d4ed8 100%)",
+              "radial-gradient(circle at 50% 30%, #d1fae5 0%, #6ee7b7 35%, #059669 75%, #064e3b 100%)",
             boxShadow:
-              "inset -10px -20px 50px rgba(30,58,138,0.55), inset 12px 14px 40px rgba(255,255,255,0.55), 0 10px 40px -10px rgba(59,130,246,0.5)",
+              "inset -10px -20px 50px rgba(6,78,59,0.55), inset 12px 14px 40px rgba(255,255,255,0.45), 0 10px 40px -10px rgba(16,185,129,0.5)",
           }}
         >
           {/* drifting cloud layer 1 */}
@@ -262,7 +262,7 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
             style={{
               animationDuration: status === "speaking" ? "8s" : status === "thinking" ? "5s" : "20s",
               background:
-                "radial-gradient(45% 30% at 30% 35%, rgba(255,255,255,0.9), transparent 60%), radial-gradient(40% 28% at 70% 55%, rgba(255,255,255,0.75), transparent 65%), radial-gradient(35% 25% at 50% 80%, rgba(191,219,254,0.85), transparent 60%)",
+                "radial-gradient(45% 30% at 30% 35%, rgba(236,253,245,0.9), transparent 60%), radial-gradient(40% 28% at 70% 55%, rgba(209,250,229,0.75), transparent 65%), radial-gradient(35% 25% at 50% 80%, rgba(167,243,208,0.85), transparent 60%)",
               filter: "blur(8px)",
               mixBlendMode: "screen",
             }}
@@ -275,18 +275,18 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
               animationDuration: status === "speaking" ? "11s" : "26s",
               animationDirection: "reverse",
               background:
-                "radial-gradient(40% 28% at 60% 30%, rgba(255,255,255,0.85), transparent 60%), radial-gradient(35% 22% at 25% 65%, rgba(219,234,254,0.8), transparent 65%), radial-gradient(45% 30% at 75% 75%, rgba(147,197,253,0.7), transparent 60%)",
+                "radial-gradient(40% 28% at 60% 30%, rgba(236,253,245,0.85), transparent 60%), radial-gradient(35% 22% at 25% 65%, rgba(209,250,229,0.8), transparent 65%), radial-gradient(45% 30% at 75% 75%, rgba(110,231,183,0.7), transparent 60%)",
               filter: "blur(10px)",
               mixBlendMode: "screen",
             }}
           />
 
-          {/* deep shadow base (gives the dark blue bottom) */}
+          {/* deep shadow base */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(circle at 50% 110%, rgba(29,78,216,0.7), transparent 55%)",
+                "radial-gradient(circle at 50% 110%, rgba(6,78,59,0.75), transparent 55%)",
               mixBlendMode: "multiply",
             }}
           />
@@ -294,18 +294,19 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
           {/* glossy top highlight */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_20%,rgba(255,255,255,0.7),transparent_50%)]" />
 
-          {/* speaking pulse — shadow that moves as AI talks */}
+          {/* speaking pulse */}
           {status === "speaking" && (
             <div
               className="absolute inset-0 animate-pulse"
               style={{
                 background:
-                  "radial-gradient(circle at 50% 70%, rgba(30,64,175,0.55), transparent 55%)",
+                  "radial-gradient(circle at 50% 70%, rgba(6,95,70,0.6), transparent 55%)",
                 animationDuration: "0.9s",
                 mixBlendMode: "multiply",
               }}
             />
           )}
+
 
           {/* thinking shimmer sweep */}
           {status === "thinking" && (
