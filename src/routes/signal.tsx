@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { getSignalPlan, type SignalPlan } from "@/lib/gold-analysis.functions";
+import { getSignalPlan, getLiveTick, type SignalPlan } from "@/lib/gold-analysis.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
@@ -90,6 +91,18 @@ function SignalPage() {
       setPlaying(true);
       abortRef.current = false;
 
+      // Pre-draw all locally-detected zones (Premium/Discount/OTE/Liquidity/EQH/EQL)
+      // — these are static context, drawn at start, not narrated.
+      const autoTypes = new Set([
+        "premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql",
+      ]);
+      for (const m of p.markings) {
+        if (autoTypes.has(m.type)) {
+          if (m.tf === "htf") htfRef.current?.drawMarking(m);
+          else ltfRef.current?.drawMarking(m);
+        }
+      }
+
       try {
         await speakWait(p.intro);
         for (let i = 0; i < p.narration.length; i++) {
@@ -157,6 +170,73 @@ function SignalPage() {
     speech.stopSpeaking();
     setPlaying(false);
   };
+
+  /* ---------- LIVE TRADE TRACKER ---------- */
+  const fetchTick = useServerFn(getLiveTick);
+  const [livePrice, setLivePrice] = useState<number | null>(null);
+  const [trackerStatus, setTrackerStatus] = useState<"PENDING" | "RUNNING" | "WIN" | "LOSS">("PENDING");
+  const [sparkline, setSparkline] = useState<number[]>([]);
+  const eventsFiredRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!plan || plan.trade.direction === "WAIT") return;
+    eventsFiredRef.current = new Set();
+    setTrackerStatus("PENDING");
+    setSparkline([plan.currentPrice]);
+    setLivePrice(plan.currentPrice);
+
+    let stopped = false;
+    const poll = async () => {
+      try {
+        const tick = await fetchTick({ data: { symbol: plan.instrument.symbol } });
+        if (stopped) return;
+        setLivePrice(tick.price);
+        setSparkline((arr) => [...arr.slice(-59), tick.price]);
+
+        const tr = plan.trade;
+        const dir = tr.direction;
+        const fire = (key: string, msg: string) => {
+          if (eventsFiredRef.current.has(key)) return;
+          eventsFiredRef.current.add(key);
+          toast.success(msg);
+          speech.speak(msg);
+        };
+        // Entry fill
+        const tol = plan.currentPrice * 0.0003;
+        if (dir === "BUY") {
+          if (tick.price <= tr.entry + tol && trackerStatus === "PENDING") {
+            fire("filled", `Entry filled at ${tick.price.toFixed(plan.instrument.decimals)}`);
+            setTrackerStatus("RUNNING");
+          }
+          if (tick.price <= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stopped = true; }
+          if (tick.price >= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stopped = true; }
+        } else if (dir === "SELL") {
+          if (tick.price >= tr.entry - tol && trackerStatus === "PENDING") {
+            fire("filled", `Entry filled at ${tick.price.toFixed(plan.instrument.decimals)}`);
+            setTrackerStatus("RUNNING");
+          }
+          if (tick.price >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stopped = true; }
+          if (tick.price <= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stopped = true; }
+        }
+      } catch {
+        // silent — keep last price
+      }
+    };
+    poll();
+    const id = setInterval(poll, 15000);
+    return () => { stopped = true; clearInterval(id); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan]);
+
+  /* ---------- R-MULTIPLE ---------- */
+  const rMultiple = useMemo(() => {
+    if (!plan || !livePrice || plan.trade.direction === "WAIT") return 0;
+    const { entry, sl } = plan.trade;
+    const risk = Math.abs(entry - sl);
+    if (!risk) return 0;
+    const pnl = plan.trade.direction === "BUY" ? livePrice - entry : entry - livePrice;
+    return pnl / risk;
+  }, [livePrice, plan]);
 
   if (!authReady) return <div className="fixed inset-0 bg-white" />;
 
@@ -287,8 +367,33 @@ function SignalPage() {
               </div>
             </div>
 
-            {/* CENTER — charts */}
+            {/* CENTER — charts + multi-tf strip */}
             <div className="lg:col-span-8 bg-white flex flex-col gap-px">
+              {/* Multi-TF alignment strip */}
+              {plan && (
+                <div className="bg-white px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-3 border-b border-zinc-100">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-500 mr-1`}>
+                      MTF
+                    </span>
+                    {plan.multiTf.map((b) => (
+                      <TfPill key={b.tf} tfBias={b} />
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+                      {plan.alignmentLabel}
+                    </span>
+                    <div className="w-24 h-1.5 bg-gradient-to-r from-rose-100 via-zinc-100 to-emerald-100 rounded-full relative overflow-hidden">
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 w-2 h-3 bg-zinc-900 rounded-sm"
+                        style={{ left: `${Math.max(0, Math.min(96, plan.alignmentScore))}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
@@ -328,6 +433,15 @@ function SignalPage() {
                 <div className="rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px]">
                   {plan ? <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF" /> : <ChartSkeleton />}
                 </div>
+                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
+                  <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
+                  <LegendDot color="bg-sky-500/70" label="OB" />
+                  <LegendDot color="bg-amber-500/70" label="Liquidity" />
+                  <LegendDot color="bg-violet-500/70" label="EQH/EQL" />
+                  <LegendDot color="bg-yellow-400/70" label="OTE" />
+                  <LegendDot color="bg-rose-400/40" label="Premium" />
+                  <LegendDot color="bg-emerald-400/40" label="Discount" />
+                </div>
               </div>
             </div>
 
@@ -336,6 +450,21 @@ function SignalPage() {
               <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
                 Intelligence Dashboard
               </h3>
+
+              {/* A+ Setup Score */}
+              {plan && <SetupScoreCard plan={plan} />}
+
+              {/* Live trade tracker */}
+              {plan && t && t.direction !== "WAIT" && (
+                <TradeTrackerCard
+                  plan={plan}
+                  livePrice={livePrice}
+                  rMultiple={rMultiple}
+                  status={trackerStatus}
+                  sparkline={sparkline}
+                />
+              )}
+
 
               {/* News risk */}
               {plan && (
@@ -470,3 +599,211 @@ function ChartSkeleton() {
     </div>
   );
 }
+
+function LegendDot({ color, label }: { color: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className={cn("h-1.5 w-1.5 rounded-full", color)} />
+      {label}
+    </span>
+  );
+}
+
+function TfPill({ tfBias }: { tfBias: SignalPlan["multiTf"][number] }) {
+  const Icon = tfBias.bias === "bullish" ? TrendingUp : tfBias.bias === "bearish" ? TrendingDown : Minus;
+  const tone =
+    tfBias.bias === "bullish" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+    tfBias.bias === "bearish" ? "bg-rose-50 text-rose-700 border-rose-200" :
+    "bg-zinc-50 text-zinc-600 border-zinc-200";
+  return (
+    <motion.span
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={cn(
+        "inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-semibold tracking-wider uppercase",
+        MONO, tone,
+      )}
+    >
+      <span className="opacity-70">{tfBias.tf}</span>
+      <Icon className="h-3 w-3" />
+      <span className="tabular-nums opacity-60">{tfBias.score}</span>
+    </motion.span>
+  );
+}
+
+function SetupScoreCard({ plan }: { plan: SignalPlan }) {
+  const gradeTone =
+    plan.setupGrade === "A+" ? "from-emerald-500 to-teal-500" :
+    plan.setupGrade === "A" ? "from-sky-500 to-indigo-500" :
+    plan.setupGrade === "B" ? "from-amber-500 to-orange-500" :
+    "from-rose-500 to-rose-700";
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-lg border border-zinc-100 bg-white p-3 space-y-3 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+    >
+      <div className="flex items-center justify-between">
+        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>A+ Setup Score</span>
+        <span className={`text-[10px] ${MONO} tabular-nums text-zinc-500`}>{plan.setupScore}/100</span>
+      </div>
+      <div className="flex items-center gap-3">
+        <div className={cn("h-12 w-12 rounded-lg bg-gradient-to-br grid place-items-center text-white font-black tracking-tight", gradeTone)}>
+          <span className="text-xl leading-none">{plan.setupGrade}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${plan.setupScore}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className={cn("h-full bg-gradient-to-r", gradeTone)}
+            />
+          </div>
+          <p className="text-[10px] text-zinc-500 mt-1 leading-tight">
+            {plan.setupGrade === "A+" ? "Institutional-grade alignment." :
+             plan.setupGrade === "A" ? "Strong A-class setup." :
+             plan.setupGrade === "B" ? "Decent setup — manage risk tighter." :
+             "Lower conviction — consider standing aside."}
+          </p>
+        </div>
+      </div>
+      <ul className="space-y-1">
+        {plan.setupChecks.map((c) => (
+          <li
+            key={c.key}
+            title={c.reason}
+            className="flex items-center gap-2 text-[11px] py-0.5"
+          >
+            {c.pass === true ? (
+              <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+            ) : c.pass === false ? (
+              <X className="h-3 w-3 text-rose-500 shrink-0" />
+            ) : (
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-300 ml-[3px] mr-[3px] shrink-0" />
+            )}
+            <span className={cn("flex-1 truncate", c.pass === false ? "text-zinc-500" : "text-zinc-800")}>
+              {c.label}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </motion.div>
+  );
+}
+
+function TradeTrackerCard({
+  plan, livePrice, rMultiple, status, sparkline,
+}: {
+  plan: SignalPlan;
+  livePrice: number | null;
+  rMultiple: number;
+  status: "PENDING" | "RUNNING" | "WIN" | "LOSS";
+  sparkline: number[];
+}) {
+  const dec = plan.instrument.decimals;
+  const t = plan.trade;
+  const range = Math.abs(t.tp - t.sl);
+  const slLeft = t.direction === "BUY" ? t.sl : t.tp;
+  const tpRight = t.direction === "BUY" ? t.tp : t.sl;
+  const pct = livePrice != null
+    ? Math.max(0, Math.min(100, ((livePrice - slLeft) / (tpRight - slLeft)) * 100))
+    : 50;
+  const entryPct = Math.max(0, Math.min(100, ((t.entry - slLeft) / (tpRight - slLeft)) * 100));
+
+  const statusTone =
+    status === "WIN" ? "bg-emerald-100 text-emerald-700 border-emerald-200" :
+    status === "LOSS" ? "bg-rose-100 text-rose-700 border-rose-200" :
+    status === "RUNNING" ? "bg-sky-100 text-sky-700 border-sky-200" :
+    "bg-zinc-100 text-zinc-700 border-zinc-200";
+
+  // Mini sparkline path
+  const sparkPath = useMemo(() => {
+    if (sparkline.length < 2) return "";
+    const min = Math.min(...sparkline);
+    const max = Math.max(...sparkline);
+    const r = max - min || 1;
+    return sparkline
+      .map((v, i) => {
+        const x = (i / (sparkline.length - 1)) * 100;
+        const y = 20 - ((v - min) / r) * 18 - 1;
+        return `${i === 0 ? "M" : "L"}${x.toFixed(2)},${y.toFixed(2)}`;
+      })
+      .join(" ");
+  }, [sparkline]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-lg border border-zinc-100 bg-white p-3 space-y-3 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+    >
+      <div className="flex items-center justify-between">
+        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500 flex items-center gap-1.5`}>
+          <Activity className="h-3 w-3" /> Live Tracker
+        </span>
+        <span className={cn("text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded border", MONO, statusTone)}>
+          {status}
+        </span>
+      </div>
+
+      <div className="flex items-end justify-between">
+        <div>
+          <div className={`text-[10px] ${MONO} text-zinc-500 uppercase tracking-widest`}>Live</div>
+          <div className={`text-base font-bold tabular-nums ${MONO}`}>
+            {livePrice != null ? livePrice.toFixed(dec) : "—"}
+          </div>
+        </div>
+        <div className="text-right">
+          <div className={`text-[10px] ${MONO} text-zinc-500 uppercase tracking-widest`}>R-multiple</div>
+          <div className={cn(
+            "text-base font-bold tabular-nums",
+            rMultiple > 0 ? "text-emerald-600" : rMultiple < 0 ? "text-rose-600" : "text-zinc-700",
+          )}>
+            {rMultiple > 0 ? "+" : ""}{rMultiple.toFixed(2)}R
+          </div>
+        </div>
+      </div>
+
+      {/* SL — Entry — TP bar */}
+      <div className="space-y-1.5">
+        <div className="relative h-2 bg-gradient-to-r from-rose-100 via-zinc-100 to-emerald-100 rounded-full">
+          <div
+            className="absolute top-1/2 -translate-y-1/2 h-3 w-px bg-zinc-400"
+            style={{ left: `${entryPct}%` }}
+          />
+          <motion.div
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-3 w-3 rounded-full bg-zinc-900 ring-2 ring-white shadow"
+            animate={{ left: `${pct}%` }}
+            transition={{ type: "spring", stiffness: 80, damping: 18 }}
+          />
+        </div>
+        <div className={`flex justify-between text-[9px] ${MONO} text-zinc-500 uppercase tracking-wider`}>
+          <span>SL {t.sl.toFixed(dec)}</span>
+          <span>E {t.entry.toFixed(dec)}</span>
+          <span>TP {t.tp.toFixed(dec)}</span>
+        </div>
+      </div>
+
+      {/* Sparkline */}
+      {sparkPath && (
+        <svg viewBox="0 0 100 20" className="w-full h-8" preserveAspectRatio="none">
+          <path
+            d={sparkPath}
+            fill="none"
+            stroke={rMultiple >= 0 ? "#10b981" : "#ef4444"}
+            strokeWidth="1.2"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      )}
+
+      {rMultiple >= 1 && status === "RUNNING" && (
+        <div className="text-[10px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
+          Suggestion: move SL to break-even — 1R secured.
+        </div>
+      )}
+    </motion.div>
+  );
+}
+

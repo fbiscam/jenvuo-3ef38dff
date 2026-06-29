@@ -356,6 +356,10 @@ export type Marking =
   | { type: "liquidity"; tf: "htf" | "ltf"; price: number; side: "buy" | "sell"; label: string }
   | { type: "bos" | "choch"; tf: "htf" | "ltf"; fromTime: number; toTime: number; price: number; kind: "bullish" | "bearish"; label: string }
   | { type: "zone"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "supply" | "demand"; label: string }
+  | { type: "eqh" | "eql"; tf: "htf" | "ltf"; price: number; label: string }
+  | { type: "premiumZone" | "discountZone"; tf: "htf" | "ltf"; priceLow: number; priceHigh: number; label: string }
+  | { type: "oteZone"; tf: "htf" | "ltf"; priceLow: number; priceHigh: number; kind: "bullish" | "bearish"; label: string }
+  | { type: "breaker"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "bullish" | "bearish"; label: string }
   | { type: "entry" | "sl" | "tp"; tf: "htf" | "ltf"; price: number; label: string };
 
 export type NewsItem = {
@@ -369,6 +373,12 @@ export type NewsItem = {
 };
 
 export type KeyLevel = { label: string; price: number; kind: "resistance" | "support" | "pivot" | "premium" | "discount" | "equilibrium" };
+
+export type TfBias = { tf: "4H" | "1H" | "15M" | "5M"; bias: "bullish" | "bearish" | "neutral"; score: number; label: string };
+
+export type SetupCheck = { key: string; label: string; pass: boolean | null; reason: string };
+
+export type LiveTick = { price: number; t: number };
 
 export type SignalPlan = {
   htfBias: "bullish" | "bearish" | "neutral";
@@ -396,12 +406,17 @@ export type SignalPlan = {
     warning: string;
     events: NewsItem[];
   };
+  multiTf: TfBias[];
+  alignmentScore: number;
+  alignmentLabel: string;
+  setupScore: number;
+  setupGrade: "A+" | "A" | "B" | "C";
+  setupChecks: SetupCheck[];
   generatedAt: string;
   htfCandles: CandleDTO[];
   ltfCandles: CandleDTO[];
   currentPrice: number;
   instrument: { symbol: string; display: string; kind: InstrumentKind; decimals: number };
-
 };
 
 
@@ -454,6 +469,200 @@ async function fetchGoldNewsInline(): Promise<NewsItem[]> {
   }
 }
 
+// ============================================================
+// LOCAL DETECTORS — multi-TF bias, liquidity, EQH/EQL, OTE, etc.
+// ============================================================
+
+function ema(values: number[], period: number): number {
+  if (values.length === 0) return 0;
+  const k = 2 / (period + 1);
+  let e = values[0];
+  for (let i = 1; i < values.length; i++) e = values[i] * k + e * (1 - k);
+  return e;
+}
+
+function computeTfBias(candles: Candle[], tfLabel: TfBias["tf"]): TfBias {
+  if (candles.length < 20) return { tf: tfLabel, bias: "neutral", score: 50, label: "Insufficient" };
+  const recent = candles.slice(-60);
+  const closes = recent.map((c) => c.c);
+  const emaNow = ema(closes, 20);
+  const emaPrev = ema(closes.slice(0, Math.max(20, closes.length - 10)), 20);
+  const slope = emaNow - emaPrev;
+  const seg = recent.slice(-20);
+  let up = 0, down = 0;
+  for (let i = 1; i < seg.length; i++) {
+    if (seg[i].h > seg[i - 1].h && seg[i].l > seg[i - 1].l) up++;
+    else if (seg[i].h < seg[i - 1].h && seg[i].l < seg[i - 1].l) down++;
+  }
+  const highs = recent.map((c) => c.h);
+  const lows = recent.map((c) => c.l);
+  const eq = (Math.max(...highs) + Math.min(...lows)) / 2;
+  const last = recent[recent.length - 1].c;
+  let score = 50;
+  if (slope > 0) score += 18; else if (slope < 0) score -= 18;
+  score += (up - down) * 2;
+  if (last > eq) score += 6; else score -= 6;
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const bias: TfBias["bias"] = score >= 60 ? "bullish" : score <= 40 ? "bearish" : "neutral";
+  const label = score >= 75 ? "Strong" : score >= 60 ? "Mild" : score >= 41 ? "Mixed" : score >= 25 ? "Mild" : "Strong";
+  return { tf: tfLabel, bias, score, label: `${label} ${bias}` };
+}
+
+function detectEqualLevels(candles: Candle[], tf: "htf" | "ltf", decimals: number): Marking[] {
+  if (candles.length < 30) return [];
+  const tol = candles[candles.length - 1].c * 0.0008; // 0.08%
+  const recent = candles.slice(-80);
+  const highs: { i: number; v: number }[] = [];
+  const lows: { i: number; v: number }[] = [];
+  for (let i = 2; i < recent.length - 2; i++) {
+    if (recent[i].h > recent[i - 1].h && recent[i].h > recent[i - 2].h && recent[i].h > recent[i + 1].h && recent[i].h > recent[i + 2].h) {
+      highs.push({ i, v: recent[i].h });
+    }
+    if (recent[i].l < recent[i - 1].l && recent[i].l < recent[i - 2].l && recent[i].l < recent[i + 1].l && recent[i].l < recent[i + 2].l) {
+      lows.push({ i, v: recent[i].l });
+    }
+  }
+  const out: Marking[] = [];
+  for (let i = 0; i < highs.length; i++) {
+    for (let j = i + 1; j < highs.length; j++) {
+      if (Math.abs(highs[i].v - highs[j].v) <= tol) {
+        out.push({ type: "eqh", tf, price: +((highs[i].v + highs[j].v) / 2).toFixed(decimals), label: "EQH" });
+        break;
+      }
+    }
+  }
+  for (let i = 0; i < lows.length; i++) {
+    for (let j = i + 1; j < lows.length; j++) {
+      if (Math.abs(lows[i].v - lows[j].v) <= tol) {
+        out.push({ type: "eql", tf, price: +((lows[i].v + lows[j].v) / 2).toFixed(decimals), label: "EQL" });
+        break;
+      }
+    }
+  }
+  return out.slice(0, 4);
+}
+
+function detectLiquidityPools(candles: Candle[], tf: "htf" | "ltf"): Marking[] {
+  if (candles.length < 30) return [];
+  const recent = candles.slice(-60);
+  const highs = recent.map((c) => c.h);
+  const lows = recent.map((c) => c.l);
+  const sh = Math.max(...highs);
+  const sl = Math.min(...lows);
+  return [
+    { type: "liquidity", tf, price: sh, side: "buy", label: "BSL — buy-side liquidity" },
+    { type: "liquidity", tf, price: sl, side: "sell", label: "SSL — sell-side liquidity" },
+  ];
+}
+
+function buildPremiumDiscountAndOTE(candles: Candle[], tf: "htf" | "ltf", lastClose: number): Marking[] {
+  if (candles.length < 30) return [];
+  const recent = candles.slice(-80);
+  const sh = Math.max(...recent.map((c) => c.h));
+  const sl = Math.min(...recent.map((c) => c.l));
+  const eq = (sh + sl) / 2;
+  const range = sh - sl;
+  const trendUp = lastClose > eq;
+  const oteLow = trendUp ? sl + range * 0.62 : sl + range * 0.21;
+  const oteHigh = trendUp ? sl + range * 0.79 : sl + range * 0.38;
+  return [
+    { type: "premiumZone", tf, priceLow: eq, priceHigh: sh, label: "Premium" },
+    { type: "discountZone", tf, priceLow: sl, priceHigh: eq, label: "Discount" },
+    { type: "oteZone", tf, priceLow: Math.min(oteLow, oteHigh), priceHigh: Math.max(oteLow, oteHigh), kind: trendUp ? "bullish" : "bearish", label: "OTE 62-79%" },
+  ];
+}
+
+function computeSetupScore(args: {
+  trade: SignalPlan["trade"];
+  htfBias: SignalPlan["htfBias"];
+  killzone: string;
+  markings: Marking[];
+  lastPrice: number;
+  htfEq: number;
+  imminentHighNews: boolean;
+}): { score: number; grade: SignalPlan["setupGrade"]; checks: SetupCheck[] } {
+  const { trade, htfBias, killzone, markings, lastPrice, htfEq, imminentHighNews } = args;
+  const dir = trade.direction;
+  const checks: SetupCheck[] = [];
+
+  const biasAligned =
+    (dir === "BUY" && htfBias === "bullish") ||
+    (dir === "SELL" && htfBias === "bearish");
+  checks.push({
+    key: "bias", label: "HTF bias aligned",
+    pass: dir === "WAIT" ? null : biasAligned,
+    reason: dir === "WAIT" ? "Trade on hold" : biasAligned ? `${htfBias} HTF supports ${dir}` : `HTF is ${htfBias}, trade is ${dir}`,
+  });
+
+  const inKillzone = /Killzone/i.test(killzone);
+  checks.push({
+    key: "killzone", label: "Inside killzone",
+    pass: inKillzone, reason: inKillzone ? killzone : `Currently ${killzone}`,
+  });
+
+  const hasLiquiditySweep = markings.some((m) => /sweep|grab|liquidity/i.test((m as any).label || ""));
+  checks.push({
+    key: "sweep", label: "Liquidity sweep present",
+    pass: hasLiquiditySweep, reason: hasLiquiditySweep ? "Sweep identified" : "No clean sweep detected",
+  });
+
+  const hasFvg = markings.some((m) => m.type === "fvg" && m.tf === "ltf");
+  checks.push({
+    key: "fvg", label: "LTF FVG in entry zone",
+    pass: hasFvg, reason: hasFvg ? "LTF FVG marked" : "No LTF FVG",
+  });
+
+  const oteZone = markings.find((m) => m.type === "oteZone");
+  const inOTE = !!(oteZone && trade.entry >= (oteZone as any).priceLow && trade.entry <= (oteZone as any).priceHigh);
+  checks.push({
+    key: "ote", label: "Entry inside OTE 62-79%",
+    pass: dir === "WAIT" ? null : inOTE,
+    reason: inOTE ? "Entry within optimal Fib zone" : "Entry outside 62-79% range",
+  });
+
+  const rrGood = trade.rr >= 2;
+  checks.push({
+    key: "rr", label: "RR ≥ 2.0",
+    pass: dir === "WAIT" ? null : rrGood,
+    reason: `R:R ${trade.rr.toFixed(2)}`,
+  });
+
+  const inPremium = lastPrice > htfEq;
+  const pdAligned = (dir === "BUY" && !inPremium) || (dir === "SELL" && inPremium);
+  checks.push({
+    key: "pd", label: "Premium / Discount alignment",
+    pass: dir === "WAIT" ? null : pdAligned,
+    reason: dir === "WAIT" ? "—" : pdAligned ? `Trading from ${inPremium ? "premium" : "discount"}` : `Wrong side of equilibrium`,
+  });
+
+  checks.push({
+    key: "news", label: "News window clear",
+    pass: !imminentHighNews,
+    reason: imminentHighNews ? "High-impact event within 60m" : "No imminent high-impact news",
+  });
+
+  const counted = checks.filter((c) => c.pass !== null);
+  const passed = counted.filter((c) => c.pass).length;
+  const score = counted.length ? Math.round((passed / counted.length) * 100) : 0;
+  const grade: SignalPlan["setupGrade"] = score >= 85 ? "A+" : score >= 70 ? "A" : score >= 55 ? "B" : "C";
+  return { score, grade, checks };
+}
+
+export const getLiveTick = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { symbol?: string };
+    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
+  })
+  .handler(async ({ data }) => {
+    const inst = resolveInstrument(data.symbol);
+    const candles = await fetchInstrumentCandles(inst, "1m").catch(() => [] as Candle[]);
+    const last = candles[candles.length - 1];
+    if (!last) throw new Error("Live tick unavailable");
+    const tick: LiveTick = { price: last.c, t: last.t };
+    return tick;
+  });
+
+
 export const getSignalPlan = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
     const obj = (d ?? {}) as { symbol?: string };
@@ -465,10 +674,12 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
     const inst = resolveInstrument(data.symbol);
 
-    const [htfRaw, ltfRaw, news] = await Promise.all([
+    const [htfRaw, ltfRaw, news, h4Raw, m5Raw] = await Promise.all([
       fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "15m").catch(() => [] as Candle[]),
       inst.needsUsdNews ? fetchGoldNewsInline() : Promise.resolve([] as NewsItem[]),
+      fetchInstrumentCandles(inst, "4h").catch(() => [] as Candle[]),
+      fetchInstrumentCandles(inst, "5m").catch(() => [] as Candle[]),
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
       throw new Error(`Live ${inst.display} feed unavailable. Try again in a moment.`);
@@ -669,9 +880,57 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       { label: "HTF Swing Low", price: swingLow, kind: "support" },
     ];
 
+    // ============ LOCAL ENRICHMENTS ============
+    const aiMarkings: Marking[] = Array.isArray(parsed.markings) ? parsed.markings : [];
+    const pdOte = buildPremiumDiscountAndOTE(htf, "htf", last.c);
+    const eqHL = [...detectEqualLevels(htf, "htf", dec), ...detectEqualLevels(ltf, "ltf", dec)];
+    const liqPools = [...detectLiquidityPools(htf, "htf"), ...detectLiquidityPools(ltf, "ltf")];
+    const allMarkings: Marking[] = [...pdOte, ...liqPools, ...eqHL, ...aiMarkings];
+
+    const htfBiasLocal: SignalPlan["htfBias"] =
+      parsed.htfBias === "bearish" ? "bearish" : parsed.htfBias === "bullish" ? "bullish" : "neutral";
+
+    const tradeFromAi = {
+      direction: (parsed?.trade?.direction === "SELL" ? "SELL" : parsed?.trade?.direction === "BUY" ? "BUY" : "WAIT") as "BUY" | "SELL" | "WAIT",
+      entry: Number(parsed?.trade?.entry ?? 0),
+      sl: Number(parsed?.trade?.sl ?? 0),
+      tp: Number(parsed?.trade?.tp ?? 0),
+      rr: Number(parsed?.trade?.rr ?? 0),
+      confidence: Math.max(0, Math.min(100, Number(parsed?.trade?.confidence ?? 0))),
+      summary: String(parsed?.trade?.summary ?? ""),
+      invalidation: String(parsed?.trade?.invalidation ?? ""),
+    };
+
+    // Multi-TF bias
+    const multiTf: TfBias[] = [
+      computeTfBias(h4Raw.length ? h4Raw : htf, "4H"),
+      computeTfBias(htf, "1H"),
+      computeTfBias(ltf, "15M"),
+      computeTfBias(m5Raw.length ? m5Raw : ltf, "5M"),
+    ];
+    const avgScore = Math.round(multiTf.reduce((s, b) => s + b.score, 0) / multiTf.length);
+    const alignmentScore = avgScore;
+    const alignmentLabel =
+      avgScore >= 70 ? "Strong Bullish Alignment" :
+      avgScore >= 58 ? "Mild Bullish Alignment" :
+      avgScore <= 30 ? "Strong Bearish Alignment" :
+      avgScore <= 42 ? "Mild Bearish Alignment" :
+      "Mixed / Choppy";
+
+    // Setup score
+    const { score: setupScore, grade: setupGrade, checks: setupChecks } = computeSetupScore({
+      trade: tradeFromAi,
+      htfBias: htfBiasLocal,
+      killzone,
+      markings: allMarkings,
+      lastPrice: last.c,
+      htfEq: equilibrium,
+      imminentHighNews: !!imminentHigh,
+    });
+
     const plan: SignalPlan = {
-      htfBias: parsed.htfBias === "bearish" ? "bearish" : parsed.htfBias === "bullish" ? "bullish" : "neutral",
-      intro: String(parsed.intro ?? "Let's break down the live gold chart together."),
+      htfBias: htfBiasLocal,
+      intro: String(parsed.intro ?? "Let's break down the live chart together."),
       htfNarrative: String(parsed.htfNarrative ?? ""),
       ltfNarrative: String(parsed.ltfNarrative ?? ""),
       confluences: Array.isArray(parsed.confluences) ? parsed.confluences.map(String).slice(0, 12) : [],
@@ -689,20 +948,17 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
             tf: n?.tf === "htf" ? "htf" : "ltf",
           }))
         : [],
-      markings: Array.isArray(parsed.markings) ? parsed.markings : [],
-      trade: {
-        direction: parsed?.trade?.direction === "SELL" ? "SELL" : parsed?.trade?.direction === "BUY" ? "BUY" : "WAIT",
-        entry: Number(parsed?.trade?.entry ?? 0),
-        sl: Number(parsed?.trade?.sl ?? 0),
-        tp: Number(parsed?.trade?.tp ?? 0),
-        rr: Number(parsed?.trade?.rr ?? 0),
-        confidence: Math.max(0, Math.min(100, Number(parsed?.trade?.confidence ?? 0))),
-        summary: String(parsed?.trade?.summary ?? ""),
-        invalidation: String(parsed?.trade?.invalidation ?? ""),
-      },
+      markings: allMarkings,
+      trade: tradeFromAi,
       session,
       killzone,
       newsRisk: { severity: newsSeverity, warning: newsWarning, events: upcomingNews },
+      multiTf,
+      alignmentScore,
+      alignmentLabel,
+      setupScore,
+      setupGrade,
+      setupChecks,
       generatedAt: new Date().toISOString(),
       htfCandles: htf.map(toDTO),
       ltfCandles: ltf.map(toDTO),
