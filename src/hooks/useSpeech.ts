@@ -11,6 +11,22 @@ export function useSpeech() {
   const recognitionRef = useRef<SR | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const wantListeningRef = useRef(false);
+  const startingRef = useRef(false);
+
+  const safeStart = useCallback(() => {
+    if (startingRef.current) return;
+    startingRef.current = true;
+    window.setTimeout(() => {
+      try {
+        recognitionRef.current?.start();
+        setListening(true);
+      } catch {
+        /* already started or permission pending */
+      } finally {
+        startingRef.current = false;
+      }
+    }, 120);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -23,7 +39,7 @@ export function useSpeech() {
     const rec = new SpeechRecognition();
     rec.continuous = true;
     rec.interimResults = true;
-    rec.lang = "en-US";
+    rec.lang = "ur-PK";
     rec.onresult = (e: any) => {
       let finalText = "";
       let interimText = "";
@@ -42,12 +58,7 @@ export function useSpeech() {
       setListening(false);
       // auto-restart if user still wants to listen (continuous mode)
       if (wantListeningRef.current) {
-        try {
-          rec.start();
-          setListening(true);
-        } catch {
-          /* ignore */
-        }
+        safeStart();
       }
     };
     rec.onerror = (e: any) => {
@@ -80,13 +91,8 @@ export function useSpeech() {
     wantListeningRef.current = true;
     setTranscript("");
     setInterim("");
-    try {
-      recognitionRef.current?.start();
-      setListening(true);
-    } catch {
-      /* already started */
-    }
-  }, []);
+    safeStart();
+  }, [safeStart]);
 
   const stopListening = useCallback(() => {
     wantListeningRef.current = false;
@@ -102,12 +108,9 @@ export function useSpeech() {
 
   const resumeIfWanted = useCallback(() => {
     if (wantListeningRef.current) {
-      try {
-        recognitionRef.current?.start();
-        setListening(true);
-      } catch { /* ignore */ }
+      safeStart();
     }
-  }, []);
+  }, [safeStart]);
 
   const speak = useCallback((text: string, onDone?: () => void) => {
     if (typeof window === "undefined" || !text) return;
