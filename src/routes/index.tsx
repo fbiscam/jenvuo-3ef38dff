@@ -418,6 +418,183 @@ function HomePage() {
         </div>
       </section>
 
+      {/* HOW IT WORKS */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <SectionLabel>Workflow</SectionLabel>
+              <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight">
+                Four steps. One voice. Zero friction.
+              </h2>
+            </div>
+            <p className="max-w-md text-zinc-900 leading-relaxed">
+              From spoken intent to executable plan — JENVU compresses an entire trading desk
+              into a single voice loop.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
+            {[
+              { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English — pair, bias, news, anything." },
+              { k: "02", t: "Reason", d: "JENVU pulls live structure, ICT/SMC context, DXY and Forex Factory feeds." },
+              { k: "03", t: "Mark Up", d: "Charts auto-annotate FVG, OB, BOS, CHoCH and liquidity sweeps." },
+              { k: "04", t: "Narrate", d: "You hear a structured A+ plan: entry, SL, TP, R:R and confluence score." },
+            ].map((s) => (
+              <div key={s.k} className="bg-white p-7">
+                <div className={`flex items-center justify-between ${MONO} text-[10px] tracking-widest uppercase text-zinc-900`}>
+                  <span>{s.k}</span>
+                  <span className="h-px w-10 bg-zinc-900" />
+                </div>
+                <h3 className="mt-5 text-lg font-semibold tracking-tight">{s.t}</h3>
+                <p className="mt-2 text-sm text-zinc-900 leading-relaxed">{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DESK LOGIC */}
+      <section className="border-t border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <SectionLabel>Desk Logic</SectionLabel>
+          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
+            The frameworks JENVU thinks in.
+          </h2>
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["ICT", "Killzones, judas swings, PD arrays, OTE."],
+              ["SMC", "Structure shifts, mitigations, equilibrium."],
+              ["Liquidity", "EQH/EQL, sweeps, internal vs external."],
+              ["Order Flow", "Displacement, imbalance, institutional candles."],
+              ["Risk", "Fixed-R sizing, max daily drawdown, kill-switch."],
+              ["Confluence", "Multi-TF alignment scored A / A+ / A++."],
+              ["Macro", "DXY, yields, Forex Factory red folder."],
+              ["Sessions", "Asia · London · NY killzone bias."],
+            ].map(([k, v]) => (
+              <div key={k} className="bg-white p-6">
+                <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
+                <p className="mt-3 text-sm text-zinc-900 leading-relaxed">{v}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <SectionLabel>Field Notes</SectionLabel>
+          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
+            Trusted by traders who run real size.
+          </h2>
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
+            {[
+              {
+                q: "Feels like sitting next to a 25-year desk trader. The narration alone changed how I read structure.",
+                n: "A. Rahman",
+                r: "Prop Desk · Dubai",
+              },
+              {
+                q: "ICT setups marked live on the chart, with voice — I stopped second-guessing my entries.",
+                n: "M. Chen",
+                r: "Independent · Singapore",
+              },
+              {
+                q: "Gold execution is on another level. The killzone + sweep logic is exactly how I trade.",
+                n: "S. Patel",
+                r: "Family Office · London",
+              },
+            ].map((t) => (
+              <figure key={t.n} className="bg-white p-7 flex flex-col gap-6">
+                <blockquote className="text-zinc-900 leading-relaxed">"{t.q}"</blockquote>
+                <figcaption className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-zinc-900">{t.n}</div>
+                    <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{t.r}</div>
+                  </div>
+                  <span className={`${MONO} text-[10px] text-zinc-900`}>↗</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CHANGELOG */}
+      <section className="border-t border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <SectionLabel>Changelog</SectionLabel>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight">Recent shipments</h2>
+            </div>
+            <span className={`${MONO} text-[11px] text-zinc-900`}>v2.04.1 · stable</span>
+          </div>
+          <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+            {[
+              ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions."],
+              ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts."],
+              ["2026.05.30", "v2.02", "Forex Factory red-folder context injected into every plan."],
+              ["2026.05.12", "v2.01", "Push-to-talk replaces always-on; cleaner mic control."],
+              ["2026.04.28", "v2.00", "Voice-native rewrite. New orb. New signal engine."],
+            ].map(([d, v, n], i) => (
+              <div
+                key={v}
+                className={`grid grid-cols-12 items-center px-6 py-4 ${
+                  i !== 0 ? "border-t border-zinc-100" : ""
+                }`}
+              >
+                <span className={`col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
+                <span className={`col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900`}>{v}</span>
+                <span className="col-span-7 text-sm text-zinc-900">{n}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="grid gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <SectionLabel>FAQ</SectionLabel>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight">Asked often.</h2>
+              <p className="mt-3 text-zinc-900">Everything else lives in the docs and disclaimer.</p>
+            </div>
+            <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
+              {[
+                {
+                  q: "Is JENVU only for Gold?",
+                  a: "Gold is its specialty, but JENVU covers FX majors, BTC, ETH, indices and energy with the same ICT/SMC engine.",
+                },
+                {
+                  q: "Does it execute trades automatically?",
+                  a: "No. JENVU narrates A+ setups with structured entries, stops and targets — execution stays in your hands.",
+                },
+                {
+                  q: "What model powers the voice agent?",
+                  a: "A low-latency Gemini-class model wired through Lovable AI, tuned for institutional trading reasoning.",
+                },
+                {
+                  q: "Does it work on mobile?",
+                  a: "Yes. The voice loop, signal engine and charts are fully responsive on phones and tablets.",
+                },
+              ].map((f) => (
+                <details key={f.q} className="group py-5">
+                  <summary className="flex items-center justify-between cursor-pointer list-none">
+                    <span className="text-base font-medium text-zinc-900">{f.q}</span>
+                    <span className={`${MONO} text-zinc-900 group-open:rotate-45 transition-transform`}>+</span>
+                  </summary>
+                  <p className="mt-3 text-sm text-zinc-900 leading-relaxed max-w-2xl">{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-6 py-24">
