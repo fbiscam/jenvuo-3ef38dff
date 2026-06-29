@@ -1,0 +1,236 @@
+import { useEffect, useImperativeHandle, useRef, forwardRef } from "react";
+import {
+  createChart,
+  CandlestickSeries,
+  createSeriesMarkers,
+  type IChartApi,
+  type ISeriesApi,
+  type ISeriesMarkersPluginApi,
+  type Time,
+  type IPriceLine,
+  type SeriesMarker,
+  CrosshairMode,
+  LineStyle,
+} from "lightweight-charts";
+import type { CandleDTO, Marking } from "@/lib/gold-analysis.functions";
+
+export type SignalChartHandle = {
+  drawMarking: (m: Marking) => void;
+  clear: () => void;
+};
+
+type Props = {
+  candles: CandleDTO[];
+  tf: "htf" | "ltf";
+  dark: boolean;
+  title: string;
+};
+
+const COLORS = {
+  fvgBull: "rgba(34,197,94,0.22)",
+  fvgBear: "rgba(239,68,68,0.22)",
+  obDemand: "rgba(59,130,246,0.28)",
+  obSupply: "rgba(244,114,182,0.28)",
+  zoneDemand: "rgba(16,185,129,0.18)",
+  zoneSupply: "rgba(244,63,94,0.18)",
+  bullLine: "#22c55e",
+  bearLine: "#ef4444",
+  liqBuy: "#fbbf24",
+  liqSell: "#f97316",
+  entry: "#3b82f6",
+  sl: "#ef4444",
+  tp: "#10b981",
+};
+
+const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
+  { candles, tf, dark, title },
+  ref,
+) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<IChartApi | null>(null);
+  const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const linesRef = useRef<IPriceLine[]>([]);
+  const markersRef = useRef<SeriesMarker<Time>[]>([]);
+  const markersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
+  // Box overlays drawn via DOM div absolutely positioned over chart
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement }[]>([]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const chart = createChart(containerRef.current, {
+      layout: {
+        background: { color: "transparent" },
+        textColor: dark ? "#d4d4d8" : "#262626",
+        fontFamily: "Urbanist, sans-serif",
+      },
+      grid: {
+        vertLines: { color: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)" },
+        horzLines: { color: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)" },
+      },
+      crosshair: { mode: CrosshairMode.Normal },
+      rightPriceScale: { borderVisible: false },
+      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
+      autoSize: true,
+    });
+    const series = chart.addSeries(CandlestickSeries, {
+      upColor: "#22c55e",
+      downColor: "#ef4444",
+      borderUpColor: "#22c55e",
+      borderDownColor: "#ef4444",
+      wickUpColor: "#22c55e",
+      wickDownColor: "#ef4444",
+    });
+    series.setData(candles.map((c) => ({ ...c, time: c.time as Time })));
+    chart.timeScale().fitContent();
+    chartRef.current = chart;
+    seriesRef.current = series;
+    markersPluginRef.current = createSeriesMarkers(series, []);
+
+    const redrawBoxes = () => {
+      if (!overlayRef.current || !seriesRef.current || !chartRef.current) return;
+      const ts = chartRef.current.timeScale();
+      for (const b of boxesRef.current) {
+        const m: any = b.marking;
+        if (m.fromTime == null || m.toTime == null) continue;
+        const x1 = ts.timeToCoordinate(m.fromTime as Time);
+        const x2 = ts.timeToCoordinate(m.toTime as Time);
+        const y1 = seriesRef.current.priceToCoordinate(m.priceHigh);
+        const y2 = seriesRef.current.priceToCoordinate(m.priceLow);
+        if (x1 == null || x2 == null || y1 == null || y2 == null) {
+          b.el.style.display = "none";
+          continue;
+        }
+        b.el.style.display = "block";
+        const left = Math.min(x1, x2);
+        const width = Math.max(2, Math.abs(x2 - x1));
+        const top = Math.min(y1, y2);
+        const height = Math.max(2, Math.abs(y2 - y1));
+        b.el.style.left = `${left}px`;
+        b.el.style.top = `${top}px`;
+        b.el.style.width = `${width}px`;
+        b.el.style.height = `${height}px`;
+      }
+    };
+    chart.timeScale().subscribeVisibleTimeRangeChange(redrawBoxes);
+    chart.subscribeCrosshairMove(redrawBoxes);
+    const ro = new ResizeObserver(redrawBoxes);
+    if (containerRef.current) ro.observe(containerRef.current);
+    (chartRef.current as any).__redrawBoxes = redrawBoxes;
+
+    return () => {
+      ro.disconnect();
+      chart.remove();
+      chartRef.current = null;
+      seriesRef.current = null;
+      linesRef.current = [];
+      markersRef.current = [];
+      boxesRef.current = [];
+      if (overlayRef.current) overlayRef.current.innerHTML = "";
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candles, dark]);
+
+  useImperativeHandle(ref, () => ({
+    clear: () => {
+      const s = seriesRef.current;
+      if (!s) return;
+      linesRef.current.forEach((l) => s.removePriceLine(l));
+      linesRef.current = [];
+      markersRef.current = [];
+      markersPluginRef.current?.setMarkers([]);
+      boxesRef.current.forEach((b) => b.el.remove());
+      boxesRef.current = [];
+    },
+    drawMarking: (m: Marking) => {
+      const s = seriesRef.current;
+      const chart = chartRef.current;
+      if (!s || !chart) return;
+      if (m.tf !== tf) return;
+
+      // Box-style markings (FVG, OB, zone)
+      if (m.type === "fvg" || m.type === "orderBlock" || m.type === "zone") {
+        if (!overlayRef.current) return;
+        const el = document.createElement("div");
+        const color =
+          m.type === "fvg"
+            ? m.kind === "bullish"
+              ? COLORS.fvgBull
+              : COLORS.fvgBear
+            : m.type === "orderBlock"
+              ? m.kind === "demand"
+                ? COLORS.obDemand
+                : COLORS.obSupply
+              : m.kind === "demand"
+                ? COLORS.zoneDemand
+                : COLORS.zoneSupply;
+        const border =
+          m.kind === "bullish" || m.kind === "demand" ? "#22c55e" : "#ef4444";
+        el.style.cssText = `position:absolute;background:${color};border:1px dashed ${border};border-radius:3px;pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:10px;color:${dark ? "#fff" : "#000"};padding:2px 4px;font-weight:600;`;
+        el.textContent = m.label;
+        overlayRef.current.appendChild(el);
+        boxesRef.current.push({ marking: m, el });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => {
+          el.style.opacity = "1";
+        });
+        return;
+      }
+
+      // Line markings (liquidity, BOS/CHOCH, entry/sl/tp)
+      let color = COLORS.entry;
+      let style: LineStyle = LineStyle.Solid;
+      let price = 0;
+      let title = m.label;
+      if (m.type === "liquidity") {
+        price = m.price;
+        color = m.side === "buy" ? COLORS.liqBuy : COLORS.liqSell;
+        style = LineStyle.Dashed;
+      } else if (m.type === "bos" || m.type === "choch") {
+        price = m.price;
+        color = m.kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
+        style = LineStyle.LargeDashed;
+        // also add a marker at fromTime
+        markersRef.current.push({
+          time: m.fromTime as Time,
+          position: m.kind === "bullish" ? "belowBar" : "aboveBar",
+          color,
+          shape: m.kind === "bullish" ? "arrowUp" : "arrowDown",
+          text: m.type.toUpperCase(),
+        });
+        markersPluginRef.current?.setMarkers(markersRef.current);
+      } else if (m.type === "entry") {
+        price = m.price;
+        color = COLORS.entry;
+      } else if (m.type === "sl") {
+        price = m.price;
+        color = COLORS.sl;
+      } else if (m.type === "tp") {
+        price = m.price;
+        color = COLORS.tp;
+      }
+
+      const line = s.createPriceLine({
+        price,
+        color,
+        lineWidth: 2,
+        lineStyle: style,
+        axisLabelVisible: true,
+        title,
+      });
+      linesRef.current.push(line);
+    },
+  }));
+
+  return (
+    <div className="relative w-full h-full">
+      <div className="absolute top-2 left-3 z-20 text-xs font-bold tracking-wider uppercase opacity-70">
+        {title}
+      </div>
+      <div ref={containerRef} className="absolute inset-0" />
+      <div ref={overlayRef} className="absolute inset-0 pointer-events-none overflow-hidden" />
+    </div>
+  );
+});
+
+export default SignalChart;
