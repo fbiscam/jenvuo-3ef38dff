@@ -343,7 +343,7 @@ function FeatureGrid() {
             colSpan="lg:col-span-4"
             icon={<Globe2 className="h-3 w-3" />}
             tag="Multi-Asset"
-            title="Gold, Crypto, FX, Indices, Stocks."
+            title={<span className="whitespace-nowrap">Gold, Crypto, FX, Indices, Stocks.</span>}
             body="One engine, every session. A-to-Z coverage across markets that matter."
             image={featAssets}
           />
