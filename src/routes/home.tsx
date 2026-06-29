@@ -123,9 +123,17 @@ function HomePage() {
             transition={{ duration: 0.9, delay: 0.1 }}
             className="relative"
           >
-            <div className="relative rounded-[2rem] bg-[#0A0A0A] p-8 lg:p-10 overflow-hidden border border-black shadow-[0_40px_120px_-30px_rgba(0,0,0,0.55)]">
+            <div className="relative rounded-[2rem] bg-white p-8 lg:p-10 overflow-hidden border border-black/10 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.25)]">
+              <div
+                className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl opacity-40"
+                style={{ background: `radial-gradient(circle, ${ACCENT}55, transparent 70%)` }}
+              />
+              <div
+                className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full blur-3xl opacity-30"
+                style={{ background: "radial-gradient(circle, #000000aa, transparent 70%)" }}
+              />
               {/* corner ticker labels */}
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-white/40 font-semibold">
+              <div className="relative flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-black/50 font-semibold">
                 <span>JENVU // LIVE</span>
                 <span className="flex items-center gap-1.5">
                   <span
@@ -136,7 +144,7 @@ function HomePage() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-center py-10 lg:py-14">
+              <div className="relative flex items-center justify-center py-10 lg:py-14">
                 <motion.div
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -145,7 +153,7 @@ function HomePage() {
                 </motion.div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="relative grid grid-cols-3 gap-3 text-center">
                 {[
                   { k: "PAIRS", v: "A–Z" },
                   { k: "BIAS", v: "ICT/SMC" },
@@ -153,14 +161,14 @@ function HomePage() {
                 ].map((s) => (
                   <div
                     key={s.k}
-                    className="rounded-xl border border-white/10 bg-white/[0.03] py-3"
+                    className="rounded-xl border border-black/10 bg-black/[0.02] py-3"
                   >
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold">
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-black/50 font-semibold">
                       {s.k}
                     </div>
                     <div
                       className="mt-1 text-lg font-black"
-                      style={{ color: ACCENT }}
+                      style={{ color: "#000" }}
                     >
                       {s.v}
                     </div>
