@@ -492,18 +492,32 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     const upcomingNews = news.filter((n) => n.minutesUntil >= -15 && n.minutesUntil <= 240);
     const imminentHigh = news.find((n) => n.impact === "High" && n.minutesUntil >= -15 && n.minutesUntil <= 60);
 
+    const dec = inst.decimals;
     const fmt = (arr: Candle[]) =>
       arr
-        .map((c) => `${Math.floor(c.t / 1000)}|${c.o.toFixed(2)},${c.h.toFixed(2)},${c.l.toFixed(2)},${c.c.toFixed(2)}`)
+        .map((c) => `${Math.floor(c.t / 1000)}|${c.o.toFixed(dec)},${c.h.toFixed(dec)},${c.l.toFixed(dec)},${c.c.toFixed(dec)}`)
         .join("\n");
 
-    const newsBlock = upcomingNews.length
+    const newsBlock = !inst.needsUsdNews
+      ? "Crypto market — no traditional USD economic calendar applied. Focus on on-chain liquidity, funding, and BTC dominance."
+      : upcomingNews.length
       ? upcomingNews
           .map((n) => `- [${n.impact}] ${n.country} ${n.title} in ${n.minutesUntil}m (forecast ${n.forecast ?? "-"}, prev ${n.previous ?? "-"})`)
           .join("\n")
-      : "No High/Medium USD or XAU events in the next 4 hours.";
+      : "No High/Medium USD events in the next 4 hours.";
 
-    const system = `You are Jenvu — an elite institutional XAU/USD trader with 25+ years on real bank/prop desks. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
+    const macroBlock =
+      inst.kind === "crypto"
+        ? "- BTC dominance, ETH/BTC ratio, total crypto market cap, stablecoin flows\n- Funding rates, open interest, liquidation clusters, exchange reserves\n- On-chain: whale wallets, miner outflows, ETF flows (BTC/ETH)\n- Macro risk-on/off, DXY inverse correlation on majors"
+        : inst.kind === "forex"
+          ? "- Central bank policy divergence, rate differentials, yields\n- DXY for USD pairs, risk-on/off flows, carry dynamics\n- High-impact data: NFP, CPI, FOMC, ECB, BoE, BoJ"
+          : inst.kind === "index"
+            ? "- Earnings season, breadth (advancers/decliners), sector rotation\n- VIX regime, yields (US10Y), Fed policy, mega-cap leadership"
+            : inst.kind === "stock"
+              ? "- Earnings, guidance, sector beta, index correlation, options flow\n- Macro: rates, risk-on/off, sector rotation"
+              : "- DXY inverse correlation, US10Y yields, real yields, risk on/off, COT positioning\n- News: NFP, CPI, FOMC, PPI, retail sales, geopolitical risk";
+
+    const system = `You are Jenvu — an elite institutional trader with 25+ years on bank/prop desks. You are a master of EVERY liquid market: gold, FX majors, indices, crypto, equities. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
 - Market structure: BOS, CHOCH, internal vs external structure, MSS
 - Premium / Discount arrays around equilibrium of the dealing range
 - Order Blocks (bullish/bearish), Breaker Blocks, Mitigation Blocks, Rejection Blocks
@@ -511,12 +525,12 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 - Liquidity: BSL/SSL, equal highs/lows, trendline liquidity, Asian range, PDH/PDL, weekly open, inducement
 - Liquidity sweeps, judas swing, turtle soup, stop runs
 - OTE (Optimal Trade Entry 62-79% Fib), standard deviations, symmetrical price delivery
-- Killzones (London 07-10 GMT, NY AM 12-15 GMT, NY PM 17-20 GMT, Asia 00-04 GMT)
+- Killzones (London 07-10 GMT, NY AM 12-15 GMT, NY PM 17-20 GMT, Asia 00-04 GMT) — crypto runs 24/7 but still respects these flows
 - Power of Three (Accumulation, Manipulation, Distribution)
-- DXY inverse correlation, US10Y yields, real yields, risk on/off, COT positioning
-- News/fundamental impact: NFP, CPI, FOMC, PPI, retail sales, geopolitical risk
+Macro context for ${inst.display} (${inst.kind.toUpperCase()}):
+${macroBlock}
 
-You are analyzing LIVE gold candles and must deliver an A+ institutional plan that gets drawn on a chart and narrated step-by-step by voice. Be specific, decisive, and pro — like a senior trader walking a junior through the chart. Reference the actual prices, structure, and times you see.
+You are analyzing LIVE ${inst.display} candles and must deliver an A+ institutional plan that gets drawn on a chart and narrated step-by-step by voice. Be specific, decisive, and pro — like a senior trader walking a junior through the chart. Reference the actual prices, structure, and times you see.
 
 LANGUAGE: ALL output text (intro, every narration "say", labels, summary, narratives, confluences) MUST be clear professional ENGLISH only. No Hindi/Urdu/Hinglish/Roman Urdu.
 
