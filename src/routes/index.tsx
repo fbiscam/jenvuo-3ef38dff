@@ -337,11 +337,11 @@ function Coverage() {
           Crypto via Binance, traditional markets via Yahoo Finance, news via an economic calendar feed.
           Symbol coverage expands continuously.
         </p>
-        <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3">
+        <div className="mt-12 flex flex-wrap gap-2.5">
           {assets.map((a) => (
             <span
               key={a}
-              className="inline-flex items-center gap-2 text-[13px] font-semibold tracking-tight"
+              className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-[13px] font-semibold tracking-tight hover:border-black/30 transition"
               style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.01em", color: VOID }}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
