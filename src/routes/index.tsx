@@ -264,14 +264,14 @@ function Row({ k, v, highlight }: { k: string; v: string; highlight?: boolean })
 function TrustStrip() {
   const items = ["ICT · Inner Circle", "Smart Money Concepts", "Wyckoff Phases", "Order Blocks", "Fair Value Gaps", "Liquidity Pools", "OTE Entries", "Killzone Logic", "DXY Context"];
   return (
-    <section className="border-y border-[color:var(--ink)]/10 bg-[color:var(--warm)]/60">
+    <section className="border-y border-white/10" style={{ background: VOID, color: PAPER }}>
       <div className="mx-auto max-w-[1320px] px-6 py-5 flex items-center gap-6 overflow-x-auto scrollbar-none">
-        <span className="shrink-0 text-[11px] uppercase tracking-[0.3em] font-bold text-[color:var(--ink)]/55">
+        <span className="shrink-0 text-[11px] uppercase tracking-[0.3em] font-bold text-white/60">
           Trained on
         </span>
         <div className="flex items-center gap-8">
           {items.map((i) => (
-            <span key={i} className="shrink-0 text-[13px] font-semibold text-[color:var(--ink)]/70 whitespace-nowrap font-display tracking-tight">
+            <span key={i} className="shrink-0 text-[13px] font-semibold text-white whitespace-nowrap font-display tracking-tight">
               {i}
             </span>
           ))}
