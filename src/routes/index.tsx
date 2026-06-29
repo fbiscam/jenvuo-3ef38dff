@@ -335,7 +335,7 @@ function Home() {
               )}
               aria-label={text.trim() ? "Send message" : "End"}
             >
-              <ArrowUp className="h-4 w-4" />
+              {text.trim() ? <ArrowUp className="h-4 w-4" /> : <X className="h-4 w-4" />}
             </button>
           </div>
         </div>
