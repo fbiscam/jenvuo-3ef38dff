@@ -153,7 +153,23 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   }, [candles, dark]);
 
   useImperativeHandle(ref, () => ({
+    updateLivePrice: (price: number) => {
+      const s = seriesRef.current;
+      if (!s) return;
+      const last = candles[candles.length - 1];
+      if (!last) return;
+      try {
+        s.update({
+          time: last.time as Time,
+          open: last.open,
+          high: Math.max(last.high, price),
+          low: Math.min(last.low, price),
+          close: price,
+        });
+      } catch {}
+    },
     clear: () => {
+
       const s = seriesRef.current;
       if (!s) return;
       linesRef.current.forEach((l) => s.removePriceLine(l));
