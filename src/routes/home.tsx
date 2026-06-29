@@ -70,7 +70,7 @@ export const Route = createFileRoute("/home")({
 
 function HomePage() {
   return (
-    <div className="min-h-dvh w-full bg-white text-black font-[Outfit,Roboto,sans-serif] flex flex-col">
+    <div className="min-h-dvh w-full bg-white text-black font-[Urbanist,sans-serif] flex flex-col">
       {/* Top nav — Google style */}
       <header className="w-full">
         <div className="mx-auto max-w-7xl px-6 py-5 flex items-center justify-end gap-6 text-sm font-medium text-black/70">
