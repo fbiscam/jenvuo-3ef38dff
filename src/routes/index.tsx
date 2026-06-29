@@ -289,7 +289,7 @@ function FeatureGrid() {
   return (
     <section className="relative">
       <div className="mx-auto max-w-[1320px] px-6 py-24 lg:py-32">
-        <SectionHead eyebrow="Capabilities" title={<>An entire trading floor,<br />condensed into a voice.</>} />
+        <SectionHead eyebrow="" title={<>An entire trading floor,<br />condensed into a voice.</>} />
 
         {/* hero-grid: 1 large + 4 small */}
         <div className="mt-16 grid lg:grid-cols-12 gap-5">
@@ -650,7 +650,7 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
 function SectionHead({ eyebrow, title }: { eyebrow: string; title: React.ReactNode }) {
   return (
     <div className="max-w-3xl">
-      <div className="text-[11px] uppercase tracking-[0.3em] font-bold text-[color:var(--ink)]/50">{eyebrow}</div>
+      {eyebrow && <div className="text-[11px] uppercase tracking-[0.3em] font-bold text-[color:var(--ink)]/50">{eyebrow}</div>}
       <h2 className="mt-5 font-display font-semibold tracking-[-0.035em] text-[clamp(40px,5.5vw,72px)] leading-[1.02]" style={{ color: VOID }}>
         {title}
       </h2>
