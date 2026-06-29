@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Mic, X, Plus, Sliders } from "lucide-react";
 import { SignalCard } from "@/components/SignalCard";
 import { NewsPanel } from "@/components/NewsPanel";
-import { useSpeech } from "@/hooks/useSpeech";
+import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { getGoldNews } from "@/lib/news.functions";
 import { cn } from "@/lib/utils";
@@ -190,9 +190,7 @@ function Home() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="h-9 w-9 rounded-full hover:bg-black/5 flex items-center justify-center text-neutral-500">
-            <Sliders className="h-4 w-4" />
-          </button>
+          <VoicePicker value={speech.voicePreset} onChange={speech.setVoicePreset} />
         </div>
       </header>
 
@@ -409,4 +407,71 @@ function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "think
     </div>
   );
 }
+
+function VoicePicker({ value, onChange }: { value: VoicePresetKey; onChange: (k: VoicePresetKey) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className={cn(
+          "h-9 w-9 rounded-full flex items-center justify-center transition",
+          open ? "bg-black text-white" : "hover:bg-black/5 text-neutral-600",
+        )}
+        aria-label="Voice settings"
+      >
+        <Sliders className="h-4 w-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-60 rounded-2xl border border-neutral-200 bg-white shadow-xl p-2 z-30 animate-in fade-in slide-in-from-top-1">
+          <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+            Voice
+          </div>
+          <div className="flex flex-col">
+            {VOICE_PRESETS.map((p) => {
+              const active = p.key === value;
+              return (
+                <button
+                  key={p.key}
+                  onClick={() => { onChange(p.key); setOpen(false); }}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-xl text-left transition",
+                    active ? "bg-neutral-100" : "hover:bg-neutral-50",
+                  )}
+                >
+                  <span className={cn(
+                    "h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0",
+                    p.key === "aria"  && "bg-gradient-to-br from-rose-400 to-fuchsia-500",
+                    p.key === "nova"  && "bg-gradient-to-br from-sky-400 to-indigo-500",
+                    p.key === "orion" && "bg-gradient-to-br from-emerald-500 to-teal-700",
+                    p.key === "atlas" && "bg-gradient-to-br from-amber-500 to-orange-600",
+                  )}>
+                    {p.label[0]}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-neutral-900">{p.label}</div>
+                    <div className="text-xs text-neutral-500 truncate">{p.desc}</div>
+                  </div>
+                  {active && <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 

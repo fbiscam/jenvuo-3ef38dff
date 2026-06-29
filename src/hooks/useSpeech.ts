@@ -2,6 +2,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 type SR = any;
 
+export type VoicePresetKey = "aria" | "orion" | "nova" | "atlas";
+
+export const VOICE_PRESETS: {
+  key: VoicePresetKey;
+  label: string;
+  desc: string;
+  match: RegExp;
+  lang: RegExp;
+  pitch: number;
+  rate: number;
+}[] = [
+  { key: "aria",  label: "Aria",  desc: "Warm female · US",   match: /samantha|google us english|aria|jenny|zira|female/i, lang: /en-US/i, pitch: 1.05, rate: 1.0 },
+  { key: "nova",  label: "Nova",  desc: "Soft female · UK",   match: /karen|serena|kate|google uk english female|female/i, lang: /en-GB/i, pitch: 1.1,  rate: 0.98 },
+  { key: "orion", label: "Orion", desc: "Deep male · UK",     match: /daniel|google uk english male|oliver|male/i,         lang: /en-GB/i, pitch: 0.9,  rate: 1.0 },
+  { key: "atlas", label: "Atlas", desc: "Confident male · US",match: /alex|david|fred|google us english male|male/i,        lang: /en-US/i, pitch: 0.95, rate: 1.04 },
+];
+
 export function useSpeech() {
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
@@ -11,8 +28,10 @@ export function useSpeech() {
   const [supported, setSupported] = useState(true);
   const [needsGesture, setNeedsGesture] = useState(false);
   const [wordPulse, setWordPulse] = useState(0);
+  const [voicePreset, setVoicePresetState] = useState<VoicePresetKey>("orion");
   const recognitionRef = useRef<SR | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
+  const voicePresetRef = useRef<VoicePresetKey>("orion");
   const wantListeningRef = useRef(false);
   const startingRef = useRef(false);
   const pausedRef = useRef(false);
@@ -101,15 +120,27 @@ export function useSpeech() {
 
     const pickVoice = () => {
       const voices = window.speechSynthesis.getVoices();
+      const preset = VOICE_PRESETS.find((p) => p.key === voicePresetRef.current) ?? VOICE_PRESETS[0];
       voiceRef.current =
-        voices.find((v) => /en/i.test(v.lang) && /male|david|daniel|google uk english male/i.test(v.name)) ||
-        voices.find((v) => /en-GB/i.test(v.lang)) ||
+        voices.find((v) => preset.lang.test(v.lang) && preset.match.test(v.name)) ||
+        voices.find((v) => preset.match.test(v.name)) ||
+        voices.find((v) => preset.lang.test(v.lang)) ||
         voices.find((v) => /en/i.test(v.lang)) ||
         voices[0] ||
         null;
     };
+    // restore saved preset
+    try {
+      const saved = localStorage.getItem("jenvu.voicePreset") as VoicePresetKey | null;
+      if (saved && VOICE_PRESETS.some((p) => p.key === saved)) {
+        voicePresetRef.current = saved;
+        setVoicePresetState(saved);
+      }
+    } catch { /* ignore */ }
     pickVoice();
     window.speechSynthesis.onvoiceschanged = pickVoice;
+    // re-pick when preset changes
+    (window as any).__jenvuPickVoice = pickVoice;
 
     return () => {
       wantListeningRef.current = false;
@@ -154,8 +185,9 @@ export function useSpeech() {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     if (voiceRef.current) u.voice = voiceRef.current;
-    u.rate = 1.02;
-    u.pitch = 0.95;
+    const preset = VOICE_PRESETS.find((p) => p.key === voicePresetRef.current) ?? VOICE_PRESETS[0];
+    u.rate = preset.rate;
+    u.pitch = preset.pitch;
     u.volume = 1;
     u.onstart = () => { setSpeaking(true); setWordPulse((n) => n + 1); };
     u.onboundary = (ev: any) => {
@@ -171,8 +203,29 @@ export function useSpeech() {
     setSpeaking(false);
   }, []);
 
+  const setVoicePreset = useCallback((key: VoicePresetKey) => {
+    voicePresetRef.current = key;
+    setVoicePresetState(key);
+    try { localStorage.setItem("jenvu.voicePreset", key); } catch { /* ignore */ }
+    try { (window as any).__jenvuPickVoice?.(); } catch { /* ignore */ }
+    // preview the chosen voice
+    try {
+      window.speechSynthesis.cancel();
+      const preset = VOICE_PRESETS.find((p) => p.key === key) ?? VOICE_PRESETS[0];
+      const u = new SpeechSynthesisUtterance(`Voice set to ${preset.label}.`);
+      const voices = window.speechSynthesis.getVoices();
+      const v = voices.find((vv) => preset.lang.test(vv.lang) && preset.match.test(vv.name))
+        || voices.find((vv) => preset.match.test(vv.name))
+        || voices.find((vv) => preset.lang.test(vv.lang));
+      if (v) u.voice = v;
+      u.rate = preset.rate; u.pitch = preset.pitch;
+      window.speechSynthesis.speak(u);
+    } catch { /* ignore */ }
+  }, []);
+
   return {
     listening, speaking, transcript, transcriptId, interim, supported, needsGesture, wordPulse,
+    voicePreset, setVoicePreset,
     startListening, stopListening, pauseListening, resumeIfWanted,
     speak, stopSpeaking, setTranscript,
     isContinuous: () => wantListeningRef.current,
