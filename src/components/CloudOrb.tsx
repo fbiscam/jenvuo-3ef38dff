@@ -63,7 +63,7 @@ export function CloudOrb({ status = "idle", pulse = 0 }: { status?: OrbStatus; p
             className="absolute inset-0 rounded-full"
             style={{ boxShadow: "inset 0 0 26px rgba(160,210,255,0.6)" }}
           />
-          {status === "speaking" && (
+          {speaking && (
             <div
               className="absolute inset-0 animate-pulse"
               style={{
