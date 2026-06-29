@@ -341,8 +341,17 @@ function SignalPage() {
                 </span>
               )}
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
+                {plan && !isMarketOpen(plan.instrument.symbol) ? (
+                  <>
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                    <span className={`text-[10px] sm:text-[11px] font-medium text-zinc-500 tracking-tight ${MONO} uppercase`}>Market Closed</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
