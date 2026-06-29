@@ -612,31 +612,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* BUILT FOR */}
-      <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <SectionLabel>Built For</SectionLabel>
-          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
-            One terminal, many seats at the desk.
-          </h2>
-          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { k: "Prop Traders", d: "Pass funded challenges with disciplined ICT/SMC entries and pre-defined risk." },
-              { k: "Day Traders", d: "Live London & NY killzone narration with sub-15ms voice loop." },
-              { k: "Swing Desks", d: "1H/4H structure reviews with macro and Forex Factory overlay." },
-              { k: "Family Offices", d: "Institutional-grade Gold and FX coverage with audit-ready signal logs." },
-            ].map((b) => (
-              <div key={b.k} className="bg-white p-7">
-                <div className="h-10 w-10 grid place-items-center rounded-lg bg-zinc-900 text-white">
-                  <span className={`${MONO} text-xs`}>JV</span>
-                </div>
-                <h3 className="mt-5 text-base font-semibold tracking-tight text-zinc-900">{b.k}</h3>
-                <p className="mt-2 text-sm text-zinc-900 leading-relaxed">{b.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* COMPARISON */}
       <section className="border-t border-zinc-100 bg-zinc-50/40">
