@@ -198,16 +198,22 @@ function SignalPage() {
         >
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
-        <div className="text-center">
+        <div className="relative text-center">
           <div className="text-[10px] uppercase tracking-[0.3em] text-amber-700/80 font-bold">Jenvu AI · Institutional Desk</div>
           <div className="text-base font-black tracking-tight flex items-center justify-center gap-2">
-            XAU/USD
+            <button
+              onClick={() => setPickerOpen((v) => !v)}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-md hover:bg-neutral-100 transition border border-neutral-200/70 bg-white/60"
+            >
+              {(plan?.symbolLabel) ?? currentAsset.short}
+              <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+            </button>
             {(livePrice ?? plan?.currentPrice) != null && (
-              <span className="text-amber-600 tabular-nums">${(livePrice ?? plan!.currentPrice).toFixed(2)}</span>
+              <span className="text-amber-600 tabular-nums">{fixp(livePrice ?? plan!.currentPrice)}</span>
             )}
             {priceDelta !== 0 && (
               <span className={cn("text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded", priceDelta > 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700")}>
-                {priceDelta > 0 ? "▲" : "▼"} {Math.abs(priceDelta).toFixed(2)}
+                {priceDelta > 0 ? "▲" : "▼"} {fixp(Math.abs(priceDelta))}
               </span>
             )}
             {plan && (
@@ -216,6 +222,29 @@ function SignalPage() {
               </span>
             )}
           </div>
+          {pickerOpen && (
+            <div className="absolute left-1/2 -translate-x-1/2 mt-2 z-50 w-[320px] max-h-[70vh] overflow-y-auto rounded-2xl border border-neutral-200 bg-white shadow-2xl p-2 text-left">
+              {(["metal", "crypto", "forex"] as const).map((kind) => (
+                <div key={kind} className="mb-1">
+                  <div className="text-[9px] uppercase tracking-widest font-bold text-neutral-400 px-2 pt-2 pb-1">{kind}</div>
+                  {Object.values(ASSETS).filter((a) => a.kind === kind).map((a) => (
+                    <button
+                      key={a.key}
+                      onClick={() => { setSymbol(a.key); setPickerOpen(false); setTimeout(() => load(), 30); }}
+                      disabled={loading}
+                      className={cn(
+                        "w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center justify-between gap-2",
+                        a.key === symbol ? "bg-neutral-900 text-white" : "hover:bg-neutral-100 text-neutral-800",
+                      )}
+                    >
+                      <span>{a.short}</span>
+                      <span className="text-[10px] opacity-60">{a.label.split(" / ")[0]}</span>
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2">
