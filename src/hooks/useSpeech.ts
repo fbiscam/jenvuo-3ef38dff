@@ -157,7 +157,10 @@ export function useSpeech() {
     u.rate = 1.02;
     u.pitch = 0.95;
     u.volume = 1;
-    u.onstart = () => setSpeaking(true);
+    u.onstart = () => { setSpeaking(true); setWordPulse((n) => n + 1); };
+    u.onboundary = (ev: any) => {
+      if (!ev || ev.name === undefined || ev.name === "word") setWordPulse((n) => n + 1);
+    };
     u.onend = () => { setSpeaking(false); onDone?.(); };
     u.onerror = () => { setSpeaking(false); onDone?.(); };
     window.speechSynthesis.speak(u);
