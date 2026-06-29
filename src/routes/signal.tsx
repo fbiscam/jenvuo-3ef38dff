@@ -122,10 +122,11 @@ function SignalPage() {
       setPipeline((s) => (s < PIPELINE_STEPS.length - 1 ? s + 1 : s));
     }, 700);
     try {
-      const p = await fetchPlan({ data: { htfTf, ltfTf } });
+      const p = await fetchPlan({ data: { htfTf, ltfTf, symbol } });
       setPipeline(PIPELINE_STEPS.length);
       setPlan(p);
       setLivePrice(p.currentPrice);
+      setPriceDelta(0);
       setTimeout(() => runNarration(p), 400);
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
@@ -135,7 +136,7 @@ function SignalPage() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchPlan, runNarration, htfTf, ltfTf]);
+  }, [fetchPlan, runNarration, htfTf, ltfTf, symbol]);
 
   useEffect(() => {
     if (authReady && !plan && !loading) load();
