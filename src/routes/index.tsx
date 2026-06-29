@@ -185,7 +185,7 @@ function Home() {
 
 
   return (
-    <div className={cn("h-screen w-screen relative overflow-hidden flex flex-col transition-colors duration-300", dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900")}>
+    <div className={cn("fixed inset-0 w-screen overflow-hidden overscroll-none flex flex-col transition-colors duration-300", dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900")}>
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between shrink-0">
         <div className="flex items-center">
