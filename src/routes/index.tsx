@@ -62,6 +62,14 @@ function Home() {
   const greetedRef = useRef(false);
   const alertedRef = useRef<Set<string>>(new Set());
   const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [dark, setDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const v = window.localStorage.getItem("jenvu.theme");
+    return v ? v === "dark" : true;
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem("jenvu.theme", dark ? "dark" : "light");
+  }, [dark]);
 
   const news = useQuery({
     queryKey: ["gold-news"],
