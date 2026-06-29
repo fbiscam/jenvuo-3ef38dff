@@ -235,7 +235,7 @@ function HomePage() {
                   <div className="absolute inset-0 rounded-full border border-zinc-100 animate-[spin_18s_linear_infinite]" />
                   <div className="absolute inset-5 rounded-full border border-zinc-200/60 animate-[spin_24s_linear_infinite_reverse]" />
                   <div className="absolute inset-9">
-                    <CloudOrb speaking listening size={160} />
+                    <CloudOrb status="speaking" pulse={1} />
                   </div>
                 </div>
                 <div className="mt-10 text-center">
@@ -446,7 +446,7 @@ function HomePage() {
               </div>
             </div>
             <div className="relative">
-              <CloudOrb speaking listening size={200} />
+              <CloudOrb status="speaking" pulse={1} />
             </div>
           </div>
         </div>
