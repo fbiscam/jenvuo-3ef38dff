@@ -1,24 +1,27 @@
-## Plan: Mobile alignment cleanup for homepage
+## Goal
+Wrap `/app` (voice agent) with the same chrome as homepage `/` — header (logo + AUTH_TERMINAL pill + live ticker) and footer — while keeping the voice agent UI, orb, signals, and all functionality untouched in the middle.
 
-1. **Header mobile alignment**
-   - Convert the mobile header into a stable grid layout so logo and Launch button stay aligned.
-   - Reduce mobile padding/button sizing where needed so the top row feels centered and balanced.
+## Changes (single file: `src/routes/app.tsx`)
 
-2. **Hero section mobile polish**
-   - Center hero text and CTA buttons on phones.
-   - Make CTA buttons stack or fit cleanly without uneven left/right spacing.
-   - Keep desktop 150% zoom unchanged and mobile at normal scale.
+1. **Add header** (sticky, white, mono labels) matching homepage:
+   - Left: `/favicon.png` + "JENVU AI" linking to `/`
+   - Right: status pill `APP_TERMINAL // ONLINE` (green dot)
+   - Ticker strip below using the same `useLiveTicker` logic (extract pricing fetch into a shared hook or copy the same effect from index.tsx)
 
-3. **Terminal workstation mobile layout**
-   - Tighten mobile padding in the terminal card.
-   - Center the orb area and reduce orb/card height on small screens.
-   - Make feed rows, tags, and dashboard stats wrap cleanly with no “aagay peechay” spacing.
+2. **Add footer** matching homepage:
+   - "JENVU AI · © year" left, `v1.0 // VOICE_EDITION` right
 
-4. **All section spacing consistency**
-   - Change repeated `px-6 py-20` sections to responsive mobile spacing like `px-5 sm:px-6 py-14 sm:py-20`.
-   - Center or stack section headers that currently use desktop flex alignment on mobile.
-   - Fix changelog, coverage, FAQ, comparison, integrations, and footer alignment for phone widths.
+3. **Wrap existing voice-agent content** in `<main className="flex-1 min-h-0 ...">` so layout becomes `h-dvh flex flex-col` (header / main / footer). No scroll, fits viewport like `/auth`.
 
-5. **Verification**
-   - Re-check at mobile width around 390px for horizontal overflow and visual alignment.
-   - Confirm desktop keeps the 150% homepage scale.
+4. **Typography**: apply `font-['Inter']` to root and `font-['JetBrains_Mono']` to chrome labels — same constants as index/auth.
+
+5. **Preserve everything else** in `/app`: orb, mic button, send composer, signal cards, news panel, theme toggle, logout — no functional changes.
+
+## Technical notes
+- Reuse the ticker pattern from `src/routes/index.tsx` (Binance + gold-api). To avoid duplication, extract `useLiveTicker` and `INITIAL_TICKER` into `src/hooks/useLiveTicker.ts` and import in both `index.tsx` and `app.tsx`.
+- Match auth.tsx's compact chrome sizing (`py-3 sm:py-4`) so the voice area keeps maximum room.
+- Dark-mode aware: homepage chrome is white-only; keep it white on `/app` even when user toggles dark theme for the voice surface — chrome stays consistent across routes.
+
+## Out of scope
+- No changes to voice agent logic, signal generation, or `/signal` route.
+- No homepage hero/sections added to `/app`.
