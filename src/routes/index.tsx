@@ -133,12 +133,10 @@ function Home() {
     <div className="min-h-screen bg-black text-neutral-100 relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="h-7 w-7 rounded-full bg-gradient-to-br from-amber-400 to-amber-700 shadow-sm" />
-          <div>
-            <h1 className="text-sm font-semibold tracking-tight text-white">Jenvu AI</h1>
-            <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-500">Live voice · XAU/USD</p>
-          </div>
+        <div className="flex items-center">
+          <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(245,191,90,0.35)]">
+            Jenvu AI
+          </h1>
         </div>
         <div className="flex items-center gap-2">
           <button className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400">
