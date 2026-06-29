@@ -428,7 +428,7 @@ function SignalPage() {
                           )} />
                           <span className="text-neutral-700">{k.label}</span>
                         </span>
-                        <span className="font-mono font-bold tabular-nums text-neutral-900">${k.price.toFixed(2)}</span>
+                        <span className="font-mono font-bold tabular-nums text-neutral-900">{fixp(k.price)}</span>
                       </div>
                     ))}
                   </div>
