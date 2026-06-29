@@ -120,15 +120,27 @@ export function useSpeech() {
 
     const pickVoice = () => {
       const voices = window.speechSynthesis.getVoices();
+      const preset = VOICE_PRESETS.find((p) => p.key === voicePresetRef.current) ?? VOICE_PRESETS[0];
       voiceRef.current =
-        voices.find((v) => /en/i.test(v.lang) && /male|david|daniel|google uk english male/i.test(v.name)) ||
-        voices.find((v) => /en-GB/i.test(v.lang)) ||
+        voices.find((v) => preset.lang.test(v.lang) && preset.match.test(v.name)) ||
+        voices.find((v) => preset.match.test(v.name)) ||
+        voices.find((v) => preset.lang.test(v.lang)) ||
         voices.find((v) => /en/i.test(v.lang)) ||
         voices[0] ||
         null;
     };
+    // restore saved preset
+    try {
+      const saved = localStorage.getItem("jenvu.voicePreset") as VoicePresetKey | null;
+      if (saved && VOICE_PRESETS.some((p) => p.key === saved)) {
+        voicePresetRef.current = saved;
+        setVoicePresetState(saved);
+      }
+    } catch { /* ignore */ }
     pickVoice();
     window.speechSynthesis.onvoiceschanged = pickVoice;
+    // re-pick when preset changes
+    (window as any).__jenvuPickVoice = pickVoice;
 
     return () => {
       wantListeningRef.current = false;
