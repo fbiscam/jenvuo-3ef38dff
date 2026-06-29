@@ -197,7 +197,7 @@ function HomePage() {
               </Link>
               <Link
                 to="/signal"
-                className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+                className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
               >
                 See Signal Engine
               </Link>
@@ -224,7 +224,7 @@ function HomePage() {
       <section className="mx-auto max-w-6xl px-6 pb-20">
         <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
           {/* terminal header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-zinc-50/60">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white">
             <div className="flex items-center gap-3">
               <div className="flex gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
@@ -259,7 +259,7 @@ function HomePage() {
                     className={`p-3 rounded-lg border ${
                       s.tone === "green"
                         ? "border-emerald-100/70 bg-emerald-50/30"
-                        : "border-zinc-100 bg-zinc-50/40"
+                        : "border-zinc-100 bg-white/40"
                     } space-y-2`}
                   >
                     <div className="flex justify-between items-center">
@@ -325,7 +325,7 @@ function HomePage() {
                     <span className={`text-[10px] ${MONO} text-zinc-900 uppercase`}>DXY Index</span>
                     <span className="text-xs font-semibold">104.22</span>
                   </div>
-                  <div className="h-16 w-full bg-zinc-50 rounded border border-zinc-100 flex items-end p-2 gap-0.5">
+                  <div className="h-16 w-full bg-white rounded border border-zinc-100 flex items-end p-2 gap-0.5">
                     {[50, 66, 75, 33, 50, 66, 50, 80, 40].map((h, i) => (
                       <div
                         key={i}
@@ -429,7 +429,7 @@ function HomePage() {
               },
 
             ].map((f) => (
-              <div key={f.k} className="bg-white p-7 hover:bg-zinc-50/60 transition-colors">
+              <div key={f.k} className="bg-white p-7 hover:bg-white transition-colors">
                 <div className={`flex items-center justify-between ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
                   <span>{f.k}</span>
                   <span>→</span>
@@ -443,7 +443,7 @@ function HomePage() {
       </section>
 
       {/* COVERAGE */}
-      <section className="border-t border-zinc-100 bg-zinc-50/40">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="grid gap-10 lg:grid-cols-12">
             <div className="lg:col-span-4">
@@ -475,7 +475,7 @@ function HomePage() {
       </section>
 
       {/* CHANGELOG */}
-      <section className="border-t border-zinc-100 bg-zinc-50/40">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -542,7 +542,7 @@ function HomePage() {
       </section>
 
       {/* DESK LOGIC */}
-      <section className="border-t border-zinc-100 bg-zinc-50/40">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
             The frameworks JENVU thinks in.
@@ -612,7 +612,7 @@ function HomePage() {
 
 
       {/* COMPARISON */}
-      <section className="border-t border-zinc-100 bg-zinc-50/40">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
             Why traders move to JENVU.
@@ -650,7 +650,7 @@ function HomePage() {
 
 
       {/* INTEGRATIONS */}
-      <section className="border-t border-zinc-100 bg-zinc-50/40">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
@@ -731,7 +731,7 @@ function HomePage() {
                 </Link>
                 <Link
                   to="/signal"
-                  className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+                  className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
                 >
                   Open Signal Engine
                 </Link>
