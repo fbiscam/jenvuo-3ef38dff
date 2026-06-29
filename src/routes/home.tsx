@@ -612,3 +612,16 @@ function FakeChart() {
     </svg>
   );
 }
+
+function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="text-[11px] uppercase tracking-[0.25em] font-bold text-black/40 mb-3">
+        {title}
+      </div>
+      <div className="flex flex-col gap-2 text-black/70 font-semibold [&_a:hover]:text-black">
+        {children}
+      </div>
+    </div>
+  );
+}
