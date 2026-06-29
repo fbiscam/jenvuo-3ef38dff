@@ -71,83 +71,65 @@ const YAHOO_INTERVAL: Record<string, { interval: string; range: string }> = {
 };
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 60_000; // 1 minute
+const CACHE_TTL = 60_000;
 
-async function fetchFromYahoo(tf: string): Promise<Candle[]> {
+async function fetchFromYahoo(symbol: string, tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-  const symbols = ["GC=F", "XAUUSD=X"];
   let lastErr: any = null;
   for (const host of hosts) {
-    for (const sym of symbols) {
-      try {
-        const url = `https://${host}/v8/finance/chart/${sym}?interval=${cfg.interval}&range=${cfg.range}`;
-        const res = await fetch(url, {
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-            Accept: "application/json",
-          },
-        });
-        if (!res.ok) {
-          lastErr = new Error(`Yahoo ${host}/${sym}: ${res.status}`);
-          continue;
-        }
-        const json: any = await res.json();
-        const result = json?.chart?.result?.[0];
-        if (!result) {
-          lastErr = new Error("No price data");
-          continue;
-        }
-        const ts: number[] = result.timestamp ?? [];
-        const q = result.indicators?.quote?.[0] ?? {};
-        const candles: Candle[] = [];
-        for (let i = 0; i < ts.length; i++) {
-          const o = q.open?.[i],
-            h = q.high?.[i],
-            l = q.low?.[i],
-            c = q.close?.[i],
-            v = q.volume?.[i] ?? 0;
-          if (o == null || h == null || l == null || c == null) continue;
-          candles.push({ t: ts[i] * 1000, o, h, l, c, v });
-        }
-        if (candles.length >= 10) return candles.slice(-120);
-      } catch (e) {
-        lastErr = e;
+    try {
+      const url = `https://${host}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${cfg.interval}&range=${cfg.range}`;
+      const res = await fetch(url, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+          Accept: "application/json",
+        },
+      });
+      if (!res.ok) { lastErr = new Error(`Yahoo ${host}: ${res.status}`); continue; }
+      const json: any = await res.json();
+      const result = json?.chart?.result?.[0];
+      if (!result) { lastErr = new Error("No price data"); continue; }
+      const ts: number[] = result.timestamp ?? [];
+      const q = result.indicators?.quote?.[0] ?? {};
+      const candles: Candle[] = [];
+      for (let i = 0; i < ts.length; i++) {
+        const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i], v = q.volume?.[i] ?? 0;
+        if (o == null || h == null || l == null || c == null) continue;
+        candles.push({ t: ts[i] * 1000, o, h, l, c, v });
       }
-    }
+      if (candles.length >= 10) return candles.slice(-180);
+    } catch (e) { lastErr = e; }
   }
   throw lastErr ?? new Error("Yahoo unavailable");
 }
 
-async function fetchFromBinance(tf: string): Promise<Candle[]> {
+async function fetchFromBinance(symbol: string, tf: string): Promise<Candle[]> {
   const map: Record<string, string> = {
     "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m",
     "1h": "1h", "4h": "4h", "1d": "1d",
   };
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
-  const symbols = ["PAXGUSDT", "XAUTUSDT"];
   let lastErr: any = null;
   for (const host of hosts) {
-    for (const sym of symbols) {
-      try {
-        const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
-        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) { lastErr = new Error(`Binance ${host}/${sym}: ${res.status}`); continue; }
-        const rows: any[] = await res.json();
-        const candles: Candle[] = rows.map((r) => ({
-          t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
-        })).filter((c) => isFinite(c.c));
-        if (candles.length >= 10) return candles.slice(-180);
-      } catch (e) { lastErr = e; }
-    }
+    try {
+      const url = `https://${host}/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=200`;
+      const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+      if (!res.ok) { lastErr = new Error(`Binance ${host}/${symbol}: ${res.status}`); continue; }
+      const rows: any[] = await res.json();
+      const candles: Candle[] = rows.map((r) => ({
+        t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
+      })).filter((c) => isFinite(c.c));
+      if (candles.length >= 10) return candles.slice(-180);
+    } catch (e) { lastErr = e; }
   }
   throw lastErr ?? new Error("Binance unavailable");
 }
 
-async function fetchFromStooq(): Promise<Candle[]> {
-  const res = await fetch("https://stooq.com/q/d/l/?s=xauusd&i=d", {
+async function fetchFromStooq(symbol: string): Promise<Candle[]> {
+  const res = await fetch(`https://stooq.com/q/d/l/?s=${symbol}&i=d`, {
     headers: { "User-Agent": "Mozilla/5.0" },
   });
   if (!res.ok) throw new Error(`Stooq: ${res.status}`);
@@ -161,33 +143,38 @@ async function fetchFromStooq(): Promise<Candle[]> {
     if (!isFinite(oN) || !isFinite(cN)) continue;
     candles.push({ t, o: oN, h: hN, l: lN, c: cN, v: +v || 0 });
   }
-  return candles.slice(-120);
+  return candles.slice(-160);
 }
 
-async function fetchGoldCandles(tf: string): Promise<Candle[]> {
-  const cached = candleCache.get(tf);
+async function fetchAssetCandles(assetKey: string, tf: string): Promise<Candle[]> {
+  const a = asset(assetKey);
+  const cacheKey = `${a.key}:${tf}`;
+  const cached = candleCache.get(cacheKey);
   const now = Date.now();
   if (cached && now - cached.at < CACHE_TTL) return cached.data;
-  // Binance PAXG (tokenized gold, tracks XAU/USD closely) — most edge-friendly
-  try {
-    const data = await fetchFromBinance(tf);
-    candleCache.set(tf, { at: now, data });
-    return data;
-  } catch {}
-  try {
-    const data = await fetchFromYahoo(tf);
-    candleCache.set(tf, { at: now, data });
-    return data;
-  } catch (e) {
-    if (cached) return cached.data;
+
+  const providers: Array<() => Promise<Candle[]>> = [];
+  if (a.binance) providers.push(() => fetchFromBinance(a.binance!, tf));
+  if (a.yahoo)   providers.push(() => fetchFromYahoo(a.yahoo!, tf));
+  if (a.stooq)   providers.push(() => fetchFromStooq(a.stooq!));
+
+  let lastErr: any = null;
+  for (const fn of providers) {
     try {
-      const data = await fetchFromStooq();
-      candleCache.set(tf, { at: now, data });
-      return data;
-    } catch {
-      throw e;
-    }
+      const data = await fn();
+      if (data.length >= 10) {
+        candleCache.set(cacheKey, { at: now, data });
+        return data;
+      }
+    } catch (e) { lastErr = e; }
   }
+  if (cached) return cached.data;
+  throw lastErr ?? new Error(`No data source for ${a.short}`);
+}
+
+// Backward-compatible gold alias used by analyzeGold
+async function fetchGoldCandles(tf: string): Promise<Candle[]> {
+  return fetchAssetCandles("XAUUSD", tf);
 }
 
 export const analyzeGold = createServerFn({ method: "POST" })
