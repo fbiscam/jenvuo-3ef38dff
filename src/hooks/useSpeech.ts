@@ -53,8 +53,7 @@ export function useSpeech() {
       if (interimText) setInterim(interimText);
       if (finalText.trim()) {
         setInterim("");
-        // Always emit a new value, even if identical to previous, so consumers re-run
-        setTranscript(finalText.trim() + "\u200B".repeat(Math.floor(Math.random() * 3)));
+        setTranscript(finalText.trim());
       }
     };
     rec.onstart = () => setListening(true);
