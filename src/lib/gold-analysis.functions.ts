@@ -356,6 +356,10 @@ export type Marking =
   | { type: "liquidity"; tf: "htf" | "ltf"; price: number; side: "buy" | "sell"; label: string }
   | { type: "bos" | "choch"; tf: "htf" | "ltf"; fromTime: number; toTime: number; price: number; kind: "bullish" | "bearish"; label: string }
   | { type: "zone"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "supply" | "demand"; label: string }
+  | { type: "eqh" | "eql"; tf: "htf" | "ltf"; price: number; label: string }
+  | { type: "premiumZone" | "discountZone"; tf: "htf" | "ltf"; priceLow: number; priceHigh: number; label: string }
+  | { type: "oteZone"; tf: "htf" | "ltf"; priceLow: number; priceHigh: number; kind: "bullish" | "bearish"; label: string }
+  | { type: "breaker"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "bullish" | "bearish"; label: string }
   | { type: "entry" | "sl" | "tp"; tf: "htf" | "ltf"; price: number; label: string };
 
 export type NewsItem = {
@@ -369,6 +373,12 @@ export type NewsItem = {
 };
 
 export type KeyLevel = { label: string; price: number; kind: "resistance" | "support" | "pivot" | "premium" | "discount" | "equilibrium" };
+
+export type TfBias = { tf: "4H" | "1H" | "15M" | "5M"; bias: "bullish" | "bearish" | "neutral"; score: number; label: string };
+
+export type SetupCheck = { key: string; label: string; pass: boolean | null; reason: string };
+
+export type LiveTick = { price: number; t: number };
 
 export type SignalPlan = {
   htfBias: "bullish" | "bearish" | "neutral";
@@ -396,12 +406,17 @@ export type SignalPlan = {
     warning: string;
     events: NewsItem[];
   };
+  multiTf: TfBias[];
+  alignmentScore: number;
+  alignmentLabel: string;
+  setupScore: number;
+  setupGrade: "A+" | "A" | "B" | "C";
+  setupChecks: SetupCheck[];
   generatedAt: string;
   htfCandles: CandleDTO[];
   ltfCandles: CandleDTO[];
   currentPrice: number;
   instrument: { symbol: string; display: string; kind: InstrumentKind; decimals: number };
-
 };
 
 
