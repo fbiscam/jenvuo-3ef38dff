@@ -453,18 +453,23 @@ async function fetchGoldNewsInline(): Promise<NewsItem[]> {
 }
 
 export const getSignalPlan = createServerFn({ method: "POST" })
-  .inputValidator((_d: unknown) => ({}))
-  .handler(async () => {
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { symbol?: string };
+    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
+  })
+  .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
+    const inst = resolveInstrument(data.symbol);
+
     const [htfRaw, ltfRaw, news] = await Promise.all([
-      fetchGoldCandles("1h").catch(() => [] as Candle[]),
-      fetchGoldCandles("15m").catch(() => [] as Candle[]),
-      fetchGoldNewsInline(),
+      fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
+      fetchInstrumentCandles(inst, "15m").catch(() => [] as Candle[]),
+      inst.needsUsdNews ? fetchGoldNewsInline() : Promise.resolve([] as NewsItem[]),
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
-      throw new Error("Live gold feed unavailable. Try again in a moment.");
+      throw new Error(`Live ${inst.display} feed unavailable. Try again in a moment.`);
     }
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
