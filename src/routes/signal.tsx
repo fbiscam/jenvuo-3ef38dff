@@ -148,7 +148,7 @@ function SignalPage() {
         <div className="text-center">
           <div className="text-[10px] uppercase tracking-[0.3em] text-amber-700/80 font-bold">Jenvu AI · Institutional Desk</div>
           <div className="text-base font-black tracking-tight flex items-center justify-center gap-2">
-            XAU/USD {plan && <span className="text-amber-600 tabular-nums">${plan.currentPrice.toFixed(2)}</span>}
+            {plan?.instrument.display ?? "Loading…"} {plan && <span className="text-amber-600 tabular-nums">{plan.instrument.kind === "crypto" ? "" : "$"}{plan.currentPrice.toFixed(plan.instrument.decimals)}</span>}
             {plan && (
               <span className="ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-900 text-white tracking-wider">
                 {plan.killzone}
