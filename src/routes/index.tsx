@@ -130,18 +130,18 @@ function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 relative overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-black text-neutral-100 relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="h-7 w-7 rounded-full bg-gradient-to-br from-amber-400 to-amber-700 shadow-sm" />
           <div>
-            <h1 className="text-sm font-semibold tracking-tight text-neutral-900">GoldGPT</h1>
-            <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-400">Live voice · XAU/USD</p>
+            <h1 className="text-sm font-semibold tracking-tight text-white">GoldGPT</h1>
+            <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-500">Live voice · XAU/USD</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="h-9 w-9 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-500">
+          <button className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400">
             <Sliders className="h-4 w-4" />
           </button>
         </div>
@@ -172,10 +172,10 @@ function Home() {
       </main>
 
       {/* Bottom composer — ChatGPT style */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t from-white via-white to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t from-black via-black to-transparent">
         <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] pl-2 pr-1.5 py-1.5">
-            <button className="h-9 w-9 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-500 shrink-0">
+          <div className="flex items-center gap-2 rounded-full border border-white/10 bg-neutral-900 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.6)] pl-2 pr-1.5 py-1.5">
+            <button className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400 shrink-0">
               <Plus className="h-5 w-5" />
             </button>
             <input
@@ -185,7 +185,7 @@ function Home() {
               onKeyDown={(e) => e.key === "Enter" && submitText()}
               placeholder="Type"
               disabled={loading}
-              className="flex-1 bg-transparent text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none px-1 py-1"
+              className="flex-1 bg-transparent text-[15px] text-neutral-100 placeholder:text-neutral-500 focus:outline-none px-1 py-1"
             />
             <button
               onClick={toggleMic}
@@ -193,7 +193,7 @@ function Home() {
                 "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition",
                 speech.listening
                   ? "bg-emerald-500 text-white"
-                  : "hover:bg-neutral-100 text-neutral-600",
+                  : "hover:bg-white/10 text-neutral-300",
               )}
               aria-label="Toggle microphone"
             >
@@ -201,7 +201,7 @@ function Home() {
             </button>
             <button
               onClick={endAll}
-              className="h-9 w-9 rounded-full bg-neutral-900 text-white flex items-center justify-center shrink-0 hover:bg-neutral-800 transition"
+              className="h-9 w-9 rounded-full bg-white text-black flex items-center justify-center shrink-0 hover:bg-neutral-200 transition"
               aria-label="End"
             >
               <X className="h-4 w-4" />
