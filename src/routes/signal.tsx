@@ -34,6 +34,11 @@ function SignalPage() {
   const [playing, setPlaying] = useState(false);
   const [htfTf, setHtfTf] = useState<"1h" | "4h" | "1d">("1h");
   const [ltfTf, setLtfTf] = useState<"5m" | "15m" | "30m">("15m");
+  const [symbol, setSymbol] = useState<string>("XAUUSD");
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const currentAsset = ASSETS[symbol] ?? ASSETS.XAUUSD;
+  const prec = plan?.precision ?? currentAsset.precision;
+  const fixp = useCallback((n: number) => (isFinite(n) ? n.toFixed(prec) : "—"), [prec]);
   const [pipeline, setPipeline] = useState<number>(-1);
   const [livePrice, setLivePrice] = useState<number | null>(null);
   const [priceDelta, setPriceDelta] = useState<number>(0);
