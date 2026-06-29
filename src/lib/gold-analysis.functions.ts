@@ -705,7 +705,7 @@ Produce the A+ ICT/SMC/Volume trade plan for ${a.short} now — mark every zone,
           }))
         : fallbackKeyLevels,
       narration: Array.isArray(parsed.narration)
-        ? parsed.narration.slice(0, 16).map((n: any) => ({
+        ? parsed.narration.slice(0, 22).map((n: any) => ({
             say: String(n?.say ?? ""),
             markingIndex: typeof n?.markingIndex === "number" ? n.markingIndex : null,
             tf: n?.tf === "htf" ? "htf" : "ltf",
