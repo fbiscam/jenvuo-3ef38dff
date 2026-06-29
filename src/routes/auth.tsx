@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Mail, Lock, ArrowRight, ShieldCheck } from "lucide-react";
+import { Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { CloudOrb } from "@/components/CloudOrb";
 
@@ -31,11 +31,11 @@ const INITIAL_TICKER: TickerRow[] = [
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let alive = true;
     supabase.auth.getSession().then(({ data }) => {
       if (alive && data.session) navigate({ to: "/", replace: true });
@@ -256,7 +256,7 @@ function AuthPage() {
 }
 
 function RotatingStatus() {
-  const [idx, setIdx] = useState(0);
+  const [idx, setIdx] = React.useState(0);
   const phrases = [
     "Mapping liquidity on XAUUSD...",
     "FVG detected on BTC 15m...",
@@ -265,18 +265,10 @@ function RotatingStatus() {
     "Scanning SMT divergence..."
   ];
   
-  useEffect(() => {
+  React.useEffect(() => {
     const itv = setInterval(() => setIdx((i: number) => (i + 1) % phrases.length), 3000);
     return () => clearInterval(itv);
-  }, []);
+  }, [phrases.length]);
 
   return <span className="animate-pulse">{phrases[idx]}</span>;
-}
-
-function useState(initialValue: any): [any, any] {
-  return React.useState(initialValue);
-}
-
-function useEffect(effect: React.EffectCallback, deps?: React.DependencyList): void {
-  return React.useEffect(effect, deps);
 }
