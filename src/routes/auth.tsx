@@ -247,8 +247,10 @@ function AuthPage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
+
 
 function RotatingStatus() {
   const [idx, setIdx] = React.useState(0);
