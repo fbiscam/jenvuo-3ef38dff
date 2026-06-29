@@ -473,7 +473,7 @@ function Process() {
   return (
     <section>
       <div className="mx-auto max-w-[1320px] px-6 py-28">
-        <SectionHead eyebrow="Process" title={<>Three steps.<br /><span className="opacity-40">Zero friction.</span></>} />
+        <SectionHead eyebrow="Process" title={<>Three steps.<br /><span>Zero friction.</span></>} />
 
         <div className="mt-16 grid lg:grid-cols-3 gap-[1px] bg-[color:var(--ink)]/10 rounded-[28px] overflow-hidden border border-[color:var(--ink)]/10">
           {steps.map((s) => (
