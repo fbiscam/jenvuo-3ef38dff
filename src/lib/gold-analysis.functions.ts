@@ -206,7 +206,7 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: system },
           { role: "user", content: userPrompt },
