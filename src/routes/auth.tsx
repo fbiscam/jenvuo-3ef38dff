@@ -246,6 +246,7 @@ function AuthPage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
 
