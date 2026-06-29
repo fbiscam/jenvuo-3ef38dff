@@ -208,11 +208,8 @@ function Home() {
     <div className="min-h-screen bg-black text-neutral-100 relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center">
-          <h1 className="text-2xl font-extrabold tracking-[0.15em] text-white uppercase">
-            JENVU AI
-          </h1>
-        </div>
+        <div className="flex items-center" />
+
         <div className="flex items-center gap-3">
           <span
             className={cn(
