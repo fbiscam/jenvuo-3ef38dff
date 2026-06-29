@@ -403,7 +403,7 @@ Produce the A+ ICT/SMC trade plan now.`;
 
     const plan: SignalPlan = {
       htfBias: parsed.htfBias === "bearish" ? "bearish" : parsed.htfBias === "bullish" ? "bullish" : "neutral",
-      intro: String(parsed.intro ?? "Chalo gold ka analysis shuru karte hain."),
+      intro: String(parsed.intro ?? "Let's break down the live gold chart together."),
       narration: Array.isArray(parsed.narration)
         ? parsed.narration.slice(0, 12).map((n: any) => ({
             say: String(n?.say ?? ""),
