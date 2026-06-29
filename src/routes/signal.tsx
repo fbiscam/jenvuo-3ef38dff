@@ -12,6 +12,10 @@ import { cn } from "@/lib/utils";
 
 
 export const Route = createFileRoute("/signal")({
+  validateSearch: (search: Record<string, unknown>) => {
+    const raw = String(search?.symbol ?? "").toUpperCase();
+    return { symbol: ASSETS[raw] ? raw : undefined };
+  },
   head: () => ({
     meta: [
       { title: "Live AI Trading Signal — Jenvu AI" },
@@ -23,6 +27,7 @@ export const Route = createFileRoute("/signal")({
 
 function SignalPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const fetchPlan = useServerFn(getSignalPlan);
   const speech = useSpeech();
 
@@ -34,7 +39,7 @@ function SignalPage() {
   const [playing, setPlaying] = useState(false);
   const [htfTf, setHtfTf] = useState<"1h" | "4h" | "1d">("1h");
   const [ltfTf, setLtfTf] = useState<"5m" | "15m" | "30m">("15m");
-  const [symbol, setSymbol] = useState<string>("XAUUSD");
+  const [symbol, setSymbol] = useState<string>(search.symbol ?? "XAUUSD");
   const [pickerOpen, setPickerOpen] = useState(false);
   const currentAsset = ASSETS[symbol] ?? ASSETS.XAUUSD;
   const prec = plan?.precision ?? currentAsset.precision;
