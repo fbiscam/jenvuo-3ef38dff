@@ -130,13 +130,39 @@ function Home() {
   const handleCommand = useCallback(async (query: string) => {
     if (loadingRef.current || !query.trim()) return;
 
+    // Detect asset from query
+    const q = query.toLowerCase();
+    const ASSET_PATTERNS: { re: RegExp; key: string; spoken: string }[] = [
+      { re: /\b(bitcoin|btc)\b/, key: "BTCUSD", spoken: "Bitcoin" },
+      { re: /\b(ethereum|eth)\b/, key: "ETHUSD", spoken: "Ethereum" },
+      { re: /\b(solana|sol)\b/, key: "SOLUSD", spoken: "Solana" },
+      { re: /\b(bnb|binance\s*coin)\b/, key: "BNBUSD", spoken: "B N B" },
+      { re: /\b(xrp|ripple)\b/, key: "XRPUSD", spoken: "X R P" },
+      { re: /\b(doge|dogecoin)\b/, key: "DOGEUSD", spoken: "Dogecoin" },
+      { re: /\b(eur\s*usd|eurusd|euro|eur)\b/, key: "EURUSD", spoken: "Euro Dollar" },
+      { re: /\b(gbp\s*usd|gbpusd|pound|cable|gbp)\b/, key: "GBPUSD", spoken: "Pound Dollar" },
+      { re: /\b(usd\s*jpy|usdjpy|yen|jpy)\b/, key: "USDJPY", spoken: "Dollar Yen" },
+      { re: /\b(aud\s*usd|audusd|aussie|aud)\b/, key: "AUDUSD", spoken: "Aussie Dollar" },
+      { re: /\b(usd\s*cad|usdcad|loonie|cad)\b/, key: "USDCAD", spoken: "Dollar Loonie" },
+      { re: /\b(usd\s*chf|usdchf|swissie|chf)\b/, key: "USDCHF", spoken: "Dollar Swissie" },
+      { re: /\b(nzd\s*usd|nzdusd|kiwi|nzd)\b/, key: "NZDUSD", spoken: "Kiwi Dollar" },
+      { re: /\b(silver|xag)\b/, key: "XAGUSD", spoken: "Silver" },
+      { re: /\b(gold|xau)\b/, key: "XAUUSD", spoken: "Gold" },
+    ];
+    const matched = ASSET_PATTERNS.find((p) => p.re.test(q));
+    const hasSignalVerb = /\b(signal|setup|trade\s*idea|trade\s*plan|plan|analy[sz]e|analysis|chart|live\s*chart|new\s*signal|entry|buy|sell|long|short|price|forecast)\b/i.test(query);
+
     // Signal/setup/trade intent → navigate to /signal page
-    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analy[sz]e\s*gold|gold\s*(signal|setup|entry|trade|plan)|live\s*chart|show\s*chart|new\s*signal)\b/i.test(query)) {
+    if (hasSignalVerb || matched) {
       speech.stopSpeaking();
       speech.pauseListening();
-      navigate({ to: "/signal" });
+      const symbol = matched?.key ?? "XAUUSD";
+      const spoken = matched?.spoken ?? "Gold";
+      speech.speak(`Opening live ${spoken} analysis.`, () => {});
+      navigate({ to: "/signal", search: { symbol } });
       return;
     }
+
 
     loadingRef.current = true;
     setLoading(true);
