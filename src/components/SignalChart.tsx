@@ -17,7 +17,7 @@ import type { CandleDTO, Marking } from "@/lib/gold-analysis.functions";
 export type SignalChartHandle = {
   drawMarking: (m: Marking) => void;
   clear: () => void;
-  updateLivePrice: (price: number) => void;
+  updateLivePrice: (price: number, tSeconds?: number) => void;
 };
 
 
