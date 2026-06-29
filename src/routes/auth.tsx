@@ -54,7 +54,7 @@ function AuthPage() {
 
         <div className="relative w-full max-w-md">
           {/* glass card */}
-          <div className="relative rounded-3xl bg-white/80 backdrop-blur-xl border border-black/10 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)] p-8 sm:p-10">
+          <div className="relative rounded-3xl bg-transparent p-8 sm:p-10">
             {/* logo badge */}
             <div className="flex items-center gap-3 mb-8">
               <div className="w-11 h-11 flex items-center justify-center">
