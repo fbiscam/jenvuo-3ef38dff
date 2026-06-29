@@ -11,9 +11,9 @@ export function PageShell({
   children,
 }: {
   eyebrow: string;
-  title: string;
+  title: React.ReactNode;
   intro?: string;
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
   return (
     <>
