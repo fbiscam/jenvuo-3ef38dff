@@ -611,6 +611,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
           { role: "user", content: user },
         ],
         response_format: { type: "json_object" },
+        max_tokens: 4096,
       }),
     });
 
@@ -622,12 +623,27 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     }
     const aiJson: any = await aiRes.json();
     const content = aiJson?.choices?.[0]?.message?.content ?? "{}";
-    let parsed: any;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
+    let parsed: any = {};
+    const tryParse = (s: string) => { try { return JSON.parse(s); } catch { return null; } };
+    const repair = (s: string) =>
+      s
+        .replace(/```json\s*/gi, "")
+        .replace(/```\s*/g, "")
+        .replace(/[\x00-\x1F\x7F]/g, " ")
+        .replace(/,\s*([}\]])/g, "$1");
+    parsed = tryParse(content);
+    if (!parsed) {
       const m = content.match(/\{[\s\S]*\}/);
-      parsed = m ? JSON.parse(m[0]) : {};
+      if (m) {
+        parsed = tryParse(m[0]) ?? tryParse(repair(m[0]));
+        if (!parsed) {
+          let s = repair(m[0]);
+          const opens = (s.match(/\{/g) || []).length - (s.match(/\}/g) || []).length;
+          const opensA = (s.match(/\[/g) || []).length - (s.match(/\]/g) || []).length;
+          s = s.replace(/,\s*$/, "") + "]".repeat(Math.max(0, opensA)) + "}".repeat(Math.max(0, opens));
+          parsed = tryParse(s) ?? {};
+        }
+      }
     }
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
