@@ -238,16 +238,11 @@ function Home() {
         <div className="flex flex-col items-center gap-6 flex-1">
           <CloudOrb status={status} />
           <div className="text-center min-h-[2.5rem]">
-            <div className="text-[11px] font-medium uppercase tracking-[0.3em] text-neutral-400">
-              {status === "listening" && "Listening"}
-              {status === "thinking" && "Thinking…"}
-              {status === "speaking" && "Speaking"}
-              
-            </div>
             {speech.interim && (
               <div className="mt-2 text-sm text-neutral-400 italic max-w-md">{speech.interim}</div>
             )}
           </div>
+
         </div>
 
         {signal && (
