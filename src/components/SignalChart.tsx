@@ -85,6 +85,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     chart.timeScale().fitContent();
     chartRef.current = chart;
     seriesRef.current = series;
+    markersPluginRef.current = createSeriesMarkers(series, []);
 
     const redrawBoxes = () => {
       if (!overlayRef.current || !seriesRef.current || !chartRef.current) return;
