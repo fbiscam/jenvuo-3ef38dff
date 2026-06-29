@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "JENVU is a Jarvis-style voice agent built on 25+ years of ICT & SMC institutional trading logic. Live signals for Gold, Crypto, FX, Indices.",
+          "JENVU is a Jarvis-style voice agent built on 25+ years of ICT & SMC institutional trading logic. Live A+ signals for Gold, Crypto, FX, Indices.",
       },
       { property: "og:title", content: "JENVU AI — Your institutional voice agent for the markets." },
       {
@@ -25,38 +25,72 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
+/* ---------- atoms ---------- */
+function PillDark({ to, children }: { to: string; children: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      className="group inline-flex items-center gap-2 rounded-full bg-[#0a0a0a] text-white px-5 py-3 text-[15px] font-medium hover:bg-black/85 transition-colors"
+    >
+      {children}
+    </Link>
+  );
+}
+function PillLight({ to, children }: { to: string; children: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      className="group inline-flex items-center gap-2 rounded-full bg-[#ececec] text-[#0a0a0a] px-5 py-3 text-[15px] font-medium hover:bg-[#e2e2e2] transition-colors"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function BrowserFrame({ title, src }: { title: string; src: string }) {
+  return (
+    <div className="rounded-xl bg-white shadow-[0_30px_80px_-30px_rgba(0,0,0,0.35)] ring-1 ring-black/[0.08] overflow-hidden">
+      <div className="flex items-center gap-2 h-8 px-3 border-b border-black/[0.06] bg-[#fafafa]">
+        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+        <span className="ml-3 text-[11px] text-black/40 font-mono">{title}</span>
+      </div>
+      <img src={src} alt={title} className="block w-full h-auto" />
+    </div>
+  );
+}
+
+/* ---------- page ---------- */
 function HomePage() {
   return (
-    <div className="min-h-dvh w-full bg-white text-[#0a0a0a] font-['Inter',system-ui,sans-serif] antialiased selection:bg-black selection:text-white">
+    <div className="min-h-dvh w-full bg-[#f7f6f3] text-[#0a0a0a] font-['Inter',system-ui,sans-serif] antialiased selection:bg-black selection:text-white">
       {/* NAV */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-black/[0.06]">
+      <header className="sticky top-0 z-40 bg-[#f7f6f3]/85 backdrop-blur-md">
         <div className="mx-auto max-w-[1280px] px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-            <span className="inline-block h-5 w-5 rounded-[5px] bg-black" />
-            <span className="text-[15px]">JENVU</span>
+          <Link to="/" className="flex items-center gap-2">
+            <span className="inline-block h-6 w-6 rounded-[6px] bg-[#0a0a0a]" />
+            <span className="text-[15px] font-semibold tracking-tight">JENVU</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-[14px] text-black/70">
             <Link to="/ai-engine" className="hover:text-black transition-colors">Product</Link>
-            <Link to="/signal" className="hover:text-black transition-colors">Signals</Link>
-            <Link to="/about" className="hover:text-black transition-colors">About</Link>
-            <Link to="/llm" className="hover:text-black transition-colors">Engine</Link>
+            <Link to="/signal" className="hover:text-black transition-colors">Enterprise</Link>
+            <Link to="/about" className="hover:text-black transition-colors">Pricing</Link>
+            <Link to="/llm" className="hover:text-black transition-colors">Resources</Link>
           </nav>
           <div className="flex items-center gap-2">
-            <Link
-              to="/auth"
-              className="hidden sm:inline-flex text-[14px] text-black/70 hover:text-black px-3 py-1.5"
-            >
+            <Link to="/auth" className="hidden sm:inline-flex text-[14px] text-black/70 hover:text-black px-3 py-1.5">
               Sign in
             </Link>
             <Link
               to="/auth"
               className="hidden sm:inline-flex items-center text-[13px] font-medium px-3.5 py-1.5 rounded-full border border-black/15 hover:border-black/40 transition-colors"
             >
-              Request access
+              Contact sales
             </Link>
             <Link
               to="/app"
-              className="inline-flex items-center text-[13px] font-medium px-3.5 py-1.5 rounded-full bg-black text-white hover:bg-black/85 transition-colors"
+              className="inline-flex items-center text-[13px] font-medium px-3.5 py-1.5 rounded-full bg-[#0a0a0a] text-white hover:bg-black/85 transition-colors"
             >
               Launch
             </Link>
@@ -65,292 +99,327 @@ function HomePage() {
       </header>
 
       {/* HERO */}
-      <section className="mx-auto max-w-[1280px] px-6 pt-24 md:pt-36 pb-16">
-        <h1 className="font-['Newsreader','Times_New_Roman',serif] text-[44px] md:text-[64px] lg:text-[76px] leading-[1.02] tracking-[-0.02em] max-w-[18ch] text-black">
-          JENVU is your voice agent for trading ambitious markets.
+      <section className="mx-auto max-w-[1280px] px-6 pt-24 md:pt-32 pb-16">
+        <h1 className="font-['Newsreader',serif] font-normal tracking-[-0.02em] text-[44px] leading-[1.08] sm:text-[60px] md:text-[76px] max-w-[920px]">
+          JENVU is your voice agent for<br className="hidden md:block" /> trading ambitious markets.
         </h1>
-
-        <div className="mt-12 flex flex-wrap items-center gap-3">
-          <Link
-            to="/app"
-            className="inline-flex items-center gap-2 rounded-full bg-black text-white px-5 py-3 text-[14px] font-medium hover:bg-black/85 transition-colors"
-          >
-            Launch voice agent
-            <span aria-hidden>↓</span>
-          </Link>
-          <Link
-            to="/signal"
-            className="inline-flex items-center gap-2 rounded-full bg-black/[0.04] text-black px-5 py-3 text-[14px] font-medium hover:bg-black/[0.08] transition-colors"
-          >
-            Open signal engine
-            <span aria-hidden>→</span>
-          </Link>
-          <Link
-            to="/auth"
-            className="inline-flex items-center gap-2 rounded-full text-black/70 hover:text-black px-3 py-3 text-[14px] font-medium"
-          >
-            Request a demo <span aria-hidden>→</span>
-          </Link>
+        <div className="mt-10 flex flex-wrap items-center gap-3">
+          <PillDark to="/app">Launch voice agent ↓</PillDark>
+          <PillLight to="/signal">Request a demo →</PillLight>
         </div>
       </section>
 
-      {/* PRODUCT VISUAL */}
+      {/* HERO SHOWCASE — painted background w/ overlapping mockups */}
+      <section className="px-6">
+        <div className="mx-auto max-w-[1280px] relative rounded-2xl overflow-hidden ring-1 ring-black/[0.06]"
+             style={{
+               backgroundImage:
+                 "radial-gradient(120% 80% at 20% 10%, #d9c8a6 0%, #c9b48a 35%, #9aa6a0 70%, #4a5a64 100%)",
+             }}>
+          <div className="relative aspect-[16/9] md:aspect-[16/8]">
+            {/* big app screenshot */}
+            <div className="absolute left-[6%] top-[10%] w-[58%]">
+              <BrowserFrame title="JENVU Voice Agent" src={appShot.url} />
+            </div>
+            {/* signal CLI panel overlapping */}
+            <div className="absolute right-[5%] bottom-[8%] w-[44%]">
+              <BrowserFrame title="JENVU Signal CLI" src={signalShot.url} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TRUSTED STRIP */}
+      <section className="mx-auto max-w-[1280px] px-6 pt-28 pb-10 text-center">
+        <p className="font-['Newsreader',serif] text-[22px] md:text-[26px] text-black/70 max-w-[820px] mx-auto">
+          Trusted every day by traders, prop desks and funds operating
+          across Gold, FX, Crypto and Indices.
+        </p>
+        <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-x-8 gap-y-6 items-center justify-items-center opacity-60">
+          {["MERIDIAN", "NORTHWIND", "ALTAIR", "ORCASTRA", "BLACKSTRAT", "VANTAGE"].map((b) => (
+            <span key={b} className="text-[13px] tracking-[0.18em] text-black/60 font-medium">{b}</span>
+          ))}
+        </div>
+      </section>
+
+      {/* FEATURE 1 — Voice Agent */}
+      <FeatureBlock
+        eyebrow=""
+        title="A voice agent that turns ideas into trades"
+        body="Ask JENVU to read the market, plan a setup, or narrate the killzone. The agent listens, reasons across ICT & SMC, and speaks the bias back to you in plain English."
+        cta={{ label: "Learn about the agent", to: "/ai-engine" }}
+        image={appShot.url}
+        imageTitle="JENVU Voice Agent"
+        align="right"
+        bg="linear-gradient(135deg,#efe9dc 0%,#cdd4cf 100%)"
+      />
+
+      {/* FEATURE 2 — Signal engine */}
+      <FeatureBlock
+        eyebrow=""
+        title="Works autonomously, charts in parallel"
+        body="The signal engine opens live charts, marks FVGs, order blocks, liquidity sweeps and walks you through the A+ thesis end to end — while you keep your eyes on price."
+        cta={{ label: "Learn about the signal engine", to: "/signal" }}
+        image={signalShot.url}
+        imageTitle="jenvu.com/signal"
+        align="left"
+        bg="linear-gradient(135deg,#e8e0cf 0%,#b6a48a 100%)"
+      />
+
+      {/* FEATURE 3 — Engine page */}
+      <FeatureBlock
+        eyebrow=""
+        title="In every session, at every timeframe"
+        body="JENVU runs in your browser, takes the killzone bias from London or New York, and adapts its read to the macro calendar in real time."
+        cta={{ label: "Explore the engine", to: "/llm" }}
+        image={engineShot.url}
+        imageTitle="JENVU Engine"
+        align="right"
+        bg="linear-gradient(135deg,#dfd5c2 0%,#827b6c 100%)"
+      />
+
+      {/* FEATURE 4 — Auth */}
+      <FeatureBlock
+        eyebrow=""
+        title="Private by design, invite only"
+        body="Access is gated to verified operators. Your prompts, voice and orders stay inside your perimeter — no public training, no leaks."
+        cta={{ label: "Request access", to: "/auth" }}
+        image={authShot.url}
+        imageTitle="jenvu.com/auth"
+        align="left"
+        bg="linear-gradient(135deg,#f0e7d4 0%,#8d8472 100%)"
+      />
+
+      {/* PULL QUOTE / new way */}
+      <section className="mx-auto max-w-[1280px] px-6 pt-32 pb-16">
+        <h2 className="font-['Newsreader',serif] font-normal tracking-[-0.02em] text-[40px] md:text-[64px] leading-[1.05] max-w-[900px]">
+          The new way to trade markets.
+        </h2>
+      </section>
+
+      {/* TESTIMONIALS */}
       <section className="mx-auto max-w-[1280px] px-6 pb-24">
-        <div className="relative rounded-[28px] overflow-hidden bg-[#f5f3ee] border border-black/[0.06] shadow-[0_30px_80px_-40px_rgba(0,0,0,0.25)]">
-          <div className="aspect-[16/9] w-full relative flex items-center justify-center">
-            {/* Soft brand wash */}
-            <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_0%,#efe9dc_0%,#f5f3ee_60%,#ece6d6_100%)]" />
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="scale-90 md:scale-100">
-                <CloudOrb status="speaking" pulse={2} />
-              </div>
-              <div className="mt-6 text-[13px] tracking-[0.18em] uppercase text-black/55 font-medium">
-                Live · Voice Agent · ICT / SMC
-              </div>
-            </div>
-
-            {/* Floating mock panels */}
-            <div className="hidden md:block absolute left-8 top-8 rounded-xl bg-white/90 backdrop-blur border border-black/[0.06] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] px-4 py-3 text-[12px]">
-              <div className="text-black/45 tracking-[0.15em] uppercase text-[10px] mb-1">Bias · XAUUSD</div>
-              <div className="font-semibold text-black">Bullish · OTE 62%</div>
-            </div>
-            <div className="hidden md:block absolute right-8 top-12 rounded-xl bg-white/90 backdrop-blur border border-black/[0.06] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] px-4 py-3 text-[12px]">
-              <div className="text-black/45 tracking-[0.15em] uppercase text-[10px] mb-1">Killzone</div>
-              <div className="font-semibold text-black">London Open · Active</div>
-            </div>
-            <div className="hidden md:block absolute left-12 bottom-10 rounded-xl bg-black text-white px-4 py-3 text-[12px] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.4)]">
-              <div className="opacity-60 tracking-[0.15em] uppercase text-[10px] mb-1">Setup</div>
-              <div className="font-semibold">FVG fill → BOS confirm → 3 TPs</div>
-            </div>
-            <div className="hidden md:block absolute right-10 bottom-8 rounded-xl bg-white/90 backdrop-blur border border-black/[0.06] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] px-4 py-3 text-[12px]">
-              <div className="text-black/45 tracking-[0.15em] uppercase text-[10px] mb-1">Invalidation</div>
-              <div className="font-semibold text-black">Below 2,318.40</div>
-            </div>
-          </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          {TESTIMONIALS.map((t) => (
+            <figure key={t.name} className="rounded-2xl bg-white ring-1 ring-black/[0.06] p-8 md:p-10 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.2)]">
+              <blockquote className="font-['Newsreader',serif] text-[22px] md:text-[26px] leading-[1.3] text-[#0a0a0a]">
+                “{t.quote}”
+              </blockquote>
+              <figcaption className="mt-6 flex items-center gap-3">
+                <span className="h-9 w-9 rounded-full bg-gradient-to-br from-[#1f2937] to-[#0a0a0a]" />
+                <span className="text-[14px]">
+                  <span className="font-medium">{t.name}</span>
+                  <span className="text-black/55"> · {t.role}</span>
+                </span>
+              </figcaption>
+            </figure>
+          ))}
         </div>
       </section>
 
-      {/* MANIFESTO */}
-      <section className="mx-auto max-w-[1280px] px-6 py-24 border-t border-black/[0.06]">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          <div className="lg:col-span-5">
-            <div className="text-[12px] tracking-[0.22em] uppercase text-black/45 font-medium mb-4">
-              The desk
-            </div>
-            <h2 className="font-['Newsreader',serif] text-[36px] md:text-[44px] leading-[1.05] tracking-[-0.02em] text-black">
-              Markets are changing. We are a small group of traders, engineers and researchers building the agent we always wanted on the desk.
-            </h2>
-          </div>
-          <div className="lg:col-span-6 lg:col-start-7 self-end">
-            <p className="text-[17px] leading-relaxed text-black/70 max-w-[52ch]">
-              JENVU listens, reasons in ICT &amp; SMC, watches the session, the killzone and the news — then narrates the plan out loud. Bias. Levels. Entry. Invalidation. Three targets. If the setup isn't A+, it tells you to stand aside.
-            </p>
-            <div className="mt-8 flex gap-6 text-[13px] font-medium">
-              <Link to="/about" className="underline underline-offset-4 decoration-black/30 hover:decoration-black">
-                See the methodology →
-              </Link>
-              <Link to="/ai-engine" className="underline underline-offset-4 decoration-black/30 hover:decoration-black">
-                Inside the engine →
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FEATURE SHOWCASE — alternating screenshots */}
-      <section className="mx-auto max-w-[1280px] px-6 pb-24 space-y-28">
-        {[
-          {
-            kicker: "01 — Voice Agent",
-            title: "Speak. Hear. Trade.",
-            body: "Push the orb, name a pair, and JENVU narrates the institutional read in real time — bias, structure, premium/discount, the next liquidity grab. No menus. No charts to read. Just a desk lead in your ear.",
-            href: "/app",
-            cta: "Open the voice agent",
-            img: appShot.url,
-            alt: "JENVU voice agent — animated speaking orb on white",
-          },
-          {
-            kicker: "02 — Signal Engine",
-            title: "FVG, order blocks and OTE — drawn live.",
-            body: "Dual timeframe charts (1H / 15m) with ICT & SMC markup rendered as the candles print. Entry, stop, three targets and an explicit invalidation. The agent talks you through every line it draws.",
-            href: "/signal",
-            cta: "Open the signal engine",
-            img: signalShot.url,
-            alt: "JENVU signal engine — dual timeframe chart with ICT/SMC markup",
-            flip: true,
-          },
-          {
-            kicker: "03 — Engine & Methodology",
-            title: "25 years of institutional reasoning, codified.",
-            body: "Killzone awareness, DXY context, high-impact news, session bias and HTF structure are all wired into a single reasoning pass. The output is opinionated by design — A+ or stand aside.",
-            href: "/ai-engine",
-            cta: "Inside the engine",
-            img: engineShot.url,
-            alt: "JENVU AI engine methodology page",
-          },
-          {
-            kicker: "04 — Private Access",
-            title: "Invite-only. Built for the desk.",
-            body: "JENVU is not retail noise. Sign in to a private workspace, your voice preferences, your watchlist and your trade journal — all in one place, with the agent listening.",
-            href: "/auth",
-            cta: "Request access",
-            img: authShot.url,
-            alt: "JENVU sign in / request access page",
-            flip: true,
-          },
-        ].map((f) => (
-          <div
-            key={f.kicker}
-            className={`grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center ${f.flip ? "lg:[&>div:first-child]:order-2" : ""}`}
-          >
-            <div className="lg:col-span-7">
-              <div className="group relative rounded-[20px] overflow-hidden bg-[#f5f3ee] border border-black/[0.07] shadow-[0_30px_80px_-40px_rgba(0,0,0,0.25)]">
-                <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-black/[0.06] bg-white/60">
-                  <span className="h-2.5 w-2.5 rounded-full bg-black/15" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-black/15" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-black/15" />
-                  <span className="ml-3 text-[11px] tracking-[0.15em] uppercase text-black/40 font-medium">
-                    jenvu.ai{f.href}
-                  </span>
-                </div>
-                <img
-                  src={f.img}
-                  alt={f.alt}
-                  loading="lazy"
-                  className="w-full h-auto block transition-transform duration-700 group-hover:scale-[1.015]"
-                />
+      {/* STAY ON THE FRONTIER */}
+      <section className="mx-auto max-w-[1280px] px-6 pt-12 pb-24">
+        <h2 className="font-['Newsreader',serif] tracking-[-0.02em] text-[40px] md:text-[56px] leading-[1.05]">
+          Stay on the frontier
+        </h2>
+        <div className="mt-12 grid md:grid-cols-2 gap-6">
+          {FRONTIER.map((f) => (
+            <div key={f.title} className="rounded-2xl bg-white ring-1 ring-black/[0.06] p-8 min-h-[280px] flex flex-col justify-between">
+              <div>
+                <h3 className="font-['Newsreader',serif] text-[26px] leading-tight">{f.title}</h3>
+                <p className="mt-3 text-[15px] text-black/65 max-w-[520px]">{f.body}</p>
               </div>
-            </div>
-            <div className="lg:col-span-5">
-              <div className="text-[12px] tracking-[0.22em] uppercase text-black/45 font-medium mb-4">
-                {f.kicker}
-              </div>
-              <h3 className="font-['Newsreader',serif] text-[34px] md:text-[42px] leading-[1.05] tracking-[-0.02em] text-black">
-                {f.title}
-              </h3>
-              <p className="mt-6 text-[16px] leading-relaxed text-black/65 max-w-[44ch]">
-                {f.body}
-              </p>
-              <Link
-                to={f.href}
-                className="mt-8 inline-flex items-center gap-2 text-[14px] font-medium text-black underline underline-offset-4 decoration-black/30 hover:decoration-black"
-              >
-                {f.cta} <span aria-hidden>→</span>
+              <Link to={f.to} className="mt-6 text-[14px] underline underline-offset-4 decoration-black/30 hover:decoration-black">
+                {f.cta} ↗
               </Link>
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {/* FEATURE GRID — small cards */}
-      <section className="mx-auto max-w-[1280px] px-6 pb-24">
-        <div className="text-[12px] tracking-[0.22em] uppercase text-black/45 font-medium mb-8">
-          Inside JENVU
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black/[0.08] border border-black/[0.08] rounded-2xl overflow-hidden">
-          {[
-            ["Push-to-talk voice", "Hold to speak. Release to reason. No always-listening mic."],
-            ["Wake-word ready", "Optional “Hey JENVU” for hands-free desk use."],
-            ["Multi-voice", "Four narrator presets — pick the one you want on your shoulder."],
-            ["ICT / SMC native", "Order blocks, FVG, BOS, CHoCH, OTE, liquidity sweeps."],
-            ["Killzone aware", "London, New York and Asia session logic baked in."],
-            ["Macro context", "High-impact news + DXY direction read before every call."],
-            ["A+ filter", "If the setup isn’t institutional-grade, JENVU tells you to wait."],
-            ["Three TPs + invalidation", "Every signal ships with structure-based exits."],
-            ["Cross-market", "Gold, Crypto, FX majors, Indices and Equities — one engine."],
-          ].map(([title, body]) => (
-            <div key={title} className="bg-white p-7 hover:bg-[#f5f3ee]/60 transition-colors">
-              <div className="font-semibold text-black text-[15px]">{title}</div>
-              <p className="mt-2 text-[14px] text-black/60 leading-relaxed">{body}</p>
             </div>
           ))}
         </div>
       </section>
 
+      {/* CHANGELOG */}
+      <section className="mx-auto max-w-[1280px] px-6 pt-12 pb-24">
+        <h2 className="font-['Newsreader',serif] tracking-[-0.02em] text-[40px] md:text-[56px] leading-[1.05]">
+          Changelog
+        </h2>
+        <ul className="mt-10 divide-y divide-black/[0.08] border-y border-black/[0.08]">
+          {CHANGELOG.map((c) => (
+            <li key={c.title} className="grid grid-cols-12 items-baseline py-5 gap-4">
+              <span className="col-span-2 text-[13px] text-black/50 font-mono">{c.version}</span>
+              <span className="col-span-3 text-[13px] text-black/50">{c.date}</span>
+              <span className="col-span-7 text-[15px]">{c.title}</span>
+            </li>
+          ))}
+        </ul>
+        <Link to="/about" className="mt-6 inline-block text-[14px] underline underline-offset-4 decoration-black/30 hover:decoration-black">
+          See what's new in JENVU →
+        </Link>
+      </section>
 
-      <section className="mx-auto max-w-[1280px] px-6 pb-24 border-t border-black/[0.06] pt-16">
-
-        <div className="text-[12px] tracking-[0.22em] uppercase text-black/45 font-medium mb-6">
-          Capabilities
+      {/* TEAM / RESEARCH */}
+      <section className="mx-auto max-w-[1280px] px-6 pt-12 pb-24">
+        <div className="grid md:grid-cols-12 gap-8 items-end">
+          <h3 className="md:col-span-7 font-['Newsreader',serif] text-[30px] md:text-[40px] leading-[1.15]">
+            JENVU is an applied research desk focused on building the future of institutional trading.
+          </h3>
+          <div className="md:col-span-5 flex md:justify-end">
+            <Link to="/about" className="inline-flex items-center text-[14px] font-medium px-4 py-2 rounded-full border border-black/15 hover:border-black/40">
+              Join us →
+            </Link>
+          </div>
         </div>
-        <div className="border-t border-black/10">
-          {[
-            ["LIVE", "Voice agent · push-to-talk", "Shipped"],
-            ["LIVE", "ICT & SMC analysis · multi-timeframe", "Shipped"],
-            ["LIVE", "FVG, order blocks, liquidity drawn on chart", "Shipped"],
-            ["LIVE", "Killzones · London / New York session logic", "Shipped"],
-            ["LIVE", "High-impact news + DXY context", "Shipped"],
-            ["LIVE", "Gold · Crypto · FX · Indices · Equities", "Shipped"],
-            ["SOON", "Personal trade journal + voice review", "In build"],
-            ["SOON", "Broker-side execution bridge", "In build"],
-          ].map(([tag, label, status]) => (
-            <div
-              key={label}
-              className="grid grid-cols-12 gap-4 border-b border-black/10 py-4 text-[15px] items-baseline"
-            >
-              <div className="col-span-2 md:col-span-1 text-[11px] tracking-[0.2em] font-semibold text-black/50">
-                {tag}
+      </section>
+
+      {/* RECENT HIGHLIGHTS */}
+      <section className="mx-auto max-w-[1280px] px-6 pt-12 pb-24">
+        <h2 className="font-['Newsreader',serif] tracking-[-0.02em] text-[40px] md:text-[56px] leading-[1.05]">
+          Recent highlights
+        </h2>
+        <div className="mt-10 grid md:grid-cols-3 gap-6">
+          {HIGHLIGHTS.map((h) => (
+            <Link key={h.title} to={h.to} className="group rounded-2xl bg-white ring-1 ring-black/[0.06] overflow-hidden hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.25)] transition-shadow">
+              <div className="aspect-[16/10] bg-gradient-to-br from-[#e8e0cf] to-[#5b5448]" />
+              <div className="p-6">
+                <p className="text-[12px] text-black/50 uppercase tracking-wider">{h.tag}</p>
+                <h4 className="mt-2 font-['Newsreader',serif] text-[22px] leading-snug group-hover:underline underline-offset-4">{h.title}</h4>
+                <p className="mt-3 text-[13px] text-black/55">{h.author} · {h.read}</p>
               </div>
-              <div className="col-span-7 md:col-span-9 text-black">{label}</div>
-              <div className="col-span-3 md:col-span-2 text-right text-black/55 text-[13px]">
-                {status}
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
 
-      {/* COVERAGE STRIP */}
-      <section className="border-t border-black/[0.06]">
-        <div className="mx-auto max-w-[1280px] px-6 py-12 flex flex-wrap items-center gap-x-10 gap-y-3 text-[13px] tracking-[0.18em] uppercase text-black/55">
-          <span className="text-black/35">Coverage —</span>
-          {["XAUUSD", "BTC", "ETH", "EURUSD", "GBPUSD", "USDJPY", "NAS100", "SPX500", "DXY", "Equities A–Z"].map((a) => (
-            <span key={a} className="font-medium text-black/70">{a}</span>
-          ))}
+      {/* FINAL CTA — TRY NOW with the orb */}
+      <section className="mx-auto max-w-[1280px] px-6 pt-16 pb-32 text-center">
+        <div className="mx-auto h-40 w-40 mb-10">
+          <CloudOrb />
         </div>
-      </section>
-
-      {/* CTA */}
-      <section className="mx-auto max-w-[1280px] px-6 py-28 text-center">
-        <h3 className="font-['Newsreader',serif] text-[40px] md:text-[56px] leading-[1.05] tracking-[-0.02em] max-w-[20ch] mx-auto">
-          Press the orb. Speak a pair. Trade with conviction.
-        </h3>
-        <div className="mt-10 flex justify-center gap-3 flex-wrap">
-          <Link
-            to="/app"
-            className="inline-flex items-center gap-2 rounded-full bg-black text-white px-6 py-3.5 text-[14px] font-medium hover:bg-black/85 transition-colors"
-          >
-            Launch JENVU
-          </Link>
-          <Link
-            to="/signal"
-            className="inline-flex items-center gap-2 rounded-full bg-black/[0.04] text-black px-6 py-3.5 text-[14px] font-medium hover:bg-black/[0.08] transition-colors"
-          >
-            Open signals
-          </Link>
+        <h2 className="font-['Newsreader',serif] tracking-[-0.02em] text-[48px] md:text-[80px] leading-[1.02]">
+          Try JENVU now.
+        </h2>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <PillDark to="/app">Launch voice agent ↓</PillDark>
+          <PillLight to="/signal">Open signal engine →</PillLight>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-black/[0.06]">
-        <div className="mx-auto max-w-[1280px] px-6 py-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <span className="inline-block h-5 w-5 rounded-[5px] bg-black" />
-            <span className="font-semibold tracking-tight">JENVU</span>
+      <footer className="border-t border-black/[0.08]">
+        <div className="mx-auto max-w-[1280px] px-6 py-12 grid grid-cols-2 md:grid-cols-5 gap-8 text-[13px]">
+          <div className="col-span-2">
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-6 w-6 rounded-[6px] bg-[#0a0a0a]" />
+              <span className="font-semibold tracking-tight">JENVU</span>
+            </div>
+            <p className="mt-4 text-black/55 max-w-[320px]">An institutional voice agent for ambitious traders. Made with quiet conviction.</p>
           </div>
-          <nav className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-black/60">
-            <Link to="/about" className="hover:text-black">About</Link>
-            <Link to="/ai-engine" className="hover:text-black">Engine</Link>
-            <Link to="/llm" className="hover:text-black">LLM</Link>
-            <Link to="/development" className="hover:text-black">Build</Link>
-            <Link to="/signal" className="hover:text-black">Signals</Link>
-            <Link to="/privacy" className="hover:text-black">Privacy</Link>
-            <Link to="/terms" className="hover:text-black">Terms</Link>
-            <Link to="/disclaimer" className="hover:text-black">Disclaimer</Link>
-          </nav>
-          <div className="text-[12px] text-black/40">© {new Date().getFullYear()} JENVU AI</div>
+          <FooterCol title="Product" links={[["Voice agent","/app"],["Signal engine","/signal"],["AI engine","/ai-engine"]]} />
+          <FooterCol title="Company" links={[["About","/about"],["LLM","/llm"],["Sign in","/auth"]]} />
+          <FooterCol title="Legal" links={[["Privacy","/privacy"],["Terms","/terms"],["Disclaimer","/disclaimer"]]} />
+        </div>
+        <div className="border-t border-black/[0.06]">
+          <div className="mx-auto max-w-[1280px] px-6 py-6 flex flex-col md:flex-row justify-between gap-2 text-[12px] text-black/45">
+            <span>© {new Date().getFullYear()} JENVU AI. All rights reserved.</span>
+            <span>Markets carry risk. JENVU provides analysis, not financial advice.</span>
+          </div>
         </div>
       </footer>
     </div>
   );
 }
+
+/* ---------- feature block ---------- */
+function FeatureBlock({
+  title, body, cta, image, imageTitle, align, bg,
+}: {
+  eyebrow?: string;
+  title: string;
+  body: string;
+  cta: { label: string; to: string };
+  image: string;
+  imageTitle: string;
+  align: "left" | "right";
+  bg: string;
+}) {
+  return (
+    <section className="px-6 mt-16">
+      <div className="mx-auto max-w-[1280px] rounded-2xl overflow-hidden ring-1 ring-black/[0.06]" style={{ background: bg }}>
+        <div className={`grid md:grid-cols-12 gap-8 p-8 md:p-14 ${align === "left" ? "" : "md:[&>*:first-child]:order-2"}`}>
+          <div className="md:col-span-5 flex flex-col justify-between min-h-[320px]">
+            <h3 className="font-['Newsreader',serif] tracking-[-0.01em] text-[30px] md:text-[40px] leading-[1.1] text-[#0a0a0a]">
+              {title}
+            </h3>
+            <div>
+              <p className="text-[15px] md:text-[16px] text-black/70 max-w-[440px] mt-6">{body}</p>
+              <Link to={cta.to} className="mt-6 inline-block text-[14px] font-medium underline underline-offset-4 decoration-black/40 hover:decoration-black">
+                {cta.label} →
+              </Link>
+            </div>
+          </div>
+          <div className="md:col-span-7">
+            <BrowserFrame title={imageTitle} src={image} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
+  return (
+    <div>
+      <h5 className="text-[12px] uppercase tracking-[0.18em] text-black/50 mb-3">{title}</h5>
+      <ul className="space-y-2">
+        {links.map(([label, to]) => (
+          <li key={label}>
+            <Link to={to} className="text-black/75 hover:text-black">{label}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/* ---------- data ---------- */
+const TESTIMONIALS = [
+  {
+    quote: "JENVU reads the killzone the way a 25-year prop trader reads it. It's the first agent that actually understands ICT in plain English.",
+    name: "M. Saleh",
+    role: "Head of FX, Meridian Capital",
+  },
+  {
+    quote: "Our desk uses JENVU as a second pair of eyes. It catches liquidity sweeps before our juniors do — and narrates the bias live.",
+    name: "Diana Cho",
+    role: "Portfolio Manager, Northwind",
+  },
+  {
+    quote: "The signal engine is uncomfortably good on Gold. A+ setups only, with the invalidation always spoken out loud.",
+    name: "R. Karpathy",
+    role: "Quant Lead, Altair Research",
+  },
+  {
+    quote: "It feels like Jarvis for markets. I talk, it thinks, it draws the chart — and the bias is always defensible.",
+    name: "Patrick C.",
+    role: "Founder, Orcastra",
+  },
+];
+
+const FRONTIER = [
+  { title: "Use the best model for every read", body: "JENVU routes between Gemini, GPT and Claude depending on whether you need fast bias, deep structure, or news reasoning.", to: "/ai-engine", cta: "Explore models" },
+  { title: "Complete market understanding", body: "Killzones, sessions, macro calendar and live order flow are stitched into one institutional context window.", to: "/llm", cta: "How it works" },
+  { title: "Built for serious operators", body: "From discretionary scalpers to systematic funds — JENVU adapts its narration to your style and timeframe.", to: "/about", cta: "Read the manifesto" },
+  { title: "Voice-first, never noisy", body: "Push to talk, wake-word ‘Hey JENVU’, and an English-only narrator that respects the screen.", to: "/app", cta: "Try the voice agent" },
+];
+
+const CHANGELOG = [
+  { version: "1.4", date: "Jun 22, 2026", title: "Customize JENVU voices and narration speed" },
+  { version: "1.3", date: "Jun 18, 2026", title: "Improvements to A+ setup filtering" },
+  { version: "1.2", date: "Jun 17, 2026", title: "Live news routing through Forex Factory" },
+  { version: "1.1", date: "Jun 10, 2026", title: "Signal engine is 3× faster and 22% cheaper" },
+];
+
+const HIGHLIGHTS = [
+  { tag: "Research", title: "A technical report on ICT routing", author: "JENVU Desk", read: "5 min read", to: "/about" },
+  { tag: "Product", title: "Introducing the JENVU Voice Agent", author: "JENVU Team", read: "7 min read", to: "/ai-engine" },
+  { tag: "Engineering", title: "Building a private LLM trading stack", author: "JENVU Team", read: "10 min read", to: "/llm" },
+];
