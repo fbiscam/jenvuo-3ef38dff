@@ -352,7 +352,7 @@ function FeatureGrid() {
             colSpan="lg:col-span-4"
             icon={<Target className="h-3 w-3" />}
             tag="A+ Only"
-            title="Entry. Stop. Three TPs. Invalidation."
+            title={<span className="whitespace-nowrap">Entry. Stop. Three TPs. Invalidation.</span>}
             body={<>When the read is weak, the desk says stand aside.<br />No noise, no FOMO.</>}
             tone="dark"
           />
