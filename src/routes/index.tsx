@@ -124,7 +124,7 @@ function HomePage() {
           <div className="lg:col-span-7">
             
             <h1 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-[1.05]">
-              <span className="whitespace-nowrap">Institutional intelligence</span><br />
+              <span className="whitespace-nowrap bg-black text-white px-3 py-1 box-decoration-clone">Institutional intelligence</span><br />
               <span className="text-zinc-900">vocalized in real time.</span>
             </h1>
             <p className="mt-6 max-w-4xl text-base md:text-lg text-zinc-900 leading-relaxed">
