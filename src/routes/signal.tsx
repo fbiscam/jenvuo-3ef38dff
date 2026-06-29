@@ -636,106 +636,93 @@ function TfPill({ tfBias }: { tfBias: SignalPlan["multiTf"][number] }) {
 
 function SetupScoreCard({ plan }: { plan: SignalPlan }) {
   const isTop = plan.setupGrade === "A+" || plan.setupGrade === "A";
-  const barTone =
-    plan.setupGrade === "A+" ? "bg-zinc-900" :
-    plan.setupGrade === "A" ? "bg-zinc-900" :
-    plan.setupGrade === "B" ? "bg-zinc-700" :
-    "bg-rose-500";
-  const blurb =
-    plan.setupGrade === "A+" ? "Institutional-grade alignment." :
-    plan.setupGrade === "A" ? "Strong A-class setup." :
-    plan.setupGrade === "B" ? "Decent setup — manage risk tighter." :
-    "Lower conviction — consider standing aside.";
+  const passed = plan.setupChecks.filter((c) => c.pass === true).length;
+  const total = plan.setupChecks.length;
+  const sentimentLabel = isTop ? "Bullish" : plan.setupGrade === "B" ? "Neutral" : "Bearish";
+  const sentimentTone = isTop ? "text-emerald-600" : plan.setupGrade === "B" ? "text-zinc-600" : "text-rose-600";
+  const barFill = isTop ? "bg-emerald-500" : plan.setupGrade === "B" ? "bg-zinc-700" : "bg-rose-500";
+
+  // Deterministic bar heights per check (passed = tall/dark, failed = short/light)
+  const bars = plan.setupChecks.map((c, i) => {
+    const base = 30 + ((i * 37) % 55); // varied heights
+    const h = c.pass === true ? Math.max(55, base + 20) : c.pass === false ? Math.min(40, base - 10) : base;
+    return { h, pass: c.pass };
+  });
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-zinc-200 bg-white overflow-hidden shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)]"
+      className="rounded-2xl border border-zinc-200 bg-white overflow-hidden"
     >
-      {/* Terminal header bar */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-100 bg-zinc-50/60">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-zinc-300" />
-          <span className="w-2 h-2 rounded-full bg-zinc-300" />
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span className={`ml-2 text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+      <div className="p-4 space-y-4">
+        {/* Header row: label + score */}
+        <div className="flex items-center justify-between">
+          <span className={`text-[11px] ${MONO} tracking-widest uppercase text-zinc-900`}>
             A+ Setup Score
           </span>
-        </div>
-        <span className={`text-[10px] ${MONO} tabular-nums text-zinc-500`}>
-          {plan.setupScore}/100
-        </span>
-      </div>
-
-      {/* Hero grade row */}
-      <div className="px-3 pt-3 pb-2 flex items-stretch gap-3">
-        <div className={cn(
-          "h-14 w-14 rounded-xl grid place-items-center shrink-0 border",
-          isTop ? "bg-zinc-900 border-zinc-900 text-white" : "bg-white border-zinc-200 text-zinc-900",
-        )}>
-          <span className={`text-xl font-black tracking-tight leading-none ${MONO}`}>
-            {plan.setupGrade}
+          <span className={`text-base font-bold tabular-nums ${MONO} text-zinc-900`}>
+            {plan.setupScore}
+            <span className="text-zinc-400 text-[11px] font-medium">/100</span>
           </span>
         </div>
-        <div className="flex-1 min-w-0 flex flex-col justify-between">
-          <div className="flex items-baseline justify-between gap-2">
-            <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Score</span>
-            <span className={`text-base font-bold tabular-nums ${MONO} text-zinc-900`}>
-              {plan.setupScore}
-              <span className="text-zinc-400 text-[11px] font-medium"> / 100</span>
-            </span>
+
+        {/* Bar chart visualization */}
+        <div className="rounded-xl border border-zinc-200 p-3">
+          <div className="flex items-end justify-between gap-1.5 h-16">
+            {bars.map((b, i) => (
+              <motion.div
+                key={i}
+                initial={{ height: 0 }}
+                animate={{ height: `${b.h}%` }}
+                transition={{ duration: 0.6, delay: i * 0.05, ease: "easeOut" }}
+                className={cn(
+                  "flex-1 rounded-t-sm",
+                  b.pass === true ? "bg-zinc-900" :
+                  b.pass === false ? "bg-zinc-200" :
+                  "bg-zinc-400",
+                )}
+              />
+            ))}
           </div>
-          <div className="w-full h-1 bg-zinc-100 rounded-full overflow-hidden">
+        </div>
+
+        {/* Sentiment row */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-zinc-700">Setup Quality</span>
+            <span className={cn("text-sm font-semibold", sentimentTone)}>{sentimentLabel}</span>
+          </div>
+          <div className="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${plan.setupScore}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className={cn("h-full", barTone)}
+              className={cn("h-full", barFill)}
             />
           </div>
-          <p className="text-[10px] text-zinc-500 leading-tight">{blurb}</p>
         </div>
-      </div>
 
-      {/* Checklist grid — terminal tile style */}
-      <div className="px-3 pb-3">
-        <div className="grid grid-cols-1 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
-          {plan.setupChecks.map((c, i) => (
-            <div
-              key={c.key}
-              title={c.reason}
-              className="flex items-center gap-2 bg-white px-2.5 py-1.5"
-            >
-              <span className={`text-[9px] ${MONO} text-zinc-400 tabular-nums w-4`}>
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              {c.pass === true ? (
-                <span className="h-4 w-4 rounded-md bg-zinc-900 grid place-items-center shrink-0">
-                  <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
-                </span>
-              ) : c.pass === false ? (
-                <span className="h-4 w-4 rounded-md border border-rose-300 bg-rose-50 grid place-items-center shrink-0">
-                  <X className="h-2.5 w-2.5 text-rose-500" strokeWidth={3} />
-                </span>
-              ) : (
-                <span className="h-4 w-4 rounded-md border border-zinc-200 grid place-items-center shrink-0">
-                  <span className="h-1 w-1 rounded-full bg-zinc-300" />
-                </span>
-              )}
-              <span className={cn(
-                "flex-1 truncate text-[11px]",
-                c.pass === false ? "text-zinc-400 line-through decoration-zinc-200" : "text-zinc-800",
-              )}>
-                {c.label}
-              </span>
+        {/* Two KV tiles */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-xl border border-zinc-200 px-3 py-2">
+            <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Grade</div>
+            <div className={`text-base font-bold tabular-nums ${MONO} text-zinc-900 mt-0.5`}>
+              {plan.setupGrade}
             </div>
-          ))}
+          </div>
+          <div className="rounded-xl border border-zinc-200 px-3 py-2">
+            <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Passed</div>
+            <div className={`text-base font-bold tabular-nums ${MONO} text-zinc-900 mt-0.5`}>
+              {passed}<span className="text-zinc-400 text-[11px] font-medium">/{total}</span>
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>
   );
 }
+
 
 
 function TradeTrackerCard({
