@@ -200,24 +200,11 @@ function Home() {
       <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-center px-6 gap-10 pb-28 pt-16">
         <div className="flex flex-col items-center gap-6 flex-1">
           <CloudOrb status={status} />
-          <div className="text-center min-h-[2.5rem]">
-            {!speech.listening && !speech.speaking && !loading && speech.supported && (
-              <button
-                onClick={toggleMic}
-                className="rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-neutral-800"
-              >
-                Tap to start talking
-              </button>
-            )}
-            {!speech.supported && (
-              <div className="text-sm text-red-500">
-                Voice not supported in this browser. Please open in Chrome (desktop) or use the text box below.
-              </div>
-            )}
-            {speech.interim && (
-              <div className="mt-2 text-sm text-neutral-400 italic max-w-md">{speech.interim}</div>
-            )}
-          </div>
+          {!speech.supported && (
+            <div className="text-center text-sm text-red-500">
+              Voice not supported in this browser. Please open in Chrome (desktop) or use the text box below.
+            </div>
+          )}
 
         </div>
 
