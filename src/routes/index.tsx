@@ -650,7 +650,7 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
 function SectionHead({ eyebrow, title }: { eyebrow: string; title: React.ReactNode }) {
   return (
     <div className="max-w-3xl">
-      <div className="text-[11px] uppercase tracking-[0.3em] font-bold text-[color:var(--ink)]/50">{eyebrow}</div>
+      {eyebrow && <div className="text-[11px] uppercase tracking-[0.3em] font-bold text-[color:var(--ink)]/50">{eyebrow}</div>}
       <h2 className="mt-5 font-display font-semibold tracking-[-0.035em] text-[clamp(40px,5.5vw,72px)] leading-[1.02]" style={{ color: VOID }}>
         {title}
       </h2>
