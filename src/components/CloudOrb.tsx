@@ -26,7 +26,7 @@ export function CloudOrb({ status = "idle", pulse = 0 }: { status?: OrbStatus; p
             background:
               "radial-gradient(circle at 50% 25%, #f4faff 0%, #b8dcff 28%, #5ea8ee 60%, #1f5fb0 90%, #0b3a7a 100%)",
             boxShadow:
-              "inset -10px -16px 44px rgba(20,60,140,0.6), inset 8px 12px 32px rgba(255,255,255,0.85), 0 0 60px rgba(120,180,240,0.55)",
+              "inset -14px -20px 50px rgba(20,60,140,0.7), inset 10px 14px 38px rgba(255,255,255,0.95), 0 0 90px rgba(150,200,255,0.9), 0 0 140px rgba(170,130,255,0.45)",
           }}
         >
           <div
