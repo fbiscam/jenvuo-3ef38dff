@@ -357,11 +357,11 @@ function Home() {
   };
 
 
+  const ticker = useLiveTicker();
+
   if (!authReady) {
     return <div className="fixed inset-0 bg-black" />;
   }
-
-  const ticker = useLiveTicker();
 
   return (
     <div className={cn(`h-dvh w-full overflow-hidden flex flex-col ${SANS} antialiased`, "bg-white text-zinc-900")}>
