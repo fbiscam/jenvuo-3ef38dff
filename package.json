@@ -10,9 +10,9 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "cap:sync": "vite build && cap sync",
-    "cap:ios": "vite build && cap sync ios && cap open ios",
-    "cap:android": "vite build && cap sync android && cap open android",
+    "cap:sync": "vite build --base=./ && cap sync",
+    "cap:ios": "vite build --base=./ && cap sync ios && cap open ios",
+    "cap:android": "vite build --base=./ && cap sync android && cap open android",
     "cap:live": "CAP_SERVER_URL=https://jenvu.com cap sync"
   },
   "dependencies": {
