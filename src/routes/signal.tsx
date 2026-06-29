@@ -27,6 +27,20 @@ export const Route = createFileRoute("/signal")({
 });
 
 /* ---------- helpers ---------- */
+function isCryptoSymbol(sym: string): boolean {
+  const s = sym.toUpperCase();
+  return /(BTC|ETH|SOL|XRP|DOGE|BNB|ADA|USDT|USDC|LTC|AVAX|MATIC|DOT|LINK|TRX|SHIB|TON)/.test(s);
+}
+function isMarketOpen(sym: string, d: Date = new Date()): boolean {
+  if (isCryptoSymbol(sym)) return true;
+  // Forex / metals / indices: closed Fri 21:00 UTC → Sun 22:00 UTC
+  const day = d.getUTCDay(); // 0 Sun .. 6 Sat
+  const h = d.getUTCHours();
+  if (day === 6) return false;
+  if (day === 5 && h >= 21) return false;
+  if (day === 0 && h < 22) return false;
+  return true;
+}
 function tagOf(text: string): { tag: string; tone: "violet" | "blue" | "emerald" | "amber" | "rose" | "zinc" } {
   const t = text.toLowerCase();
   if (/\bfvg|fair\s*value\s*gap\b/.test(t)) return { tag: "FVG", tone: "violet" };
@@ -205,6 +219,10 @@ function SignalPage() {
         try { ltfRef.current?.updateLivePrice(tick.price); } catch {}
 
 
+        // Skip TP/SL/entry-fill events when market is closed (weekends for FX/metals/indices).
+        // Stale feed prices during closure can spuriously trigger notifications.
+        if (!isMarketOpen(plan.instrument.symbol)) return;
+
         const tr = plan.trade;
         const dir = tr.direction;
         const fire = (key: string, msg: string) => {
@@ -323,8 +341,17 @@ function SignalPage() {
                 </span>
               )}
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
+                {plan && !isMarketOpen(plan.instrument.symbol) ? (
+                  <>
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                    <span className={`text-[10px] sm:text-[11px] font-medium text-zinc-500 tracking-tight ${MONO} uppercase`}>Market Closed</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
