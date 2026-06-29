@@ -122,10 +122,6 @@ function AuthPage() {
               {/* LEFT — FORM */}
               <div className="lg:col-span-7 bg-white p-6 sm:p-10 lg:p-14">
                 <div className="max-w-md mx-auto lg:mx-0">
-                  <div className={`flex items-center gap-3 ${MONO} text-[10px] tracking-[0.22em] uppercase text-zinc-900`}>
-                    <span className="h-px w-6 bg-zinc-300" />
-                    SECURE ACCESS
-                  </div>
                   
                   <h1 className="mt-7 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
                     Sign in to<br />the desk.
