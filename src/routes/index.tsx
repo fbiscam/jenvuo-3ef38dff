@@ -211,22 +211,8 @@ function Home() {
         <div className="flex items-center" />
 
         <div className="flex items-center gap-3">
-          <span
-            className={cn(
-              "hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-[0.2em] border",
-              awake
-                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-                : "border-white/10 bg-white/5 text-neutral-400",
-            )}
-          >
-            <span
-              className={cn(
-                "h-1.5 w-1.5 rounded-full",
-                awake ? "bg-emerald-400 animate-pulse" : "bg-neutral-500",
-              )}
-            />
-            {awake ? "Awake" : 'Say "Hey Jenvu"'}
-          </span>
+
+
           <button className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400">
             <Sliders className="h-4 w-4" />
           </button>
