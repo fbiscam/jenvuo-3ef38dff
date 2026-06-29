@@ -172,7 +172,7 @@ export function useSpeech() {
   }, []);
 
   return {
-    listening, speaking, transcript, transcriptId, interim, supported, needsGesture,
+    listening, speaking, transcript, transcriptId, interim, supported, needsGesture, wordPulse,
     startListening, stopListening, pauseListening, resumeIfWanted,
     speak, stopSpeaking, setTranscript,
     isContinuous: () => wantListeningRef.current,
