@@ -255,7 +255,21 @@ function Home() {
           >
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
+          <button
+            onClick={signOut}
+            className={cn(
+              "h-9 w-9 rounded-full flex items-center justify-center transition border",
+              dark
+                ? "bg-neutral-900 border-neutral-700 text-neutral-300 hover:bg-neutral-800"
+                : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-100",
+            )}
+            aria-label="Sign out"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
+
       </header>
 
       {/* Main: orb centerpiece */}
