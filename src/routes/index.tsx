@@ -260,8 +260,8 @@ function Home() {
       {/* Bottom composer — ChatGPT style */}
       <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t from-black via-black to-transparent">
         <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-2 rounded-full border border-black/10 bg-black shadow-[0_8px_30px_-8px_rgba(0,0,0,0.35)] pl-2 pr-1.5 py-1.5">
-            <button className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-300 shrink-0">
+          <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white shadow-[0_8px_30px_-8px_rgba(0,0,0,0.5)] pl-2 pr-1.5 py-1.5">
+            <button className="h-9 w-9 rounded-full hover:bg-black/5 flex items-center justify-center text-neutral-700 shrink-0">
               <Plus className="h-5 w-5" />
             </button>
             <input
@@ -271,7 +271,7 @@ function Home() {
               onKeyDown={(e) => e.key === "Enter" && submitText()}
               placeholder="Type"
               disabled={loading}
-              className="flex-1 bg-transparent text-[15px] text-neutral-100 placeholder:text-neutral-500 focus:outline-none px-1 py-1"
+              className="flex-1 bg-transparent text-[15px] text-neutral-900 placeholder:text-neutral-500 focus:outline-none px-1 py-1"
             />
             <button
               onClick={toggleMic}
@@ -279,7 +279,7 @@ function Home() {
                 "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition",
                 speech.listening
                   ? "bg-emerald-500 text-white"
-                  : "hover:bg-white/10 text-neutral-200",
+                  : "hover:bg-black/5 text-neutral-700",
               )}
               aria-label="Toggle microphone"
             >
@@ -287,7 +287,7 @@ function Home() {
             </button>
             <button
               onClick={endAll}
-              className="h-9 w-9 rounded-full bg-white text-black flex items-center justify-center shrink-0 hover:bg-neutral-200 transition"
+              className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center shrink-0 hover:bg-neutral-800 transition"
               aria-label="End"
             >
               <X className="h-4 w-4" />
