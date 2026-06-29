@@ -120,33 +120,39 @@ function SignalPage() {
     setPlaying(false);
   };
 
-  if (!authReady) return <div className="fixed inset-0 bg-black" />;
+  if (!authReady) return <div className="fixed inset-0 bg-white" />;
 
   const t = plan?.trade;
   const isBuy = t?.direction === "BUY";
   const isSell = t?.direction === "SELL";
 
   return (
-    <div className={cn("fixed inset-0 flex flex-col overflow-hidden", dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900")}>
+    <div className="fixed inset-0 flex flex-col overflow-hidden bg-gradient-to-br from-white via-slate-50 to-amber-50/40 text-neutral-900">
+      {/* Decorative glow */}
+      <div className="pointer-events-none absolute -top-40 -right-40 h-[480px] w-[480px] rounded-full bg-amber-200/30 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-40 -left-40 h-[480px] w-[480px] rounded-full bg-sky-200/30 blur-3xl" />
+
       {/* Header */}
-      <header className={cn("flex items-center justify-between px-4 py-3 border-b shrink-0", dark ? "border-neutral-800" : "border-neutral-200")}>
+      <header className="relative z-10 flex items-center justify-between px-5 py-3 border-b border-neutral-200/70 backdrop-blur-md bg-white/70 shrink-0">
         <button
           onClick={() => { stop(); navigate({ to: "/" }); }}
-          className={cn("flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition", dark ? "bg-neutral-900 hover:bg-neutral-800" : "bg-neutral-100 hover:bg-neutral-200")}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition bg-white border border-neutral-200 hover:bg-neutral-50 shadow-sm"
         >
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
         <div className="text-center">
-          <div className="text-xs uppercase tracking-[0.2em] opacity-60">Jenvu AI · Live Signal</div>
-          <div className="text-sm font-bold">XAU/USD {plan ? `· ${plan.currentPrice.toFixed(2)}` : ""}</div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-amber-700/80 font-bold">Jenvu AI · Institutional Desk</div>
+          <div className="text-base font-black tracking-tight">
+            XAU/USD {plan && <span className="ml-2 text-amber-600 tabular-nums">${plan.currentPrice.toFixed(2)}</span>}
+          </div>
         </div>
         <div className="flex gap-2">
           {playing ? (
-            <button onClick={stop} className={cn("flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition", dark ? "bg-red-500/20 text-red-300 hover:bg-red-500/30" : "bg-red-100 text-red-700 hover:bg-red-200")}>
+            <button onClick={stop} className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition bg-red-50 text-red-700 hover:bg-red-100 border border-red-200">
               <Pause className="h-4 w-4" /> Stop
             </button>
           ) : (
-            <button onClick={load} disabled={loading} className={cn("flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition disabled:opacity-50", dark ? "bg-neutral-900 hover:bg-neutral-800" : "bg-neutral-100 hover:bg-neutral-200")}>
+            <button onClick={load} disabled={loading} className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition disabled:opacity-50 bg-neutral-900 text-white hover:bg-neutral-800 shadow-sm">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Re-analyze
             </button>
           )}
