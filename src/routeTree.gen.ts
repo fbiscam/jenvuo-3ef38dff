@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignalRouteImport } from './routes/signal'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiSeedAdminRouteImport } from './routes/api/seed-admin'
@@ -17,6 +18,11 @@ import { Route as ApiSeedAdminRouteImport } from './routes/api/seed-admin'
 const SignalRoute = SignalRouteImport.update({
   id: '/signal',
   path: '/signal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -38,12 +44,14 @@ const ApiSeedAdminRoute = ApiSeedAdminRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/home': typeof HomeRoute
   '/signal': typeof SignalRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/home': typeof HomeRoute
   '/signal': typeof SignalRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
 }
@@ -51,20 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/home': typeof HomeRoute
   '/signal': typeof SignalRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/signal' | '/api/seed-admin'
+  fullPaths: '/' | '/auth' | '/home' | '/signal' | '/api/seed-admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/signal' | '/api/seed-admin'
-  id: '__root__' | '/' | '/auth' | '/signal' | '/api/seed-admin'
+  to: '/' | '/auth' | '/home' | '/signal' | '/api/seed-admin'
+  id: '__root__' | '/' | '/auth' | '/home' | '/signal' | '/api/seed-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  HomeRoute: typeof HomeRoute
   SignalRoute: typeof SignalRoute
   ApiSeedAdminRoute: typeof ApiSeedAdminRoute
 }
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/signal'
       fullPath: '/signal'
       preLoaderRoute: typeof SignalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -105,6 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  HomeRoute: HomeRoute,
   SignalRoute: SignalRoute,
   ApiSeedAdminRoute: ApiSeedAdminRoute,
 }
