@@ -253,9 +253,10 @@ function Home() {
           </div>
         </div>
 
-        {signal && (
-          <aside className="w-full lg:w-[380px] lg:max-w-[380px] shrink-0">
-            <SignalCard signal={signal} />
+        {(signal || (news.data && news.data.length > 0)) && (
+          <aside className="w-full lg:w-[380px] lg:max-w-[380px] shrink-0 space-y-4">
+            {signal && <SignalCard signal={signal} />}
+            {news.data && <NewsPanel events={news.data} />}
           </aside>
         )}
       </main>
