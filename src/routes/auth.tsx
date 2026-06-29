@@ -123,7 +123,7 @@ function AuthPage() {
                 disabled={loading}
                 className="group relative w-full mt-2 rounded-xl py-3.5 text-sm font-semibold text-white bg-black hover:bg-neutral-900 disabled:opacity-60 transition inline-flex items-center justify-center gap-2 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] overflow-hidden"
               >
-                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-gradient-to-r from-fuchsia-600 via-violet-600 to-sky-600" />
+                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-neutral-900" />
                 <span className="relative inline-flex items-center gap-2">
                   {loading ? "Signing in…" : (<>Sign in <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" /></>)}
                 </span>
