@@ -1,13 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target, Brain, ShieldAlert, CheckCircle2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { getSignalPlan, type SignalPlan } from "@/lib/gold-analysis.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+
 
 
 export const Route = createFileRoute("/signal")({
@@ -31,6 +32,22 @@ function SignalPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(-1);
   const [playing, setPlaying] = useState(false);
+  const [htfTf, setHtfTf] = useState<"1h" | "4h" | "1d">("1h");
+  const [ltfTf, setLtfTf] = useState<"5m" | "15m" | "30m">("15m");
+  const [pipeline, setPipeline] = useState<number>(-1);
+  const [livePrice, setLivePrice] = useState<number | null>(null);
+  const [priceDelta, setPriceDelta] = useState<number>(0);
+
+  const PIPELINE_STEPS = [
+    "Fetching live gold candles",
+    "Mapping HTF market structure",
+    "Detecting BOS / CHOCH shifts",
+    "Locating liquidity pools (PDH/PDL/EQH/EQL)",
+    "Scanning Order Blocks & FVGs",
+    "Computing premium/discount & OTE",
+    "Cross-checking news & killzone risk",
+    "Building A+ execution plan",
+  ];
 
   const htfRef = useRef<SignalChartHandle>(null);
   const ltfRef = useRef<SignalChartHandle>(null);
@@ -42,6 +59,7 @@ function SignalPage() {
       else setAuthReady(true);
     });
   }, [navigate]);
+
 
   const speakWait = useCallback(
     (text: string) =>
