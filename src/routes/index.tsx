@@ -363,7 +363,7 @@ function HomePage() {
               {
                 k: "05",
                 t: "Cross-Market Coverage",
-                d: "Gold, FX majors, BTC, ETH, alts, indices and energy — one terminal, one voice.",
+                d: "Gold, FX majors, BTC, ETH, alts, indices and energy one terminal, one voice.",
               },
               {
                 k: "06",
