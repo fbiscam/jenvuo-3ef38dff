@@ -156,7 +156,7 @@ function Home() {
               {status === "listening" && "Listening"}
               {status === "thinking" && "Thinking…"}
               {status === "speaking" && "Speaking"}
-              {status === "idle" && "Tap mic or type"}
+              
             </div>
             {speech.interim && (
               <div className="mt-2 text-sm text-neutral-400 italic max-w-md">{speech.interim}</div>
