@@ -124,7 +124,7 @@ function AuthPage() {
                 <div className="max-w-md mx-auto lg:mx-0">
                   
                   <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
-                    Sign in to <br />desk.
+                    Sign in to <br />the desk.
                   </h1>
                   <p className="mt-3 text-sm text-zinc-600 leading-relaxed">
                     Voice-native institutional intelligence, on call.
