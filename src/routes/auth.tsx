@@ -57,20 +57,11 @@ function AuthPage() {
           {/* glass card */}
           <div className="relative rounded-3xl bg-transparent p-8 sm:p-10">
             {/* logo badge */}
-            <div className="flex items-center gap-3.5 mb-9">
-              <div className="w-14 h-14 flex items-center justify-center">
-                <img src={faviconUrl} alt="Jenvu AI" className="w-14 h-14 object-contain" />
-              </div>
+            <div className="flex items-center gap-3.5 mb-9 invisible" aria-hidden="true">
+              <div className="w-14 h-14" />
               <div className="leading-tight">
-                <h1
-                  className="text-[28px] font-black uppercase tracking-tight text-black"
-                  style={{ fontFamily: "'Urbanist', sans-serif" }}
-                >
-                  Jenvu AI
-                </h1>
-                <p className="text-[13px] uppercase tracking-[0.18em] text-black/50 font-semibold">
-                  Voice Intelligence
-                </p>
+                <h1 className="text-[28px] font-black uppercase tracking-tight">Jenvu AI</h1>
+                <p className="text-[13px] uppercase tracking-[0.18em] font-semibold">Voice Intelligence</p>
               </div>
             </div>
 
