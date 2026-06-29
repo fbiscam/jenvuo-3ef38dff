@@ -7,9 +7,9 @@ export const Route = createFileRoute("/privacy")({
       { title: "Privacy Policy — JENVU AI" },
       { name: "description", content: "How JENVU AI collects, uses, and protects your data." },
       { property: "og:title", content: "Privacy Policy — JENVU AI" },
-      { property: "og:url", content: "https://greetings-gentle-flow.lovable.app/privacy" },
+      { property: "og:url", content: "https://jenvu.com/privacy" },
     ],
-    links: [{ rel: "canonical", href: "https://greetings-gentle-flow.lovable.app/privacy" }],
+    links: [{ rel: "canonical", href: "https://jenvu.com/privacy" }],
   }),
   component: PrivacyPage,
 });
