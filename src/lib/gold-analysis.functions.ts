@@ -254,3 +254,175 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
 
     return signal;
   });
+
+// ============================================================
+// SIGNAL PLAN — structured ICT/SMC markings + voice narration
+// ============================================================
+
+export type CandleDTO = { time: number; open: number; high: number; low: number; close: number };
+
+export type Marking =
+  | { type: "fvg"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "bullish" | "bearish"; label: string }
+  | { type: "orderBlock"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "demand" | "supply"; label: string }
+  | { type: "liquidity"; tf: "htf" | "ltf"; price: number; side: "buy" | "sell"; label: string }
+  | { type: "bos" | "choch"; tf: "htf" | "ltf"; fromTime: number; toTime: number; price: number; kind: "bullish" | "bearish"; label: string }
+  | { type: "zone"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "supply" | "demand"; label: string }
+  | { type: "entry" | "sl" | "tp"; tf: "htf" | "ltf"; price: number; label: string };
+
+export type SignalPlan = {
+  htfBias: "bullish" | "bearish" | "neutral";
+  intro: string;
+  narration: { say: string; markingIndex: number | null; tf: "htf" | "ltf" }[];
+  markings: Marking[];
+  trade: {
+    direction: "BUY" | "SELL" | "WAIT";
+    entry: number;
+    sl: number;
+    tp: number;
+    rr: number;
+    confidence: number;
+    summary: string;
+  };
+  generatedAt: string;
+  htfCandles: CandleDTO[];
+  ltfCandles: CandleDTO[];
+  currentPrice: number;
+};
+
+function toDTO(c: Candle): CandleDTO {
+  return { time: Math.floor(c.t / 1000), open: c.o, high: c.h, low: c.l, close: c.c };
+}
+
+export const getSignalPlan = createServerFn({ method: "POST" })
+  .inputValidator((_d: unknown) => ({}))
+  .handler(async () => {
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+
+    const [htfRaw, ltfRaw] = await Promise.all([
+      fetchGoldCandles("1h").catch(() => [] as Candle[]),
+      fetchGoldCandles("15m").catch(() => [] as Candle[]),
+    ]);
+    if (htfRaw.length < 20 || ltfRaw.length < 20) {
+      throw new Error("Live gold feed unavailable. Try again in a moment.");
+    }
+    const htf = htfRaw.slice(-120);
+    const ltf = ltfRaw.slice(-180);
+    const last = ltf[ltf.length - 1];
+
+    const fmt = (arr: Candle[]) =>
+      arr
+        .map((c) => `${Math.floor(c.t / 1000)}|${c.o.toFixed(2)},${c.h.toFixed(2)},${c.l.toFixed(2)},${c.c.toFixed(2)}`)
+        .join("\n");
+
+    const system = `You are Jenvu — an elite 25+ year XAU/USD trader using strict ICT + SMC methodology.
+You are analyzing live gold candles and producing a complete A+ trade plan that will be drawn on a chart and narrated step-by-step by voice.
+
+Return ONLY valid JSON (no markdown) with this exact shape:
+{
+  "htfBias": "bullish" | "bearish" | "neutral",
+  "intro": "One short sentence to open the analysis (spoken aloud)",
+  "markings": [
+    { "type":"bos"|"choch", "tf":"htf"|"ltf", "fromTime": <unix-seconds>, "toTime": <unix-seconds>, "price": <number>, "kind":"bullish"|"bearish", "label":"Bullish BOS on 1H" },
+    { "type":"fvg", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"bullish"|"bearish", "label":"Bullish FVG" },
+    { "type":"orderBlock", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"demand"|"supply", "label":"Demand OB" },
+    { "type":"liquidity", "tf":"htf"|"ltf", "price":<n>, "side":"buy"|"sell", "label":"BSL above swing high" },
+    { "type":"zone", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"supply"|"demand", "label":"HTF Demand Zone" },
+    { "type":"entry", "tf":"ltf", "price":<n>, "label":"Entry" },
+    { "type":"sl", "tf":"ltf", "price":<n>, "label":"Stop Loss" },
+    { "type":"tp", "tf":"ltf", "price":<n>, "label":"Take Profit" }
+  ],
+  "narration": [
+    { "say": "First, dekho 1 hour HTF par bias bullish hai — BOS clearly bana hua hai yahan.", "markingIndex": 0, "tf":"htf" },
+    { "say": "Yahan demand zone mark kar diya — institutional buying yahin se aayi.", "markingIndex": 1, "tf":"htf" },
+    { "say": "Ab LTF 15 minute par aate hain, FVG mil gaya is range mein.", "markingIndex": 2, "tf":"ltf" },
+    { "say": "Liquidity yahan resting hai — price isay sweep karke reverse karega.", "markingIndex": 3, "tf":"ltf" },
+    { "say": "Entry yahan FVG ke andar, stop loss zone ke neeche, take profit liquidity ke upar.", "markingIndex": 5, "tf":"ltf" }
+  ],
+  "trade": {
+    "direction":"BUY"|"SELL"|"WAIT",
+    "entry": <number>,
+    "sl": <number>,
+    "tp": <number>,
+    "rr": <number>,
+    "confidence": 60-95,
+    "summary": "Final spoken summary — direction, entry, SL, TP, RR, confidence."
+  }
+}
+
+Rules:
+- fromTime / toTime MUST be unix seconds taken from the provided candles (use the exact timestamps you see).
+- ltf trade levels (entry/sl/tp) must respect current price ${last.c.toFixed(2)} and yield realistic RR >= 1.5.
+- 5-8 narration steps total. Each step references one marking by its index in the markings array (or null for general comments). Speak in warm Hinglish / Roman Urdu, like a senior trader explaining to a student. Keep each "say" under 25 words.
+- Build HTF context FIRST (bias, BOS/CHOCH, HTF OB or zone), then LTF refinement (FVG, OB, liquidity), then entry/SL/TP.
+- If conditions are not A+ set direction="WAIT" and explain why in trade.summary.`;
+
+    const user = `LIVE GOLD CANDLES (unix-seconds | O,H,L,C)
+CURRENT PRICE: ${last.c.toFixed(2)}
+
+=== HTF (1 HOUR, last ${htf.length} candles) ===
+${fmt(htf)}
+
+=== LTF (15 MIN, last ${ltf.length} candles) ===
+${fmt(ltf)}
+
+Produce the A+ ICT/SMC trade plan now.`;
+
+    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    if (!aiRes.ok) {
+      const txt = await aiRes.text();
+      if (aiRes.status === 429) throw new Error("Rate limit. Try again in a moment.");
+      if (aiRes.status === 402) throw new Error("AI credits exhausted.");
+      throw new Error(`AI error ${aiRes.status}: ${txt.slice(0, 200)}`);
+    }
+    const aiJson: any = await aiRes.json();
+    const content = aiJson?.choices?.[0]?.message?.content ?? "{}";
+    let parsed: any;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      const m = content.match(/\{[\s\S]*\}/);
+      parsed = m ? JSON.parse(m[0]) : {};
+    }
+
+    const plan: SignalPlan = {
+      htfBias: parsed.htfBias === "bearish" ? "bearish" : parsed.htfBias === "bullish" ? "bullish" : "neutral",
+      intro: String(parsed.intro ?? "Chalo gold ka analysis shuru karte hain."),
+      narration: Array.isArray(parsed.narration)
+        ? parsed.narration.slice(0, 12).map((n: any) => ({
+            say: String(n?.say ?? ""),
+            markingIndex: typeof n?.markingIndex === "number" ? n.markingIndex : null,
+            tf: n?.tf === "htf" ? "htf" : "ltf",
+          }))
+        : [],
+      markings: Array.isArray(parsed.markings) ? parsed.markings : [],
+      trade: {
+        direction: parsed?.trade?.direction === "SELL" ? "SELL" : parsed?.trade?.direction === "BUY" ? "BUY" : "WAIT",
+        entry: Number(parsed?.trade?.entry ?? 0),
+        sl: Number(parsed?.trade?.sl ?? 0),
+        tp: Number(parsed?.trade?.tp ?? 0),
+        rr: Number(parsed?.trade?.rr ?? 0),
+        confidence: Math.max(0, Math.min(100, Number(parsed?.trade?.confidence ?? 0))),
+        summary: String(parsed?.trade?.summary ?? ""),
+      },
+      generatedAt: new Date().toISOString(),
+      htfCandles: htf.map(toDTO),
+      ltfCandles: ltf.map(toDTO),
+      currentPrice: last.c,
+    };
+
+    return plan;
+  });
+
