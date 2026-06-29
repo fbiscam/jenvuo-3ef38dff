@@ -668,7 +668,7 @@ function HomePage() {
             Why traders move to JENVU.
           </h2>
           <div className="mt-10 rounded-2xl border border-zinc-200 bg-white overflow-hidden">
-            <div className={`grid grid-cols-4 px-6 py-4 border-b border-zinc-200 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
+            <div className={`hidden md:grid grid-cols-4 px-6 py-4 border-b border-zinc-200 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
               <span>Capability</span>
               <span className="text-center">Generic AI</span>
               <span className="text-center">Signal Group</span>
@@ -684,14 +684,33 @@ function HomePage() {
             ].map(([cap, a, b, c], i) => (
               <div
                 key={String(cap)}
-                className={`grid grid-cols-4 items-center px-6 py-4 text-sm ${
-                  i !== 0 ? "border-t border-zinc-100" : ""
-                }`}
+                className={`px-5 sm:px-6 py-4 text-sm ${i !== 0 ? "border-t border-zinc-100" : ""}`}
               >
-                <span className="text-zinc-900 font-medium">{cap}</span>
-                <span className="text-center text-zinc-900">{a ? "●" : "—"}</span>
-                <span className="text-center text-zinc-900">{b ? "●" : "—"}</span>
-                <span className="text-center text-zinc-900 font-bold">{c ? "●" : "—"}</span>
+                {/* desktop row */}
+                <div className="hidden md:grid grid-cols-4 items-center">
+                  <span className="text-zinc-900 font-medium">{cap}</span>
+                  <span className="text-center text-zinc-900">{a ? "●" : "—"}</span>
+                  <span className="text-center text-zinc-900">{b ? "●" : "—"}</span>
+                  <span className="text-center text-zinc-900 font-bold">{c ? "●" : "—"}</span>
+                </div>
+                {/* mobile stacked */}
+                <div className="md:hidden space-y-2">
+                  <div className="text-zinc-900 font-medium">{cap}</div>
+                  <div className={`grid grid-cols-3 gap-2 ${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
+                    <div className="flex flex-col items-center gap-1">
+                      <span>Generic</span>
+                      <span className="text-zinc-900 text-sm">{a ? "●" : "—"}</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <span>Signals</span>
+                      <span className="text-zinc-900 text-sm">{b ? "●" : "—"}</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-zinc-900">JENVU</span>
+                      <span className="text-zinc-900 text-sm font-bold">{c ? "●" : "—"}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
