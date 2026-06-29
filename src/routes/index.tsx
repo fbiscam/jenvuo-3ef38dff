@@ -289,7 +289,7 @@ function FeatureGrid() {
   return (
     <section className="relative">
       <div className="mx-auto max-w-[1320px] px-6 py-24 lg:py-32">
-        <SectionHead eyebrow="Capabilities" title={<>An entire trading floor,<br />condensed into a voice.</>} />
+        <SectionHead eyebrow="" title={<>An entire trading floor,<br />condensed into a voice.</>} />
 
         {/* hero-grid: 1 large + 4 small */}
         <div className="mt-16 grid lg:grid-cols-12 gap-5">
