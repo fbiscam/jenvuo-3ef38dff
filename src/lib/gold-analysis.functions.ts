@@ -298,6 +298,18 @@ export type Marking =
   | { type: "zone"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "supply" | "demand"; label: string }
   | { type: "entry" | "sl" | "tp"; tf: "htf" | "ltf"; price: number; label: string };
 
+export type NewsItem = {
+  title: string;
+  date: string;
+  impact: "High" | "Medium" | "Low";
+  country: string;
+  minutesUntil: number;
+  forecast?: string;
+  previous?: string;
+};
+
+export type KeyLevel = { label: string; price: number; kind: "resistance" | "support" | "pivot" | "premium" | "discount" | "equilibrium" };
+
 export type SignalPlan = {
   htfBias: "bullish" | "bearish" | "neutral";
   intro: string;
@@ -311,12 +323,25 @@ export type SignalPlan = {
     rr: number;
     confidence: number;
     summary: string;
+    invalidation: string;
+  };
+  confluences: string[];
+  keyLevels: KeyLevel[];
+  htfNarrative: string;
+  ltfNarrative: string;
+  session: string;
+  killzone: string;
+  newsRisk: {
+    severity: "low" | "medium" | "high";
+    warning: string;
+    events: NewsItem[];
   };
   generatedAt: string;
   htfCandles: CandleDTO[];
   ltfCandles: CandleDTO[];
   currentPrice: number;
 };
+
 
 function toDTO(c: Candle): CandleDTO {
   return { time: Math.floor(c.t / 1000), open: c.o, high: c.h, low: c.l, close: c.c };
