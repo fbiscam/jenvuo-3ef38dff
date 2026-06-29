@@ -162,6 +162,13 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    // Native (Capacitor) bootstrap: status bar + hide splash. No-op on web.
+    import("../lib/native/bootstrap")
+      .then((m) => m.bootstrapNative())
+      .catch(() => {});
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
