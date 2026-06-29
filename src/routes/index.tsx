@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Mic, X, Plus, Sliders } from "lucide-react";
 import { SignalCard } from "@/components/SignalCard";
+import { NewsPanel } from "@/components/NewsPanel";
 import { useSpeech } from "@/hooks/useSpeech";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
+import { getGoldNews } from "@/lib/news.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
