@@ -292,7 +292,10 @@ function HomePage() {
             <div className="flex shrink-0 items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">LIVE</span>
+                <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">
+                  <span className="sm:hidden">LIVE</span>
+                  <span className="hidden sm:inline">LIVE FEED</span>
+                </span>
               </div>
               <div className="hidden sm:block h-4 w-px bg-zinc-200" />
               <span className={`hidden sm:inline text-[11px] ${MONO} text-zinc-900`}>LATENCY · 14MS</span>
@@ -509,7 +512,7 @@ function HomePage() {
                 JENVU AI routes liquidity, structure and news context across asset classes
               </p>
             </div>
-            <div className="lg:col-span-8 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
+            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
               {[
                 ["Metals", "XAU · XAG · PAXG"],
                 ["FX Majors", "EUR · GBP · JPY"],
