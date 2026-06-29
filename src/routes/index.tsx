@@ -384,7 +384,7 @@ function SmallCard({
   colSpan: string;
   icon: React.ReactNode;
   tag: string;
-  title: string;
+  title: React.ReactNode;
   body: string;
   image?: string;
   tone?: "light" | "dark";
