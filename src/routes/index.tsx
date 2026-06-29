@@ -124,7 +124,8 @@ function HomePage() {
           <div className="lg:col-span-7">
             
             <h1 className="mt-5 text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
-              Institutional intelligence,{" "}
+              Institutional<br />
+              intelligence,<br />
               <span className="text-zinc-900">vocalized in real time.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-zinc-900 leading-relaxed">
