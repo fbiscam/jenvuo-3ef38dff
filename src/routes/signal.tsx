@@ -238,8 +238,9 @@ function SignalPage() {
         if (stopped) return;
         setLivePrice(tick.price);
         setSparkline((arr) => [...arr.slice(-59), tick.price]);
-        try { htfRef.current?.updateLivePrice(tick.price); } catch {}
-        try { ltfRef.current?.updateLivePrice(tick.price); } catch {}
+        const tSec = typeof tick.t === "number" ? Math.floor(tick.t / 1000) : Math.floor(Date.now() / 1000);
+        try { htfRef.current?.updateLivePrice(tick.price, tSec); } catch {}
+        try { ltfRef.current?.updateLivePrice(tick.price, tSec); } catch {}
 
 
         // Skip TP/SL/entry-fill events when market is closed (weekends for FX/metals/indices).
