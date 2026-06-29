@@ -16,7 +16,7 @@ const WARM = "#e8e4dd";
 const INK = "#2d2d2d";
 const VOID = "#0d0d0d";
 
-export const Route = createFileRoute("/home")({
+export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "JENVU AI — Institutional Voice Intelligence for Markets" },
@@ -81,7 +81,7 @@ function Nav() {
   return (
     <header className="relative z-20 border-b border-[color:var(--ink)]/10">
       <div className="mx-auto max-w-[1320px] px-6 py-5 flex items-center justify-between">
-        <Link to="/home" className="flex items-center gap-2.5">
+        <Link to="/" className="flex items-center gap-2.5">
           <Logo />
           <span className="font-display tracking-[-0.02em] text-[15px] font-bold uppercase">
             Jenvu<span className="opacity-50">/ai</span>
@@ -103,7 +103,7 @@ function Nav() {
             Sign in
           </Link>
           <Link
-            to="/"
+            to="/app"
             className="text-[13px] font-semibold px-4 py-2 rounded-full bg-[color:var(--void)] text-[color:var(--paper)] hover:opacity-90 transition inline-flex items-center gap-1.5"
           >
             Launch
@@ -172,7 +172,7 @@ function Hero() {
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link
-                to="/"
+                to="/app"
                 className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--void)] text-[color:var(--paper)] px-6 py-3.5 text-[14px] font-semibold hover:opacity-90 transition"
               >
                 <Mic className="h-4 w-4" />
@@ -315,7 +315,7 @@ function FeatureGrid() {
                   </p>
                 </div>
                 <div className="mt-8 flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.2em] text-[color:var(--ink)]/55">
-                  <Link to="/" className="inline-flex items-center gap-1.5 hover:text-[color:var(--void)]">
+                  <Link to="/app" className="inline-flex items-center gap-1.5 hover:text-[color:var(--void)]">
                     Try the agent <ArrowUpRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
@@ -583,7 +583,7 @@ function FinalCta() {
           <span className="italic font-light opacity-70">Hear the setup.</span>
         </h2>
         <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
-          <Link to="/" className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--paper)] text-[color:var(--void)] px-7 py-4 text-[14px] font-bold hover:opacity-90 transition">
+          <Link to="/app" className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--paper)] text-[color:var(--void)] px-7 py-4 text-[14px] font-bold hover:opacity-90 transition">
             <Mic className="h-4 w-4" />
             Launch voice agent
             <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
