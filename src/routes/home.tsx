@@ -129,8 +129,63 @@ function HomePage() {
         </div>
       </main>
 
+      {/* FEATURES */}
+      <section className="relative w-full border-t border-black/10 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-24 lg:py-32">
+          <div className="max-w-3xl">
+            <div className="text-[11px] uppercase tracking-[0.3em] text-black/45 font-bold">
+              Features
+            </div>
+            <h2 className="mt-4 text-4xl sm:text-5xl lg:text-6xl font-black tracking-[-0.03em] leading-[1.05]">
+              Everything an institutional desk has —
+              <span className="text-black/35"> spoken aloud.</span>
+            </h2>
+          </div>
+
+          <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
+            {FEATURES.map((f) => (
+              <article key={f.title} className="group">
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#fafafa] border border-black/5">
+                  <img
+                    src={f.img}
+                    alt={f.title}
+                    loading="lazy"
+                    width={1024}
+                    height={1024}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+                  />
+                </div>
+                <div className="mt-5 text-[11px] uppercase tracking-[0.25em] font-bold text-black/45">
+                  {f.tag}
+                </div>
+                <h3 className="mt-2 text-xl font-black tracking-tight">
+                  {f.title}
+                </h3>
+                <p className="mt-2 text-[15px] text-black/60 leading-relaxed">
+                  {f.body}
+                </p>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-20 flex flex-wrap items-center justify-between gap-6 border-t border-black/10 pt-10">
+            <p className="text-lg font-semibold text-black/70 max-w-xl">
+              Ready to hear your first A+ setup?
+            </p>
+            <Link
+              to="/"
+              className="group inline-flex items-center gap-2 rounded-full bg-black text-white px-6 py-3 text-sm font-semibold hover:bg-black/85 transition"
+            >
+              Launch JENVU
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer — Google style */}
       <footer className="border-t border-black/10 bg-[#f2f2f2]">
+
         <div className="mx-auto max-w-7xl px-6 py-4 text-sm text-black/60">
           © {new Date().getFullYear()} JENVU
         </div>
