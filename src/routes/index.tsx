@@ -218,10 +218,7 @@ function Home() {
       {/* Bottom composer — ChatGPT style */}
       <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t from-white via-white to-transparent">
         <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white shadow-[0_8px_30px_-8px_rgba(0,0,0,0.5)] pl-2 pr-1.5 py-1.5">
-            <button className="h-9 w-9 rounded-full hover:bg-black/5 flex items-center justify-center text-neutral-700 shrink-0">
-              <Plus className="h-5 w-5" />
-            </button>
+          <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white shadow-[0_8px_30px_-8px_rgba(0,0,0,0.5)] pl-4 pr-1.5 py-1.5">
             <input
               type="text"
               value={text}
