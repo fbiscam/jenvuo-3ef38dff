@@ -205,7 +205,7 @@ function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-neutral-100 relative overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-white text-neutral-900 relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center" />
