@@ -543,13 +543,13 @@ function HomePage() {
             ].map(([d, v, n], i) => (
               <div
                 key={v}
-                className={`grid grid-cols-12 items-center px-6 py-4 ${
+                className={`grid grid-cols-2 sm:grid-cols-12 gap-y-1 sm:gap-y-0 sm:items-center px-5 sm:px-6 py-4 ${
                   i !== 0 ? "border-t border-zinc-100" : ""
                 }`}
               >
-                <span className={`col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
-                <span className={`col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900`}>{v}</span>
-                <span className="col-span-7 text-sm text-zinc-900">{n}</span>
+                <span className={`sm:col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
+                <span className={`sm:col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900 text-right sm:text-left`}>{v}</span>
+                <span className="col-span-2 sm:col-span-7 text-sm text-zinc-900">{n}</span>
               </div>
             ))}
           </div>
