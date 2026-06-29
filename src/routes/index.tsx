@@ -114,34 +114,19 @@ function Home() {
     }
   }
 
-  // Wake-word + command router
+  // Every final transcript becomes a command (no wake word required)
   useEffect(() => {
     const t = speech.transcript;
     if (!t || t === lastHandled.current) return;
     lastHandled.current = t;
     const lower = t.toLowerCase();
     const wakeMatch = lower.match(/\b(hey|hi|ok|okay)?\s*(jenvu|janvu|jarvis|jen view|jen vu)\b[\s,.!?]*(.*)/i);
-
-    if (!awakeRef.current) {
-      if (wakeMatch) {
-        awakeRef.current = true;
-        setAwake(true);
-        const tail = wakeMatch[3]?.trim();
-        if (tail && tail.length > 2) {
-          handleCommand(tail);
-        } else {
-          speech.speak("Yes, I'm listening.", () => {
-            speech.resumeIfWanted();
-            armSleep();
-          });
-        }
-      }
-      // else: ignore, still in standby
-      return;
+    const cmd = (wakeMatch?.[3]?.trim() || t).trim();
+    if (cmd.length > 1) {
+      awakeRef.current = true;
+      setAwake(true);
+      handleCommand(cmd);
     }
-    // Awake → treat as command (strip wake word if present)
-    const cmd = wakeMatch?.[3]?.trim() || t;
-    if (cmd.length > 1) handleCommand(cmd);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speech.transcript]);
 
