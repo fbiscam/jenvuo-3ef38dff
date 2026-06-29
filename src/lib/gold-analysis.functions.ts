@@ -469,6 +469,201 @@ async function fetchGoldNewsInline(): Promise<NewsItem[]> {
   }
 }
 
+// ============================================================
+// LOCAL DETECTORS — multi-TF bias, liquidity, EQH/EQL, OTE, etc.
+// ============================================================
+
+function ema(values: number[], period: number): number {
+  if (values.length === 0) return 0;
+  const k = 2 / (period + 1);
+  let e = values[0];
+  for (let i = 1; i < values.length; i++) e = values[i] * k + e * (1 - k);
+  return e;
+}
+
+function computeTfBias(candles: Candle[], tfLabel: TfBias["tf"]): TfBias {
+  if (candles.length < 20) return { tf: tfLabel, bias: "neutral", score: 50, label: "Insufficient" };
+  const recent = candles.slice(-60);
+  const closes = recent.map((c) => c.c);
+  const emaNow = ema(closes, 20);
+  const emaPrev = ema(closes.slice(0, Math.max(20, closes.length - 10)), 20);
+  const slope = emaNow - emaPrev;
+  const seg = recent.slice(-20);
+  let up = 0, down = 0;
+  for (let i = 1; i < seg.length; i++) {
+    if (seg[i].h > seg[i - 1].h && seg[i].l > seg[i - 1].l) up++;
+    else if (seg[i].h < seg[i - 1].h && seg[i].l < seg[i - 1].l) down++;
+  }
+  const highs = recent.map((c) => c.h);
+  const lows = recent.map((c) => c.l);
+  const eq = (Math.max(...highs) + Math.min(...lows)) / 2;
+  const last = recent[recent.length - 1].c;
+  let score = 50;
+  if (slope > 0) score += 18; else if (slope < 0) score -= 18;
+  score += (up - down) * 2;
+  if (last > eq) score += 6; else score -= 6;
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const bias: TfBias["bias"] = score >= 60 ? "bullish" : score <= 40 ? "bearish" : "neutral";
+  const label = score >= 75 ? "Strong" : score >= 60 ? "Mild" : score >= 41 ? "Mixed" : score >= 25 ? "Mild" : "Strong";
+  return { tf: tfLabel, bias, score, label: `${label} ${bias}` };
+}
+
+function detectEqualLevels(candles: Candle[], tf: "htf" | "ltf", decimals: number): Marking[] {
+  if (candles.length < 30) return [];
+  const tol = candles[candles.length - 1].c * 0.0008; // 0.08%
+  const recent = candles.slice(-80);
+  const highs: { i: number; v: number }[] = [];
+  const lows: { i: number; v: number }[] = [];
+  for (let i = 2; i < recent.length - 2; i++) {
+    if (recent[i].h > recent[i - 1].h && recent[i].h > recent[i - 2].h && recent[i].h > recent[i + 1].h && recent[i].h > recent[i + 2].h) {
+      highs.push({ i, v: recent[i].h });
+    }
+    if (recent[i].l < recent[i - 1].l && recent[i].l < recent[i - 2].l && recent[i].l < recent[i + 1].l && recent[i].l < recent[i + 2].l) {
+      lows.push({ i, v: recent[i].l });
+    }
+  }
+  const out: Marking[] = [];
+  for (let i = 0; i < highs.length; i++) {
+    for (let j = i + 1; j < highs.length; j++) {
+      if (Math.abs(highs[i].v - highs[j].v) <= tol) {
+        out.push({ type: "eqh", tf, price: +((highs[i].v + highs[j].v) / 2).toFixed(decimals), label: "EQH" });
+        break;
+      }
+    }
+  }
+  for (let i = 0; i < lows.length; i++) {
+    for (let j = i + 1; j < lows.length; j++) {
+      if (Math.abs(lows[i].v - lows[j].v) <= tol) {
+        out.push({ type: "eql", tf, price: +((lows[i].v + lows[j].v) / 2).toFixed(decimals), label: "EQL" });
+        break;
+      }
+    }
+  }
+  return out.slice(0, 4);
+}
+
+function detectLiquidityPools(candles: Candle[], tf: "htf" | "ltf"): Marking[] {
+  if (candles.length < 30) return [];
+  const recent = candles.slice(-60);
+  const highs = recent.map((c) => c.h);
+  const lows = recent.map((c) => c.l);
+  const sh = Math.max(...highs);
+  const sl = Math.min(...lows);
+  return [
+    { type: "liquidity", tf, price: sh, side: "buy", label: "BSL — buy-side liquidity" },
+    { type: "liquidity", tf, price: sl, side: "sell", label: "SSL — sell-side liquidity" },
+  ];
+}
+
+function buildPremiumDiscountAndOTE(candles: Candle[], tf: "htf" | "ltf", lastClose: number): Marking[] {
+  if (candles.length < 30) return [];
+  const recent = candles.slice(-80);
+  const sh = Math.max(...recent.map((c) => c.h));
+  const sl = Math.min(...recent.map((c) => c.l));
+  const eq = (sh + sl) / 2;
+  const range = sh - sl;
+  const trendUp = lastClose > eq;
+  const oteLow = trendUp ? sl + range * 0.62 : sl + range * 0.21;
+  const oteHigh = trendUp ? sl + range * 0.79 : sl + range * 0.38;
+  return [
+    { type: "premiumZone", tf, priceLow: eq, priceHigh: sh, label: "Premium" },
+    { type: "discountZone", tf, priceLow: sl, priceHigh: eq, label: "Discount" },
+    { type: "oteZone", tf, priceLow: Math.min(oteLow, oteHigh), priceHigh: Math.max(oteLow, oteHigh), kind: trendUp ? "bullish" : "bearish", label: "OTE 62-79%" },
+  ];
+}
+
+function computeSetupScore(args: {
+  trade: SignalPlan["trade"];
+  htfBias: SignalPlan["htfBias"];
+  killzone: string;
+  markings: Marking[];
+  lastPrice: number;
+  htfEq: number;
+  imminentHighNews: boolean;
+}): { score: number; grade: SignalPlan["setupGrade"]; checks: SetupCheck[] } {
+  const { trade, htfBias, killzone, markings, lastPrice, htfEq, imminentHighNews } = args;
+  const dir = trade.direction;
+  const checks: SetupCheck[] = [];
+
+  const biasAligned =
+    (dir === "BUY" && htfBias === "bullish") ||
+    (dir === "SELL" && htfBias === "bearish");
+  checks.push({
+    key: "bias", label: "HTF bias aligned",
+    pass: dir === "WAIT" ? null : biasAligned,
+    reason: dir === "WAIT" ? "Trade on hold" : biasAligned ? `${htfBias} HTF supports ${dir}` : `HTF is ${htfBias}, trade is ${dir}`,
+  });
+
+  const inKillzone = /Killzone/i.test(killzone);
+  checks.push({
+    key: "killzone", label: "Inside killzone",
+    pass: inKillzone, reason: inKillzone ? killzone : `Currently ${killzone}`,
+  });
+
+  const hasLiquiditySweep = markings.some((m) => /sweep|grab|liquidity/i.test((m as any).label || ""));
+  checks.push({
+    key: "sweep", label: "Liquidity sweep present",
+    pass: hasLiquiditySweep, reason: hasLiquiditySweep ? "Sweep identified" : "No clean sweep detected",
+  });
+
+  const hasFvg = markings.some((m) => m.type === "fvg" && m.tf === "ltf");
+  checks.push({
+    key: "fvg", label: "LTF FVG in entry zone",
+    pass: hasFvg, reason: hasFvg ? "LTF FVG marked" : "No LTF FVG",
+  });
+
+  const oteZone = markings.find((m) => m.type === "oteZone");
+  const inOTE = !!(oteZone && trade.entry >= (oteZone as any).priceLow && trade.entry <= (oteZone as any).priceHigh);
+  checks.push({
+    key: "ote", label: "Entry inside OTE 62-79%",
+    pass: dir === "WAIT" ? null : inOTE,
+    reason: inOTE ? "Entry within optimal Fib zone" : "Entry outside 62-79% range",
+  });
+
+  const rrGood = trade.rr >= 2;
+  checks.push({
+    key: "rr", label: "RR ≥ 2.0",
+    pass: dir === "WAIT" ? null : rrGood,
+    reason: `R:R ${trade.rr.toFixed(2)}`,
+  });
+
+  const inPremium = lastPrice > htfEq;
+  const pdAligned = (dir === "BUY" && !inPremium) || (dir === "SELL" && inPremium);
+  checks.push({
+    key: "pd", label: "Premium / Discount alignment",
+    pass: dir === "WAIT" ? null : pdAligned,
+    reason: dir === "WAIT" ? "—" : pdAligned ? `Trading from ${inPremium ? "premium" : "discount"}` : `Wrong side of equilibrium`,
+  });
+
+  checks.push({
+    key: "news", label: "News window clear",
+    pass: !imminentHighNews,
+    reason: imminentHighNews ? "High-impact event within 60m" : "No imminent high-impact news",
+  });
+
+  const counted = checks.filter((c) => c.pass !== null);
+  const passed = counted.filter((c) => c.pass).length;
+  const score = counted.length ? Math.round((passed / counted.length) * 100) : 0;
+  const grade: SignalPlan["setupGrade"] = score >= 85 ? "A+" : score >= 70 ? "A" : score >= 55 ? "B" : "C";
+  return { score, grade, checks };
+}
+
+export const getLiveTick = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { symbol?: string };
+    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
+  })
+  .handler(async ({ data }) => {
+    const inst = resolveInstrument(data.symbol);
+    const candles = await fetchInstrumentCandles(inst, "1m").catch(() => [] as Candle[]);
+    const last = candles[candles.length - 1];
+    if (!last) throw new Error("Live tick unavailable");
+    const tick: LiveTick = { price: last.c, t: last.t };
+    return tick;
+  });
+
+function _noop_marker() {
+
 export const getSignalPlan = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
     const obj = (d ?? {}) as { symbol?: string };
