@@ -128,7 +128,7 @@ function HomePage() {
               <span className="text-zinc-900">vocalized in real time.</span>
             </h1>
             <p className="mt-6 max-w-4xl text-base md:text-lg text-zinc-900 leading-relaxed">
-              JENVU AI is a voice-native trading terminal that reads markets through 25+ years of ICT &amp; SMC logic — narrating A+ setups the moment they form.
+              A voice-native trading terminal powered by 25+ years of ICT &amp; SMC logic — narrating A+ setups the moment they form.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
