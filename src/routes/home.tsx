@@ -47,6 +47,17 @@ function HomePage() {
           backgroundSize: "56px 56px",
         }}
       />
+      {/* hero gradient mesh */}
+      <div className="pointer-events-none absolute top-0 left-0 right-0 h-[820px] overflow-hidden">
+        <div
+          className="absolute -top-40 -left-40 h-[36rem] w-[36rem] rounded-full blur-3xl opacity-40"
+          style={{ background: `radial-gradient(circle, ${ACCENT}55, transparent 70%)` }}
+        />
+        <div
+          className="absolute top-20 -right-40 h-[40rem] w-[40rem] rounded-full blur-3xl opacity-25"
+          style={{ background: "radial-gradient(circle, #000, transparent 70%)" }}
+        />
+      </div>
 
       <Nav />
 
@@ -219,6 +230,34 @@ function HomePage() {
           </div>
         </div>
         <style>{`@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
+      </section>
+
+      {/* STATS BAND */}
+      <section className="relative mx-auto max-w-7xl px-6 py-16 lg:py-20">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-black/10 rounded-3xl overflow-hidden border border-black/10">
+          {[
+            { v: "25+", k: "Years of ICT/SMC logic" },
+            { v: "A–Z", k: "Markets covered" },
+            { v: "<1s", k: "Voice-to-signal latency" },
+            { v: "24/7", k: "Killzone awareness" },
+          ].map((s) => (
+            <div
+              key={s.k}
+              className="bg-white p-8 lg:p-10 hover:bg-[#FFFCF3] transition group"
+            >
+              <div
+                className="text-5xl lg:text-6xl font-black tracking-tight"
+                style={{ color: "#0A0A0A" }}
+              >
+                {s.v}
+                <span style={{ color: ACCENT }}>.</span>
+              </div>
+              <div className="mt-3 text-xs uppercase tracking-[0.25em] font-bold text-black/55">
+                {s.k}
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* FEATURES */}
