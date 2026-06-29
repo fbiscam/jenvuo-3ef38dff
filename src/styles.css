@@ -144,9 +144,7 @@
   }
 
   html, body {
-    height: 100%;
-    overflow: hidden;
-    overscroll-behavior: none;
+    min-height: 100%;
   }
   body {
     background-color: var(--color-background);
