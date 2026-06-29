@@ -54,14 +54,17 @@ function AuthPage() {
     };
   }, [navigate]);
 
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
+    setErrorMsg(null);
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      toast.error(error.message);
+      setErrorMsg(error.message);
       return;
     }
     navigate({ to: "/app", replace: true });
@@ -175,6 +178,13 @@ function AuthPage() {
                         />
                       </div>
                     </div>
+
+                    {errorMsg && (
+                      <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                        <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                        <span className="leading-snug">{errorMsg}</span>
+                      </div>
+                    )}
 
                     <button
                       type="submit"
