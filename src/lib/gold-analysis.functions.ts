@@ -691,6 +691,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       htfCandles: htf.map(toDTO),
       ltfCandles: ltf.map(toDTO),
       currentPrice: last.c,
+      instrument: { symbol: inst.raw || inst.key, display: inst.display, kind: inst.kind, decimals: inst.decimals },
     };
 
     return plan;
