@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
+import * as React from "react";
 import { toast } from "sonner";
 import { Mic, X, Plus, Sliders, Moon, Sun, LogOut, ArrowUp } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -12,6 +13,91 @@ import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { getGoldNews } from "@/lib/news.functions";
 import { cn } from "@/lib/utils";
+
+const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const SANS = "font-['Inter',system-ui,sans-serif]";
+
+/* ---------- ticker (matches homepage) ---------- */
+type TickerRow = [string, string, string];
+const INITIAL_TICKER: TickerRow[] = [
+  ["XAU/USD", "2,418.30", "+0.42%"],
+  ["BTC/USDT", "71,204.10", "+1.18%"],
+  ["ETH/USDT", "3,841.20", "+2.04%"],
+  ["EUR/USD", "1.0832", "-0.07%"],
+  ["GBP/USD", "1.2671", "+0.09%"],
+  ["NAS100", "20,114.5", "+0.61%"],
+  ["DXY", "104.21", "-0.12%"],
+  ["SOL/USDT", "168.40", "+3.12%"],
+  ["XRP/USDT", "0.5184", "+0.78%"],
+  ["BNB/USDT", "612.30", "+1.04%"],
+];
+
+const BINANCE_MAP: Record<string, string> = {
+  "BTC/USDT": "BTCUSDT",
+  "ETH/USDT": "ETHUSDT",
+  "EUR/USD": "EURUSDT",
+  "SOL/USDT": "SOLUSDT",
+  "XRP/USDT": "XRPUSDT",
+  "BNB/USDT": "BNBUSDT",
+};
+
+function fmtPrice(n: number): string {
+  if (n >= 1000) return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (n >= 10) return n.toFixed(2);
+  return n.toFixed(4);
+}
+
+function useLiveTicker(): TickerRow[] {
+  const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
+  React.useEffect(() => {
+    let alive = true;
+    const symbols = Object.values(BINANCE_MAP);
+    const fetchGold = async () => {
+      try {
+        const r = await fetch("https://api.gold-api.com/price/XAU");
+        if (!r.ok) return null;
+        const j = await r.json();
+        const price = Number(j.price);
+        return isFinite(price) ? price : null;
+      } catch { return null; }
+    };
+    const tick = async () => {
+      try {
+        const [binRes, gold] = await Promise.all([
+          fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(symbols))}`).then((r) => (r.ok ? r.json() : null)),
+          fetchGold(),
+        ]);
+        if (!alive) return;
+        const data: Array<{ symbol: string; lastPrice: string; priceChangePercent: string }> = Array.isArray(binRes) ? binRes : [];
+        const bySym = new Map(data.map((d) => [d.symbol, d]));
+        setRows((prev) =>
+          prev.map(([label, price, delta]) => {
+            if (label === "XAU/USD" && gold) {
+              const prevN = parseFloat(price.replace(/,/g, ""));
+              const pct = isFinite(prevN) && prevN > 0 ? ((gold - prevN) / prevN) * 100 : 0;
+              const sign = pct >= 0 ? "+" : "";
+              const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
+              return [label, fmtPrice(gold), deltaOut];
+            }
+            const bsym = BINANCE_MAP[label];
+            if (!bsym) return [label, price, delta];
+            const d = bySym.get(bsym);
+            if (!d) return [label, price, delta];
+            const p = parseFloat(d.lastPrice);
+            const pct = parseFloat(d.priceChangePercent);
+            const sign = pct >= 0 ? "+" : "";
+            return [label, fmtPrice(p), `${sign}${pct.toFixed(2)}%`];
+          })
+        );
+      } catch { /* ignore */ }
+    };
+    tick();
+    const id = setInterval(tick, 10_000);
+    return () => { alive = false; clearInterval(id); };
+  }, []);
+  return rows;
+}
+
 
 
 export const Route = createFileRoute("/app")({
