@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
+import * as React from "react";
 import { toast } from "sonner";
 import { Mic, X, Plus, Sliders, Moon, Sun, LogOut, ArrowUp } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -12,6 +13,91 @@ import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { getGoldNews } from "@/lib/news.functions";
 import { cn } from "@/lib/utils";
+
+const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const SANS = "font-['Inter',system-ui,sans-serif]";
+
+/* ---------- ticker (matches homepage) ---------- */
+type TickerRow = [string, string, string];
+const INITIAL_TICKER: TickerRow[] = [
+  ["XAU/USD", "2,418.30", "+0.42%"],
+  ["BTC/USDT", "71,204.10", "+1.18%"],
+  ["ETH/USDT", "3,841.20", "+2.04%"],
+  ["EUR/USD", "1.0832", "-0.07%"],
+  ["GBP/USD", "1.2671", "+0.09%"],
+  ["NAS100", "20,114.5", "+0.61%"],
+  ["DXY", "104.21", "-0.12%"],
+  ["SOL/USDT", "168.40", "+3.12%"],
+  ["XRP/USDT", "0.5184", "+0.78%"],
+  ["BNB/USDT", "612.30", "+1.04%"],
+];
+
+const BINANCE_MAP: Record<string, string> = {
+  "BTC/USDT": "BTCUSDT",
+  "ETH/USDT": "ETHUSDT",
+  "EUR/USD": "EURUSDT",
+  "SOL/USDT": "SOLUSDT",
+  "XRP/USDT": "XRPUSDT",
+  "BNB/USDT": "BNBUSDT",
+};
+
+function fmtPrice(n: number): string {
+  if (n >= 1000) return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (n >= 10) return n.toFixed(2);
+  return n.toFixed(4);
+}
+
+function useLiveTicker(): TickerRow[] {
+  const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
+  React.useEffect(() => {
+    let alive = true;
+    const symbols = Object.values(BINANCE_MAP);
+    const fetchGold = async () => {
+      try {
+        const r = await fetch("https://api.gold-api.com/price/XAU");
+        if (!r.ok) return null;
+        const j = await r.json();
+        const price = Number(j.price);
+        return isFinite(price) ? price : null;
+      } catch { return null; }
+    };
+    const tick = async () => {
+      try {
+        const [binRes, gold] = await Promise.all([
+          fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(symbols))}`).then((r) => (r.ok ? r.json() : null)),
+          fetchGold(),
+        ]);
+        if (!alive) return;
+        const data: Array<{ symbol: string; lastPrice: string; priceChangePercent: string }> = Array.isArray(binRes) ? binRes : [];
+        const bySym = new Map(data.map((d) => [d.symbol, d]));
+        setRows((prev) =>
+          prev.map(([label, price, delta]) => {
+            if (label === "XAU/USD" && gold) {
+              const prevN = parseFloat(price.replace(/,/g, ""));
+              const pct = isFinite(prevN) && prevN > 0 ? ((gold - prevN) / prevN) * 100 : 0;
+              const sign = pct >= 0 ? "+" : "";
+              const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
+              return [label, fmtPrice(gold), deltaOut];
+            }
+            const bsym = BINANCE_MAP[label];
+            if (!bsym) return [label, price, delta];
+            const d = bySym.get(bsym);
+            if (!d) return [label, price, delta];
+            const p = parseFloat(d.lastPrice);
+            const pct = parseFloat(d.priceChangePercent);
+            const sign = pct >= 0 ? "+" : "";
+            return [label, fmtPrice(p), `${sign}${pct.toFixed(2)}%`];
+          })
+        );
+      } catch { /* ignore */ }
+    };
+    tick();
+    const id = setInterval(tick, 10_000);
+    return () => { alive = false; clearInterval(id); };
+  }, []);
+  return rows;
+}
+
 
 
 export const Route = createFileRoute("/app")({
@@ -275,51 +361,67 @@ function Home() {
     return <div className="fixed inset-0 bg-black" />;
   }
 
+  const ticker = useLiveTicker();
+
   return (
-
-    <div className={cn("fixed inset-0 w-screen overflow-hidden overscroll-none flex flex-col transition-colors duration-300", dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900")}>
-      {/* Header */}
-      <header className="relative z-10 px-6 py-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center">
-          <StatusPill status={status} supported={speech.supported} dark={dark} />
+    <div className={cn(`h-dvh w-full overflow-hidden flex flex-col ${SANS} antialiased`, "bg-white text-zinc-900")}>
+      {/* HEADER (matches homepage) */}
+      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md shrink-0">
+        <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
+          <Link to="/" className="flex min-w-0 items-center gap-2.5">
+            <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
+            <span className="truncate font-semibold tracking-tight">JENVU AI</span>
+          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase text-zinc-900`}>
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="relative rounded-full bg-emerald-500 h-1.5 w-1.5" />
+              </span>
+              APP_TERMINAL // ONLINE
+            </div>
+            <button
+              onClick={() => setDark((d) => !d)}
+              className="h-8 w-8 rounded-lg flex items-center justify-center border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 transition"
+              aria-label="Toggle theme"
+              title={dark ? "Switch to light" : "Switch to dark"}
+            >
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={signOut}
+              className="h-8 w-8 rounded-lg flex items-center justify-center border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 transition"
+              aria-label="Sign out"
+              title="Sign out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-
-
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setDark((d) => !d)}
-            className={cn(
-              "h-9 w-9 rounded-full flex items-center justify-center transition border",
-              dark
-                ? "bg-neutral-900 border-neutral-700 text-amber-300 hover:bg-neutral-800"
-                : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-100",
-            )}
-            aria-label="Toggle theme"
-            title={dark ? "Switch to light" : "Switch to dark"}
-          >
-            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-          <button
-            onClick={signOut}
-            className={cn(
-              "h-9 w-9 rounded-full flex items-center justify-center transition border",
-              dark
-                ? "bg-neutral-900 border-neutral-700 text-neutral-300 hover:bg-neutral-800"
-                : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-100",
-            )}
-            aria-label="Sign out"
-            title="Sign out"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
+        {/* ticker strip */}
+        <div className="border-t border-zinc-100 overflow-hidden">
+          <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap animate-ticker`}>
+            {[...ticker, ...ticker].map(([s, p, d], i) => (
+              <span key={i} className="flex items-center gap-2">
+                <span className="text-zinc-900 font-medium">{s}</span>
+                <span>{p}</span>
+                <span className={d.startsWith("-") ? "text-red-500" : "text-emerald-600"}>{d}</span>
+                <span className="text-zinc-200">•</span>
+              </span>
+            ))}
+          </div>
         </div>
-
       </header>
 
-      {/* Main: orb centerpiece */}
-      <main className="relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row items-center justify-center px-6 gap-6 lg:gap-10 pb-28 overflow-hidden">
-        <div className="flex flex-col items-center justify-center gap-4 flex-1 min-h-0">
+      {/* MAIN: voice agent surface */}
+      <main className={cn(
+        "relative flex-1 min-h-0 flex flex-col lg:flex-row items-center justify-center px-6 gap-6 lg:gap-10 overflow-hidden transition-colors duration-300",
+        dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900",
+      )}>
+        <div className="flex flex-col items-center justify-center gap-4 flex-1 min-h-0 w-full">
+          <div className="pt-2">
+            <StatusPill status={status} supported={speech.supported} dark={dark} />
+          </div>
           <div className="flex-1 min-h-0 flex items-center justify-center w-full">
             <CloudOrb status={status} pulse={speech.wordPulse} />
           </div>
@@ -337,15 +439,15 @@ function Home() {
         )}
       </main>
 
-      {/* Bottom composer — ChatGPT style */}
+      {/* COMPOSER — in flow above footer */}
       <div className={cn(
-        "fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t to-transparent",
-        dark ? "from-neutral-950 via-neutral-950" : "from-white via-white",
+        "shrink-0 px-4 pt-4 pb-3",
+        dark ? "bg-neutral-950" : "bg-white border-t border-zinc-100",
       )}>
         <div className="max-w-3xl mx-auto">
           <div className={cn(
-            "flex items-center gap-2 rounded-full border pl-4 pr-1.5 py-1.5 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.5)]",
-            dark ? "bg-neutral-900 border-neutral-800" : "bg-white border-white/20",
+            "flex items-center gap-2 rounded-full border pl-4 pr-1.5 py-1.5 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.15)]",
+            dark ? "bg-neutral-900 border-neutral-800" : "bg-white border-zinc-200",
           )}>
             <input
               type="text"
@@ -387,9 +489,24 @@ function Home() {
           </div>
         </div>
       </div>
+
+      {/* FOOTER (matches homepage) */}
+      <footer className="border-t border-zinc-100 bg-white shrink-0">
+        <div className="mx-auto max-w-6xl px-5 py-3 flex items-center justify-between gap-5">
+          <div className="flex items-center gap-2 text-[11px] text-zinc-400">
+            <span className="font-semibold text-zinc-900">JENVU AI</span>
+            <span>·</span>
+            <span>© {new Date().getFullYear()}</span>
+          </div>
+          <div className={`${MONO} text-[10px] text-zinc-400 uppercase tracking-widest`}>
+            v1.0 // VOICE_EDITION
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
+
 
 function StatusPill({ status, supported, dark }: { status: "idle" | "listening" | "thinking" | "speaking"; supported: boolean; dark?: boolean }) {
   if (!supported) {
