@@ -150,15 +150,17 @@ function Home() {
     speech.startListening();
   };
 
-  // Auto-start mic on page load.
+  // Always-on voice: persist preference, auto-start on load & after refresh
   useEffect(() => {
     if (!speech.supported) return;
-    const t = setTimeout(() => {
-      if (greetedRef.current) return;
-      greetedRef.current = true;
-      speech.startListening();
-    }, 600);
-    return () => clearTimeout(t);
+    if (greetedRef.current) return;
+    greetedRef.current = true;
+    const pref = typeof window !== "undefined" ? localStorage.getItem("jenvu.voiceOn") : null;
+    const wantOn = pref === null ? true : pref === "1"; // default ON
+    if (wantOn) {
+      const t = setTimeout(() => speech.startListening(), 500);
+      return () => clearTimeout(t);
+    }
   }, [speech]);
 
   const submitText = () => {
