@@ -146,20 +146,21 @@ function Hero() {
         {/* main grid */}
         <div className="mt-10 grid lg:grid-cols-12 gap-10 lg:gap-8 items-start">
           {/* Headline */}
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-8 text-left">
             <h1
-              className="font-display font-semibold tracking-[-0.045em] leading-[0.93] text-[clamp(56px,9vw,140px)]"
+              className="font-display font-semibold tracking-[-0.045em] leading-[0.95] text-[clamp(48px,8vw,128px)]"
               style={{ color: VOID }}
             >
-              The trading
-              <br />
-              desk that
-              <br />
-              <em className="not-italic font-light italic" style={{ fontFamily: "'Sora', sans-serif" }}>
-                <span className="italic">speaks</span>
-              </em>{" "}
-              <span className="inline-block align-baseline">
-                <span className="px-3 pb-1 pt-0 rounded-2xl" style={{ background: VOID, color: PAPER }}>
+              <span className="block">The trading</span>
+              <span className="block">desk that</span>
+              <span className="block">
+                <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>
+                  speaks
+                </span>{" "}
+                <span
+                  className="inline-block rounded-2xl px-4 py-0 align-baseline leading-[0.95]"
+                  style={{ background: VOID, color: PAPER }}
+                >
                   back.
                 </span>
               </span>
