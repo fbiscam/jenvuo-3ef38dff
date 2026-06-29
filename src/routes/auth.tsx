@@ -54,8 +54,8 @@ function AuthPage() {
         <div className="w-full max-w-sm">
 
           <h1
-            className="text-5xl font-black uppercase tracking-tight mb-3 leading-none bg-clip-text text-transparent"
-            style={{ backgroundImage: "linear-gradient(135deg,#ec4899 0%,#f59e0b 35%,#0ea5e9 70%,#8b5cf6 100%)" }}
+            className="text-5xl font-black uppercase tracking-tight mb-3 leading-none text-black"
+            style={{ fontFamily: "'Urbanist', sans-serif" }}
           >
             Jenvu AI
           </h1>
