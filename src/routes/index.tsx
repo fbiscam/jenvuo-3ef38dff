@@ -63,6 +63,11 @@ function Home() {
   const alertedRef = useRef<Set<string>>(new Set());
   const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bufferRef = useRef("");
+  const interimRef = useRef("");
+  const transcriptRef = useRef("");
+  useEffect(() => { interimRef.current = speech.interim; }, [speech.interim]);
+  useEffect(() => { transcriptRef.current = speech.transcript; }, [speech.transcript]);
+
   const [dark, setDark] = useState<boolean>(true);
   useEffect(() => {
     if (typeof window === "undefined") return;
