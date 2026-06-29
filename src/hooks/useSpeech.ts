@@ -39,7 +39,9 @@ export function useSpeech() {
     const rec = new SpeechRecognition();
     rec.continuous = true;
     rec.interimResults = true;
-    rec.lang = "ur-PK";
+    // en-US recognizes English + Hinglish reliably across Chrome/Edge.
+    // ur-PK silently returns no results for most accents.
+    rec.lang = "en-US";
     rec.onresult = (e: any) => {
       let finalText = "";
       let interimText = "";
@@ -54,18 +56,25 @@ export function useSpeech() {
         setTranscript(finalText.trim());
       }
     };
+    rec.onstart = () => setListening(true);
     rec.onend = () => {
-      setListening(false);
       // auto-restart if user still wants to listen (continuous mode)
       if (wantListeningRef.current) {
+        // keep UI in "listening" — don't flicker to Standby between restarts
         safeStart();
+      } else {
+        setListening(false);
       }
     };
     rec.onerror = (e: any) => {
       if (e?.error === "not-allowed" || e?.error === "service-not-allowed") {
         wantListeningRef.current = false;
+        setListening(false);
+      } else if (e?.error === "no-speech" || e?.error === "aborted" || e?.error === "network") {
+        // transient — let onend handle restart
+      } else {
+        setListening(false);
       }
-      setListening(false);
     };
     recognitionRef.current = rec;
 
