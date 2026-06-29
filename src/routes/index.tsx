@@ -6,12 +6,12 @@ import featAssets from "@/assets/feat-assets.jpg";
 
 /**
  * JENVU AI — homepage
- * Palette: Paper & Ink  (#f5f3ee paper · #e8e4dd warm · #2d2d2d ink · #0d0d0d void)
+ * Palette: Paper & Ink  (#ffffff paper · #e8e4dd warm · #2d2d2d ink · #0d0d0d void)
  * Type:    Sora (display)  +  Manrope (body)
  * Layout:  Hero grid — editorial AI-lab aesthetic
  */
 
-const PAPER = "#f5f3ee";
+const PAPER = "#ffffff";
 const WARM = "#e8e4dd";
 const INK = "#2d2d2d";
 const VOID = "#0d0d0d";
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   return (
     <div
-      className="min-h-dvh w-full text-[color:var(--ink)] [--paper:#f5f3ee] [--warm:#e8e4dd] [--ink:#2d2d2d] [--void:#0d0d0d]"
+      className="min-h-dvh w-full text-[color:var(--ink)] [--paper:#ffffff] [--warm:#e8e4dd] [--ink:#2d2d2d] [--void:#0d0d0d]"
       style={{
         background: PAPER,
         fontFamily: "'Manrope', system-ui, sans-serif",
@@ -214,9 +214,9 @@ function Console() {
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#f5f3ee]/20" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#f5f3ee]/20" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#f5f3ee]/20" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#ffffff]/20" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#ffffff]/20" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#ffffff]/20" />
         </div>
         <div className="text-[10px] uppercase tracking-[0.25em] font-bold text-[color:var(--paper)]/40">
           jenvu · live
