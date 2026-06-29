@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 
-const ACCENT = "#E8B84A";
+const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const SANS = "font-['Inter',system-ui,sans-serif]";
 
 export function PageShell({
   eyebrow,
@@ -16,93 +16,98 @@ export function PageShell({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-dvh w-full bg-white text-black font-[Urbanist,sans-serif]">
-      <div
-        className="pointer-events-none fixed inset-0 opacity-[0.035]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",
-          backgroundSize: "56px 56px",
-        }}
-      />
-
-      <header className="relative z-10 mx-auto max-w-7xl px-6 py-6 flex items-center justify-between">
-        <Link to="/" className="font-black tracking-[0.25em] text-lg">
-          JENVU AI
-        </Link>
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-black/70 hover:text-black"
-        >
-          <ArrowLeft className="h-4 w-4" /> Back to home
-        </Link>
-      </header>
-
-      <section className="relative mx-auto max-w-4xl px-6 pt-10 pb-16">
-        <div className="text-[11px] uppercase tracking-[0.3em] font-bold text-black/50">
-          {eyebrow}
-        </div>
-        <h1 className="mt-4 text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[0.95]">
-          {title}
-        </h1>
-        <div
-          className="mt-6 h-[2px] w-24"
-          style={{ background: ACCENT }}
-        />
-        {intro && (
-          <p className="mt-8 text-lg text-black/70 leading-relaxed max-w-3xl">
-            {intro}
-          </p>
-        )}
-      </section>
-
-      <main className="relative mx-auto max-w-4xl px-6 pb-24">
-        <div className="rounded-[2rem] bg-[#0A0A0A] text-white p-8 lg:p-12 space-y-8 leading-relaxed">
-          {children}
-        </div>
-
-        <p className="mt-10 text-center text-xs uppercase tracking-[0.3em] text-black/40 font-semibold">
-          Last updated · {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-        </p>
-      </main>
-
-      <footer className="border-t border-black/10">
-        <div className="mx-auto max-w-7xl px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm">
-          <div className="font-black tracking-[0.2em]">JENVU AI</div>
-          <div className="flex flex-wrap gap-5 text-black/60 font-semibold">
-            <Link to="/about">About</Link>
-            <Link to="/ai-engine">AI Engine</Link>
-            <Link to="/llm">LLM</Link>
-            <Link to="/development">Build</Link>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
-            <Link to="/disclaimer">Disclaimer</Link>
+    <>
+      <style>{`@media (min-width: 1024px){.jenvu-zoom{zoom:1.5}}`}</style>
+      <div className={`jenvu-zoom min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+        {/* NAV — matches homepage */}
+        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+          <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
+            <Link to="/" className="flex min-w-0 items-center gap-2.5">
+              <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
+              <span className="truncate font-semibold tracking-tight">JENVU AI</span>
+            </Link>
+            <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900">
+              <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
+              <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
+              <Link to="/about" className="hover:text-zinc-900">About</Link>
+              <Link to="/terms" className="hover:text-zinc-900">Terms</Link>
+            </nav>
+            <div className="flex shrink-0 items-center gap-2">
+              <Link
+                to="/app"
+                className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-zinc-800"
+              >
+                Launch
+              </Link>
+            </div>
           </div>
-          <div className="text-black/50">© {new Date().getFullYear()} JENVU</div>
-        </div>
-      </footer>
-    </div>
+        </header>
+
+        {/* HERO */}
+        <section className="border-b border-zinc-100">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
+            <div className={`flex items-center gap-3 ${MONO} text-[10px] tracking-[0.22em] uppercase text-zinc-900`}>
+              <span className="h-px w-6 bg-zinc-300" />
+              {eyebrow}
+            </div>
+            <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
+              {title}
+            </h1>
+            {intro && (
+              <p className="mt-5 max-w-2xl text-base text-zinc-600 leading-relaxed sm:text-lg">
+                {intro}
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* BODY */}
+        <main className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 space-y-10 leading-relaxed shadow-[0_24px_60px_-24px_rgba(0,0,0,0.08)]">
+            {children}
+          </div>
+          <p className={`mt-8 text-center ${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
+            Last updated · {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+          </p>
+        </main>
+
+        {/* FOOTER — matches homepage */}
+        <footer className="border-t border-zinc-100">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10 flex flex-col md:flex-row items-center justify-between gap-5 text-sm text-zinc-900">
+            <div className="flex items-center gap-2.5">
+              <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded object-contain" />
+              <span className="text-zinc-900 font-semibold">JENVU AI</span>
+              <span className="text-zinc-300">·</span>
+              <span>© {new Date().getFullYear()}</span>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+              <Link to="/about" className="hover:text-zinc-900">About</Link>
+              <Link to="/terms" className="hover:text-zinc-900">Terms</Link>
+              <Link to="/privacy" className="hover:text-zinc-900">Privacy</Link>
+              <Link to="/disclaimer" className="hover:text-zinc-900">Disclaimer</Link>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </>
   );
 }
 
 export function H2({ children }: { children: ReactNode }) {
   return (
-    <h2
-      className="text-2xl font-black uppercase tracking-tight pt-2"
-      style={{ color: ACCENT }}
-    >
+    <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 pt-2 border-t border-zinc-100 first:border-t-0 first:pt-0">
       {children}
     </h2>
   );
 }
 
 export function P({ children }: { children: ReactNode }) {
-  return <p className="text-white/75">{children}</p>;
+  return <p className="text-zinc-700 leading-relaxed">{children}</p>;
 }
 
 export function UL({ children }: { children: ReactNode }) {
   return (
-    <ul className="space-y-2 text-white/75 list-disc pl-5 marker:text-[color:var(--accent,#E8B84A)]">
+    <ul className="space-y-2 text-zinc-700 list-disc pl-5 marker:text-zinc-400">
       {children}
     </ul>
   );
