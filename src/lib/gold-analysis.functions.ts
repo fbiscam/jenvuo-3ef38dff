@@ -577,18 +577,19 @@ Rules:
   11) Confluence with killzone/DXY, 12) Entry trigger, 13) SL logic, 14) TP & invalidation.
 - ALWAYS include at minimum: 1 HTF BOS or CHOCH, 1 HTF OB or zone, 1 LTF FVG, 1 LTF OB, 1 liquidity level, plus entry/sl/tp markings.
 - Mention the current session/killzone (${session} / ${killzone}) and premium-vs-discount read explicitly.
-- If a HIGH impact USD/XAU news event is within 60 minutes, set direction="WAIT", confidence<=50, and clearly call out the news risk in summary and invalidation.
+- If a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, set direction="WAIT", confidence<=50, and clearly call out the news risk in summary and invalidation.
 - If conditions are not A+ set direction="WAIT", confidence<=55, explain what's missing in summary.`;
 
-    const user = `LIVE GOLD CANDLES (unix-seconds | O,H,L,C)
-CURRENT PRICE: ${last.c.toFixed(2)}
+    const user = `LIVE ${inst.display} CANDLES (unix-seconds | O,H,L,C)
+INSTRUMENT: ${inst.display} (${inst.kind})
+CURRENT PRICE: ${last.c.toFixed(dec)}
 SESSION: ${session} | KILLZONE: ${killzone}
-HTF SWING HIGH (160h): ${swingHigh.toFixed(2)} | SWING LOW: ${swingLow.toFixed(2)} | EQUILIBRIUM: ${equilibrium.toFixed(2)} | PRICE IS IN: ${inPremium ? "PREMIUM" : "DISCOUNT"}
-PDH (last 24h): ${pdh.toFixed(2)} | PDL: ${pdl.toFixed(2)}
+HTF SWING HIGH (160): ${swingHigh.toFixed(dec)} | SWING LOW: ${swingLow.toFixed(dec)} | EQUILIBRIUM: ${equilibrium.toFixed(dec)} | PRICE IS IN: ${inPremium ? "PREMIUM" : "DISCOUNT"}
+PDH (last 24h): ${pdh.toFixed(dec)} | PDL: ${pdl.toFixed(dec)}
 
-UPCOMING USD/XAU NEWS (next 4h):
+UPCOMING MACRO/NEWS (next 4h):
 ${newsBlock}
-${imminentHigh ? `\n⚠ HIGH IMPACT EVENT WITHIN 60 MIN: ${imminentHigh.title} in ${imminentHigh.minutesUntil}m — recommend WAIT.` : ""}
+${imminentHigh && inst.needsUsdNews ? `\n⚠ HIGH IMPACT EVENT WITHIN 60 MIN: ${imminentHigh.title} in ${imminentHigh.minutesUntil}m — recommend WAIT.` : ""}
 
 === HTF (1 HOUR, last ${htf.length} candles) ===
 ${fmt(htf)}
@@ -596,7 +597,7 @@ ${fmt(htf)}
 === LTF (15 MIN, last ${ltf.length} candles) ===
 ${fmt(ltf)}
 
-Produce the A+ ICT/SMC trade plan now.`;
+Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
