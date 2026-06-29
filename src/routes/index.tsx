@@ -791,16 +791,16 @@ function HomePage() {
         </div>
       </section>
       <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-6 pt-6 pb-24">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
-            <div className="max-w-xl">
-              <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
+            <div className="max-w-xl text-center md:text-left">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal. Speak to the market now.
               </h2>
               <p className="mt-3 text-zinc-900">
                 Your voice agent is one tap away listening<br />reasoning, thinking, research & narrating.
               </p>
-              <div className="mt-7 flex gap-3">
+              <div className="mt-7 flex flex-wrap justify-center md:justify-start gap-3">
                 <Link
                   to="/app"
                   className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
@@ -815,7 +815,7 @@ function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="relative">
+            <div className="relative h-40 w-40 sm:h-56 sm:w-56 shrink-0">
               <CloudOrb status="speaking" pulse={1} />
             </div>
           </div>
