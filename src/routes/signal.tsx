@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target, Brain, ShieldAlert, CheckCircle2, Clock, ChevronDown } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target, Brain, ShieldAlert, ShieldCheck, CheckCircle2, XCircle, Clock, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { getSignalPlan, ASSETS, type SignalPlan } from "@/lib/gold-analysis.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
