@@ -311,8 +311,12 @@ function HomePage() {
         eyebrow="Live Signal"
         title="A trading desk in a single screen."
       >
-        <div className="relative rounded-[2rem] bg-[#0A0A0A] p-6 lg:p-10 overflow-hidden">
-          <div className="flex items-center justify-between text-white/50 text-xs uppercase tracking-[0.25em] font-semibold mb-6">
+        <div className="relative rounded-[2rem] bg-white border border-black/10 p-6 lg:p-10 overflow-hidden shadow-[0_40px_120px_-40px_rgba(0,0,0,0.25)]">
+          <div
+            className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full blur-3xl opacity-30"
+            style={{ background: `radial-gradient(circle, ${ACCENT}66, transparent 70%)` }}
+          />
+          <div className="relative flex items-center justify-between text-black/55 text-xs uppercase tracking-[0.25em] font-semibold mb-6">
             <span>XAU/USD · 1H + 15M</span>
             <span className="flex items-center gap-2">
               <Activity className="h-3.5 w-3.5" style={{ color: ACCENT }} />
@@ -320,8 +324,8 @@ function HomePage() {
             </span>
           </div>
 
-          <div className="grid lg:grid-cols-[2fr_1fr] gap-5">
-            <div className="rounded-xl bg-gradient-to-br from-black to-[#111] border border-white/10 p-5 h-72 relative overflow-hidden">
+          <div className="relative grid lg:grid-cols-[2fr_1fr] gap-5">
+            <div className="rounded-xl bg-gradient-to-br from-white to-[#FAF7EE] border border-black/10 p-5 h-72 relative overflow-hidden">
               <FakeChart />
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
@@ -333,14 +337,13 @@ function HomePage() {
               ].map(([k, v]) => (
                 <div
                   key={k}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
+                  className="rounded-xl border border-black/10 bg-black/[0.02] p-4"
                 >
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold">
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-black/50 font-semibold">
                     {k}
                   </div>
                   <div
-                    className="mt-1 font-black text-lg"
-                    style={{ color: ACCENT }}
+                    className="mt-1 font-black text-lg text-black"
                   >
                     {v}
                   </div>
@@ -349,10 +352,10 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="mt-8 flex justify-center">
+          <div className="relative mt-8 flex justify-center">
             <Link
               to="/signal"
-              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-7 py-3.5 font-bold hover:bg-white/90 transition"
+              className="inline-flex items-center gap-2 rounded-full bg-black text-white px-7 py-3.5 font-bold hover:bg-black/85 transition"
             >
               Open Live Signal <ArrowRight className="h-4 w-4" />
             </Link>
