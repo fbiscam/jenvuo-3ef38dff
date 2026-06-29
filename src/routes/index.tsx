@@ -235,12 +235,41 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
             "conic-gradient(from 0deg, #f472b6, #a78bfa, #38bdf8, #34d399, #fbbf24, #fb7185, #f472b6)",
         }}
       />
+
+      {/* rotating colorful ring shadow around the circle */}
+      <div
+        className="absolute -inset-6 rounded-full animate-spin"
+        style={{
+          animationDuration: "6s",
+          background:
+            "conic-gradient(from 0deg, #f472b6, #a78bfa, #38bdf8, #34d399, #fbbf24, #fb7185, #f472b6)",
+          WebkitMask:
+            "radial-gradient(circle, transparent 58%, #000 60%, #000 70%, transparent 72%)",
+          mask:
+            "radial-gradient(circle, transparent 58%, #000 60%, #000 70%, transparent 72%)",
+          filter: "blur(8px)",
+          opacity: 0.9,
+        }}
+      />
+
+      {/* orbiting colored glow dots */}
+      <div
+        className="absolute inset-0 animate-spin"
+        style={{ animationDuration: "7s" }}
+      >
+        <span className="absolute left-1/2 -top-2 -translate-x-1/2 h-6 w-6 rounded-full bg-fuchsia-400 blur-xl opacity-90" />
+        <span className="absolute left-1/2 -bottom-2 -translate-x-1/2 h-6 w-6 rounded-full bg-sky-400 blur-xl opacity-90" />
+        <span className="absolute top-1/2 -left-2 -translate-y-1/2 h-6 w-6 rounded-full bg-emerald-400 blur-xl opacity-90" />
+        <span className="absolute top-1/2 -right-2 -translate-y-1/2 h-6 w-6 rounded-full bg-amber-400 blur-xl opacity-90" />
+      </div>
+
       {(status === "listening" || status === "speaking") && (
         <>
           <span className="absolute -inset-2 rounded-full border border-fuchsia-200/70 animate-ping" style={{ animationDuration: "2.4s" }} />
           <span className="absolute -inset-8 rounded-full border border-sky-200/60 animate-ping" style={{ animationDuration: "3.2s" }} />
         </>
       )}
+
 
       {/* Colorful sphere */}
       <div
