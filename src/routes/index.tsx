@@ -333,6 +333,48 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
 
       {/* Ocean-layered sky-blue sphere */}
       <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
+        {/* outer rotating iridescent ring */}
+        <div
+          className="absolute inset-0 rounded-full animate-spin"
+          style={{
+            animationDuration: status === "speaking" ? "6s" : "18s",
+            background:
+              "conic-gradient(from 0deg, #38bdf8, #22d3ee, #a78bfa, #f472b6, #facc15, #34d399, #38bdf8)",
+            padding: "2px",
+            WebkitMask: "radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px))",
+                    mask: "radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px))",
+            filter: "blur(0.5px)",
+            opacity: 0.85,
+          }}
+        />
+        {/* counter-spinning soft dotted ring */}
+        <div
+          className="absolute inset-3 rounded-full animate-spin"
+          style={{
+            animationDuration: "24s",
+            animationDirection: "reverse",
+            background:
+              "repeating-conic-gradient(from 0deg, rgba(255,255,255,0.55) 0deg 2deg, transparent 2deg 12deg)",
+            WebkitMask: "radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px))",
+                    mask: "radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px))",
+            opacity: 0.5,
+          }}
+        />
+
+        {/* orbiting colorful glow dots */}
+        {(status === "listening" || status === "speaking" || status === "thinking") && (
+          <div
+            className="absolute inset-0 animate-spin"
+            style={{ animationDuration: status === "speaking" ? "5s" : "10s" }}
+          >
+            <span className="absolute left-1/2 top-0 -translate-x-1/2 h-3 w-3 rounded-full bg-pink-400 shadow-[0_0_18px_6px_rgba(244,114,182,0.7)]" />
+            <span className="absolute right-0 top-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-sky-400 shadow-[0_0_18px_6px_rgba(56,189,248,0.7)]" />
+            <span className="absolute left-1/2 bottom-0 -translate-x-1/2 h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_18px_6px_rgba(52,211,153,0.7)]" />
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-amber-300 shadow-[0_0_18px_6px_rgba(252,211,77,0.7)]" />
+          </div>
+        )}
+
+
         <div
           className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
           style={{
