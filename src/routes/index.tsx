@@ -136,7 +136,7 @@ function Home() {
         <div className="flex items-center gap-2.5">
           <div className="h-7 w-7 rounded-full bg-gradient-to-br from-amber-400 to-amber-700 shadow-sm" />
           <div>
-            <h1 className="text-sm font-semibold tracking-tight text-white">GoldGPT</h1>
+            <h1 className="text-sm font-semibold tracking-tight text-white">Jenvu AI</h1>
             <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-500">Live voice · XAU/USD</p>
           </div>
         </div>
