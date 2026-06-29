@@ -367,8 +367,33 @@ function SignalPage() {
               </div>
             </div>
 
-            {/* CENTER — charts */}
+            {/* CENTER — charts + multi-tf strip */}
             <div className="lg:col-span-8 bg-white flex flex-col gap-px">
+              {/* Multi-TF alignment strip */}
+              {plan && (
+                <div className="bg-white px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-3 border-b border-zinc-100">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-500 mr-1`}>
+                      MTF
+                    </span>
+                    {plan.multiTf.map((b) => (
+                      <TfPill key={b.tf} tfBias={b} />
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+                      {plan.alignmentLabel}
+                    </span>
+                    <div className="w-24 h-1.5 bg-gradient-to-r from-rose-100 via-zinc-100 to-emerald-100 rounded-full relative overflow-hidden">
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 w-2 h-3 bg-zinc-900 rounded-sm"
+                        style={{ left: `${Math.max(0, Math.min(96, plan.alignmentScore))}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
@@ -407,6 +432,15 @@ function SignalPage() {
                 </div>
                 <div className="rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px]">
                   {plan ? <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF" /> : <ChartSkeleton />}
+                </div>
+                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
+                  <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
+                  <LegendDot color="bg-sky-500/70" label="OB" />
+                  <LegendDot color="bg-amber-500/70" label="Liquidity" />
+                  <LegendDot color="bg-violet-500/70" label="EQH/EQL" />
+                  <LegendDot color="bg-yellow-400/70" label="OTE" />
+                  <LegendDot color="bg-rose-400/40" label="Premium" />
+                  <LegendDot color="bg-emerald-400/40" label="Discount" />
                 </div>
               </div>
             </div>
