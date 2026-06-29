@@ -195,7 +195,15 @@ function Home() {
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between shrink-0">
         <div className="flex items-center">
-          <StatusPill status={status} supported={speech.supported} dark={dark} />
+          <span
+            className={cn(
+              "font-bold uppercase tracking-[0.25em] text-lg sm:text-xl select-none",
+              dark ? "text-white" : "text-neutral-900",
+            )}
+            style={{ fontFamily: '"Urbanist", sans-serif' }}
+          >
+            JENVU AI
+          </span>
         </div>
 
         <div className="flex items-center gap-3">
