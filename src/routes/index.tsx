@@ -276,13 +276,13 @@ function Manifesto() {
           Most AI guesses. <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>This one reasons.</span>
         </h2>
 
-        <div className="mt-16 grid lg:grid-cols-3 gap-12">
+        <div className="mt-16 grid lg:grid-cols-3 gap-5">
           {[
             { n: "01", t: "Voice-native, not chatbot-bolted", b: "Designed for spoken conversation — the rhythm of a real desk analyst beside you." },
             { n: "02", t: "Institutional logic, not retail noise", b: "ICT, SMC, Wyckoff, liquidity and killzones — the playbooks proprietary desks run." },
             { n: "03", t: "Honest by design", b: "When confluences are weak, Jenvu tells you to wait. No invented setups, no FOMO." },
           ].map((row) => (
-            <div key={row.n}>
+            <div key={row.n} className="rounded-3xl border border-black/10 bg-white p-7 hover:border-black/30 transition shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]">
               <div className="font-mono text-[12px] font-bold tracking-[0.25em]" style={{ color: VOID, fontFamily: "'JetBrains Mono', monospace" }}>{row.n}</div>
               <h3 className="mt-4 font-display text-[22px] font-semibold tracking-tight" style={{ color: VOID }}>{row.t}</h3>
               <p className="mt-3 text-[15px] leading-relaxed" style={{ color: VOID }}>{row.b}</p>
