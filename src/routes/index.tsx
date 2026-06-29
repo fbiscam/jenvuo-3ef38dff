@@ -124,6 +124,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 /* ---------- page ---------- */
 function HomePage() {
+  const ticker = useLiveTicker();
   return (
     <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
