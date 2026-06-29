@@ -430,6 +430,29 @@ function SignalPage() {
   );
 }
 
+function TfTabs({ label, value, options, onChange, onApply, disabled }: { label: string; value: string; options: string[]; onChange: (v: string) => void; onApply: () => void; disabled?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-2 px-3 pt-2 pb-1 border-b border-neutral-100">
+      <span className="text-[10px] uppercase tracking-widest font-bold text-neutral-500">{label}</span>
+      <div className="flex items-center gap-1">
+        {options.map((o) => (
+          <button
+            key={o}
+            disabled={disabled}
+            onClick={() => { if (o !== value) { onChange(o); setTimeout(onApply, 50); } }}
+            className={cn(
+              "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider transition disabled:opacity-40",
+              o === value ? "bg-neutral-900 text-white shadow-sm" : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200",
+            )}
+          >
+            {o}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Stat({ label, value, tone }: { label: string; value: string; tone?: "good" | "bad" }) {
   return (
     <div>
