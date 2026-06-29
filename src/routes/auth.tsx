@@ -99,7 +99,7 @@ function AuthPage() {
             </button>
           </form>
 
-          <p className="mt-8 text-xs text-black/55 text-center">
+          <p className="mt-8 text-xs text-black font-medium text-center">
             Access is invite-only. Contact the admin for an account.
           </p>
         </div>
