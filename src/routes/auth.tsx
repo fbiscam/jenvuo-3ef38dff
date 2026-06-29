@@ -77,13 +77,13 @@ function AuthPage() {
             <h2 className="text-3xl font-bold text-black tracking-tight mb-2">
               Welcome back
             </h2>
-            <p className="text-sm text-black/55 mb-8">
+            <p className="text-sm text-black/80 mb-8 font-medium">
               Sign in to continue your conversation.
             </p>
 
             <form onSubmit={signIn} className="space-y-3.5">
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-black/50 mb-1.5 ml-1">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-black/80 mb-1.5 ml-1">
                   Email
                 </label>
                 <div className="relative group">
@@ -101,7 +101,7 @@ function AuthPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-black/50 mb-1.5 ml-1">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-black/80 mb-1.5 ml-1">
                   Password
                 </label>
                 <div className="relative group">
@@ -132,7 +132,7 @@ function AuthPage() {
 
             <div className="mt-8 flex items-center gap-3">
               <div className="h-px flex-1 bg-black/10" />
-              <span className="text-[10px] uppercase tracking-[0.18em] text-black/40 font-semibold">Invite Only</span>
+              <span className="text-[10px] uppercase tracking-[0.18em] text-black/80 font-semibold">Invite Only</span>
               <div className="h-px flex-1 bg-black/10" />
             </div>
             <p className="mt-4 text-xs text-black/60 text-center">
