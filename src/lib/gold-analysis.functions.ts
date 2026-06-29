@@ -370,6 +370,9 @@ export type SignalPlan = {
   htfCandles: CandleDTO[];
   ltfCandles: CandleDTO[];
   currentPrice: number;
+  symbol: string;
+  symbolLabel: string;
+  precision: number;
 };
 
 
