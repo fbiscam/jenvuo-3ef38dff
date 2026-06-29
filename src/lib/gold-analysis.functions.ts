@@ -132,14 +132,19 @@ export const analyzeGold = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
-    const candles = await fetchGoldCandles(data.timeframe);
-    if (candles.length < 10) throw new Error("Not enough price data");
-    const last = candles[candles.length - 1];
+    let candles: Candle[] = [];
+    try {
+      candles = await fetchGoldCandles(data.timeframe);
+    } catch {
+      candles = [];
+    }
+    const hasData = candles.length >= 10;
+    const last = hasData ? candles[candles.length - 1] : null;
     const recent = candles.slice(-50);
     const highs = recent.map((c) => c.h);
     const lows = recent.map((c) => c.l);
-    const swingHigh = Math.max(...highs);
-    const swingLow = Math.min(...lows);
+    const swingHigh = hasData ? Math.max(...highs) : 0;
+    const swingLow = hasData ? Math.min(...lows) : 0;
 
     const compact = recent
       .map(
@@ -170,9 +175,10 @@ Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
   "fullAnalysis": "4-6 sentence detailed pro trader commentary"
 }`;
 
-    const userPrompt = `TIMEFRAME: ${data.timeframe.toUpperCase()}
+    const userPrompt = hasData
+      ? `TIMEFRAME: ${data.timeframe.toUpperCase()}
 SYMBOL: XAU/USD (Gold)
-CURRENT PRICE: ${last.c.toFixed(2)}
+CURRENT PRICE: ${last!.c.toFixed(2)}
 RECENT SWING HIGH (50 candles): ${swingHigh.toFixed(2)}
 RECENT SWING LOW (50 candles): ${swingLow.toFixed(2)}
 USER QUERY: ${data.query}
@@ -180,7 +186,13 @@ USER QUERY: ${data.query}
 LAST 50 CANDLES (OHLC):
 ${compact}
 
-Give me the A+ ICT/SMC setup right now. Be decisive and confident.`;
+Give me the A+ ICT/SMC setup right now. Be decisive and confident.`
+      : `TIMEFRAME: ${data.timeframe.toUpperCase()}
+SYMBOL: XAU/USD (Gold)
+NOTE: Live price feed temporarily unavailable. Use your trader knowledge of current gold market context, recent macro drivers, killzone timing, and general ICT/SMC playbook to answer.
+USER QUERY: ${data.query}
+
+Respond conversationally in spokenSummary. Set direction to "WAIT" and confidence <=40 if no real setup possible; include a note in fullAnalysis that live data is offline.`;
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -231,7 +243,7 @@ Give me the A+ ICT/SMC setup right now. Be decisive and confident.`;
       spokenSummary: String(parsed.spokenSummary ?? "Analysis complete."),
       fullAnalysis: String(parsed.fullAnalysis ?? ""),
       timeframe: data.timeframe,
-      currentPrice: last.c,
+      currentPrice: last?.c ?? 0,
       generatedAt: new Date().toISOString(),
     };
 
