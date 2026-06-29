@@ -473,12 +473,45 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     const pdh = Math.max(...prev24.map((c) => c.h));
     const pdl = Math.min(...prev24.map((c) => c.l));
 
+    // === Volume & Volatility computation (institutional read) ===
+    const trueRange = (cc: Candle, prev: Candle) =>
+      Math.max(cc.h - cc.l, Math.abs(cc.h - prev.c), Math.abs(cc.l - prev.c));
+    const atrN = (arr: Candle[], n = 14) => {
+      if (arr.length < n + 1) return 0;
+      let s = 0;
+      for (let i = arr.length - n; i < arr.length; i++) s += trueRange(arr[i], arr[i - 1]);
+      return s / n;
+    };
+    const atrLtf = atrN(ltf, 14);
+    const atrHtf = atrN(htf, 14);
+    const avg = (xs: number[]) => xs.reduce((s, b) => s + b, 0) / Math.max(1, xs.length);
+    const ltfVols = ltf.map((c) => c.v ?? 0);
+    const ltfAvgVol = avg(ltfVols.slice(-20));
+    const lastVolMult = ltfAvgVol > 0 ? (last.v ?? 0) / ltfAvgVol : 0;
+    // Fractal swing detection on HTF (window of 2)
+    const swings: { t: number; p: number; kind: "H" | "L" }[] = [];
+    for (let i = 2; i < htf.length - 2; i++) {
+      const cc = htf[i];
+      if (cc.h > htf[i - 1].h && cc.h > htf[i - 2].h && cc.h > htf[i + 1].h && cc.h > htf[i + 2].h)
+        swings.push({ t: Math.floor(cc.t / 1000), p: cc.h, kind: "H" });
+      if (cc.l < htf[i - 1].l && cc.l < htf[i - 2].l && cc.l < htf[i + 1].l && cc.l < htf[i + 2].l)
+        swings.push({ t: Math.floor(cc.t / 1000), p: cc.l, kind: "L" });
+    }
+    const recentSwings = swings.slice(-6);
+    const momentumPct = ltf.length >= 6 ? ((last.c - ltf[ltf.length - 6].c) / ltf[ltf.length - 6].c) * 100 : 0;
+    const volSpikes = ltf
+      .map((c) => ({ c, mult: ltfAvgVol > 0 ? (c.v ?? 0) / ltfAvgVol : 0 }))
+      .filter((x) => x.mult >= 1.8)
+      .slice(-5)
+      .map((x) => `t=${Math.floor(x.c.t / 1000)} ${fixp(x.c.o)}->${fixp(x.c.c)} vol×${x.mult.toFixed(2)}`);
+    const swingsLine = recentSwings.map((s) => `${s.kind}@${fixp(s.p)}(t=${s.t})`).join(" ");
+
     const upcomingNews = news.filter((n) => n.minutesUntil >= -15 && n.minutesUntil <= 240);
     const imminentHigh = news.find((n) => n.impact === "High" && n.minutesUntil >= -15 && n.minutesUntil <= 60);
 
     const fmt = (arr: Candle[]) =>
       arr
-        .map((c) => `${Math.floor(c.t / 1000)}|${fixp(c.o)},${fixp(c.h)},${fixp(c.l)},${fixp(c.c)}`)
+        .map((c) => `${Math.floor(c.t / 1000)}|${fixp(c.o)},${fixp(c.h)},${fixp(c.l)},${fixp(c.c)}|v${(c.v ?? 0).toFixed(0)}`)
         .join("\n");
 
     // Asset-specific context bullets
