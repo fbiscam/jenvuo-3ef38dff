@@ -138,7 +138,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       linesRef.current.forEach((l) => s.removePriceLine(l));
       linesRef.current = [];
       markersRef.current = [];
-      s.setMarkers([]);
+      markersPluginRef.current?.setMarkers([]);
       boxesRef.current.forEach((b) => b.el.remove());
       boxesRef.current = [];
     },
