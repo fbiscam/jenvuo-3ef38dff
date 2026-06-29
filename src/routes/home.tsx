@@ -425,25 +425,29 @@ function HomePage() {
 
       {/* FINAL CTA */}
       <section className="relative mx-auto max-w-7xl px-6 pb-24">
-        <div className="relative rounded-[2rem] bg-[#0A0A0A] text-white p-12 lg:p-20 overflow-hidden">
+        <div className="relative rounded-[2rem] bg-white border border-black/10 p-12 lg:p-20 overflow-hidden shadow-[0_50px_140px_-40px_rgba(0,0,0,0.3)]">
           <div
-            className="absolute -top-20 -right-20 h-80 w-80 rounded-full blur-3xl opacity-30"
-            style={{ background: ACCENT }}
+            className="pointer-events-none absolute -top-32 -right-32 h-[28rem] w-[28rem] rounded-full blur-3xl opacity-40"
+            style={{ background: `radial-gradient(circle, ${ACCENT}77, transparent 70%)` }}
+          />
+          <div
+            className="pointer-events-none absolute -bottom-32 -left-32 h-[24rem] w-[24rem] rounded-full blur-3xl opacity-20"
+            style={{ background: "radial-gradient(circle, #000, transparent 70%)" }}
           />
           <div className="relative grid lg:grid-cols-[1fr_auto] gap-10 items-center">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-white/40 font-semibold">
+              <div className="text-[11px] uppercase tracking-[0.3em] text-black/50 font-semibold">
                 Ready when you are
               </div>
               <h2 className="mt-4 text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[0.95]">
                 Stop guessing.
                 <br />
-                Start <span style={{ color: ACCENT }}>executing.</span>
+                Start <span style={{ color: "#000", borderBottom: `4px solid ${ACCENT}` }}>executing.</span>
               </h2>
             </div>
             <Link
               to="/"
-              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-9 py-5 font-black tracking-wide hover:bg-white/90 transition"
+              className="inline-flex items-center gap-2 rounded-full bg-black text-white px-9 py-5 font-black tracking-wide hover:bg-black/85 transition"
             >
               Launch JENVU <ArrowRight className="h-5 w-5" />
             </Link>
