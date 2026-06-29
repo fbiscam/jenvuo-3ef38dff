@@ -297,6 +297,7 @@ function SignalPage() {
   const t = plan?.trade;
   const isBuy = t?.direction === "BUY";
   const isSell = t?.direction === "SELL";
+  const marketClosed = !!plan && !isMarketOpen(plan.instrument.symbol);
   const sym = plan?.instrument.display ?? (symbol || "—");
   const displayPrice = livePrice ?? plan?.currentPrice;
   const priceStr = plan && displayPrice != null ? `${plan.instrument.kind === "crypto" ? "" : "$"}${displayPrice.toFixed(plan.instrument.decimals)}` : "—";
