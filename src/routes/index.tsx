@@ -1,5 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CloudOrb } from "@/components/CloudOrb";
+import appShot from "@/assets/home/app.png.asset.json";
+import signalShot from "@/assets/home/signal.png.asset.json";
+import authShot from "@/assets/home/auth.png.asset.json";
+import engineShot from "@/assets/home/engine.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
