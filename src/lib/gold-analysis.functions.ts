@@ -181,24 +181,23 @@ Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
   "fullAnalysis": "Longer written answer"
 }`;
 
+    const isTradingIntent = /\b(setup|signal|entry|buy|sell|long|short|trade|analy[sz]e|analysis|bias|tp|sl|stop\s*loss|take\s*profit|gold|xau|chart|trend|market|price|level|zone|fvg|ob|order\s*block|liquidity|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(data.query);
     const userPrompt = hasData
-      ? `TIMEFRAME: ${data.timeframe.toUpperCase()}
+      ? `USER MESSAGE: ${data.query}
+
+CONTEXT (use ONLY if user is asking about gold trading):
+TIMEFRAME: ${data.timeframe.toUpperCase()}
 SYMBOL: XAU/USD (Gold)
 CURRENT PRICE: ${last!.c.toFixed(2)}
-RECENT SWING HIGH (50 candles): ${swingHigh.toFixed(2)}
-RECENT SWING LOW (50 candles): ${swingLow.toFixed(2)}
-USER QUERY: ${data.query}
-
+RECENT SWING HIGH (50): ${swingHigh.toFixed(2)}
+RECENT SWING LOW (50): ${swingLow.toFixed(2)}
 LAST 50 CANDLES (OHLC):
 ${compact}
 
-Give me the A+ ICT/SMC setup right now. Be decisive and confident.`
-      : `TIMEFRAME: ${data.timeframe.toUpperCase()}
-SYMBOL: XAU/USD (Gold)
-NOTE: Live price feed temporarily unavailable. Use your trader knowledge of current gold market context, recent macro drivers, killzone timing, and general ICT/SMC playbook to answer.
-USER QUERY: ${data.query}
+${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fill trading fields confidently." : "User is just chatting / asking general thing — REPLY conversationally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty. Do NOT push a signal."}`
+      : `USER MESSAGE: ${data.query}
 
-Respond conversationally in spokenSummary. Set direction to "WAIT" and confidence <=40 if no real setup possible; include a note in fullAnalysis that live data is offline.`;
+${isTradingIntent ? "User wants trading view but live feed offline — answer conversationally, set direction='WAIT', confidence<=40, mention feed offline in fullAnalysis." : "User is just chatting — answer naturally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty."}`;
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
