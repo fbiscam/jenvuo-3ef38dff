@@ -316,13 +316,8 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
         transition: "transform 900ms cubic-bezier(0.4,0,0.2,1)",
       }}
     >
-      {/* halo removed — keep background pure black */}
+      {/* halo and ring waves removed */}
 
-      {/* faint expanding rings */}
-      {(status === "listening" || status === "speaking") && (
-        <>
-          <span className="absolute inset-6 rounded-full border border-white/20 animate-ping" style={{ animationDuration: "3s" }} />
-          <span className="absolute inset-2 rounded-full border border-white/10 animate-ping" style={{ animationDuration: "4s" }} />
         </>
       )}
 
