@@ -1,5 +1,51 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Mic, ArrowRight } from "lucide-react";
+import featVoice from "@/assets/feat-voice.jpg";
+import featSignal from "@/assets/feat-signal.jpg";
+import featAssets from "@/assets/feat-assets.jpg";
+import featNews from "@/assets/feat-news.jpg";
+import featBrain from "@/assets/feat-brain.jpg";
+import featTarget from "@/assets/feat-target.jpg";
+
+const FEATURES = [
+  {
+    img: featVoice,
+    tag: "Voice Agent",
+    title: "Speak. Hear. Trade.",
+    body: "Push-to-talk Jarvis-style agent that listens, reasons and narrates institutional setups in real time.",
+  },
+  {
+    img: featSignal,
+    tag: "Signal Engine",
+    title: "ICT & SMC, drawn live.",
+    body: "Fair value gaps, order blocks, liquidity sweeps, BOS/CHoCH and OTE entries rendered on the chart.",
+  },
+  {
+    img: featAssets,
+    tag: "Multi-Asset",
+    title: "Any market. A to Z.",
+    body: "Gold, Crypto, Forex majors, Indices and global equities — one engine, every session.",
+  },
+  {
+    img: featNews,
+    tag: "News & Killzones",
+    title: "Context that matters.",
+    body: "High-impact economic events, DXY context and London / New York killzone awareness baked into every call.",
+  },
+  {
+    img: featBrain,
+    tag: "Reasoning",
+    title: "25-year desk logic.",
+    body: "An institutional reasoning model trained on bias, structure, premium/discount and liquidity playbooks.",
+  },
+  {
+    img: featTarget,
+    tag: "A+ Setups",
+    title: "Entry. Stop. Three TPs.",
+    body: "Honest output with invalidation levels — when conditions are weak, the agent tells you to stand aside.",
+  },
+];
+
 
 export const Route = createFileRoute("/home")({
   head: () => ({
@@ -34,7 +80,8 @@ function HomePage() {
       </header>
 
       {/* Center stage */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 -mt-10">
+      <main className="flex flex-col items-center justify-center px-6 min-h-[calc(100dvh-72px)]">
+
         <h1 className="text-7xl sm:text-8xl lg:text-9xl font-black tracking-[-0.04em] text-center">
           JENVU<span className="text-black/30"> AI</span>
         </h1>
@@ -82,8 +129,63 @@ function HomePage() {
         </div>
       </main>
 
+      {/* FEATURES */}
+      <section className="relative w-full border-t border-black/10 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-24 lg:py-32">
+          <div className="max-w-3xl">
+            <div className="text-[11px] uppercase tracking-[0.3em] text-black/45 font-bold">
+              Features
+            </div>
+            <h2 className="mt-4 text-4xl sm:text-5xl lg:text-6xl font-black tracking-[-0.03em] leading-[1.05]">
+              Everything an institutional desk has —
+              <span className="text-black/35"> spoken aloud.</span>
+            </h2>
+          </div>
+
+          <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
+            {FEATURES.map((f) => (
+              <article key={f.title} className="group">
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#fafafa] border border-black/5">
+                  <img
+                    src={f.img}
+                    alt={f.title}
+                    loading="lazy"
+                    width={1024}
+                    height={1024}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+                  />
+                </div>
+                <div className="mt-5 text-[11px] uppercase tracking-[0.25em] font-bold text-black/45">
+                  {f.tag}
+                </div>
+                <h3 className="mt-2 text-xl font-black tracking-tight">
+                  {f.title}
+                </h3>
+                <p className="mt-2 text-[15px] text-black/60 leading-relaxed">
+                  {f.body}
+                </p>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-20 flex flex-wrap items-center justify-between gap-6 border-t border-black/10 pt-10">
+            <p className="text-lg font-semibold text-black/70 max-w-xl">
+              Ready to hear your first A+ setup?
+            </p>
+            <Link
+              to="/"
+              className="group inline-flex items-center gap-2 rounded-full bg-black text-white px-6 py-3 text-sm font-semibold hover:bg-black/85 transition"
+            >
+              Launch JENVU
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer — Google style */}
       <footer className="border-t border-black/10 bg-[#f2f2f2]">
+
         <div className="mx-auto max-w-7xl px-6 py-4 text-sm text-black/60">
           © {new Date().getFullYear()} JENVU
         </div>
