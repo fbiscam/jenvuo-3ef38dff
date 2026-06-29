@@ -155,11 +155,10 @@ function HomePage() {
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-2.5">
-            <span className="grid h-6 w-6 place-items-center rounded-md bg-zinc-900">
-              <span className="block h-1.5 w-1.5 rotate-45 bg-white" />
-            </span>
+            <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
             <span className="font-semibold tracking-tight">JENVU AI</span>
           </Link>
+
           <nav className={`hidden md:flex items-center gap-7 text-sm text-zinc-900`}>
             <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
             <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
