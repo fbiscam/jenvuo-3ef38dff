@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target, Brain, ShieldAlert, CheckCircle2, Clock, ChevronDown } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target, Brain, ShieldAlert, ShieldCheck, CheckCircle2, XCircle, Clock, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { getSignalPlan, ASSETS, type SignalPlan } from "@/lib/gold-analysis.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
@@ -399,6 +399,62 @@ function SignalPage() {
                   </ul>
                 </div>
               )}
+
+              {/* Auditor — independent second-opinion AI */}
+              {plan.audit && plan.audit.summary && (() => {
+                const v = plan.audit.verdict;
+                const tone =
+                  v === "APPROVED"
+                    ? { border: "border-emerald-200", bg: "from-emerald-50/70 to-white", text: "text-emerald-700", chip: "bg-emerald-600 text-white", Icon: ShieldCheck, label: "Auditor: APPROVED" }
+                    : v === "REJECTED"
+                      ? { border: "border-red-300", bg: "from-red-50 to-white", text: "text-red-700", chip: "bg-red-600 text-white", Icon: XCircle, label: "Auditor: REJECTED" }
+                      : { border: "border-amber-200", bg: "from-amber-50/70 to-white", text: "text-amber-800", chip: "bg-amber-600 text-white", Icon: ShieldAlert, label: "Auditor: CAUTION" };
+                const Icon = tone.Icon;
+                return (
+                  <div className={cn("rounded-2xl p-4 border bg-gradient-to-br shadow-sm", tone.border, tone.bg)}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className={cn("text-[10px] uppercase tracking-widest font-bold flex items-center gap-1.5", tone.text)}>
+                        <Icon className="h-3.5 w-3.5" /> {tone.label}
+                      </div>
+                      <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full", tone.chip)}>
+                        {plan.audit.agreement}% agreement
+                      </span>
+                    </div>
+                    <p className="text-xs text-neutral-800 leading-snug mb-2">{plan.audit.summary}</p>
+                    <div className="flex items-center gap-3 text-[10px] text-neutral-600 mb-2">
+                      <span>Original conf: <b className="text-neutral-900">{plan.trade.confidence}%</b></span>
+                      <span>Audited conf: <b className="text-neutral-900">{plan.audit.auditedConfidence}%</b></span>
+                    </div>
+                    {plan.audit.issues.length > 0 && (
+                      <div className="mb-2">
+                        <div className="text-[10px] uppercase tracking-wider text-red-700 font-bold mb-1">Issues</div>
+                        <ul className="space-y-1">
+                          {plan.audit.issues.map((it, i) => (
+                            <li key={i} className="text-[11px] text-neutral-800 flex gap-1.5 leading-snug">
+                              <span className="text-red-500 font-black">!</span>{it}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {plan.audit.strengths.length > 0 && (
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wider text-emerald-700 font-bold mb-1">Strengths</div>
+                        <ul className="space-y-1">
+                          {plan.audit.strengths.map((s, i) => (
+                            <li key={i} className="text-[11px] text-neutral-800 flex gap-1.5 leading-snug">
+                              <CheckCircle2 className="h-3 w-3 text-emerald-600 mt-0.5 shrink-0" />{s}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <div className="text-[9px] text-neutral-400 mt-2 uppercase tracking-wider">Reviewed by {plan.audit.auditorModel}</div>
+                  </div>
+                );
+              })()}
+
+
 
               {plan.confluences.length > 0 && (
                 <div className="rounded-2xl p-4 border border-neutral-200 bg-white shadow-sm">
