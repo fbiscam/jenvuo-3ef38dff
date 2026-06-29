@@ -292,6 +292,62 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
 
       {/* Light sky-blue sphere with swirling water-wave currents */}
       <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
+        {/* Outer iridescent rotating ring */}
+        <div
+          className="absolute inset-0 rounded-full animate-spin opacity-70"
+          style={{
+            animationDuration: status === "speaking" ? "8s" : "24s",
+            background: iridescent,
+            WebkitMask:
+              "radial-gradient(circle, transparent 58%, black 60%, black 66%, transparent 68%)",
+            mask: "radial-gradient(circle, transparent 58%, black 60%, black 66%, transparent 68%)",
+            filter: "blur(2px)",
+          }}
+        />
+
+        {/* Counter-spinning dotted ring */}
+        <div
+          className="absolute inset-2 rounded-full animate-spin opacity-60"
+          style={{
+            animationDuration: status === "speaking" ? "12s" : "32s",
+            animationDirection: "reverse",
+            background:
+              "repeating-conic-gradient(from 0deg, rgba(255,255,255,0.9) 0deg 2deg, transparent 2deg 10deg)",
+            WebkitMask:
+              "radial-gradient(circle, transparent 70%, black 71%, black 73%, transparent 74%)",
+            mask: "radial-gradient(circle, transparent 70%, black 71%, black 73%, transparent 74%)",
+          }}
+        />
+
+        {/* Orbiting colorful glow dots */}
+        {[
+          { color: "#f472b6", duration: "9s", delay: "0s" },
+          { color: "#38bdf8", duration: "11s", delay: "-2s" },
+          { color: "#34d399", duration: "13s", delay: "-5s" },
+          { color: "#fbbf24", duration: "10s", delay: "-7s" },
+        ].map((dot, i) => (
+          <div
+            key={i}
+            className="absolute inset-0 animate-spin"
+            style={{
+              animationDuration: dot.duration,
+              animationDelay: dot.delay,
+              animationDirection: i % 2 === 0 ? "normal" : "reverse",
+            }}
+          >
+            <div
+              className="absolute h-3 w-3 rounded-full"
+              style={{
+                top: "50%",
+                left: "-2px",
+                transform: "translateY(-50%)",
+                background: dot.color,
+                boxShadow: `0 0 14px 4px ${dot.color}, 0 0 28px 8px ${dot.color}80`,
+              }}
+            />
+          </div>
+        ))}
+
         <div
           className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
           style={{
