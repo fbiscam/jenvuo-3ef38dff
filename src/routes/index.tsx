@@ -53,7 +53,31 @@ function parseTimeframe(text: string, fallback: string): string {
 }
 
 function Home() {
+  const navigate = useNavigate();
+  const [authReady, setAuthReady] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!alive) return;
+      if (!data.session) {
+        navigate({ to: "/auth", replace: true });
+      } else {
+        setAuthReady(true);
+      }
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (!session) navigate({ to: "/auth", replace: true });
+    });
+    return () => { alive = false; sub.subscription.unsubscribe(); };
+  }, [navigate]);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
+
   const analyze = useServerFn(analyzeGold);
+
   const fetchNews = useServerFn(getGoldNews);
   const [timeframe, setTimeframe] = useState<string>("15m");
   const [signal, setSignal] = useState<GoldSignal | null>(null);
