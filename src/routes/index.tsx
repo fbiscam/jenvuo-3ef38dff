@@ -1,484 +1,595 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowUpRight, Mic, Sparkles, Activity, Brain, Target, Globe2 } from "lucide-react";
-
-/**
- * JENVU AI — homepage (pure white, no blocks)
- * Palette: Paper & Ink
- * Type:    Sora (display)  +  Manrope (body)
- */
-
-const PAPER = "#ffffff";
-const INK = "#2d2d2d";
-const VOID = "#0d0d0d";
+import { motion } from "framer-motion";
+import { CloudOrb } from "@/components/CloudOrb";
+import {
+  ArrowRight,
+  Mic,
+  LineChart,
+  Globe2,
+  Newspaper,
+  Sparkles,
+  Activity,
+  Brain,
+  Target,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "JENVU AI — Institutional Voice Intelligence for Markets" },
+      { title: "JENVU AI — Institutional Trading Intelligence, Spoken Aloud" },
       {
         name: "description",
         content:
-          "A Jarvis-style voice agent powered by 25+ years of ICT & SMC institutional logic. Live signals for Gold, Crypto, Forex, Indices and Stocks.",
+          "JENVU AI is a Jarvis-style voice agent powered by 25+ years of ICT & SMC institutional logic. Live signals for Gold, Crypto, Forex, Indices and Stocks.",
+      },
+      { property: "og:title", content: "JENVU AI — Elite Voice Trading Agent" },
+      {
+        property: "og:description",
+        content:
+          "Speak. Analyze. Execute. Institutional-grade setups with ICT, SMC and killzone awareness — narrated in real time.",
       },
     ],
   }),
   component: HomePage,
 });
 
+const ACCENT = "#E8B84A";
+
 function HomePage() {
   return (
-    <div
-      className="min-h-dvh w-full text-[color:var(--ink)] [--paper:#ffffff] [--ink:#2d2d2d] [--void:#0d0d0d]"
-      style={{
-        background: PAPER,
-        fontFamily: "'Manrope', system-ui, sans-serif",
-      }}
-    >
+    <div className="min-h-dvh w-full bg-white text-black font-[Urbanist,sans-serif] overflow-x-hidden">
+      {/* faint grid texture */}
+      <div
+        className="pointer-events-none fixed inset-0 opacity-[0.035]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+        }}
+      />
+
       <Nav />
-      <Hero />
-      <TrustStrip />
-      <FeatureList />
-      <Manifesto />
-      <Process />
-      <Coverage />
-      <Faq />
-      <FinalCta />
-      <Footer />
+
+      {/* HERO */}
+      <section className="relative mx-auto max-w-7xl px-6 pt-12 pb-24 lg:pt-20 lg:pb-32">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="relative z-10"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-black/[0.03] px-3 py-1.5 text-[11px] tracking-[0.2em] uppercase font-semibold">
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ background: ACCENT, boxShadow: `0 0 10px ${ACCENT}` }}
+              />
+              Institutional Grade · Voice First
+            </div>
+
+            <h1 className="mt-6 text-5xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight uppercase">
+              Trade like
+              <br />
+              the{" "}
+              <span className="relative inline-block">
+                1%.
+                <span
+                  className="absolute -bottom-2 left-0 right-0 h-2 rounded"
+                  style={{ background: ACCENT }}
+                />
+              </span>
+              <br />
+              <span className="text-black/40">Powered by</span> JENVU AI.
+            </h1>
+
+            <p className="mt-8 max-w-xl text-lg text-black/70 leading-relaxed">
+              A real-time voice agent built on 25+ years of institutional
+              trading logic. Speak the asset — Jenvu draws the chart, narrates
+              the structure, and delivers an A+ setup using ICT, SMC,
+              killzones and liquidity.
+            </p>
+
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Link
+                to="/"
+                className="group inline-flex items-center gap-2 rounded-full bg-black px-7 py-4 text-white font-bold tracking-wide hover:bg-black/85 transition"
+              >
+                Launch Voice Agent
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition" />
+              </Link>
+              <Link
+                to="/signal"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-black px-7 py-4 font-bold tracking-wide hover:bg-black hover:text-white transition"
+              >
+                See a Live Signal
+              </Link>
+            </div>
+
+            <div className="mt-10 flex items-center gap-6 text-xs uppercase tracking-[0.18em] text-black/50 font-semibold">
+              <span>ICT</span>
+              <span>·</span>
+              <span>SMC</span>
+              <span>·</span>
+              <span>Killzones</span>
+              <span>·</span>
+              <span>Liquidity</span>
+            </div>
+          </motion.div>
+
+          {/* Hero black panel */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, delay: 0.1 }}
+            className="relative"
+          >
+            <div className="relative rounded-[2rem] bg-[#0A0A0A] p-8 lg:p-10 overflow-hidden border border-black shadow-[0_40px_120px_-30px_rgba(0,0,0,0.55)]">
+              {/* corner ticker labels */}
+              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-white/40 font-semibold">
+                <span>JENVU // LIVE</span>
+                <span className="flex items-center gap-1.5">
+                  <span
+                    className="h-1.5 w-1.5 rounded-full animate-pulse"
+                    style={{ background: ACCENT }}
+                  />
+                  ONLINE
+                </span>
+              </div>
+
+              <div className="flex items-center justify-center py-10 lg:py-14">
+                <motion.div
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <CloudOrb status="speaking" pulse={2} />
+                </motion.div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 text-center">
+                {[
+                  { k: "PAIRS", v: "A–Z" },
+                  { k: "BIAS", v: "ICT/SMC" },
+                  { k: "LATENCY", v: "<1s" },
+                ].map((s) => (
+                  <div
+                    key={s.k}
+                    className="rounded-xl border border-white/10 bg-white/[0.03] py-3"
+                  >
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold">
+                      {s.k}
+                    </div>
+                    <div
+                      className="mt-1 text-lg font-black"
+                      style={{ color: ACCENT }}
+                    >
+                      {s.v}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* floating chip */}
+            <div className="absolute -bottom-6 -left-6 hidden sm:flex items-center gap-3 rounded-2xl bg-white border border-black/10 shadow-xl px-5 py-3">
+              <Sparkles className="h-4 w-4" style={{ color: ACCENT }} />
+              <span className="text-sm font-bold">"Analyze XAU/USD"</span>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* TRUST STRIP */}
+      <section className="relative bg-black text-white overflow-hidden">
+        <div className="mx-auto max-w-7xl px-6 py-5 flex items-center gap-10 overflow-hidden whitespace-nowrap">
+          <div className="flex gap-10 text-xs uppercase tracking-[0.3em] font-semibold animate-[scroll_28s_linear_infinite]">
+            {[
+              "Smart Money Concepts",
+              "Order Blocks",
+              "Fair Value Gaps",
+              "Liquidity Sweeps",
+              "Premium / Discount",
+              "Killzones",
+              "BOS · CHoCH",
+              "OTE Entries",
+              "DXY Context",
+              "Session Bias",
+            ]
+              .concat([
+                "Smart Money Concepts",
+                "Order Blocks",
+                "Fair Value Gaps",
+                "Liquidity Sweeps",
+                "Premium / Discount",
+                "Killzones",
+              ])
+              .map((t, i) => (
+                <span key={i} className="flex items-center gap-10">
+                  {t}
+                  <span style={{ color: ACCENT }}>●</span>
+                </span>
+              ))}
+          </div>
+        </div>
+        <style>{`@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
+      </section>
+
+      {/* FEATURES */}
+      <Section
+        eyebrow="Capabilities"
+        title="An edge that listens, thinks, and speaks."
+      >
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            {
+              icon: Mic,
+              title: "Live Voice Agent",
+              body: "Push-to-talk. Jenvu listens, reasons, and narrates setups in real time like a senior desk trader.",
+            },
+            {
+              icon: LineChart,
+              title: "Signal Engine",
+              body: "ICT & SMC playbook with FVGs, OBs, liquidity, BOS/CHoCH and OTE entries — drawn on the chart.",
+            },
+            {
+              icon: Globe2,
+              title: "Multi-Asset",
+              body: "Gold, Crypto (BTC, ETH…), Forex majors, Indices (NAS100, SPX) and global equities — A to Z.",
+            },
+            {
+              icon: Newspaper,
+              title: "News & Killzones",
+              body: "High-impact economic events, session bias, London/NY killzone awareness baked into every call.",
+            },
+          ].map((f) => (
+            <FeatureCard key={f.title} {...f} />
+          ))}
+        </div>
+      </Section>
+
+      {/* HOW IT WORKS */}
+      <Section eyebrow="Workflow" title="Three steps from idea to A+ setup.">
+        <div className="grid md:grid-cols-3 gap-5">
+          {[
+            {
+              n: "01",
+              icon: Mic,
+              title: "Speak",
+              body: '"Analyze Bitcoin." "Show me a Gold setup." Natural commands, instant pickup.',
+            },
+            {
+              n: "02",
+              icon: Brain,
+              title: "Analyze",
+              body: "Live candles + DXY + news context flow through a 25-year institutional reasoning model.",
+            },
+            {
+              n: "03",
+              icon: Target,
+              title: "Execute",
+              body: "Entry, stop, three TPs, invalidation, and a narrated walkthrough — drawn on the chart.",
+            },
+          ].map((s) => (
+            <div
+              key={s.n}
+              className="relative rounded-2xl bg-[#0A0A0A] text-white p-8 overflow-hidden group hover:-translate-y-1 transition"
+            >
+              <div
+                className="absolute -top-6 -right-2 text-[7rem] font-black leading-none opacity-20"
+                style={{ color: ACCENT }}
+              >
+                {s.n}
+              </div>
+              <s.icon className="h-7 w-7" style={{ color: ACCENT }} />
+              <div className="mt-6 text-2xl font-black tracking-tight">
+                {s.title}
+              </div>
+              <p className="mt-3 text-white/65 leading-relaxed">{s.body}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* LIVE SIGNAL PREVIEW */}
+      <Section
+        eyebrow="Live Signal"
+        title="A trading desk in a single screen."
+      >
+        <div className="relative rounded-[2rem] bg-[#0A0A0A] p-6 lg:p-10 overflow-hidden">
+          <div className="flex items-center justify-between text-white/50 text-xs uppercase tracking-[0.25em] font-semibold mb-6">
+            <span>XAU/USD · 1H + 15M</span>
+            <span className="flex items-center gap-2">
+              <Activity className="h-3.5 w-3.5" style={{ color: ACCENT }} />
+              Live
+            </span>
+          </div>
+
+          <div className="grid lg:grid-cols-[2fr_1fr] gap-5">
+            <div className="rounded-xl bg-gradient-to-br from-black to-[#111] border border-white/10 p-5 h-72 relative overflow-hidden">
+              <FakeChart />
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+              {[
+                ["Bias", "Bullish"],
+                ["Entry", "2,341.50"],
+                ["Stop", "2,334.80"],
+                ["TP1 / TP2 / TP3", "2,348 · 2,356 · 2,372"],
+              ].map(([k, v]) => (
+                <div
+                  key={k}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
+                >
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold">
+                    {k}
+                  </div>
+                  <div
+                    className="mt-1 font-black text-lg"
+                    style={{ color: ACCENT }}
+                  >
+                    {v}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-center">
+            <Link
+              to="/signal"
+              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-7 py-3.5 font-bold hover:bg-white/90 transition"
+            >
+              Open Live Signal <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </Section>
+
+      {/* EXPERTISE BAND */}
+      <Section
+        eyebrow="Expertise"
+        title="25+ years of institutional logic — in every setup."
+      >
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[
+            "Fair Value Gaps (FVG)",
+            "Order Blocks (OB)",
+            "Break of Structure / CHoCH",
+            "Optimal Trade Entry (OTE)",
+            "Liquidity Sweeps & PDH/PDL",
+            "Premium vs Discount Arrays",
+            "London & New York Killzones",
+            "DXY & Inter-market Context",
+            "High-impact News Filtering",
+          ].map((c) => (
+            <div
+              key={c}
+              className="flex items-center gap-3 rounded-xl border border-black/10 px-5 py-4 hover:border-black transition"
+            >
+              <span
+                className="h-2 w-2 rounded-full"
+                style={{ background: ACCENT }}
+              />
+              <span className="font-semibold">{c}</span>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* ASSET COVERAGE */}
+      <Section eyebrow="Coverage" title="Any market. Any session.">
+        <div className="flex flex-wrap gap-3">
+          {[
+            "XAU/USD",
+            "BTC/USD",
+            "ETH/USD",
+            "SOL/USD",
+            "EUR/USD",
+            "GBP/USD",
+            "USD/JPY",
+            "NAS100",
+            "SPX500",
+            "US30",
+            "AAPL",
+            "TSLA",
+            "NVDA",
+          ].map((a) => (
+            <span
+              key={a}
+              className="rounded-full bg-black text-white px-5 py-2.5 text-sm font-bold tracking-wide"
+            >
+              {a}
+            </span>
+          ))}
+        </div>
+      </Section>
+
+      {/* FINAL CTA */}
+      <section className="relative mx-auto max-w-7xl px-6 pb-24">
+        <div className="relative rounded-[2rem] bg-[#0A0A0A] text-white p-12 lg:p-20 overflow-hidden">
+          <div
+            className="absolute -top-20 -right-20 h-80 w-80 rounded-full blur-3xl opacity-30"
+            style={{ background: ACCENT }}
+          />
+          <div className="relative grid lg:grid-cols-[1fr_auto] gap-10 items-center">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.3em] text-white/40 font-semibold">
+                Ready when you are
+              </div>
+              <h2 className="mt-4 text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[0.95]">
+                Stop guessing.
+                <br />
+                Start <span style={{ color: ACCENT }}>executing.</span>
+              </h2>
+            </div>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-9 py-5 font-black tracking-wide hover:bg-white/90 transition"
+            >
+              Launch JENVU <ArrowRight className="h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-black/10">
+        <div className="mx-auto max-w-7xl px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm">
+          <div className="font-black tracking-[0.2em]">JENVU AI</div>
+          <div className="text-black/50">
+            © {new Date().getFullYear()} JENVU. Institutional voice intelligence.
+          </div>
+          <div className="flex gap-5 text-black/60 font-semibold">
+            <Link to="/">Agent</Link>
+            <Link to="/signal">Signals</Link>
+            <Link to="/auth">Sign in</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* NAV                                                                 */
-/* ------------------------------------------------------------------ */
-
 function Nav() {
   return (
     <header className="relative z-20">
-      <div className="mx-auto max-w-[1320px] px-6 py-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5">
-          <Logo />
-          <span className="font-display tracking-[-0.02em] text-[15px] font-bold uppercase">
-            Jenvu<span className="opacity-50">/ai</span>
-          </span>
+      <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between">
+        <Link to="/" className="font-black tracking-[0.25em] text-lg">
+          JENVU AI
         </Link>
-
-        <nav className="hidden md:flex items-center gap-8 text-[13px] text-[color:var(--void)] font-medium">
-          <Link to="/about" className="hover:opacity-60">About</Link>
-          <Link to="/ai-engine" className="hover:opacity-60">Engine</Link>
-          <Link to="/llm" className="hover:opacity-60">Model</Link>
-          <Link to="/signal" className="hover:opacity-60">Signals</Link>
+        <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-black/70">
+          <a href="#features" className="hover:text-black">Features</a>
+          <a href="#workflow" className="hover:text-black">How it works</a>
+          <Link to="/signal" className="hover:text-black">Signals</Link>
         </nav>
-
-        <div className="flex items-center gap-5">
-          <Link to="/auth" className="text-[13px] font-semibold hover:opacity-60">
-            Sign in
-          </Link>
-          <Link
-            to="/app"
-            className="text-[13px] font-semibold inline-flex items-center gap-1.5 hover:opacity-60"
-          >
-            Launch
-            <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
+        <Link
+          to="/auth"
+          className="rounded-full bg-black text-white px-5 py-2.5 text-sm font-bold hover:bg-black/85 transition"
+        >
+          Sign in
+        </Link>
       </div>
     </header>
   );
 }
 
-function Logo() {
+function Section({
+  eyebrow,
+  title,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  const id = eyebrow.toLowerCase().replace(/\s+/g, "-");
   return (
-    <span
-      className="grid place-items-center h-7 w-7 rounded-md text-[color:var(--paper)] font-display font-black"
-      style={{ background: VOID, fontSize: 13, letterSpacing: "-0.05em" }}
-    >
-      J
-    </span>
+    <section id={id} className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
+      <div className="flex items-end justify-between flex-wrap gap-4 mb-12">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.3em] text-black/50 font-bold">
+            {eyebrow}
+          </div>
+          <h2 className="mt-3 text-4xl lg:text-5xl font-black uppercase tracking-tight max-w-2xl leading-tight">
+            {title}
+          </h2>
+        </div>
+        <div
+          className="h-[2px] w-24 hidden md:block"
+          style={{ background: ACCENT }}
+        />
+      </div>
+      {children}
+    </section>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* HERO                                                                */
-/* ------------------------------------------------------------------ */
-
-function Hero() {
+function FeatureCard({
+  icon: Icon,
+  title,
+  body,
+}: {
+  icon: typeof Mic;
+  title: string;
+  body: string;
+}) {
   return (
-    <section className="relative">
-      <div className="mx-auto max-w-[1320px] px-6 pt-20 lg:pt-28 pb-24 text-center">
-        <h1
-          className="font-display font-semibold tracking-[-0.045em] leading-[0.95] text-[clamp(56px,9vw,160px)]"
-          style={{ color: VOID }}
+    <div className="group relative rounded-2xl bg-[#0A0A0A] text-white p-7 overflow-hidden hover:-translate-y-1 transition">
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition"
+        style={{
+          background: `radial-gradient(400px circle at 50% 0%, ${ACCENT}22, transparent 60%)`,
+        }}
+      />
+      <div className="relative">
+        <div
+          className="inline-flex h-11 w-11 items-center justify-center rounded-xl"
+          style={{ background: `${ACCENT}1a`, color: ACCENT }}
         >
-          <span className="block">The trading desk</span>
-          <span className="block">that speaks back.</span>
-        </h1>
-
-        <p className="mt-10 mx-auto max-w-2xl text-[17px] leading-relaxed" style={{ color: VOID }}>
-          Jenvu is a voice-native AI analyst trained on 25 years of institutional logic — ICT,
-          SMC, liquidity, killzones. Speak the asset. Hear the setup.
-        </p>
-
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            to="/app"
-            className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--void)] text-[color:var(--paper)] px-6 py-3.5 text-[14px] font-semibold hover:opacity-90 transition"
-          >
-            <Mic className="h-4 w-4" />
-            Talk to Jenvu
-            <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
-          </Link>
-          <Link
-            to="/signal"
-            className="inline-flex items-center gap-2 text-[14px] font-semibold px-6 py-3.5 hover:opacity-60 transition"
-            style={{ color: VOID }}
-          >
-            See a live signal
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
+          <Icon className="h-5 w-5" />
         </div>
-
-        <div className="mt-14 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-[0.25em] font-bold text-[color:var(--void)]">
-          <span>ICT</span><Dot /><span>SMC</span><Dot /><span>Killzones</span><Dot /><span>Liquidity</span><Dot /><span>OTE</span>
-        </div>
+        <div className="mt-5 text-xl font-black tracking-tight">{title}</div>
+        <p className="mt-2 text-white/65 leading-relaxed text-sm">{body}</p>
       </div>
-    </section>
-  );
-}
-
-function Dot() {
-  return <span className="h-1 w-1 rounded-full bg-[color:var(--ink)]/30" />;
-}
-
-/* ------------------------------------------------------------------ */
-/* TRUST                                                               */
-/* ------------------------------------------------------------------ */
-
-function TrustStrip() {
-  const items = ["ICT", "Smart Money Concepts", "Wyckoff", "Order Blocks", "Fair Value Gaps", "Liquidity Pools", "OTE", "Killzones", "DXY Context"];
-  return (
-    <section>
-      <div className="mx-auto max-w-[1320px] px-6 py-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
-        <span className="text-[11px] uppercase tracking-[0.3em] font-bold" style={{ color: VOID }}>
-          Trained on
-        </span>
-        {items.map((i) => (
-          <span key={i} className="text-[13px] font-semibold whitespace-nowrap font-display tracking-tight" style={{ color: VOID }}>
-            {i}
-          </span>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* FEATURE LIST (no cards)                                             */
-/* ------------------------------------------------------------------ */
-
-function FeatureList() {
-  const features = [
-    {
-      icon: <Mic className="h-4 w-4" />,
-      tag: "Voice Agent",
-      title: "Push-to-talk. Hear the desk think.",
-      body: "A natural conversation with a 25-year analyst. Bias, structure, sweeps, entries — narrated in real time.",
-    },
-    {
-      icon: <Brain className="h-4 w-4" />,
-      tag: "Reasoning",
-      title: "Desk-grade logic, not chat fluff.",
-      body: "Bias, premium/discount, BOS/CHoCH, DXY correlation — fused in under a second.",
-    },
-    {
-      icon: <Activity className="h-4 w-4" />,
-      tag: "Signal Engine",
-      title: "ICT & SMC, rendered live.",
-      body: "FVGs, order blocks, liquidity sweeps and OTE zones drawn directly on the chart.",
-    },
-    {
-      icon: <Globe2 className="h-4 w-4" />,
-      tag: "Multi-Asset",
-      title: "Gold, Crypto, FX, Indices, Stocks.",
-      body: "One engine, every session. A-to-Z coverage across markets that matter.",
-    },
-    {
-      icon: <Target className="h-4 w-4" />,
-      tag: "A+ Only",
-      title: "Entry. Stop. Three TPs. Invalidation.",
-      body: "When the read is weak, the desk says stand aside. No noise, no FOMO.",
-    },
-  ];
-
-  return (
-    <section>
-      <div className="mx-auto max-w-[1320px] px-6 py-28">
-        <SectionHead title={<><span className="block">An entire trading floor,</span><span className="block">condensed into a voice.</span></>} />
-
-        <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {features.map((f, i) => (
-            <div
-              key={f.tag}
-              className="group relative rounded-3xl border border-black/10 bg-white p-7 hover:border-black/30 transition shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]"
-            >
-              <div className="flex items-center justify-between">
-                <span className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-[color:var(--void)] text-white">
-                  {f.icon}
-                </span>
-                <span className="font-mono text-[11px] opacity-50" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                  0{i + 1}
-                </span>
-              </div>
-              <div className="mt-6 text-[10px] uppercase tracking-[0.25em] font-bold" style={{ color: VOID }}>
-                {f.tag}
-              </div>
-              <h3 className="mt-3 font-display font-semibold tracking-[-0.025em] text-[22px] leading-[1.15]" style={{ color: VOID }}>
-                {f.title}
-              </h3>
-              <p className="mt-3 text-[14px] leading-relaxed" style={{ color: VOID }}>
-                {f.body}
-              </p>
-            </div>
-          ))}
-
-          <Link
-            to="/app"
-            className="group relative rounded-3xl p-7 bg-[color:var(--void)] text-white flex flex-col justify-between min-h-[240px] hover:opacity-95 transition"
-          >
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-white text-[color:var(--void)]">
-                <ArrowUpRight className="h-4 w-4" />
-              </span>
-              <span className="font-mono text-[11px] opacity-50" style={{ fontFamily: "'JetBrains Mono', monospace" }}>→</span>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.25em] font-bold opacity-70">Try it</div>
-              <h3 className="mt-3 font-display font-semibold tracking-[-0.025em] text-[22px] leading-[1.15]">
-                Launch the voice agent.
-              </h3>
-            </div>
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* MANIFESTO                                                           */
-/* ------------------------------------------------------------------ */
-
-function Manifesto() {
-  return (
-    <section>
-      <div className="mx-auto max-w-[1100px] px-6 py-28">
-        <h2 className="font-display font-semibold tracking-[-0.035em] text-[clamp(36px,4.5vw,64px)] leading-[1.02] max-w-3xl" style={{ color: VOID }}>
-          Most AI guesses. <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>This one reasons.</span>
-        </h2>
-
-        <div className="mt-16 grid lg:grid-cols-3 gap-5">
-          {[
-            { n: "01", t: "Voice-native, not chatbot-bolted", b: "Designed for spoken conversation — the rhythm of a real desk analyst beside you." },
-            { n: "02", t: "Institutional logic, not retail noise", b: "ICT, SMC, Wyckoff, liquidity and killzones — the playbooks proprietary desks run." },
-            { n: "03", t: "Honest by design", b: "When confluences are weak, Jenvu tells you to wait. No invented setups, no FOMO." },
-          ].map((row) => (
-            <div key={row.n} className="rounded-3xl border border-black/10 bg-white p-7 hover:border-black/30 transition shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]">
-              <div className="font-mono text-[12px] font-bold tracking-[0.25em]" style={{ color: VOID, fontFamily: "'JetBrains Mono', monospace" }}>{row.n}</div>
-              <h3 className="mt-4 font-display text-[22px] font-semibold tracking-tight" style={{ color: VOID }}>{row.t}</h3>
-              <p className="mt-3 text-[15px] leading-relaxed" style={{ color: VOID }}>{row.b}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* PROCESS                                                             */
-/* ------------------------------------------------------------------ */
-
-function Process() {
-  const steps = [
-    { n: "01", t: "Speak", b: "Tap the mic. Say 'Analyze Gold' or 'Show me Bitcoin'. No commands, no syntax." },
-    { n: "02", t: "Reason", b: "Live candles, DXY context, killzone bias and ICT/SMC confluences fused under one second." },
-    { n: "03", t: "Hear", b: "Entry, stop, three TPs and invalidation narrated aloud while the chart draws the levels." },
-  ];
-  return (
-    <section>
-      <div className="mx-auto max-w-[1100px] px-6 py-28">
-        <SectionHead title={<>Three steps. <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>Zero friction.</span></>} />
-
-        <div className="mt-16 grid lg:grid-cols-3 gap-5">
-          {steps.map((s) => (
-            <div key={s.n} className="rounded-3xl border border-black/10 bg-white p-8 hover:border-black/30 transition shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]">
-              <div className="font-mono text-[12px] font-bold tracking-[0.25em]" style={{ color: VOID, fontFamily: "'JetBrains Mono', monospace" }}>{s.n}</div>
-              <h3 className="mt-4 font-display font-semibold tracking-[-0.03em] text-[36px] leading-none" style={{ color: VOID }}>{s.t}</h3>
-              <p className="mt-5 text-[15px] leading-relaxed" style={{ color: VOID }}>{s.b}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* COVERAGE                                                            */
-/* ------------------------------------------------------------------ */
-
-function Coverage() {
-  const assets = ["XAU/USD", "BTC/USD", "ETH/USD", "SOL/USD", "EUR/USD", "GBP/USD", "USD/JPY", "USD/CAD", "AUD/USD", "NAS100", "SPX500", "DJ30", "DXY", "AAPL", "TSLA", "NVDA", "MSFT", "META"];
-  return (
-    <section>
-      <div className="mx-auto max-w-[1100px] px-6 py-28">
-        <SectionHead title={<>One engine. <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>Every market.</span></>} />
-        <p className="mt-6 text-[15px] leading-relaxed max-w-xl" style={{ color: VOID }}>
-          Crypto via Binance, traditional markets via Yahoo Finance, news via an economic calendar feed.
-          Symbol coverage expands continuously.
-        </p>
-        <div className="mt-12 flex flex-wrap gap-2.5">
-          {assets.map((a) => (
-            <span
-              key={a}
-              className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-[13px] font-semibold tracking-tight hover:border-black/30 transition"
-              style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.01em", color: VOID }}
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              {a}
-            </span>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* FAQ                                                                 */
-/* ------------------------------------------------------------------ */
-
-function Faq() {
-  const items = [
-    { q: "Is Jenvu financial advice?", a: "No. Jenvu is an analytical companion. Every signal is educational; execution and risk are your responsibility." },
-    { q: "What markets are supported?", a: "Gold, all major Crypto, Forex majors, Indices and large-cap equities — anything resolvable through our data adapters." },
-    { q: "Does it work on mobile?", a: "Yes. The voice agent works on iOS and Android browsers with microphone permission." },
-    { q: "Where does the data come from?", a: "Live candles via Binance for crypto, Yahoo Finance for traditional markets, and an economic calendar feed for news." },
-    { q: "Which model powers the reasoning?", a: "A Gemini-class reasoning model tuned with institutional playbooks. Latency-optimized for spoken delivery." },
-  ];
-  return (
-    <section>
-      <div className="mx-auto max-w-[1100px] px-6 py-28">
-        <SectionHead title={<>Questions, <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>answered.</span></>} />
-        <div className="mt-14 divide-y divide-[color:var(--ink)]/15">
-          {items.map((f) => (
-            <details key={f.q} className="group py-7">
-              <summary className="flex items-center justify-between cursor-pointer list-none">
-                <span className="font-display font-semibold tracking-[-0.02em] text-[20px] lg:text-[24px] pr-6" style={{ color: VOID }}>{f.q}</span>
-                <span className="text-[28px] font-light group-open:rotate-45 transition shrink-0" style={{ color: VOID }}>+</span>
-              </summary>
-              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl" style={{ color: VOID }}>{f.a}</p>
-            </details>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* CTA                                                                 */
-/* ------------------------------------------------------------------ */
-
-function FinalCta() {
-  return (
-    <section>
-      <div className="mx-auto max-w-[1320px] px-6 py-28 lg:py-36 text-center">
-        <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-bold" style={{ color: VOID }}>
-          <Sparkles className="h-3 w-3" />
-          Ready when you are
-        </div>
-        <h2 className="mt-8 font-display font-semibold tracking-[-0.045em] leading-[0.95] text-[clamp(56px,9vw,140px)]" style={{ color: VOID }}>
-          Speak the asset.<br />
-          <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>Hear the setup.</span>
-        </h2>
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
-          <Link to="/app" className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--void)] text-[color:var(--paper)] px-7 py-4 text-[14px] font-bold hover:opacity-90 transition">
-            <Mic className="h-4 w-4" />
-            Launch voice agent
-            <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
-          </Link>
-          <Link to="/signal" className="inline-flex items-center gap-2 px-7 py-4 text-[14px] font-bold hover:opacity-60 transition" style={{ color: VOID }}>
-            See a live signal
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* FOOTER                                                              */
-/* ------------------------------------------------------------------ */
-
-function Footer() {
-  return (
-    <footer>
-      <div className="mx-auto max-w-[1320px] px-6 py-16 grid lg:grid-cols-12 gap-10">
-        <div className="lg:col-span-5">
-          <div className="flex items-center gap-2.5">
-            <Logo />
-            <span className="font-display tracking-[-0.02em] text-[15px] font-bold uppercase">
-              Jenvu<span className="opacity-50">/ai</span>
-            </span>
-          </div>
-          <p className="mt-5 text-[14px] max-w-sm leading-relaxed" style={{ color: VOID }}>
-            Institutional voice intelligence for global markets. Built for traders who'd rather listen than scroll.
-          </p>
-        </div>
-
-        <FooterCol title="Product" links={[["Voice agent", "/"], ["Signals", "/signal"], ["AI Engine", "/ai-engine"], ["LLM", "/llm"]]} />
-        <FooterCol title="Company" links={[["About", "/about"], ["Development", "/development"], ["Sign in", "/auth"]]} />
-        <FooterCol title="Legal" links={[["Privacy", "/privacy"], ["Terms", "/terms"], ["Disclaimer", "/disclaimer"]]} />
-      </div>
-      <div>
-        <div className="mx-auto max-w-[1320px] px-6 py-5 flex flex-wrap items-center justify-between gap-3 text-[12px]" style={{ color: VOID }}>
-          <div>© {new Date().getFullYear()} JENVU AI · All rights reserved</div>
-          <div className="font-mono" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-            v1.0 · paper edition
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
-  return (
-    <div className="lg:col-span-2">
-      <div className="text-[11px] uppercase tracking-[0.25em] font-bold" style={{ color: VOID }}>{title}</div>
-      <ul className="mt-5 space-y-3 text-[14px] font-medium" style={{ color: VOID }}>
-        {links.map(([label, href]) => (
-          <li key={label}>
-            <Link to={href} className="hover:opacity-60">{label}</Link>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Shared                                                              */
-/* ------------------------------------------------------------------ */
-
-function SectionHead({ title }: { title: React.ReactNode }) {
+function FakeChart() {
+  // Decorative SVG chart preview
   return (
-    <div className="max-w-3xl">
-      <h2 className="font-display font-semibold tracking-[-0.035em] text-[clamp(40px,5.5vw,72px)] leading-[1.02]" style={{ color: VOID }}>
-        {title}
-      </h2>
-    </div>
+    <svg viewBox="0 0 600 220" className="w-full h-full">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={ACCENT} stopOpacity="0.5" />
+          <stop offset="100%" stopColor={ACCENT} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {[40, 80, 120, 160, 200].map((y) => (
+        <line
+          key={y}
+          x1="0"
+          x2="600"
+          y1={y}
+          y2={y}
+          stroke="rgba(255,255,255,0.05)"
+        />
+      ))}
+      <path
+        d="M0,160 C60,150 90,170 130,140 C180,100 220,130 270,110 C320,90 360,120 410,80 C460,50 510,70 600,40"
+        fill="none"
+        stroke={ACCENT}
+        strokeWidth="2.5"
+      />
+      <path
+        d="M0,160 C60,150 90,170 130,140 C180,100 220,130 270,110 C320,90 360,120 410,80 C460,50 510,70 600,40 L600,220 L0,220 Z"
+        fill="url(#g1)"
+      />
+      {/* OB box */}
+      <rect
+        x="200"
+        y="105"
+        width="90"
+        height="30"
+        fill={ACCENT}
+        fillOpacity="0.12"
+        stroke={ACCENT}
+        strokeDasharray="4 4"
+      />
+      <text x="206" y="100" fill={ACCENT} fontSize="10" fontWeight="700">
+        OB
+      </text>
+      {/* entry line */}
+      <line
+        x1="0"
+        x2="600"
+        y1="95"
+        y2="95"
+        stroke="white"
+        strokeOpacity="0.6"
+        strokeDasharray="2 4"
+      />
+      <text x="8" y="90" fill="white" fillOpacity="0.7" fontSize="10">
+        ENTRY
+      </text>
+    </svg>
   );
 }
