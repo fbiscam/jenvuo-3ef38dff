@@ -38,13 +38,22 @@ function tagOf(text: string): { tag: string; tone: "violet" | "blue" | "emerald"
   return { tag: "NOTE", tone: "zinc" };
 }
 const toneClass: Record<string, string> = {
-  violet: "bg-violet-100 text-violet-700",
-  blue: "bg-sky-100 text-sky-700",
-  emerald: "bg-emerald-100 text-emerald-700",
-  amber: "bg-amber-100 text-amber-700",
-  rose: "bg-rose-100 text-rose-700",
-  zinc: "bg-zinc-100 text-zinc-700",
+  violet: "bg-emerald-500 text-white",
+  blue: "bg-zinc-900 text-white",
+  emerald: "bg-zinc-100 text-zinc-700 border border-zinc-200",
+  amber: "bg-zinc-900 text-white",
+  rose: "bg-zinc-900 text-white",
+  zinc: "bg-zinc-100 text-zinc-700 border border-zinc-200",
 };
+const toneCardClass: Record<string, string> = {
+  violet: "bg-emerald-50/60 border-emerald-100",
+  blue: "bg-white border-zinc-200",
+  emerald: "bg-white border-zinc-200",
+  amber: "bg-white border-zinc-200",
+  rose: "bg-white border-zinc-200",
+  zinc: "bg-white border-zinc-200",
+};
+
 function hhmmss(d = new Date()): string {
   return d.toTimeString().slice(0, 8);
 }
@@ -327,7 +336,7 @@ function SignalPage() {
                   <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading narration…
                 </div>
               )}
-              <div ref={feedScrollRef} className="space-y-2.5 overflow-y-auto pr-1 max-h-[520px]">
+              <div ref={feedScrollRef} className="space-y-3 overflow-y-auto pr-1 max-h-[520px]">
                 {plan?.narration.map((n, i) => {
                   const { tag, tone } = tagOf(n.say);
                   const active = i === step;
@@ -337,34 +346,33 @@ function SignalPage() {
                       key={i}
                       data-step={i}
                       className={cn(
-                        "p-3 rounded-lg border transition-colors",
+                        "px-3.5 py-3 rounded-xl border transition-all",
+                        toneCardClass[tone],
                         active
-                          ? "border-zinc-900/60 bg-zinc-50 shadow-sm"
+                          ? "shadow-[0_4px_16px_-6px_rgba(0,0,0,0.12)] ring-1 ring-zinc-900/10"
                           : past
-                            ? "border-zinc-100 bg-white opacity-70"
-                            : "border-zinc-100 bg-white/60 opacity-60",
+                            ? "opacity-70"
+                            : "opacity-60",
                       )}
                     >
-                      <div className="flex items-center justify-between gap-3 mb-1.5">
-                        <span className="text-[11px] font-semibold tracking-tight">{sym}</span>
-                        <span className={`text-[10px] ${MONO} text-zinc-500 tabular-nums`}>{hhmmss()}</span>
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <span className="text-[12px] font-bold tracking-tight text-zinc-900">{sym}</span>
+                        <span className={`text-[11px] ${MONO} text-zinc-500 tabular-nums`}>{hhmmss()}</span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="mb-1.5">
                         <span className={cn(
-                          "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider",
+                          "inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider",
                           toneClass[tone],
                         )}>
                           {tag}
                         </span>
-                        <span className={`text-[10px] ${MONO} uppercase tracking-wider text-zinc-500`}>
-                          {n.tf}
-                        </span>
-                        <span className="text-xs text-zinc-800 leading-snug w-full">{n.say}</span>
                       </div>
+                      <p className="text-[13px] text-zinc-800 leading-snug">{n.say}</p>
                     </div>
                   );
                 })}
               </div>
+
 
               {/* Key levels — pinned to bottom of left rail */}
               {plan && plan.keyLevels.length > 0 && (
