@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { CloudOrb } from "@/components/CloudOrb";
+import faviconUrl from "@/assets/favicon.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
