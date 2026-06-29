@@ -212,31 +212,52 @@ function FeatureList() {
 
   return (
     <section>
-      <div className="mx-auto max-w-[1100px] px-6 py-28">
+      <div className="mx-auto max-w-[1320px] px-6 py-28">
         <SectionHead title={<><span className="block">An entire trading floor,</span><span className="block">condensed into a voice.</span></>} />
 
-        <div className="mt-20 space-y-16">
+        <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((f, i) => (
-            <div key={f.tag} className="grid lg:grid-cols-12 gap-6 lg:gap-10 items-baseline">
-              <div className="lg:col-span-3 flex items-center gap-3" style={{ color: VOID }}>
-                <span className="font-mono text-[12px] opacity-50" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+            <div
+              key={f.tag}
+              className="group relative rounded-3xl border border-black/10 bg-white p-7 hover:border-black/30 transition shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]"
+            >
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-[color:var(--void)] text-white">
+                  {f.icon}
+                </span>
+                <span className="font-mono text-[11px] opacity-50" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                   0{i + 1}
                 </span>
-                <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-bold">
-                  {f.icon}
-                  {f.tag}
-                </span>
               </div>
-              <div className="lg:col-span-9">
-                <h3 className="font-display font-semibold tracking-[-0.03em] text-[28px] lg:text-[34px] leading-[1.1]" style={{ color: VOID }}>
-                  {f.title}
-                </h3>
-                <p className="mt-3 text-[15px] leading-relaxed max-w-2xl" style={{ color: VOID }}>
-                  {f.body}
-                </p>
+              <div className="mt-6 text-[10px] uppercase tracking-[0.25em] font-bold" style={{ color: VOID }}>
+                {f.tag}
               </div>
+              <h3 className="mt-3 font-display font-semibold tracking-[-0.025em] text-[22px] leading-[1.15]" style={{ color: VOID }}>
+                {f.title}
+              </h3>
+              <p className="mt-3 text-[14px] leading-relaxed" style={{ color: VOID }}>
+                {f.body}
+              </p>
             </div>
           ))}
+
+          <Link
+            to="/app"
+            className="group relative rounded-3xl p-7 bg-[color:var(--void)] text-white flex flex-col justify-between min-h-[240px] hover:opacity-95 transition"
+          >
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-white text-[color:var(--void)]">
+                <ArrowUpRight className="h-4 w-4" />
+              </span>
+              <span className="font-mono text-[11px] opacity-50" style={{ fontFamily: "'JetBrains Mono', monospace" }}>→</span>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.25em] font-bold opacity-70">Try it</div>
+              <h3 className="mt-3 font-display font-semibold tracking-[-0.025em] text-[22px] leading-[1.15]">
+                Launch the voice agent.
+              </h3>
+            </div>
+          </Link>
         </div>
       </div>
     </section>
