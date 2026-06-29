@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target, Brain, ShieldAlert, CheckCircle2, Clock } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown, Pause, AlertTriangle, Newspaper, Zap, Activity, Target, Brain, ShieldAlert, CheckCircle2, Clock, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-import { getSignalPlan, type SignalPlan } from "@/lib/gold-analysis.functions";
+import { getSignalPlan, ASSETS, type SignalPlan } from "@/lib/gold-analysis.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/signal")({
   head: () => ({
     meta: [
-      { title: "Live Gold Signal — Jenvu AI" },
-      { name: "description", content: "Live ICT/SMC trade plan for XAU/USD with chart markings and voice narration." },
+      { title: "Live AI Trading Signal — Jenvu AI" },
+      { name: "description", content: "Live ICT/SMC trade plans for Gold, Forex majors and Crypto with chart markings and voice narration." },
     ],
   }),
   component: SignalPage,
@@ -34,6 +34,11 @@ function SignalPage() {
   const [playing, setPlaying] = useState(false);
   const [htfTf, setHtfTf] = useState<"1h" | "4h" | "1d">("1h");
   const [ltfTf, setLtfTf] = useState<"5m" | "15m" | "30m">("15m");
+  const [symbol, setSymbol] = useState<string>("XAUUSD");
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const currentAsset = ASSETS[symbol] ?? ASSETS.XAUUSD;
+  const prec = plan?.precision ?? currentAsset.precision;
+  const fixp = useCallback((n: number) => (isFinite(n) ? n.toFixed(prec) : "—"), [prec]);
   const [pipeline, setPipeline] = useState<number>(-1);
   const [livePrice, setLivePrice] = useState<number | null>(null);
   const [priceDelta, setPriceDelta] = useState<number>(0);
@@ -117,10 +122,11 @@ function SignalPage() {
       setPipeline((s) => (s < PIPELINE_STEPS.length - 1 ? s + 1 : s));
     }, 700);
     try {
-      const p = await fetchPlan({ data: { htfTf, ltfTf } });
+      const p = await fetchPlan({ data: { htfTf, ltfTf, symbol } });
       setPipeline(PIPELINE_STEPS.length);
       setPlan(p);
       setLivePrice(p.currentPrice);
+      setPriceDelta(0);
       setTimeout(() => runNarration(p), 400);
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
@@ -130,7 +136,7 @@ function SignalPage() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchPlan, runNarration, htfTf, ltfTf]);
+  }, [fetchPlan, runNarration, htfTf, ltfTf, symbol]);
 
   useEffect(() => {
     if (authReady && !plan && !loading) load();
@@ -141,13 +147,15 @@ function SignalPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authReady]);
 
-  // Live price ticker (polls every 30s via Binance PAXG)
+  // Live price ticker (polls every 20s — Binance if available for the symbol)
   useEffect(() => {
     if (!plan) return;
+    const binanceSym = ASSETS[plan.symbol]?.binance;
+    if (!binanceSym) return;
     let alive = true;
     const tick = async () => {
       try {
-        const r = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT");
+        const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${binanceSym}`);
         if (!r.ok) return;
         const j = await r.json();
         const p = parseFloat(j.price);
@@ -159,7 +167,7 @@ function SignalPage() {
       } catch {}
     };
     tick();
-    const id = setInterval(tick, 30000);
+    const id = setInterval(tick, 20000);
     return () => { alive = false; clearInterval(id); };
   }, [plan]);
 
@@ -190,16 +198,22 @@ function SignalPage() {
         >
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
-        <div className="text-center">
+        <div className="relative text-center">
           <div className="text-[10px] uppercase tracking-[0.3em] text-amber-700/80 font-bold">Jenvu AI · Institutional Desk</div>
           <div className="text-base font-black tracking-tight flex items-center justify-center gap-2">
-            XAU/USD
+            <button
+              onClick={() => setPickerOpen((v) => !v)}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-md hover:bg-neutral-100 transition border border-neutral-200/70 bg-white/60"
+            >
+              {(plan?.symbolLabel) ?? currentAsset.short}
+              <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+            </button>
             {(livePrice ?? plan?.currentPrice) != null && (
-              <span className="text-amber-600 tabular-nums">${(livePrice ?? plan!.currentPrice).toFixed(2)}</span>
+              <span className="text-amber-600 tabular-nums">{fixp(livePrice ?? plan!.currentPrice)}</span>
             )}
             {priceDelta !== 0 && (
               <span className={cn("text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded", priceDelta > 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700")}>
-                {priceDelta > 0 ? "▲" : "▼"} {Math.abs(priceDelta).toFixed(2)}
+                {priceDelta > 0 ? "▲" : "▼"} {fixp(Math.abs(priceDelta))}
               </span>
             )}
             {plan && (
@@ -208,6 +222,29 @@ function SignalPage() {
               </span>
             )}
           </div>
+          {pickerOpen && (
+            <div className="absolute left-1/2 -translate-x-1/2 mt-2 z-50 w-[320px] max-h-[70vh] overflow-y-auto rounded-2xl border border-neutral-200 bg-white shadow-2xl p-2 text-left">
+              {(["metal", "crypto", "forex"] as const).map((kind) => (
+                <div key={kind} className="mb-1">
+                  <div className="text-[9px] uppercase tracking-widest font-bold text-neutral-400 px-2 pt-2 pb-1">{kind}</div>
+                  {Object.values(ASSETS).filter((a) => a.kind === kind).map((a) => (
+                    <button
+                      key={a.key}
+                      onClick={() => { setSymbol(a.key); setPickerOpen(false); setTimeout(() => load(), 30); }}
+                      disabled={loading}
+                      className={cn(
+                        "w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center justify-between gap-2",
+                        a.key === symbol ? "bg-neutral-900 text-white" : "hover:bg-neutral-100 text-neutral-800",
+                      )}
+                    >
+                      <span>{a.short}</span>
+                      <span className="text-[10px] opacity-60">{a.label.split(" / ")[0]}</span>
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2">
@@ -260,7 +297,7 @@ function SignalPage() {
               </ul>
             </div>
           )}
-          {!plan && !loading && <div className="text-sm opacity-60 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading live gold data…</div>}
+          {!plan && !loading && <div className="text-sm opacity-60 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading live {currentAsset.short} data…</div>}
 
 
           {plan && (
@@ -315,10 +352,10 @@ function SignalPage() {
                     <div className="text-[11px] text-neutral-500">Confidence <span className="font-black text-neutral-900">{t.confidence}%</span></div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <Stat label="Entry" value={t.entry.toFixed(2)} />
+                    <Stat label="Entry" value={fixp(t.entry)} />
                     <Stat label="R:R" value={`1:${t.rr.toFixed(2)}`} />
-                    <Stat label="Stop Loss" value={t.sl.toFixed(2)} tone="bad" />
-                    <Stat label="Take Profit" value={t.tp.toFixed(2)} tone="good" />
+                    <Stat label="Stop Loss" value={fixp(t.sl)} tone="bad" />
+                    <Stat label="Take Profit" value={fixp(t.tp)} tone="good" />
                   </div>
                   {t.summary && <p className="text-xs text-neutral-700 mt-3 leading-relaxed border-t border-neutral-200/60 pt-3">{t.summary}</p>}
                   {t.invalidation && (
@@ -391,7 +428,7 @@ function SignalPage() {
                           )} />
                           <span className="text-neutral-700">{k.label}</span>
                         </span>
-                        <span className="font-mono font-bold tabular-nums text-neutral-900">${k.price.toFixed(2)}</span>
+                        <span className="font-mono font-bold tabular-nums text-neutral-900">{fixp(k.price)}</span>
                       </div>
                     ))}
                   </div>
