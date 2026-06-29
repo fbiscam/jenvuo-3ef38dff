@@ -92,8 +92,7 @@ function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-2xl py-3.5 text-sm font-semibold text-white shadow-[0_10px_40px_-10px_rgba(236,72,153,0.55)] hover:shadow-[0_14px_50px_-10px_rgba(56,189,248,0.6)] disabled:opacity-60 transition inline-flex items-center justify-center gap-2"
-              style={{ backgroundImage: "linear-gradient(135deg,#ec4899 0%,#a855f7 50%,#38bdf8 100%)" }}
+              className="w-full rounded-2xl py-3.5 text-sm font-semibold text-white bg-black hover:bg-neutral-900 disabled:opacity-60 transition inline-flex items-center justify-center gap-2"
             >
               {loading ? "Signing in…" : (<>Sign in <ArrowRight className="w-4 h-4" /></>)}
             </button>
