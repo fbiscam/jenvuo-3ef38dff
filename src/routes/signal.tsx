@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { getSignalPlan, type SignalPlan } from "@/lib/gold-analysis.functions";
+import { getSignalPlan, getLiveTick, type SignalPlan } from "@/lib/gold-analysis.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
