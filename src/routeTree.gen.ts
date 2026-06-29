@@ -9,15 +9,37 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignalRouteImport } from './routes/signal'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as LlmRouteImport } from './routes/llm'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as DisclaimerRouteImport } from './routes/disclaimer'
+import { Route as DevelopmentRouteImport } from './routes/development'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AiEngineRouteImport } from './routes/ai-engine'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiSeedAdminRouteImport } from './routes/api/seed-admin'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignalRoute = SignalRouteImport.update({
   id: '/signal',
   path: '/signal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmRoute = LlmRouteImport.update({
+  id: '/llm',
+  path: '/llm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomeRoute = HomeRouteImport.update({
@@ -25,9 +47,29 @@ const HomeRoute = HomeRouteImport.update({
   path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DisclaimerRoute = DisclaimerRouteImport.update({
+  id: '/disclaimer',
+  path: '/disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevelopmentRoute = DevelopmentRouteImport.update({
+  id: '/development',
+  path: '/development',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiEngineRoute = AiEngineRouteImport.update({
+  id: '/ai-engine',
+  path: '/ai-engine',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,49 +85,135 @@ const ApiSeedAdminRoute = ApiSeedAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/ai-engine': typeof AiEngineRoute
   '/auth': typeof AuthRoute
+  '/development': typeof DevelopmentRoute
+  '/disclaimer': typeof DisclaimerRoute
   '/home': typeof HomeRoute
+  '/llm': typeof LlmRoute
+  '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
+  '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/ai-engine': typeof AiEngineRoute
   '/auth': typeof AuthRoute
+  '/development': typeof DevelopmentRoute
+  '/disclaimer': typeof DisclaimerRoute
   '/home': typeof HomeRoute
+  '/llm': typeof LlmRoute
+  '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
+  '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/ai-engine': typeof AiEngineRoute
   '/auth': typeof AuthRoute
+  '/development': typeof DevelopmentRoute
+  '/disclaimer': typeof DisclaimerRoute
   '/home': typeof HomeRoute
+  '/llm': typeof LlmRoute
+  '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
+  '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/home' | '/signal' | '/api/seed-admin'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/ai-engine'
+    | '/auth'
+    | '/development'
+    | '/disclaimer'
+    | '/home'
+    | '/llm'
+    | '/privacy'
+    | '/signal'
+    | '/terms'
+    | '/api/seed-admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/home' | '/signal' | '/api/seed-admin'
-  id: '__root__' | '/' | '/auth' | '/home' | '/signal' | '/api/seed-admin'
+  to:
+    | '/'
+    | '/about'
+    | '/ai-engine'
+    | '/auth'
+    | '/development'
+    | '/disclaimer'
+    | '/home'
+    | '/llm'
+    | '/privacy'
+    | '/signal'
+    | '/terms'
+    | '/api/seed-admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/ai-engine'
+    | '/auth'
+    | '/development'
+    | '/disclaimer'
+    | '/home'
+    | '/llm'
+    | '/privacy'
+    | '/signal'
+    | '/terms'
+    | '/api/seed-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AiEngineRoute: typeof AiEngineRoute
   AuthRoute: typeof AuthRoute
+  DevelopmentRoute: typeof DevelopmentRoute
+  DisclaimerRoute: typeof DisclaimerRoute
   HomeRoute: typeof HomeRoute
+  LlmRoute: typeof LlmRoute
+  PrivacyRoute: typeof PrivacyRoute
   SignalRoute: typeof SignalRoute
+  TermsRoute: typeof TermsRoute
   ApiSeedAdminRoute: typeof ApiSeedAdminRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signal': {
       id: '/signal'
       path: '/signal'
       fullPath: '/signal'
       preLoaderRoute: typeof SignalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llm': {
+      id: '/llm'
+      path: '/llm'
+      fullPath: '/llm'
+      preLoaderRoute: typeof LlmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/home': {
@@ -95,11 +223,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/disclaimer': {
+      id: '/disclaimer'
+      path: '/disclaimer'
+      fullPath: '/disclaimer'
+      preLoaderRoute: typeof DisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/development': {
+      id: '/development'
+      path: '/development'
+      fullPath: '/development'
+      preLoaderRoute: typeof DevelopmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-engine': {
+      id: '/ai-engine'
+      path: '/ai-engine'
+      fullPath: '/ai-engine'
+      preLoaderRoute: typeof AiEngineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -121,9 +277,16 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AiEngineRoute: AiEngineRoute,
   AuthRoute: AuthRoute,
+  DevelopmentRoute: DevelopmentRoute,
+  DisclaimerRoute: DisclaimerRoute,
   HomeRoute: HomeRoute,
+  LlmRoute: LlmRoute,
+  PrivacyRoute: PrivacyRoute,
   SignalRoute: SignalRoute,
+  TermsRoute: TermsRoute,
   ApiSeedAdminRoute: ApiSeedAdminRoute,
 }
 export const routeTree = rootRouteImport

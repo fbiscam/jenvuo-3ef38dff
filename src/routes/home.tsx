@@ -432,15 +432,34 @@ function HomePage() {
 
       {/* FOOTER */}
       <footer className="border-t border-black/10">
-        <div className="mx-auto max-w-7xl px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm">
-          <div className="font-black tracking-[0.2em]">JENVU AI</div>
-          <div className="text-black/50">
-            © {new Date().getFullYear()} JENVU. Institutional voice intelligence.
+        <div className="mx-auto max-w-7xl px-6 py-10 grid gap-8 md:grid-cols-4 text-sm">
+          <div>
+            <div className="font-black tracking-[0.25em] text-lg">JENVU AI</div>
+            <p className="mt-3 text-black/55 leading-relaxed">
+              Institutional voice intelligence for the modern trader.
+            </p>
           </div>
-          <div className="flex gap-5 text-black/60 font-semibold">
-            <Link to="/">Agent</Link>
-            <Link to="/signal">Signals</Link>
+          <FooterCol title="Product">
+            <Link to="/">Voice Agent</Link>
+            <Link to="/signal">Live Signals</Link>
             <Link to="/auth">Sign in</Link>
+          </FooterCol>
+          <FooterCol title="Company">
+            <Link to="/about">About</Link>
+            <Link to="/ai-engine">AI Engine</Link>
+            <Link to="/llm">LLM</Link>
+            <Link to="/development">Development</Link>
+          </FooterCol>
+          <FooterCol title="Legal">
+            <Link to="/privacy">Privacy Policy</Link>
+            <Link to="/terms">Terms of Use</Link>
+            <Link to="/disclaimer">Disclaimer</Link>
+          </FooterCol>
+        </div>
+        <div className="border-t border-black/10">
+          <div className="mx-auto max-w-7xl px-6 py-5 text-xs text-black/50 flex justify-between flex-wrap gap-3">
+            <span>© {new Date().getFullYear()} JENVU. All rights reserved.</span>
+            <span className="uppercase tracking-[0.3em] font-semibold">Not financial advice</span>
           </div>
         </div>
       </footer>
@@ -591,5 +610,18 @@ function FakeChart() {
         ENTRY
       </text>
     </svg>
+  );
+}
+
+function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="text-[11px] uppercase tracking-[0.25em] font-bold text-black/40 mb-3">
+        {title}
+      </div>
+      <div className="flex flex-col gap-2 text-black/70 font-semibold [&_a:hover]:text-black">
+        {children}
+      </div>
+    </div>
   );
 }

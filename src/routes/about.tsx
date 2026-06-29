@@ -1,0 +1,58 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { PageShell, H2, P, UL } from "@/components/PageShell";
+
+export const Route = createFileRoute("/about")({
+  head: () => ({
+    meta: [
+      { title: "About — JENVU AI" },
+      { name: "description", content: "The mission, philosophy, and team behind JENVU AI." },
+      { property: "og:title", content: "About — JENVU AI" },
+      { property: "og:url", content: "https://greetings-gentle-flow.lovable.app/about" },
+    ],
+    links: [{ rel: "canonical", href: "https://greetings-gentle-flow.lovable.app/about" }],
+  }),
+  component: AboutPage,
+});
+
+function AboutPage() {
+  return (
+    <PageShell
+      eyebrow="About"
+      title="Built for traders who refuse to guess."
+      intro="JENVU AI was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned 25 years of ICT and SMC playbooks into a voice-first agent any serious trader can talk to."
+    >
+      <section className="space-y-3">
+        <H2>The Mission</H2>
+        <P>
+          Give independent traders the same structural read of the market that desk
+          analysts have been using for decades — narrated in real time, drawn on the chart,
+          and available the moment an idea hits.
+        </P>
+      </section>
+      <section className="space-y-3">
+        <H2>What Makes Us Different</H2>
+        <UL>
+          <li><b>Voice-first</b> — speak the asset, hear the plan. No menus.</li>
+          <li><b>Institutional playbook</b> — ICT, SMC, killzones, liquidity, OTE.</li>
+          <li><b>Multi-asset</b> — Gold, Crypto, FX, Indices, Stocks from one engine.</li>
+          <li><b>Honest output</b> — when conditions are bad, the agent says "wait".</li>
+        </UL>
+      </section>
+      <section className="space-y-3">
+        <H2>The Standard</H2>
+        <P>
+          Every setup must clear bias, structure, liquidity, premium/discount, killzone,
+          and news-risk checks before it ships. If even one gate fails, the agent
+          recommends standing aside. We'd rather miss a trade than print a bad one.
+        </P>
+      </section>
+      <section className="space-y-3">
+        <H2>Contact</H2>
+        <P>
+          Press, partnerships, or feedback — reach the team through the address listed in
+          the published site footer. We read everything.
+        </P>
+      </section>
+    </PageShell>
+  );
+}

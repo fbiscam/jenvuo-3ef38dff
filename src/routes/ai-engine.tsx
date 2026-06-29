@@ -1,0 +1,61 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { PageShell, H2, P, UL } from "@/components/PageShell";
+
+export const Route = createFileRoute("/ai-engine")({
+  head: () => ({
+    meta: [
+      { title: "The AI Engine — JENVU AI" },
+      { name: "description", content: "How the JENVU AI agent listens, reasons, and narrates institutional trade setups." },
+      { property: "og:title", content: "The AI Engine — JENVU AI" },
+      { property: "og:url", content: "https://greetings-gentle-flow.lovable.app/ai-engine" },
+    ],
+    links: [{ rel: "canonical", href: "https://greetings-gentle-flow.lovable.app/ai-engine" }],
+  }),
+  component: AIPage,
+});
+
+function AIPage() {
+  return (
+    <PageShell
+      eyebrow="Technology"
+      title="The AI Engine"
+      intro="JENVU AI is more than a chatbot. It's a multi-stage reasoning pipeline that fuses live market data, institutional concepts, and natural-language synthesis into one fluid agent."
+    >
+      <section className="space-y-3">
+        <H2>Perception Layer</H2>
+        <P>
+          The Web Speech API captures your voice and converts it to text in real time.
+          A lightweight intent resolver routes commands like "Analyze Bitcoin" or
+          "Show me Gold" to the correct instrument adapter (Binance for crypto, Yahoo
+          for FX/indices/stocks/metals).
+        </P>
+      </section>
+      <section className="space-y-3">
+        <H2>Market Context Layer</H2>
+        <UL>
+          <li>Multi-timeframe candle ingestion (1H and 15M).</li>
+          <li>Structural mapping: PDH/PDL, equilibrium, premium/discount arrays.</li>
+          <li>News & economic calendar awareness with high-impact filtering.</li>
+          <li>Session and killzone awareness (London / New York GMT windows).</li>
+        </UL>
+      </section>
+      <section className="space-y-3">
+        <H2>Reasoning Layer</H2>
+        <P>
+          A large language model with a 25-year institutional trader persona reasons over
+          the prepared context using ICT and SMC playbooks — bias, sweep, displacement,
+          OTE, OB, FVG, BOS/CHoCH — and outputs a structured plan with entry, stop, three
+          targets, and an invalidation level.
+        </P>
+      </section>
+      <section className="space-y-3">
+        <H2>Output Layer</H2>
+        <P>
+          The plan is rendered on dual lightweight-charts (1H + 15M) with zones drawn for
+          FVGs, OBs, and liquidity, while text-to-speech narrates each step in sync with
+          word-level orb pulses for a Jarvis-class voice experience.
+        </P>
+      </section>
+    </PageShell>
+  );
+}
