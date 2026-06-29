@@ -153,22 +153,27 @@ function Home() {
   const toggleMic = () => {
     if (!speech.supported) { toast.error("Voice not supported. Use Chrome."); return; }
     if (speech.listening) {
-      // User pressed stop → flush whatever was captured and let AI reply
+      // User pressed stop → wait briefly for final results to flush, then send
+      const interimNow = speech.interim;
       speech.stopListening();
-      const captured = bufferRef.current.trim();
-      bufferRef.current = "";
-      if (captured) {
-        // strip wake words if present
+      window.setTimeout(() => {
+        const captured = (bufferRef.current + " " + interimNow).trim();
+        bufferRef.current = "";
+        if (!captured) {
+          toast.message("Kuch sunai nahi diya — phir se try karein.");
+          return;
+        }
         const lower = captured.toLowerCase();
         const wakeMatch = lower.match(/\b(hey|hi|ok|okay)?\s*(jenvu|janvu|jarvis|jen view|jen vu)\b[\s,.!?]*(.*)/i);
         const cmd = (wakeMatch?.[3]?.trim() || captured).trim();
-        if (cmd.length > 1) handleCommand(cmd);
-      }
+        if (cmd.length > 0) handleCommand(cmd);
+      }, 350);
       return;
     }
     bufferRef.current = "";
     speech.startListening();
   };
+
 
 
   const submitText = () => {
