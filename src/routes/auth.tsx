@@ -54,7 +54,7 @@ function AuthPage() {
     };
   }, [navigate]);
 
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
