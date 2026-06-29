@@ -595,8 +595,7 @@ function HomePage() {
         <div className="mx-auto max-w-6xl px-6 py-16">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
-              <SectionLabel>Data Feeds</SectionLabel>
-              <h3 className="mt-3 text-xl font-semibold tracking-tight text-zinc-900">
+              <h3 className="text-xl font-semibold tracking-tight text-zinc-900">
                 Wired into the venues that move price.
               </h3>
             </div>
@@ -620,8 +619,7 @@ function HomePage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="grid gap-10 lg:grid-cols-12">
             <div className="lg:col-span-4">
-              <SectionLabel>FAQ</SectionLabel>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight">Asked often.</h2>
+              <h2 className="text-3xl font-semibold tracking-tight">Asked often.</h2>
               <p className="mt-3 text-zinc-900">Everything else lives in the docs and disclaimer.</p>
             </div>
             <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
@@ -659,8 +657,7 @@ function HomePage() {
         <div className="mx-auto max-w-6xl px-6 py-24">
           <div className="rounded-2xl border border-zinc-200 bg-white p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
             <div className="max-w-xl">
-              <SectionLabel>Initialize</SectionLabel>
-              <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight">
+              <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal. Speak to the market.
               </h2>
               <p className="mt-3 text-zinc-900">
