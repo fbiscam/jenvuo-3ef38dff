@@ -132,14 +132,19 @@ export const analyzeGold = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
-    const candles = await fetchGoldCandles(data.timeframe);
-    if (candles.length < 10) throw new Error("Not enough price data");
-    const last = candles[candles.length - 1];
+    let candles: Candle[] = [];
+    try {
+      candles = await fetchGoldCandles(data.timeframe);
+    } catch {
+      candles = [];
+    }
+    const hasData = candles.length >= 10;
+    const last = hasData ? candles[candles.length - 1] : null;
     const recent = candles.slice(-50);
     const highs = recent.map((c) => c.h);
     const lows = recent.map((c) => c.l);
-    const swingHigh = Math.max(...highs);
-    const swingLow = Math.min(...lows);
+    const swingHigh = hasData ? Math.max(...highs) : 0;
+    const swingLow = hasData ? Math.min(...lows) : 0;
 
     const compact = recent
       .map(
