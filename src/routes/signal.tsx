@@ -336,7 +336,7 @@ function SignalPage() {
                   <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading narration…
                 </div>
               )}
-              <div ref={feedScrollRef} className="space-y-2.5 overflow-y-auto pr-1 max-h-[520px]">
+              <div ref={feedScrollRef} className="space-y-3 overflow-y-auto pr-1 max-h-[520px]">
                 {plan?.narration.map((n, i) => {
                   const { tag, tone } = tagOf(n.say);
                   const active = i === step;
@@ -346,34 +346,33 @@ function SignalPage() {
                       key={i}
                       data-step={i}
                       className={cn(
-                        "p-3 rounded-lg border transition-colors",
+                        "px-3.5 py-3 rounded-xl border transition-all",
+                        toneCardClass[tone],
                         active
-                          ? "border-zinc-900/60 bg-zinc-50 shadow-sm"
+                          ? "shadow-[0_4px_16px_-6px_rgba(0,0,0,0.12)] ring-1 ring-zinc-900/10"
                           : past
-                            ? "border-zinc-100 bg-white opacity-70"
-                            : "border-zinc-100 bg-white/60 opacity-60",
+                            ? "opacity-70"
+                            : "opacity-60",
                       )}
                     >
-                      <div className="flex items-center justify-between gap-3 mb-1.5">
-                        <span className="text-[11px] font-semibold tracking-tight">{sym}</span>
-                        <span className={`text-[10px] ${MONO} text-zinc-500 tabular-nums`}>{hhmmss()}</span>
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <span className="text-[12px] font-bold tracking-tight text-zinc-900">{sym}</span>
+                        <span className={`text-[11px] ${MONO} text-zinc-500 tabular-nums`}>{hhmmss()}</span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="mb-1.5">
                         <span className={cn(
-                          "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider",
+                          "inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider",
                           toneClass[tone],
                         )}>
                           {tag}
                         </span>
-                        <span className={`text-[10px] ${MONO} uppercase tracking-wider text-zinc-500`}>
-                          {n.tf}
-                        </span>
-                        <span className="text-xs text-zinc-800 leading-snug w-full">{n.say}</span>
                       </div>
+                      <p className="text-[13px] text-zinc-800 leading-snug">{n.say}</p>
                     </div>
                   );
                 })}
               </div>
+
 
               {/* Key levels — pinned to bottom of left rail */}
               {plan && plan.keyLevels.length > 0 && (
