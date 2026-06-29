@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/disclaimer")({
   head: () => ({
     meta: [
-      { title: "Our Disclaimer — JENVU AI" },
+      { title: "Our Legal Disclaimer — JENVU AI" },
       { name: "description", content: "Risk disclosure and disclaimer for JENVU AI signals and analysis." },
-      { property: "og:title", content: "Our Disclaimer — JENVU AI" },
+      { property: "og:title", content: "Our Legal Disclaimer — JENVU AI" },
       { property: "og:url", content: "https://jenvu.com/disclaimer" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/disclaimer" }],
