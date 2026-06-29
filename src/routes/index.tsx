@@ -298,7 +298,7 @@ function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "think
 
   return (
     <div
-      className="relative h-[22rem] w-[22rem] sm:h-[26rem] sm:w-[26rem] flex items-center justify-center"
+      className="relative h-[18rem] w-[18rem] sm:h-[22rem] sm:w-[22rem] lg:h-[26rem] lg:w-[26rem] max-h-full max-w-full flex items-center justify-center"
       style={{
         transform: `scale(${scale})`,
         transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
