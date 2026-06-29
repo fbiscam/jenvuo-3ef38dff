@@ -103,19 +103,19 @@ function useLiveTicker(): TickerRow[] {
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "Voice Trading Terminal (Live Agent) — JENVU AI" },
+      { title: "Voice Trading Terminal — JENVU AI" },
       {
         name: "description",
         content:
           "Speak to JENVU AI and get live institutional ICT/SMC analysis for Gold, Crypto, FX and Indices — A+ setups, structured entries, stops and targets narrated in real time.",
       },
       { name: "keywords", content: "voice trading agent, AI trading terminal, gold voice analysis, ICT voice agent, SMC trading AI, XAUUSD voice signals" },
-      { property: "og:title", content: "Voice Trading Terminal (Live Agent) — JENVU AI" },
+      { property: "og:title", content: "Voice Trading Terminal — JENVU AI" },
       { property: "og:description", content: "Voice-native institutional trading agent for Gold, Crypto, FX and Indices." },
       { property: "og:url", content: "https://jenvu.com/app" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Voice Trading Terminal (Live Agent) — JENVU AI" },
+      { name: "twitter:title", content: "Voice Trading Terminal — JENVU AI" },
       { name: "twitter:description", content: "Speak. Analyze. Execute. Institutional ICT/SMC narrated live." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/app" }],

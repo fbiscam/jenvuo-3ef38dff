@@ -20,19 +20,19 @@ export const Route = createFileRoute("/signal")({
   }),
   head: () => ({
     meta: [
-      { title: "Live Signal Desk (ICT & SMC A+ Setups) — JENVU AI" },
+      { title: "Live Signal Desk — JENVU AI" },
       {
         name: "description",
         content:
           "Real-time ICT & SMC signal desk for Gold, Crypto, FX and Indices. Multi-timeframe bias, A+ setup scoring, annotated charts, voice narration and live trade tracking — all in one institutional terminal.",
       },
       { name: "keywords", content: "ICT signals, SMC trading, gold signals, XAUUSD analysis, A+ setup, smart money concepts, voice trading agent, live signal desk" },
-      { property: "og:title", content: "Live Signal Desk (ICT & SMC A+ Setups) — JENVU AI" },
+      { property: "og:title", content: "Live Signal Desk — JENVU AI" },
       { property: "og:description", content: "Multi-timeframe ICT/SMC analysis with A+ setup scoring, annotated charts and live trade tracking." },
       { property: "og:url", content: "https://jenvu.com/signal" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Live Signal Desk (ICT & SMC A+ Setups) — JENVU AI" },
+      { name: "twitter:title", content: "Live Signal Desk — JENVU AI" },
       { name: "twitter:description", content: "Real-time institutional signal desk with voice narration and A+ setup scoring." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/signal" }],
