@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import welcomeVideo from "@/assets/welcome-orb.mp4.asset.json";
+import { CloudOrb } from "@/components/CloudOrb";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -104,17 +104,12 @@ function AuthPage() {
         </div>
       </div>
 
-      {/* RIGHT — Welcome video */}
-      <div className="relative flex-1 min-h-[45vh] lg:min-h-screen overflow-hidden bg-black border-l border-black/10">
-        <video
-          src={welcomeVideo.url}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover grayscale"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+      {/* RIGHT — Live Voice Agent orb */}
+      <div className="relative flex-1 min-h-[45vh] lg:min-h-screen overflow-hidden bg-black border-l border-black/10 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <CloudOrb status="speaking" pulse={0} />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
 
         <div className="absolute bottom-10 left-8 right-8 lg:left-14 lg:right-14 text-white">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/25 backdrop-blur-md mb-5">
