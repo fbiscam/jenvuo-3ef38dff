@@ -427,34 +427,36 @@ export const getSignalPlan = createServerFn({ method: "POST" })
   .inputValidator((d: any) => ({
     htfTf: ["1h", "4h", "1d"].includes(String(d?.htfTf)) ? String(d.htfTf) : "1h",
     ltfTf: ["5m", "15m", "30m"].includes(String(d?.ltfTf)) ? String(d.ltfTf) : "15m",
+    symbol: ASSETS[String(d?.symbol || "").toUpperCase()] ? String(d.symbol).toUpperCase() : "XAUUSD",
   }))
   .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
+    const a = asset(data.symbol);
+    const prec = a.precision;
+    const fixp = (n: number) => n.toFixed(prec);
+
     const [htfRaw, ltfRaw, news] = await Promise.all([
-      fetchGoldCandles(data.htfTf).catch(() => [] as Candle[]),
-      fetchGoldCandles(data.ltfTf).catch(() => [] as Candle[]),
+      fetchAssetCandles(a.key, data.htfTf).catch(() => [] as Candle[]),
+      fetchAssetCandles(a.key, data.ltfTf).catch(() => [] as Candle[]),
       fetchGoldNewsInline(),
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
-      throw new Error("Live gold feed unavailable. Try again in a moment.");
+      throw new Error(`Live feed for ${a.short} unavailable. Try again in a moment.`);
     }
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
     const last = ltf[ltf.length - 1];
 
-
     const { session, killzone } = detectKillzone(new Date());
 
-    // Compute helpful key levels server-side
     const htfHighs = htf.map((c) => c.h);
     const htfLows = htf.map((c) => c.l);
     const swingHigh = Math.max(...htfHighs);
     const swingLow = Math.min(...htfLows);
     const equilibrium = (swingHigh + swingLow) / 2;
     const inPremium = last.c > equilibrium;
-    // Previous day (last 24h) high/low from 1h
     const prev24 = htf.slice(-24);
     const pdh = Math.max(...prev24.map((c) => c.h));
     const pdl = Math.min(...prev24.map((c) => c.l));
@@ -464,16 +466,29 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
     const fmt = (arr: Candle[]) =>
       arr
-        .map((c) => `${Math.floor(c.t / 1000)}|${c.o.toFixed(2)},${c.h.toFixed(2)},${c.l.toFixed(2)},${c.c.toFixed(2)}`)
+        .map((c) => `${Math.floor(c.t / 1000)}|${fixp(c.o)},${fixp(c.h)},${fixp(c.l)},${fixp(c.c)}`)
         .join("\n");
+
+    // Asset-specific context bullets
+    const macroContext =
+      a.kind === "crypto"
+        ? "- BTC dominance, ETH/BTC ratio, funding rates, open interest, liquidations, ETF flows, on-chain accumulation, DXY risk-on/off."
+        : a.kind === "forex"
+          ? "- DXY index direction, central bank policy divergence, real yield differentials, COT positioning, risk on/off, session liquidity."
+          : "- DXY inverse correlation, US10Y real yields, central bank policy, geopolitical risk, ETF & central-bank gold flows.";
+
+    const newsRelevance =
+      a.kind === "forex" || a.kind === "metal"
+        ? "USD / high-impact macro events (NFP, CPI, FOMC, PMI, retail sales) drive volatility — respect the calendar."
+        : "Crypto reacts to macro USD risk events plus exchange/ETF flows and major on-chain catalysts — respect the calendar.";
 
     const newsBlock = upcomingNews.length
       ? upcomingNews
           .map((n) => `- [${n.impact}] ${n.country} ${n.title} in ${n.minutesUntil}m (forecast ${n.forecast ?? "-"}, prev ${n.previous ?? "-"})`)
           .join("\n")
-      : "No High/Medium USD or XAU events in the next 4 hours.";
+      : "No High/Medium USD events in the next 4 hours.";
 
-    const system = `You are Jenvu — an elite institutional XAU/USD trader with 25+ years on real bank/prop desks. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
+    const system = `You are Jenvu — an elite institutional multi-asset trader with 25+ years on real bank / prop / crypto-desk seats. You trade Gold, FX majors and crypto majors at master level using ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
 - Market structure: BOS, CHOCH, internal vs external structure, MSS
 - Premium / Discount arrays around equilibrium of the dealing range
 - Order Blocks (bullish/bearish), Breaker Blocks, Mitigation Blocks, Rejection Blocks
@@ -483,20 +498,21 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 - OTE (Optimal Trade Entry 62-79% Fib), standard deviations, symmetrical price delivery
 - Killzones (London 07-10 GMT, NY AM 12-15 GMT, NY PM 17-20 GMT, Asia 00-04 GMT)
 - Power of Three (Accumulation, Manipulation, Distribution)
-- DXY inverse correlation, US10Y yields, real yields, risk on/off, COT positioning
-- News/fundamental impact: NFP, CPI, FOMC, PPI, retail sales, geopolitical risk
+- Asset-specific macro context:
+${macroContext}
+- ${newsRelevance}
 
-You are analyzing LIVE gold candles and must deliver an A+ institutional plan that gets drawn on a chart and narrated step-by-step by voice. Be specific, decisive, and pro — like a senior trader walking a junior through the chart. Reference the actual prices, structure, and times you see.
+You are analyzing LIVE ${a.short} candles and must deliver an A+ institutional plan that gets drawn on a chart and narrated step-by-step by voice. Be specific, decisive, and pro — like a senior trader walking a junior through the chart. Reference the actual prices, structure, and times you see. Use ${prec}-decimal precision for all prices.
 
-LANGUAGE: ALL output text (intro, every narration "say", labels, summary, narratives, confluences) MUST be clear professional ENGLISH only. No Hindi/Urdu/Hinglish/Roman Urdu.
+LANGUAGE: ALL output text MUST be clear professional ENGLISH only.
 
 Return ONLY valid JSON (no markdown) with this exact shape:
 {
   "htfBias": "bullish" | "bearish" | "neutral",
-  "intro": "One short sentence to open the analysis (spoken aloud)",
-  "htfNarrative": "2-3 sentence written HTF read: structure, bias, premium/discount, key zones, DXY context.",
+  "intro": "One short sentence to open the analysis (spoken aloud, mention ${a.short}).",
+  "htfNarrative": "2-3 sentence written HTF read: structure, bias, premium/discount, key zones, macro context.",
   "ltfNarrative": "2-3 sentence written LTF read: refinement, FVG/OB, inducement, expected sweep, trigger.",
-  "confluences": ["6-10 short bullet confluences supporting the trade — be specific (e.g. 'HTF 1H bullish BOS at 2378.40', 'LTF FVG aligned with HTF demand', 'NY AM killzone open')"],
+  "confluences": ["6-10 short bullet confluences — be specific with real prices and the ${a.short} context"],
   "keyLevels": [
     { "label":"PDH","price":<n>,"kind":"resistance" },
     { "label":"PDL","price":<n>,"kind":"support" },
@@ -505,11 +521,11 @@ Return ONLY valid JSON (no markdown) with this exact shape:
     { "label":"HTF Swing Low","price":<n>,"kind":"support" }
   ],
   "markings": [
-    { "type":"bos"|"choch", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "price":<n>, "kind":"bullish"|"bearish", "label":"Bullish BOS on 1H" },
-    { "type":"fvg", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"bullish"|"bearish", "label":"Bullish FVG" },
-    { "type":"orderBlock", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"demand"|"supply", "label":"Demand OB" },
-    { "type":"liquidity", "tf":"htf"|"ltf", "price":<n>, "side":"buy"|"sell", "label":"BSL above equal highs" },
-    { "type":"zone", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"supply"|"demand", "label":"HTF Demand Zone" },
+    { "type":"bos"|"choch", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "price":<n>, "kind":"bullish"|"bearish", "label":"..." },
+    { "type":"fvg", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"bullish"|"bearish", "label":"..." },
+    { "type":"orderBlock", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"demand"|"supply", "label":"..." },
+    { "type":"liquidity", "tf":"htf"|"ltf", "price":<n>, "side":"buy"|"sell", "label":"..." },
+    { "type":"zone", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"supply"|"demand", "label":"..." },
     { "type":"entry","tf":"ltf","price":<n>,"label":"Entry" },
     { "type":"sl","tf":"ltf","price":<n>,"label":"Stop Loss" },
     { "type":"tp","tf":"ltf","price":<n>,"label":"Take Profit" }
@@ -519,34 +535,31 @@ Return ONLY valid JSON (no markdown) with this exact shape:
     "direction":"BUY"|"SELL"|"WAIT",
     "entry":<n>, "sl":<n>, "tp":<n>, "rr":<n>,
     "confidence": 0-95,
-    "summary":"Final spoken summary in English — direction, entry, SL, TP, R:R, confidence and the one-line reason.",
+    "summary":"Final spoken summary — direction, entry, SL, TP, R:R, confidence and one-line reason.",
     "invalidation":"One sentence explaining exactly what price action invalidates this setup."
   },
-  "reasoning": "4-6 sentence deep institutional explanation of WHY this exact signal was generated — narrative connecting HTF bias, liquidity logic, smart-money intent, killzone timing, and the precise trigger. Written like a desk memo.",
-  "whyThisSignal": ["5-8 punchy bullet points each starting with a verb (e.g. 'HTF printed bullish BOS at 2378.40 confirming demand control', 'Price swept PDL liquidity at 2371.20 then reclaimed'). These are the standalone reasons a junior trader could defend the trade with."],
-  "riskFactors": ["3-5 honest risk callouts (e.g. 'High-impact CPI in 45 min', 'Price still in HTF premium', 'Thin Asia liquidity'). If none, return one item: 'No material risks detected on the calendar.'"]
+  "reasoning": "4-6 sentence institutional desk-memo explaining WHY this exact signal — HTF bias, liquidity logic, smart-money intent, killzone timing, precise trigger.",
+  "whyThisSignal": ["5-8 punchy bullets each starting with a verb, citing real prices from the data."],
+  "riskFactors": ["3-5 honest risk callouts. If none: 'No material risks detected on the calendar.'"]
 }
-
 
 Rules:
 - fromTime/toTime MUST be unix-seconds taken EXACTLY from the provided candles.
-- LTF entry/sl/tp must respect current price ${last.c.toFixed(2)} and yield realistic RR >= 1.8 (prefer 1:2 to 1:4).
-- Produce 10-14 narration steps, each 12-30 words, professional 25-year-veteran tone, in this order:
-  1) HTF bias & structure, 2) HTF BOS/CHOCH, 3) HTF OB/zone, 4) Premium vs Discount, 5) HTF liquidity (PDH/PDL/equal highs/lows),
-  6) Shift to LTF, 7) LTF structure / MSS, 8) LTF FVG, 9) LTF OB / breaker, 10) Inducement & expected sweep,
-  11) Confluence with killzone/DXY, 12) Entry trigger, 13) SL logic, 14) TP & invalidation.
+- LTF entry/sl/tp must respect current price ${fixp(last.c)} and yield realistic RR >= 1.8 (prefer 1:2 to 1:4).
+- Produce 10-14 narration steps, each 12-30 words, professional 25-year-veteran tone, covering: HTF bias & structure → BOS/CHOCH → HTF OB/zone → Premium vs Discount → HTF liquidity → shift to LTF → LTF structure → LTF FVG → LTF OB → inducement/expected sweep → confluence with killzone/macro → entry trigger → SL logic → TP & invalidation.
 - ALWAYS include at minimum: 1 HTF BOS or CHOCH, 1 HTF OB or zone, 1 LTF FVG, 1 LTF OB, 1 liquidity level, plus entry/sl/tp markings.
-- Mention the current session/killzone (${session} / ${killzone}) and premium-vs-discount read explicitly.
-- If a HIGH impact USD/XAU news event is within 60 minutes, set direction="WAIT", confidence<=50, and clearly call out the news risk in summary and invalidation.
-- If conditions are not A+ set direction="WAIT", confidence<=55, explain what's missing in summary.`;
+- Mention current session/killzone (${session} / ${killzone}) and premium-vs-discount read explicitly.
+- If a HIGH impact USD event is within 60 minutes, set direction="WAIT", confidence<=50, and clearly call out news risk.
+- If conditions are not A+ set direction="WAIT", confidence<=55, explain what's missing.`;
 
-    const user = `LIVE GOLD CANDLES (unix-seconds | O,H,L,C)
-CURRENT PRICE: ${last.c.toFixed(2)}
+    const user = `LIVE ${a.short} CANDLES (unix-seconds | O,H,L,C)
+SYMBOL: ${a.short} (${a.kind.toUpperCase()})
+CURRENT PRICE: ${fixp(last.c)}
 SESSION: ${session} | KILLZONE: ${killzone}
-HTF SWING HIGH (${htf.length}c): ${swingHigh.toFixed(2)} | SWING LOW: ${swingLow.toFixed(2)} | EQUILIBRIUM: ${equilibrium.toFixed(2)} | PRICE IS IN: ${inPremium ? "PREMIUM" : "DISCOUNT"}
-PDH (last 24h): ${pdh.toFixed(2)} | PDL: ${pdl.toFixed(2)}
+HTF SWING HIGH (${htf.length}c): ${fixp(swingHigh)} | SWING LOW: ${fixp(swingLow)} | EQUILIBRIUM: ${fixp(equilibrium)} | PRICE IS IN: ${inPremium ? "PREMIUM" : "DISCOUNT"}
+PDH (last 24h): ${fixp(pdh)} | PDL: ${fixp(pdl)}
 
-UPCOMING USD/XAU NEWS (next 4h):
+UPCOMING USD MACRO NEWS (next 4h):
 ${newsBlock}
 ${imminentHigh ? `\n⚠ HIGH IMPACT EVENT WITHIN 60 MIN: ${imminentHigh.title} in ${imminentHigh.minutesUntil}m — recommend WAIT.` : ""}
 
@@ -556,19 +569,20 @@ ${fmt(htf)}
 === LTF (${data.ltfTf.toUpperCase()}, last ${ltf.length} candles) ===
 ${fmt(ltf)}
 
-Produce the A+ ICT/SMC trade plan now.`;
+Produce the A+ ICT/SMC trade plan for ${a.short} now.`;
 
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "openai/gpt-5.5",
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
         ],
         response_format: { type: "json_object" },
+        service_tier: "priority",
       }),
     });
 
