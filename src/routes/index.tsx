@@ -182,9 +182,9 @@ function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 relative overflow-hidden flex flex-col">
+    <div className="h-screen w-screen bg-white text-neutral-900 relative overflow-hidden flex flex-col">
       {/* Header */}
-      <header className="relative z-10 px-6 py-4 flex items-center justify-between">
+      <header className="relative z-10 px-6 py-4 flex items-center justify-between shrink-0">
         <div className="flex items-center">
           <StatusPill status={status} supported={speech.supported} />
         </div>
@@ -197,19 +197,20 @@ function Home() {
       </header>
 
       {/* Main: orb centerpiece */}
-      <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-center px-6 gap-10 pb-28 pt-16">
-        <div className="flex flex-col items-center gap-6 flex-1">
-          <CloudOrb status={status} pulse={speech.wordPulse} />
+      <main className="relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row items-center justify-center px-6 gap-6 lg:gap-10 pb-28 overflow-hidden">
+        <div className="flex flex-col items-center justify-center gap-4 flex-1 min-h-0">
+          <div className="flex-1 min-h-0 flex items-center justify-center w-full">
+            <CloudOrb status={status} pulse={speech.wordPulse} />
+          </div>
           {!speech.supported && (
-            <div className="text-center text-sm text-red-500">
+            <div className="text-center text-sm text-red-500 px-4">
               Voice not supported in this browser. Please open in Chrome (desktop) or use the text box below.
             </div>
           )}
-
         </div>
 
         {signal && signal.direction !== "WAIT" && signal.confidence > 0 && (
-          <aside className="w-full lg:w-[380px] lg:max-w-[380px] shrink-0 space-y-4">
+          <aside className="w-full lg:w-[380px] lg:max-w-[380px] shrink-0 space-y-4 overflow-y-auto max-h-full">
             <SignalCard signal={signal} />
           </aside>
         )}
@@ -297,7 +298,7 @@ function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "think
 
   return (
     <div
-      className="relative h-[22rem] w-[22rem] sm:h-[26rem] sm:w-[26rem] flex items-center justify-center"
+      className="relative h-[18rem] w-[18rem] sm:h-[22rem] sm:w-[22rem] lg:h-[26rem] lg:w-[26rem] max-h-full max-w-full flex items-center justify-center"
       style={{
         transform: `scale(${scale})`,
         transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
