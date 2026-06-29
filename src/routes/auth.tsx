@@ -63,7 +63,7 @@ function AuthPage() {
   };
 
   return (
-    <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
+    <div className={`h-dvh w-full overflow-hidden bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
@@ -98,7 +98,7 @@ function AuthPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col items-center justify-center p-5 sm:p-10">
+      <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 sm:p-6 overflow-hidden">
         <div className="w-full max-w-6xl">
           <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
             {/* terminal header */}
@@ -120,19 +120,19 @@ function AuthPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
               {/* LEFT — FORM */}
-              <div className="lg:col-span-7 bg-white p-6 sm:p-10 lg:p-14">
+              <div className="lg:col-span-7 bg-white p-5 sm:p-8 lg:p-10">
                 <div className="max-w-md mx-auto lg:mx-0">
                   
-                  <h1 className="mt-7 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+                  <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
                     Sign in to<br />the desk.
                   </h1>
-                  <p className="mt-5 text-base text-zinc-600 leading-relaxed">
-                    Voice-native institutional intelligence, on call. Log in to access live ICT & SMC market narrations.
+                  <p className="mt-3 text-sm text-zinc-600 leading-relaxed">
+                    Voice-native institutional intelligence, on call.
                   </p>
 
-                  <form onSubmit={signIn} className="mt-10 space-y-6">
+                  <form onSubmit={signIn} className="mt-6 space-y-4">
                     <div>
-                      <label className={`block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2.5 ${MONO}`}>
+                      <label className={`block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5 ${MONO}`}>
                         User Identification
                       </label>
                       <div className="relative">
@@ -142,14 +142,14 @@ function AuthPage() {
                           required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                           placeholder="Institutional email..."
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className={`block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2.5 ${MONO}`}>
+                      <label className={`block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5 ${MONO}`}>
                         Access Key
                       </label>
                       <div className="relative">
@@ -159,7 +159,7 @@ function AuthPage() {
                           required
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                           placeholder="Enter password..."
                         />
                       </div>
@@ -168,27 +168,23 @@ function AuthPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="group w-full rounded-lg bg-zinc-900 px-5 py-4 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2"
+                      className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2"
                     >
                       {loading ? "Authenticating..." : (<>Authenticate <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                     </button>
                   </form>
 
-                  <div className="mt-12 pt-10 border-t border-zinc-100">
-                    <div className={`flex items-center gap-3 ${MONO} text-[10px] tracking-[0.22em] uppercase text-zinc-400`}>
-                      <span className="h-px w-6 bg-zinc-200" />
-                      RESTRICTED ENVIRONMENT
-                    </div>
-                    <p className="mt-4 text-xs text-zinc-500 leading-relaxed">
-                      This terminal is invite-only. If you do not have credentials, contact your account administrator or system head.
+                  <div className="mt-6 pt-4 border-t border-zinc-100">
+                    <p className="text-xs text-zinc-500 leading-relaxed">
+                      This terminal is invite-only. Contact your account administrator for credentials.
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* RIGHT — VISUAL */}
-              <div className="lg:col-span-5 bg-white flex flex-col p-6 sm:p-10 lg:p-14 border-t lg:border-t-0 lg:border-l border-zinc-100">
-                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[300px]">
+              <div className="hidden lg:flex lg:col-span-5 bg-white flex-col p-6 lg:p-10 border-t lg:border-t-0 lg:border-l border-zinc-100">
+                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[240px]">
                   <div
                     className="absolute inset-0 opacity-[0.04] pointer-events-none"
                     style={{
@@ -197,7 +193,7 @@ function AuthPage() {
                     }}
                   />
                   <div className="relative z-10 flex flex-col items-center">
-                    <div className="relative h-44 w-44 sm:h-56 sm:w-56">
+                    <div className="relative h-40 w-40 lg:h-48 lg:w-48">
                       <div className="absolute inset-0 rounded-full border border-zinc-100 animate-[spin_18s_linear_infinite]" />
                       <div className="absolute inset-5 rounded-full border border-zinc-200/60 animate-[spin_24s_linear_infinite_reverse]" />
                       <div className="absolute inset-9">
@@ -205,12 +201,12 @@ function AuthPage() {
                       </div>
                     </div>
                     
-                    <div className="mt-10 text-center space-y-4">
+                    <div className="mt-6 text-center space-y-2">
                       <div className={`flex items-center justify-center gap-2 ${MONO} text-[10px] tracking-[0.2em] text-zinc-400 uppercase`}>
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
                         LIVE_NARRATION
                       </div>
-                      <div className={`h-12 flex items-center justify-center ${MONO} text-[11px] text-zinc-900 text-center max-w-[200px] leading-relaxed`}>
+                      <div className={`h-10 flex items-center justify-center ${MONO} text-[11px] text-zinc-900 text-center max-w-[200px] leading-relaxed`}>
                         <RotatingStatus />
                       </div>
                     </div>
@@ -235,9 +231,9 @@ function AuthPage() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-5 py-8 flex flex-col sm:flex-row items-center justify-between gap-5">
-          <div className="flex items-center gap-2 text-xs text-zinc-400">
+      <footer className="border-t border-zinc-100 shrink-0">
+        <div className="mx-auto max-w-6xl px-5 py-3 flex items-center justify-between gap-5">
+          <div className="flex items-center gap-2 text-[11px] text-zinc-400">
             <span className="font-semibold text-zinc-900">JENVU AI</span>
             <span>·</span>
             <span>© {new Date().getFullYear()}</span>
