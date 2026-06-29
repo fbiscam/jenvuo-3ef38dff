@@ -483,7 +483,7 @@ function HomePage() {
       {/* TESTIMONIALS */}
       <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <SectionLabel>Field Notes</SectionLabel>
+          <SectionLabel>{"\n"}</SectionLabel>
           <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight max-w-2xl">
             Trusted by traders who run real size.
           </h2>
