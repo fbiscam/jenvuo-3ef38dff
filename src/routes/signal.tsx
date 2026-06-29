@@ -193,7 +193,15 @@ function SignalPage() {
         <div className="text-center">
           <div className="text-[10px] uppercase tracking-[0.3em] text-amber-700/80 font-bold">Jenvu AI · Institutional Desk</div>
           <div className="text-base font-black tracking-tight flex items-center justify-center gap-2">
-            XAU/USD {plan && <span className="text-amber-600 tabular-nums">${plan.currentPrice.toFixed(2)}</span>}
+            XAU/USD
+            {(livePrice ?? plan?.currentPrice) != null && (
+              <span className="text-amber-600 tabular-nums">${(livePrice ?? plan!.currentPrice).toFixed(2)}</span>
+            )}
+            {priceDelta !== 0 && (
+              <span className={cn("text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded", priceDelta > 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700")}>
+                {priceDelta > 0 ? "▲" : "▼"} {Math.abs(priceDelta).toFixed(2)}
+              </span>
+            )}
             {plan && (
               <span className="ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-900 text-white tracking-wider">
                 {plan.killzone}
@@ -201,6 +209,7 @@ function SignalPage() {
             )}
           </div>
         </div>
+
         <div className="flex gap-2">
           {playing ? (
             <button onClick={stop} className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition bg-red-50 text-red-700 hover:bg-red-100 border border-red-200">
@@ -215,22 +224,44 @@ function SignalPage() {
       </header>
 
       {/* Body */}
-      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-[1fr_360px] overflow-hidden">
+      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-[1fr_380px] overflow-hidden">
         {/* Charts */}
         <div className="flex flex-col overflow-hidden p-3 gap-3">
-          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden">
-            {plan && <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF · 1 Hour · Bias" />}
-            {!plan && <ChartSkeleton dark={dark} />}
+          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col">
+            <TfTabs label="HTF · Bias" value={htfTf} options={["1h", "4h", "1d"]} onChange={(v) => { setHtfTf(v as any); }} onApply={load} disabled={loading} />
+            <div className="flex-1 min-h-0 relative">
+              {plan && <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title={`HTF · ${plan.htfTf?.toUpperCase() ?? htfTf.toUpperCase()} · Bias`} />}
+              {!plan && <ChartSkeleton dark={dark} />}
+            </div>
           </div>
-          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden">
-            {plan && <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF · 15 Minute · Execution" />}
-            {!plan && <ChartSkeleton dark={dark} />}
+          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col">
+            <TfTabs label="LTF · Execution" value={ltfTf} options={["5m", "15m", "30m"]} onChange={(v) => { setLtfTf(v as any); }} onApply={load} disabled={loading} />
+            <div className="flex-1 min-h-0 relative">
+              {plan && <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title={`LTF · ${plan.ltfTf?.toUpperCase() ?? ltfTf.toUpperCase()} · Execution`} />}
+              {!plan && <ChartSkeleton dark={dark} />}
+            </div>
           </div>
         </div>
 
         {/* Sidebar */}
         <aside className="border-l border-neutral-200 overflow-y-auto p-4 space-y-4 bg-white/60 backdrop-blur-md">
-          {!plan && <div className="text-sm opacity-60 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading live gold data…</div>}
+          {loading && (
+            <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
+              <div className="text-[10px] uppercase tracking-widest font-bold text-amber-700 mb-2 flex items-center gap-1.5"><Brain className="h-3.5 w-3.5" /> Live Analysis Pipeline</div>
+              <ul className="space-y-1.5">
+                {PIPELINE_STEPS.map((s, i) => (
+                  <li key={i} className="flex items-center gap-2 text-xs">
+                    {i < pipeline ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" /> :
+                      i === pipeline ? <Loader2 className="h-3.5 w-3.5 text-amber-600 animate-spin shrink-0" /> :
+                      <Clock className="h-3.5 w-3.5 text-neutral-300 shrink-0" />}
+                    <span className={cn("leading-snug", i < pipeline ? "text-neutral-500 line-through" : i === pipeline ? "text-neutral-900 font-semibold" : "text-neutral-400")}>{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {!plan && !loading && <div className="text-sm opacity-60 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading live gold data…</div>}
+
 
           {plan && (
             <>
