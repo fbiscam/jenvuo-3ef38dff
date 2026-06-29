@@ -1,93 +1,62 @@
-# Live Signal Page with Chart Markings & Voice Narration
+# JENVU AI — Marketing Homepage
 
-Jab user voice/text mein "signal", "setup", "trade idea", "analyze gold" jaisa kuch bole — app naye `/signal` route pe navigate karega, real XAU/USD candles load karega, AI us pe ICT + SMC markings draw karega, aur Jenvu voice step-by-step samjhayegi ke "yeh dekho, yahan FVG hai, yahan se entry, yahan SL…".
+A standalone landing page that introduces JENVU AI, showcases its capabilities (voice agent + institutional signal engine), and routes visitors into the live experience.
 
-## User Flow
+## Route & Structure
 
-```text
-Home (orb)
-   │  user: "Jenvu, give me a gold signal"
-   ▼
-intent detector picks up "signal/setup/trade"
-   │  navigate("/signal")
-   ▼
-/signal page
-   ├─ Top: HTF chart (1H) with bias markings
-   ├─ Main: LTF chart (15m) with entry/SL/TP + zones
-   ├─ Right: live narration log + signal card
-   └─ Voice: speaks each step as it gets drawn
-        "Loading gold price… HTF bias bullish… FVG mil gaya 2645–2648…
-         Order block yahan… Entry 2646, SL 2642, TP 2655, RR 1:2.25"
-   ▼
-Back button → home orb
-```
+- New route: `src/routes/home.tsx` (URL `/home`) — keeps `/` as the live voice agent so existing flow is untouched.
+- Add `head()` meta: title, description, og:title, og:description.
+- A small "Enter JENVU" CTA on the homepage routes to `/` (voice agent) and "See a Live Signal" routes to `/signal`.
 
-## What Gets Built
+(If you'd rather have `/` become the marketing page and move the voice agent to `/app`, say so and I'll swap.)
 
-### 1. New route `src/routes/signal.tsx`
-- Two stacked charts (HTF 1H + LTF 15m) using `lightweight-charts` (TradingView OSS).
-- Right sidebar: live narration feed (each AI step as a chip), final `SignalCard`, "Back to Jenvu" button.
-- Auto-runs analysis on mount; re-run button for refresh.
-- Reuses dark/light theme from home.
+## Visual Direction — "Elite Class"
 
-### 2. Chart component `src/components/SignalChart.tsx`
-- Wraps lightweight-charts candlestick series.
-- Exposes imperative API to draw:
-  - **FVG** → colored rectangle (price range across N candles)
-  - **Order Block** → filled box on the OB candle
-  - **Liquidity** → horizontal dashed line + "BSL/SSL" label
-  - **BOS/CHOCH** → trendline + text marker
-  - **Supply/Demand zones** → semi-transparent boxes
-  - **Entry / SL / TP** → 3 priceLines with R:R box overlay
-- Each draw call animates in (fade) so user dekhta hai "kya draw ho raha hai".
+Pure white canvas with deep-black inner panels and restrained accent color, mirroring the `/signal` aesthetic.
 
-### 3. Live data `src/lib/market-data.functions.ts`
-- Server function fetches XAU/USD candles from Twelve Data free API.
-- Returns 1H (last 200 candles) + 15m (last 300 candles).
-- Cached 60s to respect rate limit.
-- **Requires:** Twelve Data API key (free tier, user signup).
+- **Background**: pure white (`#FFFFFF`) with faint grid/noise texture.
+- **Inner cards / hero panel**: pure black (`#0A0A0A`) with subtle inner glow + thin hairline border.
+- **Accent**: single amber/gold spark (`#E8B84A`) — same family as the signal page — used sparingly on numbers, underlines, and the orb halo.
+- **Typography**: Urbanist (already global) — display weights for headlines, tight tracking, oversized numerals.
+- **Motion**: framer-motion subtle reveals; the existing `CloudOrb` reused as the hero centerpiece, scaled large with a soft floating animation.
 
-### 4. AI analysis upgrade `src/lib/gold-analysis.functions.ts`
-- Extends current Gemini call to return a **structured** plan:
-  ```json
-  {
-    "htfBias": "bullish",
-    "narration": ["Step 1…", "Step 2…", …],
-    "markings": [
-      {"type":"fvg","tf":"15m","from":2645,"to":2648,"startIdx":120,"endIdx":135,"label":"Bullish FVG"},
-      {"type":"orderBlock","tf":"1h","candleIdx":85,"label":"Demand OB"},
-      {"type":"liquidity","tf":"15m","price":2652,"side":"buy","label":"BSL sweep target"},
-      {"type":"bos","tf":"1h","fromIdx":60,"toIdx":90,"price":2640,"label":"Bullish BOS"}
-    ],
-    "trade": {"direction":"BUY","entry":2646,"sl":2642,"tp":2655,"rr":2.25,"confidence":87}
-  }
-  ```
-- Sends both HTF + LTF candle arrays to Gemini 2.5 Flash with strict ICT/SMC prompt.
+## Sections (top → bottom)
 
-### 5. Voice narration sequencer (in `signal.tsx`)
-- Iterates over `narration[]` array.
-- For each step: speak the line, simultaneously trigger the matching `markings[]` draw on chart.
-- ~1.5s pause between steps so user can see + hear.
-- Final step: read out the trade levels.
+1. **Hero**
+   - Left: oversized headline "Trade like the 1%. Powered by JENVU AI." + sub-line + two CTAs ("Launch Voice Agent", "See Live Signal").
+   - Right: black inner panel containing the `CloudOrb` with iridescent shimmer.
+   - Top nav: JENVU AI wordmark, links (Features, How it Works, Signals, Sign in).
 
-### 6. Intent routing (home page)
-- In `src/routes/index.tsx`, after AI reply, if `signal.direction !== "WAIT"` OR user text matches `/signal|setup|trade idea|analyze/i`, navigate to `/signal` instead of just speaking.
+2. **Trust strip** — thin black bar with rotating tags: "ICT • SMC • Killzones • Liquidity • Order Blocks • Premium/Discount".
 
-## Files Touched
+3. **Feature grid (4 cards)** — black cards on white:
+   - Live Voice Agent (Jarvis-style)
+   - Institutional Signal Engine (ICT/SMC)
+   - Multi-Asset Coverage (Gold, Crypto, FX, Indices, Stocks)
+   - News & Killzone Awareness
 
-```text
-NEW  src/routes/signal.tsx
-NEW  src/components/SignalChart.tsx
-NEW  src/lib/market-data.functions.ts
-EDIT src/lib/gold-analysis.functions.ts  (structured markings output)
-EDIT src/routes/index.tsx                (intent → navigate)
-DEPS bun add lightweight-charts
-SECRET TWELVE_DATA_API_KEY
-```
+4. **How it Works** — 3-step horizontal flow: Speak → Analyze → Execute. Numbered (01/02/03) in oversized amber.
 
-## What I Need From You Before Building
+5. **Live Signal Preview** — a screenshot-style mock of the signal dashboard inside a black frame (uses real components scaled down) with a "Open Live Signal" button.
 
-1. **Twelve Data API key** — free signup at twelvedata.com (800 req/day free). I'll request it via secret prompt when you approve.
-2. **Confirm OK** to add `lightweight-charts` library (~40kb, MIT).
+6. **Expertise band** — "25+ years of institutional trading logic, in every setup" with bullet list of concepts (FVG, OTE, BOS/CHoCH, Liquidity Sweeps, DXY context, Session bias).
 
-Once you approve, I'll build it end-to-end and you can say "Jenvu, gold signal" to see it live.
+7. **Asset coverage** — pill grid of supported tickers (XAU/USD, BTC, ETH, EUR/USD, NAS100, etc).
+
+8. **Final CTA** — full-width black band: "Ready when you are." + Launch button.
+
+9. **Footer** — minimal: wordmark, year, small links.
+
+## Technical Notes
+
+- New file only: `src/routes/home.tsx`. No changes to existing routes or analysis logic.
+- Reuse `CloudOrb` from current dashboard for hero centerpiece.
+- All colors via existing semantic tokens in `src/styles.css`; add a `--accent-gold` token if not already present.
+- framer-motion already in project — use for entrance fades and orb float.
+- Fully responsive (mobile stacks hero, single-column feature grid).
+- SEO: route-specific head() meta.
+
+## Out of Scope
+
+- No backend, no auth changes, no analysis engine changes.
+- No pricing/testimonials section unless you ask (kept lean and elite).
