@@ -161,7 +161,7 @@ function Home() {
       // User pressed stop → wait for final results to flush, then send
       speech.stopListening();
       const tryFlush = (attempt = 0) => {
-        const captured = (bufferRef.current + " " + (speech.interim || "") + " " + (speech.transcript || "")).trim();
+        const captured = (bufferRef.current + " " + (interimRef.current || "") + " " + (transcriptRef.current || "")).trim();
         if (!captured && attempt < 6) {
           window.setTimeout(() => tryFlush(attempt + 1), 200);
           return;
