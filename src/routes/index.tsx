@@ -318,8 +318,6 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
     >
       {/* halo and ring waves removed */}
 
-        </>
-      )}
 
       {/* Ocean-layered sky-blue sphere */}
       <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
