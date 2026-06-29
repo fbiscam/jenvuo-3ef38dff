@@ -216,6 +216,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       markersPluginRef.current?.setMarkers([]);
       boxesRef.current.forEach((b) => b.el.remove());
       boxesRef.current = [];
+      if (lastPriceLineRef.current) {
+        try { s.removePriceLine(lastPriceLineRef.current); } catch {}
+        lastPriceLineRef.current = null;
+      }
     },
     drawMarking: (m: Marking) => {
       const s = seriesRef.current;
