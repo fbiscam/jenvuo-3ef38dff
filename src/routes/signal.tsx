@@ -20,19 +20,19 @@ export const Route = createFileRoute("/signal")({
   }),
   head: () => ({
     meta: [
-      { title: "Live Signal Desk — JENVU AI" },
+      { title: "Live Signal Desk — Jenvu - AI" },
       {
         name: "description",
         content:
           "Real-time ICT & SMC signal desk for Gold, Crypto, FX and Indices. Multi-timeframe bias, A+ setup scoring, annotated charts, voice narration and live trade tracking — all in one institutional terminal.",
       },
       { name: "keywords", content: "ICT signals, SMC trading, gold signals, XAUUSD analysis, A+ setup, smart money concepts, voice trading agent, live signal desk" },
-      { property: "og:title", content: "Live Signal Desk — JENVU AI" },
+      { property: "og:title", content: "Live Signal Desk — Jenvu - AI" },
       { property: "og:description", content: "Multi-timeframe ICT/SMC analysis with A+ setup scoring, annotated charts and live trade tracking." },
       { property: "og:url", content: "https://jenvu.com/signal" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Live Signal Desk — JENVU AI" },
+      { name: "twitter:title", content: "Live Signal Desk — Jenvu - AI" },
       { name: "twitter:description", content: "Real-time institutional signal desk with voice narration and A+ setup scoring." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/signal" }],
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/signal")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          name: "JENVU AI Signal Desk",
+          name: "Jenvu - AI Signal Desk",
           url: "https://jenvu.com/signal",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
@@ -344,10 +344,10 @@ function SignalPage() {
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </button>
           <div className="flex justify-center items-center gap-2.5 min-w-0 pl-24 sm:pl-40">
-            <Link to="/" aria-label="JENVU AI home" className="shrink-0 inline-flex items-center justify-center rounded-md hover:opacity-80 transition">
-              <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded-md object-contain" />
+            <Link to="/" aria-label="Jenvu - AI home" className="shrink-0 inline-flex items-center justify-center rounded-md hover:opacity-80 transition">
+              <img src="/favicon.png" alt="Jenvu - AI" className="h-5 w-5 rounded-md object-contain" />
             </Link>
-            <span className="font-semibold tracking-tight text-sm select-none">JENVU AI</span>
+            <span className="font-semibold tracking-tight text-sm select-none">Jenvu - AI</span>
           </div>
           <div className="flex items-center gap-2 justify-end">
             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase`}>
@@ -383,7 +383,7 @@ function SignalPage() {
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
               </div>
               <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
-                JENVU AI // SIGNAL_DESK · {sym}
+                Jenvu - AI // SIGNAL_DESK · {sym}
               </span>
             </div>
             <div className="flex shrink-0 items-center gap-2 sm:gap-4">

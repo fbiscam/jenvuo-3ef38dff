@@ -5,13 +5,13 @@ import { CloudOrb } from "@/components/CloudOrb";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Voice-Native Trading Intelligence — JENVU AI" },
+      { title: "Voice-Native Trading Intelligence — Jenvu - AI" },
       {
         name: "description",
         content:
           "Voice-native AI trading terminal for Gold, Crypto, FX & Indices. Live ICT/SMC analysis, A+ setups and spoken execution built on 25+ years of institutional logic.",
       },
-      { property: "og:title", content: "Voice-Native Trading Intelligence — JENVU AI" },
+      { property: "og:title", content: "Voice-Native Trading Intelligence — Jenvu - AI" },
       {
         property: "og:description",
         content: "Speak. Analyze. Execute. The voice terminal that turns market noise into institutional-grade signals.",
@@ -196,8 +196,8 @@ function HomePage() {
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
-            <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
-            <span className="truncate font-semibold tracking-tight">JENVU AI</span>
+            <img src="/favicon.png" alt="Jenvu - AI" className="h-6 w-6 rounded-md object-contain" />
+            <span className="truncate font-semibold tracking-tight">Jenvu - AI</span>
           </Link>
 
           <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
@@ -296,7 +296,7 @@ function HomePage() {
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
               </div>
               <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
-                JENVU AI // SYSTEM_ACTIVE
+                Jenvu - AI // SYSTEM_ACTIVE
               </span>
             </div>
             <div className="flex shrink-0 items-center gap-2 sm:gap-4">
@@ -519,7 +519,7 @@ function HomePage() {
                 One terminal. Every major market.
               </h2>
               <p className="mt-4 text-zinc-900 leading-relaxed">
-                JENVU AI routes liquidity, structure and news context across asset classes
+                Jenvu - AI routes liquidity, structure and news context across asset classes
               </p>
             </div>
             <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
@@ -689,7 +689,7 @@ function HomePage() {
               <span>Capability</span>
               <span className="text-center">Generic AI</span>
               <span className="text-center">Signal Group</span>
-              <span className="text-center text-zinc-900 font-bold">JENVU AI</span>
+              <span className="text-center text-zinc-900 font-bold">Jenvu - AI</span>
             </div>
             {[
               ["Voice-native interface", false, false, true],
@@ -845,8 +845,8 @@ function HomePage() {
       <footer className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10 flex flex-col md:flex-row items-center justify-between gap-5 text-sm text-zinc-900">
           <div className="flex items-center gap-2.5">
-            <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded object-contain" />
-            <span className="text-zinc-900 font-semibold">JENVU AI</span>
+            <img src="/favicon.png" alt="Jenvu - AI" className="h-5 w-5 rounded object-contain" />
+            <span className="text-zinc-900 font-semibold">Jenvu - AI</span>
             <span className="text-zinc-300">·</span>
             <span>© {new Date().getFullYear()}</span>
           </div>
