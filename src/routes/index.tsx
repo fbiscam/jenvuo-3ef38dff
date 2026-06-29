@@ -660,7 +660,7 @@ function HomePage() {
           <div className="rounded-2xl border border-zinc-200 bg-white p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
             <div className="max-w-xl">
               <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
-                Boot the terminal. Speak to the market.
+                Boot the terminal. Speak to the market now.
               </h2>
               <p className="mt-3 text-zinc-900">
                 Your voice agent is one tap away listening<br />reasoning, thinking, research & narrating.
