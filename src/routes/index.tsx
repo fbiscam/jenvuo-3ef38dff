@@ -435,8 +435,8 @@ function HomePage() {
 
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
             {[
-              { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English — pair, bias, news, anything." },
-              { k: "02", t: "Reason", d: "JENVU pulls live structure, ICT/SMC context, DXY and Forex Factory feeds." },
+              { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English — pair, bias, news & signs or anything." },
+              { k: "02", t: "Reason", d: "JENVU pulls live structure, ICT/SMC context, DXY and Forex Factory feeds" },
               { k: "03", t: "Mark Up", d: "Charts auto-annotate FVG, OB, BOS, CHoCH and liquidity sweeps." },
               { k: "04", t: "Narrate", d: "You hear a structured A+ plan: entry, SL, TP, R:R and confluence score." },
             ].map((s) => (
