@@ -175,9 +175,10 @@ Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
   "fullAnalysis": "4-6 sentence detailed pro trader commentary"
 }`;
 
-    const userPrompt = `TIMEFRAME: ${data.timeframe.toUpperCase()}
+    const userPrompt = hasData
+      ? `TIMEFRAME: ${data.timeframe.toUpperCase()}
 SYMBOL: XAU/USD (Gold)
-CURRENT PRICE: ${last.c.toFixed(2)}
+CURRENT PRICE: ${last!.c.toFixed(2)}
 RECENT SWING HIGH (50 candles): ${swingHigh.toFixed(2)}
 RECENT SWING LOW (50 candles): ${swingLow.toFixed(2)}
 USER QUERY: ${data.query}
@@ -185,7 +186,13 @@ USER QUERY: ${data.query}
 LAST 50 CANDLES (OHLC):
 ${compact}
 
-Give me the A+ ICT/SMC setup right now. Be decisive and confident.`;
+Give me the A+ ICT/SMC setup right now. Be decisive and confident.`
+      : `TIMEFRAME: ${data.timeframe.toUpperCase()}
+SYMBOL: XAU/USD (Gold)
+NOTE: Live price feed temporarily unavailable. Use your trader knowledge of current gold market context, recent macro drivers, killzone timing, and general ICT/SMC playbook to answer.
+USER QUERY: ${data.query}
+
+Respond conversationally in spokenSummary. Set direction to "WAIT" and confidence <=40 if no real setup possible; include a note in fullAnalysis that live data is offline.`;
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
