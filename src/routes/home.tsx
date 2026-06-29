@@ -175,9 +175,14 @@ function HomePage() {
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
                   />
                 </div>
-                <div className="mt-5 text-[11px] uppercase tracking-[0.25em] font-bold text-black/45">
+                <div
+                  className="mt-5 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] font-bold"
+                  style={{ color: f.color }}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: f.color }} />
                   {f.tag}
                 </div>
+
                 <h3 className="mt-2 text-xl font-black tracking-tight">
                   {f.title}
                 </h3>
