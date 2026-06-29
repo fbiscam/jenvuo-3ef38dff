@@ -251,9 +251,9 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
           className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
           style={{
             background:
-              "radial-gradient(circle at 50% 30%, #fffbeb 0%, #fcd34d 35%, #d97706 75%, #78350f 100%)",
+              "radial-gradient(circle at 50% 30%, #fdf4ff 0%, #f0abfc 30%, #c026d3 65%, #6b21a8 90%, #2e1065 100%)",
             boxShadow:
-              "inset -10px -20px 50px rgba(120,53,15,0.6), inset 12px 14px 40px rgba(255,255,255,0.5), 0 10px 40px -10px rgba(217,119,6,0.55)",
+              "inset -10px -20px 50px rgba(46,16,101,0.65), inset 12px 14px 40px rgba(255,255,255,0.5), 0 10px 50px -8px rgba(168,85,247,0.6)",
           }}
         >
           {/* drifting cloud layer 1 */}
@@ -262,7 +262,7 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
             style={{
               animationDuration: status === "speaking" ? "8s" : status === "thinking" ? "5s" : "20s",
               background:
-                "radial-gradient(45% 30% at 30% 35%, rgba(255,251,235,0.9), transparent 60%), radial-gradient(40% 28% at 70% 55%, rgba(253,230,138,0.8), transparent 65%), radial-gradient(35% 25% at 50% 80%, rgba(252,211,77,0.85), transparent 60%)",
+                "radial-gradient(45% 30% at 30% 35%, rgba(253,244,255,0.9), transparent 60%), radial-gradient(40% 28% at 70% 55%, rgba(240,171,252,0.8), transparent 65%), radial-gradient(35% 25% at 50% 80%, rgba(217,70,239,0.75), transparent 60%)",
               filter: "blur(8px)",
               mixBlendMode: "screen",
             }}
@@ -275,7 +275,7 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
               animationDuration: status === "speaking" ? "11s" : "26s",
               animationDirection: "reverse",
               background:
-                "radial-gradient(40% 28% at 60% 30%, rgba(255,251,235,0.85), transparent 60%), radial-gradient(35% 22% at 25% 65%, rgba(253,230,138,0.8), transparent 65%), radial-gradient(45% 30% at 75% 75%, rgba(251,191,36,0.7), transparent 60%)",
+                "radial-gradient(40% 28% at 60% 30%, rgba(253,244,255,0.85), transparent 60%), radial-gradient(35% 22% at 25% 65%, rgba(232,121,249,0.75), transparent 65%), radial-gradient(45% 30% at 75% 75%, rgba(168,85,247,0.7), transparent 60%)",
               filter: "blur(10px)",
               mixBlendMode: "screen",
             }}
@@ -286,7 +286,7 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(circle at 50% 110%, rgba(120,53,15,0.75), transparent 55%)",
+                "radial-gradient(circle at 50% 110%, rgba(46,16,101,0.8), transparent 55%)",
               mixBlendMode: "multiply",
             }}
           />
@@ -300,12 +300,13 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
               className="absolute inset-0 animate-pulse"
               style={{
                 background:
-                  "radial-gradient(circle at 50% 70%, rgba(146,64,14,0.65), transparent 55%)",
+                  "radial-gradient(circle at 50% 70%, rgba(88,28,135,0.7), transparent 55%)",
                 animationDuration: "0.9s",
                 mixBlendMode: "multiply",
               }}
             />
           )}
+
 
 
 
