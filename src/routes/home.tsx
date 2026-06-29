@@ -556,22 +556,26 @@ function FeatureCard({
   body: string;
 }) {
   return (
-    <div className="group relative rounded-2xl bg-[#0A0A0A] text-white p-7 overflow-hidden hover:-translate-y-1 transition">
+    <div className="group relative rounded-2xl bg-white border border-black/10 p-7 overflow-hidden hover:-translate-y-1 hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.2)] transition">
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition"
         style={{
-          background: `radial-gradient(400px circle at 50% 0%, ${ACCENT}22, transparent 60%)`,
+          background: `radial-gradient(400px circle at 50% 0%, ${ACCENT}26, transparent 60%)`,
         }}
       />
       <div className="relative">
         <div
           className="inline-flex h-11 w-11 items-center justify-center rounded-xl"
-          style={{ background: `${ACCENT}1a`, color: ACCENT }}
+          style={{ background: `${ACCENT}26`, color: "#7a5a10" }}
         >
           <Icon className="h-5 w-5" />
         </div>
-        <div className="mt-5 text-xl font-black tracking-tight">{title}</div>
-        <p className="mt-2 text-white/65 leading-relaxed text-sm">{body}</p>
+        <div className="mt-5 text-xl font-black tracking-tight text-black">{title}</div>
+        <p className="mt-2 text-black/65 leading-relaxed text-sm">{body}</p>
+        <div
+          className="absolute bottom-[-28px] left-[-28px] h-[3px] w-0 group-hover:w-full transition-all duration-500"
+          style={{ background: ACCENT }}
+        />
       </div>
     </div>
   );
