@@ -60,8 +60,8 @@ function AuthPage() {
           <div className="relative rounded-3xl bg-white/80 backdrop-blur-xl border border-black/10 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)] p-8 sm:p-10">
             {/* logo badge */}
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-fuchsia-500 via-violet-500 to-sky-500 shadow-lg shadow-violet-500/30 flex items-center justify-center">
-                <span className="text-white font-black text-lg">J</span>
+              <div className="w-11 h-11 flex items-center justify-center">
+                <img src="/favicon.png" alt="Jenvu AI" className="w-11 h-11 object-contain" />
               </div>
               <div className="leading-tight">
                 <h1
