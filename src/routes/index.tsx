@@ -181,13 +181,13 @@ function HomePage() {
     <div style={zoom ? { zoom } : undefined} className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-2.5">
             <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
             <span className="font-semibold tracking-tight">JENVU AI</span>
           </Link>
 
-          <nav className={`hidden md:flex items-center gap-7 text-sm text-zinc-900`}>
+          <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
             <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
             <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
             <Link to="/about" className="hover:text-zinc-900">About</Link>
