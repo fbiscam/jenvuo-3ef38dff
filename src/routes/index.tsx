@@ -63,6 +63,11 @@ function Home() {
   const alertedRef = useRef<Set<string>>(new Set());
   const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bufferRef = useRef("");
+  const interimRef = useRef("");
+  const transcriptRef = useRef("");
+  useEffect(() => { interimRef.current = speech.interim; }, [speech.interim]);
+  useEffect(() => { transcriptRef.current = speech.transcript; }, [speech.transcript]);
+
   const [dark, setDark] = useState<boolean>(true);
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -153,11 +158,14 @@ function Home() {
   const toggleMic = () => {
     if (!speech.supported) { toast.error("Voice not supported. Use Chrome."); return; }
     if (speech.listening) {
-      // User pressed stop → wait briefly for final results to flush, then send
-      const interimNow = speech.interim;
+      // User pressed stop → wait for final results to flush, then send
       speech.stopListening();
-      window.setTimeout(() => {
-        const captured = (bufferRef.current + " " + interimNow).trim();
+      const tryFlush = (attempt = 0) => {
+        const captured = (bufferRef.current + " " + (interimRef.current || "") + " " + (transcriptRef.current || "")).trim();
+        if (!captured && attempt < 6) {
+          window.setTimeout(() => tryFlush(attempt + 1), 200);
+          return;
+        }
         bufferRef.current = "";
         if (!captured) {
           toast.message("Kuch sunai nahi diya — phir se try karein.");
@@ -167,12 +175,14 @@ function Home() {
         const wakeMatch = lower.match(/\b(hey|hi|ok|okay)?\s*(jenvu|janvu|jarvis|jen view|jen vu)\b[\s,.!?]*(.*)/i);
         const cmd = (wakeMatch?.[3]?.trim() || captured).trim();
         if (cmd.length > 0) handleCommand(cmd);
-      }, 350);
+      };
+      window.setTimeout(() => tryFlush(0), 250);
       return;
     }
     bufferRef.current = "";
     speech.startListening();
   };
+
 
 
 
