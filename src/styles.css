@@ -132,6 +132,12 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+:root {
+  --gold: #d4af37;
+  --gold-bright: #f5cf5a;
+  --cyan: #00e5ff;
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -140,5 +146,6 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   }
 }
