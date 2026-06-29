@@ -13,10 +13,10 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignalRouteImport } from './routes/signal'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LlmRouteImport } from './routes/llm'
-import { Route as HomeRouteImport } from './routes/home'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as DevelopmentRouteImport } from './routes/development'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as AiEngineRouteImport } from './routes/ai-engine'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -42,11 +42,6 @@ const LlmRoute = LlmRouteImport.update({
   path: '/llm',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DisclaimerRoute = DisclaimerRouteImport.update({
   id: '/disclaimer',
   path: '/disclaimer',
@@ -60,6 +55,11 @@ const DevelopmentRoute = DevelopmentRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AiEngineRoute = AiEngineRouteImport.update({
@@ -87,10 +87,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-engine': typeof AiEngineRoute
+  '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
-  '/home': typeof HomeRoute
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
@@ -101,10 +101,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-engine': typeof AiEngineRoute
+  '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
-  '/home': typeof HomeRoute
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
@@ -116,10 +116,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-engine': typeof AiEngineRoute
+  '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
-  '/home': typeof HomeRoute
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
@@ -132,10 +132,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-engine'
+    | '/app'
     | '/auth'
     | '/development'
     | '/disclaimer'
-    | '/home'
     | '/llm'
     | '/privacy'
     | '/signal'
@@ -146,10 +146,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-engine'
+    | '/app'
     | '/auth'
     | '/development'
     | '/disclaimer'
-    | '/home'
     | '/llm'
     | '/privacy'
     | '/signal'
@@ -160,10 +160,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-engine'
+    | '/app'
     | '/auth'
     | '/development'
     | '/disclaimer'
-    | '/home'
     | '/llm'
     | '/privacy'
     | '/signal'
@@ -175,10 +175,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AiEngineRoute: typeof AiEngineRoute
+  AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
-  HomeRoute: typeof HomeRoute
   LlmRoute: typeof LlmRoute
   PrivacyRoute: typeof PrivacyRoute
   SignalRoute: typeof SignalRoute
@@ -216,13 +216,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LlmRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/disclaimer': {
       id: '/disclaimer'
       path: '/disclaimer'
@@ -242,6 +235,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ai-engine': {
@@ -279,10 +279,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AiEngineRoute: AiEngineRoute,
+  AppRoute: AppRoute,
   AuthRoute: AuthRoute,
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
-  HomeRoute: HomeRoute,
   LlmRoute: LlmRoute,
   PrivacyRoute: PrivacyRoute,
   SignalRoute: SignalRoute,

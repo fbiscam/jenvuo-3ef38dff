@@ -27,11 +27,11 @@ export function PageShell({
       />
 
       <header className="relative z-10 mx-auto max-w-7xl px-6 py-6 flex items-center justify-between">
-        <Link to="/home" className="font-black tracking-[0.25em] text-lg">
+        <Link to="/" className="font-black tracking-[0.25em] text-lg">
           JENVU AI
         </Link>
         <Link
-          to="/home"
+          to="/"
           className="inline-flex items-center gap-2 text-sm font-semibold text-black/70 hover:text-black"
         >
           <ArrowLeft className="h-4 w-4" /> Back to home

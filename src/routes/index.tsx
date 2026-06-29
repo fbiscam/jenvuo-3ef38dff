@@ -1,615 +1,665 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { Mic, X, Plus, Sliders, Moon, Sun, LogOut, ArrowUp } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
-import { SignalCard } from "@/components/SignalCard";
-import { NewsPanel } from "@/components/NewsPanel";
-import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech";
-import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
-import { getGoldNews } from "@/lib/news.functions";
-import { cn } from "@/lib/utils";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight, Mic, Sparkles, Activity, Waves, Brain, Target, Newspaper, Globe2 } from "lucide-react";
+import featVoice from "@/assets/feat-voice.jpg";
+import featSignal from "@/assets/feat-signal.jpg";
+import featAssets from "@/assets/feat-assets.jpg";
 
+/**
+ * JENVU AI — homepage
+ * Palette: Paper & Ink  (#f5f3ee paper · #e8e4dd warm · #2d2d2d ink · #0d0d0d void)
+ * Type:    Sora (display)  +  Manrope (body)
+ * Layout:  Hero grid — editorial AI-lab aesthetic
+ */
+
+const PAPER = "#f5f3ee";
+const WARM = "#e8e4dd";
+const INK = "#2d2d2d";
+const VOID = "#0d0d0d";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GoldGPT — Live AI Voice Agent for Gold Trading" },
+      { title: "JENVU AI — Institutional Voice Intelligence for Markets" },
       {
         name: "description",
         content:
-          "Real-time AI voice assistant for XAU/USD. Speak naturally — get instant ICT/SMC analysis and A+ trade setups.",
+          "A Jarvis-style voice agent powered by 25+ years of ICT & SMC institutional logic. Live signals for Gold, Crypto, Forex, Indices and Stocks.",
       },
     ],
   }),
-  component: Home,
+  component: HomePage,
 });
 
-const TF_REGEX =
-  /\b(1\s*m(?:in)?|5\s*m(?:in)?|15\s*m(?:in)?|30\s*m(?:in)?|1\s*h(?:our)?|4\s*h(?:our)?|1\s*d(?:ay)?|one\s+minute|five\s+minute|fifteen\s+minute|thirty\s+minute|one\s+hour|four\s+hour|daily)\b/i;
-
-function parseTimeframe(text: string, fallback: string): string {
-  const m = text.match(TF_REGEX);
-  if (!m) return fallback;
-  const t = m[1].toLowerCase().replace(/\s+/g, "");
-  if (t.startsWith("one") && t.includes("minute")) return "1m";
-  if (t.startsWith("five")) return "5m";
-  if (t.startsWith("fifteen")) return "15m";
-  if (t.startsWith("thirty")) return "30m";
-  if (t.startsWith("onehour")) return "1h";
-  if (t.startsWith("fourhour")) return "4h";
-  if (t === "daily") return "1d";
-  if (t.startsWith("1m") || t === "1min") return "1m";
-  if (t.startsWith("5m")) return "5m";
-  if (t.startsWith("15m")) return "15m";
-  if (t.startsWith("30m")) return "30m";
-  if (t.startsWith("1h")) return "1h";
-  if (t.startsWith("4h")) return "4h";
-  if (t.startsWith("1d")) return "1d";
-  return fallback;
-}
-
-const SYMBOL_KEYWORDS: Array<{ rx: RegExp; sym: string }> = [
-  { rx: /\b(gold|xau(?:\/?usd)?)\b/i, sym: "XAUUSD" },
-  { rx: /\b(silver|xag(?:\/?usd)?)\b/i, sym: "XAGUSD" },
-  { rx: /\b(bitcoin|btc)\b/i, sym: "BTC" },
-  { rx: /\b(ethereum|eth)\b/i, sym: "ETH" },
-  { rx: /\b(solana|sol)\b/i, sym: "SOL" },
-  { rx: /\b(ripple|xrp)\b/i, sym: "XRP" },
-  { rx: /\b(cardano|ada)\b/i, sym: "ADA" },
-  { rx: /\b(dogecoin|doge)\b/i, sym: "DOGE" },
-  { rx: /\b(bnb|binance\s*coin)\b/i, sym: "BNB" },
-  { rx: /\b(avalanche|avax)\b/i, sym: "AVAX" },
-  { rx: /\b(polkadot|dot)\b/i, sym: "DOT" },
-  { rx: /\b(chainlink|link)\b/i, sym: "LINK" },
-  { rx: /\b(litecoin|ltc)\b/i, sym: "LTC" },
-  { rx: /\b(toncoin|\bton\b)\b/i, sym: "TON" },
-  { rx: /\b(shiba|shib)\b/i, sym: "SHIB" },
-  { rx: /\bpepe\b/i, sym: "PEPE" },
-  { rx: /\b(nasdaq|nas100|ndx|us100)\b/i, sym: "NAS100" },
-  { rx: /\b(s\s*&\s*p\s*500|sp500|spx|us500)\b/i, sym: "SPX" },
-  { rx: /\b(dow\s*jones|us30|dji)\b/i, sym: "US30" },
-  { rx: /\bdxy\b/i, sym: "DXY" },
-  { rx: /\bdax\b/i, sym: "DAX" },
-];
-
-function detectSymbol(query: string): string {
-  // Explicit FX pair like "EUR/USD" or "EURUSD"
-  const fx = query.toUpperCase().match(/\b(EUR|GBP|JPY|AUD|NZD|CAD|CHF|USD)\s*\/?\s*(EUR|GBP|JPY|AUD|NZD|CAD|CHF|USD)\b/);
-  if (fx && fx[1] !== fx[2]) return `${fx[1]}${fx[2]}`;
-  for (const { rx, sym } of SYMBOL_KEYWORDS) if (rx.test(query)) return sym;
-  // Bare crypto/stock ticker (3-5 caps)
-  const t = query.toUpperCase().match(/\b([A-Z]{2,5})(?:\s*\/\s*USDT?)?\b/);
-  if (t && !/^(BUY|SELL|LONG|SHORT|TP|SL|WAIT|THE|AND|FOR|NOW|YES|ICT|SMC|HTF|LTF|BOS|FVG|OB|RR)$/.test(t[1])) return t[1];
-  return "XAUUSD";
-}
-
-function Home() {
-  const navigate = useNavigate();
-  const [authReady, setAuthReady] = useState(false);
-  useEffect(() => {
-    let alive = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (!alive) return;
-      if (!data.session) {
-        navigate({ to: "/auth", replace: true });
-      } else {
-        setAuthReady(true);
-      }
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (!session) navigate({ to: "/auth", replace: true });
-    });
-    return () => { alive = false; sub.subscription.unsubscribe(); };
-  }, [navigate]);
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  };
-
-  const analyze = useServerFn(analyzeGold);
-
-  const fetchNews = useServerFn(getGoldNews);
-  const [timeframe, setTimeframe] = useState<string>("15m");
-  const [signal, setSignal] = useState<GoldSignal | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [text, setText] = useState("");
-  const speech = useSpeech();
-  const lastHandled = useRef("");
-  const loadingRef = useRef(false);
-  const greetedRef = useRef(false);
-  const alertedRef = useRef<Set<string>>(new Set());
-  const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const bufferRef = useRef("");
-  const interimRef = useRef("");
-  const transcriptRef = useRef("");
-  useEffect(() => { interimRef.current = speech.interim; }, [speech.interim]);
-  useEffect(() => { transcriptRef.current = speech.transcript; }, [speech.transcript]);
-
-  const [dark, setDark] = useState<boolean>(false);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const v = window.localStorage.getItem("jenvu.theme");
-    if (v) setDark(v === "dark");
-  }, []);
-  useEffect(() => {
-    if (typeof window !== "undefined") window.localStorage.setItem("jenvu.theme", dark ? "dark" : "light");
-  }, [dark]);
-
-  const news = useQuery({
-    queryKey: ["gold-news"],
-    queryFn: () => fetchNews(),
-    refetchInterval: 1000 * 60 * 5, // 5 min
-    staleTime: 1000 * 60 * 2,
-  });
-
-  const status: "idle" | "listening" | "thinking" | "speaking" = loading
-    ? "thinking"
-    : speech.speaking
-      ? "speaking"
-      : speech.listening
-        ? "listening"
-        : "idle";
-
-  function armSleep() {
-    if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current);
-    sleepTimerRef.current = setTimeout(() => {
-      speech.stopListening();
-    }, 45_000); // go back to standby after 45s of silence
-  }
-
-  const handleCommand = useCallback(async (query: string) => {
-    if (loadingRef.current || !query.trim()) return;
-
-    // Signal/setup/trade intent → navigate to /signal page for ANY instrument the user names
-    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analy[sz]e|live\s*chart|show\s*chart|new\s*signal|chart\s*open|open\s*chart|view\s*chart)\b/i.test(query)) {
-      const symbol = detectSymbol(query);
-      speech.stopSpeaking();
-      speech.pauseListening();
-      navigate({ to: "/signal", search: { symbol } });
-      return;
-    }
-
-    loadingRef.current = true;
-    setLoading(true);
-    speech.pauseListening();
-    const tf = parseTimeframe(query, timeframe);
-    if (tf !== timeframe) setTimeframe(tf);
-    try {
-      const result = await analyze({ data: { timeframe: tf, query } });
-      setSignal(result);
-      speech.speak(result.spokenSummary, () => {
-        speech.resumeIfWanted();
-        armSleep();
-      });
-    } catch (e: any) {
-      toast.error(e?.message || "Analysis failed");
-      speech.speak("Sorry, the analysis failed.", () => {
-        speech.resumeIfWanted();
-        armSleep();
-      });
-    } finally {
-      loadingRef.current = false;
-      setLoading(false);
-    }
-  }, [analyze, speech, timeframe, navigate]);
-
-  // Accumulate final transcripts into a buffer while listening (do NOT send yet)
-  useEffect(() => {
-    const t = speech.transcript;
-    const key = `${speech.transcriptId}:${t}`;
-    if (!t || key === lastHandled.current) return;
-    lastHandled.current = key;
-    bufferRef.current = (bufferRef.current ? bufferRef.current + " " : "") + t;
-  }, [speech.transcript, speech.transcriptId]);
-
-  // News alert: announce high-impact events <=15 min away
-  useEffect(() => {
-    const events = news.data;
-    if (!events || !events.length) return;
-    for (const e of events) {
-      if (e.impact !== "High") continue;
-      if (e.minutesUntil < 0 || e.minutesUntil > 15) continue;
-      const key = e.date + e.title;
-      if (alertedRef.current.has(key)) continue;
-      alertedRef.current.add(key);
-      const line = `Heads up. High-impact ${e.country} news in ${e.minutesUntil} minutes: ${e.title}. Expect volatility on gold.`;
-      toast.warning(line);
-      if (!loadingRef.current) {
-        speech.pauseListening();
-        speech.speak(line, () => speech.resumeIfWanted());
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [news.data]);
-
-  const toggleMic = () => {
-    if (!speech.supported) { toast.error("Voice not supported. Use Chrome."); return; }
-    if (speech.listening) {
-      // User pressed stop → wait for final results to flush, then send
-      speech.stopListening();
-      const tryFlush = (attempt = 0) => {
-        const captured = (bufferRef.current + " " + (interimRef.current || "") + " " + (transcriptRef.current || "")).trim();
-        if (!captured && attempt < 6) {
-          window.setTimeout(() => tryFlush(attempt + 1), 90);
-          return;
-        }
-        bufferRef.current = "";
-        if (!captured) {
-          toast.message("Kuch sunai nahi diya — phir se try karein.");
-          return;
-        }
-        const lower = captured.toLowerCase();
-        const wakeMatch = lower.match(/\b(hey|hi|ok|okay)?\s*(jenvu|janvu|jarvis|jen view|jen vu)\b[\s,.!?]*(.*)/i);
-        const cmd = (wakeMatch?.[3]?.trim() || captured).trim();
-        if (cmd.length > 0) handleCommand(cmd);
-      };
-      window.setTimeout(() => tryFlush(0), 100);
-      return;
-    }
-    bufferRef.current = "";
-    speech.startListening();
-  };
-
-
-
-
-  const submitText = () => {
-    const t = text.trim();
-    if (!t) return;
-    setText("");
-    handleCommand(t);
-  };
-
-  const endAll = () => {
-    speech.stopListening();
-    speech.stopSpeaking();
-  };
-
-
-  if (!authReady) {
-    return <div className="fixed inset-0 bg-black" />;
-  }
-
-  return (
-
-    <div className={cn("fixed inset-0 w-screen overflow-hidden overscroll-none flex flex-col transition-colors duration-300", dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900")}>
-      {/* Header */}
-      <header className="relative z-10 px-6 py-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center">
-          <StatusPill status={status} supported={speech.supported} dark={dark} />
-        </div>
-
-
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setDark((d) => !d)}
-            className={cn(
-              "h-9 w-9 rounded-full flex items-center justify-center transition border",
-              dark
-                ? "bg-neutral-900 border-neutral-700 text-amber-300 hover:bg-neutral-800"
-                : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-100",
-            )}
-            aria-label="Toggle theme"
-            title={dark ? "Switch to light" : "Switch to dark"}
-          >
-            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-          <button
-            onClick={signOut}
-            className={cn(
-              "h-9 w-9 rounded-full flex items-center justify-center transition border",
-              dark
-                ? "bg-neutral-900 border-neutral-700 text-neutral-300 hover:bg-neutral-800"
-                : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-100",
-            )}
-            aria-label="Sign out"
-            title="Sign out"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
-        </div>
-
-      </header>
-
-      {/* Main: orb centerpiece */}
-      <main className="relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row items-center justify-center px-6 gap-6 lg:gap-10 pb-28 overflow-hidden">
-        <div className="flex flex-col items-center justify-center gap-4 flex-1 min-h-0">
-          <div className="flex-1 min-h-0 flex items-center justify-center w-full">
-            <CloudOrb status={status} pulse={speech.wordPulse} />
-          </div>
-          {!speech.supported && (
-            <div className="text-center text-sm text-red-500 px-4">
-              Voice not supported in this browser. Please open in Chrome (desktop) or use the text box below.
-            </div>
-          )}
-        </div>
-
-        {signal && signal.direction !== "WAIT" && signal.confidence > 0 && (
-          <aside className="w-full lg:w-[380px] lg:max-w-[380px] shrink-0 space-y-4 overflow-y-auto max-h-full">
-            <SignalCard signal={signal} />
-          </aside>
-        )}
-      </main>
-
-      {/* Bottom composer — ChatGPT style */}
-      <div className={cn(
-        "fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-8 bg-gradient-to-t to-transparent",
-        dark ? "from-neutral-950 via-neutral-950" : "from-white via-white",
-      )}>
-        <div className="max-w-3xl mx-auto">
-          <div className={cn(
-            "flex items-center gap-2 rounded-full border pl-4 pr-1.5 py-1.5 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.5)]",
-            dark ? "bg-neutral-900 border-neutral-800" : "bg-white border-white/20",
-          )}>
-            <input
-              type="text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && submitText()}
-              placeholder="Type"
-              disabled={loading}
-              className={cn(
-                "flex-1 bg-transparent text-[15px] focus:outline-none px-1 py-1",
-                dark ? "text-neutral-100 placeholder:text-neutral-500" : "text-neutral-900 placeholder:text-neutral-500",
-              )}
-            />
-            <button
-              onClick={toggleMic}
-              className={cn(
-                "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition",
-                speech.listening
-                  ? "bg-emerald-500 text-white"
-                  : dark ? "hover:bg-white/10 text-neutral-200" : "hover:bg-black/5 text-neutral-700",
-              )}
-              aria-label="Toggle microphone"
-            >
-              <Mic className="h-4.5 w-4.5" />
-            </button>
-            {text.trim() && (
-              <button
-                onClick={submitText}
-                disabled={loading}
-                className={cn(
-                  "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition disabled:opacity-50",
-                  dark ? "bg-white text-black hover:bg-neutral-200" : "bg-black text-white hover:bg-neutral-800",
-                )}
-                aria-label="Send message"
-              >
-                <ArrowUp className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatusPill({ status, supported, dark }: { status: "idle" | "listening" | "thinking" | "speaking"; supported: boolean; dark?: boolean }) {
-  if (!supported) {
-    return (
-      <div className="inline-flex items-center gap-2 rounded-full bg-neutral-100 border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600 whitespace-nowrap">
-        <span className="h-2 w-2 rounded-full bg-neutral-400" />
-        Voice not supported
-      </div>
-    );
-  }
-  const map = {
-    idle: {
-      dot: "bg-neutral-400", label: "Standby", pulse: false,
-      ring: "ring-1 ring-neutral-200",
-      bg: "bg-white",
-      text: "text-neutral-700",
-    },
-    listening: {
-      dot: "bg-emerald-500", label: "Listening", pulse: true,
-      ring: "ring-1 ring-emerald-200",
-      bg: "bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50",
-      text: "text-emerald-700",
-    },
-    thinking: {
-      dot: "bg-amber-500", label: "Thinking", pulse: true,
-      ring: "ring-1 ring-amber-200",
-      bg: "bg-gradient-to-r from-amber-50 via-orange-50 to-rose-50",
-      text: "text-amber-700",
-    },
-    speaking: {
-      dot: "bg-sky-500", label: "Speaking", pulse: true,
-      ring: "ring-1 ring-sky-200",
-      bg: "bg-gradient-to-r from-sky-50 via-indigo-50 to-fuchsia-50",
-      text: "text-sky-700",
-    },
-  } as const;
-  const s = map[status];
-  return (
-    <div className={cn(
-      "inline-flex items-center gap-2 rounded-full shadow-sm px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors duration-300",
-      s.bg, s.ring, s.text,
-    )}>
-      <span className="relative flex h-2 w-2">
-        {s.pulse && <span className={cn("absolute inline-flex h-full w-full rounded-full opacity-70 animate-ping", s.dot)} />}
-        <span className={cn("relative inline-flex h-2 w-2 rounded-full", s.dot)} />
-      </span>
-      <span className="tracking-wide">Voice</span>
-      <span className="opacity-50">·</span>
-      <span>{s.label}</span>
-    </div>
-  );
-}
-
-function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "thinking" | "speaking"; pulse?: number }) {
-  const speaking = status === "speaking";
-  // each word bumps `pulse` → cycle a hue offset and a tiny scale kick
-  const hueShift = (pulse * 47) % 360;
-  const kick = speaking ? 1 + ((pulse % 2) === 0 ? 0.04 : 0.07) : 1;
-  const baseScale =
-    status === "speaking" ? 1.05 :
-    status === "listening" ? 1.02 :
-    status === "thinking" ? 1.0 : 0.97;
-  const scale = baseScale * kick;
-
-  const iridescent =
-    "conic-gradient(from 200deg, #ff6ba6 0%, #ff9966 12%, #ffd86b 24%, #6ee7b7 38%, #38bdf8 52%, #a78bfa 68%, #f472b6 84%, #ff6ba6 100%)";
-
+function HomePage() {
   return (
     <div
-      className="relative h-[18rem] w-[18rem] sm:h-[22rem] sm:w-[22rem] lg:h-[26rem] lg:w-[26rem] max-h-full max-w-full flex items-center justify-center"
+      className="min-h-dvh w-full text-[color:var(--ink)] [--paper:#f5f3ee] [--warm:#e8e4dd] [--ink:#2d2d2d] [--void:#0d0d0d]"
       style={{
-        transform: `scale(${scale})`,
-        transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
-        filter: speaking ? `hue-rotate(${hueShift}deg) saturate(1.3)` : "none",
+        background: PAPER,
+        fontFamily: "'Manrope', system-ui, sans-serif",
       }}
     >
-      {/* halo and ring waves removed */}
+      {/* subtle paper grain */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 opacity-[0.5] mix-blend-multiply"
+        style={{
+          backgroundImage: `radial-gradient(${INK}22 1px, transparent 1px)`,
+          backgroundSize: "3px 3px",
+          maskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+        }}
+      />
 
+      <Nav />
 
-      {/* Light sky-blue sphere with swirling water-wave currents */}
-      <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
+      <Hero />
 
+      <TrustStrip />
 
-        <div
-          className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
-          style={{
-            background:
-              "radial-gradient(circle at 50% 25%, #f4faff 0%, #b8dcff 28%, #5ea8ee 60%, #1f5fb0 90%, #0b3a7a 100%)",
-            boxShadow:
-              "inset -10px -16px 44px rgba(20,60,140,0.6), inset 8px 12px 32px rgba(255,255,255,0.85), 0 0 60px rgba(120,180,240,0.55)",
-          }}
-        >
-          {/* Flowing vivid color blobs — organic drift */}
-          <div
-            className="absolute -inset-1/3"
-            style={{
-              animation: `orb-drift-a ${status === "speaking" ? "7s" : status === "thinking" ? "9s" : "14s"} ease-in-out infinite, orb-hue 18s linear infinite`,
-              background:
-                "radial-gradient(30% 24% at 28% 30%, rgba(244,114,182,0.95), transparent 70%), radial-gradient(28% 22% at 72% 26%, rgba(251,191,36,0.9), transparent 70%), radial-gradient(32% 26% at 30% 74%, rgba(52,211,153,0.95), transparent 70%), radial-gradient(30% 24% at 74% 72%, rgba(167,139,250,0.95), transparent 70%)",
-              mixBlendMode: "screen",
-            }}
-          />
+      <FeatureGrid />
 
-          {/* Counter-flow aurora ribbon */}
-          <div
-            className="absolute -inset-1/3"
-            style={{
-              animation: `orb-drift-b ${status === "speaking" ? "9s" : "18s"} ease-in-out infinite`,
-              background:
-                "conic-gradient(from 90deg, rgba(255,90,160,0.7) 0%, rgba(56,189,248,0.0) 18%, rgba(255,200,80,0.7) 35%, rgba(255,255,255,0.0) 50%, rgba(80,230,180,0.7) 65%, rgba(56,189,248,0.0) 80%, rgba(170,130,255,0.7) 100%)",
-              filter: "blur(24px)",
-              mixBlendMode: "screen",
-            }}
-          />
+      <ManifestoSplit />
 
-          {/* Shimmering foamy crest */}
-          <div
-            className="absolute -inset-1/4"
-            style={{
-              animation: `orb-shimmer ${status === "speaking" ? "2.2s" : "5s"} ease-in-out infinite`,
-              background:
-                "radial-gradient(36% 12% at 50% 50%, rgba(255,255,255,0.9), transparent 70%), radial-gradient(26% 9% at 36% 58%, rgba(255,210,235,0.75), transparent 70%), radial-gradient(28% 10% at 66% 46%, rgba(200,245,255,0.85), transparent 70%)",
-              filter: "blur(6px)",
-              mixBlendMode: "screen",
-            }}
-          />
+      <Process />
 
+      <Coverage />
 
-          {/* Glossy top highlight */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_42%_18%,rgba(255,255,255,0.95),transparent_48%)]" />
+      <Faq />
 
-          {/* Soft sky rim */}
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{ boxShadow: "inset 0 0 26px rgba(160,210,255,0.6)" }}
-          />
+      <FinalCta />
 
-          {/* Speaking ripple */}
-          {status === "speaking" && (
-            <div
-              className="absolute inset-0 animate-pulse"
-              style={{
-                background:
-                  "radial-gradient(circle at 50% 55%, rgba(120,180,240,0.45), transparent 60%)",
-                animationDuration: "0.9s",
-                mixBlendMode: "screen",
-              }}
-            />
-          )}
+      <Footer />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* NAV                                                                 */
+/* ------------------------------------------------------------------ */
+
+function Nav() {
+  return (
+    <header className="relative z-20 border-b border-[color:var(--ink)]/10">
+      <div className="mx-auto max-w-[1320px] px-6 py-5 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2.5">
+          <Logo />
+          <span className="font-display tracking-[-0.02em] text-[15px] font-bold uppercase">
+            Jenvu<span className="opacity-50">/ai</span>
+          </span>
+        </Link>
+
+        <nav className="hidden md:flex items-center gap-8 text-[13px] text-[color:var(--ink)]/70 font-medium">
+          <Link to="/about" className="hover:text-[color:var(--void)]">About</Link>
+          <Link to="/ai-engine" className="hover:text-[color:var(--void)]">Engine</Link>
+          <Link to="/llm" className="hover:text-[color:var(--void)]">Model</Link>
+          <Link to="/signal" className="hover:text-[color:var(--void)]">Signals</Link>
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <Link
+            to="/auth"
+            className="text-[13px] font-semibold px-4 py-2 rounded-full hover:bg-[color:var(--warm)] transition"
+          >
+            Sign in
+          </Link>
+          <Link
+            to="/app"
+            className="text-[13px] font-semibold px-4 py-2 rounded-full bg-[color:var(--void)] text-[color:var(--paper)] hover:opacity-90 transition inline-flex items-center gap-1.5"
+          >
+            Launch
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Logo() {
+  return (
+    <span
+      className="grid place-items-center h-7 w-7 rounded-md text-[color:var(--paper)] font-display font-black"
+      style={{ background: VOID, fontSize: 13, letterSpacing: "-0.05em" }}
+    >
+      J
+    </span>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* HERO                                                                */
+/* ------------------------------------------------------------------ */
+
+function Hero() {
+  return (
+    <section className="relative">
+      <div className="mx-auto max-w-[1320px] px-6 pt-16 lg:pt-24 pb-20">
+        {/* status pill */}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[color:var(--ink)]/15 bg-[color:var(--paper)] text-[11px] uppercase tracking-[0.22em] font-bold text-[color:var(--ink)]/70">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-60" />
+            <span className="relative rounded-full bg-emerald-500 h-1.5 w-1.5" />
+          </span>
+          Live · v1.0 · Voice intelligence
+        </div>
+
+        {/* main grid */}
+        <div className="mt-10 grid lg:grid-cols-12 gap-10 lg:gap-8 items-start">
+          {/* Headline */}
+          <div className="lg:col-span-8">
+            <h1
+              className="font-display font-semibold tracking-[-0.045em] leading-[0.93] text-[clamp(56px,9vw,140px)]"
+              style={{ color: VOID }}
+            >
+              The trading
+              <br />
+              desk that
+              <br />
+              <em className="not-italic font-light italic" style={{ fontFamily: "'Sora', sans-serif" }}>
+                <span className="italic">speaks</span>
+              </em>{" "}
+              <span className="inline-block align-baseline">
+                <span className="px-3 pb-1 pt-0 rounded-2xl" style={{ background: VOID, color: PAPER }}>
+                  back.
+                </span>
+              </span>
+            </h1>
+
+            <p className="mt-8 max-w-2xl text-[17px] leading-relaxed text-[color:var(--ink)]/75">
+              Jenvu is a voice-native AI analyst trained on 25 years of institutional logic — ICT,
+              SMC, liquidity, killzones. Speak the asset. Hear the setup. Watch the chart draw itself.
+            </p>
+
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <Link
+                to="/app"
+                className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--void)] text-[color:var(--paper)] px-6 py-3.5 text-[14px] font-semibold hover:opacity-90 transition"
+              >
+                <Mic className="h-4 w-4" />
+                Talk to Jenvu
+                <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
+              </Link>
+              <Link
+                to="/signal"
+                className="inline-flex items-center gap-2 rounded-full border border-[color:var(--ink)]/20 px-6 py-3.5 text-[14px] font-semibold hover:bg-[color:var(--warm)] transition"
+              >
+                See a live signal
+              </Link>
+            </div>
+
+            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-[0.25em] font-bold text-[color:var(--ink)]/55">
+              <span>ICT</span><Dot /><span>SMC</span><Dot /><span>Killzones</span><Dot /><span>Liquidity</span><Dot /><span>OTE</span>
+            </div>
+          </div>
+
+          {/* Console card */}
+          <div className="lg:col-span-4">
+            <Console />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Dot() {
+  return <span className="h-1 w-1 rounded-full bg-[color:var(--ink)]/30" />;
+}
+
+function Console() {
+  return (
+    <div
+      className="rounded-[28px] p-6 shadow-[0_30px_80px_-30px_rgba(13,13,13,0.35)] border"
+      style={{ background: VOID, borderColor: "#222" }}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#f5f3ee]/20" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#f5f3ee]/20" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#f5f3ee]/20" />
+        </div>
+        <div className="text-[10px] uppercase tracking-[0.25em] font-bold text-[color:var(--paper)]/40">
+          jenvu · live
         </div>
       </div>
 
+      <div className="mt-6 text-[color:var(--paper)] font-mono text-[12px] leading-relaxed space-y-3" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+        <div className="flex gap-3">
+          <span className="text-[color:var(--paper)]/40">›</span>
+          <span className="text-[color:var(--paper)]/70">analyze xau/usd</span>
+        </div>
+        <div className="pl-5 space-y-1.5">
+          <Row k="bias" v="bullish · london killzone" />
+          <Row k="structure" v="HH / HL · BOS @ 2348.20" />
+          <Row k="liquidity" v="swept asia low 2331.80" />
+          <Row k="entry" v="2342.10 (OTE 0.705)" />
+          <Row k="stop" v="2336.40 · −5.7 R" />
+          <Row k="tp1 / tp2 / tp3" v="2355 / 2362 / 2374" />
+          <Row k="invalidation" v="close < 2335" highlight />
+        </div>
+        <div className="pt-3 border-t border-white/10 flex items-center gap-2 text-[color:var(--paper)]/50">
+          <Waves className="h-3 w-3" />
+          <span className="truncate">narrating · "we're in premium, watching the FVG…"</span>
+        </div>
+      </div>
+
+      <div className="mt-5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-[color:var(--paper)]/50">
+          <Sparkles className="h-3 w-3" />
+          A+ setup detected
+        </div>
+        <span className="text-[10px] font-mono text-[color:var(--paper)]/50">14:32:08 GMT</span>
+      </div>
     </div>
   );
 }
 
-function VoicePicker({ value, onChange }: { value: VoicePresetKey; onChange: (k: VoicePresetKey) => void }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [open]);
-
+function Row({ k, v, highlight }: { k: string; v: string; highlight?: boolean }) {
   return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className={cn(
-          "h-9 w-9 rounded-full flex items-center justify-center transition",
-          open ? "bg-black text-white" : "hover:bg-black/5 text-neutral-600",
-        )}
-        aria-label="Voice settings"
-      >
-        <Sliders className="h-4 w-4" />
-      </button>
-      {open && (
-        <div className="absolute right-0 mt-2 w-60 rounded-2xl border border-neutral-200 bg-white shadow-xl p-2 z-30 animate-in fade-in slide-in-from-top-1">
-          <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
-            Voice
-          </div>
-          <div className="flex flex-col">
-            {VOICE_PRESETS.map((p) => {
-              const active = p.key === value;
-              return (
-                <button
-                  key={p.key}
-                  onClick={() => { onChange(p.key); setOpen(false); }}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-xl text-left transition",
-                    active ? "bg-neutral-100" : "hover:bg-neutral-50",
-                  )}
-                >
-                  <span className={cn(
-                    "h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0",
-                    p.key === "aria"  && "bg-gradient-to-br from-rose-400 to-fuchsia-500",
-                    p.key === "nova"  && "bg-gradient-to-br from-sky-400 to-indigo-500",
-                    p.key === "orion" && "bg-gradient-to-br from-emerald-500 to-teal-700",
-                    p.key === "atlas" && "bg-gradient-to-br from-amber-500 to-orange-600",
-                  )}>
-                    {p.label[0]}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-neutral-900">{p.label}</div>
-                    <div className="text-xs text-neutral-500 truncate">{p.desc}</div>
-                  </div>
-                  {active && <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />}
-                </button>
-              );
-            })}
-          </div>
+    <div className="flex items-baseline gap-3">
+      <span className="text-[color:var(--paper)]/35 w-28 shrink-0">{k}</span>
+      <span className={highlight ? "text-rose-300" : "text-[color:var(--paper)]"}>{v}</span>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* TRUST                                                               */
+/* ------------------------------------------------------------------ */
+
+function TrustStrip() {
+  const items = ["ICT · Inner Circle", "Smart Money Concepts", "Wyckoff Phases", "Order Blocks", "Fair Value Gaps", "Liquidity Pools", "OTE Entries", "Killzone Logic", "DXY Context"];
+  return (
+    <section className="border-y border-[color:var(--ink)]/10 bg-[color:var(--warm)]/60">
+      <div className="mx-auto max-w-[1320px] px-6 py-5 flex items-center gap-6 overflow-x-auto scrollbar-none">
+        <span className="shrink-0 text-[11px] uppercase tracking-[0.3em] font-bold text-[color:var(--ink)]/55">
+          Trained on
+        </span>
+        <div className="flex items-center gap-8">
+          {items.map((i) => (
+            <span key={i} className="shrink-0 text-[13px] font-semibold text-[color:var(--ink)]/70 whitespace-nowrap font-display tracking-tight">
+              {i}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* FEATURE GRID                                                        */
+/* ------------------------------------------------------------------ */
+
+function FeatureGrid() {
+  return (
+    <section className="relative">
+      <div className="mx-auto max-w-[1320px] px-6 py-24 lg:py-32">
+        <SectionHead eyebrow="Capabilities" title={<>An entire trading floor,<br /><span className="opacity-40">condensed into a voice.</span></>} />
+
+        {/* hero-grid: 1 large + 4 small */}
+        <div className="mt-16 grid lg:grid-cols-12 gap-5">
+          {/* Big feature */}
+          <article className="lg:col-span-8 rounded-[32px] overflow-hidden border border-[color:var(--ink)]/10 bg-[color:var(--paper)] group">
+            <div className="grid lg:grid-cols-2">
+              <div className="p-10 lg:p-12 flex flex-col justify-between min-h-[420px]">
+                <div>
+                  <Tag icon={<Mic className="h-3 w-3" />}>Voice Agent</Tag>
+                  <h3 className="mt-6 font-display font-semibold tracking-[-0.03em] text-[40px] leading-[1.02]">
+                    Push-to-talk.<br />
+                    <span className="opacity-50">Hear the desk think.</span>
+                  </h3>
+                  <p className="mt-5 text-[15px] leading-relaxed text-[color:var(--ink)]/70 max-w-md">
+                    A natural conversation with a 25-year analyst. Bias, structure, sweeps, entries —
+                    narrated in real time as the chart draws every confluence.
+                  </p>
+                </div>
+                <div className="mt-8 flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.2em] text-[color:var(--ink)]/55">
+                  <Link to="/app" className="inline-flex items-center gap-1.5 hover:text-[color:var(--void)]">
+                    Try the agent <ArrowUpRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+              <div className="relative bg-[color:var(--warm)] aspect-square lg:aspect-auto overflow-hidden">
+                <img src={featVoice} alt="Voice" className="absolute inset-0 h-full w-full object-cover mix-blend-multiply" />
+                <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 60% 40%, transparent, #e8e4dd 80%)" }} />
+              </div>
+            </div>
+          </article>
+
+          {/* Small */}
+          <SmallCard
+            colSpan="lg:col-span-4"
+            icon={<Brain className="h-3 w-3" />}
+            tag="Reasoning"
+            title="Desk-grade logic, not chat fluff."
+            body="Bias, premium/discount, BOS/CHoCH, DXY correlation — fused in under a second."
+            tone="dark"
+          />
+
+          <SmallCard
+            colSpan="lg:col-span-4"
+            icon={<Activity className="h-3 w-3" />}
+            tag="Signal Engine"
+            title="ICT & SMC, rendered live."
+            body="FVGs, order blocks, liquidity sweeps and OTE zones drawn directly on the chart."
+            image={featSignal}
+          />
+
+          <SmallCard
+            colSpan="lg:col-span-4"
+            icon={<Globe2 className="h-3 w-3" />}
+            tag="Multi-Asset"
+            title="Gold, Crypto, FX, Indices, Stocks."
+            body="One engine, every session. A-to-Z coverage across markets that matter."
+            image={featAssets}
+          />
+
+          <SmallCard
+            colSpan="lg:col-span-4"
+            icon={<Target className="h-3 w-3" />}
+            tag="A+ Only"
+            title="Entry. Stop. Three TPs. Invalidation."
+            body="When the read is weak, the desk says stand aside. No noise, no FOMO."
+            tone="dark"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Tag({ icon, children }: { icon?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[color:var(--ink)]/15 text-[10px] uppercase tracking-[0.22em] font-bold text-[color:var(--ink)]/70 bg-[color:var(--paper)]">
+      {icon}
+      {children}
+    </span>
+  );
+}
+
+function SmallCard({
+  colSpan,
+  icon,
+  tag,
+  title,
+  body,
+  image,
+  tone = "light",
+}: {
+  colSpan: string;
+  icon: React.ReactNode;
+  tag: string;
+  title: string;
+  body: string;
+  image?: string;
+  tone?: "light" | "dark";
+}) {
+  const dark = tone === "dark";
+  return (
+    <article
+      className={`${colSpan} rounded-[28px] overflow-hidden border p-8 flex flex-col justify-between min-h-[300px] transition hover:-translate-y-0.5`}
+      style={{
+        background: dark ? VOID : PAPER,
+        borderColor: dark ? "#222" : "rgba(45,45,45,0.1)",
+        color: dark ? PAPER : INK,
+      }}
+    >
+      <div>
+        <span
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] uppercase tracking-[0.22em] font-bold border"
+          style={{
+            borderColor: dark ? "rgba(245,243,238,0.2)" : "rgba(45,45,45,0.15)",
+            color: dark ? "rgba(245,243,238,0.75)" : "rgba(45,45,45,0.7)",
+          }}
+        >
+          {icon}
+          {tag}
+        </span>
+        <h3 className="mt-5 font-display font-semibold tracking-[-0.03em] text-[24px] leading-[1.1]">
+          {title}
+        </h3>
+        <p className={`mt-3 text-[14px] leading-relaxed ${dark ? "text-[color:var(--paper)]/60" : "text-[color:var(--ink)]/65"}`}>
+          {body}
+        </p>
+      </div>
+      {image && (
+        <div className="mt-6 -mx-8 -mb-8 h-32 relative overflow-hidden">
+          <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-90" />
+          <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, ${PAPER}99, transparent 30%)` }} />
         </div>
       )}
+    </article>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* MANIFESTO SPLIT                                                     */
+/* ------------------------------------------------------------------ */
+
+function ManifestoSplit() {
+  return (
+    <section className="border-y border-[color:var(--ink)]/10" style={{ background: VOID, color: PAPER }}>
+      <div className="mx-auto max-w-[1320px] px-6 py-28 grid lg:grid-cols-12 gap-12">
+        <div className="lg:col-span-5">
+          <div className="text-[11px] uppercase tracking-[0.3em] font-bold text-[color:var(--paper)]/50">
+            Why Jenvu
+          </div>
+          <h2 className="mt-5 font-display font-semibold tracking-[-0.035em] text-[clamp(36px,4.5vw,64px)] leading-[1.02]">
+            Most AI guesses.<br /><span className="opacity-50">This one reasons.</span>
+          </h2>
+        </div>
+
+        <div className="lg:col-span-7 space-y-10">
+          {[
+            { n: "01", t: "Voice-native, not chatbot-bolted", b: "Designed for spoken conversation — the latency, intonation and rhythm of a real desk analyst beside you." },
+            { n: "02", t: "Institutional logic, not retail noise", b: "ICT, SMC, Wyckoff, liquidity, premium/discount, killzones — the playbooks proprietary desks actually run." },
+            { n: "03", t: "Honest by design", b: "When confluences are weak, Jenvu tells you to wait. No invented setups, no FOMO bias, no flattery." },
+          ].map((row) => (
+            <div key={row.n} className="grid grid-cols-[60px_1fr] gap-6 pb-10 border-b border-white/10 last:border-0">
+              <div className="font-display text-[40px] font-light text-[color:var(--paper)]/30 leading-none">{row.n}</div>
+              <div>
+                <h3 className="font-display text-[22px] font-semibold tracking-tight">{row.t}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-[color:var(--paper)]/65">{row.b}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* PROCESS                                                             */
+/* ------------------------------------------------------------------ */
+
+function Process() {
+  const steps = [
+    { n: "01", t: "Speak", b: "Tap the mic. Say 'Analyze Gold' or 'Show me Bitcoin'. No commands, no syntax." },
+    { n: "02", t: "Reason", b: "Live candles, DXY context, killzone bias and ICT/SMC confluences fused under one second." },
+    { n: "03", t: "Hear", b: "Entry, stop, three TPs and invalidation narrated aloud while the chart draws the levels." },
+  ];
+  return (
+    <section>
+      <div className="mx-auto max-w-[1320px] px-6 py-28">
+        <SectionHead eyebrow="Process" title={<>Three steps.<br /><span className="opacity-40">Zero friction.</span></>} />
+
+        <div className="mt-16 grid lg:grid-cols-3 gap-[1px] bg-[color:var(--ink)]/10 rounded-[28px] overflow-hidden border border-[color:var(--ink)]/10">
+          {steps.map((s) => (
+            <div key={s.n} className="bg-[color:var(--paper)] p-10 lg:p-12 min-h-[280px] flex flex-col">
+              <div className="font-display text-[14px] font-bold tracking-[0.3em] text-[color:var(--ink)]/40">{s.n}</div>
+              <h3 className="mt-6 font-display font-semibold tracking-[-0.03em] text-[40px] leading-none">{s.t}</h3>
+              <p className="mt-5 text-[15px] leading-relaxed text-[color:var(--ink)]/65 max-w-xs">{s.b}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* COVERAGE                                                            */
+/* ------------------------------------------------------------------ */
+
+function Coverage() {
+  const assets = ["XAU/USD", "BTC/USD", "ETH/USD", "SOL/USD", "EUR/USD", "GBP/USD", "USD/JPY", "USD/CAD", "AUD/USD", "NAS100", "SPX500", "DJ30", "DXY", "AAPL", "TSLA", "NVDA", "MSFT", "META"];
+  return (
+    <section className="border-y border-[color:var(--ink)]/10 bg-[color:var(--warm)]/50">
+      <div className="mx-auto max-w-[1320px] px-6 py-28 grid lg:grid-cols-12 gap-10 items-end">
+        <div className="lg:col-span-5">
+          <SectionHead eyebrow="Coverage" title={<>One engine.<br /><span className="opacity-40">Every market.</span></>} />
+          <p className="mt-6 text-[15px] leading-relaxed text-[color:var(--ink)]/70 max-w-md">
+            Crypto via Binance, traditional markets via Yahoo Finance, news via an economic calendar feed.
+            Symbol coverage expands continuously.
+          </p>
+        </div>
+        <div className="lg:col-span-7">
+          <div className="flex flex-wrap gap-2">
+            {assets.map((a) => (
+              <span
+                key={a}
+                className="inline-flex items-center gap-2 rounded-full bg-[color:var(--paper)] border border-[color:var(--ink)]/15 px-4 py-2 text-[13px] font-semibold tracking-tight hover:border-[color:var(--ink)]/40 transition cursor-default"
+                style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.01em" }}
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                {a}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* FAQ                                                                 */
+/* ------------------------------------------------------------------ */
+
+function Faq() {
+  const items = [
+    { q: "Is Jenvu financial advice?", a: "No. Jenvu is an analytical companion. Every signal is educational; execution and risk are your responsibility." },
+    { q: "What markets are supported?", a: "Gold, all major Crypto, Forex majors, Indices and large-cap equities — anything resolvable through our data adapters." },
+    { q: "Does it work on mobile?", a: "Yes. The voice agent works on iOS and Android browsers with microphone permission." },
+    { q: "Where does the data come from?", a: "Live candles via Binance for crypto, Yahoo Finance for traditional markets, and an economic calendar feed for news." },
+    { q: "Which model powers the reasoning?", a: "A Gemini-class reasoning model tuned with institutional playbooks. Latency-optimized for spoken delivery." },
+  ];
+  return (
+    <section>
+      <div className="mx-auto max-w-[1100px] px-6 py-28">
+        <SectionHead eyebrow="FAQ" title={<>Questions,<br /><span className="opacity-40">answered.</span></>} />
+        <div className="mt-14 divide-y divide-[color:var(--ink)]/10 border-y border-[color:var(--ink)]/10">
+          {items.map((f) => (
+            <details key={f.q} className="group py-7">
+              <summary className="flex items-center justify-between cursor-pointer list-none">
+                <span className="font-display font-semibold tracking-[-0.02em] text-[20px] lg:text-[24px] pr-6">{f.q}</span>
+                <span className="text-[28px] font-light text-[color:var(--ink)]/40 group-open:rotate-45 transition shrink-0">+</span>
+              </summary>
+              <p className="mt-4 text-[15px] leading-relaxed text-[color:var(--ink)]/65 max-w-2xl">{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* CTA                                                                 */
+/* ------------------------------------------------------------------ */
+
+function FinalCta() {
+  return (
+    <section style={{ background: VOID, color: PAPER }}>
+      <div className="mx-auto max-w-[1320px] px-6 py-28 lg:py-36 text-center">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 text-[11px] uppercase tracking-[0.22em] font-bold text-[color:var(--paper)]/70">
+          <Newspaper className="h-3 w-3" />
+          Ready when you are
+        </div>
+        <h2 className="mt-8 font-display font-semibold tracking-[-0.045em] leading-[0.95] text-[clamp(56px,9vw,140px)]">
+          Speak the asset.<br />
+          <span className="italic font-light opacity-70">Hear the setup.</span>
+        </h2>
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
+          <Link to="/app" className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--paper)] text-[color:var(--void)] px-7 py-4 text-[14px] font-bold hover:opacity-90 transition">
+            <Mic className="h-4 w-4" />
+            Launch voice agent
+            <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
+          </Link>
+          <Link to="/signal" className="inline-flex items-center gap-2 rounded-full border border-white/25 px-7 py-4 text-[14px] font-bold hover:bg-white/10 transition">
+            See a live signal
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* FOOTER                                                              */
+/* ------------------------------------------------------------------ */
+
+function Footer() {
+  return (
+    <footer className="bg-[color:var(--paper)] border-t border-[color:var(--ink)]/10">
+      <div className="mx-auto max-w-[1320px] px-6 py-16 grid lg:grid-cols-12 gap-10">
+        <div className="lg:col-span-5">
+          <div className="flex items-center gap-2.5">
+            <Logo />
+            <span className="font-display tracking-[-0.02em] text-[15px] font-bold uppercase">
+              Jenvu<span className="opacity-50">/ai</span>
+            </span>
+          </div>
+          <p className="mt-5 text-[14px] text-[color:var(--ink)]/65 max-w-sm leading-relaxed">
+            Institutional voice intelligence for global markets. Built for traders who'd rather listen
+            than scroll.
+          </p>
+        </div>
+
+        <FooterCol title="Product" links={[["Voice agent", "/"], ["Signals", "/signal"], ["AI Engine", "/ai-engine"], ["LLM", "/llm"]]} />
+        <FooterCol title="Company" links={[["About", "/about"], ["Development", "/development"], ["Sign in", "/auth"]]} />
+        <FooterCol title="Legal" links={[["Privacy", "/privacy"], ["Terms", "/terms"], ["Disclaimer", "/disclaimer"]]} />
+      </div>
+      <div className="border-t border-[color:var(--ink)]/10">
+        <div className="mx-auto max-w-[1320px] px-6 py-5 flex flex-wrap items-center justify-between gap-3 text-[12px] text-[color:var(--ink)]/55">
+          <div>© {new Date().getFullYear()} JENVU AI · All rights reserved</div>
+          <div className="font-mono" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+            v1.0 · paper edition
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
+  return (
+    <div className="lg:col-span-2">
+      <div className="text-[11px] uppercase tracking-[0.25em] font-bold text-[color:var(--ink)]/50">{title}</div>
+      <ul className="mt-5 space-y-3 text-[14px] font-medium text-[color:var(--ink)]/80">
+        {links.map(([label, href]) => (
+          <li key={label}>
+            <Link to={href} className="hover:text-[color:var(--void)]">{label}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Shared                                                              */
+/* ------------------------------------------------------------------ */
 
+function SectionHead({ eyebrow, title }: { eyebrow: string; title: React.ReactNode }) {
+  return (
+    <div className="max-w-3xl">
+      <div className="text-[11px] uppercase tracking-[0.3em] font-bold text-[color:var(--ink)]/50">{eyebrow}</div>
+      <h2 className="mt-5 font-display font-semibold tracking-[-0.035em] text-[clamp(40px,5.5vw,72px)] leading-[1.02]" style={{ color: VOID }}>
+        {title}
+      </h2>
+    </div>
+  );
+}
