@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — JENVU AI" },
+      { title: "Partner With Us — JENVU AI" },
       { name: "description", content: "The mission, philosophy, and team behind JENVU AI." },
-      { property: "og:title", content: "About — JENVU AI" },
+      { property: "og:title", content: "Partner With Us — JENVU AI" },
       { property: "og:url", content: "https://jenvu.com/about" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/about" }],

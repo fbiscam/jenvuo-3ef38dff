@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — JENVU AI" },
+      { title: "Our Policy Concerns — JENVU AI" },
       { name: "description", content: "How JENVU AI collects, uses, and protects your data." },
-      { property: "og:title", content: "Privacy Policy — JENVU AI" },
+      { property: "og:title", content: "Our Policy Concerns — JENVU AI" },
       { property: "og:url", content: "https://jenvu.com/privacy" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/privacy" }],

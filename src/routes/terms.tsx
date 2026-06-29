@@ -4,9 +4,9 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Use — JENVU AI" },
+      { title: "Terms Terms of Use — JENVU AI Conditions — JENVU AI" },
       { name: "description", content: "The terms that govern your use of JENVU AI." },
-      { property: "og:title", content: "Terms of Use — JENVU AI" },
+      { property: "og:title", content: "Terms Terms of Use — JENVU AI Conditions — JENVU AI" },
       { property: "og:url", content: "https://jenvu.com/terms" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/terms" }],
