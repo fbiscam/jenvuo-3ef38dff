@@ -554,46 +554,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="grid gap-10 lg:grid-cols-12">
-            <div className="lg:col-span-4">
-              <SectionLabel>FAQ</SectionLabel>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight">Asked often.</h2>
-              <p className="mt-3 text-zinc-900">Everything else lives in the docs and disclaimer.</p>
-            </div>
-            <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
-              {[
-                {
-                  q: "Is JENVU only for Gold?",
-                  a: "Gold is its specialty, but JENVU covers FX majors, BTC, ETH, indices and energy with the same ICT/SMC engine.",
-                },
-                {
-                  q: "Does it execute trades automatically?",
-                  a: "No. JENVU narrates A+ setups with structured entries, stops and targets — execution stays in your hands.",
-                },
-                {
-                  q: "What model powers the voice agent?",
-                  a: "A low-latency Gemini-class model wired through Lovable AI, tuned for institutional trading reasoning.",
-                },
-                {
-                  q: "Does it work on mobile?",
-                  a: "Yes. The voice loop, signal engine and charts are fully responsive on phones and tablets.",
-                },
-              ].map((f) => (
-                <details key={f.q} className="group py-5">
-                  <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="text-base font-medium text-zinc-900">{f.q}</span>
-                    <span className={`${MONO} text-zinc-900 group-open:rotate-45 transition-transform`}>+</span>
-                  </summary>
-                  <p className="mt-3 text-sm text-zinc-900 leading-relaxed max-w-2xl">{f.a}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
 
 
@@ -743,6 +703,46 @@ function HomePage() {
       </section>
 
       {/* CTA */}
+      {/* FAQ */}
+      <section className="border-t border-zinc-100">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="grid gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <SectionLabel>FAQ</SectionLabel>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight">Asked often.</h2>
+              <p className="mt-3 text-zinc-900">Everything else lives in the docs and disclaimer.</p>
+            </div>
+            <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
+              {[
+                {
+                  q: "Is JENVU only for Gold?",
+                  a: "Gold is its specialty, but JENVU covers FX majors, BTC, ETH, indices and energy with the same ICT/SMC engine.",
+                },
+                {
+                  q: "Does it execute trades automatically?",
+                  a: "No. JENVU narrates A+ setups with structured entries, stops and targets — execution stays in your hands.",
+                },
+                {
+                  q: "What model powers the voice agent?",
+                  a: "A low-latency Gemini-class model wired through Lovable AI, tuned for institutional trading reasoning.",
+                },
+                {
+                  q: "Does it work on mobile?",
+                  a: "Yes. The voice loop, signal engine and charts are fully responsive on phones and tablets.",
+                },
+              ].map((f) => (
+                <details key={f.q} className="group py-5">
+                  <summary className="flex items-center justify-between cursor-pointer list-none">
+                    <span className="text-base font-medium text-zinc-900">{f.q}</span>
+                    <span className={`${MONO} text-zinc-900 group-open:rotate-45 transition-transform`}>+</span>
+                  </summary>
+                  <p className="mt-3 text-sm text-zinc-900 leading-relaxed max-w-2xl">{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
       <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-6 py-24">
           <div className="rounded-2xl border border-zinc-200 bg-white p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
