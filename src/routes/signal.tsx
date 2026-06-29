@@ -4,10 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { getSignalPlan, getLiveTick, getNewsRisk, type SignalPlan } from "@/lib/gold-analysis.functions";
+import { getSignalPlan, getNewsRisk, type SignalPlan } from "@/lib/gold-analysis.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
+import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { cn } from "@/lib/utils";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
@@ -217,70 +218,69 @@ function SignalPage() {
 
 
 
-  /* ---------- LIVE TRADE TRACKER ---------- */
-  const fetchTick = useServerFn(getLiveTick);
-  const [livePrice, setLivePrice] = useState<number | null>(null);
+  /* ---------- LIVE TRADE TRACKER (streaming) ---------- */
   const [trackerStatus, setTrackerStatus] = useState<"PENDING" | "RUNNING" | "WIN" | "LOSS">("PENDING");
   const [sparkline, setSparkline] = useState<number[]>([]);
   const eventsFiredRef = useRef<Set<string>>(new Set());
+  const trackerStatusRef = useRef(trackerStatus);
+  trackerStatusRef.current = trackerStatus;
+  const stoppedRef = useRef(false);
+  const lastSparkPushRef = useRef(0);
 
   useEffect(() => {
-    if (!plan || plan.trade.direction === "WAIT") return;
     eventsFiredRef.current = new Set();
+    stoppedRef.current = false;
     setTrackerStatus("PENDING");
-    setSparkline([plan.currentPrice]);
-    setLivePrice(plan.currentPrice);
+    if (plan) setSparkline([plan.currentPrice]);
+  }, [plan?.instrument.symbol]);
 
-    let stopped = false;
-    const poll = async () => {
-      try {
-        const tick = await fetchTick({ data: { symbol: plan.instrument.symbol } });
-        if (stopped) return;
-        setLivePrice(tick.price);
-        setSparkline((arr) => [...arr.slice(-59), tick.price]);
-        const tSec = typeof tick.t === "number" ? Math.floor(tick.t / 1000) : Math.floor(Date.now() / 1000);
-        try { htfRef.current?.updateLivePrice(tick.price, tSec); } catch {}
-        try { ltfRef.current?.updateLivePrice(tick.price, tSec); } catch {}
+  const handleStreamTick = useCallback((priceTick: number, tMs: number) => {
+    if (!plan || stoppedRef.current) return;
 
+    // Sparkline — throttle to ~2/sec to keep DOM cheap on WS streams.
+    if (tMs - lastSparkPushRef.current > 450) {
+      lastSparkPushRef.current = tMs;
+      setSparkline((arr) => [...arr.slice(-59), priceTick]);
+    }
 
-        // Skip TP/SL/entry-fill events when market is closed (weekends for FX/metals/indices).
-        // Stale feed prices during closure can spuriously trigger notifications.
-        if (!isMarketOpen(plan.instrument.symbol)) return;
+    const tSec = Math.floor(tMs / 1000);
+    try { htfRef.current?.updateLivePrice(priceTick, tSec); } catch { /* noop */ }
+    try { ltfRef.current?.updateLivePrice(priceTick, tSec); } catch { /* noop */ }
 
-        const tr = plan.trade;
-        const dir = tr.direction;
-        const fire = (key: string, msg: string) => {
-          if (eventsFiredRef.current.has(key)) return;
-          eventsFiredRef.current.add(key);
-          toast.success(msg);
-          speech.speak(msg);
-        };
-        // Entry fill
-        const tol = plan.currentPrice * 0.0003;
-        if (dir === "BUY") {
-          if (tick.price <= tr.entry + tol && trackerStatus === "PENDING") {
-            fire("filled", `Entry filled at ${tick.price.toFixed(plan.instrument.decimals)}`);
-            setTrackerStatus("RUNNING");
-          }
-          if (tick.price <= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stopped = true; }
-          if (tick.price >= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stopped = true; }
-        } else if (dir === "SELL") {
-          if (tick.price >= tr.entry - tol && trackerStatus === "PENDING") {
-            fire("filled", `Entry filled at ${tick.price.toFixed(plan.instrument.decimals)}`);
-            setTrackerStatus("RUNNING");
-          }
-          if (tick.price >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stopped = true; }
-          if (tick.price <= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stopped = true; }
-        }
-      } catch {
-        // silent — keep last price
-      }
+    // Skip TP/SL/entry-fill events when market is closed (weekends for FX/metals/indices).
+    if (!isMarketOpen(plan.instrument.symbol)) return;
+    if (plan.trade.direction === "WAIT") return;
+
+    const tr = plan.trade;
+    const dir = tr.direction;
+    const fire = (key: string, msg: string) => {
+      if (eventsFiredRef.current.has(key)) return;
+      eventsFiredRef.current.add(key);
+      toast.success(msg);
+      speech.speak(msg);
     };
-    poll();
-    const id = setInterval(poll, 5000);
-    return () => { stopped = true; clearInterval(id); };
+    const tol = plan.currentPrice * 0.0003;
+    if (dir === "BUY") {
+      if (priceTick <= tr.entry + tol && trackerStatusRef.current === "PENDING") {
+        fire("filled", `Entry filled at ${priceTick.toFixed(plan.instrument.decimals)}`);
+        setTrackerStatus("RUNNING");
+      }
+      if (priceTick <= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; }
+      if (priceTick >= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; }
+    } else if (dir === "SELL") {
+      if (priceTick >= tr.entry - tol && trackerStatusRef.current === "PENDING") {
+        fire("filled", `Entry filled at ${priceTick.toFixed(plan.instrument.decimals)}`);
+        setTrackerStatus("RUNNING");
+      }
+      if (priceTick >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; }
+      if (priceTick <= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plan]);
+  }, [plan, speech]);
+
+  const livePrice = useLivePriceStream(plan?.instrument.symbol, plan?.currentPrice ?? null, handleStreamTick);
+
+
 
   /* ---------- R-MULTIPLE ---------- */
   const rMultiple = useMemo(() => {
