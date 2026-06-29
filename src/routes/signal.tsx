@@ -160,28 +160,28 @@ function SignalPage() {
       </header>
 
       {/* Body */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] overflow-hidden">
+      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-[1fr_360px] overflow-hidden">
         {/* Charts */}
-        <div className="flex flex-col overflow-hidden">
-          <div className={cn("flex-1 min-h-0 border-b", dark ? "border-neutral-800" : "border-neutral-200")}>
-            {plan && <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF · 1 Hour" />}
+        <div className="flex flex-col overflow-hidden p-3 gap-3">
+          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden">
+            {plan && <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF · 1 Hour · Bias" />}
             {!plan && <ChartSkeleton dark={dark} />}
           </div>
-          <div className="flex-1 min-h-0">
+          <div className="flex-1 min-h-0 rounded-2xl bg-white/80 backdrop-blur border border-neutral-200 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)] overflow-hidden">
             {plan && <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF · 15 Minute · Execution" />}
             {!plan && <ChartSkeleton dark={dark} />}
           </div>
         </div>
 
         {/* Sidebar */}
-        <aside className={cn("border-l overflow-y-auto p-4 space-y-4", dark ? "border-neutral-800 bg-neutral-950" : "border-neutral-200 bg-neutral-50")}>
+        <aside className="border-l border-neutral-200 overflow-y-auto p-4 space-y-4 bg-white/60 backdrop-blur-md">
           {!plan && <div className="text-sm opacity-60 flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading live gold data…</div>}
 
           {plan && (
             <>
-              <div className={cn("rounded-2xl p-4 border", dark ? "border-neutral-800 bg-neutral-900" : "border-neutral-200 bg-white")}>
-                <div className="text-[10px] uppercase tracking-widest opacity-50 mb-2">HTF Bias</div>
-                <div className={cn("text-xl font-bold flex items-center gap-2", plan.htfBias === "bullish" ? "text-emerald-500" : plan.htfBias === "bearish" ? "text-red-500" : "opacity-70")}>
+              <div className="rounded-2xl p-4 border border-neutral-200 bg-white shadow-sm">
+                <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-bold">HTF Bias · 1H</div>
+                <div className={cn("text-xl font-black flex items-center gap-2", plan.htfBias === "bullish" ? "text-emerald-600" : plan.htfBias === "bearish" ? "text-red-600" : "text-neutral-500")}>
                   {plan.htfBias === "bullish" ? <TrendingUp className="h-5 w-5" /> : plan.htfBias === "bearish" ? <TrendingDown className="h-5 w-5" /> : null}
                   {plan.htfBias.toUpperCase()}
                 </div>
@@ -189,43 +189,43 @@ function SignalPage() {
 
               {t && (
                 <div className={cn(
-                  "rounded-2xl p-4 border-2",
-                  isBuy ? "border-emerald-500/40 bg-emerald-500/5" : isSell ? "border-red-500/40 bg-red-500/5" : dark ? "border-neutral-800 bg-neutral-900" : "border-neutral-200 bg-white",
+                  "rounded-2xl p-4 border-2 shadow-sm",
+                  isBuy ? "border-emerald-400 bg-gradient-to-br from-emerald-50 to-white" : isSell ? "border-red-400 bg-gradient-to-br from-red-50 to-white" : "border-neutral-200 bg-white",
                 )}>
                   <div className="flex items-center justify-between mb-3">
-                    <div className={cn("text-2xl font-black", isBuy ? "text-emerald-500" : isSell ? "text-red-500" : "opacity-60")}>
+                    <div className={cn("text-2xl font-black tracking-tight", isBuy ? "text-emerald-600" : isSell ? "text-red-600" : "text-neutral-500")}>
                       {t.direction}
                     </div>
-                    <div className="text-xs opacity-60">Confidence <span className="font-bold opacity-100">{t.confidence}%</span></div>
+                    <div className="text-[11px] text-neutral-500">Confidence <span className="font-black text-neutral-900">{t.confidence}%</span></div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="grid grid-cols-2 gap-3 text-sm">
                     <Stat label="Entry" value={t.entry.toFixed(2)} />
                     <Stat label="R:R" value={`1:${t.rr.toFixed(2)}`} />
                     <Stat label="Stop Loss" value={t.sl.toFixed(2)} tone="bad" />
                     <Stat label="Take Profit" value={t.tp.toFixed(2)} tone="good" />
                   </div>
-                  {t.summary && <p className="text-xs opacity-80 mt-3 leading-relaxed">{t.summary}</p>}
+                  {t.summary && <p className="text-xs text-neutral-700 mt-3 leading-relaxed border-t border-neutral-200/60 pt-3">{t.summary}</p>}
                 </div>
               )}
 
               <div>
-                <div className="text-[10px] uppercase tracking-widest opacity-50 mb-2 px-1">Narration</div>
+                <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 px-1 font-bold">Live Walkthrough</div>
                 <div className="space-y-2">
                   {plan.narration.map((n, i) => (
                     <div
                       key={i}
                       className={cn(
-                        "rounded-xl p-3 text-sm border transition",
+                        "rounded-xl p-3 text-sm border transition-all duration-300",
                         i === step
-                          ? dark ? "border-emerald-500/60 bg-emerald-500/10" : "border-emerald-500 bg-emerald-50"
+                          ? "border-amber-400 bg-gradient-to-r from-amber-50 to-white shadow-md scale-[1.02]"
                           : i < step
-                            ? dark ? "border-neutral-800 bg-neutral-900 opacity-60" : "border-neutral-200 bg-white opacity-70"
-                            : dark ? "border-neutral-800 bg-neutral-900/50 opacity-40" : "border-neutral-200 bg-white opacity-50",
+                            ? "border-neutral-200 bg-white opacity-70"
+                            : "border-neutral-200 bg-white/60 opacity-50",
                       )}
                     >
                       <div className="flex items-start gap-2">
-                        <span className={cn("text-[10px] font-mono mt-0.5 px-1.5 py-0.5 rounded", dark ? "bg-neutral-800" : "bg-neutral-200")}>{n.tf.toUpperCase()}</span>
-                        <span>{n.say}</span>
+                        <span className={cn("text-[10px] font-mono mt-0.5 px-1.5 py-0.5 rounded font-bold", n.tf === "htf" ? "bg-sky-100 text-sky-700" : "bg-amber-100 text-amber-700")}>{n.tf.toUpperCase()}</span>
+                        <span className="text-neutral-800 leading-snug">{n.say}</span>
                       </div>
                     </div>
                   ))}
