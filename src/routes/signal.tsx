@@ -91,6 +91,18 @@ function SignalPage() {
       setPlaying(true);
       abortRef.current = false;
 
+      // Pre-draw all locally-detected zones (Premium/Discount/OTE/Liquidity/EQH/EQL)
+      // — these are static context, drawn at start, not narrated.
+      const autoTypes = new Set([
+        "premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql",
+      ]);
+      for (const m of p.markings) {
+        if (autoTypes.has(m.type)) {
+          if (m.tf === "htf") htfRef.current?.drawMarking(m);
+          else ltfRef.current?.drawMarking(m);
+        }
+      }
+
       try {
         await speakWait(p.intro);
         for (let i = 0; i < p.narration.length; i++) {
