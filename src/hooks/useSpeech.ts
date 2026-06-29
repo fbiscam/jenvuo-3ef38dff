@@ -10,6 +10,7 @@ export function useSpeech() {
   const [interim, setInterim] = useState("");
   const [supported, setSupported] = useState(true);
   const [needsGesture, setNeedsGesture] = useState(false);
+  const [wordPulse, setWordPulse] = useState(0);
   const recognitionRef = useRef<SR | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const wantListeningRef = useRef(false);
@@ -156,7 +157,10 @@ export function useSpeech() {
     u.rate = 1.02;
     u.pitch = 0.95;
     u.volume = 1;
-    u.onstart = () => setSpeaking(true);
+    u.onstart = () => { setSpeaking(true); setWordPulse((n) => n + 1); };
+    u.onboundary = (ev: any) => {
+      if (!ev || ev.name === undefined || ev.name === "word") setWordPulse((n) => n + 1);
+    };
     u.onend = () => { setSpeaking(false); onDone?.(); };
     u.onerror = () => { setSpeaking(false); onDone?.(); };
     window.speechSynthesis.speak(u);
@@ -168,7 +172,7 @@ export function useSpeech() {
   }, []);
 
   return {
-    listening, speaking, transcript, transcriptId, interim, supported, needsGesture,
+    listening, speaking, transcript, transcriptId, interim, supported, needsGesture, wordPulse,
     startListening, stopListening, pauseListening, resumeIfWanted,
     speak, stopSpeaking, setTranscript,
     isContinuous: () => wantListeningRef.current,

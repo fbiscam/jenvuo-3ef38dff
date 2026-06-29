@@ -199,7 +199,7 @@ function Home() {
       {/* Main: orb centerpiece */}
       <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-center px-6 gap-10 pb-28 pt-16">
         <div className="flex flex-col items-center gap-6 flex-1">
-          <CloudOrb status={status} />
+          <CloudOrb status={status} pulse={speech.wordPulse} />
           {!speech.supported && (
             <div className="text-center text-sm text-red-500">
               Voice not supported in this browser. Please open in Chrome (desktop) or use the text box below.
@@ -281,16 +281,16 @@ function StatusPill({ status, supported }: { status: "idle" | "listening" | "thi
   );
 }
 
-function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "speaking" }) {
-  const scale =
+function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "thinking" | "speaking"; pulse?: number }) {
+  const speaking = status === "speaking";
+  // each word bumps `pulse` → cycle a hue offset and a tiny scale kick
+  const hueShift = (pulse * 47) % 360;
+  const kick = speaking ? 1 + ((pulse % 2) === 0 ? 0.04 : 0.07) : 1;
+  const baseScale =
     status === "speaking" ? 1.05 :
     status === "listening" ? 1.02 :
     status === "thinking" ? 1.0 : 0.97;
-
-  const ringSpin =
-    status === "speaking" ? "6s" :
-    status === "thinking" ? "3s" :
-    status === "listening" ? "10s" : "18s";
+  const scale = baseScale * kick;
 
   const iridescent =
     "conic-gradient(from 200deg, #ff6ba6 0%, #ff9966 12%, #ffd86b 24%, #6ee7b7 38%, #38bdf8 52%, #a78bfa 68%, #f472b6 84%, #ff6ba6 100%)";
@@ -300,7 +300,8 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
       className="relative h-[22rem] w-[22rem] sm:h-[26rem] sm:w-[26rem] flex items-center justify-center"
       style={{
         transform: `scale(${scale})`,
-        transition: "transform 900ms cubic-bezier(0.4,0,0.2,1)",
+        transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
+        filter: speaking ? `hue-rotate(${hueShift}deg) saturate(1.3)` : "none",
       }}
     >
       {/* halo and ring waves removed */}
