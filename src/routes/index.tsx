@@ -189,13 +189,6 @@ function Home() {
     speech.stopSpeaking();
   };
 
-  return (
-    <div className="h-screen w-screen bg-white text-neutral-900 relative overflow-hidden flex flex-col">
-      {/* Header */}
-      <header className="relative z-10 px-6 py-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center">
-          <StatusPill status={status} supported={speech.supported} />
-        </div>
 
   return (
     <div className={cn("h-screen w-screen relative overflow-hidden flex flex-col transition-colors duration-300", dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900")}>
