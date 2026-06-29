@@ -2,6 +2,44 @@ import { createServerFn } from "@tanstack/react-start";
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
 
+// ============================================================
+// MULTI-ASSET REGISTRY — Crypto, Forex, Metals
+// ============================================================
+export type AssetKind = "crypto" | "forex" | "metal";
+export type AssetDef = {
+  key: string;
+  label: string;
+  short: string;
+  kind: AssetKind;
+  binance?: string; // e.g. BTCUSDT (preferred when available)
+  yahoo?: string;   // e.g. EURUSD=X, GC=F
+  stooq?: string;   // e.g. xauusd, eurusd
+  precision: number;
+  tickerHint?: string;
+};
+
+export const ASSETS: Record<string, AssetDef> = {
+  XAUUSD:  { key:"XAUUSD",  label:"Gold / XAU·USD",      short:"XAU/USD",   kind:"metal",  binance:"PAXGUSDT", yahoo:"GC=F",     stooq:"xauusd", precision:2, tickerHint:"Spot gold (USD per oz)" },
+  XAGUSD:  { key:"XAGUSD",  label:"Silver / XAG·USD",    short:"XAG/USD",   kind:"metal",  yahoo:"SI=F",       stooq:"xagusd",   precision:3 },
+  BTCUSD:  { key:"BTCUSD",  label:"Bitcoin / BTC·USD",   short:"BTC/USD",   kind:"crypto", binance:"BTCUSDT",  precision:2 },
+  ETHUSD:  { key:"ETHUSD",  label:"Ethereum / ETH·USD",  short:"ETH/USD",   kind:"crypto", binance:"ETHUSDT",  precision:2 },
+  SOLUSD:  { key:"SOLUSD",  label:"Solana / SOL·USD",    short:"SOL/USD",   kind:"crypto", binance:"SOLUSDT",  precision:2 },
+  BNBUSD:  { key:"BNBUSD",  label:"BNB / BNB·USD",       short:"BNB/USD",   kind:"crypto", binance:"BNBUSDT",  precision:2 },
+  XRPUSD:  { key:"XRPUSD",  label:"XRP / XRP·USD",       short:"XRP/USD",   kind:"crypto", binance:"XRPUSDT",  precision:4 },
+  DOGEUSD: { key:"DOGEUSD", label:"Dogecoin / DOGE·USD", short:"DOGE/USD",  kind:"crypto", binance:"DOGEUSDT", precision:5 },
+  EURUSD:  { key:"EURUSD",  label:"Euro / EUR·USD",      short:"EUR/USD",   kind:"forex",  yahoo:"EURUSD=X",   stooq:"eurusd",   precision:5 },
+  GBPUSD:  { key:"GBPUSD",  label:"Pound / GBP·USD",     short:"GBP/USD",   kind:"forex",  yahoo:"GBPUSD=X",   stooq:"gbpusd",   precision:5 },
+  USDJPY:  { key:"USDJPY",  label:"Dollar Yen / USD·JPY",short:"USD/JPY",   kind:"forex",  yahoo:"USDJPY=X",   stooq:"usdjpy",   precision:3 },
+  AUDUSD:  { key:"AUDUSD",  label:"Aussie / AUD·USD",    short:"AUD/USD",   kind:"forex",  yahoo:"AUDUSD=X",   stooq:"audusd",   precision:5 },
+  USDCAD:  { key:"USDCAD",  label:"Loonie / USD·CAD",    short:"USD/CAD",   kind:"forex",  yahoo:"USDCAD=X",   stooq:"usdcad",   precision:5 },
+  USDCHF:  { key:"USDCHF",  label:"Swissie / USD·CHF",   short:"USD/CHF",   kind:"forex",  yahoo:"USDCHF=X",   stooq:"usdchf",   precision:5 },
+  NZDUSD:  { key:"NZDUSD",  label:"Kiwi / NZD·USD",      short:"NZD/USD",   kind:"forex",  yahoo:"NZDUSD=X",   stooq:"nzdusd",   precision:5 },
+};
+
+function asset(key: string): AssetDef {
+  return ASSETS[key?.toUpperCase?.()] ?? ASSETS.XAUUSD;
+}
+
 export type GoldSignal = {
   bias: "BULLISH" | "BEARISH" | "NEUTRAL";
   direction: "BUY" | "SELL" | "WAIT";
