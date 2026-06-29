@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/signal")({
   head: () => ({
     meta: [
-      { title: "Live Gold Signal — Jenvu AI" },
-      { name: "description", content: "Live ICT/SMC trade plan for XAU/USD with chart markings and voice narration." },
+      { title: "Live AI Trading Signal — Jenvu AI" },
+      { name: "description", content: "Live ICT/SMC trade plans for Gold, Forex majors and Crypto with chart markings and voice narration." },
     ],
   }),
   component: SignalPage,
