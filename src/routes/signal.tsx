@@ -599,7 +599,7 @@ function SignalPage() {
               )}
 
               {/* Trade card */}
-              {t && plan && (
+              {t && plan && !marketClosed && (
                 <div className="space-y-3">
                   <div className="flex items-end justify-between">
                     <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Trade Plan</span>
