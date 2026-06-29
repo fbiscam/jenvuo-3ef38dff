@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalRouteImport } from './routes/signal'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LlmRouteImport } from './routes/llm'
+import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as DevelopmentRouteImport } from './routes/development'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -46,6 +47,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const LlmRoute = LlmRouteImport.update({
   id: '/llm',
   path: '/llm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DownloadRoute = DownloadRouteImport.update({
+  id: '/download',
+  path: '/download',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DisclaimerRoute = DisclaimerRouteImport.update({
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/download': typeof DownloadRoute
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/download': typeof DownloadRoute
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/download': typeof DownloadRoute
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/development'
     | '/disclaimer'
+    | '/download'
     | '/llm'
     | '/privacy'
     | '/signal'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/development'
     | '/disclaimer'
+    | '/download'
     | '/llm'
     | '/privacy'
     | '/signal'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/development'
     | '/disclaimer'
+    | '/download'
     | '/llm'
     | '/privacy'
     | '/signal'
@@ -191,6 +203,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
+  DownloadRoute: typeof DownloadRoute
   LlmRoute: typeof LlmRoute
   PrivacyRoute: typeof PrivacyRoute
   SignalRoute: typeof SignalRoute
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/llm'
       fullPath: '/llm'
       preLoaderRoute: typeof LlmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/download': {
+      id: '/download'
+      path: '/download'
+      fullPath: '/download'
+      preLoaderRoute: typeof DownloadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/disclaimer': {
@@ -303,6 +323,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
+  DownloadRoute: DownloadRoute,
   LlmRoute: LlmRoute,
   PrivacyRoute: PrivacyRoute,
   SignalRoute: SignalRoute,

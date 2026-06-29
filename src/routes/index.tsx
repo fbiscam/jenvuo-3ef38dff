@@ -204,7 +204,7 @@ function HomePage() {
             <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
             <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
             <Link to="/about" className="hover:text-zinc-900">About</Link>
-            <Link to="/terms" className="hover:text-zinc-900">Terms</Link>
+            <Link to="/download" className="hover:text-zinc-900">Download</Link>
           </nav>
           <div className="flex shrink-0 items-center gap-2">
             <Link
@@ -852,6 +852,7 @@ function HomePage() {
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             <Link to="/about" className="hover:text-zinc-900">About</Link>
+            <Link to="/download" className="hover:text-zinc-900">Download</Link>
             <Link to="/terms" className="hover:text-zinc-900">Terms</Link>
             <Link to="/privacy" className="hover:text-zinc-900">Privacy</Link>
             <Link to="/disclaimer" className="hover:text-zinc-900">Disclaimer</Link>
