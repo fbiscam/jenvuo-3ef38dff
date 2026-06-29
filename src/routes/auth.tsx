@@ -51,9 +51,6 @@ function AuthPage() {
 
       {/* LEFT — Login */}
       <div className="relative z-10 flex-1 flex items-center justify-center p-6 lg:p-16">
-        {/* soft ambient glow */}
-        <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-fuchsia-400/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-sky-400/20 blur-3xl" />
 
         <div className="relative w-full max-w-md">
           {/* glass card */}
