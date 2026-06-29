@@ -443,14 +443,14 @@ function ManifestoSplit() {
         <div className="lg:col-span-7 space-y-10">
           {[
             { n: "01", t: "Voice-native, not chatbot-bolted", b: "Designed for spoken conversation — the rhythm of a real desk analyst beside you." },
-            { n: "02", t: "Institutional logic, not retail noise", b: "ICT, SMC, Wyckoff, liquidity, premium/discount, killzones — the playbooks proprietary desks actually run." },
-            { n: "03", t: "Honest by design", b: "When confluences are weak, Jenvu tells you to wait. No invented setups, no FOMO bias, no flattery." },
+            { n: "02", t: "Institutional logic, not retail noise", b: "ICT, SMC, Wyckoff, liquidity and killzones — the playbooks proprietary desks run." },
+            { n: "03", t: "Honest by design", b: "When confluences are weak, Jenvu tells you to wait. No invented setups, no FOMO." },
           ].map((row) => (
             <div key={row.n} className="grid grid-cols-[60px_1fr] gap-6 pb-10 border-b border-white/10 last:border-0">
               <div className="font-display text-[40px] font-light text-[color:var(--paper)]/30 leading-none">{row.n}</div>
               <div>
                 <h3 className="font-display text-[22px] font-semibold tracking-tight">{row.t}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-[color:var(--paper)]/65">{row.b}</p>
+                <p className="mt-2 text-[15px] leading-relaxed text-[color:var(--paper)]">{row.b}</p>
               </div>
             </div>
           ))}
