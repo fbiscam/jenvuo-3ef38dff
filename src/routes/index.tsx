@@ -134,14 +134,7 @@ function Hero() {
   return (
     <section className="relative">
       <div className="mx-auto max-w-[1320px] px-6 pt-16 lg:pt-24 pb-20">
-        {/* status pill */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[color:var(--ink)]/15 bg-[color:var(--paper)] text-[11px] uppercase tracking-[0.22em] font-bold text-[color:var(--ink)]/70">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-60" />
-            <span className="relative rounded-full bg-emerald-500 h-1.5 w-1.5" />
-          </span>
-          Live · v1.0 · Voice intelligence
-        </div>
+        {/* status pill removed */}
 
         {/* main grid */}
         <div className="mt-10 grid lg:grid-cols-12 gap-10 lg:gap-8 items-start">
