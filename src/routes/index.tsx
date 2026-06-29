@@ -121,19 +121,14 @@ function Home() {
     }
   }, [analyze, speech, timeframe]);
 
-  // Every final transcript becomes a command (no wake word required)
+  // Accumulate final transcripts into a buffer while listening (do NOT send yet)
   useEffect(() => {
     const t = speech.transcript;
     const key = `${speech.transcriptId}:${t}`;
     if (!t || key === lastHandled.current) return;
     lastHandled.current = key;
-    const lower = t.toLowerCase();
-    const wakeMatch = lower.match(/\b(hey|hi|ok|okay)?\s*(jenvu|janvu|jarvis|jen view|jen vu)\b[\s,.!?]*(.*)/i);
-    const cmd = (wakeMatch?.[3]?.trim() || t).trim();
-    if (cmd.length > 1) {
-      handleCommand(cmd);
-    }
-  }, [handleCommand, speech.transcript, speech.transcriptId]);
+    bufferRef.current = (bufferRef.current ? bufferRef.current + " " : "") + t;
+  }, [speech.transcript, speech.transcriptId]);
 
   // News alert: announce high-impact events <=15 min away
   useEffect(() => {
@@ -158,26 +153,23 @@ function Home() {
   const toggleMic = () => {
     if (!speech.supported) { toast.error("Voice not supported. Use Chrome."); return; }
     if (speech.listening) {
-      try { localStorage.setItem("jenvu.voiceOn", "0"); } catch {}
+      // User pressed stop → flush whatever was captured and let AI reply
       speech.stopListening();
+      const captured = bufferRef.current.trim();
+      bufferRef.current = "";
+      if (captured) {
+        // strip wake words if present
+        const lower = captured.toLowerCase();
+        const wakeMatch = lower.match(/\b(hey|hi|ok|okay)?\s*(jenvu|janvu|jarvis|jen view|jen vu)\b[\s,.!?]*(.*)/i);
+        const cmd = (wakeMatch?.[3]?.trim() || captured).trim();
+        if (cmd.length > 1) handleCommand(cmd);
+      }
       return;
     }
-    try { localStorage.setItem("jenvu.voiceOn", "1"); } catch {}
+    bufferRef.current = "";
     speech.startListening();
   };
 
-  // Always-on voice: persist preference, auto-start on load & after refresh
-  useEffect(() => {
-    if (!speech.supported) return;
-    if (greetedRef.current) return;
-    greetedRef.current = true;
-    const pref = typeof window !== "undefined" ? localStorage.getItem("jenvu.voiceOn") : null;
-    const wantOn = pref === null ? true : pref === "1"; // default ON
-    if (wantOn) {
-      const t = setTimeout(() => speech.startListening(), 500);
-      return () => clearTimeout(t);
-    }
-  }, [speech]);
 
   const submitText = () => {
     const t = text.trim();
