@@ -146,7 +146,12 @@ function Home() {
 
   const toggleMic = () => {
     if (!speech.supported) { toast.error("Voice not supported. Use Chrome."); return; }
-    if (speech.listening) { speech.stopListening(); return; }
+    if (speech.listening) {
+      try { localStorage.setItem("jenvu.voiceOn", "0"); } catch {}
+      speech.stopListening();
+      return;
+    }
+    try { localStorage.setItem("jenvu.voiceOn", "1"); } catch {}
     speech.startListening();
   };
 
