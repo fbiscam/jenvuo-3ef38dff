@@ -13,10 +13,10 @@ export const VOICE_PRESETS: {
   pitch: number;
   rate: number;
 }[] = [
-  { key: "aria",  label: "Aria",  desc: "Warm female · US",   match: /samantha|google us english|aria|jenny|zira|female/i, lang: /en-US/i, pitch: 1.05, rate: 1.25 },
-  { key: "nova",  label: "Nova",  desc: "Soft female · UK",   match: /karen|serena|kate|google uk english female|female/i, lang: /en-GB/i, pitch: 1.1,  rate: 1.22 },
-  { key: "orion", label: "Orion", desc: "Deep male · UK",     match: /daniel|google uk english male|oliver|male/i,         lang: /en-GB/i, pitch: 0.9,  rate: 1.25 },
-  { key: "atlas", label: "Atlas", desc: "Confident male · US",match: /alex|david|fred|google us english male|male/i,        lang: /en-US/i, pitch: 0.95, rate: 1.3 },
+  { key: "aria",  label: "Aria",  desc: "Warm female · US",   match: /samantha|google us english|aria|jenny|zira|female/i, lang: /en-US/i, pitch: 1.05, rate: 1.0 },
+  { key: "nova",  label: "Nova",  desc: "Soft female · UK",   match: /karen|serena|kate|google uk english female|female/i, lang: /en-GB/i, pitch: 1.1,  rate: 1.0 },
+  { key: "orion", label: "Orion", desc: "Deep male · UK",     match: /daniel|google uk english male|oliver|male/i,         lang: /en-GB/i, pitch: 0.9,  rate: 1.0 },
+  { key: "atlas", label: "Atlas", desc: "Confident male · US",match: /alex|david|fred|google us english male|male/i,        lang: /en-US/i, pitch: 0.95, rate: 1.05 },
 ];
 
 export function useSpeech() {
