@@ -414,7 +414,8 @@ function HomePage() {
           ].map((a) => (
             <span
               key={a}
-              className="rounded-full bg-black text-white px-5 py-2.5 text-sm font-bold tracking-wide"
+              className="rounded-full bg-white border-2 border-black/10 text-black px-5 py-2.5 text-sm font-bold tracking-wide hover:border-black hover:-translate-y-0.5 transition"
+              style={{ boxShadow: `inset 0 -2px 0 ${ACCENT}` }}
             >
               {a}
             </span>
