@@ -203,7 +203,7 @@ function Home() {
         const cmd = (wakeMatch?.[3]?.trim() || captured).trim();
         if (cmd.length > 0) handleCommand(cmd);
       };
-      window.setTimeout(() => tryFlush(0), 250);
+      window.setTimeout(() => tryFlush(0), 100);
       return;
     }
     bufferRef.current = "";
