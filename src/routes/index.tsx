@@ -111,13 +111,7 @@ function Hero() {
           style={{ color: VOID }}
         >
           <span className="block">The trading desk</span>
-          <span className="block">
-            that{" "}
-            <span className="italic font-light" style={{ fontFamily: "'Sora', sans-serif" }}>
-              speaks
-            </span>{" "}
-            back.
-          </span>
+          <span className="block">that speaks back.</span>
         </h1>
 
         <p className="mt-10 mx-auto max-w-2xl text-[17px] leading-relaxed" style={{ color: VOID }}>
