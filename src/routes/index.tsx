@@ -300,7 +300,8 @@ function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "think
       className="relative h-[22rem] w-[22rem] sm:h-[26rem] sm:w-[26rem] flex items-center justify-center"
       style={{
         transform: `scale(${scale})`,
-        transition: "transform 900ms cubic-bezier(0.4,0,0.2,1)",
+        transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
+        filter: speaking ? `hue-rotate(${hueShift}deg) saturate(1.3)` : "none",
       }}
     >
       {/* halo and ring waves removed */}
