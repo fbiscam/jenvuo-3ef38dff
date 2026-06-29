@@ -36,12 +36,22 @@ type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "2,418.30", "+0.42%"],
   ["BTC/USDT", "71,204.10", "+1.18%"],
-  ["EUR/USD", "1.0832", "-0.07%"],
-  ["NAS100", "20,114.5", "+0.61%"],
   ["ETH/USDT", "3,841.20", "+2.04%"],
-  ["DXY", "104.21", "-0.12%"],
+  ["EUR/USD", "1.0832", "-0.07%"],
   ["GBP/USD", "1.2671", "+0.09%"],
+  ["NAS100", "20,114.5", "+0.61%"],
+  ["DXY", "104.21", "-0.12%"],
   ["WTI", "78.42", "+0.84%"],
+  ["SOL/USDT", "168.40", "+3.12%"],
+  ["XRP/USDT", "0.5184", "+0.78%"],
+  ["BNB/USDT", "612.30", "+1.04%"],
+  ["ADA/USDT", "0.4421", "+1.92%"],
+  ["DOGE/USDT", "0.1612", "+2.45%"],
+  ["AVAX/USDT", "36.21", "+1.88%"],
+  ["LINK/USDT", "16.84", "+2.10%"],
+  ["DOT/USDT", "7.12", "+1.34%"],
+  ["LTC/USDT", "84.50", "+0.92%"],
+  ["MATIC/USDT", "0.7184", "+1.55%"],
 ];
 
 // Maps display symbol -> Binance ticker symbol (where available)
@@ -49,7 +59,18 @@ const BINANCE_MAP: Record<string, string> = {
   "BTC/USDT": "BTCUSDT",
   "ETH/USDT": "ETHUSDT",
   "EUR/USD": "EURUSDT",
+  "SOL/USDT": "SOLUSDT",
+  "XRP/USDT": "XRPUSDT",
+  "BNB/USDT": "BNBUSDT",
+  "ADA/USDT": "ADAUSDT",
+  "DOGE/USDT": "DOGEUSDT",
+  "AVAX/USDT": "AVAXUSDT",
+  "LINK/USDT": "LINKUSDT",
+  "DOT/USDT": "DOTUSDT",
+  "LTC/USDT": "LTCUSDT",
+  "MATIC/USDT": "MATICUSDT",
 };
+
 
 function fmtPrice(n: number): string {
   if (n >= 1000) return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
