@@ -631,11 +631,11 @@ function FakeChart() {
         x2="600"
         y1="95"
         y2="95"
-        stroke="white"
-        strokeOpacity="0.6"
+        stroke="black"
+        strokeOpacity="0.55"
         strokeDasharray="2 4"
       />
-      <text x="8" y="90" fill="white" fillOpacity="0.7" fontSize="10">
+      <text x="8" y="90" fill="black" fillOpacity="0.65" fontSize="10" fontWeight="700">
         ENTRY
       </text>
     </svg>
