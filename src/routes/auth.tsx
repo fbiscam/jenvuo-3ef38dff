@@ -102,11 +102,11 @@ function AuthPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 sm:p-6 overflow-hidden">
-        <div className="w-full max-w-6xl">
+      <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 sm:p-4 overflow-hidden">
+        <div className="w-full max-w-6xl max-h-full">
           <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
             {/* terminal header */}
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex gap-1.5 shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
@@ -124,7 +124,8 @@ function AuthPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
               {/* LEFT — FORM */}
-              <div className="lg:col-span-7 bg-white p-5 sm:p-8 lg:p-10">
+              <div className="lg:col-span-7 bg-white p-5 sm:p-6 lg:p-8">
+
                 <div className="max-w-md mx-auto lg:mx-0">
                   
                   <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
