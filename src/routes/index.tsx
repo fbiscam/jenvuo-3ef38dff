@@ -235,14 +235,7 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
         transition: "transform 900ms cubic-bezier(0.4,0,0.2,1)",
       }}
     >
-      {/* outer soft halo */}
-      <div
-        className="absolute inset-0 rounded-full blur-3xl opacity-60 animate-spin"
-        style={{
-          animationDuration: "22s",
-          background: iridescent,
-        }}
-      />
+      {/* halo removed — keep background pure black */}
 
       {/* faint expanding rings */}
       {(status === "listening" || status === "speaking") && (
