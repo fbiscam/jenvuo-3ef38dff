@@ -184,12 +184,12 @@ function Home() {
     <div className="min-h-screen bg-white text-neutral-900 relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center" />
+        <div className="flex items-center">
+          <StatusPill status={status} supported={speech.supported} />
+        </div>
 
         <div className="flex items-center gap-3">
-
-
-          <button className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400">
+          <button className="h-9 w-9 rounded-full hover:bg-black/5 flex items-center justify-center text-neutral-500">
             <Sliders className="h-4 w-4" />
           </button>
         </div>
