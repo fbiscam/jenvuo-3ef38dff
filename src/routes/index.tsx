@@ -238,16 +238,11 @@ function Home() {
         <div className="flex flex-col items-center gap-6 flex-1">
           <CloudOrb status={status} />
           <div className="text-center min-h-[2.5rem]">
-            <div className="text-[11px] font-medium uppercase tracking-[0.3em] text-neutral-400">
-              {status === "listening" && "Listening"}
-              {status === "thinking" && "Thinking…"}
-              {status === "speaking" && "Speaking"}
-              
-            </div>
             {speech.interim && (
               <div className="mt-2 text-sm text-neutral-400 italic max-w-md">{speech.interim}</div>
             )}
           </div>
+
         </div>
 
         {signal && (
@@ -321,15 +316,8 @@ function CloudOrb({ status }: { status: "idle" | "listening" | "thinking" | "spe
         transition: "transform 900ms cubic-bezier(0.4,0,0.2,1)",
       }}
     >
-      {/* halo removed — keep background pure black */}
+      {/* halo and ring waves removed */}
 
-      {/* faint expanding rings */}
-      {(status === "listening" || status === "speaking") && (
-        <>
-          <span className="absolute inset-6 rounded-full border border-white/20 animate-ping" style={{ animationDuration: "3s" }} />
-          <span className="absolute inset-2 rounded-full border border-white/10 animate-ping" style={{ animationDuration: "4s" }} />
-        </>
-      )}
 
       {/* Ocean-layered sky-blue sphere */}
       <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
