@@ -20,9 +20,13 @@ export const Route = createFileRoute("/signal")({
   }),
   head: () => ({
     meta: [
-      { title: "Live Trade Signal — Jenvu AI" },
-      { name: "description", content: "Live ICT/SMC trade plan with chart markings and voice narration for any market." },
+      { title: "Live Signal Desk — Jenvu AI" },
+      { name: "description", content: "Real-time ICT/SMC signal desk with multi-timeframe bias, A+ setup scoring, chart markings, voice narration and live trade tracking." },
+      { property: "og:title", content: "Live Signal Desk — Jenvu AI" },
+      { property: "og:description", content: "Multi-timeframe ICT/SMC analysis with A+ setup scoring and live trade tracking." },
+      { property: "og:url", content: "https://jenvu.com/signal" },
     ],
+    links: [{ rel: "canonical", href: "https://jenvu.com/signal" }],
   }),
   component: SignalPage,
 });
