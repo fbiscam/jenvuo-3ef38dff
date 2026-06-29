@@ -258,26 +258,51 @@ function Home() {
 function StatusPill({ status, supported }: { status: "idle" | "listening" | "thinking" | "speaking"; supported: boolean }) {
   if (!supported) {
     return (
-      <div className="flex items-center gap-2 rounded-full bg-neutral-100 border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600">
+      <div className="inline-flex items-center gap-2 rounded-full bg-neutral-100 border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600 whitespace-nowrap">
         <span className="h-2 w-2 rounded-full bg-neutral-400" />
         Voice not supported
       </div>
     );
   }
   const map = {
-    idle:      { dot: "bg-neutral-400",   label: "Standby",    pulse: false },
-    listening: { dot: "bg-emerald-500",   label: "Listening",  pulse: true  },
-    thinking:  { dot: "bg-amber-500",     label: "Thinking",   pulse: true  },
-    speaking:  { dot: "bg-sky-500",       label: "Speaking",   pulse: true  },
+    idle: {
+      dot: "bg-neutral-400", label: "Standby", pulse: false,
+      ring: "ring-1 ring-neutral-200",
+      bg: "bg-white",
+      text: "text-neutral-700",
+    },
+    listening: {
+      dot: "bg-emerald-500", label: "Listening", pulse: true,
+      ring: "ring-1 ring-emerald-200",
+      bg: "bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50",
+      text: "text-emerald-700",
+    },
+    thinking: {
+      dot: "bg-amber-500", label: "Thinking", pulse: true,
+      ring: "ring-1 ring-amber-200",
+      bg: "bg-gradient-to-r from-amber-50 via-orange-50 to-rose-50",
+      text: "text-amber-700",
+    },
+    speaking: {
+      dot: "bg-sky-500", label: "Speaking", pulse: true,
+      ring: "ring-1 ring-sky-200",
+      bg: "bg-gradient-to-r from-sky-50 via-indigo-50 to-fuchsia-50",
+      text: "text-sky-700",
+    },
   } as const;
   const s = map[status];
   return (
-    <div className="flex items-center gap-2 rounded-full bg-white border border-neutral-200 shadow-sm px-3 py-1.5 text-xs font-medium text-neutral-700">
+    <div className={cn(
+      "inline-flex items-center gap-2 rounded-full shadow-sm px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors duration-300",
+      s.bg, s.ring, s.text,
+    )}>
       <span className="relative flex h-2 w-2">
-        {s.pulse && <span className={cn("absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping", s.dot)} />}
+        {s.pulse && <span className={cn("absolute inline-flex h-full w-full rounded-full opacity-70 animate-ping", s.dot)} />}
         <span className={cn("relative inline-flex h-2 w-2 rounded-full", s.dot)} />
       </span>
-      Voice · {s.label}
+      <span className="tracking-wide">Voice</span>
+      <span className="opacity-50">·</span>
+      <span>{s.label}</span>
     </div>
   );
 }
