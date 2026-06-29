@@ -99,9 +99,8 @@ function SignalPage() {
     abortRef.current = true;
     speech.stopSpeaking();
     try {
-      const p = await fetchPlan({ data: {} });
+      const p = await fetchPlan({ data: { symbol: symbol || "XAUUSD" } });
       setPlan(p);
-      // run narration after small delay so chart mounts
       setTimeout(() => runNarration(p), 400);
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
@@ -109,7 +108,7 @@ function SignalPage() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchPlan, runNarration]);
+  }, [fetchPlan, runNarration, symbol]);
 
   useEffect(() => {
     if (authReady && !plan && !loading) load();
