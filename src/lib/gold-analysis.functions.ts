@@ -335,11 +335,12 @@ Return ONLY valid JSON (no markdown) with this exact shape:
     { "type":"tp", "tf":"ltf", "price":<n>, "label":"Take Profit" }
   ],
   "narration": [
-    { "say": "First, dekho 1 hour HTF par bias bullish hai — BOS clearly bana hua hai yahan.", "markingIndex": 0, "tf":"htf" },
-    { "say": "Yahan demand zone mark kar diya — institutional buying yahin se aayi.", "markingIndex": 1, "tf":"htf" },
-    { "say": "Ab LTF 15 minute par aate hain, FVG mil gaya is range mein.", "markingIndex": 2, "tf":"ltf" },
-    { "say": "Liquidity yahan resting hai — price isay sweep karke reverse karega.", "markingIndex": 3, "tf":"ltf" },
-    { "say": "Entry yahan FVG ke andar, stop loss zone ke neeche, take profit liquidity ke upar.", "markingIndex": 5, "tf":"ltf" }
+    { "say": "Opening with the higher timeframe — on the 1 hour gold is printing a clean bullish market structure.", "markingIndex": 0, "tf":"htf" },
+    { "say": "Notice this bullish break of structure here — buyers took out the previous high with strong displacement.", "markingIndex": 0, "tf":"htf" },
+    { "say": "I am marking the HTF demand order block right here — this is where institutional buyers stepped in.", "markingIndex": 1, "tf":"htf" },
+    { "say": "Dropping down to the 15 minute, we have a clean bullish fair value gap left unfilled in this range.", "markingIndex": 2, "tf":"ltf" },
+    { "say": "Liquidity is resting above these equal highs — price will likely sweep this pool before the real move.", "markingIndex": 3, "tf":"ltf" },
+    { "say": "Entry inside the FVG with the order block as confluence, stop loss below the demand, take profit at the liquidity above.", "markingIndex": 5, "tf":"ltf" }
   ],
   "trade": {
     "direction":"BUY"|"SELL"|"WAIT",
@@ -347,17 +348,18 @@ Return ONLY valid JSON (no markdown) with this exact shape:
     "sl": <number>,
     "tp": <number>,
     "rr": <number>,
-    "confidence": 60-95,
-    "summary": "Final spoken summary — direction, entry, SL, TP, RR, confidence."
+    "confidence": 70-95,
+    "summary": "Final spoken summary in English — direction, entry, stop loss, take profit, risk reward and confidence."
   }
 }
 
 Rules:
-- fromTime / toTime MUST be unix seconds taken from the provided candles (use the exact timestamps you see).
-- ltf trade levels (entry/sl/tp) must respect current price ${last.c.toFixed(2)} and yield realistic RR >= 1.5.
-- 5-8 narration steps total. Each step references one marking by its index in the markings array (or null for general comments). Speak in warm Hinglish / Roman Urdu, like a senior trader explaining to a student. Keep each "say" under 25 words.
-- Build HTF context FIRST (bias, BOS/CHOCH, HTF OB or zone), then LTF refinement (FVG, OB, liquidity), then entry/SL/TP.
-- If conditions are not A+ set direction="WAIT" and explain why in trade.summary.`;
+- fromTime / toTime MUST be unix seconds taken EXACTLY from the provided candles.
+- LTF trade levels (entry/sl/tp) must respect current price ${last.c.toFixed(2)} and yield realistic RR >= 1.8.
+- Produce 7-10 narration steps. Each step references one marking by its index (or null for general commentary). Each "say" is 12-28 words, professional English, confident tone of a 25-year veteran.
+- ALWAYS include at least: 1 HTF BOS or CHOCH, 1 HTF order block or zone, 1 LTF FVG, 1 LTF order block, 1 liquidity level, plus entry/sl/tp.
+- Build HTF context FIRST (bias, structure, HTF OB/zone, liquidity), then LTF refinement (FVG, OB, inducement, sweep), then precise entry/SL/TP with logic.
+- If conditions are not A+ set direction="WAIT", confidence<=55, and explain in trade.summary what is missing.`;
 
     const user = `LIVE GOLD CANDLES (unix-seconds | O,H,L,C)
 CURRENT PRICE: ${last.c.toFixed(2)}
