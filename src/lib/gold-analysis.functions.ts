@@ -82,8 +82,33 @@ async function fetchFromYahoo(tf: string): Promise<Candle[]> {
   throw lastErr ?? new Error("Yahoo unavailable");
 }
 
+async function fetchFromBinance(tf: string): Promise<Candle[]> {
+  const map: Record<string, string> = {
+    "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m",
+    "1h": "1h", "4h": "4h", "1d": "1d",
+  };
+  const interval = map[tf] ?? "15m";
+  const hosts = ["api.binance.com", "data-api.binance.vision"];
+  const symbols = ["PAXGUSDT", "XAUTUSDT"];
+  let lastErr: any = null;
+  for (const host of hosts) {
+    for (const sym of symbols) {
+      try {
+        const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
+        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        if (!res.ok) { lastErr = new Error(`Binance ${host}/${sym}: ${res.status}`); continue; }
+        const rows: any[] = await res.json();
+        const candles: Candle[] = rows.map((r) => ({
+          t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
+        })).filter((c) => isFinite(c.c));
+        if (candles.length >= 10) return candles.slice(-180);
+      } catch (e) { lastErr = e; }
+    }
+  }
+  throw lastErr ?? new Error("Binance unavailable");
+}
+
 async function fetchFromStooq(): Promise<Candle[]> {
-  // Daily fallback only
   const res = await fetch("https://stooq.com/q/d/l/?s=xauusd&i=d", {
     headers: { "User-Agent": "Mozilla/5.0" },
   });
@@ -105,14 +130,18 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
   const cached = candleCache.get(tf);
   const now = Date.now();
   if (cached && now - cached.at < CACHE_TTL) return cached.data;
+  // Binance PAXG (tokenized gold, tracks XAU/USD closely) — most edge-friendly
+  try {
+    const data = await fetchFromBinance(tf);
+    candleCache.set(tf, { at: now, data });
+    return data;
+  } catch {}
   try {
     const data = await fetchFromYahoo(tf);
     candleCache.set(tf, { at: now, data });
     return data;
   } catch (e) {
-    // Stale cache fallback
     if (cached) return cached.data;
-    // Last-resort daily fallback
     try {
       const data = await fetchFromStooq();
       candleCache.set(tf, { at: now, data });
