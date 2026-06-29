@@ -327,14 +327,15 @@ function Home() {
               <Mic className="h-4.5 w-4.5" />
             </button>
             <button
-              onClick={endAll}
+              onClick={() => (text.trim() ? submitText() : endAll())}
+              disabled={loading}
               className={cn(
-                "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition",
+                "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition disabled:opacity-50",
                 dark ? "bg-white text-black hover:bg-neutral-200" : "bg-black text-white hover:bg-neutral-800",
               )}
-              aria-label="End"
+              aria-label={text.trim() ? "Send message" : "End"}
             >
-              <X className="h-4 w-4" />
+              {text.trim() ? <ArrowUp className="h-4 w-4" /> : <X className="h-4 w-4" />}
             </button>
           </div>
         </div>
