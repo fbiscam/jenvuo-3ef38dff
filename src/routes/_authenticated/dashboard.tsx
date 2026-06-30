@@ -316,7 +316,7 @@ function DashboardLayout() {
               {greeting()}, {fullName || "Trader"} · Plan <span className="font-medium text-zinc-700">{planTier}</span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 lg:self-end lg:mb-2">
+          <div className="flex items-center gap-1.5 lg:self-end lg:mb-6">
             <Link
               to="/app"
               className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium text-zinc-900 shadow-sm hover:bg-zinc-50"
