@@ -291,95 +291,86 @@ function PricingPage() {
         </div>
       </section>
 
-      {/* FEATURE BLOCKS */}
-      <section className="relative border-y border-zinc-200 bg-zinc-950 text-zinc-100 overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-            backgroundSize: "56px 56px",
-          }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full blur-3xl opacity-20"
-          style={{ background: "radial-gradient(circle, #f59e0b 0%, transparent 70%)" }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full blur-3xl opacity-20"
-          style={{ background: "radial-gradient(circle, #6366f1 0%, transparent 70%)" }}
-        />
-
-        <div className="relative mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-24">
-          <div className="flex items-end justify-between gap-6 mb-12 border-b border-zinc-800 pb-6">
-            <div>
-              <div className={`flex items-center gap-2 ${MONO} text-[10px] uppercase tracking-[0.3em] text-amber-400`}>
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
-                Modules
-              </div>
-              <h2 className="mt-3 text-3xl sm:text-5xl font-semibold tracking-tight">
-                Every capability,<br className="hidden sm:block" />
-                <span className="italic font-light text-zinc-400">visualised.</span>
-              </h2>
-            </div>
-            <div className={`hidden sm:flex flex-col items-end ${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
-              <span className="text-zinc-300 text-2xl font-semibold tracking-tight">06</span>
-              <span>modules</span>
-            </div>
+      {/* PLAN CARDS */}
+      <section className="border-y border-zinc-100 bg-white">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-20">
+          <div className="mb-12 max-w-2xl">
+            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+              Choose your edge.
+            </h2>
+            <p className="mt-3 text-zinc-600">
+              Three tiers. One voice agent. Built for serious gold traders.
+            </p>
           </div>
 
-          <div className="grid gap-px bg-zinc-800 sm:grid-cols-2 lg:grid-cols-3 rounded-2xl overflow-hidden border border-zinc-800">
-            {FEATURE_BLOCKS.map((b, idx) => (
-              <article
-                key={b.title}
-                className="group relative bg-zinc-950 hover:bg-zinc-900 transition-colors duration-300"
-              >
-                <div className="aspect-[4/3] overflow-hidden bg-zinc-900 relative">
-                  <img
-                    src={b.img}
-                    alt={b.title}
-                    width={1024}
-                    height={768}
-                    loading="lazy"
-                    className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-[1.04] transition duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/30 to-transparent" />
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <span className={`${MONO} text-[9px] uppercase tracking-wider px-2 py-1 rounded bg-zinc-950/80 backdrop-blur border border-zinc-700 text-amber-400`}>
-                      {b.tag}
+          <div className="grid gap-6 md:grid-cols-3">
+            {TIERS.map((tier) => {
+              const Icon = tier.icon;
+              const highlight = tier.highlight;
+              return (
+                <article
+                  key={tier.id}
+                  className={`relative rounded-3xl border p-7 flex flex-col transition ${
+                    highlight
+                      ? "bg-zinc-950 text-white border-zinc-950 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)]"
+                      : "bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.2)]"
+                  }`}
+                >
+                  {highlight && (
+                    <div className="absolute -top-3 left-7">
+                      <span className={`${MONO} text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-400 text-zinc-950 font-bold`}>
+                        Most popular
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <div className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${
+                      highlight ? "bg-white/10 text-amber-400" : "bg-zinc-100 text-zinc-900"
+                    }`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <span className={`${MONO} text-[10px] uppercase tracking-wider ${highlight ? "text-zinc-400" : "text-zinc-500"}`}>
+                      {tier.bestFor}
                     </span>
                   </div>
-                  <div className={`absolute top-3 right-3 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>
-                    0{idx + 1} / 06
+
+                  <h3 className="mt-5 text-xl font-semibold tracking-tight">{tier.name}</h3>
+                  <p className={`mt-1 text-sm ${highlight ? "text-zinc-400" : "text-zinc-600"}`}>{tier.tagline}</p>
+
+                  <div className="mt-6 flex items-baseline gap-1">
+                    <span className="text-5xl font-semibold tracking-tight">
+                      ${tier.price}
+                    </span>
+                    <span className={`text-sm ${highlight ? "text-zinc-400" : "text-zinc-500"}`}>/mo</span>
                   </div>
-                </div>
 
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold tracking-tight text-white">{b.title}</h3>
-                  <p className="mt-2 text-sm text-zinc-400 leading-relaxed line-clamp-3">{b.desc}</p>
+                  <ul className={`mt-7 space-y-3 text-sm ${highlight ? "text-zinc-200" : "text-zinc-700"}`}>
+                    {tier.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2.5">
+                        <Check className={`mt-0.5 h-4 w-4 flex-shrink-0 ${highlight ? "text-amber-400" : "text-zinc-900"}`} />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
 
-                  <div className="mt-5 flex items-center justify-between pt-4 border-t border-zinc-800">
-                    <div className={`${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>
-                      {b.tone}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-amber-400 opacity-0 group-hover:opacity-100 translate-x-[-4px] group-hover:translate-x-0 transition-all duration-300">
-                      <span className={`${MONO} text-[9px] uppercase tracking-wider`}>Live</span>
-                      <span className="inline-block h-1 w-1 rounded-full bg-amber-400" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* corner accent */}
-                <span className="absolute top-0 left-0 h-3 w-3 border-t border-l border-amber-400/0 group-hover:border-amber-400/60 transition" />
-                <span className="absolute bottom-0 right-0 h-3 w-3 border-b border-r border-amber-400/0 group-hover:border-amber-400/60 transition" />
-              </article>
-            ))}
+                  <Link
+                    to={tier.ctaTo}
+                    className={`mt-8 inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-medium transition ${
+                      highlight
+                        ? "bg-amber-400 text-zinc-950 hover:bg-amber-300"
+                        : "bg-zinc-900 text-white hover:bg-black"
+                    }`}
+                  >
+                    {tier.cta}
+                  </Link>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
+
 
 
 
