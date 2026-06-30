@@ -33,8 +33,9 @@ function DashboardLayout() {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    window.location.href = "/auth";
+    window.location.href = "/";
   };
+
 
   return (
     <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased" style={{ zoom: 1.25 }}>
