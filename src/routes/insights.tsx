@@ -95,19 +95,24 @@ function InsightsPage() {
             </div>
           </div>
           
-          {/* CNN-STYLE BREAKING TICKER */}
-          {breakingNews.length > 0 && (
+          {/* CNN-STYLE BREAKING TICKER — clickable, links to articles */}
+          {tickerItems.length > 0 && (
             <div className="bg-red-600 text-white overflow-hidden py-1.5 px-4 sm:px-6">
               <div className="mx-auto max-w-6xl flex items-center gap-4">
                 <span className={`${MONO} text-[10px] font-bold uppercase bg-white text-red-600 px-1.5 py-0.5 rounded shrink-0 animate-pulse`}>
-                  Breaking
+                  Live
                 </span>
                 <div className="flex-1 overflow-hidden">
                   <div className="flex gap-10 whitespace-nowrap animate-ticker-fast">
-                    {[...breakingNews, ...breakingNews].map((news, i) => (
-                      <span key={news.id + i} className="text-xs font-medium tracking-tight">
-                        {news.title}
-                      </span>
+                    {[...tickerItems, ...tickerItems].map((news, i) => (
+                      <Link
+                        key={news.id + "-" + i}
+                        to="/insights/$slug"
+                        params={{ slug: news.slug }}
+                        className="text-xs font-medium tracking-tight hover:underline shrink-0"
+                      >
+                        {news.is_breaking ? "● BREAKING — " : "› "}{news.title}
+                      </Link>
                     ))}
                   </div>
                 </div>
