@@ -619,7 +619,7 @@ function SignalPage() {
             </div>
 
             {/* RIGHT — intelligence */}
-            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 space-y-6 overflow-y-auto max-h-[820px]">
+            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 flex flex-col gap-6 overflow-y-auto max-h-[820px]">
               <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
                 Intelligence Dashboard
               </h3>
@@ -751,7 +751,7 @@ function SignalPage() {
 
               <Link
                 to="/app"
-                className="w-full inline-flex items-center justify-center py-3 bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-800 transition-colors uppercase"
+                className="mt-auto w-full inline-flex items-center justify-center py-3 bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-800 transition-colors uppercase"
               >
                 Execute Voice Trade
               </Link>
