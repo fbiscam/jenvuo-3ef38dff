@@ -189,11 +189,15 @@ function PricingPage() {
         <div className="mb-10 grid gap-4 sm:hidden">
           {TIERS.map((t) => {
             const accent = t.id === "pro";
+            const isCurrent = currentPlan === t.id;
             return (
-              <div key={t.id} className={`rounded-2xl border ${accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
-                <div className="flex items-center justify-between">
+              <div key={t.id} className={`rounded-2xl border ${isCurrent ? "border-emerald-400 bg-emerald-50/40" : accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <span className={`text-base font-semibold ${accent ? "text-amber-700" : "text-zinc-900"}`}>{t.name}</span>
-                  {accent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>}
+                  <div className="flex items-center gap-1.5">
+                    {isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>Current</span>}
+                    {accent && !isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>}
+                  </div>
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
                   <span className="text-2xl font-bold tracking-tight text-zinc-900">${t.price}</span>
@@ -205,7 +209,11 @@ function PricingPage() {
                     <li key={f} className="flex gap-2"><span className="text-zinc-400">·</span><span>{f}</span></li>
                   ))}
                 </ul>
-                <Link to={t.ctaTo} className={`mt-5 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-xs font-medium ${accent ? "bg-zinc-900 text-white" : "border border-zinc-300 bg-white text-zinc-900"}`}>{t.cta}</Link>
+                {isCurrent ? (
+                  <div className="mt-5 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">Active plan</div>
+                ) : (
+                  <Link to={t.ctaTo} className={`mt-5 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-xs font-medium ${accent ? "bg-zinc-900 text-white" : "border border-zinc-300 bg-white text-zinc-900"}`}>{t.cta}</Link>
+                )}
               </div>
             );
           })}
