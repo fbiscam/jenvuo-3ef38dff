@@ -1,76 +1,35 @@
+# Mobile Alignment Optimization
 
-## Goal
+Flip mobile defaults so every title, card, hero, and CTA reads flush-left on small screens, matching the desktop alignment. Today many sections use `text-center ... md:text-left` (centered on mobile, left on desktop). We'll invert that to `text-left ... md:text-left` so mobile mirrors desktop.
 
-Right now each Help Center query opens its own URL, but the article bodies are only 1–3 lines. You want every query to open a **proper, full-length article page** with real explanation, steps, and supporting detail — like OpenAI's Help Center.
+## Scope (entire site)
 
-The routing already works (`/help/$collection/$slug`). This plan focuses on rewriting the **content** of all 19 articles in `src/lib/help-content.ts` and lightly upgrading the article page layout to render that richer content well.
+Routes & shared components:
 
-## Scope — 19 articles across 6 collections
+- `src/routes/index.tsx`, `pricing.tsx`, `download.tsx`, `contact.tsx`, `auth.tsx`, `app.tsx`, `unsubscribe.tsx`
+- `insights.index.tsx`, `insights.$slug.tsx`
+- `help.tsx`, `help.$collection.tsx`, `help.$collection.$slug.tsx`
+- `_authenticated/dashboard.tsx`, `dashboard.index.tsx`, `dashboard.billing.tsx`, `dashboard.journal.tsx`
+- `components/PageShell.tsx`, `SiteFooter.tsx`, `UpgradeOverlay.tsx`, `AlertsHistoryPanel.tsx`
 
-Each article will be rewritten to include: intro paragraph → "What you need to know" → step-by-step instructions (where relevant) → tips / common pitfalls → related links.
+## Transform rules (applied via regex sweep)
 
-**Getting Started (4)**
-- What is Jenvu AI?
-- How do I create an account?
-- Generate your first signal
-- Which assets does Jenvu support?
+Only flip when desktop already opts to left — preserves intentional centering (pricing matrix data cells, modals, etc.):
 
-**Voice Agent (3)**
-- How do I talk to the agent?
-- Mic isn't working — what to check
-- What can I ask?
+- `text-center <bp>:text-left` → `text-left <bp>:text-left`
+- `items-center <bp>:items-start|end` → `items-start ...`
+- `justify-center <bp>:justify-start|between|end` → `justify-start ...`
+- `mx-auto <bp>:mx-0` → `<bp>:mx-0` (remove mobile auto-centering of max-w blocks)
+- `flex-col items-center <bp>:flex-row` → `flex-col items-start <bp>:flex-row`
 
-**Signal Engine (3)**
-- How are signals generated?
-- What makes a setup A+?
-- What happens when markets are closed?
+Then spot-fix any remaining headline / card title that's still centered on mobile but not on desktop.
 
-**Plans, Credits & Billing (3)**
-- Plan comparison
-- How much does each action cost?
-- How do I upgrade or cancel?
+## Guardrails
 
-**Account & Security (4)**
-- Reset your password
-- Change your email
-- Delete your account
-- How is my data handled?
+- No structural, color, spacing, typography, or functionality changes.
+- Desktop appearance unchanged (every removed mobile centering has an existing `sm/md/lg:` counterpart).
+- Keep numeric/data cells centered where semantics demand (pricing comparison values, status dots).
 
-**Mobile App (2)**
-- Install on iOS and Android
-- Enable push notifications
+## Verification
 
-## Content upgrades
-
-1. **Extend the `Block` type** in `src/lib/help-content.ts` to support richer formatting:
-   - `h3` subheadings
-   - `ol` (numbered steps) in addition to `ul`
-   - `note` / `callout` (for tips, warnings, "good to know")
-   - `code` (for command examples like voice prompts)
-2. **Rewrite all 19 article bodies** with multi-section content (typical 250–500 words per article, sectioned with H2/H3, bullet lists, numbered steps, and at least one callout where appropriate).
-3. Keep titles and slugs unchanged so existing URLs / SEO stay intact.
-
-## Article page layout upgrades
-
-In `src/routes/help.$collection.$slug.tsx`:
-- Render the new block types (`h3`, `ol`, `note`, `code`) with the existing zinc/mono theme.
-- Add a sticky **"On this page"** table of contents (auto-built from H2s) on the right on desktop.
-- Keep "Was this helpful?" feedback and Related articles as they are.
-- Update reading-time estimate to reflect the longer bodies.
-
-## SEO
-
-- Per-article `description` will be regenerated from the new summary so meta descriptions stay tight (≤160 chars).
-- Existing JSON-LD (`Article` + `BreadcrumbList`) stays — it already pulls from `loaderData`.
-- No URL changes → no redirects needed.
-
-## Out of scope
-
-- No new collections or new articles beyond the existing 19 (can be added later).
-- No backend changes — content stays static in `help-content.ts`.
-- No design overhaul of the Help hub or collection pages.
-
-## Technical notes
-
-- Files touched: `src/lib/help-content.ts` (type + content), `src/routes/help.$collection.$slug.tsx` (new block renderers + TOC).
-- Help hub search already indexes `article.body` items, so the richer content will automatically improve search hits.
+Playwright at 390×844 mobile across `/`, `/pricing`, `/help`, `/insights`, `/contact`, `/download`, `/auth`, `/dashboard`; spot-check 1280×800 desktop unchanged.

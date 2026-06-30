@@ -157,7 +157,7 @@ function PricingPage() {
 
       {/* HERO */}
       <section className="relative border-b border-zinc-100 overflow-hidden">
-        <div className="relative mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-24 text-center">
+        <div className="relative mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-24 text-left sm:text-center">
           
           <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
             Trade gold with an institutional edge.
@@ -165,7 +165,7 @@ function PricingPage() {
           <p className="mx-auto mt-5 max-w-2xl text-base text-zinc-600 sm:text-lg">
             One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of professional desk methodology.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-2">
+          <div className="mt-8 flex flex-wrap justify-start sm:justify-center gap-2">
             {["A+ Setups", "ICT / SMC", "< 30s Alerts", "25Y Methodology"].map((s) => (
               <span key={s} className={`${MONO} text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-zinc-200 bg-white text-zinc-700`}>
                 {s}
@@ -380,7 +380,7 @@ function PricingPage() {
       {/* FAQ */}
       <section className="border-t border-zinc-100 bg-zinc-50/50">
         <div className="mx-auto max-w-3xl px-5 sm:px-6 py-16 sm:py-20">
-          <div className="text-center mb-10">
+          <div className="text-left sm:text-center mb-10">
             
             <h3 className="mt-3 text-3xl font-semibold tracking-tight">Frequently asked</h3>
           </div>

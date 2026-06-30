@@ -297,7 +297,7 @@ function ContactPage() {
                     </div>
                   )}
 
-                  <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
+                  <div className="flex flex-col-reverse sm:flex-row sm:items-start sm:justify-between gap-3 pt-2">
                     <p className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-400`}>
                       ENCRYPTED · STORED SECURELY · SAFE
                     </p>

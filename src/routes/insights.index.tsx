@@ -214,7 +214,7 @@ function InsightsPage() {
 
         {/* MAIN FEED */}
         <main className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-20">
-          <div className="flex flex-col gap-4 border-b border-zinc-100 pb-6 mb-10 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 border-b border-zinc-100 pb-6 mb-10 sm:flex-row sm:items-start sm:justify-between">
             <h2 className={`text-xl font-bold ${MONO} uppercase tracking-[0.2em]`}>Terminal Briefings</h2>
             <div className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 p-1 text-xs font-medium">
               {filters.map((f) => {
