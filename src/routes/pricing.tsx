@@ -243,7 +243,9 @@ function PricingPage() {
             <tbody>
               {([
                 { f: "Price", a: "Free", b: "$49/mo", c: "$149/mo", d: "Custom", isHeading: true },
+                { f: "Monthly credits", a: "10", b: "500", c: "2,000", d: "Custom" },
                 { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+
                 { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
                 { f: "A+ signal access", a: false, b: true, c: true, d: true },
                 { f: "ICT / SMC narration", a: false, b: true, c: true, d: true },
