@@ -50,7 +50,7 @@ function AboutPage() {
         <H2>Contact</H2>
         <P>
           Press, partnerships, or feedback — reach the team through the address listed in
-          the published site footer. We read everything.
+          the published site footer.{"\u00a0"}
         </P>
       </section>
     </PageShell>
