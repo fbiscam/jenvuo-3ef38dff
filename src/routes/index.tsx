@@ -744,6 +744,56 @@ function HomePage() {
             })}
           </div>
 
+          {/* Comparison matrix */}
+          <div className="mt-16">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 05 / COMPARE ]</p>
+              <p className={`${MONO} hidden sm:block text-[10px] uppercase tracking-wider text-zinc-400`}>10 capabilities</p>
+            </div>
+            <div className="rounded-2xl border border-zinc-200 overflow-hidden bg-white">
+              <table className="w-full text-sm">
+                <thead className="bg-zinc-900 text-white">
+                  <tr>
+                    <th className={`text-left px-5 py-4 ${MONO} text-[10px] uppercase tracking-wider font-medium`}>Feature</th>
+                    <th className={`text-center px-5 py-4 ${MONO} text-[10px] uppercase tracking-wider font-medium`}>Free</th>
+                    <th className={`text-center px-5 py-4 ${MONO} text-[10px] uppercase tracking-wider font-medium text-amber-400`}>Pro</th>
+                    <th className={`text-center px-5 py-4 ${MONO} text-[10px] uppercase tracking-wider font-medium`}>Elite</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-200">
+                  {([
+                    { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited" },
+                    { f: "A+ signal access", a: false, b: true, c: true },
+                    { f: "Alert latency", a: "4h delay", b: "Realtime", c: "< 30s priority" },
+                    { f: "ICT / SMC narration", a: false, b: true, c: true },
+                    { f: "Multi-timeframe bias", a: false, b: true, c: true },
+                    { f: "Trade journal", a: false, b: true, c: true },
+                    { f: "Multi-pair scanner", a: false, b: false, c: true },
+                    { f: "API & webhooks", a: false, b: false, c: true },
+                    { f: "Custom alert rules", a: false, b: false, c: true },
+                    { f: "Dedicated onboarding", a: false, b: false, c: true },
+                  ] as const).map((row) => (
+                    <tr key={row.f} className="hover:bg-zinc-50/70 transition">
+                      <td className="px-5 py-3.5 font-medium text-zinc-900">{row.f}</td>
+                      {[row.a, row.b, row.c].map((v, i) => (
+                        <td key={i} className={`px-5 py-3.5 text-center ${i === 1 ? "bg-amber-50/40" : ""}`}>
+                          {v === true ? (
+                            <Check className="inline h-4 w-4 text-emerald-600" />
+                          ) : v === false ? (
+                            <Minus className="inline h-4 w-4 text-zinc-300" />
+                          ) : (
+                            <span className={`${MONO} text-[11px] uppercase tracking-wider text-zinc-700`}>{v}</span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
           {/* Footer strip */}
           <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white px-6 py-5 sm:flex-row">
             <div className="flex items-center gap-3">
