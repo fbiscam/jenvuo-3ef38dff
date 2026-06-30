@@ -1189,8 +1189,8 @@ function SignalVoiceAgent({
   const showInput = inputOpen || status !== "idle" || messages.length > 0;
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-center">
+    <div className="flex flex-col gap-4 min-h-[180px]">
+      <div className={cn("flex justify-center", !showInput && "flex-1 items-center")}>
         <button
           type="button"
           onClick={() => setInputOpen((v) => !v)}
@@ -1200,6 +1200,8 @@ function SignalVoiceAgent({
           <SignalOrb status={status} pulse={speech.wordPulse} />
         </button>
       </div>
+
+
 
       {messages.length > 0 && (
         <div
@@ -1225,7 +1227,7 @@ function SignalVoiceAgent({
       <div
         className={cn(
           "flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white pl-2.5 pr-1 py-1 transition-opacity",
-          showInput ? "opacity-100" : "opacity-0 pointer-events-none",
+          showInput ? "opacity-100" : "hidden",
         )}
         aria-hidden={!showInput}
       >
