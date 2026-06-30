@@ -3,6 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Trash2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
+import { useCredits } from "@/hooks/useCredits";
+import UpgradeOverlay from "@/components/UpgradeOverlay";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/journal")({
   component: Journal,
