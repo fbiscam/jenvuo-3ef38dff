@@ -272,8 +272,8 @@ function InsightDetailPage() {
 
           <div className="mt-20 pt-10 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-zinc-400">
-                J
+              <div className="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center overflow-hidden">
+                <img src="/favicon.png" alt="JENVU AI" className="h-7 w-7 object-contain" />
               </div>
               <div>
                 <div className="text-sm font-semibold text-zinc-900">Jenvu Terminal Engine</div>
