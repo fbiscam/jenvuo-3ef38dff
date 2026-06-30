@@ -138,10 +138,42 @@ function SignalPage() {
     });
   }, [navigate]);
 
+  const [voiceBlocked, setVoiceBlocked] = useState(false);
+  const [activeTf, setActiveTf] = useState<"htf" | "ltf" | null>(null);
+
   const speakWait = useCallback(
     (text: string) =>
       new Promise<void>((resolve) => {
-        speech.speak(text, () => resolve());
+        if (!text || !text.trim()) return resolve();
+        const words = text.split(/\s+/).filter(Boolean).length;
+        const minMs = Math.max(2500, words * 320);
+        let done = false;
+        const finish = () => { if (!done) { done = true; resolve(); } };
+        // Hard ceiling so a stuck onend never blocks the walkthrough.
+        const ceiling = setTimeout(finish, Math.max(minMs + 4000, words * 600));
+        try {
+          let started = false;
+          const startCheck = setTimeout(() => {
+            // If speech never started within 400ms, treat as blocked → caption mode.
+            if (!started) {
+              setVoiceBlocked(true);
+              setTimeout(() => { clearTimeout(ceiling); finish(); }, minMs);
+            }
+          }, 400);
+          // monkey-patch onstart detection by piggy-backing on speaking flag tick
+          const tick = setInterval(() => {
+            if (window.speechSynthesis?.speaking) { started = true; clearInterval(tick); clearTimeout(startCheck); }
+          }, 80);
+          speech.speak(text, () => {
+            clearInterval(tick); clearTimeout(startCheck); clearTimeout(ceiling);
+            // Guarantee minimum pause even if TTS finished too fast.
+            const elapsed = 0;
+            setTimeout(finish, Math.max(0, minMs - elapsed));
+          });
+        } catch {
+          setVoiceBlocked(true);
+          setTimeout(finish, minMs);
+        }
       }),
     [speech],
   );
@@ -151,11 +183,12 @@ function SignalPage() {
       htfRef.current?.clear();
       ltfRef.current?.clear();
       setStep(-1);
+      setActiveTf(null);
       setPlaying(true);
       abortRef.current = false;
 
-      // Pre-draw all locally-detected zones (Premium/Discount/OTE/Liquidity/EQH/EQL)
-      // — these are static context, drawn at start, not narrated.
+      // Pre-draw static context zones (Premium/Discount/OTE/Liquidity/EQH/EQL)
+      // so they sit on the chart before narration starts.
       const autoTypes = new Set([
         "premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql",
       ]);
@@ -172,24 +205,33 @@ function SignalPage() {
           if (abortRef.current) break;
           const n = p.narration[i];
           setStep(i);
+          setActiveTf(n.tf);
           if (n.markingIndex != null && p.markings[n.markingIndex]) {
             const m = p.markings[n.markingIndex];
-            if (m.tf === "htf") htfRef.current?.drawMarking(m);
-            else ltfRef.current?.drawMarking(m);
+            const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
+            target?.drawMarking(m);
+            // Give the box one frame to mount, then focus + pulse it.
+            await new Promise((r) => setTimeout(r, 60));
+            target?.focusMarking(m);
           }
           await speakWait(n.say);
-          await new Promise((r) => setTimeout(r, 250));
         }
         if (!abortRef.current) {
+          // Final reveal — draw all entry/sl/tp lines together on LTF.
+          setActiveTf("ltf");
           for (const m of p.markings) {
             if (m.type === "entry" || m.type === "sl" || m.type === "tp") {
               ltfRef.current?.drawMarking(m);
             }
           }
+          const entry = p.markings.find((m) => m.type === "entry");
+          if (entry) ltfRef.current?.focusMarking(entry);
           await speakWait(p.trade.summary);
+          toast.success(`Setup ready · ${p.setupGrade}`);
         }
       } finally {
         setPlaying(false);
+        setActiveTf(null);
       }
     },
     [speakWait],
@@ -204,13 +246,8 @@ function SignalPage() {
       if (!ok) { setLoading(false); return; }
       const p = await fetchPlan({ data: { symbol: symbol || "XAUUSD" } });
       setPlan(p);
-      // ICT/SMC narration is a premium add-on — only for plans with full_ict
-      if (credits.features.full_ict) {
-        const ictOk = await credits.spend("ict_narration", { symbol: symbol || "XAUUSD" });
-        if (ictOk) setTimeout(() => runNarration(p), 400);
-      } else {
-        toast.info("Upgrade to Pro for full ICT/SMC narration.");
-      }
+      // Always run the guided walkthrough — it's the core product, not a paid add-on.
+      setTimeout(() => runNarration(p), 400);
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
     } finally {
