@@ -75,7 +75,13 @@ function AlertPrefs() {
   if (loading) return <div className="text-sm text-zinc-500">Loading…</div>;
 
   return (
+    <UpgradeOverlay
+      show={locked}
+      title="Realtime Alerts are Pro"
+      description="Get A+ setups delivered the moment they form. Upgrade to Pro or Elite to enable realtime alerts."
+    >
     <div className="max-w-2xl space-y-6">
+
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <h2 className="text-base font-semibold">Delivery channels</h2>
         <p className="mt-1 text-sm text-zinc-500">Choose how new A+ setups reach you.</p>
