@@ -642,7 +642,7 @@ function HomePage() {
       <section className="border-t border-zinc-100 bg-zinc-50/40">
         <div className="mx-auto max-w-6xl px-5 sm:px-6 py-20">
           <div className="text-center">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-500">Pricing</p>
+            
             <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">
               Trade gold with an institutional edge.
             </h2>
