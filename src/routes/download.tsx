@@ -54,7 +54,7 @@ type Platform = {
   label: string;
   channel: string;
   blurb: string;
-  status: "AVAILABLE" | "COMING SOON";
+  status: "INSTALL" | "COMING SOON";
   cta: string;
   href: string;
   glyph: string;
