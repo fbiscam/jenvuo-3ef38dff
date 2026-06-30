@@ -124,7 +124,7 @@ const FAQ = [
 
 function PricingPage() {
   return (
-    <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased`} style={{ zoom: 1.25 }}>
+    <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased`} style={{ zoom: 1.1 }}>
 
       {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
