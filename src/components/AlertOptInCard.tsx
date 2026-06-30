@@ -39,6 +39,9 @@ export default function AlertOptInCard() {
       if (!res.ok) throw new Error(res.error || 'Subscription failed')
       setDone(true)
       setEmail('')
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('jenvu:alerts:subscribed', '1')
+      }
     } catch (e: any) {
       setErr(e?.message ?? 'Subscription failed')
     } finally {
