@@ -82,7 +82,7 @@ function HelpCenterPage() {
 
         {/* HERO + SEARCH */}
         <section className="border-b border-zinc-100 bg-gradient-to-b from-zinc-50 to-white">
-          <div className="mx-auto max-w-3xl px-5 sm:px-6 py-16 sm:py-24 text-center">
+          <div className="mx-auto max-w-3xl px-5 sm:px-6 py-16 sm:py-24 text-left sm:text-center">
             <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-zinc-900">
               How can we help?
             </h1>

@@ -157,7 +157,7 @@ function PricingPage() {
 
       {/* HERO */}
       <section className="relative border-b border-zinc-100 overflow-hidden">
-        <div className="relative mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-24 text-center">
+        <div className="relative mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-24 text-left sm:text-center">
           
           <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
             Trade gold with an institutional edge.
@@ -380,7 +380,7 @@ function PricingPage() {
       {/* FAQ */}
       <section className="border-t border-zinc-100 bg-zinc-50/50">
         <div className="mx-auto max-w-3xl px-5 sm:px-6 py-16 sm:py-20">
-          <div className="text-center mb-10">
+          <div className="text-left sm:text-center mb-10">
             
             <h3 className="mt-3 text-3xl font-semibold tracking-tight">Frequently asked</h3>
           </div>
