@@ -67,7 +67,7 @@ export function useLivePriceStream(
       const tick = async () => {
         try {
           const t = await fetchTick({ data: { symbol } });
-          if (stopped) return;
+          if (stopped || !t) return;
           pushTick(t.price, typeof t.t === "number" ? t.t : Date.now());
         } catch { /* keep last */ }
       };
