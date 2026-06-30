@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan } from "@/lib/gold-analysis.functions";
+import { askSignalAgent } from "@/lib/signal-agent.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
@@ -532,29 +533,10 @@ function SignalPage() {
               </div>
 
 
-              {/* Key levels — pinned to bottom of left rail */}
-              {plan && plan.keyLevels.length > 0 && (
-                <div className="space-y-2 mt-auto pt-3 border-t border-zinc-100">
-                  <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Key Levels</span>
-                  <div className="space-y-1">
-                    {plan.keyLevels.map((k, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-zinc-100 last:border-0">
-                        <span className="flex items-center gap-1.5">
-                          <span className={cn("w-1.5 h-1.5 rounded-full",
-                            k.kind === "resistance" ? "bg-rose-500" :
-                            k.kind === "support" ? "bg-emerald-500" :
-                            k.kind === "equilibrium" ? "bg-amber-500" : "bg-sky-500",
-                          )} />
-                          <span className="text-zinc-700">{k.label}</span>
-                        </span>
-                        <span className={`${MONO} font-medium tabular-nums text-zinc-900`}>
-                          {plan.instrument.kind === "crypto" ? "" : "$"}{k.price.toFixed(plan.instrument.decimals)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* AI Agent — replaces Key Levels (moved to right rail) */}
+              <div className="mt-auto pt-3 border-t border-zinc-100">
+                <SignalAgentPanel plan={plan} livePrice={livePrice} />
+              </div>
             </div>
 
 
@@ -644,6 +626,30 @@ function SignalPage() {
 
               {/* A+ Setup Score */}
               {plan && <SetupScoreCard plan={plan} />}
+
+              {/* Key Levels — moved from left rail */}
+              {plan && plan.keyLevels.length > 0 && (
+                <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3">
+                  <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Key Levels</span>
+                  <div className="space-y-1">
+                    {plan.keyLevels.map((k, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-zinc-100 last:border-0">
+                        <span className="flex items-center gap-1.5">
+                          <span className={cn("w-1.5 h-1.5 rounded-full",
+                            k.kind === "resistance" ? "bg-rose-500" :
+                            k.kind === "support" ? "bg-emerald-500" :
+                            k.kind === "equilibrium" ? "bg-amber-500" : "bg-sky-500",
+                          )} />
+                          <span className="text-zinc-700">{k.label}</span>
+                        </span>
+                        <span className={`${MONO} font-medium tabular-nums text-zinc-900`}>
+                          {plan.instrument.kind === "crypto" ? "" : "$"}{k.price.toFixed(plan.instrument.decimals)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Market closed notice — replaces tracker/trade card */}
               {marketClosed && plan && (
@@ -1031,6 +1037,124 @@ function TradeTrackerCard({
         </div>
       )}
     </motion.div>
+  );
+}
+
+/* ---------- SIGNAL AGENT PANEL ---------- */
+function SignalAgentPanel({ plan, livePrice }: { plan: SignalPlan | null; livePrice: number | null }) {
+  const ask = useServerFn(askSignalAgent);
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [messages, setMessages] = useState<{ role: "user" | "agent"; text: string }[]>([
+    { role: "agent", text: "Ask me about this setup — bias, entry logic, invalidation, or what to wait for next." },
+  ]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages]);
+
+  const submit = async (text?: string) => {
+    const question = (text ?? q).trim();
+    if (!question || busy) return;
+    setMessages((m) => [...m, { role: "user", text: question }]);
+    setQ("");
+    setBusy(true);
+    try {
+      const ctx = plan ? {
+        symbol: plan.instrument.symbol,
+        bias: plan.htfBias,
+        direction: plan.trade.direction,
+        entry: plan.trade.entry,
+        sl: plan.trade.sl,
+        tp: plan.trade.tp,
+        rr: plan.trade.rr,
+        setupGrade: plan.setupGrade,
+        setupScore: plan.setupScore,
+        session: plan.session,
+        killzone: plan.killzone,
+        confluences: plan.confluences,
+        keyLevels: plan.keyLevels.map((k) => ({ label: k.label, price: k.price, kind: k.kind })),
+        currentPrice: livePrice ?? plan.currentPrice,
+      } : undefined;
+      const res = await ask({ data: { question, context: ctx } });
+      setMessages((m) => [...m, { role: "agent", text: res.reply }]);
+    } catch (e: any) {
+      setMessages((m) => [...m, { role: "agent", text: e?.message || "Agent failed to respond." }]);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const suggestions = ["Why this bias?", "Where is invalidation?", "What confirms entry?"];
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500 inline-flex items-center gap-1.5`}>
+          <Sparkles className="h-3 w-3 text-zinc-900" /> AI Agent
+        </span>
+        <span className={`text-[9px] ${MONO} tracking-widest uppercase ${busy ? "text-amber-600" : "text-emerald-600"}`}>
+          {busy ? "thinking" : "online"}
+        </span>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-2 space-y-1.5 max-h-44 overflow-y-auto"
+      >
+        {messages.map((m, i) => (
+          <div
+            key={i}
+            className={cn(
+              "text-[11.5px] leading-snug rounded-md px-2 py-1.5",
+              m.role === "user"
+                ? "bg-zinc-900 text-white ml-6"
+                : "bg-white border border-zinc-100 text-zinc-800 mr-6",
+            )}
+          >
+            {m.text}
+          </div>
+        ))}
+        {busy && (
+          <div className="text-[11px] text-zinc-500 inline-flex items-center gap-1.5">
+            <Loader2 className="h-3 w-3 animate-spin" /> analyzing context…
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-1">
+        {suggestions.map((s) => (
+          <button
+            key={s}
+            onClick={() => submit(s)}
+            disabled={busy}
+            className="text-[10px] px-2 py-1 rounded-md border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 disabled:opacity-40"
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white pl-2.5 pr-1 py-1">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+          placeholder="Ask the agent…"
+          disabled={busy}
+          className="flex-1 bg-transparent text-[12px] text-zinc-900 placeholder:text-zinc-400 outline-none"
+        />
+        <button
+          onClick={() => submit()}
+          disabled={busy || !q.trim()}
+          className="h-6 w-6 inline-flex items-center justify-center rounded-md bg-zinc-900 text-white disabled:opacity-40 hover:bg-zinc-800"
+          aria-label="Send"
+        >
+          <Send className="h-3 w-3" />
+        </button>
+      </div>
+    </div>
   );
 }
 
