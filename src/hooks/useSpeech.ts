@@ -180,9 +180,16 @@ export function useSpeech() {
     }
   }, [safeStart]);
 
-  const speak = useCallback((text: string, onDone?: () => void) => {
-    if (typeof window === "undefined" || !text) return;
-    window.speechSynthesis.cancel();
+  // --- queued speech with interrupt+resume ---
+  const queueRef = useRef<string[]>([]);
+  const currentTextRef = useRef<string>("");
+  const currentCharRef = useRef<number>(0);
+  const currentIdRef = useRef<number>(0);
+
+  const _speakOne = useCallback((text: string) => {
+    const id = ++currentIdRef.current;
+    currentTextRef.current = text;
+    currentCharRef.current = 0;
     const u = new SpeechSynthesisUtterance(text);
     if (voiceRef.current) u.voice = voiceRef.current;
     const preset = VOICE_PRESETS.find((p) => p.key === voicePresetRef.current) ?? VOICE_PRESETS[0];
@@ -191,14 +198,45 @@ export function useSpeech() {
     u.volume = 1;
     u.onstart = () => { setSpeaking(true); setWordPulse((n) => n + 1); };
     u.onboundary = (ev: any) => {
+      if (typeof ev?.charIndex === "number") currentCharRef.current = ev.charIndex;
       if (!ev || ev.name === undefined || ev.name === "word") setWordPulse((n) => n + 1);
     };
-    u.onend = () => { setSpeaking(false); onDone?.(); };
-    u.onerror = () => { setSpeaking(false); onDone?.(); };
+    const advance = () => {
+      if (id !== currentIdRef.current) return; // invalidated by interrupt
+      const next = queueRef.current.shift();
+      if (next) {
+        _speakOne(next);
+      } else {
+        currentTextRef.current = "";
+        currentCharRef.current = 0;
+        setSpeaking(false);
+      }
+    };
+    u.onend = advance;
+    u.onerror = advance;
     window.speechSynthesis.speak(u);
   }, []);
 
+  const speak = useCallback((text: string, _onDone?: () => void) => {
+    if (typeof window === "undefined" || !text) return;
+    // If already speaking, capture the rest of the current sentence and queue it AFTER the new reply.
+    let remaining = "";
+    if (window.speechSynthesis.speaking && currentTextRef.current) {
+      remaining = currentTextRef.current.slice(currentCharRef.current).trim();
+    }
+    const previous = queueRef.current.slice();
+    queueRef.current = [...(remaining ? [remaining] : []), ...previous];
+    currentIdRef.current++; // invalidate any in-flight onend
+    window.speechSynthesis.cancel();
+    // small delay so cancel() finishes before the new utterance starts (Chrome quirk)
+    setTimeout(() => _speakOne(text), 80);
+  }, [_speakOne]);
+
   const stopSpeaking = useCallback(() => {
+    currentIdRef.current++;
+    queueRef.current = [];
+    currentTextRef.current = "";
+    currentCharRef.current = 0;
     window.speechSynthesis.cancel();
     setSpeaking(false);
   }, []);
