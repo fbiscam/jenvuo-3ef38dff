@@ -641,7 +641,7 @@ function HomePage() {
       {/* PRICING */}
       <section className="relative border-t border-zinc-100 bg-white">
 
-        <div className="relative mx-auto max-w-7xl px-5 sm:px-8 py-24">
+        <div className="relative mx-auto max-w-7xl px-5 sm:px-8 pt-14 pb-16">
           {/* Header band */}
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
