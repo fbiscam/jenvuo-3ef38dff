@@ -338,8 +338,8 @@ function DashboardLayout() {
               <Metric
                 label="Credits balance"
                 value={credits.isLoading ? "…" : credits.balance}
-                delta={`${allowancePct}%`}
-                tone="blue"
+                delta={credits.allowance ? (usedPct > 0 ? `-${usedPct}%` : `${remainingPct}%`) : null}
+                tone={balanceTone}
                 seed={3}
               />
               <Metric
@@ -359,14 +359,14 @@ function DashboardLayout() {
                 label="Win rate"
                 value={counts.journalWinRate != null ? `${counts.journalWinRate}%` : "0.0%"}
                 delta={null}
-                tone="blue"
+                tone={counts.journalWinRate != null && counts.journalWinRate < 50 ? "rose" : "blue"}
                 seed={7}
               />
               <Metric
                 label="Journal entries"
                 value={counts.journalTotal}
                 delta={null}
-                tone="rose"
+                tone="zinc"
                 seed={11}
               />
             </div>
@@ -378,14 +378,14 @@ function DashboardLayout() {
               <Metric
                 label="Saved A+ setups"
                 value={counts.saved}
-                delta={counts.saved > 0 ? `${counts.saved}` : null}
+                delta={null}
                 tone="blue"
                 seed={13}
               />
               <Metric
                 label={`Alerts · ${range}`}
                 value={counts.alerts7d}
-                delta={counts.alerts7d > 0 ? `${counts.alerts7d}` : null}
+                delta={null}
                 tone="blue"
                 seed={17}
               />
