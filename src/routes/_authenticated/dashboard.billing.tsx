@@ -1,17 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Check, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   component: Billing,
 });
 
-const TIERS = [
-  { id: "free", name: "Free", price: "$0", features: ["1 voice query/day", "Delayed alerts (4h)", "Public insights"] },
-  { id: "pro", name: "Pro", price: "$49", features: ["Unlimited voice & signal", "Realtime A+ email & push", "Full insights + history", "Trade journal"] },
-  { id: "elite", name: "Elite", price: "$149", features: ["Everything in Pro", "Priority A+ alerts (< 30s)", "Multi-pair scanner", "API access", "Priority support"] },
+const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+
+type Mark = boolean | string;
+
+const MATRIX_ROWS: ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }> = [
+  { f: "Price", a: "Free", b: "$49/mo", c: "$149/mo", d: "Custom", isHeading: true },
+  { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+  { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
+  { f: "A+ signal access", a: false, b: true, c: true, d: true },
+  { f: "ICT / SMC narration", a: false, b: true, c: true, d: true },
+  { f: "Multi-timeframe bias", a: false, b: true, c: true, d: true },
+  { f: "Trade journal", a: false, b: true, c: true, d: true },
+  { f: "Email + push alerts", a: false, b: true, c: true, d: true },
+  { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
+  { f: "API access & webhooks", a: false, b: false, c: true, d: true, badge: "new" },
+  { f: "Custom alert rules", a: false, b: false, c: true, d: true },
+  { f: "Dedicated onboarding", a: false, b: false, c: false, d: true },
+  { f: "Priority desk support", a: false, b: false, c: false, d: true },
 ];
+
+const PLAN_KEY_BY_COL: Record<number, string> = { 0: "free", 1: "pro", 2: "elite", 3: "custom" };
 
 function Billing() {
   const [plan, setPlan] = useState<string>("free");
@@ -25,21 +40,29 @@ function Billing() {
     })();
   }, []);
 
+  const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
+      {/* CURRENT PLAN */}
       <section className="rounded-2xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-500">Current plan</div>
+            <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Current plan</div>
             <div className="mt-2 flex items-center gap-3">
-              <h2 className="text-2xl font-semibold capitalize">{plan}</h2>
+              <h2 className="text-2xl font-semibold">{planLabel}</h2>
               {plan === "free" && (
                 <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-800">
                   Limited
                 </span>
               )}
+              {plan !== "free" && (
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-800">
+                  Active
+                </span>
+              )}
             </div>
-            <p className="mt-2 text-sm text-zinc-500">
+            <p className="mt-2 max-w-xl text-sm text-zinc-500">
               {plan === "free"
                 ? "Upgrade to unlock realtime A+ alerts, unlimited signals, and the trade journal."
                 : "Your plan renews automatically. Manage billing via the customer portal."}
@@ -51,36 +74,123 @@ function Billing() {
         </div>
       </section>
 
+      {/* COMPARISON MATRIX */}
       <section>
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Plans</h3>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          {TIERS.map((t) => {
-            const current = plan === t.id;
-            return (
-              <div
-                key={t.id}
-                className={`rounded-2xl border p-5 ${current ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 bg-white"}`}
-              >
-                <div className="flex items-center justify-between">
-                  <h4 className="text-base font-semibold">{t.name}</h4>
-                  {t.id === "pro" && !current && <Sparkles className="h-4 w-4 text-amber-500" />}
-                </div>
-                <div className={`mt-2 text-2xl font-bold ${current ? "text-white" : "text-zinc-900"}`}>
-                  {t.price}
-                  <span className={`text-sm font-normal ${current ? "text-zinc-400" : "text-zinc-500"}`}>/mo</span>
-                </div>
-                <ul className={`mt-4 space-y-2 text-xs ${current ? "text-zinc-300" : "text-zinc-600"}`}>
-                  {t.features.map((f) => (
-                    <li key={f} className="flex items-start gap-1.5">
-                      <Check className="mt-0.5 h-3 w-3 shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                {current && <div className="mt-4 rounded-md bg-white/10 px-2 py-1 text-center text-[10px] uppercase tracking-wider">Current</div>}
-              </div>
-            );
-          })}
+        <div className="mb-6">
+          <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Compare plans</div>
+          <h3 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Pick your tier, line by line.</h3>
+        </div>
+
+        <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+          <table className="w-full min-w-[760px] text-sm border-collapse">
+            <colgroup>
+              <col className="w-[28%]" />
+              <col className="w-[18%]" />
+              <col className="w-[18%] bg-amber-50/40" />
+              <col className="w-[18%]" />
+              <col className="w-[18%]" />
+            </colgroup>
+
+            <thead>
+              <tr className="border-b border-zinc-200">
+                <th className="p-6 text-left align-bottom">
+                  <span className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">Plans</span>
+                </th>
+                {[
+                  { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false, key: "free" },
+                  { name: "Pro", price: "$49", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: "$149", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
+                  { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false, key: "custom" },
+                ].map((p) => {
+                  const isCurrent = plan === p.key;
+                  return (
+                    <th
+                      key={p.name}
+                      className={`p-6 text-left align-top border-l border-zinc-200 ${p.accent ? "bg-amber-50/50" : ""} ${isCurrent ? "ring-2 ring-inset ring-zinc-900" : ""}`}
+                    >
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                        {p.accent && !isCurrent && (
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                            Popular
+                          </span>
+                        )}
+                        {isCurrent && (
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-zinc-900 text-white font-bold`}>
+                            Current
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-2 flex items-baseline gap-1">
+                        <span className="text-2xl font-bold tracking-tight text-zinc-900">{p.price}</span>
+                        {p.price.startsWith("$") && p.price !== "$0" && (
+                          <span className="text-[11px] text-zinc-500">/month</span>
+                        )}
+                      </div>
+                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
+                      {isCurrent ? (
+                        <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-zinc-300 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-500">
+                          Active
+                        </div>
+                      ) : (
+                        <Link
+                          to={p.to}
+                          className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                            p.accent || p.dark
+                              ? "bg-zinc-900 text-white hover:bg-black"
+                              : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
+                          }`}
+                        >
+                          {p.cta}
+                        </Link>
+                      )}
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+
+            <tbody>
+              {MATRIX_ROWS.map((row, idx) => (
+                <tr
+                  key={row.f}
+                  className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
+                >
+                  <td className="px-6 py-3.5 text-zinc-800">
+                    <div className="flex items-center gap-2">
+                      {row.badge && (
+                        <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                          {row.badge}
+                        </span>
+                      )}
+                      <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-zinc-500" : ""}>
+                        {row.f}
+                      </span>
+                    </div>
+                  </td>
+                  {[row.a, row.b, row.c, row.d].map((v, i) => {
+                    const isCurrentCol = plan === PLAN_KEY_BY_COL[i];
+                    return (
+                      <td
+                        key={i}
+                        className={`px-6 py-3.5 text-center border-l border-zinc-200 ${i === 1 ? "bg-amber-50/40" : ""} ${isCurrentCol ? "bg-zinc-900/[0.03]" : ""}`}
+                      >
+                        {v === true ? (
+                          <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
+                        ) : v === false ? (
+                          <span className="inline-block h-px w-4 bg-zinc-200" />
+                        ) : (
+                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : "text-zinc-700"}`}>
+                            {v}
+                          </span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
