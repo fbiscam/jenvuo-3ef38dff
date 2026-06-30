@@ -397,8 +397,10 @@ function Home() {
             <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
             <span className="truncate font-semibold tracking-tight">JENVU AI</span>
           </Link>
-          <div className="hidden md:flex justify-center flex-1">
-            <StatusPill status={status} supported={speech.supported} dark={false} />
+          <div className="hidden md:flex pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="pointer-events-auto">
+              <StatusPill status={status} supported={speech.supported} dark={false} />
+            </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <Link
