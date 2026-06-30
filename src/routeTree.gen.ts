@@ -24,6 +24,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AiEngineRouteImport } from './routes/ai-engine'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as ApiSeedAdminRouteImport } from './routes/api/seed-admin'
 
 const TermsRoute = TermsRouteImport.update({
@@ -101,6 +102,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsSlugRoute = InsightsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => InsightsRoute,
+} as any)
 const ApiSeedAdminRoute = ApiSeedAdminRouteImport.update({
   id: '/api/seed-admin',
   path: '/api/seed-admin',
@@ -117,13 +123,14 @@ export interface FileRoutesByFullPath {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
-  '/insights': typeof InsightsRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
+  '/insights/$slug': typeof InsightsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -135,13 +142,14 @@ export interface FileRoutesByTo {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
-  '/insights': typeof InsightsRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
+  '/insights/$slug': typeof InsightsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -154,13 +162,14 @@ export interface FileRoutesById {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
-  '/insights': typeof InsightsRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
+  '/insights/$slug': typeof InsightsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/api/seed-admin'
+    | '/insights/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/api/seed-admin'
+    | '/insights/$slug'
   id:
     | '__root__'
     | '/'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/api/seed-admin'
+    | '/insights/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -229,7 +241,7 @@ export interface RootRouteChildren {
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
   DownloadRoute: typeof DownloadRoute
-  InsightsRoute: typeof InsightsRoute
+  InsightsRoute: typeof InsightsRouteWithChildren
   LlmRoute: typeof LlmRoute
   PrivacyRoute: typeof PrivacyRoute
   SignalRoute: typeof SignalRoute
@@ -345,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights/$slug': {
+      id: '/insights/$slug'
+      path: '/$slug'
+      fullPath: '/insights/$slug'
+      preLoaderRoute: typeof InsightsSlugRouteImport
+      parentRoute: typeof InsightsRoute
+    }
     '/api/seed-admin': {
       id: '/api/seed-admin'
       path: '/api/seed-admin'
@@ -354,6 +373,18 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface InsightsRouteChildren {
+  InsightsSlugRoute: typeof InsightsSlugRoute
+}
+
+const InsightsRouteChildren: InsightsRouteChildren = {
+  InsightsSlugRoute: InsightsSlugRoute,
+}
+
+const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
+  InsightsRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -365,7 +396,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
   DownloadRoute: DownloadRoute,
-  InsightsRoute: InsightsRoute,
+  InsightsRoute: InsightsRouteWithChildren,
   LlmRoute: LlmRoute,
   PrivacyRoute: PrivacyRoute,
   SignalRoute: SignalRoute,
