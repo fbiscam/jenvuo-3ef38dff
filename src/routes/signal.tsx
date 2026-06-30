@@ -1215,7 +1215,7 @@ function SignalVoiceAgent({
   const suggestions = ["Why this bias?", "Where is invalidation?", "What confirms entry?"];
 
   const [inputOpen, setInputOpen] = useState(false);
-  const showInput = inputOpen || status !== "idle" || messages.length > 0;
+  const showInput = inputOpen;
 
   return (
     <div className="flex flex-col gap-4 min-h-[180px]">
