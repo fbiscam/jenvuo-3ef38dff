@@ -306,10 +306,11 @@ function PricingPage() {
                 className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.2)] transition"
               >
                 <div className="px-6 pt-6">
-                  <span className={`${MONO} inline-block text-[9px] uppercase tracking-wider px-2 py-1 rounded-sm bg-zinc-950 text-white`}>
+                  <span className={`${MONO} inline-block text-[9px] uppercase tracking-wider px-2 py-1 rounded-sm bg-white text-zinc-900 border border-zinc-200`}>
                     {b.tag}
                   </span>
                 </div>
+
 
                 <div className="p-6">
                   <h3 className="text-base font-semibold tracking-tight text-zinc-900">{b.title}</h3>
