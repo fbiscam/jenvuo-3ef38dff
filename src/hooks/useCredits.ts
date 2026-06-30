@@ -18,23 +18,23 @@ export function useCredits() {
   });
 
   async function spend(action: CreditAction, metadata?: Record<string, unknown>): Promise<boolean> {
-    if (!user) {
-      toast.error("Please sign in to continue.");
-      return false;
-    }
     try {
       const res = await spendFn({ data: { action, metadata } });
-      queryClient.setQueryData(["credit-state", user.id], (prev: any) =>
+      const uid = user?.id ?? "self";
+      queryClient.setQueryData(["credit-state", uid], (prev: any) =>
         prev ? { ...prev, balance: res.balance } : prev,
       );
-      queryClient.invalidateQueries({ queryKey: ["credit-state", user.id] });
+      queryClient.invalidateQueries({ queryKey: ["credit-state", uid] });
       return true;
     } catch (e: any) {
-      if (String(e?.message).includes("INSUFFICIENT_CREDITS")) {
+      const msg = String(e?.message ?? "");
+      if (msg.includes("INSUFFICIENT_CREDITS")) {
         toast.error("Out of credits", {
           description: "Upgrade your plan or buy a top-up pack.",
           action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
         });
+      } else if (msg.toLowerCase().includes("unauthorized")) {
+        toast.error("Please sign in to continue.");
       } else {
         toast.error("Couldn't spend credits", { description: e?.message ?? "Try again." });
       }
