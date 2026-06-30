@@ -10,7 +10,7 @@ import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import {
   Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge,
-  MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar,
+  MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
@@ -232,14 +232,17 @@ function DashboardLayout() {
   const [fullName, setFullName] = useState<string>("");
   const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0 });
   const [range, setRange] = useState<RangeKey>("7d");
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshTick, setRefreshTick] = useState(0);
   const credits = useCredits();
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      setRefreshing(true);
       const { data } = await supabase.auth.getUser();
       const u = data.user;
-      if (!u) return;
+      if (!u) { if (!cancelled) setRefreshing(false); return; }
       if (!cancelled) {
         setEmail(u.email ?? "");
         setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
@@ -265,9 +268,16 @@ function DashboardLayout() {
         journalTotal: rows.length,
         journalWinRate: decided.length ? Math.round((wins / decided.length) * 100) : null,
       });
+      setRefreshing(false);
     })();
     return () => { cancelled = true; };
-  }, [range]);
+  }, [range, refreshTick]);
+
+  const handleRefresh = () => {
+    if (refreshing) return;
+    setRefreshTick((t) => t + 1);
+    toast.success("Analytics refreshed");
+  };
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -329,7 +339,18 @@ function DashboardLayout() {
         {/* Analytics header */}
         <div className="mt-7 flex items-center justify-between">
           <h2 className="text-[15px] font-semibold text-zinc-900">Analytics</h2>
-          <DropdownMenu>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              aria-label="Refresh analytics"
+              title="Refresh analytics"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+            </button>
+            <DropdownMenu>
             <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
               <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
             </DropdownMenuTrigger>
@@ -345,7 +366,8 @@ function DashboardLayout() {
                 </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
-          </DropdownMenu>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
