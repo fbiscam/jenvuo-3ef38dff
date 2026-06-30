@@ -1222,39 +1222,46 @@ function SignalVoiceAgent({
         </div>
       )}
 
-      {showInput && (
-        <div className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white pl-2.5 pr-1 py-1">
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && submit()}
-            placeholder={speech.listening ? "Listening…" : "Ask or tap the mic…"}
-            disabled={busy}
-            className="flex-1 bg-transparent text-[12px] text-zinc-900 placeholder:text-zinc-400 outline-none"
-            autoFocus
-          />
-          <button
-            onClick={toggleMic}
-            className={cn(
-              "h-7 w-7 inline-flex items-center justify-center rounded-md transition",
-              speech.listening
-                ? "bg-emerald-500 text-white animate-pulse"
-                : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200",
-            )}
-            aria-label="Toggle microphone"
-          >
-            <Mic className="h-3.5 w-3.5" />
-          </button>
-          <button
-            onClick={() => submit()}
-            disabled={busy || !q.trim()}
-            className="h-7 w-7 inline-flex items-center justify-center rounded-md bg-zinc-900 text-white disabled:opacity-40 hover:bg-zinc-800"
-            aria-label="Send"
-          >
-            <Send className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      )}
+      <div
+        className={cn(
+          "flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white pl-2.5 pr-1 py-1 transition-opacity",
+          showInput ? "opacity-100" : "opacity-0 pointer-events-none",
+        )}
+        aria-hidden={!showInput}
+      >
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+          placeholder={speech.listening ? "Listening…" : "Ask or tap the mic…"}
+          disabled={busy || !showInput}
+          tabIndex={showInput ? 0 : -1}
+          className="flex-1 bg-transparent text-[12px] text-zinc-900 placeholder:text-zinc-400 outline-none"
+        />
+        <button
+          onClick={toggleMic}
+          tabIndex={showInput ? 0 : -1}
+          className={cn(
+            "h-7 w-7 inline-flex items-center justify-center rounded-md transition",
+            speech.listening
+              ? "bg-emerald-500 text-white animate-pulse"
+              : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200",
+          )}
+          aria-label="Toggle microphone"
+        >
+          <Mic className="h-3.5 w-3.5" />
+        </button>
+        <button
+          onClick={() => submit()}
+          disabled={busy || !q.trim()}
+          tabIndex={showInput ? 0 : -1}
+          className="h-7 w-7 inline-flex items-center justify-center rounded-md bg-zinc-900 text-white disabled:opacity-40 hover:bg-zinc-800"
+          aria-label="Send"
+        >
+          <Send className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
     </div>
   );
 }
