@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 import { useSignalAlerts } from "@/hooks/useSignalAlerts";
 import AlertOptInCard from "@/components/AlertOptInCard";
 import AlertsHistoryPanel from "@/components/AlertsHistoryPanel";
+import { useCredits } from "@/hooks/useCredits";
+
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
