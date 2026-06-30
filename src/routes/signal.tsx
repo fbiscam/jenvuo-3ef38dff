@@ -446,7 +446,7 @@ function SignalPage() {
 
       {/* TERMINAL CARD */}
       <section className="mx-auto max-w-[1600px] px-5 py-5 sm:px-6 sm:py-8">
-        <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
           {/* terminal header */}
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
             <div className="flex items-center gap-3 min-w-0">
