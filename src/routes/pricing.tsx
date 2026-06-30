@@ -291,85 +291,53 @@ function PricingPage() {
         </div>
       </section>
 
-      {/* PLAN CARDS */}
+      {/* FEATURE CARDS — 6 modules */}
       <section className="border-y border-zinc-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-20">
           <div className="mb-12 max-w-2xl">
             <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
-              Choose your edge.
+              Everything in the platform.
             </h2>
             <p className="mt-3 text-zinc-600">
-              Three tiers. One voice agent. Built for serious gold traders.
+              Six modules engineered for serious gold traders — voice, narration, alerts, journal, scanner, and API.
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
-            {TIERS.map((tier) => {
-              const Icon = tier.icon;
-              const highlight = tier.highlight;
-              return (
-                <article
-                  key={tier.id}
-                  className={`relative rounded-3xl border p-7 flex flex-col transition ${
-                    highlight
-                      ? "bg-zinc-950 text-white border-zinc-950 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)]"
-                      : "bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.2)]"
-                  }`}
-                >
-                  {highlight && (
-                    <div className="absolute -top-3 left-7">
-                      <span className={`${MONO} text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-400 text-zinc-950 font-bold`}>
-                        Most popular
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between">
-                    <div className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${
-                      highlight ? "bg-white/10 text-amber-400" : "bg-zinc-100 text-zinc-900"
-                    }`}>
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <span className={`${MONO} text-[10px] uppercase tracking-wider ${highlight ? "text-zinc-400" : "text-zinc-500"}`}>
-                      {tier.bestFor}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURE_BLOCKS.map((b) => (
+              <article
+                key={b.tag}
+                className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.2)] transition"
+              >
+                <div className="relative h-40 overflow-hidden bg-zinc-100">
+                  <img
+                    src={b.img}
+                    alt={b.title}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent" />
+                  <span className={`${MONO} absolute top-3 left-3 text-[9px] uppercase tracking-wider px-2 py-1 rounded-sm bg-zinc-950 text-white`}>
+                    {b.tag}
+                  </span>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-base font-semibold tracking-tight text-zinc-900">{b.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">{b.desc}</p>
+                  <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4">
+                    <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
+                      {b.tone}
+                    </span>
+                    <span className={`${MONO} text-[10px] uppercase tracking-wider text-amber-600`}>
+                      Included →
                     </span>
                   </div>
-
-                  <h3 className="mt-5 text-xl font-semibold tracking-tight">{tier.name}</h3>
-                  <p className={`mt-1 text-sm ${highlight ? "text-zinc-400" : "text-zinc-600"}`}>{tier.tagline}</p>
-
-                  <div className="mt-6 flex items-baseline gap-1">
-                    <span className="text-5xl font-semibold tracking-tight">
-                      ${tier.price}
-                    </span>
-                    <span className={`text-sm ${highlight ? "text-zinc-400" : "text-zinc-500"}`}>/mo</span>
-                  </div>
-
-                  <ul className={`mt-7 space-y-3 text-sm ${highlight ? "text-zinc-200" : "text-zinc-700"}`}>
-                    {tier.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2.5">
-                        <Check className={`mt-0.5 h-4 w-4 flex-shrink-0 ${highlight ? "text-amber-400" : "text-zinc-900"}`} />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link
-                    to={tier.ctaTo}
-                    className={`mt-8 inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-medium transition ${
-                      highlight
-                        ? "bg-amber-400 text-zinc-950 hover:bg-amber-300"
-                        : "bg-zinc-900 text-white hover:bg-black"
-                    }`}
-                  >
-                    {tier.cta}
-                  </Link>
-                </article>
-              );
-            })}
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
+
 
 
 
