@@ -106,7 +106,7 @@ export default function SiteFooter() {
         </div>
 
         {/* Divider + sub bar */}
-        <div className="mt-8 pt-4 border-t border-zinc-100 flex flex-col md:flex-row items-center justify-between gap-3">
+        <div className="mt-12 pt-6 border-t border-zinc-100 flex flex-col items-center justify-center gap-2 text-center">
           <div
             className={`${MONO} text-[11px] uppercase tracking-[0.25em] text-zinc-900`}
           >
