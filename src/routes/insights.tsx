@@ -53,7 +53,17 @@ const SANS = "font-['Inter',system-ui,sans-serif]";
 function InsightsPage() {
   const { data: insights } = useSuspenseQuery(insightsQueryOptions);
   
-  const breakingNews = insights.filter((i) => i.is_breaking);
+  // Ticker: any breaking + most recent items (outsourced top-bar feed)
+  const tickerItems = (() => {
+    const breaking = insights.filter((i) => i.is_breaking);
+    const recent = insights.slice(0, 8);
+    const seen = new Set<string>();
+    return [...breaking, ...recent].filter((i) => {
+      if (seen.has(i.id)) return false;
+      seen.add(i.id);
+      return true;
+    }).slice(0, 10);
+  })();
   const featured = insights[0];
   const remaining = insights.slice(1);
 
