@@ -59,15 +59,15 @@ const TIERS = [
   {
     id: "pro",
     name: "Pro",
-    price: 49,
+    price: 29,
     icon: Zap,
     bestFor: "Active trader",
     tagline: "For serious gold traders.",
     cta: "Notify me when live",
     ctaTo: "/contact",
-    credits: 500,
+    credits: 175,
     features: [
-      "500 credits / month included",
+      "175 credits / month included",
       "Unlimited voice queries (1 credit each)",
       "A+ signal access (2 credits)",
       "Realtime email & push alerts (5 credits)",
