@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import CreditsPill from "@/components/CreditsPill";
+
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
