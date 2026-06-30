@@ -300,35 +300,125 @@ function PricingPage() {
         </div>
       </section>
 
-      {/* COMPARISON MATRIX */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-20">
+      {/* COMPARISON MATRIX — homepage Beanstalk style */}
+      <section className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
         <div className="mb-10">
           <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 03 / COMPARE ]</p>
           <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Pick your tier, line by line.</h2>
         </div>
-        <div className="rounded-2xl border border-zinc-200 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-zinc-900 text-white">
-              <tr>
-                <th className={`text-left px-5 py-4 ${MONO} text-[10px] uppercase tracking-wider font-medium`}>Feature</th>
-                <th className={`text-center px-5 py-4 ${MONO} text-[10px] uppercase tracking-wider font-medium`}>Free</th>
-                <th className={`text-center px-5 py-4 ${MONO} text-[10px] uppercase tracking-wider font-medium text-amber-400`}>Pro</th>
-                <th className={`text-center px-5 py-4 ${MONO} text-[10px] uppercase tracking-wider font-medium`}>Elite</th>
+
+        <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+          <table className="w-full min-w-[760px] text-sm border-collapse">
+            <colgroup>
+              <col className="w-[28%]" />
+              <col className="w-[18%]" />
+              <col className="w-[18%] bg-amber-50/40" />
+              <col className="w-[18%]" />
+              <col className="w-[18%]" />
+            </colgroup>
+
+            <thead>
+              <tr className="border-b border-zinc-200">
+                <th className="p-6 text-left align-bottom">
+                  <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Plans</span>
+                </th>
+                {[
+                  { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false },
+                  { name: "Pro", price: "$49", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
+                  { name: "Elite", price: "$149", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
+                  { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false },
+                ].map((p) => (
+                  <th
+                    key={p.name}
+                    className={`p-6 text-left align-top border-l border-zinc-200 ${p.accent ? "bg-amber-50/50" : ""}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                      {p.accent && (
+                        <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                          Popular
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-2 flex items-baseline gap-1">
+                      <span className="text-2xl font-bold tracking-tight text-zinc-900">{p.price}</span>
+                      {p.price.startsWith("$") && p.price !== "$0" && (
+                        <span className="text-[11px] text-zinc-500">/month</span>
+                      )}
+                    </div>
+                    <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
+                    <Link
+                      to={p.to}
+                      className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                        p.accent
+                          ? "bg-zinc-900 text-white hover:bg-black"
+                          : p.dark
+                          ? "bg-zinc-900 text-white hover:bg-black"
+                          : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
+                      }`}
+                    >
+                      {p.cta}
+                    </Link>
+                  </th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-200 bg-white">
-              {MATRIX.map((row) => (
-                <tr key={row.feature} className="hover:bg-zinc-50/70 transition">
-                  <td className="px-5 py-3.5 font-medium text-zinc-900">{row.feature}</td>
-                  <Cell value={row.free} />
-                  <Cell value={row.pro} highlight />
-                  <Cell value={row.elite} />
+
+            <tbody>
+              {([
+                { f: "Price", a: "Free", b: "$49/mo", c: "$149/mo", d: "Custom", isHeading: true },
+                { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+                { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
+                { f: "A+ signal access", a: false, b: true, c: true, d: true },
+                { f: "ICT / SMC narration", a: false, b: true, c: true, d: true },
+                { f: "Multi-timeframe bias", a: false, b: true, c: true, d: true },
+                { f: "Trade journal", a: false, b: true, c: true, d: true },
+                { f: "Email + push alerts", a: false, b: true, c: true, d: true },
+                { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
+                { f: "API access & webhooks", a: false, b: false, c: true, d: true, badge: "new" },
+                { f: "Custom alert rules", a: false, b: false, c: true, d: true },
+                { f: "Dedicated onboarding", a: false, b: false, c: false, d: true },
+                { f: "Priority desk support", a: false, b: false, c: false, d: true },
+              ] as ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }>).map((row, idx) => (
+                <tr
+                  key={row.f}
+                  className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
+                >
+                  <td className="px-6 py-3.5 text-zinc-800">
+                    <div className="flex items-center gap-2">
+                      {"badge" in row && row.badge && (
+                        <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                          {row.badge}
+                        </span>
+                      )}
+                      <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-zinc-500" : ""}>
+                        {row.f}
+                      </span>
+                    </div>
+                  </td>
+                  {[row.a, row.b, row.c, row.d].map((v, i) => (
+                    <td
+                      key={i}
+                      className={`px-6 py-3.5 text-center border-l border-zinc-200 ${i === 1 ? "bg-amber-50/40" : ""}`}
+                    >
+                      {v === true ? (
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
+                      ) : v === false ? (
+                        <span className="inline-block h-px w-4 bg-zinc-200" />
+                      ) : (
+                        <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : "text-zinc-700"}`}>
+                          {v}
+                        </span>
+                      )}
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </section>
+
 
       {/* FAQ */}
       <section className="border-t border-zinc-100 bg-zinc-50/50">
