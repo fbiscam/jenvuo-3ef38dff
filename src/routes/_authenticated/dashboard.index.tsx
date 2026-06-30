@@ -49,25 +49,21 @@ function SavedSignals() {
 
   if (!rows.length) {
     return (
-      <div className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-white via-white to-zinc-50 p-10 text-center">
-        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-amber-300 via-zinc-900 to-amber-300" />
-        <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-amber-100/50 blur-3xl" />
-        <div className="relative">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200">
-            <Bookmark className="h-7 w-7 text-zinc-700" />
-          </div>
-          <h3 className="mt-4 text-lg font-semibold tracking-tight">No saved setups yet</h3>
-          <p className="mx-auto mt-1.5 max-w-md text-sm text-zinc-500">
-            When a new A+ setup fires on the Signal Desk, hit the bookmark to keep it here.
-          </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <Link to="/signal" className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">
-              Open Signal Desk <ExternalLink className="h-3.5 w-3.5" />
-            </Link>
-            <Link to="/dashboard/alerts" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">
-              Set alert preferences
-            </Link>
-          </div>
+      <div className="rounded-2xl border border-zinc-200 bg-white p-10 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-zinc-200 bg-white">
+          <Bookmark className="h-6 w-6 text-zinc-700" />
+        </div>
+        <h3 className="mt-4 text-lg font-semibold tracking-tight">No saved setups yet</h3>
+        <p className="mx-auto mt-1.5 max-w-md text-sm text-zinc-500">
+          When a new A+ setup fires on the Signal Desk, hit the bookmark to keep it here.
+        </p>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          <Link to="/signal" className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">
+            Open Signal Desk <ExternalLink className="h-3.5 w-3.5" />
+          </Link>
+          <Link to="/dashboard/alerts" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">
+            Set alert preferences
+          </Link>
         </div>
       </div>
     );
