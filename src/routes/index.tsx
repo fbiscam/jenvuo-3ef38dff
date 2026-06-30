@@ -594,10 +594,10 @@ function HomePage() {
 
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
             {[
-              { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English — pair, bias, news & signs or anything." },
-              { k: "02", t: "Reason", d: "JENVU pulls live structure, ICT/SMC context, DXY and Forex Factory feeds" },
-              { k: "03", t: "Mark Up", d: "Charts auto-annotate FVG, OB, BOS, CHoCH and liquidity sweeps." },
-              { k: "04", t: "Narrate", d: "You hear a structured A+ plan: entry, SL, TP, R:R and confluence score." },
+              { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English anything." },
+              { k: "02", t: "Reason", d: "JENVU pulls structure, ICT/SMC, DXY and news." },
+              { k: "03", t: "Mark Up", d: "Charts auto-annotate FVG, OB, BOS and sweeps." },
+              { k: "04", t: "Narrate", d: "Hear an A+ plan: entry, SL, TP, R:R." },
             ].map((s) => (
               <div key={s.k} className="bg-white p-6 text-left sm:p-7">
                 <div className={`flex items-center justify-between ${MONO} text-[10px] tracking-widest uppercase text-zinc-900`}>
@@ -605,7 +605,7 @@ function HomePage() {
                   <span className="h-px w-10 bg-zinc-900" />
                 </div>
                 <h3 className="mt-5 text-lg font-semibold tracking-tight">{s.t}</h3>
-                <p className="mt-2 text-sm text-zinc-900 leading-relaxed">{s.d}</p>
+                <p className="mt-2 text-sm text-zinc-900 leading-relaxed line-clamp-2 min-h-[2.75rem]">{s.d}</p>
               </div>
             ))}
           </div>
