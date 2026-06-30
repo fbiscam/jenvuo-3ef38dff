@@ -44,9 +44,9 @@ const columns = [
 export default function SiteFooter() {
   const year = new Date().getFullYear();
   return (
-    <footer className="relative border-t border-zinc-200 bg-white">
+    <footer className="relative bg-white">
       {/* Subtle divider */}
-      <div className="h-px w-full bg-zinc-200" />
+      <div className="h-px w-full bg-transparent" />
 
 
       {/* Main grid */}
