@@ -245,7 +245,7 @@ function AuthPage() {
 
                     {mode === "signup" && (
                       <div>
-                        <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ${MONO}`}>
+                        <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
                           Full Name
                         </label>
                         <div className="relative">
@@ -256,7 +256,7 @@ function AuthPage() {
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             maxLength={100}
-                            className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                            className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                             placeholder="Your full name..."
                           />
                         </div>
@@ -264,7 +264,7 @@ function AuthPage() {
                     )}
 
                     <div>
-                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ${MONO}`}>
+                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
                         User Identification
                       </label>
                       <div className="relative">
@@ -274,14 +274,14 @@ function AuthPage() {
                           required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                           placeholder="Institutional email..."
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ${MONO}`}>
+                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
                         Access Key
                       </label>
                       <div className="relative">
@@ -292,7 +292,7 @@ function AuthPage() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           minLength={mode === "signup" ? 8 : undefined}
-                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                           placeholder={mode === "signup" ? "Min 8 characters..." : "Enter password..."}
                         />
                       </div>
@@ -308,7 +308,7 @@ function AuthPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="group w-full rounded-lg bg-zinc-900 px-5 py-4 text-base font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                      className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                     >
                       {loading
                         ? (mode === "signin" ? "Authenticating..." : "Creating account...")
