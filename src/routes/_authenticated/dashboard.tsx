@@ -324,15 +324,23 @@ function DashboardLayout() {
               title="Market Pulse"
               right={
                 <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] text-zinc-500 hover:text-zinc-900">
-                  <span>1</span> <ArrowRight className="h-3.5 w-3.5" />
+                  <span>12</span> <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               }
             />
-            <div>
+            <div className="max-h-[360px] overflow-y-auto">
               <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
+              <TickerRow label="XAG / USD" symbol="XAGUSD" decimals={3} />
+              <TickerRow label="DXY" symbol="DXY" decimals={3} />
+              <TickerRow label="EUR / USD" symbol="EURUSD" decimals={5} />
+              <TickerRow label="GBP / USD" symbol="GBPUSD" decimals={5} />
+              <TickerRow label="USD / JPY" symbol="USDJPY" decimals={3} />
               <TickerRow label="BTC / USDT" symbol="BTCUSDT" decimals={1} />
               <TickerRow label="ETH / USDT" symbol="ETHUSDT" decimals={2} />
-              <TickerRow label="DXY" symbol="DXY" decimals={3} />
+              <TickerRow label="SOL / USDT" symbol="SOLUSDT" decimals={2} />
+              <TickerRow label="BNB / USDT" symbol="BNBUSDT" decimals={2} />
+              <TickerRow label="XRP / USDT" symbol="XRPUSDT" decimals={4} />
+              <TickerRow label="DOGE / USDT" symbol="DOGEUSDT" decimals={5} />
             </div>
           </Card>
 
