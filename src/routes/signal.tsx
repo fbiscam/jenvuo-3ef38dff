@@ -487,11 +487,6 @@ function SignalPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
             {/* LEFT — ICT execution feed */}
             <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-4 min-h-[280px]">
-              {/* Voice AI Agent — orb + chat, can mark on chart */}
-              <div className="pb-3 border-b border-zinc-100">
-                <SignalVoiceAgent plan={plan} livePrice={livePrice} htfRef={htfRef} ltfRef={ltfRef} />
-              </div>
-
               <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
                 ICT Execution Feed
               </h3>
@@ -500,7 +495,7 @@ function SignalPage() {
                   <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading narration…
                 </div>
               )}
-              <div ref={feedScrollRef} className="space-y-3 overflow-y-auto pr-1 flex-1 min-h-0">
+              <div ref={feedScrollRef} className="space-y-3 overflow-y-auto pr-1 max-h-[520px]">
                 {plan?.narration.map((n, i) => {
                   const { tag, tone } = tagOf(n.say);
                   const active = i === step;
@@ -536,6 +531,12 @@ function SignalPage() {
                   );
                 })}
               </div>
+
+
+              {/* Voice AI Agent — orb + chat, can mark on chart */}
+              <div className="mt-auto pt-3 border-t border-zinc-100">
+                <SignalVoiceAgent plan={plan} livePrice={livePrice} htfRef={htfRef} ltfRef={ltfRef} />
+              </div>
             </div>
 
 
@@ -566,7 +567,7 @@ function SignalPage() {
                 </div>
               )}
 
-              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 flex-1 min-h-0">
+              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
                     HTF // 1H · Bias
@@ -582,11 +583,11 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden flex-1 min-h-[260px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
+                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
                   {plan ? <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF" /> : <ChartSkeleton />}
                 </div>
               </div>
-              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100 flex-1 min-h-0">
+              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100">
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
                     LTF // 15M · Execution
@@ -602,7 +603,7 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden flex-1 min-h-[260px] transition-opacity duration-300", activeTf === "htf" ? "opacity-55" : "opacity-100")}>
+                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "htf" ? "opacity-55" : "opacity-100")}>
                   {plan ? <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF" /> : <ChartSkeleton />}
                 </div>
                 <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
@@ -618,7 +619,7 @@ function SignalPage() {
             </div>
 
             {/* RIGHT — intelligence */}
-            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 flex flex-col gap-6 overflow-y-auto max-h-[820px]">
+            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 space-y-6 overflow-y-auto max-h-[820px]">
               <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
                 Intelligence Dashboard
               </h3>
@@ -744,98 +745,13 @@ function SignalPage() {
                 </div>
               )}
 
-              {/* Sentiment Meter */}
-              {plan && (() => {
-                const bull = plan.htfBias === "bullish" ? 50 + plan.alignmentScore / 2 : plan.htfBias === "bearish" ? 50 - plan.alignmentScore / 2 : 50;
-                const bullPct = Math.max(5, Math.min(95, bull));
-                const tone = bullPct >= 60 ? "Bullish" : bullPct <= 40 ? "Bearish" : "Neutral";
-                return (
-                  <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3">
-                    <div className="flex items-center justify-between">
-                      <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Sentiment Meter</span>
-                      <span className={cn(`text-[10px] ${MONO} font-bold uppercase tracking-wider`,
-                        tone === "Bullish" ? "text-emerald-600" : tone === "Bearish" ? "text-rose-600" : "text-zinc-500"
-                      )}>{tone}</span>
-                    </div>
-                    <div className="relative h-2 rounded-full overflow-hidden bg-zinc-100 flex">
-                      <div className="bg-emerald-500/80 h-full transition-all" style={{ width: `${bullPct}%` }} />
-                      <div className="bg-rose-500/80 h-full transition-all" style={{ width: `${100 - bullPct}%` }} />
-                      <div className="absolute top-0 bottom-0 w-px bg-white/80" style={{ left: "50%" }} />
-                    </div>
-                    <div className={`flex justify-between text-[9px] ${MONO} tracking-widest uppercase text-zinc-400`}>
-                      <span className="text-emerald-600">Bulls {Math.round(bullPct)}%</span>
-                      <span className="text-rose-600">Bears {Math.round(100 - bullPct)}%</span>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Liquidity / OB / FVG lists */}
-              {plan && plan.markings.length > 0 && (() => {
-                const fmt = (p: number) => `${plan.instrument.kind === "crypto" ? "" : "$"}${p.toFixed(plan.instrument.decimals)}`;
-                const liq = plan.markings.filter((m: any) => m.type === "liquidity").slice(0, 4);
-                const obs = plan.markings.filter((m: any) => m.type === "orderBlock").slice(0, 3);
-                const fvgs = plan.markings.filter((m: any) => m.type === "fvg").slice(0, 3);
-                if (liq.length + obs.length + fvgs.length === 0) return null;
-                return (
-                  <div className="space-y-3 rounded-lg border border-zinc-200 bg-white p-3">
-                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>POI / Liquidity Map</span>
-
-                    {liq.length > 0 && (
-                      <div className="space-y-1">
-                        <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400`}>Liquidity</div>
-                        {liq.map((m: any, i) => (
-                          <div key={`l${i}`} className="flex items-center justify-between text-[11px] py-0.5">
-                            <span className="flex items-center gap-1.5">
-                              <span className={cn("w-1.5 h-1.5 rounded-full", m.side === "buy" ? "bg-emerald-500" : "bg-rose-500")} />
-                              <span className="text-zinc-700">{m.side === "buy" ? "BSL" : "SSL"} <span className="text-zinc-400 uppercase">{m.tf}</span></span>
-                            </span>
-                            <span className={`${MONO} tabular-nums font-medium text-zinc-900`}>{fmt(m.price)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {obs.length > 0 && (
-                      <div className="space-y-1 pt-1 border-t border-zinc-100">
-                        <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400`}>Order Blocks</div>
-                        {obs.map((m: any, i) => (
-                          <div key={`o${i}`} className="flex items-center justify-between text-[11px] py-0.5">
-                            <span className="flex items-center gap-1.5">
-                              <span className={cn("w-1.5 h-1.5 rounded-sm", m.kind === "demand" ? "bg-emerald-500" : "bg-rose-500")} />
-                              <span className="text-zinc-700 capitalize">{m.kind} OB <span className="text-zinc-400 uppercase">{m.tf}</span></span>
-                            </span>
-                            <span className={`${MONO} tabular-nums font-medium text-zinc-900`}>{fmt(m.priceLow)}–{fmt(m.priceHigh)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {fvgs.length > 0 && (
-                      <div className="space-y-1 pt-1 border-t border-zinc-100">
-                        <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400`}>Fair Value Gaps</div>
-                        {fvgs.map((m: any, i) => (
-                          <div key={`f${i}`} className="flex items-center justify-between text-[11px] py-0.5">
-                            <span className="flex items-center gap-1.5">
-                              <span className={cn("w-1.5 h-2 rounded-sm", m.kind === "bullish" ? "bg-violet-400" : "bg-violet-600")} />
-                              <span className="text-zinc-700 capitalize">{m.kind} FVG <span className="text-zinc-400 uppercase">{m.tf}</span></span>
-                            </span>
-                            <span className={`${MONO} tabular-nums font-medium text-zinc-900`}>{fmt(m.priceLow)}–{fmt(m.priceHigh)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-
               {/* A+ alert opt-in + recent fired alerts */}
               <AlertOptInCard />
               <AlertsHistoryPanel alerts={alertHistory} loading={alertsLoading} />
 
               <Link
                 to="/app"
-                className="mt-auto w-full inline-flex items-center justify-center py-3 bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-800 transition-colors uppercase"
+                className="w-full inline-flex items-center justify-center py-3 bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-800 transition-colors uppercase"
               >
                 Execute Voice Trade
               </Link>
