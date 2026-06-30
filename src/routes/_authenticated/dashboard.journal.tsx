@@ -114,14 +114,26 @@ function Journal() {
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          ["Trades", stats.total],
-          ["Open", stats.open],
-          ["Win rate", `${stats.winRate}%`],
-          ["P&L", `${stats.pnl >= 0 ? "+" : ""}${stats.pnl.toFixed(2)}`],
-        ].map(([k, v]) => (
-          <div key={k as string} className="rounded-xl border border-zinc-200 bg-white p-4">
-            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">{k}</div>
-            <div className="mt-1 text-xl font-semibold text-zinc-900">{v}</div>
+          { k: "Trades", v: stats.total, live: false },
+          { k: "Open", v: stats.open, live: false },
+          { k: "Win rate", v: `${stats.winRate}%`, live: false },
+          {
+            k: "P&L",
+            v: `${stats.pnl >= 0 ? "+" : ""}${stats.pnl.toFixed(2)}`,
+            live: stats.open > 0,
+            tone: stats.pnl > 0 ? "text-emerald-600" : stats.pnl < 0 ? "text-rose-600" : "text-zinc-900",
+          },
+        ].map((c) => (
+          <div key={c.k} className="rounded-xl border border-zinc-200 bg-white p-4">
+            <div className="flex items-center justify-between">
+              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">{c.k}</div>
+              {c.live && (
+                <span className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.2em] text-emerald-600">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Live
+                </span>
+              )}
+            </div>
+            <div className={`mt-1 text-xl font-semibold ${(c as any).tone ?? "text-zinc-900"}`}>{c.v}</div>
           </div>
         ))}
       </div>
@@ -143,36 +155,81 @@ function Journal() {
           <table className="w-full text-sm">
             <thead className="bg-zinc-50 text-left font-mono text-[10px] uppercase tracking-wider text-zinc-500">
               <tr>
-                {["Date", "Pair", "Dir", "Entry", "SL", "TP", "Result", "P&L", ""].map((h) => (
+                {["Date", "Pair", "Dir", "Entry", "Price", "SL", "TP", "Result", "P&L", ""].map((h) => (
                   <th key={h} className="px-3 py-2 font-medium">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
-              {trades.map((t) => (
-                <tr key={t.id} className="hover:bg-zinc-50/50">
-                  <td className="px-3 py-2.5 text-xs text-zinc-500">{new Date(t.opened_at).toLocaleDateString()}</td>
-                  <td className="px-3 py-2.5 font-mono text-xs">{t.pair}</td>
-                  <td className="px-3 py-2.5">
-                    <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${t.direction === "long" ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
-                      {t.direction}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2.5 font-mono text-xs">{t.entry ?? "—"}</td>
-                  <td className="px-3 py-2.5 font-mono text-xs">{t.stop_loss ?? "—"}</td>
-                  <td className="px-3 py-2.5 font-mono text-xs">{t.take_profit ?? "—"}</td>
-                  <td className="px-3 py-2.5 text-xs capitalize">{t.outcome}</td>
-                  <td className={`px-3 py-2.5 font-mono text-xs ${(t.pnl ?? 0) > 0 ? "text-emerald-600" : (t.pnl ?? 0) < 0 ? "text-rose-600" : "text-zinc-500"}`}>
-                    {t.pnl !== null ? (t.pnl > 0 ? "+" : "") + t.pnl.toFixed(2) : "—"}
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <button onClick={() => remove(t.id)} className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-rose-600">
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {trades.map((t) => {
+                const live = livePrices[t.pair.toUpperCase()] ?? null;
+                const livePnl = liveOf(t);
+                const isOpen = t.outcome === "open";
+                const fmt = (n: number | null | undefined) =>
+                  n == null ? "—" : n.toFixed(Math.abs(n) >= 100 ? 2 : 4);
+                const dist = (target: number | null) => {
+                  if (!isOpen || live == null || target == null) return null;
+                  const d = target - live;
+                  return d;
+                };
+                const slDist = dist(t.stop_loss);
+                const tpDist = dist(t.take_profit);
+                const displayPnl = isOpen ? livePnl : t.pnl;
+                return (
+                  <tr key={t.id} className="hover:bg-zinc-50/50">
+                    <td className="px-3 py-2.5 text-xs text-zinc-500">{new Date(t.opened_at).toLocaleDateString()}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs">{t.pair}</td>
+                    <td className="px-3 py-2.5">
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${t.direction === "long" ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+                        {t.direction}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 font-mono text-xs">{t.entry ?? "—"}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs">
+                      {isOpen ? (
+                        live != null ? (
+                          <span className="inline-flex items-center gap-1">
+                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                            {fmt(live)}
+                          </span>
+                        ) : (
+                          <span className="text-zinc-400">…</span>
+                        )
+                      ) : (
+                        <span className="text-zinc-300">—</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 font-mono text-xs">
+                      <div>{t.stop_loss ?? "—"}</div>
+                      {slDist != null && (
+                        <div className="text-[10px] text-zinc-400">{slDist >= 0 ? "+" : ""}{slDist.toFixed(2)}</div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 font-mono text-xs">
+                      <div>{t.take_profit ?? "—"}</div>
+                      {tpDist != null && (
+                        <div className="text-[10px] text-zinc-400">{tpDist >= 0 ? "+" : ""}{tpDist.toFixed(2)}</div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-xs capitalize">{t.outcome}</td>
+                    <td className={`px-3 py-2.5 font-mono text-xs ${(displayPnl ?? 0) > 0 ? "text-emerald-600" : (displayPnl ?? 0) < 0 ? "text-rose-600" : "text-zinc-500"}`}>
+                      {displayPnl != null ? (
+                        <span className="inline-flex items-center gap-1">
+                          {isOpen && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />}
+                          {displayPnl > 0 ? "+" : ""}{displayPnl.toFixed(2)}
+                        </span>
+                      ) : "—"}
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <button onClick={() => remove(t.id)} className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-rose-600">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
+
           </table>
         </div>
       )}
