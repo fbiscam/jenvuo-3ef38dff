@@ -23,16 +23,16 @@ const insightDetailQueryOptions = (slug: string) => queryOptions({
 });
 
 export const Route = createFileRoute("/insights/$slug")({
-  head: ({ data }) => ({
+  head: ({ loaderData }) => ({
     meta: [
-      { title: data ? `${data.title} — Jenvu` : "Market Insight — Jenvu" },
+      { title: loaderData ? `${loaderData.title} — Jenvu` : "Market Insight — Jenvu" },
       {
         name: "description",
-        content: data?.excerpt || "Institutional market analysis from Jenvu.",
+        content: loaderData?.excerpt || "Institutional market analysis from Jenvu.",
       },
-      { property: "og:title", content: data?.title },
-      { property: "og:description", content: data?.excerpt },
-      { property: "og:image", content: data?.image_url },
+      { property: "og:title", content: loaderData?.title },
+      { property: "og:description", content: loaderData?.excerpt },
+      { property: "og:image", content: loaderData?.image_url },
     ],
   }),
   loader: ({ params, context }) => context.queryClient.ensureQueryData(insightDetailQueryOptions(params.slug)),
