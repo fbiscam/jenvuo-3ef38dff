@@ -173,7 +173,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <SonnerToaster theme="light" position="bottom-center" toastOptions={{ style: { background: "#ffffff", color: "#000000", border: "1px solid #e4e4e7" } }} />
+      <SonnerToaster theme="light" position="top-right" toastOptions={{ style: { background: "#ffffff", color: "#000000", border: "1px solid #e4e4e7" } }} />
     </QueryClientProvider>
   );
 }
