@@ -587,7 +587,7 @@ function SignalPage() {
                   {plan ? <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF" /> : <ChartSkeleton />}
                 </div>
               </div>
-              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100">
+              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100 flex-1 min-h-0">
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
                     LTF // 15M · Execution
