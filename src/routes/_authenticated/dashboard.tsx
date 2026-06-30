@@ -119,7 +119,7 @@ function Metric({
   const derivedMag = magnitude ?? (delta ? Math.min(60, Math.abs(parseFloat(delta.replace(/[^0-9.\-]/g, ""))) || 30) : 0);
 
   return (
-    <div className="flex-1 min-w-0 p-4">
+    <div className="flex-1 min-w-0 px-4 pt-2 pb-4">
       <div className="flex items-center gap-1 text-[12px] text-zinc-500">
         {label}
         
