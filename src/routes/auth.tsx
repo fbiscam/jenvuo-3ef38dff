@@ -1,11 +1,29 @@
 import * as React from "react";
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { CloudOrb } from "@/components/CloudOrb";
 
+type AuthSearch = { redirect?: string };
+
+function sanitizeRedirect(r?: string): string {
+  if (!r || typeof r !== "string") return "/dashboard";
+  if (!r.startsWith("/") || r.startsWith("//")) return "/dashboard";
+  return r;
+}
+
 export const Route = createFileRoute("/auth")({
+  ssr: false,
+  validateSearch: (search: Record<string, unknown>): AuthSearch => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
+  beforeLoad: async ({ search }) => {
+    const { data } = await supabase.auth.getUser();
+    if (data.user) {
+      throw redirect({ to: sanitizeRedirect(search.redirect) as "/dashboard" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Sign In Your Account — Jenvu" },
@@ -27,6 +45,7 @@ export const Route = createFileRoute("/auth")({
   }),
   component: AuthPage,
 });
+
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Inter',system-ui,sans-serif]";
