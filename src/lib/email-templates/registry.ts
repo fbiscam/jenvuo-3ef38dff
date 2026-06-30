@@ -17,4 +17,5 @@ export interface TemplateEntry {
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'new-article': newArticleTemplate,
+  'signal-alert': signalAlertTemplate,
 }
