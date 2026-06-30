@@ -665,7 +665,7 @@ function HomePage() {
 
               {/* Plan header row */}
               <thead>
-                <tr className="border-b border-zinc-200">
+                <tr className="border-b border-transparent">
                   <th className="p-6 text-left align-bottom">
                     <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Plans</span>
                   </th>
