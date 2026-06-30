@@ -1,12 +1,19 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Insight = Tables<"insights">;
+
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+function fmtUTCLong(iso: string) {
+  const d = new Date(iso);
+  const hh = String(d.getUTCHours()).padStart(2, "0");
+  const mm = String(d.getUTCMinutes()).padStart(2, "0");
+  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()} · ${hh}:${mm} UTC`;
+}
 
 const insightDetailQueryOptions = (slug: string) => queryOptions({
   queryKey: ["insight", slug],
@@ -23,19 +30,63 @@ const insightDetailQueryOptions = (slug: string) => queryOptions({
 });
 
 export const Route = createFileRoute("/insights/$slug")({
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     const data = loaderData as Insight | undefined;
+    const url = `https://jenvu.com/insights/${params.slug}`;
+    const title = data ? `${data.title} — Jenvu` : "Market Insight — Jenvu";
+    const desc = data?.excerpt || "Institutional market analysis from Jenvu.";
+    const img = data?.image_url || "https://jenvu.com/favicon.png";
     return {
       meta: [
-        { title: data ? `${data.title} — Jenvu` : "Market Insight — Jenvu" },
-        {
-          name: "description",
-          content: data?.excerpt || "Institutional market analysis from Jenvu.",
-        },
-        { property: "og:title", content: data?.title || "" },
-        { property: "og:description", content: data?.excerpt || "" },
-        { property: "og:image", content: data?.image_url || "" },
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: data?.title || title },
+        { property: "og:description", content: desc },
+        { property: "og:image", content: img },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "article" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: data?.title || title },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: img },
       ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: data
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Article",
+                headline: data.title,
+                description: data.excerpt,
+                image: [img],
+                datePublished: data.published_at,
+                dateModified: data.updated_at || data.published_at,
+                author: { "@type": "Organization", name: "Jenvu" },
+                publisher: {
+                  "@type": "Organization",
+                  name: "Jenvu",
+                  logo: { "@type": "ImageObject", url: "https://jenvu.com/favicon.png" },
+                },
+                mainEntityOfPage: { "@type": "WebPage", "@id": url },
+                articleSection: data.category,
+              }),
+            },
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  { "@type": "ListItem", position: 1, name: "Home", item: "https://jenvu.com/" },
+                  { "@type": "ListItem", position: 2, name: "Insights", item: "https://jenvu.com/insights" },
+                  { "@type": "ListItem", position: 3, name: data.title, item: url },
+                ],
+              }),
+            },
+          ]
+        : [],
     };
   },
   loader: ({ params, context }) => context.queryClient.ensureQueryData(insightDetailQueryOptions(params.slug)),
@@ -94,7 +145,7 @@ function InsightDetailPage() {
               {insight.title}
             </h1>
             <div className="mt-8 flex items-center gap-4 text-xs text-zinc-400">
-              <span>{format(new Date(insight.published_at), "MMMM d, yyyy · HH:mm 'UTC'")}</span>
+              <span>{fmtUTCLong(insight.published_at)}</span>
               <span className="h-1 w-1 rounded-full bg-zinc-200" />
               <span>Institutional Grade</span>
             </div>

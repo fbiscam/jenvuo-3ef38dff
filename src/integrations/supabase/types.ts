@@ -47,6 +47,36 @@ export type Database = {
         }
         Relationships: []
       }
+      insight_topics: {
+        Row: {
+          angle: string | null
+          category: string
+          created_at: string
+          id: string
+          keyword: string
+          last_used_at: string | null
+          priority: number
+        }
+        Insert: {
+          angle?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          keyword: string
+          last_used_at?: string | null
+          priority?: number
+        }
+        Update: {
+          angle?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          keyword?: string
+          last_used_at?: string | null
+          priority?: number
+        }
+        Relationships: []
+      }
       insights: {
         Row: {
           category: string

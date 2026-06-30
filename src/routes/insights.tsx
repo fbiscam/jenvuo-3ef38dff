@@ -1,10 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { format } from "date-fns";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Insight = Tables<"insights">;
+
+// Format date deterministically in UTC so SSR and client match exactly.
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtUTC(iso: string, kind: "full" | "compact") {
+  const d = new Date(iso);
+  const mo = MONTHS[d.getUTCMonth()];
+  const day = d.getUTCDate();
+  const yr = d.getUTCFullYear();
+  const hh = String(d.getUTCHours()).padStart(2, "0");
+  const mm = String(d.getUTCMinutes()).padStart(2, "0");
+  return kind === "full"
+    ? `${mo} ${day}, ${yr} · ${hh}:${mm} UTC`
+    : `${hh}:${mm} UTC · ${mo} ${day}`;
+}
 
 const insightsQueryOptions = queryOptions({
   queryKey: ["insights"],
@@ -110,7 +123,7 @@ function InsightsPage() {
                   </p>
                   <div className="mt-8 flex items-center gap-4">
                     <span className={`${MONO} text-[11px] text-zinc-400`}>
-                      {format(new Date(featured.published_at), "MMM d, yyyy · HH:mm 'UTC'")}
+                      {fmtUTC(featured.published_at, "full")}
                     </span>
                     <Link
                       to={`/insights/${featured.slug}`}
@@ -180,7 +193,7 @@ function InsightsPage() {
                   </p>
                   <div className="mt-4 flex items-center justify-between">
                     <span className={`${MONO} text-[10px] text-zinc-400`}>
-                      {format(new Date(item.published_at), "HH:mm 'UTC' · MMM d")}
+                      {fmtUTC(item.published_at, "compact")}
                     </span>
                     <span className="text-[10px] font-bold text-zinc-900 group-hover:translate-x-1 transition-transform">
                       VIEW REPORT ↗
