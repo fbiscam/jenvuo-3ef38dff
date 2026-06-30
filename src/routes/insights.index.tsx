@@ -45,6 +45,18 @@ export const Route = createFileRoute("/insights/")({
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(insightsQueryOptions),
   component: InsightsPage,
+  errorComponent: ({ error }) => (
+    <div className="min-h-dvh w-full bg-white text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
+      <div className="text-xs font-mono uppercase tracking-widest text-red-600 mb-3">Insights unavailable</div>
+      <h1 className="text-2xl font-semibold mb-3">We couldn't load the insights feed.</h1>
+      <p className="text-sm text-zinc-500 max-w-md">{error?.message || "Please refresh and try again."}</p>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="min-h-dvh w-full bg-white text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
+      <h1 className="text-2xl font-semibold mb-3">Insights not found</h1>
+    </div>
+  ),
 });
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
