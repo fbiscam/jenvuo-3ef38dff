@@ -88,11 +88,10 @@ function InsightsPage() {
   ];
   const remaining = useMemo(() => {
     if (filter === "latest") return allRemaining;
-    const match = filter === "gold" ? ["gold", "xau"] : ["macro", "fed", "nfp", "cpi", "dxy", "rate"];
-    return allRemaining.filter((i) => {
-      const c = (i.category || "").toLowerCase();
-      return match.some((m) => c.includes(m));
-    });
+    const goldCats = ["gold", "analysis", "ict", "smc", "strategy", "institutional"];
+    const macroCats = ["market news", "education", "ai"];
+    const match = filter === "gold" ? goldCats : macroCats;
+    return allRemaining.filter((i) => match.includes((i.category || "").toLowerCase()));
   }, [allRemaining, filter]);
 
   return (
