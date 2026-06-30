@@ -164,14 +164,14 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
 function TickerRow({ label, symbol, decimals = 2 }: { label: string; symbol: string; decimals?: number }) {
   const livePrice = useLivePriceStream(symbol, null);
   const fetchSnapshot = useServerFn(getMarketSnapshot);
-  const [snap, setSnap] = useState<{ price: number; prevClose: number | null } | null>(null);
+  const [snap, setSnap] = useState<{ price: number; prevClose: number | null; changePct: number | null } | null>(null);
 
   useEffect(() => {
     let stopped = false;
     const tick = async () => {
       try {
         const s = await fetchSnapshot({ data: { symbol } });
-        if (!stopped && s) setSnap({ price: s.price, prevClose: s.prevClose });
+        if (!stopped && s) setSnap({ price: s.price, prevClose: s.prevClose, changePct: s.changePct ?? null });
       } catch { /* keep last */ }
     };
     void tick();
@@ -179,8 +179,20 @@ function TickerRow({ label, symbol, decimals = 2 }: { label: string; symbol: str
     return () => { stopped = true; clearInterval(id); };
   }, [symbol, fetchSnapshot]);
 
-  const price = livePrice ?? snap?.price ?? null;
-  const change = price != null && snap?.prevClose ? ((price - snap.prevClose) / snap.prevClose) * 100 : null;
+  // Use live WS price only when it's in the same ballpark as the snapshot price
+  // (guards against symbol/scale mismatches from the WS stream).
+  const sameScale =
+    livePrice != null && snap?.price
+      ? Math.abs(livePrice - snap.price) / snap.price < 0.2
+      : false;
+  const price = sameScale ? livePrice : snap?.price ?? null;
+  // Prefer the snapshot's own changePct (price + prevClose from one source).
+  const change =
+    snap?.changePct != null
+      ? snap.changePct
+      : price != null && snap?.prevClose
+        ? ((price - snap.prevClose) / snap.prevClose) * 100
+        : null;
   const up = (change ?? 0) >= 0;
 
   return (
