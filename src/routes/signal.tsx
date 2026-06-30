@@ -1173,12 +1173,11 @@ function SignalVoiceAgent({
           }
         : undefined;
       const res = await ask({ data: { question, context: ctx } });
-      setMessages((m) => [...m, { role: "agent", text: res.reply }]);
       // Mark/focus relevant zones based on both the user question and reply
       highlightFromText(`${question} ${res.reply}`);
       speech.speak(stripMd(res.reply));
     } catch (e: any) {
-      setMessages((m) => [...m, { role: "agent", text: e?.message || "Agent failed to respond." }]);
+      toast.error(e?.message || "Agent failed to respond.");
     } finally {
       setBusy(false);
     }
@@ -1232,26 +1231,6 @@ function SignalVoiceAgent({
 
 
 
-      {messages.length > 0 && (
-        <div
-          ref={scrollRef}
-          className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-2 space-y-1.5 max-h-32 overflow-y-auto"
-        >
-          {messages.slice(-5).map((m, i) => (
-            <div
-              key={i}
-              className={cn(
-                "text-[11.5px] leading-snug rounded-md px-2 py-1.5",
-                m.role === "user"
-                  ? "bg-zinc-900 text-white ml-6"
-                  : "bg-white border border-zinc-100 text-zinc-800 mr-6",
-              )}
-            >
-              {m.text}
-            </div>
-          ))}
-        </div>
-      )}
 
       <div
         className={cn(
