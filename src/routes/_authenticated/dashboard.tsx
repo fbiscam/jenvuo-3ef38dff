@@ -256,7 +256,7 @@ function DashboardLayout() {
 
   return (
     <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased jenvu-zoom">
-      <style>{`@media (min-width: 1024px){.jenvu-zoom{zoom:1.2}}`}</style>
+      <style>{`@media (min-width: 1024px){.jenvu-zoom{zoom:1.32}}`}</style>
 
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white">
