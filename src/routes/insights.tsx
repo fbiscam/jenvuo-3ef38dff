@@ -184,8 +184,29 @@ function InsightsPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
             {remaining.map((item) => (
               <article key={item.id} className="group cursor-pointer">
-                <Link to={`/insights/${item.slug}`} className="block">
+                <Link to="/insights/$slug" params={{ slug: item.slug }} className="block">
                   <div className="aspect-video rounded-xl overflow-hidden bg-zinc-100 border border-zinc-100 mb-5">
+                    {item.image_url ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.title}
+                        loading="lazy"
+                        onError={(e) => {
+                          const t = e.currentTarget;
+                          t.onerror = null;
+                          t.src = `https://source.unsplash.com/1200x800/?gold,trading,finance,${encodeURIComponent(item.category)}`;
+                        }}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <img
+                        src={`https://source.unsplash.com/1200x800/?gold,trading,${encodeURIComponent(item.category)}`}
+                        alt={item.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    )}
+                  </div>
                     {item.image_url ? (
                       <img
                         src={item.image_url}
