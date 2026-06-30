@@ -149,7 +149,7 @@ function AuthPage() {
 
   return (
     <>
-    <style>{`@media (min-width: 1280px) and (min-height: 800px){.jenvu-auth-zoom{zoom:1.05}}`}</style>
+    <style>{`@media (min-width: 1280px) and (min-height: 800px){.jenvu-auth-zoom{zoom:1.155}}`}</style>
     <div className={`jenvu-auth-zoom h-dvh w-full overflow-hidden bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
 
 
