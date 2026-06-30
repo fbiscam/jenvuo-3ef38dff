@@ -1,0 +1,56 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { getCreditState, spendCredits, CREDIT_COSTS, type CreditAction } from "@/lib/credits.functions";
+import { useAuthUser } from "./useAuthUser";
+
+export function useCredits() {
+  const { user } = useAuthUser();
+  const queryClient = useQueryClient();
+  const fetchState = useServerFn(getCreditState);
+  const spendFn = useServerFn(spendCredits);
+
+  const query = useQuery({
+    queryKey: ["credit-state", user?.id],
+    queryFn: () => fetchState(),
+    enabled: !!user,
+    staleTime: 15_000,
+  });
+
+  async function spend(action: CreditAction, metadata?: Record<string, unknown>): Promise<boolean> {
+    if (!user) {
+      toast.error("Please sign in to continue.");
+      return false;
+    }
+    try {
+      const res = await spendFn({ data: { action, metadata } });
+      queryClient.setQueryData(["credit-state", user.id], (prev: any) =>
+        prev ? { ...prev, balance: res.balance } : prev,
+      );
+      queryClient.invalidateQueries({ queryKey: ["credit-state", user.id] });
+      return true;
+    } catch (e: any) {
+      if (String(e?.message).includes("INSUFFICIENT_CREDITS")) {
+        toast.error("Out of credits", {
+          description: "Upgrade your plan or buy a top-up pack.",
+          action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+        });
+      } else {
+        toast.error("Couldn't spend credits", { description: e?.message ?? "Try again." });
+      }
+      return false;
+    }
+  }
+
+  return {
+    isLoading: query.isLoading,
+    state: query.data,
+    balance: query.data?.balance ?? 0,
+    allowance: query.data?.allowance ?? 0,
+    plan: query.data?.plan,
+    features: query.data?.features ?? { journal: false, realtime_alerts: false, full_ict: false, scanner: false },
+    spend,
+    costs: CREDIT_COSTS,
+    refresh: () => queryClient.invalidateQueries({ queryKey: ["credit-state", user?.id] }),
+  };
+}

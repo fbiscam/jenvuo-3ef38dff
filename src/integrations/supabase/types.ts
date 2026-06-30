@@ -77,6 +77,60 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_balances: {
+        Row: {
+          balance: number
+          monthly_allowance: number
+          period_resets_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          monthly_allowance?: number
+          period_resets_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          monthly_allowance?: number
+          period_resets_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      credit_ledger: {
+        Row: {
+          balance_after: number
+          created_at: string
+          delta: number
+          id: string
+          metadata: Json
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          balance_after: number
+          created_at?: string
+          delta: number
+          id?: string
+          metadata?: Json
+          reason: string
+          user_id: string
+        }
+        Update: {
+          balance_after?: number
+          created_at?: string
+          delta?: number
+          id?: string
+          metadata?: Json
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -269,6 +323,48 @@ export type Database = {
         }
         Relationships: []
       }
+      plans: {
+        Row: {
+          created_at: string
+          feature_full_ict: boolean
+          feature_journal: boolean
+          feature_realtime_alerts: boolean
+          feature_scanner: boolean
+          id: string
+          monthly_credits: number
+          name: string
+          price_usd: number
+          rollover_months: number
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          feature_full_ict?: boolean
+          feature_journal?: boolean
+          feature_realtime_alerts?: boolean
+          feature_scanner?: boolean
+          id: string
+          monthly_credits?: number
+          name: string
+          price_usd?: number
+          rollover_months?: number
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          feature_full_ict?: boolean
+          feature_journal?: boolean
+          feature_realtime_alerts?: boolean
+          feature_scanner?: boolean
+          id?: string
+          monthly_credits?: number
+          name?: string
+          price_usd?: number
+          rollover_months?: number
+          sort_order?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -430,6 +526,30 @@ export type Database = {
         }
         Relationships: []
       }
+      topup_packs: {
+        Row: {
+          credits: number
+          id: string
+          label: string
+          price_usd: number
+          sort_order: number
+        }
+        Insert: {
+          credits: number
+          id: string
+          label: string
+          price_usd: number
+          sort_order?: number
+        }
+        Update: {
+          credits?: number
+          id?: string
+          label?: string
+          price_usd?: number
+          sort_order?: number
+        }
+        Relationships: []
+      }
       trade_journal: {
         Row: {
           closed_at: string | null
@@ -481,6 +601,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          id: string
+          plan_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          plan_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          plan_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -494,6 +655,16 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      grant_credits: {
+        Args: {
+          _amount: number
+          _metadata?: Json
+          _reason: string
+          _user_id: string
+        }
+        Returns: number
+      }
+      grant_monthly_credits: { Args: never; Returns: number }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -510,6 +681,19 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      set_user_plan: {
+        Args: { _plan_id: string; _user_id: string }
+        Returns: undefined
+      }
+      spend_credits: {
+        Args: {
+          _amount: number
+          _metadata?: Json
+          _reason: string
+          _user_id: string
+        }
+        Returns: number
       }
     }
     Enums: {

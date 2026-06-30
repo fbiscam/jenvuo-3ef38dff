@@ -51,7 +51,9 @@ const TIERS = [
     tagline: "Try the voice agent.",
     cta: "Start free",
     ctaTo: "/auth",
-    features: ["Voice agent (1 query/day)", "Delayed alerts (4h)", "Public market insights", "Community support"],
+    credits: 10,
+    features: ["10 credits / month included", "Voice agent (1 credit / query)", "Delayed alerts (4h)", "Public market insights", "Community support"],
+
     highlight: false,
   },
   {
@@ -63,14 +65,17 @@ const TIERS = [
     tagline: "For serious gold traders.",
     cta: "Notify me when live",
     ctaTo: "/contact",
+    credits: 500,
     features: [
-      "Unlimited voice queries",
-      "Unlimited A+ signal access",
-      "Realtime email & push alerts",
-      "Full ICT / SMC narration",
+      "500 credits / month included",
+      "Unlimited voice queries (1 credit each)",
+      "A+ signal access (2 credits)",
+      "Realtime email & push alerts (5 credits)",
+      "Full ICT / SMC narration (3 credits)",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
     ],
+
     highlight: true,
   },
   {
@@ -82,7 +87,9 @@ const TIERS = [
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
+    credits: 2000,
     features: [
+      "2,000 credits / month included",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
       "Multi-pair scanner (XAU + DXY + indices)",
@@ -90,6 +97,7 @@ const TIERS = [
       "Custom alert rules",
       "Dedicated onboarding & SLA",
     ],
+
     highlight: false,
   },
 ] as const;
@@ -235,7 +243,9 @@ function PricingPage() {
             <tbody>
               {([
                 { f: "Price", a: "Free", b: "$49/mo", c: "$149/mo", d: "Custom", isHeading: true },
+                { f: "Monthly credits", a: "10", b: "500", c: "2,000", d: "Custom" },
                 { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+
                 { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
                 { f: "A+ signal access", a: false, b: true, c: true, d: true },
                 { f: "ICT / SMC narration", a: false, b: true, c: true, d: true },
@@ -330,9 +340,41 @@ function PricingPage() {
         </div>
       </section>
 
-
-
-
+      {/* TOP-UP PACKS */}
+      <section className="mx-auto max-w-7xl px-5 sm:px-8 py-12 sm:py-16">
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <div>
+            <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Credit top-ups</span>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more credits this month?</h2>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600">One-time packs that never expire. Stack on top of any plan, including Free.</p>
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { credits: 50, price: 5, sub: "Starter" },
+            { credits: 250, price: 20, sub: "Trader", accent: true },
+            { credits: 750, price: 50, sub: "Desk" },
+            { credits: 2000, price: 120, sub: "Institutional" },
+          ].map((p) => (
+            <div key={p.credits} className={`rounded-2xl border ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
+              <div className="flex items-center justify-between">
+                <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>{p.sub}</span>
+                {p.accent && (
+                  <span className={`${MONO} text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Best value</span>
+                )}
+              </div>
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="text-3xl font-bold tabular-nums">{p.credits}</span>
+                <span className="text-xs text-zinc-500">credits</span>
+              </div>
+              <div className="mt-1 text-sm text-zinc-700">${p.price} one-time</div>
+              <Link to="/contact" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
+                Notify me
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
 
 
       {/* FAQ */}

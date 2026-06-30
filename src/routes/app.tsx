@@ -12,6 +12,8 @@ import { NewsPanel } from "@/components/NewsPanel";
 import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { getGoldNews } from "@/lib/news.functions";
+import { useCredits } from "@/hooks/useCredits";
+
 import { cn } from "@/lib/utils";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
@@ -223,8 +225,10 @@ function Home() {
   };
 
   const analyze = useServerFn(analyzeGold);
+  const credits = useCredits();
 
   const fetchNews = useServerFn(getGoldNews);
+
   const [timeframe, setTimeframe] = useState<string>("15m");
   const [signal, setSignal] = useState<GoldSignal | null>(null);
   const [loading, setLoading] = useState(false);
@@ -291,8 +295,16 @@ function Home() {
     const tf = parseTimeframe(query, timeframe);
     if (tf !== timeframe) setTimeframe(tf);
     try {
+      const ok = await credits.spend("voice_query", { query: query.slice(0, 80) });
+      if (!ok) {
+        loadingRef.current = false;
+        setLoading(false);
+        speech.resumeIfWanted();
+        return;
+      }
       const result = await analyze({ data: { timeframe: tf, query } });
       setSignal(result);
+
       speech.speak(result.spokenSummary, () => {
         speech.resumeIfWanted();
         armSleep();
@@ -307,7 +319,7 @@ function Home() {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [analyze, speech, timeframe, navigate]);
+  }, [analyze, speech, timeframe, navigate, credits]);
 
   // Accumulate final transcripts into a buffer while listening (do NOT send yet)
   useEffect(() => {

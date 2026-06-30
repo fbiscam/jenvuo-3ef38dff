@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useCredits } from "@/hooks/useCredits";
+import UpgradeOverlay from "@/components/UpgradeOverlay";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/alerts")({
   component: AlertPrefs,
@@ -24,9 +27,12 @@ const DEFAULTS: Prefs = {
 };
 
 function AlertPrefs() {
+  const { features, isLoading } = useCredits();
+  const locked = !isLoading && !features.realtime_alerts;
   const [prefs, setPrefs] = useState<Prefs>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
 
   useEffect(() => {
     (async () => {
@@ -69,7 +75,13 @@ function AlertPrefs() {
   if (loading) return <div className="text-sm text-zinc-500">Loading…</div>;
 
   return (
+    <UpgradeOverlay
+      show={locked}
+      title="Realtime Alerts are Pro"
+      description="Get A+ setups delivered the moment they form. Upgrade to Pro or Elite to enable realtime alerts."
+    >
     <div className="max-w-2xl space-y-6">
+
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <h2 className="text-base font-semibold">Delivery channels</h2>
         <p className="mt-1 text-sm text-zinc-500">Choose how new A+ setups reach you.</p>
@@ -145,8 +157,10 @@ function AlertPrefs() {
         </button>
       </div>
     </div>
+    </UpgradeOverlay>
   );
 }
+
 
 function Toggle({ label, description, checked, onChange }: { label: string; description: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (

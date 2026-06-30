@@ -3,6 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Trash2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
+import { useCredits } from "@/hooks/useCredits";
+import UpgradeOverlay from "@/components/UpgradeOverlay";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/journal")({
   component: Journal,
@@ -25,9 +28,12 @@ type Trade = {
 const EMPTY: Partial<Trade> = { pair: "XAUUSD", direction: "long", outcome: "open" };
 
 function Journal() {
+  const { features, isLoading } = useCredits();
+  const locked = !isLoading && !features.journal;
   const [trades, setTrades] = useState<Trade[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Partial<Trade>>(EMPTY);
+
 
   const load = async () => {
     const { data } = await supabase.from("trade_journal").select("*").order("opened_at", { ascending: false });
@@ -79,7 +85,13 @@ function Journal() {
   };
 
   return (
+    <UpgradeOverlay
+      show={locked}
+      title="Trade Journal is Pro"
+      description="Track every setup, win-rate and P&L. Upgrade to Pro to unlock the journal."
+    >
     <div className="space-y-6">
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           ["Trades", stats.total],
@@ -180,8 +192,10 @@ function Journal() {
         </div>
       )}
     </div>
+    </UpgradeOverlay>
   );
 }
+
 
 function Field({ label, children, full }: { label: string; children: React.ReactNode; full?: boolean }) {
   return (

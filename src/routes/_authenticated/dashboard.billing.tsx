@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useCredits } from "@/hooks/useCredits";
+import { CREDIT_COSTS } from "@/lib/credits.functions";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   component: Billing,
@@ -30,6 +33,7 @@ const PLAN_KEY_BY_COL: Record<number, string> = { 0: "free", 1: "pro", 2: "elite
 
 function Billing() {
   const [plan, setPlan] = useState<string>("free");
+  const credits = useCredits();
 
   useEffect(() => {
     (async () => {
@@ -41,6 +45,9 @@ function Billing() {
   }, []);
 
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+  const pct = credits.allowance > 0 ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
+  const resetsAt = credits.state?.periodResetsAt ? new Date(credits.state.periodResetsAt) : null;
+
 
   return (
     <div className="space-y-10">
@@ -73,6 +80,53 @@ function Billing() {
           </Link>
         </div>
       </section>
+
+      {/* CREDITS BALANCE */}
+      <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Credits balance</div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-4xl font-semibold tabular-nums">{credits.balance}</span>
+              <span className="text-sm text-zinc-500">/ {credits.allowance} this cycle</span>
+            </div>
+            {resetsAt && (
+              <p className="mt-1 text-xs text-zinc-500">Resets {resetsAt.toLocaleDateString()}</p>
+            )}
+          </div>
+          <Link to="/pricing" className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
+            Buy top-up
+          </Link>
+        </div>
+        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+          <div className="h-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
+        </div>
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {(Object.entries(CREDIT_COSTS) as [keyof typeof CREDIT_COSTS, number][]).map(([k, v]) => (
+            <div key={k} className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-3">
+              <div className={`${MONO} text-[9px] uppercase tracking-[0.2em] text-zinc-500`}>{k.replace("_", " ")}</div>
+              <div className="mt-1 text-sm font-semibold text-zinc-900">{v} credit{v > 1 ? "s" : ""}</div>
+            </div>
+          ))}
+        </div>
+        {credits.state?.recent && credits.state.recent.length > 0 && (
+          <div className="mt-6">
+            <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Recent activity</div>
+            <div className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
+              {credits.state.recent.slice(0, 8).map((r) => (
+                <div key={r.id} className="flex items-center justify-between px-3 py-2 text-xs">
+                  <span className="text-zinc-600">{r.reason.replace("_", " ")}</span>
+                  <span className={`tabular-nums font-medium ${r.delta < 0 ? "text-rose-600" : "text-emerald-600"}`}>
+                    {r.delta > 0 ? "+" : ""}{r.delta}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+
+
 
       {/* COMPARISON MATRIX */}
       <section>
