@@ -36,6 +36,7 @@ function Billing() {
   const currentPlan = useCurrentPlan();
   const plan = currentPlan ?? "free";
   const credits = useCredits();
+  const [showAllActivity, setShowAllActivity] = useState(false);
 
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
   const pct = credits.allowance > 0 ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
