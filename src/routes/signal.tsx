@@ -751,7 +751,7 @@ function SignalPage() {
 
               <Link
                 to="/app"
-                className="w-full inline-flex items-center justify-center py-3 bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-800 transition-colors uppercase"
+                className="mt-auto w-full inline-flex items-center justify-center py-3 bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-800 transition-colors uppercase"
               >
                 Execute Voice Trade
               </Link>
