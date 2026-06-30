@@ -207,7 +207,7 @@ function HomePage() {
             <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
             <Link to="/pricing" className="hover:text-zinc-900">Pricing</Link>
             <Link to="/about" className="hover:text-zinc-900">About</Link>
-            <Link to="/download" className="hover:text-zinc-900">Download</Link>
+            
             <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
           </nav>
           <div className="flex shrink-0 items-center gap-2">
