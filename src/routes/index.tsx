@@ -203,6 +203,7 @@ function HomePage() {
           <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
             <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
             <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
+            <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
             <Link to="/about" className="hover:text-zinc-900">About</Link>
             <Link to="/download" className="hover:text-zinc-900">Download</Link>
             <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
