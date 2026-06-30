@@ -653,7 +653,7 @@ function HomePage() {
           </div>
 
           {/* Beanstalk-style pricing table */}
-          <div className="mt-14 overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+          <div className="mt-14 overflow-x-auto rounded-2xl border border-transparent bg-white">
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
                 <col className="w-[28%]" />
