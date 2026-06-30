@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { template as newArticleTemplate } from './new-article'
+import { template as signalAlertTemplate } from './signal-alert'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -16,4 +17,5 @@ export interface TemplateEntry {
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'new-article': newArticleTemplate,
+  'signal-alert': signalAlertTemplate,
 }

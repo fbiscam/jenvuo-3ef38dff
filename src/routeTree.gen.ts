@@ -33,6 +33,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
 import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/api/public/hooks/notify-subscribers'
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
 
@@ -159,6 +160,12 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksScanSignalsRoute =
+  ApiPublicHooksScanSignalsRouteImport.update({
+    id: '/api/public/hooks/scan-signals',
+    path: '/api/public/hooks/scan-signals',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksNotifySubscribersRoute =
   ApiPublicHooksNotifySubscribersRouteImport.update({
     id: '/api/public/hooks/notify-subscribers',
@@ -196,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -223,6 +231,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -252,6 +261,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/scan-signals'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -309,6 +320,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/scan-signals'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -337,6 +349,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/scan-signals'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -364,6 +377,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
   ApiPublicHooksNotifySubscribersRoute: typeof ApiPublicHooksNotifySubscribersRoute
+  ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
@@ -539,6 +553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/scan-signals': {
+      id: '/api/public/hooks/scan-signals'
+      path: '/api/public/hooks/scan-signals'
+      fullPath: '/api/public/hooks/scan-signals'
+      preLoaderRoute: typeof ApiPublicHooksScanSignalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/notify-subscribers': {
       id: '/api/public/hooks/notify-subscribers'
       path: '/api/public/hooks/notify-subscribers'
@@ -592,6 +613,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
   ApiPublicHooksNotifySubscribersRoute: ApiPublicHooksNotifySubscribersRoute,
+  ApiPublicHooksScanSignalsRoute: ApiPublicHooksScanSignalsRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,

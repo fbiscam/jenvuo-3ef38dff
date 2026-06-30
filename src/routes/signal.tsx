@@ -10,6 +10,9 @@ import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { cn } from "@/lib/utils";
+import { useSignalAlerts } from "@/hooks/useSignalAlerts";
+import AlertOptInCard from "@/components/AlertOptInCard";
+import AlertsHistoryPanel from "@/components/AlertsHistoryPanel";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
@@ -115,6 +118,9 @@ function SignalPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(-1);
   const [playing, setPlaying] = useState(false);
+
+  const alertsPair = (plan?.instrument.symbol ?? symbol ?? "XAUUSD").toUpperCase();
+  const { alerts: alertHistory, loading: alertsLoading } = useSignalAlerts(alertsPair);
 
   const htfRef = useRef<SignalChartHandle>(null);
   const ltfRef = useRef<SignalChartHandle>(null);
@@ -674,6 +680,10 @@ function SignalPage() {
                   </ul>
                 </div>
               )}
+
+              {/* A+ alert opt-in + recent fired alerts */}
+              <AlertOptInCard />
+              <AlertsHistoryPanel alerts={alertHistory} loading={alertsLoading} />
 
               <Link
                 to="/app"
