@@ -667,8 +667,7 @@ function HomePage() {
               <thead>
                 <tr className="border-b border-zinc-200">
                   <th className="p-6 text-left align-bottom">
-                    
-                    
+                    <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Plans</span>
                   </th>
                   {[
                     { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false },
