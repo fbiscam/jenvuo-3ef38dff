@@ -306,8 +306,10 @@ function DashboardLayout() {
 
   const handleRefresh = () => {
     if (refreshing) return;
+    setRefreshing(true);
     setRefreshTick((t) => t + 1);
     toast.success("Analytics refreshed");
+    window.setTimeout(() => setRefreshing(false), 800);
   };
 
   const signOut = async () => {
@@ -377,9 +379,9 @@ function DashboardLayout() {
               disabled={refreshing}
               aria-label="Refresh analytics"
               title="Refresh analytics"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+              className="group inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 active:bg-zinc-100 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-3.5 w-3.5 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
             </button>
             <DropdownMenu>
             <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
