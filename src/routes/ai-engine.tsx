@@ -20,14 +20,6 @@ function AIPage() {
       eyebrow="Technology"
       title="The AI Engine"
       intro="Jenvu is more than a chatbot. It's a multi-stage reasoning pipeline that fuses live market data, institutional concepts, and natural-language synthesis into one fluid agent."
-      navItems={[
-        { label: "Signal Engine", to: "/signal" },
-        { label: "AI Engine", to: "/ai-engine", active: true },
-        { label: "Insights", to: "/insights" },
-        { label: "About", to: "/about" },
-        { label: "Download", to: "/download" },
-        { label: "Contact", to: "/contact" },
-      ]}
     >
       <section className="space-y-3">
         <H2>Perception Layer</H2>
