@@ -125,18 +125,6 @@ const FAQ = [
 function PricingPage() {
   return (
     <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased`} style={{ zoom: 1.25 }}>
-      {/* TICKER */}
-      <div className="border-b border-zinc-100 bg-zinc-50/70 overflow-hidden">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-2 flex items-center gap-6 whitespace-nowrap overflow-x-auto">
-          {INITIAL_TICKER.map(([sym, px, ch]) => (
-            <div key={sym} className={`flex items-center gap-2 ${MONO} text-[10px] uppercase tracking-wider`}>
-              <span className="text-zinc-900 font-semibold">{sym}</span>
-              <span className="text-zinc-600">{px}</span>
-              <span className={ch.startsWith("-") ? "text-red-600" : "text-emerald-600"}>{ch}</span>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
