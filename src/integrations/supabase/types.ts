@@ -391,24 +391,27 @@ export type Database = {
       }
       saved_signals: {
         Row: {
-          alert_id: string
+          alert_id: string | null
           created_at: string
           id: string
           notes: string | null
+          snapshot: Json | null
           user_id: string
         }
         Insert: {
-          alert_id: string
+          alert_id?: string | null
           created_at?: string
           id?: string
           notes?: string | null
+          snapshot?: Json | null
           user_id: string
         }
         Update: {
-          alert_id?: string
+          alert_id?: string | null
           created_at?: string
           id?: string
           notes?: string | null
+          snapshot?: Json | null
           user_id?: string
         }
         Relationships: [
