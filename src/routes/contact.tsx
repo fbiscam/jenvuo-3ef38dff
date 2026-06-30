@@ -141,9 +141,6 @@ function ContactPage() {
         {/* HERO */}
         <section className="border-b border-zinc-100">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-16">
-            <div className={`${MONO} text-[10px] uppercase tracking-[0.28em] text-zinc-500`}>
-              CONTACT // GET IN TOUCH
-            </div>
             <h1 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
               Talk to the desk.
             </h1>
