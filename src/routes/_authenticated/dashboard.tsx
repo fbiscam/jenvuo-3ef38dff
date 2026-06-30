@@ -306,11 +306,10 @@ function DashboardLayout() {
 
   const handleRefresh = () => {
     if (refreshing) return;
-    setRefreshing(true);
     setRefreshTick((t) => t + 1);
-    toast.success("Analytics refreshed");
-    window.setTimeout(() => setRefreshing(false), 800);
+    toast.success("Refreshing analytics…");
   };
+
 
   const signOut = async () => {
     await supabase.auth.signOut();
