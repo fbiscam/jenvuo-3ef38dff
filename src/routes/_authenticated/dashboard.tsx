@@ -317,21 +317,6 @@ function DashboardLayout() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
-            <button
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(email || "");
-                  toast.success("Account email copied", { description: email });
-                } catch {
-                  toast.error("Could not copy email");
-                }
-              }}
-              className="rounded-md border border-zinc-200 bg-white p-2 text-zinc-500 hover:bg-zinc-50"
-              aria-label="Copy account email"
-              title="Copy account email"
-            >
-              <Tag className="h-4 w-4" />
-            </button>
             <DropdownMenu>
               <DropdownMenuTrigger className="rounded-md border border-zinc-200 bg-white p-2 text-zinc-500 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300" aria-label="More actions">
                 <MoreHorizontal className="h-4 w-4" />
