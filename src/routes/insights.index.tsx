@@ -5,6 +5,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import type { Tables } from "@/integrations/supabase/types";
+import SiteFooter from "@/components/SiteFooter";
 
 type Insight = Tables<"insights">;
 
@@ -288,25 +289,7 @@ function InsightsPage() {
           </div>
         </main>
 
-        {/* FOOTER */}
-        <footer className="border-t border-zinc-100">
-          <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10 flex flex-col md:flex-row items-center justify-between gap-5 text-sm text-zinc-900">
-            <div className="flex items-center gap-2.5">
-              <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded object-contain" />
-              <span className="text-zinc-900 font-semibold">JENVU AI</span>
-              <span className="text-zinc-300">·</span>
-              <span>© {new Date().getFullYear()}</span>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-              <Link to="/about" className="hover:text-zinc-900">About</Link>
-              <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
-              <Link to="/download" className="hover:text-zinc-900">Download</Link>
-              <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
-              <Link to="/terms" className="hover:text-zinc-900">Terms</Link>
-              <Link to="/privacy" className="hover:text-zinc-900">Privacy</Link>
-            </div>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
     </>
   );
