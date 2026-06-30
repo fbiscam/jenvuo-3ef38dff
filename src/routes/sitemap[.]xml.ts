@@ -49,6 +49,8 @@ export const Route = createFileRoute("/sitemap.xml")({
           }
         } catch {
           // ignore
+        }
+
 
         // Append every published insight
         try {
