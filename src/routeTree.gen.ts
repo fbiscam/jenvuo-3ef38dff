@@ -17,6 +17,7 @@ import { Route as LlmRouteImport } from './routes/llm'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as DevelopmentRouteImport } from './routes/development'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AiEngineRouteImport } from './routes/ai-engine'
@@ -64,6 +65,11 @@ const DevelopmentRoute = DevelopmentRouteImport.update({
   path: '/development',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
+    | '/contact'
     | '/development'
     | '/disclaimer'
     | '/download'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
+    | '/contact'
     | '/development'
     | '/disclaimer'
     | '/download'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
+    | '/contact'
     | '/development'
     | '/disclaimer'
     | '/download'
@@ -201,6 +213,7 @@ export interface RootRouteChildren {
   AiEngineRoute: typeof AiEngineRoute
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
+  ContactRoute: typeof ContactRoute
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
   DownloadRoute: typeof DownloadRoute
@@ -270,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevelopmentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -321,6 +341,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiEngineRoute: AiEngineRoute,
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
+  ContactRoute: ContactRoute,
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
   DownloadRoute: DownloadRoute,
