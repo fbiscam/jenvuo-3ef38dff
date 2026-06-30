@@ -192,8 +192,10 @@ function Journal() {
         </div>
       )}
     </div>
+    </UpgradeOverlay>
   );
 }
+
 
 function Field({ label, children, full }: { label: string; children: React.ReactNode; full?: boolean }) {
   return (
