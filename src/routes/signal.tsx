@@ -333,12 +333,23 @@ function SignalPage() {
   const stoppedRef = useRef(false);
   const lastSparkPushRef = useRef(0);
 
+  /* journal/save state */
+  const journalRowIdRef = useRef<string | null>(null);
+  const [tradeLogged, setTradeLogged] = useState(false);
+  const [logging, setLogging] = useState(false);
+  const [signalSaved, setSignalSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     eventsFiredRef.current = new Set();
     stoppedRef.current = false;
     setTrackerStatus("PENDING");
+    journalRowIdRef.current = null;
+    setTradeLogged(false);
+    setSignalSaved(false);
     if (plan) setSparkline([plan.currentPrice]);
   }, [plan?.instrument.symbol]);
+
 
   const handleStreamTick = useCallback((priceTick: number, tMs: number) => {
     if (!plan || stoppedRef.current) return;
