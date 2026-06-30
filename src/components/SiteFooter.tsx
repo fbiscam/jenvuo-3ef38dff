@@ -108,12 +108,12 @@ export default function SiteFooter() {
         {/* Divider + sub bar */}
         <div className="mt-12 pt-6 border-t border-zinc-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <div
-            className={`${MONO} text-[11px] uppercase tracking-[0.25em] text-zinc-500`}
+            className={`${MONO} text-[11px] uppercase tracking-[0.25em] text-zinc-900`}
           >
             © {year} JENVU AI · ALL RIGHTS RESERVED
           </div>
           <div
-            className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-400 flex items-center gap-3`}
+            className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-900 flex items-center gap-3`}
           >
             <a
               href="mailto:support@jenvu.com"
@@ -122,6 +122,7 @@ export default function SiteFooter() {
               support@jenvu.com
             </a>
           </div>
+
         </div>
       </div>
     </footer>
