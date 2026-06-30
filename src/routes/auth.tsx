@@ -265,7 +265,7 @@ function AuthPage() {
       <footer className="border-t border-zinc-100 shrink-0">
         <div className="mx-auto max-w-6xl px-5 py-3 flex items-center justify-between gap-5">
           <div className="flex items-center gap-2 text-[11px] text-zinc-400">
-            <span className="font-semibold text-zinc-900">Jenvu</span>
+            <span className="font-semibold text-zinc-900">JENVU AI</span>
             <span>·</span>
             <span>© {new Date().getFullYear()}</span>
           </div>
