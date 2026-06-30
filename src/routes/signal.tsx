@@ -1227,7 +1227,7 @@ function SignalVoiceAgent({
       <div
         className={cn(
           "flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white pl-2.5 pr-1 py-1 transition-opacity",
-          showInput ? "opacity-100" : "opacity-0 pointer-events-none",
+          showInput ? "opacity-100" : "hidden",
         )}
         aria-hidden={!showInput}
       >
