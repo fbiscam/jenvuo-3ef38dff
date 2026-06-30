@@ -1,59 +1,62 @@
-## Pricing page — themed redesign + feature blocks
+# Auth-Aware Header + 1-Week Session
 
-Make the pricing page feel like the rest of the Terminal-style site (homepage / insights / contact) and add visual feature blocks so users instantly understand what each plan unlocks.
+## Goal
 
-### 1. Header chrome (match homepage)
-- Add live ticker bar above header (same `useLiveTicker` strip used on `/app` and homepage).
-- Status pill (`PRICING_DESK // LIVE`) centered absolutely like other pages.
-- Add Dashboard pill + Launch button on the right.
+Header buttons swap based on sign-in state, on every page that has the top nav:
 
-### 2. Hero refinement
-- Add an institutional `[ 01 / PRICING ]` index marker, mono uppercase eyebrow.
-- Headline + sub stays, but add a 4-stat row underneath: "A+ Setups · ICT/SMC · <30s Alerts · 25Y Methodology" in mono pill style.
+- **Signed out** → `Sign In` + `Try Jenvu` (both → `/auth`)
+- **Signed in** → `Dashboard` (→ `/dashboard`) + `Launch` (→ `/app`)
 
-### 3. Plan cards — keep current 3 cards (already themed) but polish
-- Add a small icon badge with conic-gradient ring around the tier icon (matches dashboard "Launch AI" card aesthetic).
-- Add per-card "Best for" tag at top (e.g. Free → "Curious", Pro → "Active trader", Elite → "Desk / fund").
-- Soften Pro card: keep dark but use subtle iridescent shadow instead of flat black.
+Session persists ~1 week. Sign-out flips header back instantly. `/auth` page never flashes for already-signed-in users.
 
-### 4. NEW: "What you actually get" feature blocks (with images)
-A 3-column grid of feature cards under the pricing tiers, each with a generated image + title + bullet description. Six blocks total in a 3×2 grid:
+## Changes
 
-| Block | Image | Title |
-|---|---|---|
-| 1 | Voice waveform + orb | Voice-first analysis |
-| 2 | TradingView-style chart with FVG / OB markings | ICT & SMC narration |
-| 3 | A+ signal alert email mockup | Realtime A+ alerts |
-| 4 | Trade journal dashboard mockup | Trade journal & analytics |
-| 5 | Multi-pair scanner grid | Multi-timeframe bias |
-| 6 | API / webhook code snippet visual | API access (Elite) |
+### 1. Auth state hook
+New `src/hooks/useAuthUser.ts`:
+- Hydrates with `supabase.auth.getUser()`
+- Subscribes once to `supabase.auth.onAuthStateChange` (filters `SIGNED_IN`/`SIGNED_OUT`/`USER_UPDATED`)
+- Returns `{ user, loading }`
 
-Each card: white bg, zinc-200 border, hover lift, mono caption + sans title + 1-line description. Images generated via `imagegen` (1024×768 jpg) and stored at `src/assets/pricing-*.jpg`.
-
-### 5. NEW: "Plan comparison" matrix table
-Below feature blocks — a clean dense comparison table (Free vs Pro vs Elite) listing every capability with check / dash / value cells. Black header row, hover row tint, mono cell labels.
-
-### 6. FAQ section (keep, restyle)
-Match insights page's pill-style accordions: rounded-2xl with subtle hover, add a small `[ FAQ ]` mono eyebrow.
-
-### 7. Footer
-Already uses `SiteFooter` — no change.
-
-### Technical details
-- All edits in `src/routes/pricing.tsx` (single file).
-- Generate 6 images via `imagegen--generate_image` (fast model, jpg) into `src/assets/pricing-{voice,ict,alerts,journal,scanner,api}.jpg`.
-- Reuse existing tokens (zinc palette, MONO/SANS fonts). No new CSS variables.
-- Keep `zoom: 1.25` as user requested previously.
-
-### Layout sketch
-
-```text
-┌─ ticker strip ───────────────────────┐
-├─ header (logo · pill · launch) ──────┤
-├─ hero (eyebrow · h1 · sub · stats) ──┤
-├─ 3 pricing cards ────────────────────┤
-├─ feature blocks 3×2 (image + text) ──┤
-├─ comparison matrix table ────────────┤
-├─ FAQ accordion ──────────────────────┤
-└─ SiteFooter ─────────────────────────┘
+### 2. Reusable header buttons
+New `src/components/HeaderAuthButtons.tsx`:
 ```
+loading  → empty placeholder (prevents flash)
+no user  → [Sign In ghost]    [Try Jenvu pill →]
+user     → [Dashboard ghost]  [Launch pill ↗]
+```
+
+### 3. Wire into every header
+Replace existing button cluster with `<HeaderAuthButtons />` in:
+- `src/routes/index.tsx`
+- `src/routes/app.tsx`
+- `src/routes/signal.tsx`
+- `src/routes/pricing.tsx`
+- `src/components/PageShell.tsx` (covers about / privacy / disclaimer / contact / insights / download / terms / llm / development / ai-engine)
+
+### 4. No `/auth` flash when already signed in
+Update `src/routes/auth.tsx`:
+- `ssr: false` (Supabase session lives in `localStorage`)
+- `beforeLoad`: `supabase.auth.getUser()` — if user exists, `throw redirect({ to: "/dashboard" })` (or the `?redirect=` param if present) before the auth UI mounts
+- Inside the form, support `?redirect=/app` so future header links can pass intended destination (e.g. clicking Launch while signed-out lands on `/auth?redirect=/app`, then bounces to `/app` after login)
+
+### 5. Sign-out flow (dashboard)
+Update logout button:
+1. `queryClient.cancelQueries()` (if available)
+2. `await supabase.auth.signOut()`
+3. `navigate({ to: "/", replace: true })`
+
+Header reactively flips back to `Sign In / Try Jenvu`.
+
+### 6. 1-week session
+Supabase JS already persists session in `localStorage` + auto-refreshes the access token. Set Supabase Auth **refresh token lifetime → 7 days (604800s)** so a user inactive >7 days must sign in again — matching the request.
+
+## Out of scope
+- No new auth providers / no `/auth` UI redesign.
+- No design changes — same pill + ghost link aesthetic.
+- No new tables / no role logic.
+
+## Files
+
+- new: `src/hooks/useAuthUser.ts`, `src/components/HeaderAuthButtons.tsx`
+- edit: `src/routes/auth.tsx` (redirect guard), `src/routes/index.tsx`, `src/routes/app.tsx`, `src/routes/signal.tsx`, `src/routes/pricing.tsx`, `src/components/PageShell.tsx`, dashboard logout handler
+- backend: refresh-token lifetime → 7 days

@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import SiteFooter from "@/components/SiteFooter";
+import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Inter',system-ui,sans-serif]";
+
 
 export function PageShell({
   eyebrow,
@@ -35,14 +37,8 @@ export function PageShell({
               <Link to="/about" className="hover:text-zinc-900">About</Link>
               <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
             </nav>
-            <div className="flex shrink-0 items-center gap-2">
-              <Link
-                to="/app"
-                className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-zinc-800"
-              >
-                Launch
-              </Link>
-            </div>
+            <HeaderAuthButtons />
+
           </div>
         </header>
 
