@@ -746,7 +746,7 @@ function HomePage() {
                     {[row.a, row.b, row.c, row.d].map((v, i) => (
                       <td
                         key={i}
-                        className={`px-6 py-3.5 text-center border-l border-zinc-100 ${i === 1 ? "bg-amber-50/40" : ""}`}
+                        className={`px-6 py-3.5 text-center border-l border-transparent ${i === 1 ? "bg-amber-50/40" : ""}`}
                       >
                         {v === true ? (
                           <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
