@@ -598,7 +598,7 @@ function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "think
 
   return (
     <div
-      className="relative aspect-square w-[min(78vw,18rem)] sm:w-[22rem] lg:w-[26rem] flex items-center justify-center"
+      className="relative aspect-square w-[min(66vw,15rem)] sm:w-[18rem] lg:w-[22rem] flex items-center justify-center"
       style={{
         transform: `scale(${scale})`,
         transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
