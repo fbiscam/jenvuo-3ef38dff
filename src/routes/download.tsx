@@ -151,7 +151,7 @@ function DownloadPage() {
         <section className="mx-auto max-w-6xl px-5 pb-14 sm:px-6 sm:pb-20">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
             {PLATFORMS.map((p) => {
-              const available = p.status === "AVAILABLE" && !!p.href;
+              const available = p.status === "INSTALL" && !!p.href;
               return (
                 <div
                   key={p.key}
