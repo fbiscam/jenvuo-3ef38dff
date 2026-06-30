@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useCredits } from "@/hooks/useCredits";
+import { CREDIT_COSTS } from "@/lib/credits.functions";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   component: Billing,
