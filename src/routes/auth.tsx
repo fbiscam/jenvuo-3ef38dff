@@ -1,9 +1,11 @@
 import * as React from "react";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Mail, Lock, ArrowRight } from "lucide-react";
+import { Mail, Lock, ArrowRight, User } from "lucide-react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { CloudOrb } from "@/components/CloudOrb";
+
 
 type AuthSearch = { redirect?: string };
 
