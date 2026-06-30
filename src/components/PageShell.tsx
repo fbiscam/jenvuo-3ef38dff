@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import SiteFooter from "@/components/SiteFooter";
+import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Inter',system-ui,sans-serif]";
+
 
 export function PageShell({
   eyebrow,
