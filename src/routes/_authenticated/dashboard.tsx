@@ -39,7 +39,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardLayout,
 });
 
-type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number };
+type OpenTrade = { pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null };
+type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number; closedWins: number; closedDecided: number; openTrades: OpenTrade[] };
 
 const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: boolean; countKey?: keyof Counts }> = [
   { to: "/dashboard", label: "Saved", icon: Bookmark, exact: true, countKey: "saved" },
