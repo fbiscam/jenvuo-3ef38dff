@@ -381,7 +381,7 @@ function DashboardLayout() {
                 seed={13}
               />
               <Metric
-                label="Alerts · 7d"
+                label={`Alerts · ${range}`}
                 value={counts.alerts7d}
                 delta={counts.alerts7d > 0 ? `${counts.alerts7d}` : null}
                 tone="blue"
