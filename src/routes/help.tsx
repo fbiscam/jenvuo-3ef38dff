@@ -160,9 +160,6 @@ function HelpCenterPage() {
         {/* POPULAR */}
         <section className="border-t border-zinc-100 bg-zinc-50/60">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
-            <div className={`${MONO} text-[10px] uppercase tracking-[0.28em] text-zinc-500`}>
-              [ 02 / Popular ]
-            </div>
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
               Frequently read
             </h2>
