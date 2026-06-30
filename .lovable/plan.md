@@ -1,93 +1,108 @@
-## Credit-Based Pricing System
 
-Plans give a monthly credit allowance. Every premium action deducts credits. When the balance hits zero, the user is blocked until next month or until they buy a top-up pack. Payment integration is deferred — for now top-up packs show a "coming soon" CTA, plan upgrades are admin-granted, and the entire ledger / gating / UI is built end-to-end.
+## Goal
 
-### Plans & monthly credits
+Every signal Jenvu emits should feel like a 25-year ICT/SMC trader's A+ setup — not a guess. We do that by feeding the AI **structured market data** (not raw prompts), running a **deterministic checklist** first, and only invoking the LLM for narration/confirmation. Cheap model, high accuracy.
 
-| Plan  | Price   | Monthly credits | Notes                                  |
-| ----- | ------- | --------------- | -------------------------------------- |
-| Free  | $0      | 10              | Trial. Hard cap.                       |
-| Pro   | $29/mo  | 500             | Unused credits roll up to 1 month.     |
-| Elite | $99/mo  | 2,000           | Roll up to 2 months. Priority signals. |
+## Model choice
 
-### Top-up packs (UI now, payment later)
+- **Primary**: `google/gemini-3.1-flash-lite` — cheapest, fast, great at structured JSON output.
+- **Fallback / heavy reasoning** (only when score is borderline 75–84): `google/gemini-3-flash-preview`.
+- Everything else (voice replies, narration) stays on Flash Lite.
 
-| Pack | Price | Credits |
-| ---- | ----- | ------- |
-| S    | $5    | 50      |
-| M    | $20   | 250     |
-| L    | $50   | 750     |
+Reason: the *analysis* is done in code with raw OHLCV math. The LLM only **labels, narrates, and sanity-checks**. So model cost stays low and quality stays high.
 
-### Action costs
+## The 7-stage pipeline (runs per signal request + every 15min via cron)
 
-| Action                       | Credits |
-| ---------------------------- | ------- |
-| Voice query (AI reply)       | 1       |
-| Signal generation            | 2       |
-| ICT / SMC narration on chart | 3       |
-| A+ realtime alert delivered  | 5       |
+```text
+1. DATA FETCH      → OHLCV M5/M15/H1/H4/D1 + DXY + live price + news window
+2. STRUCTURE       → BOS/CHoCH, swing highs/lows, trend per TF (code, not AI)
+3. LIQUIDITY MAP   → equal highs/lows, Asia/London/NY session pools, PDH/PDL
+4. ICT/SMC ZONES   → FVGs, Order Blocks, Breakers, Mitigation blocks (code)
+5. CONFLUENCE      → HTF bias + LTF entry zone + killzone + DXY correlation
+6. SCORE (0-100)   → weighted checklist → only ≥85 = A+ signal
+7. AI NARRATION    → Gemini Flash Lite writes the "why" + risk plan
+```
 
-### What changes for the user
+Stages 1–6 are **pure TypeScript** in `src/lib/analysis/`. No AI cost, fully deterministic, testable. Stage 7 is the only LLM call.
 
-1. **Header / dashboard** shows a live "Credits: 487 / 500" pill with a thin progress bar. Click → `/dashboard/billing`.
-2. **Before any premium action** the client calls a server fn that atomically checks + deducts credits. If insufficient → toast "Out of credits — upgrade or top up" with a button to `/pricing`.
-3. **Free user limits** are enforced by both plan tier (booleans like `can_use_journal`, `can_get_realtime_alerts`) AND credit balance. Free users see locked features with an "Upgrade" overlay on Journal, Realtime Alerts, full ICT narration, and the Scanner.
-4. **Billing page** rebuilt: current plan + credits remaining + usage chart (last 30 days) + top-up packs + plan comparison table.
-5. **Monthly reset** runs via pg_cron on the 1st of each month — refills allowance per plan and archives the previous period's usage.
+## Stage details
 
-### Technical implementation
+**1. Data fetch** (`src/lib/analysis/data.ts`)
+- Pull XAUUSD candles from existing Binance WS + a REST source (TwelveData/Yahoo backup) for 5 timeframes.
+- Pull DXY for correlation (gold inverse).
+- Pull last 3h of high-impact news from existing `news.functions.ts`.
 
-**New tables**
+**2. Market structure** (`structure.ts`)
+- Compute swing points (fractal, lookback=5).
+- Detect BOS (break of structure) and CHoCH (change of character) per TF.
+- Output: `{ trend: 'bullish'|'bearish'|'ranging', lastBOS, lastCHoCH }` per TF.
 
-- `plans` — seeded with free/pro/elite (price, monthly_credits, feature flags). Reference table.
-- `user_subscriptions` — `user_id`, `plan_id`, `status` (active/canceled), `current_period_start`, `current_period_end`. One active row per user. Default-creates a Free row in `handle_new_user`.
-- `credit_balances` — `user_id` (PK), `balance`, `monthly_allowance`, `period_resets_at`, `updated_at`. Single row per user.
-- `credit_ledger` — `id`, `user_id`, `delta` (negative = spend, positive = grant/topup), `reason` (enum: monthly_grant, voice_query, signal, ict_narration, alert, topup_purchase, admin_adjust), `metadata` jsonb, `created_at`. Immutable audit log.
-- `topup_packs` — reference table (S/M/L pricing).
+**3. Liquidity map** (`liquidity.ts`)
+- Equal highs/lows (tolerance = 0.05% of price).
+- Session pools: Asia high/low, London high/low, prior day H/L, prior week H/L.
+- Mark which pools are **unswept** (= magnets).
 
-All tables: RLS on, users can SELECT own rows only, mutations only via server functions / service role. Standard GRANT block.
+**4. ICT/SMC zones** (`zones.ts`)
+- **FVG**: 3-candle imbalance, tag as bullish/bearish, mark mitigated/unmitigated.
+- **Order Block**: last opposing candle before impulsive BOS.
+- **Breaker**: failed OB after CHoCH.
+- **Premium/Discount**: 50% of last dealing range.
 
-**Server functions** (`src/lib/credits.functions.ts`, all use `requireSupabaseAuth`)
+**5. Confluence engine** (`confluence.ts`)
+- HTF bias (H4+D1 agree) ✓
+- LTF entry zone is unmitigated OB or FVG ✓
+- Entry sits in discount (for buys) / premium (for sells) ✓
+- Liquidity sweep just occurred ✓
+- Inside active killzone (London 7-10 UTC, NY 12-15 UTC) ✓
+- DXY confirms (inverse moving) ✓
+- No red-folder news in next 30min ✓
 
-- `getCreditState()` → returns `{ balance, allowance, plan, periodEndsAt, recentLedger }`.
-- `spendCredits({ amount, reason, metadata })` → atomic Postgres function `public.spend_credits(uid, amt, reason, meta)` that locks the row, checks balance, inserts ledger row, updates balance. Returns new balance or throws `InsufficientCredits`.
-- `getPlanFeatures()` → returns booleans the UI gates on.
+**6. Scoring** (`score.ts`)
 
-**Admin / privileged** (`src/lib/credits-admin.functions.ts`, admin-role checked)
+| Factor | Weight |
+|---|---|
+| HTF bias alignment (H4+D1) | 25 |
+| Liquidity sweep before entry | 20 |
+| Unmitigated FVG / OB at entry | 15 |
+| Premium/Discount correct side | 10 |
+| Killzone active | 10 |
+| DXY correlation confirms | 10 |
+| Clean R:R ≥ 1:3 to next liquidity | 10 |
 
-- `grantCredits()`, `setUserPlan()` — for manual upgrades until payments land.
+- **≥ 85** → A+ signal, emit + alert.
+- **70–84** → "watching" (shown on signal page, no alert, no credit charge).
+- **< 70** → discarded silently.
 
-**Postgres functions**
+This is the gate that makes every emitted signal A+.
 
-- `spend_credits(uid uuid, amt int, reason text, meta jsonb)` — SECURITY DEFINER, locks balance row `FOR UPDATE`, raises exception if `balance < amt`, else writes ledger + decrements balance atomically.
-- `grant_monthly_credits()` — pg_cron job on `0 0 1 * *`. For every active subscription, tops balance up to (allowance + rollover cap) and writes a `monthly_grant` ledger row.
-- `handle_new_user` extended to create Free subscription + balance row.
+**7. AI narration** (`narrate.functions.ts`)
+- Single Gemini Flash Lite call. Input = the structured JSON from stages 1–6.
+- Output (strict JSON via `Output.object`): `{ headline, ictNarrative, smcNarrative, riskPlan, invalidation, confidenceWord }`.
+- Prompt forces it to **cite the data** ("price swept Asia high at 2657.4, then CHoCH on M15…") — no generic fluff. Temperature 0.3.
 
-**Hook**
+## Entry / SL / TP (deterministic, not AI)
 
-- `src/hooks/useCredits.ts` — wraps `getCreditState` with TanStack Query, exposes `balance`, `plan`, `features`, and a `spend(action)` helper that calls the server fn and invalidates the query.
+- **Entry**: midpoint of the chosen OB/FVG.
+- **SL**: 2 pips beyond the OB/FVG extreme (or beyond swept liquidity).
+- **TP1**: nearest opposing liquidity pool. **TP2**: next HTF liquidity. **TP3**: 1:5 extension.
+- AI never invents prices — it only explains them. Eliminates hallucinated entries.
 
-**Gating integration points**
+## Wiring into the app
 
-- `src/routes/app.tsx` — voice query handler calls `spend("voice_query")` before AI call. Out-of-credits → toast.
-- `src/routes/signal.tsx` — signal generation calls `spend("signal")`. ICT narration step calls `spend("ict_narration")`. Free users see a locked overlay if `!features.full_ict_narration`.
-- `src/routes/_authenticated/dashboard.alerts.tsx` — realtime toggle disabled unless `features.realtime_alerts`. Each delivered A+ alert (server-side scanner) calls `spend("alert")` against the recipient before push.
-- `src/routes/_authenticated/dashboard.journal.tsx` — locked overlay if `!features.journal`.
+- New module: `src/lib/analysis/` (data, structure, liquidity, zones, confluence, score, types).
+- New server fn: `generateAplusSignal` in `src/lib/signals.functions.ts` — runs pipeline, calls narration, deducts credits (existing `spend('signal')`).
+- `src/routes/signal.tsx` switches to call this fn; replaces current ad-hoc analysis. Shows score badge + checklist breakdown so user *sees* why it's A+.
+- `src/routes/api/public/hooks/scan-signals.ts` (already exists, pg_cron) calls the same pipeline every 15min; only inserts into `signal_alerts` when score ≥ 85 — keeps the alert system honest.
+- Closed-market handling unchanged (skip emission).
 
-**UI additions**
+## What the user sees
 
-- `src/components/CreditsPill.tsx` — header pill: "⚡ 487". Hover shows allowance + reset date. Click → billing.
-- `src/components/UpgradeOverlay.tsx` — reusable locked-feature scrim with plan blurb + CTA.
-- `src/routes/_authenticated/dashboard.billing.tsx` — full rebuild: current plan card, credit balance with progress ring, 30-day usage sparkline (from ledger), top-up pack grid (3 cards, "Coming soon" buttons), plan comparison table (kept from current), recent ledger table.
-- `src/routes/pricing.tsx` — update Free/Pro/Elite cards with credit allowance, add top-up packs section below comparison table.
+- Signal card gains a **"A+ Score: 92/100"** ring + a 7-line confluence checklist (✓/✗ per factor).
+- Narration is grounded in real prices, not generic ICT essays.
+- Alerts (5 credits) fire **only** for A+; "watching" setups are free to view.
 
-**Payment hookup (deferred)**
+## Out of scope (this build)
 
-Top-up and upgrade buttons are wired to a stub server fn that returns "Payments coming soon." When the user is ready, we run `recommend_payment_provider`, enable Stripe or Paddle seamless, create products matching the plans + packs, and replace the stub with real checkout sessions + webhook handlers that call `grantCredits()`. No DB changes needed at that point.
-
-### Out of scope for this build
-
-- Real Stripe/Paddle checkout (deferred per user request).
-- Annual billing toggle.
-- Team plans.
-- Refunds / proration logic.
+- Backtesting harness (next pass).
+- Multi-pair (still gold-only as per product).
+- Replacing the existing chart drawing — visuals stay, data source becomes the new pipeline.
