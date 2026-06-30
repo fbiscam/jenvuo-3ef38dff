@@ -659,8 +659,8 @@ function HomePage() {
                   </th>
                   {[
                     { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false },
-                    { name: "Pro", price: "$49", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
-                    { name: "Elite", price: "$149", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
+                    { name: "Pro", price: "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
+                    { name: "Elite", price: "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
                     { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false },
                   ].map((p) => (
                     <th
@@ -701,7 +701,8 @@ function HomePage() {
 
               <tbody>
                 {([
-                  { f: "Price", a: "Free", b: "$49/mo", c: "$149/mo", d: "Custom", isHeading: true },
+                  { f: "Price", a: "Free", b: "$29/mo", c: "$99/mo", d: "Custom", isHeading: true },
+                  { f: "Monthly credits", a: "10", b: "175", c: "595", d: "Custom" },
                   { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
                   { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
                   { f: "A+ signal access", a: false, b: true, c: true, d: true },

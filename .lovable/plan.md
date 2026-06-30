@@ -1,55 +1,38 @@
-# Dashboard upgrade — more features, same resolution
+## Goal
 
-Goal: keep the current 1.35 desktop zoom and tab structure, but turn the bare header into a real account command center with live stats, fast actions, and a richer visual treatment.
+Set monthly credit grants so every plan retains a **40% margin** vs the top-up rate ($5 / 50 credits = **$0.10 par**). Users receive **60% of par** credits.
 
-## What gets added (in `src/routes/_authenticated/dashboard.tsx`)
+## New plan grid
 
-1. **Hero band** (replaces the current `Account` title row)
-   - Soft gradient panel (white → zinc-50 with subtle amber/zinc accent line on top), rounded-2xl, 1px hairline border.
-   - Left: avatar circle (user initial), greeting "Good morning, {name}", email, plan badge (Free / Pro / Elite) pulled from `user_subscriptions`.
-   - Right: Launch AI button (kept), plus a secondary `Open Signal Desk` ghost button.
+| Plan  | Price | Par credits ($0.10 each) | Granted (60%) | Effective $/credit | Margin |
+|-------|-------|--------------------------|----------------|---------------------|--------|
+| Free  | $0    | —                        | **10 / month** (unchanged) | n/a | n/a |
+| Pro   | $29   | 290                      | **175 / month** | $0.166 | 40% |
+| Elite | $99   | 990                      | **595 / month** | $0.166 | 40% |
 
-2. **Stat strip — 4 KPI cards** under the hero
-   - **Credits** — balance from `user_credits`, with small bar showing % of monthly allowance + "Top up" link to billing.
-   - **Saved A+ Setups** — count from `saved_signals`.
-   - **Alerts fired (7d)** — count from `signal_alerts` where `created_at > now() - 7d`.
-   - **Journal win-rate** — wins / total from `trade_journal` (— if no trades).
-   - Each card: icon, label, big number, delta line, subtle hover lift.
+Top-up packs stay at par ($0.10/credit) so heavy users can refill without re-pricing.
 
-3. **Quick actions row** (3 tiles, icon + title + one-line desc)
-   - Launch Voice AI → `/app`
-   - Open Signal Desk → `/signal`
-   - New Journal Entry → `/dashboard/journal`
-   - Tiles use a tinted accent border on hover (amber for AI, emerald for signal, sky for journal) to inject color without breaking the white theme.
+## Changes
 
-4. **Live Market Pulse strip** (compact, single row)
-   - XAU/USD, DXY, BTC, ES mini — symbol + price + 24h % from the existing `useLivePriceStream` hook (same source the signal page uses). Mono numerals, color-coded change.
+### 1. Database (migration)
+Update `public.plans`:
+- `pro`   → `price_usd = 29`, `monthly_credits = 175`
+- `elite` → `price_usd = 99`, `monthly_credits = 595`
+- `free`  → unchanged (10)
 
-5. **Tab nav polish**
-   - Keep the same tab list and routes.
-   - Add a soft pill background for the active tab (zinc-900 text on zinc-100 pill) + the existing underline removed in favor of pills — feels more like a modern app shell. Inactive tabs stay light.
-   - Add a count badge next to "Saved" and "Alerts" when > 0.
+### 2. Pricing page (`src/routes/pricing.tsx`)
+- `TIERS`: Pro `price: 29`, `credits: 175`; Elite `price: 99`, `credits: 595`.
+- Update feature bullet copy (`"500 credits / month included"` → `"175 credits / month included"`, etc.).
+- Comparison matrix row `"Monthly credits"`: `10 / 175 / 595 / Custom`.
+- Keep top-up packs as-is ($5/50, $20/250, $50/750, $120/2000).
 
-6. **Empty-state polish in `dashboard.index.tsx` (Saved tab)**
-   - Replace the dashed box with a gradient card matching the hero, larger bookmark icon, two CTAs (Open Signal Desk primary, Set Alert Preferences secondary).
-   - Saved cards: add hover lift, gradient grade chip (A+ = amber gradient), small chart-like sparkline placeholder bar under the metrics.
+### 3. Dashboard billing (`src/routes/_authenticated/dashboard.billing.tsx`)
+- Mirror the same numbers in the Current Plan card and comparison matrix.
 
-## What stays the same
+### 4. Fallback constant (`src/lib/credits.functions.ts`)
+- Default free fallback (`monthly_credits: 10`) unchanged. No code changes needed for cost-per-action (`signal=2`, `ict_narration=3`, `voice_query=1`, `alert=5`) — margin is enforced by the smaller monthly grant.
 
-- 1.35 zoom on lg+ (resolution unchanged).
-- Tab routes, file structure, all child pages (`alerts`, `journal`, `billing`, `profile`) untouched.
-- White theme, Inter font, zinc palette.
-- All existing functionality (sign out, launch AI, saved load/delete).
+## Notes
 
-## Technical notes
-
-- New data reads piggyback on existing Supabase tables — no schema changes.
-- Use parallel `supabase.from(...).select("*", { count: "exact", head: true })` calls in a single `useEffect` for KPI counts so the hero loads in one round-trip.
-- `useLivePriceStream` is already shipped — reuse for the pulse strip.
-- All new color accents use existing zinc/amber/emerald/sky Tailwind tokens; no new design tokens needed.
-
-## Out of scope
-
-- No changes to `/signal`, `/app`, `/pricing`, or any tab page beyond the Saved empty/card polish.
-- No new tables, RLS, or backend routes.
-- No font or theme token changes.
+- Existing subscribers won't auto-resync; the next `grant_monthly_credits()` cron run will use the new `monthly_credits`. No backfill needed.
+- The 40% margin holds even if a Pro user spends every credit on the cheapest action (voice query): 175 credits × $0.10 par = $17.50 of value delivered for $29 paid.

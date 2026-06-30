@@ -14,7 +14,8 @@ const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 type Mark = boolean | string;
 
 const MATRIX_ROWS: ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }> = [
-  { f: "Price", a: "Free", b: "$49/mo", c: "$149/mo", d: "Custom", isHeading: true },
+  { f: "Price", a: "Free", b: "$29/mo", c: "$99/mo", d: "Custom", isHeading: true },
+  { f: "Monthly credits", a: "10", b: "175", c: "595", d: "Custom" },
   { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
   { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
   { f: "A+ signal access", a: false, b: true, c: true, d: true },
@@ -152,8 +153,8 @@ function Billing() {
                 </th>
                 {[
                   { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false, key: "free" },
-                  { name: "Pro", price: "$49", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
-                  { name: "Elite", price: "$149", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
+                  { name: "Pro", price: "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
                   { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false, key: "custom" },
                 ].map((p) => {
                   const isCurrent = plan === p.key;

@@ -20,7 +20,7 @@ export const Route = createFileRoute("/pricing")({
       { title: "Pricing — Jenvu" },
       { name: "description", content: "Pro and Elite plans for institutional-grade gold trading intelligence. Voice agent, A+ realtime alerts, full ICT & SMC analysis." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
-      { property: "og:description", content: "Realtime A+ gold setups, voice intelligence, and trade journal — Pro $49/mo, Elite $149/mo." },
+      { property: "og:description", content: "Realtime A+ gold setups, voice intelligence, and trade journal — Pro $29/mo, Elite $99/mo." },
       { property: "og:url", content: "https://jenvu.com/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/pricing" }],
@@ -59,15 +59,15 @@ const TIERS = [
   {
     id: "pro",
     name: "Pro",
-    price: 49,
+    price: 29,
     icon: Zap,
     bestFor: "Active trader",
     tagline: "For serious gold traders.",
     cta: "Notify me when live",
     ctaTo: "/contact",
-    credits: 500,
+    credits: 175,
     features: [
-      "500 credits / month included",
+      "175 credits / month included",
       "Unlimited voice queries (1 credit each)",
       "A+ signal access (2 credits)",
       "Realtime email & push alerts (5 credits)",
@@ -81,15 +81,15 @@ const TIERS = [
   {
     id: "elite",
     name: "Elite",
-    price: 149,
+    price: 99,
     icon: Crown,
     bestFor: "Desk / fund",
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
-    credits: 2000,
+    credits: 595,
     features: [
-      "2,000 credits / month included",
+      "595 credits / month included",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
       "Multi-pair scanner (XAU + DXY + indices)",
@@ -200,8 +200,8 @@ function PricingPage() {
                 </th>
                 {[
                   { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false },
-                  { name: "Pro", price: "$49", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
-                  { name: "Elite", price: "$149", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
+                  { name: "Pro", price: "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
+                  { name: "Elite", price: "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
                   { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false },
                 ].map((p) => (
                   <th
@@ -242,8 +242,8 @@ function PricingPage() {
 
             <tbody>
               {([
-                { f: "Price", a: "Free", b: "$49/mo", c: "$149/mo", d: "Custom", isHeading: true },
-                { f: "Monthly credits", a: "10", b: "500", c: "2,000", d: "Custom" },
+                { f: "Price", a: "Free", b: "$29/mo", c: "$99/mo", d: "Custom", isHeading: true },
+                { f: "Monthly credits", a: "10", b: "175", c: "595", d: "Custom" },
                 { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
                 { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
