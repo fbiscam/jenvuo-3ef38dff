@@ -53,7 +53,17 @@ const SANS = "font-['Inter',system-ui,sans-serif]";
 function InsightsPage() {
   const { data: insights } = useSuspenseQuery(insightsQueryOptions);
   
-  const breakingNews = insights.filter((i) => i.is_breaking);
+  // Ticker: any breaking + most recent items (outsourced top-bar feed)
+  const tickerItems = (() => {
+    const breaking = insights.filter((i) => i.is_breaking);
+    const recent = insights.slice(0, 8);
+    const seen = new Set<string>();
+    return [...breaking, ...recent].filter((i) => {
+      if (seen.has(i.id)) return false;
+      seen.add(i.id);
+      return true;
+    }).slice(0, 10);
+  })();
   const featured = insights[0];
   const remaining = insights.slice(1);
 
@@ -85,19 +95,24 @@ function InsightsPage() {
             </div>
           </div>
           
-          {/* CNN-STYLE BREAKING TICKER */}
-          {breakingNews.length > 0 && (
+          {/* CNN-STYLE BREAKING TICKER — clickable, links to articles */}
+          {tickerItems.length > 0 && (
             <div className="bg-red-600 text-white overflow-hidden py-1.5 px-4 sm:px-6">
               <div className="mx-auto max-w-6xl flex items-center gap-4">
                 <span className={`${MONO} text-[10px] font-bold uppercase bg-white text-red-600 px-1.5 py-0.5 rounded shrink-0 animate-pulse`}>
-                  Breaking
+                  Live
                 </span>
                 <div className="flex-1 overflow-hidden">
                   <div className="flex gap-10 whitespace-nowrap animate-ticker-fast">
-                    {[...breakingNews, ...breakingNews].map((news, i) => (
-                      <span key={news.id + i} className="text-xs font-medium tracking-tight">
-                        {news.title}
-                      </span>
+                    {[...tickerItems, ...tickerItems].map((news, i) => (
+                      <Link
+                        key={news.id + "-" + i}
+                        to="/insights/$slug"
+                        params={{ slug: news.slug }}
+                        className="text-xs font-medium tracking-tight hover:underline shrink-0"
+                      >
+                        {news.is_breaking ? "● BREAKING — " : "› "}{news.title}
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -126,7 +141,8 @@ function InsightsPage() {
                       {fmtUTC(featured.published_at, "full")}
                     </span>
                     <Link
-                      to={`/insights/${featured.slug}`}
+                      to="/insights/$slug"
+                      params={{ slug: featured.slug }}
                       className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 hover:gap-3 transition-all"
                     >
                       Read full briefing <span>→</span>
@@ -135,17 +151,16 @@ function InsightsPage() {
                 </div>
                 <div className="lg:col-span-5">
                   <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-zinc-200 border border-zinc-200 shadow-2xl relative group">
-                    {featured.image_url ? (
-                      <img
-                        src={featured.image_url}
-                        alt={featured.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-white text-4xl font-bold">
-                        JENVU
-                      </div>
-                    )}
+                    <img
+                      src={featured.image_url || `https://source.unsplash.com/1600x1200/?gold,trading,${encodeURIComponent(featured.category)}`}
+                      alt={featured.title}
+                      onError={(e) => {
+                        const t = e.currentTarget;
+                        t.onerror = null;
+                        t.src = `https://source.unsplash.com/1600x1200/?gold,finance`;
+                      }}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/40 to-transparent" />
                   </div>
                 </div>
@@ -168,18 +183,27 @@ function InsightsPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
             {remaining.map((item) => (
               <article key={item.id} className="group cursor-pointer">
-                <Link to={`/insights/${item.slug}`} className="block">
+                <Link to="/insights/$slug" params={{ slug: item.slug }} className="block">
                   <div className="aspect-video rounded-xl overflow-hidden bg-zinc-100 border border-zinc-100 mb-5">
                     {item.image_url ? (
                       <img
                         src={item.image_url}
                         alt={item.title}
+                        loading="lazy"
+                        onError={(e) => {
+                          const t = e.currentTarget;
+                          t.onerror = null;
+                          t.src = `https://source.unsplash.com/1200x800/?gold,trading,finance,${encodeURIComponent(item.category)}`;
+                        }}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-zinc-200 text-zinc-400">
-                        No Image
-                      </div>
+                      <img
+                        src={`https://source.unsplash.com/1200x800/?gold,trading,${encodeURIComponent(item.category)}`}
+                        alt={item.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
                     )}
                   </div>
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500 mb-2`}>
