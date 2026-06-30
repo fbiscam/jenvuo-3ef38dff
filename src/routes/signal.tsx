@@ -413,6 +413,22 @@ function SignalPage() {
               </span>
               SIGNAL_DESK // ONLINE
             </div>
+            {voiceBlocked && (
+              <button
+                onClick={() => {
+                  try {
+                    const u = new SpeechSynthesisUtterance(" ");
+                    window.speechSynthesis.speak(u);
+                  } catch {}
+                  setVoiceBlocked(false);
+                  if (plan) runNarration(plan);
+                }}
+                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-amber-200 bg-amber-50 text-[12px] font-medium text-amber-800 hover:bg-amber-100 transition"
+                title="Browser blocked autoplay — tap to enable voice"
+              >
+                🔇 Enable voice
+              </button>
+            )}
             {playing ? (
               <button onClick={stop} className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-red-200 bg-red-50 text-[12px] font-medium text-red-700 hover:bg-red-100 transition">
                 <Pause className="h-3.5 w-3.5" /> Stop
