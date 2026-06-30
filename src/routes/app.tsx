@@ -225,8 +225,10 @@ function Home() {
   };
 
   const analyze = useServerFn(analyzeGold);
+  const credits = useCredits();
 
   const fetchNews = useServerFn(getGoldNews);
+
   const [timeframe, setTimeframe] = useState<string>("15m");
   const [signal, setSignal] = useState<GoldSignal | null>(null);
   const [loading, setLoading] = useState(false);
