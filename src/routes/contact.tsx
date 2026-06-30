@@ -147,7 +147,7 @@ function ContactPage() {
               Talk to the desk.
             </h1>
             <p className="mt-4 max-w-2xl text-base text-zinc-600 leading-relaxed sm:text-lg">
-              Partnerships, support, press, or feedback — drop a note and we'll reply within one business day.
+              Partnerships, support, press, or feedback — drop a note&nbsp;
             </p>
           </div>
         </section>
