@@ -207,21 +207,31 @@ function DashboardLayout() {
   const [email, setEmail] = useState<string>("");
   const [fullName, setFullName] = useState<string>("");
   const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0 });
+  const [range, setRange] = useState<RangeKey>("7d");
   const credits = useCredits();
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       const { data } = await supabase.auth.getUser();
       const u = data.user;
       if (!u) return;
-      setEmail(u.email ?? "");
-      setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
-      const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
-      const [saved, alerts, journal] = await Promise.all([
-        supabase.from("saved_signals").select("id", { count: "exact", head: true }),
-        supabase.from("signal_alerts").select("id", { count: "exact", head: true }).gte("created_at", since),
-        supabase.from("trade_journal").select("outcome").eq("user_id", u.id),
-      ]);
+      if (!cancelled) {
+        setEmail(u.email ?? "");
+        setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
+      }
+      const days = RANGE_DAYS[range];
+      const since = days != null ? new Date(Date.now() - days * 24 * 3600 * 1000).toISOString() : null;
+
+      const savedQ = supabase.from("saved_signals").select("id", { count: "exact", head: true });
+      const alertsQ = supabase.from("signal_alerts").select("id", { count: "exact", head: true });
+      const journalQ = supabase.from("trade_journal").select("outcome, created_at").eq("user_id", u.id);
+      if (since) {
+        alertsQ.gte("created_at", since);
+        journalQ.gte("created_at", since);
+      }
+      const [saved, alerts, journal] = await Promise.all([savedQ, alertsQ, journalQ]);
+      if (cancelled) return;
       const rows = (journal.data ?? []) as Array<{ outcome: string }>;
       const decided = rows.filter(r => r.outcome === "win" || r.outcome === "loss");
       const wins = decided.filter(r => r.outcome === "win").length;
@@ -232,7 +242,8 @@ function DashboardLayout() {
         journalWinRate: decided.length ? Math.round((wins / decided.length) * 100) : null,
       });
     })();
-  }, []);
+    return () => { cancelled = true; };
+  }, [range]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
