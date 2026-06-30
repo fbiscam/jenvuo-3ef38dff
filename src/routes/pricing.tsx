@@ -134,6 +134,7 @@ const FAQ = [
 ];
 
 function PricingPage() {
+  const currentPlan = useCurrentPlan();
   return (
     <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased`} style={{ zoom: 1.1 }}>
 
