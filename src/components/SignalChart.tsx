@@ -15,11 +15,14 @@ import {
 import type { CandleDTO, Marking } from "@/lib/gold-analysis.functions";
 
 export type SignalChartHandle = {
-  drawMarking: (m: Marking) => void;
+  drawMarking: (m: Marking, opts?: { transient?: boolean }) => void;
   focusMarking: (m: Marking) => void;
+  panToMarking: (m: Marking) => void;
   clear: () => void;
+  clearTransient: () => void;
   updateLivePrice: (price: number, tSeconds?: number) => void;
 };
+
 
 
 type Props = {
