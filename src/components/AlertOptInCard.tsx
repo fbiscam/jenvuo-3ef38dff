@@ -17,9 +17,12 @@ export default function AlertOptInCard() {
   useEffect(() => {
     if (typeof window === 'undefined' || !('Notification' in window)) {
       setPerm('unsupported')
-      return
+    } else {
+      setPerm(Notification.permission)
     }
-    setPerm(Notification.permission)
+    if (typeof window !== 'undefined' && window.localStorage.getItem('jenvu:alerts:subscribed') === '1') {
+      setDone(true)
+    }
   }, [])
 
   const enableBrowser = async () => {
@@ -36,6 +39,9 @@ export default function AlertOptInCard() {
       if (!res.ok) throw new Error(res.error || 'Subscription failed')
       setDone(true)
       setEmail('')
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('jenvu:alerts:subscribed', '1')
+      }
     } catch (e: any) {
       setErr(e?.message ?? 'Subscription failed')
     } finally {
@@ -45,6 +51,8 @@ export default function AlertOptInCard() {
 
   const permGranted = perm === 'granted'
   const permBlocked = perm === 'denied' || perm === 'unsupported'
+
+  if (done) return null
 
   return (
     <div className="rounded-lg border border-zinc-200 bg-white p-3 space-y-3">
