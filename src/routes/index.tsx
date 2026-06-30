@@ -461,7 +461,7 @@ function HomePage() {
 
       {/* CAPABILITIES */}
       <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-5 py-14 text-center sm:px-6 sm:py-20 md:text-left">
+        <div className="mx-auto max-w-6xl px-5 py-10 text-center sm:px-6 sm:py-14 md:text-left">
           
           <h2 className="mx-auto mt-4 max-w-3xl text-2xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl md:whitespace-nowrap">
             Built like a trading desk, spoken like a partner.
@@ -515,7 +515,7 @@ function HomePage() {
 
       {/* COVERAGE */}
       <section className="border-t border-zinc-100 bg-white/40">
-        <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
             <div className="text-center lg:col-span-4 lg:text-left">
               
@@ -547,7 +547,7 @@ function HomePage() {
 
       {/* CHANGELOG */}
       <section className="border-t border-zinc-100 bg-white/40">
-        <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="mb-8 flex flex-col items-center justify-center gap-2 text-center sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:text-left">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Recent shipments</h2>
@@ -579,7 +579,7 @@ function HomePage() {
 
       {/* HOW IT WORKS */}
       <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="flex flex-col items-center gap-4 text-center md:flex-row md:items-end md:justify-between md:text-left">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
@@ -614,7 +614,7 @@ function HomePage() {
 
       {/* DESK LOGIC */}
       <section className="border-t border-zinc-100 bg-white/40">
-        <div className="mx-auto max-w-6xl px-5 py-14 text-center sm:px-6 sm:py-20 md:text-left">
+        <div className="mx-auto max-w-6xl px-5 py-10 text-center sm:px-6 sm:py-14 md:text-left">
           <h2 className="mx-auto max-w-2xl text-2xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl">
             The frameworks JENVU thinks in.
           </h2>
@@ -787,7 +787,7 @@ function HomePage() {
 
       {/* COMPARISON */}
       <section className="border-t border-zinc-100 bg-white/40">
-        <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <h2 className="text-center text-2xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
             Why traders move to JENVU.
           </h2>
@@ -844,7 +844,7 @@ function HomePage() {
 
       {/* INTEGRATIONS */}
       <section className="border-t border-zinc-100 bg-white/40">
-        <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <h3 className="text-xl font-semibold tracking-tight text-zinc-900">
@@ -868,7 +868,7 @@ function HomePage() {
       {/* CTA */}
       {/* FAQ */}
       <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
             <div className="text-center lg:col-span-4 lg:text-left">
               <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Asked often.</h2>
@@ -975,7 +975,7 @@ function TestimonialsCarousel() {
   const visible = [0, 1, 2].map((o) => TESTIMONIALS[(i + o) % TESTIMONIALS.length]);
   return (
     <section className="border-t border-zinc-100 bg-white">
-      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+      <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
         <div className="mb-8 flex items-end justify-between gap-4">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Trusted by traders.</h2>
           <div className="flex gap-1.5">
