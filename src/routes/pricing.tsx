@@ -388,7 +388,7 @@ function PricingPage() {
       <section className="border-t border-zinc-100 bg-zinc-50/50">
         <div className="mx-auto max-w-3xl px-5 sm:px-6 py-16 sm:py-20">
           <div className="text-center mb-10">
-            <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 04 / FAQ ]</p>
+            
             <h3 className="mt-3 text-3xl font-semibold tracking-tight">Frequently asked</h3>
           </div>
           <div className="divide-y divide-zinc-200 rounded-2xl border border-zinc-200 bg-white overflow-hidden">
