@@ -124,6 +124,7 @@ function InsightsPage() {
               <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
               <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
               <Link to="/insights" className="hover:text-zinc-900 font-medium text-zinc-900">Insights</Link>
+              <Link to="/pricing" className="hover:text-zinc-900">Pricing</Link>
               <Link to="/download" className="hover:text-zinc-900">Download</Link>
               <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
             </nav>
