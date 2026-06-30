@@ -50,19 +50,25 @@ const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: bo
 
 /* ---------- helpers ---------- */
 
-function Sparkline({ seed = 1, tone = "blue", empty = false }: { seed?: number; tone?: "blue" | "rose" | "zinc"; empty?: boolean }) {
+function Sparkline({ seed = 1, tone = "blue", empty = false, trend = "flat", magnitude = 0 }: { seed?: number; tone?: "blue" | "rose" | "zinc"; empty?: boolean; trend?: "up" | "down" | "flat"; magnitude?: number }) {
   const w = 120, h = 36;
 
-  // deterministic pseudo-random points so SSR/CSR match
+  // deterministic pseudo-random points with optional trend bias
   const pts = useMemo(() => {
     const n = 24;
     const arr: number[] = [];
+    // magnitude (0..100) scales how strong the slope is
+    const m = Math.max(10, Math.min(60, magnitude || 30));
+    const slope = trend === "up" ? m : trend === "down" ? -m : 0;
+    const start = trend === "flat" ? 50 : trend === "up" ? 50 - slope / 2 : 50 + Math.abs(slope) / 2;
     for (let i = 0; i < n; i++) {
-      const s = Math.sin((i + seed) * 1.7) * 12 + Math.cos((i + seed) * 0.9) * 8;
-      arr.push(Math.max(8, Math.min(92, 50 + s + ((seed * 7) % 9) - 4)));
+      const t = i / (n - 1);
+      const base = start + slope * t;
+      const noise = Math.sin((i + seed) * 1.7) * 6 + Math.cos((i + seed) * 0.9) * 4;
+      arr.push(Math.max(8, Math.min(92, base + noise)));
     }
     return arr;
-  }, [seed]);
+  }, [seed, trend, magnitude]);
 
   const stroke = tone === "rose" ? "#f43f5e" : tone === "zinc" ? "#71717a" : "#3b82f6";
 
@@ -80,7 +86,7 @@ function Sparkline({ seed = 1, tone = "blue", empty = false }: { seed?: number; 
   const step = w / (pts.length - 1);
   const d = pts.map((p, i) => `${i === 0 ? "M" : "L"}${(i * step).toFixed(1)},${(h - (p / 100) * h).toFixed(1)}`).join(" ");
   const area = `${d} L${w},${h} L0,${h} Z`;
-  const fillId = `spark-${tone}-${seed}`;
+  const fillId = `spark-${tone}-${seed}-${trend}`;
 
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="block">
