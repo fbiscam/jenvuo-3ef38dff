@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-r
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
 import { useCredits } from "@/hooks/useCredits";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
