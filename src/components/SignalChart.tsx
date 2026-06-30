@@ -62,16 +62,18 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
-  const linesRef = useRef<IPriceLine[]>([]);
+  const linesRef = useRef<{ line: IPriceLine; transient: boolean }[]>([]);
   const markersRef = useRef<SeriesMarker<Time>[]>([]);
+  const transientMarkerKeysRef = useRef<Set<string>>(new Set());
   const markersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   // Box overlays drawn via DOM div absolutely positioned over chart
   const overlayRef = useRef<HTMLDivElement>(null);
-  const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement }[]>([]);
+  const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement; transient: boolean }[]>([]);
   // Live tick state — mutable, survives across ticks within the same bar
   const liveBarRef = useRef<{ time: number; open: number; high: number; low: number; close: number } | null>(null);
   const bucketSecRef = useRef<number>(60);
   const lastPriceLineRef = useRef<IPriceLine | null>(null);
+
 
   useEffect(() => {
     if (!containerRef.current) return;
