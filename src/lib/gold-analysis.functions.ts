@@ -659,6 +659,43 @@ function computeSetupScore(args: {
   return { score, grade, checks };
 }
 
+// Quick real-time quote (no candle cache) — used by /signal live ticker.
+async function fetchYahooQuote(symbols: string[]): Promise<LiveTick | null> {
+  const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
+  for (const host of hosts) {
+    for (const sym of symbols) {
+      try {
+        const url = `https://${host}/v7/finance/quote?symbols=${encodeURIComponent(sym)}`;
+        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        if (!res.ok) continue;
+        const j: any = await res.json();
+        const q = j?.quoteResponse?.result?.[0];
+        const p = q?.regularMarketPrice ?? q?.postMarketPrice ?? q?.preMarketPrice;
+        const t = (q?.regularMarketTime ?? Math.floor(Date.now() / 1000)) * 1000;
+        if (typeof p === "number" && isFinite(p)) return { price: p, t };
+      } catch { /* try next */ }
+    }
+  }
+  return null;
+}
+
+async function fetchBinanceQuote(symbols: string[]): Promise<LiveTick | null> {
+  const hosts = ["api.binance.com", "data-api.binance.vision"];
+  for (const host of hosts) {
+    for (const sym of symbols) {
+      try {
+        const url = `https://${host}/api/v3/ticker/price?symbol=${sym}`;
+        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        if (!res.ok) continue;
+        const j: any = await res.json();
+        const p = parseFloat(j?.price);
+        if (isFinite(p)) return { price: p, t: Date.now() };
+      } catch { /* try next */ }
+    }
+  }
+  return null;
+}
+
 export const getLiveTick = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
     const obj = (d ?? {}) as { symbol?: string };
@@ -666,8 +703,16 @@ export const getLiveTick = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
-    // Try progressively higher TFs so closed-market or low-liquidity instruments
-    // (DXY, JPY pairs on weekends) still return a last known price.
+    // 1) Try real-time quote endpoints first (no cache, sub-second freshness).
+    if (inst.binanceSymbols?.length) {
+      const q = await fetchBinanceQuote(inst.binanceSymbols);
+      if (q) return q;
+    }
+    if (inst.yahooSymbols?.length) {
+      const q = await fetchYahooQuote(inst.yahooSymbols);
+      if (q) return q;
+    }
+    // 2) Fallback to last candle close if both quote feeds fail / market closed.
     for (const tf of ["1m", "5m", "15m", "1h", "1d"]) {
       const candles = await fetchInstrumentCandles(inst, tf).catch(() => [] as Candle[]);
       const last = candles[candles.length - 1];
@@ -675,6 +720,7 @@ export const getLiveTick = createServerFn({ method: "POST" })
     }
     return null as LiveTick | null;
   });
+
 
 export const getMarketSnapshot = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
