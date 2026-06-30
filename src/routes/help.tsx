@@ -189,9 +189,6 @@ function HelpCenterPage() {
         <section className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
           <div className="rounded-2xl border border-zinc-200 bg-white text-zinc-900 p-8 sm:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
-              <div className={`${MONO} text-[10px] uppercase tracking-[0.28em] text-zinc-500`}>
-                [ Still stuck? ]
-              </div>
               <h3 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
                 Talk to a human.
               </h3>
