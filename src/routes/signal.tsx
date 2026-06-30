@@ -567,7 +567,7 @@ function SignalPage() {
                 </div>
               )}
 
-              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
+              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 flex-1 min-h-0">
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
                     HTF // 1H · Bias
@@ -583,11 +583,11 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
+                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden flex-1 min-h-[260px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
                   {plan ? <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF" /> : <ChartSkeleton />}
                 </div>
               </div>
-              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100">
+              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100 flex-1 min-h-0">
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
                     LTF // 15M · Execution
@@ -603,7 +603,7 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "htf" ? "opacity-55" : "opacity-100")}>
+                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden flex-1 min-h-[260px] transition-opacity duration-300", activeTf === "htf" ? "opacity-55" : "opacity-100")}>
                   {plan ? <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF" /> : <ChartSkeleton />}
                 </div>
                 <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
