@@ -807,8 +807,94 @@ function SignalPage() {
                       style={{ width: `${Math.max(8, Math.min(100, t.confidence))}%` }}
                     />
                   </div>
+
+                  {/* Take Trade / Save Signal */}
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <button
+                      type="button"
+                      disabled={logging || tradeLogged || (!isBuy && !isSell)}
+                      onClick={async () => {
+                        if (!plan) return;
+                        setLogging(true);
+                        const { data: u } = await supabase.auth.getUser();
+                        if (!u.user) { toast.error("Sign in to log trades"); setLogging(false); return; }
+                        const { data, error } = await supabase.from("trade_journal").insert({
+                          user_id: u.user.id,
+                          pair: plan.instrument.symbol,
+                          direction: isBuy ? "long" : "short",
+                          entry: t.entry,
+                          stop_loss: t.sl,
+                          take_profit: t.tp,
+                          outcome: "open",
+                          notes: `Auto-logged from AI signal · Conf ${t.confidence}%${plan.confluences.length ? " · " + plan.confluences.slice(0, 3).join(" | ") : ""}`,
+                        }).select("id").single();
+                        setLogging(false);
+                        if (error || !data) { toast.error("Could not log trade"); return; }
+                        journalRowIdRef.current = data.id;
+                        setTradeLogged(true);
+                        toast.success("Trade logged · auto-tracking win/loss");
+                      }}
+                      className={cn(
+                        "inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[11px] font-semibold tracking-wider uppercase transition-colors",
+                        tradeLogged
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : isBuy
+                            ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                            : isSell
+                              ? "bg-rose-600 text-white hover:bg-rose-700"
+                              : "bg-zinc-200 text-zinc-500 cursor-not-allowed",
+                        (logging || tradeLogged) && "opacity-90",
+                      )}
+                    >
+                      {logging ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : tradeLogged ? <Check className="h-3.5 w-3.5" /> : null}
+                      {tradeLogged ? "Trade Done" : "Take this Trade"}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={saving || signalSaved}
+                      onClick={async () => {
+                        if (!plan) return;
+                        setSaving(true);
+                        const { data: u } = await supabase.auth.getUser();
+                        if (!u.user) { toast.error("Sign in to save"); setSaving(false); return; }
+                        const snapshot = {
+                          pair: plan.instrument.symbol,
+                          decimals: plan.instrument.decimals,
+                          direction: isBuy ? "long" : isSell ? "short" : "wait",
+                          entry: t.entry,
+                          stop_loss: t.sl,
+                          take_profit: t.tp,
+                          rr: t.rr,
+                          confidence: t.confidence,
+                          confluences: plan.confluences,
+                          session: plan.session,
+                          saved_price: plan.currentPrice,
+                        };
+                        const { error } = await supabase.from("saved_signals").insert({
+                          user_id: u.user.id,
+                          alert_id: null,
+                          snapshot,
+                          notes: `${plan.instrument.symbol} · ${(isBuy ? "LONG" : isSell ? "SHORT" : "WAIT")} · Conf ${t.confidence}%`,
+                        });
+                        setSaving(false);
+                        if (error) { toast.error("Could not save signal"); return; }
+                        setSignalSaved(true);
+                        toast.success("Signal saved to your dashboard");
+                      }}
+                      className={cn(
+                        "inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[11px] font-semibold tracking-wider uppercase border transition-colors",
+                        signalSaved
+                          ? "bg-zinc-50 text-zinc-700 border-zinc-200"
+                          : "bg-white text-zinc-800 border-zinc-300 hover:bg-zinc-50",
+                      )}
+                    >
+                      {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : signalSaved ? <Check className="h-3.5 w-3.5" /> : null}
+                      {signalSaved ? "Saved" : "Save Signal"}
+                    </button>
+                  </div>
                 </div>
               )}
+
 
 
 
