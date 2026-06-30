@@ -646,8 +646,8 @@ function HomePage() {
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               
-              <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
-                Trade gold with an <span className="italic font-light text-zinc-500">institutional edge.</span>
+              <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+                Trade gold with an institutional edge.
               </h2>
             </div>
             <div className="md:max-w-sm md:text-right">
