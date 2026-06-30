@@ -1261,21 +1261,65 @@ function SignalOrb({
   pulse?: number;
 }) {
   const speaking = status === "speaking";
-  const hueShift = (pulse * 47) % 360;
-  const kick = speaking ? 1 + ((pulse % 2) === 0 ? 0.04 : 0.07) : 1;
+  const [amp, setAmp] = useState(0); // 0..1 simulated voice amplitude
+  const envRef = useRef(0);
+  const targetRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
+
+  // Kick the envelope on every word boundary while speaking
+  useEffect(() => {
+    if (!speaking) return;
+    // random target between 0.55 and 1.0 for each word — feels like vocal dynamics
+    targetRef.current = 0.55 + Math.random() * 0.45;
+  }, [pulse, speaking]);
+
+  // RAF loop: smoothly chase target, decay, add subtle tremor
+  useEffect(() => {
+    if (!speaking) {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      envRef.current = 0;
+      targetRef.current = 0;
+      setAmp(0);
+      return;
+    }
+    let t0 = performance.now();
+    const tick = (now: number) => {
+      const dt = Math.min(64, now - t0); t0 = now;
+      // chase target, then decay it toward 0 so each word feels like a burst
+      envRef.current += (targetRef.current - envRef.current) * Math.min(1, dt / 90);
+      targetRef.current *= Math.pow(0.5, dt / 260); // half-life ~260ms
+      // tremor for "living" feel
+      const tremor = (Math.sin(now / 70) * 0.05 + Math.sin(now / 33) * 0.03);
+      const v = Math.max(0, Math.min(1, envRef.current + tremor * envRef.current));
+      setAmp(v);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [speaking]);
+
   const baseScale =
-    status === "speaking" ? 1.05 :
+    status === "speaking" ? 1.02 :
     status === "listening" ? 1.02 :
     status === "thinking" ? 1.0 : 0.97;
-  const scale = baseScale * kick;
+  // Zoom in on loud bursts, softer on quiet — up to +14%
+  const scale = baseScale + (speaking ? amp * 0.14 : 0);
+  // Color rotates continuously while speaking, sped up by amplitude
+  const hueShift = speaking ? ((pulse * 37) + amp * 220) % 360 : 0;
+  const sat = speaking ? 1.2 + amp * 0.8 : 1;
+  const bright = speaking ? 1 + amp * 0.18 : 1;
+  const glow = speaking ? 24 + amp * 70 : 18;
 
   return (
     <div
       className="relative aspect-square w-24 sm:w-28 flex items-center justify-center"
       style={{
         transform: `scale(${scale})`,
-        transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
-        filter: speaking ? `hue-rotate(${hueShift}deg) saturate(1.3)` : "none",
+        transition: speaking ? "transform 90ms linear" : "transform 260ms cubic-bezier(0.4,0,0.2,1)",
+        filter: speaking
+          ? `hue-rotate(${hueShift}deg) saturate(${sat}) brightness(${bright})`
+          : "none",
+        willChange: "transform, filter",
       }}
     >
       <div
@@ -1283,38 +1327,41 @@ function SignalOrb({
         style={{
           background:
             "radial-gradient(circle at 50% 25%, #f4faff 0%, #b8dcff 28%, #5ea8ee 60%, #1f5fb0 90%, #0b3a7a 100%)",
-          boxShadow:
-            "inset -8px -12px 32px rgba(20,60,140,0.55), inset 6px 10px 24px rgba(255,255,255,0.85), 0 0 36px rgba(120,180,240,0.45)",
+          boxShadow: `inset -8px -12px 32px rgba(20,60,140,0.55), inset 6px 10px 24px rgba(255,255,255,0.85), 0 0 ${glow}px rgba(140,190,250,${0.4 + amp * 0.5})`,
+          transition: "box-shadow 120ms linear",
         }}
       >
         <div
           className="absolute -inset-1/3"
           style={{
-            animation: `orb-drift-a ${status === "speaking" ? "7s" : status === "thinking" ? "9s" : "14s"} ease-in-out infinite, orb-hue 18s linear infinite`,
+            animation: `orb-drift-a ${status === "speaking" ? "5s" : status === "thinking" ? "9s" : "14s"} ease-in-out infinite, orb-hue ${speaking ? 6 : 18}s linear infinite`,
             background:
               "radial-gradient(30% 24% at 28% 30%, rgba(244,114,182,0.95), transparent 70%), radial-gradient(28% 22% at 72% 26%, rgba(251,191,36,0.9), transparent 70%), radial-gradient(32% 26% at 30% 74%, rgba(52,211,153,0.95), transparent 70%), radial-gradient(30% 24% at 74% 72%, rgba(167,139,250,0.95), transparent 70%)",
             mixBlendMode: "screen",
+            opacity: 0.75 + amp * 0.25,
           }}
         />
         <div
           className="absolute -inset-1/3"
           style={{
-            animation: `orb-drift-b ${status === "speaking" ? "9s" : "18s"} ease-in-out infinite`,
+            animation: `orb-drift-b ${status === "speaking" ? "7s" : "18s"} ease-in-out infinite`,
             background:
               "conic-gradient(from 90deg, rgba(255,90,160,0.7) 0%, rgba(56,189,248,0) 18%, rgba(255,200,80,0.7) 35%, rgba(255,255,255,0) 50%, rgba(80,230,180,0.7) 65%, rgba(56,189,248,0) 80%, rgba(170,130,255,0.7) 100%)",
-            filter: "blur(20px)",
+            filter: `blur(${20 - amp * 8}px)`,
             mixBlendMode: "screen",
+            transform: `rotate(${(pulse * 23 + amp * 60).toFixed(1)}deg)`,
+            transition: "transform 120ms linear, filter 120ms linear",
           }}
         />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_42%_18%,rgba(255,255,255,0.95),transparent_48%)]" />
         <div className="absolute inset-0 rounded-full" style={{ boxShadow: "inset 0 0 22px rgba(160,210,255,0.6)" }} />
-        {status === "speaking" && (
+        {speaking && (
           <div
-            className="absolute inset-0 animate-pulse"
+            className="absolute inset-0"
             style={{
-              background: "radial-gradient(circle at 50% 55%, rgba(120,180,240,0.45), transparent 60%)",
-              animationDuration: "0.9s",
+              background: `radial-gradient(circle at 50% 55%, rgba(140,200,255,${0.25 + amp * 0.55}), transparent ${50 + amp * 20}%)`,
               mixBlendMode: "screen",
+              transition: "background 100ms linear",
             }}
           />
         )}
@@ -1322,4 +1369,5 @@ function SignalOrb({
     </div>
   );
 }
+
 
