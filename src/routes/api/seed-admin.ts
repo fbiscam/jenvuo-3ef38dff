@@ -5,7 +5,7 @@ export const Route = createFileRoute("/api/seed-admin")({
     handlers: {
       POST: async () => {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const email = "haseeb@jenvu.com";
+        const email = "support@jenvu.com";
         const password = "Hasee12@#";
 
         const { data, error } = await supabaseAdmin.auth.admin.createUser({
