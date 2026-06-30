@@ -113,6 +113,8 @@ function SignalPage() {
   const { symbol } = Route.useSearch();
   const fetchPlan = useServerFn(getSignalPlan);
   const speech = useSpeech();
+  const credits = useCredits();
+
 
   const [authReady, setAuthReady] = useState(false);
   const dark = false;
