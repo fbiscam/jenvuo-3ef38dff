@@ -200,16 +200,25 @@ function SignalPage() {
     abortRef.current = true;
     speech.stopSpeaking();
     try {
+      const ok = await credits.spend("signal", { symbol: symbol || "XAUUSD" });
+      if (!ok) { setLoading(false); return; }
       const p = await fetchPlan({ data: { symbol: symbol || "XAUUSD" } });
       setPlan(p);
-      setTimeout(() => runNarration(p), 400);
+      // ICT/SMC narration is a premium add-on — only for plans with full_ict
+      if (credits.features.full_ict) {
+        const ictOk = await credits.spend("ict_narration", { symbol: symbol || "XAUUSD" });
+        if (ictOk) setTimeout(() => runNarration(p), 400);
+      } else {
+        toast.info("Upgrade to Pro for full ICT/SMC narration.");
+      }
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
     } finally {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchPlan, runNarration, symbol]);
+  }, [fetchPlan, runNarration, symbol, credits]);
+
 
   useEffect(() => {
     if (authReady) load();
