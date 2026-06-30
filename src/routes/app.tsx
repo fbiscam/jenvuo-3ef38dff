@@ -305,6 +305,8 @@ function Home() {
       }
       const result = await analyze({ data: { timeframe: tf, query } });
       setSignal(result);
+      appendVoiceTurn({ query, reply: result.spokenSummary });
+
 
       speech.speak(result.spokenSummary, () => {
         speech.resumeIfWanted();
