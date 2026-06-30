@@ -36,7 +36,7 @@ export const Route = createFileRoute("/contact")({
           mainEntity: {
             "@type": "Organization",
             name: "Jenvu AI",
-            email: "haseeb@jenvu.com",
+            email: "support@jenvu.com",
             url: "https://jenvu.com",
           },
         }),
