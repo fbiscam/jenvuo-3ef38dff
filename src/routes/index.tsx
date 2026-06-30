@@ -677,7 +677,7 @@ function HomePage() {
                   ].map((p) => (
                     <th
                       key={p.name}
-                      className={`p-6 text-left align-top border-l border-zinc-200 ${p.accent ? "bg-amber-50/50" : ""}`}
+                      className={`p-6 text-left align-top border-l border-transparent ${p.accent ? "bg-amber-50/50" : ""}`}
                     >
                       <div className="flex items-center gap-2">
                         <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
