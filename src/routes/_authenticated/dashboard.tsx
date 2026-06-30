@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
 import { useCredits } from "@/hooks/useCredits";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
+import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import {
   Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, Plus,
@@ -39,7 +40,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardLayout,
 });
 
-type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number };
+type OpenTrade = { pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null };
+type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number; closedWins: number; closedDecided: number; openTrades: OpenTrade[] };
 
 const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: boolean; countKey?: keyof Counts }> = [
   { to: "/dashboard", label: "Saved", icon: Bookmark, exact: true, countKey: "saved" },
@@ -230,7 +232,7 @@ function DashboardLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [email, setEmail] = useState<string>("");
   const [fullName, setFullName] = useState<string>("");
-  const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0 });
+  const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0, closedWins: 0, closedDecided: 0, openTrades: [] });
   const [range, setRange] = useState<RangeKey>("7d");
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
@@ -252,26 +254,55 @@ function DashboardLayout() {
 
       const savedQ = supabase.from("saved_signals").select("id", { count: "exact", head: true });
       const alertsQ = supabase.from("signal_alerts").select("id", { count: "exact", head: true });
-      const journalQ = supabase.from("trade_journal").select("outcome, created_at").eq("user_id", u.id);
+      const journalQ = supabase.from("trade_journal").select("outcome, created_at, pair, direction, entry, stop_loss, take_profit").eq("user_id", u.id);
       if (since) {
         alertsQ.gte("created_at", since);
         journalQ.gte("created_at", since);
       }
       const [saved, alerts, journal] = await Promise.all([savedQ, alertsQ, journalQ]);
       if (cancelled) return;
-      const rows = (journal.data ?? []) as Array<{ outcome: string }>;
+      const rows = (journal.data ?? []) as Array<{ outcome: string; pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null }>;
       const decided = rows.filter(r => r.outcome === "win" || r.outcome === "loss");
       const wins = decided.filter(r => r.outcome === "win").length;
+      const openTrades: OpenTrade[] = rows
+        .filter(r => r.outcome === "open" && r.entry != null)
+        .map(r => ({ pair: r.pair, direction: r.direction, entry: r.entry, stop_loss: r.stop_loss, take_profit: r.take_profit }));
       setCounts({
         saved: saved.count ?? 0,
         alerts7d: alerts.count ?? 0,
         journalTotal: rows.length,
         journalWinRate: decided.length ? Math.round((wins / decided.length) * 100) : null,
+        closedWins: wins,
+        closedDecided: decided.length,
+        openTrades,
       });
       setRefreshing(false);
     })();
     return () => { cancelled = true; };
   }, [range, refreshTick]);
+
+  const openSymbols = useMemo(
+    () => Array.from(new Set(counts.openTrades.map(t => t.pair.toUpperCase()))),
+    [counts.openTrades],
+  );
+  const livePrices = useLivePrices(openSymbols);
+  const liveWinRate = useMemo(() => {
+    let wins = counts.closedWins;
+    let decided = counts.closedDecided;
+    for (const t of counts.openTrades) {
+      const px = livePrices[t.pair.toUpperCase()];
+      if (px == null || t.entry == null) continue;
+      const isLong = t.direction === "long";
+      const hitTp = t.take_profit != null && (isLong ? px >= t.take_profit : px <= t.take_profit);
+      const hitSl = t.stop_loss != null && (isLong ? px <= t.stop_loss : px >= t.stop_loss);
+      const running = isLong ? px - t.entry : t.entry - px;
+      if (hitTp) { wins++; decided++; }
+      else if (hitSl) { decided++; }
+      else if (running > 0) { wins++; decided++; }
+      else if (running < 0) { decided++; }
+    }
+    return decided ? Math.round((wins / decided) * 100) : counts.journalWinRate;
+  }, [counts, livePrices]);
 
   const handleRefresh = () => {
     if (refreshing) return;
@@ -397,11 +428,11 @@ function DashboardLayout() {
             <div className="flex divide-x divide-zinc-200">
               <Metric
                 label="Win rate"
-                value={counts.journalWinRate != null ? `${counts.journalWinRate}%` : "0.0%"}
+                value={liveWinRate != null ? `${liveWinRate}%` : "0.0%"}
                 delta={null}
-                tone={counts.journalWinRate != null && counts.journalWinRate < 50 ? "rose" : "blue"}
-                trend={counts.journalWinRate == null ? "flat" : counts.journalWinRate < 50 ? "down" : counts.journalWinRate > 60 ? "up" : "flat"}
-                magnitude={counts.journalWinRate != null ? Math.abs(counts.journalWinRate - 50) : 0}
+                tone={liveWinRate != null && liveWinRate < 50 ? "rose" : "blue"}
+                trend={liveWinRate == null ? "flat" : liveWinRate < 50 ? "down" : liveWinRate > 60 ? "up" : "flat"}
+                magnitude={liveWinRate != null ? Math.abs(liveWinRate - 50) : 0}
                 seed={7}
               />
               <Metric
