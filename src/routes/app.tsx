@@ -389,7 +389,7 @@ function Home() {
   }
 
   return (
-    <div className={cn(`h-dvh w-full overflow-hidden flex flex-col ${SANS} antialiased overscroll-none touch-none`, "bg-white text-zinc-900")}>
+    <div className={cn(`overflow-hidden flex flex-col ${SANS} antialiased overscroll-none`, "bg-white text-zinc-900")} style={{ zoom: 1.25, height: "calc(100dvh / 1.25)", width: "calc(100vw / 1.25)" }}>
       {/* HEADER (matches homepage) */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md shrink-0">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
