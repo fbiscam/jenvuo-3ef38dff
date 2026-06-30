@@ -1056,9 +1056,8 @@ function SignalVoiceAgent({
   const speech = useSpeech();
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
-  const [messages, setMessages] = useState<{ role: "user" | "agent"; text: string }[]>([
-    { role: "agent", text: "Tap the mic or type — ask anything about this setup." },
-  ]);
+  const [messages, setMessages] = useState<{ role: "user" | "agent"; text: string }[]>([]);
+
   const bufferRef = useRef("");
   const lastHandled = useRef("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -1228,18 +1227,7 @@ function SignalVoiceAgent({
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-1">
-        {suggestions.map((s) => (
-          <button
-            key={s}
-            onClick={() => submit(s)}
-            disabled={busy}
-            className="text-[10px] px-2 py-1 rounded-md border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 disabled:opacity-40"
-          >
-            {s}
-          </button>
-        ))}
-      </div>
+
 
       <div className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white pl-2.5 pr-1 py-1">
         <input
