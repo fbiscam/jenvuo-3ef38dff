@@ -64,35 +64,20 @@ function Journal() {
     const closedPnl = closed.reduce((s, t) => s + (t.pnl ?? 0), 0);
     const livePnl = trades.reduce((s, t) => s + (liveOf(t) ?? 0), 0);
 
-    // Project open trades into live win/loss using live price vs TP/SL, else sign of running P&L
-    let liveWins = 0, liveLosses = 0, liveCounted = 0;
-    for (const t of trades) {
-      if (t.outcome !== "open" || t.entry == null) continue;
-      const px = livePrices[t.pair.toUpperCase()];
-      if (px == null) continue;
-      const isLong = t.direction === "long";
-      const hitTp = t.take_profit != null && (isLong ? px >= t.take_profit : px <= t.take_profit);
-      const hitSl = t.stop_loss != null && (isLong ? px <= t.stop_loss : px >= t.stop_loss);
-      const running = liveOf(t) ?? 0;
-      if (hitTp) liveWins++;
-      else if (hitSl) liveLosses++;
-      else if (running > 0) liveWins++;
-      else if (running < 0) liveLosses++;
-      else continue;
-      liveCounted++;
-    }
-    const totalWins = wins + liveWins;
-    const totalDecided = closed.length + liveCounted;
+    // Win rate only counts trades that have actually closed as win/loss.
+    // Open trades and deleted trades are excluded.
+    const decided = wins + losses;
     return {
       total: trades.length,
       open: trades.length - closed.length,
-      winRate: totalDecided ? Math.round((totalWins / totalDecided) * 100) : 0,
+      winRate: decided ? Math.round((wins / decided) * 100) : 0,
       wins,
       losses,
       pnl: closedPnl + livePnl,
       livePnl,
-      liveCounted,
+      liveCounted: 0,
     };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trades, livePrices]);
 
