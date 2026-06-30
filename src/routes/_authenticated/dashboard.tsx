@@ -366,7 +366,6 @@ function DashboardLayout() {
                 </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
-          </DropdownMenu>
             </DropdownMenu>
           </div>
         </div>
