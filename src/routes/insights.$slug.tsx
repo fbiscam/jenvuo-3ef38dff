@@ -29,7 +29,7 @@ const insightDetailQueryOptions = (slug: string) => queryOptions({
   },
 });
 
-export const Route = createFileRoute("/insights_/$slug")({
+export const Route = createFileRoute("/insights/$slug")({
   head: ({ params, loaderData }) => {
     const data = loaderData as Insight | undefined;
     const url = `https://jenvu.com/insights/${params.slug}`;
@@ -115,7 +115,7 @@ const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Inter',system-ui,sans-serif]";
 
 function InsightDetailPage() {
-  const { slug } = useParams({ from: "/insights_/$slug" });
+  const { slug } = useParams({ from: "/insights/$slug" });
   const { data: insight } = useSuspenseQuery(insightDetailQueryOptions(slug));
 
   return (
