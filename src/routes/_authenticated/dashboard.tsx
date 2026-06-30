@@ -66,7 +66,7 @@ function DashboardLayout() {
           </div>
           <Link
             to="/app"
-            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-zinc-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-zinc-900/25 transition hover:gap-3 hover:bg-black"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-900 border border-zinc-200 shadow-sm transition hover:gap-3 hover:border-zinc-300 hover:shadow-md"
           >
             <Mic className="h-4 w-4" />
             Launch AI
