@@ -712,12 +712,13 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
     const inst = resolveInstrument(data.symbol);
 
-    const [htfRaw, ltfRaw, news, h4Raw, m5Raw] = await Promise.all([
+    const [htfRaw, ltfRaw, news, h4Raw, m5Raw, dxyRaw] = await Promise.all([
       fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "15m").catch(() => [] as Candle[]),
       inst.needsUsdNews ? fetchGoldNewsInline() : Promise.resolve([] as NewsItem[]),
       fetchInstrumentCandles(inst, "4h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "5m").catch(() => [] as Candle[]),
+      inst.needsUsdNews ? fetchInstrumentCandles(resolveInstrument("DXY"), "1h").catch(() => [] as Candle[]) : Promise.resolve([] as Candle[]),
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
       throw new Error(`Live ${inst.display} feed unavailable. Try again in a moment.`);
