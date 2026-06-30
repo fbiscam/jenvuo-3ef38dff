@@ -1066,9 +1066,139 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       allMarkings.push({ type: "tp",    tf: "ltf", price: +built.tp.toFixed(dec),    label: `TP ${built.tp.toFixed(dec)}` });
     }
 
+    // ============ GUIDED NARRATION ============
+    // Always build a deterministic step-by-step script tied to real markings,
+    // so every analysis renders a proper guided walk-through on the chart.
+    const aiNarration: { say: string; markingIndex: number | null; tf: "htf" | "ltf" }[] =
+      Array.isArray(parsed.narration)
+        ? parsed.narration.slice(0, 16).map((n: any) => ({
+            say: String(n?.say ?? ""),
+            markingIndex: typeof n?.markingIndex === "number" ? n.markingIndex : null,
+            tf: n?.tf === "htf" ? "htf" : "ltf",
+          }))
+        : [];
+
+    const find = (pred: (m: Marking) => boolean) => {
+      const i = allMarkings.findIndex(pred);
+      return i >= 0 ? i : null;
+    };
+    const pickAiSay = (re: RegExp, fallback: string) => {
+      const hit = aiNarration.find((n) => re.test(n.say));
+      return hit?.say && hit.say.length > 8 ? hit.say : fallback;
+    };
+    const fmtPx = (n: number) => `${inst.kind === "crypto" ? "" : "$"}${n.toFixed(dec)}`;
+
+    const idxHtfBos = find((m) => (m.type === "bos" || m.type === "choch") && m.tf === "htf");
+    const idxHtfOB = find((m) => (m.type === "orderBlock" || m.type === "zone") && m.tf === "htf");
+    const idxPD = find((m) => m.type === (inPremium ? "premiumZone" : "discountZone"));
+    const idxLiqHtf = find((m) => (m.type === "liquidity" || m.type === "eqh" || m.type === "eql") && m.tf === "htf");
+    const idxLtfFvg = find((m) => m.type === "fvg" && m.tf === "ltf");
+    const idxLtfOB = find((m) => (m.type === "orderBlock" || m.type === "breaker") && m.tf === "ltf");
+    const idxEntry = find((m) => m.type === "entry");
+    const idxSL = find((m) => m.type === "sl");
+    const idxTP = find((m) => m.type === "tp");
+
+    const htfBosM = idxHtfBos != null ? allMarkings[idxHtfBos] as any : null;
+    const htfObM = idxHtfOB != null ? allMarkings[idxHtfOB] as any : null;
+    const liqM = idxLiqHtf != null ? allMarkings[idxLiqHtf] as any : null;
+    const ltfFvgM = idxLtfFvg != null ? allMarkings[idxLtfFvg] as any : null;
+    const ltfObM = idxLtfOB != null ? allMarkings[idxLtfOB] as any : null;
+
+    const guided: { say: string; markingIndex: number | null; tf: "htf" | "ltf" }[] = [];
+    const push = (say: string, markingIndex: number | null, tf: "htf" | "ltf") => {
+      if (say && say.trim()) guided.push({ say: say.trim(), markingIndex, tf });
+    };
+
+    push(
+      pickAiSay(/bias|structure|htf|premium|discount/i,
+        `Higher timeframe bias is ${htfBiasLocal}. Price is trading in the ${inPremium ? "premium" : "discount"} of the dealing range between ${fmtPx(swingLow)} and ${fmtPx(swingHigh)}.`),
+      null, "htf",
+    );
+    if (htfBosM) {
+      push(
+        pickAiSay(/\bbos\b|choch|break of structure|change of character/i,
+          `${htfBosM.kind === "bullish" ? "Bullish" : "Bearish"} ${htfBosM.type === "bos" ? "break of structure" : "change of character"} on HTF at ${fmtPx(htfBosM.price)} — that's our directional anchor.`),
+        idxHtfBos, "htf",
+      );
+    }
+    if (htfObM) {
+      const mid = (htfObM.priceLow + htfObM.priceHigh) / 2;
+      push(
+        pickAiSay(/order block|\bob\b|demand|supply|zone/i,
+          `HTF ${htfObM.kind === "demand" || htfObM.kind === "bullish" ? "demand" : "supply"} zone defined around ${fmtPx(mid)} — institutional interest sits here.`),
+        idxHtfOB, "htf",
+      );
+    }
+    if (idxPD != null) {
+      push(
+        pickAiSay(/premium|discount|equilibrium/i,
+          `Equilibrium of the range is ${fmtPx(equilibrium)}. Price in the ${inPremium ? "premium half — favor sells / fade rallies" : "discount half — favor buys / fade dips"}.`),
+        idxPD, "htf",
+      );
+    }
+    if (liqM) {
+      const liqPx = liqM.price ?? equilibrium;
+      push(
+        pickAiSay(/liquidity|equal high|equal low|pdh|pdl|sweep/i,
+          `Liquidity resting at ${fmtPx(liqPx)} — that's the magnet smart money will sweep before reversing.`),
+        idxLiqHtf, "htf",
+      );
+    }
+    push(
+      pickAiSay(/shift to ltf|lower timeframe|15m|refinement|drop down/i,
+        `Dropping to the 15-minute for execution refinement. We need a clean entry confirmation aligned with the HTF bias.`),
+      null, "ltf",
+    );
+    if (ltfFvgM) {
+      const mid = (ltfFvgM.priceLow + ltfFvgM.priceHigh) / 2;
+      push(
+        pickAiSay(/fvg|fair value gap|imbalance/i,
+          `${ltfFvgM.kind === "bullish" ? "Bullish" : "Bearish"} fair value gap on LTF around ${fmtPx(mid)} — unfilled imbalance, primary entry magnet.`),
+        idxLtfFvg, "ltf",
+      );
+    }
+    if (ltfObM) {
+      const mid = (ltfObM.priceLow + ltfObM.priceHigh) / 2;
+      push(
+        pickAiSay(/ltf.*order block|breaker|refined/i,
+          `LTF ${ltfObM.type === "breaker" ? "breaker block" : "order block"} stacks confluence at ${fmtPx(mid)} — refined entry pocket.`),
+        idxLtfOB, "ltf",
+      );
+    }
+    if (idxEntry != null && tradeFromAi.direction !== "WAIT") {
+      const e = allMarkings[idxEntry] as any;
+      push(
+        pickAiSay(/entry|trigger|fill/i,
+          `Entry plan: ${tradeFromAi.direction} at ${fmtPx(e.price)} once price taps the zone and prints rejection.`),
+        idxEntry, "ltf",
+      );
+      if (idxSL != null) {
+        const sl = allMarkings[idxSL] as any;
+        push(
+          pickAiSay(/stop loss|\bsl\b|invalidation|risk/i,
+            `Stop loss tucked at ${fmtPx(sl.price)} — beyond the protected swing. Anything past that invalidates the read.`),
+          idxSL, "ltf",
+        );
+      }
+      if (idxTP != null) {
+        const tp = allMarkings[idxTP] as any;
+        push(
+          pickAiSay(/take profit|target|\btp\b|1:|r:r/i,
+            `Target at ${fmtPx(tp.price)} for ${tradeFromAi.rr.toFixed(2)}R — ${tradeFromAi.confidence}% confidence on this setup.`),
+          idxTP, "ltf",
+        );
+      }
+    } else {
+      push(
+        pickAiSay(/wait|stand aside|no trade|missing/i,
+          `Setup is not A+ right now — standing aside. We need a cleaner sweep and confirmation before risking capital.`),
+        null, "ltf",
+      );
+    }
+
     const plan: SignalPlan = {
       htfBias: htfBiasLocal,
-      intro: String(parsed.intro ?? "Let's break down the live chart together."),
+      intro: String(parsed.intro ?? `Let's break down ${inst.display} live. I'll walk you through the chart step by step.`),
       htfNarrative: String(parsed.htfNarrative ?? ""),
       ltfNarrative: String(parsed.ltfNarrative ?? ""),
       confluences: Array.isArray(parsed.confluences) ? parsed.confluences.map(String).slice(0, 12) : [],
@@ -1079,13 +1209,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
             kind: (["resistance", "support", "pivot", "premium", "discount", "equilibrium"].includes(k.kind) ? k.kind : "pivot") as KeyLevel["kind"],
           }))
         : fallbackKeyLevels,
-      narration: Array.isArray(parsed.narration)
-        ? parsed.narration.slice(0, 16).map((n: any) => ({
-            say: String(n?.say ?? ""),
-            markingIndex: typeof n?.markingIndex === "number" ? n.markingIndex : null,
-            tf: n?.tf === "htf" ? "htf" : "ltf",
-          }))
-        : [],
+      narration: guided,
       markings: allMarkings,
       trade: tradeFromAi,
       session,
