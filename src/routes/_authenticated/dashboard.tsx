@@ -487,20 +487,18 @@ function DashboardLayout() {
           </Card>
 
           <Card className="flex flex-col">
-            <CardHeader icon={Mic} title="Voice Agent" right={<ArrowRight className="h-4 w-4 text-zinc-400" />} />
-            <div className="flex flex-1 flex-col items-center justify-center px-6 py-8 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100">
-                <Mic className="h-5 w-5 text-zinc-700" />
-              </div>
-              <h3 className="mt-3 text-[14px] font-semibold text-zinc-900">Talk to Jenvu, get instant context</h3>
-              <p className="mt-1 max-w-[260px] text-[12px] text-zinc-500">
-                From ICT bias to a one-tap A+ entry — your gold co-pilot, hands free.
-              </p>
-              <Link to="/app" className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] font-medium text-zinc-800 hover:bg-zinc-50">
-                Start talking
-              </Link>
-            </div>
+            <CardHeader
+              icon={Mic}
+              title="Voice Agent"
+              right={
+                <Link to="/app" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                  Open <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              }
+            />
+            <VoiceAgentHistory />
           </Card>
+
 
           <Card className="flex flex-col">
             <CardHeader icon={Activity} title="Signal Desk" right={<ArrowRight className="h-4 w-4 text-zinc-400" />} />
