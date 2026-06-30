@@ -133,7 +133,7 @@ When the user wants an analysis / setup / signal, deliver a full A+ institutiona
 
 For casual questions (greeting, "why this bias?", "explain FVG"), answer naturally in 2-4 sentences using ICT/SMC vocabulary.
 
-Use the LIVE prices and levels from the context. Be specific, decisive, pro. No disclaimers.`;
+Use the LIVE prices and levels from the context. Be specific, decisive, pro. No disclaimers. IMPORTANT: Reply in PLAIN TEXT only — never use markdown formatting. No asterisks (*, **, ***), no hashes (#, ##, ###), no backticks, no underscores for emphasis, no bullet dashes. Use simple numbered lines like "1) ..." and plain sentences. Keep it clean so it reads naturally when spoken aloud.`;
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
