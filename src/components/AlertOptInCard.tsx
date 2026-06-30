@@ -11,7 +11,10 @@ export default function AlertOptInCard() {
   const [perm, setPerm] = useState<NotificationPermission | 'unsupported'>('default')
   const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [done, setDone] = useState(false)
+  const [done, setDone] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.localStorage.getItem('jenvu:alerts:subscribed') === '1'
+  })
   const [err, setErr] = useState<string | null>(null)
 
   useEffect(() => {
@@ -20,10 +23,8 @@ export default function AlertOptInCard() {
     } else {
       setPerm(Notification.permission)
     }
-    if (typeof window !== 'undefined' && window.localStorage.getItem('jenvu:alerts:subscribed') === '1') {
-      setDone(true)
-    }
   }, [])
+
 
   const enableBrowser = async () => {
     const next = await requestAlertPermission()
