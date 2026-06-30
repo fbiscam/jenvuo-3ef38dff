@@ -988,6 +988,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       imminentHighNews: !!imminentHigh && inst.needsUsdNews,
       dxyConfirms,
       lastPrice: last.c,
+      kind: inst.kind,
     });
     const setupScore = scored.score;
     const setupGrade = scored.grade;
