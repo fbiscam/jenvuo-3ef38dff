@@ -133,7 +133,7 @@ function Metric({
         )}
       </div>
       <div className="mt-2 -mb-1 opacity-90">
-        <Sparkline seed={seed} tone={tone} empty={isEmpty} trend={derivedTrend} magnitude={derivedMag} />
+        <Sparkline seed={seed} tone={derivedTrend === "down" ? "rose" : derivedTrend === "up" ? "blue" : tone} empty={isEmpty} trend={derivedTrend} magnitude={derivedMag} />
       </div>
     </div>
   );
