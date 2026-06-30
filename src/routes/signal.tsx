@@ -1102,11 +1102,15 @@ function SignalVoiceAgent({
   livePrice,
   htfRef,
   ltfRef,
+  analyzing,
+  narrationPulse,
 }: {
   plan: SignalPlan | null;
   livePrice: number | null;
   htfRef: React.RefObject<SignalChartHandle | null>;
   ltfRef: React.RefObject<SignalChartHandle | null>;
+  analyzing: boolean;
+  narrationPulse: number;
 }) {
   const ask = useServerFn(askSignalAgent);
   const speech = useSpeech();
