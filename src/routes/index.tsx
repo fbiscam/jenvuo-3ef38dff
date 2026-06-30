@@ -623,7 +623,7 @@ function HomePage() {
               ["ICT", "Killzones, judas swings and PD arrays."],
               ["SMC", "Structure shifts, mitigations and equilibrium reads."],
               ["Liquidity", "EQH, EQL and sweeps flagged early."],
-              ["Order Flow", "Displacement, imbalance and institutional candles."],
+              ["Order Flow", "Displacement, imbalance and institutional candle prints."],
               ["Risk", "Fixed-R sizing with hard daily kill-switch."],
               ["Confluence", "Multi-TF alignment scored A, A+, A++."],
               ["Macro", "DXY, yields and red-folder news overlay."],
