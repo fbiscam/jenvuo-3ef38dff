@@ -292,47 +292,95 @@ function PricingPage() {
       </section>
 
       {/* FEATURE BLOCKS */}
-      <section className="border-y border-zinc-100 bg-zinc-50/40">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-20">
-          <div className="flex items-end justify-between gap-6 mb-10">
+      <section className="relative border-y border-zinc-200 bg-zinc-950 text-zinc-100 overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full blur-3xl opacity-20"
+          style={{ background: "radial-gradient(circle, #f59e0b 0%, transparent 70%)" }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full blur-3xl opacity-20"
+          style={{ background: "radial-gradient(circle, #6366f1 0%, transparent 70%)" }}
+        />
+
+        <div className="relative mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-24">
+          <div className="flex items-end justify-between gap-6 mb-12 border-b border-zinc-800 pb-6">
             <div>
-              
-              <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Every capability, visualised.</h2>
+              <div className={`flex items-center gap-2 ${MONO} text-[10px] uppercase tracking-[0.3em] text-amber-400`}>
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+                Modules
+              </div>
+              <h2 className="mt-3 text-3xl sm:text-5xl font-semibold tracking-tight">
+                Every capability,<br className="hidden sm:block" />
+                <span className="italic font-light text-zinc-400">visualised.</span>
+              </h2>
             </div>
-            <div className={`hidden sm:block ${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
-              06 modules
+            <div className={`hidden sm:flex flex-col items-end ${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
+              <span className="text-zinc-300 text-2xl font-semibold tracking-tight">06</span>
+              <span>modules</span>
             </div>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURE_BLOCKS.map((b) => (
-              <article key={b.title} className="group rounded-2xl border border-zinc-200 bg-white overflow-hidden hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.25)] transition">
-                <div className="aspect-[4/3] overflow-hidden bg-zinc-100 relative">
+
+          <div className="grid gap-px bg-zinc-800 sm:grid-cols-2 lg:grid-cols-3 rounded-2xl overflow-hidden border border-zinc-800">
+            {FEATURE_BLOCKS.map((b, idx) => (
+              <article
+                key={b.title}
+                className="group relative bg-zinc-950 hover:bg-zinc-900 transition-colors duration-300"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-zinc-900 relative">
                   <img
                     src={b.img}
                     alt={b.title}
                     width={1024}
                     height={768}
                     loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500"
+                    className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-[1.04] transition duration-700"
                   />
-                  <div className="absolute top-3 left-3">
-                    <span className={`${MONO} text-[9px] uppercase tracking-wider px-2 py-1 rounded bg-white/90 backdrop-blur text-zinc-900`}>
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/30 to-transparent" />
+                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                    <span className={`${MONO} text-[9px] uppercase tracking-wider px-2 py-1 rounded bg-zinc-950/80 backdrop-blur border border-zinc-700 text-amber-400`}>
                       {b.tag}
                     </span>
                   </div>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-base font-semibold tracking-tight">{b.title}</h3>
-                  <p className="mt-1.5 text-sm text-zinc-600 leading-relaxed">{b.desc}</p>
-                  <div className={`mt-4 ${MONO} text-[9px] uppercase tracking-wider text-zinc-400`}>
-                    {b.tone}
+                  <div className={`absolute top-3 right-3 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>
+                    0{idx + 1} / 06
                   </div>
                 </div>
+
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold tracking-tight text-white">{b.title}</h3>
+                  <p className="mt-2 text-sm text-zinc-400 leading-relaxed line-clamp-3">{b.desc}</p>
+
+                  <div className="mt-5 flex items-center justify-between pt-4 border-t border-zinc-800">
+                    <div className={`${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>
+                      {b.tone}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-amber-400 opacity-0 group-hover:opacity-100 translate-x-[-4px] group-hover:translate-x-0 transition-all duration-300">
+                      <span className={`${MONO} text-[9px] uppercase tracking-wider`}>Live</span>
+                      <span className="inline-block h-1 w-1 rounded-full bg-amber-400" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* corner accent */}
+                <span className="absolute top-0 left-0 h-3 w-3 border-t border-l border-amber-400/0 group-hover:border-amber-400/60 transition" />
+                <span className="absolute bottom-0 right-0 h-3 w-3 border-b border-r border-amber-400/0 group-hover:border-amber-400/60 transition" />
               </article>
             ))}
           </div>
         </div>
       </section>
+
 
 
 
