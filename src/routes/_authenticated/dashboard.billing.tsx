@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useCredits } from "@/hooks/useCredits";
+import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { CREDIT_COSTS } from "@/lib/credits.functions";
 
 
