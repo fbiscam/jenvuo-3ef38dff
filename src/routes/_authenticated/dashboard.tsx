@@ -428,11 +428,11 @@ function DashboardLayout() {
             <div className="flex divide-x divide-zinc-200">
               <Metric
                 label="Win rate"
-                value={counts.journalWinRate != null ? `${counts.journalWinRate}%` : "0.0%"}
+                value={liveWinRate != null ? `${liveWinRate}%` : "0.0%"}
                 delta={null}
-                tone={counts.journalWinRate != null && counts.journalWinRate < 50 ? "rose" : "blue"}
-                trend={counts.journalWinRate == null ? "flat" : counts.journalWinRate < 50 ? "down" : counts.journalWinRate > 60 ? "up" : "flat"}
-                magnitude={counts.journalWinRate != null ? Math.abs(counts.journalWinRate - 50) : 0}
+                tone={liveWinRate != null && liveWinRate < 50 ? "rose" : "blue"}
+                trend={liveWinRate == null ? "flat" : liveWinRate < 50 ? "down" : liveWinRate > 60 ? "up" : "flat"}
+                magnitude={liveWinRate != null ? Math.abs(liveWinRate - 50) : 0}
                 seed={7}
               />
               <Metric
