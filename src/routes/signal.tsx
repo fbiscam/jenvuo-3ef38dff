@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
-import { TradingViewChart } from "@/components/TradingViewChart";
+
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
@@ -190,14 +190,14 @@ function SignalPage() {
       abortRef.current = false;
 
       // Pre-draw static context zones (Premium/Discount/OTE/Liquidity/EQH/EQL)
-      // so they sit on the chart before narration starts.
+      // as PERSISTENT background context so they stay visible the whole walkthrough.
       const autoTypes = new Set([
         "premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql",
       ]);
       for (const m of p.markings) {
         if (autoTypes.has(m.type)) {
-          if (m.tf === "htf") htfRef.current?.drawMarking(m);
-          else ltfRef.current?.drawMarking(m);
+          const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
+          target?.drawMarking(m, { transient: false });
         }
       }
 
@@ -208,26 +208,44 @@ function SignalPage() {
           const n = p.narration[i];
           setStep(i);
           setActiveTf(n.tf);
+          const target = n.tf === "htf" ? htfRef.current : ltfRef.current;
+          // Sequential lifecycle: clear previous transient marking, draw + pan to the new one,
+          // then narrate. Only ONE active ICT/SMC marking is visible at a time.
+          htfRef.current?.clearTransient();
+          ltfRef.current?.clearTransient();
           if (n.markingIndex != null && p.markings[n.markingIndex]) {
             const m = p.markings[n.markingIndex];
-            const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
-            target?.drawMarking(m);
+            const drawTarget = m.tf === "htf" ? htfRef.current : ltfRef.current;
+            drawTarget?.drawMarking(m, { transient: true });
+            // Pan/zoom chart so the marking sits in view
+            drawTarget?.panToMarking(m);
             // Give the box one frame to mount, then focus + pulse it.
-            await new Promise((r) => setTimeout(r, 60));
-            target?.focusMarking(m);
+            await new Promise((r) => setTimeout(r, 80));
+            drawTarget?.focusMarking(m);
+          } else if (target) {
+            // No specific marking — just keep current view
           }
           await speakWait(n.say);
+          // Brief fade-out pause before next step
+          if (i < p.narration.length - 1) {
+            await new Promise((r) => setTimeout(r, 220));
+          }
         }
         if (!abortRef.current) {
-          // Final reveal — draw all entry/sl/tp lines together on LTF.
+          // Final reveal — clear any transient marker, then draw entry/sl/tp together (persistent).
+          htfRef.current?.clearTransient();
+          ltfRef.current?.clearTransient();
           setActiveTf("ltf");
           for (const m of p.markings) {
             if (m.type === "entry" || m.type === "sl" || m.type === "tp") {
-              ltfRef.current?.drawMarking(m);
+              ltfRef.current?.drawMarking(m, { transient: false });
             }
           }
           const entry = p.markings.find((m) => m.type === "entry");
-          if (entry) ltfRef.current?.focusMarking(entry);
+          if (entry) {
+            ltfRef.current?.panToMarking(entry);
+            ltfRef.current?.focusMarking(entry);
+          }
           await speakWait(p.trade.summary);
           toast.success(`Setup ready · ${p.setupGrade}`);
         }
@@ -238,6 +256,7 @@ function SignalPage() {
     },
     [speakWait],
   );
+
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -585,8 +604,17 @@ function SignalPage() {
                   )}
                 </div>
                 <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
-                  <TradingViewChart symbol={plan?.instrument.symbol ?? symbol} timeframe="1h" theme="light" />
+                  {plan ? (
+                    <SignalChart
+                      ref={htfRef}
+                      candles={plan.htfCandles}
+                      tf="htf"
+                      dark={false}
+                      title="1H"
+                    />
+                  ) : null}
                 </div>
+
               </div>
               <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100">
                 <div className="flex items-center justify-between">
@@ -605,7 +633,16 @@ function SignalPage() {
                   )}
                 </div>
                 <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "htf" ? "opacity-55" : "opacity-100")}>
-                  <TradingViewChart symbol={plan?.instrument.symbol ?? symbol} timeframe="15m" theme="light" />
+                  {plan ? (
+                    <SignalChart
+                      ref={ltfRef}
+                      candles={plan.ltfCandles}
+                      tf="ltf"
+                      dark={false}
+                      title="15M"
+                    />
+                  ) : null}
+
                 </div>
                 <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
                   <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
@@ -1112,7 +1149,11 @@ function SignalVoiceAgent({
       { rx: /\b(stop\s*loss|invalidation|\bsl\b)\b/, types: ["sl"] },
       { rx: /\b(take\s*profit|target|\btp\b)\b/, types: ["tp"] },
     ];
+    // Sequential single-active rule: clear last transient before drawing the new one.
+    htfRef.current?.clearTransient();
+    ltfRef.current?.clearTransient();
     const focused = new Set<string>();
+    let drawn = 0;
     for (const { rx, types, kind } of matchers) {
       if (!rx.test(lower)) continue;
       const m = plan.markings.find(
@@ -1124,10 +1165,14 @@ function SignalVoiceAgent({
       if (!m) continue;
       focused.add(`${m.type}:${(m as any).label ?? ""}`);
       const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
-      target?.drawMarking(m);
+      target?.drawMarking(m, { transient: true });
+      target?.panToMarking(m);
       setTimeout(() => target?.focusMarking(m), 80);
-      if (focused.size >= 2) break;
+      drawn += 1;
+      // Only ONE active marking per agent reply.
+      if (drawn >= 1) break;
     }
+
   };
 
   const stripMd = (s: string) =>

@@ -15,11 +15,14 @@ import {
 import type { CandleDTO, Marking } from "@/lib/gold-analysis.functions";
 
 export type SignalChartHandle = {
-  drawMarking: (m: Marking) => void;
+  drawMarking: (m: Marking, opts?: { transient?: boolean }) => void;
   focusMarking: (m: Marking) => void;
+  panToMarking: (m: Marking) => void;
   clear: () => void;
+  clearTransient: () => void;
   updateLivePrice: (price: number, tSeconds?: number) => void;
 };
+
 
 
 type Props = {
@@ -59,16 +62,18 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
-  const linesRef = useRef<IPriceLine[]>([]);
+  const linesRef = useRef<{ line: IPriceLine; transient: boolean }[]>([]);
   const markersRef = useRef<SeriesMarker<Time>[]>([]);
+  const transientMarkerKeysRef = useRef<Set<string>>(new Set());
   const markersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   // Box overlays drawn via DOM div absolutely positioned over chart
   const overlayRef = useRef<HTMLDivElement>(null);
-  const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement }[]>([]);
+  const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement; transient: boolean }[]>([]);
   // Live tick state — mutable, survives across ticks within the same bar
   const liveBarRef = useRef<{ time: number; open: number; high: number; low: number; close: number } | null>(null);
   const bucketSecRef = useRef<number>(60);
   const lastPriceLineRef = useRef<IPriceLine | null>(null);
+
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -208,18 +213,49 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       } catch {}
     },
     clear: () => {
-
       const s = seriesRef.current;
       if (!s) return;
-      linesRef.current.forEach((l) => s.removePriceLine(l));
+      linesRef.current.forEach((l) => { try { s.removePriceLine(l.line); } catch {} });
       linesRef.current = [];
       markersRef.current = [];
+      transientMarkerKeysRef.current.clear();
       markersPluginRef.current?.setMarkers([]);
       boxesRef.current.forEach((b) => b.el.remove());
       boxesRef.current = [];
       if (lastPriceLineRef.current) {
         try { s.removePriceLine(lastPriceLineRef.current); } catch {}
         lastPriceLineRef.current = null;
+      }
+    },
+    clearTransient: () => {
+      const s = seriesRef.current;
+      if (!s) return;
+      // Remove transient price lines, keep persistent ones (entry/sl/tp + static context)
+      const keep: { line: IPriceLine; transient: boolean }[] = [];
+      for (const l of linesRef.current) {
+        if (l.transient) { try { s.removePriceLine(l.line); } catch {} }
+        else keep.push(l);
+      }
+      linesRef.current = keep;
+      // Remove transient overlay boxes
+      const keepBoxes: typeof boxesRef.current = [];
+      for (const b of boxesRef.current) {
+        if (b.transient) {
+          b.el.style.opacity = "0";
+          const el = b.el;
+          setTimeout(() => { try { el.remove(); } catch {} }, 260);
+        } else keepBoxes.push(b);
+      }
+      boxesRef.current = keepBoxes;
+      // Remove transient markers (BOS/CHoCH arrows)
+      if (transientMarkerKeysRef.current.size > 0) {
+        const kept = markersRef.current.filter((mk) => {
+          const key = `${mk.time}:${mk.text ?? ""}`;
+          return !transientMarkerKeysRef.current.has(key);
+        });
+        markersRef.current = kept;
+        transientMarkerKeysRef.current.clear();
+        markersPluginRef.current?.setMarkers(kept);
       }
     },
     focusMarking: (m: Marking) => {
@@ -242,15 +278,38 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (hit) {
         const prev = hit.el.style.boxShadow;
         hit.el.style.boxShadow = "0 0 0 3px rgba(59,130,246,0.55), 0 0 24px rgba(59,130,246,0.45)";
-        hit.el.style.transition = "box-shadow 220ms ease";
+        hit.el.style.transition = "box-shadow 220ms ease, opacity 600ms ease";
         setTimeout(() => { try { hit.el.style.boxShadow = prev || "none"; } catch {} }, 1100);
       }
     },
-    drawMarking: (m: Marking) => {
+    panToMarking: (m: Marking) => {
+      const chart = chartRef.current;
+      if (!chart) return;
+      if (m.tf !== tf) return;
+      const ts = chart.timeScale();
+      const anyM: any = m;
+      let from: number | undefined = anyM.fromTime;
+      let to: number | undefined = anyM.toTime;
+      // Price-only markings (eqh, eql, liquidity, entry/sl/tp) — center around live bar
+      if (typeof from !== "number" || typeof to !== "number") {
+        const lastT = liveBarRef.current?.time;
+        if (typeof lastT !== "number") return;
+        const bucket = bucketSecRef.current || 60;
+        from = lastT - bucket * 30;
+        to = lastT + bucket * 5;
+      }
+      try {
+        const span = Math.max((to as number) - (from as number), bucketSecRef.current || 60);
+        const pad = Math.max(span * 5, (bucketSecRef.current || 60) * 25);
+        ts.setVisibleRange({ from: ((from as number) - pad) as Time, to: ((to as number) + pad) as Time });
+      } catch {}
+    },
+    drawMarking: (m: Marking, opts?: { transient?: boolean }) => {
       const s = seriesRef.current;
       const chart = chartRef.current;
       if (!s || !chart) return;
       if (m.tf !== tf) return;
+      const transient = !!opts?.transient;
 
       // Box-style markings (FVG, OB, zone, breaker)
       if (m.type === "fvg" || m.type === "orderBlock" || m.type === "zone" || m.type === "breaker") {
@@ -274,7 +333,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         el.style.cssText = `position:absolute;background:${color};border:1px dashed ${border};border-radius:3px;pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:10px;color:${dark ? "#fff" : "#000"};padding:2px 4px;font-weight:600;`;
         el.textContent = m.label;
         overlayRef.current.appendChild(el);
-        boxesRef.current.push({ marking: m, el });
+        boxesRef.current.push({ marking: m, el, transient });
         (chart as any).__redrawBoxes?.();
         requestAnimationFrame(() => { el.style.opacity = "1"; });
         return;
@@ -293,7 +352,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         el.style.cssText = `position:absolute;background:${color};border-top:1px dashed ${border};border-bottom:1px dashed ${border};pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:9px;color:${dark ? "#fff" : "#000"};padding:1px 6px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;`;
         el.textContent = m.label;
         overlayRef.current.appendChild(el);
-        boxesRef.current.push({ marking: m, el });
+        boxesRef.current.push({ marking: m, el, transient });
         (chart as any).__redrawBoxes?.();
         requestAnimationFrame(() => { el.style.opacity = "1"; });
         return;
@@ -318,13 +377,16 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         price = m.price;
         color = m.kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
         style = LineStyle.LargeDashed;
+        const text = m.type.toUpperCase();
+        const time = m.fromTime as Time;
         markersRef.current.push({
-          time: m.fromTime as Time,
+          time,
           position: m.kind === "bullish" ? "belowBar" : "aboveBar",
           color,
           shape: m.kind === "bullish" ? "arrowUp" : "arrowDown",
-          text: m.type.toUpperCase(),
+          text,
         });
+        if (transient) transientMarkerKeysRef.current.add(`${time}:${text}`);
         markersPluginRef.current?.setMarkers(markersRef.current);
       } else if (m.type === "entry") {
         price = m.price; color = COLORS.entry; lineWidth = 3;
@@ -338,9 +400,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         price, color, lineWidth, lineStyle: style,
         axisLabelVisible: true, title,
       });
-      linesRef.current.push(line);
+      linesRef.current.push({ line, transient });
     },
   }));
+
 
   return (
     <div className="relative w-full h-full">
