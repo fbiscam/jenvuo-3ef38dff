@@ -306,7 +306,7 @@ function DashboardLayout() {
 
       <main className="mx-auto max-w-7xl px-5 py-7 sm:px-8">
         {/* Identity row */}
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4 lg:items-end">
           <div className="min-w-0">
             <div className="text-[12px] text-zinc-500">Account home</div>
             <h1 className="mt-1 truncate text-[26px] font-semibold tracking-tight text-zinc-900 sm:text-[30px]">
@@ -316,7 +316,7 @@ function DashboardLayout() {
               {greeting()}, {fullName || "Trader"} · Plan <span className="font-medium text-zinc-700">{planTier}</span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 lg:self-end">
             <Link
               to="/app"
               className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium text-zinc-900 shadow-sm hover:bg-zinc-50"
