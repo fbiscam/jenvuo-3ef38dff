@@ -605,7 +605,7 @@ function SignalPage() {
                   )}
                 </div>
                 <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "htf" ? "opacity-55" : "opacity-100")}>
-                  {plan ? <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF" /> : <ChartSkeleton />}
+                  <TradingViewChart symbol={plan?.instrument.symbol ?? symbol} timeframe="15m" theme="light" />
                 </div>
                 <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
                   <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
