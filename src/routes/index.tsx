@@ -963,7 +963,8 @@ function HomePage() {
                 Speak to the market now.
               </h2>
               <p className="mt-3 text-zinc-900">
-                Your voice agent is one tap away listening reasoning, thinking, research & narrating.
+                Your voice agent is one tap away listening<br className="hidden md:inline" />{" "}
+                reasoning, thinking, research & narrating.
               </p>
               <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row md:justify-start">
                 <Link
