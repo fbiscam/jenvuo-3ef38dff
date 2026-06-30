@@ -12,16 +12,21 @@ export const Route = createFileRoute("/help/$collection/$slug")({
   },
   head: ({ params, loaderData }) => {
     const title = loaderData?.article?.title ?? "Help";
-    const desc = loaderData?.article?.summary ?? "Jenvu Help Center";
+    const desc = loaderData?.article?.summary ?? "Jenvu AI Help Center article";
+    const collectionTitle = loaderData?.collection?.title ?? "Help Center";
     const url = `https://jenvu.com/help/${params.collection}/${params.slug}`;
     return {
       meta: [
-        { title: `${title} — Jenvu Help` },
+        { title: `${title} | Jenvu AI Help` },
         { name: "description", content: desc },
-        { property: "og:title", content: title },
+        { property: "og:title", content: `${title} — ${collectionTitle}` },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
         { property: "og:type", content: "article" },
+        { property: "article:section", content: collectionTitle },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: loaderData
@@ -36,6 +41,21 @@ export const Route = createFileRoute("/help/$collection/$slug")({
                 datePublished: loaderData.article.updatedAt,
                 dateModified: loaderData.article.updatedAt,
                 author: { "@type": "Organization", name: "Jenvu AI" },
+                publisher: { "@type": "Organization", name: "Jenvu AI", url: "https://jenvu.com" },
+                mainEntityOfPage: url,
+                articleSection: collectionTitle,
+              }),
+            },
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  { "@type": "ListItem", position: 1, name: "Help Center", item: "https://jenvu.com/help" },
+                  { "@type": "ListItem", position: 2, name: collectionTitle, item: `https://jenvu.com/help/${params.collection}` },
+                  { "@type": "ListItem", position: 3, name: title, item: url },
+                ],
               }),
             },
           ]
