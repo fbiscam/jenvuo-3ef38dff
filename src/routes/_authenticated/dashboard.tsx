@@ -316,12 +316,49 @@ function DashboardLayout() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
-            <button className="rounded-md border border-zinc-200 bg-white p-2 text-zinc-500 hover:bg-zinc-50" aria-label="Tags">
+            <button
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(email || "");
+                  toast.success("Account email copied", { description: email });
+                } catch {
+                  toast.error("Could not copy email");
+                }
+              }}
+              className="rounded-md border border-zinc-200 bg-white p-2 text-zinc-500 hover:bg-zinc-50"
+              aria-label="Copy account email"
+              title="Copy account email"
+            >
               <Tag className="h-4 w-4" />
             </button>
-            <button className="rounded-md border border-zinc-200 bg-white p-2 text-zinc-500 hover:bg-zinc-50" aria-label="More">
-              <MoreHorizontal className="h-4 w-4" />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="rounded-md border border-zinc-200 bg-white p-2 text-zinc-500 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300" aria-label="More actions">
+                <MoreHorizontal className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem asChild className="text-[12px]">
+                  <Link to="/dashboard/profile">View profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="text-[12px]">
+                  <Link to="/dashboard/billing">Billing & credits</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="text-[12px]">
+                  <Link to="/pricing">Upgrade plan</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-[12px]"
+                  onSelect={() => {
+                    setRange((r) => r);
+                    window.location.reload();
+                  }}
+                >
+                  Refresh data
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-[12px] text-rose-600 focus:text-rose-700" onSelect={signOut}>
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Link
               to="/app"
               className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium text-zinc-900 shadow-sm hover:bg-zinc-50"
