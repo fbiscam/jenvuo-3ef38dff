@@ -613,7 +613,7 @@ function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "think
 
 
         <div
-          className="relative h-[88%] w-[88%] rounded-full overflow-hidden"
+          className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
           style={{
             background:
               "radial-gradient(circle at 50% 25%, #f4faff 0%, #b8dcff 28%, #5ea8ee 60%, #1f5fb0 90%, #0b3a7a 100%)",
