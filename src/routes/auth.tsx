@@ -212,7 +212,7 @@ function AuthPage() {
               {/* LEFT — FORM */}
               <div className="lg:col-span-7 bg-white p-4 sm:p-5 lg:p-6 lg:overflow-y-auto">
 
-                <div className="max-w-lg mx-auto lg:mx-0">
+                <div className="max-w-lg lg:mx-0">
 
                   <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl lg:text-4xl">
                     {mode === "signin" ? "Sign in to your desk." : "Create your desk."}

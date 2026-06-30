@@ -429,7 +429,7 @@ function HomePage() {
           </div>
 
           {/* status bar */}
-          <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-white flex justify-center sm:justify-between items-center gap-3">
+          <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-white flex justify-start sm:justify-between items-center gap-3">
             <div className="flex gap-4 sm:gap-6 items-center">
               <div className="flex items-center gap-1.5">
                 <span className={`text-[10px] ${MONO} text-zinc-900`}>CPU</span>
@@ -523,7 +523,7 @@ function HomePage() {
                 ["Energy", "WTI · BRENT"],
                 ["DXY & Macro", "DXY · Yields"],
               ].map(([k, v]) => (
-                <div key={k} className="bg-white p-5 text-center sm:text-left">
+                <div key={k} className="bg-white p-5 text-left sm:text-left">
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
                   <div className="mt-2 text-sm font-medium tracking-tight">{v}</div>
                 </div>
@@ -856,7 +856,7 @@ function HomePage() {
       <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-center md:text-left">
+            <div className="text-left md:text-left">
               <h3 className="text-xl font-semibold tracking-tight text-zinc-900">
                 Wired into the venues&nbsp;
               </h3>
@@ -929,7 +929,7 @@ function HomePage() {
 
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
           <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
-            <div className="max-w-xl text-center md:text-left">
+            <div className="max-w-xl text-left md:text-left">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal.&nbsp;<br />
                 Speak to the market now.
