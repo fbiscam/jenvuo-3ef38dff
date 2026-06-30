@@ -834,10 +834,10 @@ function HomePage() {
               return (
                 <article
                   key={t.id}
-                  className={`relative rounded-3xl border p-7 ${
+                  className={`relative rounded-3xl border bg-white p-7 ${
                     t.highlight
-                      ? "border-zinc-900 bg-zinc-900 text-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.4)] md:scale-[1.03]"
-                      : "border-zinc-200 bg-white"
+                      ? "border-zinc-900 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.18)] md:scale-[1.03]"
+                      : "border-zinc-200"
                   }`}
                 >
                   {t.highlight && (
@@ -846,31 +846,34 @@ function HomePage() {
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <Icon className={`h-5 w-5 ${t.highlight ? "text-amber-400" : "text-zinc-900"}`} />
-                    <h3 className="text-lg font-semibold">{t.name}</h3>
+                    <Icon className="h-5 w-5 text-zinc-900" />
+                    <h3 className="text-lg font-semibold text-zinc-900">{t.name}</h3>
                   </div>
-                  <p className={`mt-1 text-sm ${t.highlight ? "text-zinc-400" : "text-zinc-500"}`}>{t.tagline}</p>
+                  <p className="mt-1 text-sm text-zinc-500">{t.tagline}</p>
                   <div className="mt-6 flex items-baseline gap-1">
-                    <span className="text-5xl font-bold tracking-tight">${t.price}</span>
-                    <span className={`text-sm ${t.highlight ? "text-zinc-400" : "text-zinc-500"}`}>/month</span>
+                    <span className="text-5xl font-bold tracking-tight text-zinc-900">${t.price}</span>
+                    <span className="text-sm text-zinc-500">/month</span>
                   </div>
                   <Link
                     to={t.ctaTo}
                     className={`mt-7 block rounded-xl px-4 py-3 text-center text-sm font-medium transition ${
-                      t.highlight ? "bg-white text-zinc-900 hover:bg-zinc-100" : "bg-zinc-900 text-white hover:bg-zinc-800"
+                      t.highlight
+                        ? "bg-zinc-900 text-white hover:bg-black"
+                        : "border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
                     }`}
                   >
                     {t.cta}
                   </Link>
-                  <ul className={`mt-7 space-y-3 text-sm ${t.highlight ? "text-zinc-300" : "text-zinc-700"}`}>
+                  <ul className="mt-7 space-y-3 text-sm text-zinc-700">
                     {t.features.map((f) => (
                       <li key={f} className="flex items-start gap-2.5">
-                        <Check className={`mt-0.5 h-4 w-4 shrink-0 ${t.highlight ? "text-amber-400" : "text-emerald-600"}`} />
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                         <span>{f}</span>
                       </li>
                     ))}
                   </ul>
                 </article>
+
               );
             })}
           </div>
