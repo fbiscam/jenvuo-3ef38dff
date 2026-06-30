@@ -183,7 +183,34 @@ function PricingPage() {
           <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Pick your tier, line by line.</h2>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+        {/* Mobile stacked plan cards */}
+        <div className="mb-10 grid gap-4 sm:hidden">
+          {TIERS.map((t) => {
+            const accent = t.id === "pro";
+            return (
+              <div key={t.id} className={`rounded-2xl border ${accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
+                <div className="flex items-center justify-between">
+                  <span className={`text-base font-semibold ${accent ? "text-amber-700" : "text-zinc-900"}`}>{t.name}</span>
+                  {accent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>}
+                </div>
+                <div className="mt-2 flex items-baseline gap-1">
+                  <span className="text-2xl font-bold tracking-tight text-zinc-900">${t.price}</span>
+                  {t.price > 0 && <span className="text-[11px] text-zinc-500">/mo</span>}
+                </div>
+                <p className={`${MONO} mt-0.5 text-[10px] uppercase tracking-wider text-zinc-500`}>{t.bestFor}</p>
+                <ul className="mt-4 space-y-1.5 text-sm text-zinc-700">
+                  {t.features.slice(0, 5).map((f) => (
+                    <li key={f} className="flex gap-2"><span className="text-zinc-400">·</span><span>{f}</span></li>
+                  ))}
+                </ul>
+                <Link to={t.ctaTo} className={`mt-5 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-xs font-medium ${accent ? "bg-zinc-900 text-white" : "border border-zinc-300 bg-white text-zinc-900"}`}>{t.cta}</Link>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="hidden sm:block overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+
           <table className="w-full min-w-[760px] text-sm border-collapse">
             <colgroup>
               <col className="w-[28%]" />
