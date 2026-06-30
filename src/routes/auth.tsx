@@ -88,8 +88,8 @@ function AuthPage() {
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
-            <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded-md object-contain" />
-            <span className="truncate font-semibold tracking-tight">Jenvu</span>
+            <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
+            <span className="truncate font-semibold tracking-tight">JENVU AI</span>
           </Link>
 
           <div className="flex shrink-0 items-center gap-2">
@@ -265,7 +265,7 @@ function AuthPage() {
       <footer className="border-t border-zinc-100 shrink-0">
         <div className="mx-auto max-w-6xl px-5 py-3 flex items-center justify-between gap-5">
           <div className="flex items-center gap-2 text-[11px] text-zinc-400">
-            <span className="font-semibold text-zinc-900">Jenvu</span>
+            <span className="font-semibold text-zinc-900">JENVU AI</span>
             <span>·</span>
             <span>© {new Date().getFullYear()}</span>
           </div>

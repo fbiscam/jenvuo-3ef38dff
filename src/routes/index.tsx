@@ -196,8 +196,8 @@ function HomePage() {
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
-            <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded-md object-contain" />
-            <span className="truncate font-semibold tracking-tight">Jenvu</span>
+            <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
+            <span className="truncate font-semibold tracking-tight">JENVU AI</span>
           </Link>
 
           <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
@@ -847,8 +847,8 @@ function HomePage() {
       <footer className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10 flex flex-col md:flex-row items-center justify-between gap-5 text-sm text-zinc-900">
           <div className="flex items-center gap-2.5">
-            <img src="/favicon.png" alt="Jenvu" className="h-5 w-5 rounded object-contain" />
-            <span className="text-zinc-900 font-semibold">Jenvu</span>
+            <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded object-contain" />
+            <span className="text-zinc-900 font-semibold">JENVU AI</span>
             <span className="text-zinc-300">·</span>
             <span>© {new Date().getFullYear()}</span>
           </div>
