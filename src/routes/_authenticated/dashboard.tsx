@@ -306,8 +306,10 @@ function DashboardLayout() {
 
   const handleRefresh = () => {
     if (refreshing) return;
+    setRefreshing(true);
     setRefreshTick((t) => t + 1);
     toast.success("Analytics refreshed");
+    window.setTimeout(() => setRefreshing(false), 800);
   };
 
   const signOut = async () => {
