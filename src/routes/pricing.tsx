@@ -299,7 +299,7 @@ function PricingPage() {
               Everything in the platform.
             </h2>
             <p className="mt-3 text-zinc-600">
-              Six modules engineered for serious gold traders — voice, narration, alerts, journal, scanner, and API.
+              Six modules for serious gold traders voice, narration, alerts, journal, scanner, and API.
             </p>
           </div>
 
