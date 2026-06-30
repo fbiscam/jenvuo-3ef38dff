@@ -70,10 +70,20 @@ const INDEX_MAP: Record<string, { yahoo: string; display: string; decimals: numb
   DXY: { yahoo: "DX-Y.NYB", display: "Dollar Index", decimals: 2 },
 };
 
+const SYMBOL_ALIASES: Record<string, string> = {
+  BITCOIN: "BTCUSDT", ETHEREUM: "ETHUSDT", SOLANA: "SOLUSDT", RIPPLE: "XRPUSDT",
+  GOLD: "XAUUSD", SILVER: "XAGUSD",
+  NASDAQ: "NAS100", NASDAQ100: "NAS100", SP500: "SPX500", SANDP: "SPX500", DOW: "US30", DOWJONES: "US30",
+  OIL: "USOIL", CRUDE: "USOIL", WTI: "USOIL",
+};
+
 export function resolveInstrument(input: string): ResolvedInstrument {
   const raw = (input || "").trim();
-  if (!raw) return resolveInstrument("XAUUSD");
-  const cleaned = raw.toUpperCase().replace(/[\s_\-]/g, "").replace(/PERP$/, "");
+  if (!raw) return { ...resolveInstrument("XAUUSD"), raw: "XAUUSD" };
+  let cleaned = raw.toUpperCase().replace(/[\s_\-]/g, "").replace(/PERP$/, "");
+  if (SYMBOL_ALIASES[cleaned]) cleaned = SYMBOL_ALIASES[cleaned];
+
+
 
   if (/^XAU(USD)?$/.test(cleaned) || cleaned === "GOLD") {
     return {
