@@ -131,7 +131,7 @@ function Billing() {
       {/* COMPARISON MATRIX */}
       <section>
         <div className="mb-6">
-          <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Compare plans</div>
+          <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>&nbsp;</div>
           <h3 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Pick your tier, line by line.</h3>
         </div>
 
