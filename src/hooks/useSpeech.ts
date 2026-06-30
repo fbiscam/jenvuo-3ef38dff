@@ -180,17 +180,33 @@ export function useSpeech() {
     }
   }, [safeStart]);
 
-  // --- queued speech with interrupt+resume ---
-  const queueRef = useRef<string[]>([]);
-  const currentTextRef = useRef<string>("");
+  // --- queued speech with interrupt+resume that preserves onDone callbacks ---
+  type SpeechJob = { text: string; onDone?: () => void };
+  const queueRef = useRef<SpeechJob[]>([]);
+  const currentJobRef = useRef<SpeechJob | null>(null);
   const currentCharRef = useRef<number>(0);
   const currentIdRef = useRef<number>(0);
 
-  const _speakOne = useCallback((text: string) => {
-    const id = ++currentIdRef.current;
-    currentTextRef.current = text;
+  const _playNext = useCallback(() => {
+    const next = queueRef.current.shift();
+    if (!next) {
+      currentJobRef.current = null;
+      currentCharRef.current = 0;
+      setSpeaking(false);
+      return;
+    }
+    // Empty-text job = "fire onDone then continue". Used to defer the original
+    // narration's completion callback until AFTER the interrupting reply finishes.
+    if (!next.text || !next.text.trim()) {
+      currentJobRef.current = null;
+      try { next.onDone?.(); } catch { /* ignore */ }
+      _playNext();
+      return;
+    }
+    currentJobRef.current = next;
     currentCharRef.current = 0;
-    const u = new SpeechSynthesisUtterance(text);
+    const id = ++currentIdRef.current;
+    const u = new SpeechSynthesisUtterance(next.text);
     if (voiceRef.current) u.voice = voiceRef.current;
     const preset = VOICE_PRESETS.find((p) => p.key === voicePresetRef.current) ?? VOICE_PRESETS[0];
     u.rate = preset.rate;
@@ -203,39 +219,47 @@ export function useSpeech() {
     };
     const advance = () => {
       if (id !== currentIdRef.current) return; // invalidated by interrupt
-      const next = queueRef.current.shift();
-      if (next) {
-        _speakOne(next);
-      } else {
-        currentTextRef.current = "";
-        currentCharRef.current = 0;
-        setSpeaking(false);
-      }
+      const done = next.onDone;
+      currentJobRef.current = null;
+      try { done?.(); } catch { /* ignore */ }
+      _playNext();
     };
     u.onend = advance;
     u.onerror = advance;
     window.speechSynthesis.speak(u);
   }, []);
 
-  const speak = useCallback((text: string, _onDone?: () => void) => {
+  const speak = useCallback((text: string, onDone?: () => void) => {
     if (typeof window === "undefined" || !text) return;
-    // If already speaking, capture the rest of the current sentence and queue it AFTER the new reply.
-    let remaining = "";
-    if (window.speechSynthesis.speaking && currentTextRef.current) {
-      remaining = currentTextRef.current.slice(currentCharRef.current).trim();
+    const isSpeakingNow = window.speechSynthesis.speaking && !!currentJobRef.current;
+
+    // Build the resume job from the currently-speaking utterance so it picks up
+    // where it left off after the new reply finishes — and keep its onDone.
+    let resumeJob: SpeechJob | null = null;
+    if (isSpeakingNow && currentJobRef.current) {
+      const cur = currentJobRef.current;
+      const remaining = cur.text.slice(currentCharRef.current).trim();
+      resumeJob = { text: remaining, onDone: cur.onDone };
+      // The current job's onDone has been moved into resumeJob — don't fire it twice.
+      cur.onDone = undefined;
     }
+
     const previous = queueRef.current.slice();
-    queueRef.current = [...(remaining ? [remaining] : []), ...previous];
-    currentIdRef.current++; // invalidate any in-flight onend
+    queueRef.current = [
+      { text, onDone },
+      ...(resumeJob ? [resumeJob] : []),
+      ...previous,
+    ];
+    currentIdRef.current++; // invalidate any in-flight onend handlers
     window.speechSynthesis.cancel();
     // small delay so cancel() finishes before the new utterance starts (Chrome quirk)
-    setTimeout(() => _speakOne(text), 80);
-  }, [_speakOne]);
+    setTimeout(() => _playNext(), 80);
+  }, [_playNext]);
 
   const stopSpeaking = useCallback(() => {
     currentIdRef.current++;
     queueRef.current = [];
-    currentTextRef.current = "";
+    currentJobRef.current = null;
     currentCharRef.current = 0;
     window.speechSynthesis.cancel();
     setSpeaking(false);
