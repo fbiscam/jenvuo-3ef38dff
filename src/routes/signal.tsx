@@ -853,7 +853,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-zinc-200 bg-white overflow-hidden"
+      className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm"
     >
       <div className="p-4 space-y-4">
         {/* Header row: label + score */}
