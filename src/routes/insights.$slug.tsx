@@ -182,11 +182,93 @@ function InsightDetailPage() {
             />
           </div>
 
-          <div className="prose prose-zinc max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-zinc-900 prose-img:rounded-2xl">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {insight.excerpt && (
+            <p className="text-xl sm:text-2xl leading-relaxed text-zinc-700 font-light mb-12 pb-12 border-b border-zinc-100">
+              {insight.excerpt}
+            </p>
+          )}
+
+          <article className="article-body text-[17px] leading-[1.85] text-zinc-800">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({ children }) => (
+                  <h2 className="mt-16 mb-6 text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900 leading-tight">{children}</h2>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="mt-16 mb-6 text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">{children}</h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="mt-12 mb-4 text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900">{children}</h3>
+                ),
+                h4: ({ children }) => (
+                  <h4 className={`${MONO} mt-10 mb-3 text-[11px] uppercase tracking-[0.2em] text-zinc-500`}>{children}</h4>
+                ),
+                p: ({ children }) => (
+                  <p className="mb-7 text-zinc-700">{children}</p>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-semibold text-zinc-900 bg-yellow-50 px-1 rounded-sm">{children}</strong>
+                ),
+                em: ({ children }) => (
+                  <em className="italic text-zinc-900">{children}</em>
+                ),
+                a: ({ href, children }) => (
+                  <a href={href} className="text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-900 transition-colors">{children}</a>
+                ),
+                ul: ({ children }) => (
+                  <ul className="my-7 space-y-3 pl-0 list-none">{children}</ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="my-7 space-y-3 pl-0 list-none counter-reset-[item]">{children}</ol>
+                ),
+                li: ({ children }) => (
+                  <li className="relative pl-7 text-zinc-700 before:content-[''] before:absolute before:left-0 before:top-[0.7em] before:h-1.5 before:w-1.5 before:rounded-full before:bg-zinc-900">
+                    {children}
+                  </li>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="my-10 border-l-4 border-zinc-900 bg-zinc-50 pl-6 pr-5 py-5 rounded-r-lg italic text-zinc-800 text-lg">
+                    {children}
+                  </blockquote>
+                ),
+                hr: () => <hr className="my-12 border-zinc-200" />,
+                code: ({ children, className }) => {
+                  const isBlock = className?.includes("language-");
+                  if (isBlock) {
+                    return (
+                      <code className={`${MONO} block bg-zinc-950 text-zinc-100 p-5 rounded-xl text-sm overflow-x-auto my-7`}>
+                        {children}
+                      </code>
+                    );
+                  }
+                  return (
+                    <code className={`${MONO} bg-zinc-100 text-zinc-900 px-1.5 py-0.5 rounded text-[0.9em]`}>
+                      {children}
+                    </code>
+                  );
+                },
+                pre: ({ children }) => <pre className="my-7">{children}</pre>,
+                table: ({ children }) => (
+                  <div className="my-10 overflow-x-auto rounded-xl border border-zinc-200">
+                    <table className="w-full text-sm">{children}</table>
+                  </div>
+                ),
+                thead: ({ children }) => <thead className="bg-zinc-50">{children}</thead>,
+                th: ({ children }) => (
+                  <th className={`${MONO} px-4 py-3 text-left text-[11px] uppercase tracking-widest text-zinc-600 border-b border-zinc-200`}>{children}</th>
+                ),
+                td: ({ children }) => (
+                  <td className="px-4 py-3 border-b border-zinc-100 text-zinc-700">{children}</td>
+                ),
+                img: ({ src, alt }) => (
+                  <img src={src} alt={alt} className="my-10 rounded-2xl w-full border border-zinc-100" />
+                ),
+              }}
+            >
               {insight.content}
             </ReactMarkdown>
-          </div>
+          </article>
 
           <div className="mt-20 pt-10 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
