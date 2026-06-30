@@ -134,11 +134,27 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
 /* ---------- live ticker row ---------- */
 
 function TickerRow({ label, symbol, decimals = 2 }: { label: string; symbol: string; decimals?: number }) {
-  const price = useLivePriceStream(symbol, null);
-  const [seed, setSeed] = useState<number | null>(null);
-  useEffect(() => { if (seed == null && price != null) setSeed(price); }, [price, seed]);
-  const change = price != null && seed ? ((price - seed) / seed) * 100 : null;
+  const livePrice = useLivePriceStream(symbol, null);
+  const fetchSnapshot = useServerFn(getMarketSnapshot);
+  const [snap, setSnap] = useState<{ price: number; prevClose: number | null } | null>(null);
+
+  useEffect(() => {
+    let stopped = false;
+    const tick = async () => {
+      try {
+        const s = await fetchSnapshot({ data: { symbol } });
+        if (!stopped && s) setSnap({ price: s.price, prevClose: s.prevClose });
+      } catch { /* keep last */ }
+    };
+    void tick();
+    const id = setInterval(tick, 15_000);
+    return () => { stopped = true; clearInterval(id); };
+  }, [symbol, fetchSnapshot]);
+
+  const price = livePrice ?? snap?.price ?? null;
+  const change = price != null && snap?.prevClose ? ((price - snap.prevClose) / snap.prevClose) * 100 : null;
   const up = (change ?? 0) >= 0;
+
   return (
     <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-2.5 last:border-b-0">
       <div className="flex items-center gap-2">
@@ -147,10 +163,12 @@ function TickerRow({ label, symbol, decimals = 2 }: { label: string; symbol: str
       </div>
       <div className="flex items-center gap-3">
         <span className="font-mono text-[12px] text-zinc-600">{price != null ? price.toFixed(decimals) : "—"}</span>
-        {change != null && (
+        {change != null ? (
           <span className={`font-mono text-[11px] ${up ? "text-emerald-600" : "text-rose-600"}`}>
             {up ? "+" : ""}{change.toFixed(2)}%
           </span>
+        ) : (
+          <span className="font-mono text-[11px] text-zinc-400">—</span>
         )}
       </div>
     </div>
