@@ -390,7 +390,7 @@ function SignalPage() {
 
 
   return (
-    <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased">
+    <div className="min-h-dvh w-full bg-[#F8FAFC] text-slate-900 font-['Inter',system-ui,sans-serif] antialiased">
       {/* HEADER */}
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="mx-auto grid max-w-[1600px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4">
@@ -446,7 +446,7 @@ function SignalPage() {
 
       {/* TERMINAL CARD */}
       <section className="mx-auto max-w-[1600px] px-5 py-5 sm:px-6 sm:py-8">
-        <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
           {/* terminal header */}
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
             <div className="flex items-center gap-3 min-w-0">
@@ -853,7 +853,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-zinc-200 bg-white overflow-hidden"
+      className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm"
     >
       <div className="p-4 space-y-4">
         {/* Header row: label + score */}
