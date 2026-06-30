@@ -27,9 +27,12 @@ const DEFAULTS: Prefs = {
 };
 
 function AlertPrefs() {
+  const { features, isLoading } = useCredits();
+  const locked = !isLoading && !features.realtime_alerts;
   const [prefs, setPrefs] = useState<Prefs>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
 
   useEffect(() => {
     (async () => {
