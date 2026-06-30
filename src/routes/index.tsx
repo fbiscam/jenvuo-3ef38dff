@@ -193,6 +193,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 /* ---------- page ---------- */
 function HomePage() {
   const ticker = useLiveTicker();
+  const currentPlan = useCurrentPlan();
   return (
     <>
       <style>{`@media (min-width: 1024px){.jenvu-zoom{zoom:1.5}}`}</style>
