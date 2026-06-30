@@ -110,7 +110,7 @@ function Metric({
     <div className="flex-1 min-w-0 p-4">
       <div className="flex items-center gap-1 text-[12px] text-zinc-500">
         {label}
-        <span className="opacity-50">ⓘ</span>
+        
       </div>
       <div className="mt-1 flex items-baseline gap-2">
         <span className={`text-[22px] font-semibold tracking-tight ${isEmpty ? "text-zinc-400" : "text-zinc-900"}`}>{value}</span>
