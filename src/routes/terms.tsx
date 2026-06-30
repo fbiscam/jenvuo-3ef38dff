@@ -5,7 +5,7 @@ export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
       { title: "Terms of Service — Jenvu" },
-      { name: "description", content: "The contract between you and Jenvu when you use our website, voice agent, signals and analysis." },
+      { name: "description", content: "The contract between you and Jenvu when you use our website, voice agent, A+ signals, journal and trading analysis." },
       { property: "og:title", content: "Terms of Service — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/terms" },
     ],

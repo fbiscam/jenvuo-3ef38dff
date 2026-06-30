@@ -8,7 +8,7 @@ import SiteFooter from "@/components/SiteFooter";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Partner With Us — Jenvu" },
+      { title: "Contact Jenvu" },
       {
         name: "description",
         content:

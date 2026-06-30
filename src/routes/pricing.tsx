@@ -17,7 +17,7 @@ const SANS = "font-['Inter',system-ui,sans-serif]";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — Jenvu" },
+      { title: "Pricing Plans — Jenvu" },
       { name: "description", content: "Pro and Elite plans for institutional-grade gold trading intelligence. Voice agent, A+ realtime alerts, full ICT & SMC analysis." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
       { property: "og:description", content: "Realtime A+ gold setups, voice intelligence, and trade journal — Pro $29/mo, Elite $99/mo." },
