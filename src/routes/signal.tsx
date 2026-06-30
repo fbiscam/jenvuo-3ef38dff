@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
+import { TradingViewChart } from "@/components/TradingViewChart";
 import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
@@ -584,7 +585,7 @@ function SignalPage() {
                   )}
                 </div>
                 <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
-                  {plan ? <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF" /> : <ChartSkeleton />}
+                  <TradingViewChart symbol={plan?.instrument.symbol ?? symbol} timeframe="1h" theme="light" />
                 </div>
               </div>
               <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100">
@@ -604,7 +605,7 @@ function SignalPage() {
                   )}
                 </div>
                 <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "htf" ? "opacity-55" : "opacity-100")}>
-                  {plan ? <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF" /> : <ChartSkeleton />}
+                  <TradingViewChart symbol={plan?.instrument.symbol ?? symbol} timeframe="15m" theme="light" />
                 </div>
                 <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
                   <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
