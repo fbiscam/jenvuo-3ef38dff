@@ -645,7 +645,7 @@ function HomePage() {
           {/* Header band */}
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
-              <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 04 / PRICING ]</p>
+              
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
                 Trade gold with an <span className="italic font-light text-zinc-500">institutional edge.</span>
               </h2>
