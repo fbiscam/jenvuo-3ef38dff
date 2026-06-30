@@ -150,7 +150,7 @@ function AuthPage() {
   return (
     <>
     <style>{`@media (min-width: 1280px) and (min-height: 800px){.jenvu-auth-zoom{zoom:1.05}}`}</style>
-    <div className={`jenvu-auth-zoom min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
+    <div className={`jenvu-auth-zoom h-dvh w-full overflow-hidden bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
 
 
       {/* NAV */}
@@ -187,9 +187,10 @@ function AuthPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col items-center justify-center p-3 sm:p-4">
-        <div className="w-full max-w-6xl">
-          <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
+      <main className="flex-1 min-h-0 overflow-hidden flex flex-col items-center justify-center p-2 sm:p-3">
+        <div className="w-full max-w-6xl max-h-full overflow-hidden">
+          <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden max-h-[calc(100dvh-9rem)] flex flex-col">
+
             {/* terminal header */}
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-3">
               <div className="flex items-center gap-3 min-w-0">
@@ -207,21 +208,22 @@ function AuthPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
               {/* LEFT — FORM */}
-              <div className="lg:col-span-7 bg-white p-5 sm:p-6 lg:p-8">
+              <div className="lg:col-span-7 bg-white p-4 sm:p-5 lg:p-6 lg:overflow-y-auto">
 
                 <div className="max-w-lg mx-auto lg:mx-0">
 
-                  <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl lg:text-5xl">
+                  <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl lg:text-4xl">
                     {mode === "signin" ? "Sign in to your desk." : "Create your desk."}
                   </h1>
-                  <p className="mt-3 text-base text-zinc-600 leading-relaxed sm:text-lg">
+                  <p className="mt-2 text-sm text-zinc-600 leading-relaxed sm:text-base">
                     Voice-native institutional intelligence, on call.
                   </p>
 
+
                   {/* Tabs */}
-                  <div className="mt-6 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
+                  <div className="mt-4 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
                     <button
                       type="button"
                       onClick={() => { setMode("signin"); setErrorMsg(null); }}
@@ -238,11 +240,12 @@ function AuthPage() {
                     </button>
                   </div>
 
-                  <form onSubmit={mode === "signin" ? signIn : signUp} className="mt-5 space-y-4">
+                  <form onSubmit={mode === "signin" ? signIn : signUp} className="mt-4 space-y-3">
+
 
                     {mode === "signup" && (
                       <div>
-                        <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ${MONO}`}>
+                        <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
                           Full Name
                         </label>
                         <div className="relative">
@@ -253,7 +256,7 @@ function AuthPage() {
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             maxLength={100}
-                            className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                            className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                             placeholder="Your full name..."
                           />
                         </div>
@@ -261,7 +264,7 @@ function AuthPage() {
                     )}
 
                     <div>
-                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ${MONO}`}>
+                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
                         User Identification
                       </label>
                       <div className="relative">
@@ -271,14 +274,14 @@ function AuthPage() {
                           required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                           placeholder="Institutional email..."
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ${MONO}`}>
+                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
                         Access Key
                       </label>
                       <div className="relative">
@@ -289,7 +292,7 @@ function AuthPage() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           minLength={mode === "signup" ? 8 : undefined}
-                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                           placeholder={mode === "signup" ? "Min 8 characters..." : "Enter password..."}
                         />
                       </div>
@@ -305,7 +308,7 @@ function AuthPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="group w-full rounded-lg bg-zinc-900 px-5 py-4 text-base font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                      className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                     >
                       {loading
                         ? (mode === "signin" ? "Authenticating..." : "Creating account...")
@@ -313,13 +316,14 @@ function AuthPage() {
                     </button>
                   </form>
 
-                  <div className="mt-6 pt-4 border-t border-zinc-100">
+                  <div className="mt-4 pt-3 border-t border-zinc-100">
                     <p className="text-sm text-zinc-500 leading-relaxed">
                       {mode === "signin"
                         ? <>New to Jenvu? <button type="button" onClick={() => { setMode("signup"); setErrorMsg(null); }} className="font-medium text-zinc-900 underline-offset-2 hover:underline">Create an account</button>.</>
                         : <>Already have an account? <button type="button" onClick={() => { setMode("signin"); setErrorMsg(null); }} className="font-medium text-zinc-900 underline-offset-2 hover:underline">Sign in</button>.</>}
                     </p>
                   </div>
+
 
 
                 </div>
