@@ -85,7 +85,13 @@ function Journal() {
   };
 
   return (
+    <UpgradeOverlay
+      show={locked}
+      title="Trade Journal is Pro"
+      description="Track every setup, win-rate and P&L. Upgrade to Pro to unlock the journal."
+    >
     <div className="space-y-6">
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           ["Trades", stats.total],
