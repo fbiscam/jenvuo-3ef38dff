@@ -1187,22 +1187,8 @@ function SignalVoiceAgent({
 
   return (
     <div className="space-y-2.5">
-      <div className="flex items-center justify-between">
-        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500 inline-flex items-center gap-1.5`}>
-          <Sparkles className="h-3 w-3 text-zinc-900" /> Voice Agent
-        </span>
-        <span
-          className={cn(
-            `text-[9px] ${MONO} tracking-widest uppercase`,
-            status === "thinking" && "text-amber-600",
-            status === "listening" && "text-emerald-600",
-            status === "speaking" && "text-sky-600",
-            status === "idle" && "text-zinc-500",
-          )}
-        >
-          {status === "idle" ? "online" : status}
-        </span>
-      </div>
+
+
 
       <div className="flex justify-center">
         <SignalOrb status={status} pulse={speech.wordPulse} />
