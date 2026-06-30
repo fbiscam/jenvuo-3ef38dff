@@ -316,13 +316,14 @@ function AuthPage() {
                     </button>
                   </form>
 
-                  <div className="mt-6 pt-4 border-t border-zinc-100">
+                  <div className="mt-4 pt-3 border-t border-zinc-100">
                     <p className="text-sm text-zinc-500 leading-relaxed">
                       {mode === "signin"
                         ? <>New to Jenvu? <button type="button" onClick={() => { setMode("signup"); setErrorMsg(null); }} className="font-medium text-zinc-900 underline-offset-2 hover:underline">Create an account</button>.</>
                         : <>Already have an account? <button type="button" onClick={() => { setMode("signin"); setErrorMsg(null); }} className="font-medium text-zinc-900 underline-offset-2 hover:underline">Sign in</button>.</>}
                     </p>
                   </div>
+
 
 
                 </div>
