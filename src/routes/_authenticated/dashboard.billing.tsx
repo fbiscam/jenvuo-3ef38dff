@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
@@ -35,6 +36,7 @@ function Billing() {
   const currentPlan = useCurrentPlan();
   const plan = currentPlan ?? "free";
   const credits = useCredits();
+  const [showAllActivity, setShowAllActivity] = useState(false);
 
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
   const pct = credits.allowance > 0 ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
@@ -105,7 +107,7 @@ function Billing() {
           <div className="mt-6">
             <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Recent activity</div>
             <div className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
-              {credits.state.recent.slice(0, 8).map((r) => (
+              {(showAllActivity ? credits.state.recent : credits.state.recent.slice(0, 10)).map((r) => (
                 <div key={r.id} className="flex items-center justify-between px-3 py-2 text-xs">
                   <span className="text-zinc-600">{r.reason.replace("_", " ")}</span>
                   <span className={`tabular-nums font-medium ${r.delta < 0 ? "text-rose-600" : "text-emerald-600"}`}>
@@ -114,6 +116,15 @@ function Billing() {
                 </div>
               ))}
             </div>
+            {credits.state.recent.length > 10 && (
+              <button
+                type="button"
+                onClick={() => setShowAllActivity((v) => !v)}
+                className="mt-3 text-xs font-medium text-zinc-700 hover:text-zinc-900 underline underline-offset-2"
+              >
+                {showAllActivity ? "Show less" : `Show more (${credits.state.recent.length - 10})`}
+              </button>
+            )}
           </div>
         )}
       </section>
