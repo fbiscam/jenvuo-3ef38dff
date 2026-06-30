@@ -594,7 +594,7 @@ function HomePage() {
 
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
             {[
-              { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English anything." },
+              { k: "01", t: "Speak", d: "Push-to-talk and ask in plain simple English anything." },
               { k: "02", t: "Reason", d: "JENVU pulls structure, ICT/SMC, DXY and news." },
               { k: "03", t: "Mark Up", d: "Charts auto-annotate FVG, OB, BOS and sweeps." },
               { k: "04", t: "Narrate", d: "Hear an A+ plan: entry, SL, TP, R:R." },
