@@ -658,9 +658,9 @@ export const getLiveTick = createServerFn({ method: "POST" })
     const inst = resolveInstrument(data.symbol);
     const candles = await fetchInstrumentCandles(inst, "1m").catch(() => [] as Candle[]);
     const last = candles[candles.length - 1];
-    if (!last) throw new Error("Live tick unavailable");
+    if (!last) return null as LiveTick | null;
     const tick: LiveTick = { price: last.c, t: last.t };
-    return tick;
+    return tick as LiveTick | null;
   });
 
 export const getNewsRisk = createServerFn({ method: "POST" })
