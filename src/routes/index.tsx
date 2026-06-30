@@ -234,16 +234,16 @@ function HomePage() {
       {/* HERO */}
       <section className="mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
         <div className="grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
-          <div className="text-center lg:col-span-7 lg:text-left">
+          <div className="text-left lg:col-span-7 lg:text-left">
             
-            <h1 className="mx-auto mt-5 max-w-3xl text-3xl font-semibold tracking-tight leading-[1.15] sm:text-4xl md:text-5xl lg:mx-0">
+            <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight leading-[1.15] sm:text-4xl md:text-5xl lg:mx-0">
               <span className="inline-block leading-[1.1] text-zinc-900">Institutional intelligence</span><br />
               <span className="text-zinc-900">vocalized in real time.</span>
             </h1>
-            <p className="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-zinc-900 md:text-lg lg:mx-0">
+            <p className="mt-5 max-w-3xl text-base leading-relaxed text-zinc-900 md:text-lg lg:mx-0">
               A voice-native trading terminal powered by 25+ years of ICT &amp; SMC market logic narrating live A+ setups across Gold &amp; Crypto
             </p>
-            <div className="mt-7 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center lg:justify-start">
+            <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
                 to="/app"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
@@ -266,7 +266,7 @@ function HomePage() {
                 ["Frameworks", "ICT, SMC"],
                 ["Avg. R:R", "1 : 3.2"],
               ].map(([k, v]) => (
-                <div key={k} className="bg-white p-5 text-center text-zinc-900 sm:text-left">
+                <div key={k} className="bg-white p-5 text-left text-zinc-900 sm:text-left">
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>{k}</div>
                   <div className="mt-2 text-xl font-semibold tracking-tight text-zinc-900">{v}</div>
                 </div>
@@ -449,9 +449,9 @@ function HomePage() {
 
       {/* CAPABILITIES */}
       <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-5 py-10 text-center sm:px-6 sm:py-14 md:text-left">
+        <div className="mx-auto max-w-6xl px-5 py-10 text-left sm:px-6 sm:py-14 md:text-left">
           
-          <h2 className="mx-auto mt-4 max-w-3xl text-2xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl md:whitespace-nowrap">
+          <h2 className="mt-4 max-w-3xl text-2xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl md:whitespace-nowrap">
             Built like a trading desk, spoken like a partner.
           </h2>
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
@@ -505,7 +505,7 @@ function HomePage() {
       <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
-            <div className="text-center lg:col-span-4 lg:text-left">
+            <div className="text-left lg:col-span-4 lg:text-left">
               
               <h2 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
                 One terminal. Every major market.
@@ -536,7 +536,7 @@ function HomePage() {
       {/* CHANGELOG */}
       <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <div className="mb-8 flex flex-col items-center justify-center gap-2 text-center sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:text-left">
+          <div className="mb-8 flex flex-col items-start justify-start gap-2 text-left sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:text-left">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Recent shipments</h2>
             </div>
@@ -568,7 +568,7 @@ function HomePage() {
       {/* HOW IT WORKS */}
       <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <div className="flex flex-col items-center gap-4 text-center md:flex-row md:items-end md:justify-between md:text-left">
+          <div className="flex flex-col items-start gap-4 text-left md:flex-row md:items-end md:justify-between md:text-left">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
                 Four steps. One voice.
@@ -602,8 +602,8 @@ function HomePage() {
 
       {/* DESK LOGIC */}
       <section className="border-t border-zinc-100 bg-white/40">
-        <div className="mx-auto max-w-6xl px-5 py-10 text-center sm:px-6 sm:py-14 md:text-left">
-          <h2 className="mx-auto max-w-2xl text-2xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl">
+        <div className="mx-auto max-w-6xl px-5 py-10 text-left sm:px-6 sm:py-14 md:text-left">
+          <h2 className="max-w-2xl text-2xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl">
             The frameworks JENVU thinks in.
           </h2>
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
@@ -755,7 +755,7 @@ function HomePage() {
           </div>
 
           {/* Footer strip */}
-          <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white px-6 py-5 sm:flex-row">
+          <div className="mt-12 flex flex-col items-start justify-between gap-4 rounded-2xl border border-zinc-200 bg-white px-6 py-5 sm:flex-row">
             <div className="flex items-center gap-3">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <p className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-600`}>
@@ -798,7 +798,7 @@ function HomePage() {
       {/* COMPARISON */}
       <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <h2 className="text-center text-2xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
+          <h2 className="text-left text-2xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
             Why traders move to JENVU.
           </h2>
           <div className="mt-10 rounded-2xl border border-zinc-200 bg-white overflow-hidden">
@@ -855,7 +855,7 @@ function HomePage() {
       {/* INTEGRATIONS */}
       <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col md:flex-row items-start justify-between gap-6">
             <div className="text-left md:text-left">
               <h3 className="text-xl font-semibold tracking-tight text-zinc-900">
                 Wired into the venues&nbsp;
@@ -880,7 +880,7 @@ function HomePage() {
       <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
-            <div className="text-center lg:col-span-4 lg:text-left">
+            <div className="text-left lg:col-span-4 lg:text-left">
               <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Asked often.</h2>
               <p className="mt-3 text-zinc-900">Everything else lives in the docs&nbsp;</p>
             </div>
@@ -928,7 +928,7 @@ function HomePage() {
       <section className="border-t border-zinc-100">
 
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
             <div className="max-w-xl text-left md:text-left">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal.&nbsp;<br />
@@ -938,7 +938,7 @@ function HomePage() {
                 Your voice agent is one tap away listening<br />
                 reasoning, thinking, research & narrating.
               </p>
-              <div className="mt-7 flex flex-col items-stretch justify-center gap-3 sm:flex-row md:justify-start">
+              <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row md:justify-start">
                 <Link
                   to="/app"
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
