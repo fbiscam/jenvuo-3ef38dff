@@ -165,7 +165,7 @@ function PricingPage() {
           <p className="mx-auto mt-5 max-w-2xl text-base text-zinc-600 sm:text-lg">
             One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of professional desk methodology.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-2">
+          <div className="mt-8 flex flex-wrap justify-start sm:justify-center gap-2">
             {["A+ Setups", "ICT / SMC", "< 30s Alerts", "25Y Methodology"].map((s) => (
               <span key={s} className={`${MONO} text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-zinc-200 bg-white text-zinc-700`}>
                 {s}
