@@ -296,7 +296,7 @@ function PricingPage() {
         <div className="mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-20">
           <div className="flex items-end justify-between gap-6 mb-10">
             <div>
-              <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 03 / WHAT YOU GET ]</p>
+              
               <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Every capability, visualised.</h2>
             </div>
             <div className={`hidden sm:block ${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
