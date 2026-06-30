@@ -5,6 +5,8 @@ import { Plus, Trash2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
+import { useLivePrices } from "@/hooks/useLivePrices";
+
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/journal")({
