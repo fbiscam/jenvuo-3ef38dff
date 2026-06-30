@@ -1,62 +1,24 @@
-# Auth-Aware Header + 1-Week Session
-
 ## Goal
+Add a sign-up flow to the `/auth` page so new users can create a Jenvu account with email + password. Existing sign-in flow stays intact.
 
-Header buttons swap based on sign-in state, on every page that has the top nav:
+## Scope
+- `src/routes/auth.tsx` — add a Sign In / Sign Up tab toggle on the existing form panel.
+- Sign-up uses `supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + '/dashboard' } })`.
+- Optional full-name field stored in `user_metadata.full_name` (existing `handle_new_user` trigger already reads this into `profiles`).
+- Client-side zod validation: valid email, password ≥ 8 chars, name ≤ 100 chars.
+- Success toast + auto-redirect to `/dashboard` when session is returned; otherwise show "Check your email to confirm" message.
+- Keep Google OAuth button (already present) untouched.
 
-- **Signed out** → `Sign In` + `Try Jenvu` (both → `/auth`)
-- **Signed in** → `Dashboard` (→ `/dashboard`) + `Launch` (→ `/app`)
-
-Session persists ~1 week. Sign-out flips header back instantly. `/auth` page never flashes for already-signed-in users.
-
-## Changes
-
-### 1. Auth state hook
-New `src/hooks/useAuthUser.ts`:
-- Hydrates with `supabase.auth.getUser()`
-- Subscribes once to `supabase.auth.onAuthStateChange` (filters `SIGNED_IN`/`SIGNED_OUT`/`USER_UPDATED`)
-- Returns `{ user, loading }`
-
-### 2. Reusable header buttons
-New `src/components/HeaderAuthButtons.tsx`:
-```
-loading  → empty placeholder (prevents flash)
-no user  → [Sign In ghost]    [Try Jenvu pill →]
-user     → [Dashboard ghost]  [Launch pill ↗]
-```
-
-### 3. Wire into every header
-Replace existing button cluster with `<HeaderAuthButtons />` in:
-- `src/routes/index.tsx`
-- `src/routes/app.tsx`
-- `src/routes/signal.tsx`
-- `src/routes/pricing.tsx`
-- `src/components/PageShell.tsx` (covers about / privacy / disclaimer / contact / insights / download / terms / llm / development / ai-engine)
-
-### 4. No `/auth` flash when already signed in
-Update `src/routes/auth.tsx`:
-- `ssr: false` (Supabase session lives in `localStorage`)
-- `beforeLoad`: `supabase.auth.getUser()` — if user exists, `throw redirect({ to: "/dashboard" })` (or the `?redirect=` param if present) before the auth UI mounts
-- Inside the form, support `?redirect=/app` so future header links can pass intended destination (e.g. clicking Launch while signed-out lands on `/auth?redirect=/app`, then bounces to `/app` after login)
-
-### 5. Sign-out flow (dashboard)
-Update logout button:
-1. `queryClient.cancelQueries()` (if available)
-2. `await supabase.auth.signOut()`
-3. `navigate({ to: "/", replace: true })`
-
-Header reactively flips back to `Sign In / Try Jenvu`.
-
-### 6. 1-week session
-Supabase JS already persists session in `localStorage` + auto-refreshes the access token. Set Supabase Auth **refresh token lifetime → 7 days (604800s)** so a user inactive >7 days must sign in again — matching the request.
+## Auth config
+- Keep email confirmation ON (default, safer). User can later ask to auto-confirm.
+- No DB migrations needed — `profiles` table + `handle_new_user` trigger already handle new signups.
 
 ## Out of scope
-- No new auth providers / no `/auth` UI redesign.
-- No design changes — same pill + ghost link aesthetic.
-- No new tables / no role logic.
+- Password reset page (already discussed previously, not requested now).
+- Phone / SMS sign-up.
+- Profile fields beyond full name.
 
-## Files
+## Files touched
+- `src/routes/auth.tsx` (UI + signUp handler + tab state)
 
-- new: `src/hooks/useAuthUser.ts`, `src/components/HeaderAuthButtons.tsx`
-- edit: `src/routes/auth.tsx` (redirect guard), `src/routes/index.tsx`, `src/routes/app.tsx`, `src/routes/signal.tsx`, `src/routes/pricing.tsx`, `src/components/PageShell.tsx`, dashboard logout handler
-- backend: refresh-token lifetime → 7 days
+Confirm and I'll implement.
