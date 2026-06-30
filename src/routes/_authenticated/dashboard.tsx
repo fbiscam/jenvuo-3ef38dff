@@ -371,6 +371,8 @@ function DashboardLayout() {
                 value={counts.journalWinRate != null ? `${counts.journalWinRate}%` : "0.0%"}
                 delta={null}
                 tone={counts.journalWinRate != null && counts.journalWinRate < 50 ? "rose" : "blue"}
+                trend={counts.journalWinRate == null ? "flat" : counts.journalWinRate < 50 ? "down" : counts.journalWinRate > 60 ? "up" : "flat"}
+                magnitude={counts.journalWinRate != null ? Math.abs(counts.journalWinRate - 50) : 0}
                 seed={7}
               />
               <Metric
