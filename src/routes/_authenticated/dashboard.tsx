@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-r
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import SiteFooter from "@/components/SiteFooter";
-import { Bookmark, Bell, CreditCard, BookOpen, User, LogOut } from "lucide-react";
+import { Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
