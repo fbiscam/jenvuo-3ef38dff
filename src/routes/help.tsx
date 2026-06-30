@@ -141,9 +141,6 @@ function HelpCenterPage() {
         <section className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
           <div className="flex items-end justify-between mb-8">
             <div>
-              <div className={`${MONO} text-[10px] uppercase tracking-[0.28em] text-zinc-500`}>
-                [ 01 / Collections ]
-              </div>
               <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
                 Browse by topic
               </h2>
