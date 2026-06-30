@@ -299,7 +299,7 @@ function DashboardLayout() {
             </button>
             <Link
               to="/app"
-              className="inline-flex items-center gap-1.5 rounded-md bg-[#1d6df1] px-3 py-2 text-[13px] font-medium text-white shadow-sm hover:bg-[#1559cc]"
+              className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium text-zinc-900 shadow-sm hover:bg-zinc-50"
             >
               <Plus className="h-4 w-4" /> Launch AI
             </Link>
