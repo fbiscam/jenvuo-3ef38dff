@@ -3,8 +3,12 @@
 
 export type Block =
   | { type: "h2"; content: string }
+  | { type: "h3"; content: string }
   | { type: "p"; content: string }
-  | { type: "ul"; items: string[] };
+  | { type: "ul"; items: string[] }
+  | { type: "ol"; items: string[] }
+  | { type: "note"; tone?: "info" | "tip" | "warn"; content: string }
+  | { type: "code"; content: string };
 
 export type Article = {
   slug: string;
@@ -43,13 +47,28 @@ export const collections: Collection[] = [
           "Jenvu is a voice-native trading agent for Gold, FX, indices and crypto — built on ICT and SMC playbooks.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu is a voice-first market intelligence terminal. You speak — it analyzes structure, liquidity and bias using institutional ICT and SMC concepts, narrates its read in real time, and renders the chart with marked zones." },
-          { type: "h2", content: "What you can do" },
+          { type: "p", content: "Jenvu AI is a voice-first market intelligence terminal. You speak — it listens, analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, narrates its read in real time, and renders the chart with marked zones so you can see exactly what it sees." },
+          { type: "p", content: "Think of it as having a senior desk analyst on call 24/7: ask for a setup on Gold, BTC or EUR/USD and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
+
+          { type: "h2", content: "What you can do with Jenvu" },
           { type: "ul", items: [
-            "Talk to the agent like a desk analyst.",
+            "Talk to the agent like a desk analyst — push-to-talk, no typing required.",
             "Generate A+ setups on demand for Gold and other supported assets.",
-            "Watch the AI mark structure, FVGs, order blocks and liquidity on the chart.",
-            "Save signals to your dashboard and receive alerts.",
+            "Watch the AI mark structure, FVGs, order blocks and liquidity directly on the chart.",
+            "Save signals to your dashboard and receive alerts when new A+ setups are detected.",
+            "Get news context, killzone awareness and bias confirmation before risking capital.",
+          ]},
+
+          { type: "h2", content: "Who Jenvu is built for" },
+          { type: "p", content: "Jenvu is designed for traders who already understand ICT/SMC fundamentals and want an institutional-grade analyst that never sleeps. It's equally useful for beginners learning the playbook — the narration explains every step in plain English." },
+
+          { type: "note", tone: "info", content: "Jenvu is an analysis tool, not financial advice. You stay in control of every trade — the agent only suggests when its confluence model is satisfied." },
+
+          { type: "h2", content: "Where to go next" },
+          { type: "ul", items: [
+            "Read 'How do I create an account?' to set up your profile.",
+            "Open 'Generate your first signal' for a 3-click walkthrough.",
+            "Browse 'Which assets does Jenvu support?' for the full instrument list.",
           ]},
         ],
       },
@@ -59,8 +78,27 @@ export const collections: Collection[] = [
         summary: "Sign up takes under a minute — email + password or Google.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Open the Sign In page and switch to 'Create account'. Enter your full name, email and a password (8+ characters). You can also continue with Google." },
-          { type: "p", content: "New accounts start on the Free plan with starter credits so you can try the voice agent and the signal engine right away." },
+          { type: "p", content: "Creating a Jenvu account takes less than 60 seconds. New accounts start on the Free plan and include starter credits so you can try the voice agent and the signal engine immediately." },
+
+          { type: "h2", content: "Sign up with email" },
+          { type: "ol", items: [
+            "Open the Sign In page from the top-right of any page.",
+            "Switch to the 'Create account' tab.",
+            "Enter your full name, email and a password of 8+ characters.",
+            "Click 'Create account' — you'll be signed in straight away.",
+          ]},
+
+          { type: "h2", content: "Sign up with Google" },
+          { type: "p", content: "Prefer one-click? Click 'Continue with Google' on the Sign In page and pick the Google account you want to use. We only request your name, email and profile picture — nothing else." },
+
+          { type: "h2", content: "What happens next" },
+          { type: "ul", items: [
+            "Your dashboard loads with starter credits already topped up.",
+            "You can launch the voice agent from the home page or the dashboard.",
+            "Upgrade to Pro or Elite any time from Dashboard → Billing.",
+          ]},
+
+          { type: "note", tone: "tip", content: "Use a real email — password resets, A+ signal alerts and billing receipts are all sent there." },
         ],
       },
       {
@@ -69,13 +107,30 @@ export const collections: Collection[] = [
         summary: "From homepage to A+ setup in three clicks.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "h2", content: "Steps" },
-          { type: "ul", items: [
-            "Open the Signal Desk from the navigation.",
-            "Pick or type a symbol (XAUUSD, BTCUSD, EURUSD, NAS100, etc.).",
-            "Wait while the AI runs the 7-stage pipeline. If the setup scores 85+ it's graded A+.",
+          { type: "p", content: "Getting your first signal out of Jenvu is intentionally simple. The 7-stage pipeline does the heavy lifting — you just pick the instrument and watch the agent work." },
+
+          { type: "h2", content: "Step by step" },
+          { type: "ol", items: [
+            "Open the Signal Desk from the top navigation.",
+            "Pick or type a symbol — XAUUSD, BTCUSD, EURUSD, NAS100, etc.",
+            "Hit 'Analyze'. The 1H and 15M charts load and the agent starts narrating.",
+            "Wait while the 7-stage pipeline runs — usually 10–25 seconds.",
+            "If the final score is 85+, the setup is graded A+ and entry, stop and targets appear.",
           ]},
-          { type: "p", content: "While the agent works, it narrates each step and draws the relevant zones on the 1H and 15M charts." },
+
+          { type: "h2", content: "What you'll see on the chart" },
+          { type: "ul", items: [
+            "Swing highs and lows marked with HH / HL / LH / LL labels.",
+            "BOS (break of structure) and CHoCH (change of character) lines.",
+            "Order blocks shaded as supply / demand zones.",
+            "Fair Value Gaps highlighted as imbalance bands.",
+            "Liquidity pools tagged (PDH, PDL, equal highs / lows).",
+          ]},
+
+          { type: "h2", content: "Listening to the narration" },
+          { type: "p", content: "While the agent works, it narrates each step. If your browser blocks autoplay audio, tap the '🔇 Enable voice' pill once and Jenvu will speak from then on. You can replay any step from the timeline." },
+
+          { type: "note", tone: "warn", content: "If the setup scores below 85, Jenvu shows the read but does not issue an entry. Standing aside is a feature — it protects your win rate." },
         ],
       },
       {
@@ -84,14 +139,27 @@ export const collections: Collection[] = [
         summary: "Gold, major FX pairs, key indices, large-cap crypto and select stocks.",
         updatedAt: "2026-06-30",
         body: [
+          { type: "p", content: "Jenvu's analysis engine is asset-aware. It adjusts factor weights for each asset class — what matters on Gold is not the same as what matters on Bitcoin, and the engine accounts for that." },
+
+          { type: "h2", content: "Supported instruments" },
+          { type: "h3", content: "Metals" },
           { type: "ul", items: [
-            "Metals: XAU/USD, XAG/USD",
-            "FX: EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD and other majors",
-            "Indices: NAS100, SPX500, US30, GER40",
-            "Crypto: BTC, ETH, SOL and other top caps",
-            "Equities: select large-cap US stocks",
+            "XAU/USD (Gold) — primary asset, fullest playbook.",
+            "XAG/USD (Silver).",
           ]},
-          { type: "p", content: "The analysis engine adapts its factor weights to the asset class (metal, forex, index, crypto, stock)." },
+          { type: "h3", content: "Forex majors" },
+          { type: "ul", items: [
+            "EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD.",
+            "Major crosses on request (EUR/JPY, GBP/JPY, etc.).",
+          ]},
+          { type: "h3", content: "Indices" },
+          { type: "ul", items: ["NAS100, SPX500, US30, GER40, UK100."] },
+          { type: "h3", content: "Crypto" },
+          { type: "ul", items: ["BTC, ETH, SOL and other top-cap pairs traded on Binance spot."] },
+          { type: "h3", content: "Equities" },
+          { type: "ul", items: ["Select large-cap US stocks (AAPL, MSFT, NVDA, TSLA, etc.)."] },
+
+          { type: "note", tone: "info", content: "Don't see your instrument? Type the symbol into the Signal Desk anyway — if data is available, the engine will analyse it. Otherwise drop us a note via the Contact page." },
         ],
       },
     ],
@@ -108,7 +176,23 @@ export const collections: Collection[] = [
         summary: "Push-to-talk on desktop, tap-to-talk on mobile.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Open the Voice Agent page. Click the mic to start talking and click again to stop — the AI replies once you release. You can also type into the composer if you prefer." },
+          { type: "p", content: "Jenvu uses a push-to-talk model so it only listens when you want it to. No always-on mic, no accidental wake-ups — you stay in control." },
+
+          { type: "h2", content: "Desktop" },
+          { type: "ol", items: [
+            "Open the Voice Agent page.",
+            "Click the mic button in the centre composer to start speaking.",
+            "Click it again when you're done. The orb pulses while it's listening.",
+            "The agent replies aloud the moment you release the mic.",
+          ]},
+
+          { type: "h2", content: "Mobile" },
+          { type: "p", content: "Same flow — tap the mic to start, tap again to stop. On iOS and Android the native mic permission prompt appears the first time. Accept it to enable voice mode." },
+
+          { type: "h2", content: "Typing instead" },
+          { type: "p", content: "Don't want to talk? Type into the composer pill and hit the arrow button. Jenvu still replies aloud unless you've muted the speaker." },
+
+          { type: "note", tone: "tip", content: "Keep questions short and specific — 'Bias on Gold?' beats 'Tell me about Gold today'. The agent responds faster and more accurately." },
         ],
       },
       {
@@ -117,12 +201,30 @@ export const collections: Collection[] = [
         summary: "Browser permissions, OS settings, and the right input device.",
         updatedAt: "2026-06-30",
         body: [
+          { type: "p", content: "If the mic button does nothing or the orb won't react to your voice, the problem is almost always a permission or device issue. Run through this checklist top to bottom." },
+
+          { type: "h2", content: "1. Browser permission" },
           { type: "ul", items: [
-            "Allow microphone access for jenvu.com in your browser site settings.",
-            "On macOS / Windows, confirm the browser has mic permission at the OS level.",
-            "Close other apps holding the mic (Zoom, Meet, Discord).",
-            "Reload the page after changing any permission.",
+            "Click the padlock icon in your browser's address bar.",
+            "Make sure 'Microphone' is set to Allow for jenvu.com.",
+            "Reload the page after changing it.",
           ]},
+
+          { type: "h2", content: "2. Operating system permission" },
+          { type: "ul", items: [
+            "macOS: System Settings → Privacy & Security → Microphone → enable your browser.",
+            "Windows: Settings → Privacy → Microphone → enable for your browser.",
+            "iOS: Settings → Safari / Chrome → Microphone → Allow.",
+            "Android: Settings → Apps → your browser → Permissions → Microphone → Allow.",
+          ]},
+
+          { type: "h2", content: "3. Other apps holding the mic" },
+          { type: "p", content: "Zoom, Google Meet, Discord and Teams sometimes grab exclusive access to the microphone. Close them fully (not just the call) and reload Jenvu." },
+
+          { type: "h2", content: "4. Right input device" },
+          { type: "p", content: "On laptops with a headset plugged in, the mic input may default to a device that's muted or unplugged. Switch input in your OS sound settings and reload." },
+
+          { type: "note", tone: "warn", content: "Voice input requires HTTPS. Local file previews (file:// URLs) cannot use the microphone — always test on jenvu.com." },
         ],
       },
       {
@@ -131,13 +233,21 @@ export const collections: Collection[] = [
         summary: "Examples of commands the agent understands.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "ul", items: [
-            "“Analyze Gold.”",
-            "“Give me a setup on Bitcoin.”",
-            "“What's the bias on EUR/USD right now?”",
-            "“Walk me through the 15-minute structure.”",
-            "“Is it safe to trade NFP today?”",
-          ]},
+          { type: "p", content: "Jenvu understands natural language — you don't need fixed phrases. These examples are a good starting point and cover the most common workflows." },
+
+          { type: "h2", content: "Analysis & setups" },
+          { type: "code", content: "“Analyze Gold.”\n“Give me an A+ setup on Bitcoin.”\n“What's the bias on EUR/USD right now?”\n“Walk me through the 15-minute structure on NAS100.”" },
+
+          { type: "h2", content: "Risk & news" },
+          { type: "code", content: "“Is it safe to trade NFP today?”\n“Any high-impact news in the next hour?”\n“What killzone are we in?”" },
+
+          { type: "h2", content: "ICT & SMC concepts" },
+          { type: "code", content: "“Show me the daily order block on Gold.”\n“Where is liquidity resting above price?”\n“Is this a manipulation move or a real BOS?”" },
+
+          { type: "h2", content: "Account & app" },
+          { type: "code", content: "“How many credits do I have left?”\n“Open my saved signals.”\n“Take me to billing.”" },
+
+          { type: "note", tone: "tip", content: "If Jenvu misunderstands, just rephrase and ask again — there is no penalty and follow-ups are answered in the same thread." },
         ],
       },
     ],
@@ -154,15 +264,23 @@ export const collections: Collection[] = [
         summary: "A 7-stage deterministic pipeline blending price action with LLM reasoning.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "ul", items: [
-            "Stage 1 — Multi-timeframe candle ingestion (1H + 15M).",
-            "Stage 2 — Swing, BOS and CHoCH detection.",
-            "Stage 3 — Fair Value Gaps and Order Blocks.",
-            "Stage 4 — Liquidity pool mapping (PDH/PDL, equal highs/lows).",
-            "Stage 5 — Premium/Discount + killzone overlay.",
-            "Stage 6 — Weighted scoring (85+ = A+).",
-            "Stage 7 — LLM narration synced with chart markings.",
+          { type: "p", content: "Every Jenvu signal goes through the same 7-stage pipeline. The first six stages are deterministic — pure TypeScript over candle data — so the same input always produces the same read. Only the final narration stage uses an LLM, and even there the model is constrained to describe what the deterministic stages already detected." },
+
+          { type: "h2", content: "The 7 stages" },
+          { type: "ol", items: [
+            "Multi-timeframe candle ingestion — 1H for context, 15M for execution.",
+            "Swing detection and structure mapping — HH / HL / LH / LL.",
+            "BOS (break of structure) and CHoCH (change of character) detection.",
+            "Fair Value Gaps and Order Block identification.",
+            "Liquidity pool mapping — PDH / PDL, equal highs / lows, session sweeps.",
+            "Premium/Discount zoning + killzone overlay + weighted scoring.",
+            "LLM narration synced with the chart markings from stages 2–6.",
           ]},
+
+          { type: "h2", content: "Why deterministic + LLM" },
+          { type: "p", content: "Pure LLM signals hallucinate. Pure rule-based signals can't explain themselves. Jenvu's hybrid keeps the analysis grounded in measurable price action while letting the agent speak to you like a human analyst." },
+
+          { type: "note", tone: "info", content: "The scoring weights vary by asset class. Gold and FX weight liquidity heavily; crypto weights breaker blocks and session opens more." },
         ],
       },
       {
@@ -171,7 +289,22 @@ export const collections: Collection[] = [
         summary: "The grade is reserved for high-confluence trades that pass every gate.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Bias, structure, liquidity, premium/discount, killzone alignment and news-risk all need to pass. If any gate fails the agent recommends standing aside — we'd rather miss a trade than print a bad one." },
+          { type: "p", content: "A+ is not a marketing label — it's a hard threshold. A setup is only graded A+ when every one of the following gates passes and the weighted score lands at 85 or above out of 100." },
+
+          { type: "h2", content: "The gates" },
+          { type: "ul", items: [
+            "Higher-timeframe bias is clearly defined (no consolidation).",
+            "Structure on the execution timeframe agrees with HTF bias.",
+            "A clean liquidity sweep precedes the entry zone.",
+            "Price is in the correct premium/discount half for the direction.",
+            "Trade falls inside an institutional killzone (London or NY).",
+            "No high-impact red-folder news within the next 30 minutes.",
+          ]},
+
+          { type: "h2", content: "Why we stand aside often" },
+          { type: "p", content: "Most setups don't pass every gate. That's by design — Jenvu's job is to protect your equity curve, not to keep you constantly in the market. If you see fewer A+ signals on quiet days, that's the engine working correctly." },
+
+          { type: "note", tone: "tip", content: "Lower-grade reads (B and C) are still visible on the Signal Desk. They're useful for context, education and journal review — just don't trade them blind." },
         ],
       },
       {
@@ -180,7 +313,25 @@ export const collections: Collection[] = [
         summary: "You'll see a MARKET CLOSED badge — no live entries are issued.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Forex and indices have session windows. When the relevant market is closed, Jenvu shows a badge and skips live entry/SL/TP guidance because those levels would be stale by the next open." },
+          { type: "p", content: "Forex and indices follow session windows. Crypto trades 24/7. When you ask for an instrument that's outside its trading session, Jenvu detects it and adapts." },
+
+          { type: "h2", content: "What you'll see" },
+          { type: "ul", items: [
+            "A red 'MARKET CLOSED' badge above the chart.",
+            "Last-known price displayed without a live tick.",
+            "Structure analysis still runs so you can study the chart.",
+            "Entry, stop loss and take profit are intentionally hidden — those levels would be stale by the next open.",
+          ]},
+
+          { type: "h2", content: "Sessions reference" },
+          { type: "ul", items: [
+            "Forex: Sunday 22:00 UTC → Friday 22:00 UTC.",
+            "Major indices: roughly 13:30 → 20:00 UTC (US cash session).",
+            "Gold (XAU/USD): follows forex hours.",
+            "Crypto: open 24/7, no closed state.",
+          ]},
+
+          { type: "note", tone: "info", content: "If you want to plan the next session in advance, ask Jenvu for 'tomorrow's London bias on Gold' — it'll build a HTF read without issuing a live signal." },
         ],
       },
     ],
@@ -197,12 +348,35 @@ export const collections: Collection[] = [
         summary: "Free, Pro and Elite — credits, limits and features.",
         updatedAt: "2026-06-30",
         body: [
+          { type: "p", content: "Jenvu uses a hybrid subscription + credit model. Your plan unlocks features and discounts; credits meter usage so heavy users pay fairly and casual users aren't overcharged." },
+
+          { type: "h2", content: "Free" },
           { type: "ul", items: [
-            "Free — starter credits, basic signals.",
-            "Pro — $29 / 175 credits, full signal engine and voice agent.",
-            "Elite — $99 / 595 credits, priority alerts and higher limits.",
+            "Starter credits on sign-up.",
+            "Voice agent with basic narration.",
+            "Signal engine on Gold and one extra asset.",
+            "Standard A+ alerts (delayed by ~2 minutes).",
           ]},
-          { type: "p", content: "See the Pricing page for the full feature matrix." },
+
+          { type: "h2", content: "Pro — $29 / month" },
+          { type: "ul", items: [
+            "175 monthly credits included.",
+            "Full signal engine on all supported assets.",
+            "Real-time A+ alerts (no delay).",
+            "Saved signals, journal and history.",
+            "Priority voice latency.",
+          ]},
+
+          { type: "h2", content: "Elite — $99 / month" },
+          { type: "ul", items: [
+            "595 monthly credits included.",
+            "Everything in Pro.",
+            "Higher concurrent analysis limits.",
+            "Priority alert queue.",
+            "Direct support channel.",
+          ]},
+
+          { type: "note", tone: "info", content: "See the Pricing page for the full feature matrix and the exact per-credit cost on each plan." },
         ],
       },
       {
@@ -211,11 +385,25 @@ export const collections: Collection[] = [
         summary: "Signals, narrated walkthroughs and voice replies each have a credit cost.",
         updatedAt: "2026-06-30",
         body: [
+          { type: "p", content: "Credits are the unit of compute on Jenvu. One credit ≈ $0.10 at list price; paid plans bring the effective rate down significantly." },
+
+          { type: "h2", content: "Action costs" },
           { type: "ul", items: [
-            "Signal only — 2 credits.",
-            "Signal + ICT narration — 5 credits.",
-            "Voice agent reply — 1 credit.",
+            "Signal only (chart markings + score) — 2 credits.",
+            "Signal + full ICT/SMC narration — 5 credits.",
+            "Voice agent reply (per turn) — 1 credit.",
+            "A+ push alert delivered to you — free.",
           ]},
+
+          { type: "h2", content: "How credits refresh" },
+          { type: "ul", items: [
+            "Free: starter credits, no monthly top-up.",
+            "Pro: 175 credits added on each billing date.",
+            "Elite: 595 credits added on each billing date.",
+            "Unused credits roll over for one billing cycle.",
+          ]},
+
+          { type: "note", tone: "tip", content: "Track usage live from Dashboard → Billing. The sparkline turns red when you've dropped below 30% of your monthly balance." },
         ],
       },
       {
@@ -224,7 +412,25 @@ export const collections: Collection[] = [
         summary: "Manage your plan from the Dashboard → Billing tab.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Open your Dashboard and switch to the Billing tab. You can change plans, view credit usage and cancel at any time. Access continues to the end of the current billing period." },
+          { type: "p", content: "All plan changes happen from one place. There's no email back-and-forth and no waiting on support." },
+
+          { type: "h2", content: "Upgrade" },
+          { type: "ol", items: [
+            "Open your Dashboard.",
+            "Switch to the Billing tab.",
+            "Pick Pro or Elite and confirm payment.",
+            "Your new credits are available immediately.",
+          ]},
+
+          { type: "h2", content: "Downgrade or cancel" },
+          { type: "ol", items: [
+            "Dashboard → Billing → 'Change plan'.",
+            "Pick a lower tier or 'Cancel subscription'.",
+            "Access continues until the end of your current billing period.",
+            "On the next renewal date you drop to the new plan (or Free, if cancelled).",
+          ]},
+
+          { type: "note", tone: "warn", content: "Cancelling does not delete your account or your saved signals — it only stops the renewal. To remove your account entirely, see 'Delete your account'." },
         ],
       },
     ],
@@ -241,7 +447,25 @@ export const collections: Collection[] = [
         summary: "Use the 'Forgot password' link on the sign-in page.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "On the sign-in page, choose 'Forgot password' and enter your account email. We'll send a secure link to set a new one. Links expire after 60 minutes." },
+          { type: "p", content: "If you can't remember your password, you can reset it yourself in under a minute without contacting support." },
+
+          { type: "h2", content: "Steps" },
+          { type: "ol", items: [
+            "Open the Sign In page.",
+            "Click 'Forgot password' under the password field.",
+            "Enter the email you signed up with.",
+            "Check your inbox for a secure reset link from Jenvu.",
+            "Click the link, choose a new password and sign in.",
+          ]},
+
+          { type: "note", tone: "warn", content: "Reset links expire after 60 minutes for security. If yours has expired, just request a new one — there is no limit." },
+
+          { type: "h2", content: "Not receiving the email?" },
+          { type: "ul", items: [
+            "Check your Spam / Promotions folders.",
+            "Confirm you used the same email address you signed up with.",
+            "Add support@jenvu.com to your contacts and try again.",
+          ]},
         ],
       },
       {
@@ -250,7 +474,18 @@ export const collections: Collection[] = [
         summary: "Update your account email from the Profile tab.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Open the Dashboard → Profile tab to update your email. You'll be asked to confirm the new address before the change takes effect." },
+          { type: "p", content: "You can move your account to a new email address yourself. Your signals, credits and billing history move with you." },
+
+          { type: "h2", content: "Steps" },
+          { type: "ol", items: [
+            "Open Dashboard → Profile.",
+            "Click the email field and type your new address.",
+            "Hit 'Save'.",
+            "Check the new inbox for a confirmation link from Jenvu.",
+            "Click the link to complete the change.",
+          ]},
+
+          { type: "note", tone: "info", content: "Until you click the confirmation link, your old email remains active so you don't get locked out by a typo." },
         ],
       },
       {
@@ -259,7 +494,20 @@ export const collections: Collection[] = [
         summary: "Account deletion is permanent and removes all saved data.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Email support@jenvu.com from your account address with the subject 'Delete account'. We confirm the request and complete deletion within 7 days." },
+          { type: "p", content: "Account deletion is permanent. We remove your profile, saved signals, journal entries, alerts and billing history. This action cannot be reversed." },
+
+          { type: "h2", content: "How to request deletion" },
+          { type: "ol", items: [
+            "Email support@jenvu.com from the address on your account.",
+            "Use the subject line 'Delete account'.",
+            "We reply within one business day to confirm.",
+            "Deletion completes within 7 days of your confirmation.",
+          ]},
+
+          { type: "note", tone: "warn", content: "If you have an active subscription, cancel it from Dashboard → Billing first. Otherwise your card may be charged on the next renewal before the deletion request lands." },
+
+          { type: "h2", content: "Prefer to pause instead?" },
+          { type: "p", content: "If you only want a break, downgrade to Free from Dashboard → Billing. Your account stays put and you can come back any time." },
         ],
       },
       {
@@ -268,7 +516,24 @@ export const collections: Collection[] = [
         summary: "See our Privacy Policy for the full breakdown.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "We only store the minimum data needed to run your account, signals and alerts. Read the Privacy Policy for retention, processors and your rights." },
+          { type: "p", content: "We only collect and retain the minimum data needed to run your account, generate signals and deliver alerts. We do not sell user data and we don't share it with advertisers." },
+
+          { type: "h2", content: "What we store" },
+          { type: "ul", items: [
+            "Your name, email and authentication tokens.",
+            "Saved signals, journal entries and alert preferences.",
+            "Billing metadata (plan, credits, invoice references).",
+            "Anonymous product analytics (page views, error logs).",
+          ]},
+
+          { type: "h2", content: "What we don't store" },
+          { type: "ul", items: [
+            "Raw audio from voice sessions — we transcribe and discard.",
+            "Payment card numbers — handled by our PCI-compliant processor.",
+            "Cross-site tracking identifiers.",
+          ]},
+
+          { type: "note", tone: "info", content: "For the full legal text — retention windows, sub-processors and your rights under GDPR / CCPA — see the Privacy Policy linked in the footer." },
         ],
       },
     ],
@@ -285,7 +550,23 @@ export const collections: Collection[] = [
         summary: "Download links are on the Download page.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Visit the Download page for the latest builds. The mobile app uses native microphone access, push notifications and haptics." },
+          { type: "p", content: "Jenvu ships as a native app on both iOS and Android. It uses the device microphone, push notifications and haptics for a true desk-grade experience on the go." },
+
+          { type: "h2", content: "Download" },
+          { type: "ol", items: [
+            "Open jenvu.com/download on your phone.",
+            "Tap the App Store or Google Play badge for your device.",
+            "Install, open the app and sign in with the same account you use on the web.",
+          ]},
+
+          { type: "h2", content: "First-launch permissions" },
+          { type: "ul", items: [
+            "Microphone — required for the voice agent.",
+            "Notifications — required for A+ signal alerts.",
+            "Haptics — automatic, no prompt.",
+          ]},
+
+          { type: "note", tone: "tip", content: "Accept all three on first launch. You can always tighten them later in your phone's settings without losing data." },
         ],
       },
       {
@@ -294,7 +575,24 @@ export const collections: Collection[] = [
         summary: "Get A+ setup alerts as soon as they're detected.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "After signing in on the app, accept the push prompt. You can fine-tune which alerts you receive from Dashboard → Alerts." },
+          { type: "p", content: "Push notifications are how Jenvu surfaces A+ setups the moment the engine detects them — typically within seconds of the structure shift on the chart." },
+
+          { type: "h2", content: "Turn them on" },
+          { type: "ol", items: [
+            "Open the Jenvu mobile app and sign in.",
+            "Accept the push prompt on first launch.",
+            "If you tapped 'Don't allow', enable Notifications for Jenvu in your phone's Settings app.",
+            "Open Dashboard → Alerts to fine-tune which alerts you receive.",
+          ]},
+
+          { type: "h2", content: "What you'll get" },
+          { type: "ul", items: [
+            "A+ setup detected — symbol, direction and score.",
+            "News risk warning before high-impact events.",
+            "Killzone open reminders (London / NY) if enabled.",
+          ]},
+
+          { type: "note", tone: "info", content: "Free plan alerts are delayed by ~2 minutes. Pro and Elite receive them in real time." },
         ],
       },
     ],
