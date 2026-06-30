@@ -175,7 +175,7 @@ function PricingPage() {
       {/* COMPARISON MATRIX — homepage Beanstalk style */}
       <section className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
         <div className="mb-10">
-          <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 02 / COMPARE ]</p>
+          
           <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Pick your tier, line by line.</h2>
         </div>
 
