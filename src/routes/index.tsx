@@ -811,7 +811,80 @@ function HomePage() {
           </div>
         </div>
       </section>
+      {/* PRICING */}
+      <section className="border-t border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-20">
+          <div className="text-center">
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-500">Pricing</p>
+            <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">
+              Trade gold with an institutional edge.
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base text-zinc-600">
+              One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of desk methodology.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {[
+              { id: "free", name: "Free", price: 0, icon: Sparkles, tagline: "Try the voice agent.", cta: "Start free", ctaTo: "/auth" as const, features: ["Voice agent (1 query/day)", "Delayed alerts (4h)", "Public market insights"], highlight: false },
+              { id: "pro", name: "Pro", price: 49, icon: Zap, tagline: "For serious gold traders.", cta: "Notify me when live", ctaTo: "/contact" as const, features: ["Unlimited voice queries", "Unlimited A+ signal access", "Realtime email & push alerts", "Full ICT / SMC narration", "Trade journal & analytics"], highlight: true },
+              { id: "elite", name: "Elite", price: 149, icon: Crown, tagline: "For prop desks & funds.", cta: "Talk to sales", ctaTo: "/contact" as const, features: ["Everything in Pro", "Priority A+ alerts (< 30s)", "Multi-pair scanner", "API access & webhooks", "Dedicated onboarding & SLA"], highlight: false },
+            ].map((t) => {
+              const Icon = t.icon;
+              return (
+                <article
+                  key={t.id}
+                  className={`relative rounded-3xl border p-7 ${
+                    t.highlight
+                      ? "border-zinc-900 bg-zinc-900 text-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.4)] md:scale-[1.03]"
+                      : "border-zinc-200 bg-white"
+                  }`}
+                >
+                  {t.highlight && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-900">
+                      Most popular
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <Icon className={`h-5 w-5 ${t.highlight ? "text-amber-400" : "text-zinc-900"}`} />
+                    <h3 className="text-lg font-semibold">{t.name}</h3>
+                  </div>
+                  <p className={`mt-1 text-sm ${t.highlight ? "text-zinc-400" : "text-zinc-500"}`}>{t.tagline}</p>
+                  <div className="mt-6 flex items-baseline gap-1">
+                    <span className="text-5xl font-bold tracking-tight">${t.price}</span>
+                    <span className={`text-sm ${t.highlight ? "text-zinc-400" : "text-zinc-500"}`}>/month</span>
+                  </div>
+                  <Link
+                    to={t.ctaTo}
+                    className={`mt-7 block rounded-xl px-4 py-3 text-center text-sm font-medium transition ${
+                      t.highlight ? "bg-white text-zinc-900 hover:bg-zinc-100" : "bg-zinc-900 text-white hover:bg-zinc-800"
+                    }`}
+                  >
+                    {t.cta}
+                  </Link>
+                  <ul className={`mt-7 space-y-3 text-sm ${t.highlight ? "text-zinc-300" : "text-zinc-700"}`}>
+                    {t.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2.5">
+                        <Check className={`mt-0.5 h-4 w-4 shrink-0 ${t.highlight ? "text-amber-400" : "text-emerald-600"}`} />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link to="/pricing" className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900 hover:underline">
+              Compare full plans &amp; FAQ →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="border-t border-zinc-100">
+
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
           <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
             <div className="max-w-xl text-center md:text-left">
