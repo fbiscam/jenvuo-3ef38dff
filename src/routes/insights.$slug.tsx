@@ -145,7 +145,7 @@ function InsightDetailPage() {
               {insight.title}
             </h1>
             <div className="mt-8 flex items-center gap-4 text-xs text-zinc-400">
-              <span>{format(new Date(insight.published_at), "MMMM d, yyyy · HH:mm 'UTC'")}</span>
+              <span>{fmtUTCLong(insight.published_at)}</span>
               <span className="h-1 w-1 rounded-full bg-zinc-200" />
               <span>Institutional Grade</span>
             </div>
