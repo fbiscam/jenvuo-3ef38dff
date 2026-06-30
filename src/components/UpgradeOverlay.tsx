@@ -27,7 +27,7 @@ export default function UpgradeOverlay({
       {show && (
         <div className="absolute inset-0 z-10 flex items-center justify-center p-6">
           <div className="max-w-sm rounded-2xl border border-zinc-200 bg-white/95 backdrop-blur p-6 text-center shadow-xl">
-            <div className="mx-auto mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white">
+            <div className="mx-auto mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-900">
               <Lock className="h-4 w-4" />
             </div>
             <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Premium</div>
