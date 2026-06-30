@@ -10,7 +10,7 @@ import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Jenvu — Voice Trading AI" },
+      { title: "JENVU AI — Institutional Voice Terminal for the Markets" },
       {
         name: "description",
         content:
