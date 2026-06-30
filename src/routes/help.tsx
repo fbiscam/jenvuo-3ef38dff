@@ -11,12 +11,16 @@ import { collections, allArticles, type Collection } from "@/lib/help-content";
 export const Route = createFileRoute("/help")({
   head: () => ({
     meta: [
-      { title: "Help Center — Jenvu" },
-      { name: "description", content: "Guides, FAQs and troubleshooting for the Jenvu voice trading agent — getting started, signals, billing, account and the mobile app." },
-      { property: "og:title", content: "Help Center — Jenvu" },
-      { property: "og:description", content: "Browse Jenvu's help articles: voice agent, signal engine, billing, security and mobile." },
+      { title: "Help Center — Guides, FAQs & Support | Jenvu AI" },
+      { name: "description", content: "Jenvu AI Help Center — step-by-step guides, FAQs and troubleshooting for the voice trading agent, ICT/SMC signal engine, credits & billing, account security and the mobile app." },
+      { name: "keywords", content: "Jenvu help, Jenvu AI support, voice trading agent help, ICT SMC signals help, gold trading AI FAQ, Jenvu billing, Jenvu mobile app" },
+      { property: "og:title", content: "Help Center — Jenvu AI" },
+      { property: "og:description", content: "Guides, FAQs and troubleshooting for Jenvu's voice trading agent, signal engine, billing and mobile app." },
       { property: "og:url", content: "https://jenvu.com/help" },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Help Center — Jenvu AI" },
+      { name: "twitter:description", content: "Guides, FAQs and troubleshooting for the Jenvu voice trading agent." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/help" }],
   }),
