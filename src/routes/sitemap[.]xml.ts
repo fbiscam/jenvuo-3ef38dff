@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import type {} from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 
 const BASE_URL = "https://jenvu.com";
 
@@ -7,6 +7,7 @@ interface SitemapEntry {
   path: string;
   changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
   priority?: string;
+  lastmod?: string;
 }
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/signal", changefreq: "daily", priority: "0.9" },
           { path: "/auth", changefreq: "monthly", priority: "0.5" },
           { path: "/download", changefreq: "weekly", priority: "0.8" },
-          { path: "/insights", changefreq: "daily", priority: "0.8" },
+          { path: "/insights", changefreq: "daily", priority: "0.9" },
           { path: "/about", changefreq: "monthly", priority: "0.7" },
           { path: "/contact", changefreq: "monthly", priority: "0.7" },
           { path: "/ai-engine", changefreq: "monthly", priority: "0.7" },
@@ -30,12 +31,36 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/disclaimer", changefreq: "yearly", priority: "0.3" },
         ];
 
+        // Append every published insight
+        try {
+          const supa = createClient(
+            process.env.SUPABASE_URL!,
+            process.env.SUPABASE_PUBLISHABLE_KEY!,
+            { auth: { persistSession: false, autoRefreshToken: false } },
+          );
+          const { data: posts } = await supa
+            .from("insights")
+            .select("slug, published_at")
+            .order("published_at", { ascending: false })
+            .limit(1000);
+          for (const p of posts ?? []) {
+            entries.push({
+              path: `/insights/${p.slug}`,
+              changefreq: "weekly",
+              priority: "0.7",
+              lastmod: new Date(p.published_at).toISOString().slice(0, 10),
+            });
+          }
+        } catch {
+          // ignore — sitemap still serves with static routes
+        }
+
         const today = new Date().toISOString().slice(0, 10);
         const urls = entries.map((e) =>
           [
             `  <url>`,
             `    <loc>${BASE_URL}${e.path}</loc>`,
-            `    <lastmod>${today}</lastmod>`,
+            `    <lastmod>${e.lastmod ?? today}</lastmod>`,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
             `  </url>`,
@@ -54,7 +79,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         return new Response(xml, {
           headers: {
             "Content-Type": "application/xml",
-            "Cache-Control": "public, max-age=3600",
+            "Cache-Control": "public, max-age=1800",
           },
         });
       },
