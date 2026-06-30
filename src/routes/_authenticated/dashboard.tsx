@@ -163,6 +163,103 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
   );
 }
 
+/* ---------- signal desk history ---------- */
+
+type DeskAlert = {
+  id: string; pair: string; grade: string; direction: string;
+  entry: number; sl: number; tp: number; rr: number;
+  confidence: number; session: string | null; fired_at: string;
+};
+
+function SignalDeskHistory() {
+  const [alerts, setAlerts] = useState<DeskAlert[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("signal_alerts")
+        .select("id, pair, grade, direction, entry, sl, tp, rr, confidence, session, fired_at")
+        .order("fired_at", { ascending: false })
+        .limit(8);
+      if (!cancelled) { setAlerts((data as DeskAlert[]) ?? []); setLoading(false); }
+    })();
+    const channel = supabase
+      .channel("dashboard_signal_desk")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "signal_alerts" }, (payload) => {
+        setAlerts((prev) => [payload.new as DeskAlert, ...prev].slice(0, 8));
+      })
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(channel); };
+  }, []);
+
+  if (loading) {
+    return <div className="flex flex-1 items-center justify-center px-6 py-10 text-[12px] text-zinc-400">Loading scans…</div>;
+  }
+  if (alerts.length === 0) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center px-6 py-8 text-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100">
+          <Activity className="h-5 w-5 text-zinc-700" />
+        </div>
+        <h3 className="mt-3 text-[14px] font-semibold text-zinc-900">No A+ scans yet</h3>
+        <p className="mt-1 max-w-[260px] text-[12px] text-zinc-500">The engine runs every 15 minutes. New A+ setups will land here automatically.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 divide-y divide-zinc-100 overflow-hidden">
+      {alerts.map((a) => {
+        const isBuy = a.direction?.toLowerCase().includes("long") || a.direction?.toLowerCase().includes("buy");
+        const when = new Date(a.fired_at);
+        const ago = relTime(when);
+        return (
+          <Link
+            key={a.id}
+            to="/signal"
+            className="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-50"
+          >
+            <span className={`inline-flex h-6 min-w-[28px] items-center justify-center rounded-md px-1.5 text-[10px] font-semibold ${a.grade === "A+" ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-700"}`}>
+              {a.grade}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 text-[12.5px] font-medium text-zinc-900">
+                <span className="truncate">{a.pair}</span>
+                <span className={`text-[10px] font-semibold ${isBuy ? "text-emerald-600" : "text-rose-600"}`}>
+                  {isBuy ? "BUY" : "SELL"}
+                </span>
+              </div>
+              <div className="mt-0.5 truncate text-[11px] text-zinc-500">
+                Entry {fmt(a.entry)} · SL {fmt(a.sl)} · TP {fmt(a.tp)} · RR {a.rr?.toFixed?.(2) ?? a.rr}
+              </div>
+            </div>
+            <div className="shrink-0 text-right">
+              <div className="text-[11px] font-medium text-zinc-700">{a.confidence}%</div>
+              <div className="text-[10px] text-zinc-400">{ago}</div>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+function fmt(n: number) {
+  if (n == null || Number.isNaN(n)) return "—";
+  const abs = Math.abs(n);
+  const d = abs >= 1000 ? 2 : abs >= 10 ? 3 : 5;
+  return n.toLocaleString(undefined, { maximumFractionDigits: d });
+}
+function relTime(d: Date) {
+  const s = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60); if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60); if (h < 24) return `${h}h`;
+  const days = Math.floor(h / 24); return `${days}d`;
+}
+
 /* ---------- live ticker row ---------- */
 
 function TickerRow({ label, symbol, decimals = 2 }: { label: string; symbol: string; decimals?: number }) {
@@ -501,19 +598,16 @@ function DashboardLayout() {
 
 
           <Card className="flex flex-col">
-            <CardHeader icon={Activity} title="Signal Desk" right={<ArrowRight className="h-4 w-4 text-zinc-400" />} />
-            <div className="flex flex-1 flex-col items-center justify-center px-6 py-8 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100">
-                <Activity className="h-5 w-5 text-zinc-700" />
-              </div>
-              <h3 className="mt-3 text-[14px] font-semibold text-zinc-900">Live A+ scans, ICT/SMC narration</h3>
-              <p className="mt-1 max-w-[260px] text-[12px] text-zinc-500">
-                Watch the engine grade the next setup in real time with full trade plan.
-              </p>
-              <Link to="/signal" className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] font-medium text-zinc-800 hover:bg-zinc-50">
-                Open desk
-              </Link>
-            </div>
+            <CardHeader
+              icon={Activity}
+              title="Signal Desk"
+              right={
+                <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                  Open desk <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              }
+            />
+            <SignalDeskHistory />
           </Card>
         </section>
 
