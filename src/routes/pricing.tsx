@@ -81,15 +81,15 @@ const TIERS = [
   {
     id: "elite",
     name: "Elite",
-    price: 149,
+    price: 99,
     icon: Crown,
     bestFor: "Desk / fund",
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
-    credits: 2000,
+    credits: 595,
     features: [
-      "2,000 credits / month included",
+      "595 credits / month included",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
       "Multi-pair scanner (XAU + DXY + indices)",
