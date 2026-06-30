@@ -33,6 +33,7 @@ const PLAN_KEY_BY_COL: Record<number, string> = { 0: "free", 1: "pro", 2: "elite
 
 function Billing() {
   const [plan, setPlan] = useState<string>("free");
+  const credits = useCredits();
 
   useEffect(() => {
     (async () => {
@@ -44,6 +45,9 @@ function Billing() {
   }, []);
 
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+  const pct = credits.allowance > 0 ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
+  const resetsAt = credits.state?.periodResetsAt ? new Date(credits.state.periodResetsAt) : null;
+
 
   return (
     <div className="space-y-10">
