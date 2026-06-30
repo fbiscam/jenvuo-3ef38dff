@@ -489,6 +489,7 @@ function DashboardLayout() {
                 <Link
                   key={t.to}
                   to={t.to as "/dashboard"}
+                  resetScroll={false}
                   className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] transition ${
                     active
                       ? "bg-white text-zinc-900 border border-zinc-200 shadow-sm"
