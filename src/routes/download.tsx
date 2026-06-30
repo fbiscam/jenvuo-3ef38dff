@@ -140,7 +140,7 @@ function DownloadPage() {
         {/* HERO */}
         <section className="mx-auto max-w-6xl px-5 pt-12 pb-10 sm:px-6 sm:pt-16 sm:pb-14">
           <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight leading-[1.15] sm:text-4xl md:text-5xl">
-            Carry the desk <br className="hidden sm:block" /> in your pocket.
+            Carry the desk <br className="hidden sm:block" />in your pocket.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-zinc-900 md:text-lg">
             Jenvu on iOS, Android and desktop same voice agent, same institutional engine, same A+ setups. Download links are being prepared shortly
