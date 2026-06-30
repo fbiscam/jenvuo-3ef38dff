@@ -29,7 +29,7 @@ const insightDetailQueryOptions = (slug: string) => queryOptions({
   },
 });
 
-export const Route = createFileRoute("/insights/$slug")({
+export const Route = createFileRoute("/insights_/$slug")({
   head: ({ params, loaderData }) => {
     const data = loaderData as Insight | undefined;
     const url = `https://jenvu.com/insights/${params.slug}`;
