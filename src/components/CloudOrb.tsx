@@ -12,16 +12,17 @@ export function CloudOrb({ status = "idle", pulse = 0 }: { status?: OrbStatus; p
 
   return (
     <div
-      className="relative h-[18rem] w-[18rem] sm:h-[22rem] sm:w-[22rem] lg:h-[26rem] lg:w-[26rem] max-h-full max-w-full flex items-center justify-center"
+      className="relative h-full w-full aspect-square flex items-center justify-center"
       style={{
         transform: `scale(${scale})`,
         transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
         filter: speaking ? `hue-rotate(${hueShift}deg) saturate(1.3)` : "none",
       }}
     >
-      <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
+      <div className="relative h-full w-full aspect-square rounded-full flex items-center justify-center">
         <div
-          className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
+          className="relative h-full w-full aspect-square rounded-full overflow-hidden"
+
           style={{
             background:
               "radial-gradient(circle at 50% 25%, #f4faff 0%, #b8dcff 28%, #5ea8ee 60%, #1f5fb0 90%, #0b3a7a 100%)",
