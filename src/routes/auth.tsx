@@ -63,23 +63,20 @@ const INITIAL_TICKER: TickerRow[] = [
 
 function AuthPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const redirectTo = sanitizeRedirect(search.redirect);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    let alive = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (alive && data.session) navigate({ to: "/dashboard", replace: true });
+    const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
+      if (evt === "SIGNED_IN" && session) {
+        navigate({ to: redirectTo as "/dashboard", replace: true });
+      }
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
-      if (session) navigate({ to: "/dashboard", replace: true });
-    });
-    return () => {
-      alive = false;
-      sub.subscription.unsubscribe();
-    };
-  }, [navigate]);
+    return () => sub.subscription.unsubscribe();
+  }, [navigate, redirectTo]);
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
@@ -94,8 +91,9 @@ function AuthPage() {
       setErrorMsg(error.message);
       return;
     }
-    navigate({ to: "/dashboard", replace: true });
+    navigate({ to: redirectTo as "/dashboard", replace: true });
   };
+
 
   return (
     <>
