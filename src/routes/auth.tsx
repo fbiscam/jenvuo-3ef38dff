@@ -212,16 +212,53 @@ function AuthPage() {
               <div className="lg:col-span-7 bg-white p-5 sm:p-6 lg:p-8">
 
                 <div className="max-w-lg mx-auto lg:mx-0">
-                  
+
                   <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl lg:text-5xl">
-                    Sign in to your desk.
+                    {mode === "signin" ? "Sign in to your desk." : "Create your desk."}
                   </h1>
                   <p className="mt-3 text-base text-zinc-600 leading-relaxed sm:text-lg">
                     Voice-native institutional intelligence, on call.
                   </p>
 
+                  {/* Tabs */}
+                  <div className="mt-6 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
+                    <button
+                      type="button"
+                      onClick={() => { setMode("signin"); setErrorMsg(null); }}
+                      className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signin" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
+                    >
+                      Sign in
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setMode("signup"); setErrorMsg(null); }}
+                      className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
+                    >
+                      Sign up
+                    </button>
+                  </div>
 
-                  <form onSubmit={signIn} className="mt-7 space-y-4">
+                  <form onSubmit={mode === "signin" ? signIn : signUp} className="mt-5 space-y-4">
+
+                    {mode === "signup" && (
+                      <div>
+                        <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ${MONO}`}>
+                          Full Name
+                        </label>
+                        <div className="relative">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                          <input
+                            type="text"
+                            required
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            maxLength={100}
+                            className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                            placeholder="Your full name..."
+                          />
+                        </div>
+                      </div>
+                    )}
 
                     <div>
                       <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ${MONO}`}>
@@ -251,8 +288,9 @@ function AuthPage() {
                           required
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
+                          minLength={mode === "signup" ? 8 : undefined}
                           className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
-                          placeholder="Enter password..."
+                          placeholder={mode === "signup" ? "Min 8 characters..." : "Enter password..."}
                         />
                       </div>
                     </div>
@@ -267,17 +305,24 @@ function AuthPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="group w-full rounded-lg bg-zinc-900 px-5 py-4 text-base font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2"
+                      className="group w-full rounded-lg bg-zinc-900 px-5 py-4 text-base font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                     >
-                      {loading ? "Authenticating..." : (<>Authenticate <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                      {loading
+                        ? (mode === "signin" ? "Authenticating..." : "Creating account...")
+                        : (<>{mode === "signin" ? "Authenticate" : "Create account"} <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                     </button>
                   </form>
 
                   <div className="mt-6 pt-4 border-t border-zinc-100">
                     <p className="text-sm text-zinc-500 leading-relaxed">
-                      This terminal is invite-only. Contact your account administrator for credentials.
+                      {mode === "signin"
+                        ? <>New to Jenvu? <button type="button" onClick={() => { setMode("signup"); setErrorMsg(null); }} className="font-medium text-zinc-900 underline-offset-2 hover:underline">Create an account</button>.</>
+                        : <>Already have an account? <button type="button" onClick={() => { setMode("signin"); setErrorMsg(null); }} className="font-medium text-zinc-900 underline-offset-2 hover:underline">Sign in</button>.</>}
                     </p>
                   </div>
+
+
+                </div>
 
 
                 </div>
