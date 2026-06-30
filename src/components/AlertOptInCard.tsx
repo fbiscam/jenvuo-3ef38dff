@@ -17,9 +17,12 @@ export default function AlertOptInCard() {
   useEffect(() => {
     if (typeof window === 'undefined' || !('Notification' in window)) {
       setPerm('unsupported')
-      return
+    } else {
+      setPerm(Notification.permission)
     }
-    setPerm(Notification.permission)
+    if (typeof window !== 'undefined' && window.localStorage.getItem('jenvu:alerts:subscribed') === '1') {
+      setDone(true)
+    }
   }, [])
 
   const enableBrowser = async () => {
