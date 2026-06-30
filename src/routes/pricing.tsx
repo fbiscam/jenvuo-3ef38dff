@@ -140,14 +140,8 @@ function PricingPage() {
             <Link to="/insights" className="text-zinc-600 hover:text-zinc-900">Insights</Link>
             <Link to="/contact" className="text-zinc-600 hover:text-zinc-900">Contact</Link>
           </nav>
-          <div className="flex shrink-0 items-center gap-2">
-            <Link to="/dashboard" className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50 transition ${MONO} text-[10px] tracking-wider uppercase`}>
-              Dashboard
-            </Link>
-            <Link to="/app" className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-zinc-800">
-              Launch
-            </Link>
-          </div>
+          <HeaderAuthButtons />
+
         </div>
       </header>
 
