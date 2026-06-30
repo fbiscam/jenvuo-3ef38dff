@@ -1,75 +1,75 @@
+# Auto-Journal from Signal Page
 
-## Problem
+Goal: jab user signal page par trade plan dekhe, ek click se trade journal me auto-log ho, aur live price ke base par win/loss/pnl khud update ho jaye. Sath me "Save Signal" button bhi ho jo bina trade liye signal snapshot save kare. Sidebar me "Journal" ko user-friendly label milega.
 
-Charts pe markings nahi aa rahin kyunki `/signal` page ab `TradingViewChart` (TV ka iframe embed) use kar raha hai. Iframe ke andar hum programmatically draw nahi kar sakte, isliye `htfRef.current?.drawMarking(...)` / `focusMarking(...)` calls silently no-op ho rahe hain. Agent bolta hai "yeh FVG hai, yeh BOS hai" — par chart pe kuch nahi banta.
+---
 
-Saath hi user chahta hai:
-- Ek waqt mein sirf **ek hi marking visible** ho (BOS dikhe → fade out → fir FVG draw ho → fade out → fir OB, etc.).
-- Marking par chart **auto pan/zoom** kare (aage-piche scroll), taa ke woh zone center mein clearly dikhe.
-- Labels proper ICT/SMC naming: `BOS`, `CHoCH`, `FVG`, `OB` (Bullish/Bearish), `Liquidity Sweep`, `EQH/EQL`, `OTE`, `Premium/Discount`, `Entry/SL/TP`.
+## 1. Signal page — naye buttons (Trade Plan card ke andar)
 
-## Solution
+Do buttons add karenge `t && plan && !marketClosed` wale block me, Confluences ke neeche:
 
-Drawable chart wapas laao (`SignalChart` — lightweight-charts based, ref API already exists: `drawMarking` / `focusMarking` / `clear`), aur narration loop ko "single active marking + auto-pan" model par switch karo.
+- **`Take this Trade`** (primary, BUY=green / SELL=red)
+- **`Save Signal`** (secondary, ghost button)
 
-### 1. Chart layer
+States:
+- Loading spinner jab insert ho raha ho
+- Success: button "✓ Trade Logged" / "✓ Saved" + disabled
+- Toast confirmation
+- Agar user signed-in nahi hai → "Sign in to track" CTA
 
-- `src/routes/signal.tsx` mein HTF aur LTF panes ko wapas `SignalChart` se render karo (refs already wired: `htfRef`, `ltfRef`).
-- `TradingViewChart` ko sirf ek optional "Pro view" toggle ke peeche rakho (default off), kyunki TV iframe pe draw nahi ho sakta. Default experience = drawable chart.
-- `SignalChart` ke andar ek naya method add karo: `panToMarking(m)` — chart ka visible range marking ke center ke around set kare (e.g. ±40 candles), aur `clearTransient()` jo sirf last drawn "transient" marking ko hata de (static context zones jaise Premium/Discount/OTE chhode).
+### Take Trade flow
+1. Insert row into `trade_journal`:
+   - `pair`, `direction` (long/short from BUY/SELL), `entry`, `stop_loss`, `take_profit`
+   - `outcome: 'open'`, `notes: "Auto-logged from AI signal • Conf {n}% • {confluences joined}"`
+2. Saved row `id` ko `useRef` me rakhenge.
+3. Existing price tracker (lines 365-385) jab `setTrackerStatus("WIN"|"LOSS")` call kare, wahi moment par `UPDATE trade_journal` chalega:
+   - `outcome: 'win' | 'loss'`
+   - `pnl: (exit - entry) × direction multiplier × contract size` (gold ke liye 1 lot = 100oz; simple version: per-point USD diff stored as pnl, user baad me edit kar sakta hai)
+   - `closed_at: now()`
+4. Agar user manually "Stop" karta hai trade tracker → outcome `breakeven` ya untouched chhodenge (default: untouched, user dashboard me edit kar sakta hai).
 
-### 2. Sequential narration lifecycle
+### Save Signal flow
+- Snapshot save karenge — current `saved_signals` table sirf `alert_id` accept karti hai (FK to `signal_alerts`), jo AI generated plans ke liye exist nahi karta.
+- **Migration**: `saved_signals.alert_id` ko nullable banayenge + ek `snapshot jsonb` column add karenge jisme plan ka full data (pair, direction, entry, sl, tp, confidence, confluences, narrative) chala jayega.
+- Dashboard saved list (`dashboard.index.tsx`) ko update karke snapshot bhi render kare.
 
-`runNarration` aur `SignalVoiceAgent` ke `annotate` flow ko aise badlo:
+---
 
-```text
-for each narration step n:
-  1. clearTransient()                  // pichli BOS/FVG/OB hata do
-  2. drawMarking(n.marking) as transient
-  3. panToMarking(n.marking)           // chart aage/piche scroll
-  4. await speakWait(n.say)            // tab tak voice bolta rahe
-  5. small fade-out delay (250ms)
-final:
-  draw Entry + SL + TP together (persistent)
-  pan to entry
+## 2. Journal page label change
+
+Sidebar / dashboard nav me `Journal` ki jagah **"My Trades"** (chhota + clear). Page header bhi update — "Trade history & performance" tagline.
+
+(File: jahan dashboard nav links defined hain — `dashboard.tsx`.)
+
+---
+
+## 3. Database migration
+
+```sql
+ALTER TABLE public.saved_signals
+  ALTER COLUMN alert_id DROP NOT NULL,
+  ADD COLUMN snapshot jsonb;
 ```
 
-Static context zones (Premium / Discount / OTE / EQH / EQL / Liquidity pools) `clearTransient()` se nahi hatengi — woh background context ke liye plan ke shuru mein draw hoti hain aur poora narration tak rehti hain.
+(Existing GRANTs/RLS already cover the table.)
 
-### 3. Labels & color coding
+---
 
-`SignalChart.drawMarking` ke labels ko ICT/SMC standard naming par fix karo:
-- `BOS` (Break of Structure) — solid arrow + label
-- `CHoCH` (Change of Character) — dashed arrow
-- `FVG` — translucent rectangle (Bullish = emerald, Bearish = rose)
-- `OB` — solid bordered box, "Bullish OB" / "Bearish OB"
-- `Liquidity Sweep` — amber wick highlight + label
-- `EQH` / `EQL` — violet dashed horizontal line
-- `OTE` — yellow zone (0.62–0.79 fib)
-- `Entry / SL / TP1 / TP2` — final reveal lines
+## 4. Files touched
 
-Legend strip already exists below LTF — usko in exact labels se sync karo.
+- `src/routes/signal.tsx` — buttons, insert logic, tracker → journal update wiring
+- `src/routes/_authenticated/dashboard.index.tsx` — render saved snapshots when `alert_id` null
+- `src/routes/_authenticated/dashboard.tsx` — rename "Journal" nav item to "My Trades"
+- `src/routes/_authenticated/dashboard.journal.tsx` — header text tweak
+- One migration on `saved_signals`
 
-### 4. Voice agent annotation path
+---
 
-`SignalVoiceAgent` (lines ~1055–1180) currently up to 2 markings draw karta hai aur kabhi clear nahi karta. Wahan bhi same single-active rule lagao: har naye agent reply pe `clearTransient()` → matched marking draw + pan → speak.
+## Edge cases
 
-### 5. Candle accuracy
+- Duplicate clicks: button disabled after success; ref guards re-insert.
+- Page refresh mid-trade: tracker reference lost — trade stays `open` in journal, user can close manually from `/dashboard/journal` (already supported).
+- Free plan: journal feature is Pro-locked (`features.journal`). Take Trade button par bhi same check — agar locked, button par "Upgrade to log trades" tooltip / inline CTA. Save Signal free users ke liye allowed rahega.
+- PnL calc: gold ke liye `(exit - entry)` raw points dikhayenge (user lot size jaante hain); doosre pairs ke liye same — simple, transparent.
 
-Backend already real OHLC return karta hai. SignalChart ko ensure karo ke woh `plan.candles.htf` / `plan.candles.ltf` (1h aur 15m) ko hi use kare aur live last-candle ko Binance/Yahoo quote se update kare — TradingView jaisi accuracy ke liye yahi enough hai.
-
-## Files to change
-
-- `src/components/SignalChart.tsx` — add `panToMarking`, `clearTransient`; tighten label rendering for BOS/CHoCH/FVG/OB/Liquidity/EQH/EQL/OTE.
-- `src/routes/signal.tsx` —
-  - HTF + LTF panes ko `SignalChart` par revert.
-  - `runNarration` ko sequential single-active flow par re-write (step 2 above).
-  - `SignalVoiceAgent` ke annotate block ko same lifecycle par laao.
-  - `TradingViewChart` import optional rakh sakte hain ya hata sakte hain.
-
-## Out of scope
-
-- TV embed ke upar overlay drawing (iframe coords reliable nahi).
-- Naye marking types (Breaker block, Mitigation block) — abhi current set par focus.
-
-Confirm karo to main build mode mein implement kar deta hoon.
+Approve karo to build mode me implement kar deta hu.
