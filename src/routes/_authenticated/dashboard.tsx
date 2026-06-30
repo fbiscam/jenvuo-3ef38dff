@@ -367,6 +367,8 @@ function DashboardLayout() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
