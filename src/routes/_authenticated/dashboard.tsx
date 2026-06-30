@@ -209,7 +209,7 @@ function DashboardLayout() {
   const allowancePct = credits.allowance ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
 
   return (
-    <div className="min-h-dvh w-full bg-[#f6f7f9] text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased jenvu-zoom">
+    <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased jenvu-zoom">
       <style>{`@media (min-width: 1024px){.jenvu-zoom{zoom:1.2}}`}</style>
 
       {/* Top bar */}
