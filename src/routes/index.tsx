@@ -639,16 +639,8 @@ function HomePage() {
       </section>
 
       {/* PRICING */}
-      <section className="relative border-t border-zinc-100 bg-gradient-to-b from-white via-zinc-50/60 to-white overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.035]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",
-            backgroundSize: "56px 56px",
-          }}
-        />
+      <section className="relative border-t border-zinc-100 bg-white">
+
         <div className="relative mx-auto max-w-7xl px-5 sm:px-8 py-24">
           {/* Header band */}
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
