@@ -118,6 +118,23 @@ const SANS = "font-['Inter',system-ui,sans-serif]";
 function InsightDetailPage() {
   const { slug } = useParams({ from: "/insights/$slug" });
   const { data: insight } = useSuspenseQuery(insightDetailQueryOptions(slug));
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const scrolled = h.scrollTop;
+      const max = h.scrollHeight - h.clientHeight;
+      setProgress(max > 0 ? Math.min(100, Math.max(0, (scrolled / max) * 100)) : 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [slug]);
 
   return (
     <>
@@ -125,6 +142,11 @@ function InsightDetailPage() {
       <div className={`jenvu-zoom min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
         {/* NAV */}
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+          <div
+            className="absolute left-0 top-0 h-[3px] bg-gradient-to-r from-red-500 via-amber-500 to-emerald-500 transition-[width] duration-150 ease-out"
+            style={{ width: `${progress}%` }}
+            aria-hidden="true"
+          />
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
