@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import type { Tables } from "@/integrations/supabase/types";
@@ -77,7 +78,22 @@ function InsightsPage() {
     }).slice(0, 10);
   })();
   const featured = insights[0];
-  const remaining = insights.slice(1);
+  const allRemaining = insights.slice(1);
+
+  const [filter, setFilter] = useState<"latest" | "gold" | "macro">("latest");
+  const filters: { id: typeof filter; label: string }[] = [
+    { id: "latest", label: "Latest" },
+    { id: "gold", label: "Gold" },
+    { id: "macro", label: "Macro" },
+  ];
+  const remaining = useMemo(() => {
+    if (filter === "latest") return allRemaining;
+    const match = filter === "gold" ? ["gold", "xau"] : ["macro", "fed", "nfp", "cpi", "dxy", "rate"];
+    return allRemaining.filter((i) => {
+      const c = (i.category || "").toLowerCase();
+      return match.some((m) => c.includes(m));
+    });
+  }, [allRemaining, filter]);
 
   return (
     <>
@@ -183,12 +199,25 @@ function InsightsPage() {
 
         {/* MAIN FEED */}
         <main className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-20">
-          <div className="flex items-center justify-between border-b border-zinc-100 pb-6 mb-10">
+          <div className="flex flex-col gap-4 border-b border-zinc-100 pb-6 mb-10 sm:flex-row sm:items-center sm:justify-between">
             <h2 className={`text-xl font-bold ${MONO} uppercase tracking-[0.2em]`}>Terminal Briefings</h2>
-            <div className="flex gap-4 text-xs font-medium text-zinc-500">
-              <button className="text-zinc-900 border-b-2 border-zinc-900 pb-1">Latest</button>
-              <button className="hover:text-zinc-900">Gold</button>
-              <button className="hover:text-zinc-900">Macro</button>
+            <div className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 p-1 text-xs font-medium">
+              {filters.map((f) => {
+                const active = filter === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    onClick={() => setFilter(f.id)}
+                    className={`px-4 py-1.5 rounded-full transition-colors ${
+                      active
+                        ? "bg-zinc-900 text-white shadow-sm"
+                        : "text-zinc-500 hover:text-zinc-900"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
