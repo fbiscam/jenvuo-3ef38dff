@@ -597,7 +597,7 @@ function HomePage() {
               { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English anything." },
               { k: "02", t: "Reason", d: "JENVU pulls structure, ICT/SMC, DXY and news." },
               { k: "03", t: "Mark Up", d: "Charts auto-annotate FVG, OB, BOS and sweeps." },
-              { k: "04", t: "Narrate", d: "Hear an A+ plan: entry, SL, TP, R:R with confluence." },
+              { k: "04", t: "Narrate", d: "Hear an A+ plan: entry, SL, TP, R:R." },
             ].map((s) => (
               <div key={s.k} className="bg-white p-6 text-left sm:p-7">
                 <div className={`flex items-center justify-between ${MONO} text-[10px] tracking-widest uppercase text-zinc-900`}>
@@ -667,7 +667,7 @@ function HomePage() {
               <thead>
                 <tr className="border-b border-transparent">
                   <th className="p-6 text-left align-bottom">
-                    <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Plans</span>
+                    <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Compare Our Plans</span>
                   </th>
                   {[
                     { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false },
