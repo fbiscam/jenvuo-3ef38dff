@@ -207,18 +207,6 @@ function InsightsPage() {
                       />
                     )}
                   </div>
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-zinc-200 text-zinc-400">
-                        No Image
-                      </div>
-                    )}
-                  </div>
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500 mb-2`}>
                     {item.category}
                   </div>
