@@ -1173,12 +1173,11 @@ function SignalVoiceAgent({
           }
         : undefined;
       const res = await ask({ data: { question, context: ctx } });
-      setMessages((m) => [...m, { role: "agent", text: res.reply }]);
       // Mark/focus relevant zones based on both the user question and reply
       highlightFromText(`${question} ${res.reply}`);
       speech.speak(stripMd(res.reply));
     } catch (e: any) {
-      setMessages((m) => [...m, { role: "agent", text: e?.message || "Agent failed to respond." }]);
+      toast.error(e?.message || "Agent failed to respond.");
     } finally {
       setBusy(false);
     }
