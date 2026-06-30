@@ -487,6 +487,11 @@ function SignalPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
             {/* LEFT — ICT execution feed */}
             <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-4 min-h-[280px]">
+              {/* Voice AI Agent — orb + chat, can mark on chart */}
+              <div className="pb-3 border-b border-zinc-100">
+                <SignalVoiceAgent plan={plan} livePrice={livePrice} htfRef={htfRef} ltfRef={ltfRef} />
+              </div>
+
               <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
                 ICT Execution Feed
               </h3>
@@ -495,7 +500,7 @@ function SignalPage() {
                   <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading narration…
                 </div>
               )}
-              <div ref={feedScrollRef} className="space-y-3 overflow-y-auto pr-1 max-h-[520px]">
+              <div ref={feedScrollRef} className="space-y-3 overflow-y-auto pr-1 flex-1 min-h-0">
                 {plan?.narration.map((n, i) => {
                   const { tag, tone } = tagOf(n.say);
                   const active = i === step;
@@ -530,12 +535,6 @@ function SignalPage() {
                     </div>
                   );
                 })}
-              </div>
-
-
-              {/* Voice AI Agent — orb + chat, can mark on chart */}
-              <div className="mt-auto pt-3 border-t border-zinc-100">
-                <SignalVoiceAgent plan={plan} livePrice={livePrice} htfRef={htfRef} ltfRef={ltfRef} />
               </div>
             </div>
 
