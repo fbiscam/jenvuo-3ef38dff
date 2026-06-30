@@ -80,10 +80,10 @@ function SavedSignals() {
         if (!s) return null;
         const isLong = s.direction === "long";
         return (
-          <article key={r.id} className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)]">
+          <article key={r.id} className="group rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)] transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
             <header className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="rounded-md bg-zinc-900 px-2 py-0.5 text-[11px] font-bold tracking-wider text-white">{s.grade ?? "—"}</span>
+                <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold tracking-wider text-white ${s.grade === "A+" ? "bg-gradient-to-r from-amber-500 to-amber-600 shadow-sm shadow-amber-500/30" : "bg-zinc-900"}`}>{s.grade ?? "—"}</span>
                 <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium tracking-wider ${isLong ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
                   {(s.direction ?? "—").toUpperCase()}
                 </span>
