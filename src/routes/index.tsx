@@ -650,14 +650,6 @@ function HomePage() {
                 Trade gold with an institutional edge.
               </h2>
             </div>
-            <div className="md:max-w-sm md:text-right">
-              <p className="text-base text-zinc-600 leading-relaxed">
-                One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of professional desk methodology.
-              </p>
-              <Link to="/pricing" className={`mt-4 inline-flex items-center gap-2 ${MONO} text-[10px] uppercase tracking-[0.2em] text-zinc-900 hover:text-amber-600 transition`}>
-                Compare all plans →
-              </Link>
-            </div>
           </div>
 
           {/* Beanstalk-style pricing table */}
