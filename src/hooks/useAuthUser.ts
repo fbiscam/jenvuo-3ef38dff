@@ -8,13 +8,19 @@ export function useAuthUser() {
 
   useEffect(() => {
     let alive = true;
-    supabase.auth.getUser().then(({ data }) => {
+    // Fast: read session from local storage synchronously-ish (no network)
+    supabase.auth.getSession().then(({ data }) => {
       if (!alive) return;
-      setUser(data.user ?? null);
+      setUser(data.session?.user ?? null);
       setLoading(false);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
-      if (evt !== "SIGNED_IN" && evt !== "SIGNED_OUT" && evt !== "USER_UPDATED") return;
+      if (evt === "SIGNED_OUT") {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+      if (evt !== "SIGNED_IN" && evt !== "USER_UPDATED" && evt !== "INITIAL_SESSION" && evt !== "TOKEN_REFRESHED") return;
       setUser(session?.user ?? null);
       setLoading(false);
     });
