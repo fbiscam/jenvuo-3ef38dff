@@ -343,11 +343,19 @@ function SignalPage() {
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </button>
-          <div className="flex justify-center items-center gap-2.5 min-w-0 pl-24 sm:pl-40">
+          <div className="flex justify-center items-center gap-2.5 min-w-0 pl-16 sm:pl-24">
             <Link to="/" aria-label="Jenvu home" className="shrink-0 inline-flex items-center justify-center rounded-md hover:opacity-80 transition">
               <img src="/favicon.png" alt="Jenvu" className="h-5 w-5 rounded-md object-contain" />
             </Link>
             <span className="font-semibold tracking-tight text-sm select-none">Jenvu</span>
+            <nav className="hidden lg:flex items-center gap-6 ml-8 text-xs text-zinc-500">
+              <Link to="/signal" className="text-zinc-900 font-medium">Signal Engine</Link>
+              <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
+              <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
+              <Link to="/about" className="hover:text-zinc-900">About</Link>
+              <Link to="/download" className="hover:text-zinc-900">Download</Link>
+              <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
+            </nav>
           </div>
           <div className="flex items-center gap-2 justify-end">
             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase`}>
