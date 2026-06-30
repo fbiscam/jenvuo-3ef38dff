@@ -401,13 +401,20 @@ function Home() {
             <StatusPill status={status} supported={speech.supported} dark={false} />
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase text-zinc-900`}>
+            <Link
+              to="/dashboard"
+              className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-900 bg-zinc-900 text-white hover:bg-zinc-800 transition ${MONO} text-[10px] tracking-wider uppercase`}
+            >
+              Dashboard
+            </Link>
+            <div className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase text-zinc-900`}>
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inset-0 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="relative rounded-full bg-emerald-500 h-1.5 w-1.5" />
               </span>
               APP_TERMINAL // ONLINE
             </div>
+
             <button
               onClick={() => setDark((d) => !d)}
               className="h-8 w-8 rounded-lg flex items-center justify-center border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 transition"
