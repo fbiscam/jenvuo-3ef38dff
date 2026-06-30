@@ -676,7 +676,7 @@ function HomePage() {
                 <tr className="border-b border-zinc-200">
                   <th className="p-6 text-left align-bottom">
                     <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 04 / PLANS ]</p>
-                    <p className="mt-2 text-xs text-zinc-500">Compare every capability across tiers.</p>
+                    
                   </th>
                   {[
                     { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false },
