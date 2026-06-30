@@ -13,7 +13,7 @@ import {
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar,
 } from "lucide-react";
 import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem,
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 
 type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
