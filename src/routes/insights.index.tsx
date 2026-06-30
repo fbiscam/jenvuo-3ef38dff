@@ -78,7 +78,22 @@ function InsightsPage() {
     }).slice(0, 10);
   })();
   const featured = insights[0];
-  const remaining = insights.slice(1);
+  const allRemaining = insights.slice(1);
+
+  const [filter, setFilter] = useState<"latest" | "gold" | "macro">("latest");
+  const filters: { id: typeof filter; label: string }[] = [
+    { id: "latest", label: "Latest" },
+    { id: "gold", label: "Gold" },
+    { id: "macro", label: "Macro" },
+  ];
+  const remaining = useMemo(() => {
+    if (filter === "latest") return allRemaining;
+    const match = filter === "gold" ? ["gold", "xau"] : ["macro", "fed", "nfp", "cpi", "dxy", "rate"];
+    return allRemaining.filter((i) => {
+      const c = (i.category || "").toLowerCase();
+      return match.some((m) => c.includes(m));
+    });
+  }, [allRemaining, filter]);
 
   return (
     <>
