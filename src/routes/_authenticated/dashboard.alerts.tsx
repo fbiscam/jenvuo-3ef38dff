@@ -157,8 +157,10 @@ function AlertPrefs() {
         </button>
       </div>
     </div>
+    </UpgradeOverlay>
   );
 }
+
 
 function Toggle({ label, description, checked, onChange }: { label: string; description: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
