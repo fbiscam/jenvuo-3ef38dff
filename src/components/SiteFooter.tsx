@@ -113,10 +113,6 @@ export default function SiteFooter() {
           <div
             className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-400 flex items-center gap-3`}
           >
-            <span>XAU/USD</span>
-            <span className="text-zinc-300">·</span>
-            <span>NY · LDN · TKY</span>
-            <span className="text-zinc-300">·</span>
             <a
               href="mailto:support@jenvu.com"
               className="hover:text-zinc-700 transition-colors"
