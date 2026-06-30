@@ -11,6 +11,21 @@ import {
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar,
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+
+type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
+const RANGE_LABELS: Record<RangeKey, string> = {
+  "24h": "Last 24 hours",
+  "7d": "Last 7 days",
+  "30d": "Last 30 days",
+  "90d": "Last 90 days",
+  "all": "All time",
+};
+const RANGE_DAYS: Record<RangeKey, number | null> = {
+  "24h": 1, "7d": 7, "30d": 30, "90d": 90, "all": null,
+};
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -192,21 +207,31 @@ function DashboardLayout() {
   const [email, setEmail] = useState<string>("");
   const [fullName, setFullName] = useState<string>("");
   const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0 });
+  const [range, setRange] = useState<RangeKey>("7d");
   const credits = useCredits();
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       const { data } = await supabase.auth.getUser();
       const u = data.user;
       if (!u) return;
-      setEmail(u.email ?? "");
-      setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
-      const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
-      const [saved, alerts, journal] = await Promise.all([
-        supabase.from("saved_signals").select("id", { count: "exact", head: true }),
-        supabase.from("signal_alerts").select("id", { count: "exact", head: true }).gte("created_at", since),
-        supabase.from("trade_journal").select("outcome").eq("user_id", u.id),
-      ]);
+      if (!cancelled) {
+        setEmail(u.email ?? "");
+        setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
+      }
+      const days = RANGE_DAYS[range];
+      const since = days != null ? new Date(Date.now() - days * 24 * 3600 * 1000).toISOString() : null;
+
+      const savedQ = supabase.from("saved_signals").select("id", { count: "exact", head: true });
+      const alertsQ = supabase.from("signal_alerts").select("id", { count: "exact", head: true });
+      const journalQ = supabase.from("trade_journal").select("outcome, created_at").eq("user_id", u.id);
+      if (since) {
+        alertsQ.gte("created_at", since);
+        journalQ.gte("created_at", since);
+      }
+      const [saved, alerts, journal] = await Promise.all([savedQ, alertsQ, journalQ]);
+      if (cancelled) return;
       const rows = (journal.data ?? []) as Array<{ outcome: string }>;
       const decided = rows.filter(r => r.outcome === "win" || r.outcome === "loss");
       const wins = decided.filter(r => r.outcome === "win").length;
@@ -217,7 +242,8 @@ function DashboardLayout() {
         journalWinRate: decided.length ? Math.round((wins / decided.length) * 100) : null,
       });
     })();
-  }, []);
+    return () => { cancelled = true; };
+  }, [range]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -283,9 +309,23 @@ function DashboardLayout() {
         {/* Analytics header */}
         <div className="mt-7 flex items-center justify-between">
           <h2 className="text-[15px] font-semibold text-zinc-900">Analytics</h2>
-          <button className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50">
-            <Calendar className="h-3.5 w-3.5" /> Last 7 days
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
+              <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
+                <DropdownMenuCheckboxItem
+                  key={k}
+                  checked={range === k}
+                  onCheckedChange={() => setRange(k)}
+                  className="text-[12px]"
+                >
+                  {RANGE_LABELS[k]}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
@@ -341,7 +381,7 @@ function DashboardLayout() {
                 seed={13}
               />
               <Metric
-                label="Alerts · 7d"
+                label={`Alerts · ${range}`}
                 value={counts.alerts7d}
                 delta={counts.alerts7d > 0 ? `${counts.alerts7d}` : null}
                 tone="blue"
