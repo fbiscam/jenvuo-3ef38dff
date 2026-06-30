@@ -16,7 +16,9 @@ export default function HeaderAuthButtons() {
   if (user) {
     return (
       <div className="flex shrink-0 items-center gap-2">
+        <div className="hidden md:block"><CreditsPill /></div>
         <Link
+
           to="/dashboard"
           className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50 transition ${MONO} text-[10px] tracking-wider uppercase`}
         >
