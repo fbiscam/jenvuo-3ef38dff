@@ -222,6 +222,30 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         lastPriceLineRef.current = null;
       }
     },
+    focusMarking: (m: Marking) => {
+      const chart = chartRef.current;
+      if (!chart) return;
+      if (m.tf !== tf) return;
+      const ts = chart.timeScale();
+      const anyM: any = m;
+      const from: number | undefined = anyM.fromTime;
+      const to: number | undefined = anyM.toTime;
+      try {
+        if (typeof from === "number" && typeof to === "number") {
+          const span = Math.max(to - from, 60);
+          const pad = Math.max(span * 6, 60 * 30);
+          ts.setVisibleRange({ from: (from - pad) as Time, to: (to + pad) as Time });
+        }
+      } catch {}
+      // pulse the matching box (if any)
+      const hit = boxesRef.current.find((b) => b.marking === m);
+      if (hit) {
+        const prev = hit.el.style.boxShadow;
+        hit.el.style.boxShadow = "0 0 0 3px rgba(59,130,246,0.55), 0 0 24px rgba(59,130,246,0.45)";
+        hit.el.style.transition = "box-shadow 220ms ease";
+        setTimeout(() => { try { hit.el.style.boxShadow = prev || "none"; } catch {} }, 1100);
+      }
+    },
     drawMarking: (m: Marking) => {
       const s = seriesRef.current;
       const chart = chartRef.current;
