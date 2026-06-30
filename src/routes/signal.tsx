@@ -10,6 +10,9 @@ import { useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { cn } from "@/lib/utils";
+import { useSignalAlerts } from "@/hooks/useSignalAlerts";
+import AlertOptInCard from "@/components/AlertOptInCard";
+import AlertsHistoryPanel from "@/components/AlertsHistoryPanel";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
