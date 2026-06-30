@@ -138,10 +138,6 @@ function DownloadPage() {
 
         {/* HERO */}
         <section className="mx-auto max-w-6xl px-5 pt-12 pb-10 sm:px-6 sm:pt-16 sm:pb-14">
-          <div className={`flex items-center gap-3 ${MONO} text-[10px] tracking-[0.22em] uppercase text-zinc-900`}>
-            <span className="h-px w-6 bg-zinc-300" />
-            DOWNLOAD · v1.0
-          </div>
           <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight leading-[1.15] sm:text-4xl md:text-5xl">
             Carry the desk
             <br />
