@@ -1205,7 +1205,7 @@ function SignalVoiceAgent({
 
   const submit = async (text?: string) => {
     const question = (text ?? q).trim();
-    if (!question || busy) return;
+    if (!question || busy || analyzing) return;
     setQ("");
     setInputOpen(false);
     setBusy(true);
