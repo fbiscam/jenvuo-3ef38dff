@@ -585,7 +585,7 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div className="rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px]">
+                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
                   {plan ? <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF" /> : <ChartSkeleton />}
                 </div>
               </div>
