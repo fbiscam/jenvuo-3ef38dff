@@ -668,7 +668,7 @@ function HomePage() {
                   }`}
                 >
                   {t.highlight && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-0.5 font-mono to-[10px] font-bold uppercase tracking-wider text-zinc-900">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-900">
                       Most popular
                     </div>
                   )}
