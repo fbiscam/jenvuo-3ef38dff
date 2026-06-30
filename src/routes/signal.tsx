@@ -119,6 +119,9 @@ function SignalPage() {
   const [step, setStep] = useState(-1);
   const [playing, setPlaying] = useState(false);
 
+  const alertsPair = (plan?.instrument.symbol ?? symbol ?? "XAUUSD").toUpperCase();
+  const { alerts: alertHistory, loading: alertsLoading } = useSignalAlerts(alertsPair);
+
   const htfRef = useRef<SignalChartHandle>(null);
   const ltfRef = useRef<SignalChartHandle>(null);
   const abortRef = useRef(false);
