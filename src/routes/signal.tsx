@@ -1185,38 +1185,12 @@ function SignalVoiceAgent({
 
   const suggestions = ["Why this bias?", "Where is invalidation?", "What confirms entry?"];
 
-  const [orbOpen, setOrbOpen] = useState(false);
-  const orbVisible = orbOpen || status !== "idle";
-
   return (
     <div className="space-y-4">
       <div className="flex justify-center">
-        {orbVisible ? (
-          <button
-            type="button"
-            onClick={() => setOrbOpen((v) => !v)}
-            className="rounded-full focus:outline-none"
-            aria-label="Hide voice orb"
-          >
-            <SignalOrb status={status} pulse={speech.wordPulse} />
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setOrbOpen(true)}
-            aria-label="Activate voice orb"
-            className="h-9 w-9 rounded-full border border-zinc-200 bg-white hover:bg-zinc-50 shadow-sm transition flex items-center justify-center"
-          >
-            <span
-              className="h-4 w-4 rounded-full"
-              style={{
-                background:
-                  "radial-gradient(circle at 35% 30%, #f4faff 0%, #b8dcff 35%, #5ea8ee 70%, #1f5fb0 100%)",
-              }}
-            />
-          </button>
-        )}
+        <SignalOrb status={status} pulse={speech.wordPulse} />
       </div>
+
 
 
       {messages.length > 0 && (
