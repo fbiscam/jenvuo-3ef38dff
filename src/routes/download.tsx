@@ -86,7 +86,7 @@ const PLATFORMS: Platform[] = [
     label: "Desktop / PWA",
     channel: "Install from browser",
     blurb: "Install JENVU directly from Chrome, Edge or Safari. Standalone window, offline shell, instant updates.",
-    status: "AVAILABLE",
+    status: "INSTALL",
     cta: "Open & install",
     href: DOWNLOADS.pwa,
     glyph: "◐",
