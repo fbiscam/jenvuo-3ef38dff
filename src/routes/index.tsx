@@ -641,7 +641,7 @@ function HomePage() {
       {/* PRICING */}
       <section className="relative border-t border-zinc-100 bg-white">
 
-        <div className="relative mx-auto max-w-7xl px-5 sm:px-8 py-24">
+        <div className="relative mx-auto max-w-7xl px-5 sm:px-8 pt-14 pb-16">
           {/* Header band */}
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
@@ -782,44 +782,7 @@ function HomePage() {
       </section>
 
 
-      {/* TESTIMONIALS */}
-      <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-5 py-14 text-center sm:px-6 sm:py-20 md:text-left">
-          <h2 className="mx-auto max-w-2xl text-2xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl">
-            Trusted by traders who run real size.
-          </h2>
-          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
-            {[
-              {
-                q: "Feels like sitting next to a 25-year desk trader. The narration alone changed how I read structure.",
-                n: "A. Rahman",
-                r: "Prop Desk · Dubai",
-              },
-              {
-                q: "ICT setups marked live on the chart, with voice — I stopped second-guessing my entries.",
-                n: "M. Chen",
-                r: "Independent · Singapore",
-              },
-              {
-                q: "Gold execution is on another level. The killzone + sweep logic is exactly how I trade.",
-                n: "S. Patel",
-                r: "Family Office · London",
-              },
-            ].map((t) => (
-              <figure key={t.n} className="bg-white p-6 flex flex-col gap-6 text-left sm:p-7">
-                <blockquote className="text-zinc-900 leading-relaxed">"{t.q}"</blockquote>
-                <figcaption className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-semibold text-zinc-900">{t.n}</div>
-                    <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{t.r}</div>
-                  </div>
-                  <span className={`${MONO} text-[10px] text-zinc-900`}>↗</span>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
 
 
