@@ -252,7 +252,9 @@ function DashboardLayout() {
 
   const planTier = ((credits.plan as { tier?: string; name?: string } | null)?.tier
     ?? (credits.plan as { name?: string } | null)?.name ?? "free").toString().toUpperCase();
-  const allowancePct = credits.allowance ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
+  const remainingPct = credits.allowance ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
+  const usedPct = credits.allowance ? Math.max(0, 100 - remainingPct) : 0;
+  const balanceTone: "blue" | "rose" | "zinc" = remainingPct < 30 ? "rose" : remainingPct < 60 ? "zinc" : "blue";
 
   return (
     <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased jenvu-zoom">
