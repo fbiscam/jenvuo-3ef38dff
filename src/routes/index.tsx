@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 
 import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 
