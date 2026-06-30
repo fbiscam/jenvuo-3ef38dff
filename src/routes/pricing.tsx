@@ -172,53 +172,10 @@ function PricingPage() {
       </section>
 
 
-      {/* FEATURE BLOCKS */}
-      <section className="border-y border-zinc-100 bg-zinc-50/40">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-20">
-          <div className="flex items-end justify-between gap-6 mb-10">
-            <div>
-              <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 02 / WHAT YOU GET ]</p>
-              <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Every capability, visualised.</h2>
-            </div>
-            <div className={`hidden sm:block ${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
-              06 modules
-            </div>
-          </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURE_BLOCKS.map((b) => (
-              <article key={b.title} className="group rounded-2xl border border-zinc-200 bg-white overflow-hidden hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.25)] transition">
-                <div className="aspect-[4/3] overflow-hidden bg-zinc-100 relative">
-                  <img
-                    src={b.img}
-                    alt={b.title}
-                    width={1024}
-                    height={768}
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500"
-                  />
-                  <div className="absolute top-3 left-3">
-                    <span className={`${MONO} text-[9px] uppercase tracking-wider px-2 py-1 rounded bg-white/90 backdrop-blur text-zinc-900`}>
-                      {b.tag}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-base font-semibold tracking-tight">{b.title}</h3>
-                  <p className="mt-1.5 text-sm text-zinc-600 leading-relaxed">{b.desc}</p>
-                  <div className={`mt-4 ${MONO} text-[9px] uppercase tracking-wider text-zinc-400`}>
-                    {b.tone}
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* COMPARISON MATRIX — homepage Beanstalk style */}
       <section className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
         <div className="mb-10">
-          <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 03 / COMPARE ]</p>
+          <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 02 / COMPARE ]</p>
           <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Pick your tier, line by line.</h2>
         </div>
 
@@ -333,6 +290,50 @@ function PricingPage() {
           </table>
         </div>
       </section>
+
+      {/* FEATURE BLOCKS */}
+      <section className="border-y border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-20">
+          <div className="flex items-end justify-between gap-6 mb-10">
+            <div>
+              <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 03 / WHAT YOU GET ]</p>
+              <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Every capability, visualised.</h2>
+            </div>
+            <div className={`hidden sm:block ${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
+              06 modules
+            </div>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURE_BLOCKS.map((b) => (
+              <article key={b.title} className="group rounded-2xl border border-zinc-200 bg-white overflow-hidden hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.25)] transition">
+                <div className="aspect-[4/3] overflow-hidden bg-zinc-100 relative">
+                  <img
+                    src={b.img}
+                    alt={b.title}
+                    width={1024}
+                    height={768}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500"
+                  />
+                  <div className="absolute top-3 left-3">
+                    <span className={`${MONO} text-[9px] uppercase tracking-wider px-2 py-1 rounded bg-white/90 backdrop-blur text-zinc-900`}>
+                      {b.tag}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <h3 className="text-base font-semibold tracking-tight">{b.title}</h3>
+                  <p className="mt-1.5 text-sm text-zinc-600 leading-relaxed">{b.desc}</p>
+                  <div className={`mt-4 ${MONO} text-[9px] uppercase tracking-wider text-zinc-400`}>
+                    {b.tone}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
 
 
       {/* FAQ */}
