@@ -221,7 +221,7 @@ function InsightsPage() {
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500 mb-2`}>
                     {item.category}
                   </div>
-                  <h3 className="text-xl font-semibold tracking-tight text-zinc-900 group-hover:text-zinc-700 transition-colors">
+                  <h3 className="text-xl font-semibold tracking-tight text-zinc-900 group-hover:text-zinc-700 transition-colors line-clamp-2 min-h-[3.5rem]">
                     {item.title}
                   </h3>
                   <p className="mt-3 text-sm text-zinc-600 line-clamp-2 leading-relaxed">
