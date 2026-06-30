@@ -976,19 +976,7 @@ function TestimonialsCarousel() {
   return (
     <section className="border-t border-zinc-100 bg-white">
       <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-        <div className="mb-8 flex items-end justify-between gap-4">
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Trusted by traders.</h2>
-          <div className="flex gap-1.5">
-            {TESTIMONIALS.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setI(idx)}
-                aria-label={`Show testimonial ${idx + 1}`}
-                className={`h-1.5 rounded-full transition-all ${idx === i ? "w-6 bg-zinc-900" : "w-1.5 bg-zinc-300 hover:bg-zinc-500"}`}
-              />
-            ))}
-          </div>
-        </div>
+        <h2 className="mb-10 text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Trusted by traders.</h2>
         <div className="grid gap-6 md:grid-cols-3">
           {visible.map((t, idx) => (
             <figure
