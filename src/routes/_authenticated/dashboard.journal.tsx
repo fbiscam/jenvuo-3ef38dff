@@ -43,20 +43,38 @@ function Journal() {
   };
   useEffect(() => { load(); }, []);
 
+  // Live prices for open trades
+  const openSymbols = useMemo(
+    () => Array.from(new Set(trades.filter((t) => t.outcome === "open" && t.entry != null).map((t) => t.pair))),
+    [trades],
+  );
+  const livePrices = useLivePrices(openSymbols);
+
+  const liveOf = (t: Trade): number | null => {
+    if (t.outcome !== "open" || t.entry == null) return null;
+    const px = livePrices[t.pair.toUpperCase()];
+    if (px == null) return null;
+    return t.direction === "long" ? px - t.entry : t.entry - px;
+  };
+
   const stats = useMemo(() => {
     const closed = trades.filter((t) => t.outcome !== "open");
     const wins = closed.filter((t) => t.outcome === "win").length;
     const losses = closed.filter((t) => t.outcome === "loss").length;
-    const totalPnl = closed.reduce((s, t) => s + (t.pnl ?? 0), 0);
+    const closedPnl = closed.reduce((s, t) => s + (t.pnl ?? 0), 0);
+    const livePnl = trades.reduce((s, t) => s + (liveOf(t) ?? 0), 0);
     return {
       total: trades.length,
       open: trades.length - closed.length,
       winRate: closed.length ? Math.round((wins / closed.length) * 100) : 0,
       wins,
       losses,
-      pnl: totalPnl,
+      pnl: closedPnl + livePnl,
+      livePnl,
     };
-  }, [trades]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trades, livePrices]);
+
 
   const save = async () => {
     const { data: user } = await supabase.auth.getUser();
