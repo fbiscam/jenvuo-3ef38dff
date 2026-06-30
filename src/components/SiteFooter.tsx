@@ -43,14 +43,9 @@ export default function SiteFooter() {
   const year = new Date().getFullYear();
   return (
     <footer className="relative border-t border-zinc-200 bg-white">
-      {/* Tricolor accent bar */}
-      <div
-        className="h-[3px] w-full"
-        style={{
-          background:
-            "linear-gradient(90deg, #ef4444 0%, #ef4444 33%, #f59e0b 33%, #f59e0b 66%, #10b981 66%, #10b981 100%)",
-        }}
-      />
+      {/* Subtle divider */}
+      <div className="h-px w-full bg-zinc-200" />
+
 
       {/* Main grid */}
       <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-16">
