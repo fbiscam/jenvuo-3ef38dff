@@ -110,11 +110,33 @@ function ArticlePage() {
           <article className="mt-10 space-y-6 text-zinc-800 leading-relaxed">
             {article.body.map((b: Block, i: number) => {
               if (b.type === "h2") return <h2 key={i} className="text-xl sm:text-2xl font-semibold tracking-tight pt-2 text-zinc-900">{b.content}</h2>;
+              if (b.type === "h3") return <h3 key={i} className="text-base sm:text-lg font-semibold tracking-tight text-zinc-900">{b.content}</h3>;
               if (b.type === "p") return <p key={i}>{b.content}</p>;
-              return (
+              if (b.type === "ul") return (
                 <ul key={i} className="list-disc pl-5 space-y-2 marker:text-zinc-400">
                   {b.items.map((it: string, j: number) => <li key={j}>{it}</li>)}
                 </ul>
+              );
+              if (b.type === "ol") return (
+                <ol key={i} className="list-decimal pl-5 space-y-2 marker:text-zinc-400">
+                  {b.items.map((it: string, j: number) => <li key={j}>{it}</li>)}
+                </ol>
+              );
+              if (b.type === "code") return (
+                <pre key={i} className={`${MONO} rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-[12px] sm:text-[13px] text-zinc-800 whitespace-pre-wrap`}>{b.content}</pre>
+              );
+              // note
+              const tone = b.tone ?? "info";
+              const styles =
+                tone === "warn" ? "border-amber-200 bg-amber-50 text-amber-900" :
+                tone === "tip"  ? "border-emerald-200 bg-emerald-50 text-emerald-900" :
+                                  "border-zinc-200 bg-zinc-50 text-zinc-800";
+              const label = tone === "warn" ? "Heads up" : tone === "tip" ? "Tip" : "Note";
+              return (
+                <div key={i} className={`rounded-xl border ${styles} p-4`}>
+                  <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] opacity-70 mb-1`}>{label}</div>
+                  <div className="text-sm">{b.content}</div>
+                </div>
               );
             })}
           </article>
