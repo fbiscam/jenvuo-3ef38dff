@@ -1,41 +1,75 @@
-## Goal
-Voice/text agent on `/signal` should analyze **any** pair/coin/stock the user asks about (BTC, ETH, EURUSD, NAS100, AAPL, etc.) — not just the currently loaded symbol — and deliver a full ICT/SMC A+ breakdown like a 25-year institutional trader, narrating step-by-step.
 
-## What's already in place
-- `resolveInstrument()` in `gold-analysis.functions.ts` already supports **crypto, metal, forex, index, stock** (BTC, ETH, EURUSD, etc.).
-- `getSignalPlan({ symbol })` already runs the full A+ pipeline (HTF bias, BOS/CHoCH, FVG, OB, liquidity, OTE, killzone) for any resolvable symbol.
-- The agent endpoint `askSignalAgent` exists but only answers chat questions against the **currently loaded plan's context** — so when user asks "analyze BTC" while page is on XAUUSD, it says it can't.
+## Problem
 
-## Changes
+Charts pe markings nahi aa rahin kyunki `/signal` page ab `TradingViewChart` (TV ka iframe embed) use kar raha hai. Iframe ke andar hum programmatically draw nahi kar sakte, isliye `htfRef.current?.drawMarking(...)` / `focusMarking(...)` calls silently no-op ho rahe hain. Agent bolta hai "yeh FVG hai, yeh BOS hai" — par chart pe kuch nahi banta.
 
-### 1. `src/lib/signal-agent.functions.ts` — make the agent symbol-aware
-- Detect a target symbol in the user's question (regex: BTC, ETH, SOL, XAU, EURUSD, GBPUSD, USDJPY, NAS100, US30, SPX, AAPL, TSLA, etc., plus generic 3-letter base + USD/USDT).
-- If a symbol is detected **and** differs from `context.symbol`:
-  - Call `resolveInstrument()` + the internal A+ analysis pipeline (extract the reusable analysis core from `analyzeSignalPlan` so the agent fn can call it).
-  - Build a fresh context block from that new plan (bias, score, entry/SL/TP, RR, killzone, key levels, FVG/OB/liquidity zones).
-- Pass the (possibly switched) context to the LLM with an enhanced system prompt:
-  - Remove "specialty is gold" wording → rewrite as: *"25-year institutional trader, master of every liquid market (FX, metals, indices, crypto, equities) using ICT + SMC at expert level."*
-  - Require step-by-step pro narration: **(1) HTF bias & structure** → **(2) liquidity map** → **(3) POI (OB/FVG)** → **(4) entry trigger & confirmation** → **(5) SL placement logic** → **(6) TP ladder & RR** → **(7) invalidation & risk note**.
-  - Speak in confident desk-trader voice, ICT/SMC vocabulary, no disclaimers, no "I can't analyze that."
-- Return `{ reply, plan }` so the client can optionally render/draw the new symbol's setup.
+Saath hi user chahta hai:
+- Ek waqt mein sirf **ek hi marking visible** ho (BOS dikhe → fade out → fir FVG draw ho → fade out → fir OB, etc.).
+- Marking par chart **auto pan/zoom** kare (aage-piche scroll), taa ke woh zone center mein clearly dikhe.
+- Labels proper ICT/SMC naming: `BOS`, `CHoCH`, `FVG`, `OB` (Bullish/Bearish), `Liquidity Sweep`, `EQH/EQL`, `OTE`, `Premium/Discount`, `Entry/SL/TP`.
 
-### 2. `src/lib/gold-analysis.functions.ts` — expose reusable analyzer
-- Extract the internal analysis body from `getSignalPlan` into a local helper `runFullAnalysis(symbol)` so `askSignalAgent` can invoke it without going through the route layer / credit spend.
-- Keep `getSignalPlan` as the thin server-fn wrapper that calls `runFullAnalysis`.
+## Solution
 
-### 3. `src/routes/signal.tsx` — let the agent switch the desk view
-- When `askSignalAgent` returns a `plan` for a new symbol, update local `plan` state and navigate `?symbol=NEWSYM` so charts + ICT feed re-render for that asset.
-- Narration (`speech.speak`) plays the agent's step-by-step reply while chart auto-marks zones via existing `highlightFromText`.
-- Update placeholder copy: "Ask anything — BTC, ETH, EURUSD, NAS100, Gold…".
+Drawable chart wapas laao (`SignalChart` — lightweight-charts based, ref API already exists: `drawMarking` / `focusMarking` / `clear`), aur narration loop ko "single active marking + auto-pan" model par switch karo.
 
-### 4. Symbol normalization
-- Add lightweight aliases in `resolveInstrument`: `BITCOIN→BTC`, `GOLD→XAUUSD`, `NASDAQ→NAS100`, `SP500→SPX500`, `DOW→US30`, `OIL→USOIL`. Unknown symbols return a friendly "I couldn't resolve that ticker" reply instead of crashing.
+### 1. Chart layer
 
-## What stays the same
-- Credit system, alerts, voice push-to-talk, orb UI, chart layout — untouched.
-- Default symbol on first load remains XAUUSD.
+- `src/routes/signal.tsx` mein HTF aur LTF panes ko wapas `SignalChart` se render karo (refs already wired: `htfRef`, `ltfRef`).
+- `TradingViewChart` ko sirf ek optional "Pro view" toggle ke peeche rakho (default off), kyunki TV iframe pe draw nahi ho sakta. Default experience = drawable chart.
+- `SignalChart` ke andar ek naya method add karo: `panToMarking(m)` — chart ka visible range marking ke center ke around set kare (e.g. ±40 candles), aur `clearTransient()` jo sirf last drawn "transient" marking ko hata de (static context zones jaise Premium/Discount/OTE chhode).
 
-## Acceptance
-- On `/signal?symbol=XAUUSD`, asking "analyze BTC" / "BTC ka A+ setup do" / "what's the play on EURUSD?" triggers a full ICT/SMC narration for that symbol and switches the desk to it.
-- Agent never refuses with "I can only analyze gold."
-- Narration follows the 7-step institutional flow with explicit entry / SL / TP / RR / invalidation.
+### 2. Sequential narration lifecycle
+
+`runNarration` aur `SignalVoiceAgent` ke `annotate` flow ko aise badlo:
+
+```text
+for each narration step n:
+  1. clearTransient()                  // pichli BOS/FVG/OB hata do
+  2. drawMarking(n.marking) as transient
+  3. panToMarking(n.marking)           // chart aage/piche scroll
+  4. await speakWait(n.say)            // tab tak voice bolta rahe
+  5. small fade-out delay (250ms)
+final:
+  draw Entry + SL + TP together (persistent)
+  pan to entry
+```
+
+Static context zones (Premium / Discount / OTE / EQH / EQL / Liquidity pools) `clearTransient()` se nahi hatengi — woh background context ke liye plan ke shuru mein draw hoti hain aur poora narration tak rehti hain.
+
+### 3. Labels & color coding
+
+`SignalChart.drawMarking` ke labels ko ICT/SMC standard naming par fix karo:
+- `BOS` (Break of Structure) — solid arrow + label
+- `CHoCH` (Change of Character) — dashed arrow
+- `FVG` — translucent rectangle (Bullish = emerald, Bearish = rose)
+- `OB` — solid bordered box, "Bullish OB" / "Bearish OB"
+- `Liquidity Sweep` — amber wick highlight + label
+- `EQH` / `EQL` — violet dashed horizontal line
+- `OTE` — yellow zone (0.62–0.79 fib)
+- `Entry / SL / TP1 / TP2` — final reveal lines
+
+Legend strip already exists below LTF — usko in exact labels se sync karo.
+
+### 4. Voice agent annotation path
+
+`SignalVoiceAgent` (lines ~1055–1180) currently up to 2 markings draw karta hai aur kabhi clear nahi karta. Wahan bhi same single-active rule lagao: har naye agent reply pe `clearTransient()` → matched marking draw + pan → speak.
+
+### 5. Candle accuracy
+
+Backend already real OHLC return karta hai. SignalChart ko ensure karo ke woh `plan.candles.htf` / `plan.candles.ltf` (1h aur 15m) ko hi use kare aur live last-candle ko Binance/Yahoo quote se update kare — TradingView jaisi accuracy ke liye yahi enough hai.
+
+## Files to change
+
+- `src/components/SignalChart.tsx` — add `panToMarking`, `clearTransient`; tighten label rendering for BOS/CHoCH/FVG/OB/Liquidity/EQH/EQL/OTE.
+- `src/routes/signal.tsx` —
+  - HTF + LTF panes ko `SignalChart` par revert.
+  - `runNarration` ko sequential single-active flow par re-write (step 2 above).
+  - `SignalVoiceAgent` ke annotate block ko same lifecycle par laao.
+  - `TradingViewChart` import optional rakh sakte hain ya hata sakte hain.
+
+## Out of scope
+
+- TV embed ke upar overlay drawing (iframe coords reliable nahi).
+- Naye marking types (Breaker block, Mitigation block) — abhi current set par focus.
+
+Confirm karo to main build mode mein implement kar deta hoon.
