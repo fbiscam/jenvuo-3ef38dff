@@ -86,6 +86,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_breaking: boolean | null
+          notified_at: string | null
           published_at: string
           slug: string
           title: string
@@ -99,6 +100,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_breaking?: boolean | null
+          notified_at?: string | null
           published_at?: string
           slug: string
           title: string
@@ -112,9 +114,40 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_breaking?: boolean | null
+          notified_at?: string | null
           published_at?: string
           slug?: string
           title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          status: string
+          subscribed_at: string
+          unsubscribed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          status?: string
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          status?: string
+          subscribed_at?: string
+          unsubscribed_at?: string | null
           updated_at?: string
         }
         Relationships: []
