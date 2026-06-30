@@ -314,3 +314,76 @@ function InsightsPage() {
     </>
   );
 }
+
+const emailSchema = z
+  .string()
+  .trim()
+  .min(1, "Email is required")
+  .max(255, "Too long")
+  .email("Enter a valid email");
+
+function SubscribeForm() {
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = emailSchema.safeParse(email);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Invalid email");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase
+        .from("newsletter_subscribers")
+        .insert({ email: parsed.data.toLowerCase() });
+      if (error) {
+        if (error.code === "23505") {
+          toast.success("You're already subscribed — briefings on their way.");
+          setDone(true);
+        } else {
+          toast.error("Could not subscribe. Please try again.");
+        }
+      } else {
+        toast.success("Subscribed. Watch your inbox for the next briefing.");
+        setDone(true);
+        setEmail("");
+      }
+    } catch {
+      toast.error("Network error. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="max-w-md mx-auto rounded-xl border border-zinc-200 bg-white px-5 py-4 text-sm text-zinc-700">
+        ✓ You're on the list. Next briefing lands directly in your inbox.
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        maxLength={255}
+        placeholder="Enter email for daily briefings"
+        className="flex-1 bg-white border border-zinc-200 text-zinc-900 placeholder:text-zinc-400 rounded-xl px-4 py-3 text-sm outline-none focus:border-zinc-900 transition-all"
+      />
+      <button
+        type="submit"
+        disabled={busy}
+        className="bg-zinc-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-zinc-800 transition-colors whitespace-nowrap disabled:opacity-60"
+      >
+        {busy ? "…" : "SUBSCRIBE"}
+      </button>
+    </form>
+  );
+}
