@@ -656,12 +656,53 @@ export const getLiveTick = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
-    const candles = await fetchInstrumentCandles(inst, "1m").catch(() => [] as Candle[]);
-    const last = candles[candles.length - 1];
-    if (!last) return null as LiveTick | null;
-    const tick: LiveTick = { price: last.c, t: last.t };
-    return tick as LiveTick | null;
+    // Try progressively higher TFs so closed-market or low-liquidity instruments
+    // (DXY, JPY pairs on weekends) still return a last known price.
+    for (const tf of ["1m", "5m", "15m", "1h", "1d"]) {
+      const candles = await fetchInstrumentCandles(inst, tf).catch(() => [] as Candle[]);
+      const last = candles[candles.length - 1];
+      if (last) return { price: last.c, t: last.t } as LiveTick;
+    }
+    return null as LiveTick | null;
   });
+
+export const getMarketSnapshot = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { symbol?: string };
+    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
+  })
+  .handler(async ({ data }) => {
+    const inst = resolveInstrument(data.symbol);
+    // Use daily candles for a stable 24h reference price.
+    const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
+    let price: number | null = null;
+    let prevClose: number | null = null;
+    if (daily.length >= 2) {
+      price = daily[daily.length - 1].c;
+      prevClose = daily[daily.length - 2].c;
+    } else if (daily.length === 1) {
+      price = daily[0].c;
+      prevClose = daily[0].o;
+    }
+    // Overlay intraday last price when available — keeps the figure fresh
+    // while % change stays anchored to yesterday's close.
+    for (const tf of ["1m", "5m", "15m", "1h"]) {
+      const intraday = await fetchInstrumentCandles(inst, tf).catch(() => [] as Candle[]);
+      const last = intraday[intraday.length - 1];
+      if (last) { price = last.c; break; }
+    }
+    if (price == null) return null;
+    return {
+      price,
+      prevClose,
+      changePct: prevClose ? ((price - prevClose) / prevClose) * 100 : null,
+      decimals: inst.decimals,
+      display: inst.display,
+      kind: inst.kind,
+      t: Date.now(),
+    };
+  });
+
 
 export const getNewsRisk = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
