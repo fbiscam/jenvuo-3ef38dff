@@ -453,7 +453,8 @@ function HomePage() {
         <div className="mx-auto max-w-6xl px-5 py-10 text-left sm:px-6 sm:py-14 md:text-left">
           
           <h2 className="mt-4 max-w-3xl text-xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl md:whitespace-nowrap">
-            Built like a trading desk, spoken like a partner.
+            <span className="sm:hidden">Built like a trading desk, spoken just like a real partner.</span>
+            <span className="hidden sm:inline">Built like a trading desk, spoken like a partner.</span>
           </h2>
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
             {[
