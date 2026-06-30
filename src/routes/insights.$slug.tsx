@@ -32,9 +32,9 @@ export const Route = createFileRoute("/insights/$slug")({
           name: "description",
           content: data?.excerpt || "Institutional market analysis from Jenvu.",
         },
-        { property: "og:title", content: data?.title },
-        { property: "og:description", content: data?.excerpt },
-        { property: "og:image", content: data?.image_url },
+        { property: "og:title", content: data?.title || "" },
+        { property: "og:description", content: data?.excerpt || "" },
+        { property: "og:image", content: data?.image_url || "" },
       ],
     };
   },
