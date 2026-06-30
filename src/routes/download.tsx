@@ -54,7 +54,7 @@ type Platform = {
   label: string;
   channel: string;
   blurb: string;
-  status: "AVAILABLE" | "COMING SOON";
+  status: "INSTALL" | "COMING SOON";
   cta: string;
   href: string;
   glyph: string;
@@ -86,7 +86,7 @@ const PLATFORMS: Platform[] = [
     label: "Desktop / PWA",
     channel: "Install from browser",
     blurb: "Install JENVU directly from Chrome, Edge or Safari. Standalone window, offline shell, instant updates.",
-    status: "AVAILABLE",
+    status: "INSTALL",
     cta: "Open & install",
     href: DOWNLOADS.pwa,
     glyph: "◐",
@@ -151,7 +151,7 @@ function DownloadPage() {
         <section className="mx-auto max-w-6xl px-5 pb-14 sm:px-6 sm:pb-20">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
             {PLATFORMS.map((p) => {
-              const available = p.status === "AVAILABLE" && !!p.href;
+              const available = p.status === "INSTALL" && !!p.href;
               return (
                 <div
                   key={p.key}
