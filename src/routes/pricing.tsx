@@ -87,7 +87,9 @@ const TIERS = [
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
+    credits: 2000,
     features: [
+      "2,000 credits / month included",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
       "Multi-pair scanner (XAU + DXY + indices)",
@@ -95,6 +97,7 @@ const TIERS = [
       "Custom alert rules",
       "Dedicated onboarding & SLA",
     ],
+
     highlight: false,
   },
 ] as const;
