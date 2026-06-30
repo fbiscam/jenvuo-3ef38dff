@@ -142,19 +142,20 @@ function AuthPage() {
               {/* LEFT — FORM */}
               <div className="lg:col-span-7 bg-white p-5 sm:p-6 lg:p-8">
 
-                <div className="max-w-md mx-auto lg:mx-0">
+                <div className="max-w-lg mx-auto lg:mx-0">
                   
-                  <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
+                  <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl lg:text-5xl">
                     Sign in to your desk.
                   </h1>
-                  <p className="mt-2 text-sm text-zinc-600 leading-relaxed">
+                  <p className="mt-3 text-base text-zinc-600 leading-relaxed sm:text-lg">
                     Voice-native institutional intelligence, on call.
                   </p>
 
-                  <form onSubmit={signIn} className="mt-5 space-y-3">
+
+                  <form onSubmit={signIn} className="mt-7 space-y-4">
 
                     <div>
-                      <label className={`block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5 ${MONO}`}>
+                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ${MONO}`}>
                         User Identification
                       </label>
                       <div className="relative">
@@ -164,14 +165,14 @@ function AuthPage() {
                           required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                           placeholder="Institutional email..."
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className={`block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5 ${MONO}`}>
+                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ${MONO}`}>
                         Access Key
                       </label>
                       <div className="relative">
@@ -181,7 +182,7 @@ function AuthPage() {
                           required
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                           placeholder="Enter password..."
                         />
                       </div>
@@ -197,17 +198,18 @@ function AuthPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2"
+                      className="group w-full rounded-lg bg-zinc-900 px-5 py-4 text-base font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2"
                     >
                       {loading ? "Authenticating..." : (<>Authenticate <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                     </button>
                   </form>
 
-                  <div className="mt-4 pt-3 border-t border-zinc-100">
-                    <p className="text-xs text-zinc-500 leading-relaxed">
+                  <div className="mt-6 pt-4 border-t border-zinc-100">
+                    <p className="text-sm text-zinc-500 leading-relaxed">
                       This terminal is invite-only. Contact your account administrator for credentials.
                     </p>
                   </div>
+
 
                 </div>
               </div>
