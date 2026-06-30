@@ -11,6 +11,21 @@ import {
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar,
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+
+type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
+const RANGE_LABELS: Record<RangeKey, string> = {
+  "24h": "Last 24 hours",
+  "7d": "Last 7 days",
+  "30d": "Last 30 days",
+  "90d": "Last 90 days",
+  "all": "All time",
+};
+const RANGE_DAYS: Record<RangeKey, number | null> = {
+  "24h": 1, "7d": 7, "30d": 30, "90d": 90, "all": null,
+};
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
