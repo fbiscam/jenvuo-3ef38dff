@@ -309,9 +309,23 @@ function DashboardLayout() {
         {/* Analytics header */}
         <div className="mt-7 flex items-center justify-between">
           <h2 className="text-[15px] font-semibold text-zinc-900">Analytics</h2>
-          <button className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50">
-            <Calendar className="h-3.5 w-3.5" /> Last 7 days
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
+              <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
+                <DropdownMenuCheckboxItem
+                  key={k}
+                  checked={range === k}
+                  onCheckedChange={() => setRange(k)}
+                  className="text-[12px]"
+                >
+                  {RANGE_LABELS[k]}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
