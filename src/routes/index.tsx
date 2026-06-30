@@ -639,78 +639,126 @@ function HomePage() {
       </section>
 
       {/* PRICING */}
-      <section className="border-t border-zinc-100 bg-zinc-50/40">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-20">
-          <div className="text-center">
-            
-            <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">
-              Trade gold with an institutional edge.
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-zinc-600">
-              One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of desk methodology.
-            </p>
+      <section className="relative border-t border-zinc-100 bg-gradient-to-b from-white via-zinc-50/60 to-white overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+          }}
+        />
+        <div className="relative mx-auto max-w-7xl px-5 sm:px-8 py-24">
+          {/* Header band */}
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 04 / PRICING ]</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
+                Trade gold with an <span className="italic font-light text-zinc-500">institutional edge.</span>
+              </h2>
+            </div>
+            <div className="md:max-w-sm md:text-right">
+              <p className="text-base text-zinc-600 leading-relaxed">
+                One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of professional desk methodology.
+              </p>
+              <Link to="/pricing" className={`mt-4 inline-flex items-center gap-2 ${MONO} text-[10px] uppercase tracking-[0.2em] text-zinc-900 hover:text-amber-600 transition`}>
+                Compare all plans →
+              </Link>
+            </div>
           </div>
 
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
+          {/* Cards — asymmetric 1·1.2·1 */}
+          <div className="mt-16 grid gap-4 lg:grid-cols-[1fr_1.15fr_1fr] items-stretch">
             {[
-              { id: "free", name: "Free", price: 0, icon: Sparkles, tagline: "Try the voice agent.", cta: "Start free", ctaTo: "/auth" as const, features: ["Voice agent (1 query/day)", "Delayed alerts (4h)", "Public market insights"], highlight: false },
-              { id: "pro", name: "Pro", price: 49, icon: Zap, tagline: "For serious gold traders.", cta: "Notify me when live", ctaTo: "/contact" as const, features: ["Unlimited voice queries", "Unlimited A+ signal access", "Realtime email & push alerts", "Full ICT / SMC narration", "Trade journal & analytics"], highlight: true },
-              { id: "elite", name: "Elite", price: 149, icon: Crown, tagline: "For prop desks & funds.", cta: "Talk to sales", ctaTo: "/contact" as const, features: ["Everything in Pro", "Priority A+ alerts (< 30s)", "Multi-pair scanner", "API access & webhooks", "Dedicated onboarding & SLA"], highlight: false },
+              { id: "free", name: "Free", price: 0, icon: Sparkles, bestFor: "Curious", tagline: "Try the voice agent.", cta: "Start free", ctaTo: "/auth" as const, features: ["Voice agent (1 query/day)", "Delayed alerts (4h)", "Public market insights"], highlight: false },
+              { id: "pro", name: "Pro", price: 49, icon: Zap, bestFor: "Active trader", tagline: "For serious gold traders.", cta: "Notify me when live", ctaTo: "/contact" as const, features: ["Unlimited voice queries", "Unlimited A+ signal access", "Realtime email & push alerts", "Full ICT / SMC narration", "Trade journal & analytics"], highlight: true },
+              { id: "elite", name: "Elite", price: 149, icon: Crown, bestFor: "Desk / fund", tagline: "For prop desks & funds.", cta: "Talk to sales", ctaTo: "/contact" as const, features: ["Everything in Pro", "Priority A+ alerts (< 30s)", "Multi-pair scanner", "API access & webhooks", "Dedicated onboarding & SLA"], highlight: false },
             ].map((t) => {
               const Icon = t.icon;
               return (
                 <article
                   key={t.id}
-                  className={`relative rounded-3xl border bg-white p-7 ${
+                  className={`relative rounded-[28px] border p-8 transition group ${
                     t.highlight
-                      ? "border-zinc-900 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.18)] md:scale-[1.03]"
-                      : "border-zinc-200"
+                      ? "border-zinc-900 bg-zinc-900 text-white shadow-[0_40px_100px_-30px_rgba(0,0,0,0.55)] lg:-my-3"
+                      : "border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.18)]"
                   }`}
                 >
                   {t.highlight && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-900">
-                      Most popular
-                    </div>
+                    <>
+                      <div
+                        aria-hidden
+                        className="pointer-events-none absolute -inset-px rounded-[28px] opacity-30 blur-2xl"
+                        style={{ background: "conic-gradient(from 0deg, #f59e0b, #ef4444, #8b5cf6, #06b6d4, #10b981, #f59e0b)" }}
+                      />
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-900">
+                        Most popular
+                      </div>
+                    </>
                   )}
-                  <div className="flex items-center gap-2">
-                    <Icon className="h-5 w-5 text-zinc-900" />
-                    <h3 className="text-lg font-semibold text-zinc-900">{t.name}</h3>
+
+                  <div className="relative flex h-full flex-col">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`h-9 w-9 rounded-xl grid place-items-center ${t.highlight ? "bg-white/10 ring-1 ring-white/20" : "bg-zinc-50 ring-1 ring-zinc-200"}`}>
+                          <Icon className={`h-4 w-4 ${t.highlight ? "text-amber-400" : "text-zinc-900"}`} />
+                        </div>
+                        <h3 className="text-lg font-semibold">{t.name}</h3>
+                      </div>
+                      <span className={`${MONO} text-[9px] uppercase tracking-wider px-2 py-1 rounded-full ${t.highlight ? "bg-white/10 text-zinc-300" : "bg-zinc-100 text-zinc-600"}`}>
+                        {t.bestFor}
+                      </span>
+                    </div>
+                    <p className={`mt-3 text-sm ${t.highlight ? "text-zinc-400" : "text-zinc-500"}`}>{t.tagline}</p>
+
+                    <div className="mt-7 flex items-baseline gap-1">
+                      <span className="text-6xl font-bold tracking-tight">${t.price}</span>
+                      <span className={`text-sm ${t.highlight ? "text-zinc-400" : "text-zinc-500"}`}>/month</span>
+                    </div>
+
+                    <Link
+                      to={t.ctaTo}
+                      className={`mt-7 block rounded-xl px-4 py-3.5 text-center text-sm font-medium transition ${
+                        t.highlight
+                          ? "bg-white text-zinc-900 hover:bg-zinc-100"
+                          : "bg-zinc-900 text-white hover:bg-zinc-800"
+                      }`}
+                    >
+                      {t.cta}
+                    </Link>
+
+                    <div className={`mt-7 h-px ${t.highlight ? "bg-white/10" : "bg-zinc-100"}`} />
+
+                    <ul className={`mt-6 space-y-3.5 text-sm ${t.highlight ? "text-zinc-300" : "text-zinc-700"}`}>
+                      {t.features.map((f) => (
+                        <li key={f} className="flex items-start gap-2.5">
+                          <Check className={`mt-0.5 h-4 w-4 shrink-0 ${t.highlight ? "text-amber-400" : "text-emerald-600"}`} />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <p className="mt-1 text-sm text-zinc-500">{t.tagline}</p>
-                  <div className="mt-6 flex items-baseline gap-1">
-                    <span className="text-5xl font-bold tracking-tight text-zinc-900">${t.price}</span>
-                    <span className="text-sm text-zinc-500">/month</span>
-                  </div>
-                  <Link
-                    to={t.ctaTo}
-                    className={`mt-7 block rounded-xl px-4 py-3 text-center text-sm font-medium transition ${
-                      t.highlight
-                        ? "bg-zinc-900 text-white hover:bg-black"
-                        : "border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
-                    }`}
-                  >
-                    {t.cta}
-                  </Link>
-                  <ul className="mt-7 space-y-3 text-sm text-zinc-700">
-                    {t.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2.5">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </article>
               );
             })}
           </div>
 
-          <div className="mt-8 text-center">
-            <Link to="/pricing" className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900 hover:underline">
-              Compare full plans &amp; FAQ →
+          {/* Footer strip */}
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white px-6 py-5 sm:flex-row">
+            <div className="flex items-center gap-3">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <p className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-600`}>
+                Early-access pricing · Billing activating soon
+              </p>
+            </div>
+            <Link to="/pricing" className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900 hover:gap-2.5 transition-all">
+              See full comparison & FAQ →
             </Link>
           </div>
         </div>
       </section>
+
 
       {/* TESTIMONIALS */}
       <section className="border-t border-zinc-100">
