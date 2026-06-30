@@ -33,25 +33,36 @@ const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: bo
 
 /* ---------- helpers ---------- */
 
-function Sparkline({ seed = 1, tone = "blue" }: { seed?: number; tone?: "blue" | "rose" | "zinc" }) {
+function Sparkline({ seed = 1, tone = "blue", empty = false }: { seed?: number; tone?: "blue" | "rose" | "zinc"; empty?: boolean }) {
+  const w = 120, h = 36;
+
   // deterministic pseudo-random points so SSR/CSR match
   const pts = useMemo(() => {
     const n = 24;
     const arr: number[] = [];
-    let v = 50;
     for (let i = 0; i < n; i++) {
       const s = Math.sin((i + seed) * 1.7) * 12 + Math.cos((i + seed) * 0.9) * 8;
-      v = Math.max(8, Math.min(92, 50 + s + ((seed * 7) % 9) - 4));
-      arr.push(v);
+      arr.push(Math.max(8, Math.min(92, 50 + s + ((seed * 7) % 9) - 4)));
     }
     return arr;
   }, [seed]);
 
-  const w = 120, h = 36;
+  const stroke = tone === "rose" ? "#f43f5e" : tone === "zinc" ? "#71717a" : "#3b82f6";
+
+  if (empty) {
+    return (
+      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="block">
+        <line
+          x1="0" y1={h - 4} x2={w} y2={h - 4}
+          stroke="#e4e4e7" strokeWidth="1.25" strokeDasharray="3 3" strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
   const step = w / (pts.length - 1);
   const d = pts.map((p, i) => `${i === 0 ? "M" : "L"}${(i * step).toFixed(1)},${(h - (p / 100) * h).toFixed(1)}`).join(" ");
   const area = `${d} L${w},${h} L0,${h} Z`;
-  const stroke = tone === "rose" ? "#f43f5e" : tone === "zinc" ? "#71717a" : "#3b82f6";
   const fillId = `spark-${tone}-${seed}`;
 
   return (
@@ -74,6 +85,10 @@ function Metric({
   label: string; value: React.ReactNode; delta?: string | null; tone?: "blue" | "rose" | "zinc"; seed?: number;
 }) {
   const negative = delta?.startsWith("-");
+  const raw = typeof value === "string" || typeof value === "number" ? String(value).trim() : "";
+  const numeric = parseFloat(raw.replace(/[^0-9.\-]/g, ""));
+  const isEmpty = raw === "" || raw === "—" || raw === "…" || (!Number.isNaN(numeric) && numeric === 0);
+
   return (
     <div className="flex-1 min-w-0 p-4">
       <div className="flex items-center gap-1 text-[12px] text-zinc-500">
@@ -81,8 +96,8 @@ function Metric({
         <span className="opacity-50">ⓘ</span>
       </div>
       <div className="mt-1 flex items-baseline gap-2">
-        <span className="text-[22px] font-semibold tracking-tight text-zinc-900">{value}</span>
-        {delta && (
+        <span className={`text-[22px] font-semibold tracking-tight ${isEmpty ? "text-zinc-400" : "text-zinc-900"}`}>{value}</span>
+        {delta && !isEmpty && (
           <span className={`inline-flex items-center text-[11px] font-medium ${negative ? "text-rose-600" : "text-emerald-600"}`}>
             <ArrowUpRight className={`h-3 w-3 ${negative ? "rotate-90" : ""}`} />
             {delta.replace("-", "")}
@@ -90,7 +105,7 @@ function Metric({
         )}
       </div>
       <div className="mt-2 -mb-1 opacity-90">
-        <Sparkline seed={seed} tone={tone} />
+        <Sparkline seed={seed} tone={tone} empty={isEmpty} />
       </div>
     </div>
   );
