@@ -45,7 +45,7 @@ function HelpCenterPage() {
           article.title,
           article.summary,
           ...article.body.map((b) =>
-            b.type === "ul" ? b.items.join(" ") : b.content,
+            b.type === "ul" || b.type === "ol" ? b.items.join(" ") : b.content,
           ),
         ]
           .join(" ")
