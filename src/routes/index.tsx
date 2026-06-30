@@ -639,10 +639,10 @@ function HomePage() {
       </section>
 
       {/* PRICING */}
-      <section className="relative border-t border-zinc-200 bg-white overflow-hidden">
+      <section className="relative border-t border-zinc-100 bg-gradient-to-b from-white via-zinc-50/60 to-white overflow-hidden">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          className="pointer-events-none absolute inset-0 opacity-[0.035]"
           style={{
             backgroundImage:
               "linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",
@@ -662,159 +662,135 @@ function HomePage() {
               <p className="text-base text-zinc-600 leading-relaxed">
                 One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of professional desk methodology.
               </p>
-              <Link to="/pricing" className={`mt-4 inline-flex items-center gap-2 ${MONO} text-[10px] uppercase tracking-[0.2em] text-zinc-900 hover:text-zinc-500 transition`}>
+              <Link to="/pricing" className={`mt-4 inline-flex items-center gap-2 ${MONO} text-[10px] uppercase tracking-[0.2em] text-zinc-900 hover:text-amber-600 transition`}>
                 Compare all plans →
               </Link>
             </div>
           </div>
 
-          {/* Terminal-framed pricing table */}
-          <div className="mt-14 rounded-2xl border border-zinc-900/90 bg-zinc-950 p-px shadow-[0_20px_60px_-20px_rgba(0,0,0,0.35)]">
-            {/* Terminal status bar */}
-            <div className="flex items-center justify-between rounded-t-[15px] bg-zinc-950 px-5 py-2.5">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-zinc-700" />
-                <span className="h-2 w-2 rounded-full bg-zinc-700" />
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span className={`ml-3 ${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>
-                  jenvu://pricing.matrix
-                </span>
-              </div>
-              <span className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500 hidden sm:inline`}>
-                LIVE · v2.04
-              </span>
-            </div>
+          {/* Beanstalk-style pricing table */}
+          <div className="mt-14 overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+            <table className="w-full min-w-[760px] text-sm border-collapse">
+              <colgroup>
+                <col className="w-[28%]" />
+                <col className="w-[18%]" />
+                <col className="w-[18%] bg-amber-50/40" />
+                <col className="w-[18%]" />
+                <col className="w-[18%]" />
+              </colgroup>
 
-            <div className="overflow-x-auto rounded-b-[15px] bg-white">
-              <table className="w-full min-w-[760px] text-sm border-collapse">
-                <colgroup>
-                  <col className="w-[28%]" />
-                  <col className="w-[18%]" />
-                  <col className="w-[18%] bg-zinc-950" />
-                  <col className="w-[18%]" />
-                  <col className="w-[18%]" />
-                </colgroup>
-
-                {/* Plan header row */}
-                <thead>
-                  <tr className="border-b border-zinc-200">
-                    <th className="p-6 text-left align-bottom">
-                      <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 04 / PLANS ]</p>
-                      <p className="mt-2 text-xs text-zinc-500">Compare every capability across tiers.</p>
-                    </th>
-                    {[
-                      { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", accent: false },
-                      { name: "Pro", price: "$49", tag: "Active", to: "/contact" as const, cta: "Notify me", accent: true },
-                      { name: "Elite", price: "$149", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", accent: false },
-                      { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", accent: false },
-                    ].map((p) => (
-                      <th
-                        key={p.name}
-                        className={`p-6 text-left align-top border-l ${p.accent ? "bg-zinc-950 border-zinc-950 text-white" : "border-zinc-200"}`}
+              {/* Plan header row */}
+              <thead>
+                <tr className="border-b border-zinc-200">
+                  <th className="p-6 text-left align-bottom">
+                    <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500`}>[ 04 / PLANS ]</p>
+                    <p className="mt-2 text-xs text-zinc-500">Compare every capability across tiers.</p>
+                  </th>
+                  {[
+                    { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false },
+                    { name: "Pro", price: "$49", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
+                    { name: "Elite", price: "$149", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
+                    { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false },
+                  ].map((p) => (
+                    <th
+                      key={p.name}
+                      className={`p-6 text-left align-top border-l border-zinc-200 ${p.accent ? "bg-amber-50/50" : ""}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                        {p.accent && (
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                            Popular
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-2 flex items-baseline gap-1">
+                        <span className={`text-2xl font-bold tracking-tight ${p.dark ? "text-zinc-900" : "text-zinc-900"}`}>{p.price}</span>
+                        {p.price.startsWith("$") && p.price !== "$0" && (
+                          <span className="text-[11px] text-zinc-500">/month</span>
+                        )}
+                      </div>
+                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
+                      <Link
+                        to={p.to}
+                        className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                          p.accent
+                            ? "bg-zinc-900 text-white hover:bg-black"
+                            : p.dark
+                            ? "bg-zinc-900 text-white hover:bg-black"
+                            : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
+                        }`}
                       >
-                        <div className="flex items-center gap-2">
-                          <span className={`text-base font-semibold ${p.accent ? "text-white" : "text-zinc-900"}`}>{p.name}</span>
-                          {p.accent && (
-                            <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-white text-zinc-950 font-bold`}>
-                              Popular
-                            </span>
-                          )}
-                        </div>
-                        <div className="mt-2 flex items-baseline gap-1">
-                          <span className={`text-2xl font-bold tracking-tight ${p.accent ? "text-white" : "text-zinc-900"}`}>{p.price}</span>
-                          {p.price.startsWith("$") && p.price !== "$0" && (
-                            <span className={`text-[11px] ${p.accent ? "text-zinc-400" : "text-zinc-500"}`}>/month</span>
-                          )}
-                        </div>
-                        <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider ${p.accent ? "text-zinc-400" : "text-zinc-500"}`}>{p.tag}</p>
-                        <Link
-                          to={p.to}
-                          className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
-                            p.accent
-                              ? "bg-white text-zinc-950 hover:bg-zinc-200"
-                              : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white hover:border-zinc-900"
-                          }`}
-                        >
-                          {p.cta}
-                        </Link>
-                      </th>
+                        {p.cta}
+                      </Link>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              <tbody>
+                {([
+                  { f: "Price", a: "Free", b: "$49/mo", c: "$149/mo", d: "Custom", isHeading: true },
+                  { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+                  { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
+                  { f: "A+ signal access", a: false, b: true, c: true, d: true },
+                  { f: "ICT / SMC narration", a: false, b: true, c: true, d: true },
+                  { f: "Multi-timeframe bias", a: false, b: true, c: true, d: true },
+                  { f: "Trade journal", a: false, b: true, c: true, d: true },
+                  { f: "Email + push alerts", a: false, b: true, c: true, d: true },
+                  { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
+                  { f: "API access & webhooks", a: false, b: false, c: true, d: true, badge: "new" },
+                  { f: "Custom alert rules", a: false, b: false, c: true, d: true },
+                  { f: "Dedicated onboarding", a: false, b: false, c: false, d: true },
+                  { f: "Priority desk support", a: false, b: false, c: false, d: true },
+                ] as ReadonlyArray<{ f: string; a: string | boolean; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
+                  <tr
+                    key={row.f}
+                    className={`border-t border-zinc-100 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
+                  >
+                    <td className="px-6 py-3.5 text-zinc-800">
+                      <div className="flex items-center gap-2">
+                        {"badge" in row && row.badge && (
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                            {row.badge}
+                          </span>
+                        )}
+                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-zinc-500" : ""}>
+                          {row.f}
+                        </span>
+                      </div>
+                    </td>
+                    {[row.a, row.b, row.c, row.d].map((v, i) => (
+                      <td
+                        key={i}
+                        className={`px-6 py-3.5 text-center border-l border-zinc-100 ${i === 1 ? "bg-amber-50/40" : ""}`}
+                      >
+                        {v === true ? (
+                          <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
+                        ) : v === false ? (
+                          <span className="inline-block h-px w-4 bg-zinc-200" />
+                        ) : (
+                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : "text-zinc-700"}`}>
+                            {v}
+                          </span>
+                        )}
+                      </td>
                     ))}
                   </tr>
-                </thead>
-
-                <tbody>
-                  {([
-                    { f: "Price", a: "Free", b: "$49/mo", c: "$149/mo", d: "Custom", isHeading: true },
-                    { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
-                    { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
-                    { f: "A+ signal access", a: false, b: true, c: true, d: true },
-                    { f: "ICT / SMC narration", a: false, b: true, c: true, d: true },
-                    { f: "Multi-timeframe bias", a: false, b: true, c: true, d: true },
-                    { f: "Trade journal", a: false, b: true, c: true, d: true },
-                    { f: "Email + push alerts", a: false, b: true, c: true, d: true },
-                    { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
-                    { f: "API access & webhooks", a: false, b: false, c: true, d: true, badge: "new" },
-                    { f: "Custom alert rules", a: false, b: false, c: true, d: true },
-                    { f: "Dedicated onboarding", a: false, b: false, c: false, d: true },
-                    { f: "Priority desk support", a: false, b: false, c: false, d: true },
-                  ] as ReadonlyArray<{ f: string; a: string | boolean; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
-                    <tr
-                      key={row.f}
-                      className={`border-t border-zinc-100 ${idx % 2 === 1 ? "bg-zinc-50/60" : ""} transition`}
-                    >
-                      <td className="px-6 py-3.5 text-zinc-800">
-                        <div className="flex items-center gap-2">
-                          {"badge" in row && row.badge && (
-                            <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-zinc-900 text-white font-bold`}>
-                              {row.badge}
-                            </span>
-                          )}
-                          <span className={row.isHeading ? `${MONO} text-[11px] uppercase tracking-wider font-semibold text-zinc-500` : ""}>
-                            {row.f}
-                          </span>
-                        </div>
-                      </td>
-                      {[row.a, row.b, row.c, row.d].map((v, i) => {
-                        const accent = i === 1;
-                        return (
-                          <td
-                            key={i}
-                            className={`px-6 py-3.5 text-center border-l ${
-                              accent ? "bg-zinc-950 border-zinc-950 text-white" : "border-zinc-100 text-zinc-700"
-                            }`}
-                          >
-                            {v === true ? (
-                              <span className={`inline-block h-1.5 w-1.5 rounded-full ${accent ? "bg-emerald-400" : "bg-zinc-900"}`} />
-                            ) : v === false ? (
-                              <span className={`inline-block h-px w-4 ${accent ? "bg-zinc-700" : "bg-zinc-200"}`} />
-                            ) : (
-                              <span className={`${MONO} text-[11px] tracking-wider ${
-                                row.isHeading
-                                  ? accent ? "text-white font-semibold" : "text-zinc-900 font-semibold"
-                                  : accent ? "text-zinc-100" : "text-zinc-700"
-                              }`}>
-                                {v}
-                              </span>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
 
           {/* Footer strip */}
-          <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white px-6 py-5 sm:flex-row">
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white px-6 py-5 sm:flex-row">
             <div className="flex items-center gap-3">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <p className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-600`}>
                 Early-access pricing · Billing activating soon
               </p>
             </div>
-            <Link to="/pricing" className={`inline-flex items-center gap-1.5 ${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-900 hover:gap-2.5 transition-all`}>
+            <Link to="/pricing" className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900 hover:gap-2.5 transition-all">
               See full comparison & FAQ →
             </Link>
           </div>
