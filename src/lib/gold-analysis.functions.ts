@@ -926,8 +926,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const liqPools = [...detectLiquidityPools(htf, "htf"), ...detectLiquidityPools(ltf, "ltf")];
     const allMarkings: Marking[] = [...pdOte, ...liqPools, ...eqHL, ...aiMarkings];
 
-    const htfBiasLocal: SignalPlan["htfBias"] =
-      parsed.htfBias === "bearish" ? "bearish" : parsed.htfBias === "bullish" ? "bullish" : "neutral";
+
+
 
     // ============ DETERMINISTIC ENGINE OVERRIDE ============
     // Trade prices, direction, R:R, and the 7-factor score are computed in code,
