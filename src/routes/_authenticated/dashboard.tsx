@@ -59,18 +59,22 @@ function DashboardLayout() {
       </header>
 
       <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Account</h1>
-        <p className="mt-1 text-sm text-zinc-500">Manage your saved setups, alerts and trade journal.</p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Account</h1>
+            <p className="mt-1 text-sm text-zinc-500">Manage your saved setups, alerts and trade journal.</p>
+          </div>
+          <Link
+            to="/app"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-zinc-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-zinc-900/25 transition hover:gap-3 hover:bg-black"
+          >
+            <Mic className="h-4 w-4" />
+            Launch AI
+            <ArrowRight className="h-4 w-4 transition-transform" />
+          </Link>
+        </div>
 
-        {/* Launch AI button */}
-        <Link
-          to="/app"
-          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-zinc-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-zinc-900/25 transition hover:gap-3 hover:bg-black"
-        >
-          <Mic className="h-4 w-4" />
-          Launch AI
-          <ArrowRight className="h-4 w-4 transition-transform" />
-        </Link>
+
 
 
 
