@@ -487,6 +487,11 @@ function SignalPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
             {/* LEFT — ICT execution feed */}
             <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-4 min-h-[280px]">
+              {/* Voice AI Agent — orb + chat, can mark on chart */}
+              <div className="pb-3 border-b border-zinc-100">
+                <SignalVoiceAgent plan={plan} livePrice={livePrice} htfRef={htfRef} ltfRef={ltfRef} />
+              </div>
+
               <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
                 ICT Execution Feed
               </h3>
@@ -531,13 +536,8 @@ function SignalPage() {
                   );
                 })}
               </div>
-
-
-              {/* Voice AI Agent — orb + chat, can mark on chart */}
-              <div className="mt-auto pt-3 border-t border-zinc-100">
-                <SignalVoiceAgent plan={plan} livePrice={livePrice} htfRef={htfRef} ltfRef={ltfRef} />
-              </div>
             </div>
+
 
 
             {/* CENTER — charts + multi-tf strip */}
