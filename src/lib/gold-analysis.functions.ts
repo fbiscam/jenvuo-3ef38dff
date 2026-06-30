@@ -929,15 +929,35 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const htfBiasLocal: SignalPlan["htfBias"] =
       parsed.htfBias === "bearish" ? "bearish" : parsed.htfBias === "bullish" ? "bullish" : "neutral";
 
+    // ============ DETERMINISTIC ENGINE OVERRIDE ============
+    // Trade prices, direction, R:R, and the 7-factor score are computed in code,
+    // NOT by the AI. AI only narrates what the engine produces. This is the gate
+    // that makes every emitted signal A+.
+    const htfA = analyzeTF(htf);
+    const ltfA = analyzeTF(ltf);
+    const pools = buildLiquidityPools(htf, ltf);
+    const kz = killzoneOf(new Date());
+
+    // DXY correlation: gold should move inverse to DXY. Compare last 6 closes.
+    let dxyConfirms: boolean | null = null;
+    if (dxyRaw.length >= 6 && inst.kind === "metal") {
+      const dxyDelta = dxyRaw[dxyRaw.length - 1].c - dxyRaw[dxyRaw.length - 6].c;
+      const goldDelta = htf[htf.length - 1].c - htf[Math.max(0, htf.length - 6)].c;
+      dxyConfirms = (dxyDelta > 0 && goldDelta < 0) || (dxyDelta < 0 && goldDelta > 0);
+    }
+
+    const built = buildTrade(htfA, ltfA, pools, last.c);
     const tradeFromAi = {
-      direction: (parsed?.trade?.direction === "SELL" ? "SELL" : parsed?.trade?.direction === "BUY" ? "BUY" : "WAIT") as "BUY" | "SELL" | "WAIT",
-      entry: Number(parsed?.trade?.entry ?? 0),
-      sl: Number(parsed?.trade?.sl ?? 0),
-      tp: Number(parsed?.trade?.tp ?? 0),
-      rr: Number(parsed?.trade?.rr ?? 0),
-      confidence: Math.max(0, Math.min(100, Number(parsed?.trade?.confidence ?? 0))),
-      summary: String(parsed?.trade?.summary ?? ""),
-      invalidation: String(parsed?.trade?.invalidation ?? ""),
+      direction: built.direction,
+      entry: +built.entry.toFixed(dec),
+      sl: +built.sl.toFixed(dec),
+      tp: +built.tp.toFixed(dec),
+      rr: +built.rr.toFixed(2),
+      confidence: 0, // set after scoring
+      summary: "",   // filled after scoring
+      invalidation: built.direction === "WAIT"
+        ? built.reason
+        : `Invalidates if price closes ${built.direction === "BUY" ? "below" : "above"} ${built.sl.toFixed(dec)}, breaking the ${built.zone?.kind ?? "entry"} zone.`,
     };
 
     // Multi-TF bias
@@ -956,16 +976,32 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       avgScore <= 42 ? "Mild Bearish Alignment" :
       "Mixed / Choppy";
 
-    // Setup score
-    const { score: setupScore, grade: setupGrade, checks: setupChecks } = computeSetupScore({
-      trade: tradeFromAi,
-      htfBias: htfBiasLocal,
-      killzone,
-      markings: allMarkings,
+    // 7-factor weighted score → only ≥85 is A+
+    const scored = scoreSetup({
+      trade: built,
+      htf: htfA,
+      ltf: ltfA,
+      pools,
+      inKillzone: kz.inKillzone,
+      imminentHighNews: !!imminentHigh && inst.needsUsdNews,
+      dxyConfirms,
       lastPrice: last.c,
-      htfEq: equilibrium,
-      imminentHighNews: !!imminentHigh,
     });
+    const setupScore = scored.score;
+    const setupGrade = scored.grade;
+    const setupChecks: SetupCheck[] = scored.factors.map(f => ({
+      key: f.key, label: `${f.label} (${f.weight})`, pass: f.pass, reason: f.detail,
+    }));
+
+    tradeFromAi.confidence = Math.min(95, setupScore);
+    if (built.direction !== "WAIT") {
+      tradeFromAi.summary = `${setupGrade} setup: ${built.direction} ${inst.display} at ${built.entry.toFixed(dec)}, stop ${built.sl.toFixed(dec)}, target ${built.tp.toFixed(dec)} for 1:${built.rr.toFixed(1)} R. ${built.reason}`;
+    } else {
+      tradeFromAi.summary = `Standing aside on ${inst.display}: ${built.reason}`;
+    }
+
+    const htfBiasLocal: SignalPlan["htfBias"] =
+      htfA.trend === "bullish" ? "bullish" : htfA.trend === "bearish" ? "bearish" : "neutral";
 
     const plan: SignalPlan = {
       htfBias: htfBiasLocal,
