@@ -400,14 +400,6 @@ function Home() {
           <div className="hidden md:flex justify-center flex-1">
             <StatusPill status={status} supported={speech.supported} dark={false} />
           </div>
-          <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-xs text-zinc-500">
-            <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
-            <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
-            <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
-            <Link to="/about" className="hover:text-zinc-900">About</Link>
-            <Link to="/download" className="hover:text-zinc-900">Download</Link>
-            <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
-          </nav>
           <div className="flex shrink-0 items-center gap-2">
             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase text-zinc-900`}>
               <span className="relative flex h-1.5 w-1.5">
