@@ -377,23 +377,37 @@ function SignalPage() {
       speech.speak(msg);
     };
     const tol = plan.currentPrice * 0.0003;
+    const closeJournal = (outcome: "win" | "loss", exit: number) => {
+      const id = journalRowIdRef.current;
+      if (!id) return;
+      journalRowIdRef.current = null;
+      const pnl = dir === "BUY" ? exit - tr.entry : tr.entry - exit;
+      supabase.from("trade_journal").update({
+        outcome,
+        pnl: Number(pnl.toFixed(plan.instrument.decimals)),
+        closed_at: new Date().toISOString(),
+      }).eq("id", id).then(({ error }) => {
+        if (!error) toast.success(`Journal updated · ${outcome.toUpperCase()}`);
+      });
+    };
     if (dir === "BUY") {
       if (priceTick <= tr.entry + tol && trackerStatusRef.current === "PENDING") {
         fire("filled", `Entry filled at ${priceTick.toFixed(plan.instrument.decimals)}`);
         setTrackerStatus("RUNNING");
       }
-      if (priceTick <= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; }
-      if (priceTick >= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; }
+      if (priceTick <= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; closeJournal("loss", tr.sl); }
+      if (priceTick >= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tr.tp); }
     } else if (dir === "SELL") {
       if (priceTick >= tr.entry - tol && trackerStatusRef.current === "PENDING") {
         fire("filled", `Entry filled at ${priceTick.toFixed(plan.instrument.decimals)}`);
         setTrackerStatus("RUNNING");
       }
-      if (priceTick >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; }
-      if (priceTick <= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; }
+      if (priceTick >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; closeJournal("loss", tr.sl); }
+      if (priceTick <= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tr.tp); }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan, speech]);
+
 
   const livePrice = useLivePriceStream(plan?.instrument.symbol, plan?.currentPrice ?? null, handleStreamTick);
 
