@@ -277,9 +277,6 @@ function InsightsPage() {
               backgroundSize: "20px 20px"
             }} />
             <div className="relative z-10">
-              <div className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-4`}>
-                INTELLIGENCE HUB
-              </div>
               <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4">
                 Institutional briefings, delivered live.
               </h2>
