@@ -989,16 +989,16 @@ function TestimonialsCarousel() {
             ))}
           </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           {visible.map((t, idx) => (
             <figure
               key={`${i}-${idx}`}
-              className="animate-fade-in rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-zinc-300 hover:shadow-md"
+              className="animate-fade-in rounded-2xl border border-zinc-200 bg-white p-6"
             >
-              <blockquote className="text-[15px] leading-relaxed text-zinc-800">"{t.q}"</blockquote>
-              <figcaption className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4 text-xs">
+              <blockquote className="text-sm leading-relaxed text-zinc-700">"{t.q}"</blockquote>
+              <figcaption className="mt-4 flex items-center justify-between text-xs">
                 <div>
-                  <div className="font-semibold text-zinc-900">{t.n}</div>
+                  <div className="font-medium text-zinc-900">{t.n}</div>
                   <div className="text-zinc-500">{t.r}</div>
                 </div>
                 <span className="text-zinc-400">↗</span>
