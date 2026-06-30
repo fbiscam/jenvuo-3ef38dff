@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import SiteFooter from "@/components/SiteFooter";
 
 export const Route = createFileRoute('/unsubscribe')({
   head: () => ({
@@ -173,11 +174,7 @@ function UnsubscribePage() {
         </div>
       </main>
 
-      <footer className="border-t border-zinc-100">
-        <div className="mx-auto max-w-3xl px-6 py-6 text-center text-xs text-zinc-500">
-          © {new Date().getFullYear()} JENVU AI · briefings@jenvu.com
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }
