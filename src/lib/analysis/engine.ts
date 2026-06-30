@@ -301,9 +301,20 @@ export function buildTrade(
   };
 }
 
-// ---------- Score (7-factor weighted) ----------
+// ---------- Score (asset-aware weighted) ----------
 
+export type AssetKind = "crypto" | "metal" | "forex" | "index" | "stock";
 export type ScoreFactor = { key: string; label: string; weight: number; pass: boolean; detail: string };
+
+// Per-asset factor weights. Factors that don't apply to a class get weight 0 and
+// are dropped from the score (the remaining weights are re-normalised to 100).
+const FACTOR_WEIGHTS: Record<AssetKind, Record<string, number>> = {
+  metal:  { bias: 25, sweep: 20, zone: 15, pd: 10, killzone: 10, dxy: 10, rr: 10 },
+  forex:  { bias: 25, sweep: 20, zone: 15, pd: 10, killzone: 15, dxy: 5,  rr: 10 }, // dxy still helps USD pairs, killzone more critical
+  index:  { bias: 30, sweep: 20, zone: 15, pd: 10, killzone: 15, dxy: 0,  rr: 10 }, // session-driven
+  crypto: { bias: 30, sweep: 25, zone: 20, pd: 10, killzone: 0,  dxy: 0,  rr: 15 }, // 24/7, sweeps dominate
+  stock:  { bias: 30, sweep: 20, zone: 15, pd: 10, killzone: 15, dxy: 0,  rr: 10 }, // RTH session
+};
 
 export function scoreSetup(args: {
   trade: BuiltTrade;
@@ -314,58 +325,46 @@ export function scoreSetup(args: {
   imminentHighNews: boolean;
   dxyConfirms: boolean | null;     // null = unknown / N/A
   lastPrice: number;
+  kind: AssetKind;
 }): { score: number; grade: "A+" | "A" | "B" | "C"; factors: ScoreFactor[] } {
-  const { trade, htf, ltf, pools, inKillzone, imminentHighNews, dxyConfirms, lastPrice } = args;
+  const { trade, htf, ltf, pools, inKillzone, imminentHighNews, dxyConfirms, lastPrice, kind } = args;
+  const w = FACTOR_WEIGHTS[kind] ?? FACTOR_WEIGHTS.metal;
   const f: ScoreFactor[] = [];
   const dir = trade.direction;
 
-  f.push({
-    key: "bias", label: "HTF + LTF bias aligned", weight: 25,
-    pass: dir !== "WAIT" && htf.trend === (dir === "BUY" ? "bullish" : "bearish"),
-    detail: `HTF: ${htf.trend} · LTF: ${ltf.trend}`,
-  });
+  const push = (key: string, label: string, pass: boolean, detail: string) => {
+    const weight = w[key] ?? 0;
+    if (weight > 0) f.push({ key, label, weight, pass, detail });
+  };
+
+  push("bias", "HTF + LTF bias aligned",
+    dir !== "WAIT" && htf.trend === (dir === "BUY" ? "bullish" : "bearish"),
+    `HTF: ${htf.trend} · LTF: ${ltf.trend}`);
 
   const sweptPool = pools.find(p => p.swept && (dir === "BUY" ? p.side === "sell" : p.side === "buy"));
-  f.push({
-    key: "sweep", label: "Liquidity sweep before entry", weight: 20,
-    pass: !!sweptPool,
-    detail: sweptPool ? `${sweptPool.label} swept @ ${sweptPool.price.toFixed(2)}` : "No recent sweep detected",
-  });
+  push("sweep", "Liquidity sweep before entry", !!sweptPool,
+    sweptPool ? `${sweptPool.label} swept @ ${sweptPool.price.toFixed(2)}` : "No recent sweep detected");
 
-  f.push({
-    key: "zone", label: "Unmitigated OB/FVG at entry", weight: 15,
-    pass: !!trade.zone,
-    detail: trade.zone ? `${trade.zone.kind} ${trade.zone.priceLow.toFixed(2)}–${trade.zone.priceHigh.toFixed(2)}` : "No clean zone",
-  });
+  push("zone", "Unmitigated OB/FVG at entry", !!trade.zone,
+    trade.zone ? `${trade.zone.kind} ${trade.zone.priceLow.toFixed(2)}–${trade.zone.priceHigh.toFixed(2)}` : "No clean zone");
 
   const inPremium = lastPrice > htf.equilibrium;
   const pdOk = dir === "BUY" ? !inPremium : dir === "SELL" ? inPremium : false;
-  f.push({
-    key: "pd", label: "Premium/Discount correct side", weight: 10,
-    pass: pdOk,
-    detail: `Price is in ${inPremium ? "premium" : "discount"}, trade is ${dir}`,
-  });
+  push("pd", "Premium/Discount correct side", pdOk,
+    `Price is in ${inPremium ? "premium" : "discount"}, trade is ${dir}`);
 
-  f.push({
-    key: "killzone", label: "Inside active killzone", weight: 10,
-    pass: inKillzone,
-    detail: inKillzone ? "Killzone active" : "Outside killzone",
-  });
+  // Killzone — only weighted for session-driven assets
+  push("killzone", kind === "crypto" ? "Session momentum (24/7)" : "Inside active killzone",
+    kind === "crypto" ? true : inKillzone,
+    kind === "crypto" ? "Crypto trades 24/7" : (inKillzone ? "Killzone active" : "Outside killzone"));
 
-  f.push({
-    key: "dxy", label: "DXY correlation confirms", weight: 10,
-    pass: dxyConfirms === true,
-    detail: dxyConfirms == null ? "DXY data unavailable" : dxyConfirms ? "DXY moving inverse" : "DXY not confirming",
-  });
+  // DXY — only weighted for metals/forex
+  push("dxy", "DXY correlation confirms", dxyConfirms === true,
+    dxyConfirms == null ? "DXY data unavailable" : dxyConfirms ? "DXY moving inverse" : "DXY not confirming");
 
-  f.push({
-    key: "rr", label: "Clean R:R ≥ 1:3", weight: 10,
-    pass: trade.rr >= 3,
-    detail: `R:R 1:${trade.rr.toFixed(2)}`,
-  });
+  push("rr", "Clean R:R ≥ 1:3", trade.rr >= 3, `R:R 1:${trade.rr.toFixed(2)}`);
 
-  // News kill-switch: high-impact within 30m → cap grade
-  const totalWeight = f.reduce((s, x) => s + x.weight, 0);
+  const totalWeight = f.reduce((s, x) => s + x.weight, 0) || 1;
   const earned = f.reduce((s, x) => s + (x.pass ? x.weight : 0), 0);
   let score = Math.round((earned / totalWeight) * 100);
   if (imminentHighNews) score = Math.min(score, 60);
