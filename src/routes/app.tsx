@@ -319,7 +319,7 @@ function Home() {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [analyze, speech, timeframe, navigate]);
+  }, [analyze, speech, timeframe, navigate, credits]);
 
   // Accumulate final transcripts into a buffer while listening (do NOT send yet)
   useEffect(() => {
