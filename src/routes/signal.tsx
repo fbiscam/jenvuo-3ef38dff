@@ -1185,13 +1185,21 @@ function SignalVoiceAgent({
 
   const suggestions = ["Why this bias?", "Where is invalidation?", "What confirms entry?"];
 
+  const [inputOpen, setInputOpen] = useState(false);
+  const showInput = inputOpen || status !== "idle" || messages.length > 0;
+
   return (
     <div className="space-y-4">
       <div className="flex justify-center">
-        <SignalOrb status={status} pulse={speech.wordPulse} />
+        <button
+          type="button"
+          onClick={() => setInputOpen((v) => !v)}
+          className="rounded-full focus:outline-none"
+          aria-label="Toggle voice input"
+        >
+          <SignalOrb status={status} pulse={speech.wordPulse} />
+        </button>
       </div>
-
-
 
       {messages.length > 0 && (
         <div
@@ -1214,42 +1222,43 @@ function SignalVoiceAgent({
         </div>
       )}
 
-
-
-
-      <div className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white pl-2.5 pr-1 py-1">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
-          placeholder={speech.listening ? "Listening…" : "Ask or tap the mic…"}
-          disabled={busy}
-          className="flex-1 bg-transparent text-[12px] text-zinc-900 placeholder:text-zinc-400 outline-none"
-        />
-        <button
-          onClick={toggleMic}
-          className={cn(
-            "h-7 w-7 inline-flex items-center justify-center rounded-md transition",
-            speech.listening
-              ? "bg-emerald-500 text-white animate-pulse"
-              : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200",
-          )}
-          aria-label="Toggle microphone"
-        >
-          <Mic className="h-3.5 w-3.5" />
-        </button>
-        <button
-          onClick={() => submit()}
-          disabled={busy || !q.trim()}
-          className="h-7 w-7 inline-flex items-center justify-center rounded-md bg-zinc-900 text-white disabled:opacity-40 hover:bg-zinc-800"
-          aria-label="Send"
-        >
-          <Send className="h-3.5 w-3.5" />
-        </button>
-      </div>
+      {showInput && (
+        <div className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white pl-2.5 pr-1 py-1">
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+            placeholder={speech.listening ? "Listening…" : "Ask or tap the mic…"}
+            disabled={busy}
+            className="flex-1 bg-transparent text-[12px] text-zinc-900 placeholder:text-zinc-400 outline-none"
+            autoFocus
+          />
+          <button
+            onClick={toggleMic}
+            className={cn(
+              "h-7 w-7 inline-flex items-center justify-center rounded-md transition",
+              speech.listening
+                ? "bg-emerald-500 text-white animate-pulse"
+                : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200",
+            )}
+            aria-label="Toggle microphone"
+          >
+            <Mic className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => submit()}
+            disabled={busy || !q.trim()}
+            className="h-7 w-7 inline-flex items-center justify-center rounded-md bg-zinc-900 text-white disabled:opacity-40 hover:bg-zinc-800"
+            aria-label="Send"
+          >
+            <Send className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+
 
 /* ---------- compact orb (mirrors /app CloudOrb visual) ---------- */
 function SignalOrb({
