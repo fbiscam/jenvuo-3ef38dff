@@ -309,17 +309,12 @@ function PricingPage() {
                 key={b.tag}
                 className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.2)] transition"
               >
-                <div className="relative h-40 overflow-hidden bg-zinc-100">
-                  <img
-                    src={b.img}
-                    alt={b.title}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent" />
-                  <span className={`${MONO} absolute top-3 left-3 text-[9px] uppercase tracking-wider px-2 py-1 rounded-sm bg-zinc-950 text-white`}>
+                <div className="px-6 pt-6">
+                  <span className={`${MONO} inline-block text-[9px] uppercase tracking-wider px-2 py-1 rounded-sm bg-zinc-950 text-white`}>
                     {b.tag}
                   </span>
                 </div>
+
                 <div className="p-6">
                   <h3 className="text-base font-semibold tracking-tight text-zinc-900">{b.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-zinc-600">{b.desc}</p>
