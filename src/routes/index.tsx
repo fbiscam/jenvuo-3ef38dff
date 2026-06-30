@@ -7,13 +7,13 @@ import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Voice-Native Trading Intelligence — Jenvu" },
+      { title: "Voice Native Trading Intelligence — Jenvu" },
       {
         name: "description",
         content:
           "Voice-native AI trading terminal for Gold, Crypto, FX & Indices. Live ICT/SMC analysis, A+ setups and spoken execution built on 25+ years of institutional logic.",
       },
-      { property: "og:title", content: "Voice-Native Trading Intelligence — Jenvu" },
+      { property: "og:title", content: "Voice Native Trading Intelligence — Jenvu" },
       {
         property: "og:description",
         content: "Speak. Analyze. Execute. The voice terminal that turns market noise into institutional-grade signals.",
