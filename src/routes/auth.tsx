@@ -150,7 +150,7 @@ function AuthPage() {
   return (
     <>
     <style>{`@media (min-width: 1280px) and (min-height: 800px){.jenvu-auth-zoom{zoom:1.05}}`}</style>
-    <div className={`jenvu-auth-zoom h-dvh w-full overflow-hidden bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
+    <div className={`jenvu-auth-zoom min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
 
 
       {/* NAV */}
@@ -187,8 +187,8 @@ function AuthPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 sm:p-4 overflow-hidden">
-        <div className="w-full max-w-6xl max-h-full">
+      <main className="flex-1 flex flex-col items-center justify-center p-3 sm:p-4">
+        <div className="w-full max-w-6xl">
           <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
             {/* terminal header */}
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-3">
