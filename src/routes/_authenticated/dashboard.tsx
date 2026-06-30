@@ -339,7 +339,18 @@ function DashboardLayout() {
         {/* Analytics header */}
         <div className="mt-7 flex items-center justify-between">
           <h2 className="text-[15px] font-semibold text-zinc-900">Analytics</h2>
-          <DropdownMenu>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              aria-label="Refresh analytics"
+              title="Refresh analytics"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+            </button>
+            <DropdownMenu>
             <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
               <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
             </DropdownMenuTrigger>
