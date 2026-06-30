@@ -533,9 +533,9 @@ function SignalPage() {
               </div>
 
 
-              {/* AI Agent — replaces Key Levels (moved to right rail) */}
+              {/* Voice AI Agent — orb + chat, can mark on chart */}
               <div className="mt-auto pt-3 border-t border-zinc-100">
-                <SignalAgentPanel plan={plan} livePrice={livePrice} />
+                <SignalVoiceAgent plan={plan} livePrice={livePrice} htfRef={htfRef} ltfRef={ltfRef} />
               </div>
             </div>
 
