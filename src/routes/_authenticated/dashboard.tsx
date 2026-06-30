@@ -44,7 +44,7 @@ type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; 
 const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: boolean; countKey?: keyof Counts }> = [
   { to: "/dashboard", label: "Saved", icon: Bookmark, exact: true, countKey: "saved" },
   { to: "/dashboard/alerts", label: "Alerts", icon: Bell, countKey: "alerts7d" },
-  { to: "/dashboard/journal", label: "Trades", icon: BookOpen },
+  { to: "/dashboard/journal", label: "Trades", icon: BookOpen, countKey: "journalTotal" },
   { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { to: "/dashboard/profile", label: "Profile", icon: User },
 ];
