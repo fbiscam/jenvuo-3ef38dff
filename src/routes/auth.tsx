@@ -323,10 +323,8 @@ function AuthPage() {
 
 
                 </div>
-
-
-                </div>
               </div>
+
 
               {/* RIGHT — VISUAL */}
               <div className="hidden lg:flex lg:col-span-5 bg-white flex-col p-5 lg:p-6 border-t lg:border-t-0 lg:border-l border-zinc-100">
