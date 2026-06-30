@@ -354,14 +354,6 @@ function SignalPage() {
               <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded-md object-contain" />
             </Link>
             <span className="font-semibold tracking-tight text-sm select-none">JENVU AI</span>
-            <nav className="hidden lg:flex items-center gap-6 ml-8 text-xs text-zinc-500">
-              <Link to="/signal" className="text-zinc-900 font-medium">Signal Engine</Link>
-              <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
-              <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
-              <Link to="/about" className="hover:text-zinc-900">About</Link>
-              <Link to="/download" className="hover:text-zinc-900">Download</Link>
-              <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
-            </nav>
           </div>
           <div className="flex items-center gap-2 justify-end">
             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase`}>
