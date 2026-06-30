@@ -1186,7 +1186,7 @@ function SignalVoiceAgent({
   const suggestions = ["Why this bias?", "Where is invalidation?", "What confirms entry?"];
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-4">
 
 
 
