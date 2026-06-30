@@ -1005,6 +1005,25 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const htfBiasLocal: SignalPlan["htfBias"] =
       htfA.trend === "bullish" ? "bullish" : htfA.trend === "bearish" ? "bearish" : "neutral";
 
+    // Push engine-derived entry/sl/tp + chosen zone to the marking list so the
+    // chart shows exactly what the engine used.
+    if (built.direction !== "WAIT" && built.zone) {
+      const nowS = Math.floor(Date.now() / 1000);
+      allMarkings.push({
+        type: built.zone.kind === "OB" ? "orderBlock" : "fvg",
+        tf: "ltf",
+        fromTime: nowS - 3600,
+        toTime: nowS,
+        priceLow: built.zone.priceLow,
+        priceHigh: built.zone.priceHigh,
+        kind: (built.direction === "BUY" ? (built.zone.kind === "OB" ? "demand" : "bullish") : (built.zone.kind === "OB" ? "supply" : "bearish")) as any,
+        label: `Engine ${built.zone.kind} (${built.direction})`,
+      } as Marking);
+      allMarkings.push({ type: "entry", tf: "ltf", price: +built.entry.toFixed(dec), label: `Entry ${built.entry.toFixed(dec)}` });
+      allMarkings.push({ type: "sl",    tf: "ltf", price: +built.sl.toFixed(dec),    label: `SL ${built.sl.toFixed(dec)}` });
+      allMarkings.push({ type: "tp",    tf: "ltf", price: +built.tp.toFixed(dec),    label: `TP ${built.tp.toFixed(dec)}` });
+    }
+
     const plan: SignalPlan = {
       htfBias: htfBiasLocal,
       intro: String(parsed.intro ?? "Let's break down the live chart together."),
