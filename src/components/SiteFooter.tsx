@@ -9,6 +9,7 @@ const columns = [
       { to: "/", label: "Home" },
       { to: "/app", label: "Voice Agent" },
       { to: "/signal", label: "Signal Desk" },
+      { to: "/pricing", label: "Pricing" },
       { to: "/download", label: "Download App" },
     ],
   },
@@ -22,11 +23,12 @@ const columns = [
     ],
   },
   {
-    label: "Company",
+    label: "Account",
     links: [
+      { to: "/dashboard", label: "Dashboard" },
+      { to: "/auth", label: "Sign In" },
       { to: "/about", label: "About" },
       { to: "/contact", label: "Contact" },
-      { to: "/auth", label: "Sign In" },
     ],
   },
   {
