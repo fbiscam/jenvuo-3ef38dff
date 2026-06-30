@@ -108,6 +108,8 @@ export const Route = createFileRoute("/insights/$slug")({
       <Link to="/insights" className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white">Back to insights</Link>
     </div>
   ),
+});
+
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Inter',system-ui,sans-serif]";
