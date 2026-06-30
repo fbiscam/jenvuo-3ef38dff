@@ -52,15 +52,12 @@ export default function AlertOptInCard() {
   const permGranted = perm === 'granted'
   const permBlocked = perm === 'denied' || perm === 'unsupported'
 
-  return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-3 space-y-3">
-      <div className="flex items-center justify-between">
   if (done) return null
 
   return (
     <div className="rounded-lg border border-zinc-200 bg-white p-3 space-y-3">
       <div className="flex items-center justify-between">
-        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-900 font-bold`}></span>
+        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-900 font-bold`}>
           A+ Setup Alerts
         </span>
         <span className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400`}>
