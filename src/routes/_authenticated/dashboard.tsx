@@ -287,22 +287,12 @@ function DashboardLayout() {
   );
   const livePrices = useLivePrices(openSymbols);
   const liveWinRate = useMemo(() => {
-    let wins = counts.closedWins;
-    let decided = counts.closedDecided;
-    for (const t of counts.openTrades) {
-      const px = livePrices[t.pair.toUpperCase()];
-      if (px == null || t.entry == null) continue;
-      const isLong = t.direction === "long";
-      const hitTp = t.take_profit != null && (isLong ? px >= t.take_profit : px <= t.take_profit);
-      const hitSl = t.stop_loss != null && (isLong ? px <= t.stop_loss : px >= t.stop_loss);
-      const running = isLong ? px - t.entry : t.entry - px;
-      if (hitTp) { wins++; decided++; }
-      else if (hitSl) { decided++; }
-      else if (running > 0) { wins++; decided++; }
-      else if (running < 0) { decided++; }
-    }
-    return decided ? Math.round((wins / decided) * 100) : counts.journalWinRate;
-  }, [counts, livePrices]);
+    // Only count trades that have actually closed as win/loss.
+    // Open trades and deleted trades do not affect this metric.
+    if (!counts.closedDecided) return null;
+    return Math.round((counts.closedWins / counts.closedDecided) * 100);
+  }, [counts.closedWins, counts.closedDecided]);
+
 
   const handleRefresh = () => {
     if (refreshing) return;
