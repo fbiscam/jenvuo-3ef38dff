@@ -26,13 +26,29 @@ const DEFAULTS: Prefs = {
   quiet_end: null,
 };
 
+type FiredAlert = {
+  id: string;
+  pair: string;
+  grade: string;
+  direction: string;
+  entry: number;
+  sl: number;
+  tp: number;
+  rr: number;
+  confidence: number;
+  session: string | null;
+  fired_at: string;
+};
+
 function AlertPrefs() {
   const { features, isLoading } = useCredits();
   const locked = !isLoading && !features.realtime_alerts;
   const [prefs, setPrefs] = useState<Prefs>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
+  const [alerts, setAlerts] = useState<FiredAlert[]>([]);
+  const [alertsLoading, setAlertsLoading] = useState(true);
+  const [pairFilter, setPairFilter] = useState<string>("ALL");
 
   useEffect(() => {
     (async () => {
@@ -47,6 +63,28 @@ function AlertPrefs() {
       setLoading(false);
     })();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchAlerts = async () => {
+      const { data } = await supabase
+        .from("signal_alerts")
+        .select("id, pair, grade, direction, entry, sl, tp, rr, confidence, session, fired_at")
+        .order("fired_at", { ascending: false })
+        .limit(50);
+      if (!cancelled && data) setAlerts(data as FiredAlert[]);
+      if (!cancelled) setAlertsLoading(false);
+    };
+    fetchAlerts();
+    const channel = supabase
+      .channel("signal_alerts_feed")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "signal_alerts" }, (payload) => {
+        setAlerts((prev) => [payload.new as FiredAlert, ...prev].slice(0, 50));
+      })
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(channel); };
+  }, []);
+
 
   const save = async () => {
     setSaving(true);
