@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
 import { useCredits } from "@/hooks/useCredits";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
+import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import {
   Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, Plus,
