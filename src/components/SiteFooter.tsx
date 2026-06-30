@@ -27,6 +27,7 @@ const columns = [
     links: [
       { to: "/dashboard", label: "Dashboard" },
       { to: "/auth", label: "Sign In" },
+      { to: "/help", label: "Help Center" },
       { to: "/about", label: "About" },
       { to: "/contact", label: "Contact" },
     ],
