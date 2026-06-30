@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { analyzeTF, buildLiquidityPools, buildTrade, killzoneOf, scoreSetup } from "@/lib/analysis/engine";
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
 
@@ -295,7 +296,7 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-3.1-flash-lite",
         messages: [
           { role: "system", content: system },
           { role: "user", content: userPrompt },
@@ -711,12 +712,13 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
     const inst = resolveInstrument(data.symbol);
 
-    const [htfRaw, ltfRaw, news, h4Raw, m5Raw] = await Promise.all([
+    const [htfRaw, ltfRaw, news, h4Raw, m5Raw, dxyRaw] = await Promise.all([
       fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "15m").catch(() => [] as Candle[]),
       inst.needsUsdNews ? fetchGoldNewsInline() : Promise.resolve([] as NewsItem[]),
       fetchInstrumentCandles(inst, "4h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "5m").catch(() => [] as Candle[]),
+      inst.needsUsdNews ? fetchInstrumentCandles(resolveInstrument("DXY"), "1h").catch(() => [] as Candle[]) : Promise.resolve([] as Candle[]),
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
       throw new Error(`Live ${inst.display} feed unavailable. Try again in a moment.`);
@@ -853,7 +855,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-3.1-flash-lite",
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
@@ -924,18 +926,40 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const liqPools = [...detectLiquidityPools(htf, "htf"), ...detectLiquidityPools(ltf, "ltf")];
     const allMarkings: Marking[] = [...pdOte, ...liqPools, ...eqHL, ...aiMarkings];
 
-    const htfBiasLocal: SignalPlan["htfBias"] =
-      parsed.htfBias === "bearish" ? "bearish" : parsed.htfBias === "bullish" ? "bullish" : "neutral";
 
+
+
+
+
+    // ============ DETERMINISTIC ENGINE OVERRIDE ============
+    // Trade prices, direction, R:R, and the 7-factor score are computed in code,
+    // NOT by the AI. AI only narrates what the engine produces. This is the gate
+    // that makes every emitted signal A+.
+    const htfA = analyzeTF(htf);
+    const ltfA = analyzeTF(ltf);
+    const pools = buildLiquidityPools(htf, ltf);
+    const kz = killzoneOf(new Date());
+
+    // DXY correlation: gold should move inverse to DXY. Compare last 6 closes.
+    let dxyConfirms: boolean | null = null;
+    if (dxyRaw.length >= 6 && inst.kind === "metal") {
+      const dxyDelta = dxyRaw[dxyRaw.length - 1].c - dxyRaw[dxyRaw.length - 6].c;
+      const goldDelta = htf[htf.length - 1].c - htf[Math.max(0, htf.length - 6)].c;
+      dxyConfirms = (dxyDelta > 0 && goldDelta < 0) || (dxyDelta < 0 && goldDelta > 0);
+    }
+
+    const built = buildTrade(htfA, ltfA, pools, last.c);
     const tradeFromAi = {
-      direction: (parsed?.trade?.direction === "SELL" ? "SELL" : parsed?.trade?.direction === "BUY" ? "BUY" : "WAIT") as "BUY" | "SELL" | "WAIT",
-      entry: Number(parsed?.trade?.entry ?? 0),
-      sl: Number(parsed?.trade?.sl ?? 0),
-      tp: Number(parsed?.trade?.tp ?? 0),
-      rr: Number(parsed?.trade?.rr ?? 0),
-      confidence: Math.max(0, Math.min(100, Number(parsed?.trade?.confidence ?? 0))),
-      summary: String(parsed?.trade?.summary ?? ""),
-      invalidation: String(parsed?.trade?.invalidation ?? ""),
+      direction: built.direction,
+      entry: +built.entry.toFixed(dec),
+      sl: +built.sl.toFixed(dec),
+      tp: +built.tp.toFixed(dec),
+      rr: +built.rr.toFixed(2),
+      confidence: 0, // set after scoring
+      summary: "",   // filled after scoring
+      invalidation: built.direction === "WAIT"
+        ? built.reason
+        : `Invalidates if price closes ${built.direction === "BUY" ? "below" : "above"} ${built.sl.toFixed(dec)}, breaking the ${built.zone?.kind ?? "entry"} zone.`,
     };
 
     // Multi-TF bias
@@ -954,16 +978,51 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       avgScore <= 42 ? "Mild Bearish Alignment" :
       "Mixed / Choppy";
 
-    // Setup score
-    const { score: setupScore, grade: setupGrade, checks: setupChecks } = computeSetupScore({
-      trade: tradeFromAi,
-      htfBias: htfBiasLocal,
-      killzone,
-      markings: allMarkings,
+    // 7-factor weighted score → only ≥85 is A+
+    const scored = scoreSetup({
+      trade: built,
+      htf: htfA,
+      ltf: ltfA,
+      pools,
+      inKillzone: kz.inKillzone,
+      imminentHighNews: !!imminentHigh && inst.needsUsdNews,
+      dxyConfirms,
       lastPrice: last.c,
-      htfEq: equilibrium,
-      imminentHighNews: !!imminentHigh,
     });
+    const setupScore = scored.score;
+    const setupGrade = scored.grade;
+    const setupChecks: SetupCheck[] = scored.factors.map(f => ({
+      key: f.key, label: `${f.label} (${f.weight})`, pass: f.pass, reason: f.detail,
+    }));
+
+    tradeFromAi.confidence = Math.min(95, setupScore);
+    if (built.direction !== "WAIT") {
+      tradeFromAi.summary = `${setupGrade} setup: ${built.direction} ${inst.display} at ${built.entry.toFixed(dec)}, stop ${built.sl.toFixed(dec)}, target ${built.tp.toFixed(dec)} for 1:${built.rr.toFixed(1)} R. ${built.reason}`;
+    } else {
+      tradeFromAi.summary = `Standing aside on ${inst.display}: ${built.reason}`;
+    }
+
+    const htfBiasLocal: SignalPlan["htfBias"] =
+      htfA.trend === "bullish" ? "bullish" : htfA.trend === "bearish" ? "bearish" : "neutral";
+
+    // Push engine-derived entry/sl/tp + chosen zone to the marking list so the
+    // chart shows exactly what the engine used.
+    if (built.direction !== "WAIT" && built.zone) {
+      const nowS = Math.floor(Date.now() / 1000);
+      allMarkings.push({
+        type: built.zone.kind === "OB" ? "orderBlock" : "fvg",
+        tf: "ltf",
+        fromTime: nowS - 3600,
+        toTime: nowS,
+        priceLow: built.zone.priceLow,
+        priceHigh: built.zone.priceHigh,
+        kind: (built.direction === "BUY" ? (built.zone.kind === "OB" ? "demand" : "bullish") : (built.zone.kind === "OB" ? "supply" : "bearish")) as any,
+        label: `Engine ${built.zone.kind} (${built.direction})`,
+      } as Marking);
+      allMarkings.push({ type: "entry", tf: "ltf", price: +built.entry.toFixed(dec), label: `Entry ${built.entry.toFixed(dec)}` });
+      allMarkings.push({ type: "sl",    tf: "ltf", price: +built.sl.toFixed(dec),    label: `SL ${built.sl.toFixed(dec)}` });
+      allMarkings.push({ type: "tp",    tf: "ltf", price: +built.tp.toFixed(dec),    label: `TP ${built.tp.toFixed(dec)}` });
+    }
 
     const plan: SignalPlan = {
       htfBias: htfBiasLocal,

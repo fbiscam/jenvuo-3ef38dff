@@ -66,8 +66,10 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
 
         const grade = plan.setupGrade
         const direction = plan.trade.direction
-        if ((grade !== 'A+' && grade !== 'A') || (direction !== 'BUY' && direction !== 'SELL')) {
-          return Response.json({ ok: true, skipped: 'no_top_setup', grade, direction })
+        // Only fire alerts for true A+ setups (score >= 85). Lower grades stay
+        // visible on the signal page as "watching" but never trigger pushes.
+        if (grade !== 'A+' || (direction !== 'BUY' && direction !== 'SELL')) {
+          return Response.json({ ok: true, skipped: 'not_a_plus', grade, direction, score: plan.setupScore })
         }
 
         // Dedupe: same pair + same direction within DEDUPE_WINDOW_MS
