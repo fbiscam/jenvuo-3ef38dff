@@ -45,7 +45,7 @@ function Billing() {
   return (
     <div className="space-y-10">
       {/* CURRENT PLAN */}
-      <section className="rounded-2xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-6 sm:p-8">
+      <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Current plan</div>
