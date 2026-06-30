@@ -781,8 +781,30 @@ function HomePage() {
         </div>
       </section>
 
-      {/* TESTIMONIALS — auto-rotating */}
-      <TestimonialsCarousel />
+      {/* TESTIMONIALS */}
+      <section className="border-t border-zinc-100 bg-white">
+        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
+          <h2 className="mb-10 text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Trusted by traders.</h2>
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              ["Feels like sitting next to a 25-year desk trader. The narration alone changed how I read structure.", "A. Rahman", "Prop Desk · Dubai"],
+              ["ICT setups marked live on the chart, with voice — I stopped second-guessing my entries.", "M. Chen", "Independent · Singapore"],
+              ["Gold execution is on another level. The killzone + sweep logic is exactly how I trade.", "S. Patel", "Family Office · London"],
+            ].map(([q, n, r]) => (
+              <figure key={n} className="rounded-2xl border border-zinc-200 bg-white p-6">
+                <blockquote className="text-sm leading-relaxed text-zinc-700">"{q}"</blockquote>
+                <figcaption className="mt-4 flex items-center justify-between text-xs">
+                  <div>
+                    <div className="font-medium text-zinc-900">{n}</div>
+                    <div className="text-zinc-500">{r}</div>
+                  </div>
+                  <span className="text-zinc-400">↗</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
 
 
       {/* COMPARISON */}
@@ -953,49 +975,6 @@ function HomePage() {
       <SiteFooter />
     </div>
     </>
-  );
-}
-
-const TESTIMONIALS = [
-  { q: "Feels like sitting next to a 25-year desk trader. The narration alone changed how I read structure.", n: "A. Rahman", r: "Prop Desk · Dubai" },
-  { q: "ICT setups marked live on the chart, with voice — I stopped second-guessing my entries.", n: "M. Chen", r: "Independent · Singapore" },
-  { q: "Gold execution is on another level. The killzone + sweep logic is exactly how I trade.", n: "S. Patel", r: "Family Office · London" },
-  { q: "The A+ alert hit my inbox 4 minutes before the London sweep. Caught the entire leg.", n: "J. Okafor", r: "Prop Trader · Lagos" },
-  { q: "Voice-first execution is the unlock. I run analysis hands-free while managing risk.", n: "L. Becker", r: "Discretionary FX · Frankfurt" },
-  { q: "Finally a tool that respects how institutional desks actually read liquidity.", n: "R. Alvarez", r: "Hedge Fund Analyst · NYC" },
-  { q: "The bias engine across 4H/1H/15m is brutally accurate on gold. Worth every cent.", n: "T. Yamamoto", r: "Retail Pro · Tokyo" },
-];
-
-function TestimonialsCarousel() {
-  const [i, setI] = React.useState(0);
-  React.useEffect(() => {
-    const id = setInterval(() => setI((p) => (p + 1) % TESTIMONIALS.length), 5000);
-    return () => clearInterval(id);
-  }, []);
-  const visible = [0, 1, 2].map((o) => TESTIMONIALS[(i + o) % TESTIMONIALS.length]);
-  return (
-    <section className="border-t border-zinc-100 bg-white">
-      <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-        <h2 className="mb-10 text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Trusted by traders.</h2>
-        <div className="grid gap-6 md:grid-cols-3">
-          {visible.map((t, idx) => (
-            <figure
-              key={`${i}-${idx}`}
-              className="animate-fade-in rounded-2xl border border-zinc-200 bg-white p-6"
-            >
-              <blockquote className="text-sm leading-relaxed text-zinc-700">"{t.q}"</blockquote>
-              <figcaption className="mt-4 flex items-center justify-between text-xs">
-                <div>
-                  <div className="font-medium text-zinc-900">{t.n}</div>
-                  <div className="text-zinc-500">{t.r}</div>
-                </div>
-                <span className="text-zinc-400">↗</span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </div>
-    </section>
   );
 }
 
