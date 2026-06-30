@@ -317,65 +317,6 @@ function DashboardLayout() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="rounded-md border border-zinc-200 bg-white p-2 text-zinc-500 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300" aria-label="More actions">
-                <MoreHorizontal className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                sideOffset={8}
-                className="w-64 rounded-xl border border-zinc-200/80 bg-white p-0 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/[0.02]"
-              >
-                <div className="border-b border-zinc-100 px-3 py-2.5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400">Account</div>
-                  <div className="mt-0.5 truncate text-[12px] font-medium text-zinc-900">{email || "—"}</div>
-                </div>
-                <div className="p-1.5">
-                  <DropdownMenuItem asChild className="gap-2.5 rounded-md px-2.5 py-2 text-[12.5px] text-zinc-700 focus:bg-zinc-50 focus:text-zinc-900">
-                    <Link to="/dashboard/profile">
-                      <User className="h-3.5 w-3.5 text-zinc-400" />
-                      <span className="flex-1">View profile</span>
-                      <ArrowUpRight className="h-3 w-3 text-zinc-300" />
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="gap-2.5 rounded-md px-2.5 py-2 text-[12.5px] text-zinc-700 focus:bg-zinc-50 focus:text-zinc-900">
-                    <Link to="/dashboard/billing">
-                      <CreditCard className="h-3.5 w-3.5 text-zinc-400" />
-                      <span className="flex-1">Billing & credits</span>
-                      <ArrowUpRight className="h-3 w-3 text-zinc-300" />
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="gap-2.5 rounded-md px-2.5 py-2 text-[12.5px] text-zinc-700 focus:bg-zinc-50 focus:text-zinc-900">
-                    <Link to="/pricing">
-                      <TrendingUp className="h-3.5 w-3.5 text-zinc-400" />
-                      <span className="flex-1">Upgrade plan</span>
-                      <span className="rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-amber-700">Pro</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="gap-2.5 rounded-md px-2.5 py-2 text-[12.5px] text-zinc-700 focus:bg-zinc-50 focus:text-zinc-900"
-                    onSelect={() => {
-                      setRange((r) => r);
-                      window.location.reload();
-                    }}
-                  >
-                    <Activity className="h-3.5 w-3.5 text-zinc-400" />
-                    <span className="flex-1">Refresh data</span>
-                  </DropdownMenuItem>
-                </div>
-                <DropdownMenuSeparator className="my-0 bg-zinc-100" />
-                <div className="p-1.5">
-                  <DropdownMenuItem
-                    className="gap-2.5 rounded-md px-2.5 py-2 text-[12.5px] text-rose-600 focus:bg-rose-50 focus:text-rose-700"
-                    onSelect={signOut}
-                  >
-                    <LogOut className="h-3.5 w-3.5" />
-                    <span className="flex-1">Sign out</span>
-                  </DropdownMenuItem>
-                </div>
-              </DropdownMenuContent>
-
-            </DropdownMenu>
             <Link
               to="/app"
               className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium text-zinc-900 shadow-sm hover:bg-zinc-50"
