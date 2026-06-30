@@ -65,14 +65,17 @@ const TIERS = [
     tagline: "For serious gold traders.",
     cta: "Notify me when live",
     ctaTo: "/contact",
+    credits: 500,
     features: [
-      "Unlimited voice queries",
-      "Unlimited A+ signal access",
-      "Realtime email & push alerts",
-      "Full ICT / SMC narration",
+      "500 credits / month included",
+      "Unlimited voice queries (1 credit each)",
+      "A+ signal access (2 credits)",
+      "Realtime email & push alerts (5 credits)",
+      "Full ICT / SMC narration (3 credits)",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
     ],
+
     highlight: true,
   },
   {
