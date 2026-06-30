@@ -1,9 +1,11 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import SiteFooter from "@/components/SiteFooter";
 import { useCredits } from "@/hooks/useCredits";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
+import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import {
   Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge,
