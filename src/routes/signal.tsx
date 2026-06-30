@@ -1056,9 +1056,8 @@ function SignalVoiceAgent({
   const speech = useSpeech();
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
-  const [messages, setMessages] = useState<{ role: "user" | "agent"; text: string }[]>([
-    { role: "agent", text: "Tap the mic or type — ask anything about this setup." },
-  ]);
+  const [messages, setMessages] = useState<{ role: "user" | "agent"; text: string }[]>([]);
+
   const bufferRef = useRef("");
   const lastHandled = useRef("");
   const scrollRef = useRef<HTMLDivElement>(null);
