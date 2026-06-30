@@ -12,6 +12,8 @@ import { NewsPanel } from "@/components/NewsPanel";
 import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { getGoldNews } from "@/lib/news.functions";
+import { useCredits } from "@/hooks/useCredits";
+
 import { cn } from "@/lib/utils";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
