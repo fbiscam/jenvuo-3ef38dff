@@ -297,7 +297,7 @@ function DashboardLayout() {
   const handleRefresh = () => {
     if (refreshing) return;
     setRefreshTick((t) => t + 1);
-    toast.success("Refreshing analytics…");
+    
   };
 
 
