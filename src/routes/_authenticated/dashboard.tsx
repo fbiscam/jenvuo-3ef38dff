@@ -232,14 +232,17 @@ function DashboardLayout() {
   const [fullName, setFullName] = useState<string>("");
   const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0 });
   const [range, setRange] = useState<RangeKey>("7d");
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshTick, setRefreshTick] = useState(0);
   const credits = useCredits();
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      setRefreshing(true);
       const { data } = await supabase.auth.getUser();
       const u = data.user;
-      if (!u) return;
+      if (!u) { if (!cancelled) setRefreshing(false); return; }
       if (!cancelled) {
         setEmail(u.email ?? "");
         setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
@@ -265,9 +268,16 @@ function DashboardLayout() {
         journalTotal: rows.length,
         journalWinRate: decided.length ? Math.round((wins / decided.length) * 100) : null,
       });
+      setRefreshing(false);
     })();
     return () => { cancelled = true; };
-  }, [range]);
+  }, [range, refreshTick]);
+
+  const handleRefresh = () => {
+    if (refreshing) return;
+    setRefreshTick((t) => t + 1);
+    toast.success("Analytics refreshed");
+  };
 
   const signOut = async () => {
     await supabase.auth.signOut();
