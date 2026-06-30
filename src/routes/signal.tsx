@@ -847,7 +847,7 @@ function SignalPage() {
                       )}
                     >
                       {logging ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : tradeLogged ? <Check className="h-3.5 w-3.5" /> : null}
-                      {tradeLogged ? "Trade Done" : "Take this Trade"}
+                      {tradeLogged ? "Trade Logged" : "Trade Done"}
                     </button>
                     <button
                       type="button"
