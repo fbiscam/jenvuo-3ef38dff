@@ -141,7 +141,8 @@ function InsightsPage() {
                       {fmtUTC(featured.published_at, "full")}
                     </span>
                     <Link
-                      to={`/insights/${featured.slug}`}
+                      to="/insights/$slug"
+                      params={{ slug: featured.slug }}
                       className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 hover:gap-3 transition-all"
                     >
                       Read full briefing <span>→</span>
