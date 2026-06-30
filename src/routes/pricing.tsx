@@ -286,7 +286,6 @@ function PricingPage() {
                   </th>
                   );
                 })}
-                ))}
               </tr>
             </thead>
 
