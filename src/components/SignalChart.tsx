@@ -100,7 +100,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       wickUpColor: "#22c55e",
       wickDownColor: "#ef4444",
     });
-    series.setData(candles.map((c) => ({ ...c, time: c.time as Time })));
+    series.setData(candles.map((c) => ({ ...c, time: Number(c.time) as Time })));
     chart.timeScale().fitContent();
     chartRef.current = chart;
     seriesRef.current = series;
