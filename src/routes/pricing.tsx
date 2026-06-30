@@ -153,15 +153,6 @@ function PricingPage() {
 
       {/* HERO */}
       <section className="relative border-b border-zinc-100 overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-          }}
-        />
         <div className="relative mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-24 text-center">
           
           <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
