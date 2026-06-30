@@ -239,6 +239,87 @@ export type Database = {
         }
         Relationships: []
       }
+      signal_alert_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      signal_alerts: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          direction: string
+          entry: number
+          fired_at: string
+          grade: string
+          htf_bias: string | null
+          id: string
+          killzone: string | null
+          pair: string
+          rationale: string | null
+          rr: number | null
+          session: string | null
+          setup_score: number | null
+          sl: number
+          tp: number
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          direction: string
+          entry: number
+          fired_at?: string
+          grade: string
+          htf_bias?: string | null
+          id?: string
+          killzone?: string | null
+          pair?: string
+          rationale?: string | null
+          rr?: number | null
+          session?: string | null
+          setup_score?: number | null
+          sl: number
+          tp: number
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          direction?: string
+          entry?: number
+          fired_at?: string
+          grade?: string
+          htf_bias?: string | null
+          id?: string
+          killzone?: string | null
+          pair?: string
+          rationale?: string | null
+          rr?: number | null
+          session?: string | null
+          setup_score?: number | null
+          sl?: number
+          tp?: number
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
