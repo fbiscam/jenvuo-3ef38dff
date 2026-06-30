@@ -286,16 +286,7 @@ function InsightsPage() {
               <p className="text-zinc-600 max-w-xl mx-auto mb-8 text-sm sm:text-base">
                 Join 5,000+ traders receiving Jenvu terminal insights directly in their inbox before the New York open.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="Enter email for daily briefings"
-                  className="flex-1 bg-white border border-zinc-200 text-zinc-900 placeholder:text-zinc-400 rounded-xl px-4 py-3 text-sm outline-none focus:border-zinc-900 transition-all"
-                />
-                <button className="bg-zinc-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-zinc-800 transition-colors whitespace-nowrap">
-                  SUBSCRIBE
-                </button>
-              </div>
+              <SubscribeForm />
             </div>
           </div>
         </main>
