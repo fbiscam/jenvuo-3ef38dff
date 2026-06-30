@@ -269,28 +269,28 @@ function InsightsPage() {
           </div>
 
           {/* LOAD MORE / NEWSLETTER */}
-          <div className="mt-20 rounded-3xl bg-zinc-900 p-8 sm:p-12 text-center text-white relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10" style={{
-              backgroundImage: "radial-gradient(#fff 0.5px, transparent 0.5px)",
+          <div className="mt-20 rounded-3xl bg-zinc-50 border border-zinc-200 p-8 sm:p-12 text-center text-zinc-900 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-[0.07]" style={{
+              backgroundImage: "radial-gradient(#000 0.5px, transparent 0.5px)",
               backgroundSize: "20px 20px"
             }} />
             <div className="relative z-10">
-              <div className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-4`}>
+              <div className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-4`}>
                 INTELLIGENCE HUB
               </div>
               <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4">
                 Institutional briefings, delivered live.
               </h2>
-              <p className="text-zinc-400 max-w-xl mx-auto mb-8 text-sm sm:text-base">
+              <p className="text-zinc-600 max-w-xl mx-auto mb-8 text-sm sm:text-base">
                 Join 5,000+ traders receiving Jenvu terminal insights directly in their inbox before the New York open.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <input
                   type="email"
                   placeholder="Enter email for daily briefings"
-                  className="flex-1 bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-white/30 transition-all"
+                  className="flex-1 bg-white border border-zinc-200 text-zinc-900 placeholder:text-zinc-400 rounded-xl px-4 py-3 text-sm outline-none focus:border-zinc-900 transition-all"
                 />
-                <button className="bg-white text-zinc-900 px-6 py-3 rounded-xl text-sm font-bold hover:bg-zinc-100 transition-colors whitespace-nowrap">
+                <button className="bg-zinc-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-zinc-800 transition-colors whitespace-nowrap">
                   SUBSCRIBE
                 </button>
               </div>
