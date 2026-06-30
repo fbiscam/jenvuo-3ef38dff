@@ -142,14 +142,15 @@ function AuthPage() {
               {/* LEFT — FORM */}
               <div className="lg:col-span-7 bg-white p-5 sm:p-6 lg:p-8">
 
-                <div className="max-w-md mx-auto lg:mx-0">
+                <div className="max-w-lg mx-auto lg:mx-0">
                   
-                  <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
+                  <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl lg:text-5xl">
                     Sign in to your desk.
                   </h1>
-                  <p className="mt-2 text-sm text-zinc-600 leading-relaxed">
+                  <p className="mt-3 text-base text-zinc-600 leading-relaxed sm:text-lg">
                     Voice-native institutional intelligence, on call.
                   </p>
+
 
                   <form onSubmit={signIn} className="mt-5 space-y-3">
 
