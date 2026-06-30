@@ -223,7 +223,7 @@ function AuthPage() {
 
 
                   {/* Tabs */}
-                  <div className="mt-6 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
+                  <div className="mt-4 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
                     <button
                       type="button"
                       onClick={() => { setMode("signin"); setErrorMsg(null); }}
@@ -240,7 +240,8 @@ function AuthPage() {
                     </button>
                   </div>
 
-                  <form onSubmit={mode === "signin" ? signIn : signUp} className="mt-5 space-y-4">
+                  <form onSubmit={mode === "signin" ? signIn : signUp} className="mt-4 space-y-3">
+
 
                     {mode === "signup" && (
                       <div>
