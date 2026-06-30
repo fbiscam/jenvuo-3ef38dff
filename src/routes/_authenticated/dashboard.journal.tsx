@@ -138,7 +138,7 @@ function Journal() {
         {[
           { k: "Trades", v: stats.total, live: false },
           { k: "Open", v: stats.open, live: false },
-          { k: "Win rate", v: `${stats.winRate}%`, live: false },
+          { k: "Win rate", v: `${stats.winRate}%`, live: stats.liveCounted > 0 },
           {
             k: "P&L",
             v: `${stats.pnl >= 0 ? "+" : ""}${stats.pnl.toFixed(2)}`,
