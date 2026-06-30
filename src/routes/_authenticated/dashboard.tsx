@@ -501,19 +501,16 @@ function DashboardLayout() {
 
 
           <Card className="flex flex-col">
-            <CardHeader icon={Activity} title="Signal Desk" right={<ArrowRight className="h-4 w-4 text-zinc-400" />} />
-            <div className="flex flex-1 flex-col items-center justify-center px-6 py-8 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100">
-                <Activity className="h-5 w-5 text-zinc-700" />
-              </div>
-              <h3 className="mt-3 text-[14px] font-semibold text-zinc-900">Live A+ scans, ICT/SMC narration</h3>
-              <p className="mt-1 max-w-[260px] text-[12px] text-zinc-500">
-                Watch the engine grade the next setup in real time with full trade plan.
-              </p>
-              <Link to="/signal" className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] font-medium text-zinc-800 hover:bg-zinc-50">
-                Open desk
-              </Link>
-            </div>
+            <CardHeader
+              icon={Activity}
+              title="Signal Desk"
+              right={
+                <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                  Open desk <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              }
+            />
+            <SignalDeskHistory />
           </Card>
         </section>
 
