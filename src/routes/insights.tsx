@@ -193,7 +193,7 @@ function InsightsPage() {
                   </p>
                   <div className="mt-4 flex items-center justify-between">
                     <span className={`${MONO} text-[10px] text-zinc-400`}>
-                      {format(new Date(item.published_at), "HH:mm 'UTC' · MMM d")}
+                      {fmtUTC(item.published_at, "compact")}
                     </span>
                     <span className="text-[10px] font-bold text-zinc-900 group-hover:translate-x-1 transition-transform">
                       VIEW REPORT ↗
