@@ -208,18 +208,19 @@ function AuthPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
               {/* LEFT — FORM */}
-              <div className="lg:col-span-7 bg-white p-5 sm:p-6 lg:p-8">
+              <div className="lg:col-span-7 bg-white p-4 sm:p-5 lg:p-6 lg:overflow-y-auto">
 
                 <div className="max-w-lg mx-auto lg:mx-0">
 
-                  <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl lg:text-5xl">
+                  <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl lg:text-4xl">
                     {mode === "signin" ? "Sign in to your desk." : "Create your desk."}
                   </h1>
-                  <p className="mt-3 text-base text-zinc-600 leading-relaxed sm:text-lg">
+                  <p className="mt-2 text-sm text-zinc-600 leading-relaxed sm:text-base">
                     Voice-native institutional intelligence, on call.
                   </p>
+
 
                   {/* Tabs */}
                   <div className="mt-6 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
