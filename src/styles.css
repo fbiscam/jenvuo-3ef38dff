@@ -183,8 +183,26 @@
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-.animate-ticker { animation: ticker-marquee 60s linear infinite; }
+.animate-ticker { animation: ticker-marquee 60s linear infinite; will-change: transform; }
 .animate-ticker:hover { animation-play-state: paused; }
+
+/* Mobile perf: silence heavy GPU animations on small screens to prevent lag */
+@media (max-width: 767px) {
+  .animate-ticker { animation-duration: 90s; }
+  [style*="orb-drift-a"],
+  [style*="orb-drift-b"],
+  [style*="orb-shimmer"],
+  [style*="orb-hue"] {
+    animation: none !important;
+  }
+  .animate-\[spin_18s_linear_infinite\],
+  .animate-\[spin_24s_linear_infinite_reverse\] {
+    animation: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
 
 
 /* Capacitor native: safe-area insets for notches / home indicator */
