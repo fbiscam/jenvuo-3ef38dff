@@ -1,10 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { format } from "date-fns";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Insight = Tables<"insights">;
+
+// Format date deterministically in UTC so SSR and client match exactly.
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtUTC(iso: string, kind: "full" | "compact") {
+  const d = new Date(iso);
+  const mo = MONTHS[d.getUTCMonth()];
+  const day = d.getUTCDate();
+  const yr = d.getUTCFullYear();
+  const hh = String(d.getUTCHours()).padStart(2, "0");
+  const mm = String(d.getUTCMinutes()).padStart(2, "0");
+  return kind === "full"
+    ? `${mo} ${day}, ${yr} · ${hh}:${mm} UTC`
+    : `${hh}:${mm} UTC · ${mo} ${day}`;
+}
 
 const insightsQueryOptions = queryOptions({
   queryKey: ["insights"],
