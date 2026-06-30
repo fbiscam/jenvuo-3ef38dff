@@ -115,7 +115,7 @@ const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Inter',system-ui,sans-serif]";
 
 function InsightDetailPage() {
-  const { slug } = useParams({ from: "/insights/$slug" });
+  const { slug } = useParams({ from: "/insights_/$slug" });
   const { data: insight } = useSuspenseQuery(insightDetailQueryOptions(slug));
 
   return (
