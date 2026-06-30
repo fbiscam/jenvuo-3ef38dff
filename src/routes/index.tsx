@@ -647,14 +647,19 @@ function HomePage() {
           {/* Mobile stacked plan cards (table is unreadable below sm) */}
           <div className="mt-10 grid gap-4 sm:hidden">
             {[
-              { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", credits: "10 credits / mo", bullets: ["1 voice query / day", "4h delayed alerts", "Community support"] },
-              { name: "Pro", price: "$29/mo", tag: "Active trader", to: "/contact" as const, cta: "Notify me", credits: "175 credits / mo", accent: true, bullets: ["Unlimited voice queries", "Realtime A+ alerts", "Full ICT / SMC narration", "Trade journal"] },
-              { name: "Elite", price: "$99/mo", tag: "Desk / fund", to: "/contact" as const, cta: "Talk to sales", credits: "595 credits / mo", bullets: ["Everything in Pro", "< 30s priority alerts", "Multi-pair scanner", "API & webhooks"] },
-            ].map((p) => (
-              <div key={p.name} className={`rounded-2xl border ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
-                <div className="flex items-center justify-between">
+              { name: "Free", key: "free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", credits: "10 credits / mo", bullets: ["1 voice query / day", "4h delayed alerts", "Community support"] },
+              { name: "Pro", key: "pro", price: "$29/mo", tag: "Active trader", to: "/contact" as const, cta: "Notify me", credits: "175 credits / mo", accent: true, bullets: ["Unlimited voice queries", "Realtime A+ alerts", "Full ICT / SMC narration", "Trade journal"] },
+              { name: "Elite", key: "elite", price: "$99/mo", tag: "Desk / fund", to: "/contact" as const, cta: "Talk to sales", credits: "595 credits / mo", bullets: ["Everything in Pro", "< 30s priority alerts", "Multi-pair scanner", "API & webhooks"] },
+            ].map((p) => {
+              const isCurrent = currentPlan === p.key;
+              return (
+              <div key={p.name} className={`rounded-2xl border ${isCurrent ? "border-emerald-400 bg-emerald-50/40" : p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
-                  {p.accent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>}
+                  <div className="flex items-center gap-1.5">
+                    {isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>Current</span>}
+                    {p.accent && !isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>}
+                  </div>
                 </div>
                 <div className="mt-2 text-2xl font-bold tracking-tight text-zinc-900">{p.price}</div>
                 <p className={`${MONO} mt-0.5 text-[10px] uppercase tracking-wider text-zinc-500`}>{p.tag} · {p.credits}</p>
@@ -663,9 +668,14 @@ function HomePage() {
                     <li key={b} className="flex gap-2"><span className="text-zinc-400">·</span><span>{b}</span></li>
                   ))}
                 </ul>
-                <Link to={p.to} className={`mt-5 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-xs font-medium ${p.accent ? "bg-zinc-900 text-white" : "border border-zinc-300 bg-white text-zinc-900"}`}>{p.cta}</Link>
+                {isCurrent ? (
+                  <div className="mt-5 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">Active plan</div>
+                ) : (
+                  <Link to={p.to} className={`mt-5 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-xs font-medium ${p.accent ? "bg-zinc-900 text-white" : "border border-zinc-300 bg-white text-zinc-900"}`}>{p.cta}</Link>
+                )}
               </div>
-            ))}
+              );
+            })}
             <Link to="/pricing" className="text-center text-sm font-medium text-zinc-900 underline underline-offset-4">See full comparison →</Link>
           </div>
 
