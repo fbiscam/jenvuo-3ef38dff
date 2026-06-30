@@ -955,3 +955,59 @@ function HomePage() {
     </>
   );
 }
+
+const TESTIMONIALS = [
+  { q: "Feels like sitting next to a 25-year desk trader. The narration alone changed how I read structure.", n: "A. Rahman", r: "Prop Desk · Dubai" },
+  { q: "ICT setups marked live on the chart, with voice — I stopped second-guessing my entries.", n: "M. Chen", r: "Independent · Singapore" },
+  { q: "Gold execution is on another level. The killzone + sweep logic is exactly how I trade.", n: "S. Patel", r: "Family Office · London" },
+  { q: "The A+ alert hit my inbox 4 minutes before the London sweep. Caught the entire leg.", n: "J. Okafor", r: "Prop Trader · Lagos" },
+  { q: "Voice-first execution is the unlock. I run analysis hands-free while managing risk.", n: "L. Becker", r: "Discretionary FX · Frankfurt" },
+  { q: "Finally a tool that respects how institutional desks actually read liquidity.", n: "R. Alvarez", r: "Hedge Fund Analyst · NYC" },
+  { q: "The bias engine across 4H/1H/15m is brutally accurate on gold. Worth every cent.", n: "T. Yamamoto", r: "Retail Pro · Tokyo" },
+];
+
+function TestimonialsCarousel() {
+  const [i, setI] = React.useState(0);
+  React.useEffect(() => {
+    const id = setInterval(() => setI((p) => (p + 1) % TESTIMONIALS.length), 5000);
+    return () => clearInterval(id);
+  }, []);
+  const visible = [0, 1, 2].map((o) => TESTIMONIALS[(i + o) % TESTIMONIALS.length]);
+  return (
+    <section className="border-t border-zinc-100 bg-white">
+      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Trusted by traders.</h2>
+          <div className="flex gap-1.5">
+            {TESTIMONIALS.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setI(idx)}
+                aria-label={`Show testimonial ${idx + 1}`}
+                className={`h-1.5 rounded-full transition-all ${idx === i ? "w-6 bg-zinc-900" : "w-1.5 bg-zinc-300 hover:bg-zinc-500"}`}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {visible.map((t, idx) => (
+            <figure
+              key={`${i}-${idx}`}
+              className="animate-fade-in rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-zinc-300 hover:shadow-md"
+            >
+              <blockquote className="text-[15px] leading-relaxed text-zinc-800">"{t.q}"</blockquote>
+              <figcaption className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4 text-xs">
+                <div>
+                  <div className="font-semibold text-zinc-900">{t.n}</div>
+                  <div className="text-zinc-500">{t.r}</div>
+                </div>
+                <span className="text-zinc-400">↗</span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
