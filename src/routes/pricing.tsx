@@ -51,7 +51,9 @@ const TIERS = [
     tagline: "Try the voice agent.",
     cta: "Start free",
     ctaTo: "/auth",
-    features: ["Voice agent (1 query/day)", "Delayed alerts (4h)", "Public market insights", "Community support"],
+    credits: 10,
+    features: ["10 credits / month included", "Voice agent (1 credit / query)", "Delayed alerts (4h)", "Public market insights", "Community support"],
+
     highlight: false,
   },
   {
