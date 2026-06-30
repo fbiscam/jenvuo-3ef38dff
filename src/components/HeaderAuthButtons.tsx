@@ -8,9 +8,9 @@ const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 export default function HeaderAuthButtons() {
   const { user, loading } = useAuthUser();
 
-  // Reserve space to avoid layout jump
-  if (loading) {
-    return <div className="flex shrink-0 items-center gap-2" style={{ minWidth: 180, minHeight: 32 }} />;
+  // If we still don't know auth state (e.g. SSR / no localStorage), reserve space.
+  if (loading && !user) {
+    // Render the signed-out buttons by default so they appear instantly.
   }
 
   if (user) {
