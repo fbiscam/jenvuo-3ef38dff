@@ -28,9 +28,12 @@ type Trade = {
 const EMPTY: Partial<Trade> = { pair: "XAUUSD", direction: "long", outcome: "open" };
 
 function Journal() {
+  const { features, isLoading } = useCredits();
+  const locked = !isLoading && !features.journal;
   const [trades, setTrades] = useState<Trade[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Partial<Trade>>(EMPTY);
+
 
   const load = async () => {
     const { data } = await supabase.from("trade_journal").select("*").order("opened_at", { ascending: false });
