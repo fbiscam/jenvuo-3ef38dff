@@ -91,7 +91,23 @@ export const Route = createFileRoute("/insights/$slug")({
   },
   loader: ({ params, context }) => context.queryClient.ensureQueryData(insightDetailQueryOptions(params.slug)),
   component: InsightDetailPage,
-});
+  errorComponent: ({ error, reset }) => (
+    <div className="min-h-dvh w-full bg-white text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
+      <div className="text-xs font-mono uppercase tracking-widest text-red-600 mb-3">Report unavailable</div>
+      <h1 className="text-2xl font-semibold mb-3">We couldn't load this briefing.</h1>
+      <p className="text-sm text-zinc-500 max-w-md mb-6">{error?.message || "The article may have moved or the connection failed."}</p>
+      <div className="flex gap-3">
+        <button onClick={() => reset()} className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white">Retry</button>
+        <Link to="/insights" className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium">Back to insights</Link>
+      </div>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="min-h-dvh w-full bg-white text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
+      <h1 className="text-2xl font-semibold mb-3">Briefing not found</h1>
+      <Link to="/insights" className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white">Back to insights</Link>
+    </div>
+  ),
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Inter',system-ui,sans-serif]";
