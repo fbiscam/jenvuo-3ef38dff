@@ -1189,8 +1189,8 @@ function SignalVoiceAgent({
   const showInput = inputOpen || status !== "idle" || messages.length > 0;
 
   return (
-    <div className={cn("flex flex-col", showInput ? "space-y-4" : "h-full justify-center")}>
-      <div className="flex justify-center">
+    <div className="flex flex-col gap-4 min-h-[180px]">
+      <div className={cn("flex justify-center", !showInput && "flex-1 items-center")}>
         <button
           type="button"
           onClick={() => setInputOpen((v) => !v)}
@@ -1200,6 +1200,7 @@ function SignalVoiceAgent({
           <SignalOrb status={status} pulse={speech.wordPulse} />
         </button>
       </div>
+
 
 
       {messages.length > 0 && (
