@@ -122,6 +122,7 @@ function ContactPage() {
             <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900">
               <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
               <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
+              <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
               <Link to="/about" className="hover:text-zinc-900">About</Link>
               <Link to="/download" className="hover:text-zinc-900">Download</Link>
               <Link to="/contact" className="hover:text-zinc-900 font-medium">Contact</Link>
@@ -147,7 +148,7 @@ function ContactPage() {
               Talk to the desk.
             </h1>
             <p className="mt-4 max-w-2xl text-base text-zinc-600 leading-relaxed sm:text-lg">
-              Partnerships, support, press, or feedback — drop a note and we'll reply within one business day.
+              Partnerships, support, press, or feedback — drop a note&nbsp;
             </p>
           </div>
         </section>
