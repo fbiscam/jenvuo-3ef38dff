@@ -12,15 +12,21 @@ export const Route = createFileRoute("/help/$collection")({
   },
   head: ({ params, loaderData }) => {
     const title = loaderData?.collection?.title ?? "Help";
-    const desc = loaderData?.collection?.description ?? "Jenvu Help Center";
+    const desc = loaderData?.collection?.description ?? "Jenvu AI Help Center";
+    const count = loaderData?.collection?.articles?.length ?? 0;
     const url = `https://jenvu.com/help/${params.collection}`;
+    const metaDesc = `${desc} Browse ${count} guides and FAQs in the Jenvu AI Help Center.`;
     return {
       meta: [
-        { title: `${title} — Help Center — Jenvu` },
-        { name: "description", content: desc },
-        { property: "og:title", content: `${title} — Jenvu Help` },
-        { property: "og:description", content: desc },
+        { title: `${title} — Help Center | Jenvu AI` },
+        { name: "description", content: metaDesc },
+        { property: "og:title", content: `${title} — Jenvu AI Help` },
+        { property: "og:description", content: metaDesc },
         { property: "og:url", content: url },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: `${title} — Jenvu AI Help` },
+        { name: "twitter:description", content: metaDesc },
       ],
       links: [{ rel: "canonical", href: url }],
     };
