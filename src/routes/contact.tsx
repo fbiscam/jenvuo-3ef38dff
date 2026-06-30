@@ -8,22 +8,23 @@ import SiteFooter from "@/components/SiteFooter";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact Our Team — Jenvu" },
+      { title: "Partner With Us — Jenvu" },
       {
         name: "description",
         content:
-          "Get in touch with the Jenvu desk. Send partnership, support, or feedback requests directly to our team — we respond within one business day.",
+          "Partner with Jenvu — collaborate with our desk on integrations, institutional access, media, and support. Reach the team behind the voice-native trading terminal.",
       },
-      { property: "og:title", content: "Contact Our Team — Jenvu" },
+      { property: "og:title", content: "Partner With Us — Jenvu" },
       {
         property: "og:description",
-        content: "Reach the Jenvu desk for partnerships, support and feedback. Direct line to the team behind the voice-native trading terminal.",
+        content: "Partner with Jenvu — collaborate with our desk on integrations, institutional access, media, and support.",
       },
       { property: "og:url", content: "https://jenvu.com/contact" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Contact Our Team — Jenvu" },
-      { name: "twitter:description", content: "Reach the Jenvu desk for partnerships, support and feedback." },
+      { name: "twitter:title", content: "Partner With Us — Jenvu" },
+      { name: "twitter:description", content: "Partner with Jenvu — collaborate with our desk on integrations, access, and support." },
+
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/contact" }],
     scripts: [

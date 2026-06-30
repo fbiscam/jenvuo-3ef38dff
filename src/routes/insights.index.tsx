@@ -39,13 +39,25 @@ const insightsQueryOptions = queryOptions({
 export const Route = createFileRoute("/insights/")({
   head: () => ({
     meta: [
-      { title: "Market Insights & Terminal Briefings — Jenvu" },
+      { title: "Our Insights — Jenvu" },
       {
         name: "description",
         content:
-          "Live institutional briefings, gold analysis, and market updates narrated by the Jenvu terminal engine.",
+          "Our insights — daily gold analysis, ICT and SMC briefings, and institutional market updates narrated by the Jenvu terminal engine.",
       },
+      { property: "og:title", content: "Our Insights — Jenvu" },
+      {
+        property: "og:description",
+        content: "Daily gold analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
+      },
+      { property: "og:url", content: "https://jenvu.com/insights" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Our Insights — Jenvu" },
+      { name: "twitter:description", content: "Daily gold analysis, ICT and SMC briefings from the Jenvu desk." },
     ],
+    links: [{ rel: "canonical", href: "https://jenvu.com/insights" }],
+
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(insightsQueryOptions),
   component: InsightsPage,
