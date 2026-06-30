@@ -667,24 +667,6 @@ function HomePage() {
               <thead>
                 <tr className="border-b border-zinc-200">
                   <th className="p-6 text-left align-bottom">
-                    <p className={`${MONO} text-[10px] uppercase tracking-[0.3em] text-zinc-500 flex items-center gap-2`}>
-                      <span className="relative inline-block h-3 w-3 rounded-full overflow-hidden shadow-[0_0_8px_rgba(0,0,0,0.15)]">
-                        <span
-                          className="absolute inset-0 rounded-full"
-                          style={{
-                            background:
-                              "conic-gradient(from 0deg, #fbbf24, #f472b6, #60a5fa, #34d399, #fbbf24)",
-                            animation: "spin 3s linear infinite",
-                          }}
-                        />
-                        <span className="absolute inset-[2px] rounded-full bg-white/70 backdrop-blur-sm" />
-                        <span
-                          className="absolute inset-0 rounded-full animate-ping"
-                          style={{ background: "radial-gradient(circle, rgba(251,191,36,0.4), transparent 70%)" }}
-                        />
-                      </span>
-                      [ 04 / PLANS ]
-                    </p>
                     
                     
                   </th>
