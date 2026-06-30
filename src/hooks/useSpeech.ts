@@ -217,7 +217,16 @@ export function useSpeech() {
       if (typeof ev?.charIndex === "number") currentCharRef.current = ev.charIndex;
       if (!ev || ev.name === undefined || ev.name === "word") setWordPulse((n) => n + 1);
     };
+    // Chrome bug: speechSynthesis silently stops after ~15s. Pulse pause/resume to keep alive.
+    const keepAlive = window.setInterval(() => {
+      try {
+        if (!window.speechSynthesis.speaking) return;
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      } catch { /* ignore */ }
+    }, 8000);
     const advance = () => {
+      window.clearInterval(keepAlive);
       if (id !== currentIdRef.current) return; // invalidated by interrupt
       const done = next.onDone;
       currentJobRef.current = null;
@@ -227,6 +236,7 @@ export function useSpeech() {
     u.onend = advance;
     u.onerror = advance;
     window.speechSynthesis.speak(u);
+
   }, []);
 
   const speak = useCallback((text: string, onDone?: () => void) => {
