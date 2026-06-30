@@ -709,11 +709,22 @@ function SignalPage() {
               {t && plan && !marketClosed && (
                 <div className="space-y-3">
                   <div className="flex items-end justify-between">
-                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Trade Plan</span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Trade Plan</span>
+                      <span className={cn(
+                        `text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded`,
+                        isBuy ? "bg-emerald-100 text-emerald-700" :
+                        isSell ? "bg-rose-100 text-rose-700" :
+                        "bg-zinc-100 text-zinc-600",
+                      )}>
+                        {isBuy ? "● BUY" : isSell ? "● SELL" : "WAIT"}
+                      </span>
+                    </div>
                     <span className="text-[11px] text-zinc-500">
                       Conf <span className="font-bold text-zinc-900">{t.confidence}%</span>
                     </span>
                   </div>
+
                   <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-lg overflow-hidden border border-zinc-100">
                     <KV label="Entry" value={t.entry.toFixed(plan.instrument.decimals)} />
                     <KV label="R:R" value={`1:${t.rr.toFixed(2)}`} />
