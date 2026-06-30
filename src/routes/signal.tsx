@@ -1130,11 +1130,28 @@ function SignalVoiceAgent({
     }
   };
 
+  const stripMd = (s: string) =>
+    s
+      .replace(/```[\s\S]*?```/g, " ")
+      .replace(/`([^`]+)`/g, "$1")
+      .replace(/^\s{0,3}#{1,6}\s+/gm, "")
+      .replace(/\*\*\*([^*]+)\*\*\*/g, "$1")
+      .replace(/\*\*([^*]+)\*\*/g, "$1")
+      .replace(/\*([^*]+)\*/g, "$1")
+      .replace(/__([^_]+)__/g, "$1")
+      .replace(/_([^_]+)_/g, "$1")
+      .replace(/^\s*[-*+]\s+/gm, "")
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .replace(/[*_~`>#]+/g, "")
+      .replace(/\n{2,}/g, ". ")
+      .replace(/\s+/g, " ")
+      .trim();
+
   const submit = async (text?: string) => {
     const question = (text ?? q).trim();
     if (!question || busy) return;
-    setMessages((m) => [...m, { role: "user", text: question }]);
     setQ("");
+    setInputOpen(false);
     setBusy(true);
     try {
       const ctx = plan
@@ -1159,7 +1176,7 @@ function SignalVoiceAgent({
       setMessages((m) => [...m, { role: "agent", text: res.reply }]);
       // Mark/focus relevant zones based on both the user question and reply
       highlightFromText(`${question} ${res.reply}`);
-      speech.speak(res.reply);
+      speech.speak(stripMd(res.reply));
     } catch (e: any) {
       setMessages((m) => [...m, { role: "agent", text: e?.message || "Agent failed to respond." }]);
     } finally {
