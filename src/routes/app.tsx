@@ -295,8 +295,16 @@ function Home() {
     const tf = parseTimeframe(query, timeframe);
     if (tf !== timeframe) setTimeframe(tf);
     try {
+      const ok = await credits.spend("voice_query", { query: query.slice(0, 80) });
+      if (!ok) {
+        loadingRef.current = false;
+        setLoading(false);
+        speech.resumeIfWanted();
+        return;
+      }
       const result = await analyze({ data: { timeframe: tf, query } });
       setSignal(result);
+
       speech.speak(result.spokenSummary, () => {
         speech.resumeIfWanted();
         armSleep();
