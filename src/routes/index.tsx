@@ -653,7 +653,7 @@ function HomePage() {
           </div>
 
           {/* Beanstalk-style pricing table */}
-          <div className="mt-14 overflow-x-auto rounded-2xl border border-transparent bg-white">
+          <div className="mt-14 overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
                 <col className="w-[28%]" />
@@ -665,7 +665,7 @@ function HomePage() {
 
               {/* Plan header row */}
               <thead>
-                <tr className="border-b border-transparent">
+                <tr className="border-b border-zinc-200">
                   <th className="p-6 text-left align-bottom">
                     <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Plans</span>
                   </th>
@@ -677,7 +677,7 @@ function HomePage() {
                   ].map((p) => (
                     <th
                       key={p.name}
-                      className={`p-6 text-left align-top border-l border-transparent ${p.accent ? "bg-amber-50/50" : ""}`}
+                      className={`p-6 text-left align-top border-l border-zinc-200 ${p.accent ? "bg-amber-50/50" : ""}`}
                     >
                       <div className="flex items-center gap-2">
                         <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
@@ -729,7 +729,7 @@ function HomePage() {
                 ] as ReadonlyArray<{ f: string; a: string | boolean; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
                   <tr
                     key={row.f}
-                    className={`border-t border-transparent ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
+                    className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
                   >
                     <td className="px-6 py-3.5 text-zinc-800">
                       <div className="flex items-center gap-2">
@@ -746,7 +746,7 @@ function HomePage() {
                     {[row.a, row.b, row.c, row.d].map((v, i) => (
                       <td
                         key={i}
-                        className={`px-6 py-3.5 text-center border-l border-transparent ${i === 1 ? "bg-amber-50/40" : ""}`}
+                        className={`px-6 py-3.5 text-center border-l border-zinc-200 ${i === 1 ? "bg-amber-50/40" : ""}`}
                       >
                         {v === true ? (
                           <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
