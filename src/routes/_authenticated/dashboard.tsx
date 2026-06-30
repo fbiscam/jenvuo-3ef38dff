@@ -496,14 +496,14 @@ function DashboardLayout() {
                   to={t.to as "/dashboard"}
                   className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] transition ${
                     active
-                      ? "bg-zinc-900 text-white"
+                      ? "bg-white text-zinc-900 border border-zinc-200 shadow-sm"
                       : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
                   {t.label}
                   {typeof count === "number" && count > 0 && (
-                    <span className={`ml-0.5 rounded px-1.5 py-0.5 text-[10px] font-semibold ${active ? "bg-white/15 text-white" : "bg-zinc-100 text-zinc-700"}`}>
+                    <span className={`ml-0.5 rounded px-1.5 py-0.5 text-[10px] font-semibold ${active ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-700"}`}>
                       {count}
                     </span>
                   )}
