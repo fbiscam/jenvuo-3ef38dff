@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useCredits } from "@/hooks/useCredits";
+import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { CREDIT_COSTS } from "@/lib/credits.functions";
 
 
@@ -33,17 +32,9 @@ const MATRIX_ROWS: ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark
 const PLAN_KEY_BY_COL: Record<number, string> = { 0: "free", 1: "pro", 2: "elite", 3: "custom" };
 
 function Billing() {
-  const [plan, setPlan] = useState<string>("free");
+  const currentPlan = useCurrentPlan();
+  const plan = currentPlan ?? "free";
   const credits = useCredits();
-
-  useEffect(() => {
-    (async () => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return;
-      const { data } = await supabase.from("profiles").select("plan").eq("id", user.user.id).maybeSingle();
-      if (data?.plan) setPlan(data.plan);
-    })();
-  }, []);
 
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
   const pct = credits.allowance > 0 ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;

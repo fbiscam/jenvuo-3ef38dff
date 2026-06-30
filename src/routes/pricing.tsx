@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 
 import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 import pricingVoice from "@/assets/pricing-voice.jpg";
@@ -133,6 +134,7 @@ const FAQ = [
 ];
 
 function PricingPage() {
+  const currentPlan = useCurrentPlan();
   return (
     <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased`} style={{ zoom: 1.1 }}>
 
@@ -187,11 +189,15 @@ function PricingPage() {
         <div className="mb-10 grid gap-4 sm:hidden">
           {TIERS.map((t) => {
             const accent = t.id === "pro";
+            const isCurrent = currentPlan === t.id;
             return (
-              <div key={t.id} className={`rounded-2xl border ${accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
-                <div className="flex items-center justify-between">
+              <div key={t.id} className={`rounded-2xl border ${isCurrent ? "border-emerald-400 bg-emerald-50/40" : accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <span className={`text-base font-semibold ${accent ? "text-amber-700" : "text-zinc-900"}`}>{t.name}</span>
-                  {accent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>}
+                  <div className="flex items-center gap-1.5">
+                    {isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>Current</span>}
+                    {accent && !isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>}
+                  </div>
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
                   <span className="text-2xl font-bold tracking-tight text-zinc-900">${t.price}</span>
@@ -203,7 +209,11 @@ function PricingPage() {
                     <li key={f} className="flex gap-2"><span className="text-zinc-400">·</span><span>{f}</span></li>
                   ))}
                 </ul>
-                <Link to={t.ctaTo} className={`mt-5 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-xs font-medium ${accent ? "bg-zinc-900 text-white" : "border border-zinc-300 bg-white text-zinc-900"}`}>{t.cta}</Link>
+                {isCurrent ? (
+                  <div className="mt-5 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">Active plan</div>
+                ) : (
+                  <Link to={t.ctaTo} className={`mt-5 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-xs font-medium ${accent ? "bg-zinc-900 text-white" : "border border-zinc-300 bg-white text-zinc-900"}`}>{t.cta}</Link>
+                )}
               </div>
             );
           })}
@@ -226,18 +236,25 @@ function PricingPage() {
                   <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Plans</span>
                 </th>
                 {[
-                  { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false },
-                  { name: "Pro", price: "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
-                  { name: "Elite", price: "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
-                  { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false },
-                ].map((p) => (
+                  { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false, key: "free" },
+                  { name: "Pro", price: "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
+                  { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false, key: "custom" },
+                ].map((p) => {
+                  const isCurrent = currentPlan === p.key;
+                  return (
                   <th
                     key={p.name}
-                    className={`p-6 text-left align-top border-l border-zinc-200 ${p.accent ? "bg-amber-50/50" : ""}`}
+                    className={`p-6 text-left align-top border-l border-zinc-200 ${isCurrent ? "bg-emerald-50/50" : p.accent ? "bg-amber-50/50" : ""}`}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
-                      {p.accent && (
+                      {isCurrent && (
+                        <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
+                          Current
+                        </span>
+                      )}
+                      {p.accent && !isCurrent && (
                         <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
                           Popular
                         </span>
@@ -250,20 +267,25 @@ function PricingPage() {
                       )}
                     </div>
                     <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
-                    <Link
-                      to={p.to}
-                      className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
-                        p.accent
-                          ? "bg-zinc-900 text-white hover:bg-black"
-                          : p.dark
-                          ? "bg-zinc-900 text-white hover:bg-black"
-                          : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
-                      }`}
-                    >
-                      {p.cta}
-                    </Link>
+                    {isCurrent ? (
+                      <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
+                        Active
+                      </div>
+                    ) : (
+                      <Link
+                        to={p.to}
+                        className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                          p.accent || p.dark
+                            ? "bg-zinc-900 text-white hover:bg-black"
+                            : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
+                        }`}
+                      >
+                        {p.cta}
+                      </Link>
+                    )}
                   </th>
-                ))}
+                  );
+                })}
               </tr>
             </thead>
 
