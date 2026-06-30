@@ -781,12 +781,8 @@ function HomePage() {
         </div>
       </section>
 
-
-
-
-
-
-
+      {/* TESTIMONIALS — auto-rotating */}
+      <TestimonialsCarousel />
 
 
       {/* COMPARISON */}
