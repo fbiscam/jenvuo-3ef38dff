@@ -138,10 +138,42 @@ function SignalPage() {
     });
   }, [navigate]);
 
+  const [voiceBlocked, setVoiceBlocked] = useState(false);
+  const [activeTf, setActiveTf] = useState<"htf" | "ltf" | null>(null);
+
   const speakWait = useCallback(
     (text: string) =>
       new Promise<void>((resolve) => {
-        speech.speak(text, () => resolve());
+        if (!text || !text.trim()) return resolve();
+        const words = text.split(/\s+/).filter(Boolean).length;
+        const minMs = Math.max(2500, words * 320);
+        let done = false;
+        const finish = () => { if (!done) { done = true; resolve(); } };
+        // Hard ceiling so a stuck onend never blocks the walkthrough.
+        const ceiling = setTimeout(finish, Math.max(minMs + 4000, words * 600));
+        try {
+          let started = false;
+          const startCheck = setTimeout(() => {
+            // If speech never started within 400ms, treat as blocked → caption mode.
+            if (!started) {
+              setVoiceBlocked(true);
+              setTimeout(() => { clearTimeout(ceiling); finish(); }, minMs);
+            }
+          }, 400);
+          // monkey-patch onstart detection by piggy-backing on speaking flag tick
+          const tick = setInterval(() => {
+            if (window.speechSynthesis?.speaking) { started = true; clearInterval(tick); clearTimeout(startCheck); }
+          }, 80);
+          speech.speak(text, () => {
+            clearInterval(tick); clearTimeout(startCheck); clearTimeout(ceiling);
+            // Guarantee minimum pause even if TTS finished too fast.
+            const elapsed = 0;
+            setTimeout(finish, Math.max(0, minMs - elapsed));
+          });
+        } catch {
+          setVoiceBlocked(true);
+          setTimeout(finish, minMs);
+        }
       }),
     [speech],
   );
@@ -151,11 +183,12 @@ function SignalPage() {
       htfRef.current?.clear();
       ltfRef.current?.clear();
       setStep(-1);
+      setActiveTf(null);
       setPlaying(true);
       abortRef.current = false;
 
-      // Pre-draw all locally-detected zones (Premium/Discount/OTE/Liquidity/EQH/EQL)
-      // — these are static context, drawn at start, not narrated.
+      // Pre-draw static context zones (Premium/Discount/OTE/Liquidity/EQH/EQL)
+      // so they sit on the chart before narration starts.
       const autoTypes = new Set([
         "premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql",
       ]);
@@ -172,24 +205,33 @@ function SignalPage() {
           if (abortRef.current) break;
           const n = p.narration[i];
           setStep(i);
+          setActiveTf(n.tf);
           if (n.markingIndex != null && p.markings[n.markingIndex]) {
             const m = p.markings[n.markingIndex];
-            if (m.tf === "htf") htfRef.current?.drawMarking(m);
-            else ltfRef.current?.drawMarking(m);
+            const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
+            target?.drawMarking(m);
+            // Give the box one frame to mount, then focus + pulse it.
+            await new Promise((r) => setTimeout(r, 60));
+            target?.focusMarking(m);
           }
           await speakWait(n.say);
-          await new Promise((r) => setTimeout(r, 250));
         }
         if (!abortRef.current) {
+          // Final reveal — draw all entry/sl/tp lines together on LTF.
+          setActiveTf("ltf");
           for (const m of p.markings) {
             if (m.type === "entry" || m.type === "sl" || m.type === "tp") {
               ltfRef.current?.drawMarking(m);
             }
           }
+          const entry = p.markings.find((m) => m.type === "entry");
+          if (entry) ltfRef.current?.focusMarking(entry);
           await speakWait(p.trade.summary);
+          toast.success(`Setup ready · ${p.setupGrade}`);
         }
       } finally {
         setPlaying(false);
+        setActiveTf(null);
       }
     },
     [speakWait],
@@ -204,13 +246,8 @@ function SignalPage() {
       if (!ok) { setLoading(false); return; }
       const p = await fetchPlan({ data: { symbol: symbol || "XAUUSD" } });
       setPlan(p);
-      // ICT/SMC narration is a premium add-on — only for plans with full_ict
-      if (credits.features.full_ict) {
-        const ictOk = await credits.spend("ict_narration", { symbol: symbol || "XAUUSD" });
-        if (ictOk) setTimeout(() => runNarration(p), 400);
-      } else {
-        toast.info("Upgrade to Pro for full ICT/SMC narration.");
-      }
+      // Always run the guided walkthrough — it's the core product, not a paid add-on.
+      setTimeout(() => runNarration(p), 400);
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
     } finally {
@@ -376,6 +413,22 @@ function SignalPage() {
               </span>
               SIGNAL_DESK // ONLINE
             </div>
+            {voiceBlocked && (
+              <button
+                onClick={() => {
+                  try {
+                    const u = new SpeechSynthesisUtterance(" ");
+                    window.speechSynthesis.speak(u);
+                  } catch {}
+                  setVoiceBlocked(false);
+                  if (plan) runNarration(plan);
+                }}
+                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-amber-200 bg-amber-50 text-[12px] font-medium text-amber-800 hover:bg-amber-100 transition"
+                title="Browser blocked autoplay — tap to enable voice"
+              >
+                🔇 Enable voice
+              </button>
+            )}
             {playing ? (
               <button onClick={stop} className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-red-200 bg-red-50 text-[12px] font-medium text-red-700 hover:bg-red-100 transition">
                 <Pause className="h-3.5 w-3.5" /> Stop
@@ -548,7 +601,7 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div className="rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px]">
+                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
                   {plan ? <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF" /> : <ChartSkeleton />}
                 </div>
               </div>
@@ -568,7 +621,7 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div className="rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px]">
+                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "htf" ? "opacity-55" : "opacity-100")}>
                   {plan ? <SignalChart ref={ltfRef} candles={plan.ltfCandles} tf="ltf" dark={dark} title="LTF" /> : <ChartSkeleton />}
                 </div>
                 <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 flex flex-wrap gap-x-3 gap-y-1 pt-1`}>

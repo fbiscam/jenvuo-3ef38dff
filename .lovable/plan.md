@@ -1,38 +1,54 @@
-## Goal
+## Problem
 
-Set monthly credit grants so every plan retains a **40% margin** vs the top-up rate ($5 / 50 credits = **$0.10 par**). Users receive **60% of par** credits.
+On `/signal`, the agent used to **draw markings one-by-one while speaking each step** (BOS → OB → FVG → liquidity → entry/SL/TP). Right now most analyses don't show that flow — the chart either stays bare or markings appear all at once with no narration. Root causes I found:
 
-## New plan grid
+1. **Narration gated behind Pro** (`src/routes/signal.tsx:208`): free / non-`full_ict` users never trigger `runNarration`, so they see zero step-by-step marking + voice.
+2. **Speech autoplay fails silently** — `speech.speak()` resolves immediately when the browser blocks audio (no user gesture yet), so the loop blasts all markings in <1s with no voice and no pause.
+3. **AI-returned `markingIndex`** is frequently `null` or out of range, so even when narration runs, most steps draw nothing on the chart.
+4. **No visual emphasis** — drawn boxes fade in but the chart doesn't pan/zoom to the new marking, so users don't see what the agent is talking about.
+5. **Engine entry/sl/tp + key zones are appended last**, never linked to narration steps, so the climactic "Entry here, SL here, TP here" moment is missing.
 
-| Plan  | Price | Par credits ($0.10 each) | Granted (60%) | Effective $/credit | Margin |
-|-------|-------|--------------------------|----------------|---------------------|--------|
-| Free  | $0    | —                        | **10 / month** (unchanged) | n/a | n/a |
-| Pro   | $29   | 290                      | **175 / month** | $0.166 | 40% |
-| Elite | $99   | 990                      | **595 / month** | $0.166 | 40% |
+## Plan
 
-Top-up packs stay at par ($0.10/credit) so heavy users can refill without re-pricing.
+### 1. Always run the guided narration (`src/routes/signal.tsx`)
+- Remove the `credits.features.full_ict` gate around `runNarration`. Run it for every successful analysis. Keep the existing per-signal credit spend (it already covers the analysis cost); drop the second `ict_narration` spend so free users get the visual+voice walkthrough as the core product.
+- Show a small "Voice muted — tap to enable" pill if `SpeechSynthesis` is blocked, and play the walkthrough silently (chart still animates) with captions.
 
-## Changes
+### 2. Build a deterministic narration script in code (`src/lib/gold-analysis.functions.ts`)
+After the engine produces `allMarkings`, synthesize a guaranteed 10-step script with correct `markingIndex` values, in this order:
+1. HTF bias + structure
+2. HTF BOS / CHOCH (find first `bos|choch` with `tf:"htf"`)
+3. HTF OB or demand/supply zone
+4. Premium vs Discount (point to `premiumZone`/`discountZone`)
+5. HTF liquidity (PDH/PDL/EQH/EQL)
+6. Shift to LTF
+7. LTF FVG
+8. LTF OB / breaker
+9. Entry (engine entry marking)
+10. SL + TP (two quick steps)
 
-### 1. Database (migration)
-Update `public.plans`:
-- `pro`   → `price_usd = 29`, `monthly_credits = 175`
-- `elite` → `price_usd = 99`, `monthly_credits = 595`
-- `free`  → unchanged (10)
+Use AI-written `say` text when an aligned step exists; otherwise fall back to a templated sentence built from the marking's label and price. This way every step **always** has both a sentence and a marking to draw.
 
-### 2. Pricing page (`src/routes/pricing.tsx`)
-- `TIERS`: Pro `price: 29`, `credits: 175`; Elite `price: 99`, `credits: 595`.
-- Update feature bullet copy (`"500 credits / month included"` → `"175 credits / month included"`, etc.).
-- Comparison matrix row `"Monthly credits"`: `10 / 175 / 595 / Custom`.
-- Keep top-up packs as-is ($5/50, $20/250, $50/750, $120/2000).
+### 3. Cinematic step rendering (`src/components/SignalChart.tsx` + `signal.tsx`)
+- Add `focusMarking(m)` to `SignalChartHandle`: pans the time scale so the marking's `fromTime..toTime` is centered, then briefly pulses the box (outline 2px → 1px, 1s) so the eye locks on.
+- When `runNarration` advances a step:
+  - `drawMarking(m)` on the correct TF chart
+  - `focusMarking(m)` on that same chart
+  - dim the *other* TF chart to 55% opacity for that step, restore on next
+- Highlight the matching narration row in the side feed (already partly wired via `data-step`); add a left accent bar + soft background on the active row.
 
-### 3. Dashboard billing (`src/routes/_authenticated/dashboard.billing.tsx`)
-- Mirror the same numbers in the Current Plan card and comparison matrix.
+### 4. Reliable speech pacing (`src/hooks/useSpeech.ts` + `signal.tsx`)
+- `speakWait` should resolve only on the real `utterance.onend`, with a fallback timer of `max(2.5s, words*0.35s)` if `onend` never fires (Chrome bug on long utterances).
+- If `SpeechSynthesis` is unavailable or `speak` returns immediately without firing `onstart` within 250ms, switch to **caption-only mode**: still pause `max(2.5s, words*0.35s)` between steps so the chart animation reads like a guided tour.
 
-### 4. Fallback constant (`src/lib/credits.functions.ts`)
-- Default free fallback (`monthly_credits: 10`) unchanged. No code changes needed for cost-per-action (`signal=2`, `ict_narration=3`, `voice_query=1`, `alert=5`) — margin is enforced by the smaller monthly grant.
+### 5. Final trade reveal
+After step 10, draw entry/SL/TP price lines together, focus the LTF chart on them, and speak the `trade.summary` line. Toast "Setup ready · A+ / A / B" using the existing `setupGrade`.
 
-## Notes
+### Technical Details
+- Files touched: `src/routes/signal.tsx`, `src/lib/gold-analysis.functions.ts`, `src/components/SignalChart.tsx`, `src/hooks/useSpeech.ts`.
+- No DB / backend schema changes. Credit cost stays the same (one `signal` spend per analysis).
+- No new dependencies; uses `lightweight-charts` APIs already imported (`timeScale().setVisibleRange`, `priceToCoordinate`).
 
-- Existing subscribers won't auto-resync; the next `grant_monthly_credits()` cron run will use the new `monthly_credits`. No backfill needed.
-- The 40% margin holds even if a Pro user spends every credit on the cheapest action (voice query): 175 credits × $0.10 par = $17.50 of value delivered for $29 paid.
+### Out of scope
+- Changing the analysis engine math or scoring weights.
+- Redesigning the page layout — only the chart animation, feed highlight, and voice flow change.
