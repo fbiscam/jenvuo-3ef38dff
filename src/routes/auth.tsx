@@ -187,8 +187,8 @@ function AuthPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 sm:p-4 overflow-hidden">
-        <div className="w-full max-w-6xl max-h-full">
+      <main className="flex-1 flex flex-col items-center justify-center p-3 sm:p-4">
+        <div className="w-full max-w-6xl">
           <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden">
             {/* terminal header */}
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-3">
