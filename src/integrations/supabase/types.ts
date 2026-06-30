@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_preferences: {
+        Row: {
+          browser_enabled: boolean
+          email_enabled: boolean
+          min_grade: string
+          quiet_end: string | null
+          quiet_start: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          browser_enabled?: boolean
+          email_enabled?: boolean
+          min_grade?: string
+          quiet_end?: string | null
+          quiet_start?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          browser_enabled?: boolean
+          email_enabled?: boolean
+          min_grade?: string
+          quiet_end?: string | null
+          quiet_start?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -239,6 +269,62 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          plan: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          plan?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          plan?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_signals: {
+        Row: {
+          alert_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_signals_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "signal_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signal_alert_subscribers: {
         Row: {
           created_at: string
@@ -341,6 +427,57 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+        }
+        Relationships: []
+      }
+      trade_journal: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          direction: string
+          entry: number | null
+          id: string
+          notes: string | null
+          opened_at: string
+          outcome: string
+          pair: string
+          pnl: number | null
+          stop_loss: number | null
+          take_profit: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          direction: string
+          entry?: number | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          outcome?: string
+          pair?: string
+          pnl?: number | null
+          stop_loss?: number | null
+          take_profit?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          direction?: string
+          entry?: number | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          outcome?: string
+          pair?: string
+          pnl?: number | null
+          stop_loss?: number | null
+          take_profit?: number | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
