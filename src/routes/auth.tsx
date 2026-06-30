@@ -67,9 +67,12 @@ function AuthPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
+  const [mode, setMode] = React.useState<"signin" | "signup">("signin");
+  const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
@@ -80,20 +83,67 @@ function AuthPage() {
     return () => sub.subscription.unsubscribe();
   }, [navigate, redirectTo]);
 
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const signInSchema = z.object({
+    email: z.string().trim().email("Enter a valid email").max(255),
+    password: z.string().min(1, "Password is required"),
+  });
+  const signUpSchema = z.object({
+    fullName: z.string().trim().min(1, "Name is required").max(100),
+    email: z.string().trim().email("Enter a valid email").max(255),
+    password: z.string().min(8, "Password must be at least 8 characters").max(72),
+  });
 
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
     setErrorMsg(null);
+    const parsed = signInSchema.safeParse({ email, password });
+    if (!parsed.success) {
+      setErrorMsg(parsed.error.issues[0]?.message ?? "Invalid input");
+      return;
+    }
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: parsed.data.email,
+      password: parsed.data.password,
+    });
     setLoading(false);
     if (error) {
       setErrorMsg(error.message);
       return;
     }
     navigate({ to: redirectTo as "/dashboard", replace: true });
+  };
+
+  const signUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    const parsed = signUpSchema.safeParse({ fullName, email, password });
+    if (!parsed.success) {
+      setErrorMsg(parsed.error.issues[0]?.message ?? "Invalid input");
+      return;
+    }
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email: parsed.data.email,
+      password: parsed.data.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+        data: { full_name: parsed.data.fullName },
+      },
+    });
+    setLoading(false);
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+    if (data.session) {
+      toast.success("Account created");
+      navigate({ to: redirectTo as "/dashboard", replace: true });
+    } else {
+      toast.success("Check your email to confirm your account");
+      setMode("signin");
+      setPassword("");
+    }
   };
 
 
