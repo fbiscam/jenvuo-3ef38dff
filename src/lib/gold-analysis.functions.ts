@@ -926,11 +926,6 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const liqPools = [...detectLiquidityPools(htf, "htf"), ...detectLiquidityPools(ltf, "ltf")];
     const allMarkings: Marking[] = [...pdOte, ...liqPools, ...eqHL, ...aiMarkings];
 
-    // Engine-detected zones (deterministic) — added so the chart reflects what
-    // the engine actually used to compute entry/SL/TP.
-    const engineMarkings: Marking[] = [];
-    for (const f of (function () { return []; })()) void f;
-    // (engine markings appended after engine runs — see below)
 
 
 
