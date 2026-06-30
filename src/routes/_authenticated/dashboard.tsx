@@ -61,6 +61,31 @@ function DashboardLayout() {
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Account</h1>
         <p className="mt-1 text-sm text-zinc-500">Manage your saved setups, alerts and trade journal.</p>
 
+        {/* Launch AI hero */}
+        <Link
+          to="/app"
+          className="group mt-6 relative block overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-950 text-white p-6 sm:p-8 transition hover:bg-black"
+        >
+          <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gradient-to-br from-fuchsia-500/30 via-cyan-400/20 to-amber-300/30 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 -bottom-16 h-56 w-56 rounded-full bg-gradient-to-tr from-emerald-400/20 via-sky-500/20 to-violet-500/30 blur-3xl" />
+          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20 backdrop-blur">
+                <Mic className="h-7 w-7" />
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">Voice Agent</div>
+                <div className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">Launch Jenvu AI</div>
+                <div className="mt-1 text-sm text-white/70">Talk live with your A+ setup analyst — ICT, SMC & multi-TF bias.</div>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-2 self-start rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-900 shadow-lg shadow-black/20 transition group-hover:gap-3">
+              Launch AI <ArrowRight className="h-4 w-4" />
+            </span>
+          </div>
+        </Link>
+
+
         {/* Tab nav */}
         <nav className="mt-6 flex flex-wrap gap-1 border-b border-zinc-200">
           {TABS.map((t) => {
