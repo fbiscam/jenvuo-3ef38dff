@@ -50,7 +50,7 @@ export default function SiteFooter() {
 
 
       {/* Main grid */}
-      <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-16">
+      <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-10">
           {/* Brand */}
           <div className="col-span-2 md:col-span-2 space-y-4">
@@ -106,7 +106,7 @@ export default function SiteFooter() {
         </div>
 
         {/* Divider + sub bar */}
-        <div className="mt-12 pt-6 border-t border-zinc-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mt-8 pt-4 border-t border-zinc-100 flex flex-col md:flex-row items-center justify-between gap-3">
           <div
             className={`${MONO} text-[11px] uppercase tracking-[0.25em] text-zinc-900`}
           >
