@@ -509,7 +509,14 @@ function SignalPage() {
             <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-4 min-h-[280px]">
               {/* Voice AI Agent — orb + chat, can mark on chart */}
               <div className="pb-3 border-b border-zinc-100">
-                <SignalVoiceAgent plan={plan} livePrice={livePrice} htfRef={htfRef} ltfRef={ltfRef} />
+                <SignalVoiceAgent
+                  plan={plan}
+                  livePrice={livePrice}
+                  htfRef={htfRef}
+                  ltfRef={ltfRef}
+                  analyzing={playing}
+                  narrationPulse={speech.wordPulse}
+                />
               </div>
 
               <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
@@ -1095,11 +1102,15 @@ function SignalVoiceAgent({
   livePrice,
   htfRef,
   ltfRef,
+  analyzing,
+  narrationPulse,
 }: {
   plan: SignalPlan | null;
   livePrice: number | null;
   htfRef: React.RefObject<SignalChartHandle | null>;
   ltfRef: React.RefObject<SignalChartHandle | null>;
+  analyzing: boolean;
+  narrationPulse: number;
 }) {
   const ask = useServerFn(askSignalAgent);
   const speech = useSpeech();
@@ -1194,7 +1205,7 @@ function SignalVoiceAgent({
 
   const submit = async (text?: string) => {
     const question = (text ?? q).trim();
-    if (!question || busy) return;
+    if (!question || busy || analyzing) return;
     setQ("");
     setInputOpen(false);
     setBusy(true);
@@ -1248,31 +1259,50 @@ function SignalVoiceAgent({
     }
   };
 
-  const status: "idle" | "listening" | "thinking" | "speaking" = busy
-    ? "thinking"
-    : speech.speaking
-      ? "speaking"
-      : speech.listening
-        ? "listening"
-        : "idle";
+  const status: "idle" | "listening" | "thinking" | "speaking" = analyzing
+    ? "speaking"
+    : busy
+      ? "thinking"
+      : speech.speaking
+        ? "speaking"
+        : speech.listening
+          ? "listening"
+          : "idle";
 
   const suggestions = ["Why this bias?", "Where is invalidation?", "What confirms entry?"];
 
   const [inputOpen, setInputOpen] = useState(false);
-  const showInput = inputOpen;
+  // Force-close input while analysis is running; user can only interact after it's done.
+  useEffect(() => {
+    if (analyzing && inputOpen) setInputOpen(false);
+  }, [analyzing, inputOpen]);
+  const showInput = inputOpen && !analyzing;
+  const orbPulse = analyzing ? narrationPulse : speech.wordPulse;
 
   return (
-    <div className="flex flex-col gap-4 min-h-[180px]">
+    <div className="flex flex-col gap-3 min-h-[180px]">
       <div className={cn("flex justify-center", !showInput && "flex-1 items-center")}>
         <button
           type="button"
-          onClick={() => setInputOpen((v) => !v)}
-          className="rounded-full focus:outline-none"
-          aria-label="Toggle voice input"
+          onClick={() => { if (!analyzing) setInputOpen((v) => !v); }}
+          disabled={analyzing}
+          className={cn(
+            "rounded-full focus:outline-none transition",
+            analyzing ? "cursor-not-allowed" : "cursor-pointer",
+          )}
+          aria-label={analyzing ? "Agent is analyzing" : "Toggle voice input"}
+          title={analyzing ? "Analyzing… please wait" : "Tap to ask the agent"}
         >
-          <SignalOrb status={status} pulse={speech.wordPulse} />
+          <SignalOrb status={status} pulse={orbPulse} />
         </button>
       </div>
+      <p className={cn(
+        "text-center text-[10px] tracking-widest uppercase transition-opacity",
+        MONO,
+        analyzing ? "text-zinc-500 opacity-100" : "opacity-0 h-0 overflow-hidden",
+      )}>
+        Analyzing market — please wait
+      </p>
 
 
 
