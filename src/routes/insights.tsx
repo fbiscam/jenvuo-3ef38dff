@@ -123,7 +123,7 @@ function InsightsPage() {
                   </p>
                   <div className="mt-8 flex items-center gap-4">
                     <span className={`${MONO} text-[11px] text-zinc-400`}>
-                      {format(new Date(featured.published_at), "MMM d, yyyy · HH:mm 'UTC'")}
+                      {fmtUTC(featured.published_at, "full")}
                     </span>
                     <Link
                       to={`/insights/${featured.slug}`}
