@@ -100,7 +100,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       wickUpColor: "#22c55e",
       wickDownColor: "#ef4444",
     });
-    series.setData(candles.map((c) => ({ ...c, time: c.time as Time })));
+    series.setData(candles.map((c) => ({ ...c, time: Number(c.time) as Time })));
     chart.timeScale().fitContent();
     chartRef.current = chart;
     seriesRef.current = series;
@@ -109,9 +109,9 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     // Seed live-bar state from the latest candle and infer bar duration.
     const lastC = candles[candles.length - 1];
     const prevC = candles[candles.length - 2];
-    if (lastC && prevC) bucketSecRef.current = Math.max(1, lastC.time - prevC.time);
+    if (lastC && prevC) bucketSecRef.current = Math.max(1, Number(lastC.time) - Number(prevC.time));
     liveBarRef.current = lastC
-      ? { time: lastC.time, open: lastC.open, high: lastC.high, low: lastC.low, close: lastC.close }
+      ? { time: Number(lastC.time), open: lastC.open, high: lastC.high, low: lastC.low, close: lastC.close }
       : null;
 
     const redrawBoxes = () => {
