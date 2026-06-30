@@ -30,7 +30,25 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/privacy", changefreq: "yearly", priority: "0.3" },
           { path: "/terms", changefreq: "yearly", priority: "0.3" },
           { path: "/disclaimer", changefreq: "yearly", priority: "0.3" },
+          { path: "/help", changefreq: "weekly", priority: "0.6" },
         ];
+
+        // Append Help Center pages
+        try {
+          const { collections } = await import("@/lib/help-content");
+          for (const c of collections) {
+            entries.push({ path: `/help/${c.slug}`, changefreq: "monthly", priority: "0.5" });
+            for (const a of c.articles) {
+              entries.push({
+                path: `/help/${c.slug}/${a.slug}`,
+                changefreq: "monthly",
+                priority: "0.5",
+                lastmod: a.updatedAt,
+              });
+            }
+          }
+        } catch {
+          // ignore
 
         // Append every published insight
         try {
