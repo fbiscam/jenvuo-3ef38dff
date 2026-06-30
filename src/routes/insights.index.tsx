@@ -32,7 +32,7 @@ const insightsQueryOptions = queryOptions({
   },
 });
 
-export const Route = createFileRoute("/insights")({
+export const Route = createFileRoute("/insights/")({
   head: () => ({
     meta: [
       { title: "Market Insights & Terminal Briefings — Jenvu" },
