@@ -620,18 +620,18 @@ function HomePage() {
           </h2>
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
             {[
-              ["ICT", "Killzones, judas swings, PD arrays and silver bullet entries."],
-              ["SMC", "Structure shifts, mitigations, equilibrium reads and premium discount zones."],
-              ["Liquidity", "EQH, EQL, sweeps and engineered stop hunts flagged early."],
-              ["Order Flow", "Displacement, imbalance, institutional candle prints and aggressive absorption."],
-              ["Risk", "Fixed-R sizing with hard daily kill-switch and circuit breakers."],
-              ["Confluence", "Multi-timeframe alignment scored A, A+, A++ with bias confirmation."],
-              ["Macro", "DXY, yields, red-folder news and global risk sentiment overlay."],
-              ["Sessions", "Asia, London and New York killzone bias with timing."],
+              ["ICT", "Killzones, judas swings and silver bullet entries."],
+              ["SMC", "Structure shifts, mitigations and premium discount zones."],
+              ["Liquidity", "EQH, EQL sweeps and engineered stop hunts."],
+              ["Order Flow", "Displacement, imbalance and institutional candle absorption."],
+              ["Risk", "Fixed-R sizing with daily kill-switch breakers."],
+              ["Confluence", "Multi-timeframe alignment scored A, A+, A++."],
+              ["Macro", "DXY, yields and red-folder news overlay."],
+              ["Sessions", "Asia, London and New York killzone bias."],
             ].map(([k, v]) => (
               <div key={k} className="bg-white p-6 text-left">
                 <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
-                <p className="mt-3 text-sm text-zinc-900 leading-relaxed min-h-[2.75rem]">{v}</p>
+                <p className="mt-3 text-sm text-zinc-900 leading-relaxed line-clamp-2 min-h-[2.75rem]">{v}</p>
               </div>
             ))}
           </div>
