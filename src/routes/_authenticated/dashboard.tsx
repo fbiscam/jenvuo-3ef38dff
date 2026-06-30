@@ -253,21 +253,27 @@ function DashboardLayout() {
 
       const savedQ = supabase.from("saved_signals").select("id", { count: "exact", head: true });
       const alertsQ = supabase.from("signal_alerts").select("id", { count: "exact", head: true });
-      const journalQ = supabase.from("trade_journal").select("outcome, created_at").eq("user_id", u.id);
+      const journalQ = supabase.from("trade_journal").select("outcome, created_at, pair, direction, entry, stop_loss, take_profit").eq("user_id", u.id);
       if (since) {
         alertsQ.gte("created_at", since);
         journalQ.gte("created_at", since);
       }
       const [saved, alerts, journal] = await Promise.all([savedQ, alertsQ, journalQ]);
       if (cancelled) return;
-      const rows = (journal.data ?? []) as Array<{ outcome: string }>;
+      const rows = (journal.data ?? []) as Array<{ outcome: string; pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null }>;
       const decided = rows.filter(r => r.outcome === "win" || r.outcome === "loss");
       const wins = decided.filter(r => r.outcome === "win").length;
+      const openTrades: OpenTrade[] = rows
+        .filter(r => r.outcome === "open" && r.entry != null)
+        .map(r => ({ pair: r.pair, direction: r.direction, entry: r.entry, stop_loss: r.stop_loss, take_profit: r.take_profit }));
       setCounts({
         saved: saved.count ?? 0,
         alerts7d: alerts.count ?? 0,
         journalTotal: rows.length,
         journalWinRate: decided.length ? Math.round((wins / decided.length) * 100) : null,
+        closedWins: wins,
+        closedDecided: decided.length,
+        openTrades,
       });
       setRefreshing(false);
     })();
