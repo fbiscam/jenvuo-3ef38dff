@@ -103,14 +103,19 @@ function Sparkline({ seed = 1, tone = "blue", empty = false, trend = "flat", mag
 }
 
 function Metric({
-  label, value, delta, tone = "blue", seed = 1,
+  label, value, delta, tone = "blue", seed = 1, trend, magnitude,
 }: {
-  label: string; value: React.ReactNode; delta?: string | null; tone?: "blue" | "rose" | "zinc"; seed?: number;
+  label: string; value: React.ReactNode; delta?: string | null; tone?: "blue" | "rose" | "zinc"; seed?: number; trend?: "up" | "down" | "flat"; magnitude?: number;
 }) {
   const negative = delta?.startsWith("-");
   const raw = typeof value === "string" || typeof value === "number" ? String(value).trim() : "";
   const numeric = parseFloat(raw.replace(/[^0-9.\-]/g, ""));
   const isEmpty = raw === "" || raw === "—" || raw === "…" || (!Number.isNaN(numeric) && numeric === 0);
+
+  // derive trend from delta if not explicitly provided
+  const derivedTrend: "up" | "down" | "flat" = trend
+    ?? (delta ? (negative ? "down" : "up") : "flat");
+  const derivedMag = magnitude ?? (delta ? Math.min(60, Math.abs(parseFloat(delta.replace(/[^0-9.\-]/g, ""))) || 30) : 0);
 
   return (
     <div className="flex-1 min-w-0 p-4">
@@ -128,7 +133,7 @@ function Metric({
         )}
       </div>
       <div className="mt-2 -mb-1 opacity-90">
-        <Sparkline seed={seed} tone={tone} empty={isEmpty} />
+        <Sparkline seed={seed} tone={tone} empty={isEmpty} trend={derivedTrend} magnitude={derivedMag} />
       </div>
     </div>
   );
