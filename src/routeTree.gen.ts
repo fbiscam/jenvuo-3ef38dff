@@ -24,8 +24,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AiEngineRouteImport } from './routes/ai-engine'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as InsightsIndexRouteImport } from './routes/insights.index'
-import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
+import { Route as InsightsSlugRouteImport } from './routes/insights_.$slug'
 import { Route as ApiSeedAdminRouteImport } from './routes/api/seed-admin'
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
 
@@ -104,15 +103,10 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InsightsIndexRoute = InsightsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => InsightsRoute,
-} as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => InsightsRoute,
+  id: '/insights_/$slug',
+  path: '/insights/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSeedAdminRoute = ApiSeedAdminRouteImport.update({
   id: '/api/seed-admin',
@@ -136,7 +130,7 @@ export interface FileRoutesByFullPath {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
-  '/insights': typeof InsightsRouteWithChildren
+  '/insights': typeof InsightsRoute
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
@@ -144,7 +138,6 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
   '/insights/$slug': typeof InsightsSlugRoute
-  '/insights/': typeof InsightsIndexRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
 }
 export interface FileRoutesByTo {
@@ -157,6 +150,7 @@ export interface FileRoutesByTo {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
+  '/insights': typeof InsightsRoute
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
@@ -164,7 +158,6 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
   '/insights/$slug': typeof InsightsSlugRoute
-  '/insights': typeof InsightsIndexRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
 }
 export interface FileRoutesById {
@@ -178,15 +171,14 @@ export interface FileRoutesById {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
-  '/insights': typeof InsightsRouteWithChildren
+  '/insights': typeof InsightsRoute
   '/llm': typeof LlmRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/api/seed-admin': typeof ApiSeedAdminRoute
-  '/insights/$slug': typeof InsightsSlugRoute
-  '/insights/': typeof InsightsIndexRoute
+  '/insights_/$slug': typeof InsightsSlugRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
 }
 export interface FileRouteTypes {
@@ -209,7 +201,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/seed-admin'
     | '/insights/$slug'
-    | '/insights/'
     | '/api/public/hooks/generate-insight'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -222,6 +213,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
+    | '/insights'
     | '/llm'
     | '/privacy'
     | '/signal'
@@ -229,7 +221,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/seed-admin'
     | '/insights/$slug'
-    | '/insights'
     | '/api/public/hooks/generate-insight'
   id:
     | '__root__'
@@ -249,8 +240,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/api/seed-admin'
-    | '/insights/$slug'
-    | '/insights/'
+    | '/insights_/$slug'
     | '/api/public/hooks/generate-insight'
   fileRoutesById: FileRoutesById
 }
@@ -264,13 +254,14 @@ export interface RootRouteChildren {
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
   DownloadRoute: typeof DownloadRoute
-  InsightsRoute: typeof InsightsRouteWithChildren
+  InsightsRoute: typeof InsightsRoute
   LlmRoute: typeof LlmRoute
   PrivacyRoute: typeof PrivacyRoute
   SignalRoute: typeof SignalRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   ApiSeedAdminRoute: typeof ApiSeedAdminRoute
+  InsightsSlugRoute: typeof InsightsSlugRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
 }
 
@@ -381,19 +372,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/insights/': {
-      id: '/insights/'
-      path: '/'
-      fullPath: '/insights/'
-      preLoaderRoute: typeof InsightsIndexRouteImport
-      parentRoute: typeof InsightsRoute
-    }
-    '/insights/$slug': {
-      id: '/insights/$slug'
-      path: '/$slug'
+    '/insights_/$slug': {
+      id: '/insights_/$slug'
+      path: '/insights/$slug'
       fullPath: '/insights/$slug'
       preLoaderRoute: typeof InsightsSlugRouteImport
-      parentRoute: typeof InsightsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/api/seed-admin': {
       id: '/api/seed-admin'
@@ -412,20 +396,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface InsightsRouteChildren {
-  InsightsSlugRoute: typeof InsightsSlugRoute
-  InsightsIndexRoute: typeof InsightsIndexRoute
-}
-
-const InsightsRouteChildren: InsightsRouteChildren = {
-  InsightsSlugRoute: InsightsSlugRoute,
-  InsightsIndexRoute: InsightsIndexRoute,
-}
-
-const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
-  InsightsRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -436,13 +406,14 @@ const rootRouteChildren: RootRouteChildren = {
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
   DownloadRoute: DownloadRoute,
-  InsightsRoute: InsightsRouteWithChildren,
+  InsightsRoute: InsightsRoute,
   LlmRoute: LlmRoute,
   PrivacyRoute: PrivacyRoute,
   SignalRoute: SignalRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   ApiSeedAdminRoute: ApiSeedAdminRoute,
+  InsightsSlugRoute: InsightsSlugRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
 }
 export const routeTree = rootRouteImport
