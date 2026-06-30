@@ -190,14 +190,14 @@ function SignalPage() {
       abortRef.current = false;
 
       // Pre-draw static context zones (Premium/Discount/OTE/Liquidity/EQH/EQL)
-      // so they sit on the chart before narration starts.
+      // as PERSISTENT background context so they stay visible the whole walkthrough.
       const autoTypes = new Set([
         "premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql",
       ]);
       for (const m of p.markings) {
         if (autoTypes.has(m.type)) {
-          if (m.tf === "htf") htfRef.current?.drawMarking(m);
-          else ltfRef.current?.drawMarking(m);
+          const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
+          target?.drawMarking(m, { transient: false });
         }
       }
 
@@ -208,26 +208,44 @@ function SignalPage() {
           const n = p.narration[i];
           setStep(i);
           setActiveTf(n.tf);
+          const target = n.tf === "htf" ? htfRef.current : ltfRef.current;
+          // Sequential lifecycle: clear previous transient marking, draw + pan to the new one,
+          // then narrate. Only ONE active ICT/SMC marking is visible at a time.
+          htfRef.current?.clearTransient();
+          ltfRef.current?.clearTransient();
           if (n.markingIndex != null && p.markings[n.markingIndex]) {
             const m = p.markings[n.markingIndex];
-            const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
-            target?.drawMarking(m);
+            const drawTarget = m.tf === "htf" ? htfRef.current : ltfRef.current;
+            drawTarget?.drawMarking(m, { transient: true });
+            // Pan/zoom chart so the marking sits in view
+            drawTarget?.panToMarking(m);
             // Give the box one frame to mount, then focus + pulse it.
-            await new Promise((r) => setTimeout(r, 60));
-            target?.focusMarking(m);
+            await new Promise((r) => setTimeout(r, 80));
+            drawTarget?.focusMarking(m);
+          } else if (target) {
+            // No specific marking — just keep current view
           }
           await speakWait(n.say);
+          // Brief fade-out pause before next step
+          if (i < p.narration.length - 1) {
+            await new Promise((r) => setTimeout(r, 220));
+          }
         }
         if (!abortRef.current) {
-          // Final reveal — draw all entry/sl/tp lines together on LTF.
+          // Final reveal — clear any transient marker, then draw entry/sl/tp together (persistent).
+          htfRef.current?.clearTransient();
+          ltfRef.current?.clearTransient();
           setActiveTf("ltf");
           for (const m of p.markings) {
             if (m.type === "entry" || m.type === "sl" || m.type === "tp") {
-              ltfRef.current?.drawMarking(m);
+              ltfRef.current?.drawMarking(m, { transient: false });
             }
           }
           const entry = p.markings.find((m) => m.type === "entry");
-          if (entry) ltfRef.current?.focusMarking(entry);
+          if (entry) {
+            ltfRef.current?.panToMarking(entry);
+            ltfRef.current?.focusMarking(entry);
+          }
           await speakWait(p.trade.summary);
           toast.success(`Setup ready · ${p.setupGrade}`);
         }
@@ -238,6 +256,7 @@ function SignalPage() {
     },
     [speakWait],
   );
+
 
   const load = useCallback(async () => {
     setLoading(true);
