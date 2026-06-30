@@ -169,15 +169,18 @@ function InsightDetailPage() {
             </div>
           </header>
 
-          {insight.image_url && (
-            <div className="aspect-[21/9] rounded-2xl overflow-hidden mb-12 border border-zinc-100 shadow-xl">
-              <img
-                src={insight.image_url}
-                alt={insight.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
+          <div className="aspect-[21/9] rounded-2xl overflow-hidden mb-12 border border-zinc-100 shadow-xl bg-zinc-100">
+            <img
+              src={insight.image_url || `https://source.unsplash.com/1600x900/?gold,trading,${encodeURIComponent(insight.category)}`}
+              alt={insight.title}
+              onError={(e) => {
+                const t = e.currentTarget;
+                t.onerror = null;
+                t.src = `https://source.unsplash.com/1600x900/?gold,finance,${encodeURIComponent(insight.category)}`;
+              }}
+              className="w-full h-full object-cover"
+            />
+          </div>
 
           <div className="prose prose-zinc max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-zinc-900 prose-img:rounded-2xl">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
