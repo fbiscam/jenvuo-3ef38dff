@@ -638,6 +638,80 @@ function HomePage() {
         </div>
       </section>
 
+      {/* PRICING */}
+      <section className="border-t border-zinc-100 bg-zinc-50/40">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-20">
+          <div className="text-center">
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-500">Pricing</p>
+            <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">
+              Trade gold with an institutional edge.
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base text-zinc-600">
+              One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of desk methodology.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {[
+              { id: "free", name: "Free", price: 0, icon: Sparkles, tagline: "Try the voice agent.", cta: "Start free", ctaTo: "/auth" as const, features: ["Voice agent (1 query/day)", "Delayed alerts (4h)", "Public market insights"], highlight: false },
+              { id: "pro", name: "Pro", price: 49, icon: Zap, tagline: "For serious gold traders.", cta: "Notify me when live", ctaTo: "/contact" as const, features: ["Unlimited voice queries", "Unlimited A+ signal access", "Realtime email & push alerts", "Full ICT / SMC narration", "Trade journal & analytics"], highlight: true },
+              { id: "elite", name: "Elite", price: 149, icon: Crown, tagline: "For prop desks & funds.", cta: "Talk to sales", ctaTo: "/contact" as const, features: ["Everything in Pro", "Priority A+ alerts (< 30s)", "Multi-pair scanner", "API access & webhooks", "Dedicated onboarding & SLA"], highlight: false },
+            ].map((t) => {
+              const Icon = t.icon;
+              return (
+                <article
+                  key={t.id}
+                  className={`relative rounded-3xl border bg-white p-7 ${
+                    t.highlight
+                      ? "border-zinc-900 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.18)] md:scale-[1.03]"
+                      : "border-zinc-200"
+                  }`}
+                >
+                  {t.highlight && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-900">
+                      Most popular
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-5 w-5 text-zinc-900" />
+                    <h3 className="text-lg font-semibold text-zinc-900">{t.name}</h3>
+                  </div>
+                  <p className="mt-1 text-sm text-zinc-500">{t.tagline}</p>
+                  <div className="mt-6 flex items-baseline gap-1">
+                    <span className="text-5xl font-bold tracking-tight text-zinc-900">${t.price}</span>
+                    <span className="text-sm text-zinc-500">/month</span>
+                  </div>
+                  <Link
+                    to={t.ctaTo}
+                    className={`mt-7 block rounded-xl px-4 py-3 text-center text-sm font-medium transition ${
+                      t.highlight
+                        ? "bg-zinc-900 text-white hover:bg-black"
+                        : "border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+                    }`}
+                  >
+                    {t.cta}
+                  </Link>
+                  <ul className="mt-7 space-y-3 text-sm text-zinc-700">
+                    {t.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2.5">
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link to="/pricing" className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900 hover:underline">
+              Compare full plans &amp; FAQ →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* TESTIMONIALS */}
       <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-5 py-14 text-center sm:px-6 sm:py-20 md:text-left">
@@ -808,80 +882,6 @@ function HomePage() {
                 </details>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-      {/* PRICING */}
-      <section className="border-t border-zinc-100 bg-zinc-50/40">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-20">
-          <div className="text-center">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-500">Pricing</p>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">
-              Trade gold with an institutional edge.
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-zinc-600">
-              One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of desk methodology.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
-            {[
-              { id: "free", name: "Free", price: 0, icon: Sparkles, tagline: "Try the voice agent.", cta: "Start free", ctaTo: "/auth" as const, features: ["Voice agent (1 query/day)", "Delayed alerts (4h)", "Public market insights"], highlight: false },
-              { id: "pro", name: "Pro", price: 49, icon: Zap, tagline: "For serious gold traders.", cta: "Notify me when live", ctaTo: "/contact" as const, features: ["Unlimited voice queries", "Unlimited A+ signal access", "Realtime email & push alerts", "Full ICT / SMC narration", "Trade journal & analytics"], highlight: true },
-              { id: "elite", name: "Elite", price: 149, icon: Crown, tagline: "For prop desks & funds.", cta: "Talk to sales", ctaTo: "/contact" as const, features: ["Everything in Pro", "Priority A+ alerts (< 30s)", "Multi-pair scanner", "API access & webhooks", "Dedicated onboarding & SLA"], highlight: false },
-            ].map((t) => {
-              const Icon = t.icon;
-              return (
-                <article
-                  key={t.id}
-                  className={`relative rounded-3xl border bg-white p-7 ${
-                    t.highlight
-                      ? "border-zinc-900 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.18)] md:scale-[1.03]"
-                      : "border-zinc-200"
-                  }`}
-                >
-                  {t.highlight && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-900">
-                      Most popular
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <Icon className="h-5 w-5 text-zinc-900" />
-                    <h3 className="text-lg font-semibold text-zinc-900">{t.name}</h3>
-                  </div>
-                  <p className="mt-1 text-sm text-zinc-500">{t.tagline}</p>
-                  <div className="mt-6 flex items-baseline gap-1">
-                    <span className="text-5xl font-bold tracking-tight text-zinc-900">${t.price}</span>
-                    <span className="text-sm text-zinc-500">/month</span>
-                  </div>
-                  <Link
-                    to={t.ctaTo}
-                    className={`mt-7 block rounded-xl px-4 py-3 text-center text-sm font-medium transition ${
-                      t.highlight
-                        ? "bg-zinc-900 text-white hover:bg-black"
-                        : "border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
-                    }`}
-                  >
-                    {t.cta}
-                  </Link>
-                  <ul className="mt-7 space-y-3 text-sm text-zinc-700">
-                    {t.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2.5">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-
-              );
-            })}
-          </div>
-
-          <div className="mt-8 text-center">
-            <Link to="/pricing" className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900 hover:underline">
-              Compare full plans &amp; FAQ →
-            </Link>
           </div>
         </div>
       </section>
