@@ -1149,7 +1149,11 @@ function SignalVoiceAgent({
       { rx: /\b(stop\s*loss|invalidation|\bsl\b)\b/, types: ["sl"] },
       { rx: /\b(take\s*profit|target|\btp\b)\b/, types: ["tp"] },
     ];
+    // Sequential single-active rule: clear last transient before drawing the new one.
+    htfRef.current?.clearTransient();
+    ltfRef.current?.clearTransient();
     const focused = new Set<string>();
+    let drawn = 0;
     for (const { rx, types, kind } of matchers) {
       if (!rx.test(lower)) continue;
       const m = plan.markings.find(
@@ -1161,10 +1165,14 @@ function SignalVoiceAgent({
       if (!m) continue;
       focused.add(`${m.type}:${(m as any).label ?? ""}`);
       const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
-      target?.drawMarking(m);
+      target?.drawMarking(m, { transient: true });
+      target?.panToMarking(m);
       setTimeout(() => target?.focusMarking(m), 80);
-      if (focused.size >= 2) break;
+      drawn += 1;
+      // Only ONE active marking per agent reply.
+      if (drawn >= 1) break;
     }
+
   };
 
   const stripMd = (s: string) =>
