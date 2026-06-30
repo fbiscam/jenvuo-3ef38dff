@@ -14,6 +14,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalRouteImport } from './routes/signal'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LlmRouteImport } from './routes/llm'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as DownloadRouteImport } from './routes/download'
@@ -24,12 +25,19 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AiEngineRouteImport } from './routes/ai-engine'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as ApiSeedAdminRouteImport } from './routes/api/seed-admin'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
+import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
+import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
+import { Route as AuthenticatedDashboardAlertsRouteImport } from './routes/_authenticated/dashboard.alerts'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -60,6 +68,11 @@ const SignalRoute = SignalRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LlmRoute = LlmRouteImport.update({
@@ -112,6 +125,10 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -137,11 +154,46 @@ const ApiSeedAdminRoute = ApiSeedAdminRouteImport.update({
   path: '/api/seed-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardIndexRoute =
+  AuthenticatedDashboardIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardProfileRoute =
+  AuthenticatedDashboardProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardJournalRoute =
+  AuthenticatedDashboardJournalRouteImport.update({
+    id: '/journal',
+    path: '/journal',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardBillingRoute =
+  AuthenticatedDashboardBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardAlertsRoute =
+  AuthenticatedDashboardAlertsRouteImport.update({
+    id: '/alerts',
+    path: '/alerts',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -191,16 +243,23 @@ export interface FileRoutesByFullPath {
   '/download': typeof DownloadRoute
   '/insights': typeof InsightsRouteWithChildren
   '/llm': typeof LlmRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/api/seed-admin': typeof ApiSeedAdminRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/insights/': typeof InsightsIndexRoute
+  '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
+  '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
@@ -219,6 +278,7 @@ export interface FileRoutesByTo {
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
   '/llm': typeof LlmRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -228,7 +288,12 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/insights': typeof InsightsIndexRoute
+  '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
+  '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
@@ -239,6 +304,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
@@ -249,16 +315,23 @@ export interface FileRoutesById {
   '/download': typeof DownloadRoute
   '/insights': typeof InsightsRouteWithChildren
   '/llm': typeof LlmRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/signal': typeof SignalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/api/seed-admin': typeof ApiSeedAdminRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/insights/': typeof InsightsIndexRoute
+  '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
+  '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
@@ -280,16 +353,23 @@ export interface FileRouteTypes {
     | '/download'
     | '/insights'
     | '/llm'
+    | '/pricing'
     | '/privacy'
     | '/signal'
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
+    | '/dashboard'
     | '/api/seed-admin'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/insights/'
+    | '/dashboard/alerts'
+    | '/dashboard/billing'
+    | '/dashboard/journal'
+    | '/dashboard/profile'
     | '/lovable/email/suppression'
+    | '/dashboard/'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/scan-signals'
@@ -308,6 +388,7 @@ export interface FileRouteTypes {
     | '/disclaimer'
     | '/download'
     | '/llm'
+    | '/pricing'
     | '/privacy'
     | '/signal'
     | '/sitemap.xml'
@@ -317,7 +398,12 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/insights'
+    | '/dashboard/alerts'
+    | '/dashboard/billing'
+    | '/dashboard/journal'
+    | '/dashboard/profile'
     | '/lovable/email/suppression'
+    | '/dashboard'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/scan-signals'
@@ -327,6 +413,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
     | '/ai-engine'
     | '/app'
@@ -337,16 +424,23 @@ export interface FileRouteTypes {
     | '/download'
     | '/insights'
     | '/llm'
+    | '/pricing'
     | '/privacy'
     | '/signal'
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
+    | '/_authenticated/dashboard'
     | '/api/seed-admin'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/insights/'
+    | '/_authenticated/dashboard/alerts'
+    | '/_authenticated/dashboard/billing'
+    | '/_authenticated/dashboard/journal'
+    | '/_authenticated/dashboard/profile'
     | '/lovable/email/suppression'
+    | '/_authenticated/dashboard/'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/scan-signals'
@@ -357,6 +451,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AiEngineRoute: typeof AiEngineRoute
   AppRoute: typeof AppRoute
@@ -367,6 +462,7 @@ export interface RootRouteChildren {
   DownloadRoute: typeof DownloadRoute
   InsightsRoute: typeof InsightsRouteWithChildren
   LlmRoute: typeof LlmRoute
+  PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   SignalRoute: typeof SignalRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -418,6 +514,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/llm': {
@@ -490,6 +593,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -525,12 +635,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSeedAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/': {
+      id: '/_authenticated/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard/profile': {
+      id: '/_authenticated/dashboard/profile'
+      path: '/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof AuthenticatedDashboardProfileRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/journal': {
+      id: '/_authenticated/dashboard/journal'
+      path: '/journal'
+      fullPath: '/dashboard/journal'
+      preLoaderRoute: typeof AuthenticatedDashboardJournalRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/billing': {
+      id: '/_authenticated/dashboard/billing'
+      path: '/billing'
+      fullPath: '/dashboard/billing'
+      preLoaderRoute: typeof AuthenticatedDashboardBillingRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/alerts': {
+      id: '/_authenticated/dashboard/alerts'
+      path: '/alerts'
+      fullPath: '/dashboard/alerts'
+      preLoaderRoute: typeof AuthenticatedDashboardAlertsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
@@ -577,6 +729,39 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedDashboardRouteChildren {
+  AuthenticatedDashboardAlertsRoute: typeof AuthenticatedDashboardAlertsRoute
+  AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
+  AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
+  AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
+  AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+}
+
+const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
+  {
+    AuthenticatedDashboardAlertsRoute: AuthenticatedDashboardAlertsRoute,
+    AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
+    AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
+    AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
+    AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+  }
+
+const AuthenticatedDashboardRouteWithChildren =
+  AuthenticatedDashboardRoute._addFileChildren(
+    AuthenticatedDashboardRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 interface InsightsRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
@@ -593,6 +778,7 @@ const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AiEngineRoute: AiEngineRoute,
   AppRoute: AppRoute,
@@ -603,6 +789,7 @@ const rootRouteChildren: RootRouteChildren = {
   DownloadRoute: DownloadRoute,
   InsightsRoute: InsightsRouteWithChildren,
   LlmRoute: LlmRoute,
+  PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   SignalRoute: SignalRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

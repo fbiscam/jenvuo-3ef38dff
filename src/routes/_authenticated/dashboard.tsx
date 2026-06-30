@@ -15,13 +15,13 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardLayout,
 });
 
-const TABS = [
+const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: boolean }> = [
   { to: "/dashboard", label: "Saved", icon: Bookmark, exact: true },
   { to: "/dashboard/alerts", label: "Alerts", icon: Bell },
   { to: "/dashboard/journal", label: "Journal", icon: BookOpen },
   { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { to: "/dashboard/profile", label: "Profile", icon: User },
-] as const;
+];
 
 function DashboardLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
