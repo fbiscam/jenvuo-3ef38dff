@@ -620,14 +620,14 @@ function HomePage() {
           </h2>
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
             {[
-              ["ICT", "Killzones, judas swings, PD arrays and OTE — mapped live across every London and NY session."],
-              ["SMC", "Structure shifts, mitigations and equilibrium reads — tracked from HTF bias down to 5m execution."],
-              ["Liquidity", "EQH and EQL, sweeps, internal vs external pools — flagged before price reaches the trigger."],
-              ["Order Flow", "Displacement, imbalance and institutional candles — surfaced the moment intent appears."],
-              ["Risk", "Fixed-R sizing, max daily drawdown and a kill-switch — guardrails that protect capital first."],
-              ["Confluence", "Multi-TF alignment scored A, A+ or A++ — only the cleanest setups make it to the desk."],
-              ["Macro", "DXY, yields and Forex Factory red folder — overlaid on bias so news never blindsides you."],
-              ["Sessions", "Asia, London and NY killzone bias — every signal anchored to the active session profile."],
+              ["ICT", "Killzones, judas swings and PD arrays."],
+              ["SMC", "Structure shifts, mitigations and equilibrium reads."],
+              ["Liquidity", "EQH, EQL and sweeps flagged early."],
+              ["Order Flow", "Displacement, imbalance and institutional candles."],
+              ["Risk", "Fixed-R sizing with hard daily kill-switch."],
+              ["Confluence", "Multi-TF alignment scored A, A+, A++."],
+              ["Macro", "DXY, yields and red-folder news overlay."],
+              ["Sessions", "Asia, London and NY killzone bias."],
             ].map(([k, v]) => (
               <div key={k} className="bg-white p-6 text-left">
                 <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
