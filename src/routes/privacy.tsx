@@ -5,7 +5,7 @@ export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
       { title: "Privacy Policy — Jenvu" },
-      { name: "description", content: "How Jenvu collects, processes, retains and protects your personal data." },
+      { name: "description", content: "How Jenvu collects, processes, retains and protects your personal data across the voice agent, signals and account dashboard." },
       { property: "og:title", content: "Privacy Policy — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/privacy" },
     ],

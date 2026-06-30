@@ -4,7 +4,7 @@ import SiteFooter from "@/components/SiteFooter";
 export const Route = createFileRoute("/download")({
   head: () => ({
     meta: [
-      { title: "Download Our Application — Jenvu" },
+      { title: "Download App — Jenvu" },
       {
         name: "description",
         content:

@@ -105,7 +105,7 @@ function useLiveTicker(): TickerRow[] {
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "Voice Trading Terminal — Jenvu" },
+      { title: "Voice Terminal — Jenvu" },
       {
         name: "description",
         content:

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/auth")({
   },
   head: () => ({
     meta: [
-      { title: "Sign In Your Account — Jenvu" },
+      { title: "Sign In — Jenvu" }, { name: "robots", content: "noindex, nofollow" },
       {
         name: "description",
         content:

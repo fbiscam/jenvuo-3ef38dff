@@ -5,7 +5,7 @@ export const Route = createFileRoute("/disclaimer")({
   head: () => ({
     meta: [
       { title: "Risk Disclaimer — Jenvu" },
-      { name: "description", content: "Important risk disclosure for users of Jenvu AI trading analysis and signals." },
+      { name: "description", content: "Important risk disclosure for users of Jenvu AI trading analysis, signals and the voice agent. Read before trading." },
       { property: "og:title", content: "Risk Disclaimer — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/disclaimer" },
     ],

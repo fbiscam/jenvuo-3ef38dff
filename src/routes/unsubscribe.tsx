@@ -5,7 +5,7 @@ import SiteFooter from "@/components/SiteFooter";
 export const Route = createFileRoute('/unsubscribe')({
   head: () => ({
     meta: [
-      { title: 'Unsubscribe — Jenvu Briefings' },
+      { title: 'Unsubscribe — Jenvu' }, { name: 'robots', content: 'noindex, nofollow' },
       { name: 'robots', content: 'noindex, nofollow' },
       {
         name: 'description',

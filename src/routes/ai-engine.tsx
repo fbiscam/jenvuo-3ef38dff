@@ -4,8 +4,8 @@ import { PageShell, H2, P, UL } from "@/components/PageShell";
 export const Route = createFileRoute("/ai-engine")({
   head: () => ({
     meta: [
-      { title: "Artificial Intelligence Engine — Jenvu" },
-      { name: "description", content: "How the Jenvu agent listens, reasons, and narrates institutional trade setups." },
+      { title: "AI Engine — Jenvu" },
+      { name: "description", content: "Inside the Jenvu AI engine: how it listens, reasons and narrates institutional ICT and SMC trade setups in real time." },
       { property: "og:title", content: "Artificial Intelligence Engine — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/ai-engine" },
     ],
