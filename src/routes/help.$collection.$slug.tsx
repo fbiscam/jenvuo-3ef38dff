@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
-import { findArticle, findCollection } from "@/lib/help-content";
+import { findArticle, findCollection, type Article, type Block } from "@/lib/help-content";
 
 export const Route = createFileRoute("/help/$collection/$slug")({
   loader: ({ params }) => {
@@ -53,7 +53,7 @@ const SANS = "font-['Inter',system-ui,sans-serif]";
 function ArticlePage() {
   const { collection, article } = Route.useLoaderData();
   const related = (findCollection(collection.slug)?.articles ?? [])
-    .filter((a) => a.slug !== article.slug)
+    .filter((a: Article) => a.slug !== article.slug)
     .slice(0, 3);
 
   return (
@@ -88,12 +88,12 @@ function ArticlePage() {
           </div>
 
           <article className="mt-10 space-y-6 text-zinc-800 leading-relaxed">
-            {article.body.map((b, i) => {
+            {article.body.map((b: Block, i: number) => {
               if (b.type === "h2") return <h2 key={i} className="text-xl sm:text-2xl font-semibold tracking-tight pt-2 text-zinc-900">{b.content}</h2>;
               if (b.type === "p") return <p key={i}>{b.content}</p>;
               return (
                 <ul key={i} className="list-disc pl-5 space-y-2 marker:text-zinc-400">
-                  {b.items.map((it, j) => <li key={j}>{it}</li>)}
+                  {b.items.map((it: string, j: number) => <li key={j}>{it}</li>)}
                 </ul>
               );
             })}

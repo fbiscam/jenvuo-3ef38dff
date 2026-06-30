@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
-import { findCollection } from "@/lib/help-content";
+import { findCollection, type Article } from "@/lib/help-content";
 
 export const Route = createFileRoute("/help/$collection")({
   loader: ({ params }) => {
@@ -69,7 +69,7 @@ function CollectionPage() {
 
         <main className="mx-auto max-w-3xl px-5 sm:px-6 py-12 sm:py-16">
           <ul className="divide-y divide-zinc-100 rounded-2xl border border-zinc-200 bg-white">
-            {collection.articles.map((a) => (
+            {collection.articles.map((a: Article) => (
               <li key={a.slug}>
                 <Link
                   to="/help/$collection/$slug"
