@@ -38,7 +38,9 @@ function DashboardLayout() {
 
 
   return (
-    <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased" style={{ zoom: 1.1 }}>
+    <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased jenvu-zoom">
+      <style>{`@media (min-width: 1024px){.jenvu-zoom{zoom:1.5}}`}</style>
+
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
           <Link to="/" className="flex items-center gap-2.5">
