@@ -586,7 +586,6 @@ function SignalPage() {
                 </div>
                 <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
                   <TradingViewChart symbol={plan?.instrument.symbol ?? symbol} timeframe="1h" theme="light" />
-                  {plan && false ? <SignalChart ref={htfRef} candles={plan.htfCandles} tf="htf" dark={dark} title="HTF" /> : null}
                 </div>
               </div>
               <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100">
