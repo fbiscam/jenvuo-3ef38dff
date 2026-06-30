@@ -598,7 +598,7 @@ function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "think
 
   return (
     <div
-      className="relative h-[18rem] w-[18rem] sm:h-[22rem] sm:w-[22rem] lg:h-[26rem] lg:w-[26rem] max-h-full max-w-full flex items-center justify-center"
+      className="relative aspect-square w-[min(78vw,18rem)] sm:w-[22rem] lg:w-[26rem] flex items-center justify-center"
       style={{
         transform: `scale(${scale})`,
         transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
@@ -609,11 +609,11 @@ function CloudOrb({ status, pulse = 0 }: { status: "idle" | "listening" | "think
 
 
       {/* Light sky-blue sphere with swirling water-wave currents */}
-      <div className="relative h-72 w-72 sm:h-80 sm:w-80 rounded-full flex items-center justify-center">
+      <div className="relative h-full w-full rounded-full flex items-center justify-center">
 
 
         <div
-          className="relative h-[60%] w-[60%] rounded-full overflow-hidden"
+          className="relative h-[88%] w-[88%] rounded-full overflow-hidden"
           style={{
             background:
               "radial-gradient(circle at 50% 25%, #f4faff 0%, #b8dcff 28%, #5ea8ee 60%, #1f5fb0 90%, #0b3a7a 100%)",
