@@ -351,7 +351,7 @@ function Home() {
         }
         bufferRef.current = "";
         if (!captured) {
-          toast.message("Kuch sunai nahi diya — phir se try karein.");
+          toast.message("Didn't catch that — please try again.");
           return;
         }
         const lower = captured.toLowerCase();
