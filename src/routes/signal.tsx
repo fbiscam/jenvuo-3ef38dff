@@ -1040,19 +1040,84 @@ function TradeTrackerCard({
   );
 }
 
-/* ---------- SIGNAL AGENT PANEL ---------- */
-function SignalAgentPanel({ plan, livePrice }: { plan: SignalPlan | null; livePrice: number | null }) {
+/* ---------- SIGNAL VOICE AGENT (orb + chat + chart marking) ---------- */
+function SignalVoiceAgent({
+  plan,
+  livePrice,
+  htfRef,
+  ltfRef,
+}: {
+  plan: SignalPlan | null;
+  livePrice: number | null;
+  htfRef: React.RefObject<SignalChartHandle | null>;
+  ltfRef: React.RefObject<SignalChartHandle | null>;
+}) {
   const ask = useServerFn(askSignalAgent);
+  const speech = useSpeech();
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [messages, setMessages] = useState<{ role: "user" | "agent"; text: string }[]>([
-    { role: "agent", text: "Ask me about this setup — bias, entry logic, invalidation, or what to wait for next." },
+    { role: "agent", text: "Tap the mic or type — ask anything about this setup." },
   ]);
+  const bufferRef = useRef("");
+  const lastHandled = useRef("");
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Accumulate live transcript chunks while listening
+  useEffect(() => {
+    const t = speech.transcript;
+    const key = `${speech.transcriptId}:${t}`;
+    if (!t || key === lastHandled.current) return;
+    lastHandled.current = key;
+    bufferRef.current = (bufferRef.current ? bufferRef.current + " " : "") + t;
+  }, [speech.transcript, speech.transcriptId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  const highlightFromText = (text: string) => {
+    if (!plan) return;
+    const lower = text.toLowerCase();
+    const matchers: { rx: RegExp; types: Marking["type"][]; kind?: string }[] = [
+      { rx: /\b(bull(?:ish)?\s+fvg|bullish\s+gap)\b/, types: ["fvg"], kind: "bullish" },
+      { rx: /\b(bear(?:ish)?\s+fvg|bearish\s+gap)\b/, types: ["fvg"], kind: "bearish" },
+      { rx: /\b(fvg|fair value gap|imbalance|gap)\b/, types: ["fvg"] },
+      { rx: /\b(demand\s+(?:zone|ob)|bullish\s+order\s*block)\b/, types: ["orderBlock"], kind: "demand" },
+      { rx: /\b(supply\s+(?:zone|ob)|bearish\s+order\s*block)\b/, types: ["orderBlock"], kind: "supply" },
+      { rx: /\b(order\s*block|\bob\b)\b/, types: ["orderBlock"] },
+      { rx: /\b(buy[-\s]?side\s+liquidity|bsl)\b/, types: ["liquidity"], kind: "buy" },
+      { rx: /\b(sell[-\s]?side\s+liquidity|ssl)\b/, types: ["liquidity"], kind: "sell" },
+      { rx: /\b(liquidity|sweep|stop\s*hunt|grab)\b/, types: ["liquidity"] },
+      { rx: /\b(eqh|equal\s+highs?)\b/, types: ["eqh"] },
+      { rx: /\b(eql|equal\s+lows?)\b/, types: ["eql"] },
+      { rx: /\b(ote|optimal\s+trade\s+entry|0\.?618|0\.?705|0\.?79)\b/, types: ["oteZone"] },
+      { rx: /\bpremium\b/, types: ["premiumZone"] },
+      { rx: /\bdiscount\b/, types: ["discountZone"] },
+      { rx: /\bbreaker\b/, types: ["breaker"] },
+      { rx: /\b(bos|break\s+of\s+structure)\b/, types: ["bos"] },
+      { rx: /\b(choch|change\s+of\s+character)\b/, types: ["choch"] },
+      { rx: /\b(entry|trigger)\b/, types: ["entry"] },
+      { rx: /\b(stop\s*loss|invalidation|\bsl\b)\b/, types: ["sl"] },
+      { rx: /\b(take\s*profit|target|\btp\b)\b/, types: ["tp"] },
+    ];
+    const focused = new Set<string>();
+    for (const { rx, types, kind } of matchers) {
+      if (!rx.test(lower)) continue;
+      const m = plan.markings.find(
+        (x) =>
+          types.includes(x.type) &&
+          (!kind || (x as any).kind === kind) &&
+          !focused.has(`${x.type}:${(x as any).label ?? ""}`),
+      );
+      if (!m) continue;
+      focused.add(`${m.type}:${(m as any).label ?? ""}`);
+      const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
+      target?.drawMarking(m);
+      setTimeout(() => target?.focusMarking(m), 80);
+      if (focused.size >= 2) break;
+    }
+  };
 
   const submit = async (text?: string) => {
     const question = (text ?? q).trim();
@@ -1061,24 +1126,29 @@ function SignalAgentPanel({ plan, livePrice }: { plan: SignalPlan | null; livePr
     setQ("");
     setBusy(true);
     try {
-      const ctx = plan ? {
-        symbol: plan.instrument.symbol,
-        bias: plan.htfBias,
-        direction: plan.trade.direction,
-        entry: plan.trade.entry,
-        sl: plan.trade.sl,
-        tp: plan.trade.tp,
-        rr: plan.trade.rr,
-        setupGrade: plan.setupGrade,
-        setupScore: plan.setupScore,
-        session: plan.session,
-        killzone: plan.killzone,
-        confluences: plan.confluences,
-        keyLevels: plan.keyLevels.map((k) => ({ label: k.label, price: k.price, kind: k.kind })),
-        currentPrice: livePrice ?? plan.currentPrice,
-      } : undefined;
+      const ctx = plan
+        ? {
+            symbol: plan.instrument.symbol,
+            bias: plan.htfBias,
+            direction: plan.trade.direction,
+            entry: plan.trade.entry,
+            sl: plan.trade.sl,
+            tp: plan.trade.tp,
+            rr: plan.trade.rr,
+            setupGrade: plan.setupGrade,
+            setupScore: plan.setupScore,
+            session: plan.session,
+            killzone: plan.killzone,
+            confluences: plan.confluences,
+            keyLevels: plan.keyLevels.map((k) => ({ label: k.label, price: k.price, kind: k.kind })),
+            currentPrice: livePrice ?? plan.currentPrice,
+          }
+        : undefined;
       const res = await ask({ data: { question, context: ctx } });
       setMessages((m) => [...m, { role: "agent", text: res.reply }]);
+      // Mark/focus relevant zones based on both the user question and reply
+      highlightFromText(`${question} ${res.reply}`);
+      speech.speak(res.reply);
     } catch (e: any) {
       setMessages((m) => [...m, { role: "agent", text: e?.message || "Agent failed to respond." }]);
     } finally {
@@ -1086,24 +1156,64 @@ function SignalAgentPanel({ plan, livePrice }: { plan: SignalPlan | null; livePr
     }
   };
 
+  const toggleMic = () => {
+    if (!speech.supported) {
+      toast.error("Voice not supported in this browser. Use Chrome.");
+      return;
+    }
+    if (speech.listening) {
+      speech.stopListening();
+      // Allow final results to flush
+      setTimeout(() => {
+        const captured = bufferRef.current.trim();
+        bufferRef.current = "";
+        if (captured) submit(captured);
+      }, 250);
+    } else {
+      bufferRef.current = "";
+      speech.stopSpeaking();
+      speech.startListening();
+    }
+  };
+
+  const status: "idle" | "listening" | "thinking" | "speaking" = busy
+    ? "thinking"
+    : speech.speaking
+      ? "speaking"
+      : speech.listening
+        ? "listening"
+        : "idle";
+
   const suggestions = ["Why this bias?", "Where is invalidation?", "What confirms entry?"];
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       <div className="flex items-center justify-between">
         <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500 inline-flex items-center gap-1.5`}>
-          <Sparkles className="h-3 w-3 text-zinc-900" /> AI Agent
+          <Sparkles className="h-3 w-3 text-zinc-900" /> Voice Agent
         </span>
-        <span className={`text-[9px] ${MONO} tracking-widest uppercase ${busy ? "text-amber-600" : "text-emerald-600"}`}>
-          {busy ? "thinking" : "online"}
+        <span
+          className={cn(
+            `text-[9px] ${MONO} tracking-widest uppercase`,
+            status === "thinking" && "text-amber-600",
+            status === "listening" && "text-emerald-600",
+            status === "speaking" && "text-sky-600",
+            status === "idle" && "text-zinc-500",
+          )}
+        >
+          {status === "idle" ? "online" : status}
         </span>
+      </div>
+
+      <div className="flex justify-center">
+        <SignalOrb status={status} pulse={speech.wordPulse} />
       </div>
 
       <div
         ref={scrollRef}
-        className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-2 space-y-1.5 max-h-44 overflow-y-auto"
+        className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-2 space-y-1.5 max-h-32 overflow-y-auto"
       >
-        {messages.map((m, i) => (
+        {messages.slice(-5).map((m, i) => (
           <div
             key={i}
             className={cn(
@@ -1116,11 +1226,6 @@ function SignalAgentPanel({ plan, livePrice }: { plan: SignalPlan | null; livePr
             {m.text}
           </div>
         ))}
-        {busy && (
-          <div className="text-[11px] text-zinc-500 inline-flex items-center gap-1.5">
-            <Loader2 className="h-3 w-3 animate-spin" /> analyzing context…
-          </div>
-        )}
       </div>
 
       <div className="flex flex-wrap gap-1">
@@ -1141,18 +1246,101 @@ function SignalAgentPanel({ plan, livePrice }: { plan: SignalPlan | null; livePr
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && submit()}
-          placeholder="Ask the agent…"
+          placeholder={speech.listening ? "Listening…" : "Ask or tap the mic…"}
           disabled={busy}
           className="flex-1 bg-transparent text-[12px] text-zinc-900 placeholder:text-zinc-400 outline-none"
         />
         <button
+          onClick={toggleMic}
+          className={cn(
+            "h-7 w-7 inline-flex items-center justify-center rounded-md transition",
+            speech.listening
+              ? "bg-emerald-500 text-white animate-pulse"
+              : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200",
+          )}
+          aria-label="Toggle microphone"
+        >
+          <Mic className="h-3.5 w-3.5" />
+        </button>
+        <button
           onClick={() => submit()}
           disabled={busy || !q.trim()}
-          className="h-6 w-6 inline-flex items-center justify-center rounded-md bg-zinc-900 text-white disabled:opacity-40 hover:bg-zinc-800"
+          className="h-7 w-7 inline-flex items-center justify-center rounded-md bg-zinc-900 text-white disabled:opacity-40 hover:bg-zinc-800"
           aria-label="Send"
         >
-          <Send className="h-3 w-3" />
+          <Send className="h-3.5 w-3.5" />
         </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- compact orb (mirrors /app CloudOrb visual) ---------- */
+function SignalOrb({
+  status,
+  pulse = 0,
+}: {
+  status: "idle" | "listening" | "thinking" | "speaking";
+  pulse?: number;
+}) {
+  const speaking = status === "speaking";
+  const hueShift = (pulse * 47) % 360;
+  const kick = speaking ? 1 + ((pulse % 2) === 0 ? 0.04 : 0.07) : 1;
+  const baseScale =
+    status === "speaking" ? 1.05 :
+    status === "listening" ? 1.02 :
+    status === "thinking" ? 1.0 : 0.97;
+  const scale = baseScale * kick;
+
+  return (
+    <div
+      className="relative aspect-square w-24 sm:w-28 flex items-center justify-center"
+      style={{
+        transform: `scale(${scale})`,
+        transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
+        filter: speaking ? `hue-rotate(${hueShift}deg) saturate(1.3)` : "none",
+      }}
+    >
+      <div
+        className="relative h-full w-full rounded-full overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 25%, #f4faff 0%, #b8dcff 28%, #5ea8ee 60%, #1f5fb0 90%, #0b3a7a 100%)",
+          boxShadow:
+            "inset -8px -12px 32px rgba(20,60,140,0.55), inset 6px 10px 24px rgba(255,255,255,0.85), 0 0 36px rgba(120,180,240,0.45)",
+        }}
+      >
+        <div
+          className="absolute -inset-1/3"
+          style={{
+            animation: `orb-drift-a ${status === "speaking" ? "7s" : status === "thinking" ? "9s" : "14s"} ease-in-out infinite, orb-hue 18s linear infinite`,
+            background:
+              "radial-gradient(30% 24% at 28% 30%, rgba(244,114,182,0.95), transparent 70%), radial-gradient(28% 22% at 72% 26%, rgba(251,191,36,0.9), transparent 70%), radial-gradient(32% 26% at 30% 74%, rgba(52,211,153,0.95), transparent 70%), radial-gradient(30% 24% at 74% 72%, rgba(167,139,250,0.95), transparent 70%)",
+            mixBlendMode: "screen",
+          }}
+        />
+        <div
+          className="absolute -inset-1/3"
+          style={{
+            animation: `orb-drift-b ${status === "speaking" ? "9s" : "18s"} ease-in-out infinite`,
+            background:
+              "conic-gradient(from 90deg, rgba(255,90,160,0.7) 0%, rgba(56,189,248,0) 18%, rgba(255,200,80,0.7) 35%, rgba(255,255,255,0) 50%, rgba(80,230,180,0.7) 65%, rgba(56,189,248,0) 80%, rgba(170,130,255,0.7) 100%)",
+            filter: "blur(20px)",
+            mixBlendMode: "screen",
+          }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_42%_18%,rgba(255,255,255,0.95),transparent_48%)]" />
+        <div className="absolute inset-0 rounded-full" style={{ boxShadow: "inset 0 0 22px rgba(160,210,255,0.6)" }} />
+        {status === "speaking" && (
+          <div
+            className="absolute inset-0 animate-pulse"
+            style={{
+              background: "radial-gradient(circle at 50% 55%, rgba(120,180,240,0.45), transparent 60%)",
+              animationDuration: "0.9s",
+              mixBlendMode: "screen",
+            }}
+          />
+        )}
       </div>
     </div>
   );
