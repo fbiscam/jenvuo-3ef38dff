@@ -2,7 +2,7 @@ import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
-import { Check, Sparkles, Zap, Crown } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
