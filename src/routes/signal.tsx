@@ -697,85 +697,7 @@ function SignalPage() {
               {/* A+ Setup Score */}
               {plan && <SetupScoreCard plan={plan} />}
 
-              {/* Key Levels — moved from left rail */}
-              {plan && plan.keyLevels.length > 0 && (
-                <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3">
-                  <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Key Levels</span>
-                  <div className="space-y-1">
-                    {plan.keyLevels.map((k, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-zinc-100 last:border-0">
-                        <span className="flex items-center gap-1.5">
-                          <span className={cn("w-1.5 h-1.5 rounded-full",
-                            k.kind === "resistance" ? "bg-rose-500" :
-                            k.kind === "support" ? "bg-emerald-500" :
-                            k.kind === "equilibrium" ? "bg-amber-500" : "bg-sky-500",
-                          )} />
-                          <span className="text-zinc-700">{k.label}</span>
-                        </span>
-                        <span className={`${MONO} font-medium tabular-nums text-zinc-900`}>
-                          {plan.instrument.kind === "crypto" ? "" : "$"}{k.price.toFixed(plan.instrument.decimals)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Market closed notice — replaces tracker/trade card */}
-              {marketClosed && plan && (
-                <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 space-y-2">
-                  <div className={`flex items-center gap-1.5 text-[10px] ${MONO} tracking-widest uppercase text-zinc-700`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-                    Market Closed
-                  </div>
-                  <p className="text-[11px] text-zinc-700 leading-snug">
-                    {plan.instrument.symbol} session band hai. AI ne live entry / SL / TP issue nahi kiya — sirf last session ke key levels, FVG aur OB reference ke liye dikha rahe hain. Session open hote hi plan auto-revalidate hoga.
-                  </p>
-                  <p className={`text-[10px] ${MONO} text-zinc-500 uppercase tracking-wider`}>
-                    {isCryptoSymbol(plan.instrument.symbol) ? "24/7" : "Opens Sun 22:00 UTC"}
-                  </p>
-                </div>
-              )}
-
-              {/* Live trade tracker */}
-              {plan && t && t.direction !== "WAIT" && !marketClosed && (
-                <TradeTrackerCard
-                  plan={plan}
-                  livePrice={livePrice}
-                  rMultiple={rMultiple}
-                  status={trackerStatus}
-                  sparkline={sparkline}
-                />
-              )}
-
-
-
-              {/* News risk */}
-              {plan && (
-                <div className={cn(
-                  "rounded-lg border p-3 flex items-start gap-2.5",
-                  plan.newsRisk.severity === "high" ? "border-rose-200 bg-rose-50/40" :
-                  plan.newsRisk.severity === "medium" ? "border-amber-200 bg-amber-50/40" :
-                  "border-emerald-200 bg-emerald-50/30",
-                )}>
-                  {plan.newsRisk.severity === "high"
-                    ? <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0 mt-0.5" />
-                    : <span className="h-1.5 w-1.5 mt-1.5 rounded-full bg-emerald-500 shrink-0" />}
-                  <div className="min-w-0">
-                    <div className={`flex items-center justify-between gap-2 text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
-                      <span>News · {plan.session}</span>
-                      {newsUpdatedAt && (
-                        <span className="text-[9px] normal-case tracking-normal text-zinc-400">
-                          upd {new Date(newsUpdatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-zinc-800 leading-snug mt-1">{plan.newsRisk.warning}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Trade card */}
+              {/* Trade card — moved up to position 2 */}
               {t && plan && !marketClosed && (
                 <div className="space-y-3">
                   <div className="flex items-end justify-between">
@@ -894,6 +816,86 @@ function SignalPage() {
                   </div>
                 </div>
               )}
+
+              {/* Key Levels — moved from left rail */}
+              {plan && plan.keyLevels.length > 0 && (
+                <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3">
+                  <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Key Levels</span>
+                  <div className="space-y-1">
+                    {plan.keyLevels.map((k, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-zinc-100 last:border-0">
+                        <span className="flex items-center gap-1.5">
+                          <span className={cn("w-1.5 h-1.5 rounded-full",
+                            k.kind === "resistance" ? "bg-rose-500" :
+                            k.kind === "support" ? "bg-emerald-500" :
+                            k.kind === "equilibrium" ? "bg-amber-500" : "bg-sky-500",
+                          )} />
+                          <span className="text-zinc-700">{k.label}</span>
+                        </span>
+                        <span className={`${MONO} font-medium tabular-nums text-zinc-900`}>
+                          {plan.instrument.kind === "crypto" ? "" : "$"}{k.price.toFixed(plan.instrument.decimals)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Market closed notice — replaces tracker/trade card */}
+              {marketClosed && plan && (
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 space-y-2">
+                  <div className={`flex items-center gap-1.5 text-[10px] ${MONO} tracking-widest uppercase text-zinc-700`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                    Market Closed
+                  </div>
+                  <p className="text-[11px] text-zinc-700 leading-snug">
+                    {plan.instrument.symbol} session band hai. AI ne live entry / SL / TP issue nahi kiya — sirf last session ke key levels, FVG aur OB reference ke liye dikha rahe hain. Session open hote hi plan auto-revalidate hoga.
+                  </p>
+                  <p className={`text-[10px] ${MONO} text-zinc-500 uppercase tracking-wider`}>
+                    {isCryptoSymbol(plan.instrument.symbol) ? "24/7" : "Opens Sun 22:00 UTC"}
+                  </p>
+                </div>
+              )}
+
+              {/* Live trade tracker */}
+              {plan && t && t.direction !== "WAIT" && !marketClosed && (
+                <TradeTrackerCard
+                  plan={plan}
+                  livePrice={livePrice}
+                  rMultiple={rMultiple}
+                  status={trackerStatus}
+                  sparkline={sparkline}
+                />
+              )}
+
+
+
+              {/* News risk */}
+              {plan && (
+                <div className={cn(
+                  "rounded-lg border p-3 flex items-start gap-2.5",
+                  plan.newsRisk.severity === "high" ? "border-rose-200 bg-rose-50/40" :
+                  plan.newsRisk.severity === "medium" ? "border-amber-200 bg-amber-50/40" :
+                  "border-emerald-200 bg-emerald-50/30",
+                )}>
+                  {plan.newsRisk.severity === "high"
+                    ? <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0 mt-0.5" />
+                    : <span className="h-1.5 w-1.5 mt-1.5 rounded-full bg-emerald-500 shrink-0" />}
+                  <div className="min-w-0">
+                    <div className={`flex items-center justify-between gap-2 text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+                      <span>News · {plan.session}</span>
+                      {newsUpdatedAt && (
+                        <span className="text-[9px] normal-case tracking-normal text-zinc-400">
+                          upd {new Date(newsUpdatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-zinc-800 leading-snug mt-1">{plan.newsRisk.warning}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Trade card moved to position 2 above */}
 
 
 
