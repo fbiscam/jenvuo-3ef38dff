@@ -13,6 +13,7 @@ import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { getGoldNews } from "@/lib/news.functions";
 import { useCredits } from "@/hooks/useCredits";
+import { appendVoiceTurn } from "@/lib/voice-history";
 
 import { cn } from "@/lib/utils";
 
@@ -304,6 +305,8 @@ function Home() {
       }
       const result = await analyze({ data: { timeframe: tf, query } });
       setSignal(result);
+      appendVoiceTurn({ query, reply: result.spokenSummary });
+
 
       speech.speak(result.spokenSummary, () => {
         speech.resumeIfWanted();

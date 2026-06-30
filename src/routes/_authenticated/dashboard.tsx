@@ -8,6 +8,7 @@ import { useCredits } from "@/hooks/useCredits";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
+import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
 import {
   Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge,
@@ -486,20 +487,18 @@ function DashboardLayout() {
           </Card>
 
           <Card className="flex flex-col">
-            <CardHeader icon={Mic} title="Voice Agent" right={<ArrowRight className="h-4 w-4 text-zinc-400" />} />
-            <div className="flex flex-1 flex-col items-center justify-center px-6 py-8 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100">
-                <Mic className="h-5 w-5 text-zinc-700" />
-              </div>
-              <h3 className="mt-3 text-[14px] font-semibold text-zinc-900">Talk to Jenvu, get instant context</h3>
-              <p className="mt-1 max-w-[260px] text-[12px] text-zinc-500">
-                From ICT bias to a one-tap A+ entry — your gold co-pilot, hands free.
-              </p>
-              <Link to="/app" className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] font-medium text-zinc-800 hover:bg-zinc-50">
-                Start talking
-              </Link>
-            </div>
+            <CardHeader
+              icon={Mic}
+              title="Voice Agent"
+              right={
+                <Link to="/app" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                  Open <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              }
+            />
+            <VoiceAgentHistory />
           </Card>
+
 
           <Card className="flex flex-col">
             <CardHeader icon={Activity} title="Signal Desk" right={<ArrowRight className="h-4 w-4 text-zinc-400" />} />
@@ -563,3 +562,75 @@ function DashboardLayout() {
     </div>
   );
 }
+
+function VoiceAgentHistory() {
+  const [items, setItems] = useState<VoiceTurn[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const refresh = () => setItems(getVoiceHistory());
+    refresh();
+    const onStorage = (e: StorageEvent) => { if (e.key === "jenvu:voice:history") refresh(); };
+    window.addEventListener("jenvu:voice:history:updated", refresh as EventListener);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("jenvu:voice:history:updated", refresh as EventListener);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  if (!mounted) {
+    return <div className="flex-1 px-5 py-6 text-[12px] text-zinc-400">Loading…</div>;
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center px-6 py-8 text-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100">
+          <Mic className="h-5 w-5 text-zinc-700" />
+        </div>
+        <h3 className="mt-3 text-[14px] font-semibold text-zinc-900">No conversations yet</h3>
+        <p className="mt-1 max-w-[260px] text-[12px] text-zinc-500">
+          Your voice chats with Jenvu will appear here with timestamps.
+        </p>
+        <Link to="/app" className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] font-medium text-zinc-800 hover:bg-zinc-50">
+          Start talking
+        </Link>
+      </div>
+    );
+  }
+
+  const visible = items.slice(0, 6);
+
+  return (
+    <div className="flex flex-1 flex-col">
+      <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-2">
+        <span className="text-[11px] uppercase tracking-wide text-zinc-500">
+          {items.length} {items.length === 1 ? "chat" : "chats"}
+        </span>
+        <button
+          onClick={() => { if (confirm("Clear all voice history?")) clearVoiceHistory(); }}
+          className="text-[11px] text-zinc-500 hover:text-zinc-900"
+        >
+          Clear
+        </button>
+      </div>
+      <ul className="flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        {visible.map((t, i) => (
+          <li key={t.ts + ":" + i} className="px-4 py-3">
+            <div className="flex items-start justify-between gap-3">
+              <p className="line-clamp-1 text-[13px] font-medium text-zinc-900">{t.query}</p>
+              <span className="shrink-0 text-[10px] text-zinc-400" title={formatDateTime(t.ts)}>
+                {formatRelative(t.ts)}
+              </span>
+            </div>
+            <p className="mt-1 line-clamp-2 text-[12px] text-zinc-500">{t.reply}</p>
+            <p className="mt-1 text-[10px] text-zinc-400">{formatDateTime(t.ts)}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
