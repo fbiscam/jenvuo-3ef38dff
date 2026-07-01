@@ -66,10 +66,10 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
 
         const grade = plan.setupGrade
         const direction = plan.trade.direction
-        // Fire alerts for A+ and A setups (score >= 75). Lower grades stay
-        // visible on the signal page as "watching" but never trigger pushes.
+        // Fire alerts ONLY for stricter A+/A setups after Stage-2 senior review.
+        // New thresholds: A+ ≥ 88, A ≥ 75. Anything below stays as "watching".
         const acceptableGrades = ['A+', 'A']
-        if (!acceptableGrades.includes(grade) || (direction !== 'BUY' && direction !== 'SELL') || plan.setupScore < 75) {
+        if (!acceptableGrades.includes(grade) || (direction !== 'BUY' && direction !== 'SELL') || plan.setupScore < 80) {
           return Response.json({ ok: true, skipped: 'below_threshold', grade, direction, score: plan.setupScore })
         }
 

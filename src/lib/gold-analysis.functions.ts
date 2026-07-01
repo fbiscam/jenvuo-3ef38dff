@@ -1,5 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { analyzeTF, buildLiquidityPools, buildTrade, killzoneOf, scoreSetup } from "@/lib/analysis/engine";
+import {
+  analyzeTF, buildLiquidityPools, buildTrade, scoreSetup,
+  computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
+  detectSMTDivergence, killzoneForPair,
+} from "@/lib/analysis/engine";
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
 
@@ -306,7 +310,7 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "google/gemini-3.1-flash-lite",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: system },
           { role: "user", content: userPrompt },
@@ -952,7 +956,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: "google/gemini-3.1-flash-lite",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
@@ -1029,23 +1033,53 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
 
     // ============ DETERMINISTIC ENGINE OVERRIDE ============
-    // Trade prices, direction, R:R, and the 7-factor score are computed in code,
+    // Trade prices, direction, R:R, and the weighted score are computed in code,
     // NOT by the AI. AI only narrates what the engine produces. This is the gate
     // that makes every emitted signal A+.
     const htfA = analyzeTF(htf);
     const ltfA = analyzeTF(ltf);
     const pools = buildLiquidityPools(htf, ltf);
-    const kz = killzoneOf(new Date());
+    // Pair-aware killzone: uses PAIR_PROFILES so JPY/AUD/Indices/Crypto get
+    // their correct native session, not the Gold-tuned default.
+    const kz = killzoneForPair(inst.raw || inst.key, new Date());
 
-    // DXY correlation: gold should move inverse to DXY. Compare last 6 closes.
+    // DXY / correlated-pair confirmation for SMT
     let dxyConfirms: boolean | null = null;
-    if (dxyRaw.length >= 6 && inst.kind === "metal") {
+    if (dxyRaw.length >= 6 && (inst.kind === "metal" || inst.kind === "forex")) {
       const dxyDelta = dxyRaw[dxyRaw.length - 1].c - dxyRaw[dxyRaw.length - 6].c;
-      const goldDelta = htf[htf.length - 1].c - htf[Math.max(0, htf.length - 6)].c;
-      dxyConfirms = (dxyDelta > 0 && goldDelta < 0) || (dxyDelta < 0 && goldDelta > 0);
+      const mainDelta = htf[htf.length - 1].c - htf[Math.max(0, htf.length - 6)].c;
+      // Gold inverse; USD-quote forex depends — for USDXXX same direction, for XXXUSD inverse
+      const inverse = inst.kind === "metal" || /^[A-Z]{3}USD$/i.test(inst.raw || "");
+      dxyConfirms = inverse
+        ? (dxyDelta > 0 && mainDelta < 0) || (dxyDelta < 0 && mainDelta > 0)
+        : (dxyDelta > 0 && mainDelta > 0) || (dxyDelta < 0 && mainDelta < 0);
     }
 
-    const built = buildTrade(htfA, ltfA, pools, last.c);
+    // SMT divergence — same signal but window-based (checks timing of extremes)
+    const smtDivergence = dxyRaw.length >= 10
+      ? detectSMTDivergence(htf, dxyRaw, inst.kind === "metal" || /^[A-Z]{3}USD$/i.test(inst.raw || ""))
+      : null;
+
+    // Structure quality — measures if the last HTF BOS/CHoCH was impulsive
+    const htfStructureEvents = htfA.lastStructure ? [htfA.lastStructure] : [];
+    const structureQuality = htfStructureEvents.length
+      ? computeStructureQuality(htf, htfStructureEvents)
+      : null;
+
+    // ATR for volatility-adaptive SL buffer
+    const atr = computeATR(ltf, 14);
+
+    // Breaker + IFVG detection (adds richer context for AI narration)
+    const breakers = detectBreakerBlocks(ltf, htfStructureEvents.length ? htfStructureEvents : []);
+    const ifvgs = detectIFVGs(ltf, ltfA.fvgs);
+
+    const built = buildTrade(htfA, ltfA, pools, last.c, atr);
+
+    // Check if the chosen entry zone has already been mitigated
+    const zoneMitigated = built.zone
+      ? ltf.slice(-30).some(c => c.l <= built.zone!.priceHigh && c.h >= built.zone!.priceLow)
+      : false;
+
     const tradeFromAi = {
       direction: built.direction,
       entry: +built.entry.toFixed(dec),
@@ -1075,7 +1109,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       avgScore <= 42 ? "Mild Bearish Alignment" :
       "Mixed / Choppy";
 
-    // 7-factor weighted score → only ≥85 is A+
+    // 10-factor weighted score with hard-veto gates → only ≥88 is A+
     const scored = scoreSetup({
       trade: built,
       htf: htfA,
@@ -1086,12 +1120,107 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       dxyConfirms,
       lastPrice: last.c,
       kind: inst.kind,
+      structureQuality,
+      smtDivergence,
+      nativeSession: kz.nativeSession,
+      zoneMitigated,
     });
-    const setupScore = scored.score;
-    const setupGrade = scored.grade;
+    let setupScore = scored.score;
+    let setupGrade = scored.grade;
     const setupChecks: SetupCheck[] = scored.factors.map(f => ({
       key: f.key, label: `${f.label} (${f.weight})`, pass: f.pass, reason: f.detail,
     }));
+    // Add veto reasons as failed checks so the UI shows why an A+ was rejected
+    for (const v of scored.vetos) {
+      setupChecks.unshift({ key: `veto_${v.key}`, label: `⛔ ${v.label}`, pass: false, reason: v.reason });
+    }
+
+    // ============ STAGE 2: SENIOR TRADER DEEP REVIEW ============
+    // Only run the expensive pro model when the engine already thinks it's A/A+.
+    // The pro model acts as a "25-year veteran" second opinion — it can veto or confirm.
+    // Failure here should NEVER block the plan — Stage-1 result stands.
+    if ((setupGrade === "A+" || setupGrade === "A") && built.direction !== "WAIT") {
+      try {
+        const reviewSystem = `You are a 25-year institutional trader reviewing a junior's ICT/SMC setup. Be brutally honest — most setups are NOT A+. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case against this trade>","chasing_price":true|false}`;
+        const reviewUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
+CURRENT PRICE: ${last.c.toFixed(dec)} | HTF BIAS: ${htfA.trend} | LTF BIAS: ${ltfA.trend}
+KILLZONE: ${kz.killzone} | NATIVE SESSION: ${kz.nativeSession ? "yes" : "no"}
+DEALING RANGE: ${swingLow.toFixed(dec)} – ${swingHigh.toFixed(dec)} | EQ: ${equilibrium.toFixed(dec)} | Price in ${inPremium ? "PREMIUM" : "DISCOUNT"}
+STRUCTURE QUALITY: ${structureQuality != null ? (structureQuality * 100).toFixed(0) + "%" : "N/A"}
+SMT DIVERGENCE: ${smtDivergence === true ? "yes" : smtDivergence === false ? "no" : "N/A"}
+DXY CONFIRMS: ${dxyConfirms === true ? "yes" : dxyConfirms === false ? "no" : "N/A"}
+ENGINE GRADE: ${setupGrade} (score ${setupScore}/100)
+BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
+
+3 checks — answer honestly:
+1) Would a 25-year desk trader take this? Why/why not?
+2) Strongest counter-argument?
+3) Is entry CHASING price (already extended) or WAITING at premium/discount?
+
+VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only for true A+ institutional setups.`;
+
+        const reviewController = new AbortController();
+        const reviewTimeout = setTimeout(() => reviewController.abort(), 20000);
+        const reviewRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-pro",
+            messages: [
+              { role: "system", content: reviewSystem },
+              { role: "user", content: reviewUser },
+            ],
+            response_format: { type: "json_object" },
+            max_tokens: 400,
+          }),
+          signal: reviewController.signal,
+        }).finally(() => clearTimeout(reviewTimeout));
+
+        if (reviewRes.ok) {
+          const rj: any = await reviewRes.json();
+          const rc = rj?.choices?.[0]?.message?.content ?? "{}";
+          let review: any = {};
+          try { review = JSON.parse(rc); } catch { const m = rc.match(/\{[\s\S]*\}/); review = m ? JSON.parse(m[0]) : {}; }
+          const verdict = String(review.verdict || "").toUpperCase();
+          if (verdict === "VETO") {
+            setupGrade = "C";
+            setupScore = Math.min(setupScore, 50);
+            setupChecks.unshift({
+              key: "senior_veto",
+              label: "⛔ Senior trader veto",
+              pass: false,
+              reason: String(review.reasoning || "Veteran review vetoed this setup"),
+            });
+          } else if (verdict === "DOWNGRADE") {
+            setupGrade = setupGrade === "A+" ? "A" : "B";
+            setupScore = Math.max(60, setupScore - 15);
+            setupChecks.unshift({
+              key: "senior_downgrade",
+              label: "⚠ Senior review downgrade",
+              pass: false,
+              reason: String(review.reasoning || "Not quite A+ material"),
+            });
+          } else if (verdict === "CONFIRM") {
+            setupChecks.unshift({
+              key: "senior_confirm",
+              label: "✓ Senior trader confirms",
+              pass: true,
+              reason: String(review.reasoning || "Institutional-grade setup confirmed"),
+            });
+          }
+          if (review.counter_argument) {
+            setupChecks.push({
+              key: "counter_arg",
+              label: "Counter-argument (know your risk)",
+              pass: false,
+              reason: String(review.counter_argument),
+            });
+          }
+        }
+      } catch {
+        // Silent failure — Stage-1 grade stands
+      }
+    }
 
     tradeFromAi.confidence = Math.min(95, setupScore);
     if (built.direction !== "WAIT") {
