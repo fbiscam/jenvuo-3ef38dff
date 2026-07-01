@@ -117,13 +117,15 @@ function Billing() {
               ))}
             </div>
             {credits.state.recent.length > 10 && (
-              <button
-                type="button"
-                onClick={() => setShowAllActivity((v) => !v)}
-                className="mt-3 text-xs font-medium text-zinc-700 hover:text-zinc-900 underline underline-offset-2"
-              >
-                {showAllActivity ? "Show less" : `Show more (${credits.state.recent.length - 10})`}
-              </button>
+              <div className="mt-3 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setShowAllActivity((v) => !v)}
+                  className="text-xs font-medium text-zinc-700 hover:text-zinc-900"
+                >
+                  {showAllActivity ? "Show less" : `Show more (${credits.state.recent.length - 10})`}
+                </button>
+              </div>
             )}
           </div>
         )}
