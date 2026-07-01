@@ -145,6 +145,34 @@ function SignalPage() {
     });
   }, [navigate]);
 
+  // ---------- Killzone warning popup ----------
+  const [kzDismissed, setKzDismissed] = useState<boolean | null>(null);
+  const [kzDialog, setKzDialog] = useState<{ pair: string; kzText: string } | null>(null);
+  const kzShownFor = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!authReady) return;
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("killzone_notice_dismissed")
+        .eq("id", data.user.id)
+        .maybeSingle();
+      setKzDismissed(!!prof?.killzone_notice_dismissed);
+    });
+  }, [authReady]);
+
+  const dismissKzForever = useCallback(async () => {
+    setKzDialog(null);
+    setKzDismissed(true);
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return;
+    await supabase.from("profiles").update({ killzone_notice_dismissed: true }).eq("id", data.user.id);
+  }, []);
+
+
+
   const [voiceBlocked, setVoiceBlocked] = useState(false);
   const [activeTf, setActiveTf] = useState<"htf" | "ltf" | null>(null);
 
