@@ -460,8 +460,7 @@ function DashboardLayout() {
   const balanceTone: "blue" | "rose" | "zinc" = remainingPct < 30 ? "rose" : remainingPct < 60 ? "zinc" : "blue";
 
   return (
-    <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased jenvu-zoom">
-      <style>{`@media (min-width: 1024px){.jenvu-zoom{zoom:1.32}}`}</style>
+    <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
 
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white">

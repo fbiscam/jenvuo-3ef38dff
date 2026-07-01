@@ -225,3 +225,9 @@
 .scrollbar-auto-hide:focus-within::-webkit-scrollbar,
 .scrollbar-auto-hide:active::-webkit-scrollbar { width: 6px; height: 6px; }
 .scrollbar-auto-hide::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 3px; }
+
+/* Per-page zoom scaling (moved from inline <style> to fix SSR hydration mismatch) */
+@media (min-width: 1024px) { .jenvu-zoom { zoom: 1.5; } }
+@media (min-width: 1024px) { .jenvu-zoom-dashboard { zoom: 1.32; } }
+@media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
+@media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
