@@ -107,9 +107,9 @@ function Sparkline({ seed = 1, tone = "blue", empty = false, trend = "flat", mag
 }
 
 function Metric({
-  label, value, delta, tone = "blue", seed = 1, trend, magnitude,
+  label, value, delta, tone, seed = 1, trend, magnitude,
 }: {
-  label: string; value: React.ReactNode; delta?: string | null; tone?: "blue" | "rose" | "zinc"; seed?: number; trend?: "up" | "down" | "flat"; magnitude?: number;
+  label: string; value: React.ReactNode; delta?: string | null; tone?: "blue" | "rose" | "zinc" | "emerald"; seed?: number; trend?: "up" | "down" | "flat"; magnitude?: number;
 }) {
   const negative = delta?.startsWith("-");
   const raw = typeof value === "string" || typeof value === "number" ? String(value).trim() : "";
@@ -137,7 +137,7 @@ function Metric({
         )}
       </div>
       <div className="mt-2 -mb-1 opacity-90">
-        <Sparkline seed={seed} tone={derivedTrend === "down" ? "rose" : derivedTrend === "up" ? "emerald" : tone} empty={isEmpty} trend={derivedTrend} magnitude={derivedMag} />
+        <Sparkline seed={seed} tone={tone ?? (derivedTrend === "down" ? "rose" : derivedTrend === "up" ? "emerald" : "blue")} empty={isEmpty} trend={derivedTrend} magnitude={derivedMag} />
       </div>
     </div>
   );
