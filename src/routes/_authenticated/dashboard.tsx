@@ -320,13 +320,50 @@ function TickerRow({ label, symbol, decimals = 2 }: { label: string; symbol: str
 
 /* ---------- layout ---------- */
 
-function greeting() {
-  const h = new Date().getHours();
-  if (h < 5) return "Working late";
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
+const GREETINGS = {
+  lateNight: ["Burning the midnight oil", "Still charting the tape", "Late-night desk"],
+  earlyMorning: ["Rise and grind", "Pre-market focus", "Early bird"],
+  morning: ["Good morning", "Morning, markets are live", "Fresh session"],
+  afternoon: ["Good afternoon", "Midday check-in", "Session in motion"],
+  evening: ["Good evening", "Closing bell energy", "Evening wrap"],
+  night: ["Good night", "Quiet hours", "Overnight watch"],
+} as const;
+
+function pickGreeting(hour: number): string {
+  let bucket: keyof typeof GREETINGS;
+  if (hour < 4) bucket = "lateNight";
+  else if (hour < 7) bucket = "earlyMorning";
+  else if (hour < 12) bucket = "morning";
+  else if (hour < 17) bucket = "afternoon";
+  else if (hour < 21) bucket = "evening";
+  else bucket = "night";
+  const list = GREETINGS[bucket];
+  return list[Math.floor(Date.now() / 3_600_000) % list.length];
 }
+
+function useLocalHour(): number {
+  const [hour, setHour] = useState<number>(() => new Date().getHours());
+  useEffect(() => {
+    let cancelled = false;
+    const update = (tz?: string) => {
+      try {
+        const h = Number(
+          new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: tz }).format(new Date())
+        );
+        if (!cancelled && !Number.isNaN(h)) setHour(h % 24);
+      } catch { /* ignore invalid tz */ }
+    };
+    update();
+    fetch("https://ipapi.co/json/")
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d?.timezone) update(d.timezone); })
+      .catch(() => { /* offline / blocked — fall back to device time */ });
+    const id = setInterval(() => update(), 5 * 60_000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
+  return hour;
+}
+
 
 function DashboardLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
