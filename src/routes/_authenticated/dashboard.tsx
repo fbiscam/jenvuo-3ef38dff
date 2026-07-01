@@ -484,7 +484,7 @@ function DashboardLayout() {
               {email || fullName}<span className="text-zinc-500">'s Account</span>
             </h1>
             <div className="mt-1 text-[12px] text-zinc-500">
-              {greeting()}, {fullName || "Trader"} · Plan <span className="font-medium text-zinc-700">{planTier}</span>
+              {greetingText}, {fullName || "Trader"} · Plan <span className="font-medium text-zinc-700">{planTier}</span>
             </div>
           </div>
           <div className="flex items-center gap-1.5 lg:self-end lg:mb-6">
