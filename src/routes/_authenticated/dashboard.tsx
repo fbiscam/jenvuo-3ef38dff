@@ -616,7 +616,7 @@ function DashboardLayout() {
                 </Link>
               }
             />
-            <div className="max-h-[360px] overflow-y-auto">
+            <div className="max-h-[360px] overflow-y-auto scrollbar-auto-hide">
               <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
               <TickerRow label="XAG / USD" symbol="XAGUSD" decimals={3} />
               <TickerRow label="DXY" symbol="DXY" decimals={3} />
