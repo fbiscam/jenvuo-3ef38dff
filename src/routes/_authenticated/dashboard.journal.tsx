@@ -205,11 +205,6 @@ function Journal() {
         ))}
       </div>
 
-      <div className="flex justify-end">
-        <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">
-          <Plus className="h-4 w-4" /> Log trade
-        </button>
-      </div>
 
       {!trades.length ? (
         <div className="rounded-2xl border border-dashed border-zinc-300 p-10 text-center">
