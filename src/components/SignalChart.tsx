@@ -69,6 +69,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   // Box overlays drawn via DOM div absolutely positioned over chart
   const overlayRef = useRef<HTMLDivElement>(null);
   const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement; transient: boolean }[]>([]);
+  // Floating text labels for price-line markings (liquidity, EQH/EQL, BOS/CHOCH, entry/sl/tp)
+  const labelsRef = useRef<{ marking: Marking; price: number; color: string; el: HTMLDivElement; transient: boolean }[]>([]);
   // Live tick state — mutable, survives across ticks within the same bar
   const liveBarRef = useRef<{ time: number; open: number; high: number; low: number; close: number } | null>(null);
   const bucketSecRef = useRef<number>(60);
@@ -152,6 +154,14 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         b.el.style.width = `${width}px`;
         b.el.style.height = `${height}px`;
       }
+      // Reposition floating price-line labels — pin to right edge at price coordinate.
+      for (const lb of labelsRef.current) {
+        const y = seriesRef.current.priceToCoordinate(lb.price);
+        if (y == null) { lb.el.style.display = "none"; continue; }
+        lb.el.style.display = "block";
+        lb.el.style.top = `${Math.max(2, y - 9)}px`;
+        lb.el.style.right = `4px`;
+      }
     };
     chart.timeScale().subscribeVisibleTimeRangeChange(redrawBoxes);
     chart.subscribeCrosshairMove(redrawBoxes);
@@ -167,6 +177,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       linesRef.current = [];
       markersRef.current = [];
       boxesRef.current = [];
+      labelsRef.current = [];
       liveBarRef.current = null;
       lastPriceLineRef.current = null;
       if (overlayRef.current) overlayRef.current.innerHTML = "";
@@ -224,6 +235,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       markersPluginRef.current?.setMarkers([]);
       boxesRef.current.forEach((b) => b.el.remove());
       boxesRef.current = [];
+      labelsRef.current.forEach((lb) => { try { lb.el.remove(); } catch {} });
+      labelsRef.current = [];
       if (lastPriceLineRef.current) {
         try { s.removePriceLine(lastPriceLineRef.current); } catch {}
         lastPriceLineRef.current = null;
@@ -249,6 +262,16 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         } else keepBoxes.push(b);
       }
       boxesRef.current = keepBoxes;
+      // Remove transient floating labels
+      const keepLabels: typeof labelsRef.current = [];
+      for (const lb of labelsRef.current) {
+        if (lb.transient) {
+          lb.el.style.opacity = "0";
+          const el = lb.el;
+          setTimeout(() => { try { el.remove(); } catch {} }, 260);
+        } else keepLabels.push(lb);
+      }
+      labelsRef.current = keepLabels;
       // Remove transient markers (BOS/CHoCH arrows)
       if (transientMarkerKeysRef.current.size > 0) {
         const kept = markersRef.current.filter((mk) => {
@@ -433,6 +456,17 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         axisLabelVisible: true, title,
       });
       linesRef.current.push({ line, transient });
+
+      // Floating on-chart label so every marking is named right on the chart (like FVG/OB boxes).
+      if (overlayRef.current && Number.isFinite(price)) {
+        const lbl = document.createElement("div");
+        lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.03em;padding:2px 6px;border-radius:3px;background:${color};color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.25);opacity:0;transition:opacity 400ms ease;white-space:nowrap;transform:translateY(-2px);`;
+        lbl.textContent = title;
+        overlayRef.current.appendChild(lbl);
+        labelsRef.current.push({ marking: m, price, color, el: lbl, transient });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => { lbl.style.opacity = "1"; });
+      }
     },
   }));
 
