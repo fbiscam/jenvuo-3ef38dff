@@ -92,7 +92,7 @@ function Billing() {
             Buy top-up
           </Link>
         </div>
-        <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-blue-500">
+        <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-emerald-100">
           <div
             className="absolute top-1/2 h-4 w-[3px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-900 shadow-[0_0_0_2px_rgba(255,255,255,0.9)] transition-all duration-500"
             style={{ left: `${pct}%` }}
