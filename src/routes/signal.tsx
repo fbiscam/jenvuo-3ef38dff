@@ -33,7 +33,7 @@ export const Route = createFileRoute("/signal")({
       {
         name: "description",
         content:
-          "Real-time ICT & SMC signal desk for Gold, Crypto, FX and Indices. Multi-timeframe bias, A+ setup scoring, annotated charts, voice narration and live trade tracking — all in one institutional terminal.",
+          "Real-time ICT & SMC signal desk for Gold, FX, Crypto and Indices. Multi-timeframe bias, A+ setup scoring and voice narration.",
       },
       { name: "keywords", content: "ICT signals, SMC trading, gold signals, XAUUSD analysis, A+ setup, smart money concepts, voice trading agent, live signal desk" },
       { property: "og:title", content: "Live Signal Desk — Jenvu" },
