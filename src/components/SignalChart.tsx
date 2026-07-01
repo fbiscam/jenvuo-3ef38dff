@@ -136,9 +136,11 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
           continue;
         }
 
-        if (m.fromTime == null || m.toTime == null) { b.el.style.display = "none"; continue; }
-        const x1 = ts.timeToCoordinate(m.fromTime as Time);
-        const x2 = ts.timeToCoordinate(m.toTime as Time);
+        const fromT = Number(m.fromTime);
+        const toT = Number(m.toTime);
+        if (!Number.isFinite(fromT) || !Number.isFinite(toT)) { b.el.style.display = "none"; continue; }
+        const x1 = ts.timeToCoordinate(fromT as Time);
+        const x2 = ts.timeToCoordinate(toT as Time);
         if (x1 == null || x2 == null) { b.el.style.display = "none"; continue; }
         b.el.style.display = "block";
         const left = Math.min(x1, x2);
