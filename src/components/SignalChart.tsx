@@ -380,16 +380,20 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         color = m.kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
         style = LineStyle.LargeDashed;
         const text = m.type.toUpperCase();
-        const time = m.fromTime as Time;
-        markersRef.current.push({
-          time,
-          position: m.kind === "bullish" ? "belowBar" : "aboveBar",
-          color,
-          shape: m.kind === "bullish" ? "arrowUp" : "arrowDown",
-          text,
-        });
-        if (transient) transientMarkerKeysRef.current.add(`${time}:${text}`);
-        markersPluginRef.current?.setMarkers(markersRef.current);
+        const time = Number(m.fromTime) as Time;
+        if (!Number.isFinite(time as unknown as number)) {
+          // skip marker if time is invalid, but still draw the price line below
+        } else {
+          markersRef.current.push({
+            time,
+            position: m.kind === "bullish" ? "belowBar" : "aboveBar",
+            color,
+            shape: m.kind === "bullish" ? "arrowUp" : "arrowDown",
+            text,
+          });
+          if (transient) transientMarkerKeysRef.current.add(`${time}:${text}`);
+          try { markersPluginRef.current?.setMarkers(markersRef.current); } catch {}
+        }
       } else if (m.type === "entry") {
         price = m.price; color = COLORS.entry; lineWidth = 3;
       } else if (m.type === "sl") {
