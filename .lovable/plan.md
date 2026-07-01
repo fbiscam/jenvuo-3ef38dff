@@ -1,75 +1,97 @@
-# Auto-Journal from Signal Page
+# Supercharge the Signal AI Engine
 
-Goal: jab user signal page par trade plan dekhe, ek click se trade journal me auto-log ho, aur live price ke base par win/loss/pnl khud update ho jaye. Sath me "Save Signal" button bhi ho jo bina trade liye signal snapshot save kare. Sidebar me "Journal" ko user-friendly label milega.
+Goal: Make the AI think deeper, use richer ICT/SMC concepts, and produce more accurate A+ signals across all supported pairs.
 
----
+## Current State (baseline)
 
-## 1. Signal page — naye buttons (Trade Plan card ke andar)
+- `src/lib/analysis/engine.ts` — deterministic math: swings, BOS/CHoCH, FVG, OB, liquidity pools, 7-factor weighted score (bias, sweep, zone, PD, killzone, DXY, RR).
+- `src/lib/gold-analysis.functions.ts` — pulls candles, runs engine, calls **`google/gemini-3.1-flash-lite`** (cheapest tier) to build/narrate the plan.
+- `src/lib/signal-agent.functions.ts` — chat agent also uses lite model.
+- `src/routes/api/public/hooks/scan-signals.ts` — 15-min cron scanning A+ setups.
 
-Do buttons add karenge `t && plan && !marketClosed` wale block me, Confluences ke neeche:
+**Weak points:**
+1. Model is the cheapest tier → shallow reasoning, generic narration.
+2. Killzone weight fixed at 10% for every pair (Gold-tuned only).
+3. Missing ICT concepts: breaker blocks, IFVG (inverted FVG), mitigation blocks, dealing-range PD arrays, turtle soup, judas swing, SMT divergence, session liquidity map, day-of-week bias.
+4. No hard-veto gates — score alone decides A+, so weak setups sometimes slip through.
+5. No self-critique / second-pass review before emitting A+.
+6. Correlation only checks DXY (wrong for JPY crosses, indices, crypto).
 
-- **`Take this Trade`** (primary, BUY=green / SELL=red)
-- **`Save Signal`** (secondary, ghost button)
+## Plan
 
-States:
-- Loading spinner jab insert ho raha ho
-- Success: button "✓ Trade Logged" / "✓ Saved" + disabled
-- Toast confirmation
-- Agar user signed-in nahi hai → "Sign in to track" CTA
+### 1. Upgrade reasoning models
+- Swap `google/gemini-3.1-flash-lite` → **`google/gemini-3.5-flash`** for the main narration pass (better reasoning, still fast/cheap).
+- Add optional **"senior trader review" pass** using **`google/gemini-2.5-pro`** — triggered only when Stage-1 grade ≥ A. Can veto/downgrade or confirm A+.
+- Chat agent (`signal-agent.functions.ts`) → also upgraded to `gemini-3.5-flash`.
 
-### Take Trade flow
-1. Insert row into `trade_journal`:
-   - `pair`, `direction` (long/short from BUY/SELL), `entry`, `stop_loss`, `take_profit`
-   - `outcome: 'open'`, `notes: "Auto-logged from AI signal • Conf {n}% • {confluences joined}"`
-2. Saved row `id` ko `useRef` me rakhenge.
-3. Existing price tracker (lines 365-385) jab `setTrackerStatus("WIN"|"LOSS")` call kare, wahi moment par `UPDATE trade_journal` chalega:
-   - `outcome: 'win' | 'loss'`
-   - `pnl: (exit - entry) × direction multiplier × contract size` (gold ke liye 1 lot = 100oz; simple version: per-point USD diff stored as pnl, user baad me edit kar sakta hai)
-   - `closed_at: now()`
-4. Agar user manually "Stop" karta hai trade tracker → outcome `breakeven` ya untouched chhodenge (default: untouched, user dashboard me edit kar sakta hai).
+### 2. Expand deterministic ICT/SMC detection in `engine.ts`
+New detectors:
+- **Breaker Block** — failed OB that flipped after structure break.
+- **Inverted FVG (IFVG)** — violated FVG now acting as opposite bias.
+- **Mitigation Block** — partial-fill zone tracking.
+- **Dealing Range** — last confirmed swing H↔L with premium / equilibrium / discount split.
+- **Turtle Soup** — false break of PDH/PDL/PWH/PWL + immediate reversal.
+- **Judas Swing** — first-hour opening drive reversal in London/NY.
+- **SMT Divergence** — Gold↔DXY, EURUSD↔GBPUSD, JPY-crosses↔USDJPY, NAS↔SPX.
+- **Session Liquidity Map** — Asia H/L, London H/L, NY open range.
+- **Day-of-Week Bias** — Tue-Thu trend days weighted higher, Mon/Fri manipulation.
 
-### Save Signal flow
-- Snapshot save karenge — current `saved_signals` table sirf `alert_id` accept karti hai (FK to `signal_alerts`), jo AI generated plans ke liye exist nahi karta.
-- **Migration**: `saved_signals.alert_id` ko nullable banayenge + ek `snapshot jsonb` column add karenge jisme plan ka full data (pair, direction, entry, sl, tp, confidence, confluences, narrative) chala jayega.
-- Dashboard saved list (`dashboard.index.tsx`) ko update karke snapshot bhi render kare.
+### 3. Pair-specific tuning (`PAIR_PROFILES`)
+Per-instrument config:
+- Correct killzones (Gold, FX majors, JPY crosses, indices, crypto).
+- ATR-based SL buffer (replaces fixed 0.08%).
+- Correlation instrument for SMT (DXY for EUR/GBP, USDJPY for JPY crosses, NAS/SPX for indices, BTC.D for alts).
+- Session-alignment multiplier: killzone weight jumps to 15-20% when pair is in its native session.
 
----
+### 4. Rework scoring with hard-veto gates
+Auto-downgrade to WAIT (regardless of score) if any of:
+- HTF & LTF bias conflict
+- No liquidity sweep before entry zone
+- Entry zone already mitigated
+- High-impact news within 30 min
+- R:R < 1.8
 
-## 2. Journal page label change
+Only when all vetos pass, run weighted score. Add factors: `structure_quality`, `smt`, `session_alignment`. New thresholds: **A+ ≥ 88, A ≥ 75, B ≥ 60**.
 
-Sidebar / dashboard nav me `Journal` ki jagah **"My Trades"** (chhota + clear). Page header bhi update — "Trade history & performance" tagline.
-
-(File: jahan dashboard nav links defined hain — `dashboard.tsx`.)
-
----
-
-## 3. Database migration
-
-```sql
-ALTER TABLE public.saved_signals
-  ALTER COLUMN alert_id DROP NOT NULL,
-  ADD COLUMN snapshot jsonb;
+### 5. Two-stage AI pipeline
+```
+Stage 1 (fast)  → gemini-3.5-flash: generates plan from deterministic context
+Stage 2 (deep)  → gemini-2.5-pro (only if grade ≥ A): validates plan, can veto/downgrade
+Stage 3         → final spokenSummary + step-by-step narration
 ```
 
-(Existing GRANTs/RLS already cover the table.)
+### 6. Richer prompt context to AI
+Prompt now includes:
+- Full dealing range with premium/discount %
+- Last 3 structure events per timeframe (not just last one)
+- Nearest 5 unmitigated zones (OB / FVG / Breaker) with distance in pips
+- Session liquidity map (Asia/London/NY H-L, PDH/PDL, PWH/PWL)
+- SMT divergence status
+- Day-of-week + upcoming news window
+- Historical hint: "last 10 A+ setups on this pair had X% win rate" (from `signals` table)
 
----
+### 7. Self-critique in Stage 2
+Pro model must answer 3 checks:
+- "Would a 25-year institutional trader take this trade? Why/why not?"
+- "What's the strongest counter-argument?"
+- "Is entry chasing price or waiting at premium/discount?"
 
-## 4. Files touched
+Any negative answer → downgrade one tier or force WAIT.
 
-- `src/routes/signal.tsx` — buttons, insert logic, tracker → journal update wiring
-- `src/routes/_authenticated/dashboard.index.tsx` — render saved snapshots when `alert_id` null
-- `src/routes/_authenticated/dashboard.tsx` — rename "Journal" nav item to "My Trades"
-- `src/routes/_authenticated/dashboard.journal.tsx` — header text tweak
-- One migration on `saved_signals`
+## Files touched
 
----
+- `src/lib/analysis/engine.ts` — new detectors, `PAIR_PROFILES`, reworked `scoreSetup` with veto gates + new factors.
+- `src/lib/gold-analysis.functions.ts` — model swap, Stage-2 deep-review call, expanded context builder, self-critique parser.
+- `src/lib/signal-agent.functions.ts` — model swap to `gemini-3.5-flash`.
+- `src/routes/api/public/hooks/scan-signals.ts` — new thresholds, alert only on Stage-2-confirmed A+.
 
-## Edge cases
+**No database schema changes** — new confluences fit inside existing `confluences[]` and `key_levels[]` columns.
 
-- Duplicate clicks: button disabled after success; ref guards re-insert.
-- Page refresh mid-trade: tracker reference lost — trade stays `open` in journal, user can close manually from `/dashboard/journal` (already supported).
-- Free plan: journal feature is Pro-locked (`features.journal`). Take Trade button par bhi same check — agar locked, button par "Upgrade to log trades" tooltip / inline CTA. Save Signal free users ke liye allowed rahega.
-- PnL calc: gold ke liye `(exit - entry)` raw points dikhayenge (user lot size jaante hain); doosre pairs ke liye same — simple, transparent.
+**Credit impact per signal:** ~2-3× current cost per emitted A+ (flash on every scan + pro only on ~20% of candidates). Accuracy gain far outweighs.
 
-Approve karo to build mode me implement kar deta hu.
+## Out of scope (ask separately)
+- Real news API integration (still uses time-window heuristic)
+- Backtesting to auto-tune weights
+- ML pattern recognition
+
+Approve to build.
