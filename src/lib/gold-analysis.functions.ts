@@ -239,12 +239,7 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
   return fetchInstrumentCandles(resolveInstrument("XAUUSD"), tf);
 }
 
-export const analyzeGold = createServerFn({ method: "POST" })
-  .inputValidator((d: { timeframe: string; query: string }) => ({
-    timeframe: String(d?.timeframe || "15m").toLowerCase(),
-    query: String(d?.query || "Give me the best A+ setup right now"),
-  }))
-  .handler(async ({ data }) => {
+async function _analyzeGoldCompute(data: { timeframe: string; query: string }): Promise<GoldSignal> {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
