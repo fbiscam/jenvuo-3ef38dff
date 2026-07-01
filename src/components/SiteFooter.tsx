@@ -17,6 +17,7 @@ const columns = [
     label: "Intelligence",
     links: [
       { to: "/insights", label: "Market Insights" },
+      { to: "/killzones", label: "Killzone Times" },
       { to: "/ai-engine", label: "AI Engine" },
       { to: "/llm", label: "Language Model" },
       { to: "/development", label: "Development" },
