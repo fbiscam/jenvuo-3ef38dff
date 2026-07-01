@@ -134,7 +134,7 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
 
           const templateData = {
             pair,
-            grade,
+            grade: grade as 'A+' | 'A',
             direction,
             entry: round(plan.trade.entry).toFixed(dec),
             sl: round(plan.trade.sl).toFixed(dec),
