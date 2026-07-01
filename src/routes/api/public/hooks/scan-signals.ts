@@ -58,7 +58,7 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
         // Run the analyzer (server fn called server-side returns the plan)
         let plan
         try {
-          plan = await getSignalPlan({ data: { symbol: pair } })
+          plan = await computeSignalPlan({ symbol: pair })
         } catch (e) {
           console.error('scan-signals: analyzer failed', e)
           return Response.json({ error: 'analyzer_failed', message: String(e) }, { status: 502 })
