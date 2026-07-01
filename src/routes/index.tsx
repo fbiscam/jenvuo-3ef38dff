@@ -644,6 +644,28 @@ function HomePage() {
             </div>
           </div>
 
+          {/* Current plan banner (mirrors billing page) */}
+          {currentPlan && (
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 sm:p-6">
+              <div>
+                <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-emerald-700`}>Your current plan</div>
+                <div className="mt-2 flex items-center gap-3">
+                  <h3 className="text-xl font-semibold text-zinc-900 sm:text-2xl">
+                    {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
+                  </h3>
+                  {currentPlan === "free" ? (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-800">Limited</span>
+                  ) : (
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-800">Active</span>
+                  )}
+                </div>
+              </div>
+              <Link to={currentPlan === "free" ? "/pricing" : "/dashboard/billing"} className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+                {currentPlan === "free" ? "Upgrade" : "Manage plan"}
+              </Link>
+            </div>
+          )}
+
           {/* Mobile stacked plan cards (table is unreadable below sm) */}
           <div className="mt-10 grid gap-4 sm:hidden">
             {[
