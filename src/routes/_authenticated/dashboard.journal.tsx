@@ -50,6 +50,49 @@ function Journal() {
   );
   const livePrices = useLivePrices(openSymbols);
 
+  // Auto-close open trades when live price touches TP or SL
+  useEffect(() => {
+    const closing = trades.filter((t) => {
+      if (t.outcome !== "open" || t.entry == null) return false;
+      const px = livePrices[t.pair.toUpperCase()];
+      if (px == null) return false;
+      if (t.direction === "long") {
+        if (t.take_profit != null && px >= t.take_profit) return true;
+        if (t.stop_loss != null && px <= t.stop_loss) return true;
+      } else {
+        if (t.take_profit != null && px <= t.take_profit) return true;
+        if (t.stop_loss != null && px >= t.stop_loss) return true;
+      }
+      return false;
+    });
+    if (closing.length === 0) return;
+    (async () => {
+      for (const t of closing) {
+        const px = livePrices[t.pair.toUpperCase()];
+        const hitTp =
+          t.take_profit != null &&
+          (t.direction === "long" ? px >= t.take_profit : px <= t.take_profit);
+        const outcome: Trade["outcome"] = hitTp ? "win" : "loss";
+        const exit = hitTp ? t.take_profit! : t.stop_loss!;
+        const pnl = t.direction === "long" ? exit - t.entry! : t.entry! - exit;
+        const { error } = await supabase
+          .from("trade_journal")
+          .update({ outcome, pnl, closed_at: new Date().toISOString() })
+          .eq("id", t.id)
+          .eq("outcome", "open");
+        if (!error) {
+          setTrades((prev) =>
+            prev.map((x) =>
+              x.id === t.id ? { ...x, outcome, pnl, closed_at: new Date().toISOString() } : x,
+            ),
+          );
+          toast.success(`Trade ${outcome === "win" ? "won" : "lost"} · ${t.pair} ${outcome === "win" ? "TP" : "SL"} hit`);
+        }
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [livePrices]);
+
   const liveOf = (t: Trade): number | null => {
     if (t.outcome !== "open" || t.entry == null) return null;
     const px = livePrices[t.pair.toUpperCase()];
