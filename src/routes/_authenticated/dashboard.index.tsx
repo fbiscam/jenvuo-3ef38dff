@@ -96,10 +96,11 @@ function SavedSignals() {
         const grade = snap?.confidence ? (snap.confidence >= 85 ? "A+" : snap.confidence >= 70 ? "A" : "B") : (a?.grade ?? "—");
         const pair = snap?.pair ?? "—";
         const entry = snap?.entry ?? a?.entry;
-        const sl = snap?.stop_loss ?? a?.stop_loss;
-        const tp = snap?.take_profit ?? a?.take_profit;
+        const sl = snap?.stop_loss ?? a?.sl;
+        const tp = snap?.take_profit ?? a?.tp;
         const rr = snap?.rr ?? a?.rr;
-        const summary = snap?.confluences?.slice(0, 3).join(" · ") ?? a?.summary ?? "—";
+        const summary = snap?.confluences?.slice(0, 3).join(" · ") ?? a?.rationale ?? "—";
+
         if (!snap && !a) return null;
         return (
           <article key={r.id} className="group rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)] transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
