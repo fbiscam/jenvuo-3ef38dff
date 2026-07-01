@@ -1345,6 +1345,7 @@ function SignalVoiceAgent({
       const res = await ask({ data: { question, context: ctx } });
       // Mark/focus relevant zones based on both the user question and reply
       highlightFromText(`${question} ${res.reply}`);
+      appendVoiceTurn({ query: question, reply: res.reply });
       speech.speak(stripMd(res.reply));
     } catch (e: any) {
       toast.error(e?.message || "Agent failed to respond.");
