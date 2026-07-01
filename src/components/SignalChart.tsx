@@ -266,10 +266,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (m.tf !== tf) return;
       const ts = chart.timeScale();
       const anyM: any = m;
-      const from: number | undefined = anyM.fromTime;
-      const to: number | undefined = anyM.toTime;
+      const from = Number(anyM.fromTime);
+      const to = Number(anyM.toTime);
       try {
-        if (typeof from === "number" && typeof to === "number") {
+        if (Number.isFinite(from) && Number.isFinite(to)) {
           const span = Math.max(to - from, 60);
           const pad = Math.max(span * 6, 60 * 30);
           ts.setVisibleRange({ from: (from - pad) as Time, to: (to + pad) as Time });
@@ -290,10 +290,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (m.tf !== tf) return;
       const ts = chart.timeScale();
       const anyM: any = m;
-      let from: number | undefined = anyM.fromTime;
-      let to: number | undefined = anyM.toTime;
+      let from = Number(anyM.fromTime);
+      let to = Number(anyM.toTime);
       // Price-only markings (eqh, eql, liquidity, entry/sl/tp) — center around live bar
-      if (typeof from !== "number" || typeof to !== "number") {
+      if (!Number.isFinite(from) || !Number.isFinite(to)) {
         const lastT = liveBarRef.current?.time;
         if (typeof lastT !== "number") return;
         const bucket = bucketSecRef.current || 60;
@@ -301,9 +301,9 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         to = lastT + bucket * 5;
       }
       try {
-        const span = Math.max((to as number) - (from as number), bucketSecRef.current || 60);
+        const span = Math.max(to - from, bucketSecRef.current || 60);
         const pad = Math.max(span * 5, (bucketSecRef.current || 60) * 25);
-        ts.setVisibleRange({ from: ((from as number) - pad) as Time, to: ((to as number) + pad) as Time });
+        ts.setVisibleRange({ from: (from - pad) as Time, to: (to + pad) as Time });
       } catch {}
     },
     drawMarking: (m: Marking, opts?: { transient?: boolean }) => {
