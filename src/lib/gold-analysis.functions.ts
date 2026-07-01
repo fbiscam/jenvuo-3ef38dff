@@ -1167,7 +1167,10 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     const guided: { say: string; markingIndex: number | null; tf: "htf" | "ltf" }[] = [];
     const push = (say: string, markingIndex: number | null, tf: "htf" | "ltf") => {
-      if (say && say.trim()) guided.push({ say: say.trim(), markingIndex, tf });
+      const trimmed = say?.trim();
+      if (!trimmed) return;
+      if (guided.some((g) => g.say === trimmed)) return;
+      guided.push({ say: trimmed, markingIndex, tf });
     };
 
     push(
