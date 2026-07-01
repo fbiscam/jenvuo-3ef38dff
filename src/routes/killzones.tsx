@@ -281,11 +281,15 @@ function KillzonesPage() {
           </div>
           <div className="col-span-2 sm:col-span-1 rounded-xl border border-zinc-200 bg-white p-4">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
-              Timezone
+              {ipCity ? "Detected location" : "Timezone"}
             </div>
             <div className="text-sm font-medium mt-1 flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5 text-zinc-400" />
-              {tzLong}
+              <span className="truncate">{ipCity ?? tz}</span>
+            </div>
+            <div className={`${MONO} mt-1 text-[10px] text-zinc-500 truncate`}>
+              {tz}
+              {ipTZ ? " · via IP" : ""}
             </div>
           </div>
         </div>
