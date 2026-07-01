@@ -235,7 +235,7 @@ function Billing() {
                     return (
                       <td
                         key={i}
-                        className={`px-6 py-3.5 text-center border-l border-zinc-200 ${isCurrentCol ? "bg-emerald-50/50" : i === 1 ? "bg-amber-50/40" : ""}`}
+                        className="px-6 py-3.5 text-center border-l border-zinc-200 bg-white"
                       >
                         {v === true ? (
                           <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
