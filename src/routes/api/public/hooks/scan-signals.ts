@@ -16,18 +16,19 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
       POST: async ({ request }) => {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
         const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-        const anonKey =
-          process.env.SUPABASE_PUBLISHABLE_KEY ||
-          process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-          process.env.VITE_SUPABASE_ANON_KEY
+        const cronSecret = process.env.CRON_SECRET
 
-        if (!supabaseUrl || !serviceKey || !anonKey) {
+        if (!supabaseUrl || !serviceKey || !cronSecret) {
           return Response.json({ error: 'server_misconfigured' }, { status: 500 })
         }
 
-        const apiKey =
-          request.headers.get('apikey') || request.headers.get('x-api-key') || ''
-        if (apiKey !== anonKey) {
+        // Constant-time compare
+        const provided = request.headers.get('x-cron-secret') || ''
+        const a = new TextEncoder().encode(provided)
+        const b = new TextEncoder().encode(cronSecret)
+        let ok = a.length === b.length
+        for (let i = 0; i < Math.max(a.length, b.length); i++) ok = ok && a[i % a.length] === b[i % b.length]
+        if (!ok || provided !== cronSecret) {
           return Response.json({ error: 'unauthorized' }, { status: 401 })
         }
 
