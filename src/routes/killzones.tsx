@@ -6,21 +6,23 @@ import { PAIR_PROFILES, type PairProfile } from "@/lib/analysis/engine";
 export const Route = createFileRoute("/killzones")({
   head: () => ({
     meta: [
-      { title: "Killzone Times — Gold, Forex, Crypto & Indices | Jenvu AI" },
+      { title: "Killzone Times Tracker" },
       {
         name: "description",
         content:
-          "Live ICT/SMC killzone times for every major pair, coin and index. See London, New York, Tokyo & Sydney sessions in UTC and your local timezone.",
+          "Live ICT/SMC killzone times for Gold, Forex, JPY pairs, Indices and Crypto — shown in UTC and your local timezone with real-time IN/OUT status.",
       },
-      { property: "og:title", content: "Killzone Times — Jenvu AI" },
+      { property: "og:title", content: "Killzone Times Tracker" },
       {
         property: "og:description",
         content:
-          "Real-time killzone reference for Gold, FX, JPY pairs, Indices and Crypto. UTC + your local time, with live IN/OUT status.",
+          "Live ICT/SMC killzone times for Gold, Forex, JPY pairs, Indices and Crypto — shown in UTC and your local timezone with real-time IN/OUT status.",
       },
+      { property: "og:url", content: "https://jenvu.com/killzones" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://jenvu.com/killzones" }],
   }),
   component: KillzonesPage,
 });
