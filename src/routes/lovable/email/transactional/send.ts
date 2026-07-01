@@ -115,6 +115,42 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           )
         }
 
+        // SECURITY: prevent authenticated users from relaying emails to arbitrary
+        // recipients from our verified sending domain. When the template does not
+        // pin a fixed recipient, the caller may only email their own account.
+        if (!template.to) {
+          const callerEmail = (user.email || '').toLowerCase().trim()
+          if (!callerEmail || callerEmail !== effectiveRecipient.toLowerCase().trim()) {
+            return Response.json(
+              { error: 'recipientEmail must match your account email' },
+              { status: 403 }
+            )
+          }
+        }
+
+        // SECURITY: sanitize any URL fields inside templateData so a caller cannot
+        // inject arbitrary external links (phishing) into our branded emails.
+        const ALLOWED_URL_HOSTS = new Set(['jenvu.com', 'www.jenvu.com', 'notify.jenvu.com'])
+        for (const key of Object.keys(templateData)) {
+          const val = templateData[key]
+          if (typeof val !== 'string') continue
+          if (!/url$/i.test(key) && !/link$/i.test(key)) continue
+          try {
+            const parsed = new URL(val)
+            if (parsed.protocol !== 'https:' || !ALLOWED_URL_HOSTS.has(parsed.hostname)) {
+              return Response.json(
+                { error: `templateData.${key} must be an https URL on an approved host` },
+                { status: 400 }
+              )
+            }
+          } catch {
+            return Response.json(
+              { error: `templateData.${key} must be a valid URL` },
+              { status: 400 }
+            )
+          }
+        }
+
         // 2. Check suppression list (fail-closed: if we can't verify, don't send)
         const { data: suppressed, error: suppressionError } = await supabase
           .from('suppressed_emails')

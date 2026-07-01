@@ -12,22 +12,16 @@ export const Route = createFileRoute('/api/public/hooks/notify-subscribers')({
       POST: async ({ request }) => {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-        const anonKey =
-          process.env.SUPABASE_PUBLISHABLE_KEY ||
-          process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-          process.env.VITE_SUPABASE_ANON_KEY
+        const cronSecret = process.env.CRON_SECRET
 
-        if (!supabaseUrl || !supabaseServiceKey || !anonKey) {
+        if (!supabaseUrl || !supabaseServiceKey || !cronSecret) {
           console.error('notify-subscribers: missing env')
           return Response.json({ error: 'server_misconfigured' }, { status: 500 })
         }
 
-        // Authenticate the caller (pg_cron / pg_net sends apikey header)
-        const apiKey =
-          request.headers.get('apikey') ||
-          request.headers.get('x-api-key') ||
-          ''
-        if (apiKey !== anonKey) {
+        // Authenticate the caller with the shared cron secret
+        const provided = request.headers.get('x-cron-secret') || ''
+        if (provided !== cronSecret) {
           return Response.json({ error: 'unauthorized' }, { status: 401 })
         }
 

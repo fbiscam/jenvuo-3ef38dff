@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getSignalPlan, resolveInstrument, type SignalPlan } from "@/lib/gold-analysis.functions";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { computeSignalPlan, resolveInstrument, type SignalPlan } from "@/lib/gold-analysis.functions";
 
 export type AgentContext = {
   symbol?: string;
@@ -83,8 +84,14 @@ KEY LEVELS: ${(ctx.keyLevels ?? []).map((k) => `${k.label}=${k.price}`).join(" Â
 }
 
 export const askSignalAgent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => d as { question: string; context?: AgentContext })
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: spendErr } = await supabaseAdmin.rpc("spend_credits", {
+      _user_id: context.userId, _amount: 1, _reason: "voice_query", _metadata: {} as any,
+    });
+    if (spendErr) throw new Error(spendErr.message?.includes("INSUFFICIENT_CREDITS") ? "INSUFFICIENT_CREDITS" : spendErr.message);
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI gateway not configured.");
 
@@ -107,7 +114,7 @@ export const askSignalAgent = createServerFn({ method: "POST" })
       // If user mentioned a different instrument OR explicitly asked for analysis on it, fetch its plan.
       if (isDifferent || isAnalysisIntent) {
         try {
-          switchedPlan = await getSignalPlan({ data: { symbol: detected } });
+          switchedPlan = await computeSignalPlan({ symbol: detected });
           switchedDisplay = switchedPlan.instrument.display;
           contextStr = buildContextFromPlan(switchedPlan);
           isAnalysisIntent = true;

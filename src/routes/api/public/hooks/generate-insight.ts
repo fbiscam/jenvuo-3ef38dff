@@ -36,7 +36,15 @@ async function submitToGoogle(url: string) {
 export const Route = createFileRoute("/api/public/hooks/generate-insight")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const cronSecret = process.env.CRON_SECRET;
+        if (!cronSecret) {
+          return new Response(JSON.stringify({ error: "CRON_SECRET missing" }), { status: 500 });
+        }
+        const provided = request.headers.get("x-cron-secret") || "";
+        if (provided !== cronSecret) {
+          return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
+        }
         const lovableKey = process.env.LOVABLE_API_KEY;
         if (!lovableKey) {
           return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), { status: 500 });

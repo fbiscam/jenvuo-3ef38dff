@@ -1,9 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   analyzeTF, buildLiquidityPools, buildTrade, scoreSetup,
   computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
   detectSMTDivergence, killzoneForPair,
 } from "@/lib/analysis/engine";
+
+async function _spendUserCredits(userId: string, amount: number, reason: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { error } = await supabaseAdmin.rpc("spend_credits", {
+    _user_id: userId, _amount: amount, _reason: reason, _metadata: {} as any,
+  });
+  if (error) {
+    if (error.message?.includes("INSUFFICIENT_CREDITS")) throw new Error("INSUFFICIENT_CREDITS");
+    throw new Error(error.message);
+  }
+}
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
 
@@ -227,12 +239,7 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
   return fetchInstrumentCandles(resolveInstrument("XAUUSD"), tf);
 }
 
-export const analyzeGold = createServerFn({ method: "POST" })
-  .inputValidator((d: { timeframe: string; query: string }) => ({
-    timeframe: String(d?.timeframe || "15m").toLowerCase(),
-    query: String(d?.query || "Give me the best A+ setup right now"),
-  }))
-  .handler(async ({ data }) => {
+async function _analyzeGoldCompute(data: { timeframe: string; query: string }): Promise<GoldSignal> {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
@@ -357,6 +364,17 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
     };
 
     return signal;
+}
+
+export const analyzeGold = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { timeframe: string; query: string }) => ({
+    timeframe: String(d?.timeframe || "15m").toLowerCase(),
+    query: String(d?.query || "Give me the best A+ setup right now"),
+  }))
+  .handler(async ({ data, context }) => {
+    await _spendUserCredits(context.userId, 2, "signal");
+    return _analyzeGoldCompute(data);
   });
 
 // ============================================================
@@ -802,12 +820,7 @@ export const getNewsRisk = createServerFn({ method: "POST" })
 
 
 
-export const getSignalPlan = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => {
-    const obj = (d ?? {}) as { symbol?: string };
-    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
-  })
-  .handler(async ({ data }) => {
+export async function computeSignalPlan(data: { symbol: string }): Promise<SignalPlan> {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
@@ -1422,6 +1435,17 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
     };
 
     return plan;
+}
+
+export const getSignalPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { symbol?: string };
+    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
+  })
+  .handler(async ({ data, context }) => {
+    await _spendUserCredits(context.userId, 3, "ict_narration");
+    return computeSignalPlan(data);
   });
 
 
