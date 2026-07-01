@@ -822,6 +822,8 @@ function SignalPage() {
                           confluences: plan.confluences,
                           session: plan.session,
                           saved_price: plan.currentPrice,
+                          plan, // full plan snapshot for exact re-open
+                          saved_at: new Date().toISOString(),
                         };
                         const { error } = await supabase.from("saved_signals").insert({
                           user_id: u.user.id,
