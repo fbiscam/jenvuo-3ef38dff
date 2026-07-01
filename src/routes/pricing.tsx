@@ -25,6 +25,20 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:url", content: "https://jenvu.com/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/pricing" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: FAQ.map(([q, a]) => ({
+            "@type": "Question",
+            name: q,
+            acceptedAnswer: { "@type": "Answer", text: a },
+          })),
+        }),
+      },
+    ],
   }),
   component: PricingPage,
 });
