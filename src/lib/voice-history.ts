@@ -16,7 +16,7 @@ export function getVoiceHistory(): VoiceTurn[] {
   }
 }
 
-export function appendVoiceTurn(turn: Omit<VoiceTurn, "ts"> & { ts?: number }) {
+export function appendVoiceTurn(turn: Omit<VoiceTurn, "ts"> & { ts?: number; source?: string }) {
   if (typeof window === "undefined") return;
   try {
     const list = getVoiceHistory();
@@ -24,6 +24,16 @@ export function appendVoiceTurn(turn: Omit<VoiceTurn, "ts"> & { ts?: number }) {
     const trimmed = list.slice(0, MAX);
     window.localStorage.setItem(KEY, JSON.stringify(trimmed));
     window.dispatchEvent(new CustomEvent("jenvu:voice:history:updated"));
+  } catch {
+    /* ignore */
+  }
+  // Fire-and-forget server persistence so the dashboard sees it across devices/domains.
+  try {
+    import("./voice-history.functions").then(({ saveVoiceTurn }) => {
+      saveVoiceTurn({ data: { query: turn.query, reply: turn.reply, source: turn.source } })
+        .then(() => window.dispatchEvent(new CustomEvent("jenvu:voice:history:updated")))
+        .catch(() => {});
+    }).catch(() => {});
   } catch {
     /* ignore */
   }
