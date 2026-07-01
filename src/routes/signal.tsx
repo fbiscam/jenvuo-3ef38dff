@@ -198,7 +198,7 @@ function SignalPage() {
       for (const m of p.markings) {
         if (autoTypes.has(m.type)) {
           const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
-          target?.drawMarking(m, { transient: false });
+          try { target?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
         }
       }
 
