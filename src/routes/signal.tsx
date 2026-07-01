@@ -749,6 +749,13 @@ function SignalPage() {
                         setLogging(true);
                         const { data: u } = await supabase.auth.getUser();
                         if (!u.user) { toast.error("Sign in to log trades"); setLogging(false); return; }
+                        // Decide market vs limit: if entry is away from current price, it's a limit order.
+                        const px = plan.currentPrice;
+                        const tolMarket = px * 0.0005;
+                        const atMarket =
+                          (isBuy && px <= t.entry + tolMarket && px >= t.entry - tolMarket) ||
+                          (isSell && px >= t.entry - tolMarket && px <= t.entry + tolMarket);
+                        const initialOutcome = atMarket ? "open" : "pending";
                         const { data, error } = await supabase.from("trade_journal").insert({
                           user_id: u.user.id,
                           pair: plan.instrument.symbol,
@@ -756,14 +763,18 @@ function SignalPage() {
                           entry: t.entry,
                           stop_loss: t.sl,
                           take_profit: t.tp,
-                          outcome: "open",
+                          outcome: initialOutcome,
                           notes: `Auto-logged from AI signal · Conf ${t.confidence}%${plan.confluences.length ? " · " + plan.confluences.slice(0, 3).join(" | ") : ""}`,
                         }).select("id").single();
                         setLogging(false);
                         if (error || !data) { toast.error("Could not log trade"); return; }
                         journalRowIdRef.current = data.id;
                         setTradeLogged(true);
-                        toast.success("Trade logged · auto-tracking win/loss");
+                        toast.success(
+                          initialOutcome === "pending"
+                            ? "Limit order placed · waiting for entry"
+                            : "Trade logged · auto-tracking win/loss",
+                        );
                       }}
                       className={cn(
                         "inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[11px] font-semibold tracking-wider uppercase transition-colors",
