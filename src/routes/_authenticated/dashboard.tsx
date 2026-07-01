@@ -54,7 +54,7 @@ const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: bo
 
 /* ---------- helpers ---------- */
 
-function Sparkline({ seed = 1, tone = "blue", empty = false, trend = "flat", magnitude = 0 }: { seed?: number; tone?: "blue" | "rose" | "zinc"; empty?: boolean; trend?: "up" | "down" | "flat"; magnitude?: number }) {
+function Sparkline({ seed = 1, tone = "blue", empty = false, trend = "flat", magnitude = 0 }: { seed?: number; tone?: "blue" | "rose" | "zinc" | "emerald"; empty?: boolean; trend?: "up" | "down" | "flat"; magnitude?: number }) {
   const w = 120, h = 36;
 
   // deterministic pseudo-random points with optional trend bias
