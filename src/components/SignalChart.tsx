@@ -262,26 +262,51 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     },
     focusMarking: (m: Marking) => {
       const chart = chartRef.current;
-      if (!chart) return;
+      const s = seriesRef.current;
+      if (!chart || !s) return;
       if (m.tf !== tf) return;
       const ts = chart.timeScale();
       const anyM: any = m;
-      const from = Number(anyM.fromTime);
-      const to = Number(anyM.toTime);
+      let from = Number(anyM.fromTime);
+      let to = Number(anyM.toTime);
+      const bucket = bucketSecRef.current || 60;
+      // Price-only markings — synthesize a tight window around the live bar,
+      // so liquidity / EQH / EQL / entry / sl / tp zoom in just like FVG/OB.
+      if (!Number.isFinite(from) || !Number.isFinite(to)) {
+        const lastT = liveBarRef.current?.time;
+        if (typeof lastT === "number") {
+          from = lastT - bucket * 6;
+          to = lastT + bucket * 2;
+        }
+      }
       try {
         if (Number.isFinite(from) && Number.isFinite(to)) {
-          const span = Math.max(to - from, 60);
-          const pad = Math.max(span * 6, 60 * 30);
+          const span = Math.max(to - from, bucket);
+          const pad = Math.max(span * 2.5, bucket * 8);
           ts.setVisibleRange({ from: (from - pad) as Time, to: (to + pad) as Time });
         }
       } catch {}
-      // pulse the matching box (if any)
+      // Pulse the matching box (if any)
       const hit = boxesRef.current.find((b) => b.marking === m);
       if (hit) {
         const prev = hit.el.style.boxShadow;
         hit.el.style.boxShadow = "0 0 0 3px rgba(59,130,246,0.55), 0 0 24px rgba(59,130,246,0.45)";
         hit.el.style.transition = "box-shadow 220ms ease, opacity 600ms ease";
         setTimeout(() => { try { hit.el.style.boxShadow = prev || "none"; } catch {} }, 1100);
+      }
+      // Pulse the matching price line — width flash to draw the eye.
+      const anyPrice = (anyM.price ?? null) as number | null;
+      if (anyPrice != null && overlayRef.current) {
+        const y = s.priceToCoordinate(anyPrice);
+        if (y != null) {
+          const glow = document.createElement("div");
+          const containerWidth = overlayRef.current.clientWidth;
+          glow.style.cssText = `position:absolute;left:0;width:${containerWidth}px;top:${y - 14}px;height:28px;background:radial-gradient(ellipse at center, rgba(59,130,246,0.35), rgba(59,130,246,0) 70%);pointer-events:none;opacity:0;transition:opacity 220ms ease;`;
+          overlayRef.current.appendChild(glow);
+          requestAnimationFrame(() => { glow.style.opacity = "1"; });
+          setTimeout(() => { glow.style.opacity = "0"; }, 900);
+          setTimeout(() => { try { glow.remove(); } catch {} }, 1250);
+        }
       }
     },
     panToMarking: (m: Marking) => {
@@ -292,20 +317,21 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       const anyM: any = m;
       let from = Number(anyM.fromTime);
       let to = Number(anyM.toTime);
-      // Price-only markings (eqh, eql, liquidity, entry/sl/tp) — center around live bar
+      const bucket = bucketSecRef.current || 60;
+      // Price-only markings (eqh, eql, liquidity, entry/sl/tp) — tight window around live bar
       if (!Number.isFinite(from) || !Number.isFinite(to)) {
         const lastT = liveBarRef.current?.time;
         if (typeof lastT !== "number") return;
-        const bucket = bucketSecRef.current || 60;
-        from = lastT - bucket * 30;
-        to = lastT + bucket * 5;
+        from = lastT - bucket * 8;
+        to = lastT + bucket * 3;
       }
       try {
-        const span = Math.max(to - from, bucketSecRef.current || 60);
-        const pad = Math.max(span * 5, (bucketSecRef.current || 60) * 25);
+        const span = Math.max(to - from, bucket);
+        const pad = Math.max(span * 2.5, bucket * 8);
         ts.setVisibleRange({ from: (from - pad) as Time, to: (to + pad) as Time });
       } catch {}
     },
+
     drawMarking: (m: Marking, opts?: { transient?: boolean }) => {
       const s = seriesRef.current;
       const chart = chartRef.current;
