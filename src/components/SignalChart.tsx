@@ -69,6 +69,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   // Box overlays drawn via DOM div absolutely positioned over chart
   const overlayRef = useRef<HTMLDivElement>(null);
   const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement; transient: boolean }[]>([]);
+  // Floating text labels for price-line markings (liquidity, EQH/EQL, BOS/CHOCH, entry/sl/tp)
+  const labelsRef = useRef<{ marking: Marking; price: number; color: string; el: HTMLDivElement; transient: boolean }[]>([]);
   // Live tick state — mutable, survives across ticks within the same bar
   const liveBarRef = useRef<{ time: number; open: number; high: number; low: number; close: number } | null>(null);
   const bucketSecRef = useRef<number>(60);
