@@ -154,6 +154,23 @@ function Journal() {
     setTrades((t) => t.filter((x) => x.id !== id));
   };
 
+  const closeNow = async (t: Trade) => {
+    if (t.outcome !== "open" || t.entry == null) return;
+    const px = livePrices[t.pair.toUpperCase()];
+    if (px == null) { toast.error("No live price yet — try again"); return; }
+    const pnl = t.direction === "long" ? px - t.entry : t.entry - px;
+    const outcome: Trade["outcome"] = pnl > 0 ? "win" : pnl < 0 ? "loss" : "breakeven";
+    const closed_at = new Date().toISOString();
+    const { error } = await supabase
+      .from("trade_journal")
+      .update({ outcome, pnl, closed_at })
+      .eq("id", t.id)
+      .eq("outcome", "open");
+    if (error) { toast.error("Could not close trade"); return; }
+    setTrades((prev) => prev.map((x) => (x.id === t.id ? { ...x, outcome, pnl, closed_at } : x)));
+    toast.success(`Trade closed · ${outcome.toUpperCase()} · ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}`);
+  };
+
   return (
     <UpgradeOverlay
       show={locked}
@@ -261,7 +278,14 @@ function Journal() {
                         <div className="text-[10px] text-zinc-400">{tpDist >= 0 ? "+" : ""}{tpDist.toFixed(2)}</div>
                       )}
                     </td>
-                    <td className="px-3 py-2.5 text-xs capitalize">{t.outcome}</td>
+                    <td className="px-3 py-2.5 text-xs">
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${
+                        t.outcome === "win" ? "bg-emerald-50 text-emerald-700"
+                        : t.outcome === "loss" ? "bg-rose-50 text-rose-700"
+                        : t.outcome === "breakeven" ? "bg-zinc-100 text-zinc-700"
+                        : "bg-amber-50 text-amber-700"
+                      }`}>{t.outcome}</span>
+                    </td>
                     <td className={`px-3 py-2.5 font-mono text-xs ${(displayPnl ?? 0) > 0 ? "text-emerald-600" : (displayPnl ?? 0) < 0 ? "text-rose-600" : "text-zinc-500"}`}>
                       {displayPnl != null ? (
                         <span className="inline-flex items-center gap-1">
@@ -271,9 +295,20 @@ function Journal() {
                       ) : "—"}
                     </td>
                     <td className="px-3 py-2.5">
-                      <button onClick={() => remove(t.id)} className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-rose-600">
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                      <div className="flex items-center justify-end gap-1">
+                        {isOpen && (
+                          <button
+                            onClick={() => closeNow(t)}
+                            className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-[10px] font-medium text-zinc-700 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+                            title="Close at live price"
+                          >
+                            Close
+                          </button>
+                        )}
+                        <button onClick={() => remove(t.id)} className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-rose-600">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
