@@ -137,12 +137,43 @@ function KillzonesPage() {
   const [now, setNow] = useState<Date>(() => new Date());
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<(typeof CATEGORIES)[number]>("All");
-  const tzShort = useMemo(() => shortTZ(), []);
-  const tzLong = useMemo(() => longTZ(), []);
+  const [ipTZ, setIpTZ] = useState<string | null>(null);
+  const [ipCity, setIpCity] = useState<string | null>(null);
+  const tz = ipTZ ?? longTZ();
+  const tzShort = useMemo(() => {
+    try {
+      const parts = new Intl.DateTimeFormat([], { timeZone: tz, timeZoneName: "short" })
+        .formatToParts(new Date());
+      return parts.find(p => p.type === "timeZoneName")?.value || "Local";
+    } catch {
+      return shortTZ();
+    }
+  }, [tz]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
+  }, []);
+
+  // Detect timezone from user IP (free, no key). Falls back to browser TZ on error.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json/", { cache: "no-store" });
+        if (!res.ok) return;
+        const j = (await res.json()) as { timezone?: string; city?: string; country_name?: string };
+        if (cancelled) return;
+        if (j.timezone) setIpTZ(j.timezone);
+        if (j.city || j.country_name)
+          setIpCity([j.city, j.country_name].filter(Boolean).join(", "));
+      } catch {
+        // ignore; browser TZ fallback stays in effect
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const rows = useMemo(() => {
