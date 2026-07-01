@@ -241,13 +241,15 @@ function SignalPage() {
           setActiveTf("ltf");
           for (const m of p.markings) {
             if (m.type === "entry" || m.type === "sl" || m.type === "tp") {
-              ltfRef.current?.drawMarking(m, { transient: false });
+              try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("final marking failed", e); }
             }
           }
           const entry = p.markings.find((m) => m.type === "entry");
           if (entry) {
-            ltfRef.current?.panToMarking(entry);
-            ltfRef.current?.focusMarking(entry);
+            try {
+              ltfRef.current?.panToMarking(entry);
+              ltfRef.current?.focusMarking(entry);
+            } catch (e) { console.warn("entry focus failed", e); }
           }
           await speakWait(p.trade.summary);
           toast.success(`Setup ready · ${p.setupGrade}`);
