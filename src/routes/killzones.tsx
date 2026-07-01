@@ -58,11 +58,16 @@ function fmtUTC(h: number) {
   return `${pad(hh)}:00`;
 }
 
-// Convert a UTC hour to the user's local HH:mm using today's date.
-function utcHourToLocal(hUTC: number): string {
+// Convert a UTC hour to a local HH:mm using the given IANA timezone.
+function utcHourToLocal(hUTC: number, tz?: string): string {
   const d = new Date();
   d.setUTCHours(hUTC === 24 ? 0 : hUTC, 0, 0, 0);
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+  return d.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: tz,
+  });
 }
 
 function shortTZ(): string {
