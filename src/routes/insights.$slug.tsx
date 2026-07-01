@@ -139,7 +139,6 @@ function InsightDetailPage() {
 
   return (
     <>
-      <style>{`@media (min-width: 1024px){.jenvu-zoom{zoom:1.5}}`}</style>
       <div className={`jenvu-zoom min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
         {/* NAV */}
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
