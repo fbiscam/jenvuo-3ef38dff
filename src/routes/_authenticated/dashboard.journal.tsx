@@ -43,12 +43,41 @@ function Journal() {
   };
   useEffect(() => { load(); }, []);
 
-  // Live prices for open trades
-  const openSymbols = useMemo(
-    () => Array.from(new Set(trades.filter((t) => t.outcome === "open" && t.entry != null).map((t) => t.pair))),
+  // Live prices for open + pending trades
+  const trackedSymbols = useMemo(
+    () => Array.from(new Set(trades.filter((t) => (t.outcome === "open" || t.outcome === "pending") && t.entry != null).map((t) => t.pair))),
     [trades],
   );
-  const livePrices = useLivePrices(openSymbols);
+  const livePrices = useLivePrices(trackedSymbols);
+
+  // Auto-fill pending limit orders when live price reaches entry
+  useEffect(() => {
+    const filling = trades.filter((t) => {
+      if (t.outcome !== "pending" || t.entry == null) return false;
+      const px = livePrices[t.pair.toUpperCase()];
+      if (px == null) return false;
+      const tol = Math.max(t.entry * 0.0005, 0.01);
+      return Math.abs(px - t.entry) <= tol
+        || (t.direction === "long" && px <= t.entry)
+        || (t.direction === "short" && px >= t.entry);
+    });
+    if (filling.length === 0) return;
+    (async () => {
+      for (const t of filling) {
+        const opened_at = new Date().toISOString();
+        const { error } = await supabase
+          .from("trade_journal")
+          .update({ outcome: "open", opened_at })
+          .eq("id", t.id)
+          .eq("outcome", "pending");
+        if (!error) {
+          setTrades((prev) => prev.map((x) => x.id === t.id ? { ...x, outcome: "open", opened_at } : x));
+          toast.success(`Entry filled · ${t.pair} @ ${t.entry}`);
+        }
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [livePrices]);
 
   // Auto-close open trades when live price touches TP or SL
   useEffect(() => {
