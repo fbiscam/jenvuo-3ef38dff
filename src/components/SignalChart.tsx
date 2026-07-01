@@ -154,6 +154,14 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         b.el.style.width = `${width}px`;
         b.el.style.height = `${height}px`;
       }
+      // Reposition floating price-line labels — pin to right edge at price coordinate.
+      for (const lb of labelsRef.current) {
+        const y = seriesRef.current.priceToCoordinate(lb.price);
+        if (y == null) { lb.el.style.display = "none"; continue; }
+        lb.el.style.display = "block";
+        lb.el.style.top = `${Math.max(2, y - 9)}px`;
+        lb.el.style.right = `4px`;
+      }
     };
     chart.timeScale().subscribeVisibleTimeRangeChange(redrawBoxes);
     chart.subscribeCrosshairMove(redrawBoxes);
