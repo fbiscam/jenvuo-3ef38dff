@@ -17,6 +17,9 @@ import { appendVoiceTurn } from "@/lib/voice-history";
 import AlertOptInCard from "@/components/AlertOptInCard";
 import AlertsHistoryPanel from "@/components/AlertsHistoryPanel";
 import { useCredits } from "@/hooks/useCredits";
+import { killzoneForPair, getPairProfile } from "@/lib/analysis/engine";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
 
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
