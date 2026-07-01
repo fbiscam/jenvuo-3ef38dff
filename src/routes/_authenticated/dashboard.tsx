@@ -785,7 +785,11 @@ function BestTimeWidget() {
         ))}
       </div>
 
+      <p className="mt-1 text-[10.5px] leading-relaxed text-zinc-500">
+        Note: Times shown in your local region ({Intl.DateTimeFormat().resolvedOptions().timeZone}). Please verify trading hours according to your region.
+      </p>
     </div>
+
   );
 }
 
