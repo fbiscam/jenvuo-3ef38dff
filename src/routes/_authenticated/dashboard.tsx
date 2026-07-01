@@ -705,6 +705,129 @@ function DashboardLayout() {
   );
 }
 
+// Killzones defined in PKT (UTC+5). Converted to UTC for cross-timezone accuracy.
+// PKT hour → UTC hour: subtract 5.
+type Killzone = { name: string; tag: string; startUtc: number; endUtc: number; quality: "best" | "good" | "ok" | "avoid" };
+const KILLZONES: Killzone[] = [
+  { name: "Asian Session",   tag: "Chop — avoid", startUtc: 0,     endUtc: 5,     quality: "avoid" }, // 5-10 AM PKT
+  { name: "London Open",     tag: "FVG + sweep",  startUtc: 7,     endUtc: 10,    quality: "good"  }, // 12-3 PM PKT
+  { name: "NY Killzone",     tag: "A+ setups",    startUtc: 12.5,  endUtc: 15.5,  quality: "best"  }, // 5:30-8:30 PM PKT
+  { name: "NY PM Session",   tag: "Continuation", startUtc: 16,    endUtc: 18,    quality: "ok"    }, // 9-11 PM PKT
+];
+
+function fmtCountdown(ms: number) {
+  if (ms <= 0) return "now";
+  const s = Math.floor(ms / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+function fmtLocal(utcHour: number) {
+  const d = new Date();
+  d.setUTCHours(Math.floor(utcHour), Math.round((utcHour % 1) * 60), 0, 0);
+  return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function BestTimeWidget() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(t);
+  }, []);
+
+  const nowUtcHours = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
+
+  const withState = KILLZONES.map((k) => {
+    const active = nowUtcHours >= k.startUtc && nowUtcHours < k.endUtc;
+    const progress = active ? ((nowUtcHours - k.startUtc) / (k.endUtc - k.startUtc)) * 100 : 0;
+    // ms until this session starts (next 24h)
+    let startMs = (k.startUtc - nowUtcHours) * 3600 * 1000;
+    if (startMs < 0) startMs += 24 * 3600 * 1000;
+    return { ...k, active, progress, startMs };
+  });
+
+  const activeZone = withState.find((z) => z.active);
+  const nextZone = withState.filter((z) => !z.active).sort((a, b) => a.startMs - b.startMs)[0];
+
+  const toneMap: Record<Killzone["quality"], { dot: string; text: string; bar: string; pill: string }> = {
+    best:  { dot: "bg-emerald-500", text: "text-emerald-700", bar: "bg-emerald-500", pill: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+    good:  { dot: "bg-sky-500",     text: "text-sky-700",     bar: "bg-sky-500",     pill: "bg-sky-50 text-sky-700 border-sky-200" },
+    ok:    { dot: "bg-amber-500",   text: "text-amber-700",   bar: "bg-amber-500",   pill: "bg-amber-50 text-amber-700 border-amber-200" },
+    avoid: { dot: "bg-zinc-400",    text: "text-zinc-600",    bar: "bg-zinc-400",    pill: "bg-zinc-100 text-zinc-600 border-zinc-200" },
+  };
+
+  return (
+    <div className="flex flex-1 flex-col gap-4 px-5 py-5">
+      {/* Status hero */}
+      <div className="rounded-lg border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-4">
+        {activeZone ? (
+          <>
+            <div className="flex items-center gap-2">
+              <span className={`relative flex h-2 w-2`}>
+                <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${toneMap[activeZone.quality].dot} opacity-75`} />
+                <span className={`relative inline-flex h-2 w-2 rounded-full ${toneMap[activeZone.quality].dot}`} />
+              </span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Live now</span>
+            </div>
+            <div className="mt-1.5 flex items-baseline justify-between gap-2">
+              <h4 className="text-[15px] font-semibold text-zinc-900">{activeZone.name}</h4>
+              <span className={`rounded-md border px-1.5 py-0.5 text-[10px] font-semibold ${toneMap[activeZone.quality].pill}`}>
+                {activeZone.tag}
+              </span>
+            </div>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+              <div className={`h-full ${toneMap[activeZone.quality].bar}`} style={{ width: `${activeZone.progress}%` }} />
+            </div>
+            <p className="mt-2 text-[11px] text-zinc-500">
+              {fmtLocal(activeZone.startUtc)} – {fmtLocal(activeZone.endUtc)} local
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-zinc-300" />
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Off-session</span>
+            </div>
+            <h4 className="mt-1.5 text-[15px] font-semibold text-zinc-900">Waiting for liquidity</h4>
+            {nextZone && (
+              <p className="mt-1 text-[12px] text-zinc-600">
+                <span className="font-medium text-zinc-900">{nextZone.name}</span> starts in{" "}
+                <span className={`font-semibold ${toneMap[nextZone.quality].text}`}>{fmtCountdown(nextZone.startMs)}</span>
+              </p>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Sessions list */}
+      <div className="flex flex-col gap-1.5">
+        {withState.map((z) => (
+          <div
+            key={z.name}
+            className={`flex items-center justify-between rounded-md border px-3 py-2 ${z.active ? "border-zinc-300 bg-zinc-50" : "border-zinc-200 bg-white"}`}
+          >
+            <div className="flex min-w-0 items-center gap-2.5">
+              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${toneMap[z.quality].dot}`} />
+              <div className="min-w-0">
+                <div className="truncate text-[12px] font-medium text-zinc-900">{z.name}</div>
+                <div className="text-[10.5px] text-zinc-500">{fmtLocal(z.startUtc)} – {fmtLocal(z.endUtc)}</div>
+              </div>
+            </div>
+            <span className={`shrink-0 rounded border px-1.5 py-0.5 text-[10px] font-medium ${toneMap[z.quality].pill}`}>
+              {z.active ? "Live" : fmtCountdown(z.startMs)}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-auto rounded-md bg-zinc-50 px-3 py-2 text-[11px] leading-relaxed text-zinc-600">
+        <span className="font-semibold text-zinc-900">Tip:</span> NY Killzone delivers the highest probability A+ setups on Gold. Avoid entries 30 min around red-folder news.
+      </p>
+    </div>
+  );
+}
+
 function VoiceAgentHistory() {
   const [items, setItems] = useState<VoiceTurn[]>([]);
   const [mounted, setMounted] = useState(false);
