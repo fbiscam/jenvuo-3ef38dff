@@ -568,7 +568,6 @@ function DashboardLayout() {
                 label="Win rate"
                 value={liveWinRate != null ? `${liveWinRate}%` : "0.0%"}
                 delta={null}
-                delta={null}
                 trend={liveWinRate == null ? "flat" : liveWinRate < 50 ? "down" : liveWinRate > 60 ? "up" : "flat"}
                 magnitude={liveWinRate != null ? Math.abs(liveWinRate - 50) : 0}
                 seed={7}
