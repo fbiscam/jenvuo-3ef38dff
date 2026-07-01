@@ -711,13 +711,35 @@ function VoiceAgentHistory() {
 
   useEffect(() => {
     setMounted(true);
-    const refresh = () => setItems(getVoiceHistory());
+    let cancelled = false;
+    const refresh = async () => {
+      const local = getVoiceHistory();
+      try {
+        const { listVoiceTurns } = await import("@/lib/voice-history.functions");
+        const remote = await listVoiceTurns();
+        if (cancelled) return;
+        const seen = new Set<string>();
+        const merged: VoiceTurn[] = [];
+        for (const t of [...remote, ...local]) {
+          const key = `${t.ts}|${t.query}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          merged.push({ query: t.query, reply: t.reply, ts: t.ts });
+        }
+        merged.sort((a, b) => b.ts - a.ts);
+        setItems(merged);
+      } catch {
+        if (!cancelled) setItems(local);
+      }
+    };
     refresh();
+    const onEvt = () => refresh();
     const onStorage = (e: StorageEvent) => { if (e.key === "jenvu:voice:history") refresh(); };
-    window.addEventListener("jenvu:voice:history:updated", refresh as EventListener);
+    window.addEventListener("jenvu:voice:history:updated", onEvt as EventListener);
     window.addEventListener("storage", onStorage);
     return () => {
-      window.removeEventListener("jenvu:voice:history:updated", refresh as EventListener);
+      cancelled = true;
+      window.removeEventListener("jenvu:voice:history:updated", onEvt as EventListener);
       window.removeEventListener("storage", onStorage);
     };
   }, []);
