@@ -446,15 +446,15 @@ function SignalPage() {
     <div className="min-h-dvh w-full bg-[#F8FAFC] text-slate-900 font-['Inter',system-ui,sans-serif] antialiased">
       {/* HEADER */}
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
-        <div className="mx-auto grid max-w-[1600px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4">
+        <div className="relative mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
           <button
             onClick={() => { stop(); navigate({ to: "/app" }); }}
             className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </button>
-          <div className="flex justify-center items-center gap-2.5 min-w-0">
-            <Link to="/" aria-label="Jenvu home" className="shrink-0 inline-flex items-center justify-center rounded-md hover:opacity-80 transition">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2.5">
+            <Link to="/" aria-label="Jenvu home" className="pointer-events-auto shrink-0 inline-flex items-center justify-center rounded-md hover:opacity-80 transition">
               <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded-md object-contain" />
             </Link>
             <span className="font-semibold tracking-tight text-sm select-none">JENVU AI</span>
