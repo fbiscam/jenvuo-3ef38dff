@@ -114,7 +114,7 @@ function hhmmss(d = new Date()): string {
 /* ---------- page ---------- */
 function SignalPage() {
   const navigate = useNavigate();
-  const { symbol } = Route.useSearch();
+  const { symbol, savedId } = Route.useSearch();
   const fetchPlan = useServerFn(getSignalPlan);
   const speech = useSpeech();
   const credits = useCredits();
