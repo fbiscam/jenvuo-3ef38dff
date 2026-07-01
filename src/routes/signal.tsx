@@ -398,10 +398,19 @@ function SignalPage() {
         if (!error) toast.success(`Journal updated · ${outcome.toUpperCase()}`);
       });
     };
+    const fillJournal = () => {
+      const id = journalRowIdRef.current;
+      if (!id) return;
+      supabase.from("trade_journal")
+        .update({ outcome: "open", opened_at: new Date().toISOString() })
+        .eq("id", id)
+        .eq("outcome", "pending");
+    };
     if (dir === "BUY") {
       if (priceTick <= tr.entry + tol && trackerStatusRef.current === "PENDING") {
         fire("filled", `Entry filled at ${priceTick.toFixed(plan.instrument.decimals)}`);
         setTrackerStatus("RUNNING");
+        fillJournal();
       }
       if (priceTick <= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; closeJournal("loss", tr.sl); }
       if (priceTick >= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tr.tp); }
@@ -409,6 +418,7 @@ function SignalPage() {
       if (priceTick >= tr.entry - tol && trackerStatusRef.current === "PENDING") {
         fire("filled", `Entry filled at ${priceTick.toFixed(plan.instrument.decimals)}`);
         setTrackerStatus("RUNNING");
+        fillJournal();
       }
       if (priceTick >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; closeJournal("loss", tr.sl); }
       if (priceTick <= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tr.tp); }
