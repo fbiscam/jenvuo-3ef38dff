@@ -17,6 +17,9 @@ import { appendVoiceTurn } from "@/lib/voice-history";
 import AlertOptInCard from "@/components/AlertOptInCard";
 import AlertsHistoryPanel from "@/components/AlertsHistoryPanel";
 import { useCredits } from "@/hooks/useCredits";
+import { killzoneForPair, getPairProfile } from "@/lib/analysis/engine";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
 
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
@@ -141,6 +144,34 @@ function SignalPage() {
       else setAuthReady(true);
     });
   }, [navigate]);
+
+  // ---------- Killzone warning popup ----------
+  const [kzDismissed, setKzDismissed] = useState<boolean | null>(null);
+  const [kzDialog, setKzDialog] = useState<{ pair: string; kzText: string } | null>(null);
+  const kzShownFor = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!authReady) return;
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("killzone_notice_dismissed")
+        .eq("id", data.user.id)
+        .maybeSingle();
+      setKzDismissed(!!prof?.killzone_notice_dismissed);
+    });
+  }, [authReady]);
+
+  const dismissKzForever = useCallback(async () => {
+    setKzDialog(null);
+    setKzDismissed(true);
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return;
+    await supabase.from("profiles").update({ killzone_notice_dismissed: true }).eq("id", data.user.id);
+  }, []);
+
+
 
   const [voiceBlocked, setVoiceBlocked] = useState(false);
   const [activeTf, setActiveTf] = useState<"htf" | "ltf" | null>(null);
@@ -339,6 +370,29 @@ function SignalPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authReady, symbol, savedId]);
+
+  // Killzone popup: fire once per pair-symbol when analysis returns outside its killzone
+  useEffect(() => {
+    if (!plan || kzDismissed !== false) return;
+    const sym = plan.instrument.symbol;
+    if (kzShownFor.current === sym) return;
+    const kz = killzoneForPair(sym);
+    if (kz.inKillzone) return;
+    const profile = getPairProfile(sym);
+    const fmt = (utcHour: number) => {
+      const d = new Date();
+      d.setUTCHours(utcHour % 24, 0, 0, 0);
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    };
+    const zones = profile?.killzones ?? [];
+    const kzText = zones.length
+      ? zones.map(z => `${z.name} (${fmt(z.startUTC)}–${fmt(z.endUTC)} your time)`).join(", ")
+      : "the pair's active session window";
+    kzShownFor.current = sym;
+    setKzDialog({ pair: plan.instrument.display || sym, kzText });
+  }, [plan, kzDismissed]);
+
+
 
   // auto-scroll narration feed
   useEffect(() => {
@@ -1025,8 +1079,38 @@ function SignalPage() {
           </div>
         </div>
       </main>
+
+      <Dialog open={!!kzDialog} onOpenChange={(o) => { if (!o) setKzDialog(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-700">
+              <AlertTriangle className="h-5 w-5" /> Outside optimal killzone
+            </DialogTitle>
+            <DialogDescription className="pt-2 text-zinc-700 leading-relaxed">
+              You are not in the killzone for better A+ scaling and good signal.
+              Only trade <span className="font-semibold text-zinc-900">{kzDialog?.pair}</span> in{" "}
+              <span className="font-semibold text-zinc-900">{kzDialog?.kzText}</span>.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              onClick={dismissKzForever}
+              className="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] font-medium text-zinc-600 hover:bg-zinc-50 transition"
+            >
+              Don't show again
+            </button>
+            <button
+              onClick={() => setKzDialog(null)}
+              className="h-9 px-4 rounded-lg bg-zinc-900 text-white text-[12px] font-semibold tracking-wide hover:bg-zinc-800 transition"
+            >
+              I understand
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+
 }
 
 /* ---------- bits ---------- */
