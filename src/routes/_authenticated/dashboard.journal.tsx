@@ -130,18 +130,19 @@ function Journal() {
   };
 
   const stats = useMemo(() => {
-    const closed = trades.filter((t) => t.outcome !== "open");
+    const closed = trades.filter((t) => t.outcome === "win" || t.outcome === "loss" || t.outcome === "breakeven");
+    const openTrades = trades.filter((t) => t.outcome === "open");
+    const pendingTrades = trades.filter((t) => t.outcome === "pending");
     const wins = closed.filter((t) => t.outcome === "win").length;
     const losses = closed.filter((t) => t.outcome === "loss").length;
     const closedPnl = closed.reduce((s, t) => s + (t.pnl ?? 0), 0);
-    const livePnl = trades.reduce((s, t) => s + (liveOf(t) ?? 0), 0);
+    const livePnl = openTrades.reduce((s, t) => s + (liveOf(t) ?? 0), 0);
 
-    // Win rate only counts trades that have actually closed as win/loss.
-    // Open trades and deleted trades are excluded.
     const decided = wins + losses;
     return {
       total: trades.length,
-      open: trades.length - closed.length,
+      open: openTrades.length,
+      pending: pendingTrades.length,
       winRate: decided ? Math.round((wins / decided) * 100) : 0,
       wins,
       losses,
