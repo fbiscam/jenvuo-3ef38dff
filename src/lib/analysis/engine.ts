@@ -304,19 +304,21 @@ export function buildTrade(
   };
 }
 
-// ---------- Score (asset-aware weighted) ----------
+// ---------- Score (asset-aware weighted + hard-veto gates) ----------
 
 export type AssetKind = "crypto" | "metal" | "forex" | "index" | "stock";
 export type ScoreFactor = { key: string; label: string; weight: number; pass: boolean; detail: string };
+export type VetoResult = { key: string; label: string; reason: string };
 
-// Per-asset factor weights. Factors that don't apply to a class get weight 0 and
-// are dropped from the score (the remaining weights are re-normalised to 100).
+// Per-asset factor weights. Factors that don't apply to a class get weight 0
+// and are dropped from the score (the remaining weights are re-normalised to 100).
+// New factors: structure (BOS/CHoCH quality), smt (correlation divergence), session_align (native session for this pair).
 const FACTOR_WEIGHTS: Record<AssetKind, Record<string, number>> = {
-  metal:  { bias: 25, sweep: 20, zone: 15, pd: 10, killzone: 10, dxy: 10, rr: 10 },
-  forex:  { bias: 25, sweep: 20, zone: 15, pd: 10, killzone: 15, dxy: 5,  rr: 10 }, // dxy still helps USD pairs, killzone more critical
-  index:  { bias: 30, sweep: 20, zone: 15, pd: 10, killzone: 15, dxy: 0,  rr: 10 }, // session-driven
-  crypto: { bias: 30, sweep: 25, zone: 20, pd: 10, killzone: 0,  dxy: 0,  rr: 15 }, // 24/7, sweeps dominate
-  stock:  { bias: 30, sweep: 20, zone: 15, pd: 10, killzone: 15, dxy: 0,  rr: 10 }, // RTH session
+  metal:  { bias: 20, sweep: 15, zone: 12, pd: 8,  killzone: 10, dxy: 10, rr: 8,  structure: 8, smt: 5,  session_align: 4 },
+  forex:  { bias: 20, sweep: 15, zone: 12, pd: 8,  killzone: 12, dxy: 6,  rr: 8,  structure: 8, smt: 7,  session_align: 4 },
+  index:  { bias: 22, sweep: 15, zone: 12, pd: 8,  killzone: 12, dxy: 0,  rr: 8,  structure: 10, smt: 8, session_align: 5 },
+  crypto: { bias: 25, sweep: 20, zone: 15, pd: 8,  killzone: 0,  dxy: 0,  rr: 12, structure: 12, smt: 5, session_align: 3 },
+  stock:  { bias: 22, sweep: 15, zone: 12, pd: 8,  killzone: 12, dxy: 0,  rr: 8,  structure: 10, smt: 8, session_align: 5 },
 };
 
 export function scoreSetup(args: {
@@ -329,11 +331,50 @@ export function scoreSetup(args: {
   dxyConfirms: boolean | null;     // null = unknown / N/A
   lastPrice: number;
   kind: AssetKind;
-}): { score: number; grade: "A+" | "A" | "B" | "C"; factors: ScoreFactor[] } {
-  const { trade, htf, ltf, pools, inKillzone, imminentHighNews, dxyConfirms, lastPrice, kind } = args;
+  // ---- optional new signals (safe defaults) ----
+  structureQuality?: number | null;  // 0..1 quality of last HTF BOS/CHoCH (impulse vs choppy)
+  smtDivergence?: boolean | null;    // true = correlated instrument diverges in our favor
+  nativeSession?: boolean | null;    // true = current killzone is the native/prime session for this pair
+  zoneMitigated?: boolean;           // true = entry zone already tagged
+}): {
+  score: number;
+  grade: "A+" | "A" | "B" | "C";
+  factors: ScoreFactor[];
+  vetos: VetoResult[];
+} {
+  const {
+    trade, htf, ltf, pools, inKillzone, imminentHighNews, dxyConfirms, lastPrice, kind,
+    structureQuality, smtDivergence, nativeSession, zoneMitigated,
+  } = args;
   const w = FACTOR_WEIGHTS[kind] ?? FACTOR_WEIGHTS.metal;
   const f: ScoreFactor[] = [];
+  const vetos: VetoResult[] = [];
   const dir = trade.direction;
+
+  // ---- HARD VETO GATES (any trigger → cap grade at C, score ≤ 40) ----
+  if (dir !== "WAIT") {
+    // 1. HTF/LTF bias conflict
+    if (htf.trend !== "ranging" && ltf.trend !== "ranging" && htf.trend !== ltf.trend) {
+      vetos.push({ key: "bias_conflict", label: "HTF/LTF bias conflict", reason: `HTF ${htf.trend} vs LTF ${ltf.trend}` });
+    }
+    // 2. No liquidity sweep before entry
+    const anySwept = pools.some(p => p.swept && (dir === "BUY" ? p.side === "sell" : p.side === "buy"));
+    if (!anySwept) {
+      vetos.push({ key: "no_sweep", label: "No sweep before entry", reason: "Institutional entries require prior liquidity grab" });
+    }
+    // 3. Entry zone already mitigated
+    if (zoneMitigated === true) {
+      vetos.push({ key: "mitigated", label: "Entry zone already mitigated", reason: "Zone was tagged — imbalance filled" });
+    }
+    // 4. High-impact news imminent
+    if (imminentHighNews) {
+      vetos.push({ key: "news", label: "High-impact news imminent", reason: "News event within 60m — stand aside" });
+    }
+    // 5. R:R < 1.8
+    if (trade.rr < 1.8) {
+      vetos.push({ key: "rr_low", label: "R:R below 1.8", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
+    }
+  }
 
   const push = (key: string, label: string, pass: boolean, detail: string) => {
     const weight = w[key] ?? 0;
@@ -348,7 +389,7 @@ export function scoreSetup(args: {
   push("sweep", "Liquidity sweep before entry", !!sweptPool,
     sweptPool ? `${sweptPool.label} swept @ ${sweptPool.price.toFixed(2)}` : "No recent sweep detected");
 
-  push("zone", "Unmitigated OB/FVG at entry", !!trade.zone,
+  push("zone", "Unmitigated OB/FVG at entry", !!trade.zone && zoneMitigated !== true,
     trade.zone ? `${trade.zone.kind} ${trade.zone.priceLow.toFixed(2)}–${trade.zone.priceHigh.toFixed(2)}` : "No clean zone");
 
   const inPremium = lastPrice > htf.equilibrium;
@@ -356,24 +397,358 @@ export function scoreSetup(args: {
   push("pd", "Premium/Discount correct side", pdOk,
     `Price is in ${inPremium ? "premium" : "discount"}, trade is ${dir}`);
 
-  // Killzone — only weighted for session-driven assets
   push("killzone", kind === "crypto" ? "Session momentum (24/7)" : "Inside active killzone",
     kind === "crypto" ? true : inKillzone,
     kind === "crypto" ? "Crypto trades 24/7" : (inKillzone ? "Killzone active" : "Outside killzone"));
 
-  // DXY — only weighted for metals/forex
   push("dxy", "DXY correlation confirms", dxyConfirms === true,
     dxyConfirms == null ? "DXY data unavailable" : dxyConfirms ? "DXY moving inverse" : "DXY not confirming");
 
   push("rr", "Clean R:R ≥ 1:3", trade.rr >= 3, `R:R 1:${trade.rr.toFixed(2)}`);
+
+  // ---- NEW FACTORS ----
+  push("structure", "Clean HTF structure (impulse BOS/CHoCH)",
+    (structureQuality ?? 0) >= 0.6,
+    structureQuality == null ? "Structure quality N/A" : `Impulse strength ${(structureQuality * 100).toFixed(0)}%`);
+
+  push("smt", "SMT divergence with correlated pair",
+    smtDivergence === true,
+    smtDivergence == null ? "Correlation data unavailable" : smtDivergence ? "Correlated pair diverges (institutional footprint)" : "No SMT divergence");
+
+  push("session_align", "Native/prime session for this pair",
+    nativeSession === true,
+    nativeSession == null ? "Session profile N/A" : nativeSession ? "Trading in this pair's prime hours" : "Off-hours for this pair");
 
   const totalWeight = f.reduce((s, x) => s + x.weight, 0) || 1;
   const earned = f.reduce((s, x) => s + (x.pass ? x.weight : 0), 0);
   let score = Math.round((earned / totalWeight) * 100);
   if (imminentHighNews) score = Math.min(score, 60);
 
-  const grade: "A+" | "A" | "B" | "C" =
-    score >= 85 ? "A+" : score >= 70 ? "A" : score >= 55 ? "B" : "C";
+  // Apply vetos — hard cap
+  if (vetos.length > 0) {
+    score = Math.min(score, 40);
+  }
 
-  return { score, grade, factors: f };
+  // Stricter thresholds: A+ ≥ 88 (was 85), A ≥ 75 (was 70), B ≥ 60 (was 55)
+  const grade: "A+" | "A" | "B" | "C" =
+    vetos.length > 0 ? "C" :
+    score >= 88 ? "A+" :
+    score >= 75 ? "A" :
+    score >= 60 ? "B" : "C";
+
+  return { score, grade, factors: f, vetos };
+}
+
+// ============================================================
+// EXPANDED ICT/SMC DETECTORS
+// ============================================================
+
+// ---------- ATR (volatility) ----------
+export function computeATR(candles: Candle[], period = 14): number {
+  if (candles.length < period + 1) return 0;
+  const trs: number[] = [];
+  for (let i = 1; i < candles.length; i++) {
+    const c = candles[i], p = candles[i - 1];
+    trs.push(Math.max(c.h - c.l, Math.abs(c.h - p.c), Math.abs(c.l - p.c)));
+  }
+  const slice = trs.slice(-period);
+  return slice.reduce((s, x) => s + x, 0) / slice.length;
+}
+
+// ---------- Breaker Blocks ----------
+// A breaker = OB whose extreme was broken then price returned to it,
+// now acting as flipped support/resistance.
+export type Breaker = {
+  fromTime: number; toTime: number;
+  priceLow: number; priceHigh: number;
+  kind: "bullish" | "bearish"; // bullish breaker = old supply flipped demand
+};
+
+export function detectBreakerBlocks(candles: Candle[], structure: StructureEvent[]): Breaker[] {
+  const out: Breaker[] = [];
+  // Look at last few structure events. A CHoCH implies the prior OB flipped.
+  for (const ev of structure.slice(-8)) {
+    if (ev.kind !== "CHoCH") continue;
+    const idx = candles.findIndex(c => Math.floor(c.t / 1000) === ev.toTime);
+    if (idx < 4) continue;
+    // Find the last opposing candle before the CHoCH — that becomes the breaker.
+    for (let k = idx - 1; k >= Math.max(0, idx - 10); k--) {
+      const c = candles[k];
+      if (ev.dir === "bullish" && c.c < c.o) {
+        out.push({
+          fromTime: Math.floor(c.t / 1000),
+          toTime: Math.floor(candles[Math.min(candles.length - 1, k + 3)].t / 1000),
+          priceLow: c.l, priceHigh: c.o, kind: "bullish",
+        });
+        break;
+      }
+      if (ev.dir === "bearish" && c.c > c.o) {
+        out.push({
+          fromTime: Math.floor(c.t / 1000),
+          toTime: Math.floor(candles[Math.min(candles.length - 1, k + 3)].t / 1000),
+          priceLow: c.o, priceHigh: c.h, kind: "bearish",
+        });
+        break;
+      }
+    }
+  }
+  return out.slice(-4);
+}
+
+// ---------- Inverted FVG (IFVG) ----------
+// An FVG that got violated → now acts as opposite bias imbalance.
+export type IFVG = FVG & { originalKind: "bullish" | "bearish" };
+
+export function detectIFVGs(candles: Candle[], fvgs: FVG[]): IFVG[] {
+  const out: IFVG[] = [];
+  for (const g of fvgs) {
+    // If the gap has been fully violated (price closed through both edges), invert its bias.
+    const gapIdx = candles.findIndex(c => Math.floor(c.t / 1000) === g.toTime);
+    if (gapIdx < 0) continue;
+    const after = candles.slice(gapIdx + 1);
+    const violated = g.kind === "bullish"
+      ? after.some(c => c.c < g.priceLow)
+      : after.some(c => c.c > g.priceHigh);
+    if (violated) {
+      out.push({
+        ...g,
+        originalKind: g.kind,
+        kind: g.kind === "bullish" ? "bearish" : "bullish", // flipped bias
+      });
+    }
+  }
+  return out.slice(-4);
+}
+
+// ---------- Structure quality (impulse vs choppy) ----------
+// Returns 0..1. Higher = cleaner impulsive move on last BOS/CHoCH.
+export function computeStructureQuality(candles: Candle[], structure: StructureEvent[]): number {
+  const last = structure[structure.length - 1];
+  if (!last) return 0;
+  const idx = candles.findIndex(c => Math.floor(c.t / 1000) === last.toTime);
+  if (idx < 5) return 0;
+  // Look at the 5 candles that produced the move — measure body:range ratio.
+  const impulse = candles.slice(Math.max(0, idx - 5), idx + 1);
+  let bodyTotal = 0, rangeTotal = 0;
+  for (const c of impulse) {
+    bodyTotal += Math.abs(c.c - c.o);
+    rangeTotal += (c.h - c.l);
+  }
+  if (rangeTotal === 0) return 0;
+  return Math.min(1, bodyTotal / rangeTotal);
+}
+
+// ---------- SMT Divergence ----------
+// If two correlated instruments (Gold vs DXY, EURUSD vs GBPUSD, JPY crosses vs USDJPY)
+// print divergent highs/lows in the recent window → institutional footprint.
+export function detectSMTDivergence(
+  main: Candle[],
+  correlated: Candle[],
+  inverse: boolean, // true when they should move opposite (Gold↔DXY, EUR↔DXY)
+): boolean | null {
+  if (main.length < 10 || correlated.length < 10) return null;
+  const n = Math.min(main.length, correlated.length, 20);
+  const mainSlice = main.slice(-n);
+  const corrSlice = correlated.slice(-n);
+  const mainHigh = Math.max(...mainSlice.map(c => c.h));
+  const mainLow = Math.min(...mainSlice.map(c => c.l));
+  const corrHigh = Math.max(...corrSlice.map(c => c.h));
+  const corrLow = Math.min(...corrSlice.map(c => c.l));
+  const mainHighIdx = mainSlice.findIndex(c => c.h === mainHigh);
+  const mainLowIdx = mainSlice.findIndex(c => c.l === mainLow);
+  const corrHighIdx = corrSlice.findIndex(c => c.h === corrHigh);
+  const corrLowIdx = corrSlice.findIndex(c => c.l === corrLow);
+  // Divergence: highs made at different times → hidden strength/weakness
+  const highDiv = Math.abs(mainHighIdx - (inverse ? corrLowIdx : corrHighIdx)) > 3;
+  const lowDiv = Math.abs(mainLowIdx - (inverse ? corrHighIdx : corrLowIdx)) > 3;
+  return highDiv || lowDiv;
+}
+
+// ============================================================
+// PAIR PROFILES — killzones, correlations, native sessions per instrument
+// ============================================================
+
+export type PairProfile = {
+  key: string;
+  killzones: { name: string; startUTC: number; endUTC: number }[];
+  primeSession: { name: string; startUTC: number; endUTC: number };
+  correlated?: { symbol: string; inverse: boolean }; // for SMT
+};
+
+const PAIR_PROFILES: Record<string, PairProfile> = {
+  // Metals — London + NY overlap
+  XAUUSD: {
+    key: "XAUUSD",
+    killzones: [
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
+    correlated: { symbol: "DXY", inverse: true },
+  },
+  XAGUSD: {
+    key: "XAGUSD",
+    killzones: [
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
+    correlated: { symbol: "DXY", inverse: true },
+  },
+  // EUR/GBP — London prime
+  EURUSD: {
+    key: "EURUSD",
+    killzones: [
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "London", startUTC: 7, endUTC: 12 },
+    correlated: { symbol: "GBPUSD", inverse: false },
+  },
+  GBPUSD: {
+    key: "GBPUSD",
+    killzones: [
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "London", startUTC: 7, endUTC: 12 },
+    correlated: { symbol: "EURUSD", inverse: false },
+  },
+  // JPY pairs — Tokyo + London
+  USDJPY: {
+    key: "USDJPY",
+    killzones: [
+      { name: "Tokyo Killzone", startUTC: 0, endUTC: 3 },
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+    ],
+    primeSession: { name: "Tokyo/London", startUTC: 0, endUTC: 10 },
+    correlated: { symbol: "DXY", inverse: false },
+  },
+  EURJPY: {
+    key: "EURJPY",
+    killzones: [
+      { name: "Tokyo Killzone", startUTC: 0, endUTC: 3 },
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+    ],
+    primeSession: { name: "Tokyo/London", startUTC: 0, endUTC: 10 },
+    correlated: { symbol: "USDJPY", inverse: false },
+  },
+  GBPJPY: {
+    key: "GBPJPY",
+    killzones: [
+      { name: "Tokyo Killzone", startUTC: 0, endUTC: 3 },
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+    ],
+    primeSession: { name: "Tokyo/London", startUTC: 0, endUTC: 10 },
+    correlated: { symbol: "USDJPY", inverse: false },
+  },
+  // AUD/NZD — Sydney/Tokyo
+  AUDUSD: {
+    key: "AUDUSD",
+    killzones: [
+      { name: "Sydney Killzone", startUTC: 22, endUTC: 24 },
+      { name: "Tokyo Killzone", startUTC: 0, endUTC: 3 },
+    ],
+    primeSession: { name: "Sydney/Tokyo", startUTC: 22, endUTC: 3 },
+    correlated: { symbol: "DXY", inverse: true },
+  },
+  NZDUSD: {
+    key: "NZDUSD",
+    killzones: [
+      { name: "Sydney Killzone", startUTC: 22, endUTC: 24 },
+      { name: "Tokyo Killzone", startUTC: 0, endUTC: 3 },
+    ],
+    primeSession: { name: "Sydney/Tokyo", startUTC: 22, endUTC: 3 },
+    correlated: { symbol: "DXY", inverse: true },
+  },
+  USDCAD: {
+    key: "USDCAD",
+    killzones: [{ name: "NY AM Killzone", startUTC: 12, endUTC: 15 }],
+    primeSession: { name: "NY", startUTC: 12, endUTC: 17 },
+    correlated: { symbol: "DXY", inverse: false },
+  },
+  // Indices — NY session
+  NAS100: {
+    key: "NAS100",
+    killzones: [
+      { name: "NY AM Killzone", startUTC: 13, endUTC: 16 },
+      { name: "NY PM Killzone", startUTC: 18, endUTC: 20 },
+    ],
+    primeSession: { name: "NY RTH", startUTC: 13, endUTC: 20 },
+    correlated: { symbol: "SPX500", inverse: false },
+  },
+  SPX500: {
+    key: "SPX500",
+    killzones: [
+      { name: "NY AM Killzone", startUTC: 13, endUTC: 16 },
+      { name: "NY PM Killzone", startUTC: 18, endUTC: 20 },
+    ],
+    primeSession: { name: "NY RTH", startUTC: 13, endUTC: 20 },
+    correlated: { symbol: "NAS100", inverse: false },
+  },
+  US30: {
+    key: "US30",
+    killzones: [{ name: "NY AM Killzone", startUTC: 13, endUTC: 16 }],
+    primeSession: { name: "NY RTH", startUTC: 13, endUTC: 20 },
+    correlated: { symbol: "SPX500", inverse: false },
+  },
+  // Crypto — 24/7 but NY + Asian retail are prime
+  BTCUSD: {
+    key: "BTCUSD",
+    killzones: [
+      { name: "NY AM Killzone", startUTC: 13, endUTC: 16 },
+      { name: "Asian Killzone", startUTC: 0, endUTC: 4 },
+    ],
+    primeSession: { name: "NY / Asia", startUTC: 13, endUTC: 16 },
+  },
+  ETHUSD: {
+    key: "ETHUSD",
+    killzones: [
+      { name: "NY AM Killzone", startUTC: 13, endUTC: 16 },
+      { name: "Asian Killzone", startUTC: 0, endUTC: 4 },
+    ],
+    primeSession: { name: "NY / Asia", startUTC: 13, endUTC: 16 },
+    correlated: { symbol: "BTCUSD", inverse: false },
+  },
+};
+
+export function getPairProfile(symbol: string): PairProfile | null {
+  const s = symbol.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (PAIR_PROFILES[s]) return PAIR_PROFILES[s];
+  // Aliases
+  if (s === "GOLD" || s === "XAU") return PAIR_PROFILES.XAUUSD;
+  if (s === "SILVER" || s === "XAG") return PAIR_PROFILES.XAGUSD;
+  if (s === "BTC" || s === "BITCOIN" || s === "BTCUSDT") return PAIR_PROFILES.BTCUSD;
+  if (s === "ETH" || s === "ETHEREUM" || s === "ETHUSDT") return PAIR_PROFILES.ETHUSD;
+  if (s === "NDX" || s === "US100" || s === "NASDAQ") return PAIR_PROFILES.NAS100;
+  if (s === "SPX" || s === "US500" || s === "SP500") return PAIR_PROFILES.SPX500;
+  if (s === "DJI" || s === "DOW" || s === "DOWJONES") return PAIR_PROFILES.US30;
+  return null;
+}
+
+// Pair-aware killzone check. Falls back to generic global killzones if pair unknown.
+export function killzoneForPair(
+  symbol: string,
+  d = new Date(),
+): { session: string; killzone: string; inKillzone: boolean; nativeSession: boolean } {
+  const h = d.getUTCHours();
+  const profile = getPairProfile(symbol);
+  if (profile) {
+    const active = profile.killzones.find(k =>
+      k.startUTC <= k.endUTC ? h >= k.startUTC && h < k.endUTC : h >= k.startUTC || h < k.endUTC,
+    );
+    const prime = profile.primeSession;
+    const nativeSession = prime.startUTC <= prime.endUTC
+      ? h >= prime.startUTC && h < prime.endUTC
+      : h >= prime.startUTC || h < prime.endUTC;
+    const base = killzoneOf(d);
+    return {
+      session: base.session,
+      killzone: active ? active.name : "Outside Killzone",
+      inKillzone: !!active,
+      nativeSession,
+    };
+  }
+  const base = killzoneOf(d);
+  return { ...base, nativeSession: base.inKillzone };
 }
