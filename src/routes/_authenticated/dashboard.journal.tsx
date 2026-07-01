@@ -20,7 +20,7 @@ type Trade = {
   entry: number | null;
   stop_loss: number | null;
   take_profit: number | null;
-  outcome: "open" | "win" | "loss" | "breakeven";
+  outcome: "pending" | "open" | "win" | "loss" | "breakeven";
   pnl: number | null;
   notes: string | null;
   opened_at: string;
@@ -43,12 +43,41 @@ function Journal() {
   };
   useEffect(() => { load(); }, []);
 
-  // Live prices for open trades
-  const openSymbols = useMemo(
-    () => Array.from(new Set(trades.filter((t) => t.outcome === "open" && t.entry != null).map((t) => t.pair))),
+  // Live prices for open + pending trades
+  const trackedSymbols = useMemo(
+    () => Array.from(new Set(trades.filter((t) => (t.outcome === "open" || t.outcome === "pending") && t.entry != null).map((t) => t.pair))),
     [trades],
   );
-  const livePrices = useLivePrices(openSymbols);
+  const livePrices = useLivePrices(trackedSymbols);
+
+  // Auto-fill pending limit orders when live price reaches entry
+  useEffect(() => {
+    const filling = trades.filter((t) => {
+      if (t.outcome !== "pending" || t.entry == null) return false;
+      const px = livePrices[t.pair.toUpperCase()];
+      if (px == null) return false;
+      const tol = Math.max(t.entry * 0.0005, 0.01);
+      return Math.abs(px - t.entry) <= tol
+        || (t.direction === "long" && px <= t.entry)
+        || (t.direction === "short" && px >= t.entry);
+    });
+    if (filling.length === 0) return;
+    (async () => {
+      for (const t of filling) {
+        const opened_at = new Date().toISOString();
+        const { error } = await supabase
+          .from("trade_journal")
+          .update({ outcome: "open", opened_at })
+          .eq("id", t.id)
+          .eq("outcome", "pending");
+        if (!error) {
+          setTrades((prev) => prev.map((x) => x.id === t.id ? { ...x, outcome: "open", opened_at } : x));
+          toast.success(`Entry filled · ${t.pair} @ ${t.entry}`);
+        }
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [livePrices]);
 
   // Auto-close open trades when live price touches TP or SL
   useEffect(() => {
@@ -101,18 +130,19 @@ function Journal() {
   };
 
   const stats = useMemo(() => {
-    const closed = trades.filter((t) => t.outcome !== "open");
+    const closed = trades.filter((t) => t.outcome === "win" || t.outcome === "loss" || t.outcome === "breakeven");
+    const openTrades = trades.filter((t) => t.outcome === "open");
+    const pendingTrades = trades.filter((t) => t.outcome === "pending");
     const wins = closed.filter((t) => t.outcome === "win").length;
     const losses = closed.filter((t) => t.outcome === "loss").length;
     const closedPnl = closed.reduce((s, t) => s + (t.pnl ?? 0), 0);
-    const livePnl = trades.reduce((s, t) => s + (liveOf(t) ?? 0), 0);
+    const livePnl = openTrades.reduce((s, t) => s + (liveOf(t) ?? 0), 0);
 
-    // Win rate only counts trades that have actually closed as win/loss.
-    // Open trades and deleted trades are excluded.
     const decided = wins + losses;
     return {
       total: trades.length,
-      open: trades.length - closed.length,
+      open: openTrades.length,
+      pending: pendingTrades.length,
       winRate: decided ? Math.round((wins / decided) * 100) : 0,
       wins,
       losses,
@@ -278,6 +308,7 @@ function Journal() {
                         t.outcome === "win" ? "bg-emerald-50 text-emerald-700"
                         : t.outcome === "loss" ? "bg-rose-50 text-rose-700"
                         : t.outcome === "breakeven" ? "bg-zinc-100 text-zinc-700"
+                        : t.outcome === "pending" ? "bg-sky-50 text-sky-700"
                         : "bg-amber-50 text-amber-700"
                       }`}>{t.outcome}</span>
                     </td>
