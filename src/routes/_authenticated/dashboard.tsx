@@ -785,8 +785,8 @@ function BestTimeWidget() {
         ))}
       </div>
 
-      <p className="mt-1 text-[10.5px] leading-relaxed text-zinc-500">
-        Note: Times shown in your local region. Please verify trading hours according to your region.
+      <p className="mt-1 text-center text-[10.5px] leading-relaxed text-zinc-500">
+        Note: Times shown in your local region.
       </p>
     </div>
 
