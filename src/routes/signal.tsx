@@ -371,6 +371,29 @@ function SignalPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authReady, symbol, savedId]);
 
+  // Killzone popup: fire once per pair-symbol when analysis returns outside its killzone
+  useEffect(() => {
+    if (!plan || kzDismissed !== false) return;
+    const sym = plan.instrument.symbol;
+    if (kzShownFor.current === sym) return;
+    const kz = killzoneForPair(sym);
+    if (kz.inKillzone) return;
+    const profile = getPairProfile(sym);
+    const fmt = (utcHour: number) => {
+      const d = new Date();
+      d.setUTCHours(utcHour % 24, 0, 0, 0);
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    };
+    const zones = profile?.killzones ?? [];
+    const kzText = zones.length
+      ? zones.map(z => `${z.name} (${fmt(z.startUTC)}–${fmt(z.endUTC)} your time)`).join(", ")
+      : "the pair's active session window";
+    kzShownFor.current = sym;
+    setKzDialog({ pair: plan.instrument.display || sym, kzText });
+  }, [plan, kzDismissed]);
+
+
+
   // auto-scroll narration feed
   useEffect(() => {
     const el = feedScrollRef.current;
