@@ -575,7 +575,7 @@ export type PairProfile = {
   correlated?: { symbol: string; inverse: boolean }; // for SMT
 };
 
-const PAIR_PROFILES: Record<string, PairProfile> = {
+export const PAIR_PROFILES: Record<string, PairProfile> = {
   // Metals — London + NY overlap
   XAUUSD: {
     key: "XAUUSD",

@@ -569,6 +569,12 @@ function SignalPage() {
             <span className="font-semibold tracking-tight text-sm select-none">JENVU AI</span>
           </div>
           <div className="flex items-center gap-2 justify-end">
+            <Link
+              to="/killzones"
+              className="hidden sm:inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
+            >
+              Killzones
+            </Link>
             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase`}>
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inset-0 rounded-full bg-emerald-500 animate-pulse" />

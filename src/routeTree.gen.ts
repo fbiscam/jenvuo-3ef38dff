@@ -16,6 +16,7 @@ import { Route as SignalRouteImport } from './routes/signal'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LlmRouteImport } from './routes/llm'
+import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as DownloadRouteImport } from './routes/download'
@@ -80,6 +81,11 @@ const PricingRoute = PricingRouteImport.update({
 const LlmRoute = LlmRouteImport.update({
   id: '/llm',
   path: '/llm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KillzonesRoute = KillzonesRouteImport.update({
+  id: '/killzones',
+  path: '/killzones',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InsightsRoute = InsightsRouteImport.update({
@@ -255,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/download': typeof DownloadRoute
   '/help': typeof HelpRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
+  '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -292,6 +299,7 @@ export interface FileRoutesByTo {
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
   '/help': typeof HelpRouteWithChildren
+  '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -331,6 +339,7 @@ export interface FileRoutesById {
   '/download': typeof DownloadRoute
   '/help': typeof HelpRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
+  '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -371,6 +380,7 @@ export interface FileRouteTypes {
     | '/download'
     | '/help'
     | '/insights'
+    | '/killzones'
     | '/llm'
     | '/pricing'
     | '/privacy'
@@ -408,6 +418,7 @@ export interface FileRouteTypes {
     | '/disclaimer'
     | '/download'
     | '/help'
+    | '/killzones'
     | '/llm'
     | '/pricing'
     | '/privacy'
@@ -446,6 +457,7 @@ export interface FileRouteTypes {
     | '/download'
     | '/help'
     | '/insights'
+    | '/killzones'
     | '/llm'
     | '/pricing'
     | '/privacy'
@@ -486,6 +498,7 @@ export interface RootRouteChildren {
   DownloadRoute: typeof DownloadRoute
   HelpRoute: typeof HelpRouteWithChildren
   InsightsRoute: typeof InsightsRouteWithChildren
+  KillzonesRoute: typeof KillzonesRoute
   LlmRoute: typeof LlmRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -552,6 +565,13 @@ declare module '@tanstack/react-router' {
       path: '/llm'
       fullPath: '/llm'
       preLoaderRoute: typeof LlmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/killzones': {
+      id: '/killzones'
+      path: '/killzones'
+      fullPath: '/killzones'
+      preLoaderRoute: typeof KillzonesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/insights': {
@@ -849,6 +869,7 @@ const rootRouteChildren: RootRouteChildren = {
   DownloadRoute: DownloadRoute,
   HelpRoute: HelpRouteWithChildren,
   InsightsRoute: InsightsRouteWithChildren,
+  KillzonesRoute: KillzonesRoute,
   LlmRoute: LlmRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
