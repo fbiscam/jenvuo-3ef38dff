@@ -31,6 +31,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/terms", changefreq: "yearly", priority: "0.3" },
           { path: "/disclaimer", changefreq: "yearly", priority: "0.3" },
           { path: "/help", changefreq: "weekly", priority: "0.6" },
+          { path: "/unsubscribe", changefreq: "yearly", priority: "0.1" },
         ];
 
         // Append Help Center pages
