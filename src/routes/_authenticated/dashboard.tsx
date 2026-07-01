@@ -213,7 +213,7 @@ function SignalDeskHistory() {
   }
 
   return (
-    <div className="flex-1 divide-y divide-zinc-100 overflow-hidden">
+    <div className="flex-1 divide-y divide-zinc-100 overflow-y-auto scrollbar-auto-hide max-h-[360px]">
       {alerts.map((a) => {
         const isBuy = a.direction?.toLowerCase().includes("long") || a.direction?.toLowerCase().includes("buy");
         const when = new Date(a.fired_at);
@@ -759,7 +759,7 @@ function VoiceAgentHistory() {
           Clear
         </button>
       </div>
-      <ul className="flex-1 divide-y divide-zinc-100 overflow-y-auto">
+      <ul className="flex-1 divide-y divide-zinc-100 overflow-y-auto scrollbar-auto-hide max-h-[360px]">
         {visible.map((t, i) => (
           <li key={t.ts + ":" + i} className="px-4 py-3">
             <div className="flex items-start justify-between gap-3">
