@@ -822,7 +822,7 @@ function BestTimeWidget() {
       </div>
 
       <p className="mt-auto rounded-md bg-zinc-50 px-3 py-2 text-[11px] leading-relaxed text-zinc-600">
-        <span className="font-semibold text-zinc-900">Tip:</span> NY Killzone delivers the highest probability A+ setups on Gold. Avoid entries 30 min around red-folder news.
+        <span className="font-semibold text-zinc-900">Tip:</span> NY Killzone delivers highest A+ setups. Avoid red-folder news.
       </p>
     </div>
   );
