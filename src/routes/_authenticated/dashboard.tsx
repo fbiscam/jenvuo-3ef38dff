@@ -759,11 +759,24 @@ function BestTimeWidget() {
     avoid: { dot: "bg-zinc-400",    text: "text-zinc-600",    bar: "bg-zinc-400",    pill: "bg-zinc-100 text-zinc-600 border-zinc-200" },
   };
 
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const tzAbbr = new Intl.DateTimeFormat([], { timeZoneName: "short" })
+    .formatToParts(now)
+    .find((p) => p.type === "timeZoneName")?.value ?? "";
+
   return (
-    <div className="flex flex-1 flex-col gap-4 px-5 py-5">
+    <div className="flex flex-1 flex-col gap-3 px-5 py-5">
+      {/* Timezone header */}
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Killzones</span>
+        <span className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10.5px] font-medium text-zinc-600">
+          {tzAbbr} · {tz}
+        </span>
+      </div>
 
       {/* Sessions list */}
       <div className="flex flex-col gap-1.5">
+
         {withState.map((z) => (
           <div
             key={z.name}
