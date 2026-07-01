@@ -114,7 +114,7 @@ export const askSignalAgent = createServerFn({ method: "POST" })
       // If user mentioned a different instrument OR explicitly asked for analysis on it, fetch its plan.
       if (isDifferent || isAnalysisIntent) {
         try {
-          switchedPlan = await getSignalPlan({ data: { symbol: detected } });
+          switchedPlan = await computeSignalPlan({ symbol: detected });
           switchedDisplay = switchedPlan.instrument.display;
           contextStr = buildContextFromPlan(switchedPlan);
           isAnalysisIntent = true;
