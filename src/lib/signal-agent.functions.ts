@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getSignalPlan, resolveInstrument, type SignalPlan } from "@/lib/gold-analysis.functions";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { computeSignalPlan, resolveInstrument, type SignalPlan } from "@/lib/gold-analysis.functions";
 
 export type AgentContext = {
   symbol?: string;
