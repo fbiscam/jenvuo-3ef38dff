@@ -786,7 +786,7 @@ function BestTimeWidget() {
       </div>
 
       <p className="mt-1 text-center text-[10.5px] leading-relaxed text-zinc-500">
-        Note: Times shown in your local region.
+        Please check time according to your region to make A+ signals.
       </p>
     </div>
 
