@@ -713,7 +713,7 @@ const KILLZONES: Killzone[] = [
   { name: "London Killzone",  tag: "London Open sweep", startUtc: 7,    endUtc: 10,    quality: "good"  }, // 02:00-05:00 EST
   { name: "NY AM Killzone",   tag: "A+ ICT setups",    startUtc: 12,    endUtc: 15,    quality: "best"  }, // 07:00-10:00 EST
   { name: "London Close",     tag: "Reversal window",  startUtc: 15,    endUtc: 17,    quality: "ok"    }, // 10:00-12:00 EST
-  { name: "NY PM Killzone",   tag: "Afternoon push",   startUtc: 18.5,  endUtc: 21,    quality: "good"  }, // 13:30-16:00 EST
+  
 ];
 
 
