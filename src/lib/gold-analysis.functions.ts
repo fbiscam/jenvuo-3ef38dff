@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import {
-  analyzeTF, buildLiquidityPools, buildTrade, killzoneOf, scoreSetup,
+  analyzeTF, buildLiquidityPools, buildTrade, scoreSetup,
   computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
   detectSMTDivergence, killzoneForPair,
 } from "@/lib/analysis/engine";
