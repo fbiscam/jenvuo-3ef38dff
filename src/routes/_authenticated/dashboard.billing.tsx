@@ -105,7 +105,7 @@ function Billing() {
         </div>
         {credits.state?.recent && credits.state.recent.length > 0 && (
           <div className="mt-6">
-            <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Recent activity</div>
+            <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>&nbsp;</div>
             <div className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
               {(showAllActivity ? credits.state.recent : credits.state.recent.slice(0, 10)).map((r) => (
                 <div key={r.id} className="flex items-center justify-between px-3 py-2 text-xs">
