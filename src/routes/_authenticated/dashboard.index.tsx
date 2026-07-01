@@ -30,10 +30,10 @@ type SavedRow = {
     grade: string | null;
     direction: string | null;
     entry: number | null;
-    stop_loss: number | null;
-    take_profit: number | null;
+    sl: number | null;
+    tp: number | null;
     rr: number | null;
-    summary: string | null;
+    rationale: string | null;
     created_at: string;
   } | null;
 };
@@ -44,13 +44,15 @@ function SavedSignals() {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("saved_signals")
-      .select("id, notes, created_at, snapshot, signal_alerts(id, grade, direction, entry, stop_loss, take_profit, rr, summary, created_at)")
+      .select("id, notes, created_at, snapshot, signal_alerts(id, grade, direction, entry, sl, tp, rr, rationale, created_at)")
       .order("created_at", { ascending: false });
+    if (error) console.error("saved_signals load failed", error);
     setRows((data as unknown as SavedRow[]) ?? []);
     setLoading(false);
   };
+
 
   useEffect(() => { load(); }, []);
 
