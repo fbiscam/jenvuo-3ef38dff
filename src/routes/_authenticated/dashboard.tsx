@@ -447,6 +447,14 @@ function DashboardLayout() {
 
   const planTier = ((credits.plan as { tier?: string; name?: string } | null)?.tier
     ?? (credits.plan as { name?: string } | null)?.name ?? "free").toString().toUpperCase();
+  const planTierColor = (() => {
+    const t = planTier.toLowerCase();
+    if (t.includes("elite")) return "text-emerald-600";
+    if (t.includes("pro")) return "text-blue-600";
+    if (t.includes("plus") || t.includes("starter")) return "text-violet-600";
+    if (t.includes("free")) return "text-zinc-500";
+    return "text-amber-600";
+  })();
   const remainingPct = credits.allowance ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
   const usedPct = credits.allowance ? Math.max(0, 100 - remainingPct) : 0;
   const balanceTone: "blue" | "rose" | "zinc" = remainingPct < 30 ? "rose" : remainingPct < 60 ? "zinc" : "blue";
