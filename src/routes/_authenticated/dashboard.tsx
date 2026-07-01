@@ -181,14 +181,17 @@ function SignalDeskHistory() {
       const { data } = await supabase
         .from("signal_alerts")
         .select("id, pair, grade, direction, entry, sl, tp, rr, confidence, session, fired_at")
+        .gte("confidence", 50)
         .order("fired_at", { ascending: false })
-        .limit(8);
+        .limit(100);
       if (!cancelled) { setAlerts((data as DeskAlert[]) ?? []); setLoading(false); }
     })();
     const channel = supabase
       .channel("dashboard_signal_desk")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "signal_alerts" }, (payload) => {
-        setAlerts((prev) => [payload.new as DeskAlert, ...prev].slice(0, 8));
+        const a = payload.new as DeskAlert;
+        if ((a.confidence ?? 0) < 50) return;
+        setAlerts((prev) => [a, ...prev].slice(0, 100));
       })
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(channel); };
