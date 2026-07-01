@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
-import { getSignalPlan } from '@/lib/gold-analysis.functions'
+import { computeSignalPlan } from '@/lib/gold-analysis.functions'
 
 // Called by pg_cron every 15 min. Runs the gold analyzer; if grade is A+/A and
 // a new directional setup (not duplicate of the last alert within 4h), inserts
