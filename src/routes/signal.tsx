@@ -268,8 +268,11 @@ function SignalPage() {
       if (!ok) { setLoading(false); return; }
       const p = await fetchPlan({ data: { symbol: symbol || "XAUUSD" } });
       setPlan(p);
-      // Always run the guided walkthrough — it's the core product, not a paid add-on.
-      setTimeout(() => runNarration(p), 400);
+      // Charge for the ICT narration walkthrough (skip narration silently if credits run out).
+      const narrOk = await credits.spend("ict_narration", { symbol: symbol || "XAUUSD" });
+      if (narrOk) {
+        setTimeout(() => runNarration(p), 400);
+      }
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
     } finally {
@@ -542,6 +545,7 @@ function SignalPage() {
                   ltfRef={ltfRef}
                   analyzing={playing}
                   narrationPulse={speech.wordPulse}
+                  credits={credits}
                 />
               </div>
 
@@ -1218,6 +1222,7 @@ function SignalVoiceAgent({
   ltfRef,
   analyzing,
   narrationPulse,
+  credits,
 }: {
   plan: SignalPlan | null;
   livePrice: number | null;
@@ -1225,6 +1230,7 @@ function SignalVoiceAgent({
   ltfRef: React.RefObject<SignalChartHandle | null>;
   analyzing: boolean;
   narrationPulse: number;
+  credits: ReturnType<typeof useCredits>;
 }) {
   const ask = useServerFn(askSignalAgent);
   const speech = useSpeech();
@@ -1324,6 +1330,8 @@ function SignalVoiceAgent({
     setInputOpen(false);
     setBusy(true);
     try {
+      const paid = await credits.spend("voice_query", { symbol: plan?.instrument.symbol });
+      if (!paid) { setBusy(false); return; }
       const ctx = plan
         ? {
             symbol: plan.instrument.symbol,
