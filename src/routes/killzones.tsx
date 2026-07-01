@@ -400,7 +400,7 @@ function KillzonesPage() {
                                   </span>
                                   <span className="mx-1 text-zinc-300">·</span>
                                   <span className="text-zinc-500">
-                                    {utcHourToLocal(kz.startUTC)}–{utcHourToLocal(kz.endUTC)}{" "}
+                                    {utcHourToLocal(kz.startUTC, tz)}–{utcHourToLocal(kz.endUTC, tz)}{" "}
                                     {tzShort}
                                   </span>
                                 </div>
