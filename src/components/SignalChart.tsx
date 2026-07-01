@@ -456,6 +456,17 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         axisLabelVisible: true, title,
       });
       linesRef.current.push({ line, transient });
+
+      // Floating on-chart label so every marking is named right on the chart (like FVG/OB boxes).
+      if (overlayRef.current && Number.isFinite(price)) {
+        const lbl = document.createElement("div");
+        lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.03em;padding:2px 6px;border-radius:3px;background:${color};color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.25);opacity:0;transition:opacity 400ms ease;white-space:nowrap;transform:translateY(-2px);`;
+        lbl.textContent = title;
+        overlayRef.current.appendChild(lbl);
+        labelsRef.current.push({ marking: m, price, color, el: lbl, transient });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => { lbl.style.opacity = "1"; });
+      }
     },
   }));
 
