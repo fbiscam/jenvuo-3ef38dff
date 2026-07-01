@@ -268,8 +268,11 @@ function SignalPage() {
       if (!ok) { setLoading(false); return; }
       const p = await fetchPlan({ data: { symbol: symbol || "XAUUSD" } });
       setPlan(p);
-      // Always run the guided walkthrough — it's the core product, not a paid add-on.
-      setTimeout(() => runNarration(p), 400);
+      // Charge for the ICT narration walkthrough (skip narration silently if credits run out).
+      const narrOk = await credits.spend("ict_narration", { symbol: symbol || "XAUUSD" });
+      if (narrOk) {
+        setTimeout(() => runNarration(p), 400);
+      }
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
     } finally {
