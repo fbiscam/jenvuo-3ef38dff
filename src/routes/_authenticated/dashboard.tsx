@@ -761,46 +761,6 @@ function BestTimeWidget() {
 
   return (
     <div className="flex flex-1 flex-col gap-4 px-5 py-5">
-      {/* Status hero */}
-      <div className="rounded-lg border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-4">
-        {activeZone ? (
-          <>
-            <div className="flex items-center gap-2">
-              <span className={`relative flex h-2 w-2`}>
-                <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${toneMap[activeZone.quality].dot} opacity-75`} />
-                <span className={`relative inline-flex h-2 w-2 rounded-full ${toneMap[activeZone.quality].dot}`} />
-              </span>
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Live now</span>
-            </div>
-            <div className="mt-1.5 flex items-baseline justify-between gap-2">
-              <h4 className="text-[15px] font-semibold text-zinc-900">{activeZone.name}</h4>
-              <span className={`rounded-md border px-1.5 py-0.5 text-[10px] font-semibold ${toneMap[activeZone.quality].pill}`}>
-                {activeZone.tag}
-              </span>
-            </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
-              <div className={`h-full ${toneMap[activeZone.quality].bar}`} style={{ width: `${activeZone.progress}%` }} />
-            </div>
-            <p className="mt-2 text-[11px] text-zinc-500">
-              {fmtLocal(activeZone.startUtc)} – {fmtLocal(activeZone.endUtc)} local
-            </p>
-          </>
-        ) : (
-          <>
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-zinc-300" />
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Off-session</span>
-            </div>
-            <h4 className="mt-1.5 text-[15px] font-semibold text-zinc-900">Waiting for liquidity</h4>
-            {nextZone && (
-              <p className="mt-1 text-[12px] text-zinc-600">
-                <span className="font-medium text-zinc-900">{nextZone.name}</span> starts in{" "}
-                <span className={`font-semibold ${toneMap[nextZone.quality].text}`}>{fmtCountdown(nextZone.startMs)}</span>
-              </p>
-            )}
-          </>
-        )}
-      </div>
 
       {/* Sessions list */}
       <div className="flex flex-col gap-1.5">
