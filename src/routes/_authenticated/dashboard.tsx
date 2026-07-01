@@ -774,7 +774,15 @@ function VoiceAgentHistory() {
           {items.length} {items.length === 1 ? "chat" : "chats"}
         </span>
         <button
-          onClick={() => { if (confirm("Clear all voice history?")) clearVoiceHistory(); }}
+          onClick={async () => {
+            if (!confirm("Clear all voice history?")) return;
+            clearVoiceHistory();
+            try {
+              const { clearVoiceTurns } = await import("@/lib/voice-history.functions");
+              await clearVoiceTurns();
+            } catch { /* ignore */ }
+            window.dispatchEvent(new CustomEvent("jenvu:voice:history:updated"));
+          }}
           className="text-[11px] text-zinc-500 hover:text-zinc-900"
         >
           Clear
