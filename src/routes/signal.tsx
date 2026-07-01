@@ -1330,6 +1330,8 @@ function SignalVoiceAgent({
     setInputOpen(false);
     setBusy(true);
     try {
+      const paid = await credits.spend("voice_query", { symbol: plan?.instrument.symbol });
+      if (!paid) { setBusy(false); return; }
       const ctx = plan
         ? {
             symbol: plan.instrument.symbol,
