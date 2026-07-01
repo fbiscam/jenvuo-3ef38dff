@@ -139,7 +139,7 @@ Use the LIVE prices and levels from the context. Be specific, decisive, pro. No 
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: "google/gemini-3.1-flash-lite",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: system },
           {
