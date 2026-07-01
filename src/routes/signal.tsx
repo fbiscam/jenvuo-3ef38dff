@@ -545,6 +545,7 @@ function SignalPage() {
                   ltfRef={ltfRef}
                   analyzing={playing}
                   narrationPulse={speech.wordPulse}
+                  credits={credits}
                 />
               </div>
 
