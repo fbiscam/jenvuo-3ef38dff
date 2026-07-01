@@ -54,7 +54,7 @@ const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: bo
 
 /* ---------- helpers ---------- */
 
-function Sparkline({ seed = 1, tone = "blue", empty = false, trend = "flat", magnitude = 0 }: { seed?: number; tone?: "blue" | "rose" | "zinc"; empty?: boolean; trend?: "up" | "down" | "flat"; magnitude?: number }) {
+function Sparkline({ seed = 1, tone = "blue", empty = false, trend = "flat", magnitude = 0 }: { seed?: number; tone?: "blue" | "rose" | "zinc" | "emerald"; empty?: boolean; trend?: "up" | "down" | "flat"; magnitude?: number }) {
   const w = 120, h = 36;
 
   // deterministic pseudo-random points with optional trend bias
@@ -74,7 +74,7 @@ function Sparkline({ seed = 1, tone = "blue", empty = false, trend = "flat", mag
     return arr;
   }, [seed, trend, magnitude]);
 
-  const stroke = tone === "rose" ? "#f43f5e" : tone === "zinc" ? "#71717a" : "#3b82f6";
+  const stroke = tone === "rose" ? "#f43f5e" : tone === "zinc" ? "#71717a" : tone === "emerald" ? "#10b981" : "#3b82f6";
 
   if (empty) {
     return (
@@ -137,7 +137,7 @@ function Metric({
         )}
       </div>
       <div className="mt-2 -mb-1 opacity-90">
-        <Sparkline seed={seed} tone={derivedTrend === "down" ? "rose" : derivedTrend === "up" ? "blue" : tone} empty={isEmpty} trend={derivedTrend} magnitude={derivedMag} />
+        <Sparkline seed={seed} tone={derivedTrend === "down" ? "rose" : derivedTrend === "up" ? "emerald" : tone} empty={isEmpty} trend={derivedTrend} magnitude={derivedMag} />
       </div>
     </div>
   );
