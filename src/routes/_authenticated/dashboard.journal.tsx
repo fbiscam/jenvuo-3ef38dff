@@ -20,7 +20,7 @@ type Trade = {
   entry: number | null;
   stop_loss: number | null;
   take_profit: number | null;
-  outcome: "open" | "win" | "loss" | "breakeven";
+  outcome: "pending" | "open" | "win" | "loss" | "breakeven";
   pnl: number | null;
   notes: string | null;
   opened_at: string;
