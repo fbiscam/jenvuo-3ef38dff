@@ -136,9 +136,11 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
           continue;
         }
 
-        if (m.fromTime == null || m.toTime == null) { b.el.style.display = "none"; continue; }
-        const x1 = ts.timeToCoordinate(m.fromTime as Time);
-        const x2 = ts.timeToCoordinate(m.toTime as Time);
+        const fromT = Number(m.fromTime);
+        const toT = Number(m.toTime);
+        if (!Number.isFinite(fromT) || !Number.isFinite(toT)) { b.el.style.display = "none"; continue; }
+        const x1 = ts.timeToCoordinate(fromT as Time);
+        const x2 = ts.timeToCoordinate(toT as Time);
         if (x1 == null || x2 == null) { b.el.style.display = "none"; continue; }
         b.el.style.display = "block";
         const left = Math.min(x1, x2);
@@ -264,10 +266,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (m.tf !== tf) return;
       const ts = chart.timeScale();
       const anyM: any = m;
-      const from: number | undefined = anyM.fromTime;
-      const to: number | undefined = anyM.toTime;
+      const from = Number(anyM.fromTime);
+      const to = Number(anyM.toTime);
       try {
-        if (typeof from === "number" && typeof to === "number") {
+        if (Number.isFinite(from) && Number.isFinite(to)) {
           const span = Math.max(to - from, 60);
           const pad = Math.max(span * 6, 60 * 30);
           ts.setVisibleRange({ from: (from - pad) as Time, to: (to + pad) as Time });
@@ -288,10 +290,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (m.tf !== tf) return;
       const ts = chart.timeScale();
       const anyM: any = m;
-      let from: number | undefined = anyM.fromTime;
-      let to: number | undefined = anyM.toTime;
+      let from = Number(anyM.fromTime);
+      let to = Number(anyM.toTime);
       // Price-only markings (eqh, eql, liquidity, entry/sl/tp) — center around live bar
-      if (typeof from !== "number" || typeof to !== "number") {
+      if (!Number.isFinite(from) || !Number.isFinite(to)) {
         const lastT = liveBarRef.current?.time;
         if (typeof lastT !== "number") return;
         const bucket = bucketSecRef.current || 60;
@@ -299,9 +301,9 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         to = lastT + bucket * 5;
       }
       try {
-        const span = Math.max((to as number) - (from as number), bucketSecRef.current || 60);
+        const span = Math.max(to - from, bucketSecRef.current || 60);
         const pad = Math.max(span * 5, (bucketSecRef.current || 60) * 25);
-        ts.setVisibleRange({ from: ((from as number) - pad) as Time, to: ((to as number) + pad) as Time });
+        ts.setVisibleRange({ from: (from - pad) as Time, to: (to + pad) as Time });
       } catch {}
     },
     drawMarking: (m: Marking, opts?: { transient?: boolean }) => {
@@ -378,16 +380,20 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         color = m.kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
         style = LineStyle.LargeDashed;
         const text = m.type.toUpperCase();
-        const time = m.fromTime as Time;
-        markersRef.current.push({
-          time,
-          position: m.kind === "bullish" ? "belowBar" : "aboveBar",
-          color,
-          shape: m.kind === "bullish" ? "arrowUp" : "arrowDown",
-          text,
-        });
-        if (transient) transientMarkerKeysRef.current.add(`${time}:${text}`);
-        markersPluginRef.current?.setMarkers(markersRef.current);
+        const time = Number(m.fromTime) as Time;
+        if (!Number.isFinite(time as unknown as number)) {
+          // skip marker if time is invalid, but still draw the price line below
+        } else {
+          markersRef.current.push({
+            time,
+            position: m.kind === "bullish" ? "belowBar" : "aboveBar",
+            color,
+            shape: m.kind === "bullish" ? "arrowUp" : "arrowDown",
+            text,
+          });
+          if (transient) transientMarkerKeysRef.current.add(`${time}:${text}`);
+          try { markersPluginRef.current?.setMarkers(markersRef.current); } catch {}
+        }
       } else if (m.type === "entry") {
         price = m.price; color = COLORS.entry; lineWidth = 3;
       } else if (m.type === "sl") {

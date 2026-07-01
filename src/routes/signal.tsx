@@ -198,7 +198,7 @@ function SignalPage() {
       for (const m of p.markings) {
         if (autoTypes.has(m.type)) {
           const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
-          target?.drawMarking(m, { transient: false });
+          try { target?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
         }
       }
 
@@ -217,12 +217,14 @@ function SignalPage() {
           if (n.markingIndex != null && p.markings[n.markingIndex]) {
             const m = p.markings[n.markingIndex];
             const drawTarget = m.tf === "htf" ? htfRef.current : ltfRef.current;
-            drawTarget?.drawMarking(m, { transient: true });
-            // Pan/zoom chart so the marking sits in view
-            drawTarget?.panToMarking(m);
-            // Give the box one frame to mount, then focus + pulse it.
-            await new Promise((r) => setTimeout(r, 80));
-            drawTarget?.focusMarking(m);
+            try {
+              drawTarget?.drawMarking(m, { transient: true });
+              drawTarget?.panToMarking(m);
+              await new Promise((r) => setTimeout(r, 80));
+              drawTarget?.focusMarking(m);
+            } catch (e) {
+              console.warn("marking step failed", e);
+            }
           } else if (target) {
             // No specific marking — just keep current view
           }
@@ -239,13 +241,15 @@ function SignalPage() {
           setActiveTf("ltf");
           for (const m of p.markings) {
             if (m.type === "entry" || m.type === "sl" || m.type === "tp") {
-              ltfRef.current?.drawMarking(m, { transient: false });
+              try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("final marking failed", e); }
             }
           }
           const entry = p.markings.find((m) => m.type === "entry");
           if (entry) {
-            ltfRef.current?.panToMarking(entry);
-            ltfRef.current?.focusMarking(entry);
+            try {
+              ltfRef.current?.panToMarking(entry);
+              ltfRef.current?.focusMarking(entry);
+            } catch (e) { console.warn("entry focus failed", e); }
           }
           await speakWait(p.trade.summary);
           toast.success(`Setup ready · ${p.setupGrade}`);
