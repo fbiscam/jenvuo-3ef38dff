@@ -235,6 +235,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       markersPluginRef.current?.setMarkers([]);
       boxesRef.current.forEach((b) => b.el.remove());
       boxesRef.current = [];
+      labelsRef.current.forEach((lb) => { try { lb.el.remove(); } catch {} });
+      labelsRef.current = [];
       if (lastPriceLineRef.current) {
         try { s.removePriceLine(lastPriceLineRef.current); } catch {}
         lastPriceLineRef.current = null;
