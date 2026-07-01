@@ -1024,7 +1024,7 @@ function SignalPage() {
             </span>
           </div>
         </div>
-      </section>
+      </main>
     </div>
   );
 }
