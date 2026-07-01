@@ -307,6 +307,7 @@ function Journal() {
                         t.outcome === "win" ? "bg-emerald-50 text-emerald-700"
                         : t.outcome === "loss" ? "bg-rose-50 text-rose-700"
                         : t.outcome === "breakeven" ? "bg-zinc-100 text-zinc-700"
+                        : t.outcome === "pending" ? "bg-sky-50 text-sky-700"
                         : "bg-amber-50 text-amber-700"
                       }`}>{t.outcome}</span>
                     </td>
