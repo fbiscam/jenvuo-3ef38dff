@@ -633,15 +633,15 @@ function DashboardLayout() {
 
           <Card className="flex flex-col">
             <CardHeader
-              icon={Mic}
-              title="Voice Agent"
+              icon={Gauge}
+              title="Best Time to Trade"
               right={
-                <Link to="/app" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
-                  Open <ArrowRight className="h-3.5 w-3.5" />
+                <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                  Open desk <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               }
             />
-            <VoiceAgentHistory />
+            <BestTimeWidget />
           </Card>
 
 
