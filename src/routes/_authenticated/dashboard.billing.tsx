@@ -92,8 +92,15 @@ function Billing() {
             Buy top-up
           </Link>
         </div>
-        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
-          <div className="h-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
+        <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full">
+          <div className="absolute inset-0 flex">
+            <div className="h-full w-1/2 bg-rose-500/80" />
+            <div className="h-full w-1/2 bg-emerald-500/80" />
+          </div>
+          <div
+            className="absolute top-1/2 h-4 w-[3px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-900 shadow-[0_0_0_2px_rgba(255,255,255,0.9)] transition-all duration-500"
+            style={{ left: `${pct}%` }}
+          />
         </div>
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {(Object.entries(CREDIT_COSTS) as [keyof typeof CREDIT_COSTS, number][]).map(([k, v]) => (
