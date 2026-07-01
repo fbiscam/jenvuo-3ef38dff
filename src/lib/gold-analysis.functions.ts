@@ -364,6 +364,17 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
     };
 
     return signal;
+}
+
+export const analyzeGold = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { timeframe: string; query: string }) => ({
+    timeframe: String(d?.timeframe || "15m").toLowerCase(),
+    query: String(d?.query || "Give me the best A+ setup right now"),
+  }))
+  .handler(async ({ data, context }) => {
+    await _spendUserCredits(context.userId, 2, "signal");
+    return _analyzeGoldCompute(data);
   });
 
 // ============================================================
