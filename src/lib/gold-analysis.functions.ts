@@ -820,12 +820,7 @@ export const getNewsRisk = createServerFn({ method: "POST" })
 
 
 
-export const getSignalPlan = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => {
-    const obj = (d ?? {}) as { symbol?: string };
-    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
-  })
-  .handler(async ({ data }) => {
+export async function computeSignalPlan(data: { symbol: string }): Promise<SignalPlan> {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
