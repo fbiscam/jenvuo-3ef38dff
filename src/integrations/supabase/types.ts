@@ -678,6 +678,33 @@ export type Database = {
           },
         ]
       }
+      voice_history: {
+        Row: {
+          created_at: string
+          id: string
+          query: string
+          reply: string
+          source: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          query: string
+          reply: string
+          source?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          query?: string
+          reply?: string
+          source?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
