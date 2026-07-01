@@ -262,6 +262,16 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         } else keepBoxes.push(b);
       }
       boxesRef.current = keepBoxes;
+      // Remove transient floating labels
+      const keepLabels: typeof labelsRef.current = [];
+      for (const lb of labelsRef.current) {
+        if (lb.transient) {
+          lb.el.style.opacity = "0";
+          const el = lb.el;
+          setTimeout(() => { try { el.remove(); } catch {} }, 260);
+        } else keepLabels.push(lb);
+      }
+      labelsRef.current = keepLabels;
       // Remove transient markers (BOS/CHoCH arrows)
       if (transientMarkerKeysRef.current.size > 0) {
         const kept = markersRef.current.filter((mk) => {
