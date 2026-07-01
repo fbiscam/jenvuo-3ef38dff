@@ -759,7 +759,7 @@ function VoiceAgentHistory() {
           Clear
         </button>
       </div>
-      <ul className="flex-1 divide-y divide-zinc-100 overflow-y-auto">
+      <ul className="flex-1 divide-y divide-zinc-100 overflow-y-auto scrollbar-auto-hide max-h-[360px]">
         {visible.map((t, i) => (
           <li key={t.ts + ":" + i} className="px-4 py-3">
             <div className="flex items-start justify-between gap-3">
