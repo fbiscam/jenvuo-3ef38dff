@@ -1138,9 +1138,14 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       const i = allMarkings.findIndex(pred);
       return i >= 0 ? i : null;
     };
+    const usedAiSays = new Set<string>();
     const pickAiSay = (re: RegExp, fallback: string) => {
-      const hit = aiNarration.find((n) => re.test(n.say));
-      return hit?.say && hit.say.length > 8 ? hit.say : fallback;
+      const hit = aiNarration.find((n) => re.test(n.say) && !usedAiSays.has(n.say));
+      if (hit?.say && hit.say.length > 8) {
+        usedAiSays.add(hit.say);
+        return hit.say;
+      }
+      return fallback;
     };
     const fmtPx = (n: number) => `${inst.kind === "crypto" ? "" : "$"}${n.toFixed(dec)}`;
 
