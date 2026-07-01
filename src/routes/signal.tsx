@@ -1079,8 +1079,38 @@ function SignalPage() {
           </div>
         </div>
       </main>
+
+      <Dialog open={!!kzDialog} onOpenChange={(o) => { if (!o) setKzDialog(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-700">
+              <AlertTriangle className="h-5 w-5" /> Outside optimal killzone
+            </DialogTitle>
+            <DialogDescription className="pt-2 text-zinc-700 leading-relaxed">
+              You are not in the killzone for better A+ scaling and good signal.
+              Only trade <span className="font-semibold text-zinc-900">{kzDialog?.pair}</span> in{" "}
+              <span className="font-semibold text-zinc-900">{kzDialog?.kzText}</span>.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              onClick={dismissKzForever}
+              className="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] font-medium text-zinc-600 hover:bg-zinc-50 transition"
+            >
+              Don't show again
+            </button>
+            <button
+              onClick={() => setKzDialog(null)}
+              className="h-9 px-4 rounded-lg bg-zinc-900 text-white text-[12px] font-semibold tracking-wide hover:bg-zinc-800 transition"
+            >
+              I understand
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+
 }
 
 /* ---------- bits ---------- */
