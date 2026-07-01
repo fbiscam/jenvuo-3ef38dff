@@ -217,12 +217,14 @@ function SignalPage() {
           if (n.markingIndex != null && p.markings[n.markingIndex]) {
             const m = p.markings[n.markingIndex];
             const drawTarget = m.tf === "htf" ? htfRef.current : ltfRef.current;
-            drawTarget?.drawMarking(m, { transient: true });
-            // Pan/zoom chart so the marking sits in view
-            drawTarget?.panToMarking(m);
-            // Give the box one frame to mount, then focus + pulse it.
-            await new Promise((r) => setTimeout(r, 80));
-            drawTarget?.focusMarking(m);
+            try {
+              drawTarget?.drawMarking(m, { transient: true });
+              drawTarget?.panToMarking(m);
+              await new Promise((r) => setTimeout(r, 80));
+              drawTarget?.focusMarking(m);
+            } catch (e) {
+              console.warn("marking step failed", e);
+            }
           } else if (target) {
             // No specific marking — just keep current view
           }
