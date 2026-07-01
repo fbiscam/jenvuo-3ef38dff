@@ -177,6 +177,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       linesRef.current = [];
       markersRef.current = [];
       boxesRef.current = [];
+      labelsRef.current = [];
       liveBarRef.current = null;
       lastPriceLineRef.current = null;
       if (overlayRef.current) overlayRef.current.innerHTML = "";
