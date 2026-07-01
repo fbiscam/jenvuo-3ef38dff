@@ -248,6 +248,7 @@ export function buildTrade(
   ltf: TFAnalysis,
   pools: LiquidityPool[],
   lastPrice: number,
+  atr?: number, // optional ATR — enables volatility-adaptive SL buffer
 ): BuiltTrade {
   // Direction from HTF + LTF agreement
   const dir: "BUY" | "SELL" | "WAIT" =
@@ -277,8 +278,10 @@ export function buildTrade(
 
   // Entry = zone midpoint
   const entry = (zone.priceLow + zone.priceHigh) / 2;
-  // SL = 0.1% buffer beyond zone extreme on the opposing side
-  const buffer = lastPrice * 0.0008;
+  // SL = max(0.08% of price, 0.2 * ATR) beyond zone extreme — volatility-adaptive
+  const pctBuffer = lastPrice * 0.0008;
+  const atrBuffer = atr && atr > 0 ? atr * 0.2 : 0;
+  const buffer = Math.max(pctBuffer, atrBuffer);
   const sl = dir === "BUY" ? zone.priceLow - buffer : zone.priceHigh + buffer;
   // TP = nearest unswept opposing liquidity pool
   const targetSide: "buy" | "sell" = dir === "BUY" ? "buy" : "sell";
