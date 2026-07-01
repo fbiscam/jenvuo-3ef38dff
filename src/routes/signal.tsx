@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { cn } from "@/lib/utils";
 import { useSignalAlerts } from "@/hooks/useSignalAlerts";
+import { appendVoiceTurn } from "@/lib/voice-history";
 import AlertOptInCard from "@/components/AlertOptInCard";
 import AlertsHistoryPanel from "@/components/AlertsHistoryPanel";
 import { useCredits } from "@/hooks/useCredits";
