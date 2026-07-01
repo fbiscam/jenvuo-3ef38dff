@@ -131,6 +131,39 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_lots: {
+        Row: {
+          amount_granted: number
+          amount_remaining: number
+          expires_at: string
+          granted_at: string
+          id: string
+          metadata: Json
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          amount_granted: number
+          amount_remaining: number
+          expires_at: string
+          granted_at?: string
+          id?: string
+          metadata?: Json
+          reason: string
+          user_id: string
+        }
+        Update: {
+          amount_granted?: number
+          amount_remaining?: number
+          expires_at?: string
+          granted_at?: string
+          id?: string
+          metadata?: Json
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -659,6 +692,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      expire_credits: { Args: never; Returns: number }
       grant_credits: {
         Args: {
           _amount: number
