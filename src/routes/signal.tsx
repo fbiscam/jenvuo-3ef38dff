@@ -1222,6 +1222,7 @@ function SignalVoiceAgent({
   ltfRef,
   analyzing,
   narrationPulse,
+  credits,
 }: {
   plan: SignalPlan | null;
   livePrice: number | null;
@@ -1229,6 +1230,7 @@ function SignalVoiceAgent({
   ltfRef: React.RefObject<SignalChartHandle | null>;
   analyzing: boolean;
   narrationPulse: number;
+  credits: ReturnType<typeof useCredits>;
 }) {
   const ask = useServerFn(askSignalAgent);
   const speech = useSpeech();
