@@ -216,7 +216,7 @@ function Billing() {
               {MATRIX_ROWS.map((row, idx) => (
                 <tr
                   key={row.f}
-                  className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
+                  className="border-t border-zinc-200 bg-white hover:bg-zinc-50/40 transition"
                 >
                   <td className="px-6 py-3.5 text-zinc-800">
                     <div className="flex items-center gap-2">
