@@ -1,9 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   analyzeTF, buildLiquidityPools, buildTrade, scoreSetup,
   computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
   detectSMTDivergence, killzoneForPair,
 } from "@/lib/analysis/engine";
+
+async function _spendUserCredits(userId: string, amount: number, reason: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { error } = await supabaseAdmin.rpc("spend_credits", {
+    _user_id: userId, _amount: amount, _reason: reason, _metadata: {} as any,
+  });
+  if (error) {
+    if (error.message?.includes("INSUFFICIENT_CREDITS")) throw new Error("INSUFFICIENT_CREDITS");
+    throw new Error(error.message);
+  }
+}
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
 
