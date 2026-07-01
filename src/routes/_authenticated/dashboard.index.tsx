@@ -132,7 +132,7 @@ function SavedSignals() {
             </dl>
             <footer className="mt-4 flex items-center justify-between text-[11px] text-zinc-400">
               <span className="font-mono uppercase tracking-wider">Saved {new Date(r.created_at).toLocaleDateString()}</span>
-              {snap && <Link to="/signal" search={{ symbol: pair }} className="text-zinc-600 hover:text-zinc-900">Re-open →</Link>}
+              {snap && <Link to="/signal" search={{ symbol: pair, savedId: r.id }} className="text-zinc-600 hover:text-zinc-900">Re-open →</Link>}
             </footer>
           </article>
         );
