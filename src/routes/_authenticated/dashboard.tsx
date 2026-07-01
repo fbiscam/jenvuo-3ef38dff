@@ -705,15 +705,17 @@ function DashboardLayout() {
   );
 }
 
-// Killzones defined in PKT (UTC+5). Converted to UTC for cross-timezone accuracy.
-// PKT hour → UTC hour: subtract 5.
+// Real ICT/SMC Killzones — times in UTC (converted from NY EST reference).
+// Standard institutional trading windows used by prop firms & smart-money traders.
 type Killzone = { name: string; tag: string; startUtc: number; endUtc: number; quality: "best" | "good" | "ok" | "avoid" };
 const KILLZONES: Killzone[] = [
-  { name: "Asian Session",   tag: "Chop — avoid", startUtc: 0,     endUtc: 5,     quality: "avoid" }, // 5-10 AM PKT
-  { name: "London Open",     tag: "FVG + sweep",  startUtc: 7,     endUtc: 10,    quality: "good"  }, // 12-3 PM PKT
-  { name: "NY Killzone",     tag: "A+ setups",    startUtc: 12.5,  endUtc: 15.5,  quality: "best"  }, // 5:30-8:30 PM PKT
-  { name: "NY PM Session",   tag: "Continuation", startUtc: 16,    endUtc: 18,    quality: "ok"    }, // 9-11 PM PKT
+  { name: "Asian Range",      tag: "Accumulation",     startUtc: 0,     endUtc: 5,     quality: "avoid" }, // 19:00-00:00 EST
+  { name: "London Killzone",  tag: "London Open sweep", startUtc: 7,    endUtc: 10,    quality: "good"  }, // 02:00-05:00 EST
+  { name: "NY AM Killzone",   tag: "A+ ICT setups",    startUtc: 12,    endUtc: 15,    quality: "best"  }, // 07:00-10:00 EST
+  { name: "London Close",     tag: "Reversal window",  startUtc: 15,    endUtc: 17,    quality: "ok"    }, // 10:00-12:00 EST
+  { name: "NY PM Killzone",   tag: "Afternoon push",   startUtc: 18.5,  endUtc: 21,    quality: "good"  }, // 13:30-16:00 EST
 ];
+
 
 function fmtCountdown(ms: number) {
   if (ms <= 0) return "now";
