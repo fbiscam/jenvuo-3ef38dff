@@ -374,6 +374,8 @@ function DashboardLayout() {
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
   const credits = useCredits();
+  const localHour = useLocalHour();
+  const greetingText = pickGreeting(localHour);
 
   useEffect(() => {
     let cancelled = false;
