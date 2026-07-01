@@ -58,11 +58,16 @@ function fmtUTC(h: number) {
   return `${pad(hh)}:00`;
 }
 
-// Convert a UTC hour to the user's local HH:mm using today's date.
-function utcHourToLocal(hUTC: number): string {
+// Convert a UTC hour to a local HH:mm using the given IANA timezone.
+function utcHourToLocal(hUTC: number, tz?: string): string {
   const d = new Date();
   d.setUTCHours(hUTC === 24 ? 0 : hUTC, 0, 0, 0);
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+  return d.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: tz,
+  });
 }
 
 function shortTZ(): string {
@@ -137,12 +142,43 @@ function KillzonesPage() {
   const [now, setNow] = useState<Date>(() => new Date());
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<(typeof CATEGORIES)[number]>("All");
-  const tzShort = useMemo(() => shortTZ(), []);
-  const tzLong = useMemo(() => longTZ(), []);
+  const [ipTZ, setIpTZ] = useState<string | null>(null);
+  const [ipCity, setIpCity] = useState<string | null>(null);
+  const tz = ipTZ ?? longTZ();
+  const tzShort = useMemo(() => {
+    try {
+      const parts = new Intl.DateTimeFormat([], { timeZone: tz, timeZoneName: "short" })
+        .formatToParts(new Date());
+      return parts.find(p => p.type === "timeZoneName")?.value || "Local";
+    } catch {
+      return shortTZ();
+    }
+  }, [tz]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
+  }, []);
+
+  // Detect timezone from user IP (free, no key). Falls back to browser TZ on error.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json/", { cache: "no-store" });
+        if (!res.ok) return;
+        const j = (await res.json()) as { timezone?: string; city?: string; country_name?: string };
+        if (cancelled) return;
+        if (j.timezone) setIpTZ(j.timezone);
+        if (j.city || j.country_name)
+          setIpCity([j.city, j.country_name].filter(Boolean).join(", "));
+      } catch {
+        // ignore; browser TZ fallback stays in effect
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const rows = useMemo(() => {
@@ -184,6 +220,7 @@ function KillzonesPage() {
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
+    timeZone: tz,
   });
 
   return (
@@ -244,11 +281,15 @@ function KillzonesPage() {
           </div>
           <div className="col-span-2 sm:col-span-1 rounded-xl border border-zinc-200 bg-white p-4">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
-              Timezone
+              {ipCity ? "Detected location" : "Timezone"}
             </div>
             <div className="text-sm font-medium mt-1 flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5 text-zinc-400" />
-              {tzLong}
+              <span className="truncate">{ipCity ?? tz}</span>
+            </div>
+            <div className={`${MONO} mt-1 text-[10px] text-zinc-500 truncate`}>
+              {tz}
+              {ipTZ ? " · via IP" : ""}
             </div>
           </div>
         </div>
@@ -359,7 +400,7 @@ function KillzonesPage() {
                                   </span>
                                   <span className="mx-1 text-zinc-300">·</span>
                                   <span className="text-zinc-500">
-                                    {utcHourToLocal(kz.startUTC)}–{utcHourToLocal(kz.endUTC)}{" "}
+                                    {utcHourToLocal(kz.startUTC, tz)}–{utcHourToLocal(kz.endUTC, tz)}{" "}
                                     {tzShort}
                                   </span>
                                 </div>
