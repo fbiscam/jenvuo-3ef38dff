@@ -74,7 +74,7 @@ function Sparkline({ seed = 1, tone = "blue", empty = false, trend = "flat", mag
     return arr;
   }, [seed, trend, magnitude]);
 
-  const stroke = tone === "rose" ? "#f43f5e" : tone === "zinc" ? "#71717a" : "#3b82f6";
+  const stroke = tone === "rose" ? "#f43f5e" : tone === "zinc" ? "#71717a" : tone === "emerald" ? "#10b981" : "#3b82f6";
 
   if (empty) {
     return (
