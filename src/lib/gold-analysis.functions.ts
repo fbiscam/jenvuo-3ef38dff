@@ -1435,6 +1435,17 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
     };
 
     return plan;
+}
+
+export const getSignalPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { symbol?: string };
+    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
+  })
+  .handler(async ({ data, context }) => {
+    await _spendUserCredits(context.userId, 3, "ict_narration");
+    return computeSignalPlan(data);
   });
 
 
