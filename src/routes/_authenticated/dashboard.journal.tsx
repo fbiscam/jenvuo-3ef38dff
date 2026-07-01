@@ -154,6 +154,23 @@ function Journal() {
     setTrades((t) => t.filter((x) => x.id !== id));
   };
 
+  const closeNow = async (t: Trade) => {
+    if (t.outcome !== "open" || t.entry == null) return;
+    const px = livePrices[t.pair.toUpperCase()];
+    if (px == null) { toast.error("No live price yet — try again"); return; }
+    const pnl = t.direction === "long" ? px - t.entry : t.entry - px;
+    const outcome: Trade["outcome"] = pnl > 0 ? "win" : pnl < 0 ? "loss" : "breakeven";
+    const closed_at = new Date().toISOString();
+    const { error } = await supabase
+      .from("trade_journal")
+      .update({ outcome, pnl, closed_at })
+      .eq("id", t.id)
+      .eq("outcome", "open");
+    if (error) { toast.error("Could not close trade"); return; }
+    setTrades((prev) => prev.map((x) => (x.id === t.id ? { ...x, outcome, pnl, closed_at } : x)));
+    toast.success(`Trade closed · ${outcome.toUpperCase()} · ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}`);
+  };
+
   return (
     <UpgradeOverlay
       show={locked}
