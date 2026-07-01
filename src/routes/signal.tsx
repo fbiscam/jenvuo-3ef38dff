@@ -286,15 +286,59 @@ function SignalPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchPlan, runNarration, symbol, credits]);
 
+  const loadSaved = useCallback(async (id: string) => {
+    setLoading(true);
+    abortRef.current = true;
+    speech.stopSpeaking();
+    try {
+      const { data, error } = await supabase
+        .from("saved_signals")
+        .select("snapshot")
+        .eq("id", id)
+        .maybeSingle();
+      if (error) throw error;
+      const snap: any = data?.snapshot ?? null;
+      if (snap?.plan) {
+        setPlan(snap.plan as SignalPlan);
+        // Redraw persistent entry/sl/tp + context zones without re-charging credits.
+        setTimeout(() => {
+          const p = snap.plan as SignalPlan;
+          htfRef.current?.clear();
+          ltfRef.current?.clear();
+          const autoTypes = new Set(["premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql"]);
+          for (const m of p.markings) {
+            const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
+            if (autoTypes.has(m.type) || m.type === "entry" || m.type === "sl" || m.type === "tp") {
+              try { target?.drawMarking(m, { transient: false }); } catch {}
+            }
+          }
+          const entry = p.markings.find((m) => m.type === "entry");
+          if (entry) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
+        }, 400);
+        toast.success("Saved signal restored");
+      } else {
+        toast.error("Saved snapshot missing — running fresh analysis");
+        await load();
+      }
+    } catch (e: any) {
+      toast.error(e?.message || "Could not open saved signal");
+    } finally {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [load, speech]);
+
 
   useEffect(() => {
-    if (authReady) load();
+    if (!authReady) return;
+    if (savedId) loadSaved(savedId);
+    else load();
     return () => {
       abortRef.current = true;
       speech.stopSpeaking();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authReady, symbol]);
+  }, [authReady, symbol, savedId]);
 
   // auto-scroll narration feed
   useEffect(() => {
