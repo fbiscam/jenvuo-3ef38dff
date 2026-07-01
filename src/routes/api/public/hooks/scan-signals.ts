@@ -8,7 +8,7 @@ import { getSignalPlan } from '@/lib/gold-analysis.functions'
 
 const SENDER_DOMAIN = 'notify.jenvu.com'
 const FROM = 'Jenvu Signal Desk <signals@jenvu.com>'
-const DEDUPE_WINDOW_MS = 4 * 60 * 60 * 1000 // 4 hours
+const DEDUPE_WINDOW_MS = 2 * 60 * 60 * 1000 // 2 hours
 
 export const Route = createFileRoute('/api/public/hooks/scan-signals')({
   server: {
@@ -66,10 +66,11 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
 
         const grade = plan.setupGrade
         const direction = plan.trade.direction
-        // Only fire alerts for true A+ setups (score >= 85). Lower grades stay
+        // Fire alerts for A+ and A setups (score >= 75). Lower grades stay
         // visible on the signal page as "watching" but never trigger pushes.
-        if (grade !== 'A+' || (direction !== 'BUY' && direction !== 'SELL')) {
-          return Response.json({ ok: true, skipped: 'not_a_plus', grade, direction, score: plan.setupScore })
+        const acceptableGrades = ['A+', 'A']
+        if (!acceptableGrades.includes(grade) || (direction !== 'BUY' && direction !== 'SELL') || plan.setupScore < 75) {
+          return Response.json({ ok: true, skipped: 'below_threshold', grade, direction, score: plan.setupScore })
         }
 
         // Dedupe: same pair + same direction within DEDUPE_WINDOW_MS
@@ -133,7 +134,7 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
 
           const templateData = {
             pair,
-            grade,
+            grade: grade as 'A+' | 'A',
             direction,
             entry: round(plan.trade.entry).toFixed(dec),
             sl: round(plan.trade.sl).toFixed(dec),
