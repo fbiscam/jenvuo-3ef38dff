@@ -801,6 +801,27 @@ async function fetchBinanceQuote(symbols: string[]): Promise<LiveTick | null> {
   return null;
 }
 
+// Real-time spot quote for precious metals (XAU/XAG). Yahoo's XAUUSD=X can lag
+// several dollars vs live spot; gold-api.com mirrors what TradingView's OANDA
+// spot feed shows and is refreshed every few seconds.
+async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | null> {
+  if (inst.kind !== "metal") return null;
+  const base = inst.key === "METAL:XAGUSD" ? "XAG" : "XAU";
+  try {
+    const res = await fetch(`https://api.gold-api.com/price/${base}`, {
+      headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
+    });
+    if (!res.ok) return null;
+    const j: any = await res.json();
+    const p = typeof j?.price === "number" ? j.price : parseFloat(j?.price);
+    if (!isFinite(p) || p <= 0) return null;
+    const tRaw = j?.updatedAt ? Date.parse(j.updatedAt) : Date.now();
+    return { price: p, t: isFinite(tRaw) ? tRaw : Date.now() };
+  } catch {
+    return null;
+  }
+}
+
 export const getLiveTick = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
     const obj = (d ?? {}) as { symbol?: string };
@@ -809,6 +830,10 @@ export const getLiveTick = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
     // 1) Try real-time quote endpoints first (no cache, sub-second freshness).
+    if (inst.kind === "metal") {
+      const q = await fetchMetalSpotQuote(inst);
+      if (q) return q;
+    }
     if (inst.binanceSymbols?.length) {
       const q = await fetchBinanceQuote(inst.binanceSymbols);
       if (q) return q;
@@ -834,11 +859,13 @@ export const getMarketSnapshot = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
-    const quote = inst.binanceSymbols?.length
-      ? await fetchBinanceQuote(inst.binanceSymbols).catch(() => null)
-      : inst.yahooSymbols?.length
-        ? await fetchYahooQuote(inst.yahooSymbols).catch(() => null)
-        : null;
+    const quote = inst.kind === "metal"
+      ? await fetchMetalSpotQuote(inst).catch(() => null)
+      : inst.binanceSymbols?.length
+        ? await fetchBinanceQuote(inst.binanceSymbols).catch(() => null)
+        : inst.yahooSymbols?.length
+          ? await fetchYahooQuote(inst.yahooSymbols).catch(() => null)
+          : null;
     // Use daily candles for a stable 24h reference price.
     const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
     let price: number | null = null;
@@ -916,6 +943,10 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
     const inst = resolveInstrument(data.symbol);
 
     const liveTickPromise = (async () => {
+      if (inst.kind === "metal") {
+        const q = await fetchMetalSpotQuote(inst).catch(() => null);
+        if (q) return q;
+      }
       if (inst.binanceSymbols?.length) {
         const q = await fetchBinanceQuote(inst.binanceSymbols).catch(() => null);
         if (q) return q;
