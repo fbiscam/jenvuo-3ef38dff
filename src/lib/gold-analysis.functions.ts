@@ -801,6 +801,27 @@ async function fetchBinanceQuote(symbols: string[]): Promise<LiveTick | null> {
   return null;
 }
 
+// Real-time spot quote for precious metals (XAU/XAG). Yahoo's XAUUSD=X can lag
+// several dollars vs live spot; gold-api.com mirrors what TradingView's OANDA
+// spot feed shows and is refreshed every few seconds.
+async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | null> {
+  if (inst.kind !== "metal") return null;
+  const base = inst.key === "METAL:XAGUSD" ? "XAG" : "XAU";
+  try {
+    const res = await fetch(`https://api.gold-api.com/price/${base}`, {
+      headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
+    });
+    if (!res.ok) return null;
+    const j: any = await res.json();
+    const p = typeof j?.price === "number" ? j.price : parseFloat(j?.price);
+    if (!isFinite(p) || p <= 0) return null;
+    const tRaw = j?.updatedAt ? Date.parse(j.updatedAt) : Date.now();
+    return { price: p, t: isFinite(tRaw) ? tRaw : Date.now() };
+  } catch {
+    return null;
+  }
+}
+
 export const getLiveTick = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
     const obj = (d ?? {}) as { symbol?: string };
