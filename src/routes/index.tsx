@@ -676,7 +676,7 @@ function HomePage() {
               return (
               <div key={p.name} className={`rounded-2xl border ${isCurrent ? "border-emerald-400 bg-emerald-50/40" : p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
                 <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                  <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
                   <div className="flex items-center gap-1.5">
                     {isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>Current</span>}
                     {p.accent && !isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>}
@@ -706,10 +706,10 @@ function HomePage() {
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
                 <col className="w-[28%]" />
-                <col className="w-[18%]" />
-                <col className="w-[18%] bg-amber-50/40" />
-                <col className="w-[18%]" />
-                <col className="w-[18%]" />
+                <col className={`w-[18%] ${currentPlan === "free" ? "bg-emerald-50/50" : ""}`} />
+                <col className={`w-[18%] ${currentPlan === "pro" ? "bg-emerald-50/50" : "bg-amber-50/40"}`} />
+                <col className={`w-[18%] ${currentPlan === "elite" ? "bg-emerald-50/50" : ""}`} />
+                <col className={`w-[18%] ${currentPlan === "custom" ? "bg-emerald-50/50" : ""}`} />
               </colgroup>
 
               {/* Plan header row */}
@@ -731,7 +731,7 @@ function HomePage() {
                       className={`p-6 text-left align-top border-l border-zinc-200 ${isCurrent ? "bg-emerald-50/50" : p.accent ? "bg-amber-50/50" : ""}`}
                     >
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                        <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
                         {isCurrent && (
                           <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
                             Current
@@ -805,22 +805,26 @@ function HomePage() {
                         </span>
                       </div>
                     </td>
-                    {[row.a, row.b, row.c, row.d].map((v, i) => (
+                    {[row.a, row.b, row.c, row.d].map((v, i) => {
+                      const colKey = (["free", "pro", "elite", "custom"] as const)[i];
+                      const isCurrentCol = currentPlan === colKey;
+                      return (
                       <td
                         key={i}
-                        className={`px-6 py-3.5 text-center border-l border-zinc-200 ${i === 1 ? "bg-amber-50/40" : ""}`}
+                        className={`px-6 py-3.5 text-center border-l border-zinc-200 ${isCurrentCol ? "bg-emerald-50/60" : i === 1 ? "bg-amber-50/40" : ""}`}
                       >
                         {v === true ? (
-                          <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
+                          <span className={`inline-block h-1.5 w-1.5 rounded-full ${isCurrentCol ? "bg-emerald-600" : "bg-zinc-900"}`} />
                         ) : v === false ? (
                           <span className="inline-block h-px w-4 bg-zinc-200" />
                         ) : (
-                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : "text-zinc-700"}`}>
+                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : isCurrentCol ? "text-emerald-700 font-semibold" : "text-zinc-700"}`}>
                             {v}
                           </span>
                         )}
                       </td>
-                    ))}
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>

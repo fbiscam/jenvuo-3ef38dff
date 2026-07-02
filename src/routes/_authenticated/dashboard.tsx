@@ -447,13 +447,13 @@ function DashboardLayout() {
 
   const planTier = ((credits.plan as { tier?: string; name?: string } | null)?.tier
     ?? (credits.plan as { name?: string } | null)?.name ?? "free").toString().toUpperCase();
-  const planTierColor = (() => {
+  const planTierStyle = (() => {
     const t = planTier.toLowerCase();
-    if (t.includes("elite")) return "text-emerald-600";
-    if (t.includes("pro")) return "text-blue-600";
-    if (t.includes("plus") || t.includes("starter")) return "text-violet-600";
-    if (t.includes("free")) return "text-zinc-500";
-    return "text-amber-600";
+    if (t.includes("elite")) return { pill: "bg-emerald-50 border-emerald-300 text-emerald-700", dot: "bg-emerald-500" };
+    if (t.includes("pro"))   return { pill: "bg-blue-50 border-blue-300 text-blue-700",       dot: "bg-blue-500" };
+    if (t.includes("plus") || t.includes("starter")) return { pill: "bg-violet-50 border-violet-300 text-violet-700", dot: "bg-violet-500" };
+    if (t.includes("custom")) return { pill: "bg-amber-50 border-amber-300 text-amber-700",   dot: "bg-amber-500" };
+    return { pill: "bg-zinc-100 border-zinc-300 text-zinc-700", dot: "bg-zinc-400" };
   })();
   const remainingPct = credits.allowance ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
   const usedPct = credits.allowance ? Math.max(0, 100 - remainingPct) : 0;
@@ -490,8 +490,17 @@ function DashboardLayout() {
             <h1 className="mt-1 truncate text-[26px] font-semibold tracking-tight text-zinc-900 sm:text-[30px]">
               {email || fullName}<span className="text-zinc-500">'s Account</span>
             </h1>
-            <div className="mt-1 text-[12px] text-zinc-500">
-              {greetingText}, {fullName || "Trader"} · Plan <span className={`font-semibold ${planTierColor}`}>{planTier}</span>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-zinc-500">
+              <span>{greetingText}, {fullName || "Trader"}</span>
+              <span className="text-zinc-300">·</span>
+              <Link
+                to="/dashboard/billing"
+                className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold tracking-wide ${planTierStyle.pill} hover:opacity-90`}
+                title="Manage your plan"
+              >
+                <span className={`inline-block h-1.5 w-1.5 rounded-full ${planTierStyle.dot}`} />
+                {planTier} PLAN
+              </Link>
             </div>
           </div>
           <div className="flex items-center gap-1.5 lg:self-end lg:mb-6">
