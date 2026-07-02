@@ -1091,6 +1091,87 @@ export const getNewsRisk = createServerFn({ method: "POST" })
 
 
 
+function buildFeedFallbackPlan(args: {
+  inst: ResolvedInstrument;
+  price: number;
+  htfRaw?: Candle[];
+  ltfRaw?: Candle[];
+  reason?: string;
+}): SignalPlan {
+  const { inst, price, reason } = args;
+  const now = new Date();
+  const { session } = detectKillzone(now);
+  const kz = killzoneForPair(inst.raw || inst.key, now);
+  const safePrice = Number.isFinite(price) && price > 0 ? price : 1;
+  const htf = (args.htfRaw?.length ? args.htfRaw : buildSyntheticCandles(inst, "1h", safePrice, 80)).slice(-160);
+  const ltf = (args.ltfRaw?.length ? args.ltfRaw : buildSyntheticCandles(inst, "15m", safePrice, 120)).slice(-200);
+  const htfHigh = htf.length ? Math.max(...htf.map((c) => c.h)) : safePrice * 1.002;
+  const htfLow = htf.length ? Math.min(...htf.map((c) => c.l)) : safePrice * 0.998;
+  const eq = (htfHigh + htfLow) / 2;
+  const dec = inst.decimals;
+  const canonicalSymbol = inst.key.includes(":") ? inst.key.split(":")[1] : (inst.raw || inst.key);
+  const reasonText = reason || "Primary candle providers are temporarily delayed for this instrument.";
+  const priceText = `${inst.kind === "crypto" ? "" : "$"}${safePrice.toFixed(dec)}`;
+
+  return {
+    htfBias: "neutral",
+    intro: `${inst.display} live quote is available at ${priceText}, but full candle feed is delayed right now.`,
+    htfNarrative: `${inst.display} is using a quote-only fallback because the live candle feed is temporarily unavailable. No entry is issued until real HTF/LTF candles return.`,
+    ltfNarrative: "Execution is on hold. Re-analyze in a moment; the desk will only print entry, SL and TP when enough real candles are available.",
+    confluences: [
+      `Live quote available: ${priceText}`,
+      `${session} / ${kz.killzone}`,
+      "No trade issued from fallback candles",
+      reasonText,
+    ],
+    keyLevels: [
+      { label: "Live Quote", price: safePrice, kind: "pivot" },
+      { label: "Fallback High", price: htfHigh, kind: "resistance" },
+      { label: "Fallback Low", price: htfLow, kind: "support" },
+      { label: "Equilibrium", price: eq, kind: "equilibrium" },
+    ],
+    narration: [
+      { say: `${inst.display} quote is live at ${priceText}, but the candle provider is delayed.`, markingIndex: null, tf: "htf" },
+      { say: "I am not forcing an entry from incomplete data. Waiting protects accuracy on entry, stop and targets.", markingIndex: null, tf: "ltf" },
+      { say: "Re-analyze shortly; once HTF and LTF candles are back, the full ICT plan will print automatically.", markingIndex: null, tf: "ltf" },
+    ],
+    markings: [
+      { type: "premiumZone", tf: "htf", priceLow: eq, priceHigh: htfHigh, label: "Premium" },
+      { type: "discountZone", tf: "htf", priceLow: htfLow, priceHigh: eq, label: "Discount" },
+      { type: "liquidity", tf: "htf", price: htfHigh, side: "buy", label: "Fallback High" },
+      { type: "liquidity", tf: "htf", price: htfLow, side: "sell", label: "Fallback Low" },
+    ],
+    trade: {
+      direction: "WAIT",
+      entry: 0,
+      sl: 0,
+      tp: 0,
+      rr: 0,
+      confidence: 25,
+      summary: `WAIT on ${inst.display}: ${reasonText}`,
+      invalidation: "No trade is valid until real-time candles are restored.",
+    },
+    session,
+    killzone: kz.killzone,
+    newsRisk: { severity: "low", warning: "News check skipped while feed is in fallback mode.", events: [] },
+    multiTf: ["4H", "1H", "15M", "5M"].map((tf) => ({ tf: tf as TfBias["tf"], bias: "neutral", score: 50, label: "Feed fallback" })),
+    alignmentScore: 50,
+    alignmentLabel: "Feed fallback / Waiting",
+    setupScore: 25,
+    setupGrade: "C",
+    setupChecks: [
+      { key: "live_quote", label: "Live quote available", pass: true, reason: priceText },
+      { key: "candles", label: "HTF/LTF candles available", pass: false, reason: reasonText },
+      { key: "entry", label: "Entry/SL/TP accuracy", pass: null, reason: "Waiting for full candle feed" },
+    ],
+    generatedAt: now.toISOString(),
+    htfCandles: htf.map(toDTO),
+    ltfCandles: ltf.map(toDTO),
+    currentPrice: safePrice,
+    instrument: { symbol: canonicalSymbol, display: inst.display, kind: inst.kind, decimals: inst.decimals },
+  };
+}
+
 export async function computeSignalPlan(data: { symbol: string }): Promise<SignalPlan> {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
