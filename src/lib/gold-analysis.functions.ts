@@ -1000,20 +1000,7 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
 
     const inst = resolveInstrument(data.symbol);
 
-    const liveTickPromise = (async () => {
-      if (inst.kind === "metal") {
-        const q = await fetchMetalSpotQuote(inst).catch(() => null);
-        if (q) return q;
-      }
-      if (inst.binanceSymbols?.length) {
-        const q = await fetchBinanceQuote(inst.binanceSymbols).catch(() => null);
-        if (q) return q;
-      }
-      if (inst.yahooSymbols?.length) {
-        return await fetchYahooQuote(inst.yahooSymbols).catch(() => null);
-      }
-      return null;
-    })();
+    const liveTickPromise = resolveLiveTick(inst).catch(() => null);
 
     const [htfRaw, ltfRaw, news, h4Raw, m5Raw, dxyRaw, liveTick] = await Promise.all([
       fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
