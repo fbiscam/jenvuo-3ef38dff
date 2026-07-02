@@ -297,29 +297,26 @@ export function buildTrade(
 
   const notes: string[] = [];
 
-  // Reject "chasing price": zone is too far from current price to be actionable (>3% away)
+  // Reject "chasing price": zone is too far from current price to be actionable.
   const zoneMid = (zone.priceLow + zone.priceHigh) / 2;
   const distPct = Math.abs(lastPrice - zoneMid) / lastPrice;
-  if (distPct > 0.03) {
-    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest fresh zone is ${(distPct * 100).toFixed(1)}% from price — wait for retracement.` };
+  if (distPct > profile.maxDistPct) {
+    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest fresh zone is ${(distPct * 100).toFixed(2)}% from price — wait for retracement.` };
   }
 
   // Entry = zone midpoint
   const entry = zoneMid;
   const zoneHeight = Math.abs(zone.priceHigh - zone.priceLow);
 
-  // SL buffer — widened to survive normal wick noise on volatile assets like Gold.
-  //   Old: max(0.08% × price, 0.20 × ATR)   → far too tight on XAU (~$3 buffer)
-  //   New: max(0.20% × price, 0.75 × ATR, 0.5 × zoneHeight)
-  const pctBuffer = lastPrice * 0.002;
-  const atrBuffer = atr && atr > 0 ? atr * 0.75 : 0;
+  // SL buffer — asset-aware. max(pct × price, atrMult × ATR, 0.5 × zoneHeight)
+  const pctBuffer = lastPrice * profile.pctBuffer;
+  const atrBuffer = atr && atr > 0 ? atr * profile.atrMult : 0;
   const zoneBuffer = zoneHeight * 0.5;
   const buffer = Math.max(pctBuffer, atrBuffer, zoneBuffer);
   let sl = dir === "BUY" ? zone.priceLow - buffer : zone.priceHigh + buffer;
 
-  // Enforce a MINIMUM risk distance of 0.25% of price. Prevents "$3 SL" tickets that
-  // get wicked out on any normal candle.
-  const minRisk = lastPrice * 0.0025;
+  // Enforce MINIMUM risk distance so tickets don't get wicked out on normal noise.
+  const minRisk = lastPrice * profile.minRiskPct;
   let risk = Math.abs(entry - sl);
   if (risk < minRisk) {
     sl = dir === "BUY" ? entry - minRisk : entry + minRisk;
