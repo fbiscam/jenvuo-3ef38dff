@@ -676,7 +676,7 @@ function HomePage() {
               return (
               <div key={p.name} className={`rounded-2xl border ${isCurrent ? "border-emerald-400 bg-emerald-50/40" : p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
                 <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                  <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
                   <div className="flex items-center gap-1.5">
                     {isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>Current</span>}
                     {p.accent && !isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>}
@@ -731,7 +731,7 @@ function HomePage() {
                       className={`p-6 text-left align-top border-l border-zinc-200 ${isCurrent ? "bg-emerald-50/50" : p.accent ? "bg-amber-50/50" : ""}`}
                     >
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                        <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
                         {isCurrent && (
                           <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
                             Current
