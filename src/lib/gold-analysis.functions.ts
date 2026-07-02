@@ -423,10 +423,14 @@ export type SignalPlan = {
     entry: number;
     sl: number;
     tp: number;
+    tp1?: number;
+    tp2?: number;
+    tp3?: number;
     rr: number;
     confidence: number;
     summary: string;
     invalidation: string;
+    notes?: string[];
   };
   confluences: string[];
   keyLevels: KeyLevel[];
