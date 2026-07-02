@@ -1,56 +1,81 @@
-## Signal SL/TP/Entry Issues — Diagnosis
 
-I compared the engine code (`src/lib/analysis/engine.ts` → `buildTrade`) with the last real trades logged in your database. Concrete problems:
+## Diagnosis
 
-### 1. Stop-Loss buffer is too tight for Gold
-Current formula: `SL buffer = max(0.08% of price, 0.2 × ATR)`.
-- On XAU at ~$4000 that's only ~$3.20 beyond the zone.
-- Real recent losses had SL just $3.5–$6.6 from entry — stopped by normal noise/wick.
-- Gold's typical 15M wick is $4–$12, so tight SL guarantees frequent stop-outs.
+Aap ne 3 real issues report kiye hain — main ne code trace kiya, teeno ka pakka root cause mil gaya:
 
-### 2. Take-Profit picks the nearest liquidity pool with no distance cap
-- Every recent trade has TP = **3944.57** (same static weekly liquidity level ~$50 away), regardless of entry.
-- Result: reported R:R of **4.87, 6.65, 8.97, 18.30** — mathematically valid but unrealistic to hit before invalidation.
-- Better UX: cap TP at the closer of (nearest opposing pool) vs (fixed R multiple like 1:3–1:5), and split into TP1/TP2/TP3.
+### 1) Price live nahi update hoti
+`computeSignalPlan` sirf cached 15m candles use karta hai (candle cache TTL = 60s, `fetchInstrumentCandles`). `last.c` (last candle close) hi `lastPrice` banta hai — jo aakhri 15m candle band hone tak stale rehta hai. Kabhi 5–15 min tak real market 120$ hota hai jab code me 110$ dikhata hai. Live tick endpoint (`getLiveTick`) already exists lekin plan use hi nahi karta.
 
-### 3. Entry can be right on top of current price
-`entry = zone midpoint` but there's no check for "already tagged" or "too close to price."
-- The mitigation check (`zoneMitigated`) is computed but not used to force `WAIT` — a chased zone still becomes a live signal.
-- No minimum distance-from-price rule → engine can issue a signal where entry = market, giving a tiny buffer before SL.
+### 2) Har pair pe same ~40% confidence
+`scoreSetup` me hard-veto gates hain (`no_sweep`, `rr_low < 1.8`, `mitigated`, `bias_conflict`, `news`). Jaise hi koi ek fire ho — score forcibly `Math.min(score, 40)` ho jata hai. Real world me:
+- `no_sweep` almost hamesha fire hota hai — HTF Swing High/Low pools `swept: false` hard-coded hain, aur off-hours pe PDH/PDL sweep detect nahi hota → veto → 40 cap.
+- `rr_low` bhi common — engine TP ko 2R–3R me clamp karta hai, buffer widening ke baad RR aksar 1.5–1.9 aa jata hai → veto → 40 cap.
+- Unknown factors (SMT null, DXY null, structureQuality null) `pass=false` count hote hain, denominator me weight rehta hai → score aur ghat jata hai.
 
-### 4. No sanity guardrails
-- No min risk-distance (e.g., SL must be ≥ 0.25% of price OR ≥ 0.5×ATR).
-- No max R:R cap (currently unbounded — misleading confidence).
-- No "wait for retracement" mode when price is far from the zone (limit-order handling exists in UI but engine treats midpoint as market).
+Result: crypto/forex/stocks sab me score 38–42 → grade "C" → confidence 40%.
+
+### 3) Entry aur SL/TP galat prices pe
+Same stale-price bug ka side effect. `buildTrade(htfA, ltfA, pools, last.c, ...)` me `lastPrice = last.c` (stale). Zone filter `f.priceHigh <= lastPrice` stale price ke against check karta hai — isliye zone select hota hai jo real market se 10–15$ door hai. Entry midpoint bhi is stale zone ka hai. Jab UI live tick dikhata hai (real $120), engine ka entry/SL/TP stale $110 world me calculate hua hota hai.
 
 ---
 
-## Proposed Fix
+## Fix Plan
 
-Change `buildTrade` in `src/lib/analysis/engine.ts`:
+### A) `src/lib/gold-analysis.functions.ts` → `computeSignalPlan`
 
-1. **SL buffer** — widen to `max(0.20% × price, 0.75 × ATR, 0.5 × zone height)`. For XAU that's ≥$8, matching normal wick range.
-2. **Discard mitigated zones** — if `zoneMitigated === true` OR zone was tagged in last N candles, return `WAIT` with reason instead of trading it.
-3. **Entry sanity** —
-   - BUY: require `entry ≤ lastPrice − 0.10% × price` (limit below), or accept market only if inside a fresh unmitigated zone.
-   - Same, mirrored, for SELL.
-   - If neither holds → return `WAIT` ("chasing price").
-4. **TP logic** —
-   - Compute `tpLiquidity` (nearest unswept pool) and `tpR3 = entry ± 3R`.
-   - Final TP = whichever is **closer** (prevents 1:8+ fantasy trades).
-   - Emit **TP1 = 1R**, **TP2 = 2R**, **TP3 = min(tpLiquidity, entry±4R)** so the card shows realistic partials.
-5. **R:R clamp** — if computed RR > 5, cap TP to 5R and note "capped at 1:5".
-6. **Confidence downgrade** when any of the above fallback rules trigger (subtract 10–15 from score).
+1. Fresh live tick fetch karo parallel me:
+   ```
+   const liveTick = inst.binanceSymbols?.length
+     ? await fetchBinanceQuote(inst.binanceSymbols)
+     : inst.yahooSymbols?.length
+       ? await fetchYahooQuote(inst.yahooSymbols)
+       : null;
+   const livePrice = liveTick?.price ?? last.c;
+   ```
+2. Har jagah jahan `last.c` use hota tha as "current price", `livePrice` use karo:
+   - `buildTrade(htfA, ltfA, pools, livePrice, atr, inst.kind)`
+   - `zoneMitigated` check aur `dxyConfirms` calc me
+   - Final `plan.currentPrice = livePrice`
+3. Candle cache TTL shorten karo — 60s → 20s (LTF freshness ke liye), aur last candle ko `livePrice` se overwrite karo tail me taaki analysis mid-candle sahi ho.
 
-## Files to touch
+### B) `src/lib/analysis/engine.ts` → `scoreSetup` (soft-veto refactor)
 
-- `src/lib/analysis/engine.ts` — rewrite `buildTrade` per rules above (single function, ~60 lines).
-- `src/lib/gold-analysis.functions.ts` — return the new `tp1/tp2/tp3` fields alongside the existing `tp` so nothing else breaks.
-- `src/routes/signal.tsx` + `src/components/SignalCard.tsx` — display TP1/TP2/TP3 partials (small UI tweak, optional this pass).
+1. **Hard-cap ki jagah per-veto deduction** — 40 me pin karna galat hai. Change:
+   ```
+   if (vetos.length > 0) score = Math.max(30, score - vetos.length * 15);
+   ```
+   Multiple vetoes hone pe hi grade C rahe, single veto sirf downgrade kare.
+2. **`no_sweep` veto ko sirf metal/forex/index tak limit karo** — crypto 24/7 hai, HTF Swing High/Low sweep detection unreliable hai. Crypto ke liye skip.
+3. **`rr_low` threshold 1.8 → 1.5** — engine already 2R floor karta hai, 1.8 se strict double-penalty hai.
+4. **Unknown factors ko fail count na karo** — jab `smtDivergence == null` ya `dxyConfirms == null` ya `structureQuality == null` ho, us factor ko `f` list me push hi na karo (weight se drop). Denominator natural re-normalize ho jayega.
+5. Score floor grade thresholds waise hi rahenge (A+ ≥ 88, A ≥ 75, B ≥ 60).
+
+### C) `src/lib/analysis/engine.ts` → `buildLiquidityPools`
+
+HTF Swing High/Low pools ko dynamic swept check do (currently hard-coded `swept: false`):
+```
+swept: ltf.slice(-12).some(c => c.h >= sh - tol),  // for high
+swept: ltf.slice(-12).some(c => c.l <= sl + tol),  // for low
+```
+Isse `no_sweep` veto sirf actually-unswept setups pe hi fire hoga.
+
+---
+
+## Files to change
+
+- `src/lib/gold-analysis.functions.ts` — inject live tick into `computeSignalPlan`, propagate `livePrice`, shorten candle cache TTL.
+- `src/lib/analysis/engine.ts` — soften veto scoring, drop unknown factors from denominator, dynamic swept flags on HTF swing pools.
 
 ## Not changing
-- Scoring/veto system (`scoreSetup`) — still works, just receives better inputs.
-- Trade-journal auto-tracking, alerts, or database schema.
-- The AI narration layer.
 
-Approve and I'll implement the engine rewrite plus the minimal call-site + card updates.
+- UI (`signal.tsx`, `SignalCard`) — koi visual change nahi, sirf sahi numbers milenge.
+- `buildTrade` core logic (SL/TP formulas, per-asset risk profile) — already sahi hai, sirf sahi `lastPrice` chahiye.
+- Database, credits, AI narration prompts — untouched.
+
+## Expected result
+
+- Signal me price real live market ke andar 1–3 seconds fresh hoga.
+- Confidence har pair pe alag alag aayega — good setups 70–90%, weak setups 45–65%, only true rejects 30–40%.
+- Entry/SL/TP live price ke around calculate honge, stale $10–$15 offset khatam.
+
+Approve karo, ma implement karta ho.

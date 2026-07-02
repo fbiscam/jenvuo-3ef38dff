@@ -152,7 +152,7 @@ export function resolveInstrument(input: string): ResolvedInstrument {
 }
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 60_000;
+const CACHE_TTL = 20_000;
 
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
@@ -830,13 +830,23 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
 
     const inst = resolveInstrument(data.symbol);
 
-    const [htfRaw, ltfRaw, news, h4Raw, m5Raw, dxyRaw] = await Promise.all([
+    const [htfRaw, ltfRaw, news, h4Raw, m5Raw, dxyRaw, liveTick] = await Promise.all([
       fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "15m").catch(() => [] as Candle[]),
       inst.needsUsdNews ? fetchGoldNewsInline() : Promise.resolve([] as NewsItem[]),
       fetchInstrumentCandles(inst, "4h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "5m").catch(() => [] as Candle[]),
       inst.needsUsdNews ? fetchInstrumentCandles(resolveInstrument("DXY"), "1h").catch(() => [] as Candle[]) : Promise.resolve([] as Candle[]),
+      (async () => {
+        if (inst.binanceSymbols?.length) {
+          const q = await fetchBinanceQuote(inst.binanceSymbols).catch(() => null);
+          if (q) return q;
+        }
+        if (inst.yahooSymbols?.length) {
+          return await fetchYahooQuote(inst.yahooSymbols).catch(() => null);
+        }
+        return null;
+      })(),
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
       throw new Error(`Live ${inst.display} feed unavailable. Try again in a moment.`);
@@ -844,6 +854,21 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
     const last = ltf[ltf.length - 1];
+    // Prefer real-time tick over last-candle close for all downstream analysis.
+    const livePrice = liveTick?.price && isFinite(liveTick.price) ? liveTick.price : last.c;
+    // Overlay the live price onto the last candle so mid-candle analysis uses fresh data.
+    if (livePrice !== last.c) {
+      // Mutate in place so `last` (a reference into ltf) also reflects the fresh price.
+      last.c = livePrice;
+      last.h = Math.max(last.h, livePrice);
+      last.l = Math.min(last.l, livePrice);
+      if (htf.length) {
+        const lh = htf[htf.length - 1];
+        lh.c = livePrice;
+        lh.h = Math.max(lh.h, livePrice);
+        lh.l = Math.min(lh.l, livePrice);
+      }
+    }
 
     const { session, killzone } = detectKillzone(new Date());
 
