@@ -191,7 +191,7 @@ function inferInstrumentFromText(text: string): string {
 }
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 5_000;
+const CACHE_TTL = 12_000;
 
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
