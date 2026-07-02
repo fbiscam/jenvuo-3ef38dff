@@ -1090,7 +1090,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const breakers = detectBreakerBlocks(ltf, htfStructureEvents.length ? htfStructureEvents : []);
     const ifvgs = detectIFVGs(ltf, ltfA.fvgs);
 
-    const built = buildTrade(htfA, ltfA, pools, last.c, atr);
+    const built = buildTrade(htfA, ltfA, pools, last.c, atr, inst.kind as any);
 
     // Check if the chosen entry zone has already been mitigated
     const zoneMitigated = built.zone
