@@ -52,17 +52,25 @@ export function useLivePriceStream(
     let pollId: ReturnType<typeof setInterval> | null = null;
     let raf: number | null = null;
 
+    // Reset refs on symbol change so first tick from the new market renders
+    // immediately rather than being lerped from the previous symbol's price.
+    targetRef.current = null;
+    displayRef.current = null;
+
     const pushTick = (p: number, tMs: number) => {
       if (!Number.isFinite(p)) return;
+      const prev = displayRef.current;
       targetRef.current = p;
-      if (displayRef.current == null) {
+      // Snap (skip smoothing) on first tick or on large jumps (>0.25%) so the
+      // header stays visibly in sync with the market instead of easing behind.
+      if (prev == null || Math.abs(p - prev) / p > 0.0025) {
         displayRef.current = p;
         setPrice(p);
       }
       onTickRef.current?.(p, tMs);
     };
 
-    const startPolling = () => {
+    const startPolling = (intervalMs: number) => {
       if (pollId) return;
       const tick = async () => {
         try {
@@ -72,7 +80,7 @@ export function useLivePriceStream(
         } catch { /* keep last */ }
       };
       void tick();
-      pollId = setInterval(tick, 2000);
+      pollId = setInterval(tick, intervalMs);
     };
 
     const upper = symbol.toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -88,15 +96,18 @@ export function useLivePriceStream(
           } catch { /* ignore */ }
         };
         ws.onerror = () => { /* fall through to onclose */ };
-        ws.onclose = () => { if (!stopped) startPolling(); };
+        ws.onclose = () => { if (!stopped) startPolling(1500); };
       } catch {
-        startPolling();
+        startPolling(1500);
       }
     } else {
-      startPolling();
+      // Non-crypto (forex / metals / indices / stocks): poll fast (1s) so the
+      // ticker feels live rather than lagging behind broker prices.
+      startPolling(1000);
     }
 
-    // RAF smoother — lerp displayed price toward target each frame.
+    // RAF smoother — lerp displayed price toward target each frame for small
+    // moves. Large jumps are snapped in pushTick above.
     const loop = () => {
       if (stopped) return;
       const target = targetRef.current;
@@ -104,8 +115,9 @@ export function useLivePriceStream(
       if (target != null && cur != null) {
         const diff = target - cur;
         if (Math.abs(diff) > Math.abs(target) * 1e-7) {
-          const next = cur + diff * 0.2;
-          const settled = Math.abs(target - next) < Math.abs(target) * 1e-7;
+          // Faster catch-up (was 0.2) so display doesn't visibly lag ticks.
+          const next = cur + diff * 0.5;
+          const settled = Math.abs(target - next) < Math.abs(target) * 1e-6;
           displayRef.current = settled ? target : next;
           setPrice(displayRef.current);
         }
@@ -122,6 +134,7 @@ export function useLivePriceStream(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol]);
+
 
   return price;
 }
