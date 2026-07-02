@@ -239,8 +239,10 @@ export function killzoneOf(d = new Date()): { session: string; killzone: string;
 export type BuiltTrade = {
   direction: "BUY" | "SELL" | "WAIT";
   entry: number; sl: number; tp: number; rr: number;
+  tp1?: number; tp2?: number; tp3?: number;
   zone: { kind: "OB" | "FVG"; priceLow: number; priceHigh: number } | null;
   reason: string;
+  notes?: string[];
 };
 
 export function buildTrade(
@@ -259,13 +261,15 @@ export function buildTrade(
     return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF/LTF disagree — no clean trend." };
   }
 
-  // Pick best zone: unmitigated LTF FVG/OB on the trade side, closest to price, on correct side
+  // Pick best zone: UNMITIGATED LTF FVG/OB on the trade side, closest to price, on correct side
   const candidates: Array<{ kind: "OB" | "FVG"; priceLow: number; priceHigh: number; dist: number }> = [];
   for (const f of ltf.fvgs) {
+    if (f.mitigated) continue;
     const ok = dir === "BUY" ? f.kind === "bullish" && f.priceHigh <= lastPrice : f.kind === "bearish" && f.priceLow >= lastPrice;
     if (ok) candidates.push({ kind: "FVG", priceLow: f.priceLow, priceHigh: f.priceHigh, dist: Math.abs(lastPrice - (f.priceLow + f.priceHigh) / 2) });
   }
   for (const o of ltf.obs) {
+    if (o.mitigated) continue;
     const ok = dir === "BUY" ? o.kind === "demand" && o.priceHigh <= lastPrice : o.kind === "supply" && o.priceLow >= lastPrice;
     if (ok) candidates.push({ kind: "OB", priceLow: o.priceLow, priceHigh: o.priceHigh, dist: Math.abs(lastPrice - (o.priceLow + o.priceHigh) / 2) });
   }
@@ -273,36 +277,86 @@ export function buildTrade(
   const zone = candidates[0] ?? null;
 
   if (!zone) {
-    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "No unmitigated OB/FVG aligned with bias." };
+    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "No fresh (unmitigated) OB/FVG aligned with bias." };
+  }
+
+  const notes: string[] = [];
+
+  // Reject "chasing price": zone is too far from current price to be actionable (>3% away)
+  const zoneMid = (zone.priceLow + zone.priceHigh) / 2;
+  const distPct = Math.abs(lastPrice - zoneMid) / lastPrice;
+  if (distPct > 0.03) {
+    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest fresh zone is ${(distPct * 100).toFixed(1)}% from price — wait for retracement.` };
   }
 
   // Entry = zone midpoint
-  const entry = (zone.priceLow + zone.priceHigh) / 2;
-  // SL = max(0.08% of price, 0.2 * ATR) beyond zone extreme — volatility-adaptive
-  const pctBuffer = lastPrice * 0.0008;
-  const atrBuffer = atr && atr > 0 ? atr * 0.2 : 0;
-  const buffer = Math.max(pctBuffer, atrBuffer);
-  const sl = dir === "BUY" ? zone.priceLow - buffer : zone.priceHigh + buffer;
-  // TP = nearest unswept opposing liquidity pool
+  const entry = zoneMid;
+  const zoneHeight = Math.abs(zone.priceHigh - zone.priceLow);
+
+  // SL buffer — widened to survive normal wick noise on volatile assets like Gold.
+  //   Old: max(0.08% × price, 0.20 × ATR)   → far too tight on XAU (~$3 buffer)
+  //   New: max(0.20% × price, 0.75 × ATR, 0.5 × zoneHeight)
+  const pctBuffer = lastPrice * 0.002;
+  const atrBuffer = atr && atr > 0 ? atr * 0.75 : 0;
+  const zoneBuffer = zoneHeight * 0.5;
+  const buffer = Math.max(pctBuffer, atrBuffer, zoneBuffer);
+  let sl = dir === "BUY" ? zone.priceLow - buffer : zone.priceHigh + buffer;
+
+  // Enforce a MINIMUM risk distance of 0.25% of price. Prevents "$3 SL" tickets that
+  // get wicked out on any normal candle.
+  const minRisk = lastPrice * 0.0025;
+  let risk = Math.abs(entry - sl);
+  if (risk < minRisk) {
+    sl = dir === "BUY" ? entry - minRisk : entry + minRisk;
+    risk = minRisk;
+    notes.push("SL widened to minimum safe distance");
+  }
+
+  // TP1/2/3 based on R-multiples first, so partials always exist.
+  const tp1 = dir === "BUY" ? entry + risk * 1 : entry - risk * 1;
+  const tp2 = dir === "BUY" ? entry + risk * 2 : entry - risk * 2;
+
+  // Final TP = nearest unswept opposing liquidity pool, but CAPPED at 3R and floored at 2R.
   const targetSide: "buy" | "sell" = dir === "BUY" ? "buy" : "sell";
-  const targets = pools
+  const liquidityTargets = pools
     .filter(p => p.side === targetSide && !p.swept && (dir === "BUY" ? p.price > entry : p.price < entry))
     .sort((a, b) => Math.abs(a.price - entry) - Math.abs(b.price - entry));
-  let tp = targets[0]?.price ?? (dir === "BUY" ? entry + (entry - sl) * 3 : entry - (sl - entry) * 3);
-  let risk = Math.abs(entry - sl);
-  let reward = Math.abs(tp - entry);
-  // Enforce minimum 1:2; if liquidity target too close, extend to 1:3
-  if (risk > 0 && reward / risk < 2) {
-    tp = dir === "BUY" ? entry + risk * 3 : entry - risk * 3;
-    reward = Math.abs(tp - entry);
+  const nearestLiquidity = liquidityTargets[0]?.price;
+
+  const rMax = dir === "BUY" ? entry + risk * 3 : entry - risk * 3;
+  const rMin = dir === "BUY" ? entry + risk * 2 : entry - risk * 2;
+
+  let tp: number;
+  if (nearestLiquidity == null) {
+    tp = rMax;
+  } else {
+    // Use liquidity target only if it lies between 2R and 3R (realistic).
+    const distR = Math.abs(nearestLiquidity - entry) / risk;
+    if (distR < 2) {
+      tp = rMin;
+      notes.push("TP extended to 2R (liquidity target too close)");
+    } else if (distR > 3) {
+      tp = rMax;
+      notes.push("TP capped at 3R (liquidity target too far)");
+    } else {
+      tp = nearestLiquidity;
+    }
   }
+
+  const reward = Math.abs(tp - entry);
   const rr = risk > 0 ? reward / risk : 0;
+  const tp3 = tp;
 
   return {
-    direction: dir, entry, sl, tp, rr, zone: { kind: zone.kind, priceLow: zone.priceLow, priceHigh: zone.priceHigh },
-    reason: `${dir} from ${zone.kind} @ ${entry.toFixed(2)}, SL beyond zone, TP at ${targets[0]?.label ?? "1:3 R extension"}.`,
+    direction: dir,
+    entry, sl, tp, rr,
+    tp1, tp2, tp3,
+    zone: { kind: zone.kind, priceLow: zone.priceLow, priceHigh: zone.priceHigh },
+    reason: `${dir} from fresh ${zone.kind} @ ${entry.toFixed(2)}, SL beyond zone (${buffer.toFixed(2)} buffer), TP ${liquidityTargets[0]?.label ? "at " + liquidityTargets[0].label : "at " + rr.toFixed(1) + "R"}.`,
+    notes: notes.length ? notes : undefined,
   };
 }
+
 
 // ---------- Score (asset-aware weighted + hard-veto gates) ----------
 

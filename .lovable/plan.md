@@ -1,40 +1,56 @@
-## New Page: Killzones Reference (`/killzones`)
+## Signal SL/TP/Entry Issues — Diagnosis
 
-A single reference page that lists every supported instrument (Metals, FX, JPY pairs, Commodities FX, Indices, Crypto) with its killzone windows shown in both **UTC** and the user's **local time**, plus a live "IN KILLZONE / OUTSIDE" status badge that updates every second.
+I compared the engine code (`src/lib/analysis/engine.ts` → `buildTrade`) with the last real trades logged in your database. Concrete problems:
 
-### Data source
-Reuse the existing `PAIR_PROFILES` and `killzoneForPair()` helpers in `src/lib/analysis/engine.ts` — no new backend, no new tables. All 15+ pairs already have killzone metadata (name, startUTC, endUTC, prime session, correlated symbol).
+### 1. Stop-Loss buffer is too tight for Gold
+Current formula: `SL buffer = max(0.08% of price, 0.2 × ATR)`.
+- On XAU at ~$4000 that's only ~$3.20 beyond the zone.
+- Real recent losses had SL just $3.5–$6.6 from entry — stopped by normal noise/wick.
+- Gold's typical 15M wick is $4–$12, so tight SL guarantees frequent stop-outs.
 
-### Page layout
-- Header: matches signal page aesthetic (white bg, JetBrains Mono accents)
-- Live clock strip at top: current **UTC time** + user's **Local time + timezone**
-- Search/filter bar (search by symbol) + category tabs: All · Metals · Forex · JPY · Indices · Crypto
-- Grouped sections by asset class, each rendered as a table/grid with columns:
-  - Symbol (e.g. XAUUSD — Gold)
-  - Killzones (badge list, e.g. "London 07:00–10:00 UTC · 12:00–15:00 PKT")
-  - Prime Session window
-  - Live Status (green "IN KILLZONE — London" / grey "Outside — next in 2h 14m")
-  - Country/Region tag (London / New York / Tokyo / Sydney)
-- Row click → navigates to `/signal?symbol=XXX` to analyze that pair
+### 2. Take-Profit picks the nearest liquidity pool with no distance cap
+- Every recent trade has TP = **3944.57** (same static weekly liquidity level ~$50 away), regardless of entry.
+- Result: reported R:R of **4.87, 6.65, 8.97, 18.30** — mathematically valid but unrealistic to hit before invalidation.
+- Better UX: cap TP at the closer of (nearest opposing pool) vs (fixed R multiple like 1:3–1:5), and split into TP1/TP2/TP3.
 
-### Time display
-Each killzone shows **two** time strings:
-1. `07:00–10:00 UTC` (canonical)
-2. `12:00–15:00 [user's short timezone, e.g. PKT/EST/IST]` (converted from UTC using `Intl.DateTimeFormat`)
+### 3. Entry can be right on top of current price
+`entry = zone midpoint` but there's no check for "already tagged" or "too close to price."
+- The mitigation check (`zoneMitigated`) is computed but not used to force `WAIT` — a chased zone still becomes a live signal.
+- No minimum distance-from-price rule → engine can issue a signal where entry = market, giving a tiny buffer before SL.
 
-Countdown to next killzone computed once per second via `setInterval`.
+### 4. No sanity guardrails
+- No min risk-distance (e.g., SL must be ≥ 0.25% of price OR ≥ 0.5×ATR).
+- No max R:R cap (currently unbounded — misleading confidence).
+- No "wait for retracement" mode when price is far from the zone (limit-order handling exists in UI but engine treats midpoint as market).
 
-### Navigation
-- Add "Killzones" link in the signal page header (next to Back button)
-- Add link in dashboard sidebar / footer
+---
 
-### SEO
-- `head()` with title "Killzone Times for Gold, FX, Crypto & Indices — Jenvu"
-- Meta description, og tags
-- Add `/killzones` to `public/sitemap.xml`
+## Proposed Fix
 
-### Files
-- **New**: `src/routes/killzones.tsx`
-- **Edit**: `src/routes/signal.tsx` (add nav link), `public/sitemap.xml` (add URL)
+Change `buildTrade` in `src/lib/analysis/engine.ts`:
 
-No database migration, no server function needed — fully client-rendered from the existing engine metadata.
+1. **SL buffer** — widen to `max(0.20% × price, 0.75 × ATR, 0.5 × zone height)`. For XAU that's ≥$8, matching normal wick range.
+2. **Discard mitigated zones** — if `zoneMitigated === true` OR zone was tagged in last N candles, return `WAIT` with reason instead of trading it.
+3. **Entry sanity** —
+   - BUY: require `entry ≤ lastPrice − 0.10% × price` (limit below), or accept market only if inside a fresh unmitigated zone.
+   - Same, mirrored, for SELL.
+   - If neither holds → return `WAIT` ("chasing price").
+4. **TP logic** —
+   - Compute `tpLiquidity` (nearest unswept pool) and `tpR3 = entry ± 3R`.
+   - Final TP = whichever is **closer** (prevents 1:8+ fantasy trades).
+   - Emit **TP1 = 1R**, **TP2 = 2R**, **TP3 = min(tpLiquidity, entry±4R)** so the card shows realistic partials.
+5. **R:R clamp** — if computed RR > 5, cap TP to 5R and note "capped at 1:5".
+6. **Confidence downgrade** when any of the above fallback rules trigger (subtract 10–15 from score).
+
+## Files to touch
+
+- `src/lib/analysis/engine.ts` — rewrite `buildTrade` per rules above (single function, ~60 lines).
+- `src/lib/gold-analysis.functions.ts` — return the new `tp1/tp2/tp3` fields alongside the existing `tp` so nothing else breaks.
+- `src/routes/signal.tsx` + `src/components/SignalCard.tsx` — display TP1/TP2/TP3 partials (small UI tweak, optional this pass).
+
+## Not changing
+- Scoring/veto system (`scoreSetup`) — still works, just receives better inputs.
+- Trade-journal auto-tracking, alerts, or database schema.
+- The AI narration layer.
+
+Approve and I'll implement the engine rewrite plus the minimal call-site + card updates.
