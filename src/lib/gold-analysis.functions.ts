@@ -104,17 +104,21 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   if (/^XAU(USD)?$/.test(cleaned) || cleaned === "GOLD") {
     return {
       raw, key: "METAL:XAUUSD", display: "XAU/USD", kind: "metal", decimals: 2,
-      binanceSymbols: ["PAXGUSDT", "XAUTUSDT"],
-      yahooSymbols: ["GC=F", "XAUUSD=X"],
+      // Prefer Yahoo spot (XAU/USD) over COMEX futures (GC=F) — futures trade
+      // ~$5–15 above spot due to contango, which made the ticker look ahead of
+      // the real market. Skip Binance PAXG/XAUT here — they carry a premium
+      // vs spot and desync the header.
+      yahooSymbols: ["XAUUSD=X", "GC=F"],
       quote: "USD", needsUsdNews: true,
     };
   }
   if (/^XAG(USD)?$/.test(cleaned) || cleaned === "SILVER") {
     return {
       raw, key: "METAL:XAGUSD", display: "XAG/USD", kind: "metal", decimals: 3,
-      yahooSymbols: ["SI=F", "XAGUSD=X"], quote: "USD", needsUsdNews: true,
+      yahooSymbols: ["XAGUSD=X", "SI=F"], quote: "USD", needsUsdNews: true,
     };
   }
+
   if (INDEX_MAP[cleaned]) {
     const m = INDEX_MAP[cleaned];
     return {
