@@ -848,6 +848,28 @@ function SignalPage() {
                     <KV label="Stop" value={t.sl.toFixed(plan.instrument.decimals)} tone="bad" />
                     <KV label="Target" value={t.tp.toFixed(plan.instrument.decimals)} tone="good" />
                   </div>
+                  {(() => {
+                    if (!livePrice || !(isBuy || isSell)) return null;
+                    const driftPct = Math.abs(livePrice - t.entry) / livePrice;
+                    const kind = plan.instrument.kind;
+                    const threshold =
+                      kind === "crypto" ? 0.006 :
+                      kind === "metal"  ? 0.003 :
+                      kind === "forex"  ? 0.0015 :
+                                          0.004;
+                    if (driftPct < threshold) return null;
+                    const away = (driftPct * 100).toFixed(2);
+                    const isChase = (isBuy && livePrice > t.entry) || (isSell && livePrice < t.entry);
+                    return (
+                      <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
+                        <span className="mt-0.5">⚠</span>
+                        <span>
+                          Live price ({plan.instrument.kind === "crypto" ? "" : "$"}{livePrice.toFixed(plan.instrument.decimals)}) has drifted <b>{away}%</b> from entry ({plan.instrument.kind === "crypto" ? "" : "$"}{t.entry.toFixed(plan.instrument.decimals)}).
+                          {" "}{isChase ? "Do NOT chase — " : "Wait for a pullback into entry or "}re-analyze for a fresh plan.
+                        </span>
+                      </div>
+                    );
+                  })()}
                   <div className="w-full h-1 bg-zinc-100 rounded-full overflow-hidden">
                     <div
                       className={cn("h-full", isBuy ? "bg-emerald-500" : isSell ? "bg-rose-500" : "bg-zinc-400")}
