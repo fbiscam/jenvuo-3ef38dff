@@ -104,11 +104,12 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   if (/^XAU(USD)?$/.test(cleaned) || cleaned === "GOLD") {
     return {
       raw, key: "METAL:XAUUSD", display: "XAU/USD", kind: "metal", decimals: 2,
-      // Prefer Yahoo spot (XAU/USD) over COMEX futures (GC=F) — futures trade
-      // ~$5–15 above spot due to contango, which made the ticker look ahead of
-      // the real market. Skip Binance PAXG/XAUT here — they carry a premium
-      // vs spot and desync the header.
+      // Live price comes from fetchMetalSpotQuote (gold-api.com spot) — see
+      // getLiveTick / liveTickPromise. Yahoo XAUUSD=X often 429s and futures
+      // (GC=F) trade at contango premium, so keep Binance PAXG/XAUT as a
+      // candle fallback so structure analysis still runs when Yahoo is down.
       yahooSymbols: ["XAUUSD=X", "GC=F"],
+      binanceSymbols: ["PAXGUSDT", "XAUTUSDT"],
       quote: "USD", needsUsdNews: true,
     };
   }
