@@ -883,7 +883,20 @@ function SignalPage() {
                           notes: `Auto-logged from AI signal · Conf ${t.confidence}%${plan.confluences.length ? " · " + plan.confluences.slice(0, 3).join(" | ") : ""}`,
                         }).select("id").single();
                         setLogging(false);
-                        if (error || !data) { toast.error("Could not log trade"); return; }
+                        if (error || !data) {
+                          const msg = String(error?.message ?? "");
+                          const code = String((error as any)?.code ?? "");
+                          const isPerm = code === "42501" || /row-level security|permission denied|policy/i.test(msg);
+                          if (isPerm) {
+                            toast.error("Trade Journal is a paid feature", {
+                              description: "Upgrade to Pro or Elite to log and auto-track trades.",
+                              action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+                            });
+                          } else {
+                            toast.error("Could not log trade", { description: msg || "Please try again." });
+                          }
+                          return;
+                        }
                         journalRowIdRef.current = data.id;
                         setTradeLogged(true);
                         toast.success(
