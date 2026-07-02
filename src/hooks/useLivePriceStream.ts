@@ -20,12 +20,20 @@ const BINANCE_MAP: Record<string, string> = {
   TONUSDT: "tonusdt",
 };
 
+function binanceStreamFor(symbol: string): string | null {
+  const upper = symbol.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (BINANCE_MAP[upper]) return BINANCE_MAP[upper];
+  if (/^[A-Z0-9]{2,15}(USDT|USDC|BUSD)$/.test(upper)) return upper.toLowerCase();
+  if (/^[A-Z0-9]{2,15}USD$/.test(upper)) return `${upper.slice(0, -3)}USDT`.toLowerCase();
+  return null;
+}
+
 export type LiveTickHandler = (price: number, tMs: number) => void;
 
 /**
  * Streaming live price hook.
  *  - Crypto: Binance trade WebSocket (sub-second ticks).
- *  - Forex / Metals / Indices: fast polling (2s) of server `getLiveTick` as fallback.
+ *  - Forex / Metals / Indices / Stocks: fast polling (1s) of server `getLiveTick` as fallback.
  *  - Displays a smoothed price via requestAnimationFrame interpolation so the
  *    header updates look continuous rather than jumping every poll/tick.
  *
@@ -83,8 +91,7 @@ export function useLivePriceStream(
       pollId = setInterval(tick, intervalMs);
     };
 
-    const upper = symbol.toUpperCase().replace(/[^A-Z0-9]/g, "");
-    const stream = BINANCE_MAP[upper];
+    const stream = binanceStreamFor(symbol);
     if (stream && typeof WebSocket !== "undefined") {
       try {
         ws = new WebSocket(`wss://stream.binance.com:9443/ws/${stream}@trade`);
