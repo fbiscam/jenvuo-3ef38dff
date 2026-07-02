@@ -245,13 +245,28 @@ export type BuiltTrade = {
   notes?: string[];
 };
 
+// Per-asset risk profile. Each asset class has different typical wick sizes,
+// spread, and news volatility — using the same buffer for XAU and EURUSD is wrong.
+const RISK_PROFILE: Record<
+  "crypto" | "metal" | "forex" | "index" | "stock",
+  { pctBuffer: number; minRiskPct: number; atrMult: number; maxDistPct: number }
+> = {
+  crypto: { pctBuffer: 0.0030, minRiskPct: 0.0040, atrMult: 1.00, maxDistPct: 0.05 },
+  metal:  { pctBuffer: 0.0020, minRiskPct: 0.0025, atrMult: 0.75, maxDistPct: 0.03 },
+  forex:  { pctBuffer: 0.0008, minRiskPct: 0.0012, atrMult: 0.50, maxDistPct: 0.015 },
+  index:  { pctBuffer: 0.0015, minRiskPct: 0.0020, atrMult: 0.75, maxDistPct: 0.025 },
+  stock:  { pctBuffer: 0.0020, minRiskPct: 0.0030, atrMult: 0.75, maxDistPct: 0.03 },
+};
+
 export function buildTrade(
   htf: TFAnalysis,
   ltf: TFAnalysis,
   pools: LiquidityPool[],
   lastPrice: number,
   atr?: number, // optional ATR — enables volatility-adaptive SL buffer
+  assetKind: "crypto" | "metal" | "forex" | "index" | "stock" = "metal",
 ): BuiltTrade {
+  const profile = RISK_PROFILE[assetKind] ?? RISK_PROFILE.metal;
   // Direction from HTF + LTF agreement
   const dir: "BUY" | "SELL" | "WAIT" =
     htf.trend === "bullish" && (ltf.trend === "bullish" || ltf.trend === "ranging") ? "BUY" :
