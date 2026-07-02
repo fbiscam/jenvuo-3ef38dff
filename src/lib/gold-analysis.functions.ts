@@ -923,13 +923,7 @@ export const getMarketSnapshot = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
-    const quote = inst.kind === "metal"
-      ? await fetchMetalSpotQuote(inst).catch(() => null)
-      : inst.binanceSymbols?.length
-        ? await fetchBinanceQuote(inst.binanceSymbols).catch(() => null)
-        : inst.yahooSymbols?.length
-          ? await fetchYahooQuote(inst.yahooSymbols).catch(() => null)
-          : null;
+    const quote = await resolveLiveTick(inst).catch(() => null);
     // Use daily candles for a stable 24h reference price.
     const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
     let price: number | null = null;
