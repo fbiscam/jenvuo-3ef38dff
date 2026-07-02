@@ -191,7 +191,7 @@ function inferInstrumentFromText(text: string): string {
 }
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 5_000;
+const CACHE_TTL = 12_000;
 
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
@@ -823,6 +823,79 @@ async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick |
   }
 }
 
+// Real-time FX spot fallback when Yahoo 429s. exchangerate-api mirrors the
+// interbank mid-rate closely enough for entry/SL/TP snapping on major pairs.
+async function fetchFxSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | null> {
+  if (inst.kind !== "forex") return null;
+  const m = inst.key.match(/^FX:([A-Z]{3})([A-Z]{3})$/);
+  if (!m) return null;
+  const [, base, quote] = m;
+  try {
+    const res = await fetch(`https://open.er-api.com/v6/latest/${base}`, {
+      headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
+    });
+    if (!res.ok) return null;
+    const j: any = await res.json();
+    const rate = j?.rates?.[quote];
+    const p = typeof rate === "number" ? rate : parseFloat(rate);
+    if (!isFinite(p) || p <= 0) return null;
+    const tRaw = typeof j?.time_last_update_unix === "number" ? j.time_last_update_unix * 1000 : Date.now();
+    return { price: p, t: tRaw };
+  } catch {
+    return null;
+  }
+}
+
+// Real-time crypto fallback via Coinbase spot when Binance is blocked.
+async function fetchCoinbaseQuote(symbols: string[]): Promise<LiveTick | null> {
+  for (const sym of symbols) {
+    // Map "BTCUSDT" → "BTC-USD" (Coinbase uses USD, not USDT)
+    const m = sym.match(/^([A-Z0-9]{2,15})(USDT|USDC|USD)$/);
+    if (!m) continue;
+    const base = m[1];
+    try {
+      const res = await fetch(`https://api.coinbase.com/v2/prices/${base}-USD/spot`, {
+        headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
+      });
+      if (!res.ok) continue;
+      const j: any = await res.json();
+      const p = parseFloat(j?.data?.amount);
+      if (isFinite(p) && p > 0) return { price: p, t: Date.now() };
+    } catch { /* try next */ }
+  }
+  return null;
+}
+
+// Short-lived tick cache — coalesces bursts of parallel analysis requests so
+// we don't hammer upstream APIs (Yahoo especially) and hit 429s.
+const tickCache = new Map<string, { at: number; tick: LiveTick }>();
+const TICK_TTL = 2_500;
+
+async function resolveLiveTick(inst: ResolvedInstrument): Promise<LiveTick | null> {
+  const now = Date.now();
+  const cached = tickCache.get(inst.key);
+  if (cached && now - cached.at < TICK_TTL) return cached.tick;
+
+  const order: Array<() => Promise<LiveTick | null>> = [];
+  if (inst.kind === "metal") order.push(() => fetchMetalSpotQuote(inst));
+  if (inst.binanceSymbols?.length) order.push(() => fetchBinanceQuote(inst.binanceSymbols!));
+  if (inst.kind === "crypto" && inst.binanceSymbols?.length) order.push(() => fetchCoinbaseQuote(inst.binanceSymbols!));
+  if (inst.yahooSymbols?.length) order.push(() => fetchYahooQuote(inst.yahooSymbols!));
+  if (inst.kind === "forex") order.push(() => fetchFxSpotQuote(inst));
+
+  for (const f of order) {
+    try {
+      const q = await f();
+      if (q && isFinite(q.price) && q.price > 0) {
+        tickCache.set(inst.key, { at: now, tick: q });
+        return q;
+      }
+    } catch { /* try next */ }
+  }
+  return cached?.tick ?? null;
+}
+
+
 export const getLiveTick = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
     const obj = (d ?? {}) as { symbol?: string };
@@ -830,19 +903,9 @@ export const getLiveTick = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
-    // 1) Try real-time quote endpoints first (no cache, sub-second freshness).
-    if (inst.kind === "metal") {
-      const q = await fetchMetalSpotQuote(inst);
-      if (q) return q;
-    }
-    if (inst.binanceSymbols?.length) {
-      const q = await fetchBinanceQuote(inst.binanceSymbols);
-      if (q) return q;
-    }
-    if (inst.yahooSymbols?.length) {
-      const q = await fetchYahooQuote(inst.yahooSymbols);
-      if (q) return q;
-    }
+    // 1) Try real-time quote endpoints (asset-specific spot → cross-provider fallback).
+    const q = await resolveLiveTick(inst);
+    if (q) return q;
     // 2) Fallback to last candle close if both quote feeds fail / market closed.
     for (const tf of ["1m", "5m", "15m", "1h", "1d"]) {
       const candles = await fetchInstrumentCandles(inst, tf).catch(() => [] as Candle[]);
@@ -860,13 +923,7 @@ export const getMarketSnapshot = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
-    const quote = inst.kind === "metal"
-      ? await fetchMetalSpotQuote(inst).catch(() => null)
-      : inst.binanceSymbols?.length
-        ? await fetchBinanceQuote(inst.binanceSymbols).catch(() => null)
-        : inst.yahooSymbols?.length
-          ? await fetchYahooQuote(inst.yahooSymbols).catch(() => null)
-          : null;
+    const quote = await resolveLiveTick(inst).catch(() => null);
     // Use daily candles for a stable 24h reference price.
     const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
     let price: number | null = null;
@@ -943,20 +1000,7 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
 
     const inst = resolveInstrument(data.symbol);
 
-    const liveTickPromise = (async () => {
-      if (inst.kind === "metal") {
-        const q = await fetchMetalSpotQuote(inst).catch(() => null);
-        if (q) return q;
-      }
-      if (inst.binanceSymbols?.length) {
-        const q = await fetchBinanceQuote(inst.binanceSymbols).catch(() => null);
-        if (q) return q;
-      }
-      if (inst.yahooSymbols?.length) {
-        return await fetchYahooQuote(inst.yahooSymbols).catch(() => null);
-      }
-      return null;
-    })();
+    const liveTickPromise = resolveLiveTick(inst).catch(() => null);
 
     const [htfRaw, ltfRaw, news, h4Raw, m5Raw, dxyRaw, liveTick] = await Promise.all([
       fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
