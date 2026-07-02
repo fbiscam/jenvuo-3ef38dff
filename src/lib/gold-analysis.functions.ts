@@ -1179,6 +1179,8 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
     const inst = resolveInstrument(data.symbol);
 
     const liveTickPromise = resolveLiveTick(inst).catch(() => null);
+    const htfKey = `${inst.key}:1h`;
+    const ltfKey = `${inst.key}:15m`;
 
     const [htfRaw, ltfRaw, news, h4Raw, m5Raw, dxyRaw, liveTick] = await Promise.all([
       fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
@@ -1189,8 +1191,21 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
       inst.needsUsdNews ? fetchInstrumentCandles(resolveInstrument("DXY"), "1h").catch(() => [] as Candle[]) : Promise.resolve([] as Candle[]),
       liveTickPromise,
     ]);
-    if (htfRaw.length < 20 || ltfRaw.length < 20) {
-      throw new Error(`Live ${inst.display} feed unavailable. Try again in a moment.`);
+    const usedSyntheticCandles = syntheticCandleKeys.has(htfKey) || syntheticCandleKeys.has(ltfKey);
+    if (htfRaw.length < 20 || ltfRaw.length < 20 || usedSyntheticCandles) {
+      const fallbackPrice = liveTick?.price ?? htfRaw.at(-1)?.c ?? ltfRaw.at(-1)?.c ?? 0;
+      if (fallbackPrice > 0) {
+        return buildFeedFallbackPlan({
+          inst,
+          price: fallbackPrice,
+          htfRaw,
+          ltfRaw,
+          reason: usedSyntheticCandles
+            ? "Candle provider is delayed; quote-only fallback is active."
+            : "Not enough live candles returned yet.",
+        });
+      }
+      throw new Error(`Live ${inst.display} quote unavailable. Try again in a moment.`);
     }
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
