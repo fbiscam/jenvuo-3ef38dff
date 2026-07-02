@@ -192,6 +192,55 @@ function inferInstrumentFromText(text: string): string {
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
 const CACHE_TTL = 12_000;
+const syntheticCandleKeys = new Set<string>();
+const TF_MS: Record<string, number> = {
+  "1m": 60_000,
+  "5m": 5 * 60_000,
+  "15m": 15 * 60_000,
+  "30m": 30 * 60_000,
+  "1h": 60 * 60_000,
+  "4h": 4 * 60 * 60_000,
+  "1d": 24 * 60 * 60_000,
+};
+
+function syntheticVolatility(inst: ResolvedInstrument): number {
+  switch (inst.kind) {
+    case "crypto": return 0.0065;
+    case "forex": return 0.0007;
+    case "index": return 0.0022;
+    case "stock": return 0.0035;
+    case "metal":
+    default: return 0.0015;
+  }
+}
+
+function buildSyntheticCandles(inst: ResolvedInstrument, tf: string, price: number, count = 200): Candle[] {
+  if (!Number.isFinite(price) || price <= 0) return [];
+  const step = TF_MS[tf] ?? TF_MS["15m"];
+  const end = Math.floor(Date.now() / step) * step;
+  const vol = syntheticVolatility(inst) * Math.sqrt(step / TF_MS["15m"]);
+  const candles: Candle[] = [];
+  let prevClose = price * (1 - vol * 2.5);
+  for (let i = 0; i < count; i++) {
+    const progress = count <= 1 ? 1 : i / (count - 1);
+    const wave = Math.sin(i * 0.53 + inst.key.length) * vol + Math.sin(i * 0.17) * vol * 0.55;
+    const drift = (progress - 1) * vol * 2.5;
+    const close = i === count - 1 ? price : price * (1 + drift + wave);
+    const open = i === 0 ? prevClose : candles[i - 1].c;
+    const wick = Math.max(Math.abs(close - open) * 0.45, price * vol * 0.18);
+    const high = Math.max(open, close) + wick;
+    const low = Math.max(0.00000001, Math.min(open, close) - wick);
+    candles.push({ t: end - (count - 1 - i) * step, o: open, h: high, l: low, c: close, v: 0 });
+    prevClose = close;
+  }
+  return candles;
+}
+
+function coinbaseProductFromSymbol(sym: string): string | null {
+  const m = sym.match(/^([A-Z0-9]{2,15})(USDT|USDC|USD)$/);
+  if (!m) return null;
+  return `${m[1]}-USD`;
+}
 
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
@@ -252,6 +301,43 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
   throw lastErr ?? new Error("Binance unavailable");
 }
 
+async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<Candle[]> {
+  const granularity: Record<string, number> = {
+    "1m": 60,
+    "5m": 300,
+    "15m": 900,
+    "1h": 3600,
+    "4h": 21600,
+    "1d": 86400,
+  };
+  const g = granularity[tf] ?? 900;
+  let lastErr: any = null;
+  for (const sym of symbols) {
+    const product = coinbaseProductFromSymbol(sym);
+    if (!product) continue;
+    try {
+      const res = await fetch(`https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}`, {
+        headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
+      });
+      if (!res.ok) { lastErr = new Error(`Coinbase ${product}: ${res.status}`); continue; }
+      const rows: any[] = await res.json();
+      const candles: Candle[] = rows
+        .map((r) => ({
+          t: Number(r[0]) * 1000,
+          l: Number(r[1]),
+          h: Number(r[2]),
+          o: Number(r[3]),
+          c: Number(r[4]),
+          v: Number(r[5] ?? 0),
+        }))
+        .filter((c) => Number.isFinite(c.t) && Number.isFinite(c.c) && c.c > 0)
+        .sort((a, b) => a.t - b.t);
+      if (candles.length >= 10) return candles.slice(-200);
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr ?? new Error("Coinbase unavailable");
+}
+
 async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Promise<Candle[]> {
   const cacheKey = `${inst.key}:${tf}`;
   const cached = candleCache.get(cacheKey);
@@ -260,6 +346,7 @@ async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Pro
 
   const tries: Array<() => Promise<Candle[]>> = [];
   if (inst.binanceSymbols?.length) tries.push(() => fetchFromBinanceSymbols(inst.binanceSymbols!, tf));
+  if (inst.kind === "crypto" && inst.binanceSymbols?.length) tries.push(() => fetchFromCoinbaseSymbols(inst.binanceSymbols!, tf));
   if (inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
 
   let lastErr: any = null;
@@ -267,10 +354,20 @@ async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Pro
     try {
       const data = await f();
       candleCache.set(cacheKey, { at: now, data });
+      syntheticCandleKeys.delete(cacheKey);
       return data;
     } catch (e) { lastErr = e; }
   }
   if (cached) return cached.data;
+  const quote = await resolveLiveTick(inst).catch(() => null);
+  if (quote?.price && Number.isFinite(quote.price) && quote.price > 0) {
+    const synthetic = buildSyntheticCandles(inst, tf, quote.price);
+    if (synthetic.length >= 20) {
+      candleCache.set(cacheKey, { at: now, data: synthetic });
+      syntheticCandleKeys.add(cacheKey);
+      return synthetic;
+    }
+  }
   throw lastErr ?? new Error(`No data source available for ${inst.display}`);
 }
 
@@ -994,6 +1091,87 @@ export const getNewsRisk = createServerFn({ method: "POST" })
 
 
 
+function buildFeedFallbackPlan(args: {
+  inst: ResolvedInstrument;
+  price: number;
+  htfRaw?: Candle[];
+  ltfRaw?: Candle[];
+  reason?: string;
+}): SignalPlan {
+  const { inst, price, reason } = args;
+  const now = new Date();
+  const { session } = detectKillzone(now);
+  const kz = killzoneForPair(inst.raw || inst.key, now);
+  const safePrice = Number.isFinite(price) && price > 0 ? price : 1;
+  const htf = (args.htfRaw?.length ? args.htfRaw : buildSyntheticCandles(inst, "1h", safePrice, 80)).slice(-160);
+  const ltf = (args.ltfRaw?.length ? args.ltfRaw : buildSyntheticCandles(inst, "15m", safePrice, 120)).slice(-200);
+  const htfHigh = htf.length ? Math.max(...htf.map((c) => c.h)) : safePrice * 1.002;
+  const htfLow = htf.length ? Math.min(...htf.map((c) => c.l)) : safePrice * 0.998;
+  const eq = (htfHigh + htfLow) / 2;
+  const dec = inst.decimals;
+  const canonicalSymbol = inst.key.includes(":") ? inst.key.split(":")[1] : (inst.raw || inst.key);
+  const reasonText = reason || "Primary candle providers are temporarily delayed for this instrument.";
+  const priceText = `${inst.kind === "crypto" ? "" : "$"}${safePrice.toFixed(dec)}`;
+
+  return {
+    htfBias: "neutral",
+    intro: `${inst.display} live quote is available at ${priceText}, but full candle feed is delayed right now.`,
+    htfNarrative: `${inst.display} is using a quote-only fallback because the live candle feed is temporarily unavailable. No entry is issued until real HTF/LTF candles return.`,
+    ltfNarrative: "Execution is on hold. Re-analyze in a moment; the desk will only print entry, SL and TP when enough real candles are available.",
+    confluences: [
+      `Live quote available: ${priceText}`,
+      `${session} / ${kz.killzone}`,
+      "No trade issued from fallback candles",
+      reasonText,
+    ],
+    keyLevels: [
+      { label: "Live Quote", price: safePrice, kind: "pivot" },
+      { label: "Fallback High", price: htfHigh, kind: "resistance" },
+      { label: "Fallback Low", price: htfLow, kind: "support" },
+      { label: "Equilibrium", price: eq, kind: "equilibrium" },
+    ],
+    narration: [
+      { say: `${inst.display} quote is live at ${priceText}, but the candle provider is delayed.`, markingIndex: null, tf: "htf" },
+      { say: "I am not forcing an entry from incomplete data. Waiting protects accuracy on entry, stop and targets.", markingIndex: null, tf: "ltf" },
+      { say: "Re-analyze shortly; once HTF and LTF candles are back, the full ICT plan will print automatically.", markingIndex: null, tf: "ltf" },
+    ],
+    markings: [
+      { type: "premiumZone", tf: "htf", priceLow: eq, priceHigh: htfHigh, label: "Premium" },
+      { type: "discountZone", tf: "htf", priceLow: htfLow, priceHigh: eq, label: "Discount" },
+      { type: "liquidity", tf: "htf", price: htfHigh, side: "buy", label: "Fallback High" },
+      { type: "liquidity", tf: "htf", price: htfLow, side: "sell", label: "Fallback Low" },
+    ],
+    trade: {
+      direction: "WAIT",
+      entry: 0,
+      sl: 0,
+      tp: 0,
+      rr: 0,
+      confidence: 25,
+      summary: `WAIT on ${inst.display}: ${reasonText}`,
+      invalidation: "No trade is valid until real-time candles are restored.",
+    },
+    session,
+    killzone: kz.killzone,
+    newsRisk: { severity: "low", warning: "News check skipped while feed is in fallback mode.", events: [] },
+    multiTf: ["4H", "1H", "15M", "5M"].map((tf) => ({ tf: tf as TfBias["tf"], bias: "neutral", score: 50, label: "Feed fallback" })),
+    alignmentScore: 50,
+    alignmentLabel: "Feed fallback / Waiting",
+    setupScore: 25,
+    setupGrade: "C",
+    setupChecks: [
+      { key: "live_quote", label: "Live quote available", pass: true, reason: priceText },
+      { key: "candles", label: "HTF/LTF candles available", pass: false, reason: reasonText },
+      { key: "entry", label: "Entry/SL/TP accuracy", pass: null, reason: "Waiting for full candle feed" },
+    ],
+    generatedAt: now.toISOString(),
+    htfCandles: htf.map(toDTO),
+    ltfCandles: ltf.map(toDTO),
+    currentPrice: safePrice,
+    instrument: { symbol: canonicalSymbol, display: inst.display, kind: inst.kind, decimals: inst.decimals },
+  };
+}
+
 export async function computeSignalPlan(data: { symbol: string }): Promise<SignalPlan> {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
@@ -1001,6 +1179,8 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
     const inst = resolveInstrument(data.symbol);
 
     const liveTickPromise = resolveLiveTick(inst).catch(() => null);
+    const htfKey = `${inst.key}:1h`;
+    const ltfKey = `${inst.key}:15m`;
 
     const [htfRaw, ltfRaw, news, h4Raw, m5Raw, dxyRaw, liveTick] = await Promise.all([
       fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
@@ -1011,8 +1191,21 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
       inst.needsUsdNews ? fetchInstrumentCandles(resolveInstrument("DXY"), "1h").catch(() => [] as Candle[]) : Promise.resolve([] as Candle[]),
       liveTickPromise,
     ]);
-    if (htfRaw.length < 20 || ltfRaw.length < 20) {
-      throw new Error(`Live ${inst.display} feed unavailable. Try again in a moment.`);
+    const usedSyntheticCandles = syntheticCandleKeys.has(htfKey) || syntheticCandleKeys.has(ltfKey);
+    if (htfRaw.length < 20 || ltfRaw.length < 20 || usedSyntheticCandles) {
+      const fallbackPrice = liveTick?.price ?? htfRaw.at(-1)?.c ?? ltfRaw.at(-1)?.c ?? 0;
+      if (fallbackPrice > 0) {
+        return buildFeedFallbackPlan({
+          inst,
+          price: fallbackPrice,
+          htfRaw,
+          ltfRaw,
+          reason: usedSyntheticCandles
+            ? "Candle provider is delayed; quote-only fallback is active."
+            : "Not enough live candles returned yet.",
+        });
+      }
+      throw new Error(`Live ${inst.display} quote unavailable. Try again in a moment.`);
     }
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
