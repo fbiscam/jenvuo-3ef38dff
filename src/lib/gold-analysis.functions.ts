@@ -903,19 +903,9 @@ export const getLiveTick = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
-    // 1) Try real-time quote endpoints first (no cache, sub-second freshness).
-    if (inst.kind === "metal") {
-      const q = await fetchMetalSpotQuote(inst);
-      if (q) return q;
-    }
-    if (inst.binanceSymbols?.length) {
-      const q = await fetchBinanceQuote(inst.binanceSymbols);
-      if (q) return q;
-    }
-    if (inst.yahooSymbols?.length) {
-      const q = await fetchYahooQuote(inst.yahooSymbols);
-      if (q) return q;
-    }
+    // 1) Try real-time quote endpoints (asset-specific spot → cross-provider fallback).
+    const q = await resolveLiveTick(inst);
+    if (q) return q;
     // 2) Fallback to last candle close if both quote feeds fail / market closed.
     for (const tf of ["1m", "5m", "15m", "1h", "1d"]) {
       const candles = await fetchInstrumentCandles(inst, tf).catch(() => [] as Candle[]);
