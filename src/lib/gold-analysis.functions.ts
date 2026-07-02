@@ -166,6 +166,29 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   return resolveInstrument("XAUUSD");
 }
 
+function inferInstrumentFromText(text: string): string {
+  const q = String(text || "").toUpperCase();
+  const explicit = q.match(/\$([A-Z]{2,6})\b/)?.[1];
+  if (explicit) return explicit;
+  const candidates = [
+    "XAUUSD", "XAGUSD", "GOLD", "SILVER", "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT",
+    "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "NZDUSD", "USDCAD", "EURJPY", "GBPJPY",
+    "NAS100", "US100", "SPX500", "US500", "US30", "DXY", "AAPL", "TSLA", "NVDA", "MSFT", "AMZN", "META",
+  ];
+  for (const c of candidates) {
+    if (new RegExp(`\\b${c}\\b`).test(q)) return c;
+  }
+  const fx = q.match(/\b([A-Z]{3})\/?([A-Z]{3})\b/);
+  if (fx && G10_FX.has(fx[1]) && G10_FX.has(fx[2])) return `${fx[1]}${fx[2]}`;
+  const crypto = q.match(/\b([A-Z0-9]{2,15})(USDT|USDC|BUSD|USD)\b/);
+  if (crypto) return `${crypto[1]}${crypto[2]}`;
+  const named = q.match(/\b(BTC|BITCOIN|ETH|ETHEREUM|SOL|SOLANA|XRP|DOGE|BNB|ADA|AVAX|LINK|DOT|LTC|TON|PEPE|SHIB)\b/);
+  if (named) return named[1];
+  const stock = q.match(/\b([A-Z]{2,6})\s+(STOCK|SHARE|EQUITY)\b/);
+  if (stock) return stock[1];
+  return "XAUUSD";
+}
+
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
 const CACHE_TTL = 20_000;
 
@@ -257,6 +280,37 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 async function _analyzeGoldCompute(data: { timeframe: string; query: string }): Promise<GoldSignal> {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+
+    const wantsTradingSetup = /\b(setup|signal|entry|buy|sell|long|short|trade|analy[sz]e|analysis|bias|tp|sl|stop\s*loss|take\s*profit|gold|xau|chart|trend|market|price|level|zone|fvg|ob|order\s*block|liquidity|bos|choch|smc|ict|killzone|scalp|swing|stock|coin|crypto|forex|pair)\b/i.test(data.query);
+    if (wantsTradingSetup) {
+      try {
+        const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) });
+        const dec = plan.instrument.decimals;
+        const prefix = plan.instrument.kind === "crypto" ? "" : "$";
+        const fmt = (n?: number) => typeof n === "number" && isFinite(n) ? `${prefix}${n.toFixed(dec)}` : "-";
+        return {
+          bias: plan.htfBias === "bullish" ? "BULLISH" : plan.htfBias === "bearish" ? "BEARISH" : "NEUTRAL",
+          direction: plan.trade.direction,
+          entry: plan.trade.direction === "WAIT" ? "-" : fmt(plan.trade.entry),
+          stopLoss: plan.trade.direction === "WAIT" ? "-" : fmt(plan.trade.sl),
+          takeProfits: plan.trade.direction === "WAIT" ? [] : [plan.trade.tp1, plan.trade.tp2, plan.trade.tp3 ?? plan.trade.tp].filter((n): n is number => typeof n === "number").map(fmt),
+          riskReward: plan.trade.direction === "WAIT" ? "-" : `1:${plan.trade.rr.toFixed(2)}`,
+          confidence: plan.trade.direction === "WAIT" ? Math.min(plan.trade.confidence, 55) : plan.trade.confidence,
+          killzone: plan.killzone,
+          confluences: plan.confluences,
+          ictAnalysis: plan.htfNarrative,
+          smcAnalysis: plan.ltfNarrative,
+          marketStructure: `${plan.alignmentLabel} · ${plan.setupGrade} (${plan.setupScore}/100)`,
+          spokenSummary: plan.trade.summary,
+          fullAnalysis: `${plan.htfNarrative}\n\n${plan.ltfNarrative}\n\n${plan.trade.summary}\nInvalidation: ${plan.trade.invalidation}`,
+          timeframe: data.timeframe,
+          currentPrice: plan.currentPrice,
+          generatedAt: new Date().toISOString(),
+        };
+      } catch {
+        // Fall back to the lightweight assistant path below if the full signal desk feed is temporarily unavailable.
+      }
+    }
 
     let candles: Candle[] = [];
     try {
