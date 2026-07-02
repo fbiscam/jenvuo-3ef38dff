@@ -136,7 +136,18 @@ export function resolveInstrument(input: string): ResolvedInstrument {
       quote: q, needsUsdNews: b === "USD" || q === "USD",
     };
   }
-  const cryptoMatch = cleaned.match(/^([A-Z0-9]{2,10})(USDT|USD|USDC|BUSD)?$/);
+  const cryptoPairMatch = cleaned.match(/^([A-Z0-9]{2,15})(USDT|USDC|BUSD|USD)$/);
+  if (cryptoPairMatch && cryptoPairMatch[1] !== "XAU" && cryptoPairMatch[1] !== "XAG") {
+    const base = cryptoPairMatch[1];
+    const quote = cryptoPairMatch[2] === "USD" ? "USDT" : cryptoPairMatch[2];
+    return {
+      raw, key: `CRYPTO:${base}${quote}`, display: `${base}/${quote}`, kind: "crypto",
+      decimals: base === "BTC" || base === "ETH" ? 2 : base === "SHIB" || base === "PEPE" ? 8 : 4,
+      binanceSymbols: [`${base}${quote}`, `${base}USDT`, `${base}USDC`],
+      quote, needsUsdNews: false,
+    };
+  }
+  const cryptoMatch = cleaned.match(/^([A-Z0-9]{2,10})$/);
   if (cryptoMatch && CRYPTO_BASES.has(cryptoMatch[1])) {
     const base = cryptoMatch[1];
     return {
@@ -700,8 +711,18 @@ async function fetchYahooQuote(symbols: string[]): Promise<LiveTick | null> {
         if (!res.ok) continue;
         const j: any = await res.json();
         const q = j?.quoteResponse?.result?.[0];
-        const p = q?.regularMarketPrice ?? q?.postMarketPrice ?? q?.preMarketPrice;
-        const t = (q?.regularMarketTime ?? Math.floor(Date.now() / 1000)) * 1000;
+        const state = String(q?.marketState ?? "").toUpperCase();
+        const p = state.includes("POST") && typeof q?.postMarketPrice === "number"
+          ? q.postMarketPrice
+          : state.includes("PRE") && typeof q?.preMarketPrice === "number"
+            ? q.preMarketPrice
+            : q?.regularMarketPrice ?? q?.postMarketPrice ?? q?.preMarketPrice;
+        const quoteTime = state.includes("POST") && typeof q?.postMarketTime === "number"
+          ? q.postMarketTime
+          : state.includes("PRE") && typeof q?.preMarketTime === "number"
+            ? q.preMarketTime
+            : q?.regularMarketTime;
+        const t = (quoteTime ?? Math.floor(Date.now() / 1000)) * 1000;
         if (typeof p === "number" && isFinite(p)) return { price: p, t };
       } catch { /* try next */ }
     }
@@ -834,6 +855,17 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
 
     const inst = resolveInstrument(data.symbol);
 
+    const liveTickPromise = (async () => {
+      if (inst.binanceSymbols?.length) {
+        const q = await fetchBinanceQuote(inst.binanceSymbols).catch(() => null);
+        if (q) return q;
+      }
+      if (inst.yahooSymbols?.length) {
+        return await fetchYahooQuote(inst.yahooSymbols).catch(() => null);
+      }
+      return null;
+    })();
+
     const [htfRaw, ltfRaw, news, h4Raw, m5Raw, dxyRaw, liveTick] = await Promise.all([
       fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "15m").catch(() => [] as Candle[]),
@@ -841,16 +873,7 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
       fetchInstrumentCandles(inst, "4h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "5m").catch(() => [] as Candle[]),
       inst.needsUsdNews ? fetchInstrumentCandles(resolveInstrument("DXY"), "1h").catch(() => [] as Candle[]) : Promise.resolve([] as Candle[]),
-      (async () => {
-        if (inst.binanceSymbols?.length) {
-          const q = await fetchBinanceQuote(inst.binanceSymbols).catch(() => null);
-          if (q) return q;
-        }
-        if (inst.yahooSymbols?.length) {
-          return await fetchYahooQuote(inst.yahooSymbols).catch(() => null);
-        }
-        return null;
-      })(),
+      liveTickPromise,
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
       throw new Error(`Live ${inst.display} feed unavailable. Try again in a moment.`);
