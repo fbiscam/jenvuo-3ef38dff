@@ -780,6 +780,11 @@ export const getMarketSnapshot = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
+    const quote = inst.binanceSymbols?.length
+      ? await fetchBinanceQuote(inst.binanceSymbols).catch(() => null)
+      : inst.yahooSymbols?.length
+        ? await fetchYahooQuote(inst.yahooSymbols).catch(() => null)
+        : null;
     // Use daily candles for a stable 24h reference price.
     const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
     let price: number | null = null;
@@ -798,6 +803,7 @@ export const getMarketSnapshot = createServerFn({ method: "POST" })
       const last = intraday[intraday.length - 1];
       if (last) { price = last.c; break; }
     }
+    if (quote?.price && isFinite(quote.price)) price = quote.price;
     if (price == null) return null;
     return {
       price,
@@ -1144,10 +1150,10 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     const built = buildTrade(htfA, ltfA, pools, last.c, atr, inst.kind as any);
 
-    // Check if the chosen entry zone has already been mitigated
-    const zoneMitigated = built.zone
-      ? ltf.slice(-30).some(c => c.l <= built.zone!.priceHigh && c.h >= built.zone!.priceLow)
-      : false;
+    // buildTrade already filters mitigated OB/FVGs. Do not mark the freshly
+    // tapped execution zone as "mitigated" just because the live candle is
+    // inside it; that was flattening confidence across instruments.
+    const zoneMitigated = false;
 
     const tradeFromAi = {
       direction: built.direction,
