@@ -1102,12 +1102,16 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       entry: +built.entry.toFixed(dec),
       sl: +built.sl.toFixed(dec),
       tp: +built.tp.toFixed(dec),
+      tp1: built.tp1 != null ? +built.tp1.toFixed(dec) : undefined,
+      tp2: built.tp2 != null ? +built.tp2.toFixed(dec) : undefined,
+      tp3: built.tp3 != null ? +built.tp3.toFixed(dec) : undefined,
       rr: +built.rr.toFixed(2),
       confidence: 0, // set after scoring
       summary: "",   // filled after scoring
       invalidation: built.direction === "WAIT"
         ? built.reason
         : `Invalidates if price closes ${built.direction === "BUY" ? "below" : "above"} ${built.sl.toFixed(dec)}, breaking the ${built.zone?.kind ?? "entry"} zone.`,
+      notes: built.notes,
     };
 
     // Multi-TF bias
