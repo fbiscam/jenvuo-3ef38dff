@@ -190,7 +190,7 @@ function inferInstrumentFromText(text: string): string {
 }
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 20_000;
+const CACHE_TTL = 5_000;
 
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
@@ -1522,6 +1522,8 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
       );
     }
 
+    const canonicalSymbol = inst.key.includes(":") ? inst.key.split(":")[1] : (inst.raw || inst.key);
+
     const plan: SignalPlan = {
       htfBias: htfBiasLocal,
       intro: String(parsed.intro ?? `Let's break down ${inst.display} live. I'll walk you through the chart step by step.`),
@@ -1551,7 +1553,7 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
       htfCandles: htf.map(toDTO),
       ltfCandles: ltf.map(toDTO),
       currentPrice: last.c,
-      instrument: { symbol: inst.raw || inst.key, display: inst.display, kind: inst.kind, decimals: inst.decimals },
+      instrument: { symbol: canonicalSymbol, display: inst.display, kind: inst.kind, decimals: inst.decimals },
     };
 
     return plan;
