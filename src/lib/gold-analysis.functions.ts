@@ -830,6 +830,10 @@ export const getLiveTick = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
     // 1) Try real-time quote endpoints first (no cache, sub-second freshness).
+    if (inst.kind === "metal") {
+      const q = await fetchMetalSpotQuote(inst);
+      if (q) return q;
+    }
     if (inst.binanceSymbols?.length) {
       const q = await fetchBinanceQuote(inst.binanceSymbols);
       if (q) return q;
