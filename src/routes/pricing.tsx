@@ -238,10 +238,10 @@ function PricingPage() {
           <table className="w-full min-w-[760px] text-sm border-collapse">
             <colgroup>
               <col className="w-[28%]" />
-              <col className="w-[18%]" />
-              <col className="w-[18%] bg-amber-50/40" />
-              <col className="w-[18%]" />
-              <col className="w-[18%]" />
+              <col className={`w-[18%] ${currentPlan === "free" ? "bg-emerald-50/50" : ""}`} />
+              <col className={`w-[18%] ${currentPlan === "pro" ? "bg-emerald-50/50" : "bg-amber-50/40"}`} />
+              <col className={`w-[18%] ${currentPlan === "elite" ? "bg-emerald-50/50" : ""}`} />
+              <col className={`w-[18%] ${currentPlan === "custom" ? "bg-emerald-50/50" : ""}`} />
             </colgroup>
 
             <thead>
@@ -337,22 +337,26 @@ function PricingPage() {
                       </span>
                     </div>
                   </td>
-                  {[row.a, row.b, row.c, row.d].map((v, i) => (
+                  {[row.a, row.b, row.c, row.d].map((v, i) => {
+                    const colKey = (["free", "pro", "elite", "custom"] as const)[i];
+                    const isCurrentCol = currentPlan === colKey;
+                    return (
                     <td
                       key={i}
-                      className={`px-6 py-3.5 text-center border-l border-zinc-200 ${i === 1 ? "bg-amber-50/40" : ""}`}
+                      className={`px-6 py-3.5 text-center border-l border-zinc-200 ${isCurrentCol ? "bg-emerald-50/60" : i === 1 ? "bg-amber-50/40" : ""}`}
                     >
                       {v === true ? (
-                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
+                        <span className={`inline-block h-1.5 w-1.5 rounded-full ${isCurrentCol ? "bg-emerald-600" : "bg-zinc-900"}`} />
                       ) : v === false ? (
                         <span className="inline-block h-px w-4 bg-zinc-200" />
                       ) : (
-                        <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : "text-zinc-700"}`}>
+                        <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : isCurrentCol ? "text-emerald-700 font-semibold" : "text-zinc-700"}`}>
                           {v}
                         </span>
                       )}
                     </td>
-                  ))}
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
