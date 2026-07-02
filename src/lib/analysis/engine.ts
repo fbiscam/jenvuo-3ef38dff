@@ -190,11 +190,11 @@ export function buildLiquidityPools(htf: Candle[], ltf: Candle[]): LiquidityPool
     out.push({ price: al, side: "sell", label: "Asia Low", swept: ltf.slice(-12).some(c => c.l <= al + tol) });
   }
 
-  // HTF swing extremes
+  // HTF swing extremes — dynamic swept check (was hard-coded false, causing false no_sweep vetoes)
   const sh = Math.max(...htf.slice(-80).map(c => c.h));
   const sl = Math.min(...htf.slice(-80).map(c => c.l));
-  out.push({ price: sh, side: "buy", label: "HTF Swing High", swept: false });
-  out.push({ price: sl, side: "sell", label: "HTF Swing Low", swept: false });
+  out.push({ price: sh, side: "buy",  label: "HTF Swing High", swept: ltf.slice(-24).some(c => c.h >= sh - tol) });
+  out.push({ price: sl, side: "sell", label: "HTF Swing Low",  swept: ltf.slice(-24).some(c => c.l <= sl + tol) });
 
   return out;
 }
@@ -417,16 +417,18 @@ export function scoreSetup(args: {
   const vetos: VetoResult[] = [];
   const dir = trade.direction;
 
-  // ---- HARD VETO GATES (any trigger → cap grade at C, score ≤ 40) ----
+  // ---- HARD VETO GATES (any trigger → downgrade, but no longer flat-cap at 40) ----
   if (dir !== "WAIT") {
     // 1. HTF/LTF bias conflict
     if (htf.trend !== "ranging" && ltf.trend !== "ranging" && htf.trend !== ltf.trend) {
       vetos.push({ key: "bias_conflict", label: "HTF/LTF bias conflict", reason: `HTF ${htf.trend} vs LTF ${ltf.trend}` });
     }
-    // 2. No liquidity sweep before entry
-    const anySwept = pools.some(p => p.swept && (dir === "BUY" ? p.side === "sell" : p.side === "buy"));
-    if (!anySwept) {
-      vetos.push({ key: "no_sweep", label: "No sweep before entry", reason: "Institutional entries require prior liquidity grab" });
+    // 2. No liquidity sweep before entry — skip for crypto (24/7, sweeps unreliable)
+    if (kind !== "crypto") {
+      const anySwept = pools.some(p => p.swept && (dir === "BUY" ? p.side === "sell" : p.side === "buy"));
+      if (!anySwept) {
+        vetos.push({ key: "no_sweep", label: "No sweep before entry", reason: "Institutional entries usually follow a liquidity grab" });
+      }
     }
     // 3. Entry zone already mitigated
     if (zoneMitigated === true) {
@@ -436,9 +438,9 @@ export function scoreSetup(args: {
     if (imminentHighNews) {
       vetos.push({ key: "news", label: "High-impact news imminent", reason: "News event within 60m — stand aside" });
     }
-    // 5. R:R < 1.8
-    if (trade.rr < 1.8) {
-      vetos.push({ key: "rr_low", label: "R:R below 1.8", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
+    // 5. R:R < 1.5 (engine already floors at 2R; anything below 1.5 is genuinely bad)
+    if (trade.rr < 1.5) {
+      vetos.push({ key: "rr_low", label: "R:R below 1.5", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
     }
   }
 
@@ -467,37 +469,48 @@ export function scoreSetup(args: {
     kind === "crypto" ? true : inKillzone,
     kind === "crypto" ? "Crypto trades 24/7" : (inKillzone ? "Killzone active" : "Outside killzone"));
 
-  push("dxy", "DXY correlation confirms", dxyConfirms === true,
-    dxyConfirms == null ? "DXY data unavailable" : dxyConfirms ? "DXY moving inverse" : "DXY not confirming");
+  // DXY — only score when data available; unknown = don't penalise
+  if (dxyConfirms !== null && dxyConfirms !== undefined) {
+    push("dxy", "DXY correlation confirms", dxyConfirms === true,
+      dxyConfirms ? "DXY moving inverse" : "DXY not confirming");
+  }
 
   push("rr", "Clean R:R ≥ 1:3", trade.rr >= 3, `R:R 1:${trade.rr.toFixed(2)}`);
 
-  // ---- NEW FACTORS ----
-  push("structure", "Clean HTF structure (impulse BOS/CHoCH)",
-    (structureQuality ?? 0) >= 0.6,
-    structureQuality == null ? "Structure quality N/A" : `Impulse strength ${(structureQuality * 100).toFixed(0)}%`);
+  // Structure quality — only score when computable
+  if (structureQuality !== null && structureQuality !== undefined) {
+    push("structure", "Clean HTF structure (impulse BOS/CHoCH)",
+      structureQuality >= 0.6,
+      `Impulse strength ${(structureQuality * 100).toFixed(0)}%`);
+  }
 
-  push("smt", "SMT divergence with correlated pair",
-    smtDivergence === true,
-    smtDivergence == null ? "Correlation data unavailable" : smtDivergence ? "Correlated pair diverges (institutional footprint)" : "No SMT divergence");
+  // SMT — only score when computable
+  if (smtDivergence !== null && smtDivergence !== undefined) {
+    push("smt", "SMT divergence with correlated pair",
+      smtDivergence === true,
+      smtDivergence ? "Correlated pair diverges (institutional footprint)" : "No SMT divergence");
+  }
 
-  push("session_align", "Native/prime session for this pair",
-    nativeSession === true,
-    nativeSession == null ? "Session profile N/A" : nativeSession ? "Trading in this pair's prime hours" : "Off-hours for this pair");
+  // Session — only score when computable
+  if (nativeSession !== null && nativeSession !== undefined) {
+    push("session_align", "Native/prime session for this pair",
+      nativeSession === true,
+      nativeSession ? "Trading in this pair's prime hours" : "Off-hours for this pair");
+  }
 
   const totalWeight = f.reduce((s, x) => s + x.weight, 0) || 1;
   const earned = f.reduce((s, x) => s + (x.pass ? x.weight : 0), 0);
   let score = Math.round((earned / totalWeight) * 100);
   if (imminentHighNews) score = Math.min(score, 60);
 
-  // Apply vetos — hard cap
+  // Apply vetos — soft deduction, not a flat cap. Multiple vetoes stack.
   if (vetos.length > 0) {
-    score = Math.min(score, 40);
+    score = Math.max(30, score - vetos.length * 15);
   }
 
-  // Stricter thresholds: A+ ≥ 88 (was 85), A ≥ 75 (was 70), B ≥ 60 (was 55)
+  // Grade thresholds unchanged; multi-veto forces C.
   const grade: "A+" | "A" | "B" | "C" =
-    vetos.length > 0 ? "C" :
+    vetos.length >= 2 ? "C" :
     score >= 88 ? "A+" :
     score >= 75 ? "A" :
     score >= 60 ? "B" : "C";
