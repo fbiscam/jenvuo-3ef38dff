@@ -1052,7 +1052,7 @@ Return ONLY valid JSON (no markdown) with this exact shape:
 
 Rules:
 - fromTime/toTime MUST be unix-seconds taken EXACTLY from the provided candles.
-- LTF entry/sl/tp must respect current price ${last.c.toFixed(2)} and yield realistic RR >= 1.8 (prefer 1:2 to 1:4).
+- LTF entry/sl/tp must respect current price ${last.c.toFixed(dec)} and yield realistic RR >= 1.8 (prefer 1:2 to 1:4).
 - Produce 10-14 narration steps, each 12-30 words, professional 25-year-veteran tone, in this order:
   1) HTF bias & structure, 2) HTF BOS/CHOCH, 3) HTF OB/zone, 4) Premium vs Discount, 5) HTF liquidity (PDH/PDL/equal highs/lows),
   6) Shift to LTF, 7) LTF structure / MSS, 8) LTF FVG, 9) LTF OB / breaker, 10) Inducement & expected sweep,
