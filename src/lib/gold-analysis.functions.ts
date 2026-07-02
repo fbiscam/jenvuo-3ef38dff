@@ -858,11 +858,15 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
     const livePrice = liveTick?.price && isFinite(liveTick.price) ? liveTick.price : last.c;
     // Overlay the live price onto the last candle so mid-candle analysis uses fresh data.
     if (livePrice !== last.c) {
-      const patched = { ...last, c: livePrice, h: Math.max(last.h, livePrice), l: Math.min(last.l, livePrice) };
-      ltf[ltf.length - 1] = patched;
+      // Mutate in place so `last` (a reference into ltf) also reflects the fresh price.
+      last.c = livePrice;
+      last.h = Math.max(last.h, livePrice);
+      last.l = Math.min(last.l, livePrice);
       if (htf.length) {
         const lh = htf[htf.length - 1];
-        htf[htf.length - 1] = { ...lh, c: livePrice, h: Math.max(lh.h, livePrice), l: Math.min(lh.l, livePrice) };
+        lh.c = livePrice;
+        lh.h = Math.max(lh.h, livePrice);
+        lh.l = Math.min(lh.l, livePrice);
       }
     }
 
