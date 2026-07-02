@@ -47,6 +47,9 @@ function detectSymbol(question: string): string | null {
   // ticker-style $AAPL or AAPL stock
   const stock = question.toUpperCase().match(/\$([A-Z]{2,6})\b|\b([A-Z]{2,6})\s+(STOCK|SHARE|EQUITY)/);
   if (stock) return stock[1] || stock[2];
+  // generic crypto pairs such as BONKUSDT, FETUSDT, WIFUSDC, etc.
+  const cryptoPair = question.toUpperCase().match(/\b([A-Z0-9]{2,15})(USDT|USDC|BUSD|USD)\b/);
+  if (cryptoPair && !["XAU", "XAG"].includes(cryptoPair[1])) return `${cryptoPair[1]}${cryptoPair[2]}`;
   return null;
 }
 

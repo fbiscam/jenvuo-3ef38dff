@@ -136,7 +136,18 @@ export function resolveInstrument(input: string): ResolvedInstrument {
       quote: q, needsUsdNews: b === "USD" || q === "USD",
     };
   }
-  const cryptoMatch = cleaned.match(/^([A-Z0-9]{2,10})(USDT|USD|USDC|BUSD)?$/);
+  const cryptoPairMatch = cleaned.match(/^([A-Z0-9]{2,15})(USDT|USDC|BUSD|USD)$/);
+  if (cryptoPairMatch && cryptoPairMatch[1] !== "XAU" && cryptoPairMatch[1] !== "XAG") {
+    const base = cryptoPairMatch[1];
+    const quote = cryptoPairMatch[2] === "USD" ? "USDT" : cryptoPairMatch[2];
+    return {
+      raw, key: `CRYPTO:${base}${quote}`, display: `${base}/${quote}`, kind: "crypto",
+      decimals: base === "BTC" || base === "ETH" ? 2 : base === "SHIB" || base === "PEPE" ? 8 : 4,
+      binanceSymbols: [`${base}${quote}`, `${base}USDT`, `${base}USDC`],
+      quote, needsUsdNews: false,
+    };
+  }
+  const cryptoMatch = cleaned.match(/^([A-Z0-9]{2,10})$/);
   if (cryptoMatch && CRYPTO_BASES.has(cryptoMatch[1])) {
     const base = cryptoMatch[1];
     return {
@@ -155,8 +166,31 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   return resolveInstrument("XAUUSD");
 }
 
+function inferInstrumentFromText(text: string): string {
+  const q = String(text || "").toUpperCase();
+  const explicit = q.match(/\$([A-Z]{2,6})\b/)?.[1];
+  if (explicit) return explicit;
+  const candidates = [
+    "XAUUSD", "XAGUSD", "GOLD", "SILVER", "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT",
+    "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "NZDUSD", "USDCAD", "EURJPY", "GBPJPY",
+    "NAS100", "US100", "SPX500", "US500", "US30", "DXY", "AAPL", "TSLA", "NVDA", "MSFT", "AMZN", "META",
+  ];
+  for (const c of candidates) {
+    if (new RegExp(`\\b${c}\\b`).test(q)) return c;
+  }
+  const fx = q.match(/\b([A-Z]{3})\/?([A-Z]{3})\b/);
+  if (fx && G10_FX.has(fx[1]) && G10_FX.has(fx[2])) return `${fx[1]}${fx[2]}`;
+  const crypto = q.match(/\b([A-Z0-9]{2,15})(USDT|USDC|BUSD|USD)\b/);
+  if (crypto) return `${crypto[1]}${crypto[2]}`;
+  const named = q.match(/\b(BTC|BITCOIN|ETH|ETHEREUM|SOL|SOLANA|XRP|DOGE|BNB|ADA|AVAX|LINK|DOT|LTC|TON|PEPE|SHIB)\b/);
+  if (named) return named[1];
+  const stock = q.match(/\b([A-Z]{2,6})\s+(STOCK|SHARE|EQUITY)\b/);
+  if (stock) return stock[1];
+  return "XAUUSD";
+}
+
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 20_000;
+const CACHE_TTL = 5_000;
 
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
@@ -246,6 +280,37 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 async function _analyzeGoldCompute(data: { timeframe: string; query: string }): Promise<GoldSignal> {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+
+    const wantsTradingSetup = /\b(setup|signal|entry|buy|sell|long|short|trade|analy[sz]e|analysis|bias|tp|sl|stop\s*loss|take\s*profit|gold|xau|chart|trend|market|price|level|zone|fvg|ob|order\s*block|liquidity|bos|choch|smc|ict|killzone|scalp|swing|stock|coin|crypto|forex|pair)\b/i.test(data.query);
+    if (wantsTradingSetup) {
+      try {
+        const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) });
+        const dec = plan.instrument.decimals;
+        const prefix = plan.instrument.kind === "crypto" ? "" : "$";
+        const fmt = (n?: number) => typeof n === "number" && isFinite(n) ? `${prefix}${n.toFixed(dec)}` : "-";
+        return {
+          bias: plan.htfBias === "bullish" ? "BULLISH" : plan.htfBias === "bearish" ? "BEARISH" : "NEUTRAL",
+          direction: plan.trade.direction,
+          entry: plan.trade.direction === "WAIT" ? "-" : fmt(plan.trade.entry),
+          stopLoss: plan.trade.direction === "WAIT" ? "-" : fmt(plan.trade.sl),
+          takeProfits: plan.trade.direction === "WAIT" ? [] : [plan.trade.tp1, plan.trade.tp2, plan.trade.tp3 ?? plan.trade.tp].filter((n): n is number => typeof n === "number").map(fmt),
+          riskReward: plan.trade.direction === "WAIT" ? "-" : `1:${plan.trade.rr.toFixed(2)}`,
+          confidence: plan.trade.direction === "WAIT" ? Math.min(plan.trade.confidence, 55) : plan.trade.confidence,
+          killzone: plan.killzone,
+          confluences: plan.confluences,
+          ictAnalysis: plan.htfNarrative,
+          smcAnalysis: plan.ltfNarrative,
+          marketStructure: `${plan.alignmentLabel} · ${plan.setupGrade} (${plan.setupScore}/100)`,
+          spokenSummary: plan.trade.summary,
+          fullAnalysis: `${plan.htfNarrative}\n\n${plan.ltfNarrative}\n\n${plan.trade.summary}\nInvalidation: ${plan.trade.invalidation}`,
+          timeframe: data.timeframe,
+          currentPrice: plan.currentPrice,
+          generatedAt: new Date().toISOString(),
+        };
+      } catch {
+        // Fall back to the lightweight assistant path below if the full signal desk feed is temporarily unavailable.
+      }
+    }
 
     let candles: Candle[] = [];
     try {
@@ -700,8 +765,18 @@ async function fetchYahooQuote(symbols: string[]): Promise<LiveTick | null> {
         if (!res.ok) continue;
         const j: any = await res.json();
         const q = j?.quoteResponse?.result?.[0];
-        const p = q?.regularMarketPrice ?? q?.postMarketPrice ?? q?.preMarketPrice;
-        const t = (q?.regularMarketTime ?? Math.floor(Date.now() / 1000)) * 1000;
+        const state = String(q?.marketState ?? "").toUpperCase();
+        const p = state.includes("POST") && typeof q?.postMarketPrice === "number"
+          ? q.postMarketPrice
+          : state.includes("PRE") && typeof q?.preMarketPrice === "number"
+            ? q.preMarketPrice
+            : q?.regularMarketPrice ?? q?.postMarketPrice ?? q?.preMarketPrice;
+        const quoteTime = state.includes("POST") && typeof q?.postMarketTime === "number"
+          ? q.postMarketTime
+          : state.includes("PRE") && typeof q?.preMarketTime === "number"
+            ? q.preMarketTime
+            : q?.regularMarketTime;
+        const t = (quoteTime ?? Math.floor(Date.now() / 1000)) * 1000;
         if (typeof p === "number" && isFinite(p)) return { price: p, t };
       } catch { /* try next */ }
     }
@@ -759,6 +834,11 @@ export const getMarketSnapshot = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const inst = resolveInstrument(data.symbol);
+    const quote = inst.binanceSymbols?.length
+      ? await fetchBinanceQuote(inst.binanceSymbols).catch(() => null)
+      : inst.yahooSymbols?.length
+        ? await fetchYahooQuote(inst.yahooSymbols).catch(() => null)
+        : null;
     // Use daily candles for a stable 24h reference price.
     const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
     let price: number | null = null;
@@ -777,6 +857,7 @@ export const getMarketSnapshot = createServerFn({ method: "POST" })
       const last = intraday[intraday.length - 1];
       if (last) { price = last.c; break; }
     }
+    if (quote?.price && isFinite(quote.price)) price = quote.price;
     if (price == null) return null;
     return {
       price,
@@ -834,6 +915,17 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
 
     const inst = resolveInstrument(data.symbol);
 
+    const liveTickPromise = (async () => {
+      if (inst.binanceSymbols?.length) {
+        const q = await fetchBinanceQuote(inst.binanceSymbols).catch(() => null);
+        if (q) return q;
+      }
+      if (inst.yahooSymbols?.length) {
+        return await fetchYahooQuote(inst.yahooSymbols).catch(() => null);
+      }
+      return null;
+    })();
+
     const [htfRaw, ltfRaw, news, h4Raw, m5Raw, dxyRaw, liveTick] = await Promise.all([
       fetchInstrumentCandles(inst, "1h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "15m").catch(() => [] as Candle[]),
@@ -841,16 +933,7 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
       fetchInstrumentCandles(inst, "4h").catch(() => [] as Candle[]),
       fetchInstrumentCandles(inst, "5m").catch(() => [] as Candle[]),
       inst.needsUsdNews ? fetchInstrumentCandles(resolveInstrument("DXY"), "1h").catch(() => [] as Candle[]) : Promise.resolve([] as Candle[]),
-      (async () => {
-        if (inst.binanceSymbols?.length) {
-          const q = await fetchBinanceQuote(inst.binanceSymbols).catch(() => null);
-          if (q) return q;
-        }
-        if (inst.yahooSymbols?.length) {
-          return await fetchYahooQuote(inst.yahooSymbols).catch(() => null);
-        }
-        return null;
-      })(),
+      liveTickPromise,
     ]);
     if (htfRaw.length < 20 || ltfRaw.length < 20) {
       throw new Error(`Live ${inst.display} feed unavailable. Try again in a moment.`);
@@ -969,7 +1052,7 @@ Return ONLY valid JSON (no markdown) with this exact shape:
 
 Rules:
 - fromTime/toTime MUST be unix-seconds taken EXACTLY from the provided candles.
-- LTF entry/sl/tp must respect current price ${last.c.toFixed(2)} and yield realistic RR >= 1.8 (prefer 1:2 to 1:4).
+- LTF entry/sl/tp must respect current price ${last.c.toFixed(dec)} and yield realistic RR >= 1.8 (prefer 1:2 to 1:4).
 - Produce 10-14 narration steps, each 12-30 words, professional 25-year-veteran tone, in this order:
   1) HTF bias & structure, 2) HTF BOS/CHOCH, 3) HTF OB/zone, 4) Premium vs Discount, 5) HTF liquidity (PDH/PDL/equal highs/lows),
   6) Shift to LTF, 7) LTF structure / MSS, 8) LTF FVG, 9) LTF OB / breaker, 10) Inducement & expected sweep,
@@ -1121,10 +1204,10 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     const built = buildTrade(htfA, ltfA, pools, last.c, atr, inst.kind as any);
 
-    // Check if the chosen entry zone has already been mitigated
-    const zoneMitigated = built.zone
-      ? ltf.slice(-30).some(c => c.l <= built.zone!.priceHigh && c.h >= built.zone!.priceLow)
-      : false;
+    // buildTrade already filters mitigated OB/FVGs. Do not mark the freshly
+    // tapped execution zone as "mitigated" just because the live candle is
+    // inside it; that was flattening confidence across instruments.
+    const zoneMitigated = false;
 
     const tradeFromAi = {
       direction: built.direction,
@@ -1439,6 +1522,8 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
       );
     }
 
+    const canonicalSymbol = inst.key.includes(":") ? inst.key.split(":")[1] : (inst.raw || inst.key);
+
     const plan: SignalPlan = {
       htfBias: htfBiasLocal,
       intro: String(parsed.intro ?? `Let's break down ${inst.display} live. I'll walk you through the chart step by step.`),
@@ -1468,7 +1553,7 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
       htfCandles: htf.map(toDTO),
       ltfCandles: ltf.map(toDTO),
       currentPrice: last.c,
-      instrument: { symbol: inst.raw || inst.key, display: inst.display, kind: inst.kind, decimals: inst.decimals },
+      instrument: { symbol: canonicalSymbol, display: inst.display, kind: inst.kind, decimals: inst.decimals },
     };
 
     return plan;

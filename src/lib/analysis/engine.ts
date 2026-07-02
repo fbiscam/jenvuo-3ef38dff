@@ -249,14 +249,28 @@ export type BuiltTrade = {
 // spread, and news volatility — using the same buffer for XAU and EURUSD is wrong.
 const RISK_PROFILE: Record<
   "crypto" | "metal" | "forex" | "index" | "stock",
-  { pctBuffer: number; minRiskPct: number; atrMult: number; maxDistPct: number }
+  {
+    pctBuffer: number;
+    minRiskPct: number;
+    atrMult: number;
+    maxDistPct: number;
+    entryWindowPct: number;
+    maxRiskPct: number;
+  }
 > = {
-  crypto: { pctBuffer: 0.0030, minRiskPct: 0.0040, atrMult: 1.00, maxDistPct: 0.05 },
-  metal:  { pctBuffer: 0.0020, minRiskPct: 0.0025, atrMult: 0.75, maxDistPct: 0.03 },
-  forex:  { pctBuffer: 0.0008, minRiskPct: 0.0012, atrMult: 0.50, maxDistPct: 0.015 },
-  index:  { pctBuffer: 0.0015, minRiskPct: 0.0020, atrMult: 0.75, maxDistPct: 0.025 },
-  stock:  { pctBuffer: 0.0020, minRiskPct: 0.0030, atrMult: 0.75, maxDistPct: 0.03 },
+  crypto: { pctBuffer: 0.0025, minRiskPct: 0.0030, atrMult: 0.90, maxDistPct: 0.0120, entryWindowPct: 0.0025, maxRiskPct: 0.0250 },
+  metal:  { pctBuffer: 0.0012, minRiskPct: 0.0018, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0009, maxRiskPct: 0.0120 },
+  forex:  { pctBuffer: 0.0005, minRiskPct: 0.0008, atrMult: 0.45, maxDistPct: 0.0040, entryWindowPct: 0.0006, maxRiskPct: 0.0080 },
+  index:  { pctBuffer: 0.0010, minRiskPct: 0.0015, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0010, maxRiskPct: 0.0150 },
+  stock:  { pctBuffer: 0.0015, minRiskPct: 0.0020, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0015, maxRiskPct: 0.0180 },
 };
+
+function smartPrice(n: number): string {
+  if (!Number.isFinite(n)) return "0";
+  const a = Math.abs(n);
+  const d = a >= 100 ? 2 : a >= 1 ? 4 : a >= 0.01 ? 5 : a >= 0.0001 ? 7 : 10;
+  return n.toFixed(d);
+}
 
 export function buildTrade(
   htf: TFAnalysis,
@@ -276,17 +290,27 @@ export function buildTrade(
     return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF/LTF disagree — no clean trend." };
   }
 
-  // Pick best zone: UNMITIGATED LTF FVG/OB on the trade side, closest to price, on correct side
+  // Pick best zone: UNMITIGATED LTF FVG/OB on the trade side, closest to LIVE price.
+  // We no longer emit limit entries far away from market. If price is not at/near
+  // the POI, the engine returns WAIT instead of a misleading entry/SL/TP ticket.
   const candidates: Array<{ kind: "OB" | "FVG"; priceLow: number; priceHigh: number; dist: number }> = [];
+  const distanceFromExecutionZone = (lo: number, hi: number) => {
+    if (lastPrice >= lo && lastPrice <= hi) return 0;
+    return dir === "BUY" ? Math.max(0, lastPrice - hi) : Math.max(0, lo - lastPrice);
+  };
   for (const f of ltf.fvgs) {
     if (f.mitigated) continue;
-    const ok = dir === "BUY" ? f.kind === "bullish" && f.priceHigh <= lastPrice : f.kind === "bearish" && f.priceLow >= lastPrice;
-    if (ok) candidates.push({ kind: "FVG", priceLow: f.priceLow, priceHigh: f.priceHigh, dist: Math.abs(lastPrice - (f.priceLow + f.priceHigh) / 2) });
+    const ok = dir === "BUY"
+      ? f.kind === "bullish" && lastPrice >= f.priceLow
+      : f.kind === "bearish" && lastPrice <= f.priceHigh;
+    if (ok) candidates.push({ kind: "FVG", priceLow: f.priceLow, priceHigh: f.priceHigh, dist: distanceFromExecutionZone(f.priceLow, f.priceHigh) });
   }
   for (const o of ltf.obs) {
     if (o.mitigated) continue;
-    const ok = dir === "BUY" ? o.kind === "demand" && o.priceHigh <= lastPrice : o.kind === "supply" && o.priceLow >= lastPrice;
-    if (ok) candidates.push({ kind: "OB", priceLow: o.priceLow, priceHigh: o.priceHigh, dist: Math.abs(lastPrice - (o.priceLow + o.priceHigh) / 2) });
+    const ok = dir === "BUY"
+      ? o.kind === "demand" && lastPrice >= o.priceLow
+      : o.kind === "supply" && lastPrice <= o.priceHigh;
+    if (ok) candidates.push({ kind: "OB", priceLow: o.priceLow, priceHigh: o.priceHigh, dist: distanceFromExecutionZone(o.priceLow, o.priceHigh) });
   }
   candidates.sort((a, b) => a.dist - b.dist);
   const zone = candidates[0] ?? null;
@@ -297,15 +321,26 @@ export function buildTrade(
 
   const notes: string[] = [];
 
-  // Reject "chasing price": zone is too far from current price to be actionable.
+  // Reject stale / distant zones. A valid signal must be executable around the
+  // current live tick; otherwise it is only a watch-zone and should be WAIT.
   const zoneMid = (zone.priceLow + zone.priceHigh) / 2;
-  const distPct = Math.abs(lastPrice - zoneMid) / lastPrice;
+  const zoneDistance = distanceFromExecutionZone(zone.priceLow, zone.priceHigh);
+  const distPct = zoneDistance / lastPrice;
   if (distPct > profile.maxDistPct) {
-    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest fresh zone is ${(distPct * 100).toFixed(2)}% from price — wait for retracement.` };
+    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest fresh zone is ${(distPct * 100).toFixed(2)}% from live price — wait, do not chase.` };
   }
 
-  // Entry = zone midpoint
-  const entry = zoneMid;
+  const actionableWindow = Math.max(lastPrice * profile.entryWindowPct, atr && atr > 0 ? atr * 0.20 : 0);
+  if (zoneDistance > actionableWindow) {
+    return {
+      direction: "WAIT",
+      entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
+      reason: `Live price ${smartPrice(lastPrice)} is not inside the fresh ${zone.kind} (${smartPrice(zone.priceLow)}–${smartPrice(zone.priceHigh)}). Wait for a tap before entry.`,
+    };
+  }
+
+  // Entry = the current live executable price, not an old zone midpoint.
+  const entry = lastPrice;
   const zoneHeight = Math.abs(zone.priceHigh - zone.priceLow);
 
   // SL buffer — asset-aware. max(pct × price, atrMult × ATR, 0.5 × zoneHeight)
@@ -322,6 +357,14 @@ export function buildTrade(
     sl = dir === "BUY" ? entry - minRisk : entry + minRisk;
     risk = minRisk;
     notes.push("SL widened to minimum safe distance");
+  }
+
+  const maxRisk = lastPrice * profile.maxRiskPct;
+  if (risk > maxRisk) {
+    return {
+      direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
+      reason: `Risk from live entry to protected stop is ${(risk / lastPrice * 100).toFixed(2)}%, too wide for ${assetKind}. Wait for a tighter re-entry.`,
+    };
   }
 
   // TP1/2/3 based on R-multiples first, so partials always exist.
@@ -364,7 +407,7 @@ export function buildTrade(
     entry, sl, tp, rr,
     tp1, tp2, tp3,
     zone: { kind: zone.kind, priceLow: zone.priceLow, priceHigh: zone.priceHigh },
-    reason: `${dir} from fresh ${zone.kind} @ ${entry.toFixed(2)}, SL beyond zone (${buffer.toFixed(2)} buffer), TP ${liquidityTargets[0]?.label ? "at " + liquidityTargets[0].label : "at " + rr.toFixed(1) + "R"}.`,
+    reason: `${dir} from live price ${smartPrice(entry)} near fresh ${zone.kind} (${smartPrice(zone.priceLow)}–${smartPrice(zone.priceHigh)}), SL beyond the protected zone, TP ${liquidityTargets[0]?.label ? "at " + liquidityTargets[0].label : "at " + rr.toFixed(1) + "R"}.`,
     notes: notes.length ? notes : undefined,
   };
 }
