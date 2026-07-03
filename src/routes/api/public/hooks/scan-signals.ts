@@ -72,9 +72,10 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
 })
 
 async function scanOnePair(
-  admin: ReturnType<typeof createClient>,
+  admin: any,
   pair: string,
 ): Promise<Record<string, unknown>> {
+
   let plan
   try {
     plan = await computeSignalPlan({ symbol: pair })
