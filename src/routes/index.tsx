@@ -10,7 +10,7 @@ import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Voice-Powered Gold Trading Intelligence" },
+      { title: "Voice Powered Gold Trading Intelligence" },
       {
         name: "description",
         content:
