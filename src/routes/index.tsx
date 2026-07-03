@@ -10,16 +10,16 @@ import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Voice Powered Trading Intelligence" },
+      { title: "Voice-Powered Gold Trading Intelligence" },
       {
         name: "description",
         content:
-          "Voice-native AI trading terminal for Gold, Crypto, FX & Indices. Live ICT/SMC analysis, A+ setups and spoken execution built on 25+ years of institutional logic.",
+          "Voice-native AI gold desk for XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF. Live ICT/SMC analysis, A+ setups and spoken execution built on 25+ years of bullion-desk logic.",
       },
-      { property: "og:title", content: "Voice Native Trading Intelligence — Jenvu" },
+      { property: "og:title", content: "Voice-Native Gold Trading Intelligence — Jenvu" },
       {
         property: "og:description",
-        content: "Speak. Analyze. Execute. The voice terminal that turns market noise into institutional-grade signals.",
+        content: "Speak. Analyze. Execute. The voice terminal that turns gold market noise into institutional-grade XAU signals.",
       },
       { property: "og:url", content: "https://jenvu.com/" },
       { property: "og:type", content: "website" },
@@ -35,12 +35,13 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Voice-native AI trading terminal with institutional ICT/SMC analysis for Gold, Crypto, FX and Indices.",
+            "Voice-native AI gold trading terminal with institutional ICT/SMC analysis for every XAU cross-pair.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
     ],
   }),
+
   component: HomePage,
 });
 
