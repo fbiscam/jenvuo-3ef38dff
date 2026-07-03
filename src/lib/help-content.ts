@@ -112,7 +112,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Step by step" },
           { type: "ol", items: [
             "Open the Signal Desk from the top navigation.",
-            "Pick or type a symbol — XAUUSD, BTCUSD, EURUSD, NAS100, etc.",
+            "Pick a gold pair — XAUUSD, XAUEUR, XAUGBP, XAUJPY, XAUAUD or XAUCHF.",
             "Hit 'Analyze'. The 1H and 15M charts load and the agent starts narrating.",
             "Wait while the 7-stage pipeline runs — usually 10–25 seconds.",
             "If the final score is 85+, the setup is graded A+ and entry, stop and targets appear.",
