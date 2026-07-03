@@ -545,7 +545,7 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
       generatedAt: new Date().toISOString(),
     };
 
-    return signal;
+    return { ...signal, __billable: "chat" };
 }
 
 export const analyzeGold = createServerFn({ method: "POST" })
@@ -555,9 +555,18 @@ export const analyzeGold = createServerFn({ method: "POST" })
     query: String(d?.query || "Give me the best A+ setup right now"),
   }))
   .handler(async ({ data, context }) => {
-    await _spendUserCredits(context.userId, 2, "signal");
-    return _analyzeGoldCompute(data);
+    // Compute first, then charge based on what was actually returned:
+    // - trading setup (entry/SL/TP) → 2 credits (signal cost)
+    // - conversational reply → 1 credit (chat cost)
+    const result = await _analyzeGoldCompute(data);
+    const cost = result.__billable === "signal" ? 2 : 1;
+    await _spendUserCredits(context.userId, cost, result.__billable === "signal" ? "signal" : "chat");
+    // Strip internal billing marker before returning to the client.
+    const { __billable, ...clean } = result;
+    void __billable;
+    return clean as GoldSignal;
   });
+
 
 // ============================================================
 // SIGNAL PLAN — structured ICT/SMC markings + voice narration
