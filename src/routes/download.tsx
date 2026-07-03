@@ -8,7 +8,7 @@ export const Route = createFileRoute("/download")({
       {
         name: "description",
         content:
-          "Get Jenvu on your device. Native iOS, Android APK and desktop PWA — the institutional voice trading agent for Gold, Crypto, FX & Indices in your pocket.",
+          "Get Jenvu on your device. Native iOS, Android APK and desktop PWA — the institutional voice-native gold trading agent covering every XAU cross-pair in your pocket.",
       },
       { property: "og:title", content: "Download Our Application — Jenvu" },
       {
