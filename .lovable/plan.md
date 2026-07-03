@@ -1,81 +1,106 @@
 
-## Diagnosis
+## Diagnosis — kyun har dafa "WAIT" aur A+ almost kabhi nahi
 
-Aap ne 3 real issues report kiye hain — main ne code trace kiya, teeno ka pakka root cause mil gaya:
+Code trace karne ke baad `src/lib/analysis/engine.ts` → `buildTrade` aur `scoreSetup` me 4 hard gates milay jo mostly WAIT force karte hain:
 
-### 1) Price live nahi update hoti
-`computeSignalPlan` sirf cached 15m candles use karta hai (candle cache TTL = 60s, `fetchInstrumentCandles`). `last.c` (last candle close) hi `lastPrice` banta hai — jo aakhri 15m candle band hone tak stale rehta hai. Kabhi 5–15 min tak real market 120$ hota hai jab code me 110$ dikhata hai. Live tick endpoint (`getLiveTick`) already exists lekin plan use hi nahi karta.
+### 1) Zone me pehle se ghusna zaroori hai
+```ts
+const ok = dir === "BUY"
+  ? f.kind === "bullish" && lastPrice >= f.priceLow
+  : f.kind === "bearish" && lastPrice <= f.priceHigh;
+```
+Agar live price fresh OB/FVG ke andar nahi ghusa, candidate hi drop → "No fresh zone" → WAIT.
 
-### 2) Har pair pe same ~40% confidence
-`scoreSetup` me hard-veto gates hain (`no_sweep`, `rr_low < 1.8`, `mitigated`, `bias_conflict`, `news`). Jaise hi koi ek fire ho — score forcibly `Math.min(score, 40)` ho jata hai. Real world me:
-- `no_sweep` almost hamesha fire hota hai — HTF Swing High/Low pools `swept: false` hard-coded hain, aur off-hours pe PDH/PDL sweep detect nahi hota → veto → 40 cap.
-- `rr_low` bhi common — engine TP ko 2R–3R me clamp karta hai, buffer widening ke baad RR aksar 1.5–1.9 aa jata hai → veto → 40 cap.
-- Unknown factors (SMT null, DXY null, structureQuality null) `pass=false` count hote hain, denominator me weight rehta hai → score aur ghat jata hai.
+### 2) Actionable window bohot tight
+```ts
+entryWindowPct: crypto 0.25%, metal 0.09%, forex 0.06%
+```
+Yani BTC pe zone 0.3% door ho toh bhi WAIT. Practically kabhi tap nahi hota exact moment pe.
 
-Result: crypto/forex/stocks sab me score 38–42 → grade "C" → confidence 40%.
+### 3) `maxDistPct` bhi tight
+Metal 0.6%, forex 0.4%. Real zones aksar 1-2% door hote hain — engine chase nahi karta, seedha WAIT.
 
-### 3) Entry aur SL/TP galat prices pe
-Same stale-price bug ka side effect. `buildTrade(htfA, ltfA, pools, last.c, ...)` me `lastPrice = last.c` (stale). Zone filter `f.priceHigh <= lastPrice` stale price ke against check karta hai — isliye zone select hota hai jo real market se 10–15$ door hai. Entry midpoint bhi is stale zone ka hai. Jab UI live tick dikhata hai (real $120), engine ka entry/SL/TP stale $110 world me calculate hua hota hai.
+### 4) A+ threshold + veto stacking
+- A+ ≥ 88 score, A ≥ 75.
+- Har veto -15 points.
+- `no_sweep` veto non-crypto pe almost hamesha fire hota hai kyun ki sweep detection sirf recent 6-24 candles pe hoti hai — most setups score ~55-70 → grade B → alert nahi fire hota (cron threshold `score >= 80` bhi hai).
+
+Net result: 90%+ scans "WAIT" ya "B" grade → user ko A+ signal kabhi nahi milta.
 
 ---
 
 ## Fix Plan
 
-### A) `src/lib/gold-analysis.functions.ts` → `computeSignalPlan`
+### A) `src/lib/analysis/engine.ts` → `buildTrade` — PENDING limit entries add karo
 
-1. Fresh live tick fetch karo parallel me:
+Abhi engine sirf "tap ho chuka" market entries deta hai. Change:
+
+1. **Zone filter loosen** — dono taraf ka POI accept karo (price zone ke aage ho toh limit order):
+   ```ts
+   const ok = dir === "BUY" ? f.kind === "bullish" : f.kind === "bearish";
    ```
-   const liveTick = inst.binanceSymbols?.length
-     ? await fetchBinanceQuote(inst.binanceSymbols)
-     : inst.yahooSymbols?.length
-       ? await fetchYahooQuote(inst.yahooSymbols)
-       : null;
-   const livePrice = liveTick?.price ?? last.c;
-   ```
-2. Har jagah jahan `last.c` use hota tha as "current price", `livePrice` use karo:
-   - `buildTrade(htfA, ltfA, pools, livePrice, atr, inst.kind)`
-   - `zoneMitigated` check aur `dxyConfirms` calc me
-   - Final `plan.currentPrice = livePrice`
-3. Candle cache TTL shorten karo — 60s → 20s (LTF freshness ke liye), aur last candle ko `livePrice` se overwrite karo tail me taaki analysis mid-candle sahi ho.
+   Distance-based ranking pehle se hai.
 
-### B) `src/lib/analysis/engine.ts` → `scoreSetup` (soft-veto refactor)
+2. **Execution modes**:
+   - Agar `lastPrice` zone ke andar → `MARKET` entry at `lastPrice` (current behavior).
+   - Agar zone thoda door hai lekin `maxDistPct` ke andar → `LIMIT` entry at zone midpoint, direction "BUY LIMIT" / "SELL LIMIT". `BuiltTrade` me `entryType: "MARKET" | "LIMIT"` field add karo.
+   - Agar `maxDistPct` se bhi door → WAIT (real chase avoid).
 
-1. **Hard-cap ki jagah per-veto deduction** — 40 me pin karna galat hai. Change:
-   ```
-   if (vetos.length > 0) score = Math.max(30, score - vetos.length * 15);
-   ```
-   Multiple vetoes hone pe hi grade C rahe, single veto sirf downgrade kare.
-2. **`no_sweep` veto ko sirf metal/forex/index tak limit karo** — crypto 24/7 hai, HTF Swing High/Low sweep detection unreliable hai. Crypto ke liye skip.
-3. **`rr_low` threshold 1.8 → 1.5** — engine already 2R floor karta hai, 1.8 se strict double-penalty hai.
-4. **Unknown factors ko fail count na karo** — jab `smtDivergence == null` ya `dxyConfirms == null` ya `structureQuality == null` ho, us factor ko `f` list me push hi na karo (weight se drop). Denominator natural re-normalize ho jayega.
-5. Score floor grade thresholds waise hi rahenge (A+ ≥ 88, A ≥ 75, B ≥ 60).
+3. **`maxDistPct` widen** per asset:
+   - crypto 1.2% → 2.5%
+   - metal 0.6% → 1.5%
+   - forex 0.4% → 0.9%
+   - index 0.6% → 1.5%
+   - stock 0.6% → 2.0%
 
-### C) `src/lib/analysis/engine.ts` → `buildLiquidityPools`
+4. **`entryWindowPct` sirf MARKET mode ke liye use karo** — LIMIT mode ke liye zone width pe tap ka intezaar router karega.
 
-HTF Swing High/Low pools ko dynamic swept check do (currently hard-coded `swept: false`):
+5. **Fallback POI** — agar koi fresh unmitigated OB/FVG nahi mila, HTF equilibrium/OTE (62-79%) zone ko synthetic POI banao (BUY discount side, SELL premium side). Isse trend clear ho toh WAIT ki jagah pending idea milega.
+
+### B) `scoreSetup` — softer vetos + smarter grading
+
+1. **Single veto = -8 (not -15).** Multi-veto (≥2) = -15 each. Genuine sirf tab downgrade jab 2+ red flags ho.
+2. **`no_sweep` ko soft factor banao, veto nahi** — score me weight pehle se hai. Non-crypto ke liye hard veto hatao, sirf `sweep` factor fail count ho.
+3. **Grade thresholds slightly relaxed**: A+ ≥ 85 (was 88), A ≥ 72 (was 75), B ≥ 55 (was 60).
+4. **LIMIT entries pe `zone` factor bonus** — pending order zone tap wait karta hai, execution quality actually better hoti hai. Iska pass=true if zone unmitigated.
+
+### C) `src/routes/api/public/hooks/scan-signals.ts` — alert threshold realistic
+
+Current:
+```ts
+if (!acceptableGrades.includes(grade) || plan.setupScore < 80)
 ```
-swept: ltf.slice(-12).some(c => c.h >= sh - tol),  // for high
-swept: ltf.slice(-12).some(c => c.l <= sl + tol),  // for low
-```
-Isse `no_sweep` veto sirf actually-unswept setups pe hi fire hoga.
+Change:
+- Accept A+/A grades with `setupScore >= 72` (aligned with new A threshold).
+- Direction WAIT still skipped.
+- Dedupe window shorten 2h → 90m taaki mid-session naya A+ ban jaye toh miss na ho.
+
+### D) `computeSignalPlan` (signal-agent context) — no change to prompt
+
+LLM narration already `trade.direction` aur `entryType` use karega automatically once engine exposes it. Bas `SignalCard` UI me "LIMIT @ price" ya "MARKET" label add karna hoga (chota render change).
+
+### E) UI touch — `src/components/SignalCard.tsx`
+
+Sirf presentation: agar `trade.entryType === "LIMIT"`, label pe "PENDING LIMIT" badge dikhao aur reason line me "Waiting for tap at zone" show karo. No logic change.
 
 ---
 
 ## Files to change
 
-- `src/lib/gold-analysis.functions.ts` — inject live tick into `computeSignalPlan`, propagate `livePrice`, shorten candle cache TTL.
-- `src/lib/analysis/engine.ts` — soften veto scoring, drop unknown factors from denominator, dynamic swept flags on HTF swing pools.
+- `src/lib/analysis/engine.ts` — `buildTrade` (entry modes, widened distances, synthetic OTE fallback), `scoreSetup` (soft veto, grade thresholds), `BuiltTrade` type (`entryType` field).
+- `src/routes/api/public/hooks/scan-signals.ts` — threshold + dedupe window.
+- `src/components/SignalCard.tsx` — small badge for LIMIT vs MARKET.
 
 ## Not changing
 
-- UI (`signal.tsx`, `SignalCard`) — koi visual change nahi, sirf sahi numbers milenge.
-- `buildTrade` core logic (SL/TP formulas, per-asset risk profile) — already sahi hai, sirf sahi `lastPrice` chahiye.
-- Database, credits, AI narration prompts — untouched.
+- Live price fetching, candle cache, LLM prompts, DB schema, credits, email templates.
+- Per-asset RISK_PROFILE core (SL buffer, min/max risk) — sirf `maxDistPct` widen.
 
 ## Expected result
 
-- Signal me price real live market ke andar 1–3 seconds fresh hoga.
-- Confidence har pair pe alag alag aayega — good setups 70–90%, weak setups 45–65%, only true rejects 30–40%.
-- Entry/SL/TP live price ke around calculate honge, stale $10–$15 offset khatam.
+- 60-70% scans me actionable signal (MARKET ya LIMIT) — WAIT sirf true HTF/LTF conflict pe.
+- A+ realistic frequency: 1-3 per pair per day during killzone.
+- Entry/SL/TP clean: MARKET = live price ke around, LIMIT = zone midpoint ke exact, SL/TP formulas unchanged.
+- Alerts cron zyada bar fire hoga bina noise ke (grade A/A+ sirf).
 
-Approve karo, ma implement karta ho.
+Approve karo, main implement kar deta hoon.
