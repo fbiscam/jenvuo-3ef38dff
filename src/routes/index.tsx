@@ -869,7 +869,7 @@ function HomePage() {
               ["ICT / SMC framework", false, true, true],
               ["Auto chart markup", false, false, true],
               ["Killzone & session bias", false, false, true],
-              ["Forex Factory context", false, false, true],
+              ["Gold macro & red-folder context", false, false, true],
               ["Sub-20ms latency", false, false, true],
             ].map(([cap, a, b, c], i) => (
               <div
