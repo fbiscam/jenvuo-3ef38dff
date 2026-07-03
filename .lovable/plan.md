@@ -1,106 +1,83 @@
+# Plan: Jenvu → XAU (Gold) Pairs Only
 
-## Diagnosis — kyun har dafa "WAIT" aur A+ almost kabhi nahi
+Restrict the entire product to **XAU cross-pairs**. Remove crypto, FX, indices, silver, oil, equities from code, UI, engine, agent, alerts, and content.
 
-Code trace karne ke baad `src/lib/analysis/engine.ts` → `buildTrade` aur `scoreSetup` me 4 hard gates milay jo mostly WAIT force karte hain:
+## Supported instruments (whitelist)
 
-### 1) Zone me pehle se ghusna zaroori hai
-```ts
-const ok = dir === "BUY"
-  ? f.kind === "bullish" && lastPrice >= f.priceLow
-  : f.kind === "bearish" && lastPrice <= f.priceHigh;
-```
-Agar live price fresh OB/FVG ke andar nahi ghusa, candidate hi drop → "No fresh zone" → WAIT.
+- XAU/USD (default)
+- XAU/EUR
+- XAU/GBP
+- XAU/JPY
+- XAU/AUD
+- XAU/CHF
 
-### 2) Actionable window bohot tight
-```ts
-entryWindowPct: crypto 0.25%, metal 0.09%, forex 0.06%
-```
-Yani BTC pe zone 0.3% door ho toh bhi WAIT. Practically kabhi tap nahi hota exact moment pe.
+Anything else → friendly rejection: *"Jenvu trades gold only. Try XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD or XAU/CHF."*
 
-### 3) `maxDistPct` bhi tight
-Metal 0.6%, forex 0.4%. Real zones aksar 1-2% door hote hain — engine chase nahi karta, seedha WAIT.
+## 1. Symbol resolution & feeds
 
-### 4) A+ threshold + veto stacking
-- A+ ≥ 88 score, A ≥ 75.
-- Har veto -15 points.
-- `no_sweep` veto non-crypto pe almost hamesha fire hota hai kyun ki sweep detection sirf recent 6-24 candles pe hoti hai — most setups score ~55-70 → grade B → alert nahi fire hota (cron threshold `score >= 80` bhi hai).
+- `src/lib/gold-analysis.functions.ts` — `resolveInstrument` accepts only the 6 XAU pairs; all `kind: "metal"` with quote-currency metadata. Non-gold input throws the rejection message.
+- `getLiveTick` — route each XAU pair to its OANDA feed (existing metals provider path); one fetcher per pair.
+- `src/hooks/useLivePrices.ts` — delete Binance WebSocket branch entirely; poll server tick for all XAU pairs.
+- `src/hooks/useLivePriceStream.ts` — XAU-aware; header ticker locked to the current XAU pair on `/signal`.
+- `src/components/TradingViewChart.tsx` — symbol map trimmed to `OANDA:XAUUSD/XAUEUR/XAUGBP/XAUJPY/XAUAUD/XAUCHF`; anything else → XAU/USD.
 
-Net result: 90%+ scans "WAIT" ya "B" grade → user ko A+ signal kabhi nahi milta.
+## 2. XAU pair selector (replaces multi-asset picker)
 
----
+- Signal desk: compact segmented control **USD · EUR · GBP · JPY · AUD · CHF**, defaults to USD, remembers last choice in `localStorage`.
+- Voice agent `detectSymbol` recognizes only gold aliases (`gold`, `xau`, `xauusd`, `gold euro`, `xaueur`, etc.). Non-gold → rejection reply.
+- Alerts UI pair picker uses the same 6-pair set.
 
-## Fix Plan
+## 3. XAU-specialized analysis engine
 
-### A) `src/lib/analysis/engine.ts` → `buildTrade` — PENDING limit entries add karo
+Upgrade `src/lib/analysis/engine.ts` + `computeSignalPlan` — one shared `xau` profile with per-quote nuance:
 
-Abhi engine sirf "tap ho chuka" market entries deta hai. Change:
+- **Sessions/killzones**: London fix (10:30 & 15:00 GMT), NY AM (12:30–15:00 GMT), Asia accumulation range — applied to every XAU pair.
+- **USD-strength confluence**: DXY for XAU/USD; EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CHF as USD proxies for the crosses (direction inverted where needed).
+- **Gold liquidity map**: PDH/PDL, prior week H/L, Asia range H/L, London H/L, daily/weekly opens, round-number magnets scaled per quote currency.
+- **ATR calibrated per pair** so SL/TP distances suit XAU/JPY's scale vs XAU/USD's.
+- **News risk filter** by the pair's quote: NFP, CPI, FOMC, ECB, BoE, BoJ, RBA, SNB.
+- **A+ rubric** rewritten: HTF bias + LTF sweep + OB/FVG + killzone + quote-currency confluence + no red news.
 
-1. **Zone filter loosen** — dono taraf ka POI accept karo (price zone ke aage ho toh limit order):
-   ```ts
-   const ok = dir === "BUY" ? f.kind === "bullish" : f.kind === "bearish";
-   ```
-   Distance-based ranking pehle se hai.
+## 4. Voice agent (`askSignalAgent`)
 
-2. **Execution modes**:
-   - Agar `lastPrice` zone ke andar → `MARKET` entry at `lastPrice` (current behavior).
-   - Agar zone thoda door hai lekin `maxDistPct` ke andar → `LIMIT` entry at zone midpoint, direction "BUY LIMIT" / "SELL LIMIT". `BuiltTrade` me `entryType: "MARKET" | "LIMIT"` field add karo.
-   - Agar `maxDistPct` se bhi door → WAIT (real chase avoid).
+- System prompt: *"You are Jenvu — a gold specialist with 25+ years on bullion desks, expert across XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD, XAU/CHF."* Politely refuses non-gold.
+- Deep gold knowledge in the prompt: central-bank buying, ETF flows, real yields, DXY, geopolitical premium, COMEX/COT positioning, seasonality.
+- `KNOWN_TOKENS` trimmed to gold aliases only.
 
-3. **`maxDistPct` widen** per asset:
-   - crypto 1.2% → 2.5%
-   - metal 0.6% → 1.5%
-   - forex 0.4% → 0.9%
-   - index 0.6% → 1.5%
-   - stock 0.6% → 2.0%
+## 5. Cron / alerts
 
-4. **`entryWindowPct` sirf MARKET mode ke liye use karo** — LIMIT mode ke liye zone width pe tap ka intezaar router karega.
+- `src/routes/api/public/hooks/scan-signals.ts` iterates only the 6 XAU pairs.
+- Migration deletes rows from `signal_alerts`, `alert_preferences`, `saved_signals`, `signal_alert_subscribers` where the symbol is not in the whitelist.
+- Alerts UI pair dropdown restricted to XAU pairs.
 
-5. **Fallback POI** — agar koi fresh unmitigated OB/FVG nahi mila, HTF equilibrium/OTE (62-79%) zone ko synthetic POI banao (BUY discount side, SELL premium side). Isse trend clear ho toh WAIT ki jagah pending idea milega.
+## 6. Content & SEO rewrite (gold-only)
 
-### B) `scoreSetup` — softer vetos + smarter grading
+- `src/routes/index.tsx` hero, features, testimonials, CTAs → gold-only messaging that names the 6 pairs.
+- `__root.tsx` head → *"Jenvu — AI Gold Trading Desk for XAU/USD & Gold Crosses"* + matching description/OG.
+- Rewrite copy on: `ai-engine.tsx`, `about.tsx`, `pricing.tsx`, `download.tsx`, `help.tsx`, `insights.tsx`, `signal.tsx`.
+- `public/llms.txt` describes gold-only scope with the pair list.
+- Insights: hide/remove non-gold articles.
+- Footer nav, sitemap, meta descriptions updated.
 
-1. **Single veto = -8 (not -15).** Multi-veto (≥2) = -15 each. Genuine sirf tab downgrade jab 2+ red flags ho.
-2. **`no_sweep` ko soft factor banao, veto nahi** — score me weight pehle se hai. Non-crypto ke liye hard veto hatao, sirf `sweep` factor fail count ho.
-3. **Grade thresholds slightly relaxed**: A+ ≥ 85 (was 88), A ≥ 72 (was 75), B ≥ 55 (was 60).
-4. **LIMIT entries pe `zone` factor bonus** — pending order zone tap wait karta hai, execution quality actually better hoti hai. Iska pass=true if zone unmitigated.
+## 7. UI cleanup
 
-### C) `src/routes/api/public/hooks/scan-signals.ts` — alert threshold realistic
+- Remove crypto/FX/indices/silver imagery and mentions site-wide.
+- Signal card header renders `XAU/<quote>` with correct decimal precision per pair.
+- Delete dead symbol lists (crypto tokens, index map, silver, oil) from `TradingViewChart` and `signal-agent`.
 
-Current:
-```ts
-if (!acceptableGrades.includes(grade) || plan.setupScore < 80)
-```
-Change:
-- Accept A+/A grades with `setupScore >= 72` (aligned with new A threshold).
-- Direction WAIT still skipped.
-- Dedupe window shorten 2h → 90m taaki mid-session naya A+ ban jaye toh miss na ho.
+## Choke points (single sources of truth)
 
-### D) `computeSignalPlan` (signal-agent context) — no change to prompt
+- `resolveInstrument` — the one gate for allowed pairs. Every entry point (agent, plan compute, alerts, chart, ticker) goes through it.
+- Voice-agent LLM system prompt — enforces gold-only tone & refusal.
+- Pair selector on `/signal` — the only place users switch quote currency.
 
-LLM narration already `trade.direction` aur `entryType` use karega automatically once engine exposes it. Bas `SignalCard` UI me "LIMIT @ price" ya "MARKET" label add karna hoga (chota render change).
+## Technical notes
 
-### E) UI touch — `src/components/SignalCard.tsx`
+- Dead crypto/FX/indices branches inside `gold-analysis.functions.ts` are left dormant behind `resolveInstrument` (faster, safer than deleting). New callers can't reach them.
+- Data migration is a data-only cleanup (uses insert tool with `DELETE`), no schema change.
+- `voice_history` rows are preserved (historical answers stay readable).
 
-Sirf presentation: agar `trade.entryType === "LIMIT"`, label pe "PENDING LIMIT" badge dikhao aur reason line me "Waiting for tap at zone" show karo. No logic change.
+## Out of scope
 
----
-
-## Files to change
-
-- `src/lib/analysis/engine.ts` — `buildTrade` (entry modes, widened distances, synthetic OTE fallback), `scoreSetup` (soft veto, grade thresholds), `BuiltTrade` type (`entryType` field).
-- `src/routes/api/public/hooks/scan-signals.ts` — threshold + dedupe window.
-- `src/components/SignalCard.tsx` — small badge for LIMIT vs MARKET.
-
-## Not changing
-
-- Live price fetching, candle cache, LLM prompts, DB schema, credits, email templates.
-- Per-asset RISK_PROFILE core (SL buffer, min/max risk) — sirf `maxDistPct` widen.
-
-## Expected result
-
-- 60-70% scans me actionable signal (MARKET ya LIMIT) — WAIT sirf true HTF/LTF conflict pe.
-- A+ realistic frequency: 1-3 per pair per day during killzone.
-- Entry/SL/TP clean: MARKET = live price ke around, LIMIT = zone midpoint ke exact, SL/TP formulas unchanged.
-- Alerts cron zyada bar fire hoga bina noise ke (grade A/A+ sirf).
-
-Approve karo, main implement kar deta hoon.
+- Refunds / plan grandfathering for users who signed up under multi-asset messaging — no changes to `plans`, `user_subscriptions`, or credit balances.
+- No new hero imagery generated in this pass unless you ask; existing gold visuals stay.
