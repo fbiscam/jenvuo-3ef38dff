@@ -471,32 +471,28 @@ export function scoreSetup(args: {
   const vetos: VetoResult[] = [];
   const dir = trade.direction;
 
-  // ---- HARD VETO GATES (any trigger → downgrade, but no longer flat-cap at 40) ----
+  // ---- HARD VETO GATES — reserved for genuine red flags only ----
+  // (no_sweep is not a veto anymore; it's already a scored factor. This prevents
+  // the engine from downgrading every off-session setup to grade C.)
   if (dir !== "WAIT") {
-    // 1. HTF/LTF bias conflict
+    // 1. HTF/LTF bias conflict — real conflict, not "ranging"
     if (htf.trend !== "ranging" && ltf.trend !== "ranging" && htf.trend !== ltf.trend) {
       vetos.push({ key: "bias_conflict", label: "HTF/LTF bias conflict", reason: `HTF ${htf.trend} vs LTF ${ltf.trend}` });
     }
-    // 2. No liquidity sweep before entry — skip for crypto (24/7, sweeps unreliable)
-    if (kind !== "crypto") {
-      const anySwept = pools.some(p => p.swept && (dir === "BUY" ? p.side === "sell" : p.side === "buy"));
-      if (!anySwept) {
-        vetos.push({ key: "no_sweep", label: "No sweep before entry", reason: "Institutional entries usually follow a liquidity grab" });
-      }
-    }
-    // 3. Entry zone already mitigated
+    // 2. Entry zone already mitigated
     if (zoneMitigated === true) {
       vetos.push({ key: "mitigated", label: "Entry zone already mitigated", reason: "Zone was tagged — imbalance filled" });
     }
-    // 4. High-impact news imminent
+    // 3. High-impact news imminent
     if (imminentHighNews) {
       vetos.push({ key: "news", label: "High-impact news imminent", reason: "News event within 60m — stand aside" });
     }
-    // 5. R:R < 1.5 (engine already floors at 2R; anything below 1.5 is genuinely bad)
+    // 4. R:R < 1.5
     if (trade.rr < 1.5) {
       vetos.push({ key: "rr_low", label: "R:R below 1.5", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
     }
   }
+
 
   const push = (key: string, label: string, pass: boolean, detail: string) => {
     const weight = w[key] ?? 0;
