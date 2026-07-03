@@ -490,20 +490,20 @@ function HomePage() {
             <div className="text-left lg:col-span-4 lg:text-left">
               
               <h2 className="mt-4 text-xl font-semibold tracking-tight sm:text-3xl">
-                One terminal. Every major market.
+                One terminal. Every gold cross.
               </h2>
               <p className="mt-4 text-zinc-900 leading-relaxed">
-                Jenvu routes liquidity, structure and news context across asset classes
+                Jenvu routes liquidity, structure and news context across every XAU pair a bullion desk trades.
               </p>
             </div>
             <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
               {[
-                ["Metals", "XAU · XAG · PAXG"],
-                ["FX Majors", "EUR · GBP · JPY"],
-                ["Crypto", "BTC · ETH · SOL"],
-                ["Indices", "NAS100 · SPX · DAX"],
-                ["Energy", "WTI · BRENT"],
-                ["DXY & Macro", "DXY · Yields"],
+                ["XAU / USD", "Primary bullion benchmark"],
+                ["XAU / EUR", "European gold demand"],
+                ["XAU / GBP", "LBMA London fix"],
+                ["XAU / JPY", "Tokyo bullion session"],
+                ["XAU / AUD", "Asia-Pacific miners"],
+                ["XAU / CHF", "Swiss safe-haven flows"],
               ].map(([k, v]) => (
                 <div key={k} className="bg-white p-5 text-left sm:text-left">
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
