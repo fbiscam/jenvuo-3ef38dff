@@ -108,7 +108,7 @@ export const Route = createFileRoute("/app")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Voice-native AI trading terminal that narrates institutional ICT/SMC analysis for Gold, Crypto, FX and Indices in real time.",
+            "Voice-native AI gold trading terminal that narrates institutional ICT/SMC analysis for every XAU cross-pair in real time.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
