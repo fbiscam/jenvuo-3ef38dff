@@ -8,7 +8,7 @@ import { computeSignalPlan } from '@/lib/gold-analysis.functions'
 
 const SENDER_DOMAIN = 'notify.jenvu.com'
 const FROM = 'Jenvu Signal Desk <signals@jenvu.com>'
-const DEDUPE_WINDOW_MS = 2 * 60 * 60 * 1000 // 2 hours
+const DEDUPE_WINDOW_MS = 90 * 60 * 1000 // 90 minutes
 
 export const Route = createFileRoute('/api/public/hooks/scan-signals')({
   server: {
