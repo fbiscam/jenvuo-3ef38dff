@@ -139,7 +139,7 @@ async function scanOnePair(
     .from('signal_alert_subscribers')
     .select('email')
     .eq('status', 'active')
-  const recipients = (subs ?? []).map((s) => s.email).filter(Boolean)
+  const recipients = (subs ?? []).map((s: { email: string | null }) => s.email).filter(Boolean)
 
   let enqueued = 0
   if (recipients.length > 0) {
