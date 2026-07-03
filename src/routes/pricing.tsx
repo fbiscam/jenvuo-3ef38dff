@@ -47,13 +47,12 @@ export const Route = createFileRoute("/pricing")({
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "2,418.30", "+0.42%"],
-  ["BTC/USDT", "71,204.10", "+1.18%"],
-  ["ETH/USDT", "3,841.20", "+2.04%"],
-  ["EUR/USD", "1.0832", "-0.07%"],
-  ["GBP/USD", "1.2671", "+0.09%"],
-  ["NAS100", "20,114.5", "+0.61%"],
+  ["XAU/EUR", "2,232.15", "+0.31%"],
+  ["XAU/GBP", "1,907.44", "+0.28%"],
+  ["XAU/JPY", "381,204", "+0.55%"],
+  ["XAU/AUD", "3,672.90", "+0.48%"],
+  ["XAU/CHF", "2,178.60", "+0.19%"],
   ["DXY", "104.21", "-0.12%"],
-  ["SOL/USDT", "168.40", "+3.12%"],
 ];
 
 const TIERS = [
