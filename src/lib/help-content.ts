@@ -44,7 +44,7 @@ export const collections: Collection[] = [
         slug: "what-is-jenvu",
         title: "What is Jenvu AI?",
         summary:
-          "Jenvu is a voice-native trading agent for Gold, FX, indices and crypto — built on ICT and SMC playbooks.",
+          "Jenvu is a voice-native gold trading agent covering every XAU cross-pair — built on ICT and SMC playbooks.",
         updatedAt: "2026-06-30",
         body: [
           { type: "p", content: "Jenvu AI is a voice-first market intelligence terminal. You speak — it listens, analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, narrates its read in real time, and renders the chart with marked zones so you can see exactly what it sees." },
