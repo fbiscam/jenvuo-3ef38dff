@@ -34,7 +34,7 @@ function AboutPage() {
         <UL>
           <li><b>Voice-first</b> — speak the asset, hear the plan. No menus.</li>
           <li><b>Institutional playbook</b> — ICT, SMC, killzones, liquidity, OTE.</li>
-          <li><b>Multi-asset</b> — Gold, Crypto, FX, Indices, Stocks from one engine.</li>
+          <li><b>Gold specialist</b> — every XAU cross (USD, EUR, GBP, JPY, AUD, CHF) from one bullion engine.</li>
           <li><b>Honest output</b> — when conditions are bad, the agent says "wait".</li>
         </UL>
       </section>
