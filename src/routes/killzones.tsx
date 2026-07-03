@@ -191,11 +191,7 @@ function KillzonesPage() {
 
   const grouped = useMemo(() => {
     const g: Record<Category, typeof rows> = {
-      Metals: [],
-      Forex: [],
-      JPY: [],
-      Indices: [],
-      Crypto: [],
+      XAU: [],
     };
     rows.forEach(r => g[r.meta.category].push(r));
     return g;
