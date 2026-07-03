@@ -451,7 +451,7 @@ function HomePage() {
               {
                 k: "03",
                 t: "Market Intelligence",
-                d: "London fix, DXY, gold-specific Forex Factory news and killzones merged into every plan.",
+                d: "London fix, DXY, gold-specific Forex Factory news merged into every plan.",
               },
               {
                 k: "04",
