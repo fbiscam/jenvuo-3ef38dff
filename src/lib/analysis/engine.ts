@@ -290,60 +290,62 @@ export function buildTrade(
     htf.trend === "bearish" && (ltf.trend === "bearish" || ltf.trend === "ranging") ? "SELL" : "WAIT";
 
   if (dir === "WAIT") {
-    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF/LTF disagree — no clean trend." };
+    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF/LTF disagree — no clean trend." };
   }
 
-  // Pick best zone: UNMITIGATED LTF FVG/OB on the trade side, closest to LIVE price.
-  // We no longer emit limit entries far away from market. If price is not at/near
-  // the POI, the engine returns WAIT instead of a misleading entry/SL/TP ticket.
-  const candidates: Array<{ kind: "OB" | "FVG"; priceLow: number; priceHigh: number; dist: number }> = [];
+  // Collect all UNMITIGATED LTF FVG/OB on the trade side, regardless of whether
+  // price already tapped. We rank by distance and pick MARKET vs LIMIT below.
+  type ZoneCandidate = { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number; dist: number };
+  const candidates: ZoneCandidate[] = [];
   const distanceFromExecutionZone = (lo: number, hi: number) => {
     if (lastPrice >= lo && lastPrice <= hi) return 0;
-    return dir === "BUY" ? Math.max(0, lastPrice - hi) : Math.max(0, lo - lastPrice);
+    return dir === "BUY" ? Math.max(0, lo - lastPrice, lastPrice - hi) : Math.max(0, lastPrice - hi, lo - lastPrice);
   };
   for (const f of ltf.fvgs) {
     if (f.mitigated) continue;
-    const ok = dir === "BUY"
-      ? f.kind === "bullish" && lastPrice >= f.priceLow
-      : f.kind === "bearish" && lastPrice <= f.priceHigh;
-    if (ok) candidates.push({ kind: "FVG", priceLow: f.priceLow, priceHigh: f.priceHigh, dist: distanceFromExecutionZone(f.priceLow, f.priceHigh) });
+    if (dir === "BUY" && f.kind !== "bullish") continue;
+    if (dir === "SELL" && f.kind !== "bearish") continue;
+    candidates.push({ kind: "FVG", priceLow: f.priceLow, priceHigh: f.priceHigh, dist: distanceFromExecutionZone(f.priceLow, f.priceHigh) });
   }
   for (const o of ltf.obs) {
     if (o.mitigated) continue;
-    const ok = dir === "BUY"
-      ? o.kind === "demand" && lastPrice >= o.priceLow
-      : o.kind === "supply" && lastPrice <= o.priceHigh;
-    if (ok) candidates.push({ kind: "OB", priceLow: o.priceLow, priceHigh: o.priceHigh, dist: distanceFromExecutionZone(o.priceLow, o.priceHigh) });
+    if (dir === "BUY" && o.kind !== "demand") continue;
+    if (dir === "SELL" && o.kind !== "supply") continue;
+    candidates.push({ kind: "OB", priceLow: o.priceLow, priceHigh: o.priceHigh, dist: distanceFromExecutionZone(o.priceLow, o.priceHigh) });
   }
+
+  // Fallback: synthesize an OTE (62-79%) zone from HTF swing range if no fresh OB/FVG.
+  if (!candidates.length) {
+    const range = htf.swingHigh - htf.swingLow;
+    if (range > 0) {
+      const oteLo = dir === "BUY" ? htf.swingLow + range * 0.21 : htf.swingLow + range * 0.62;
+      const oteHi = dir === "BUY" ? htf.swingLow + range * 0.38 : htf.swingLow + range * 0.79;
+      candidates.push({ kind: "OTE", priceLow: oteLo, priceHigh: oteHi, dist: distanceFromExecutionZone(oteLo, oteHi) });
+    }
+  }
+
   candidates.sort((a, b) => a.dist - b.dist);
   const zone = candidates[0] ?? null;
 
   if (!zone) {
-    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "No fresh (unmitigated) OB/FVG aligned with bias." };
+    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "No fresh (unmitigated) OB/FVG aligned with bias and no valid OTE fallback." };
   }
 
   const notes: string[] = [];
-
-  // Reject stale / distant zones. A valid signal must be executable around the
-  // current live tick; otherwise it is only a watch-zone and should be WAIT.
   const zoneMid = (zone.priceLow + zone.priceHigh) / 2;
   const zoneDistance = distanceFromExecutionZone(zone.priceLow, zone.priceHigh);
   const distPct = zoneDistance / lastPrice;
+
+  // Reject only truly stale/distant zones. Otherwise choose MARKET vs LIMIT.
   if (distPct > profile.maxDistPct) {
-    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest fresh zone is ${(distPct * 100).toFixed(2)}% from live price — wait, do not chase.` };
+    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest ${zone.kind} is ${(distPct * 100).toFixed(2)}% from live price — outside chase range, wait for pullback.` };
   }
 
-  const actionableWindow = Math.max(lastPrice * profile.entryWindowPct, atr && atr > 0 ? atr * 0.20 : 0);
-  if (zoneDistance > actionableWindow) {
-    return {
-      direction: "WAIT",
-      entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
-      reason: `Live price ${smartPrice(lastPrice)} is not inside the fresh ${zone.kind} (${smartPrice(zone.priceLow)}–${smartPrice(zone.priceHigh)}). Wait for a tap before entry.`,
-    };
-  }
+  const marketWindow = Math.max(lastPrice * profile.entryWindowPct, atr && atr > 0 ? atr * 0.20 : 0);
+  const entryType: "MARKET" | "LIMIT" = zoneDistance <= marketWindow ? "MARKET" : "LIMIT";
 
-  // Entry = the current live executable price, not an old zone midpoint.
-  const entry = lastPrice;
+  // MARKET → enter at live price. LIMIT → enter at zone midpoint (waiting for tap).
+  const entry = entryType === "MARKET" ? lastPrice : zoneMid;
   const zoneHeight = Math.abs(zone.priceHigh - zone.priceLow);
 
   // SL buffer — asset-aware. max(pct × price, atrMult × ATR, 0.5 × zoneHeight)
@@ -365,8 +367,8 @@ export function buildTrade(
   const maxRisk = lastPrice * profile.maxRiskPct;
   if (risk > maxRisk) {
     return {
-      direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
-      reason: `Risk from live entry to protected stop is ${(risk / lastPrice * 100).toFixed(2)}%, too wide for ${assetKind}. Wait for a tighter re-entry.`,
+      direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
+      reason: `Risk from entry to protected stop is ${(risk / lastPrice * 100).toFixed(2)}%, too wide for ${assetKind}. Wait for a tighter re-entry.`,
     };
   }
 
@@ -388,7 +390,6 @@ export function buildTrade(
   if (nearestLiquidity == null) {
     tp = rMax;
   } else {
-    // Use liquidity target only if it lies between 2R and 3R (realistic).
     const distR = Math.abs(nearestLiquidity - entry) / risk;
     if (distR < 2) {
       tp = rMin;
@@ -405,12 +406,19 @@ export function buildTrade(
   const rr = risk > 0 ? reward / risk : 0;
   const tp3 = tp;
 
+  const label = entryType === "LIMIT" ? `${dir} LIMIT (pending tap)` : dir;
+  const reason = entryType === "MARKET"
+    ? `${dir} at market ${smartPrice(entry)} inside fresh ${zone.kind} (${smartPrice(zone.priceLow)}–${smartPrice(zone.priceHigh)}), SL beyond the protected zone, TP ${liquidityTargets[0]?.label ? "at " + liquidityTargets[0].label : "at " + rr.toFixed(1) + "R"}.`
+    : `${label} at ${smartPrice(entry)} — waiting for price to tap fresh ${zone.kind} (${smartPrice(zone.priceLow)}–${smartPrice(zone.priceHigh)}) from live ${smartPrice(lastPrice)}. SL beyond zone, TP ${liquidityTargets[0]?.label ? "at " + liquidityTargets[0].label : "at " + rr.toFixed(1) + "R"}.`;
+
   return {
     direction: dir,
+    entryType,
     entry, sl, tp, rr,
     tp1, tp2, tp3,
     zone: { kind: zone.kind, priceLow: zone.priceLow, priceHigh: zone.priceHigh },
-    reason: `${dir} from live price ${smartPrice(entry)} near fresh ${zone.kind} (${smartPrice(zone.priceLow)}–${smartPrice(zone.priceHigh)}), SL beyond the protected zone, TP ${liquidityTargets[0]?.label ? "at " + liquidityTargets[0].label : "at " + rr.toFixed(1) + "R"}.`,
+    reason,
+
     notes: notes.length ? notes : undefined,
   };
 }
