@@ -106,7 +106,7 @@ const TIERS = [
       "595 credits / month included",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
-      "Multi-pair scanner (XAU + DXY + indices)",
+      "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF)",
       "API access & webhooks",
       "Custom alert rules",
       "Dedicated onboarding & SLA",
