@@ -568,11 +568,6 @@ export function scoreSetup(args: {
     score >= 72 ? "A" :
     score >= 55 ? "B" : "C";
 
-  const grade: "A+" | "A" | "B" | "C" =
-    vetos.length >= 2 ? "C" :
-    score >= 88 ? "A+" :
-    score >= 75 ? "A" :
-    score >= 60 ? "B" : "C";
 
   return { score, grade, factors: f, vetos };
 }
