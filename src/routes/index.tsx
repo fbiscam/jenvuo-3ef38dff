@@ -918,7 +918,7 @@ function HomePage() {
               </h3>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              {["Binance", "Yahoo Finance", "Forex Factory", "TradingView", "OANDA", "DXY"].map((n) => (
+              {["OANDA XAU feeds", "Yahoo Finance", "LBMA fix", "TradingView", "COMEX / COT", "DXY"].map((n) => (
                 <span
                   key={n}
                   className={`rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider text-zinc-900`}
