@@ -493,7 +493,7 @@ function HomePage() {
                 One terminal. Every gold cross.
               </h2>
               <p className="mt-4 text-zinc-900 leading-relaxed">
-                Jenvu routes liquidity, structure and news context across every XAU pair a bullion desk trades.
+                Jenvu routes liquidity, structure and news context across every XAU pair&nbsp;
               </p>
             </div>
             <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
