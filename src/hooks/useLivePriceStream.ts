@@ -147,10 +147,12 @@ export function useLivePriceStream(
 
     return () => {
       stopped = true;
+      if (firstTickTimer) clearTimeout(firstTickTimer);
       if (ws) { try { ws.close(); } catch { /* ignore */ } }
       if (pollId) clearInterval(pollId);
       if (raf != null) cancelAnimationFrame(raf);
     };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol]);
 
