@@ -29,27 +29,18 @@ export const Route = createFileRoute("/killzones")({
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
-type Category = "Metals" | "Forex" | "JPY" | "Indices" | "Crypto";
+type Category = "XAU";
 
 const META: Record<string, { name: string; category: Category; region: string; flag: string }> = {
-  XAUUSD: { name: "Gold", category: "Metals", region: "London / New York", flag: "🥇" },
-  XAGUSD: { name: "Silver", category: "Metals", region: "London / New York", flag: "🥈" },
-  EURUSD: { name: "Euro / US Dollar", category: "Forex", region: "London", flag: "🇪🇺" },
-  GBPUSD: { name: "Pound / US Dollar", category: "Forex", region: "London", flag: "🇬🇧" },
-  USDJPY: { name: "US Dollar / Yen", category: "JPY", region: "Tokyo / London", flag: "🇯🇵" },
-  EURJPY: { name: "Euro / Yen", category: "JPY", region: "Tokyo / London", flag: "🇯🇵" },
-  GBPJPY: { name: "Pound / Yen", category: "JPY", region: "Tokyo / London", flag: "🇯🇵" },
-  AUDUSD: { name: "Aussie / US Dollar", category: "Forex", region: "Sydney / Tokyo", flag: "🇦🇺" },
-  NZDUSD: { name: "Kiwi / US Dollar", category: "Forex", region: "Sydney / Tokyo", flag: "🇳🇿" },
-  USDCAD: { name: "US Dollar / Loonie", category: "Forex", region: "New York", flag: "🇨🇦" },
-  NAS100: { name: "Nasdaq 100", category: "Indices", region: "New York", flag: "🇺🇸" },
-  SPX500: { name: "S&P 500", category: "Indices", region: "New York", flag: "🇺🇸" },
-  US30: { name: "Dow Jones 30", category: "Indices", region: "New York", flag: "🇺🇸" },
-  BTCUSD: { name: "Bitcoin", category: "Crypto", region: "24/7 · NY / Asia", flag: "₿" },
-  ETHUSD: { name: "Ethereum", category: "Crypto", region: "24/7 · NY / Asia", flag: "Ξ" },
+  XAUUSD: { name: "Gold / US Dollar", category: "XAU", region: "London / New York", flag: "🥇" },
+  XAUEUR: { name: "Gold / Euro", category: "XAU", region: "London / Frankfurt", flag: "🇪🇺" },
+  XAUGBP: { name: "Gold / British Pound", category: "XAU", region: "London", flag: "🇬🇧" },
+  XAUJPY: { name: "Gold / Japanese Yen", category: "XAU", region: "Tokyo / London", flag: "🇯🇵" },
+  XAUAUD: { name: "Gold / Australian Dollar", category: "XAU", region: "Sydney / London", flag: "🇦🇺" },
+  XAUCHF: { name: "Gold / Swiss Franc", category: "XAU", region: "Zurich / London", flag: "🇨🇭" },
 };
 
-const CATEGORIES: (Category | "All")[] = ["All", "Metals", "Forex", "JPY", "Indices", "Crypto"];
+const CATEGORIES: (Category | "All")[] = ["All", "XAU"];
 
 function pad(n: number) {
   return n.toString().padStart(2, "0");
