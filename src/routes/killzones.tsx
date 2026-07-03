@@ -10,13 +10,13 @@ export const Route = createFileRoute("/killzones")({
       {
         name: "description",
         content:
-          "Live ICT/SMC killzone times for Gold, Forex, JPY pairs, Indices and Crypto — shown in UTC and your local timezone with real-time IN/OUT status.",
+          "Live ICT/SMC killzone times for all XAU gold cross-pairs (XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD, XAU/CHF) — shown in UTC and your local timezone with real-time IN/OUT status.",
       },
-      { property: "og:title", content: "Killzone Times Tracker" },
+      { property: "og:title", content: "Gold Killzone Times Tracker" },
       {
         property: "og:description",
         content:
-          "Live ICT/SMC killzone times for Gold, Forex, JPY pairs, Indices and Crypto — shown in UTC and your local timezone with real-time IN/OUT status.",
+          "Live ICT/SMC killzone times for all XAU gold cross-pairs — shown in UTC and your local timezone with real-time IN/OUT status.",
       },
       { property: "og:url", content: "https://jenvu.com/killzones" },
       { property: "og:type", content: "website" },
