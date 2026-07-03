@@ -11,7 +11,7 @@ const TF_MAP: Record<string, string> = {
 };
 
 type Props = {
-  /** App symbol like XAUUSD, BTCUSDT, EURUSD, NAS100. Will be mapped to a TradingView symbol. */
+  /** XAU pair symbol like XAUUSD, XAUEUR, XAUGBP, XAUJPY, XAUAUD, XAUCHF. */
   symbol?: string;
   /** Chart timeframe key (e.g. "15m"). */
   timeframe?: string;
@@ -21,42 +21,22 @@ type Props = {
   studies?: string[];
 };
 
-/** Map an internal symbol → TradingView symbol the embed widget understands. */
+const XAU_TV_MAP: Record<string, string> = {
+  XAUUSD: "OANDA:XAUUSD",
+  XAUEUR: "OANDA:XAUEUR",
+  XAUGBP: "OANDA:XAUGBP",
+  XAUJPY: "OANDA:XAUJPY",
+  XAUAUD: "OANDA:XAUAUD",
+  XAUCHF: "OANDA:XAUCHF",
+};
+
+/** Map an XAU pair → TradingView symbol. Falls back to XAU/USD. */
 function toTvSymbol(raw?: string): string {
   if (!raw) return "OANDA:XAUUSD";
   const s = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
-
-  // Metals / FX on OANDA (matches what most traders see).
-  if (s === "XAUUSD" || s === "GOLD") return "OANDA:XAUUSD";
-  if (s === "XAGUSD" || s === "SILVER") return "OANDA:XAGUSD";
-
-  // Indices
-  const indexMap: Record<string, string> = {
-    NAS100: "OANDA:NAS100USD", US100: "OANDA:NAS100USD", NDX: "OANDA:NAS100USD",
-    SPX500: "OANDA:SPX500USD", US500: "OANDA:SPX500USD", SPX: "OANDA:SPX500USD",
-    US30: "OANDA:US30USD", DJI: "OANDA:US30USD",
-    DAX: "OANDA:DE30EUR",
-    FTSE: "OANDA:UK100GBP",
-    N225: "OANDA:JP225USD",
-    DXY: "TVC:DXY",
-  };
-  if (indexMap[s]) return indexMap[s];
-
-  // Crypto — Binance spot
-  if (/^(BTC|ETH|SOL|XRP|DOGE|BNB|ADA|AVAX|MATIC|LTC|LINK|DOT|TRX|TON|SHIB|PEPE|ATOM|NEAR|ARB|OP|APT|SUI|FIL|UNI|AAVE)/.test(s)) {
-    const base = s.replace(/USDT?$|USDC$|BUSD$/, "");
-    return `BINANCE:${base}USDT`;
-  }
-
-  // FX pairs (6 letters, both halves are G10/major)
-  if (/^[A-Z]{6}$/.test(s)) {
-    const fx = new Set(["EUR","GBP","JPY","AUD","NZD","CAD","CHF","USD"]);
-    if (fx.has(s.slice(0,3)) && fx.has(s.slice(3))) return `OANDA:${s}`;
-  }
-
-  // Default: pass through and hope TradingView resolves it.
-  return s;
+  return XAU_TV_MAP[s] ?? "OANDA:XAUUSD";
 }
+
 
 export function TradingViewChart({
   symbol,

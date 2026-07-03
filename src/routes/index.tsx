@@ -10,16 +10,16 @@ import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Voice Powered Trading Intelligence" },
+      { title: "Voice-Powered Gold Trading Intelligence" },
       {
         name: "description",
         content:
-          "Voice-native AI trading terminal for Gold, Crypto, FX & Indices. Live ICT/SMC analysis, A+ setups and spoken execution built on 25+ years of institutional logic.",
+          "Voice-native AI gold desk for XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF. Live ICT/SMC analysis, A+ setups and spoken execution built on 25+ years of bullion-desk logic.",
       },
-      { property: "og:title", content: "Voice Native Trading Intelligence — Jenvu" },
+      { property: "og:title", content: "Voice-Native Gold Trading Intelligence — Jenvu" },
       {
         property: "og:description",
-        content: "Speak. Analyze. Execute. The voice terminal that turns market noise into institutional-grade signals.",
+        content: "Speak. Analyze. Execute. The voice terminal that turns gold market noise into institutional-grade XAU signals.",
       },
       { property: "og:url", content: "https://jenvu.com/" },
       { property: "og:type", content: "website" },
@@ -35,12 +35,13 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Voice-native AI trading terminal with institutional ICT/SMC analysis for Gold, Crypto, FX and Indices.",
+            "Voice-native AI gold trading terminal with institutional ICT/SMC analysis for every XAU cross-pair.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
     ],
   }),
+
   component: HomePage,
 });
 
@@ -50,49 +51,33 @@ const SANS = "font-['Inter',system-ui,sans-serif]";
 /* ---------- mock data ---------- */
 const SIGNALS = [
   { pair: "XAUUSD", t: "14:20:02", tag: "SWEEP", note: "Liquidity grab @ 2,418.30", tone: "ink" },
-  { pair: "BTCUSD", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
-  { pair: "EURUSD", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
-  { pair: "NAS100", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
+  { pair: "XAUEUR", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
+  { pair: "XAUGBP", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
+  { pair: "XAUJPY", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
 ] as const;
 
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "2,418.30", "+0.42%"],
-  ["BTC/USDT", "71,204.10", "+1.18%"],
-  ["ETH/USDT", "3,841.20", "+2.04%"],
-  ["EUR/USD", "1.0832", "-0.07%"],
-  ["GBP/USD", "1.2671", "+0.09%"],
-  ["NAS100", "20,114.5", "+0.61%"],
+  ["XAU/EUR", "2,241.05", "+0.31%"],
+  ["XAU/GBP", "1,908.72", "+0.18%"],
+  ["XAU/JPY", "376,410", "+0.55%"],
+  ["XAU/AUD", "3,684.10", "+0.72%"],
+  ["XAU/CHF", "2,132.94", "+0.24%"],
   ["DXY", "104.21", "-0.12%"],
-  ["WTI", "78.42", "+0.84%"],
-  ["SOL/USDT", "168.40", "+3.12%"],
-  ["XRP/USDT", "0.5184", "+0.78%"],
-  ["BNB/USDT", "612.30", "+1.04%"],
-  ["ADA/USDT", "0.4421", "+1.92%"],
-  ["DOGE/USDT", "0.1612", "+2.45%"],
-  ["AVAX/USDT", "36.21", "+1.88%"],
-  ["LINK/USDT", "16.84", "+2.10%"],
-  ["DOT/USDT", "7.12", "+1.34%"],
-  ["LTC/USDT", "84.50", "+0.92%"],
-  ["MATIC/USDT", "0.7184", "+1.55%"],
 ];
 
-// Maps display symbol -> Binance ticker symbol (where available)
-const BINANCE_MAP: Record<string, string> = {
-  "BTC/USDT": "BTCUSDT",
-  "ETH/USDT": "ETHUSDT",
-  "EUR/USD": "EURUSDT",
-  "SOL/USDT": "SOLUSDT",
-  "XRP/USDT": "XRPUSDT",
-  "BNB/USDT": "BNBUSDT",
-  "ADA/USDT": "ADAUSDT",
-  "DOGE/USDT": "DOGEUSDT",
-  "AVAX/USDT": "AVAXUSDT",
-  "LINK/USDT": "LINKUSDT",
-  "DOT/USDT": "DOTUSDT",
-  "LTC/USDT": "LTCUSDT",
-  "MATIC/USDT": "MATICUSDT",
+// Yahoo Finance symbol map for each XAU cross-pair on the ticker.
+const YAHOO_MAP: Record<string, string> = {
+  "XAU/USD": "XAUUSD=X",
+  "XAU/EUR": "XAUEUR=X",
+  "XAU/GBP": "XAUGBP=X",
+  "XAU/JPY": "XAUJPY=X",
+  "XAU/AUD": "XAUAUD=X",
+  "XAU/CHF": "XAUCHF=X",
+  "DXY": "DX-Y.NYB",
 };
+
 
 
 function fmtPrice(n: number): string {
@@ -105,17 +90,16 @@ function useLiveTicker(): TickerRow[] {
   const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
   React.useEffect(() => {
     let alive = true;
-    const symbols = Object.values(BINANCE_MAP);
 
-    const fetchGold = async (): Promise<{ price: number; pct: number } | null> => {
+    const fetchOne = async (yahooSym: string): Promise<number | null> => {
       try {
-        const r = await fetch("https://api.gold-api.com/price/XAU");
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSym)}?interval=5m&range=1d`;
+        const r = await fetch(url);
         if (!r.ok) return null;
-        const j = await r.json();
-        const price = Number(j.price);
-        if (!isFinite(price)) return null;
-        // gold-api doesn't return 24h change; derive from previous render
-        return { price, pct: NaN };
+        const j: any = await r.json();
+        const meta = j?.chart?.result?.[0]?.meta;
+        const p = Number(meta?.regularMarketPrice);
+        return Number.isFinite(p) ? p : null;
       } catch {
         return null;
       }
@@ -123,39 +107,33 @@ function useLiveTicker(): TickerRow[] {
 
     const fetchPrices = async () => {
       try {
-        const [binRes, gold] = await Promise.all([
-          fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(symbols))}`).then((r) => (r.ok ? r.json() : null)),
-          fetchGold(),
-        ]);
+        const entries = await Promise.all(
+          INITIAL_TICKER.map(async ([label]) => {
+            const sym = YAHOO_MAP[label];
+            if (!sym) return null;
+            const p = await fetchOne(sym);
+            return p != null ? [label, p] as const : null;
+          }),
+        );
         if (!alive) return;
-        const data: Array<{ symbol: string; lastPrice: string; priceChangePercent: string }> = Array.isArray(binRes) ? binRes : [];
-        const bySym = new Map(data.map((d) => [d.symbol, d]));
+        const priceByLabel = new Map(entries.filter((e): e is readonly [string, number] => !!e));
         setRows((prev) =>
           prev.map(([label, price, delta]) => {
-            if (label === "XAU/USD" && gold) {
-              // approximate % change vs previous shown price
-              const prevN = parseFloat(price.replace(/,/g, ""));
-              const pct = isFinite(prevN) && prevN > 0 ? ((gold.price - prevN) / prevN) * 100 : 0;
-              const sign = pct >= 0 ? "+" : "";
-              const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
-              return [label, fmtPrice(gold.price), deltaOut];
-            }
-            const bsym = BINANCE_MAP[label];
-            if (!bsym) return [label, price, delta];
-            const d = bySym.get(bsym);
-            if (!d) return [label, price, delta];
-            const p = parseFloat(d.lastPrice);
-            const pct = parseFloat(d.priceChangePercent);
+            const p = priceByLabel.get(label);
+            if (p == null) return [label, price, delta];
+            const prevN = parseFloat(price.replace(/,/g, ""));
+            const pct = isFinite(prevN) && prevN > 0 ? ((p - prevN) / prevN) * 100 : 0;
             const sign = pct >= 0 ? "+" : "";
-            return [label, fmtPrice(p), `${sign}${pct.toFixed(2)}%`];
-          })
+            const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
+            return [label, fmtPrice(p), deltaOut];
+          }),
         );
       } catch {
         /* ignore */
       }
     };
     fetchPrices();
-    const id = setInterval(fetchPrices, 10_000);
+    const id = setInterval(fetchPrices, 15_000);
     return () => {
       alive = false;
       clearInterval(id);
@@ -163,6 +141,7 @@ function useLiveTicker(): TickerRow[] {
   }, []);
   return rows;
 }
+
 
 
 

@@ -67,128 +67,67 @@ export type ResolvedInstrument = {
   needsUsdNews: boolean;
 };
 
-const CRYPTO_BASES = new Set([
-  "BTC","ETH","BNB","SOL","XRP","ADA","DOGE","AVAX","DOT","MATIC","POL","LINK","TRX","LTC","BCH","ATOM","NEAR","ARB","OP","APT","SUI","TON","SHIB","PEPE","INJ","RNDR","TIA","FIL","ICP","ETC","HBAR","UNI","AAVE","MKR","XLM","ALGO","FTM","SAND","MANA","AXS","GRT","STX","IMX","KAS","RUNE","WLD","SEI","JUP","ORDI","ENA","FET",
-]);
-const G10_FX = new Set(["EUR","GBP","JPY","AUD","NZD","CAD","CHF","USD"]);
-const INDEX_MAP: Record<string, { yahoo: string; display: string; decimals: number }> = {
-  SPX: { yahoo: "^GSPC", display: "S&P 500", decimals: 2 },
-  SPX500: { yahoo: "^GSPC", display: "S&P 500", decimals: 2 },
-  US500: { yahoo: "^GSPC", display: "S&P 500", decimals: 2 },
-  NDX: { yahoo: "^NDX", display: "Nasdaq 100", decimals: 2 },
-  NAS100: { yahoo: "^NDX", display: "Nasdaq 100", decimals: 2 },
-  US100: { yahoo: "^NDX", display: "Nasdaq 100", decimals: 2 },
-  DJI: { yahoo: "^DJI", display: "Dow Jones", decimals: 2 },
-  US30: { yahoo: "^DJI", display: "Dow Jones", decimals: 2 },
-  DAX: { yahoo: "^GDAXI", display: "DAX", decimals: 2 },
-  FTSE: { yahoo: "^FTSE", display: "FTSE 100", decimals: 2 },
-  N225: { yahoo: "^N225", display: "Nikkei 225", decimals: 2 },
-  DXY: { yahoo: "DX-Y.NYB", display: "Dollar Index", decimals: 2 },
+// ------------------------------------------------------------
+// XAU-ONLY WHITELIST
+// Jenvu trades gold cross-pairs exclusively. Anything else is redirected
+// to XAU/USD as a safe default. resolveInstrument is the single choke
+// point — every entry point (agent, plan compute, alerts, chart, ticker)
+// flows through it.
+// ------------------------------------------------------------
+
+type XauQuote = "USD" | "EUR" | "GBP" | "JPY" | "AUD" | "CHF";
+
+const XAU_PAIRS: Record<string, { display: string; decimals: number; yahoo: string; quote: XauQuote; usdProxy?: { symbol: string; inverse: boolean } }> = {
+  XAUUSD: { display: "XAU/USD", decimals: 2, yahoo: "XAUUSD=X", quote: "USD" },
+  XAUEUR: { display: "XAU/EUR", decimals: 2, yahoo: "XAUEUR=X", quote: "EUR", usdProxy: { symbol: "EURUSD=X", inverse: false } },
+  XAUGBP: { display: "XAU/GBP", decimals: 2, yahoo: "XAUGBP=X", quote: "GBP", usdProxy: { symbol: "GBPUSD=X", inverse: false } },
+  XAUJPY: { display: "XAU/JPY", decimals: 0, yahoo: "XAUJPY=X", quote: "JPY", usdProxy: { symbol: "USDJPY=X", inverse: true } },
+  XAUAUD: { display: "XAU/AUD", decimals: 2, yahoo: "XAUAUD=X", quote: "AUD", usdProxy: { symbol: "AUDUSD=X", inverse: false } },
+  XAUCHF: { display: "XAU/CHF", decimals: 2, yahoo: "XAUCHF=X", quote: "CHF", usdProxy: { symbol: "USDCHF=X", inverse: true } },
 };
 
-const SYMBOL_ALIASES: Record<string, string> = {
-  BITCOIN: "BTCUSDT", ETHEREUM: "ETHUSDT", SOLANA: "SOLUSDT", RIPPLE: "XRPUSDT",
-  GOLD: "XAUUSD", SILVER: "XAGUSD",
-  NASDAQ: "NAS100", NASDAQ100: "NAS100", SP500: "SPX500", SANDP: "SPX500", DOW: "US30", DOWJONES: "US30",
-  OIL: "USOIL", CRUDE: "USOIL", WTI: "USOIL",
+export const XAU_PAIR_LIST = Object.keys(XAU_PAIRS);
+
+const XAU_ALIASES: Record<string, string> = {
+  GOLD: "XAUUSD", XAU: "XAUUSD", XAUUSD: "XAUUSD",
+  "GOLDEUR": "XAUEUR", "GOLDEURO": "XAUEUR", "XAUEUR": "XAUEUR",
+  "GOLDGBP": "XAUGBP", "GOLDPOUND": "XAUGBP", "XAUGBP": "XAUGBP",
+  "GOLDJPY": "XAUJPY", "GOLDYEN": "XAUJPY", "XAUJPY": "XAUJPY",
+  "GOLDAUD": "XAUAUD", "XAUAUD": "XAUAUD",
+  "GOLDCHF": "XAUCHF", "XAUCHF": "XAUCHF",
 };
 
 export function resolveInstrument(input: string): ResolvedInstrument {
   const raw = (input || "").trim();
-  if (!raw) return { ...resolveInstrument("XAUUSD"), raw: "XAUUSD" };
-  let cleaned = raw.toUpperCase().replace(/[\s_\-]/g, "").replace(/PERP$/, "");
-  if (SYMBOL_ALIASES[cleaned]) cleaned = SYMBOL_ALIASES[cleaned];
-
-
-
-  if (/^XAU(USD)?$/.test(cleaned) || cleaned === "GOLD") {
-    return {
-      raw, key: "METAL:XAUUSD", display: "XAU/USD", kind: "metal", decimals: 2,
-      // Live price comes from fetchMetalSpotQuote (gold-api.com spot) — see
-      // getLiveTick / liveTickPromise. Yahoo XAUUSD=X often 429s and futures
-      // (GC=F) trade at contango premium, so keep Binance PAXG/XAUT as a
-      // candle fallback so structure analysis still runs when Yahoo is down.
-      yahooSymbols: ["XAUUSD=X", "GC=F"],
-      binanceSymbols: ["PAXGUSDT", "XAUTUSDT"],
-      quote: "USD", needsUsdNews: true,
-    };
-  }
-  if (/^XAG(USD)?$/.test(cleaned) || cleaned === "SILVER") {
-    return {
-      raw, key: "METAL:XAGUSD", display: "XAG/USD", kind: "metal", decimals: 3,
-      yahooSymbols: ["XAGUSD=X", "SI=F"], quote: "USD", needsUsdNews: true,
-    };
-  }
-
-  if (INDEX_MAP[cleaned]) {
-    const m = INDEX_MAP[cleaned];
-    return {
-      raw, key: `INDEX:${cleaned}`, display: m.display, kind: "index",
-      decimals: m.decimals, yahooSymbols: [m.yahoo], quote: "USD", needsUsdNews: true,
-    };
-  }
-  const fxMatch = cleaned.match(/^([A-Z]{3})\/?([A-Z]{3})$/);
-  if (fxMatch && G10_FX.has(fxMatch[1]) && G10_FX.has(fxMatch[2])) {
-    const [, b, q] = fxMatch;
-    return {
-      raw, key: `FX:${b}${q}`, display: `${b}/${q}`, kind: "forex",
-      decimals: q === "JPY" ? 3 : 5,
-      yahooSymbols: [`${b}${q}=X`],
-      quote: q, needsUsdNews: b === "USD" || q === "USD",
-    };
-  }
-  const cryptoPairMatch = cleaned.match(/^([A-Z0-9]{2,15})(USDT|USDC|BUSD|USD)$/);
-  if (cryptoPairMatch && cryptoPairMatch[1] !== "XAU" && cryptoPairMatch[1] !== "XAG") {
-    const base = cryptoPairMatch[1];
-    const quote = cryptoPairMatch[2] === "USD" ? "USDT" : cryptoPairMatch[2];
-    return {
-      raw, key: `CRYPTO:${base}${quote}`, display: `${base}/${quote}`, kind: "crypto",
-      decimals: base === "BTC" || base === "ETH" ? 2 : base === "SHIB" || base === "PEPE" ? 8 : 4,
-      binanceSymbols: [`${base}${quote}`, `${base}USDT`, `${base}USDC`],
-      quote, needsUsdNews: false,
-    };
-  }
-  const cryptoMatch = cleaned.match(/^([A-Z0-9]{2,10})$/);
-  if (cryptoMatch && CRYPTO_BASES.has(cryptoMatch[1])) {
-    const base = cryptoMatch[1];
-    return {
-      raw, key: `CRYPTO:${base}USDT`, display: `${base}/USDT`, kind: "crypto",
-      decimals: base === "BTC" || base === "ETH" ? 2 : base === "SHIB" || base === "PEPE" ? 8 : 4,
-      binanceSymbols: [`${base}USDT`, `${base}USD`],
-      quote: "USDT", needsUsdNews: false,
-    };
-  }
-  if (/^[A-Z]{2,6}$/.test(cleaned)) {
-    return {
-      raw, key: `STOCK:${cleaned}`, display: cleaned, kind: "stock",
-      decimals: 2, yahooSymbols: [cleaned], quote: "USD", needsUsdNews: true,
-    };
-  }
-  return resolveInstrument("XAUUSD");
+  const cleaned = raw.toUpperCase().replace(/[\s_\-/]/g, "");
+  const key = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : "XAUUSD");
+  const p = XAU_PAIRS[key];
+  // Gold spot from gold-api.com covers XAU/USD; cross-quote pairs derive
+  // from XAU/USD × the currency rate at getLiveTick time. Yahoo XAUEUR=X
+  // etc. are kept as candle fallbacks so structure analysis still runs.
+  return {
+    raw: raw || key,
+    key: `METAL:${key}`,
+    display: p.display,
+    kind: "metal",
+    decimals: p.decimals,
+    yahooSymbols: [p.yahoo, "XAUUSD=X", "GC=F"],
+    binanceSymbols: ["PAXGUSDT", "XAUTUSDT"],
+    quote: p.quote,
+    needsUsdNews: true,
+  };
 }
 
 function inferInstrumentFromText(text: string): string {
   const q = String(text || "").toUpperCase();
-  const explicit = q.match(/\$([A-Z]{2,6})\b/)?.[1];
-  if (explicit) return explicit;
-  const candidates = [
-    "XAUUSD", "XAGUSD", "GOLD", "SILVER", "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT",
-    "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "NZDUSD", "USDCAD", "EURJPY", "GBPJPY",
-    "NAS100", "US100", "SPX500", "US500", "US30", "DXY", "AAPL", "TSLA", "NVDA", "MSFT", "AMZN", "META",
-  ];
-  for (const c of candidates) {
-    if (new RegExp(`\\b${c}\\b`).test(q)) return c;
-  }
-  const fx = q.match(/\b([A-Z]{3})\/?([A-Z]{3})\b/);
-  if (fx && G10_FX.has(fx[1]) && G10_FX.has(fx[2])) return `${fx[1]}${fx[2]}`;
-  const crypto = q.match(/\b([A-Z0-9]{2,15})(USDT|USDC|BUSD|USD)\b/);
-  if (crypto) return `${crypto[1]}${crypto[2]}`;
-  const named = q.match(/\b(BTC|BITCOIN|ETH|ETHEREUM|SOL|SOLANA|XRP|DOGE|BNB|ADA|AVAX|LINK|DOT|LTC|TON|PEPE|SHIB)\b/);
-  if (named) return named[1];
-  const stock = q.match(/\b([A-Z]{2,6})\s+(STOCK|SHARE|EQUITY)\b/);
-  if (stock) return stock[1];
+  if (/\b(XAUEUR|GOLD\s*EUR|GOLD\s*EURO)\b/.test(q)) return "XAUEUR";
+  if (/\b(XAUGBP|GOLD\s*GBP|GOLD\s*POUND)\b/.test(q)) return "XAUGBP";
+  if (/\b(XAUJPY|GOLD\s*JPY|GOLD\s*YEN)\b/.test(q)) return "XAUJPY";
+  if (/\b(XAUAUD|GOLD\s*AUD)\b/.test(q)) return "XAUAUD";
+  if (/\b(XAUCHF|GOLD\s*CHF|GOLD\s*FRANC)\b/.test(q)) return "XAUCHF";
   return "XAUUSD";
 }
+
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
 const CACHE_TTL = 12_000;

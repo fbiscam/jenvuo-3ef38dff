@@ -719,6 +719,53 @@ export const PAIR_PROFILES: Record<string, PairProfile> = {
     primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
     correlated: { symbol: "DXY", inverse: true },
   },
+  XAUEUR: {
+    key: "XAUEUR",
+    killzones: [
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
+    correlated: { symbol: "EURUSD", inverse: false },
+  },
+  XAUGBP: {
+    key: "XAUGBP",
+    killzones: [
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
+    correlated: { symbol: "GBPUSD", inverse: false },
+  },
+  XAUJPY: {
+    key: "XAUJPY",
+    killzones: [
+      { name: "Tokyo Killzone", startUTC: 0, endUTC: 4 },
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "Tokyo/London/NY", startUTC: 0, endUTC: 15 },
+    correlated: { symbol: "USDJPY", inverse: true },
+  },
+  XAUAUD: {
+    key: "XAUAUD",
+    killzones: [
+      { name: "Sydney Killzone", startUTC: 22, endUTC: 2 },
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "Sydney/London/NY", startUTC: 22, endUTC: 15 },
+    correlated: { symbol: "AUDUSD", inverse: false },
+  },
+  XAUCHF: {
+    key: "XAUCHF",
+    killzones: [
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
+    correlated: { symbol: "USDCHF", inverse: true },
+  },
   XAGUSD: {
     key: "XAGUSD",
     killzones: [
@@ -728,6 +775,7 @@ export const PAIR_PROFILES: Record<string, PairProfile> = {
     primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
     correlated: { symbol: "DXY", inverse: true },
   },
+
   // EUR/GBP — London prime
   EURUSD: {
     key: "EURUSD",
@@ -848,16 +896,10 @@ export const PAIR_PROFILES: Record<string, PairProfile> = {
 export function getPairProfile(symbol: string): PairProfile | null {
   const s = symbol.toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (PAIR_PROFILES[s]) return PAIR_PROFILES[s];
-  // Aliases
   if (s === "GOLD" || s === "XAU") return PAIR_PROFILES.XAUUSD;
-  if (s === "SILVER" || s === "XAG") return PAIR_PROFILES.XAGUSD;
-  if (s === "BTC" || s === "BITCOIN" || s === "BTCUSDT") return PAIR_PROFILES.BTCUSD;
-  if (s === "ETH" || s === "ETHEREUM" || s === "ETHUSDT") return PAIR_PROFILES.ETHUSD;
-  if (s === "NDX" || s === "US100" || s === "NASDAQ") return PAIR_PROFILES.NAS100;
-  if (s === "SPX" || s === "US500" || s === "SP500") return PAIR_PROFILES.SPX500;
-  if (s === "DJI" || s === "DOW" || s === "DOWJONES") return PAIR_PROFILES.US30;
-  return null;
+  return PAIR_PROFILES.XAUUSD;
 }
+
 
 // Pair-aware killzone check. Falls back to generic global killzones if pair unknown.
 export function killzoneForPair(

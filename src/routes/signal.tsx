@@ -32,20 +32,20 @@ export const Route = createFileRoute("/signal")({
   }),
   head: () => ({
     meta: [
-      { title: "Live Signal Desk — Jenvu" },
+      { title: "Gold Signal Desk — Jenvu" },
       {
         name: "description",
         content:
-          "Real-time ICT & SMC signal desk for Gold, FX, Crypto and Indices. Multi-timeframe bias, A+ setup scoring and voice narration.",
+          "Institutional ICT/SMC signal desk for XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF. Multi-timeframe bias, A+ setup scoring and voice narration for gold.",
       },
-      { name: "keywords", content: "ICT signals, SMC trading, gold signals, XAUUSD analysis, A+ setup, smart money concepts, voice trading agent, live signal desk" },
-      { property: "og:title", content: "Live Signal Desk — Jenvu" },
-      { property: "og:description", content: "Multi-timeframe ICT/SMC analysis with A+ setup scoring, annotated charts and live trade tracking." },
+      { name: "keywords", content: "XAUUSD signals, gold trading, XAU EUR, XAU GBP, XAU JPY, gold ICT SMC, A+ gold setup, gold voice agent, bullion desk" },
+      { property: "og:title", content: "Gold Signal Desk — Jenvu" },
+      { property: "og:description", content: "AI gold desk covering all XAU cross-pairs with ICT/SMC analysis, A+ setup scoring and voice narration." },
       { property: "og:url", content: "https://jenvu.com/signal" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Live Signal Desk — Jenvu" },
-      { name: "twitter:description", content: "Real-time institutional signal desk with voice narration and A+ setup scoring." },
+      { name: "twitter:title", content: "Gold Signal Desk — Jenvu" },
+      { name: "twitter:description", content: "Institutional gold signal desk with voice narration for every XAU cross-pair." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/signal" }],
     scripts: [
@@ -54,35 +54,37 @@ export const Route = createFileRoute("/signal")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          name: "Jenvu Signal Desk",
+          name: "Jenvu Gold Signal Desk",
           url: "https://jenvu.com/signal",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Institutional ICT/SMC signal desk with multi-timeframe bias, A+ setup grading, annotated TradingView-style charts and voice narration.",
+            "Institutional ICT/SMC gold signal desk covering XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF with A+ setup grading and voice narration.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
     ],
   }),
+
   component: SignalPage,
 });
 
 /* ---------- helpers ---------- */
-function isCryptoSymbol(sym: string): boolean {
-  const s = sym.toUpperCase();
-  return /(BTC|ETH|SOL|XRP|DOGE|BNB|ADA|USDT|USDC|LTC|AVAX|MATIC|DOT|LINK|TRX|SHIB|TON)/.test(s);
-}
-function isMarketOpen(sym: string, d: Date = new Date()): boolean {
-  if (isCryptoSymbol(sym)) return true;
-  // Forex / metals / indices: closed Fri 21:00 UTC → Sun 22:00 UTC
-  const day = d.getUTCDay(); // 0 Sun .. 6 Sat
+const XAU_PAIRS = ["XAUUSD", "XAUEUR", "XAUGBP", "XAUJPY", "XAUAUD", "XAUCHF"] as const;
+const XAU_LABELS: Record<string, string> = {
+  XAUUSD: "XAU/USD", XAUEUR: "XAU/EUR", XAUGBP: "XAU/GBP",
+  XAUJPY: "XAU/JPY", XAUAUD: "XAU/AUD", XAUCHF: "XAU/CHF",
+};
+function isMarketOpen(_sym: string, d: Date = new Date()): boolean {
+  // Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
+  const day = d.getUTCDay();
   const h = d.getUTCHours();
   if (day === 6) return false;
-  if (day === 5 && h >= 21) return false;
+  if (day === 5 && h >= 22) return false;
   if (day === 0 && h < 22) return false;
   return true;
 }
+
 function tagOf(text: string): { tag: string; tone: "violet" | "blue" | "emerald" | "amber" | "rose" | "zinc" } {
   const t = text.toLowerCase();
   if (/\bfvg|fair\s*value\s*gap\b/.test(t)) return { tag: "FVG", tone: "violet" };
@@ -612,8 +614,37 @@ function SignalPage() {
         </div>
       </header>
 
+      {/* XAU PAIR SELECTOR */}
+      <div className="border-b border-zinc-100 bg-white/60">
+        <div className="mx-auto max-w-[1600px] px-5 py-2 sm:px-6 sm:py-2.5 flex items-center gap-2 overflow-x-auto">
+          <span className={`text-[10px] uppercase tracking-wider text-zinc-500 shrink-0 ${MONO}`}>Gold pair:</span>
+          {XAU_PAIRS.map((p) => {
+            const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
+            return (
+              <button
+                key={p}
+                onClick={() => {
+                  if (active || loading || playing) return;
+                  navigate({ to: "/signal", search: { symbol: p } });
+                }}
+                className={cn(
+                  "shrink-0 h-7 px-2.5 rounded-md text-[11px] font-semibold tracking-wide transition border",
+                  active
+                    ? "bg-zinc-900 text-white border-zinc-900"
+                    : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50",
+                  MONO,
+                )}
+              >
+                {XAU_LABELS[p]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* TERMINAL CARD */}
       <main className="mx-auto max-w-[1600px] px-5 py-5 sm:px-6 sm:py-8">
+
         <h1 className="sr-only">Live institutional signal desk — ICT & SMC analysis for {sym}</h1>
         <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
           {/* terminal header */}
@@ -1025,7 +1056,7 @@ function SignalPage() {
                     {plan.instrument.symbol} session band hai. AI ne live entry / SL / TP issue nahi kiya — sirf last session ke key levels, FVG aur OB reference ke liye dikha rahe hain. Session open hote hi plan auto-revalidate hoga.
                   </p>
                   <p className={`text-[10px] ${MONO} text-zinc-500 uppercase tracking-wider`}>
-                    {isCryptoSymbol(plan.instrument.symbol) ? "24/7" : "Opens Sun 22:00 UTC"}
+                    Opens Sun 22:00 UTC
                   </p>
                 </div>
               )}
