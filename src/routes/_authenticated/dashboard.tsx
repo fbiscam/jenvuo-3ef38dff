@@ -625,17 +625,12 @@ function DashboardLayout() {
             />
             <div className="max-h-[360px] overflow-y-auto scrollbar-auto-hide">
               <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
-              <TickerRow label="XAG / USD" symbol="XAGUSD" decimals={3} />
+              <TickerRow label="XAU / EUR" symbol="XAUEUR" decimals={2} />
+              <TickerRow label="XAU / GBP" symbol="XAUGBP" decimals={2} />
+              <TickerRow label="XAU / JPY" symbol="XAUJPY" decimals={0} />
+              <TickerRow label="XAU / AUD" symbol="XAUAUD" decimals={2} />
+              <TickerRow label="XAU / CHF" symbol="XAUCHF" decimals={2} />
               <TickerRow label="DXY" symbol="DXY" decimals={3} />
-              <TickerRow label="EUR / USD" symbol="EURUSD" decimals={5} />
-              <TickerRow label="GBP / USD" symbol="GBPUSD" decimals={5} />
-              <TickerRow label="USD / JPY" symbol="USDJPY" decimals={3} />
-              <TickerRow label="BTC / USDT" symbol="BTCUSDT" decimals={1} />
-              <TickerRow label="ETH / USDT" symbol="ETHUSDT" decimals={2} />
-              <TickerRow label="SOL / USDT" symbol="SOLUSDT" decimals={2} />
-              <TickerRow label="BNB / USDT" symbol="BNBUSDT" decimals={2} />
-              <TickerRow label="XRP / USDT" symbol="XRPUSDT" decimals={4} />
-              <TickerRow label="DOGE / USDT" symbol="DOGEUSDT" decimals={5} />
             </div>
           </Card>
 
