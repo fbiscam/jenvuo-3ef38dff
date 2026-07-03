@@ -24,25 +24,13 @@ const SANS = "font-['Inter',system-ui,sans-serif]";
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "2,418.30", "+0.42%"],
-  ["BTC/USDT", "71,204.10", "+1.18%"],
-  ["ETH/USDT", "3,841.20", "+2.04%"],
-  ["EUR/USD", "1.0832", "-0.07%"],
-  ["GBP/USD", "1.2671", "+0.09%"],
-  ["NAS100", "20,114.5", "+0.61%"],
+  ["XAU/EUR", "2,232.15", "+0.31%"],
+  ["XAU/GBP", "1,907.44", "+0.28%"],
+  ["XAU/JPY", "381,204", "+0.55%"],
+  ["XAU/AUD", "3,672.90", "+0.48%"],
+  ["XAU/CHF", "2,178.60", "+0.19%"],
   ["DXY", "104.21", "-0.12%"],
-  ["SOL/USDT", "168.40", "+3.12%"],
-  ["XRP/USDT", "0.5184", "+0.78%"],
-  ["BNB/USDT", "612.30", "+1.04%"],
 ];
-
-const BINANCE_MAP: Record<string, string> = {
-  "BTC/USDT": "BTCUSDT",
-  "ETH/USDT": "ETHUSDT",
-  "EUR/USD": "EURUSDT",
-  "SOL/USDT": "SOLUSDT",
-  "XRP/USDT": "XRPUSDT",
-  "BNB/USDT": "BNBUSDT",
-};
 
 function fmtPrice(n: number): string {
   if (n >= 1000) return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -54,7 +42,6 @@ function useLiveTicker(): TickerRow[] {
   const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
   React.useEffect(() => {
     let alive = true;
-    const symbols = Object.values(BINANCE_MAP);
     const fetchGold = async () => {
       try {
         const r = await fetch("https://api.gold-api.com/price/XAU");
@@ -66,30 +53,18 @@ function useLiveTicker(): TickerRow[] {
     };
     const tick = async () => {
       try {
-        const [binRes, gold] = await Promise.all([
-          fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(symbols))}`).then((r) => (r.ok ? r.json() : null)),
-          fetchGold(),
-        ]);
-        if (!alive) return;
-        const data: Array<{ symbol: string; lastPrice: string; priceChangePercent: string }> = Array.isArray(binRes) ? binRes : [];
-        const bySym = new Map(data.map((d) => [d.symbol, d]));
+        const gold = await fetchGold();
+        if (!alive || !gold) return;
         setRows((prev) =>
           prev.map(([label, price, delta]) => {
-            if (label === "XAU/USD" && gold) {
+            if (label === "XAU/USD") {
               const prevN = parseFloat(price.replace(/,/g, ""));
               const pct = isFinite(prevN) && prevN > 0 ? ((gold - prevN) / prevN) * 100 : 0;
               const sign = pct >= 0 ? "+" : "";
               const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
               return [label, fmtPrice(gold), deltaOut];
             }
-            const bsym = BINANCE_MAP[label];
-            if (!bsym) return [label, price, delta];
-            const d = bySym.get(bsym);
-            if (!d) return [label, price, delta];
-            const p = parseFloat(d.lastPrice);
-            const pct = parseFloat(d.priceChangePercent);
-            const sign = pct >= 0 ? "+" : "";
-            return [label, fmtPrice(p), `${sign}${pct.toFixed(2)}%`];
+            return [label, price, delta];
           })
         );
       } catch { /* ignore */ }
