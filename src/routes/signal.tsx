@@ -1027,7 +1027,7 @@ function SignalPage() {
                     {plan.instrument.symbol} session band hai. AI ne live entry / SL / TP issue nahi kiya — sirf last session ke key levels, FVG aur OB reference ke liye dikha rahe hain. Session open hote hi plan auto-revalidate hoga.
                   </p>
                   <p className={`text-[10px] ${MONO} text-zinc-500 uppercase tracking-wider`}>
-                    {isCryptoSymbol(plan.instrument.symbol) ? "24/7" : "Opens Sun 22:00 UTC"}
+                    Opens Sun 22:00 UTC
                   </p>
                 </div>
               )}
