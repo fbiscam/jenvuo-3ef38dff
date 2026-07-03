@@ -52,7 +52,7 @@ function DisclaimerPage() {
 
       <section className="space-y-3">
         <H2>6. Regulatory notice</H2>
-        <P>Some products discussed on Jenvu (CFDs, leveraged FX, certain crypto derivatives) may be restricted or prohibited in your jurisdiction. It is your responsibility to ensure trading complies with all applicable laws and regulations.</P>
+        <P>Some products discussed on Jenvu (spot gold, XAU CFDs, gold futures) may be restricted or prohibited in your jurisdiction. It is your responsibility to ensure trading complies with all applicable laws and regulations.</P>
       </section>
 
       <section className="space-y-3">
