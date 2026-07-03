@@ -22,11 +22,17 @@ const BINANCE_MAP: Record<string, string> = {
 
 function binanceStreamFor(symbol: string): string | null {
   const upper = symbol.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  // Only stream from Binance for symbols we've explicitly whitelisted as real
+  // crypto spot markets. The previous regex fallbacks mapped XAUUSD→xauusdt,
+  // XAGUSD→xagusdt (nonexistent streams that silently never tick), and
+  // EURUSD→eurusdt (a Binance stablecoin pair, NOT forex spot — the header
+  // then drifts from the server-computed entry/SL/TP which use Yahoo forex).
   if (BINANCE_MAP[upper]) return BINANCE_MAP[upper];
+  // Native stablecoin quote pairs are safe (e.g. FOOUSDT explicitly).
   if (/^[A-Z0-9]{2,15}(USDT|USDC|BUSD)$/.test(upper)) return upper.toLowerCase();
-  if (/^[A-Z0-9]{2,15}USD$/.test(upper)) return `${upper.slice(0, -3)}USDT`.toLowerCase();
   return null;
 }
+
 
 export type LiveTickHandler = (price: number, tMs: number) => void;
 
