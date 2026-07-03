@@ -238,12 +238,14 @@ export function killzoneOf(d = new Date()): { session: string; killzone: string;
 
 export type BuiltTrade = {
   direction: "BUY" | "SELL" | "WAIT";
+  entryType: "MARKET" | "LIMIT";
   entry: number; sl: number; tp: number; rr: number;
   tp1?: number; tp2?: number; tp3?: number;
-  zone: { kind: "OB" | "FVG"; priceLow: number; priceHigh: number } | null;
+  zone: { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number } | null;
   reason: string;
   notes?: string[];
 };
+
 
 // Per-asset risk profile. Each asset class has different typical wick sizes,
 // spread, and news volatility — using the same buffer for XAU and EURUSD is wrong.
@@ -258,11 +260,12 @@ const RISK_PROFILE: Record<
     maxRiskPct: number;
   }
 > = {
-  crypto: { pctBuffer: 0.0025, minRiskPct: 0.0030, atrMult: 0.90, maxDistPct: 0.0120, entryWindowPct: 0.0025, maxRiskPct: 0.0250 },
-  metal:  { pctBuffer: 0.0012, minRiskPct: 0.0018, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0009, maxRiskPct: 0.0120 },
-  forex:  { pctBuffer: 0.0005, minRiskPct: 0.0008, atrMult: 0.45, maxDistPct: 0.0040, entryWindowPct: 0.0006, maxRiskPct: 0.0080 },
-  index:  { pctBuffer: 0.0010, minRiskPct: 0.0015, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0010, maxRiskPct: 0.0150 },
-  stock:  { pctBuffer: 0.0015, minRiskPct: 0.0020, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0015, maxRiskPct: 0.0180 },
+  crypto: { pctBuffer: 0.0025, minRiskPct: 0.0030, atrMult: 0.90, maxDistPct: 0.0250, entryWindowPct: 0.0025, maxRiskPct: 0.0250 },
+  metal:  { pctBuffer: 0.0012, minRiskPct: 0.0018, atrMult: 0.65, maxDistPct: 0.0150, entryWindowPct: 0.0009, maxRiskPct: 0.0120 },
+  forex:  { pctBuffer: 0.0005, minRiskPct: 0.0008, atrMult: 0.45, maxDistPct: 0.0090, entryWindowPct: 0.0006, maxRiskPct: 0.0080 },
+  index:  { pctBuffer: 0.0010, minRiskPct: 0.0015, atrMult: 0.65, maxDistPct: 0.0150, entryWindowPct: 0.0010, maxRiskPct: 0.0150 },
+  stock:  { pctBuffer: 0.0015, minRiskPct: 0.0020, atrMult: 0.65, maxDistPct: 0.0200, entryWindowPct: 0.0015, maxRiskPct: 0.0180 },
+
 };
 
 function smartPrice(n: number): string {
@@ -287,60 +290,62 @@ export function buildTrade(
     htf.trend === "bearish" && (ltf.trend === "bearish" || ltf.trend === "ranging") ? "SELL" : "WAIT";
 
   if (dir === "WAIT") {
-    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF/LTF disagree — no clean trend." };
+    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF/LTF disagree — no clean trend." };
   }
 
-  // Pick best zone: UNMITIGATED LTF FVG/OB on the trade side, closest to LIVE price.
-  // We no longer emit limit entries far away from market. If price is not at/near
-  // the POI, the engine returns WAIT instead of a misleading entry/SL/TP ticket.
-  const candidates: Array<{ kind: "OB" | "FVG"; priceLow: number; priceHigh: number; dist: number }> = [];
+  // Collect all UNMITIGATED LTF FVG/OB on the trade side, regardless of whether
+  // price already tapped. We rank by distance and pick MARKET vs LIMIT below.
+  type ZoneCandidate = { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number; dist: number };
+  const candidates: ZoneCandidate[] = [];
   const distanceFromExecutionZone = (lo: number, hi: number) => {
     if (lastPrice >= lo && lastPrice <= hi) return 0;
-    return dir === "BUY" ? Math.max(0, lastPrice - hi) : Math.max(0, lo - lastPrice);
+    return dir === "BUY" ? Math.max(0, lo - lastPrice, lastPrice - hi) : Math.max(0, lastPrice - hi, lo - lastPrice);
   };
   for (const f of ltf.fvgs) {
     if (f.mitigated) continue;
-    const ok = dir === "BUY"
-      ? f.kind === "bullish" && lastPrice >= f.priceLow
-      : f.kind === "bearish" && lastPrice <= f.priceHigh;
-    if (ok) candidates.push({ kind: "FVG", priceLow: f.priceLow, priceHigh: f.priceHigh, dist: distanceFromExecutionZone(f.priceLow, f.priceHigh) });
+    if (dir === "BUY" && f.kind !== "bullish") continue;
+    if (dir === "SELL" && f.kind !== "bearish") continue;
+    candidates.push({ kind: "FVG", priceLow: f.priceLow, priceHigh: f.priceHigh, dist: distanceFromExecutionZone(f.priceLow, f.priceHigh) });
   }
   for (const o of ltf.obs) {
     if (o.mitigated) continue;
-    const ok = dir === "BUY"
-      ? o.kind === "demand" && lastPrice >= o.priceLow
-      : o.kind === "supply" && lastPrice <= o.priceHigh;
-    if (ok) candidates.push({ kind: "OB", priceLow: o.priceLow, priceHigh: o.priceHigh, dist: distanceFromExecutionZone(o.priceLow, o.priceHigh) });
+    if (dir === "BUY" && o.kind !== "demand") continue;
+    if (dir === "SELL" && o.kind !== "supply") continue;
+    candidates.push({ kind: "OB", priceLow: o.priceLow, priceHigh: o.priceHigh, dist: distanceFromExecutionZone(o.priceLow, o.priceHigh) });
   }
+
+  // Fallback: synthesize an OTE (62-79%) zone from HTF swing range if no fresh OB/FVG.
+  if (!candidates.length) {
+    const range = htf.swingHigh - htf.swingLow;
+    if (range > 0) {
+      const oteLo = dir === "BUY" ? htf.swingLow + range * 0.21 : htf.swingLow + range * 0.62;
+      const oteHi = dir === "BUY" ? htf.swingLow + range * 0.38 : htf.swingLow + range * 0.79;
+      candidates.push({ kind: "OTE", priceLow: oteLo, priceHigh: oteHi, dist: distanceFromExecutionZone(oteLo, oteHi) });
+    }
+  }
+
   candidates.sort((a, b) => a.dist - b.dist);
   const zone = candidates[0] ?? null;
 
   if (!zone) {
-    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "No fresh (unmitigated) OB/FVG aligned with bias." };
+    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "No fresh (unmitigated) OB/FVG aligned with bias and no valid OTE fallback." };
   }
 
   const notes: string[] = [];
-
-  // Reject stale / distant zones. A valid signal must be executable around the
-  // current live tick; otherwise it is only a watch-zone and should be WAIT.
   const zoneMid = (zone.priceLow + zone.priceHigh) / 2;
   const zoneDistance = distanceFromExecutionZone(zone.priceLow, zone.priceHigh);
   const distPct = zoneDistance / lastPrice;
+
+  // Reject only truly stale/distant zones. Otherwise choose MARKET vs LIMIT.
   if (distPct > profile.maxDistPct) {
-    return { direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest fresh zone is ${(distPct * 100).toFixed(2)}% from live price — wait, do not chase.` };
+    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest ${zone.kind} is ${(distPct * 100).toFixed(2)}% from live price — outside chase range, wait for pullback.` };
   }
 
-  const actionableWindow = Math.max(lastPrice * profile.entryWindowPct, atr && atr > 0 ? atr * 0.20 : 0);
-  if (zoneDistance > actionableWindow) {
-    return {
-      direction: "WAIT",
-      entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
-      reason: `Live price ${smartPrice(lastPrice)} is not inside the fresh ${zone.kind} (${smartPrice(zone.priceLow)}–${smartPrice(zone.priceHigh)}). Wait for a tap before entry.`,
-    };
-  }
+  const marketWindow = Math.max(lastPrice * profile.entryWindowPct, atr && atr > 0 ? atr * 0.20 : 0);
+  const entryType: "MARKET" | "LIMIT" = zoneDistance <= marketWindow ? "MARKET" : "LIMIT";
 
-  // Entry = the current live executable price, not an old zone midpoint.
-  const entry = lastPrice;
+  // MARKET → enter at live price. LIMIT → enter at zone midpoint (waiting for tap).
+  const entry = entryType === "MARKET" ? lastPrice : zoneMid;
   const zoneHeight = Math.abs(zone.priceHigh - zone.priceLow);
 
   // SL buffer — asset-aware. max(pct × price, atrMult × ATR, 0.5 × zoneHeight)
@@ -362,8 +367,8 @@ export function buildTrade(
   const maxRisk = lastPrice * profile.maxRiskPct;
   if (risk > maxRisk) {
     return {
-      direction: "WAIT", entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
-      reason: `Risk from live entry to protected stop is ${(risk / lastPrice * 100).toFixed(2)}%, too wide for ${assetKind}. Wait for a tighter re-entry.`,
+      direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
+      reason: `Risk from entry to protected stop is ${(risk / lastPrice * 100).toFixed(2)}%, too wide for ${assetKind}. Wait for a tighter re-entry.`,
     };
   }
 
@@ -385,7 +390,6 @@ export function buildTrade(
   if (nearestLiquidity == null) {
     tp = rMax;
   } else {
-    // Use liquidity target only if it lies between 2R and 3R (realistic).
     const distR = Math.abs(nearestLiquidity - entry) / risk;
     if (distR < 2) {
       tp = rMin;
@@ -402,12 +406,19 @@ export function buildTrade(
   const rr = risk > 0 ? reward / risk : 0;
   const tp3 = tp;
 
+  const label = entryType === "LIMIT" ? `${dir} LIMIT (pending tap)` : dir;
+  const reason = entryType === "MARKET"
+    ? `${dir} at market ${smartPrice(entry)} inside fresh ${zone.kind} (${smartPrice(zone.priceLow)}–${smartPrice(zone.priceHigh)}), SL beyond the protected zone, TP ${liquidityTargets[0]?.label ? "at " + liquidityTargets[0].label : "at " + rr.toFixed(1) + "R"}.`
+    : `${label} at ${smartPrice(entry)} — waiting for price to tap fresh ${zone.kind} (${smartPrice(zone.priceLow)}–${smartPrice(zone.priceHigh)}) from live ${smartPrice(lastPrice)}. SL beyond zone, TP ${liquidityTargets[0]?.label ? "at " + liquidityTargets[0].label : "at " + rr.toFixed(1) + "R"}.`;
+
   return {
     direction: dir,
+    entryType,
     entry, sl, tp, rr,
     tp1, tp2, tp3,
     zone: { kind: zone.kind, priceLow: zone.priceLow, priceHigh: zone.priceHigh },
-    reason: `${dir} from live price ${smartPrice(entry)} near fresh ${zone.kind} (${smartPrice(zone.priceLow)}–${smartPrice(zone.priceHigh)}), SL beyond the protected zone, TP ${liquidityTargets[0]?.label ? "at " + liquidityTargets[0].label : "at " + rr.toFixed(1) + "R"}.`,
+    reason,
+
     notes: notes.length ? notes : undefined,
   };
 }
@@ -460,32 +471,28 @@ export function scoreSetup(args: {
   const vetos: VetoResult[] = [];
   const dir = trade.direction;
 
-  // ---- HARD VETO GATES (any trigger → downgrade, but no longer flat-cap at 40) ----
+  // ---- HARD VETO GATES — reserved for genuine red flags only ----
+  // (no_sweep is not a veto anymore; it's already a scored factor. This prevents
+  // the engine from downgrading every off-session setup to grade C.)
   if (dir !== "WAIT") {
-    // 1. HTF/LTF bias conflict
+    // 1. HTF/LTF bias conflict — real conflict, not "ranging"
     if (htf.trend !== "ranging" && ltf.trend !== "ranging" && htf.trend !== ltf.trend) {
       vetos.push({ key: "bias_conflict", label: "HTF/LTF bias conflict", reason: `HTF ${htf.trend} vs LTF ${ltf.trend}` });
     }
-    // 2. No liquidity sweep before entry — skip for crypto (24/7, sweeps unreliable)
-    if (kind !== "crypto") {
-      const anySwept = pools.some(p => p.swept && (dir === "BUY" ? p.side === "sell" : p.side === "buy"));
-      if (!anySwept) {
-        vetos.push({ key: "no_sweep", label: "No sweep before entry", reason: "Institutional entries usually follow a liquidity grab" });
-      }
-    }
-    // 3. Entry zone already mitigated
+    // 2. Entry zone already mitigated
     if (zoneMitigated === true) {
       vetos.push({ key: "mitigated", label: "Entry zone already mitigated", reason: "Zone was tagged — imbalance filled" });
     }
-    // 4. High-impact news imminent
+    // 3. High-impact news imminent
     if (imminentHighNews) {
       vetos.push({ key: "news", label: "High-impact news imminent", reason: "News event within 60m — stand aside" });
     }
-    // 5. R:R < 1.5 (engine already floors at 2R; anything below 1.5 is genuinely bad)
+    // 4. R:R < 1.5
     if (trade.rr < 1.5) {
       vetos.push({ key: "rr_low", label: "R:R below 1.5", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
     }
   }
+
 
   const push = (key: string, label: string, pass: boolean, detail: string) => {
     const weight = w[key] ?? 0;
@@ -546,17 +553,21 @@ export function scoreSetup(args: {
   let score = Math.round((earned / totalWeight) * 100);
   if (imminentHighNews) score = Math.min(score, 60);
 
-  // Apply vetos — soft deduction, not a flat cap. Multiple vetoes stack.
-  if (vetos.length > 0) {
-    score = Math.max(30, score - vetos.length * 15);
+  // Vetoes: single = soft (-8), multi (2+) = harsh (-15 each). Prevents a lone
+  // false-positive gate from killing an otherwise strong setup.
+  if (vetos.length === 1) {
+    score = Math.max(35, score - 8);
+  } else if (vetos.length >= 2) {
+    score = Math.max(25, score - vetos.length * 15);
   }
 
-  // Grade thresholds unchanged; multi-veto forces C.
+  // Relaxed thresholds — realistic A+ frequency (a few per pair per day)
   const grade: "A+" | "A" | "B" | "C" =
     vetos.length >= 2 ? "C" :
-    score >= 88 ? "A+" :
-    score >= 75 ? "A" :
-    score >= 60 ? "B" : "C";
+    score >= 85 ? "A+" :
+    score >= 72 ? "A" :
+    score >= 55 ? "B" : "C";
+
 
   return { score, grade, factors: f, vetos };
 }
