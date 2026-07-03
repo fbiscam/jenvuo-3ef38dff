@@ -24,25 +24,13 @@ const SANS = "font-['Inter',system-ui,sans-serif]";
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "2,418.30", "+0.42%"],
-  ["BTC/USDT", "71,204.10", "+1.18%"],
-  ["ETH/USDT", "3,841.20", "+2.04%"],
-  ["EUR/USD", "1.0832", "-0.07%"],
-  ["GBP/USD", "1.2671", "+0.09%"],
-  ["NAS100", "20,114.5", "+0.61%"],
+  ["XAU/EUR", "2,232.15", "+0.31%"],
+  ["XAU/GBP", "1,907.44", "+0.28%"],
+  ["XAU/JPY", "381,204", "+0.55%"],
+  ["XAU/AUD", "3,672.90", "+0.48%"],
+  ["XAU/CHF", "2,178.60", "+0.19%"],
   ["DXY", "104.21", "-0.12%"],
-  ["SOL/USDT", "168.40", "+3.12%"],
-  ["XRP/USDT", "0.5184", "+0.78%"],
-  ["BNB/USDT", "612.30", "+1.04%"],
 ];
-
-const BINANCE_MAP: Record<string, string> = {
-  "BTC/USDT": "BTCUSDT",
-  "ETH/USDT": "ETHUSDT",
-  "EUR/USD": "EURUSDT",
-  "SOL/USDT": "SOLUSDT",
-  "XRP/USDT": "XRPUSDT",
-  "BNB/USDT": "BNBUSDT",
-};
 
 function fmtPrice(n: number): string {
   if (n >= 1000) return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -54,7 +42,6 @@ function useLiveTicker(): TickerRow[] {
   const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
   React.useEffect(() => {
     let alive = true;
-    const symbols = Object.values(BINANCE_MAP);
     const fetchGold = async () => {
       try {
         const r = await fetch("https://api.gold-api.com/price/XAU");
@@ -66,30 +53,18 @@ function useLiveTicker(): TickerRow[] {
     };
     const tick = async () => {
       try {
-        const [binRes, gold] = await Promise.all([
-          fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(symbols))}`).then((r) => (r.ok ? r.json() : null)),
-          fetchGold(),
-        ]);
-        if (!alive) return;
-        const data: Array<{ symbol: string; lastPrice: string; priceChangePercent: string }> = Array.isArray(binRes) ? binRes : [];
-        const bySym = new Map(data.map((d) => [d.symbol, d]));
+        const gold = await fetchGold();
+        if (!alive || !gold) return;
         setRows((prev) =>
           prev.map(([label, price, delta]) => {
-            if (label === "XAU/USD" && gold) {
+            if (label === "XAU/USD") {
               const prevN = parseFloat(price.replace(/,/g, ""));
               const pct = isFinite(prevN) && prevN > 0 ? ((gold - prevN) / prevN) * 100 : 0;
               const sign = pct >= 0 ? "+" : "";
               const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
               return [label, fmtPrice(gold), deltaOut];
             }
-            const bsym = BINANCE_MAP[label];
-            if (!bsym) return [label, price, delta];
-            const d = bySym.get(bsym);
-            if (!d) return [label, price, delta];
-            const p = parseFloat(d.lastPrice);
-            const pct = parseFloat(d.priceChangePercent);
-            const sign = pct >= 0 ? "+" : "";
-            return [label, fmtPrice(p), `${sign}${pct.toFixed(2)}%`];
+            return [label, price, delta];
           })
         );
       } catch { /* ignore */ }
@@ -110,11 +85,11 @@ export const Route = createFileRoute("/app")({
       {
         name: "description",
         content:
-          "Speak to Jenvu and get live institutional ICT/SMC analysis for Gold, Crypto, FX and Indices — A+ setups, structured entries, stops and targets narrated in real time.",
+          "Speak to Jenvu and get live institutional ICT/SMC analysis for every XAU gold cross-pair — A+ setups, structured entries, stops and targets narrated in real time.",
       },
-      { name: "keywords", content: "voice trading agent, AI trading terminal, gold voice analysis, ICT voice agent, SMC trading AI, XAUUSD voice signals" },
-      { property: "og:title", content: "Voice Trading Terminal — Jenvu" },
-      { property: "og:description", content: "Voice-native institutional trading agent for Gold, Crypto, FX and Indices." },
+      { name: "keywords", content: "voice gold trading agent, XAU voice analysis, ICT gold agent, SMC bullion AI, XAUUSD voice signals, XAUEUR, XAUJPY, XAUGBP" },
+      { property: "og:title", content: "Voice Gold Trading Terminal — Jenvu" },
+      { property: "og:description", content: "Voice-native institutional bullion desk covering every XAU cross-pair." },
       { property: "og:url", content: "https://jenvu.com/app" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -133,7 +108,7 @@ export const Route = createFileRoute("/app")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Voice-native AI trading terminal that narrates institutional ICT/SMC analysis for Gold, Crypto, FX and Indices in real time.",
+            "Voice-native AI gold trading terminal that narrates institutional ICT/SMC analysis for every XAU cross-pair in real time.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -167,37 +142,22 @@ function parseTimeframe(text: string, fallback: string): string {
 }
 
 const SYMBOL_KEYWORDS: Array<{ rx: RegExp; sym: string }> = [
-  { rx: /\b(gold|xau(?:\/?usd)?)\b/i, sym: "XAUUSD" },
-  { rx: /\b(silver|xag(?:\/?usd)?)\b/i, sym: "XAGUSD" },
-  { rx: /\b(bitcoin|btc)\b/i, sym: "BTC" },
-  { rx: /\b(ethereum|eth)\b/i, sym: "ETH" },
-  { rx: /\b(solana|sol)\b/i, sym: "SOL" },
-  { rx: /\b(ripple|xrp)\b/i, sym: "XRP" },
-  { rx: /\b(cardano|ada)\b/i, sym: "ADA" },
-  { rx: /\b(dogecoin|doge)\b/i, sym: "DOGE" },
-  { rx: /\b(bnb|binance\s*coin)\b/i, sym: "BNB" },
-  { rx: /\b(avalanche|avax)\b/i, sym: "AVAX" },
-  { rx: /\b(polkadot|dot)\b/i, sym: "DOT" },
-  { rx: /\b(chainlink|link)\b/i, sym: "LINK" },
-  { rx: /\b(litecoin|ltc)\b/i, sym: "LTC" },
-  { rx: /\b(toncoin|\bton\b)\b/i, sym: "TON" },
-  { rx: /\b(shiba|shib)\b/i, sym: "SHIB" },
-  { rx: /\bpepe\b/i, sym: "PEPE" },
-  { rx: /\b(nasdaq|nas100|ndx|us100)\b/i, sym: "NAS100" },
-  { rx: /\b(s\s*&\s*p\s*500|sp500|spx|us500)\b/i, sym: "SPX" },
-  { rx: /\b(dow\s*jones|us30|dji)\b/i, sym: "US30" },
+  { rx: /\b(gold\s*(?:in\s*)?(?:eur|euro))\b/i, sym: "XAUEUR" },
+  { rx: /\b(gold\s*(?:in\s*)?(?:gbp|pound|sterling))\b/i, sym: "XAUGBP" },
+  { rx: /\b(gold\s*(?:in\s*)?(?:jpy|yen))\b/i, sym: "XAUJPY" },
+  { rx: /\b(gold\s*(?:in\s*)?(?:aud|aussie|australian))\b/i, sym: "XAUAUD" },
+  { rx: /\b(gold\s*(?:in\s*)?(?:chf|swiss|franc))\b/i, sym: "XAUCHF" },
+  { rx: /\bxau\s*\/?\s*eur\b/i, sym: "XAUEUR" },
+  { rx: /\bxau\s*\/?\s*gbp\b/i, sym: "XAUGBP" },
+  { rx: /\bxau\s*\/?\s*jpy\b/i, sym: "XAUJPY" },
+  { rx: /\bxau\s*\/?\s*aud\b/i, sym: "XAUAUD" },
+  { rx: /\bxau\s*\/?\s*chf\b/i, sym: "XAUCHF" },
+  { rx: /\b(gold|xau(?:\/?usd)?|bullion)\b/i, sym: "XAUUSD" },
   { rx: /\bdxy\b/i, sym: "DXY" },
-  { rx: /\bdax\b/i, sym: "DAX" },
 ];
 
 function detectSymbol(query: string): string {
-  // Explicit FX pair like "EUR/USD" or "EURUSD"
-  const fx = query.toUpperCase().match(/\b(EUR|GBP|JPY|AUD|NZD|CAD|CHF|USD)\s*\/?\s*(EUR|GBP|JPY|AUD|NZD|CAD|CHF|USD)\b/);
-  if (fx && fx[1] !== fx[2]) return `${fx[1]}${fx[2]}`;
   for (const { rx, sym } of SYMBOL_KEYWORDS) if (rx.test(query)) return sym;
-  // Bare crypto/stock ticker (3-5 caps)
-  const t = query.toUpperCase().match(/\b([A-Z]{2,5})(?:\s*\/\s*USDT?)?\b/);
-  if (t && !/^(BUY|SELL|LONG|SHORT|TP|SL|WAIT|THE|AND|FOR|NOW|YES|ICT|SMC|HTF|LTF|BOS|FVG|OB|RR)$/.test(t[1])) return t[1];
   return "XAUUSD";
 }
 

@@ -1670,7 +1670,7 @@ function SignalVoiceAgent({
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && submit()}
-          placeholder={speech.listening ? "Listening…" : "Ask BTC, ETH, EURUSD, NAS100, Gold…"}
+          placeholder={speech.listening ? "Listening…" : "Ask XAU/USD, XAU/EUR, XAU/JPY, XAU/GBP…"}
           disabled={busy || !showInput}
           tabIndex={showInput ? 0 : -1}
           className="flex-1 bg-transparent text-[12px] text-zinc-900 placeholder:text-zinc-400 outline-none"

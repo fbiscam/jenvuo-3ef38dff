@@ -221,8 +221,8 @@ function HomePage() {
               <span className="text-zinc-900">vocalized in real time.</span>
             </h1>
             <p className="mt-5 max-w-3xl text-[13px] leading-relaxed text-zinc-900 sm:text-base md:text-lg lg:mx-0">
-              <span className="sm:hidden">A voice-native trading terminal powered by 25+ years of ICT &amp; SMC market logic narrating live A+ setups across Gold, FX &amp; Crypto markets</span>
-              <span className="hidden sm:inline">A voice-native trading terminal powered by 25+ years of ICT &amp; SMC market logic narrating live A+ setups across Gold &amp; Crypto</span>
+              <span className="sm:hidden">A voice-native gold trading terminal powered by 25+ years of ICT &amp; SMC market logic narrating live A+ setups across every XAU cross-pair.</span>
+              <span className="hidden sm:inline">A voice-native gold trading terminal powered by 25+ years of ICT &amp; SMC market logic narrating live A+ setups across XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF.</span>
             </p>
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
@@ -451,7 +451,7 @@ function HomePage() {
               {
                 k: "03",
                 t: "Market Intelligence",
-                d: "Session bias, DXY, Forex Factory news and killzones merged into every plan.",
+                d: "London fix, DXY, gold-specific Forex Factory news and killzones merged into every plan.",
               },
               {
                 k: "04",
@@ -460,8 +460,8 @@ function HomePage() {
               },
               {
                 k: "05",
-                t: "Cross-Market Coverage",
-                d: "Gold, FX majors, BTC, ETH, alts, indices and energy one terminal, one voice.",
+                t: "Every XAU Cross",
+                d: "XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF one terminal, one voice.",
               },
               {
                 k: "06",
@@ -490,20 +490,20 @@ function HomePage() {
             <div className="text-left lg:col-span-4 lg:text-left">
               
               <h2 className="mt-4 text-xl font-semibold tracking-tight sm:text-3xl">
-                One terminal. Every major market.
+                One terminal. Every gold cross.
               </h2>
               <p className="mt-4 text-zinc-900 leading-relaxed">
-                Jenvu routes liquidity, structure and news context across asset classes
+                Jenvu routes liquidity, structure and news context across every XAU pair a bullion desk trades.
               </p>
             </div>
             <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
               {[
-                ["Metals", "XAU · XAG · PAXG"],
-                ["FX Majors", "EUR · GBP · JPY"],
-                ["Crypto", "BTC · ETH · SOL"],
-                ["Indices", "NAS100 · SPX · DAX"],
-                ["Energy", "WTI · BRENT"],
-                ["DXY & Macro", "DXY · Yields"],
+                ["XAU / USD", "Primary bullion benchmark"],
+                ["XAU / EUR", "European gold demand"],
+                ["XAU / GBP", "LBMA London fix"],
+                ["XAU / JPY", "Tokyo bullion session"],
+                ["XAU / AUD", "Asia-Pacific miners"],
+                ["XAU / CHF", "Swiss safe-haven flows"],
               ].map(([k, v]) => (
                 <div key={k} className="bg-white p-5 text-left sm:text-left">
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
@@ -528,7 +528,7 @@ function HomePage() {
             {[
               ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions."],
               ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts."],
-              ["2026.05.30", "v2.02", "Forex Factory red-folder context injected into every plan."],
+              ["2026.05.30", "v2.02", "Red-folder USD, EUR, GBP, JPY, AUD & CHF news injected per XAU cross."],
               ["2026.05.12", "v2.01", "Push-to-talk replaces always-on; cleaner mic control."],
               ["2026.04.28", "v2.00", "Voice-native rewrite. New orb. New signal engine."],
             ].map(([d, v, n], i) => (
@@ -869,7 +869,7 @@ function HomePage() {
               ["ICT / SMC framework", false, true, true],
               ["Auto chart markup", false, false, true],
               ["Killzone & session bias", false, false, true],
-              ["Forex Factory context", false, false, true],
+              ["Gold macro & red-folder context", false, false, true],
               ["Sub-20ms latency", false, false, true],
             ].map(([cap, a, b, c], i) => (
               <div
@@ -918,7 +918,7 @@ function HomePage() {
               </h3>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              {["Binance", "Yahoo Finance", "Forex Factory", "TradingView", "OANDA", "DXY"].map((n) => (
+              {["OANDA XAU feeds", "Yahoo Finance", "LBMA fix", "TradingView", "COMEX / COT", "DXY"].map((n) => (
                 <span
                   key={n}
                   className={`rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider text-zinc-900`}
@@ -943,8 +943,8 @@ function HomePage() {
             <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
               {[
                 {
-                  q: "Is JENVU only for Gold?",
-                  a: "Gold is its specialty, but JENVU covers FX majors, BTC, ETH, indices and energy with the same ICT/SMC engine.",
+                  q: "Which pairs does JENVU cover?",
+                  a: "JENVU is a gold-only desk. It trades every XAU cross: XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF — nothing else.",
                 },
                 {
                   q: "Does it execute trades automatically?",

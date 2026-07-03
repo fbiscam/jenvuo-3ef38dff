@@ -5,7 +5,7 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About Jenvu — Our Mission" },
-      { name: "description", content: "Meet Jenvu — the mission, philosophy and desk behind the voice-native trading agent for Gold, FX, indices and crypto." },
+      { name: "description", content: "Meet Jenvu — the mission, philosophy and desk behind the voice-native gold trading agent covering every XAU cross-pair." },
       { property: "og:title", content: "Who We Are — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/about" },
     ],
@@ -34,7 +34,7 @@ function AboutPage() {
         <UL>
           <li><b>Voice-first</b> — speak the asset, hear the plan. No menus.</li>
           <li><b>Institutional playbook</b> — ICT, SMC, killzones, liquidity, OTE.</li>
-          <li><b>Multi-asset</b> — Gold, Crypto, FX, Indices, Stocks from one engine.</li>
+          <li><b>Gold specialist</b> — every XAU cross (USD, EUR, GBP, JPY, AUD, CHF) from one bullion engine.</li>
           <li><b>Honest output</b> — when conditions are bad, the agent says "wait".</li>
         </UL>
       </section>

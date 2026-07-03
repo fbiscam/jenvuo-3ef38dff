@@ -32,7 +32,7 @@ export const Route = createFileRoute("/auth")({
       {
         name: "description",
         content:
-          "Sign in to your Jenvu account to access the voice-native institutional trading terminal — live ICT/SMC analysis for Gold, Crypto, FX and Indices.",
+          "Sign in to your Jenvu account to access the voice-native institutional gold trading terminal — live ICT/SMC analysis for every XAU cross-pair.",
       },
       { name: "robots", content: "index, follow" },
       { property: "og:title", content: "Sign In Your Account — Jenvu" },
@@ -56,11 +56,12 @@ const SANS = "font-['Inter',system-ui,sans-serif]";
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "2,418.30", "+0.42%"],
-  ["BTC/USDT", "71,204.10", "+1.18%"],
-  ["ETH/USDT", "3,841.20", "+2.04%"],
-  ["EUR/USD", "1.0832", "-0.07%"],
+  ["XAU/EUR", "2,232.15", "+0.31%"],
+  ["XAU/GBP", "1,907.44", "+0.28%"],
+  ["XAU/JPY", "381,204", "+0.55%"],
+  ["XAU/AUD", "3,672.90", "+0.48%"],
+  ["XAU/CHF", "2,178.60", "+0.19%"],
   ["DXY", "104.21", "-0.12%"],
-  ["SOL/USDT", "168.40", "+3.12%"],
 ];
 
 function AuthPage() {
@@ -388,11 +389,11 @@ function AuthPage() {
 function RotatingStatus() {
   const [idx, setIdx] = React.useState(0);
   const phrases = [
-    "Mapping liquidity on XAUUSD...",
-    "FVG detected on BTC 15m...",
-    "Monitoring London Killzone...",
-    "Analyzing institutional bias...",
-    "Scanning SMT divergence..."
+    "Mapping liquidity on XAU/USD...",
+    "FVG detected on XAU/JPY 15m...",
+    "Monitoring London fix killzone...",
+    "Analyzing institutional bullion bias...",
+    "Scanning DXY-XAU divergence..."
   ];
   
   React.useEffect(() => {

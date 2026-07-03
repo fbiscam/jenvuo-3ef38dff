@@ -25,9 +25,9 @@ function AIPage() {
         <H2>Perception Layer</H2>
         <P>
           The Web Speech API captures your voice and converts it to text in real time.
-          A lightweight intent resolver routes commands like "Analyze Bitcoin" or
-          "Show me Gold" to the correct instrument adapter (Binance for crypto, Yahoo
-          for FX/indices/stocks/metals).
+          A lightweight intent resolver routes commands like "Analyze XAU/JPY" or
+          "Show me gold in euros" to the correct XAU cross-pair adapter (OANDA and
+          Yahoo Finance bullion feeds).
         </P>
       </section>
       <section className="space-y-3">

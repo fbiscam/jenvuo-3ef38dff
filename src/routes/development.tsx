@@ -42,9 +42,8 @@ function DevPage() {
         <H2>Server Functions</H2>
         <P>
           Market data fetching, news aggregation, and LLM orchestration run as TanStack
-          server functions on a serverless edge runtime. Each instrument has its own
-          adapter — Binance for crypto, Yahoo Finance for FX/indices/metals/stocks — with
-          automatic fallbacks for resilience.
+          server functions on a serverless edge runtime. Each XAU cross-pair routes to
+          OANDA and Yahoo Finance bullion feeds with automatic fallbacks for resilience.
         </P>
       </section>
       <section className="space-y-3">

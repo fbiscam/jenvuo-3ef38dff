@@ -47,13 +47,12 @@ export const Route = createFileRoute("/pricing")({
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "2,418.30", "+0.42%"],
-  ["BTC/USDT", "71,204.10", "+1.18%"],
-  ["ETH/USDT", "3,841.20", "+2.04%"],
-  ["EUR/USD", "1.0832", "-0.07%"],
-  ["GBP/USD", "1.2671", "+0.09%"],
-  ["NAS100", "20,114.5", "+0.61%"],
+  ["XAU/EUR", "2,232.15", "+0.31%"],
+  ["XAU/GBP", "1,907.44", "+0.28%"],
+  ["XAU/JPY", "381,204", "+0.55%"],
+  ["XAU/AUD", "3,672.90", "+0.48%"],
+  ["XAU/CHF", "2,178.60", "+0.19%"],
   ["DXY", "104.21", "-0.12%"],
-  ["SOL/USDT", "168.40", "+3.12%"],
 ];
 
 const TIERS = [
@@ -107,7 +106,7 @@ const TIERS = [
       "595 credits / month included",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
-      "Multi-pair scanner (XAU + DXY + indices)",
+      "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF)",
       "API access & webhooks",
       "Custom alert rules",
       "Dedicated onboarding & SLA",
@@ -122,7 +121,7 @@ const FEATURE_BLOCKS = [
   { img: pricingIct, tag: "02 / ICT · SMC", title: "ICT & SMC narration", desc: "Fair value gaps, order blocks, liquidity sweeps and BOS — all called live on chart.", tone: "Pro · Elite" },
   { img: pricingAlerts, tag: "03 / ALERTS", title: "Realtime A+ alerts", desc: "Email + push the instant a 4★ confluence setup forms. No noise. Only A+.", tone: "Pro · Elite" },
   { img: pricingJournal, tag: "04 / JOURNAL", title: "Trade journal & analytics", desc: "Auto-log every trade. Track equity curve, win rate, RR and emotional state.", tone: "Pro · Elite" },
-  { img: pricingScanner, tag: "05 / SCANNER", title: "Multi-pair scanner", desc: "Bias engine across XAU, DXY, indices and majors — synced timeframes.", tone: "Elite" },
+  { img: pricingScanner, tag: "05 / SCANNER", title: "XAU cross-pair scanner", desc: "Bias engine across every XAU cross plus DXY — synced timeframes.", tone: "Elite" },
   { img: pricingApi, tag: "06 / API", title: "API access & webhooks", desc: "Pipe signals into your stack. JSON webhooks, REST endpoints, custom rules.", tone: "Elite" },
 ];
 
@@ -144,7 +143,7 @@ const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an institutional-grade analysis tool. Every setup is for educational purposes. You remain responsible for your trades."],
   ["When does billing go live?", "We're finalising our payment infrastructure. Join the waitlist via the CTA above — you'll be notified the moment Pro is purchasable."],
   ["Can I cancel anytime?", "Yes. Subscriptions are month-to-month with no lock-in. You'll keep access until the end of the billing cycle."],
-  ["What markets are covered?", "Today: Gold (XAU/USD) with priority. The Elite scanner expands to DXY, US indices, and major FX pairs."],
+  ["What markets are covered?", "Gold only. Jenvu trades every XAU cross-pair: XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF — with DXY overlay for confluence."],
 ];
 
 function PricingPage() {

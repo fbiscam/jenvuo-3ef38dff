@@ -44,16 +44,16 @@ export const collections: Collection[] = [
         slug: "what-is-jenvu",
         title: "What is Jenvu AI?",
         summary:
-          "Jenvu is a voice-native trading agent for Gold, FX, indices and crypto — built on ICT and SMC playbooks.",
+          "Jenvu is a voice-native gold trading agent covering every XAU cross-pair — built on ICT and SMC playbooks.",
         updatedAt: "2026-06-30",
         body: [
           { type: "p", content: "Jenvu AI is a voice-first market intelligence terminal. You speak — it listens, analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, narrates its read in real time, and renders the chart with marked zones so you can see exactly what it sees." },
-          { type: "p", content: "Think of it as having a senior desk analyst on call 24/7: ask for a setup on Gold, BTC or EUR/USD and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
+          { type: "p", content: "Think of it as having a senior bullion-desk analyst on call 24/7: ask for a setup on XAU/USD, XAU/JPY or any other gold cross and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
 
           { type: "h2", content: "What you can do with Jenvu" },
           { type: "ul", items: [
             "Talk to the agent like a desk analyst — push-to-talk, no typing required.",
-            "Generate A+ setups on demand for Gold and other supported assets.",
+            "Generate A+ setups on demand for every XAU cross-pair.",
             "Watch the AI mark structure, FVGs, order blocks and liquidity directly on the chart.",
             "Save signals to your dashboard and receive alerts when new A+ setups are detected.",
             "Get news context, killzone awareness and bias confirmation before risking capital.",
@@ -112,7 +112,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Step by step" },
           { type: "ol", items: [
             "Open the Signal Desk from the top navigation.",
-            "Pick or type a symbol — XAUUSD, BTCUSD, EURUSD, NAS100, etc.",
+            "Pick a gold pair — XAUUSD, XAUEUR, XAUGBP, XAUJPY, XAUAUD or XAUCHF.",
             "Hit 'Analyze'. The 1H and 15M charts load and the agent starts narrating.",
             "Wait while the 7-stage pipeline runs — usually 10–25 seconds.",
             "If the final score is 85+, the setup is graded A+ and entry, stop and targets appear.",
@@ -136,30 +136,23 @@ export const collections: Collection[] = [
       {
         slug: "supported-assets",
         title: "Which assets does Jenvu support?",
-        summary: "Gold, major FX pairs, key indices, large-cap crypto and select stocks.",
+        summary: "Gold only — every XAU cross-pair, from XAU/USD to XAU/CHF.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu's analysis engine is asset-aware. It adjusts factor weights for each asset class — what matters on Gold is not the same as what matters on Bitcoin, and the engine accounts for that." },
+          { type: "p", content: "Jenvu is a dedicated gold desk. The analysis engine is tuned for bullion — London fix mechanics, DXY correlation, COMEX/COT positioning and central-bank buying flows — and it refuses to trade anything that isn't gold." },
 
           { type: "h2", content: "Supported instruments" },
-          { type: "h3", content: "Metals" },
+          { type: "h3", content: "Gold cross-pairs" },
           { type: "ul", items: [
-            "XAU/USD (Gold) — primary asset, fullest playbook.",
-            "XAG/USD (Silver).",
+            "XAU/USD — primary bullion benchmark.",
+            "XAU/EUR — European gold demand.",
+            "XAU/GBP — LBMA London fix.",
+            "XAU/JPY — Tokyo bullion session.",
+            "XAU/AUD — Asia-Pacific miners.",
+            "XAU/CHF — Swiss safe-haven flows.",
           ]},
-          { type: "h3", content: "Forex majors" },
-          { type: "ul", items: [
-            "EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD.",
-            "Major crosses on request (EUR/JPY, GBP/JPY, etc.).",
-          ]},
-          { type: "h3", content: "Indices" },
-          { type: "ul", items: ["NAS100, SPX500, US30, GER40, UK100."] },
-          { type: "h3", content: "Crypto" },
-          { type: "ul", items: ["BTC, ETH, SOL and other top-cap pairs traded on Binance spot."] },
-          { type: "h3", content: "Equities" },
-          { type: "ul", items: ["Select large-cap US stocks (AAPL, MSFT, NVDA, TSLA, etc.)."] },
 
-          { type: "note", tone: "info", content: "Don't see your instrument? Type the symbol into the Signal Desk anyway — if data is available, the engine will analyse it. Otherwise drop us a note via the Contact page." },
+          { type: "note", tone: "info", content: "Ask for BTC, EUR/USD, NAS100 or any non-gold asset and Jenvu will politely decline and redirect you to a gold cross-pair." },
         ],
       },
     ],
@@ -236,7 +229,7 @@ export const collections: Collection[] = [
           { type: "p", content: "Jenvu understands natural language — you don't need fixed phrases. These examples are a good starting point and cover the most common workflows." },
 
           { type: "h2", content: "Analysis & setups" },
-          { type: "code", content: "“Analyze Gold.”\n“Give me an A+ setup on Bitcoin.”\n“What's the bias on EUR/USD right now?”\n“Walk me through the 15-minute structure on NAS100.”" },
+          { type: "code", content: "“Analyze XAU/USD.”\n“Give me an A+ setup on gold in euros.”\n“What's the bias on XAU/JPY right now?”\n“Walk me through the 15-minute structure on XAU/GBP.”" },
 
           { type: "h2", content: "Risk & news" },
           { type: "code", content: "“Is it safe to trade NFP today?”\n“Any high-impact news in the next hour?”\n“What killzone are we in?”" },
@@ -280,7 +273,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Why deterministic + LLM" },
           { type: "p", content: "Pure LLM signals hallucinate. Pure rule-based signals can't explain themselves. Jenvu's hybrid keeps the analysis grounded in measurable price action while letting the agent speak to you like a human analyst." },
 
-          { type: "note", tone: "info", content: "The scoring weights vary by asset class. Gold and FX weight liquidity heavily; crypto weights breaker blocks and session opens more." },
+          { type: "note", tone: "info", content: "Scoring weights are tuned per XAU cross — DXY correlation matters most on XAU/USD, Tokyo liquidity on XAU/JPY, LBMA fix flows on XAU/GBP and XAU/EUR." },
         ],
       },
       {
@@ -313,7 +306,7 @@ export const collections: Collection[] = [
         summary: "You'll see a MARKET CLOSED badge — no live entries are issued.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Forex and indices follow session windows. Crypto trades 24/7. When you ask for an instrument that's outside its trading session, Jenvu detects it and adapts." },
+          { type: "p", content: "Spot gold follows the OTC bullion week — Sunday open in Sydney through Friday New York close, with a daily 60-minute settlement break. When you ask for a gold cross outside its trading window, Jenvu detects it and adapts." },
 
           { type: "h2", content: "What you'll see" },
           { type: "ul", items: [
@@ -325,13 +318,13 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Sessions reference" },
           { type: "ul", items: [
-            "Forex: Sunday 22:00 UTC → Friday 22:00 UTC.",
-            "Major indices: roughly 13:30 → 20:00 UTC (US cash session).",
-            "Gold (XAU/USD): follows forex hours.",
-            "Crypto: open 24/7, no closed state.",
+            "Spot gold: Sunday 22:00 UTC → Friday 22:00 UTC.",
+            "LBMA London gold fix: 10:30 & 15:00 GMT (highest liquidity).",
+            "COMEX open (NY AM): 12:30 – 15:00 GMT.",
+            "Daily settlement break: 21:00 – 22:00 UTC.",
           ]},
 
-          { type: "note", tone: "info", content: "If you want to plan the next session in advance, ask Jenvu for 'tomorrow's London bias on Gold' — it'll build a HTF read without issuing a live signal." },
+          { type: "note", tone: "info", content: "If you want to plan the next session in advance, ask Jenvu for 'tomorrow's London bias on XAU/USD' — it'll build a HTF read without issuing a live signal." },
         ],
       },
     ],
