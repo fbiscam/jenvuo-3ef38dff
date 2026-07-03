@@ -143,7 +143,7 @@ const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an institutional-grade analysis tool. Every setup is for educational purposes. You remain responsible for your trades."],
   ["When does billing go live?", "We're finalising our payment infrastructure. Join the waitlist via the CTA above — you'll be notified the moment Pro is purchasable."],
   ["Can I cancel anytime?", "Yes. Subscriptions are month-to-month with no lock-in. You'll keep access until the end of the billing cycle."],
-  ["What markets are covered?", "Today: Gold (XAU/USD) with priority. The Elite scanner expands to DXY, US indices, and major FX pairs."],
+  ["What markets are covered?", "Gold only. Jenvu trades every XAU cross-pair: XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF — with DXY overlay for confluence."],
 ];
 
 function PricingPage() {
