@@ -90,17 +90,16 @@ function useLiveTicker(): TickerRow[] {
   const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
   React.useEffect(() => {
     let alive = true;
-    const symbols = Object.values(BINANCE_MAP);
 
-    const fetchGold = async (): Promise<{ price: number; pct: number } | null> => {
+    const fetchOne = async (yahooSym: string): Promise<number | null> => {
       try {
-        const r = await fetch("https://api.gold-api.com/price/XAU");
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSym)}?interval=5m&range=1d`;
+        const r = await fetch(url);
         if (!r.ok) return null;
-        const j = await r.json();
-        const price = Number(j.price);
-        if (!isFinite(price)) return null;
-        // gold-api doesn't return 24h change; derive from previous render
-        return { price, pct: NaN };
+        const j: any = await r.json();
+        const meta = j?.chart?.result?.[0]?.meta;
+        const p = Number(meta?.regularMarketPrice);
+        return Number.isFinite(p) ? p : null;
       } catch {
         return null;
       }
@@ -108,39 +107,33 @@ function useLiveTicker(): TickerRow[] {
 
     const fetchPrices = async () => {
       try {
-        const [binRes, gold] = await Promise.all([
-          fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(symbols))}`).then((r) => (r.ok ? r.json() : null)),
-          fetchGold(),
-        ]);
+        const entries = await Promise.all(
+          INITIAL_TICKER.map(async ([label]) => {
+            const sym = YAHOO_MAP[label];
+            if (!sym) return null;
+            const p = await fetchOne(sym);
+            return p != null ? [label, p] as const : null;
+          }),
+        );
         if (!alive) return;
-        const data: Array<{ symbol: string; lastPrice: string; priceChangePercent: string }> = Array.isArray(binRes) ? binRes : [];
-        const bySym = new Map(data.map((d) => [d.symbol, d]));
+        const priceByLabel = new Map(entries.filter((e): e is readonly [string, number] => !!e));
         setRows((prev) =>
           prev.map(([label, price, delta]) => {
-            if (label === "XAU/USD" && gold) {
-              // approximate % change vs previous shown price
-              const prevN = parseFloat(price.replace(/,/g, ""));
-              const pct = isFinite(prevN) && prevN > 0 ? ((gold.price - prevN) / prevN) * 100 : 0;
-              const sign = pct >= 0 ? "+" : "";
-              const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
-              return [label, fmtPrice(gold.price), deltaOut];
-            }
-            const bsym = BINANCE_MAP[label];
-            if (!bsym) return [label, price, delta];
-            const d = bySym.get(bsym);
-            if (!d) return [label, price, delta];
-            const p = parseFloat(d.lastPrice);
-            const pct = parseFloat(d.priceChangePercent);
+            const p = priceByLabel.get(label);
+            if (p == null) return [label, price, delta];
+            const prevN = parseFloat(price.replace(/,/g, ""));
+            const pct = isFinite(prevN) && prevN > 0 ? ((p - prevN) / prevN) * 100 : 0;
             const sign = pct >= 0 ? "+" : "";
-            return [label, fmtPrice(p), `${sign}${pct.toFixed(2)}%`];
-          })
+            const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
+            return [label, fmtPrice(p), deltaOut];
+          }),
         );
       } catch {
         /* ignore */
       }
     };
     fetchPrices();
-    const id = setInterval(fetchPrices, 10_000);
+    const id = setInterval(fetchPrices, 15_000);
     return () => {
       alive = false;
       clearInterval(id);
@@ -148,6 +141,7 @@ function useLiveTicker(): TickerRow[] {
   }, []);
   return rows;
 }
+
 
 
 
