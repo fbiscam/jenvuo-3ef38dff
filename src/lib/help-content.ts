@@ -273,7 +273,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Why deterministic + LLM" },
           { type: "p", content: "Pure LLM signals hallucinate. Pure rule-based signals can't explain themselves. Jenvu's hybrid keeps the analysis grounded in measurable price action while letting the agent speak to you like a human analyst." },
 
-          { type: "note", tone: "info", content: "The scoring weights vary by asset class. Gold and FX weight liquidity heavily; crypto weights breaker blocks and session opens more." },
+          { type: "note", tone: "info", content: "Scoring weights are tuned per XAU cross — DXY correlation matters most on XAU/USD, Tokyo liquidity on XAU/JPY, LBMA fix flows on XAU/GBP and XAU/EUR." },
         ],
       },
       {
