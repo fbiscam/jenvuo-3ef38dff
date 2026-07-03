@@ -14,12 +14,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Voice-native AI gold desk for XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF. Live ICT/SMC analysis, A+ setups and spoken execution built on 25+ years of bullion-desk logic.",
+          "Voice-native AI gold trading desk covering XAU/USD, EUR, GBP, JPY, AUD & CHF. Live ICT/SMC analysis, A+ bullion setups and spoken execution.",
       },
       { property: "og:title", content: "Voice-Native Gold Trading Intelligence — Jenvu" },
       {
         property: "og:description",
-        content: "Speak. Analyze. Execute. The voice terminal that turns gold market noise into institutional-grade XAU signals.",
+        content: "Speak. Analyze. Execute. The voice terminal that narrates institutional-grade XAU signals across every major gold cross-pair.",
       },
       { property: "og:url", content: "https://jenvu.com/" },
       { property: "og:type", content: "website" },
