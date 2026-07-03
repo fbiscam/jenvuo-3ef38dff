@@ -306,7 +306,7 @@ export const collections: Collection[] = [
         summary: "You'll see a MARKET CLOSED badge — no live entries are issued.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Forex and indices follow session windows. Crypto trades 24/7. When you ask for an instrument that's outside its trading session, Jenvu detects it and adapts." },
+          { type: "p", content: "Spot gold follows the OTC bullion week — Sunday open in Sydney through Friday New York close, with a daily 60-minute settlement break. When you ask for a gold cross outside its trading window, Jenvu detects it and adapts." },
 
           { type: "h2", content: "What you'll see" },
           { type: "ul", items: [
@@ -318,13 +318,13 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Sessions reference" },
           { type: "ul", items: [
-            "Forex: Sunday 22:00 UTC → Friday 22:00 UTC.",
-            "Major indices: roughly 13:30 → 20:00 UTC (US cash session).",
-            "Gold (XAU/USD): follows forex hours.",
-            "Crypto: open 24/7, no closed state.",
+            "Spot gold: Sunday 22:00 UTC → Friday 22:00 UTC.",
+            "LBMA London gold fix: 10:30 & 15:00 GMT (highest liquidity).",
+            "COMEX open (NY AM): 12:30 – 15:00 GMT.",
+            "Daily settlement break: 21:00 – 22:00 UTC.",
           ]},
 
-          { type: "note", tone: "info", content: "If you want to plan the next session in advance, ask Jenvu for 'tomorrow's London bias on Gold' — it'll build a HTF read without issuing a live signal." },
+          { type: "note", tone: "info", content: "If you want to plan the next session in advance, ask Jenvu for 'tomorrow's London bias on XAU/USD' — it'll build a HTF read without issuing a live signal." },
         ],
       },
     ],
