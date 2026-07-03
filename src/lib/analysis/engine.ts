@@ -553,12 +553,21 @@ export function scoreSetup(args: {
   let score = Math.round((earned / totalWeight) * 100);
   if (imminentHighNews) score = Math.min(score, 60);
 
-  // Apply vetos — soft deduction, not a flat cap. Multiple vetoes stack.
-  if (vetos.length > 0) {
-    score = Math.max(30, score - vetos.length * 15);
+  // Vetoes: single = soft (-8), multi (2+) = harsh (-15 each). Prevents a lone
+  // false-positive gate from killing an otherwise strong setup.
+  if (vetos.length === 1) {
+    score = Math.max(35, score - 8);
+  } else if (vetos.length >= 2) {
+    score = Math.max(25, score - vetos.length * 15);
   }
 
-  // Grade thresholds unchanged; multi-veto forces C.
+  // Relaxed thresholds — realistic A+ frequency (a few per pair per day)
+  const grade: "A+" | "A" | "B" | "C" =
+    vetos.length >= 2 ? "C" :
+    score >= 85 ? "A+" :
+    score >= 72 ? "A" :
+    score >= 55 ? "B" : "C";
+
   const grade: "A+" | "A" | "B" | "C" =
     vetos.length >= 2 ? "C" :
     score >= 88 ? "A+" :
