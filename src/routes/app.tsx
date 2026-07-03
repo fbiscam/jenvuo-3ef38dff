@@ -85,11 +85,11 @@ export const Route = createFileRoute("/app")({
       {
         name: "description",
         content:
-          "Speak to Jenvu and get live institutional ICT/SMC analysis for Gold, Crypto, FX and Indices — A+ setups, structured entries, stops and targets narrated in real time.",
+          "Speak to Jenvu and get live institutional ICT/SMC analysis for every XAU gold cross-pair — A+ setups, structured entries, stops and targets narrated in real time.",
       },
-      { name: "keywords", content: "voice trading agent, AI trading terminal, gold voice analysis, ICT voice agent, SMC trading AI, XAUUSD voice signals" },
-      { property: "og:title", content: "Voice Trading Terminal — Jenvu" },
-      { property: "og:description", content: "Voice-native institutional trading agent for Gold, Crypto, FX and Indices." },
+      { name: "keywords", content: "voice gold trading agent, XAU voice analysis, ICT gold agent, SMC bullion AI, XAUUSD voice signals, XAUEUR, XAUJPY, XAUGBP" },
+      { property: "og:title", content: "Voice Gold Trading Terminal — Jenvu" },
+      { property: "og:description", content: "Voice-native institutional bullion desk covering every XAU cross-pair." },
       { property: "og:url", content: "https://jenvu.com/app" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
