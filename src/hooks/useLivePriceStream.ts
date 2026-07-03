@@ -22,11 +22,17 @@ const BINANCE_MAP: Record<string, string> = {
 
 function binanceStreamFor(symbol: string): string | null {
   const upper = symbol.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  // Only stream from Binance for symbols we've explicitly whitelisted as real
+  // crypto spot markets. The previous regex fallbacks mapped XAUUSD→xauusdt,
+  // XAGUSD→xagusdt (nonexistent streams that silently never tick), and
+  // EURUSD→eurusdt (a Binance stablecoin pair, NOT forex spot — the header
+  // then drifts from the server-computed entry/SL/TP which use Yahoo forex).
   if (BINANCE_MAP[upper]) return BINANCE_MAP[upper];
+  // Native stablecoin quote pairs are safe (e.g. FOOUSDT explicitly).
   if (/^[A-Z0-9]{2,15}(USDT|USDC|BUSD)$/.test(upper)) return upper.toLowerCase();
-  if (/^[A-Z0-9]{2,15}USD$/.test(upper)) return `${upper.slice(0, -3)}USDT`.toLowerCase();
   return null;
 }
+
 
 export type LiveTickHandler = (price: number, tMs: number) => void;
 
@@ -92,6 +98,7 @@ export function useLivePriceStream(
     };
 
     const stream = binanceStreamFor(symbol);
+    let firstTickTimer: ReturnType<typeof setTimeout> | null = null;
     if (stream && typeof WebSocket !== "undefined") {
       try {
         ws = new WebSocket(`wss://stream.binance.com:9443/ws/${stream}@trade`);
@@ -100,10 +107,14 @@ export function useLivePriceStream(
             const d = JSON.parse(ev.data);
             const p = parseFloat(d.p);
             pushTick(p, typeof d.T === "number" ? d.T : Date.now());
+            if (firstTickTimer) { clearTimeout(firstTickTimer); firstTickTimer = null; }
           } catch { /* ignore */ }
         };
         ws.onerror = () => { /* fall through to onclose */ };
         ws.onclose = () => { if (!stopped) startPolling(1500); };
+        // Watchdog: if no tick lands within 4s (accepted subscription but silent
+        // stream), start polling in parallel so the header keeps moving.
+        firstTickTimer = setTimeout(() => { if (!stopped) startPolling(1500); }, 4000);
       } catch {
         startPolling(1500);
       }
@@ -112,6 +123,7 @@ export function useLivePriceStream(
       // ticker feels live rather than lagging behind broker prices.
       startPolling(1000);
     }
+
 
     // RAF smoother — lerp displayed price toward target each frame for small
     // moves. Large jumps are snapped in pushTick above.
@@ -135,10 +147,12 @@ export function useLivePriceStream(
 
     return () => {
       stopped = true;
+      if (firstTickTimer) clearTimeout(firstTickTimer);
       if (ws) { try { ws.close(); } catch { /* ignore */ } }
       if (pollId) clearInterval(pollId);
       if (raf != null) cancelAnimationFrame(raf);
     };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol]);
 

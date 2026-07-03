@@ -375,40 +375,55 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
   return fetchInstrumentCandles(resolveInstrument("XAUUSD"), tf);
 }
 
-async function _analyzeGoldCompute(data: { timeframe: string; query: string }): Promise<GoldSignal> {
+// Returns whether the query looks like a real trading-setup request (as opposed
+// to casual chat like "how is gold looking?"). Keep this list tight — vague
+// market words like "gold/price/trend/market/chart" would fire on chit-chat and
+// force a rigid "WAIT on XAU/USD: …" reply, so they are intentionally excluded.
+function isTradingSetupIntent(q: string): boolean {
+  return /\b(setup|signal|entry|stop\s*loss|take\s*profit|\btp\b|\bsl\b|order\s*block|fvg|liquidity|bos|choch|killzone|scalp|swing\s+trade|give\s+me\s+(a|the)\s+trade|find\s+(a|me)\s+trade|best\s+trade|any\s+trade|trade\s+idea|trade\s+plan|a\+\s*setup)\b/i.test(q);
+}
+
+async function _analyzeGoldCompute(data: { timeframe: string; query: string }): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
-    const wantsTradingSetup = /\b(setup|signal|entry|buy|sell|long|short|trade|analy[sz]e|analysis|bias|tp|sl|stop\s*loss|take\s*profit|gold|xau|chart|trend|market|price|level|zone|fvg|ob|order\s*block|liquidity|bos|choch|smc|ict|killzone|scalp|swing|stock|coin|crypto|forex|pair)\b/i.test(data.query);
+    const wantsTradingSetup = isTradingSetupIntent(data.query);
     if (wantsTradingSetup) {
       try {
         const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) });
         const dec = plan.instrument.decimals;
         const prefix = plan.instrument.kind === "crypto" ? "" : "$";
         const fmt = (n?: number) => typeof n === "number" && isFinite(n) ? `${prefix}${n.toFixed(dec)}` : "-";
-        return {
-          bias: plan.htfBias === "bullish" ? "BULLISH" : plan.htfBias === "bearish" ? "BEARISH" : "NEUTRAL",
-          direction: plan.trade.direction,
-          entry: plan.trade.direction === "WAIT" ? "-" : fmt(plan.trade.entry),
-          stopLoss: plan.trade.direction === "WAIT" ? "-" : fmt(plan.trade.sl),
-          takeProfits: plan.trade.direction === "WAIT" ? [] : [plan.trade.tp1, plan.trade.tp2, plan.trade.tp3 ?? plan.trade.tp].filter((n): n is number => typeof n === "number").map(fmt),
-          riskReward: plan.trade.direction === "WAIT" ? "-" : `1:${plan.trade.rr.toFixed(2)}`,
-          confidence: plan.trade.direction === "WAIT" ? Math.min(plan.trade.confidence, 55) : plan.trade.confidence,
-          killzone: plan.killzone,
-          confluences: plan.confluences,
-          ictAnalysis: plan.htfNarrative,
-          smcAnalysis: plan.ltfNarrative,
-          marketStructure: `${plan.alignmentLabel} · ${plan.setupGrade} (${plan.setupScore}/100)`,
-          spokenSummary: plan.trade.summary,
-          fullAnalysis: `${plan.htfNarrative}\n\n${plan.ltfNarrative}\n\n${plan.trade.summary}\nInvalidation: ${plan.trade.invalidation}`,
-          timeframe: data.timeframe,
-          currentPrice: plan.currentPrice,
-          generatedAt: new Date().toISOString(),
-        };
+        // If the plan returned WAIT, fall through to the LLM chat path so the
+        // user hears a conversational answer, not a terse "WAIT on XAU/USD: …".
+        if (plan.trade.direction !== "WAIT") {
+          return {
+            bias: plan.htfBias === "bullish" ? "BULLISH" : plan.htfBias === "bearish" ? "BEARISH" : "NEUTRAL",
+            direction: plan.trade.direction,
+            entry: fmt(plan.trade.entry),
+            stopLoss: fmt(plan.trade.sl),
+            takeProfits: [plan.trade.tp1, plan.trade.tp2, plan.trade.tp3 ?? plan.trade.tp].filter((n): n is number => typeof n === "number").map(fmt),
+            riskReward: `1:${plan.trade.rr.toFixed(2)}`,
+            confidence: plan.trade.confidence,
+            killzone: plan.killzone,
+            confluences: plan.confluences,
+            ictAnalysis: plan.htfNarrative,
+            smcAnalysis: plan.ltfNarrative,
+            marketStructure: `${plan.alignmentLabel} · ${plan.setupGrade} (${plan.setupScore}/100)`,
+            spokenSummary: plan.trade.summary,
+            fullAnalysis: `${plan.htfNarrative}\n\n${plan.ltfNarrative}\n\n${plan.trade.summary}\nInvalidation: ${plan.trade.invalidation}`,
+            timeframe: data.timeframe,
+            currentPrice: plan.currentPrice,
+            generatedAt: new Date().toISOString(),
+            __billable: "signal",
+          };
+        }
       } catch {
         // Fall back to the lightweight assistant path below if the full signal desk feed is temporarily unavailable.
       }
     }
+
+
 
     let candles: Candle[] = [];
     try {
@@ -530,7 +545,7 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
       generatedAt: new Date().toISOString(),
     };
 
-    return signal;
+    return { ...signal, __billable: "chat" };
 }
 
 export const analyzeGold = createServerFn({ method: "POST" })
@@ -540,9 +555,18 @@ export const analyzeGold = createServerFn({ method: "POST" })
     query: String(d?.query || "Give me the best A+ setup right now"),
   }))
   .handler(async ({ data, context }) => {
-    await _spendUserCredits(context.userId, 2, "signal");
-    return _analyzeGoldCompute(data);
+    // Compute first, then charge based on what was actually returned:
+    // - trading setup (entry/SL/TP) → 2 credits (signal cost)
+    // - conversational reply → 1 credit (chat cost)
+    const result = await _analyzeGoldCompute(data);
+    const cost = result.__billable === "signal" ? 2 : 1;
+    await _spendUserCredits(context.userId, cost, result.__billable === "signal" ? "signal" : "chat");
+    // Strip internal billing marker before returning to the client.
+    const { __billable, ...clean } = result;
+    void __billable;
+    return clean as GoldSignal;
   });
+
 
 // ============================================================
 // SIGNAL PLAN — structured ICT/SMC markings + voice narration
