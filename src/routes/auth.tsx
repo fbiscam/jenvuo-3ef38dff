@@ -389,11 +389,11 @@ function AuthPage() {
 function RotatingStatus() {
   const [idx, setIdx] = React.useState(0);
   const phrases = [
-    "Mapping liquidity on XAUUSD...",
-    "FVG detected on BTC 15m...",
-    "Monitoring London Killzone...",
-    "Analyzing institutional bias...",
-    "Scanning SMT divergence..."
+    "Mapping liquidity on XAU/USD...",
+    "FVG detected on XAU/JPY 15m...",
+    "Monitoring London fix killzone...",
+    "Analyzing institutional bullion bias...",
+    "Scanning DXY-XAU divergence..."
   ];
   
   React.useEffect(() => {
