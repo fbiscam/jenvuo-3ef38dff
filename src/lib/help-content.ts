@@ -53,7 +53,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "What you can do with Jenvu" },
           { type: "ul", items: [
             "Talk to the agent like a desk analyst — push-to-talk, no typing required.",
-            "Generate A+ setups on demand for Gold and other supported assets.",
+            "Generate A+ setups on demand for every XAU cross-pair.",
             "Watch the AI mark structure, FVGs, order blocks and liquidity directly on the chart.",
             "Save signals to your dashboard and receive alerts when new A+ setups are detected.",
             "Get news context, killzone awareness and bias confirmation before risking capital.",
