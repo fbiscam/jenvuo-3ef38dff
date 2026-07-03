@@ -719,6 +719,53 @@ export const PAIR_PROFILES: Record<string, PairProfile> = {
     primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
     correlated: { symbol: "DXY", inverse: true },
   },
+  XAUEUR: {
+    key: "XAUEUR",
+    killzones: [
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
+    correlated: { symbol: "EURUSD", inverse: false },
+  },
+  XAUGBP: {
+    key: "XAUGBP",
+    killzones: [
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
+    correlated: { symbol: "GBPUSD", inverse: false },
+  },
+  XAUJPY: {
+    key: "XAUJPY",
+    killzones: [
+      { name: "Tokyo Killzone", startUTC: 0, endUTC: 4 },
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "Tokyo/London/NY", startUTC: 0, endUTC: 15 },
+    correlated: { symbol: "USDJPY", inverse: true },
+  },
+  XAUAUD: {
+    key: "XAUAUD",
+    killzones: [
+      { name: "Sydney Killzone", startUTC: 22, endUTC: 2 },
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "Sydney/London/NY", startUTC: 22, endUTC: 15 },
+    correlated: { symbol: "AUDUSD", inverse: false },
+  },
+  XAUCHF: {
+    key: "XAUCHF",
+    killzones: [
+      { name: "London Killzone", startUTC: 7, endUTC: 10 },
+      { name: "NY AM Killzone", startUTC: 12, endUTC: 15 },
+    ],
+    primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
+    correlated: { symbol: "USDCHF", inverse: true },
+  },
   XAGUSD: {
     key: "XAGUSD",
     killzones: [
@@ -728,6 +775,7 @@ export const PAIR_PROFILES: Record<string, PairProfile> = {
     primeSession: { name: "London/NY overlap", startUTC: 7, endUTC: 15 },
     correlated: { symbol: "DXY", inverse: true },
   },
+
   // EUR/GBP — London prime
   EURUSD: {
     key: "EURUSD",
