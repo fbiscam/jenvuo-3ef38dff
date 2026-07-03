@@ -51,49 +51,33 @@ const SANS = "font-['Inter',system-ui,sans-serif]";
 /* ---------- mock data ---------- */
 const SIGNALS = [
   { pair: "XAUUSD", t: "14:20:02", tag: "SWEEP", note: "Liquidity grab @ 2,418.30", tone: "ink" },
-  { pair: "BTCUSD", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
-  { pair: "EURUSD", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
-  { pair: "NAS100", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
+  { pair: "XAUEUR", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
+  { pair: "XAUGBP", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
+  { pair: "XAUJPY", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
 ] as const;
 
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "2,418.30", "+0.42%"],
-  ["BTC/USDT", "71,204.10", "+1.18%"],
-  ["ETH/USDT", "3,841.20", "+2.04%"],
-  ["EUR/USD", "1.0832", "-0.07%"],
-  ["GBP/USD", "1.2671", "+0.09%"],
-  ["NAS100", "20,114.5", "+0.61%"],
+  ["XAU/EUR", "2,241.05", "+0.31%"],
+  ["XAU/GBP", "1,908.72", "+0.18%"],
+  ["XAU/JPY", "376,410", "+0.55%"],
+  ["XAU/AUD", "3,684.10", "+0.72%"],
+  ["XAU/CHF", "2,132.94", "+0.24%"],
   ["DXY", "104.21", "-0.12%"],
-  ["WTI", "78.42", "+0.84%"],
-  ["SOL/USDT", "168.40", "+3.12%"],
-  ["XRP/USDT", "0.5184", "+0.78%"],
-  ["BNB/USDT", "612.30", "+1.04%"],
-  ["ADA/USDT", "0.4421", "+1.92%"],
-  ["DOGE/USDT", "0.1612", "+2.45%"],
-  ["AVAX/USDT", "36.21", "+1.88%"],
-  ["LINK/USDT", "16.84", "+2.10%"],
-  ["DOT/USDT", "7.12", "+1.34%"],
-  ["LTC/USDT", "84.50", "+0.92%"],
-  ["MATIC/USDT", "0.7184", "+1.55%"],
 ];
 
-// Maps display symbol -> Binance ticker symbol (where available)
-const BINANCE_MAP: Record<string, string> = {
-  "BTC/USDT": "BTCUSDT",
-  "ETH/USDT": "ETHUSDT",
-  "EUR/USD": "EURUSDT",
-  "SOL/USDT": "SOLUSDT",
-  "XRP/USDT": "XRPUSDT",
-  "BNB/USDT": "BNBUSDT",
-  "ADA/USDT": "ADAUSDT",
-  "DOGE/USDT": "DOGEUSDT",
-  "AVAX/USDT": "AVAXUSDT",
-  "LINK/USDT": "LINKUSDT",
-  "DOT/USDT": "DOTUSDT",
-  "LTC/USDT": "LTCUSDT",
-  "MATIC/USDT": "MATICUSDT",
+// Yahoo Finance symbol map for each XAU cross-pair on the ticker.
+const YAHOO_MAP: Record<string, string> = {
+  "XAU/USD": "XAUUSD=X",
+  "XAU/EUR": "XAUEUR=X",
+  "XAU/GBP": "XAUGBP=X",
+  "XAU/JPY": "XAUJPY=X",
+  "XAU/AUD": "XAUAUD=X",
+  "XAU/CHF": "XAUCHF=X",
+  "DXY": "DX-Y.NYB",
 };
+
 
 
 function fmtPrice(n: number): string {
