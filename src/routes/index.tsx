@@ -461,7 +461,7 @@ function HomePage() {
               {
                 k: "05",
                 t: "Every XAU Cross",
-                d: "XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF one terminal, one voice.",
+                d: "XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF one terminal.",
               },
               {
                 k: "06",
