@@ -238,12 +238,14 @@ export function killzoneOf(d = new Date()): { session: string; killzone: string;
 
 export type BuiltTrade = {
   direction: "BUY" | "SELL" | "WAIT";
+  entryType: "MARKET" | "LIMIT";
   entry: number; sl: number; tp: number; rr: number;
   tp1?: number; tp2?: number; tp3?: number;
-  zone: { kind: "OB" | "FVG"; priceLow: number; priceHigh: number } | null;
+  zone: { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number } | null;
   reason: string;
   notes?: string[];
 };
+
 
 // Per-asset risk profile. Each asset class has different typical wick sizes,
 // spread, and news volatility — using the same buffer for XAU and EURUSD is wrong.
