@@ -32,20 +32,20 @@ export const Route = createFileRoute("/signal")({
   }),
   head: () => ({
     meta: [
-      { title: "Live Signal Desk — Jenvu" },
+      { title: "Gold Signal Desk — Jenvu" },
       {
         name: "description",
         content:
-          "Real-time ICT & SMC signal desk for Gold, FX, Crypto and Indices. Multi-timeframe bias, A+ setup scoring and voice narration.",
+          "Institutional ICT/SMC signal desk for XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF. Multi-timeframe bias, A+ setup scoring and voice narration for gold.",
       },
-      { name: "keywords", content: "ICT signals, SMC trading, gold signals, XAUUSD analysis, A+ setup, smart money concepts, voice trading agent, live signal desk" },
-      { property: "og:title", content: "Live Signal Desk — Jenvu" },
-      { property: "og:description", content: "Multi-timeframe ICT/SMC analysis with A+ setup scoring, annotated charts and live trade tracking." },
+      { name: "keywords", content: "XAUUSD signals, gold trading, XAU EUR, XAU GBP, XAU JPY, gold ICT SMC, A+ gold setup, gold voice agent, bullion desk" },
+      { property: "og:title", content: "Gold Signal Desk — Jenvu" },
+      { property: "og:description", content: "AI gold desk covering all XAU cross-pairs with ICT/SMC analysis, A+ setup scoring and voice narration." },
       { property: "og:url", content: "https://jenvu.com/signal" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Live Signal Desk — Jenvu" },
-      { name: "twitter:description", content: "Real-time institutional signal desk with voice narration and A+ setup scoring." },
+      { name: "twitter:title", content: "Gold Signal Desk — Jenvu" },
+      { name: "twitter:description", content: "Institutional gold signal desk with voice narration for every XAU cross-pair." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/signal" }],
     scripts: [
@@ -54,17 +54,18 @@ export const Route = createFileRoute("/signal")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          name: "Jenvu Signal Desk",
+          name: "Jenvu Gold Signal Desk",
           url: "https://jenvu.com/signal",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Institutional ICT/SMC signal desk with multi-timeframe bias, A+ setup grading, annotated TradingView-style charts and voice narration.",
+            "Institutional ICT/SMC gold signal desk covering XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF with A+ setup grading and voice narration.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
     ],
   }),
+
   component: SignalPage,
 });
 
