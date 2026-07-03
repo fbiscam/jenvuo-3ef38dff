@@ -528,7 +528,7 @@ function HomePage() {
             {[
               ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions."],
               ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts."],
-              ["2026.05.30", "v2.02", "Forex Factory red-folder context injected into every plan."],
+              ["2026.05.30", "v2.02", "Red-folder USD, EUR, GBP, JPY, AUD & CHF news injected per XAU cross."],
               ["2026.05.12", "v2.01", "Push-to-talk replaces always-on; cleaner mic control."],
               ["2026.04.28", "v2.00", "Voice-native rewrite. New orb. New signal engine."],
             ].map(([d, v, n], i) => (
