@@ -19,39 +19,22 @@ export type AgentContext = {
   currentPrice?: number;
 };
 
-/* ------- symbol detection from natural language ------- */
-const KNOWN_TOKENS = [
-  // crypto
-  "BTC","BITCOIN","ETH","ETHEREUM","SOL","SOLANA","XRP","RIPPLE","DOGE","BNB","ADA","AVAX","MATIC","DOT","LINK","TRX","LTC","SHIB","PEPE","TON","ARB","OP","SUI","APT","NEAR","ATOM","INJ","TIA","FIL","FTM","HBAR","UNI","AAVE","RNDR","WLD","SEI","JUP","ORDI","FET","ENA",
-  // metals
-  "XAUUSD","XAU","GOLD","XAGUSD","XAG","SILVER",
-  // fx majors
-  "EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","NZDUSD","USDCAD","EURJPY","GBPJPY","EURGBP","AUDJPY","NZDJPY","EURAUD","GBPAUD","CHFJPY","CADJPY",
-  // indices
-  "NAS100","NDX","US100","SPX","SPX500","US500","DJI","US30","DAX","FTSE","N225","DXY","NASDAQ","SP500","DOW","DOWJONES",
-  // oil
-  "OIL","CRUDE","WTI","USOIL",
+/* ------- symbol detection: XAU pairs only ------- */
+const XAU_TOKENS: Array<{ re: RegExp; sym: string }> = [
+  { re: /\b(XAUEUR|GOLD\s*EUR|GOLD\s*EURO)\b/, sym: "XAUEUR" },
+  { re: /\b(XAUGBP|GOLD\s*GBP|GOLD\s*POUND)\b/, sym: "XAUGBP" },
+  { re: /\b(XAUJPY|GOLD\s*JPY|GOLD\s*YEN)\b/, sym: "XAUJPY" },
+  { re: /\b(XAUAUD|GOLD\s*AUD)\b/, sym: "XAUAUD" },
+  { re: /\b(XAUCHF|GOLD\s*CHF|GOLD\s*FRANC)\b/, sym: "XAUCHF" },
+  { re: /\b(XAUUSD|XAU|GOLD|BULLION)\b/, sym: "XAUUSD" },
 ];
 
 function detectSymbol(question: string): string | null {
   const q = ` ${question.toUpperCase()} `;
-  // longest match first
-  const sorted = [...KNOWN_TOKENS].sort((a, b) => b.length - a.length);
-  for (const tok of sorted) {
-    const re = new RegExp(`[^A-Z0-9]${tok}[^A-Z0-9]`);
-    if (re.test(q)) return tok;
-  }
-  // generic 3+3 fx like EURJPY appearing without spaces
-  const fx = question.toUpperCase().match(/\b([A-Z]{3})\/?([A-Z]{3})\b/);
-  if (fx) return `${fx[1]}${fx[2]}`;
-  // ticker-style $AAPL or AAPL stock
-  const stock = question.toUpperCase().match(/\$([A-Z]{2,6})\b|\b([A-Z]{2,6})\s+(STOCK|SHARE|EQUITY)/);
-  if (stock) return stock[1] || stock[2];
-  // generic crypto pairs such as BONKUSDT, FETUSDT, WIFUSDC, etc.
-  const cryptoPair = question.toUpperCase().match(/\b([A-Z0-9]{2,15})(USDT|USDC|BUSD|USD)\b/);
-  if (cryptoPair && !["XAU", "XAG"].includes(cryptoPair[1])) return `${cryptoPair[1]}${cryptoPair[2]}`;
+  for (const t of XAU_TOKENS) if (t.re.test(q)) return t.sym;
   return null;
 }
+
 
 function buildContextFromPlan(plan: SignalPlan): string {
   const lvls = (plan.keyLevels || [])
