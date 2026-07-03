@@ -98,6 +98,7 @@ export function useLivePriceStream(
     };
 
     const stream = binanceStreamFor(symbol);
+    let firstTickTimer: ReturnType<typeof setTimeout> | null = null;
     if (stream && typeof WebSocket !== "undefined") {
       try {
         ws = new WebSocket(`wss://stream.binance.com:9443/ws/${stream}@trade`);
@@ -106,10 +107,14 @@ export function useLivePriceStream(
             const d = JSON.parse(ev.data);
             const p = parseFloat(d.p);
             pushTick(p, typeof d.T === "number" ? d.T : Date.now());
+            if (firstTickTimer) { clearTimeout(firstTickTimer); firstTickTimer = null; }
           } catch { /* ignore */ }
         };
         ws.onerror = () => { /* fall through to onclose */ };
         ws.onclose = () => { if (!stopped) startPolling(1500); };
+        // Watchdog: if no tick lands within 4s (accepted subscription but silent
+        // stream), start polling in parallel so the header keeps moving.
+        firstTickTimer = setTimeout(() => { if (!stopped) startPolling(1500); }, 4000);
       } catch {
         startPolling(1500);
       }
@@ -118,6 +123,7 @@ export function useLivePriceStream(
       // ticker feels live rather than lagging behind broker prices.
       startPolling(1000);
     }
+
 
     // RAF smoother — lerp displayed price toward target each frame for small
     // moves. Large jumps are snapped in pushTick above.
