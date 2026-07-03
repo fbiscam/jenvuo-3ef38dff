@@ -451,7 +451,7 @@ function HomePage() {
               {
                 k: "03",
                 t: "Market Intelligence",
-                d: "Session bias, DXY, Forex Factory news and killzones merged into every plan.",
+                d: "London fix, DXY, gold-specific Forex Factory news and killzones merged into every plan.",
               },
               {
                 k: "04",
@@ -460,8 +460,8 @@ function HomePage() {
               },
               {
                 k: "05",
-                t: "Cross-Market Coverage",
-                d: "Gold, FX majors, BTC, ETH, alts, indices and energy one terminal, one voice.",
+                t: "Every XAU Cross",
+                d: "XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF one terminal, one voice.",
               },
               {
                 k: "06",
