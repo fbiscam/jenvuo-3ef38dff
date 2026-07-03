@@ -896,16 +896,10 @@ export const PAIR_PROFILES: Record<string, PairProfile> = {
 export function getPairProfile(symbol: string): PairProfile | null {
   const s = symbol.toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (PAIR_PROFILES[s]) return PAIR_PROFILES[s];
-  // Aliases
   if (s === "GOLD" || s === "XAU") return PAIR_PROFILES.XAUUSD;
-  if (s === "SILVER" || s === "XAG") return PAIR_PROFILES.XAGUSD;
-  if (s === "BTC" || s === "BITCOIN" || s === "BTCUSDT") return PAIR_PROFILES.BTCUSD;
-  if (s === "ETH" || s === "ETHEREUM" || s === "ETHUSDT") return PAIR_PROFILES.ETHUSD;
-  if (s === "NDX" || s === "US100" || s === "NASDAQ") return PAIR_PROFILES.NAS100;
-  if (s === "SPX" || s === "US500" || s === "SP500") return PAIR_PROFILES.SPX500;
-  if (s === "DJI" || s === "DOW" || s === "DOWJONES") return PAIR_PROFILES.US30;
-  return null;
+  return PAIR_PROFILES.XAUUSD;
 }
+
 
 // Pair-aware killzone check. Falls back to generic global killzones if pair unknown.
 export function killzoneForPair(
