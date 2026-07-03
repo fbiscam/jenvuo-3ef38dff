@@ -943,8 +943,8 @@ function HomePage() {
             <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
               {[
                 {
-                  q: "Is JENVU only for Gold?",
-                  a: "Gold is its specialty, but JENVU covers FX majors, BTC, ETH, indices and energy with the same ICT/SMC engine.",
+                  q: "Which pairs does JENVU cover?",
+                  a: "JENVU is a gold-only desk. It trades every XAU cross: XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF — nothing else.",
                 },
                 {
                   q: "Does it execute trades automatically?",
