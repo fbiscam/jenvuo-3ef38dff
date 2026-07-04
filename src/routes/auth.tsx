@@ -234,7 +234,8 @@ function AuthPage() {
                     <button
                       type="button"
                       onClick={() => { setMode("signup"); setErrorMsg(null); }}
-                      className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
+                      className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-400 hover:text-zinc-600"}`}
+                      title="Invite only"
                     >
                       Sign up
                     </button>
