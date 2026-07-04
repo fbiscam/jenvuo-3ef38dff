@@ -890,11 +890,28 @@ async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick |
     const p = typeof j?.price === "number" ? j.price : parseFloat(j?.price);
     if (!isFinite(p) || p <= 0) return null;
     const tRaw = j?.updatedAt ? Date.parse(j.updatedAt) : Date.now();
-    return { price: p, t: isFinite(tRaw) ? tRaw : Date.now() };
+    const t = isFinite(tRaw) ? tRaw : Date.now();
+
+    // Cross-quote pairs: convert XAU/USD → XAU/<quote> via FX proxy.
+    const proxy = XAU_USD_PROXY[inst.key];
+    if (proxy) {
+      const fx = await fetchYahooQuote([proxy.symbol]).catch(() => null);
+      if (!fx || !isFinite(fx.price) || fx.price <= 0) return null;
+      const converted = proxy.inverse ? p * fx.price : p / fx.price;
+      // proxy.inverse=true means symbol is USD<quote> (e.g. USDJPY) —
+      //   XAU/JPY = XAU/USD × USD/JPY
+      // proxy.inverse=false means symbol is <quote>USD (e.g. EURUSD) —
+      //   XAU/EUR = XAU/USD ÷ EUR/USD
+      if (!isFinite(converted) || converted <= 0) return null;
+      return { price: converted, t };
+    }
+
+    return { price: p, t };
   } catch {
     return null;
   }
 }
+
 
 // Real-time FX spot fallback when Yahoo 429s. exchangerate-api mirrors the
 // interbank mid-rate closely enough for entry/SL/TP snapping on major pairs.
