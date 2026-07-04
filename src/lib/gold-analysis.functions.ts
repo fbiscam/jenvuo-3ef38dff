@@ -167,6 +167,28 @@ export function assertCrossPairScale(
   return { ok: true };
 }
 
+async function assertCrossPairFxValue(
+  key: string,
+  crossPrice: number,
+  xauUsdPrice: number,
+): Promise<{ ok: boolean; reason?: string }> {
+  const proxy = xauPairConfigForInstrument(key)?.usdProxy;
+  if (!proxy) return assertCrossPairScale(key, crossPrice, xauUsdPrice);
+  const fxPrice = await fetchFxProxyRate(proxy.symbol).catch(() => null);
+  if (!fxPrice || !isFinite(fxPrice) || fxPrice <= 0) {
+    return assertCrossPairScale(key, crossPrice, xauUsdPrice);
+  }
+  const expected = proxy.inverse ? xauUsdPrice * fxPrice : xauUsdPrice / fxPrice;
+  if (!isFinite(expected) || expected <= 0) return assertCrossPairScale(key, crossPrice, xauUsdPrice);
+  const drift = Math.abs(crossPrice - expected) / expected;
+  if (drift > 0.08) {
+    const reason = `price ${crossPrice.toFixed(2)} is ${(drift * 100).toFixed(1)}% away from FX-derived ${expected.toFixed(2)} via ${proxy.symbol}`;
+    warnCrossPairScale(key, reason);
+    return { ok: false, reason };
+  }
+  return { ok: true };
+}
+
 
 function inferInstrumentFromText(text: string): string {
   const q = String(text || "").toUpperCase();
@@ -1057,9 +1079,9 @@ async function resolveLiveTick(inst: ResolvedInstrument): Promise<LiveTick | nul
         if (XAU_CROSS_RATIO_BANDS[inst.key]) {
           const xauUsd = await getXauUsdGuardPrice(now);
           if (xauUsd && xauUsd > 0) {
-            const check = assertCrossPairScale(inst.key, q.price, xauUsd);
+            const check = await assertCrossPairFxValue(inst.key, q.price, xauUsd);
             if (!check.ok) continue;
-          } else if (Math.abs(q.price - 2_418) < 500 || q.price < 10_000 && inst.key === "METAL:XAUJPY") {
+          } else if (q.price < 10_000 && inst.key === "METAL:XAUJPY") {
             warnCrossPairScale(inst.key, `XAU/USD guard baseline unavailable; rejecting suspicious quote ${q.price.toFixed(2)}`);
             continue;
           }
