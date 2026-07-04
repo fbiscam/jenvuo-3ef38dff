@@ -1186,7 +1186,7 @@ function SignalPage() {
 }
 
 /* ---------- bits ---------- */
-function KV({ label, value, tone }: { label: string; value: string; tone?: "good" | "bad" }) {
+function KV({ label, value, tone, sub }: { label: string; value: string; tone?: "good" | "bad"; sub?: string }) {
   return (
     <div className="bg-white p-2.5">
       <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>{label}</div>
@@ -1194,9 +1194,16 @@ function KV({ label, value, tone }: { label: string; value: string; tone?: "good
         "text-sm font-semibold tabular-nums mt-0.5",
         tone === "good" ? "text-emerald-600" : tone === "bad" ? "text-rose-600" : "text-zinc-900",
       )}>{value}</div>
+      {sub && (
+        <div className={cn(
+          `text-[10px] ${MONO} tabular-nums mt-0.5 opacity-80`,
+          tone === "good" ? "text-emerald-600" : tone === "bad" ? "text-rose-600" : "text-zinc-500",
+        )}>{sub}</div>
+      )}
     </div>
   );
 }
+
 
 function ChartSkeleton() {
   return (
