@@ -89,7 +89,7 @@ export default function SiteFooter() {
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white transition-all hover:scale-110 hover:border-zinc-300 hover:shadow-sm"
                 >
                   <img
-                    src={`https://cdn.simpleicons.org/${s.slug}`}
+                    src={`https://cdn.simpleicons.org/${s.slug}/000000`}
                     alt={`${s.label} logo`}
                     className="h-4 w-4"
                     loading="lazy"
