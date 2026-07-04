@@ -431,7 +431,7 @@ async function fetchCrossPairCandlesFromProxy(
   return converted.slice(-200);
 }
 
-async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Promise<Candle[]> {
+export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Promise<Candle[]> {
   const cacheKey = `${inst.key}:${tf}`;
   const cached = candleCache.get(cacheKey);
   const now = Date.now();
