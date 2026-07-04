@@ -2310,16 +2310,16 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg bg-neutral-950 border-white/10 text-white">
+        <DialogContent className="max-w-lg bg-white border-zinc-200 text-zinc-900">
           <DialogHeader>
-            <DialogTitle>Historical Backtest — {result?.symbol}</DialogTitle>
-            <DialogDescription className="text-white/60">
+            <DialogTitle className="text-zinc-900">Historical Backtest — {result?.symbol}</DialogTitle>
+            <DialogDescription className="text-zinc-600">
               Deterministic SMC engine, {result?.bars ?? 0} bars scanned, score threshold {result?.threshold ?? 75}.
             </DialogDescription>
           </DialogHeader>
 
           {result?.error ? (
-            <div className="text-sm text-red-300">{result.error}</div>
+            <div className="text-sm text-red-600">{result.error}</div>
           ) : result ? (
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-3 gap-2">
@@ -2340,20 +2340,20 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
               </div>
 
               {result.trades.length > 0 && (
-                <div className="max-h-56 overflow-y-auto rounded-lg border border-white/10 divide-y divide-white/5">
+                <div className="max-h-56 overflow-y-auto rounded-lg border border-zinc-200 divide-y divide-zinc-100">
                   {result.trades.map((t, i) => (
                     <div key={i} className="px-2 py-1.5 text-[11px] flex items-center justify-between">
-                      <span className="text-white/60">{new Date(t.time).toLocaleDateString()}</span>
-                      <span className={t.direction === "BUY" ? "text-emerald-300" : "text-rose-300"}>{t.direction}</span>
-                      <span className="text-white/70">@ {t.entry}</span>
-                      <span className="text-white/50">score {t.score}</span>
+                      <span className="text-zinc-500">{new Date(t.time).toLocaleDateString()}</span>
+                      <span className={t.direction === "BUY" ? "text-emerald-600" : "text-rose-600"}>{t.direction}</span>
+                      <span className="text-zinc-700">@ {t.entry}</span>
+                      <span className="text-zinc-500">score {t.score}</span>
                       <span
                         className={
                           t.outcome === "win"
-                            ? "text-emerald-400"
+                            ? "text-emerald-600"
                             : t.outcome === "loss"
-                            ? "text-rose-400"
-                            : "text-white/40"
+                            ? "text-rose-600"
+                            : "text-zinc-400"
                         }
                       >
                         {t.outcome} {t.rMultiple >= 0 ? "+" : ""}
@@ -2364,23 +2364,24 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
                 </div>
               )}
 
-              <p className="text-[11px] text-white/50 leading-relaxed">{result.disclaimer}</p>
+              <p className="text-[11px] text-zinc-500 leading-relaxed">{result.disclaimer}</p>
             </div>
           ) : (
-            <div className="text-sm text-white/60">No result yet.</div>
+            <div className="text-sm text-zinc-600">No result yet.</div>
           )}
 
           <DialogFooter>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-lg bg-white/10 hover:bg-white/20 px-3 py-1.5 text-xs"
+              className="rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white px-3 py-1.5 text-xs"
             >
               Close
             </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </>
   );
 }
