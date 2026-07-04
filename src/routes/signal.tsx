@@ -850,6 +850,9 @@ function SignalPage() {
                 Intelligence Dashboard
               </h3>
 
+              {/* Confluence Heatmap — at-a-glance confluence grid */}
+              {plan && <ConfluenceHeatmap plan={plan} />}
+
               {/* A+ Setup Score */}
               {plan && <SetupScoreCard plan={plan} />}
 
