@@ -1497,17 +1497,17 @@ Return ONLY valid JSON (no markdown) with this exact shape:
   }
 }
 
-Rules:
-- fromTime/toTime MUST be unix-seconds taken EXACTLY from the provided candles.
-- LTF entry/sl/tp must respect current price ${last.c.toFixed(dec)} and yield realistic RR >= 1.8 (prefer 1:2 to 1:4).
-- Produce 10-14 narration steps, each 12-30 words, professional 25-year-veteran tone, in this order:
-  1) HTF bias & structure, 2) HTF BOS/CHOCH, 3) HTF OB/zone, 4) Premium vs Discount, 5) HTF liquidity (PDH/PDL/equal highs/lows),
-  6) Shift to LTF, 7) LTF structure / MSS, 8) LTF FVG, 9) LTF OB / breaker, 10) Inducement & expected sweep,
-  11) Confluence with killzone/DXY, 12) Entry trigger, 13) SL logic, 14) TP & invalidation.
-- ALWAYS include at minimum: 1 HTF BOS or CHOCH, 1 HTF OB or zone, 1 LTF FVG, 1 LTF OB, 1 liquidity level, plus entry/sl/tp markings.
-- Mention the current session/killzone (${session} / ${killzone}) and premium-vs-discount read explicitly.
-- If a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, set direction="WAIT", confidence<=50, and clearly call out the news risk in summary and invalidation.
-- If conditions are not A+ set direction="WAIT", confidence<=55, explain what's missing in summary.`;
+STRICT RULES — non-negotiable, treat these as a compliance checklist:
+- Timestamps: fromTime/toTime MUST be unix-SECONDS copied EXACTLY from the provided candles. Never invent, round, or extrapolate. If unsure, use the timestamp of the closest real candle.
+- Prices: every price/priceLow/priceHigh MUST be within ±20% of CURRENT PRICE ${last.c.toFixed(dec)}. Use realistic values pulled from the OHLC data provided, not round-number guesses.
+- Direction: LTF entry/sl/tp MUST respect current price ${last.c.toFixed(dec)}. RR must be ≥ 1.8, prefer 1:2 to 1:4. Entry must sit inside a real HTF/LTF OB or FVG that you also emit as a marking.
+- Markings coverage: emit MINIMUM 10 and MAXIMUM 16 markings. You MUST include ALL of: 1× HTF BOS or CHOCH, 1× HTF Order Block or Zone, 1× HTF liquidity (PDH/PDL/BSL/SSL/equal-high/equal-low), 1× premium or discount array, 1× LTF FVG, 1× LTF Order Block, 1× LTF liquidity, plus entry/sl/tp triangle. Add breakers/IFVGs/OTE when they exist.
+- Narration: produce EXACTLY 12–14 steps, each 14–28 words, senior institutional tone. Order strictly: (1) HTF bias/structure, (2) HTF BOS/CHOCH, (3) HTF OB/zone, (4) Premium vs Discount, (5) HTF liquidity, (6) shift to LTF, (7) LTF MSS/structure, (8) LTF FVG, (9) LTF OB/breaker, (10) inducement + expected sweep, (11) killzone + DXY/correlation, (12) entry trigger, (13) SL logic, (14) TP + invalidation. Every narration step MUST reference its marking via markingIndex.
+- Killzone: state the current session/killzone (${session} / ${killzone}) and the premium-vs-discount read (${inPremium ? "PREMIUM" : "DISCOUNT"}) explicitly in both htfNarrative and the confluences array.
+- News veto: if a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, direction="WAIT", confidence ≤ 50, call out the news title in summary and invalidation.
+- Quality gate: only issue BUY/SELL if HTF and LTF are aligned AND a fresh unmitigated OB or FVG is present in the direction of the trade AND liquidity is sitting on the other side of entry. Otherwise direction="WAIT", confidence ≤ 55, and summary MUST list the specific missing confluence (e.g. "HTF bullish but no unmitigated LTF demand").
+- Language: professional English only — no Hindi/Urdu/Roman Urdu, no emojis, no hedging fluff ("maybe", "possibly", "could be"). Speak like a 25-year desk head.
+- Output: return ONLY the JSON object above. No prose, no markdown fences, no trailing commentary.
 
     const user = `LIVE ${inst.display} CANDLES (unix-seconds | O,H,L,C)
 INSTRUMENT: ${inst.display} (${inst.kind})
