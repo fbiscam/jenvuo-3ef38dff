@@ -1544,7 +1544,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
           { role: "user", content: user },
         ],
         response_format: { type: "json_object" },
-        max_tokens: 8192,
+        max_completion_tokens: 8192,
       }),
     });
 
