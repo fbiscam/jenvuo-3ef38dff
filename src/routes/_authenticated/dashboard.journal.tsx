@@ -154,28 +154,8 @@ function Journal() {
 
 
 
-  const save = async () => {
-    const { data: user } = await supabase.auth.getUser();
-    if (!user.user) return;
-    const payload = {
-      user_id: user.user.id,
-      pair: form.pair || "XAUUSD",
-      direction: form.direction || "long",
-      entry: form.entry ?? null,
-      stop_loss: form.stop_loss ?? null,
-      take_profit: form.take_profit ?? null,
-      outcome: form.outcome || "open",
-      pnl: form.pnl ?? null,
-      notes: form.notes || null,
-      closed_at: form.outcome && form.outcome !== "open" ? new Date().toISOString() : null,
-    };
-    const { error } = await supabase.from("trade_journal").insert(payload);
-    if (error) { toast.error("Could not save trade"); return; }
-    toast.success("Trade logged");
-    setOpen(false);
-    setForm(EMPTY);
-    load();
-  };
+
+
 
   const remove = async (id: string) => {
     await supabase.from("trade_journal").delete().eq("id", id);
