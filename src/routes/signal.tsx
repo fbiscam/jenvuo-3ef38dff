@@ -5,6 +5,7 @@ import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
+import { getBacktestStats, type BacktestStats } from "@/lib/backtest.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 
