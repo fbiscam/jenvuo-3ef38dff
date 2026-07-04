@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
 import { getBacktestStats, type BacktestStats } from "@/lib/backtest.functions";
+import { runHistoricalBacktest, type HistoricalBacktestResult } from "@/lib/backtest-historical.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 
@@ -976,6 +977,11 @@ function SignalPage() {
 
                   {/* Backtest history badge */}
                   {(isBuy || isSell) && backtest && <BacktestBadge stats={backtest} />}
+
+                  {/* Historical engine backtest */}
+                  <HistoricalBacktestPanel symbol={plan?.instrument?.symbol ?? symbol ?? "XAUUSD"} />
+
+
 
 
 
@@ -2265,5 +2271,131 @@ function SignalOrb({
     </div>
   );
 }
+
+function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
+  const run = useServerFn(runHistoricalBacktest);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<HistoricalBacktestResult | null>(null);
+  const [open, setOpen] = useState(false);
+
+  const onRun = async () => {
+    setLoading(true);
+    try {
+      const r = await run({ data: { symbol, threshold: 75 } });
+      setResult(r);
+      setOpen(true);
+    } catch (e: any) {
+      toast.error(e?.message || "Backtest failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={onRun}
+        disabled={loading}
+        className="w-full mt-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-50 px-3 py-2 text-xs font-medium text-white/90 flex items-center justify-center gap-2"
+      >
+        {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
+        {loading ? "Running historical backtest…" : "Run historical backtest (75%+ setups)"}
+      </button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-lg bg-neutral-950 border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle>Historical Backtest — {result?.symbol}</DialogTitle>
+            <DialogDescription className="text-white/60">
+              Deterministic SMC engine, {result?.bars ?? 0} bars scanned, score threshold {result?.threshold ?? 75}.
+            </DialogDescription>
+          </DialogHeader>
+
+          {result?.error ? (
+            <div className="text-sm text-red-300">{result.error}</div>
+          ) : result ? (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-3 gap-2">
+                <Stat label="Signals" value={String(result.simulated)} />
+                <Stat label="Wins" value={String(result.wins)} tone="win" />
+                <Stat label="Losses" value={String(result.losses)} tone="loss" />
+                <Stat label="Expired" value={String(result.expired)} />
+                <Stat
+                  label="Win rate"
+                  value={result.winRate == null ? "—" : `${result.winRate.toFixed(1)}%`}
+                  tone={result.winRate != null && result.winRate >= 55 ? "win" : "loss"}
+                />
+                <Stat
+                  label="Avg R"
+                  value={result.avgR == null ? "—" : `${result.avgR >= 0 ? "+" : ""}${result.avgR.toFixed(2)}R`}
+                  tone={result.avgR != null && result.avgR > 0 ? "win" : "loss"}
+                />
+              </div>
+
+              {result.trades.length > 0 && (
+                <div className="max-h-56 overflow-y-auto rounded-lg border border-white/10 divide-y divide-white/5">
+                  {result.trades.map((t, i) => (
+                    <div key={i} className="px-2 py-1.5 text-[11px] flex items-center justify-between">
+                      <span className="text-white/60">{new Date(t.time).toLocaleDateString()}</span>
+                      <span className={t.direction === "BUY" ? "text-emerald-300" : "text-rose-300"}>{t.direction}</span>
+                      <span className="text-white/70">@ {t.entry}</span>
+                      <span className="text-white/50">score {t.score}</span>
+                      <span
+                        className={
+                          t.outcome === "win"
+                            ? "text-emerald-400"
+                            : t.outcome === "loss"
+                            ? "text-rose-400"
+                            : "text-white/40"
+                        }
+                      >
+                        {t.outcome} {t.rMultiple >= 0 ? "+" : ""}
+                        {t.rMultiple.toFixed(2)}R
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <p className="text-[11px] text-white/50 leading-relaxed">{result.disclaimer}</p>
+            </div>
+          ) : (
+            <div className="text-sm text-white/60">No result yet.</div>
+          )}
+
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="rounded-lg bg-white/10 hover:bg-white/20 px-3 py-1.5 text-xs"
+            >
+              Close
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function Stat({ label, value, tone }: { label: string; value: string; tone?: "win" | "loss" }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5">
+      <div className="text-[10px] uppercase tracking-wide text-white/50">{label}</div>
+      <div
+        className={cn(
+          "text-sm font-semibold",
+          tone === "win" && "text-emerald-300",
+          tone === "loss" && "text-rose-300",
+          !tone && "text-white/90",
+        )}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
+
 
 

@@ -1,54 +1,48 @@
-## Problem
+# Historical Backtest Feature
 
-Cross gold pairs (XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD, XAU/CHF) don't get the same analysis quality as XAU/USD:
+## Goal
+User ke 75% confidence filter ke asar ko historical data par verify karein — last 30–60 days mein kitne signals aaye, kitne TP hit hue, kitne SL, aur net R:R kya raha.
 
-- **Candles** — For cross pairs we only try Yahoo (`XAUEUR=X`, `XAUGBP=X`, …). Yahoo cross-pair endpoints are flaky / heavily rate-limited, so `fetchInstrumentCandles` frequently falls through to **synthetic candles** (`buildSyntheticCandles`). Synthetic = fake wave data → HTF/LTF bias, BOS/CHOCH, FVG, killzone, structure quality, confluences all become garbage. This is exactly the "sidebar data galat" symptom.
-- **Live tick header freeze** — Cross-pair tick relies on gold-api.com spot × Yahoo FX proxy. When Yahoo FX (`EURUSD=X`, etc.) 429s, `fetchFxProxyRate` returns null and `fetchMetalSpotQuote` returns null → `resolveLiveTick` yields nothing new → header freezes on the seed price.
-- **XAU/USD works** because it has two strong sources (`gold-api.com` for tick, `XAUUSD=X` + `GC=F` for candles).
+## Approach
 
-## Fix — derive cross-pair data from XAU/USD, not from flaky cross-pair endpoints
+### 1. New server function `runHistoricalBacktest`
+File: `src/lib/backtest-historical.functions.ts`
 
-### 1. Cross-pair candles: synthesize from real XAU/USD × FX proxy candle series
+Input: `{ symbol: string; days: number }` (default 30)
 
-Update `fetchInstrumentCandles` in `src/lib/gold-analysis.functions.ts` so that when the instrument is a XAU cross pair (has `usdProxy`), we build the candle series from two reliable Yahoo feeds we already trust:
+Steps:
+1. Fetch historical 15m candles for `days` (approx `days * 96` bars)
+2. Iterate bar-by-bar from bar 200 onwards (need history for HTF/LTF context):
+   - Slice HTF (1H) + LTF (15m) window ending at current bar
+   - Run existing deterministic engine: `analyzeTF`, `buildLiquidityPools`, `buildTrade`, `scoreSetup`
+   - If direction ≠ WAIT AND `confidence > 75` → record simulated trade: `{entry, sl, tp, direction, barIndex}`
+3. For each simulated trade, walk forward up to 96 bars (24h):
+   - If price hits TP first → `win`
+   - If price hits SL first → `loss`
+   - If neither in 24h → `expired`
+4. Aggregate: total, wins, losses, expired, win-rate, avg R multiple, best/worst
 
-- Fetch `XAUUSD=X` **and** `GC=F` candles (whichever wins first, same as XAU/USD path).
-- Fetch the FX proxy candles (`EURUSD=X`, `GBPUSD=X`, `USDJPY=X`, `AUDUSD=X`, `USDCHF=X`) on the same timeframe.
-- Align by timestamp bucket (round to TF step) and per bar compute:
-  `xauQuote = proxy.inverse ? xauUsd * fx : xauUsd / fx` for o/h/l/c.
-- If either series is missing / <10 bars, try the direct Yahoo cross-pair symbol (existing behavior) as a secondary fallback.
-- Only fall through to `buildSyntheticCandles` if **both** paths fail. Log/mark synthetic as before.
+### 2. UI: new "Backtest" button on `/signal` page
+- Button opens a small modal / drawer
+- Shows: sample size, win-rate %, avg R, breakdown (wins/losses/expired), and honest disclaimer
+- Loading state (backtest takes 3–8 seconds)
 
-XAU/USD path stays unchanged.
+### 3. Confidence estimation
+Deterministic `buildTrade` doesn't call AI, so we estimate confidence from `scoreSetup` score (0–100). Threshold: score > 75 = high-conviction. Ye AI-confidence ka reasonable proxy hai (senior review typically +/- 5-10 points adjust karta hai).
 
-### 2. FX proxy rate — add a spot-quote fallback so live tick never freezes
+## Technical Notes
+- Reuses existing `fetchCrossPairCandlesFromProxy` + `analyzeTF` / `buildTrade` — no AI calls, no gateway cost
+- Pure deterministic simulation, cheap (~1 sec per pair)
+- Results saved per session (not persisted), so user can re-run anytime
+- Honest disclaimer: "Backtest = deterministic SMC engine only; live signals also use dual-AI review which may improve or filter further."
 
-`fetchFxProxyRate` currently only reads Yahoo. Add fallbacks so cross-pair tick keeps ticking when Yahoo 429s:
+## Files
+- New: `src/lib/backtest-historical.functions.ts` (~180 lines)
+- Edit: `src/routes/signal.tsx` (add button + modal, ~60 lines)
 
-- Try Yahoo (`EURUSD=X` etc.) as today.
-- Then try `open.er-api.com/v6/latest/<BASE>` (already used by `fetchFxSpotQuote`) — extract the correct rate for base/quote and invert when needed.
-- Cache the FX rate for ~2s (same style as `tickCache`) so bursts don't hammer either provider.
+## Out of scope
+- Full AI-in-the-loop backtest (would cost 100s of credits and hours)
+- Trailing stops, partial TPs (uses fixed TP1 hit only)
+- Multi-timeframe optimization
 
-This makes `fetchMetalSpotQuote` for cross pairs and the runtime `assertCrossPairFxValue` guard both resilient.
-
-### 3. Keep guards but don't kill the tick
-
-The `assertCrossPairScale` / `assertCrossPairFxValue` sanity checks stay — they're what protects XAU/JPY from ever showing XAU/USD scale. No change needed once the FX proxy is reliable; the guard will pass because our converted value is derived from XAU/USD × real FX.
-
-### 4. No UI changes required
-
-`SignalChart`, sidebar `setupChecks`, `confluences`, `htfCandles`/`ltfCandles`, `useLivePriceStream` all consume the server output — once real candles + real ticks flow for cross pairs, the sidebar automatically matches XAU/USD quality.
-
-## Files touched
-
-- `src/lib/gold-analysis.functions.ts`
-  - New helper `fetchCrossPairCandlesFromProxy(inst, tf)` that pulls XAU/USD candles + FX proxy candles and reduces them to XAU/quote OHLC.
-  - `fetchInstrumentCandles` — prepend the proxy-derived path for any instrument whose config has `usdProxy`, keep Yahoo cross-pair symbol as secondary, synthetic as last resort.
-  - `fetchFxProxyRate` — add er-api.com fallback + short cache.
-
-No route, no component, no schema changes. XAU/USD flow untouched.
-
-## Validation
-
-- Load `/signal?symbol=XAUEUR`, `XAUGBP`, `XAUJPY`, `XAUAUD`, `XAUCHF` — chart HTF/LTF should show real market candles (not smooth sine wave), price header should tick every ~1.5s, sidebar setup checks / confluences / structure quality / killzone should populate the same way XAU/USD does.
-- Re-check `/signal?symbol=XAUUSD` still works unchanged.
+Approve karein to build kar deta hoon.
