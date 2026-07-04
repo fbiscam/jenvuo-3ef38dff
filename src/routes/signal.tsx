@@ -874,6 +874,18 @@ function SignalPage() {
                   </div>
 
                   {(() => {
+                    const LOW_CONF = 60;
+                    const isLowConf = (t.confidence ?? 0) < LOW_CONF;
+                    if (isLowConf || (!isBuy && !isSell)) {
+                      return (
+                        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-[12px] text-amber-800 leading-relaxed">
+                          <div className="font-semibold mb-0.5">Low-confidence setup — entry / SL / TP hidden</div>
+                          <div className="text-[11px] text-amber-700">
+                            Confidence {t.confidence ?? 0}% (min {LOW_CONF}% required). Institutional confluences aligned nahi — trade lene ke bajaye wait karo ya re-analyze karo jab HTF bias, sweep aur zone ek saath align hon.
+                          </div>
+                        </div>
+                      );
+                    }
                     const dec = plan.instrument.decimals;
                     const riskAbs = Math.abs(t.entry - t.sl);
                     const rewardAbs = Math.abs(t.tp - t.entry);
