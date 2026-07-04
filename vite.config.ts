@@ -107,6 +107,6 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    plugins: [serverFnManifestRegen(), mcpPlugin()],
+    plugins: [serverFnManifestRegen()],
   },
 });
