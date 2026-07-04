@@ -75,7 +75,7 @@ export const runHistoricalBacktest = createServerFn({ method: "POST" })
     const LOOKAHEAD = 96;               // 24h on 15m
     const HTF_WINDOW = 300;
     const LTF_WINDOW = 200;
-    const kz = killzoneForPair(inst.display).session as any;
+    
 
     // Track last simulated trade bar so we don't stack overlapping setups.
     let cooldownUntil = -1;
