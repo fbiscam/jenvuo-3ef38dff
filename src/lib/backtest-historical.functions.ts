@@ -6,7 +6,7 @@ import {
 } from "@/lib/analysis/engine";
 import { fetchInstrumentCandles, resolveInstrument } from "@/lib/gold-analysis.functions";
 
-type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
+type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
 
 export type BacktestTrade = {
   barIndex: number;
