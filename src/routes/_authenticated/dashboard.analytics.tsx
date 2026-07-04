@@ -50,10 +50,8 @@ function Analytics() {
   }
 
   return (
-    <div className="relative">
-      {locked && <UpgradeOverlay feature="Journal Analytics" />}
-      <div className={locked ? "pointer-events-none blur-sm select-none" : ""}>
-        <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
+    <UpgradeOverlay show={locked} title="Journal Analytics" description="Upgrade to unlock full performance analytics on your trade journal.">
+      <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
           {/* Header */}
           <div className="flex items-end justify-between flex-wrap gap-3">
             <div>
