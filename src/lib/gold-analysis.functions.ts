@@ -103,20 +103,33 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   const key = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : "XAUUSD");
   const p = XAU_PAIRS[key];
   // Gold spot from gold-api.com covers XAU/USD; cross-quote pairs derive
-  // from XAU/USD × the currency rate at getLiveTick time. Yahoo XAUEUR=X
-  // etc. are kept as candle fallbacks so structure analysis still runs.
+  // from XAU/USD × the currency rate at getLiveTick time. Yahoo cross-pair
+  // (XAUEUR=X, etc.) is kept as a fallback for both quote and candles.
+  // Do NOT include XAUUSD=X / GC=F in yahooSymbols for cross-pairs —
+  // fetchYahooQuote would silently return USD-scale prices otherwise.
+  const yahooSymbols = key === "XAUUSD" ? [p.yahoo, "GC=F"] : [p.yahoo];
   return {
     raw: raw || key,
     key: `METAL:${key}`,
     display: p.display,
     kind: "metal",
     decimals: p.decimals,
-    yahooSymbols: [p.yahoo, "XAUUSD=X", "GC=F"],
-    binanceSymbols: ["PAXGUSDT", "XAUTUSDT"],
+    yahooSymbols,
+    binanceSymbols: key === "XAUUSD" ? ["PAXGUSDT", "XAUTUSDT"] : undefined,
     quote: p.quote,
     needsUsdNews: true,
   };
 }
+
+// Lookup XAU/USD → cross conversion for cross-quote pairs.
+const XAU_USD_PROXY: Record<string, { symbol: string; inverse: boolean }> = {
+  "METAL:XAUEUR": { symbol: "EURUSD=X", inverse: false },
+  "METAL:XAUGBP": { symbol: "GBPUSD=X", inverse: false },
+  "METAL:XAUJPY": { symbol: "USDJPY=X", inverse: true },
+  "METAL:XAUAUD": { symbol: "AUDUSD=X", inverse: false },
+  "METAL:XAUCHF": { symbol: "USDCHF=X", inverse: true },
+};
+
 
 function inferInstrumentFromText(text: string): string {
   const q = String(text || "").toUpperCase();
