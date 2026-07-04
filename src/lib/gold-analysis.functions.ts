@@ -1860,6 +1860,75 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
       allMarkings.push({ type: "tp",    tf: "ltf", price: +built.tp.toFixed(dec),    label: `TP ${built.tp.toFixed(dec)}` });
     }
 
+    // ============ ENGINE-DERIVED MARKINGS ============
+    // Ground truth from the pure-math engine so EVERY pair renders a rich,
+    // correct chart, regardless of how many markings the AI produced.
+    const alreadyMarked = (m: Marking) => allMarkings.some((x) => {
+      if (x.type !== m.type) return false;
+      const xa = x as any, ma = m as any;
+      if (xa.tf !== ma.tf) return false;
+      const key = (o: any) => o.priceLow != null ? `${o.priceLow}|${o.priceHigh}` : `${o.price}`;
+      return key(xa) === key(ma);
+    });
+    const addMark = (m: Marking) => { if (!alreadyMarked(m)) allMarkings.push(m); };
+
+    // BOS/CHOCH from last HTF + LTF structure events
+    for (const [tfKey, an] of [["htf", htfA] as const, ["ltf", ltfA] as const]) {
+      const ev = an.lastStructure;
+      if (!ev) continue;
+      addMark({
+        type: ev.kind === "BOS" ? "bos" : "choch",
+        tf: tfKey,
+        fromTime: ev.fromTime,
+        toTime: ev.toTime,
+        price: +ev.price.toFixed(dec),
+        kind: ev.dir,
+        label: `${ev.dir === "bullish" ? "Bullish" : "Bearish"} ${ev.kind} on ${tfKey === "htf" ? "1H" : "15M"}`,
+      });
+    }
+
+    // Rank helpers — closest to current price, unmitigated first
+    const distTo = (lo: number, hi: number) => Math.abs(((lo + hi) / 2) - last.c);
+    const topFvgs = (arr: typeof htfA.fvgs, tf: "htf" | "ltf", n: number) =>
+      arr.filter((f) => !f.mitigated).sort((a, b) => distTo(a.priceLow, a.priceHigh) - distTo(b.priceLow, b.priceHigh)).slice(0, n)
+        .map((f): Marking => ({
+          type: "fvg", tf, fromTime: f.fromTime, toTime: f.toTime,
+          priceLow: +f.priceLow.toFixed(dec), priceHigh: +f.priceHigh.toFixed(dec),
+          kind: f.kind, label: `${tf === "htf" ? "HTF" : "LTF"} ${f.kind === "bullish" ? "Bullish" : "Bearish"} FVG`,
+        }));
+    const topObs = (arr: typeof htfA.obs, tf: "htf" | "ltf", n: number) =>
+      arr.filter((o) => !o.mitigated).sort((a, b) => distTo(a.priceLow, a.priceHigh) - distTo(b.priceLow, b.priceHigh)).slice(0, n)
+        .map((o): Marking => ({
+          type: "orderBlock", tf, fromTime: o.fromTime, toTime: o.toTime,
+          priceLow: +o.priceLow.toFixed(dec), priceHigh: +o.priceHigh.toFixed(dec),
+          kind: o.kind, label: `${tf === "htf" ? "HTF" : "LTF"} ${o.kind === "demand" ? "Demand" : "Supply"} OB`,
+        }));
+
+    for (const m of topFvgs(htfA.fvgs, "htf", 2)) addMark(m);
+    for (const m of topFvgs(ltfA.fvgs, "ltf", 3)) addMark(m);
+    for (const m of topObs(htfA.obs, "htf", 2)) addMark(m);
+    for (const m of topObs(ltfA.obs, "ltf", 2)) addMark(m);
+
+    // Breakers + Inverted FVGs (LTF)
+    for (const b of breakers.slice(0, 2)) {
+      addMark({
+        type: "breaker", tf: "ltf",
+        fromTime: b.fromTime, toTime: b.toTime,
+        priceLow: +b.priceLow.toFixed(dec), priceHigh: +b.priceHigh.toFixed(dec),
+        kind: b.kind, label: `${b.kind === "bullish" ? "Bullish" : "Bearish"} Breaker Block`,
+      });
+    }
+    for (const g of ifvgs.slice(0, 2)) {
+      addMark({
+        type: "fvg", tf: "ltf",
+        fromTime: g.fromTime, toTime: g.toTime,
+        priceLow: +g.priceLow.toFixed(dec), priceHigh: +g.priceHigh.toFixed(dec),
+        kind: g.kind, label: `Inverted FVG (${g.kind})`,
+      });
+    }
+
+
+
     // ============ GUIDED NARRATION ============
     // Always build a deterministic step-by-step script tied to real markings,
     // so every analysis renders a proper guided walk-through on the chart.
