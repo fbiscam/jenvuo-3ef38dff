@@ -1345,41 +1345,136 @@ function TfPill({ tfBias }: { tfBias: SignalPlan["multiTf"][number] }) {
 function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
   const checks = plan.setupChecks.slice(0, 6);
   const passed = checks.filter((c) => c.pass === true).length;
+  const total = checks.length;
+  const pct = total ? Math.round((passed / total) * 100) : 0;
+  const strength =
+    pct >= 84 ? { label: "A+ CONFLUENCE", tone: "emerald", ring: "from-emerald-400 via-emerald-500 to-teal-500" }
+    : pct >= 66 ? { label: "STRONG", tone: "emerald", ring: "from-emerald-400 to-emerald-600" }
+    : pct >= 50 ? { label: "MIXED", tone: "amber", ring: "from-amber-400 to-amber-600" }
+    : { label: "WEAK", tone: "rose", ring: "from-rose-400 to-rose-600" };
+  const pillTone =
+    strength.tone === "emerald" ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+    : strength.tone === "amber" ? "bg-amber-50 text-amber-700 border-amber-200"
+    : "bg-rose-50 text-rose-700 border-rose-200";
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 4 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-zinc-200 bg-white p-3.5 shadow-sm"
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="relative overflow-hidden rounded-xl border border-zinc-200/80 bg-gradient-to-br from-white via-white to-zinc-50/60 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_8px_24px_-12px_rgba(0,0,0,0.08)]"
     >
-      <div className="flex items-center justify-between mb-2.5">
-        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
-          Confluence Heatmap
-        </span>
-        <span className={`text-[10px] ${MONO} tabular-nums text-zinc-900 font-bold`}>
-          {passed}<span className="text-zinc-400">/{checks.length}</span>
+      {/* subtle grid backdrop */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.035]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",
+          backgroundSize: "18px 18px",
+        }}
+      />
+
+      {/* Header */}
+      <div className="relative flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className={`inline-block h-1.5 w-1.5 rounded-full bg-gradient-to-r ${strength.ring}`} />
+          <span className={`text-[10px] ${MONO} tracking-[0.2em] uppercase text-zinc-500`}>
+            Confluence Heatmap
+          </span>
+        </div>
+        <span className={cn("text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full border", pillTone, MONO)}>
+          {strength.label}
         </span>
       </div>
-      <div className="grid grid-cols-6 gap-1.5">
-        {checks.map((c) => {
-          const tone =
-            c.pass === true ? "bg-emerald-500 text-white border-emerald-600"
-            : c.pass === false ? "bg-rose-100 text-rose-600 border-rose-200"
-            : "bg-zinc-100 text-zinc-500 border-zinc-200";
-          const icon = c.pass === true ? "✓" : c.pass === false ? "✕" : "–";
-          return (
+
+      {/* Score row: ring + progress bar */}
+      <div className="relative flex items-center gap-3 mb-3.5">
+        {/* Score dial */}
+        <div className="relative shrink-0">
+          <svg viewBox="0 0 44 44" className="h-14 w-14 -rotate-90">
+            <circle cx="22" cy="22" r="18" strokeWidth="4" className="stroke-zinc-100" fill="none" />
+            <motion.circle
+              cx="22" cy="22" r="18" strokeWidth="4" fill="none" strokeLinecap="round"
+              className={cn(
+                strength.tone === "emerald" ? "stroke-emerald-500"
+                : strength.tone === "amber" ? "stroke-amber-500"
+                : "stroke-rose-500",
+              )}
+              strokeDasharray={2 * Math.PI * 18}
+              initial={{ strokeDashoffset: 2 * Math.PI * 18 }}
+              animate={{ strokeDashoffset: 2 * Math.PI * 18 * (1 - pct / 100) }}
+              transition={{ duration: 0.9, ease: "easeOut" }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className={`text-[13px] font-bold tabular-nums text-zinc-900 leading-none ${MONO}`}>
+              {passed}<span className="text-zinc-300">/{total}</span>
+            </span>
+            <span className={`text-[8px] ${MONO} tracking-widest text-zinc-400 mt-0.5`}>{pct}%</span>
+          </div>
+        </div>
+        {/* Progress rail */}
+        <div className="flex-1 min-w-0">
+          <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 mb-1.5`}>Setup Strength</div>
+          <div className="relative h-2 rounded-full bg-zinc-100 overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${pct}%` }}
+              transition={{ duration: 0.9, ease: "easeOut" }}
+              className={cn("absolute inset-y-0 left-0 rounded-full bg-gradient-to-r", strength.ring)}
+            />
             <div
+              className="absolute inset-0 opacity-40 mix-blend-overlay"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(45deg, rgba(255,255,255,0.6) 0 6px, transparent 6px 12px)",
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Confluence tiles */}
+      <div className="relative grid grid-cols-6 gap-1.5">
+        {checks.map((c, i) => {
+          const pass = c.pass === true;
+          const fail = c.pass === false;
+          const tile = pass
+            ? "border-emerald-300/70 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-[0_4px_12px_-4px_rgba(16,185,129,0.5)]"
+            : fail
+            ? "border-rose-200 bg-gradient-to-br from-rose-50 to-rose-100 text-rose-600"
+            : "border-zinc-200 bg-gradient-to-br from-zinc-50 to-zinc-100 text-zinc-400";
+          const icon = pass ? "✓" : fail ? "✕" : "–";
+          return (
+            <motion.div
               key={c.key}
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.05 * i, duration: 0.3, ease: "easeOut" }}
+              whileHover={{ y: -2, scale: 1.03 }}
               title={`${c.label} — ${c.reason}`}
-              className={cn("aspect-square rounded-md border flex items-center justify-center text-[13px] font-bold", tone)}
+              className={cn(
+                "relative aspect-square rounded-lg border flex items-center justify-center text-[15px] font-bold cursor-help transition-shadow",
+                tile,
+              )}
             >
-              {icon}
-            </div>
+              {pass && (
+                <span className="absolute inset-0 rounded-lg bg-gradient-to-t from-transparent to-white/20 pointer-events-none" />
+              )}
+              <span className="relative drop-shadow-sm">{icon}</span>
+            </motion.div>
           );
         })}
       </div>
-      <div className="grid grid-cols-6 gap-1.5 mt-1.5">
+
+      {/* Labels */}
+      <div className="relative grid grid-cols-6 gap-1.5 mt-1.5">
         {checks.map((c) => (
-          <div key={c.key} className="text-[8px] text-zinc-500 text-center leading-tight uppercase tracking-wide truncate" title={c.label}>
+          <div
+            key={c.key}
+            className={`text-[8px] ${MONO} text-zinc-500 text-center leading-tight uppercase tracking-wider truncate`}
+            title={c.label}
+          >
             {c.label.split(" ")[0]}
           </div>
         ))}
@@ -1387,6 +1482,7 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
     </motion.div>
   );
 }
+
 
 // -------------------- News Countdown Chip --------------------
 // -------------------- Backtest Badge --------------------
