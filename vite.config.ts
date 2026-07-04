@@ -67,13 +67,17 @@ function serverFnManifestRegen(): Plugin {
       server.httpServer?.once("listening", () => { void warmLoad(server); });
 
       const trigger = (file: string, kind: string) => {
-        if (!isServerFnFile(file) || restarting) return;
+        if (!isServerFnFile(file)) return;
+        server.config.logger.info(
+          `[serverfn-manifest-regen] ${kind} event for ${file} (restarting=${restarting})`,
+        );
+        if (restarting) return;
         if (pending) clearTimeout(pending);
         pending = setTimeout(() => {
           pending = null;
           restarting = true;
           server.config.logger.info(
-            `[serverfn-manifest-regen] ${kind} ${file} — restarting to refresh manifest`,
+            `[serverfn-manifest-regen] restarting dev server (trigger: ${kind} ${file})`,
           );
           server.restart().finally(() => { restarting = false; });
         }, 400);
