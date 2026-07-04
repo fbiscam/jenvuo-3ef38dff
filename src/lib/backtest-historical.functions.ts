@@ -103,10 +103,12 @@ export const runHistoricalBacktest = createServerFn({ method: "POST" })
       const structureQuality = htfStructureEvents.length
         ? computeStructureQuality(htfSlice, htfStructureEvents)
         : null;
+      const scored = scoreSetup({
+        trade: built,
         htf: htfA,
         ltf: ltfA,
         pools,
-        inKillzone: true,   // historical bars — we can't know killzone reliably; be lenient
+        inKillzone: true,
         imminentHighNews: false,
         dxyConfirms: null,
         lastPrice: last,
