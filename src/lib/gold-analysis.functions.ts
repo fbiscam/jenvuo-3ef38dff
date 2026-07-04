@@ -875,6 +875,31 @@ async function fetchBinanceQuote(symbols: string[]): Promise<LiveTick | null> {
   return null;
 }
 
+// FX proxy rate for XAU cross-pair conversion. Tries Yahoo first, then
+// exchangerate-api (open.er-api.com) as a fallback — Yahoo's v7/finance/quote
+// endpoint now returns 401 for anonymous callers, which would otherwise
+// leave XAU/EUR, XAU/JPY etc. without any live price at all.
+async function fetchFxProxyRate(symbol: string): Promise<number | null> {
+  const y = await fetchYahooQuote([symbol]).catch(() => null);
+  if (y && isFinite(y.price) && y.price > 0) return y.price;
+  // symbol looks like "EURUSD=X" or "USDJPY=X"
+  const m = symbol.match(/^([A-Z]{3})([A-Z]{3})=X$/);
+  if (!m) return null;
+  const [, base, quote] = m;
+  try {
+    const res = await fetch(`https://open.er-api.com/v6/latest/${base}`, {
+      headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
+    });
+    if (!res.ok) return null;
+    const j: any = await res.json();
+    const rate = j?.rates?.[quote];
+    const p = typeof rate === "number" ? rate : parseFloat(rate);
+    return isFinite(p) && p > 0 ? p : null;
+  } catch {
+    return null;
+  }
+}
+
 // Real-time spot quote for precious metals (XAU/XAG). Yahoo's XAUUSD=X can lag
 // several dollars vs live spot; gold-api.com mirrors what TradingView's OANDA
 // spot feed shows and is refreshed every few seconds.
