@@ -1185,27 +1185,55 @@ function SignalPage() {
       </main>
 
       <Dialog open={!!kzDialog} onOpenChange={(o) => { if (!o) setKzDialog(null); }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-amber-700">
-              <AlertTriangle className="h-5 w-5" /> Outside optimal killzone
-            </DialogTitle>
-            <DialogDescription className="pt-2 text-zinc-700 leading-relaxed">
-              You are not in the killzone for better A+ scaling and good signal.
-              Only trade <span className="font-semibold text-zinc-900">{kzDialog?.pair}</span> in{" "}
-              <span className="font-semibold text-zinc-900">{kzDialog?.kzText}</span>.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-2">
+        <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)]">
+          {/* Accent bar */}
+          <div className="h-1 w-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400" />
+
+          {/* Tape header */}
+          <div className={`flex items-center justify-between px-5 pt-4 pb-3 border-b border-dashed border-zinc-200 ${MONO}`}>
+            <span className="text-[10px] tracking-[0.2em] uppercase text-zinc-500">Killzone · Advisory</span>
+            <span className="text-[10px] tracking-[0.2em] uppercase text-amber-700">Live</span>
+          </div>
+
+          <div className="px-5 pt-5 pb-4">
+            <DialogHeader className="space-y-0">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 border border-amber-200 text-amber-600">
+                  <AlertTriangle className="h-4.5 w-4.5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <DialogTitle className={`text-[15px] font-semibold text-zinc-900 leading-tight ${MONO}`}>
+                    Outside optimal killzone
+                  </DialogTitle>
+                  <DialogDescription className="pt-2 text-[13px] text-zinc-600 leading-relaxed">
+                    You are not in the killzone for better A+ scaling and good signal.
+                  </DialogDescription>
+                </div>
+              </div>
+
+              {/* Detail panel */}
+              <div className={`mt-4 rounded-lg border border-zinc-200 bg-zinc-50/60 px-3 py-2.5 ${MONO}`}>
+                <div className="text-[9px] tracking-[0.2em] uppercase text-zinc-400 mb-1">Only trade</div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[13px] font-semibold text-zinc-900 tabular-nums">{kzDialog?.pair}</span>
+                  <span className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-0.5">
+                    {kzDialog?.kzText}
+                  </span>
+                </div>
+              </div>
+            </DialogHeader>
+          </div>
+
+          <DialogFooter className={`gap-2 sm:gap-2 px-5 py-3 border-t border-zinc-100 bg-zinc-50/40 ${MONO}`}>
             <button
               onClick={dismissKzForever}
-              className="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] font-medium text-zinc-600 hover:bg-zinc-50 transition"
+              className="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-[11px] font-medium tracking-wider uppercase text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700 transition"
             >
               Don't show again
             </button>
             <button
               onClick={() => setKzDialog(null)}
-              className="h-9 px-4 rounded-lg bg-zinc-900 text-white text-[12px] font-semibold tracking-wide hover:bg-zinc-800 transition"
+              className="h-9 px-4 rounded-lg bg-zinc-900 text-white text-[11px] font-semibold tracking-wider uppercase hover:bg-zinc-800 transition shadow-[0_4px_12px_-4px_rgba(0,0,0,0.4)]"
             >
               I understand
             </button>
