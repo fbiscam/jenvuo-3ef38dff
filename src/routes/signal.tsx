@@ -5,6 +5,7 @@ import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
+import { getBacktestStats, type BacktestStats } from "@/lib/backtest.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 
@@ -430,6 +431,21 @@ function SignalPage() {
     return () => { stopped = true; clearInterval(id); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan?.instrument.symbol]);
+
+  /* ---------- BACKTEST STATS (per plan) ---------- */
+  const fetchBacktest = useServerFn(getBacktestStats);
+  const [backtest, setBacktest] = useState<BacktestStats | null>(null);
+  useEffect(() => {
+    if (!plan) { setBacktest(null); return; }
+    const dir = plan.trade.direction;
+    if (dir !== "BUY" && dir !== "SELL") { setBacktest(null); return; }
+    let cancelled = false;
+    fetchBacktest({ data: { pair: plan.instrument.symbol, direction: dir } })
+      .then((r) => { if (!cancelled) setBacktest(r); })
+      .catch(() => { if (!cancelled) setBacktest(null); });
+    return () => { cancelled = true; };
+  }, [plan?.instrument.symbol, plan?.trade.direction, fetchBacktest]);
+
 
 
 
@@ -951,6 +967,11 @@ function SignalPage() {
                     <PositionSizer plan={plan} />
                   )}
 
+                  {/* Backtest history badge */}
+                  {(isBuy || isSell) && backtest && <BacktestBadge stats={backtest} />}
+
+
+
 
                   {/* Take Trade / Save Signal */}
                   <div className="grid grid-cols-2 gap-2 pt-1">
@@ -1364,6 +1385,38 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
 }
 
 // -------------------- News Countdown Chip --------------------
+// -------------------- Backtest Badge --------------------
+function BacktestBadge({ stats }: { stats: BacktestStats }) {
+  if (stats.sample === "none") {
+    return (
+      <div className="rounded-lg border border-dashed border-zinc-200 bg-zinc-50 px-3 py-2 text-[11px] text-zinc-600">
+        <span className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-500`}>Your history</span>
+        <div className="mt-0.5">No previous trades on this pair/direction yet — build a sample.</div>
+      </div>
+    );
+  }
+  const wr = stats.winRate ?? 0;
+  const tone = wr >= 60 ? "emerald" : wr >= 45 ? "amber" : "rose";
+  const toneCls = {
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    amber: "border-amber-200 bg-amber-50 text-amber-800",
+    rose: "border-rose-200 bg-rose-50 text-rose-800",
+  }[tone];
+  return (
+    <div className={`rounded-lg border px-3 py-2 ${toneCls}`}>
+      <div className={`text-[9px] ${MONO} tracking-widest uppercase font-bold flex items-center justify-between`}>
+        <span>Your history on this setup</span>
+        {stats.sample === "sparse" && <span className="opacity-70">(sparse · {stats.total})</span>}
+      </div>
+      <div className="mt-1 text-[12px] tabular-nums">
+        <b className={MONO}>{stats.total}</b> similar trades ·{" "}
+        <b className={MONO}>{stats.winRate != null ? `${stats.winRate.toFixed(0)}%` : "—"}</b> win rate ·{" "}
+        avg <b className={MONO}>{stats.avgPnl != null ? `$${stats.avgPnl.toFixed(2)}` : "—"}</b>
+      </div>
+    </div>
+  );
+}
+
 function NewsCountdownChip({ plan }: { plan: SignalPlan }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
