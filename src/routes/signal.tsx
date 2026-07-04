@@ -1249,15 +1249,14 @@ function SignalPage() {
               </div>
 
               {/* Detail panel */}
-              <div className={`mt-4 rounded-lg border border-zinc-200 bg-zinc-50/60 px-3 py-2.5 ${MONO}`}>
-                <div className="text-[9px] tracking-[0.2em] uppercase text-zinc-400 mb-1">Only trade</div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[13px] font-semibold text-zinc-900 tabular-nums">{kzDialog?.pair}</span>
-                  <span className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-0.5">
-                    {kzDialog?.kzText}
-                  </span>
-                </div>
+              <div className={`mt-4 rounded-lg border border-zinc-200 bg-zinc-50/60 px-3 py-2.5 flex items-center gap-2 flex-wrap ${MONO}`}>
+                <span className="text-[9px] tracking-[0.2em] uppercase text-zinc-400 shrink-0">Only trade</span>
+                <span className="text-[12px] font-semibold text-zinc-900 tabular-nums shrink-0">{kzDialog?.pair}</span>
+                <span className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-0.5 ml-auto">
+                  {kzDialog?.kzText}
+                </span>
               </div>
+
             </DialogHeader>
           </div>
 
