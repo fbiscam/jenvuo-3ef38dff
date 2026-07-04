@@ -345,40 +345,6 @@ function Journal() {
         </div>
       )}
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setOpen(false)}>
-          <div className="w-full max-w-md rounded-2xl bg-white p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold">Log a trade</h3>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-              <Field label="Pair">
-                <input value={form.pair ?? ""} onChange={(e) => setForm({ ...form, pair: e.target.value })} className="input" />
-              </Field>
-              <Field label="Direction">
-                <select value={form.direction} onChange={(e) => setForm({ ...form, direction: e.target.value as Trade["direction"] })} className="input">
-                  <option value="long">Long</option><option value="short">Short</option>
-                </select>
-              </Field>
-              <Field label="Entry"><input type="number" step="any" onChange={(e) => setForm({ ...form, entry: parseFloat(e.target.value) || null })} className="input" /></Field>
-              <Field label="Stop loss"><input type="number" step="any" onChange={(e) => setForm({ ...form, stop_loss: parseFloat(e.target.value) || null })} className="input" /></Field>
-              <Field label="Take profit"><input type="number" step="any" onChange={(e) => setForm({ ...form, take_profit: parseFloat(e.target.value) || null })} className="input" /></Field>
-              <Field label="Outcome">
-                <select value={form.outcome} onChange={(e) => setForm({ ...form, outcome: e.target.value as Trade["outcome"] })} className="input">
-                  <option value="open">Open</option><option value="win">Win</option><option value="loss">Loss</option><option value="breakeven">Breakeven</option>
-                </select>
-              </Field>
-              <Field label="P&L ($)" full><input type="number" step="any" onChange={(e) => setForm({ ...form, pnl: parseFloat(e.target.value) || null })} className="input" /></Field>
-              <Field label="Notes" full>
-                <textarea rows={3} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="input" />
-              </Field>
-            </div>
-            <div className="mt-5 flex justify-end gap-2">
-              <button onClick={() => setOpen(false)} className="rounded-lg px-4 py-2 text-sm text-zinc-600 hover:bg-zinc-100">Cancel</button>
-              <button onClick={save} className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">Save</button>
-            </div>
-          </div>
-          <style>{`.input{width:100%;border:1px solid #e4e4e7;border-radius:.5rem;padding:.5rem .75rem;font-size:.875rem;margin-top:.25rem;font-family:inherit;background:white;}`}</style>
-        </div>
-      )}
     </div>
     </UpgradeOverlay>
   );
