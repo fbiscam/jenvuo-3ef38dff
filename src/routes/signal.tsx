@@ -1430,10 +1430,11 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
           const pass = c.pass === true;
           const fail = c.pass === false;
           const tile = pass
-            ? "border-zinc-900 bg-zinc-900 text-white"
+            ? "border-emerald-600 bg-emerald-500 text-white"
             : fail
-            ? "border-zinc-200 bg-white text-zinc-300"
+            ? "border-rose-600 bg-rose-500 text-white"
             : "border-zinc-200 bg-zinc-50 text-zinc-400";
+
           const icon = pass ? "✓" : fail ? "✕" : "–";
           return (
             <motion.div
