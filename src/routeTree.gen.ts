@@ -13,6 +13,7 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalRouteImport } from './routes/signal'
+import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LlmRouteImport } from './routes/llm'
@@ -23,6 +24,7 @@ import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as DevelopmentRouteImport } from './routes/development'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CancellationRouteImport } from './routes/cancellation'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AiEngineRouteImport } from './routes/ai-engine'
@@ -67,6 +69,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SignalRoute = SignalRouteImport.update({
   id: '/signal',
   path: '/signal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundRoute = RefundRouteImport.update({
+  id: '/refund',
+  path: '/refund',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -117,6 +124,11 @@ const DevelopmentRoute = DevelopmentRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CancellationRoute = CancellationRouteImport.update({
+  id: '/cancellation',
+  path: '/cancellation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -262,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/cancellation': typeof CancellationRoute
   '/contact': typeof ContactRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
@@ -272,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
   '/signal': typeof SignalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -302,6 +316,7 @@ export interface FileRoutesByTo {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/cancellation': typeof CancellationRoute
   '/contact': typeof ContactRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
@@ -311,6 +326,7 @@ export interface FileRoutesByTo {
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
   '/signal': typeof SignalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -342,6 +358,7 @@ export interface FileRoutesById {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/cancellation': typeof CancellationRoute
   '/contact': typeof ContactRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
@@ -352,6 +369,7 @@ export interface FileRoutesById {
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
   '/signal': typeof SignalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -384,6 +402,7 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
+    | '/cancellation'
     | '/contact'
     | '/development'
     | '/disclaimer'
@@ -394,6 +413,7 @@ export interface FileRouteTypes {
     | '/llm'
     | '/pricing'
     | '/privacy'
+    | '/refund'
     | '/signal'
     | '/sitemap.xml'
     | '/terms'
@@ -424,6 +444,7 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
+    | '/cancellation'
     | '/contact'
     | '/development'
     | '/disclaimer'
@@ -433,6 +454,7 @@ export interface FileRouteTypes {
     | '/llm'
     | '/pricing'
     | '/privacy'
+    | '/refund'
     | '/signal'
     | '/sitemap.xml'
     | '/terms'
@@ -463,6 +485,7 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
+    | '/cancellation'
     | '/contact'
     | '/development'
     | '/disclaimer'
@@ -473,6 +496,7 @@ export interface FileRouteTypes {
     | '/llm'
     | '/pricing'
     | '/privacy'
+    | '/refund'
     | '/signal'
     | '/sitemap.xml'
     | '/terms'
@@ -505,6 +529,7 @@ export interface RootRouteChildren {
   AiEngineRoute: typeof AiEngineRoute
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
+  CancellationRoute: typeof CancellationRoute
   ContactRoute: typeof ContactRoute
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
@@ -515,6 +540,7 @@ export interface RootRouteChildren {
   LlmRoute: typeof LlmRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
+  RefundRoute: typeof RefundRoute
   SignalRoute: typeof SignalRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
@@ -557,6 +583,13 @@ declare module '@tanstack/react-router' {
       path: '/signal'
       fullPath: '/signal'
       preLoaderRoute: typeof SignalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund': {
+      id: '/refund'
+      path: '/refund'
+      fullPath: '/refund'
+      preLoaderRoute: typeof RefundRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -627,6 +660,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cancellation': {
+      id: '/cancellation'
+      path: '/cancellation'
+      fullPath: '/cancellation'
+      preLoaderRoute: typeof CancellationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -885,6 +925,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiEngineRoute: AiEngineRoute,
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
+  CancellationRoute: CancellationRoute,
   ContactRoute: ContactRoute,
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
@@ -895,6 +936,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmRoute: LlmRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
+  RefundRoute: RefundRoute,
   SignalRoute: SignalRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
