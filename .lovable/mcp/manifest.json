@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "jenvu-mcp",
+      "version": "0.1.0",
+      "title": "Jenvu AI MCP"
+    },
+    "tools": [
+      {
+        "name": "list_pairs",
+        "title": "List supported gold pairs",
+        "description": "Lists the gold cross-pairs Jenvu covers (XAU vs USD/EUR/GBP/JPY/AUD/CHF).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_market_context",
+        "title": "Get gold market context",
+        "description": "Returns Jenvu's institutional-grade market context for a given gold pair — killzone timing, session bias hints, and which XAU pair the user asked about. Read-only informational tool.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "pair": {
+              "type": "string",
+              "enum": [
+                "XAUUSD",
+                "XAUEUR",
+                "XAUGBP",
+                "XAUJPY",
+                "XAUAUD",
+                "XAUCHF"
+              ],
+              "description": "Gold pair symbol (XAU vs quote currency)."
+            }
+          },
+          "required": [
+            "pair"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
