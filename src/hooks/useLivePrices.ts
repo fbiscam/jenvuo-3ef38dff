@@ -17,12 +17,16 @@ export function useLivePrices(symbols: string[]): Record<string, number> {
     const list = key.split(",").filter(Boolean);
     let stopped = false;
 
+    const isHidden = () =>
+      typeof document !== "undefined" && document.visibilityState === "hidden";
+
     const set = (sym: string, p: number) => {
       if (!Number.isFinite(p)) return;
       setPrices((prev) => (prev[sym] === p ? prev : { ...prev, [sym]: p }));
     };
 
     const poll = async () => {
+      if (isHidden()) return;
       for (const sym of list) {
         try {
           const t = await fetchTick({ data: { symbol: sym } });
@@ -33,14 +37,22 @@ export function useLivePrices(symbols: string[]): Record<string, number> {
     };
 
     void poll();
-    const pollId = setInterval(poll, 3000);
+    const pollId = setInterval(poll, 5000);
+    const onVis = () => { if (!isHidden()) void poll(); };
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", onVis);
+    }
 
     return () => {
       stopped = true;
       clearInterval(pollId);
+      if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", onVis);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
+
 
   return prices;
 }
