@@ -220,19 +220,24 @@ function AlertPrefs() {
         <h2 className="text-base font-semibold">Conviction filter</h2>
         <p className="mt-1 text-sm text-zinc-500">Only fire when grade meets this threshold.</p>
         <div className="mt-4 inline-flex rounded-lg border border-zinc-200 p-1">
-          {(["A+", "A"] as const).map((g) => (
+          {([
+            { key: "A+", label: "A+ only" },
+            { key: "A", label: "A & A+" },
+          ] as const).map((opt) => (
             <button
-              key={g}
-              onClick={() => setPrefs((p) => ({ ...p, min_grade: g }))}
+              key={opt.key}
+              onClick={() => setPrefs((p) => ({ ...p, min_grade: opt.key }))}
               className={`px-4 py-1.5 text-sm font-medium rounded-md transition ${
-                prefs.min_grade === g ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"
+                prefs.min_grade === opt.key ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"
               }`}
             >
-              {g}
+              {opt.label}
             </button>
           ))}
         </div>
+        <p className="mt-2 text-[11px] text-zinc-400">Tip: "A &amp; A+" enables both grades so you never miss a solid setup.</p>
       </section>
+
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <h2 className="text-base font-semibold">Quiet hours</h2>
