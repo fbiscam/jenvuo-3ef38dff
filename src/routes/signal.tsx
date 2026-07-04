@@ -1362,44 +1362,34 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="relative overflow-hidden rounded-xl border border-zinc-200/80 bg-gradient-to-br from-white via-white to-zinc-50/60 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_8px_24px_-12px_rgba(0,0,0,0.08)]"
+      className="relative overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02),0_8px_30px_rgba(0,0,0,0.04)]"
     >
-      {/* subtle grid backdrop */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.035]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",
-          backgroundSize: "18px 18px",
-        }}
-      />
-
-      {/* Header */}
-      <div className="relative flex items-center justify-between mb-3">
+      {/* Header — terminal style like the rest of the page */}
+      <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-zinc-100">
         <div className="flex items-center gap-2">
-          <span className={`inline-block h-1.5 w-1.5 rounded-full bg-gradient-to-r ${strength.ring}`} />
-          <span className={`text-[10px] ${MONO} tracking-[0.2em] uppercase text-zinc-500`}>
+          <div className="flex gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-zinc-200" />
+            <div className="w-2 h-2 rounded-full bg-zinc-200" />
+            <div className="w-2 h-2 rounded-full bg-zinc-200" />
+          </div>
+          <span className={`ml-2 text-[10px] ${MONO} tracking-[0.2em] uppercase text-zinc-900`}>
             Confluence Heatmap
           </span>
         </div>
-        <span className={cn("text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full border", pillTone, MONO)}>
+        <span className={cn("text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded border border-zinc-200 bg-white text-zinc-700", MONO)}>
           {strength.label}
         </span>
       </div>
 
       {/* Score row: ring + progress bar */}
-      <div className="relative flex items-center gap-3 mb-3.5">
-        {/* Score dial */}
+      <div className="flex items-center gap-3 mb-3.5">
+        {/* Score dial — monochrome */}
         <div className="relative shrink-0">
           <svg viewBox="0 0 44 44" className="h-14 w-14 -rotate-90">
-            <circle cx="22" cy="22" r="18" strokeWidth="4" className="stroke-zinc-100" fill="none" />
+            <circle cx="22" cy="22" r="18" strokeWidth="3.5" className="stroke-zinc-100" fill="none" />
             <motion.circle
-              cx="22" cy="22" r="18" strokeWidth="4" fill="none" strokeLinecap="round"
-              className={cn(
-                strength.tone === "emerald" ? "stroke-emerald-500"
-                : strength.tone === "amber" ? "stroke-amber-500"
-                : "stroke-rose-500",
-              )}
+              cx="22" cy="22" r="18" strokeWidth="3.5" fill="none" strokeLinecap="round"
+              className="stroke-zinc-900"
               strokeDasharray={2 * Math.PI * 18}
               initial={{ strokeDashoffset: 2 * Math.PI * 18 }}
               animate={{ strokeDashoffset: 2 * Math.PI * 18 * (1 - pct / 100) }}
@@ -1415,60 +1405,56 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
         </div>
         {/* Progress rail */}
         <div className="flex-1 min-w-0">
-          <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 mb-1.5`}>Setup Strength</div>
-          <div className="relative h-2 rounded-full bg-zinc-100 overflow-hidden">
+          <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-500 mb-1.5`}>Setup Strength</div>
+          <div className="relative h-1.5 rounded-full bg-zinc-100 overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${pct}%` }}
               transition={{ duration: 0.9, ease: "easeOut" }}
-              className={cn("absolute inset-y-0 left-0 rounded-full bg-gradient-to-r", strength.ring)}
+              className="absolute inset-y-0 left-0 rounded-full bg-zinc-900"
             />
-            <div
-              className="absolute inset-0 opacity-40 mix-blend-overlay"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(45deg, rgba(255,255,255,0.6) 0 6px, transparent 6px 12px)",
-              }}
-            />
+          </div>
+          {/* Tick scale */}
+          <div className="mt-1.5 flex justify-between">
+            {Array.from({ length: 11 }).map((_, i) => (
+              <span key={i} className={cn("h-1 w-px", i % 5 === 0 ? "bg-zinc-400" : "bg-zinc-200")} />
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Confluence tiles */}
-      <div className="relative grid grid-cols-6 gap-1.5">
+      {/* Confluence tiles — clean, theme-consistent */}
+      <div className="grid grid-cols-6 gap-1.5">
         {checks.map((c, i) => {
           const pass = c.pass === true;
           const fail = c.pass === false;
           const tile = pass
-            ? "border-emerald-300/70 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-[0_4px_12px_-4px_rgba(16,185,129,0.5)]"
+            ? "border-zinc-900 bg-zinc-900 text-white"
             : fail
-            ? "border-rose-200 bg-gradient-to-br from-rose-50 to-rose-100 text-rose-600"
-            : "border-zinc-200 bg-gradient-to-br from-zinc-50 to-zinc-100 text-zinc-400";
+            ? "border-zinc-200 bg-white text-zinc-300"
+            : "border-zinc-200 bg-zinc-50 text-zinc-400";
           const icon = pass ? "✓" : fail ? "✕" : "–";
           return (
             <motion.div
               key={c.key}
-              initial={{ opacity: 0, scale: 0.85 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.05 * i, duration: 0.3, ease: "easeOut" }}
-              whileHover={{ y: -2, scale: 1.03 }}
+              whileHover={{ y: -1 }}
               title={`${c.label} — ${c.reason}`}
               className={cn(
-                "relative aspect-square rounded-lg border flex items-center justify-center text-[15px] font-bold cursor-help transition-shadow",
+                "relative aspect-square rounded-md border flex items-center justify-center text-[14px] font-bold cursor-help transition-colors",
                 tile,
               )}
             >
-              {pass && (
-                <span className="absolute inset-0 rounded-lg bg-gradient-to-t from-transparent to-white/20 pointer-events-none" />
-              )}
-              <span className="relative drop-shadow-sm">{icon}</span>
+              <span className="relative">{icon}</span>
             </motion.div>
           );
         })}
       </div>
 
       {/* Labels */}
-      <div className="relative grid grid-cols-6 gap-1.5 mt-1.5">
+      <div className="grid grid-cols-6 gap-1.5 mt-1.5">
         {checks.map((c) => (
           <div
             key={c.key}
@@ -1482,6 +1468,7 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
     </motion.div>
   );
 }
+
 
 
 // -------------------- News Countdown Chip --------------------
