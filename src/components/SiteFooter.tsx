@@ -38,9 +38,12 @@ const columns = [
     links: [
       { to: "/terms", label: "Terms of Service" },
       { to: "/privacy", label: "Privacy Policy" },
+      { to: "/refund", label: "Refund Policy" },
+      { to: "/cancellation", label: "Cancellation Policy" },
       { to: "/disclaimer", label: "Risk Disclaimer" },
     ],
   },
+
 ] as const;
 
 export default function SiteFooter() {
