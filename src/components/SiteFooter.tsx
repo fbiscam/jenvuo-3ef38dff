@@ -97,44 +97,10 @@ export default function SiteFooter() {
                 </a>
               ))}
             </div>
-
-            {/* Newsletter */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.currentTarget as HTMLFormElement;
-                const input = form.elements.namedItem("email") as HTMLInputElement;
-                if (input?.value) {
-                  form.reset();
-                }
-              }}
-              className="pt-2 max-w-xs"
-            >
-              <label
-                htmlFor="footer-newsletter-email"
-                className={`${MONO} block text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-700 mb-2`}
-              >
-                Newsletter
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  id="footer-newsletter-email"
-                  name="email"
-                  type="email"
-                  required
-                  maxLength={255}
-                  placeholder="you@email.com"
-                  className="flex-1 min-w-0 h-9 rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none focus:border-zinc-400"
-                />
-                <button
-                  type="submit"
-                  className="h-9 shrink-0 rounded-md bg-zinc-900 px-3 text-xs font-semibold uppercase tracking-wider text-white hover:bg-zinc-700 transition-colors"
-                >
-                  Subscribe
-                </button>
-              </div>
-            </form>
           </div>
+
+
+
 
 
           {/* Link columns */}
