@@ -1599,7 +1599,34 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     ];
 
     // ============ LOCAL ENRICHMENTS ============
-    const aiMarkings: Marking[] = Array.isArray(parsed.markings) ? parsed.markings : [];
+    // Validate AI markings: drop anything with timestamps outside the candle
+    // window or prices absurdly far from the live price. Prevents hallucinated
+    // levels from cluttering the chart.
+    const allCandleTimes = [...htf, ...ltf].map((c) => Math.floor(c.t / 1000));
+    const minTime = Math.min(...allCandleTimes);
+    const maxTime = Math.max(...allCandleTimes);
+    const priceLoBound = last.c * 0.80;
+    const priceHiBound = last.c * 1.20;
+    const isValidAiMark = (m: any): boolean => {
+      if (!m || typeof m !== "object" || typeof m.type !== "string") return false;
+      // Time window: allow up to 1 day past the last candle for projected zones.
+      const timeMax = maxTime + 86400;
+      for (const k of ["fromTime", "toTime"]) {
+        if (m[k] != null) {
+          const t = Number(m[k]);
+          if (!Number.isFinite(t) || t < minTime || t > timeMax) return false;
+        }
+      }
+      for (const k of ["price", "priceLow", "priceHigh"]) {
+        if (m[k] != null) {
+          const p = Number(m[k]);
+          if (!Number.isFinite(p) || p < priceLoBound || p > priceHiBound) return false;
+        }
+      }
+      return true;
+    };
+    const aiMarkings: Marking[] = (Array.isArray(parsed.markings) ? parsed.markings : [])
+      .filter(isValidAiMark) as Marking[];
     const pdOte = buildPremiumDiscountAndOTE(htf, "htf", last.c);
     const eqHL = [...detectEqualLevels(htf, "htf", dec), ...detectEqualLevels(ltf, "ltf", dec)];
     const liqPools = [...detectLiquidityPools(htf, "htf"), ...detectLiquidityPools(ltf, "ltf")];
