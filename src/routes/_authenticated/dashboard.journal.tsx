@@ -179,6 +179,8 @@ function Journal() {
     toast.success(`Trade closed · ${outcome.toUpperCase()} · ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}`);
   };
 
+  if (isLoading) return <div className="text-sm text-zinc-500">Loading…</div>;
+
   return (
     <UpgradeOverlay
       show={locked}

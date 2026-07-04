@@ -34,13 +34,38 @@ const PLAN_KEY_BY_COL: Record<number, string> = { 0: "free", 1: "pro", 2: "elite
 
 function Billing() {
   const currentPlan = useCurrentPlan();
-  const plan = currentPlan ?? "free";
   const credits = useCredits();
   const [showAllActivity, setShowAllActivity] = useState(false);
 
+  // Wait for both plan + credits so we never flash "Free" before the real plan resolves.
+  const isLoading = currentPlan === null || credits.isLoading;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-10">
+        <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
+          <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Current plan</div>
+          <div className="mt-3 h-8 w-40 animate-pulse rounded bg-zinc-100" />
+          <div className="mt-3 h-4 w-72 animate-pulse rounded bg-zinc-100" />
+        </section>
+        <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
+          <div className="h-10 w-32 animate-pulse rounded bg-zinc-100" />
+          <div className="mt-4 h-2 w-full animate-pulse rounded-full bg-zinc-100" />
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="h-16 animate-pulse rounded-xl bg-zinc-100" />
+            ))}
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  const plan = currentPlan;
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
   const pct = credits.allowance > 0 ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
   const resetsAt = credits.state?.periodResetsAt ? new Date(credits.state.periodResetsAt) : null;
+
 
 
   return (

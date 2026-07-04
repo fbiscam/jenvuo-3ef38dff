@@ -121,7 +121,7 @@ function AlertPrefs() {
     }
   };
 
-  if (loading) return <div className="text-sm text-zinc-500">Loading…</div>;
+  if (loading || isLoading) return <div className="text-sm text-zinc-500">Loading…</div>;
 
   return (
     <UpgradeOverlay
