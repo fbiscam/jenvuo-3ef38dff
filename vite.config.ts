@@ -24,7 +24,6 @@ import path from "node:path";
 // forces the server-fn plugin to see every ID before the first client call.
 function serverFnManifestRegen(): Plugin {
   const isServerFnFile = (file: string) => /\.functions\.tsx?$/.test(file);
-  let restarting = false;
   let pending: NodeJS.Timeout | null = null;
 
   async function findServerFnFiles(root: string): Promise<string[]> {
@@ -68,15 +67,16 @@ function serverFnManifestRegen(): Plugin {
     // environments), unlike `server.watcher` which in Vite 7 only surfaces a
     // subset. This is the reliable place to notice server-fn edits.
     async handleHotUpdate(ctx) {
-      if (!isServerFnFile(ctx.file) || restarting) return;
+      if (!isServerFnFile(ctx.file)) return;
       if (pending) clearTimeout(pending);
       pending = setTimeout(() => {
         pending = null;
-        restarting = true;
         ctx.server.config.logger.info(
-          `[serverfn-manifest-regen] server-fn file changed (${ctx.file}) — restarting to refresh manifest`,
+          `[serverfn-manifest-regen] server-fn file changed (${ctx.file}) — warm-loading manifest`,
         );
-        ctx.server.restart().finally(() => { restarting = false; });
+        const mod = ctx.server.moduleGraph.getModuleById(ctx.file);
+        if (mod) ctx.server.moduleGraph.invalidateModule(mod);
+        void warmLoad(ctx.server);
       }, 400);
     },
   };
