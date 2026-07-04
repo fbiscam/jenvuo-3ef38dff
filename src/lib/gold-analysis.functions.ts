@@ -1044,6 +1044,15 @@ async function resolveLiveTick(inst: ResolvedInstrument): Promise<LiveTick | nul
     try {
       const q = await f();
       if (q && isFinite(q.price) && q.price > 0) {
+        // Second-line guard: any cross-pair tick, from any provider, must
+        // fall within its expected ratio band vs the last known XAU/USD.
+        if (XAU_CROSS_RATIO_BANDS[inst.key]) {
+          const xauUsd = tickCache.get("METAL:XAUUSD")?.tick.price;
+          if (xauUsd && xauUsd > 0) {
+            const check = assertCrossPairScale(inst.key, q.price, xauUsd);
+            if (!check.ok) continue;
+          }
+        }
         tickCache.set(inst.key, { at: now, tick: q });
         return q;
       }
