@@ -232,7 +232,7 @@ function KillzonesPage() {
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </button>
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2.5">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden sm:flex items-center gap-2.5">
             <Link
               to="/"
               aria-label="Jenvu home"
