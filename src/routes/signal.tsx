@@ -873,12 +873,32 @@ function SignalPage() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-lg overflow-hidden border border-zinc-100">
-                    <KV label="Entry" value={t.entry.toFixed(plan.instrument.decimals)} />
-                    <KV label="R:R" value={`1:${t.rr.toFixed(2)}`} />
-                    <KV label="Stop" value={t.sl.toFixed(plan.instrument.decimals)} tone="bad" />
-                    <KV label="Target" value={t.tp.toFixed(plan.instrument.decimals)} tone="good" />
-                  </div>
+                  {(() => {
+                    const dec = plan.instrument.decimals;
+                    const riskAbs = Math.abs(t.entry - t.sl);
+                    const rewardAbs = Math.abs(t.tp - t.entry);
+                    const riskPct = t.entry ? (riskAbs / t.entry) * 100 : 0;
+                    const rewardPct = t.entry ? (rewardAbs / t.entry) * 100 : 0;
+                    const fmtDist = (n: number) => n >= 100 ? n.toFixed(0) : n.toFixed(dec);
+                    return (
+                      <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-lg overflow-hidden border border-zinc-100">
+                        <KV label="Entry" value={t.entry.toFixed(dec)} />
+                        <KV label="R:R" value={`1:${t.rr.toFixed(2)}`} />
+                        <KV
+                          label="Stop"
+                          value={t.sl.toFixed(dec)}
+                          tone="bad"
+                          sub={riskAbs > 0 ? `−${fmtDist(riskAbs)} pts · ${riskPct.toFixed(2)}%` : undefined}
+                        />
+                        <KV
+                          label="Target"
+                          value={t.tp.toFixed(dec)}
+                          tone="good"
+                          sub={rewardAbs > 0 ? `+${fmtDist(rewardAbs)} pts · ${rewardPct.toFixed(2)}%` : undefined}
+                        />
+                      </div>
+                    );
+                  })()}
                   {(() => {
                     if (!livePrice || !(isBuy || isSell)) return null;
                     const driftPct = Math.abs(livePrice - t.entry) / livePrice;
