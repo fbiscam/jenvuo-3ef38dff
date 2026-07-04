@@ -979,7 +979,7 @@ function SignalPage() {
                   {(isBuy || isSell) && backtest && <BacktestBadge stats={backtest} />}
 
                   {/* Historical engine backtest */}
-                  <HistoricalBacktestPanel symbol={symbolParam} />
+                  <HistoricalBacktestPanel symbol={plan?.instrument?.symbol ?? symbol ?? "XAUUSD"} />
 
 
 
