@@ -1243,7 +1243,7 @@ function SignalPage() {
                     Outside optimal killzone
                   </DialogTitle>
                   <DialogDescription className="pt-2 text-[13px] text-zinc-600 leading-relaxed">
-                    You are not in the killzone for better A+ scaling and good signal.
+                    You are not in the killzone for better A+ scaling for good signal.
                   </DialogDescription>
                 </div>
               </div>
