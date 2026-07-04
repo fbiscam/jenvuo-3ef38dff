@@ -6,6 +6,8 @@ import {
 } from "@/lib/analysis/engine";
 import { fetchInstrumentCandles, resolveInstrument } from "@/lib/gold-analysis.functions";
 
+type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
+
 export type BacktestTrade = {
   barIndex: number;
   time: number;
@@ -55,26 +57,26 @@ export const runHistoricalBacktest = createServerFn({ method: "POST" })
     const inst = resolveInstrument(data.symbol);
     const threshold = data.threshold;
 
-    let ltf: Awaited<ReturnType<typeof fetchInstrumentCandles>> = [];
-    let htf: Awaited<ReturnType<typeof fetchInstrumentCandles>> = [];
+    let ltf: Candle[] = [];
+    let htf: Candle[] = [];
     try {
       [ltf, htf] = await Promise.all([
-        fetchInstrumentCandles(inst, "15m"),
-        fetchInstrumentCandles(inst, "1h"),
+        fetchBacktestCandles(inst, "15m", 900),
+        fetchBacktestCandles(inst, "1h", 600),
       ]);
     } catch (e: any) {
       return emptyResult(inst.display, threshold, e?.message || "Candle feed unavailable");
     }
 
-    if (ltf.length < 250 || htf.length < 100) {
-      return emptyResult(inst.display, threshold, "Not enough historical candles for a meaningful backtest");
+    if (ltf.length < 120 || htf.length < 50) {
+      return emptyResult(inst.display, threshold, "Not enough historical candles for a meaningful backtest", Math.max(ltf.length, htf.length));
     }
 
     const trades: BacktestTrade[] = [];
-    const START = 200;                 // need lookback for HTF context
-    const LOOKAHEAD = 96;               // 24h on 15m
-    const HTF_WINDOW = 300;
-    const LTF_WINDOW = 200;
+    const START = Math.min(200, Math.max(60, Math.floor(ltf.length * 0.25))); // need lookback for HTF context
+    const LOOKAHEAD = Math.min(96, Math.max(32, Math.floor(ltf.length * 0.12))); // up to 24h on 15m
+    const HTF_WINDOW = Math.min(300, htf.length);
+    const LTF_WINDOW = Math.min(200, Math.max(80, START));
     
 
     // Track last simulated trade bar so we don't stack overlapping setups.
@@ -119,7 +121,7 @@ export const runHistoricalBacktest = createServerFn({ method: "POST" })
         zoneMitigated: false,
       });
 
-      if (scored.score <= threshold) continue;
+      if (scored.score < threshold) continue;
       if (!Number.isFinite(built.entry) || !Number.isFinite(built.sl) || !Number.isFinite(built.tp)) continue;
 
       // Walk forward to determine outcome
@@ -171,14 +173,110 @@ export const runHistoricalBacktest = createServerFn({ method: "POST" })
 
 // ------------- helpers -------------
 
-function emptyResult(symbol: string, threshold: number, error: string): HistoricalBacktestResult {
+function emptyResult(symbol: string, threshold: number, error: string, bars = 0): HistoricalBacktestResult {
   return {
-    symbol, bars: 0, simulated: 0, wins: 0, losses: 0, expired: 0,
+    symbol, bars, simulated: 0, wins: 0, losses: 0, expired: 0,
     winRate: null, avgR: null, bestR: null, worstR: null, trades: [],
     threshold,
     disclaimer: "Backtest could not run — see error.",
     error,
   };
+}
+
+async function fetchBacktestCandles(
+  inst: ReturnType<typeof resolveInstrument>,
+  tf: "15m" | "1h",
+  limit: number,
+): Promise<Candle[]> {
+  const yahooSymbols = inst.yahooSymbols ?? [];
+  if (yahooSymbols.length) {
+    const yahoo = await fetchYahooBacktestCandles(yahooSymbols, tf, limit).catch(() => [] as Candle[]);
+    if (yahoo.length >= Math.min(limit, 120)) return yahoo;
+  }
+
+  const binanceSymbols = inst.binanceSymbols ?? [];
+  if (binanceSymbols.length) {
+    const binance = await fetchBinanceBacktestCandles(binanceSymbols, tf, limit).catch(() => [] as Candle[]);
+    if (binance.length >= Math.min(limit, 120)) return binance;
+  }
+
+  return fetchInstrumentCandles(inst, tf);
+}
+
+async function fetchYahooBacktestCandles(
+  symbols: string[],
+  tf: "15m" | "1h",
+  limit: number,
+): Promise<Candle[]> {
+  const interval = tf === "15m" ? "15m" : "60m";
+  const range = tf === "15m" ? "30d" : "90d";
+  const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
+  let lastErr: unknown = null;
+
+  for (const host of hosts) {
+    for (const sym of symbols) {
+      try {
+        const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${interval}&range=${range}`;
+        const res = await fetch(url, {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+            Accept: "application/json",
+          },
+        });
+        if (!res.ok) {
+          lastErr = new Error(`Yahoo ${sym}: ${res.status}`);
+          continue;
+        }
+        const json: any = await res.json();
+        const result = json?.chart?.result?.[0];
+        const ts: number[] = result?.timestamp ?? [];
+        const quote = result?.indicators?.quote?.[0] ?? {};
+        const candles: Candle[] = [];
+        for (let i = 0; i < ts.length; i++) {
+          const o = Number(quote.open?.[i]);
+          const h = Number(quote.high?.[i]);
+          const l = Number(quote.low?.[i]);
+          const c = Number(quote.close?.[i]);
+          const v = Number(quote.volume?.[i] ?? 0);
+          if (![o, h, l, c].every((n) => Number.isFinite(n) && n > 0)) continue;
+          candles.push({ t: ts[i] * 1000, o, h, l, c, v });
+        }
+        if (candles.length >= 120) return candles.slice(-limit);
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+  }
+
+  throw lastErr instanceof Error ? lastErr : new Error("Yahoo backtest data unavailable");
+}
+
+async function fetchBinanceBacktestCandles(symbols: string[], tf: "15m" | "1h", limit: number): Promise<Candle[]> {
+  const interval = tf === "15m" ? "15m" : "1h";
+  const hosts = ["api.binance.com", "data-api.binance.vision"];
+  let lastErr: unknown = null;
+
+  for (const host of hosts) {
+    for (const sym of symbols) {
+      try {
+        const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=${Math.min(1000, limit)}`;
+        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" } });
+        if (!res.ok) {
+          lastErr = new Error(`Binance ${sym}: ${res.status}`);
+          continue;
+        }
+        const rows: any[] = await res.json();
+        const candles = rows
+          .map((r) => ({ t: Number(r[0]), o: Number(r[1]), h: Number(r[2]), l: Number(r[3]), c: Number(r[4]), v: Number(r[5] ?? 0) }))
+          .filter((c) => Number.isFinite(c.t) && [c.o, c.h, c.l, c.c].every((n) => Number.isFinite(n) && n > 0));
+        if (candles.length >= 120) return candles.slice(-limit);
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+  }
+
+  throw lastErr instanceof Error ? lastErr : new Error("Binance backtest data unavailable");
 }
 
 function findHtfIndex(htf: Array<{ t: number }>, ltfTime: number): number {
