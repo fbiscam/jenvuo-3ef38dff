@@ -327,13 +327,3 @@ function Journal() {
     </UpgradeOverlay>
   );
 }
-
-
-function Field({ label, children, full }: { label: string; children: React.ReactNode; full?: boolean }) {
-  return (
-    <label className={`block font-medium text-zinc-600 ${full ? "col-span-2" : ""}`}>
-      {label}
-      {children}
-    </label>
-  );
-}
