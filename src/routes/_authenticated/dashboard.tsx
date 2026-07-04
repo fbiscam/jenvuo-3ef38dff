@@ -488,7 +488,7 @@ function DashboardLayout() {
         <div className="flex flex-wrap items-start justify-between gap-4 lg:items-end">
           <div className="min-w-0">
             <div className="text-[12px] text-zinc-500">Account home</div>
-            <h1 className="mt-1 truncate text-[26px] font-semibold tracking-tight text-zinc-900 sm:text-[30px]">
+            <h1 className="mt-1 truncate text-[16px] font-semibold tracking-tight text-zinc-900 sm:text-[30px]">
               {email || fullName}<span className="text-zinc-500">'s Account</span>
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-zinc-500">
