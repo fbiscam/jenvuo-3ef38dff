@@ -1122,6 +1122,13 @@ function SignalPage() {
                 </div>
               )}
 
+              {/* Historical engine backtest — always available when a plan is loaded */}
+              {plan && (
+                <div className="rounded-lg border border-zinc-200 bg-white p-3">
+                  <HistoricalBacktestPanel symbol={plan.instrument.symbol} />
+                </div>
+              )}
+
               {/* Market closed notice — replaces tracker/trade card */}
               {marketClosed && plan && (
                 <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 space-y-2">
