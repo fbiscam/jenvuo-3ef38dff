@@ -496,21 +496,28 @@ async function _analyzeGoldCompute(data: { timeframe: string; query: string }): 
         // If the plan returned WAIT, fall through to the LLM chat path so the
         // user hears a conversational answer, not a terse "WAIT on XAU/USD: …".
         if (plan.trade.direction !== "WAIT") {
+          // Only expose entry/SL/TP when confidence > 75%. Below that we still
+          // return the analysis + confidence but hide the trade block.
+          const highConviction = (plan.trade.confidence ?? 0) > 75;
           return {
             bias: plan.htfBias === "bullish" ? "BULLISH" : plan.htfBias === "bearish" ? "BEARISH" : "NEUTRAL",
-            direction: plan.trade.direction,
-            entry: fmt(plan.trade.entry),
-            stopLoss: fmt(plan.trade.sl),
-            takeProfits: [plan.trade.tp1, plan.trade.tp2, plan.trade.tp3 ?? plan.trade.tp].filter((n): n is number => typeof n === "number").map(fmt),
-            riskReward: `1:${plan.trade.rr.toFixed(2)}`,
+            direction: highConviction ? plan.trade.direction : "WAIT",
+            entry: highConviction ? fmt(plan.trade.entry) : "-",
+            stopLoss: highConviction ? fmt(plan.trade.sl) : "-",
+            takeProfits: highConviction
+              ? [plan.trade.tp1, plan.trade.tp2, plan.trade.tp3 ?? plan.trade.tp].filter((n): n is number => typeof n === "number").map(fmt)
+              : [],
+            riskReward: highConviction ? `1:${plan.trade.rr.toFixed(2)}` : "-",
             confidence: plan.trade.confidence,
             killzone: plan.killzone,
             confluences: plan.confluences,
             ictAnalysis: plan.htfNarrative,
             smcAnalysis: plan.ltfNarrative,
             marketStructure: `${plan.alignmentLabel} · ${plan.setupGrade} (${plan.setupScore}/100)`,
-            spokenSummary: plan.trade.summary,
-            fullAnalysis: `${plan.htfNarrative}\n\n${plan.ltfNarrative}\n\n${plan.trade.summary}\nInvalidation: ${plan.trade.invalidation}`,
+            spokenSummary: highConviction
+              ? plan.trade.summary
+              : `Confidence only ${plan.trade.confidence}% — waiting for a 75%+ high-conviction setup before issuing entry, SL and TP.`,
+            fullAnalysis: `${plan.htfNarrative}\n\n${plan.ltfNarrative}\n\n${highConviction ? plan.trade.summary : "Setup is forming but confidence is below the 75% threshold. Entry, SL and TP are withheld until conviction rises."}\nInvalidation: ${plan.trade.invalidation}`,
             timeframe: data.timeframe,
             currentPrice: plan.currentPrice,
             generatedAt: new Date().toISOString(),
