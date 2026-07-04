@@ -121,15 +121,6 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   };
 }
 
-// Lookup XAU/USD → cross conversion for cross-quote pairs.
-const XAU_USD_PROXY: Record<string, { symbol: string; inverse: boolean }> = {
-  "METAL:XAUEUR": { symbol: "EURUSD=X", inverse: false },
-  "METAL:XAUGBP": { symbol: "GBPUSD=X", inverse: false },
-  "METAL:XAUJPY": { symbol: "USDJPY=X", inverse: true },
-  "METAL:XAUAUD": { symbol: "AUDUSD=X", inverse: false },
-  "METAL:XAUCHF": { symbol: "USDCHF=X", inverse: true },
-};
-
 // Expected cross/USD price ratio bands. If a cross-pair tick falls outside
 // these bands (e.g. XAU/JPY returning ~2400 instead of ~370k), it almost
 // certainly means the FX conversion failed and we are quoting raw XAU/USD.
@@ -152,6 +143,11 @@ function warnCrossPairScale(key: string, msg: string) {
   console.error(`[XAU-SCALE-GUARD] ${key}: ${msg}`);
 }
 
+function xauPairConfigForInstrument(key: string) {
+  const pairKey = key.startsWith("METAL:") ? key.slice("METAL:".length) : key;
+  return XAU_PAIRS[pairKey];
+}
+
 export function assertCrossPairScale(
   key: string,
   crossPrice: number,
@@ -165,6 +161,28 @@ export function assertCrossPairScale(
   const ratio = crossPrice / xauUsdPrice;
   if (ratio < band.min || ratio > band.max) {
     const reason = `cross/USD ratio ${ratio.toFixed(4)} outside expected ${band.label} — got ${crossPrice.toFixed(2)} vs XAU/USD ${xauUsdPrice.toFixed(2)}`;
+    warnCrossPairScale(key, reason);
+    return { ok: false, reason };
+  }
+  return { ok: true };
+}
+
+async function assertCrossPairFxValue(
+  key: string,
+  crossPrice: number,
+  xauUsdPrice: number,
+): Promise<{ ok: boolean; reason?: string }> {
+  const proxy = xauPairConfigForInstrument(key)?.usdProxy;
+  if (!proxy) return assertCrossPairScale(key, crossPrice, xauUsdPrice);
+  const fxPrice = await fetchFxProxyRate(proxy.symbol).catch(() => null);
+  if (!fxPrice || !isFinite(fxPrice) || fxPrice <= 0) {
+    return assertCrossPairScale(key, crossPrice, xauUsdPrice);
+  }
+  const expected = proxy.inverse ? xauUsdPrice * fxPrice : xauUsdPrice / fxPrice;
+  if (!isFinite(expected) || expected <= 0) return assertCrossPairScale(key, crossPrice, xauUsdPrice);
+  const drift = Math.abs(crossPrice - expected) / expected;
+  if (drift > 0.08) {
+    const reason = `price ${crossPrice.toFixed(2)} is ${(drift * 100).toFixed(1)}% away from FX-derived ${expected.toFixed(2)} via ${proxy.symbol}`;
     warnCrossPairScale(key, reason);
     return { ok: false, reason };
   }
@@ -959,7 +977,7 @@ async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick |
     const t = isFinite(tRaw) ? tRaw : Date.now();
 
     // Cross-quote pairs: convert XAU/USD → XAU/<quote> via FX proxy.
-    const proxy = XAU_USD_PROXY[inst.key];
+    const proxy = xauPairConfigForInstrument(inst.key)?.usdProxy;
     if (proxy) {
       const fxPrice = await fetchFxProxyRate(proxy.symbol).catch(() => null);
       if (fxPrice == null || !isFinite(fxPrice) || fxPrice <= 0) {
@@ -1028,6 +1046,17 @@ async function fetchCoinbaseQuote(symbols: string[]): Promise<LiveTick | null> {
 const tickCache = new Map<string, { at: number; tick: LiveTick }>();
 const TICK_TTL = 2_500;
 
+async function getXauUsdGuardPrice(now: number): Promise<number | null> {
+  const cached = tickCache.get("METAL:XAUUSD")?.tick.price;
+  if (cached && isFinite(cached) && cached > 0) return cached;
+  const q = await fetchMetalSpotQuote(resolveInstrument("XAUUSD")).catch(() => null);
+  if (q?.price && isFinite(q.price) && q.price > 0) {
+    tickCache.set("METAL:XAUUSD", { at: now, tick: q });
+    return q.price;
+  }
+  return null;
+}
+
 async function resolveLiveTick(inst: ResolvedInstrument): Promise<LiveTick | null> {
   const now = Date.now();
   const cached = tickCache.get(inst.key);
@@ -1045,12 +1074,16 @@ async function resolveLiveTick(inst: ResolvedInstrument): Promise<LiveTick | nul
       const q = await f();
       if (q && isFinite(q.price) && q.price > 0) {
         // Second-line guard: any cross-pair tick, from any provider, must
-        // fall within its expected ratio band vs the last known XAU/USD.
+        // fall within its expected ratio band vs XAU/USD. If the cross quote
+        // provider ever leaks raw XAU/USD scale, reject it before caching.
         if (XAU_CROSS_RATIO_BANDS[inst.key]) {
-          const xauUsd = tickCache.get("METAL:XAUUSD")?.tick.price;
+          const xauUsd = await getXauUsdGuardPrice(now);
           if (xauUsd && xauUsd > 0) {
-            const check = assertCrossPairScale(inst.key, q.price, xauUsd);
+            const check = await assertCrossPairFxValue(inst.key, q.price, xauUsd);
             if (!check.ok) continue;
+          } else if (q.price < 10_000 && inst.key === "METAL:XAUJPY") {
+            warnCrossPairScale(inst.key, `XAU/USD guard baseline unavailable; rejecting suspicious quote ${q.price.toFixed(2)}`);
+            continue;
           }
         }
         tickCache.set(inst.key, { at: now, tick: q });
