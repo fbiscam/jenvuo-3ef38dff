@@ -103,20 +103,33 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   const key = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : "XAUUSD");
   const p = XAU_PAIRS[key];
   // Gold spot from gold-api.com covers XAU/USD; cross-quote pairs derive
-  // from XAU/USD × the currency rate at getLiveTick time. Yahoo XAUEUR=X
-  // etc. are kept as candle fallbacks so structure analysis still runs.
+  // from XAU/USD × the currency rate at getLiveTick time. Yahoo cross-pair
+  // (XAUEUR=X, etc.) is kept as a fallback for both quote and candles.
+  // Do NOT include XAUUSD=X / GC=F in yahooSymbols for cross-pairs —
+  // fetchYahooQuote would silently return USD-scale prices otherwise.
+  const yahooSymbols = key === "XAUUSD" ? [p.yahoo, "GC=F"] : [p.yahoo];
   return {
     raw: raw || key,
     key: `METAL:${key}`,
     display: p.display,
     kind: "metal",
     decimals: p.decimals,
-    yahooSymbols: [p.yahoo, "XAUUSD=X", "GC=F"],
-    binanceSymbols: ["PAXGUSDT", "XAUTUSDT"],
+    yahooSymbols,
+    binanceSymbols: key === "XAUUSD" ? ["PAXGUSDT", "XAUTUSDT"] : undefined,
     quote: p.quote,
     needsUsdNews: true,
   };
 }
+
+// Lookup XAU/USD → cross conversion for cross-quote pairs.
+const XAU_USD_PROXY: Record<string, { symbol: string; inverse: boolean }> = {
+  "METAL:XAUEUR": { symbol: "EURUSD=X", inverse: false },
+  "METAL:XAUGBP": { symbol: "GBPUSD=X", inverse: false },
+  "METAL:XAUJPY": { symbol: "USDJPY=X", inverse: true },
+  "METAL:XAUAUD": { symbol: "AUDUSD=X", inverse: false },
+  "METAL:XAUCHF": { symbol: "USDCHF=X", inverse: true },
+};
+
 
 function inferInstrumentFromText(text: string): string {
   const q = String(text || "").toUpperCase();
@@ -877,11 +890,28 @@ async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick |
     const p = typeof j?.price === "number" ? j.price : parseFloat(j?.price);
     if (!isFinite(p) || p <= 0) return null;
     const tRaw = j?.updatedAt ? Date.parse(j.updatedAt) : Date.now();
-    return { price: p, t: isFinite(tRaw) ? tRaw : Date.now() };
+    const t = isFinite(tRaw) ? tRaw : Date.now();
+
+    // Cross-quote pairs: convert XAU/USD → XAU/<quote> via FX proxy.
+    const proxy = XAU_USD_PROXY[inst.key];
+    if (proxy) {
+      const fx = await fetchYahooQuote([proxy.symbol]).catch(() => null);
+      if (!fx || !isFinite(fx.price) || fx.price <= 0) return null;
+      const converted = proxy.inverse ? p * fx.price : p / fx.price;
+      // proxy.inverse=true means symbol is USD<quote> (e.g. USDJPY) —
+      //   XAU/JPY = XAU/USD × USD/JPY
+      // proxy.inverse=false means symbol is <quote>USD (e.g. EURUSD) —
+      //   XAU/EUR = XAU/USD ÷ EUR/USD
+      if (!isFinite(converted) || converted <= 0) return null;
+      return { price: converted, t };
+    }
+
+    return { price: p, t };
   } catch {
     return null;
   }
 }
+
 
 // Real-time FX spot fallback when Yahoo 429s. exchangerate-api mirrors the
 // interbank mid-rate closely enough for entry/SL/TP snapping on major pairs.
