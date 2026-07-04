@@ -257,7 +257,7 @@ function KillzonesPage() {
           <div className={`${MONO} text-[10px] tracking-[0.2em] uppercase text-zinc-500 mb-2`}>
             // Killzone Reference
           </div>
-          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight">
+          <h1 className="text-[19px] sm:text-4xl font-semibold tracking-tight whitespace-nowrap sm:whitespace-normal">
             Every pair. Every killzone. Live.
           </h1>
           <p className="text-sm sm:text-[15px] text-zinc-600 mt-2 max-w-2xl">
