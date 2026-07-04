@@ -1507,7 +1507,9 @@ STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - News veto: if a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, direction="WAIT", confidence ≤ 50, call out the news title in summary and invalidation.
 - Quality gate: only issue BUY/SELL if HTF and LTF are aligned AND a fresh unmitigated OB or FVG is present in the direction of the trade AND liquidity is sitting on the other side of entry. Otherwise direction="WAIT", confidence ≤ 55, and summary MUST list the specific missing confluence (e.g. "HTF bullish but no unmitigated LTF demand").
 - Language: professional English only — no Hindi/Urdu/Roman Urdu, no emojis, no hedging fluff ("maybe", "possibly", "could be"). Speak like a 25-year desk head.
-- Output: return ONLY the JSON object above. No prose, no markdown fences, no trailing commentary.
+- Output: return ONLY the JSON object above. No prose, no markdown fences, no trailing commentary.`;
+
+
 
     const user = `LIVE ${inst.display} CANDLES (unix-seconds | O,H,L,C)
 INSTRUMENT: ${inst.display} (${inst.kind})
