@@ -1387,6 +1387,9 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
     }
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
+    // Trimmed slices sent to the AI prompt — full arrays remain for engine math.
+    const htfPrompt = htf.slice(-90);
+    const ltfPrompt = ltf.slice(-110);
     const last = ltf[ltf.length - 1];
     // Prefer real-time tick over last-candle close for all downstream analysis.
     const livePrice = liveTick?.price && isFinite(liveTick.price) ? liveTick.price : last.c;
@@ -1522,11 +1525,11 @@ UPCOMING MACRO/NEWS (next 4h):
 ${newsBlock}
 ${imminentHigh && inst.needsUsdNews ? `\n⚠ HIGH IMPACT EVENT WITHIN 60 MIN: ${imminentHigh.title} in ${imminentHigh.minutesUntil}m — recommend WAIT.` : ""}
 
-=== HTF (1 HOUR, last ${htf.length} candles) ===
-${fmt(htf)}
+=== HTF (1 HOUR, last ${htfPrompt.length} candles) ===
+${fmt(htfPrompt)}
 
-=== LTF (15 MIN, last ${ltf.length} candles) ===
-${fmt(ltf)}
+=== LTF (15 MIN, last ${ltfPrompt.length} candles) ===
+${fmt(ltfPrompt)}
 
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
