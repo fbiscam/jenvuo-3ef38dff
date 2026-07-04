@@ -1784,7 +1784,7 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
               { role: "user", content: reviewUser },
             ],
             response_format: { type: "json_object" },
-            max_tokens: 400,
+            max_completion_tokens: 400,
           }),
           signal: reviewController.signal,
         }).finally(() => clearTimeout(reviewTimeout));
