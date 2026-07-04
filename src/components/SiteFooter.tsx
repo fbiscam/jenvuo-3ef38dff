@@ -91,6 +91,7 @@ export default function SiteFooter() {
             <div key={col.label} className="space-y-3">
               <div
                 className={`${MONO} text-xs font-bold uppercase tracking-[0.25em] text-zinc-700`}
+              >
               
                 {col.label}
               </div>
