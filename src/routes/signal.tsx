@@ -432,6 +432,21 @@ function SignalPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan?.instrument.symbol]);
 
+  /* ---------- BACKTEST STATS (per plan) ---------- */
+  const fetchBacktest = useServerFn(getBacktestStats);
+  const [backtest, setBacktest] = useState<BacktestStats | null>(null);
+  useEffect(() => {
+    if (!plan) { setBacktest(null); return; }
+    const dir = plan.trade.direction;
+    if (dir !== "BUY" && dir !== "SELL") { setBacktest(null); return; }
+    let cancelled = false;
+    fetchBacktest({ data: { pair: plan.instrument.symbol, direction: dir } })
+      .then((r) => { if (!cancelled) setBacktest(r); })
+      .catch(() => { if (!cancelled) setBacktest(null); });
+    return () => { cancelled = true; };
+  }, [plan?.instrument.symbol, plan?.trade.direction, fetchBacktest]);
+
+
 
 
   /* ---------- LIVE TRADE TRACKER (streaming) ---------- */
