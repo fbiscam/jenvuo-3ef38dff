@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import CreditsPill from "@/components/CreditsPill";
@@ -6,14 +7,15 @@ import CreditsPill from "@/components/CreditsPill";
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
 export default function HeaderAuthButtons() {
-  const { user, loading } = useAuthUser();
+  const { user } = useAuthUser();
+  // Avoid SSR/CSR hydration mismatch: server has no localStorage, so it
+  // always renders the signed-out UI. Only reveal the signed-in variant
+  // after the client has mounted.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  // If we still don't know auth state (e.g. SSR / no localStorage), reserve space.
-  if (loading && !user) {
-    // Render the signed-out buttons by default so they appear instantly.
-  }
+  if (mounted && user) {
 
-  if (user) {
     return (
       <div className="flex shrink-0 items-center gap-2">
         
