@@ -978,8 +978,7 @@ function SignalPage() {
                   {/* Backtest history badge */}
                   {(isBuy || isSell) && backtest && <BacktestBadge stats={backtest} />}
 
-                  {/* Historical engine backtest */}
-                  <HistoricalBacktestPanel symbol={plan?.instrument?.symbol ?? symbol ?? "XAUUSD"} />
+
 
 
 
@@ -1120,6 +1119,13 @@ function SignalPage() {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Historical engine backtest — always available when a plan is loaded */}
+              {plan && (
+                <div className="rounded-lg border border-zinc-200 bg-white p-3">
+                  <HistoricalBacktestPanel symbol={plan.instrument.symbol} />
                 </div>
               )}
 
