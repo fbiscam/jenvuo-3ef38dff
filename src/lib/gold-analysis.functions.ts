@@ -654,6 +654,28 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
     return { ...signal, __billable: "chat" };
 }
 
+// ------------------------------------------------------------
+// Signal lock: within a 20-min window and while price hasn't broken the
+// invalidation (stop loss) level, re-analyze returns the same signal —
+// no flip-flop, no extra credit charge. Prevents users from taking a
+// BUY, re-analyzing 30s later, seeing SELL, and closing at a loss.
+// ------------------------------------------------------------
+type SignalLockEntry = {
+  signal: GoldSignal;
+  expiresAt: number;
+  direction: "BUY" | "SELL";
+  entryPx: number;
+  slPx: number;
+};
+const SIGNAL_LOCK_TTL_MS = 20 * 60 * 1000;
+const signalLockCache = new Map<string, SignalLockEntry>();
+
+function parsePx(s: string | undefined): number {
+  if (!s) return NaN;
+  const n = Number(String(s).replace(/[^\d.\-]/g, ""));
+  return isFinite(n) ? n : NaN;
+}
+
 export const analyzeGold = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { timeframe: string; query: string }) => ({
@@ -661,6 +683,38 @@ export const analyzeGold = createServerFn({ method: "POST" })
     query: String(d?.query || "Give me the best A+ setup right now"),
   }))
   .handler(async ({ data, context }) => {
+    const lockKey = `${context.userId}::${data.timeframe}`;
+    const now = Date.now();
+    const cached = signalLockCache.get(lockKey);
+
+    if (cached && cached.expiresAt > now) {
+      // Check invalidation against live price before serving cached signal.
+      try {
+        const inst = resolveInstrument("XAUUSD");
+        const tick = await resolveLiveTick(inst);
+        const px = tick?.price;
+        const invalidated =
+          typeof px === "number" && isFinite(px) &&
+          ((cached.direction === "BUY" && px <= cached.slPx) ||
+           (cached.direction === "SELL" && px >= cached.slPx));
+
+        if (!invalidated) {
+          const minsLeft = Math.max(1, Math.round((cached.expiresAt - now) / 60000));
+          const lockedNote = `\n\n🔒 Signal locked — this ${cached.direction} setup stays active for ~${minsLeft} more min or until price ${cached.direction === "BUY" ? "breaks below" : "breaks above"} ${cached.slPx}. Re-analyze free while locked; no flip-flop.`;
+          return {
+            ...cached.signal,
+            currentPrice: typeof px === "number" && isFinite(px) ? px : cached.signal.currentPrice,
+            fullAnalysis: (cached.signal.fullAnalysis || "") + lockedNote,
+          } as GoldSignal;
+        }
+        // invalidated → release and compute fresh
+        signalLockCache.delete(lockKey);
+      } catch {
+        // if live tick fails, still serve cache (don't punish the user)
+        return cached.signal;
+      }
+    }
+
     // Compute first, then charge based on what was actually returned:
     // - trading setup (entry/SL/TP) → 2 credits (signal cost)
     // - conversational reply → 1 credit (chat cost)
@@ -670,8 +724,25 @@ export const analyzeGold = createServerFn({ method: "POST" })
     // Strip internal billing marker before returning to the client.
     const { __billable, ...clean } = result;
     void __billable;
+
+    // Cache actionable signals (BUY/SELL with real entry+SL)
+    if (__billable === "signal" && (clean.direction === "BUY" || clean.direction === "SELL")) {
+      const entryPx = parsePx(clean.entry);
+      const slPx = parsePx(clean.stopLoss);
+      if (isFinite(entryPx) && isFinite(slPx)) {
+        signalLockCache.set(lockKey, {
+          signal: clean as GoldSignal,
+          expiresAt: now + SIGNAL_LOCK_TTL_MS,
+          direction: clean.direction,
+          entryPx,
+          slPx,
+        });
+      }
+    }
+
     return clean as GoldSignal;
   });
+
 
 
 // ============================================================
