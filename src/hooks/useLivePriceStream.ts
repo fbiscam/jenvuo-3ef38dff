@@ -26,9 +26,11 @@ export function useLivePriceStream(
   symbol: string | undefined,
   seedPrice: number | null,
   onTick?: LiveTickHandler,
+  opts?: { intervalMs?: number },
 ) {
   const [price, setPrice] = useState<number | null>(seedPrice ?? null);
   const fetchTick = useServerFn(getLiveTick);
+  const intervalMs = opts?.intervalMs ?? 1500;
 
   const targetRef = useRef<number | null>(seedPrice ?? null);
   const displayRef = useRef<number | null>(seedPrice ?? null);
@@ -47,12 +49,13 @@ export function useLivePriceStream(
     targetRef.current = null;
     displayRef.current = null;
 
+    const isHidden = () =>
+      typeof document !== "undefined" && document.visibilityState === "hidden";
+
     const pushTick = (p: number, tMs: number) => {
       if (!Number.isFinite(p)) return;
       const prev = displayRef.current;
       targetRef.current = p;
-      // Snap (skip smoothing) on first tick or on large jumps (>0.25%) so the
-      // header stays visibly in sync with the market instead of easing behind.
       if (prev == null || Math.abs(p - prev) / p > 0.0025) {
         displayRef.current = p;
         setPrice(p);
@@ -60,9 +63,10 @@ export function useLivePriceStream(
       onTickRef.current?.(p, tMs);
     };
 
-    const startPolling = (intervalMs: number) => {
+    const startPolling = (ms: number) => {
       if (pollId) return;
       const tick = async () => {
+        if (isHidden()) return; // skip work when tab is backgrounded
         try {
           const t = await fetchTick({ data: { symbol } });
           if (stopped || !t) return;
@@ -70,7 +74,7 @@ export function useLivePriceStream(
         } catch { /* keep last */ }
       };
       void tick();
-      pollId = setInterval(tick, intervalMs);
+      pollId = setInterval(tick, ms);
     };
 
     const stream = binanceStreamFor(symbol);
@@ -87,22 +91,32 @@ export function useLivePriceStream(
           } catch { /* ignore */ }
         };
         ws.onerror = () => { /* fall through to onclose */ };
-        ws.onclose = () => { if (!stopped) startPolling(1500); };
-        // Watchdog: if no tick lands within 4s (accepted subscription but silent
-        // stream), start polling in parallel so the header keeps moving.
-        firstTickTimer = setTimeout(() => { if (!stopped) startPolling(1500); }, 4000);
+        ws.onclose = () => { if (!stopped) startPolling(intervalMs); };
+        firstTickTimer = setTimeout(() => { if (!stopped) startPolling(intervalMs); }, 4000);
       } catch {
-        startPolling(1500);
+        startPolling(intervalMs);
       }
     } else {
-      // Non-crypto (forex / metals / indices / stocks): poll fast (1s) so the
-      // ticker feels live rather than lagging behind broker prices.
-      startPolling(1000);
+      startPolling(intervalMs);
     }
 
+    // Re-fetch immediately when the tab becomes visible again so the price
+    // isn't stale after a long backgrounding.
+    const onVis = () => {
+      if (stopped || isHidden()) return;
+      void (async () => {
+        try {
+          const t = await fetchTick({ data: { symbol } });
+          if (!stopped && t) pushTick(t.price, typeof t.t === "number" ? t.t : Date.now());
+        } catch { /* ignore */ }
+      })();
+    };
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", onVis);
+    }
 
-    // RAF smoother — lerp displayed price toward target each frame for small
-    // moves. Large jumps are snapped in pushTick above.
+    // RAF smoother — pauses automatically when tab is hidden (browsers throttle
+    // rAF to ~0), and we early-out when nothing changed.
     const loop = () => {
       if (stopped) return;
       const target = targetRef.current;
@@ -110,7 +124,6 @@ export function useLivePriceStream(
       if (target != null && cur != null) {
         const diff = target - cur;
         if (Math.abs(diff) > Math.abs(target) * 1e-7) {
-          // Faster catch-up (was 0.2) so display doesn't visibly lag ticks.
           const next = cur + diff * 0.5;
           const settled = Math.abs(target - next) < Math.abs(target) * 1e-6;
           displayRef.current = settled ? target : next;
@@ -127,11 +140,15 @@ export function useLivePriceStream(
       if (ws) { try { ws.close(); } catch { /* ignore */ } }
       if (pollId) clearInterval(pollId);
       if (raf != null) cancelAnimationFrame(raf);
+      if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", onVis);
+      }
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [symbol]);
+  }, [symbol, intervalMs]);
 
 
   return price;
 }
+
