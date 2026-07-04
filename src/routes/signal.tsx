@@ -1460,10 +1460,10 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
         {checks.map((c) => (
           <div
             key={c.key}
-            className={`text-[8px] ${MONO} text-zinc-500 text-center leading-tight uppercase tracking-wider truncate`}
+            className={`text-[8px] ${MONO} text-zinc-800 font-semibold text-center leading-tight uppercase tracking-wider break-words`}
             title={c.label}
           >
-            {c.label.split(" ")[0]}
+            {c.label}
           </div>
         ))}
       </div>
