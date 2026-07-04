@@ -15,25 +15,33 @@ import type { Plugin } from "vite";
 function serverFnManifestRegen(): Plugin {
   const isServerFnFile = (file: string) => /\.functions\.tsx?$/.test(file);
   let restarting = false;
+  let pending: NodeJS.Timeout | null = null;
   return {
     name: "lovable:serverfn-manifest-regen",
     apply: "serve",
     configureServer(server) {
       const trigger = (file: string, kind: string) => {
         if (!isServerFnFile(file) || restarting) return;
-        restarting = true;
-        server.config.logger.info(
-          `[serverfn-manifest-regen] ${kind} ${file} — restarting dev server to refresh manifest`,
-        );
-        server.restart().finally(() => {
-          restarting = false;
-        });
+        if (pending) clearTimeout(pending);
+        // Debounce so a burst of edits/saves only produces one restart.
+        pending = setTimeout(() => {
+          pending = null;
+          restarting = true;
+          server.config.logger.info(
+            `[serverfn-manifest-regen] ${kind} ${file} — restarting dev server to refresh manifest`,
+          );
+          server.restart().finally(() => {
+            restarting = false;
+          });
+        }, 400);
       };
+      // Restart on add/unlink AND change — adding/removing a `createServerFn`
+      // export inside an existing file is an edit, not a new file, but it still
+      // invalidates the server-fn manifest and causes "Invalid server function
+      // ID" 500s on next call until the dev server restarts.
       server.watcher.on("add", (f) => trigger(f, "added"));
       server.watcher.on("unlink", (f) => trigger(f, "removed"));
-      // Note: plain edits to an existing *.functions.ts file don't change the manifest
-      // (same set of exported server fns), so we only restart on add/unlink to avoid
-      // reload churn during normal editing.
+      server.watcher.on("change", (f) => trigger(f, "changed"));
     },
   };
 }
