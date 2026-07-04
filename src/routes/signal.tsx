@@ -645,6 +645,9 @@ function SignalPage() {
                   try { speech.stopSpeaking(); } catch {}
                   setPlaying(false);
                   setActiveTf(null);
+                  setPlan(null);
+                  setLoading(true);
+                  setStep(-1);
                   navigate({ to: "/signal", search: { symbol: p }, replace: true });
                 }}
                 className={cn(
