@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as React from "react";
 import { toast } from "sonner";
-import { Mic, X, Plus, Sliders, Moon, Sun, LogOut, ArrowUp } from "lucide-react";
+import { Mic, X, Plus, Sliders, LogOut, ArrowUp } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { SignalCard } from "@/components/SignalCard";
