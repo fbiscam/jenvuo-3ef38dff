@@ -946,6 +946,12 @@ function SignalPage() {
                     />
                   </div>
 
+                  {/* Position sizing calculator */}
+                  {(isBuy || isSell) && (t.confidence ?? 0) >= 60 && (
+                    <PositionSizer plan={plan} />
+                  )}
+
+
                   {/* Take Trade / Save Signal */}
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
