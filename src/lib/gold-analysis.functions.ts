@@ -1537,7 +1537,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3.5-flash",
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
@@ -1777,7 +1777,7 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: "google/gemini-3.5-flash",
             messages: [
               { role: "system", content: reviewSystem },
               { role: "user", content: reviewUser },
