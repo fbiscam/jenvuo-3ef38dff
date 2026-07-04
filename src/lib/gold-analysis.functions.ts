@@ -962,13 +962,14 @@ async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick |
     const proxy = XAU_USD_PROXY[inst.key];
     if (proxy) {
       const fxPrice = await fetchFxProxyRate(proxy.symbol).catch(() => null);
-      if (fxPrice == null || !isFinite(fxPrice) || fxPrice <= 0) return null;
+      if (fxPrice == null || !isFinite(fxPrice) || fxPrice <= 0) {
+        warnCrossPairScale(inst.key, `FX proxy ${proxy.symbol} unavailable — refusing to fall back to raw XAU/USD ${p.toFixed(2)}`);
+        return null;
+      }
       const converted = proxy.inverse ? p * fxPrice : p / fxPrice;
-      // proxy.inverse=true means symbol is USD<quote> (e.g. USDJPY) —
-      //   XAU/JPY = XAU/USD × USD/JPY
-      // proxy.inverse=false means symbol is <quote>USD (e.g. EURUSD) —
-      //   XAU/EUR = XAU/USD ÷ EUR/USD
       if (!isFinite(converted) || converted <= 0) return null;
+      const check = assertCrossPairScale(inst.key, converted, p);
+      if (!check.ok) return null;
       return { price: converted, t };
     }
 
