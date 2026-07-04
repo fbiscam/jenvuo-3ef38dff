@@ -1537,7 +1537,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: "google/gemini-3.5-flash",
+        model: "google/gemini-3.1-pro-preview",
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
