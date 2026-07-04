@@ -62,29 +62,22 @@ function serverFnManifestRegen(): Plugin {
     name: "lovable:serverfn-manifest-regen",
     apply: "serve",
     configureServer(server) {
-      // Warm-load once the server is ready (and again after each restart —
-      // configureServer runs fresh on restart).
       server.httpServer?.once("listening", () => { void warmLoad(server); });
-
-      const trigger = (file: string, kind: string) => {
-        if (!isServerFnFile(file)) return;
-        server.config.logger.info(
-          `[serverfn-manifest-regen] ${kind} event for ${file} (restarting=${restarting})`,
+    },
+    // handleHotUpdate fires on every file change Vite watches (across all
+    // environments), unlike `server.watcher` which in Vite 7 only surfaces a
+    // subset. This is the reliable place to notice server-fn edits.
+    async handleHotUpdate(ctx) {
+      if (!isServerFnFile(ctx.file) || restarting) return;
+      if (pending) clearTimeout(pending);
+      pending = setTimeout(() => {
+        pending = null;
+        restarting = true;
+        ctx.server.config.logger.info(
+          `[serverfn-manifest-regen] server-fn file changed (${ctx.file}) — restarting to refresh manifest`,
         );
-        if (restarting) return;
-        if (pending) clearTimeout(pending);
-        pending = setTimeout(() => {
-          pending = null;
-          restarting = true;
-          server.config.logger.info(
-            `[serverfn-manifest-regen] restarting dev server (trigger: ${kind} ${file})`,
-          );
-          server.restart().finally(() => { restarting = false; });
-        }, 400);
-      };
-      server.watcher.on("add", (f) => trigger(f, "added"));
-      server.watcher.on("unlink", (f) => trigger(f, "removed"));
-      server.watcher.on("change", (f) => trigger(f, "changed"));
+        ctx.server.restart().finally(() => { restarting = false; });
+      }, 400);
     },
   };
 }
