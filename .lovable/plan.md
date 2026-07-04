@@ -1,36 +1,54 @@
-## Plan: Refund Policy + Cancellation Policy pages
+## Problem
 
-Style will match existing legal pages (`/terms`, `/privacy`, `/disclaimer`) using the shared `PageShell`, `H2`, `P`, `UL` components — clean white minimal look, consistent typography, no new theme.
+Cross gold pairs (XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD, XAU/CHF) don't get the same analysis quality as XAU/USD:
 
-### 1. New route: `src/routes/refund.tsx` → `/refund`
-`PageShell` with eyebrow "Legal", title "Refund Policy". Sections:
-- **1. Overview** — Digital service; refunds limited by nature of credits/AI usage.
-- **2. No refunds after credits are used** *(key rule)* — Once any credits from a top-up or plan upgrade have been consumed (voice minutes, signals, AI queries, etc.), that payment becomes non-refundable — even if only a portion was used. Unused credits also do not carry a cash value.
-- **3. Plan upgrades** — Upgrade charges are non-refundable once the upgraded tier is activated and any of its credits/benefits have been accessed.
-- **4. Top-ups** — Credit top-ups are non-refundable once any credit from that top-up has been used. Fully unused top-ups may be refunded within 7 days of purchase at our discretion.
-- **5. Duplicate / accidental charges** — Refunded within 7 days if reported before use.
-- **6. Failed / undelivered service** — If we fail to deliver a paid feature due to our fault, we refund pro-rata or credit the account.
-- **7. Statutory rights** — Nothing limits mandatory consumer rights in your jurisdiction.
-- **8. How to request** — Email `support@jenvu.com` with order ID within 7 days.
+- **Candles** — For cross pairs we only try Yahoo (`XAUEUR=X`, `XAUGBP=X`, …). Yahoo cross-pair endpoints are flaky / heavily rate-limited, so `fetchInstrumentCandles` frequently falls through to **synthetic candles** (`buildSyntheticCandles`). Synthetic = fake wave data → HTF/LTF bias, BOS/CHOCH, FVG, killzone, structure quality, confluences all become garbage. This is exactly the "sidebar data galat" symptom.
+- **Live tick header freeze** — Cross-pair tick relies on gold-api.com spot × Yahoo FX proxy. When Yahoo FX (`EURUSD=X`, etc.) 429s, `fetchFxProxyRate` returns null and `fetchMetalSpotQuote` returns null → `resolveLiveTick` yields nothing new → header freezes on the seed price.
+- **XAU/USD works** because it has two strong sources (`gold-api.com` for tick, `XAUUSD=X` + `GC=F` for candles).
 
-### 2. New route: `src/routes/cancellation.tsx` → `/cancellation`
-`PageShell` with eyebrow "Legal", title "Cancellation Policy". Sections:
-- **1. Cancel anytime** — From Dashboard → Billing, or by emailing support.
-- **2. When it takes effect** — End of current billing period; access continues until then.
-- **3. No pro-rata refund** — Consistent with Refund Policy; unused days are not refunded.
-- **4. Auto-renewal** — Subscriptions renew automatically until cancelled.
-- **5. Downgrades** — Take effect next billing cycle; unused higher-tier credits are forfeited.
-- **6. Account deletion** — Separate from cancellation; see Privacy Policy.
-- **7. Contact** — `support@jenvu.com`.
+## Fix — derive cross-pair data from XAU/USD, not from flaky cross-pair endpoints
 
-Each route gets its own `head()` with unique title, description, og:title, og:url, canonical.
+### 1. Cross-pair candles: synthesize from real XAU/USD × FX proxy candle series
 
-### 3. Footer update: `src/components/SiteFooter.tsx`
-Add two links to the **Legal** column:
-- `/refund` — "Refund Policy"
-- `/cancellation` — "Cancellation Policy"
+Update `fetchInstrumentCandles` in `src/lib/gold-analysis.functions.ts` so that when the instrument is a XAU cross pair (has `usdProxy`), we build the candle series from two reliable Yahoo feeds we already trust:
 
-### Technical notes
-- TanStack Start file-based routing; `createFileRoute("/refund")` and `createFileRoute("/cancellation")`.
-- Reuses `PageShell`/`H2`/`P`/`UL` from `@/components/PageShell` — no new components, no new CSS.
-- No backend, no auth, no dependencies.
+- Fetch `XAUUSD=X` **and** `GC=F` candles (whichever wins first, same as XAU/USD path).
+- Fetch the FX proxy candles (`EURUSD=X`, `GBPUSD=X`, `USDJPY=X`, `AUDUSD=X`, `USDCHF=X`) on the same timeframe.
+- Align by timestamp bucket (round to TF step) and per bar compute:
+  `xauQuote = proxy.inverse ? xauUsd * fx : xauUsd / fx` for o/h/l/c.
+- If either series is missing / <10 bars, try the direct Yahoo cross-pair symbol (existing behavior) as a secondary fallback.
+- Only fall through to `buildSyntheticCandles` if **both** paths fail. Log/mark synthetic as before.
+
+XAU/USD path stays unchanged.
+
+### 2. FX proxy rate — add a spot-quote fallback so live tick never freezes
+
+`fetchFxProxyRate` currently only reads Yahoo. Add fallbacks so cross-pair tick keeps ticking when Yahoo 429s:
+
+- Try Yahoo (`EURUSD=X` etc.) as today.
+- Then try `open.er-api.com/v6/latest/<BASE>` (already used by `fetchFxSpotQuote`) — extract the correct rate for base/quote and invert when needed.
+- Cache the FX rate for ~2s (same style as `tickCache`) so bursts don't hammer either provider.
+
+This makes `fetchMetalSpotQuote` for cross pairs and the runtime `assertCrossPairFxValue` guard both resilient.
+
+### 3. Keep guards but don't kill the tick
+
+The `assertCrossPairScale` / `assertCrossPairFxValue` sanity checks stay — they're what protects XAU/JPY from ever showing XAU/USD scale. No change needed once the FX proxy is reliable; the guard will pass because our converted value is derived from XAU/USD × real FX.
+
+### 4. No UI changes required
+
+`SignalChart`, sidebar `setupChecks`, `confluences`, `htfCandles`/`ltfCandles`, `useLivePriceStream` all consume the server output — once real candles + real ticks flow for cross pairs, the sidebar automatically matches XAU/USD quality.
+
+## Files touched
+
+- `src/lib/gold-analysis.functions.ts`
+  - New helper `fetchCrossPairCandlesFromProxy(inst, tf)` that pulls XAU/USD candles + FX proxy candles and reduces them to XAU/quote OHLC.
+  - `fetchInstrumentCandles` — prepend the proxy-derived path for any instrument whose config has `usdProxy`, keep Yahoo cross-pair symbol as secondary, synthetic as last resort.
+  - `fetchFxProxyRate` — add er-api.com fallback + short cache.
+
+No route, no component, no schema changes. XAU/USD flow untouched.
+
+## Validation
+
+- Load `/signal?symbol=XAUEUR`, `XAUGBP`, `XAUJPY`, `XAUAUD`, `XAUCHF` — chart HTF/LTF should show real market candles (not smooth sine wave), price header should tick every ~1.5s, sidebar setup checks / confluences / structure quality / killzone should populate the same way XAU/USD does.
+- Re-check `/signal?symbol=XAUUSD` still works unchanged.
