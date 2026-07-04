@@ -1383,42 +1383,51 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
       </div>
 
       {/* Score row: ring + progress bar */}
-      <div className="flex items-center gap-3 mb-3.5">
-        {/* Score dial — monochrome */}
+      <div className="relative flex items-center gap-4 mb-3.5 rounded-xl border border-zinc-200 bg-gradient-to-br from-white via-zinc-50/60 to-white px-3.5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+        {/* Score dial */}
         <div className="relative shrink-0">
-          <svg viewBox="0 0 44 44" className="h-14 w-14 -rotate-90">
-            <circle cx="22" cy="22" r="18" strokeWidth="3.5" className="stroke-zinc-100" fill="none" />
+          <svg viewBox="0 0 44 44" className="h-16 w-16 -rotate-90 drop-shadow-sm">
+            <defs>
+              <linearGradient id="dialGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#18181b" />
+                <stop offset="100%" stopColor="#52525b" />
+              </linearGradient>
+            </defs>
+            <circle cx="22" cy="22" r="18" strokeWidth="4" className="stroke-zinc-100" fill="none" />
             <motion.circle
-              cx="22" cy="22" r="18" strokeWidth="3.5" fill="none" strokeLinecap="round"
-              className="stroke-zinc-900"
+              cx="22" cy="22" r="18" strokeWidth="4" fill="none" strokeLinecap="round"
+              stroke="url(#dialGrad)"
               strokeDasharray={2 * Math.PI * 18}
               initial={{ strokeDashoffset: 2 * Math.PI * 18 }}
               animate={{ strokeDashoffset: 2 * Math.PI * 18 * (1 - pct / 100) }}
-              transition={{ duration: 0.9, ease: "easeOut" }}
+              transition={{ duration: 1, ease: "easeOut" }}
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={`text-[13px] font-bold tabular-nums text-zinc-900 leading-none ${MONO}`}>
+            <span className={`text-[14px] font-bold tabular-nums text-zinc-900 leading-none ${MONO}`}>
               {passed}<span className="text-zinc-300">/{total}</span>
             </span>
-            <span className={`text-[8px] ${MONO} tracking-widest text-zinc-400 mt-0.5`}>{pct}%</span>
+            <span className={`text-[8px] ${MONO} tracking-widest text-zinc-500 mt-0.5 font-semibold`}>{pct}%</span>
           </div>
         </div>
         {/* Progress rail */}
         <div className="flex-1 min-w-0">
-          <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-500 mb-1.5`}>Setup Strength</div>
-          <div className="relative h-1.5 rounded-full bg-zinc-100 overflow-hidden">
+          <div className="flex items-center justify-between mb-2">
+            <span className={`text-[9px] ${MONO} tracking-[0.2em] uppercase text-zinc-700 font-semibold`}>Setup Strength</span>
+            <span className={`text-[9px] ${MONO} tabular-nums text-zinc-500`}>{pct}%</span>
+          </div>
+          <div className="relative h-2 rounded-full bg-zinc-100 overflow-hidden ring-1 ring-inset ring-zinc-200/60">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${pct}%` }}
-              transition={{ duration: 0.9, ease: "easeOut" }}
-              className="absolute inset-y-0 left-0 rounded-full bg-zinc-900"
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-700 shadow-[0_0_8px_rgba(0,0,0,0.25)]"
             />
           </div>
           {/* Tick scale */}
           <div className="mt-1.5 flex justify-between">
             {Array.from({ length: 11 }).map((_, i) => (
-              <span key={i} className={cn("h-1 w-px", i % 5 === 0 ? "bg-zinc-400" : "bg-zinc-200")} />
+              <span key={i} className={cn("w-px", i % 5 === 0 ? "h-1.5 bg-zinc-500" : "h-1 bg-zinc-300")} />
             ))}
           </div>
         </div>
