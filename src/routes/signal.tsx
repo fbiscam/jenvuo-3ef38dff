@@ -1316,6 +1316,198 @@ function TfPill({ tfBias }: { tfBias: SignalPlan["multiTf"][number] }) {
   );
 }
 
+// -------------------- Confluence Heatmap --------------------
+function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
+  const checks = plan.setupChecks.slice(0, 6);
+  const passed = checks.filter((c) => c.pass === true).length;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-xl border border-zinc-200 bg-white p-3.5 shadow-sm"
+    >
+      <div className="flex items-center justify-between mb-2.5">
+        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+          Confluence Heatmap
+        </span>
+        <span className={`text-[10px] ${MONO} tabular-nums text-zinc-900 font-bold`}>
+          {passed}<span className="text-zinc-400">/{checks.length}</span>
+        </span>
+      </div>
+      <div className="grid grid-cols-6 gap-1.5">
+        {checks.map((c) => {
+          const tone =
+            c.pass === true ? "bg-emerald-500 text-white border-emerald-600"
+            : c.pass === false ? "bg-rose-100 text-rose-600 border-rose-200"
+            : "bg-zinc-100 text-zinc-500 border-zinc-200";
+          const icon = c.pass === true ? "✓" : c.pass === false ? "✕" : "–";
+          return (
+            <div
+              key={c.key}
+              title={`${c.label} — ${c.reason}`}
+              className={cn("aspect-square rounded-md border flex items-center justify-center text-[13px] font-bold", tone)}
+            >
+              {icon}
+            </div>
+          );
+        })}
+      </div>
+      <div className="grid grid-cols-6 gap-1.5 mt-1.5">
+        {checks.map((c) => (
+          <div key={c.key} className="text-[8px] text-zinc-500 text-center leading-tight uppercase tracking-wide truncate" title={c.label}>
+            {c.label.split(" ")[0]}
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+// -------------------- News Countdown Chip --------------------
+function NewsCountdownChip({ plan }: { plan: SignalPlan }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  const next = useMemo(() => {
+    const events = plan.newsRisk.events ?? [];
+    const soon = events
+      .map((e) => ({ ...e, minsUntil: Math.round((new Date(e.date).getTime() - now) / 60000) }))
+      .filter((e) => e.minsUntil >= -5 && e.minsUntil <= 90 && /High/i.test(e.impact))
+      .sort((a, b) => a.minsUntil - b.minsUntil)[0];
+    return soon ?? null;
+  }, [plan.newsRisk.events, now]);
+  if (!next) return null;
+  const isLive = next.minsUntil <= 5 && next.minsUntil >= -5;
+  const label = isLive ? "LIVE NOW" : `in ${next.minsUntil}m`;
+  return (
+    <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 flex items-start gap-2">
+      <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0 mt-0.5" />
+      <div className="min-w-0 flex-1">
+        <div className={`text-[10px] ${MONO} tracking-widest uppercase text-rose-700 font-bold flex items-center justify-between gap-2`}>
+          <span>Red-News Window</span>
+          <span className="tabular-nums">{label}</span>
+        </div>
+        <div className="text-[11px] text-rose-900 leading-snug mt-0.5">
+          <b>{next.title}</b> ({next.country}) — high-impact release {isLive ? "is printing now" : `in ${next.minsUntil} minutes`}. Spreads widen, stops hunt. Prefer to WAIT.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------- Position Sizer --------------------
+type PSizeConfig = { balance: number; riskPct: number };
+const PSIZE_STORAGE = "jenvu.psize.v1";
+
+function loadPSize(): PSizeConfig {
+  if (typeof window === "undefined") return { balance: 1000, riskPct: 1 };
+  try {
+    const raw = window.localStorage.getItem(PSIZE_STORAGE);
+    if (raw) {
+      const p = JSON.parse(raw) as Partial<PSizeConfig>;
+      return {
+        balance: Number.isFinite(p.balance) ? Number(p.balance) : 1000,
+        riskPct: Number.isFinite(p.riskPct) ? Number(p.riskPct) : 1,
+      };
+    }
+  } catch { /* noop */ }
+  return { balance: 1000, riskPct: 1 };
+}
+
+function PositionSizer({ plan }: { plan: SignalPlan }) {
+  const [cfg, setCfg] = useState<PSizeConfig>(loadPSize);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    try { window.localStorage.setItem(PSIZE_STORAGE, JSON.stringify(cfg)); } catch { /* noop */ }
+  }, [cfg]);
+
+  const t = plan.trade;
+  const slDist = Math.abs(t.entry - t.sl);
+  const tpDist = Math.abs(t.tp - t.entry);
+  const riskAmount = (cfg.balance * cfg.riskPct) / 100;
+  const units = slDist > 0 ? riskAmount / slDist : 0;
+  const rewardAmount = units * tpDist;
+
+  const kind = plan.instrument.kind;
+  // Metal 1 standard lot = 100 oz; forex 1 lot = 100,000 units; crypto/stock = 1 unit
+  const perLot = kind === "metal" ? 100 : kind === "forex" ? 100_000 : 1;
+  const lots = units / perLot;
+  const lotLabel =
+    kind === "metal" ? `${lots.toFixed(2)} lots (100 oz)`
+    : kind === "forex" ? `${lots.toFixed(2)} standard lots`
+    : `${units.toFixed(4)} units`;
+
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-gradient-to-br from-white to-zinc-50 p-3.5 shadow-sm">
+      <div className="flex items-center justify-between mb-2.5">
+        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+          Position Sizing
+        </span>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500 hover:text-zinc-900 transition-colors`}
+        >
+          {open ? "Save" : "Edit"}
+        </button>
+      </div>
+
+      {open && (
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <label className="flex flex-col gap-1">
+            <span className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-500`}>Balance ($)</span>
+            <input
+              type="number"
+              min={1}
+              value={cfg.balance}
+              onChange={(e) => setCfg((c) => ({ ...c, balance: Math.max(0, Number(e.target.value) || 0) }))}
+              className="rounded-md border border-zinc-200 px-2 py-1.5 text-[12px] tabular-nums focus:outline-none focus:ring-2 focus:ring-amber-400/30"
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-500`}>Risk %</span>
+            <input
+              type="number"
+              min={0.1}
+              max={10}
+              step={0.1}
+              value={cfg.riskPct}
+              onChange={(e) => setCfg((c) => ({ ...c, riskPct: Math.max(0.1, Math.min(10, Number(e.target.value) || 1)) }))}
+              className="rounded-md border border-zinc-200 px-2 py-1.5 text-[12px] tabular-nums focus:outline-none focus:ring-2 focus:ring-amber-400/30"
+            />
+          </label>
+        </div>
+      )}
+
+      <div className="grid grid-cols-3 gap-px bg-zinc-100 rounded-lg overflow-hidden border border-zinc-100">
+        <div className="bg-white px-2.5 py-2">
+          <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-500`}>Risk</div>
+          <div className={`text-[13px] font-bold tabular-nums ${MONO} text-rose-600 mt-0.5`}>
+            ${riskAmount.toFixed(2)}
+          </div>
+        </div>
+        <div className="bg-white px-2.5 py-2">
+          <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-500`}>Reward</div>
+          <div className={`text-[13px] font-bold tabular-nums ${MONO} text-emerald-600 mt-0.5`}>
+            ${rewardAmount.toFixed(2)}
+          </div>
+        </div>
+        <div className="bg-white px-2.5 py-2">
+          <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-500`}>Size</div>
+          <div className={`text-[13px] font-bold tabular-nums ${MONO} text-zinc-900 mt-0.5`}>
+            {lotLabel}
+          </div>
+        </div>
+      </div>
+      <div className="text-[10px] text-zinc-500 mt-2 leading-snug">
+        {cfg.riskPct}% risk on ${cfg.balance.toLocaleString()} · SL {slDist.toFixed(plan.instrument.decimals)} pts
+      </div>
+    </div>
+  );
+}
+
 function SetupScoreCard({ plan }: { plan: SignalPlan }) {
   const isTop = plan.setupGrade === "A+" || plan.setupGrade === "A";
   const passed = plan.setupChecks.filter((c) => c.pass === true).length;
