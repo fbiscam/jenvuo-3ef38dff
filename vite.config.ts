@@ -6,7 +6,7 @@
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
+
 import type { Plugin, ViteDevServer } from "vite";
 import { promises as fs } from "node:fs";
 import path from "node:path";
@@ -107,6 +107,6 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    plugins: [serverFnManifestRegen(), mcpPlugin()],
+    plugins: [serverFnManifestRegen()],
   },
 });
