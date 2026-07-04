@@ -2303,7 +2303,7 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
         type="button"
         onClick={onRun}
         disabled={loading}
-        className="w-full mt-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-50 px-3 py-2 text-xs font-medium text-white/90 flex items-center justify-center gap-2"
+        className="w-full mt-2 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 disabled:opacity-50 px-3 py-2 text-xs font-medium text-zinc-900 flex items-center justify-center gap-2"
       >
         {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
         {loading ? "Running historical backtest…" : "Run historical backtest (75%+ setups)"}
