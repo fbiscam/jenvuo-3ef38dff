@@ -640,8 +640,12 @@ function SignalPage() {
               <button
                 key={p}
                 onClick={() => {
-                  if (active || loading || playing) return;
-                  navigate({ to: "/signal", search: { symbol: p } });
+                  if (active) return;
+                  abortRef.current = true;
+                  try { speech.stopSpeaking(); } catch {}
+                  setPlaying(false);
+                  setActiveTf(null);
+                  navigate({ to: "/signal", search: { symbol: p }, replace: true });
                 }}
                 className={cn(
                   "shrink-0 h-7 px-2.5 rounded-md text-[11px] font-semibold tracking-wide transition border",
