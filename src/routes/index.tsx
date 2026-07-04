@@ -10,11 +10,11 @@ import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Voice Powered Gold Trading Intelligence" },
+      { title: "Jenvu AI — Voice-Powered Gold Trading Intelligence" },
       {
         name: "description",
         content:
-          "Voice-native AI gold trading desk covering XAU/USD, EUR, GBP, JPY, AUD & CHF. Live ICT/SMC analysis, A+ bullion setups and spoken execution.",
+          "Jenvu AI is a voice-native gold trading desk for XAU/USD, EUR, GBP, JPY, AUD & CHF — live ICT/SMC analysis, A+ setups and spoken execution.",
       },
       { property: "og:title", content: "Voice-Native Gold Trading Intelligence — Jenvu" },
       {
