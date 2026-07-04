@@ -221,7 +221,7 @@ function HomePage() {
               <span className="text-zinc-900">vocalized in real time.</span>
             </h1>
             <p className="mt-5 max-w-3xl text-[13px] leading-relaxed text-zinc-900 sm:text-base md:text-lg lg:mx-0">
-              <span className="sm:hidden">Voice-native gold desk narrating live A+ ICT/SMC setups.</span>
+              <span className="sm:hidden">Voice-native gold desk narrating live A+ ICT/SMC setups across every major XAU cross-pair.</span>
               <span className="hidden sm:inline">A voice-native gold trading terminal powered by 25+ years of ICT &amp; SMC market logic narrating live A+ setups across Gold pairs.</span>
             </p>
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
