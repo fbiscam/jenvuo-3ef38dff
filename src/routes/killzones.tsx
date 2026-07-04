@@ -42,6 +42,16 @@ const META: Record<string, { name: string; category: Category; region: string; f
 
 const CATEGORIES: (Category | "All")[] = ["All", "XAU"];
 
+// Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
+function isMarketOpen(d: Date): boolean {
+  const day = d.getUTCDay();
+  const h = d.getUTCHours();
+  if (day === 6) return false;
+  if (day === 5 && h >= 22) return false;
+  if (day === 0 && h < 22) return false;
+  return true;
+}
+
 function pad(n: number) {
   return n.toString().padStart(2, "0");
 }
