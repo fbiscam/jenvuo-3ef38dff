@@ -1537,7 +1537,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "openai/gpt-5.4",
+        service_tier: "priority",
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
