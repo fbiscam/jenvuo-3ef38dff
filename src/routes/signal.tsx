@@ -1222,24 +1222,24 @@ function SignalPage() {
       </main>
 
       <Dialog open={!!kzDialog} onOpenChange={(o) => { if (!o) setKzDialog(null); }}>
-        <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)]">
-          {/* Accent bar */}
-          <div className="h-1 w-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400" />
-
+        <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)]">
           {/* Tape header */}
           <div className={`flex items-center justify-between px-5 pt-4 pb-3 border-b border-dashed border-zinc-200 ${MONO}`}>
-            <span className="text-[10px] tracking-[0.2em] uppercase text-zinc-500">Killzone · Advisory</span>
-            <span className="text-[10px] tracking-[0.2em] uppercase text-amber-700">Live</span>
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-900 animate-pulse" />
+              <span className="text-[10px] tracking-[0.2em] uppercase text-zinc-500">Killzone · Advisory</span>
+            </div>
+            <span className="text-[10px] tracking-[0.2em] uppercase text-zinc-400">Live</span>
           </div>
 
           <div className="px-5 pt-5 pb-4">
             <DialogHeader className="space-y-0">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 border border-amber-200 text-amber-600">
-                  <AlertTriangle className="h-4.5 w-4.5" />
+                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-900 text-white">
+                  <AlertTriangle className="h-4 w-4" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <DialogTitle className={`text-[15px] font-semibold text-zinc-900 leading-tight ${MONO}`}>
+                  <DialogTitle className={`text-[15px] font-semibold text-zinc-900 leading-tight tracking-tight`}>
                     Outside optimal killzone
                   </DialogTitle>
                   <DialogDescription className="pt-2 text-[13px] text-zinc-600 leading-relaxed">
@@ -1248,34 +1248,36 @@ function SignalPage() {
                 </div>
               </div>
 
-              {/* Detail panel */}
-              <div className={`mt-4 rounded-lg border border-zinc-200 bg-zinc-50/60 px-3 py-2.5 ${MONO}`}>
-                <div className="text-[9px] tracking-[0.2em] uppercase text-zinc-400 mb-1">Only trade</div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[13px] font-semibold text-zinc-900 tabular-nums">{kzDialog?.pair}</span>
-                  <span className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-0.5">
-                    {kzDialog?.kzText}
-                  </span>
+              {/* Detail panel — homepage bento style */}
+              <div className="mt-4 rounded-xl border border-zinc-200 overflow-hidden">
+                <div className={`flex items-center justify-between px-3 py-2 border-b border-dashed border-zinc-200 bg-zinc-50/60 ${MONO}`}>
+                  <span className="text-[9px] tracking-[0.2em] uppercase text-zinc-500">Only trade</span>
+                  <span className="text-[11px] font-semibold text-zinc-900 tabular-nums">{kzDialog?.pair}</span>
+                </div>
+                <div className="px-3 py-2.5 bg-white">
+                  <div className={`text-[9px] ${MONO} tracking-[0.2em] uppercase text-zinc-400 mb-1`}>Session window</div>
+                  <p className="text-[12px] text-zinc-800 leading-snug">{kzDialog?.kzText}</p>
                 </div>
               </div>
             </DialogHeader>
           </div>
 
-          <DialogFooter className={`gap-2 sm:gap-2 px-5 py-3 border-t border-zinc-100 bg-zinc-50/40 ${MONO}`}>
+          <DialogFooter className={`gap-2 sm:gap-2 px-5 py-3 border-t border-zinc-100 bg-white ${MONO}`}>
             <button
               onClick={dismissKzForever}
-              className="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-[11px] font-medium tracking-wider uppercase text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700 transition"
+              className="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-[11px] font-medium tracking-[0.18em] uppercase text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 transition"
             >
               Don't show again
             </button>
             <button
               onClick={() => setKzDialog(null)}
-              className="h-9 px-4 rounded-lg bg-zinc-900 text-white text-[11px] font-semibold tracking-wider uppercase hover:bg-zinc-800 transition shadow-[0_4px_12px_-4px_rgba(0,0,0,0.4)]"
+              className="h-9 px-4 rounded-lg bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] uppercase hover:bg-zinc-800 transition"
             >
               I understand
             </button>
           </DialogFooter>
         </DialogContent>
+
       </Dialog>
     </div>
   );
