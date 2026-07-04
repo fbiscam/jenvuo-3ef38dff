@@ -42,6 +42,16 @@ const META: Record<string, { name: string; category: Category; region: string; f
 
 const CATEGORIES: (Category | "All")[] = ["All", "XAU"];
 
+// Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
+function isMarketOpen(d: Date): boolean {
+  const day = d.getUTCDay();
+  const h = d.getUTCHours();
+  if (day === 6) return false;
+  if (day === 5 && h >= 22) return false;
+  if (day === 0 && h < 22) return false;
+  return true;
+}
+
 function pad(n: number) {
   return n.toString().padStart(2, "0");
 }
@@ -329,6 +339,7 @@ function KillzonesPage() {
                 <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2">
                   {items.map(({ profile, meta }) => {
                     const st = statusFor(profile, now);
+                    const marketOpen = isMarketOpen(now);
                     return (
                       <button
                         key={profile.key}
@@ -353,19 +364,26 @@ function KillzonesPage() {
                           </div>
                           <div
                             className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md ${MONO} text-[10px] uppercase tracking-wider ${
-                              st.inKillzone
-                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                : "bg-zinc-50 text-zinc-600 border border-zinc-200"
+                              !marketOpen
+                                ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                : st.inKillzone
+                                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                  : "bg-zinc-50 text-zinc-600 border border-zinc-200"
                             }`}
                           >
                             <span
                               className={`h-1.5 w-1.5 rounded-full ${
-                                st.inKillzone ? "bg-emerald-500 animate-pulse" : "bg-zinc-400"
+                                !marketOpen
+                                  ? "bg-amber-500"
+                                  : st.inKillzone
+                                    ? "bg-emerald-500 animate-pulse"
+                                    : "bg-zinc-400"
                               }`}
                             />
-                            {st.inKillzone ? "In Killzone" : "Outside"}
+                            {!marketOpen ? "Market Closed" : st.inKillzone ? "In Killzone" : "Outside"}
                           </div>
                         </div>
+
 
                         <div className="mt-3 space-y-1.5">
                           {profile.killzones.map(kz => {
