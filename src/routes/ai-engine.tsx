@@ -19,7 +19,7 @@ function AIPage() {
     <PageShell
       eyebrow="Technology"
       title="The AI Engine"
-      intro="Jenvu is more than a chatbot. It's a multi-stage reasoning pipeline that fuses live market data, institutional concepts, and natural-language synthesis into one fluid agent."
+      intro="More than a chatbot — a multi-stage reasoning pipeline fusing live market data, institutional concepts and natural-language synthesis."
     >
       <section className="space-y-3">
         <H2>Perception Layer</H2>
