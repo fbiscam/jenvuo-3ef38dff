@@ -27,7 +27,7 @@ type Trade = {
   closed_at: string | null;
 };
 
-const EMPTY: Partial<Trade> = { pair: "XAUUSD", direction: "long", outcome: "open" };
+
 
 function Journal() {
   const { features, isLoading } = useCredits();
