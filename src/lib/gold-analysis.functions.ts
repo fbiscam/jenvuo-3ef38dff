@@ -349,13 +349,77 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
   throw lastErr ?? new Error("Coinbase unavailable");
 }
 
+// For XAU cross-pairs (XAU/EUR, GBP, JPY, AUD, CHF), Yahoo's direct
+// XAUEUR=X etc. endpoints are flaky and often 429. Derive real OHLC by
+// fetching XAU/USD candles + the FX proxy candles on the same timeframe,
+// aligning by timestamp bucket, and converting per bar. This gives the
+// cross-pair the same analysis quality as XAU/USD (real BOS/CHOCH/FVG
+// instead of synthetic sine-wave fallback data).
+async function fetchCrossPairCandlesFromProxy(
+  inst: ResolvedInstrument,
+  tf: string,
+): Promise<Candle[]> {
+  const pairKey = inst.key.startsWith("METAL:") ? inst.key.slice("METAL:".length) : inst.key;
+  const cfg = XAU_PAIRS[pairKey];
+  const proxy = cfg?.usdProxy;
+  if (!proxy) throw new Error("no proxy");
+
+  const [xauUsd, fx] = await Promise.all([
+    fetchFromYahooSymbols(["XAUUSD=X", "GC=F"], tf),
+    fetchFromYahooSymbols([proxy.symbol], tf),
+  ]);
+  if (!xauUsd.length || !fx.length) throw new Error("proxy candles empty");
+
+  // Bucket FX by timestamp (rounded to TF step) so we can look up by XAU bar time.
+  const step = TF_MS[tf] ?? TF_MS["15m"];
+  const bucket = (t: number) => Math.floor(t / step) * step;
+  const fxByBucket = new Map<number, Candle>();
+  for (const c of fx) fxByBucket.set(bucket(c.t), c);
+  const sortedFx = [...fx].sort((a, b) => a.t - b.t);
+
+  const findFx = (t: number): Candle | null => {
+    const direct = fxByBucket.get(bucket(t));
+    if (direct) return direct;
+    // Nearest previous FX candle
+    let lo = 0, hi = sortedFx.length - 1, best: Candle | null = null;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (sortedFx[mid].t <= t) { best = sortedFx[mid]; lo = mid + 1; }
+      else hi = mid - 1;
+    }
+    return best;
+  };
+
+  const converted: Candle[] = [];
+  for (const x of xauUsd) {
+    const f = findFx(x.t);
+    if (!f) continue;
+    const conv = (v: number) => (proxy.inverse ? v * f.c : v / f.c);
+    const o = conv(x.o), c = conv(x.c);
+    // Use FX close to convert wicks — good enough at intraday timeframes and
+    // avoids double-counting FX volatility from FX high/low.
+    const h = conv(x.h);
+    const l = conv(x.l);
+    if (![o, h, l, c].every((n) => Number.isFinite(n) && n > 0)) continue;
+    converted.push({ t: x.t, o, h: Math.max(o, h, c), l: Math.min(o, l, c), c, v: 0 });
+  }
+  if (converted.length < 20) throw new Error("proxy conversion yielded too few candles");
+  return converted.slice(-200);
+}
+
 async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Promise<Candle[]> {
   const cacheKey = `${inst.key}:${tf}`;
   const cached = candleCache.get(cacheKey);
   const now = Date.now();
   if (cached && now - cached.at < CACHE_TTL) return cached.data;
 
+  const pairKey = inst.key.startsWith("METAL:") ? inst.key.slice("METAL:".length) : inst.key;
+  const hasProxy = !!XAU_PAIRS[pairKey]?.usdProxy;
+
   const tries: Array<() => Promise<Candle[]>> = [];
+  // Cross-pairs: derive from XAU/USD × FX proxy FIRST (most reliable), then
+  // fall back to Yahoo's direct cross-pair symbol.
+  if (hasProxy) tries.push(() => fetchCrossPairCandlesFromProxy(inst, tf));
   if (inst.binanceSymbols?.length) tries.push(() => fetchFromBinanceSymbols(inst.binanceSymbols!, tf));
   if (inst.kind === "crypto" && inst.binanceSymbols?.length) tries.push(() => fetchFromCoinbaseSymbols(inst.binanceSymbols!, tf));
   if (inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
