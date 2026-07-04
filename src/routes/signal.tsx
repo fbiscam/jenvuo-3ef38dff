@@ -967,6 +967,11 @@ function SignalPage() {
                     <PositionSizer plan={plan} />
                   )}
 
+                  {/* Backtest history badge */}
+                  {(isBuy || isSell) && backtest && <BacktestBadge stats={backtest} />}
+
+
+
 
                   {/* Take Trade / Save Signal */}
                   <div className="grid grid-cols-2 gap-2 pt-1">
