@@ -364,22 +364,48 @@ async function fetchCrossPairCandlesFromProxy(
   const proxy = cfg?.usdProxy;
   if (!proxy) throw new Error("no proxy");
 
-  const [xauUsd, fx] = await Promise.all([
-    fetchFromYahooSymbols(["XAUUSD=X", "GC=F"], tf),
-    fetchFromYahooSymbols([proxy.symbol], tf),
-  ]);
-  if (!xauUsd.length || !fx.length) throw new Error("proxy candles empty");
+  // 1) XAU/USD candles: Yahoo XAUUSD=X / GC=F first, then Binance PAXG/XAUT
+  //    (both stablecoin-quoted gold tokens that track spot to within a few
+  //    cents). Yahoo cross-pair endpoints often 401 for anonymous callers,
+  //    so Binance is the reliable fallback that keeps analysis real.
+  let xauUsd: Candle[] = [];
+  try {
+    xauUsd = await fetchFromYahooSymbols(["XAUUSD=X", "GC=F"], tf);
+  } catch { /* try binance */ }
+  if (!xauUsd.length) {
+    try {
+      xauUsd = await fetchFromBinanceSymbols(["PAXGUSDT", "XAUTUSDT"], tf);
+    } catch { /* fall through */ }
+  }
+  if (!xauUsd.length) throw new Error("no XAU/USD candle source for cross-pair");
 
-  // Bucket FX by timestamp (rounded to TF step) so we can look up by XAU bar time.
+  // 2) FX proxy candles: Yahoo first. If Yahoo is unavailable, fall back to a
+  //    flat FX rate from open.er-api (updated every few seconds) — gold moves
+  //    dominate intraday, so a slowly-drifting FX still gives structurally
+  //    correct BOS/CHOCH/FVG on the cross pair.
+  let fx: Candle[] = [];
+  try {
+    fx = await fetchFromYahooSymbols([proxy.symbol], tf);
+  } catch { /* fall through to flat FX */ }
+  let flatFxRate: number | null = null;
+  if (!fx.length) {
+    flatFxRate = await fetchFxProxyRate(proxy.symbol).catch(() => null);
+    if (flatFxRate == null || !isFinite(flatFxRate) || flatFxRate <= 0) {
+      throw new Error("no FX proxy source for cross-pair");
+    }
+  }
+
+  // Bucket FX by timestamp so we can look up per XAU bar.
   const step = TF_MS[tf] ?? TF_MS["15m"];
   const bucket = (t: number) => Math.floor(t / step) * step;
   const fxByBucket = new Map<number, Candle>();
   for (const c of fx) fxByBucket.set(bucket(c.t), c);
   const sortedFx = [...fx].sort((a, b) => a.t - b.t);
 
-  const findFx = (t: number): Candle | null => {
+  const findFxRate = (t: number): number | null => {
+    if (flatFxRate != null) return flatFxRate;
     const direct = fxByBucket.get(bucket(t));
-    if (direct) return direct;
+    if (direct) return direct.c;
     // Nearest previous FX candle
     let lo = 0, hi = sortedFx.length - 1, best: Candle | null = null;
     while (lo <= hi) {
@@ -387,17 +413,15 @@ async function fetchCrossPairCandlesFromProxy(
       if (sortedFx[mid].t <= t) { best = sortedFx[mid]; lo = mid + 1; }
       else hi = mid - 1;
     }
-    return best;
+    return best ? best.c : null;
   };
 
   const converted: Candle[] = [];
   for (const x of xauUsd) {
-    const f = findFx(x.t);
-    if (!f) continue;
-    const conv = (v: number) => (proxy.inverse ? v * f.c : v / f.c);
+    const r = findFxRate(x.t);
+    if (r == null) continue;
+    const conv = (v: number) => (proxy.inverse ? v * r : v / r);
     const o = conv(x.o), c = conv(x.c);
-    // Use FX close to convert wicks — good enough at intraday timeframes and
-    // avoids double-counting FX volatility from FX high/low.
     const h = conv(x.h);
     const l = conv(x.l);
     if (![o, h, l, c].every((n) => Number.isFinite(n) && n > 0)) continue;

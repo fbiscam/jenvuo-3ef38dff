@@ -21,15 +21,13 @@ type Props = {
   studies?: string[];
 };
 
-// Prefer FX_IDC for XAU cross-pairs — smoother, more ticks than OANDA's
-// thinly-traded cross feeds. Keep OANDA for XAU/USD (deepest liquidity).
 const XAU_TV_MAP: Record<string, string> = {
   XAUUSD: "OANDA:XAUUSD",
-  XAUEUR: "FX_IDC:XAUEUR",
-  XAUGBP: "FX_IDC:XAUGBP",
-  XAUJPY: "FX_IDC:XAUJPY",
-  XAUAUD: "FX_IDC:XAUAUD",
-  XAUCHF: "FX_IDC:XAUCHF",
+  XAUEUR: "OANDA:XAUEUR",
+  XAUGBP: "OANDA:XAUGBP",
+  XAUJPY: "OANDA:XAUJPY",
+  XAUAUD: "OANDA:XAUAUD",
+  XAUCHF: "OANDA:XAUCHF",
 };
 
 /** Map an XAU pair → TradingView symbol. Falls back to XAU/USD. */
