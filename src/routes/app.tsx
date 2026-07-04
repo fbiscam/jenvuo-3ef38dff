@@ -393,14 +393,6 @@ function Home() {
             </div>
 
             <button
-              onClick={() => setDark((d) => !d)}
-              className="h-8 w-8 rounded-lg flex items-center justify-center border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 transition"
-              aria-label="Toggle theme"
-              title={dark ? "Switch to light" : "Switch to dark"}
-            >
-              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-            <button
               onClick={signOut}
               className="h-8 w-8 rounded-lg flex items-center justify-center border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 transition"
               aria-label="Sign out"
