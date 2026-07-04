@@ -241,89 +241,104 @@ function AuthPage() {
                     </button>
                   </div>
 
-                  <form onSubmit={mode === "signin" ? signIn : signUp} className="mt-4 space-y-3">
-
-
-                    {mode === "signup" && (
-                      <div>
-                        <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
-                          Full Name
-                        </label>
-                        <div className="relative">
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                          <input
-                            type="text"
-                            required
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
-                            maxLength={100}
-                            className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
-                            placeholder="Your full name..."
-                          />
+                  {mode === "signup" ? (
+                    <div className="mt-4 space-y-4">
+                      <div className={`rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-900 ${MONO}`}>
+                        <div className="flex items-start gap-2">
+                          <Lock className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+                          <div className="space-y-1.5">
+                            <p className="font-semibold uppercase tracking-widest text-[11px] text-amber-800">
+                              Invite Only
+                            </p>
+                            <p className="leading-relaxed text-[13px] text-amber-900 font-sans">
+                              Jenvu is currently invite-only. Public sign-up is closed.
+                              To request access, contact the administrator.
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    )}
-
-                    <div>
-                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
-                        User Identification
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                        <input
-                          type="email"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
-                          placeholder="Institutional email..."
-                        />
+                      <button
+                        type="button"
+                        onClick={() => { setMode("signin"); setErrorMsg(null); }}
+                        className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2"
+                      >
+                        Back to Sign in <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} />
+                      </button>
+                      <div className="pt-3 border-t border-zinc-100">
+                        <p className="text-sm text-zinc-500 leading-relaxed">
+                          Already have an account?{" "}
+                          <button
+                            type="button"
+                            onClick={() => { setMode("signin"); setErrorMsg(null); }}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline"
+                          >
+                            Sign in
+                          </button>.
+                        </p>
                       </div>
                     </div>
+                  ) : (
+                    <>
+                      <form onSubmit={signIn} className="mt-4 space-y-3">
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            User Identification
+                          </label>
+                          <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                              type="email"
+                              required
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              placeholder="Institutional email..."
+                            />
+                          </div>
+                        </div>
 
-                    <div>
-                      <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
-                        Access Key
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                        <input
-                          type="password"
-                          required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          minLength={mode === "signup" ? 8 : undefined}
-                          className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
-                          placeholder={mode === "signup" ? "Min 8 characters..." : "Enter password..."}
-                        />
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            Access Key
+                          </label>
+                          <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                              type="password"
+                              required
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              placeholder="Enter password..."
+                            />
+                          </div>
+                        </div>
+
+                        {errorMsg && (
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                            <span className="leading-snug">{errorMsg}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                        >
+                          {loading
+                            ? "Authenticating..."
+                            : (<>Authenticate <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                        </button>
+                      </form>
+
+                      <div className="mt-4 pt-3 border-t border-zinc-100">
+                        <p className="text-sm text-zinc-500 leading-relaxed">
+                          Jenvu is invite-only. Contact the administrator for access.
+                        </p>
                       </div>
-                    </div>
-
-                    {errorMsg && (
-                      <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
-                        <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
-                        <span className="leading-snug">{errorMsg}</span>
-                      </div>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
-                    >
-                      {loading
-                        ? (mode === "signin" ? "Authenticating..." : "Creating account...")
-                        : (<>{mode === "signin" ? "Authenticate" : "Create account"} <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
-                    </button>
-                  </form>
-
-                  <div className="mt-4 pt-3 border-t border-zinc-100">
-                    <p className="text-sm text-zinc-500 leading-relaxed">
-                      {mode === "signin"
-                        ? <>New to Jenvu? <button type="button" onClick={() => { setMode("signup"); setErrorMsg(null); }} className="font-medium text-zinc-900 underline-offset-2 hover:underline">Create an account</button>.</>
-                        : <>Already have an account? <button type="button" onClick={() => { setMode("signin"); setErrorMsg(null); }} className="font-medium text-zinc-900 underline-offset-2 hover:underline">Sign in</button>.</>}
-                    </p>
-                  </div>
+                    </>
+                  )}
 
 
 
