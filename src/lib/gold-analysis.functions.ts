@@ -895,9 +895,9 @@ async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick |
     // Cross-quote pairs: convert XAU/USD → XAU/<quote> via FX proxy.
     const proxy = XAU_USD_PROXY[inst.key];
     if (proxy) {
-      const fx = await fetchYahooQuote([proxy.symbol]).catch(() => null);
-      if (!fx || !isFinite(fx.price) || fx.price <= 0) return null;
-      const converted = proxy.inverse ? p * fx.price : p / fx.price;
+      const fxPrice = await fetchFxProxyRate(proxy.symbol).catch(() => null);
+      if (fxPrice == null || !isFinite(fxPrice) || fxPrice <= 0) return null;
+      const converted = proxy.inverse ? p * fxPrice : p / fxPrice;
       // proxy.inverse=true means symbol is USD<quote> (e.g. USDJPY) —
       //   XAU/JPY = XAU/USD × USD/JPY
       // proxy.inverse=false means symbol is <quote>USD (e.g. EURUSD) —
