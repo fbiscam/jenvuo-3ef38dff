@@ -1497,17 +1497,19 @@ Return ONLY valid JSON (no markdown) with this exact shape:
   }
 }
 
-Rules:
-- fromTime/toTime MUST be unix-seconds taken EXACTLY from the provided candles.
-- LTF entry/sl/tp must respect current price ${last.c.toFixed(dec)} and yield realistic RR >= 1.8 (prefer 1:2 to 1:4).
-- Produce 10-14 narration steps, each 12-30 words, professional 25-year-veteran tone, in this order:
-  1) HTF bias & structure, 2) HTF BOS/CHOCH, 3) HTF OB/zone, 4) Premium vs Discount, 5) HTF liquidity (PDH/PDL/equal highs/lows),
-  6) Shift to LTF, 7) LTF structure / MSS, 8) LTF FVG, 9) LTF OB / breaker, 10) Inducement & expected sweep,
-  11) Confluence with killzone/DXY, 12) Entry trigger, 13) SL logic, 14) TP & invalidation.
-- ALWAYS include at minimum: 1 HTF BOS or CHOCH, 1 HTF OB or zone, 1 LTF FVG, 1 LTF OB, 1 liquidity level, plus entry/sl/tp markings.
-- Mention the current session/killzone (${session} / ${killzone}) and premium-vs-discount read explicitly.
-- If a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, set direction="WAIT", confidence<=50, and clearly call out the news risk in summary and invalidation.
-- If conditions are not A+ set direction="WAIT", confidence<=55, explain what's missing in summary.`;
+STRICT RULES — non-negotiable, treat these as a compliance checklist:
+- Timestamps: fromTime/toTime MUST be unix-SECONDS copied EXACTLY from the provided candles. Never invent, round, or extrapolate. If unsure, use the timestamp of the closest real candle.
+- Prices: every price/priceLow/priceHigh MUST be within ±20% of CURRENT PRICE ${last.c.toFixed(dec)}. Use realistic values pulled from the OHLC data provided, not round-number guesses.
+- Direction: LTF entry/sl/tp MUST respect current price ${last.c.toFixed(dec)}. RR must be ≥ 1.8, prefer 1:2 to 1:4. Entry must sit inside a real HTF/LTF OB or FVG that you also emit as a marking.
+- Markings coverage: emit MINIMUM 10 and MAXIMUM 16 markings. You MUST include ALL of: 1× HTF BOS or CHOCH, 1× HTF Order Block or Zone, 1× HTF liquidity (PDH/PDL/BSL/SSL/equal-high/equal-low), 1× premium or discount array, 1× LTF FVG, 1× LTF Order Block, 1× LTF liquidity, plus entry/sl/tp triangle. Add breakers/IFVGs/OTE when they exist.
+- Narration: produce EXACTLY 12–14 steps, each 14–28 words, senior institutional tone. Order strictly: (1) HTF bias/structure, (2) HTF BOS/CHOCH, (3) HTF OB/zone, (4) Premium vs Discount, (5) HTF liquidity, (6) shift to LTF, (7) LTF MSS/structure, (8) LTF FVG, (9) LTF OB/breaker, (10) inducement + expected sweep, (11) killzone + DXY/correlation, (12) entry trigger, (13) SL logic, (14) TP + invalidation. Every narration step MUST reference its marking via markingIndex.
+- Killzone: state the current session/killzone (${session} / ${killzone}) and the premium-vs-discount read (${inPremium ? "PREMIUM" : "DISCOUNT"}) explicitly in both htfNarrative and the confluences array.
+- News veto: if a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, direction="WAIT", confidence ≤ 50, call out the news title in summary and invalidation.
+- Quality gate: only issue BUY/SELL if HTF and LTF are aligned AND a fresh unmitigated OB or FVG is present in the direction of the trade AND liquidity is sitting on the other side of entry. Otherwise direction="WAIT", confidence ≤ 55, and summary MUST list the specific missing confluence (e.g. "HTF bullish but no unmitigated LTF demand").
+- Language: professional English only — no Hindi/Urdu/Roman Urdu, no emojis, no hedging fluff ("maybe", "possibly", "could be"). Speak like a 25-year desk head.
+- Output: return ONLY the JSON object above. No prose, no markdown fences, no trailing commentary.`;
+
+
 
     const user = `LIVE ${inst.display} CANDLES (unix-seconds | O,H,L,C)
 INSTRUMENT: ${inst.display} (${inst.kind})
@@ -1532,7 +1534,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
@@ -1597,7 +1599,34 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     ];
 
     // ============ LOCAL ENRICHMENTS ============
-    const aiMarkings: Marking[] = Array.isArray(parsed.markings) ? parsed.markings : [];
+    // Validate AI markings: drop anything with timestamps outside the candle
+    // window or prices absurdly far from the live price. Prevents hallucinated
+    // levels from cluttering the chart.
+    const allCandleTimes = [...htf, ...ltf].map((c) => Math.floor(c.t / 1000));
+    const minTime = Math.min(...allCandleTimes);
+    const maxTime = Math.max(...allCandleTimes);
+    const priceLoBound = last.c * 0.80;
+    const priceHiBound = last.c * 1.20;
+    const isValidAiMark = (m: any): boolean => {
+      if (!m || typeof m !== "object" || typeof m.type !== "string") return false;
+      // Time window: allow up to 1 day past the last candle for projected zones.
+      const timeMax = maxTime + 86400;
+      for (const k of ["fromTime", "toTime"]) {
+        if (m[k] != null) {
+          const t = Number(m[k]);
+          if (!Number.isFinite(t) || t < minTime || t > timeMax) return false;
+        }
+      }
+      for (const k of ["price", "priceLow", "priceHigh"]) {
+        if (m[k] != null) {
+          const p = Number(m[k]);
+          if (!Number.isFinite(p) || p < priceLoBound || p > priceHiBound) return false;
+        }
+      }
+      return true;
+    };
+    const aiMarkings: Marking[] = (Array.isArray(parsed.markings) ? parsed.markings : [])
+      .filter(isValidAiMark) as Marking[];
     const pdOte = buildPremiumDiscountAndOTE(htf, "htf", last.c);
     const eqHL = [...detectEqualLevels(htf, "htf", dec), ...detectEqualLevels(ltf, "ltf", dec)];
     const liqPools = [...detectLiquidityPools(htf, "htf"), ...detectLiquidityPools(ltf, "ltf")];
@@ -1830,6 +1859,75 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
       allMarkings.push({ type: "sl",    tf: "ltf", price: +built.sl.toFixed(dec),    label: `SL ${built.sl.toFixed(dec)}` });
       allMarkings.push({ type: "tp",    tf: "ltf", price: +built.tp.toFixed(dec),    label: `TP ${built.tp.toFixed(dec)}` });
     }
+
+    // ============ ENGINE-DERIVED MARKINGS ============
+    // Ground truth from the pure-math engine so EVERY pair renders a rich,
+    // correct chart, regardless of how many markings the AI produced.
+    const alreadyMarked = (m: Marking) => allMarkings.some((x) => {
+      if (x.type !== m.type) return false;
+      const xa = x as any, ma = m as any;
+      if (xa.tf !== ma.tf) return false;
+      const key = (o: any) => o.priceLow != null ? `${o.priceLow}|${o.priceHigh}` : `${o.price}`;
+      return key(xa) === key(ma);
+    });
+    const addMark = (m: Marking) => { if (!alreadyMarked(m)) allMarkings.push(m); };
+
+    // BOS/CHOCH from last HTF + LTF structure events
+    for (const [tfKey, an] of [["htf", htfA] as const, ["ltf", ltfA] as const]) {
+      const ev = an.lastStructure;
+      if (!ev) continue;
+      addMark({
+        type: ev.kind === "BOS" ? "bos" : "choch",
+        tf: tfKey,
+        fromTime: ev.fromTime,
+        toTime: ev.toTime,
+        price: +ev.price.toFixed(dec),
+        kind: ev.dir,
+        label: `${ev.dir === "bullish" ? "Bullish" : "Bearish"} ${ev.kind} on ${tfKey === "htf" ? "1H" : "15M"}`,
+      });
+    }
+
+    // Rank helpers — closest to current price, unmitigated first
+    const distTo = (lo: number, hi: number) => Math.abs(((lo + hi) / 2) - last.c);
+    const topFvgs = (arr: typeof htfA.fvgs, tf: "htf" | "ltf", n: number) =>
+      arr.filter((f) => !f.mitigated).sort((a, b) => distTo(a.priceLow, a.priceHigh) - distTo(b.priceLow, b.priceHigh)).slice(0, n)
+        .map((f): Marking => ({
+          type: "fvg", tf, fromTime: f.fromTime, toTime: f.toTime,
+          priceLow: +f.priceLow.toFixed(dec), priceHigh: +f.priceHigh.toFixed(dec),
+          kind: f.kind, label: `${tf === "htf" ? "HTF" : "LTF"} ${f.kind === "bullish" ? "Bullish" : "Bearish"} FVG`,
+        }));
+    const topObs = (arr: typeof htfA.obs, tf: "htf" | "ltf", n: number) =>
+      arr.filter((o) => !o.mitigated).sort((a, b) => distTo(a.priceLow, a.priceHigh) - distTo(b.priceLow, b.priceHigh)).slice(0, n)
+        .map((o): Marking => ({
+          type: "orderBlock", tf, fromTime: o.fromTime, toTime: o.toTime,
+          priceLow: +o.priceLow.toFixed(dec), priceHigh: +o.priceHigh.toFixed(dec),
+          kind: o.kind, label: `${tf === "htf" ? "HTF" : "LTF"} ${o.kind === "demand" ? "Demand" : "Supply"} OB`,
+        }));
+
+    for (const m of topFvgs(htfA.fvgs, "htf", 2)) addMark(m);
+    for (const m of topFvgs(ltfA.fvgs, "ltf", 3)) addMark(m);
+    for (const m of topObs(htfA.obs, "htf", 2)) addMark(m);
+    for (const m of topObs(ltfA.obs, "ltf", 2)) addMark(m);
+
+    // Breakers + Inverted FVGs (LTF)
+    for (const b of breakers.slice(0, 2)) {
+      addMark({
+        type: "breaker", tf: "ltf",
+        fromTime: b.fromTime, toTime: b.toTime,
+        priceLow: +b.priceLow.toFixed(dec), priceHigh: +b.priceHigh.toFixed(dec),
+        kind: b.kind, label: `${b.kind === "bullish" ? "Bullish" : "Bearish"} Breaker Block`,
+      });
+    }
+    for (const g of ifvgs.slice(0, 2)) {
+      addMark({
+        type: "fvg", tf: "ltf",
+        fromTime: g.fromTime, toTime: g.toTime,
+        priceLow: +g.priceLow.toFixed(dec), priceHigh: +g.priceHigh.toFixed(dec),
+        kind: g.kind, label: `Inverted FVG (${g.kind})`,
+      });
+    }
+
+
 
     // ============ GUIDED NARRATION ============
     // Always build a deterministic step-by-step script tied to real markings,
