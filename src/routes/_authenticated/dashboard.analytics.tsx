@@ -45,7 +45,7 @@ function Analytics() {
 
   const stats = useMemo(() => computeStats(trades), [trades]);
 
-  if (loading) {
+  if (loading || isLoading) {
     return <div className="p-8 text-sm text-zinc-500">Loading analytics…</div>;
   }
 
