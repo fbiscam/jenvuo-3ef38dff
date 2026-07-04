@@ -90,8 +90,8 @@ export default function SiteFooter() {
           {columns.map((col) => (
             <div key={col.label} className="space-y-3">
               <div
-                className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-400`}
-              >
+                className={`${MONO} text-xs font-bold uppercase tracking-[0.25em] text-zinc-700`}
+              
                 {col.label}
               </div>
               <ul className="space-y-2">
