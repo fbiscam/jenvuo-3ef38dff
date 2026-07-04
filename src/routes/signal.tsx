@@ -1224,13 +1224,14 @@ function SignalPage() {
       <Dialog open={!!kzDialog} onOpenChange={(o) => { if (!o) setKzDialog(null); }}>
         <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)]">
           {/* Tape header */}
-          <div className={`flex items-center justify-between px-5 pt-4 pb-3 border-b border-dashed border-zinc-200 ${MONO}`}>
+          <div className={`flex items-center justify-between pl-5 pr-14 pt-4 pb-3 border-b border-dashed border-zinc-200 ${MONO}`}>
             <div className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-zinc-900 animate-pulse" />
               <span className="text-[10px] tracking-[0.2em] uppercase text-zinc-500">Killzone · Advisory</span>
             </div>
             <span className="text-[10px] tracking-[0.2em] uppercase text-zinc-400">Live</span>
           </div>
+
 
           <div className="px-5 pt-5 pb-4">
             <DialogHeader className="space-y-0">
