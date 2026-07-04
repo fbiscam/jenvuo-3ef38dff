@@ -142,7 +142,7 @@ function DownloadPage() {
             Carry the desk in your pocket.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-zinc-900 md:text-lg">
-            <span className="sm:hidden">Jenvu on iOS, Android and desktop — same voice agent, same A+ setups. Links coming soon.</span>
+            <span className="sm:hidden">Jenvu on iOS, Android and desktop — same voice agent, same institutional engine, same A+ setups. Links coming soon.</span>
             <span className="hidden sm:inline">Jenvu on iOS, Android and desktop same voice agent, same institutional engine, same A+ setups. Download links are being prepared shortly</span>
           </p>
         </section>
