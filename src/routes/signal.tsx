@@ -876,6 +876,9 @@ function SignalPage() {
                     </span>
                   </div>
 
+                  {/* Imminent-news countdown chip */}
+                  <NewsCountdownChip plan={plan} />
+
                   {(() => {
                     const LOW_CONF = 60;
                     const isLowConf = (t.confidence ?? 0) < LOW_CONF;
