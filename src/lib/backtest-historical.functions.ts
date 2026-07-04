@@ -99,9 +99,10 @@ export const runHistoricalBacktest = createServerFn({ method: "POST" })
       const built = buildTrade(htfA, ltfA, pools, last, atr, inst.kind as any);
       if (built.direction === "WAIT") continue;
 
-      const structureQuality = computeStructureQuality(htfSlice, htfA.structure);
-      const scored = scoreSetup({
-        trade: built,
+      const htfStructureEvents = htfA.lastStructure ? [htfA.lastStructure] : [];
+      const structureQuality = htfStructureEvents.length
+        ? computeStructureQuality(htfSlice, htfStructureEvents)
+        : null;
         htf: htfA,
         ltf: ltfA,
         pools,
