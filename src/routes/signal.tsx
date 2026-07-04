@@ -2388,14 +2388,14 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
 
 function Stat({ label, value, tone }: { label: string; value: string; tone?: "win" | "loss" }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5">
-      <div className="text-[10px] uppercase tracking-wide text-white/50">{label}</div>
+    <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-2 py-1.5">
+      <div className="text-[10px] uppercase tracking-wide text-zinc-500">{label}</div>
       <div
         className={cn(
           "text-sm font-semibold",
-          tone === "win" && "text-emerald-300",
-          tone === "loss" && "text-rose-300",
-          !tone && "text-white/90",
+          tone === "win" && "text-emerald-600",
+          tone === "loss" && "text-rose-600",
+          !tone && "text-zinc-900",
         )}
       >
         {value}
