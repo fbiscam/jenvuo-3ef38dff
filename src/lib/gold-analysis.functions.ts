@@ -1002,9 +1002,17 @@ async function fetchBinanceQuote(symbols: string[]): Promise<LiveTick | null> {
 // exchangerate-api (open.er-api.com) as a fallback — Yahoo's v7/finance/quote
 // endpoint now returns 401 for anonymous callers, which would otherwise
 // leave XAU/EUR, XAU/JPY etc. without any live price at all.
+const fxRateCache = new Map<string, { at: number; rate: number }>();
+const FX_RATE_TTL = 2_500;
 async function fetchFxProxyRate(symbol: string): Promise<number | null> {
+  const now = Date.now();
+  const c = fxRateCache.get(symbol);
+  if (c && now - c.at < FX_RATE_TTL) return c.rate;
   const y = await fetchYahooQuote([symbol]).catch(() => null);
-  if (y && isFinite(y.price) && y.price > 0) return y.price;
+  if (y && isFinite(y.price) && y.price > 0) {
+    fxRateCache.set(symbol, { at: now, rate: y.price });
+    return y.price;
+  }
   // symbol looks like "EURUSD=X" or "USDJPY=X"
   const m = symbol.match(/^([A-Z]{3})([A-Z]{3})=X$/);
   if (!m) return null;
@@ -1017,7 +1025,11 @@ async function fetchFxProxyRate(symbol: string): Promise<number | null> {
     const j: any = await res.json();
     const rate = j?.rates?.[quote];
     const p = typeof rate === "number" ? rate : parseFloat(rate);
-    return isFinite(p) && p > 0 ? p : null;
+    if (isFinite(p) && p > 0) {
+      fxRateCache.set(symbol, { at: now, rate: p });
+      return p;
+    }
+    return null;
   } catch {
     return null;
   }
