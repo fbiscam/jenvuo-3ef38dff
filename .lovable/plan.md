@@ -1,83 +1,116 @@
-# Plan: Jenvu → XAU (Gold) Pairs Only
 
-Restrict the entire product to **XAU cross-pairs**. Remove crypto, FX, indices, silver, oil, equities from code, UI, engine, agent, alerts, and content.
+# Jenvu Upgrade Plan — 7 Features, 3 Phases
 
-## Supported instruments (whitelist)
+Ye plan wo 7 recommendations cover karta hai jo aap ne approve kiye. Har phase alag deliverable hai — ek phase khatam hone ke baad aap test/feedback de sakte ho, phir agla start hoga.
 
-- XAU/USD (default)
-- XAU/EUR
-- XAU/GBP
-- XAU/JPY
-- XAU/AUD
-- XAU/CHF
+---
 
-Anything else → friendly rejection: *"Jenvu trades gold only. Try XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD or XAU/CHF."*
+## Phase 1 — Analysis Engine Intelligence (highest impact)
 
-## 1. Symbol resolution & feeds
+**1. News-aware WAIT (auto-block bad trades)**
+- Server function jo economic calendar fetch kare (Forex Factory / FMP API — free tier)
+- `computeSignalPlan` me integrate: agar high-impact USD news ± 30 min me ho → force WAIT with reason "Red news window: NFP in 22 min"
+- Signal card pe amber news badge dikhega with countdown
+- Store news events in Supabase (`economic_events` table, refreshed hourly by pg_cron)
 
-- `src/lib/gold-analysis.functions.ts` — `resolveInstrument` accepts only the 6 XAU pairs; all `kind: "metal"` with quote-currency metadata. Non-gold input throws the rejection message.
-- `getLiveTick` — route each XAU pair to its OANDA feed (existing metals provider path); one fetcher per pair.
-- `src/hooks/useLivePrices.ts` — delete Binance WebSocket branch entirely; poll server tick for all XAU pairs.
-- `src/hooks/useLivePriceStream.ts` — XAU-aware; header ticker locked to the current XAU pair on `/signal`.
-- `src/components/TradingViewChart.tsx` — symbol map trimmed to `OANDA:XAUUSD/XAUEUR/XAUGBP/XAUJPY/XAUAUD/XAUCHF`; anything else → XAU/USD.
+**2. Confluence Heatmap (visual clarity)**
+- Signal card ke top pe 6-icon grid dikhega: HTF Bias | Sweep | OB/FVG | Killzone | DXY | RR
+- Har icon green tick ✓ / amber warning ⚠ / red cross ✗
+- Existing `built.notes` aur analysis data se derive — koi naya backend nahi
+- Purely frontend change (~40 lines)
 
-## 2. XAU pair selector (replaces multi-asset picker)
+**3. Multi-Model Consensus (institutional grade)**
+- 2 models parallel: `google/gemini-3-flash-preview` + `openai/gpt-5-mini`
+- Dono ka JSON output merge karo:
+  - Both agree BUY/SELL → confidence boost (+10)
+  - Disagree → force WAIT + note "Model disagreement"
+  - Both WAIT → strong WAIT
+- ~2x AI credits per analysis but massively better quality
+- Add toggle in settings: "Consensus mode (uses 2x credits)"
 
-- Signal desk: compact segmented control **USD · EUR · GBP · JPY · AUD · CHF**, defaults to USD, remembers last choice in `localStorage`.
-- Voice agent `detectSymbol` recognizes only gold aliases (`gold`, `xau`, `xauusd`, `gold euro`, `xaueur`, etc.). Non-gold → rejection reply.
-- Alerts UI pair picker uses the same 6-pair set.
+---
 
-## 3. XAU-specialized analysis engine
+## Phase 2 — Trader Coaching Tools
 
-Upgrade `src/lib/analysis/engine.ts` + `computeSignalPlan` — one shared `xau` profile with per-quote nuance:
+**4. Position Sizing Calculator**
+- New component on signal card (after Entry/SL/TP block)
+- Input: account balance (saved in profile) + risk % (default 1%)
+- Output: exact lot size for the trade + $ risk / $ reward
+- Formula: `lots = (balance × risk%) / (SL_pips × pip_value_per_lot)`
+- Pip value table per pair (XAU/USD $1/pip per 0.01 lot, etc.)
+- Saves in profile so user sets once
 
-- **Sessions/killzones**: London fix (10:30 & 15:00 GMT), NY AM (12:30–15:00 GMT), Asia accumulation range — applied to every XAU pair.
-- **USD-strength confluence**: DXY for XAU/USD; EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CHF as USD proxies for the crosses (direction inverted where needed).
-- **Gold liquidity map**: PDH/PDL, prior week H/L, Asia range H/L, London H/L, daily/weekly opens, round-number magnets scaled per quote currency.
-- **ATR calibrated per pair** so SL/TP distances suit XAU/JPY's scale vs XAU/USD's.
-- **News risk filter** by the pair's quote: NFP, CPI, FOMC, ECB, BoE, BoJ, RBA, SNB.
-- **A+ rubric** rewritten: HTF bias + LTF sweep + OB/FVG + killzone + quote-currency confluence + no red news.
+**5. Backtest Win-Rate Badge**
+- On each generated signal, query `trade_journal` for last 90 days
+- Filter: same pair + same grade + same direction bias + same killzone
+- Show: *"Similar setups: 24 taken · 68% win · avg 1:2.4R"*
+- If < 10 samples: "Not enough data yet"
+- Pure DB aggregation query, no AI
 
-## 4. Voice agent (`askSignalAgent`)
+**6. Journal Analytics Dashboard (new page)**
+- New route: `/dashboard/analytics`
+- 4 sections:
+  - Overall stats: total trades, win-rate, avg R, profit factor
+  - By pair: win-rate per XAU pair (bar chart)
+  - By killzone: London vs NY vs Asian performance
+  - By grade: A+ vs A vs B actual results
+- Recharts library for visualization
+- Personalized insight strip: *"Aap XAU/JPY pe 78% loss karte ho — pause karo"*
 
-- System prompt: *"You are Jenvu — a gold specialist with 25+ years on bullion desks, expert across XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD, XAU/CHF."* Politely refuses non-gold.
-- Deep gold knowledge in the prompt: central-bank buying, ETF flows, real yields, DXY, geopolitical premium, COMEX/COT positioning, seasonality.
-- `KNOWN_TOKENS` trimmed to gold aliases only.
+---
 
-## 5. Cron / alerts
+## Phase 3 — Live Trade Tracking (existing users' #1 request)
 
-- `src/routes/api/public/hooks/scan-signals.ts` iterates only the 6 XAU pairs.
-- Migration deletes rows from `signal_alerts`, `alert_preferences`, `saved_signals`, `signal_alert_subscribers` where the symbol is not in the whitelist.
-- Alerts UI pair dropdown restricted to XAU pairs.
+**7. Live Trade Alerts (in-app + email)**
+- pg_cron every 1 min checks all open trades in `trade_journal`
+- Fetch live price, compare vs entry/SL/TP
+- Trigger events:
+  - Entry filled (price crossed entry)
+  - +1R reached → suggest "Move SL to break-even"
+  - SL/TP hit → auto-close + email + toast
+  - Price approaching TP within 20% → "Getting close" alert
+- Uses existing email infra (`sendTransactionalEmail`)
+- New table: `trade_events` (trade_id, event_type, price, created_at)
+- Toast notifications when user is on the site
+- Email digest for offline users
 
-## 6. Content & SEO rewrite (gold-only)
+---
 
-- `src/routes/index.tsx` hero, features, testimonials, CTAs → gold-only messaging that names the 6 pairs.
-- `__root.tsx` head → *"Jenvu — AI Gold Trading Desk for XAU/USD & Gold Crosses"* + matching description/OG.
-- Rewrite copy on: `ai-engine.tsx`, `about.tsx`, `pricing.tsx`, `download.tsx`, `help.tsx`, `insights.tsx`, `signal.tsx`.
-- `public/llms.txt` describes gold-only scope with the pair list.
-- Insights: hide/remove non-gold articles.
-- Footer nav, sitemap, meta descriptions updated.
+## Technical Details
 
-## 7. UI cleanup
+**New tables**:
+- `economic_events` (id, currency, impact, event_name, scheduled_at, actual, forecast)
+- `trade_events` (id, trade_id, user_id, event_type, price, message, created_at)
+- Add to `profiles`: `account_balance numeric`, `default_risk_pct numeric default 1.0`
 
-- Remove crypto/FX/indices/silver imagery and mentions site-wide.
-- Signal card header renders `XAU/<quote>` with correct decimal precision per pair.
-- Delete dead symbol lists (crypto tokens, index map, silver, oil) from `TradingViewChart` and `signal-agent`.
+**New server functions**:
+- `fetchEconomicCalendar` (cron-triggered)
+- `getConsensusAnalysis` (wraps existing analyze with 2-model call)
+- `getBacktestStats(pair, grade, direction, killzone)`
+- `getJournalAnalytics(userId)`
+- `checkOpenTrades` (cron every 1min)
 
-## Choke points (single sources of truth)
+**New routes**:
+- `/dashboard/analytics` (page)
+- `/api/public/hooks/check-trades` (cron endpoint)
+- `/api/public/hooks/refresh-news` (cron endpoint)
 
-- `resolveInstrument` — the one gate for allowed pairs. Every entry point (agent, plan compute, alerts, chart, ticker) goes through it.
-- Voice-agent LLM system prompt — enforces gold-only tone & refusal.
-- Pair selector on `/signal` — the only place users switch quote currency.
+**AI models**: `google/gemini-3-flash-preview` (primary) + `openai/gpt-5-mini` (consensus)
 
-## Technical notes
+**Credit cost impact**: Consensus mode uses ~2x credits per analysis. Made opt-in so free-tier users unaffected.
 
-- Dead crypto/FX/indices branches inside `gold-analysis.functions.ts` are left dormant behind `resolveInstrument` (faster, safer than deleting). New callers can't reach them.
-- Data migration is a data-only cleanup (uses insert tool with `DELETE`), no schema change.
-- `voice_history` rows are preserved (historical answers stay readable).
+---
 
-## Out of scope
+## Estimated Effort
 
-- Refunds / plan grandfathering for users who signed up under multi-asset messaging — no changes to `plans`, `user_subscriptions`, or credit balances.
-- No new hero imagery generated in this pass unless you ask; existing gold visuals stay.
+- **Phase 1**: ~3 chat turns (heatmap fast, news+consensus need testing)
+- **Phase 2**: ~3 chat turns (analytics page biggest)
+- **Phase 3**: ~2 chat turns (cron + alerts)
+
+**Total**: ~8 turns to ship all 7 features.
+
+## Ordering Recommendation
+
+Start with **Phase 1** — biggest impact on signal quality, users notice immediately. News-aware WAIT alone will save people from bad trades. Confluence heatmap builds trust. Consensus mode is the "wow" feature.
+
+Bolo start karun Phase 1 se? Ya kisi feature ko re-order/skip karna hai?
