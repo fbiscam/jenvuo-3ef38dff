@@ -5,9 +5,9 @@ export const Route = createFileRoute("/cancellation")({
   head: () => ({
     meta: [
       { title: "Cancellation Policy — Jenvu" },
-      { name: "description", content: "How to cancel your Jenvu subscription, when it takes effect and how it interacts with billing and credits." },
+      { name: "description", content: "How to cancel your Jenvu subscription, when it takes effect and how it affects billing and credits." },
       { property: "og:title", content: "Cancellation Policy — Jenvu" },
-      { property: "og:description", content: "How to cancel your Jenvu subscription, when it takes effect and how it interacts with billing and credits." },
+      { property: "og:description", content: "How to cancel your Jenvu subscription, when it takes effect and how it affects billing and credits." },
       { property: "og:url", content: "https://jenvu.com/cancellation" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/cancellation" }],

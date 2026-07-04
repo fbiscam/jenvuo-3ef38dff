@@ -5,9 +5,9 @@ export const Route = createFileRoute("/refund")({
   head: () => ({
     meta: [
       { title: "Refund Policy — Jenvu" },
-      { name: "description", content: "How refunds work for Jenvu subscriptions, plan upgrades and credit top-ups. Once credits are used, that payment is non-refundable." },
+      { name: "description", content: "Jenvu refund rules for plan upgrades and credit top-ups. Once credits are used, that payment is non-refundable." },
       { property: "og:title", content: "Refund Policy — Jenvu" },
-      { property: "og:description", content: "How refunds work for Jenvu subscriptions, plan upgrades and credit top-ups." },
+      { property: "og:description", content: "Jenvu refund rules for plan upgrades and credit top-ups. Once credits are used, that payment is non-refundable." },
       { property: "og:url", content: "https://jenvu.com/refund" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/refund" }],
