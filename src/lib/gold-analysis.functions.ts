@@ -1801,13 +1801,13 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
           body: JSON.stringify({
-            model: "google/gemini-3.5-flash",
+            model: "google/gemini-3-flash-preview",
             messages: [
               { role: "system", content: reviewSystem },
               { role: "user", content: reviewUser },
             ],
             response_format: { type: "json_object" },
-            max_completion_tokens: 400,
+            max_tokens: 400,
           }),
           signal: reviewController.signal,
         }).finally(() => clearTimeout(reviewTimeout));
