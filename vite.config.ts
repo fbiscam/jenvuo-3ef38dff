@@ -49,11 +49,27 @@ function serverFnManifestRegen(): Plugin {
   async function warmLoad(server: ViteDevServer) {
     const srcRoot = path.join(server.config.root, "src");
     const files = await findServerFnFiles(srcRoot);
+    // Trigger the server-fn plugin in EVERY environment so both the SSR-side
+    // slug IDs (e.g. "src_lib_...--getLiveTick_createServerFn_handler") and
+    // the client-side base64 IDs get registered in the manifest. Using
+    // ssrLoadModule alone only registers the SSR flavor, so client bundles
+    // that POST with a base64 ID still 500 with "Invalid server function ID".
+    const envs = (server as unknown as { environments?: Record<string, { transformRequest?: (url: string) => Promise<unknown> }> }).environments;
     await Promise.allSettled(
-      files.map((f) => server.ssrLoadModule(f).catch(() => undefined)),
+      files.flatMap((f) => {
+        const tasks: Array<Promise<unknown>> = [server.ssrLoadModule(f).catch(() => undefined)];
+        if (envs) {
+          for (const env of Object.values(envs)) {
+            if (typeof env.transformRequest === "function") {
+              tasks.push(env.transformRequest(f).catch(() => undefined));
+            }
+          }
+        }
+        return tasks;
+      }),
     );
     server.config.logger.info(
-      `[serverfn-manifest-regen] warm-loaded ${files.length} server-fn module(s)`,
+      `[serverfn-manifest-regen] warm-loaded ${files.length} server-fn module(s) across ${envs ? Object.keys(envs).length : 1} environment(s)`,
     );
   }
 
