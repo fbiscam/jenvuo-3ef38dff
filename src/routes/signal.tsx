@@ -852,7 +852,7 @@ function SignalPage() {
                   ) : null}
 
                 </div>
-                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
+                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-800 font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
                   <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
                   <LegendDot color="bg-sky-500/70" label="OB" />
                   <LegendDot color="bg-amber-500/70" label="Liquidity" />
