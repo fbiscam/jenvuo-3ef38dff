@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   analyzeTF, buildLiquidityPools, buildTrade, scoreSetup, computeATR,
-  computeStructureQuality, killzoneForPair,
+  computeStructureQuality,
 } from "@/lib/analysis/engine";
 import { fetchInstrumentCandles, resolveInstrument } from "@/lib/gold-analysis.functions";
 
