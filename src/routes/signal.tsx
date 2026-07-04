@@ -1466,18 +1466,41 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
 
       {/* Labels */}
       <div className="grid grid-cols-6 gap-1.5 mt-1.5">
-        {checks.map((c) => (
-          <div
-            key={c.key}
-            className={`text-[8px] ${MONO} text-zinc-800 font-semibold text-center leading-tight uppercase tracking-wider break-words`}
-            title={c.label}
-          >
-            {c.label}
-          </div>
-        ))}
+        {checks.map((c) => {
+          const short = shortLabel(c.label);
+          return (
+            <div
+              key={c.key}
+              className={`text-[8px] ${MONO} text-zinc-800 font-semibold text-center leading-tight uppercase tracking-wider truncate`}
+              title={c.label}
+            >
+              {short}
+            </div>
+          );
+        })}
       </div>
     </motion.div>
   );
+}
+
+function shortLabel(label: string): string {
+  const l = label.toLowerCase();
+  if (l.includes("live quote")) return "QUOTE";
+  if (l.includes("htf") && l.includes("ltf")) return "CANDLES";
+  if (l.includes("entry") || l.includes("sl") || l.includes("tp")) return "E/SL/TP";
+  if (l.includes("liquidity")) return "LIQ";
+  if (l.includes("unmitigated")) return "UNMIT";
+  if (l.includes("premium") || l.includes("discount")) return "PD";
+  if (l.includes("dxy")) return "DXY";
+  if (l.includes("fvg")) return "FVG";
+  if (l.includes("order block") || l.includes("ob")) return "OB";
+  if (l.includes("bos")) return "BOS";
+  if (l.includes("choch")) return "CHOCH";
+  if (l.includes("sweep")) return "SWEEP";
+  if (l.includes("session") || l.includes("killzone")) return "KZ";
+  if (l.includes("bias")) return "BIAS";
+  if (l.includes("news")) return "NEWS";
+  return label.split(/\s+/)[0].slice(0, 6).toUpperCase();
 }
 
 
