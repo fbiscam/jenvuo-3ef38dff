@@ -110,7 +110,7 @@ export default function SiteFooter() {
         {/* Divider + sub bar */}
         <div className="mt-8 pt-4 pb-4 border-t border-zinc-100 flex flex-col md:flex-row items-start justify-between gap-3 md:translate-y-2">
           <div
-            className={`${MONO} text-[11px] uppercase tracking-[0.25em] text-zinc-900`}
+            className={`${MONO} whitespace-nowrap text-[9px] tracking-[0.15em] sm:text-[11px] sm:tracking-[0.25em] uppercase text-zinc-900`}
           >
             © {year} JENVU AI · ALL RIGHTS RESERVED
           </div>
