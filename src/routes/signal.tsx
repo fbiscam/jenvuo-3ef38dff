@@ -1665,9 +1665,15 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
   const isTop = plan.setupGrade === "A+" || plan.setupGrade === "A";
   const passed = plan.setupChecks.filter((c) => c.pass === true).length;
   const total = plan.setupChecks.length;
-  const sentimentLabel = isTop ? "Bullish" : plan.setupGrade === "B" ? "Neutral" : "Bearish";
-  const sentimentTone = isTop ? "text-emerald-600" : plan.setupGrade === "B" ? "text-zinc-600" : "text-rose-600";
-  const barFill = isTop ? "bg-emerald-500" : plan.setupGrade === "B" ? "bg-zinc-700" : "bg-rose-500";
+  // Direction/bias is separate from setup quality — an A+ setup can be short.
+  const dir = (plan.trade?.direction ?? "").toString().toLowerCase();
+  const bias = (plan.htfBias ?? "").toString().toLowerCase();
+  const isBull = dir === "buy" || dir === "long" || (dir !== "sell" && dir !== "short" && bias === "bullish");
+  const isBear = dir === "sell" || dir === "short" || (dir !== "buy" && dir !== "long" && bias === "bearish");
+  const sentimentLabel = isBull ? "Bullish" : isBear ? "Bearish" : "Neutral";
+  const sentimentTone = isBull ? "text-emerald-600" : isBear ? "text-rose-600" : "text-zinc-600";
+  const barFill = isBull ? "bg-emerald-500" : isBear ? "bg-rose-500" : "bg-zinc-700";
+  void isTop;
 
   // Deterministic bar heights per check (passed = tall/dark, failed = short/light)
   const bars = plan.setupChecks.map((c, i) => {
