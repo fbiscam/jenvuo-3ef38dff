@@ -11,7 +11,7 @@ import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
 import {
   Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, Plus,
-  Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge,
+  Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw,
 } from "lucide-react";
 import {
