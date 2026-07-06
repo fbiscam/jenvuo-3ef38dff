@@ -1794,10 +1794,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // ATR for volatility-adaptive SL buffer
     const atr = computeATR(ltf, 14);
 
-    // ---- WISDOM LAYER: Market Regime Detection ----
-    // What kind of tape are we in? A 25-year veteran filters setups by regime
-    // before anything else. Choppy/volatile tapes destroy textbook ICT setups.
-    const marketRegime = detectMarketRegime(ltf);
+    // (marketRegime already computed above, before the AI narration prompt)
+
+
 
     // Breaker + IFVG detection (adds richer context for AI narration)
     const breakers = detectBreakerBlocks(ltf, htfStructureEvents.length ? htfStructureEvents : []);
