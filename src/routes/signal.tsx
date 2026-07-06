@@ -1812,7 +1812,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
               {plan.marketRegime.favorable && " · ICT-favorable tape"}
             </div>
             {plan.marketRegime.warning && (
-              <div className="text-[11px] text-zinc-800 leading-snug mt-1">
+              <div className="text-[11px] text-zinc-800 leading-snug mt-1 whitespace-nowrap overflow-hidden text-ellipsis" title={plan.marketRegime.warning}>
                 ⚠ {plan.marketRegime.warning}
               </div>
             )}
