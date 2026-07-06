@@ -1962,13 +1962,21 @@ function TradeManagementLadder({
 
   const steps = [
     {
-      label: "Step 1 · +2R hit",
-      price: p2R,
-      action: "Close 75% · Move SL to +1R",
-      why: "Most profit locked. Baaki 25% runner.",
-      hit: rMultiple >= 2,
+      label: "Step 1 · +1R hit",
+      price: p1R,
+      action: "Close 50% · Move SL to Entry",
+      why: "Half profit booked. Trade is now risk-free.",
+      hit: rMultiple >= 1,
+    },
+    {
+      label: "Step 2 · TP hit",
+      price: t.tp,
+      action: "Close remaining 50%",
+      why: "Full target reached. Trade complete.",
+      hit: rMultiple >= 3 || status === "WIN",
     },
   ];
+
 
 
 
