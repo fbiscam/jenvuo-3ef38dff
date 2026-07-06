@@ -669,7 +669,7 @@ function DashboardLayout() {
         </div>
 
         <div className="mt-3 rounded-xl border border-zinc-200 bg-white">
-          <nav className="flex flex-wrap items-center gap-0.5 border-b border-zinc-200 p-1.5">
+          <nav className="grid grid-cols-3 gap-1 border-b border-zinc-200 p-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-0.5">
             {TABS.map((t) => {
               const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
               const Icon = t.icon;
@@ -679,11 +679,12 @@ function DashboardLayout() {
                   key={t.to}
                   to={t.to as "/dashboard"}
                   resetScroll={false}
-                  className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] transition ${
+                  className={`inline-flex items-center justify-center sm:justify-start gap-2 rounded-md px-3 py-1.5 text-[13px] transition ${
                     active
                       ? "bg-white text-zinc-900 border border-zinc-200 shadow-sm"
                       : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
                   }`}
+
                 >
                   <Icon className="h-3.5 w-3.5" />
                   {t.label}
