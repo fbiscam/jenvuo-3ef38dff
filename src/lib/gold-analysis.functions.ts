@@ -1670,6 +1670,7 @@ VETERAN WISDOM LAYER — read this like a 25-year prop desk head, not a textbook
 INSTRUMENT: ${inst.display} (${inst.kind})
 CURRENT PRICE: ${last.c.toFixed(dec)}
 SESSION: ${session} | KILLZONE: ${killzone}
+MARKET REGIME: ${marketRegime.regime.toUpperCase()} (trend ${marketRegime.trendStrength}%, vol ${marketRegime.volatility}%${marketRegime.warning ? ` — ${marketRegime.warning}` : ""})
 HTF SWING HIGH (160): ${swingHigh.toFixed(dec)} | SWING LOW: ${swingLow.toFixed(dec)} | EQUILIBRIUM: ${equilibrium.toFixed(dec)} | PRICE IS IN: ${inPremium ? "PREMIUM" : "DISCOUNT"}
 PDH (last 24h): ${pdh.toFixed(dec)} | PDL: ${pdl.toFixed(dec)}
 
