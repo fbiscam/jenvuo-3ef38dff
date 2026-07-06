@@ -503,9 +503,9 @@ export function scoreSetup(args: {
     if (weight > 0) f.push({ key, label, weight, pass, detail });
   };
 
-  push("bias", "HTF + LTF bias aligned",
+  push("bias", "HTF bias aligned with trade",
     dir !== "WAIT" && htf.trend === (dir === "BUY" ? "bullish" : "bearish"),
-    `HTF: ${htf.trend} · LTF: ${ltf.trend}`);
+    `HTF: ${htf.trend} · LTF: ${ltf.trend}${htf.trend !== ltf.trend && ltf.trend !== "ranging" ? " (LTF pullback into HTF bias — normal)" : ""}`);
 
   const sweptPool = pools.find(p => p.swept && (dir === "BUY" ? p.side === "sell" : p.side === "buy"));
   push("sweep", "Liquidity sweep before entry", !!sweptPool,
