@@ -2209,12 +2209,32 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
 export const getSignalPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => {
-    const obj = (d ?? {}) as { symbol?: string };
-    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
+    const obj = (d ?? {}) as { symbol?: string; force?: boolean };
+    return {
+      symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD",
+      force: !!obj.force,
+    };
   })
   .handler(async ({ data, context }) => {
+    // 1. Per-user soft rate limit (in-memory per worker) to prevent runaway
+    //    credit burn from a stuck client.
+    const rl = checkAnalyzeRateLimit(context.userId);
+    if (!rl.allowed) {
+      throw new Error(`Too many analyze requests. Try again in ~${Math.ceil(rl.retryInSec / 60)} min.`);
+    }
+
+    // 2. 3-minute per-user per-symbol cache. Same pair asked twice within
+    //    3 min returns the same plan — instant response, zero AI credits.
+    const cacheKey = `${context.userId}:${data.symbol.toUpperCase()}`;
+    if (!data.force) {
+      const cached = getCachedPlan<SignalPlan>(cacheKey);
+      if (cached) return cached;
+    }
+
     await _spendUserCredits(context.userId, 3, "ict_narration");
-    return computeSignalPlan(data);
+    const plan = await computeSignalPlan({ symbol: data.symbol });
+    setCachedPlan(cacheKey, plan);
+    return plan;
   });
 
 
