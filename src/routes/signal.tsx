@@ -524,6 +524,9 @@ function SignalPage() {
         .eq("id", id)
         .eq("outcome", "pending");
     };
+    // +1R price — auto-close at first take profit target
+    const risk = Math.abs(tr.entry - tr.sl);
+    const tp1 = dir === "BUY" ? tr.entry + risk : tr.entry - risk;
     if (dir === "BUY") {
       if (priceTick <= tr.entry + tol && trackerStatusRef.current === "PENDING") {
         fire("filled", `Entry filled at ${priceTick.toFixed(plan.instrument.decimals)}`);
@@ -532,7 +535,7 @@ function SignalPage() {
       }
       if (trackerStatusRef.current === "RUNNING") {
         if (priceTick <= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; closeJournal("loss", tr.sl); }
-        if (priceTick >= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tr.tp); }
+        if (priceTick >= tp1) { fire("tp", `Take profit 1 (+1R) hit. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tp1); }
       }
     } else if (dir === "SELL") {
       if (priceTick >= tr.entry - tol && trackerStatusRef.current === "PENDING") {
@@ -542,9 +545,10 @@ function SignalPage() {
       }
       if (trackerStatusRef.current === "RUNNING") {
         if (priceTick >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; closeJournal("loss", tr.sl); }
-        if (priceTick <= tr.tp) { fire("tp", `Take profit reached. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tr.tp); }
+        if (priceTick <= tp1) { fire("tp", `Take profit 1 (+1R) hit. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tp1); }
       }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan, speech]);
 
