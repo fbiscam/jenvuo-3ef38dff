@@ -855,6 +855,14 @@ export type SignalPlan = {
   ltfCandles: CandleDTO[];
   currentPrice: number;
   instrument: { symbol: string; display: string; kind: InstrumentKind; decimals: number };
+  marketRegime?: {
+    regime: "trending" | "ranging" | "choppy" | "volatile";
+    confidence: number;
+    favorable: boolean;
+    warning: string | null;
+    trendStrength: number;
+    volatility: number;
+  };
 };
 
 
