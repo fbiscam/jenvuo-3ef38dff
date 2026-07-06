@@ -2022,11 +2022,12 @@ function TradeManagementLadder({
           </li>
         ))}
       </ol>
-      {status === "RUNNING" && rMultiple >= 2 && rMultiple < 3 && (
+      {status === "RUNNING" && rMultiple >= 1 && rMultiple < 3 && (
         <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
-          ⚡ <b>Action now:</b> Close 75%, move SL to +1R ({p1R.toFixed(dec)}).
+          ⚡ <b>Action now:</b> Close 50%, move SL to entry ({t.entry.toFixed(dec)}).
         </div>
       )}
+
 
     </div>
   );
