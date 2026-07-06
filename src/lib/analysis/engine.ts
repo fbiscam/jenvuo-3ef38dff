@@ -480,10 +480,9 @@ export function scoreSetup(args: {
   // (no_sweep is not a veto anymore; it's already a scored factor. This prevents
   // the engine from downgrading every off-session setup to grade C.)
   if (dir !== "WAIT") {
-    // 1. HTF/LTF bias conflict — real conflict, not "ranging"
-    if (htf.trend !== "ranging" && ltf.trend !== "ranging" && htf.trend !== ltf.trend) {
-      vetos.push({ key: "bias_conflict", label: "HTF/LTF bias conflict", reason: `HTF ${htf.trend} vs LTF ${ltf.trend}` });
-    }
+    // 1. HTF/LTF bias conflict is NOT a veto — a counter-trend LTF pullback
+    //    is exactly the entry window into HTF bias. The `bias` scored factor
+    //    below already rewards alignment, so we don't double-punish disagreement.
     // 2. Entry zone already mitigated
     if (zoneMitigated === true) {
       vetos.push({ key: "mitigated", label: "Entry zone already mitigated", reason: "Zone was tagged — imbalance filled" });
