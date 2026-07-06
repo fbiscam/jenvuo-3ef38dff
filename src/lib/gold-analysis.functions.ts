@@ -2249,6 +2249,14 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
       ltfCandles: ltf.map(toDTO),
       currentPrice: last.c,
       instrument: { symbol: canonicalSymbol, display: inst.display, kind: inst.kind, decimals: inst.decimals },
+      marketRegime: {
+        regime: marketRegime.regime,
+        confidence: marketRegime.confidence,
+        favorable: marketRegime.favorable,
+        warning: marketRegime.warning,
+        trendStrength: marketRegime.trendStrength,
+        volatility: marketRegime.volatility,
+      },
     };
 
     return plan;
