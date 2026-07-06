@@ -5,6 +5,10 @@ import {
   computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
   detectSMTDivergence, killzoneForPair,
 } from "@/lib/analysis/engine";
+import {
+  callChatCompletion, tryParseJsonLoose, AiGatewayError,
+  MODEL_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
+} from "@/lib/ai-gateway";
 
 async function _spendUserCredits(userId: string, amount: number, reason: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -526,8 +530,7 @@ function isTradingSetupIntent(q: string): boolean {
 }
 
 async function _analyzeGoldCompute(data: { timeframe: string; query: string }): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+    // AI key is validated inside callChatCompletion — no local read needed.
 
     const wantsTradingSetup = isTradingSetupIntent(data.query);
     if (wantsTradingSetup) {
@@ -641,38 +644,21 @@ ${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fi
 
 ${isTradingIntent ? "User wants trading view but live feed offline — answer conversationally, set direction='WAIT', confidence<=40, mention feed offline in fullAnalysis." : "User is just chatting — answer naturally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty."}`;
 
-    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3.5-flash",
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
-      }),
+    const { content } = await callChatCompletion({
+      models: [...MODEL_CHAIN.chat],
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: userPrompt },
+      ],
+      jsonMode: true,
+      timeoutMs: 25000,
+      priority: true,
+      stage: "chat-signal",
+    }).catch((err: unknown) => {
+      if (err instanceof AiGatewayError) throw new Error(err.message);
+      throw err;
     });
-
-    if (!aiRes.ok) {
-      const txt = await aiRes.text();
-      if (aiRes.status === 429) throw new Error("Rate limit. Wait a moment and try again.");
-      if (aiRes.status === 402) throw new Error("AI credits exhausted. Add credits in workspace settings.");
-      throw new Error(`AI error ${aiRes.status}: ${txt.slice(0, 200)}`);
-    }
-
-    const aiJson: any = await aiRes.json();
-    const content = aiJson?.choices?.[0]?.message?.content ?? "{}";
-    let parsed: any;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
-      const m = content.match(/\{[\s\S]*\}/);
-      parsed = m ? JSON.parse(m[0]) : {};
-    }
+    const parsed: any = tryParseJsonLoose(content);
 
     const signal: GoldSignal = {
       bias: parsed.bias ?? "NEUTRAL",
@@ -1500,8 +1486,7 @@ function buildFeedFallbackPlan(args: {
 }
 
 export async function computeSignalPlan(data: { symbol: string }): Promise<SignalPlan> {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+    // AI key is validated inside callChatCompletion — no local read needed.
 
     const inst = resolveInstrument(data.symbol);
 
@@ -1682,50 +1667,22 @@ ${fmt(ltfPrompt)}
 
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
-    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-3.5-flash",
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 8192,
-      }),
+    const { content } = await callChatCompletion({
+      models: [...MODEL_CHAIN.narration],
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+      jsonMode: true,
+      maxTokens: 8192,
+      timeoutMs: 30000,
+      priority: true,
+      stage: "signal-narration",
+    }).catch((err: unknown) => {
+      if (err instanceof AiGatewayError) throw new Error(err.message);
+      throw err;
     });
-
-    if (!aiRes.ok) {
-      const txt = await aiRes.text();
-      if (aiRes.status === 429) throw new Error("Rate limit. Try again in a moment.");
-      if (aiRes.status === 402) throw new Error("AI credits exhausted.");
-      throw new Error(`AI error ${aiRes.status}: ${txt.slice(0, 200)}`);
-    }
-    const aiJson: any = await aiRes.json();
-    const content = aiJson?.choices?.[0]?.message?.content ?? "{}";
-    let parsed: any = {};
-    const tryParse = (s: string) => { try { return JSON.parse(s); } catch { return null; } };
-    const repair = (s: string) =>
-      s
-        .replace(/```json\s*/gi, "")
-        .replace(/```\s*/g, "")
-        .replace(/[\x00-\x1F\x7F]/g, " ")
-        .replace(/,\s*([}\]])/g, "$1");
-    parsed = tryParse(content);
-    if (!parsed) {
-      const m = content.match(/\{[\s\S]*\}/);
-      if (m) {
-        parsed = tryParse(m[0]) ?? tryParse(repair(m[0]));
-        if (!parsed) {
-          let s = repair(m[0]);
-          const opens = (s.match(/\{/g) || []).length - (s.match(/\}/g) || []).length;
-          const opensA = (s.match(/\[/g) || []).length - (s.match(/\]/g) || []).length;
-          s = s.replace(/,\s*$/, "") + "]".repeat(Math.max(0, opensA)) + "}".repeat(Math.max(0, opens));
-          parsed = tryParse(s) ?? {};
-        }
-      }
-    }
+    const parsed: any = tryParseJsonLoose(content) || {};
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
       ? "high"
@@ -1920,63 +1877,54 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
 VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only for true A+ institutional setups.`;
 
-        const reviewController = new AbortController();
-        const reviewTimeout = setTimeout(() => reviewController.abort(), 20000);
-        const reviewRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-          body: JSON.stringify({
-            model: "google/gemini-3.5-flash",
-            messages: [
-              { role: "system", content: reviewSystem },
-              { role: "user", content: reviewUser },
-            ],
-            response_format: { type: "json_object" },
-            max_tokens: 400,
-          }),
-          signal: reviewController.signal,
-        }).finally(() => clearTimeout(reviewTimeout));
-
-        if (reviewRes.ok) {
-          const rj: any = await reviewRes.json();
-          const rc = rj?.choices?.[0]?.message?.content ?? "{}";
-          let review: any = {};
-          try { review = JSON.parse(rc); } catch { const m = rc.match(/\{[\s\S]*\}/); review = m ? JSON.parse(m[0]) : {}; }
-          const verdict = String(review.verdict || "").toUpperCase();
-          if (verdict === "VETO") {
-            setupGrade = "C";
-            setupScore = Math.min(setupScore, 50);
-            setupChecks.unshift({
-              key: "senior_veto",
-              label: "⛔ Senior trader veto",
-              pass: false,
-              reason: String(review.reasoning || "Veteran review vetoed this setup"),
-            });
-          } else if (verdict === "DOWNGRADE") {
-            setupGrade = setupGrade === "A+" ? "A" : "B";
-            setupScore = Math.max(60, setupScore - 15);
-            setupChecks.unshift({
-              key: "senior_downgrade",
-              label: "⚠ Senior review downgrade",
-              pass: false,
-              reason: String(review.reasoning || "Not quite A+ material"),
-            });
-          } else if (verdict === "CONFIRM") {
-            setupChecks.unshift({
-              key: "senior_confirm",
-              label: "✓ Senior trader confirms",
-              pass: true,
-              reason: String(review.reasoning || "Institutional-grade setup confirmed"),
-            });
-          }
-          if (review.counter_argument) {
-            setupChecks.push({
-              key: "counter_arg",
-              label: "Counter-argument (know your risk)",
-              pass: false,
-              reason: String(review.counter_argument),
-            });
-          }
+        const { content: rc } = await callChatCompletion({
+          models: [...MODEL_CHAIN.seniorReview],
+          messages: [
+            { role: "system", content: reviewSystem },
+            { role: "user", content: reviewUser },
+          ],
+          jsonMode: true,
+          maxTokens: 400,
+          timeoutMs: 20000,
+          priority: true,
+          retriesPerModel: 2,
+          stage: "senior-review",
+        });
+        const review: any = tryParseJsonLoose(rc) || {};
+        const verdict = String(review.verdict || "").toUpperCase();
+        if (verdict === "VETO") {
+          setupGrade = "C";
+          setupScore = Math.min(setupScore, 50);
+          setupChecks.unshift({
+            key: "senior_veto",
+            label: "⛔ Senior trader veto",
+            pass: false,
+            reason: String(review.reasoning || "Veteran review vetoed this setup"),
+          });
+        } else if (verdict === "DOWNGRADE") {
+          setupGrade = setupGrade === "A+" ? "A" : "B";
+          setupScore = Math.max(60, setupScore - 15);
+          setupChecks.unshift({
+            key: "senior_downgrade",
+            label: "⚠ Senior review downgrade",
+            pass: false,
+            reason: String(review.reasoning || "Not quite A+ material"),
+          });
+        } else if (verdict === "CONFIRM") {
+          setupChecks.unshift({
+            key: "senior_confirm",
+            label: "✓ Senior trader confirms",
+            pass: true,
+            reason: String(review.reasoning || "Institutional-grade setup confirmed"),
+          });
+        }
+        if (review.counter_argument) {
+          setupChecks.push({
+            key: "counter_arg",
+            label: "Counter-argument (know your risk)",
+            pass: false,
+            reason: String(review.counter_argument),
+          });
         }
       } catch {
         // Silent failure — Stage-1 grade stands
@@ -2259,12 +2207,32 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
 export const getSignalPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => {
-    const obj = (d ?? {}) as { symbol?: string };
-    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
+    const obj = (d ?? {}) as { symbol?: string; force?: boolean };
+    return {
+      symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD",
+      force: !!obj.force,
+    };
   })
   .handler(async ({ data, context }) => {
+    // 1. Per-user soft rate limit (in-memory per worker) to prevent runaway
+    //    credit burn from a stuck client.
+    const rl = checkAnalyzeRateLimit(context.userId);
+    if (!rl.allowed) {
+      throw new Error(`Too many analyze requests. Try again in ~${Math.ceil(rl.retryInSec / 60)} min.`);
+    }
+
+    // 2. 3-minute per-user per-symbol cache. Same pair asked twice within
+    //    3 min returns the same plan — instant response, zero AI credits.
+    const cacheKey = `${context.userId}:${data.symbol.toUpperCase()}`;
+    if (!data.force) {
+      const cached = getCachedPlan<SignalPlan>(cacheKey);
+      if (cached) return cached;
+    }
+
     await _spendUserCredits(context.userId, 3, "ict_narration");
-    return computeSignalPlan(data);
+    const plan = await computeSignalPlan({ symbol: data.symbol });
+    setCachedPlan(cacheKey, plan);
+    return plan;
   });
 
 

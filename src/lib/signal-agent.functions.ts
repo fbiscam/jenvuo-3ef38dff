@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { computeSignalPlan, resolveInstrument, type SignalPlan } from "@/lib/gold-analysis.functions";
+import { callChatCompletion, AiGatewayError, MODEL_CHAIN } from "@/lib/ai-gateway";
 
 export type AgentContext = {
   symbol?: string;
@@ -78,8 +79,6 @@ export const askSignalAgent = createServerFn({ method: "POST" })
       _user_id: context.userId, _amount: 1, _reason: "voice_query", _metadata: {} as any,
     });
     if (spendErr) throw new Error(spendErr.message?.includes("INSUFFICIENT_CREDITS") ? "INSUFFICIENT_CREDITS" : spendErr.message);
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI gateway not configured.");
 
     const ctx = data.context ?? {};
     const currentSym = (ctx.symbol ?? "").toUpperCase().replace(/[\s_\-/]/g, "");
@@ -131,11 +130,10 @@ For casual gold questions (greeting, "why this bias?", "explain FVG", "what move
 Use the LIVE prices and levels from the context. Be specific, decisive, pro. No disclaimers. IMPORTANT: Reply in PLAIN TEXT only — never use markdown formatting. No asterisks (*, **, ***), no hashes (#, ##, ###), no backticks, no underscores for emphasis, no bullet dashes. Use simple numbered lines like "1) ..." and plain sentences. Keep it clean so it reads naturally when spoken aloud.`;
 
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+    let reply = "No response.";
+    try {
+      const { content } = await callChatCompletion({
+        models: [...MODEL_CHAIN.chat],
         messages: [
           { role: "system", content: system },
           {
@@ -143,15 +141,14 @@ Use the LIVE prices and levels from the context. Be specific, decisive, pro. No 
             content: `${switchedDisplay ? `(User is asking about ${switchedDisplay} — use the live context below for that instrument.)\n\n` : ""}CONTEXT:\n${contextStr}\n\nQUESTION: ${data.question}`,
           },
         ],
-      }),
-    });
-    if (!res.ok) {
-      const txt = await res.text();
-      if (res.status === 429) throw new Error("Rate limit. Try again in a moment.");
-      if (res.status === 402) throw new Error("AI credits exhausted.");
-      throw new Error(`AI error ${res.status}: ${txt.slice(0, 160)}`);
+        priority: true,
+        timeoutMs: 20000,
+        stage: "voice-chat",
+      });
+      reply = content.trim() || "No response.";
+    } catch (err) {
+      if (err instanceof AiGatewayError) throw new Error(err.message);
+      throw err;
     }
-    const json: any = await res.json();
-    const reply = String(json?.choices?.[0]?.message?.content ?? "").trim() || "No response.";
     return { reply, switchedSymbol: switchedDisplay };
   });
