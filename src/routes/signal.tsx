@@ -1783,6 +1783,41 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
             </div>
           </div>
         </div>
+
+        {/* Market Regime — wisdom layer */}
+        {plan.marketRegime && (
+          <div className={cn(
+            "mt-2 rounded-xl border px-3 py-2",
+            plan.marketRegime.favorable
+              ? "border-emerald-200 bg-emerald-50/40"
+              : plan.marketRegime.regime === "volatile"
+                ? "border-rose-200 bg-rose-50/40"
+                : "border-amber-200 bg-amber-50/40"
+          )}>
+            <div className="flex items-center justify-between">
+              <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+                Market Regime
+              </div>
+              <div className={cn(
+                `text-[10px] ${MONO} tracking-widest uppercase font-semibold`,
+                plan.marketRegime.favorable ? "text-emerald-700"
+                  : plan.marketRegime.regime === "volatile" ? "text-rose-700"
+                    : "text-amber-700"
+              )}>
+                {plan.marketRegime.regime}
+              </div>
+            </div>
+            <div className={`text-[11px] text-zinc-700 leading-snug mt-1 ${MONO}`}>
+              Trend {plan.marketRegime.trendStrength}% · Vol {plan.marketRegime.volatility}%
+              {plan.marketRegime.favorable && " · ICT-favorable tape"}
+            </div>
+            {plan.marketRegime.warning && (
+              <div className="text-[11px] text-zinc-800 leading-snug mt-1">
+                ⚠ {plan.marketRegime.warning}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </motion.div>
   );

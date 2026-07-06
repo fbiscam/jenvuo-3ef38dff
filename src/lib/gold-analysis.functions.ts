@@ -3,7 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   analyzeTF, buildLiquidityPools, buildTrade, scoreSetup,
   computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
-  detectSMTDivergence, killzoneForPair,
+  detectSMTDivergence, killzoneForPair, detectMarketRegime,
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
@@ -855,6 +855,14 @@ export type SignalPlan = {
   ltfCandles: CandleDTO[];
   currentPrice: number;
   instrument: { symbol: string; display: string; kind: InstrumentKind; decimals: number };
+  marketRegime?: {
+    regime: "trending" | "ranging" | "choppy" | "volatile";
+    confidence: number;
+    favorable: boolean;
+    warning: string | null;
+    trendStrength: number;
+    volatility: number;
+  };
 };
 
 
@@ -1583,6 +1591,9 @@ export async function computeSignalPlan(data: { symbol: string }): Promise<Signa
               ? "- Earnings, guidance, sector beta, index correlation, options flow\n- Macro: rates, risk-on/off, sector rotation"
               : "- DXY inverse correlation, US10Y yields, real yields, risk on/off, COT positioning\n- News: NFP, CPI, FOMC, PPI, retail sales, geopolitical risk";
 
+    // ---- WISDOM: compute regime BEFORE AI so narration can reference it ----
+    const marketRegime = detectMarketRegime(ltf);
+
     const system = `You are Jenvu — an elite institutional trader with 25+ years on bank/prop desks. You are a master of EVERY liquid market: gold, FX majors, indices, crypto, equities. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
 - Market structure: BOS, CHOCH, internal vs external structure, MSS
 - Premium / Discount arrays around equilibrium of the dealing range
@@ -1644,6 +1655,13 @@ STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - News veto: if a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, direction="WAIT", confidence ≤ 50, call out the news title in summary and invalidation.
 - Quality gate: only issue BUY/SELL if HTF and LTF are aligned AND a fresh unmitigated OB or FVG is present in the direction of the trade AND liquidity is sitting on the other side of entry. Otherwise direction="WAIT", confidence ≤ 55, and summary MUST list the specific missing confluence (e.g. "HTF bullish but no unmitigated LTF demand").
 - Language: professional English only — no Hindi/Urdu/Roman Urdu, no emojis, no hedging fluff ("maybe", "possibly", "could be"). Speak like a 25-year desk head.
+
+VETERAN WISDOM LAYER — read this like a 25-year prop desk head, not a textbook student:
+- Context first: BEFORE the setup, judge the tape. Current market regime is "${marketRegime.regime}" (trend strength ${marketRegime.trendStrength}%, ATR ${marketRegime.volatility}% of price). ${marketRegime.favorable ? "This regime is FAVORABLE — ICT setups typically work." : `This regime is NOT ideal for textbook ICT — ${marketRegime.warning}`}
+- Session personality: London killzone favors breakouts, NY AM favors reversals of London's move, NY PM is chop, Asian range is accumulation. Respect the session behavior of the current killzone (${killzone}).
+- Sniff test: A textbook A+ setup in a ranging or choppy tape is NOT an A+ trade. If regime is choppy/ranging/volatile, tilt toward WAIT unless the setup has extreme confluence (sweep + CHoCH + fresh unmitigated zone + native session + DXY confirms).
+- Counter-argument: In the summary, briefly acknowledge what could kill this trade (e.g. "invalidated if price closes back above X — that would flip us into a bearish CHoCH").
+- No hopium: If the setup is 70% good, say so. Don't force "A+ setup" language when confidence should be 65-75. Be honest with the score.
 - Output: return ONLY the JSON object above. No prose, no markdown fences, no trailing commentary.`;
 
 
@@ -1652,6 +1670,7 @@ STRICT RULES — non-negotiable, treat these as a compliance checklist:
 INSTRUMENT: ${inst.display} (${inst.kind})
 CURRENT PRICE: ${last.c.toFixed(dec)}
 SESSION: ${session} | KILLZONE: ${killzone}
+MARKET REGIME: ${marketRegime.regime.toUpperCase()} (trend ${marketRegime.trendStrength}%, vol ${marketRegime.volatility}%${marketRegime.warning ? ` — ${marketRegime.warning}` : ""})
 HTF SWING HIGH (160): ${swingHigh.toFixed(dec)} | SWING LOW: ${swingLow.toFixed(dec)} | EQUILIBRIUM: ${equilibrium.toFixed(dec)} | PRICE IS IN: ${inPremium ? "PREMIUM" : "DISCOUNT"}
 PDH (last 24h): ${pdh.toFixed(dec)} | PDL: ${pdl.toFixed(dec)}
 
@@ -1783,6 +1802,10 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // ATR for volatility-adaptive SL buffer
     const atr = computeATR(ltf, 14);
 
+    // (marketRegime already computed above, before the AI narration prompt)
+
+
+
     // Breaker + IFVG detection (adds richer context for AI narration)
     const breakers = detectBreakerBlocks(ltf, htfStructureEvents.length ? htfStructureEvents : []);
     const ifvgs = detectIFVGs(ltf, ltfA.fvgs);
@@ -1852,6 +1875,33 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     for (const v of scored.vetos) {
       setupChecks.unshift({ key: `veto_${v.key}`, label: `⛔ ${v.label}`, pass: false, reason: v.reason });
     }
+
+    // ---- WISDOM: Regime-based downgrade ----
+    // If the tape is unfavorable (choppy/ranging/volatile), a textbook A+ is
+    // still a lower-probability trade. Downgrade one step + flag it in checks.
+    if (built.direction !== "WAIT" && !marketRegime.favorable) {
+      const before = setupGrade;
+      if (setupGrade === "A+") setupGrade = "A";
+      else if (setupGrade === "A") setupGrade = "B";
+      else if (setupGrade === "B") setupGrade = "C";
+      if (setupGrade !== before) {
+        setupScore = Math.max(50, setupScore - 10);
+      }
+      setupChecks.unshift({
+        key: "regime_warn",
+        label: `⚠ Market regime: ${marketRegime.regime}`,
+        pass: false,
+        reason: marketRegime.warning || `${marketRegime.regime} tape — probability of textbook ICT setups is reduced. Consider half size or wait.`,
+      });
+    } else if (built.direction !== "WAIT" && marketRegime.favorable) {
+      setupChecks.push({
+        key: "regime_ok",
+        label: `✓ Market regime: ${marketRegime.regime}`,
+        pass: true,
+        reason: `Favorable ${marketRegime.regime} tape (trend strength ${marketRegime.trendStrength}%) — ICT setups typically work well here.`,
+      });
+    }
+
 
     // ============ STAGE 2: SENIOR TRADER DEEP REVIEW ============
     // Only run the expensive pro model when the engine already thinks it's A/A+.
@@ -2199,6 +2249,14 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
       ltfCandles: ltf.map(toDTO),
       currentPrice: last.c,
       instrument: { symbol: canonicalSymbol, display: inst.display, kind: inst.kind, decimals: inst.decimals },
+      marketRegime: {
+        regime: marketRegime.regime,
+        confidence: marketRegime.confidence,
+        favorable: marketRegime.favorable,
+        warning: marketRegime.warning,
+        trendStrength: marketRegime.trendStrength,
+        volatility: marketRegime.volatility,
+      },
     };
 
     return plan;
