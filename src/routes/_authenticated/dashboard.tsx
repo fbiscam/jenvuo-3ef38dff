@@ -679,14 +679,15 @@ function DashboardLayout() {
                   key={t.to}
                   to={t.to as "/dashboard"}
                   resetScroll={false}
-                  className={`inline-flex items-center justify-center sm:justify-start gap-2 rounded-md px-3 py-1.5 text-[13px] transition ${
+                  className={`inline-flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 rounded-md px-2 sm:px-3 py-1.5 text-[12px] sm:text-[13px] whitespace-nowrap transition ${
                     active
                       ? "bg-white text-zinc-900 border border-zinc-200 shadow-sm"
                       : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
                   }`}
 
+
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className="h-3.5 w-3.5 shrink-0" />
                   {t.label}
                   {typeof count === "number" && count > 0 && (
                     <span className="ml-0.5 rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-zinc-900">
