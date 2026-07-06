@@ -530,8 +530,7 @@ function isTradingSetupIntent(q: string): boolean {
 }
 
 async function _analyzeGoldCompute(data: { timeframe: string; query: string }): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+    // AI key is validated inside callChatCompletion — no local read needed.
 
     const wantsTradingSetup = isTradingSetupIntent(data.query);
     if (wantsTradingSetup) {
