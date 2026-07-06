@@ -223,8 +223,9 @@ function Journal() {
           <p className="mt-1 text-sm text-zinc-500">Track entries, exits and outcomes to surface your real win rate.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+          <table className="w-full min-w-[720px] text-sm">
+
             <thead className="bg-zinc-50 text-left font-mono text-[10px] uppercase tracking-wider text-zinc-500">
               <tr>
                 {["Date", "Pair", "Dir", "Entry", "Price", "SL", "TP", "Result", "P&L", ""].map((h) => (
