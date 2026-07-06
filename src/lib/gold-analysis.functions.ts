@@ -683,14 +683,17 @@ export const analyzeGold = createServerFn({ method: "POST" })
     query: String(d?.query || "Give me the best A+ setup right now"),
   }))
   .handler(async ({ data, context }) => {
-    const lockKey = `${context.userId}::${data.timeframe}`;
+    // Lock key MUST include the instrument — different XAU pairs on the same
+    // timeframe are different setups and must not share a cache slot.
+    const instSym = inferInstrumentFromText(data.query);
+    const lockKey = `${context.userId}::${instSym}::${data.timeframe}`;
     const now = Date.now();
     const cached = signalLockCache.get(lockKey);
 
     if (cached && cached.expiresAt > now) {
-      // Check invalidation against live price before serving cached signal.
+      // Check invalidation against live price of the SAME instrument.
       try {
-        const inst = resolveInstrument("XAUUSD");
+        const inst = resolveInstrument(instSym);
         const tick = await resolveLiveTick(inst);
         const px = tick?.price;
         const invalidated =
@@ -742,6 +745,7 @@ export const analyzeGold = createServerFn({ method: "POST" })
 
     return clean as GoldSignal;
   });
+
 
 
 
