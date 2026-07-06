@@ -67,7 +67,14 @@ async function singleAttempt(
     messages: opts.messages,
   };
   if (opts.jsonMode) body.response_format = { type: "json_object" };
-  if (opts.maxTokens) body.max_tokens = opts.maxTokens;
+  if (opts.maxTokens) {
+    // GPT-5 family requires max_completion_tokens instead of max_tokens
+    if (model.startsWith("openai/gpt-5")) {
+      body.max_completion_tokens = opts.maxTokens;
+    } else {
+      body.max_tokens = opts.maxTokens;
+    }
+  }
   if (opts.priority && PRIORITY_TIER_MODELS.has(model)) {
     body.service_tier = "priority";
   }
