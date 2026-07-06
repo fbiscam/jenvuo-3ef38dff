@@ -906,16 +906,6 @@ function SignalPage() {
                   {(() => {
                     const LOW_CONF = 60;
                     const isLowConf = (t.confidence ?? 0) < LOW_CONF;
-                    if (isLowConf || (!isBuy && !isSell)) {
-                      return (
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-[12px] text-amber-800 leading-relaxed">
-                          <div className="font-semibold mb-0.5">Low-confidence setup — entry / SL / TP hidden</div>
-                          <div className="text-[11px] text-amber-700">
-                            Confidence {t.confidence ?? 0}% (min {LOW_CONF}% required). Institutional confluences aligned nahi — trade lene ke bajaye wait karo ya re-analyze karo jab HTF bias, sweep aur zone ek saath align hon.
-                          </div>
-                        </div>
-                      );
-                    }
                     const dec = plan.instrument.decimals;
                     const riskAbs = Math.abs(t.entry - t.sl);
                     const rewardAbs = Math.abs(t.tp - t.entry);
@@ -923,22 +913,37 @@ function SignalPage() {
                     const rewardPct = t.entry ? (rewardAbs / t.entry) * 100 : 0;
                     const fmtDist = (n: number) => n >= 100 ? n.toFixed(0) : n.toFixed(dec);
                     return (
-                      <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-lg overflow-hidden border border-zinc-100">
-                        <KV label="Entry" value={t.entry.toFixed(dec)} />
-                        <KV label="R:R" value={`1:${t.rr.toFixed(2)}`} />
-                        <KV
-                          label="Stop"
-                          value={t.sl.toFixed(dec)}
-                          tone="bad"
-                          sub={riskAbs > 0 ? `−${fmtDist(riskAbs)} pts · ${riskPct.toFixed(2)}%` : undefined}
-                        />
-                        <KV
-                          label="Target"
-                          value={t.tp.toFixed(dec)}
-                          tone="good"
-                          sub={rewardAbs > 0 ? `+${fmtDist(rewardAbs)} pts · ${rewardPct.toFixed(2)}%` : undefined}
-                        />
-                      </div>
+                      <>
+                        {isLowConf && (isBuy || isSell) && (
+                          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800 leading-relaxed">
+                            <span className="font-semibold">Low-confidence setup</span> — Confidence {t.confidence ?? 0}% (min {LOW_CONF}% recommended). Trade at your own risk or wait for stronger confluence alignment.
+                          </div>
+                        )}
+                        {(isBuy || isSell) && (
+                          <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-lg overflow-hidden border border-zinc-100">
+                            <KV label="Entry" value={t.entry.toFixed(dec)} />
+                            <KV label="R:R" value={`1:${t.rr.toFixed(2)}`} />
+                            <KV
+                              label="Stop"
+                              value={t.sl.toFixed(dec)}
+                              tone="bad"
+                              sub={riskAbs > 0 ? `−${fmtDist(riskAbs)} pts · ${riskPct.toFixed(2)}%` : undefined}
+                            />
+                            <KV
+                              label="Target"
+                              value={t.tp.toFixed(dec)}
+                              tone="good"
+                              sub={rewardAbs > 0 ? `+${fmtDist(rewardAbs)} pts · ${rewardPct.toFixed(2)}%` : undefined}
+                            />
+                          </div>
+                        )}
+                        {!isBuy && !isSell && (
+                          <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 text-[12px] text-zinc-700">
+                            <div className="font-semibold mb-0.5">No directional bias</div>
+                            <div className="text-[11px] text-zinc-500">Market is currently ranging — wait for a clear HTF bias before entering.</div>
+                          </div>
+                        )}
+                      </>
                     );
                   })()}
                   {(() => {
