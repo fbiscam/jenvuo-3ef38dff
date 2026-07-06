@@ -1866,6 +1866,33 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       setupChecks.unshift({ key: `veto_${v.key}`, label: `⛔ ${v.label}`, pass: false, reason: v.reason });
     }
 
+    // ---- WISDOM: Regime-based downgrade ----
+    // If the tape is unfavorable (choppy/ranging/volatile), a textbook A+ is
+    // still a lower-probability trade. Downgrade one step + flag it in checks.
+    if (built.direction !== "WAIT" && !marketRegime.favorable) {
+      const before = setupGrade;
+      if (setupGrade === "A+") setupGrade = "A";
+      else if (setupGrade === "A") setupGrade = "B";
+      else if (setupGrade === "B") setupGrade = "C";
+      if (setupGrade !== before) {
+        setupScore = Math.max(50, setupScore - 10);
+      }
+      setupChecks.unshift({
+        key: "regime_warn",
+        label: `⚠ Market regime: ${marketRegime.regime}`,
+        pass: false,
+        reason: marketRegime.warning || `${marketRegime.regime} tape — probability of textbook ICT setups is reduced. Consider half size or wait.`,
+      });
+    } else if (built.direction !== "WAIT" && marketRegime.favorable) {
+      setupChecks.push({
+        key: "regime_ok",
+        label: `✓ Market regime: ${marketRegime.regime}`,
+        pass: true,
+        reason: `Favorable ${marketRegime.regime} tape (trend strength ${marketRegime.trendStrength}%) — ICT setups typically work well here.`,
+      });
+    }
+
+
     // ============ STAGE 2: SENIOR TRADER DEEP REVIEW ============
     // Only run the expensive pro model when the engine already thinks it's A/A+.
     // The pro model acts as a "25-year veteran" second opinion — it can veto or confirm.
