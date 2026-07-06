@@ -79,8 +79,6 @@ export const askSignalAgent = createServerFn({ method: "POST" })
       _user_id: context.userId, _amount: 1, _reason: "voice_query", _metadata: {} as any,
     });
     if (spendErr) throw new Error(spendErr.message?.includes("INSUFFICIENT_CREDITS") ? "INSUFFICIENT_CREDITS" : spendErr.message);
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI gateway not configured.");
 
     const ctx = data.context ?? {};
     const currentSym = (ctx.symbol ?? "").toUpperCase().replace(/[\s_\-/]/g, "");
