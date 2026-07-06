@@ -190,8 +190,50 @@ async function assertCrossPairFxValue(
 }
 
 
+// Normalize a free-form query so typos, missing letters, phonetic spellings
+// and Roman-Urdu variants all reduce to canonical trading vocabulary. This is
+// the single choke-point every intent / instrument matcher runs through, so
+// "anlyze xau/usd", "analze gold", "analays xauusd", "kro analysis" all end
+// up as if the user had typed the correct English words.
+function normalizeQuery(text: string): string {
+  let q = String(text || "").toLowerCase();
+
+  // Collapse runs of the same letter (helllooo → hello, analyyyze → analyze).
+  q = q.replace(/([a-z])\1{2,}/g, "$1$1");
+
+  // Common typo / short-form → canonical form. Order matters (longer first).
+  const typoMap: Array<[RegExp, string]> = [
+    // analyze family — every common misspelling maps to "analyze"
+    [/\b(a+n+a*l+a*y*z*e*|anlyze|anlyz|anlaze|analze|analyz|analays|analyse|analyis|analize|anaylze|anaylse|analsis|analysys|analysie|analiz|anylsis|analyais|analays|analysse|anaylize|anaylsze)\b/g, "analyze"],
+    [/\banalysis\b|\banalisis\b|\banalyis\b|\banalsys\b|\banalisys\b|\banaylsis\b/g, "analysis"],
+    // trading setup vocab
+    [/\bsetp\b|\bsetuo\b|\bsetuup\b|\bsetupp\b/g, "setup"],
+    [/\bsginal\b|\bsignl\b|\bsigal\b|\bsingal\b|\bsignall\b/g, "signal"],
+    [/\bentery\b|\bentray\b|\benty\b|\bentri\b/g, "entry"],
+    [/\bstoploss\b|\bstop\s*los\b|\bstoploos\b|\bsl\s*price\b/g, "stop loss"],
+    [/\btakeprofit\b|\btake\s*profits?\b|\btake\s*profitt\b/g, "take profit"],
+    [/\bbyu\b|\bbyy\b|\bbuyy\b/g, "buy"],
+    [/\bsel\b|\bsellll\b|\bselll\b/g, "sell"],
+    [/\btrde\b|\btrad\b|\btardae\b|\btardae\b/g, "trade"],
+    [/\bscalpp\b|\bskalp\b|\bscalping\b/g, "scalp"],
+    [/\bkill\s*zone\b|\bkillzon\b|\bkilzone\b/g, "killzone"],
+    [/\bliqidity\b|\bliqudity\b|\bliquidty\b|\bliqidty\b/g, "liquidity"],
+    [/\border\s*bock\b|\border\s*blok\b|\borderblock\b/g, "order block"],
+    // gold / instrument keywords
+    [/\bgld\b|\bgoldd\b|\bgoold\b|\bsona\b/g, "gold"],
+    [/\bxau\s*[\/\-\s]?\s*usd\b|\bxauusd\b|\bxau\s*dollar\b/g, "xauusd"],
+    [/\bxau\s*[\/\-\s]?\s*eur\b|\bxaueur\b|\bxau\s*euro\b/g, "xaueur"],
+    [/\bxau\s*[\/\-\s]?\s*gbp\b|\bxaugbp\b|\bxau\s*pound\b/g, "xaugbp"],
+    [/\bxau\s*[\/\-\s]?\s*jpy\b|\bxaujpy\b|\bxau\s*yen\b/g, "xaujpy"],
+    [/\bxau\s*[\/\-\s]?\s*aud\b|\bxauaud\b/g, "xauaud"],
+    [/\bxau\s*[\/\-\s]?\s*chf\b|\bxauchf\b|\bxau\s*franc\b/g, "xauchf"],
+  ];
+  for (const [re, rep] of typoMap) q = q.replace(re, rep);
+  return q;
+}
+
 function inferInstrumentFromText(text: string): string {
-  const q = String(text || "").toUpperCase();
+  const q = normalizeQuery(text).toUpperCase();
   if (/\b(XAUEUR|GOLD\s*EUR|GOLD\s*EURO)\b/.test(q)) return "XAUEUR";
   if (/\b(XAUGBP|GOLD\s*GBP|GOLD\s*POUND)\b/.test(q)) return "XAUGBP";
   if (/\b(XAUJPY|GOLD\s*JPY|GOLD\s*YEN)\b/.test(q)) return "XAUJPY";
