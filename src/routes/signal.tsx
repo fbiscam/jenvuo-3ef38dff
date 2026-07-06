@@ -981,7 +981,7 @@ function SignalPage() {
                   )}
 
                   {/* Backtest history badge */}
-                  {(isBuy || isSell) && backtest && <BacktestBadge stats={backtest} />}
+                  {/* backtest badge removed — sparse sample was misleading */}
 
 
 
