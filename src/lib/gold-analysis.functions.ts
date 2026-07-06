@@ -645,38 +645,21 @@ ${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fi
 
 ${isTradingIntent ? "User wants trading view but live feed offline — answer conversationally, set direction='WAIT', confidence<=40, mention feed offline in fullAnalysis." : "User is just chatting — answer naturally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty."}`;
 
-    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3.5-flash",
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
-      }),
+    const { content } = await callChatCompletion({
+      models: [...MODEL_CHAIN.chat],
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: userPrompt },
+      ],
+      jsonMode: true,
+      timeoutMs: 25000,
+      priority: true,
+      stage: "chat-signal",
+    }).catch((err: unknown) => {
+      if (err instanceof AiGatewayError) throw new Error(err.message);
+      throw err;
     });
-
-    if (!aiRes.ok) {
-      const txt = await aiRes.text();
-      if (aiRes.status === 429) throw new Error("Rate limit. Wait a moment and try again.");
-      if (aiRes.status === 402) throw new Error("AI credits exhausted. Add credits in workspace settings.");
-      throw new Error(`AI error ${aiRes.status}: ${txt.slice(0, 200)}`);
-    }
-
-    const aiJson: any = await aiRes.json();
-    const content = aiJson?.choices?.[0]?.message?.content ?? "{}";
-    let parsed: any;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
-      const m = content.match(/\{[\s\S]*\}/);
-      parsed = m ? JSON.parse(m[0]) : {};
-    }
+    const parsed: any = tryParseJsonLoose(content);
 
     const signal: GoldSignal = {
       bias: parsed.bias ?? "NEUTRAL",
