@@ -284,13 +284,18 @@ export function buildTrade(
   assetKind: "crypto" | "metal" | "forex" | "index" | "stock" = "metal",
 ): BuiltTrade {
   const profile = RISK_PROFILE[assetKind] ?? RISK_PROFILE.metal;
-  // Direction from HTF + LTF agreement
+  // Direction is anchored on HTF bias (institutional bias). In ICT / SMC an
+  // opposing LTF leg is a pullback INTO the HTF-aligned zone, so LTF
+  // disagreement is expected on retracement setups — it is not a WAIT reason.
+  // If HTF is ranging, fall back to LTF direction. Both ranging → WAIT.
   const dir: "BUY" | "SELL" | "WAIT" =
-    htf.trend === "bullish" && (ltf.trend === "bullish" || ltf.trend === "ranging") ? "BUY" :
-    htf.trend === "bearish" && (ltf.trend === "bearish" || ltf.trend === "ranging") ? "SELL" : "WAIT";
+    htf.trend === "bullish" ? "BUY" :
+    htf.trend === "bearish" ? "SELL" :
+    ltf.trend === "bullish" ? "BUY" :
+    ltf.trend === "bearish" ? "SELL" : "WAIT";
 
   if (dir === "WAIT") {
-    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF/LTF disagree — no clean trend." };
+    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF and LTF are both ranging — no directional bias to trade." };
   }
 
   // Collect all UNMITIGATED LTF FVG/OB on the trade side, regardless of whether
