@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SignalCard } from "@/components/SignalCard";
 import { NewsPanel } from "@/components/NewsPanel";
 import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech";
-import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
+import { analyzeGold, normalizeQuery, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { getGoldNews } from "@/lib/news.functions";
 import { useCredits } from "@/hooks/useCredits";
 import { appendVoiceTurn } from "@/lib/voice-history";
@@ -157,7 +157,8 @@ const SYMBOL_KEYWORDS: Array<{ rx: RegExp; sym: string }> = [
 ];
 
 function detectSymbol(query: string): string {
-  for (const { rx, sym } of SYMBOL_KEYWORDS) if (rx.test(query)) return sym;
+  const q = normalizeQuery(query);
+  for (const { rx, sym } of SYMBOL_KEYWORDS) if (rx.test(q)) return sym;
   return "XAUUSD";
 }
 
@@ -242,7 +243,7 @@ function Home() {
     if (loadingRef.current || !query.trim()) return;
 
     // Signal/setup/trade intent → navigate to /signal page for ANY instrument the user names
-    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analy[sz]e|live\s*chart|show\s*chart|new\s*signal|chart\s*open|open\s*chart|view\s*chart)\b/i.test(query)) {
+    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analyze|analysis|live\s*chart|show\s*chart|new\s*signal|chart\s*open|open\s*chart|view\s*chart)\b/i.test(normalizeQuery(query))) {
       const symbol = detectSymbol(query);
       speech.stopSpeaking();
       speech.pauseListening();
