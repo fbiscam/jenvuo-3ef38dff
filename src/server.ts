@@ -1,7 +1,23 @@
 import "./lib/error-capture";
 
+// Eagerly register all server-fn modules with the Worker runtime so their
+// handler IDs are present in the manifest before the first client call.
+// Without these static imports, lazy `getServerFnById()` lookups fail with
+// "Server function info not found for ..." on Cloudflare Workers (the dev
+// warm-loader in vite.config.ts covers dev only).
+import "./lib/gold-analysis.functions";
+import "./lib/signal-agent.functions";
+import "./lib/signal-alerts.functions";
+import "./lib/news.functions";
+import "./lib/credits.functions";
+import "./lib/contact.functions";
+import "./lib/voice-history.functions";
+import "./lib/backtest.functions";
+import "./lib/backtest-historical.functions";
+
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
