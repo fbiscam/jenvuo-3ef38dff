@@ -1486,8 +1486,7 @@ function buildFeedFallbackPlan(args: {
 }
 
 export async function computeSignalPlan(data: { symbol: string }): Promise<SignalPlan> {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+    // AI key is validated inside callChatCompletion — no local read needed.
 
     const inst = resolveInstrument(data.symbol);
 
