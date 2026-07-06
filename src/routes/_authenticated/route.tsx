@@ -1,5 +1,11 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { useAutoCloseTrades } from "@/hooks/useAutoCloseTrades";
+
+function AuthenticatedLayout() {
+  useAutoCloseTrades();
+  return <Outlet />;
+}
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
@@ -11,5 +17,5 @@ export const Route = createFileRoute("/_authenticated")({
     }
     return { user: session.user };
   },
-  component: () => <Outlet />,
+  component: AuthenticatedLayout,
 });
