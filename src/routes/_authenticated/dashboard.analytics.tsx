@@ -32,16 +32,22 @@ function Analytics() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    let stopped = false;
+    const fetchTrades = async () => {
       const { data } = await supabase
         .from("trade_journal")
         .select("id,pair,direction,outcome,pnl,entry,stop_loss,take_profit,opened_at,closed_at")
         .order("opened_at", { ascending: false })
         .limit(1000);
+      if (stopped) return;
       setTrades((data as unknown as Trade[]) ?? []);
       setLoading(false);
-    })();
+    };
+    fetchTrades();
+    const id = setInterval(fetchTrades, 2000);
+    return () => { stopped = true; clearInterval(id); };
   }, []);
+
 
   const stats = useMemo(() => computeStats(trades), [trades]);
 
