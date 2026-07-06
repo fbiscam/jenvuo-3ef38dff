@@ -195,7 +195,7 @@ async function assertCrossPairFxValue(
 // the single choke-point every intent / instrument matcher runs through, so
 // "anlyze xau/usd", "analze gold", "analays xauusd", "kro analysis" all end
 // up as if the user had typed the correct English words.
-function normalizeQuery(text: string): string {
+export function normalizeQuery(text: string): string {
   let q = String(text || "").toLowerCase();
 
   // Collapse runs of the same letter (helllooo → hello, analyyyze → analyze).
