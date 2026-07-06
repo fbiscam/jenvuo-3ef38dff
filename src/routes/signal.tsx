@@ -1196,9 +1196,9 @@ function SignalPage() {
                   <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Confluences</span>
                   <ul className="space-y-1">
                     {plan.confluences.map((c, i) => (
-                      <li key={i} className="text-[11px] text-zinc-800 leading-snug flex gap-1.5 whitespace-nowrap overflow-hidden" title={c}>
+                      <li key={i} className="text-[11px] text-zinc-800 leading-snug flex gap-1.5" title={c}>
                         <span className="text-zinc-400 shrink-0">+</span>
-                        <span className="truncate">{c}</span>
+                        <span className="line-clamp-2">{c}</span>
                       </li>
                     ))}
                   </ul>
