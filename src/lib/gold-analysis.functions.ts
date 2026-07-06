@@ -522,7 +522,7 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 // force a rigid "WAIT on XAU/USD: …" reply, so they are intentionally excluded.
 function isTradingSetupIntent(q: string): boolean {
   const n = normalizeQuery(q);
-  return /\b(analyze|analysis|setup|signal|entry|stop\s*loss|take\s*profit|\btp\b|\bsl\b|order\s*block|fvg|liquidity|bos|choch|killzone|scalp|swing\s+trade|give\s+me\s+(a|the)\s+trade|find\s+(a|me)\s+trade|best\s+trade|any\s+trade|trade\s+idea|trade\s+plan|a\+\s*setup|buy|sell|long|short|xauusd|xaueur|xaugbp|xaujpy|xauaud|xauchf|gold)\b/i.test(n);
+  return /\b(analyze|analysis|setup|signal|entry|stop\s*loss|take\s*profit|\btp\b|\bsl\b|order\s*block|fvg|liquidity|bos|choch|killzone|scalp|swing\s+trade|give\s+me\s+(a|the)\s+trade|find\s+(a|me)\s+trade|best\s+trade|any\s+trade|trade\s+idea|trade\s+plan|a\+\s*setup|xauusd|xaueur|xaugbp|xaujpy|xauaud|xauchf)\b/i.test(n);
 }
 
 async function _analyzeGoldCompute(data: { timeframe: string; query: string }): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
