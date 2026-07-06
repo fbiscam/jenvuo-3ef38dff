@@ -1962,27 +1962,28 @@ function TradeManagementLadder({
 
   const steps = [
     {
-      label: "Step 1 · +1R hit",
+      label: "Step 1 · Jab profit +1R ho jaye",
       price: p1R,
-      action: "Close 50% · Move SL to Entry (Breakeven)",
-      why: "Aadha profit lock. Ab trade risk-free.",
+      action: "Aadhi (50%) trade band kar do, aur SL ko entry price par le aao",
+      why: "Aadha profit haath me aa gaya. Ab agar market wapas aaye to bhi loss nahi — trade risk-free ho gayi.",
       hit: rMultiple >= 1,
     },
     {
-      label: "Step 2 · +2R hit",
+      label: "Step 2 · Jab profit +2R ho jaye",
       price: p2R,
-      action: "Close 25% more · Move SL to +1R",
-      why: "1R profit locked. Baaki 25% runner.",
+      action: "25% aur band kar do, aur SL ko +1R wale price par move kar do",
+      why: "Ab 1R ka profit pakka lock ho gaya. Bachi hui 25% position ko chalne do — bada move milega to ye runner banegi.",
       hit: rMultiple >= 2,
     },
     {
-      label: "Step 3 · TP hit",
+      label: "Step 3 · Jab TP hit ho",
       price: t.tp,
-      action: "Baaki 25% auto-close on TP",
-      why: "Full 3R capture. Trade complete.",
+      action: "Bachi hui 25% position TP par khud band ho jayegi",
+      why: "Poora 3R profit mil gaya. Trade complete — ab next setup dhoondo.",
       hit: rMultiple >= 3 || status === "WIN",
     },
   ];
+
 
   return (
     <div className="rounded-md border border-zinc-100 bg-zinc-50/60 p-2 space-y-1.5">
