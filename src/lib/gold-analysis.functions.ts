@@ -3,7 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   analyzeTF, buildLiquidityPools, buildTrade, scoreSetup,
   computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
-  detectSMTDivergence, killzoneForPair,
+  detectSMTDivergence, killzoneForPair, detectMarketRegime,
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
