@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SignalCard } from "@/components/SignalCard";
 import { NewsPanel } from "@/components/NewsPanel";
 import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech";
-import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
+import { analyzeGold, normalizeQuery, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { getGoldNews } from "@/lib/news.functions";
 import { useCredits } from "@/hooks/useCredits";
 import { appendVoiceTurn } from "@/lib/voice-history";
