@@ -2014,16 +2014,12 @@ function TradeManagementLadder({
           </li>
         ))}
       </ol>
-      {status === "RUNNING" && rMultiple >= 1 && rMultiple < 2 && (
-        <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
-          ⚡ <b>Action now:</b> 50% band karo, SL ko entry ({t.entry.toFixed(dec)}) pe le aao.
-        </div>
-      )}
       {status === "RUNNING" && rMultiple >= 2 && rMultiple < 3 && (
         <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
-          ⚡ <b>Action now:</b> 25% aur band karo, SL ko +1R ({p1R.toFixed(dec)}) pe move karo.
+          ⚡ <b>Action now:</b> Close 75%, move SL to +1R ({p1R.toFixed(dec)}).
         </div>
       )}
+
     </div>
   );
 }
