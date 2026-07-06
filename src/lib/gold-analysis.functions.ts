@@ -1879,63 +1879,54 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
 VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only for true A+ institutional setups.`;
 
-        const reviewController = new AbortController();
-        const reviewTimeout = setTimeout(() => reviewController.abort(), 20000);
-        const reviewRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-          body: JSON.stringify({
-            model: "google/gemini-3.5-flash",
-            messages: [
-              { role: "system", content: reviewSystem },
-              { role: "user", content: reviewUser },
-            ],
-            response_format: { type: "json_object" },
-            max_tokens: 400,
-          }),
-          signal: reviewController.signal,
-        }).finally(() => clearTimeout(reviewTimeout));
-
-        if (reviewRes.ok) {
-          const rj: any = await reviewRes.json();
-          const rc = rj?.choices?.[0]?.message?.content ?? "{}";
-          let review: any = {};
-          try { review = JSON.parse(rc); } catch { const m = rc.match(/\{[\s\S]*\}/); review = m ? JSON.parse(m[0]) : {}; }
-          const verdict = String(review.verdict || "").toUpperCase();
-          if (verdict === "VETO") {
-            setupGrade = "C";
-            setupScore = Math.min(setupScore, 50);
-            setupChecks.unshift({
-              key: "senior_veto",
-              label: "⛔ Senior trader veto",
-              pass: false,
-              reason: String(review.reasoning || "Veteran review vetoed this setup"),
-            });
-          } else if (verdict === "DOWNGRADE") {
-            setupGrade = setupGrade === "A+" ? "A" : "B";
-            setupScore = Math.max(60, setupScore - 15);
-            setupChecks.unshift({
-              key: "senior_downgrade",
-              label: "⚠ Senior review downgrade",
-              pass: false,
-              reason: String(review.reasoning || "Not quite A+ material"),
-            });
-          } else if (verdict === "CONFIRM") {
-            setupChecks.unshift({
-              key: "senior_confirm",
-              label: "✓ Senior trader confirms",
-              pass: true,
-              reason: String(review.reasoning || "Institutional-grade setup confirmed"),
-            });
-          }
-          if (review.counter_argument) {
-            setupChecks.push({
-              key: "counter_arg",
-              label: "Counter-argument (know your risk)",
-              pass: false,
-              reason: String(review.counter_argument),
-            });
-          }
+        const { content: rc } = await callChatCompletion({
+          models: [...MODEL_CHAIN.seniorReview],
+          messages: [
+            { role: "system", content: reviewSystem },
+            { role: "user", content: reviewUser },
+          ],
+          jsonMode: true,
+          maxTokens: 400,
+          timeoutMs: 20000,
+          priority: true,
+          retriesPerModel: 2,
+          stage: "senior-review",
+        });
+        const review: any = tryParseJsonLoose(rc) || {};
+        const verdict = String(review.verdict || "").toUpperCase();
+        if (verdict === "VETO") {
+          setupGrade = "C";
+          setupScore = Math.min(setupScore, 50);
+          setupChecks.unshift({
+            key: "senior_veto",
+            label: "⛔ Senior trader veto",
+            pass: false,
+            reason: String(review.reasoning || "Veteran review vetoed this setup"),
+          });
+        } else if (verdict === "DOWNGRADE") {
+          setupGrade = setupGrade === "A+" ? "A" : "B";
+          setupScore = Math.max(60, setupScore - 15);
+          setupChecks.unshift({
+            key: "senior_downgrade",
+            label: "⚠ Senior review downgrade",
+            pass: false,
+            reason: String(review.reasoning || "Not quite A+ material"),
+          });
+        } else if (verdict === "CONFIRM") {
+          setupChecks.unshift({
+            key: "senior_confirm",
+            label: "✓ Senior trader confirms",
+            pass: true,
+            reason: String(review.reasoning || "Institutional-grade setup confirmed"),
+          });
+        }
+        if (review.counter_argument) {
+          setupChecks.push({
+            key: "counter_arg",
+            label: "Counter-argument (know your risk)",
+            pass: false,
+            reason: String(review.counter_argument),
+          });
         }
       } catch {
         // Silent failure — Stage-1 grade stands
