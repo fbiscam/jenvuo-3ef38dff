@@ -1358,7 +1358,14 @@ function TfPill({ tfBias }: { tfBias: SignalPlan["multiTf"][number] }) {
 
 // -------------------- Confluence Heatmap --------------------
 function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
-  const checks = plan.setupChecks.slice(0, 6);
+  // Dedupe by short label so we don't render two identical tiles (e.g. two "E/SL/TP")
+  const seenShort = new Set<string>();
+  const checks = plan.setupChecks.filter((c) => {
+    const s = shortLabel(c.label);
+    if (seenShort.has(s)) return false;
+    seenShort.add(s);
+    return true;
+  }).slice(0, 6);
   const passed = checks.filter((c) => c.pass === true).length;
   const total = checks.length;
   const pct = total ? Math.round((passed / total) * 100) : 0;
