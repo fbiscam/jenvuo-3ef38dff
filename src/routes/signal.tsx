@@ -1938,6 +1938,105 @@ function TradeTrackerCard({
   );
 }
 
+/* ---------- TRADE MANAGEMENT LADDER (partial close + trailing SL) ---------- */
+function TradeManagementLadder({
+  plan,
+  rMultiple,
+  status,
+}: {
+  plan: SignalPlan;
+  rMultiple: number;
+  status: "PENDING" | "RUNNING" | "WIN" | "LOSS";
+}) {
+  const t = plan.trade;
+  const dec = plan.instrument.decimals;
+  const isBuy = t.direction === "BUY";
+  const risk = Math.abs(t.entry - t.sl);
+  // 1R, 2R prices in the trade's direction
+  const p1R = isBuy ? t.entry + risk : t.entry - risk;
+  const p2R = isBuy ? t.entry + risk * 2 : t.entry - risk * 2;
+
+  const steps = [
+    {
+      label: "Step 1 · +1R hit",
+      price: p1R,
+      action: "Close 50% · Move SL to Entry (Breakeven)",
+      why: "Aadha profit lock. Ab trade risk-free.",
+      hit: rMultiple >= 1,
+    },
+    {
+      label: "Step 2 · +2R hit",
+      price: p2R,
+      action: "Close 25% more · Move SL to +1R",
+      why: "1R profit locked. Baaki 25% runner.",
+      hit: rMultiple >= 2,
+    },
+    {
+      label: "Step 3 · TP hit",
+      price: t.tp,
+      action: "Baaki 25% auto-close on TP",
+      why: "Full 3R capture. Trade complete.",
+      hit: rMultiple >= 3 || status === "WIN",
+    },
+  ];
+
+  return (
+    <div className="rounded-md border border-zinc-100 bg-zinc-50/60 p-2 space-y-1.5">
+      <div className={`flex items-center justify-between text-[10px] ${MONO} uppercase tracking-widest text-zinc-500`}>
+        <span>Trade Management</span>
+        <span className="text-[9px] text-zinc-400">Partial + Trailing SL</span>
+      </div>
+      <ol className="space-y-1">
+        {steps.map((s, i) => (
+          <li
+            key={i}
+            className={cn(
+              "flex items-start gap-2 rounded px-2 py-1.5 border transition-colors",
+              s.hit
+                ? "bg-emerald-50 border-emerald-200"
+                : "bg-white border-zinc-100",
+            )}
+          >
+            <span
+              className={cn(
+                "mt-0.5 h-4 w-4 flex-shrink-0 rounded-full text-[9px] font-bold flex items-center justify-center",
+                s.hit ? "bg-emerald-500 text-white" : "bg-zinc-200 text-zinc-600",
+              )}
+            >
+              {s.hit ? "✓" : i + 1}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <span className={`text-[10px] font-bold ${MONO} ${s.hit ? "text-emerald-700" : "text-zinc-700"}`}>
+                  {s.label}
+                </span>
+                <span className={`text-[10px] tabular-nums ${MONO} ${s.hit ? "text-emerald-700" : "text-zinc-500"}`}>
+                  @ {s.price.toFixed(dec)}
+                </span>
+              </div>
+              <div className={`text-[10px] leading-snug mt-0.5 ${s.hit ? "text-emerald-800" : "text-zinc-700"}`}>
+                {s.action}
+              </div>
+              <div className="text-[9px] text-zinc-500 leading-snug mt-0.5">{s.why}</div>
+            </div>
+          </li>
+        ))}
+      </ol>
+      {status === "RUNNING" && rMultiple >= 1 && rMultiple < 2 && (
+        <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
+          ⚡ <b>Action now:</b> 50% band karo, SL ko entry ({t.entry.toFixed(dec)}) pe le aao.
+        </div>
+      )}
+      {status === "RUNNING" && rMultiple >= 2 && rMultiple < 3 && (
+        <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
+          ⚡ <b>Action now:</b> 25% aur band karo, SL ko +1R ({p1R.toFixed(dec)}) pe move karo.
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 /* ---------- SIGNAL VOICE AGENT (orb + chat + chart marking) ---------- */
 function SignalVoiceAgent({
   plan,
