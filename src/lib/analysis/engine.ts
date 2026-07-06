@@ -284,13 +284,18 @@ export function buildTrade(
   assetKind: "crypto" | "metal" | "forex" | "index" | "stock" = "metal",
 ): BuiltTrade {
   const profile = RISK_PROFILE[assetKind] ?? RISK_PROFILE.metal;
-  // Direction from HTF + LTF agreement
+  // Direction is anchored on HTF bias (institutional bias). In ICT / SMC an
+  // opposing LTF leg is a pullback INTO the HTF-aligned zone, so LTF
+  // disagreement is expected on retracement setups — it is not a WAIT reason.
+  // If HTF is ranging, fall back to LTF direction. Both ranging → WAIT.
   const dir: "BUY" | "SELL" | "WAIT" =
-    htf.trend === "bullish" && (ltf.trend === "bullish" || ltf.trend === "ranging") ? "BUY" :
-    htf.trend === "bearish" && (ltf.trend === "bearish" || ltf.trend === "ranging") ? "SELL" : "WAIT";
+    htf.trend === "bullish" ? "BUY" :
+    htf.trend === "bearish" ? "SELL" :
+    ltf.trend === "bullish" ? "BUY" :
+    ltf.trend === "bearish" ? "SELL" : "WAIT";
 
   if (dir === "WAIT") {
-    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF/LTF disagree — no clean trend." };
+    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF and LTF are both ranging — no directional bias to trade." };
   }
 
   // Collect all UNMITIGATED LTF FVG/OB on the trade side, regardless of whether
@@ -475,10 +480,9 @@ export function scoreSetup(args: {
   // (no_sweep is not a veto anymore; it's already a scored factor. This prevents
   // the engine from downgrading every off-session setup to grade C.)
   if (dir !== "WAIT") {
-    // 1. HTF/LTF bias conflict — real conflict, not "ranging"
-    if (htf.trend !== "ranging" && ltf.trend !== "ranging" && htf.trend !== ltf.trend) {
-      vetos.push({ key: "bias_conflict", label: "HTF/LTF bias conflict", reason: `HTF ${htf.trend} vs LTF ${ltf.trend}` });
-    }
+    // 1. HTF/LTF bias conflict is NOT a veto — a counter-trend LTF pullback
+    //    is exactly the entry window into HTF bias. The `bias` scored factor
+    //    below already rewards alignment, so we don't double-punish disagreement.
     // 2. Entry zone already mitigated
     if (zoneMitigated === true) {
       vetos.push({ key: "mitigated", label: "Entry zone already mitigated", reason: "Zone was tagged — imbalance filled" });
@@ -499,9 +503,9 @@ export function scoreSetup(args: {
     if (weight > 0) f.push({ key, label, weight, pass, detail });
   };
 
-  push("bias", "HTF + LTF bias aligned",
+  push("bias", "HTF bias aligned with trade",
     dir !== "WAIT" && htf.trend === (dir === "BUY" ? "bullish" : "bearish"),
-    `HTF: ${htf.trend} · LTF: ${ltf.trend}`);
+    `HTF: ${htf.trend} · LTF: ${ltf.trend}${htf.trend !== ltf.trend && ltf.trend !== "ranging" ? " (LTF pullback into HTF bias — normal)" : ""}`);
 
   const sweptPool = pools.find(p => p.swept && (dir === "BUY" ? p.side === "sell" : p.side === "buy"));
   push("sweep", "Liquidity sweep before entry", !!sweptPool,
