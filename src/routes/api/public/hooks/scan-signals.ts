@@ -86,7 +86,7 @@ async function scanOnePair(
 
   const grade = plan.setupGrade
   const direction = plan.trade.direction
-  const acceptableGrades = ['A+', 'A', 'B']
+  const acceptableGrades = ['B']
   if (!acceptableGrades.includes(grade) || (direction !== 'BUY' && direction !== 'SELL') || plan.setupScore < 60) {
     return { skipped: 'below_threshold', grade, direction, score: plan.setupScore }
   }
