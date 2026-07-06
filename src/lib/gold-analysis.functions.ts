@@ -5,6 +5,10 @@ import {
   computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
   detectSMTDivergence, killzoneForPair,
 } from "@/lib/analysis/engine";
+import {
+  callChatCompletion, tryParseJsonLoose, AiGatewayError,
+  MODEL_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
+} from "@/lib/ai-gateway";
 
 async function _spendUserCredits(userId: string, amount: number, reason: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
