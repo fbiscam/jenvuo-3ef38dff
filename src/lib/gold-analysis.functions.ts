@@ -1669,50 +1669,22 @@ ${fmt(ltfPrompt)}
 
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
-    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-3.5-flash",
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 8192,
-      }),
+    const { content } = await callChatCompletion({
+      models: [...MODEL_CHAIN.narration],
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+      jsonMode: true,
+      maxTokens: 8192,
+      timeoutMs: 30000,
+      priority: true,
+      stage: "signal-narration",
+    }).catch((err: unknown) => {
+      if (err instanceof AiGatewayError) throw new Error(err.message);
+      throw err;
     });
-
-    if (!aiRes.ok) {
-      const txt = await aiRes.text();
-      if (aiRes.status === 429) throw new Error("Rate limit. Try again in a moment.");
-      if (aiRes.status === 402) throw new Error("AI credits exhausted.");
-      throw new Error(`AI error ${aiRes.status}: ${txt.slice(0, 200)}`);
-    }
-    const aiJson: any = await aiRes.json();
-    const content = aiJson?.choices?.[0]?.message?.content ?? "{}";
-    let parsed: any = {};
-    const tryParse = (s: string) => { try { return JSON.parse(s); } catch { return null; } };
-    const repair = (s: string) =>
-      s
-        .replace(/```json\s*/gi, "")
-        .replace(/```\s*/g, "")
-        .replace(/[\x00-\x1F\x7F]/g, " ")
-        .replace(/,\s*([}\]])/g, "$1");
-    parsed = tryParse(content);
-    if (!parsed) {
-      const m = content.match(/\{[\s\S]*\}/);
-      if (m) {
-        parsed = tryParse(m[0]) ?? tryParse(repair(m[0]));
-        if (!parsed) {
-          let s = repair(m[0]);
-          const opens = (s.match(/\{/g) || []).length - (s.match(/\}/g) || []).length;
-          const opensA = (s.match(/\[/g) || []).length - (s.match(/\]/g) || []).length;
-          s = s.replace(/,\s*$/, "") + "]".repeat(Math.max(0, opensA)) + "}".repeat(Math.max(0, opens));
-          parsed = tryParse(s) ?? {};
-        }
-      }
-    }
+    const parsed: any = tryParseJsonLoose(content) || {};
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
       ? "high"
