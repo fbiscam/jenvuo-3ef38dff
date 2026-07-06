@@ -157,7 +157,8 @@ const SYMBOL_KEYWORDS: Array<{ rx: RegExp; sym: string }> = [
 ];
 
 function detectSymbol(query: string): string {
-  for (const { rx, sym } of SYMBOL_KEYWORDS) if (rx.test(query)) return sym;
+  const q = normalizeQuery(query);
+  for (const { rx, sym } of SYMBOL_KEYWORDS) if (rx.test(q)) return sym;
   return "XAUUSD";
 }
 
