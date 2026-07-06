@@ -962,9 +962,9 @@ function SignalPage() {
                     const away = (driftPct * 100).toFixed(2);
                     const isChase = (isBuy && livePrice > t.entry) || (isSell && livePrice < t.entry);
                     return (
-                      <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
-                        <span className="mt-0.5">⚠</span>
-                        <span>
+                      <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800 leading-relaxed">
+                        <span className="mt-0.5 shrink-0">⚠</span>
+                        <span className="break-words">
                           Live price ({plan.instrument.kind === "crypto" ? "" : "$"}{livePrice.toFixed(plan.instrument.decimals)}) has drifted <b>{away}%</b> from entry ({plan.instrument.kind === "crypto" ? "" : "$"}{t.entry.toFixed(plan.instrument.decimals)}).
                           {" "}{isChase ? "Do NOT chase — " : "Wait for a pullback into entry or "}re-analyze for a fresh plan.
                         </span>
