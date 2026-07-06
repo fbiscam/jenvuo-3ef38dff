@@ -592,6 +592,99 @@ export function computeATR(candles: Candle[], period = 14): number {
   return slice.reduce((s, x) => s + x, 0) / slice.length;
 }
 
+// ---------- Market Regime (wisdom layer) ----------
+// Detects whether the market is trending, ranging, choppy or volatile so the
+// score/AI can adapt. This is what a 25-year veteran does implicitly before
+// even looking at a setup: "what kind of tape are we in?"
+export type MarketRegime = {
+  regime: "trending" | "ranging" | "choppy" | "volatile";
+  confidence: number;      // 0-100 — how sure we are
+  trendStrength: number;   // 0-100 — ADX-like
+  volatility: number;      // ATR / price (%)
+  rangeCompression: number;// last-20 range / last-50 range
+  warning: string | null;  // human-readable caution
+  favorable: boolean;      // true = ICT signals typically work here
+};
+
+export function detectMarketRegime(candles: Candle[]): MarketRegime {
+  if (candles.length < 30) {
+    return {
+      regime: "ranging", confidence: 30, trendStrength: 0,
+      volatility: 0, rangeCompression: 1,
+      warning: "Not enough data — trade with reduced size",
+      favorable: false,
+    };
+  }
+
+  const last = candles[candles.length - 1].c;
+  const atr = computeATR(candles, 14);
+  const atrPct = last > 0 ? (atr / last) * 100 : 0;
+
+  // Trend strength via directional movement (simplified ADX)
+  let posDM = 0, negDM = 0, sumTR = 0;
+  const period = Math.min(14, candles.length - 1);
+  for (let i = candles.length - period; i < candles.length; i++) {
+    const c = candles[i], p = candles[i - 1];
+    const upMove = c.h - p.h;
+    const dnMove = p.l - c.l;
+    if (upMove > dnMove && upMove > 0) posDM += upMove;
+    if (dnMove > upMove && dnMove > 0) negDM += dnMove;
+    sumTR += Math.max(c.h - c.l, Math.abs(c.h - p.c), Math.abs(c.l - p.c));
+  }
+  const posDI = sumTR > 0 ? (posDM / sumTR) * 100 : 0;
+  const negDI = sumTR > 0 ? (negDM / sumTR) * 100 : 0;
+  const dx = posDI + negDI > 0 ? (Math.abs(posDI - negDI) / (posDI + negDI)) * 100 : 0;
+  const trendStrength = Math.min(100, dx);
+
+  // Range compression: last 20 range vs last 50 range
+  const last20 = candles.slice(-20);
+  const last50 = candles.slice(-50);
+  const range20 = Math.max(...last20.map(c => c.h)) - Math.min(...last20.map(c => c.l));
+  const range50 = Math.max(...last50.map(c => c.h)) - Math.min(...last50.map(c => c.l));
+  const rangeCompression = range50 > 0 ? range20 / range50 : 1;
+
+  // Classification thresholds — tuned for gold/forex intraday
+  // volatile: extreme ATR% (news/gap moves)
+  // trending: ADX > 25 AND range not compressed
+  // ranging: ADX < 20 AND range compressed
+  // choppy: everything else (whipsaws, no edge)
+  let regime: MarketRegime["regime"];
+  let warning: string | null = null;
+  let favorable = false;
+  let confidence = 50;
+
+  if (atrPct > 1.5) {
+    regime = "volatile";
+    warning = "Extreme volatility — spreads widen, SLs get hunted. Reduce size or skip.";
+    confidence = 75;
+    favorable = false;
+  } else if (trendStrength >= 25 && rangeCompression >= 0.6) {
+    regime = "trending";
+    confidence = Math.min(90, 50 + trendStrength);
+    favorable = true;
+  } else if (trendStrength < 20 && rangeCompression < 0.55) {
+    regime = "ranging";
+    warning = "Range-bound market — FVG/OB signals often fail. Fade extremes only.";
+    confidence = 70;
+    favorable = false;
+  } else {
+    regime = "choppy";
+    warning = "Choppy tape — no clear direction. Prefer waiting for regime shift.";
+    confidence = 60;
+    favorable = false;
+  }
+
+  return {
+    regime,
+    confidence: Math.round(confidence),
+    trendStrength: Math.round(trendStrength),
+    volatility: +atrPct.toFixed(3),
+    rangeCompression: +rangeCompression.toFixed(2),
+    warning,
+    favorable,
+  };
+}
+
 // ---------- Breaker Blocks ----------
 // A breaker = OB whose extreme was broken then price returned to it,
 // now acting as flipped support/resistance.
