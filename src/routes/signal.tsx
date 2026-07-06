@@ -1962,27 +1962,14 @@ function TradeManagementLadder({
 
   const steps = [
     {
-      label: "Step 1 · Jab profit +1R ho jaye",
-      price: p1R,
-      action: "Aadhi (50%) trade band kar do, aur SL ko entry price par le aao",
-      why: "Aadha profit haath me aa gaya. Ab agar market wapas aaye to bhi loss nahi — trade risk-free ho gayi.",
-      hit: rMultiple >= 1,
-    },
-    {
-      label: "Step 2 · Jab profit +2R ho jaye",
+      label: "Step 1 · +2R hit",
       price: p2R,
-      action: "25% aur band kar do, aur SL ko +1R wale price par move kar do",
-      why: "Ab 1R ka profit pakka lock ho gaya. Bachi hui 25% position ko chalne do — bada move milega to ye runner banegi.",
+      action: "Close 75% · Move SL to +1R",
+      why: "Most profit locked. Baaki 25% runner.",
       hit: rMultiple >= 2,
     },
-    {
-      label: "Step 3 · Jab TP hit ho",
-      price: t.tp,
-      action: "Bachi hui 25% position TP par khud band ho jayegi",
-      why: "Poora 3R profit mil gaya. Trade complete — ab next setup dhoondo.",
-      hit: rMultiple >= 3 || status === "WIN",
-    },
   ];
+
 
 
   return (
@@ -2027,16 +2014,12 @@ function TradeManagementLadder({
           </li>
         ))}
       </ol>
-      {status === "RUNNING" && rMultiple >= 1 && rMultiple < 2 && (
-        <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
-          ⚡ <b>Action now:</b> 50% band karo, SL ko entry ({t.entry.toFixed(dec)}) pe le aao.
-        </div>
-      )}
       {status === "RUNNING" && rMultiple >= 2 && rMultiple < 3 && (
         <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
-          ⚡ <b>Action now:</b> 25% aur band karo, SL ko +1R ({p1R.toFixed(dec)}) pe move karo.
+          ⚡ <b>Action now:</b> Close 75%, move SL to +1R ({p1R.toFixed(dec)}).
         </div>
       )}
+
     </div>
   );
 }
