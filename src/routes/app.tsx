@@ -242,7 +242,7 @@ function Home() {
     if (loadingRef.current || !query.trim()) return;
 
     // Signal/setup/trade intent → navigate to /signal page for ANY instrument the user names
-    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analy[sz]e|live\s*chart|show\s*chart|new\s*signal|chart\s*open|open\s*chart|view\s*chart)\b/i.test(query)) {
+    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analyze|analysis|live\s*chart|show\s*chart|new\s*signal|chart\s*open|open\s*chart|view\s*chart)\b/i.test(normalizeQuery(query))) {
       const symbol = detectSymbol(query);
       speech.stopSpeaking();
       speech.pauseListening();
