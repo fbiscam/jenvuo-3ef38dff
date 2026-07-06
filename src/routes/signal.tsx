@@ -1931,11 +1931,9 @@ function TradeTrackerCard({
         </svg>
       )}
 
-      {rMultiple >= 1 && status === "RUNNING" && (
-        <div className="text-[10px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
-          Suggestion: move SL to break-even — 1R secured.
-        </div>
-      )}
+      {/* Trade Management Ladder — partial close + trailing SL plan */}
+      <TradeManagementLadder plan={plan} rMultiple={rMultiple} status={status} />
+
     </motion.div>
   );
 }
