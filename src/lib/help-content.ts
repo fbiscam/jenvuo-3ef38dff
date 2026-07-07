@@ -380,21 +380,21 @@ export const collections: Collection[] = [
         summary: "Signals, narrated walkthroughs and voice replies each have a credit cost.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Credits are the unit of compute on Jenvu. One credit ≈ $0.10 at list price; paid plans bring the effective rate down significantly." },
+          { type: "p", content: "Credits are the unit of compute on Jenvu. Every billable action costs exactly 1 credit — no hidden multipliers, no per-feature pricing." },
 
           { type: "h2", content: "Action costs" },
           { type: "ul", items: [
-            "Signal only (chart markings + score) — 2 credits.",
-            "Signal + full ICT/SMC narration — 5 credits.",
+            "Signal (chart markings + score) — 1 credit.",
+            "Full ICT / SMC narration — 1 credit.",
             "Voice agent reply (per turn) — 1 credit.",
-            "A+ push alert delivered to you — free.",
+            "A+ push / email alert delivered to you — free.",
           ]},
 
           { type: "h2", content: "How credits refresh" },
           { type: "ul", items: [
-            "Free: starter credits, no monthly top-up.",
-            "Pro: 175 credits added on each billing date.",
-            "Elite: 595 credits added on each billing date.",
+            "Free: 10 credits per month.",
+            "Pro: 230 credits added on each billing date.",
+            "Elite: 800 credits added on each billing date.",
             "Unused credits roll over for one billing cycle.",
           ]},
 
