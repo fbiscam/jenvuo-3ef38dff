@@ -402,7 +402,7 @@ function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t:
       source: "outside" as const,
     };
 
-    const { data, error } = await supabase.from("trade_journal").insert(payload).select("*").single();
+    const { data, error } = await supabase.from("trade_journal").insert(payload as never).select("*").single();
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Trade logged");
