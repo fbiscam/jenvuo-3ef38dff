@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, BookOpen } from "lucide-react";
+import { Trash2, BookOpen, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
@@ -25,6 +25,7 @@ type Trade = {
   notes: string | null;
   opened_at: string;
   closed_at: string | null;
+  source: "system" | "outside";
 };
 
 
@@ -33,6 +34,7 @@ function Journal() {
   const { features, isLoading } = useCredits();
   const locked = !isLoading && !features.journal;
   const [trades, setTrades] = useState<Trade[]>([]);
+  const [showLog, setShowLog] = useState(false);
 
 
   const load = async () => {
@@ -189,6 +191,19 @@ function Journal() {
     >
     <div className="space-y-6">
 
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">Trades</h2>
+          <p className="text-xs text-zinc-500">System = executed via Jenvu signal. Outside = manually logged.</p>
+        </div>
+        <button
+          onClick={() => setShowLog(true)}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 transition"
+        >
+          <Plus className="h-3.5 w-3.5" /> Log Trade
+        </button>
+      </div>
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { k: "Trades", v: stats.total, live: false },
@@ -216,19 +231,26 @@ function Journal() {
       </div>
 
 
+
       {!trades.length ? (
         <div className="rounded-2xl border border-dashed border-zinc-300 p-10 text-center">
           <BookOpen className="mx-auto h-8 w-8 text-zinc-400" />
           <h3 className="mt-3 text-base font-semibold">No trades logged yet</h3>
           <p className="mt-1 text-sm text-zinc-500">Track entries, exits and outcomes to surface your real win rate.</p>
+          <button
+            onClick={() => setShowLog(true)}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 transition"
+          >
+            <Plus className="h-3.5 w-3.5" /> Log Trade
+          </button>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
-          <table className="w-full min-w-[720px] text-sm">
+          <table className="w-full min-w-[780px] text-sm">
 
             <thead className="bg-zinc-50 text-left font-mono text-[10px] uppercase tracking-wider text-zinc-500">
               <tr>
-                {["Date", "Pair", "Dir", "Entry", "Price", "SL", "TP", "Result", "P&L", ""].map((h) => (
+                {["Date", "Pair", "Dir", "Source", "Entry", "Price", "SL", "TP", "Result", "P&L", ""].map((h) => (
                   <th key={h} className="px-3 py-2 font-medium">{h}</th>
                 ))}
               </tr>
@@ -255,6 +277,11 @@ function Journal() {
                     <td className="px-3 py-2.5">
                       <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${t.direction === "long" ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
                         {t.direction}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${t.source === "outside" ? "bg-amber-50 text-amber-700" : "bg-indigo-50 text-indigo-700"}`}>
+                        {t.source === "outside" ? "Outside" : "System"}
                       </span>
                     </td>
                     <td className="px-3 py-2.5 font-mono text-xs">{t.entry ?? "—"}</td>
@@ -326,7 +353,138 @@ function Journal() {
         </div>
       )}
 
+      {showLog && (
+        <LogTradeModal
+          onClose={() => setShowLog(false)}
+          onSaved={(t) => { setTrades((prev) => [t, ...prev]); setShowLog(false); }}
+        />
+      )}
+
     </div>
     </UpgradeOverlay>
+  );
+}
+
+function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t: Trade) => void }) {
+  const [pair, setPair] = useState("XAUUSD");
+  const [direction, setDirection] = useState<"long" | "short">("long");
+  const [entry, setEntry] = useState("");
+  const [sl, setSl] = useState("");
+  const [tp, setTp] = useState("");
+  const [outcome, setOutcome] = useState<Trade["outcome"]>("open");
+  const [pnl, setPnl] = useState("");
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    const { data: userData } = await supabase.auth.getUser();
+    const uid = userData.user?.id;
+    if (!uid) { toast.error("Not signed in"); setSaving(false); return; }
+
+    const parseNum = (v: string) => v.trim() === "" ? null : Number(v);
+    const now = new Date().toISOString();
+    const closed = outcome === "win" || outcome === "loss" || outcome === "breakeven";
+
+    const payload = {
+      user_id: uid,
+      pair: pair.toUpperCase().trim(),
+      direction,
+      entry: parseNum(entry),
+      stop_loss: parseNum(sl),
+      take_profit: parseNum(tp),
+      outcome,
+      pnl: parseNum(pnl),
+      notes: notes.trim() || null,
+      opened_at: now,
+      closed_at: closed ? now : null,
+      source: "outside" as const,
+    };
+
+    const { data, error } = await supabase.from("trade_journal").insert(payload as never).select("*").single();
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Trade logged");
+    onSaved(data as unknown as Trade);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <form
+        onClick={(e) => e.stopPropagation()}
+        onSubmit={submit}
+        className="w-full max-w-lg rounded-2xl bg-white shadow-xl"
+      >
+        <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-3">
+          <div>
+            <div className="text-sm font-semibold">Log Trade</div>
+            <div className="text-[11px] text-zinc-500">Manually record a trade taken outside Jenvu.</div>
+          </div>
+          <button type="button" onClick={onClose} className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 p-5">
+          <label className="col-span-1 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Pair</span>
+            <input value={pair} onChange={(e) => setPair(e.target.value)} required className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
+          </label>
+          <label className="col-span-1 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Direction</span>
+            <select value={direction} onChange={(e) => setDirection(e.target.value as "long" | "short")} className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-900">
+              <option value="long">Long</option>
+              <option value="short">Short</option>
+            </select>
+          </label>
+
+          <label className="col-span-2 text-xs sm:col-span-1">
+            <span className="mb-1 block font-medium text-zinc-700">Entry</span>
+            <input value={entry} onChange={(e) => setEntry(e.target.value)} inputMode="decimal" className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
+          </label>
+          <label className="col-span-2 text-xs sm:col-span-1">
+            <span className="mb-1 block font-medium text-zinc-700">Outcome</span>
+            <select value={outcome} onChange={(e) => setOutcome(e.target.value as Trade["outcome"])} className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-900">
+              <option value="pending">Pending</option>
+              <option value="open">Open</option>
+              <option value="win">Win</option>
+              <option value="loss">Loss</option>
+              <option value="breakeven">Breakeven</option>
+            </select>
+          </label>
+
+          <label className="col-span-1 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Stop Loss</span>
+            <input value={sl} onChange={(e) => setSl(e.target.value)} inputMode="decimal" className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
+          </label>
+          <label className="col-span-1 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Take Profit</span>
+            <input value={tp} onChange={(e) => setTp(e.target.value)} inputMode="decimal" className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
+          </label>
+
+          {(outcome === "win" || outcome === "loss" || outcome === "breakeven") && (
+            <label className="col-span-2 text-xs">
+              <span className="mb-1 block font-medium text-zinc-700">P&L (points)</span>
+              <input value={pnl} onChange={(e) => setPnl(e.target.value)} inputMode="decimal" placeholder="e.g. 12.50 or -8.00" className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
+            </label>
+          )}
+
+          <label className="col-span-2 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Notes</span>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-900" />
+          </label>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 border-t border-zinc-100 px-5 py-3">
+          <button type="button" onClick={onClose} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50">
+            Cancel
+          </button>
+          <button type="submit" disabled={saving} className="rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-60">
+            {saving ? "Saving…" : "Save trade"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
