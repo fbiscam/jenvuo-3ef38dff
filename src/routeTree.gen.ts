@@ -171,9 +171,9 @@ const InsightsSlugRoute = InsightsSlugRouteImport.update({
   getParentRoute: () => InsightsRoute,
 } as any)
 const HelpCollectionRoute = HelpCollectionRouteImport.update({
-  id: '/$collection',
-  path: '/$collection',
-  getParentRoute: () => HelpRoute,
+  id: '/help/$collection',
+  path: '/help/$collection',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
@@ -545,6 +545,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  HelpCollectionRoute: typeof HelpCollectionRouteWithChildren
   HelpIndexRoute: typeof HelpIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
@@ -727,10 +728,10 @@ declare module '@tanstack/react-router' {
     }
     '/help/$collection': {
       id: '/help/$collection'
-      path: '/$collection'
+      path: '/help/$collection'
       fullPath: '/help/$collection'
       preLoaderRoute: typeof HelpCollectionRouteImport
-      parentRoute: typeof HelpRoute
+      parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
@@ -896,6 +897,18 @@ const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
   InsightsRouteChildren,
 )
 
+interface HelpCollectionRouteChildren {
+  HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
+}
+
+const HelpCollectionRouteChildren: HelpCollectionRouteChildren = {
+  HelpCollectionSlugRoute: HelpCollectionSlugRoute,
+}
+
+const HelpCollectionRouteWithChildren = HelpCollectionRoute._addFileChildren(
+  HelpCollectionRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -919,6 +932,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  HelpCollectionRoute: HelpCollectionRouteWithChildren,
   HelpIndexRoute: HelpIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
@@ -931,13 +945,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
