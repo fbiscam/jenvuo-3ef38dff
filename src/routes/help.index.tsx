@@ -8,7 +8,7 @@ import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { collections, allArticles, type Collection } from "@/lib/help-content";
 
-export const Route = createFileRoute("/help")({
+export const Route = createFileRoute("/help/")({
   head: () => ({
     meta: [
       { title: "Help Center — Guides, FAQs & Support | Jenvu AI" },

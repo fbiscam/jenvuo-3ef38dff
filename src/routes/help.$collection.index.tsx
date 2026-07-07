@@ -4,7 +4,7 @@ import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { findCollection, type Article } from "@/lib/help-content";
 
-export const Route = createFileRoute("/help/$collection")({
+export const Route = createFileRoute("/help/$collection/")({
   loader: ({ params }) => {
     const c = findCollection(params.collection);
     if (!c) throw notFound();
