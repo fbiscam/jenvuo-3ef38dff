@@ -376,16 +376,20 @@ function DashboardLayout() {
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
   const credits = useCredits();
+  const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
   const greetingText = pickGreeting(localHour);
 
   useEffect(() => {
+    // Wait until Supabase has restored the session; otherwise RLS-gated
+    // queries return empty because auth.uid() is null on a hard refresh.
+    if (authLoading) return;
+    if (!authUser) { setRefreshing(false); return; }
+
     let cancelled = false;
     (async () => {
       setRefreshing(true);
-      const { data } = await supabase.auth.getUser();
-      const u = data.user;
-      if (!u) { if (!cancelled) setRefreshing(false); return; }
+      const u = authUser;
       if (!cancelled) {
         setEmail(u.email ?? "");
         setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
@@ -420,7 +424,7 @@ function DashboardLayout() {
       setRefreshing(false);
     })();
     return () => { cancelled = true; };
-  }, [range, refreshTick]);
+  }, [range, refreshTick, authUser?.id, authLoading]);
 
   const openSymbols = useMemo(
     () => Array.from(new Set(counts.openTrades.map(t => t.pair.toUpperCase()))),
