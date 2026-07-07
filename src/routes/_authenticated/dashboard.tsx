@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
 import { useCredits } from "@/hooks/useCredits";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
