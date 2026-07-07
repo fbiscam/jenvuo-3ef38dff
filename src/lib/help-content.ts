@@ -354,7 +354,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Pro — $29 / month" },
           { type: "ul", items: [
             "230 monthly credits included.",
-            "1 credit per action — signal, voice, narration, alert.",
+            "Pay per action — signal 2, narration 3, alert 2, voice free.",
             "Full signal engine on all supported XAU cross-pairs.",
             "Realtime A+ email & push alerts (no delay).",
             "Full ICT / SMC narration, trade journal & analytics.",
@@ -380,14 +380,14 @@ export const collections: Collection[] = [
         summary: "Signals, narrated walkthroughs and voice replies each have a credit cost.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Credits are the unit of compute on Jenvu. Every billable action costs exactly 1 credit — no hidden multipliers, no per-feature pricing." },
+          { type: "p", content: "Credits are the unit of compute on Jenvu. Each billable action has its own cost — no hidden multipliers, no per-feature pricing." },
 
           { type: "h2", content: "Action costs" },
           { type: "ul", items: [
-            "Signal (chart markings + score) — 1 credit.",
-            "Full ICT / SMC narration — 1 credit.",
+            "Signal (chart markings + score) — 2 credits.",
+            "Full ICT / SMC narration — 3 credits.",
             "Voice agent reply (per turn) — free.",
-            "A+ push / email alert delivered to you — free.",
+            "A+ push / email alert delivered to you — 2 credits.",
           ]},
 
           { type: "h2", content: "How credits refresh" },

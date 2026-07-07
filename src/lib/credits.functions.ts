@@ -6,7 +6,7 @@ export const CREDIT_COSTS = {
   voice_query: 0,
   signal: 2,
   ict_narration: 3,
-  alert: 5,
+  alert: 2,
 } as const;
 
 export type CreditAction = keyof typeof CREDIT_COSTS;
