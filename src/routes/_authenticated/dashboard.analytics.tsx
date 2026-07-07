@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCredits } from "@/hooks/useCredits";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, CartesianGrid } from "recharts";
 import { TrendingUp, TrendingDown, Target, Activity, Award, AlertTriangle } from "lucide-react";
