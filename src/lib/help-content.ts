@@ -345,28 +345,30 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Free" },
           { type: "ul", items: [
-            "Starter credits on sign-up.",
+            "10 credits per month.",
             "Voice agent with basic narration.",
-            "Signal engine on Gold and one extra asset.",
+            "Signal engine on Gold.",
             "Standard A+ alerts (delayed by ~2 minutes).",
           ]},
 
           { type: "h2", content: "Pro — $29 / month" },
           { type: "ul", items: [
-            "175 monthly credits included.",
-            "Full signal engine on all supported assets.",
-            "Real-time A+ alerts (no delay).",
-            "Saved signals, journal and history.",
-            "Priority voice latency.",
+            "230 monthly credits included.",
+            "1 credit per action — signal, voice, narration, alert.",
+            "Full signal engine on all supported XAU cross-pairs.",
+            "Realtime A+ email & push alerts (no delay).",
+            "Full ICT / SMC narration, trade journal & analytics.",
+            "Multi-timeframe bias engine.",
           ]},
 
           { type: "h2", content: "Elite — $99 / month" },
           { type: "ul", items: [
-            "595 monthly credits included.",
+            "800 monthly credits included.",
             "Everything in Pro.",
-            "Higher concurrent analysis limits.",
-            "Priority alert queue.",
-            "Direct support channel.",
+            "Priority A+ alerts (< 30 seconds).",
+            "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF).",
+            "API access, webhooks and custom alert rules.",
+            "Dedicated onboarding & SLA.",
           ]},
 
           { type: "note", tone: "info", content: "See the Pricing page for the full feature matrix and the exact per-credit cost on each plan." },
