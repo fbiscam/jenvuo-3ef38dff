@@ -412,15 +412,16 @@ function PricingPage() {
           <div>
             <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Credit top-ups</span>
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more credits this month?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600">One-time packs that never expire. Stack on top of any plan, including Free.</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600">One-time packs that never expire. Stack on top of any plan, including Free. Every $1 = 8 credits.</p>
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {[
-            { credits: 50, price: 5, sub: "Starter" },
-            { credits: 250, price: 20, sub: "Trader", accent: true },
-            { credits: 750, price: 50, sub: "Desk" },
-            { credits: 2000, price: 120, sub: "Institutional" },
+            { credits: 40, price: 5, sub: "Starter" },
+            { credits: 80, price: 10, sub: "Boost" },
+            { credits: 160, price: 20, sub: "Trader", accent: true },
+            { credits: 400, price: 50, sub: "Power" },
+            { credits: 800, price: 100, sub: "Desk" },
           ].map((p) => (
             <div key={p.credits} className={`rounded-2xl border ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
               <div className="flex items-center justify-between">
@@ -440,6 +441,9 @@ function PricingPage() {
             </div>
           ))}
         </div>
+
+        {/* CUSTOM AMOUNT */}
+        <CustomTopUp />
       </section>
 
 
@@ -486,4 +490,47 @@ function Cell({ value, highlight }: { value: Mark; highlight?: boolean }) {
     );
   }
   return <td className={`${base} ${MONO} text-[11px] uppercase tracking-wider text-zinc-700`}>{value}</td>;
+}
+
+function CustomTopUp() {
+  const [amount, setAmount] = React.useState<number>(15);
+  const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
+  const credits = safe * 8;
+  return (
+    <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 sm:p-7">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
+        <div>
+          <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Custom top-up</span>
+          <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. Every $1 = 8 credits. Credits never expire.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center rounded-md border border-zinc-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-amber-400">
+            <span className="px-3 text-sm text-zinc-500 border-r border-zinc-200 bg-zinc-50">$</span>
+            <input
+              type="number"
+              min={5}
+              step={1}
+              value={Number.isFinite(amount) ? amount : ""}
+              onChange={(e) => setAmount(parseInt(e.target.value || "0", 10))}
+              className={`w-24 px-3 py-2 text-sm tabular-nums outline-none ${MONO}`}
+            />
+          </div>
+          <div className="text-right">
+            <div className={`text-2xl font-bold tabular-nums ${MONO}`}>{credits}</div>
+            <div className="text-[11px] text-zinc-500">credits</div>
+          </div>
+          <Link
+            to="/contact"
+            className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
+          >
+            Continue
+          </Link>
+        </div>
+      </div>
+      {amount < 5 && (
+        <p className="mt-3 text-[12px] text-rose-600">Minimum top-up is $5.</p>
+      )}
+    </div>
+  );
 }
