@@ -128,7 +128,7 @@ const FEATURE_BLOCKS = [
 
 type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
-  { feature: "Voice queries / day", free: "1", pro: "Unlimited", elite: "Unlimited" },
+  { feature: "Voice queries / day", free: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
   { feature: "A+ signal access", free: false, pro: true, elite: true },
   { feature: "Alert latency", free: "4h delay", pro: "Realtime", elite: "< 30s priority" },
   { feature: "ICT / SMC narration", free: false, pro: true, elite: true },
@@ -307,7 +307,7 @@ function PricingPage() {
               {([
                 { f: "Price", a: "Free", b: "$29/mo", c: "$99/mo", d: "Custom", isHeading: true },
                 { f: "Monthly credits", a: "10", b: "230", c: "800", d: "Custom" },
-                { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+                { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
                 { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
                 { f: "A+ signal access", a: false, b: true, c: true, d: true },
