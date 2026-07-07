@@ -66,7 +66,7 @@ const TIERS = [
     cta: "Start free",
     ctaTo: "/auth",
     credits: 10,
-    features: ["10 credits / month included", "1 credit per action (signal · voice · narration · alert)", "Delayed alerts (4h)", "Public market insights", "Community support"],
+    features: ["10 credits / month included", "Pay per action: signal 2, narration 3, alert 2, voice free", "Delayed alerts (4h)", "Public market insights", "Community support"],
 
     highlight: false,
   },
@@ -82,7 +82,7 @@ const TIERS = [
     credits: 230,
     features: [
       "230 credits / month included",
-      "1 credit per action — signal, voice, narration, alert",
+      "Pay per action — signal 2, narration 3, alert 2, voice free",
       "A+ / A institutional signals",
       "Realtime email & push alerts",
       "Full ICT / SMC narration",
@@ -104,7 +104,7 @@ const TIERS = [
     credits: 800,
     features: [
       "800 credits / month included",
-      "1 credit per action — everything unified",
+      "Pay per action — signal 2, narration 3, alert 2, voice free",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
       "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF)",
