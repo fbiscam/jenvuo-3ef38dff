@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const CREDIT_COSTS = {
-  voice_query: 1,
+  voice_query: 0,
   signal: 2,
   ict_narration: 3,
   alert: 5,
