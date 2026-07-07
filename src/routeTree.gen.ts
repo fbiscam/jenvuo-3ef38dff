@@ -19,7 +19,6 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LlmRouteImport } from './routes/llm'
 import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as InsightsRouteImport } from './routes/insights'
-import { Route as HelpRouteImport } from './routes/help'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as DevelopmentRouteImport } from './routes/development'
@@ -32,6 +31,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
+import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as HelpCollectionRouteImport } from './routes/help.$collection'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -101,11 +101,6 @@ const InsightsRoute = InsightsRouteImport.update({
   path: '/insights',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HelpRoute = HelpRouteImport.update({
-  id: '/help',
-  path: '/help',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DownloadRoute = DownloadRouteImport.update({
   id: '/download',
   path: '/download',
@@ -165,15 +160,20 @@ const InsightsIndexRoute = InsightsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => InsightsRoute,
 } as any)
+const HelpIndexRoute = HelpIndexRouteImport.update({
+  id: '/help/',
+  path: '/help/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => InsightsRoute,
 } as any)
 const HelpCollectionRoute = HelpCollectionRouteImport.update({
-  id: '/$collection',
-  path: '/$collection',
-  getParentRoute: () => HelpRoute,
+  id: '/help/$collection',
+  path: '/help/$collection',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
@@ -279,7 +279,6 @@ export interface FileRoutesByFullPath {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
-  '/help': typeof HelpRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
@@ -294,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/help/$collection': typeof HelpCollectionRouteWithChildren
   '/insights/$slug': typeof InsightsSlugRoute
+  '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -321,7 +321,6 @@ export interface FileRoutesByTo {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
-  '/help': typeof HelpRouteWithChildren
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
@@ -334,6 +333,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/help/$collection': typeof HelpCollectionRouteWithChildren
   '/insights/$slug': typeof InsightsSlugRoute
+  '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -363,7 +363,6 @@ export interface FileRoutesById {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
-  '/help': typeof HelpRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
@@ -378,6 +377,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/help/$collection': typeof HelpCollectionRouteWithChildren
   '/insights/$slug': typeof InsightsSlugRoute
+  '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -407,7 +407,6 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
-    | '/help'
     | '/insights'
     | '/killzones'
     | '/llm'
@@ -422,6 +421,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/help/$collection'
     | '/insights/$slug'
+    | '/help/'
     | '/insights/'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
@@ -449,7 +449,6 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
-    | '/help'
     | '/killzones'
     | '/llm'
     | '/pricing'
@@ -462,6 +461,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/help/$collection'
     | '/insights/$slug'
+    | '/help'
     | '/insights'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
@@ -490,7 +490,6 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
-    | '/help'
     | '/insights'
     | '/killzones'
     | '/llm'
@@ -505,6 +504,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/help/$collection'
     | '/insights/$slug'
+    | '/help/'
     | '/insights/'
     | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
@@ -534,7 +534,6 @@ export interface RootRouteChildren {
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
   DownloadRoute: typeof DownloadRoute
-  HelpRoute: typeof HelpRouteWithChildren
   InsightsRoute: typeof InsightsRouteWithChildren
   KillzonesRoute: typeof KillzonesRoute
   LlmRoute: typeof LlmRoute
@@ -546,6 +545,8 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  HelpCollectionRoute: typeof HelpCollectionRouteWithChildren
+  HelpIndexRoute: typeof HelpIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
   ApiPublicHooksNotifySubscribersRoute: typeof ApiPublicHooksNotifySubscribersRoute
@@ -625,13 +626,6 @@ declare module '@tanstack/react-router' {
       path: '/insights'
       fullPath: '/insights'
       preLoaderRoute: typeof InsightsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/help': {
-      id: '/help'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/download': {
@@ -718,6 +712,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsIndexRouteImport
       parentRoute: typeof InsightsRoute
     }
+    '/help/': {
+      id: '/help/'
+      path: '/help'
+      fullPath: '/help/'
+      preLoaderRoute: typeof HelpIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/insights/$slug': {
       id: '/insights/$slug'
       path: '/$slug'
@@ -727,10 +728,10 @@ declare module '@tanstack/react-router' {
     }
     '/help/$collection': {
       id: '/help/$collection'
-      path: '/$collection'
+      path: '/help/$collection'
       fullPath: '/help/$collection'
       preLoaderRoute: typeof HelpCollectionRouteImport
-      parentRoute: typeof HelpRoute
+      parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
@@ -882,28 +883,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface HelpCollectionRouteChildren {
-  HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
-}
-
-const HelpCollectionRouteChildren: HelpCollectionRouteChildren = {
-  HelpCollectionSlugRoute: HelpCollectionSlugRoute,
-}
-
-const HelpCollectionRouteWithChildren = HelpCollectionRoute._addFileChildren(
-  HelpCollectionRouteChildren,
-)
-
-interface HelpRouteChildren {
-  HelpCollectionRoute: typeof HelpCollectionRouteWithChildren
-}
-
-const HelpRouteChildren: HelpRouteChildren = {
-  HelpCollectionRoute: HelpCollectionRouteWithChildren,
-}
-
-const HelpRouteWithChildren = HelpRoute._addFileChildren(HelpRouteChildren)
-
 interface InsightsRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
@@ -918,6 +897,18 @@ const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
   InsightsRouteChildren,
 )
 
+interface HelpCollectionRouteChildren {
+  HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
+}
+
+const HelpCollectionRouteChildren: HelpCollectionRouteChildren = {
+  HelpCollectionSlugRoute: HelpCollectionSlugRoute,
+}
+
+const HelpCollectionRouteWithChildren = HelpCollectionRoute._addFileChildren(
+  HelpCollectionRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -930,7 +921,6 @@ const rootRouteChildren: RootRouteChildren = {
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
   DownloadRoute: DownloadRoute,
-  HelpRoute: HelpRouteWithChildren,
   InsightsRoute: InsightsRouteWithChildren,
   KillzonesRoute: KillzonesRoute,
   LlmRoute: LlmRoute,
@@ -942,6 +932,8 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  HelpCollectionRoute: HelpCollectionRouteWithChildren,
+  HelpIndexRoute: HelpIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
   ApiPublicHooksNotifySubscribersRoute: ApiPublicHooksNotifySubscribersRoute,
