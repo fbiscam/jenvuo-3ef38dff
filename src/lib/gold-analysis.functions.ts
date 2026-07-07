@@ -747,11 +747,9 @@ export const analyzeGold = createServerFn({ method: "POST" })
       }
     }
 
-    // Compute first, then charge based on what was actually returned:
-    // - trading setup (entry/SL/TP) → 2 credits (signal cost)
-    // - conversational reply → 1 credit (chat cost)
+    // Unified pricing: every action = 1 credit (signal, chat, narration, voice).
     const result = await _analyzeGoldCompute(data);
-    const cost = result.__billable === "signal" ? 2 : 1;
+    const cost = 1;
     await _spendUserCredits(context.userId, cost, result.__billable === "signal" ? "signal" : "chat");
     // Strip internal billing marker before returning to the client.
     const { __billable, ...clean } = result;
