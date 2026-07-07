@@ -684,6 +684,26 @@ function SignalPage() {
         </div>
       </div>
 
+      {/* PLAN LIMITS BANNER (Free) */}
+      {!credits.isLoading && (!credits.features.realtime_alerts || !credits.features.full_ict) && (
+        <div className="border-b border-amber-100 bg-amber-50/70">
+          <div className="mx-auto max-w-[1600px] px-5 py-2 sm:px-6 flex flex-wrap items-center justify-between gap-2 text-[11px] text-amber-900">
+            <div className="flex items-center gap-2">
+              <span className={`${MONO} text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Free plan</span>
+              <span>
+                {!credits.features.full_ict && "ICT narration walkthrough locked · "}
+                {!credits.features.realtime_alerts && "Realtime alerts locked · "}
+                Upgrade to unlock the full signal desk.
+              </span>
+            </div>
+            <Link to="/pricing" className="rounded-md bg-zinc-900 px-2.5 py-1 text-[11px] font-medium text-white hover:bg-black">
+              Upgrade
+            </Link>
+          </div>
+        </div>
+      )}
+
+
       {/* TERMINAL CARD */}
       <main className="mx-auto max-w-[1600px] px-5 py-5 sm:px-6 sm:py-8">
 
