@@ -278,21 +278,21 @@ function Journal() {
                 const tpDist = dist(t.take_profit);
                 const displayPnl = isOpen ? livePnl : t.pnl;
                 return (
-                  <tr key={t.id} className="hover:bg-zinc-50/50">
-                    <td className="px-3 py-2.5 text-xs text-zinc-500">{new Date(t.opened_at).toLocaleDateString()}</td>
-                    <td className="px-3 py-2.5 font-mono text-xs">{t.pair}</td>
-                    <td className="px-3 py-2.5">
+                  <tr key={t.id} className="hover:bg-zinc-50/50 text-center">
+                    <td className="px-3 py-2.5 text-xs text-zinc-500 text-center">{new Date(t.opened_at).toLocaleDateString()}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs text-center">{t.pair}</td>
+                    <td className="px-3 py-2.5 text-center">
                       <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${t.direction === "long" ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
                         {t.direction}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5">
+                    <td className="px-3 py-2.5 text-center">
                       <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${t.source === "outside" ? "bg-amber-50 text-amber-700" : "bg-indigo-50 text-indigo-700"}`}>
                         {t.source === "outside" ? "Outside" : "System"}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 font-mono text-xs">{t.entry ?? "—"}</td>
-                    <td className="px-3 py-2.5 font-mono text-xs">
+                    <td className="px-3 py-2.5 font-mono text-xs text-center">{t.entry ?? "—"}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs text-center">
                       {isOpen ? (
                         live != null ? (
                           <span className="inline-flex items-center gap-1">
@@ -306,19 +306,19 @@ function Journal() {
                         <span className="text-zinc-300">—</span>
                       )}
                     </td>
-                    <td className="px-3 py-2.5 font-mono text-xs">
+                    <td className="px-3 py-2.5 font-mono text-xs text-center">
                       <div>{t.stop_loss ?? "—"}</div>
                       {slDist != null && (
                         <div className="text-[10px] text-zinc-400">{slDist >= 0 ? "+" : ""}{slDist.toFixed(2)}</div>
                       )}
                     </td>
-                    <td className="px-3 py-2.5 font-mono text-xs">
+                    <td className="px-3 py-2.5 font-mono text-xs text-center">
                       <div>{t.take_profit ?? "—"}</div>
                       {tpDist != null && (
                         <div className="text-[10px] text-zinc-400">{tpDist >= 0 ? "+" : ""}{tpDist.toFixed(2)}</div>
                       )}
                     </td>
-                    <td className="px-3 py-2.5 text-xs">
+                    <td className="px-3 py-2.5 text-xs text-center">
                       <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${
                         t.outcome === "win" ? "bg-emerald-50 text-emerald-700"
                         : t.outcome === "loss" ? "bg-rose-50 text-rose-700"
@@ -327,7 +327,7 @@ function Journal() {
                         : "bg-amber-50 text-amber-700"
                       }`}>{t.outcome}</span>
                     </td>
-                    <td className={`px-3 py-2.5 font-mono text-xs ${(displayPnl ?? 0) > 0 ? "text-emerald-600" : (displayPnl ?? 0) < 0 ? "text-rose-600" : "text-zinc-500"}`}>
+                    <td className={`px-3 py-2.5 font-mono text-xs text-center ${(displayPnl ?? 0) > 0 ? "text-emerald-600" : (displayPnl ?? 0) < 0 ? "text-rose-600" : "text-zinc-500"}`}>
                       {displayPnl != null ? (
                         <span className="inline-flex items-center gap-1">
                           {isOpen && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />}
@@ -336,7 +336,7 @@ function Journal() {
                       ) : "—"}
                     </td>
                     <td className="px-3 py-2.5">
-                      <div className="flex items-center justify-end gap-1">
+                      <div className="flex items-center justify-center gap-1">
                         {isOpen && (
                           <button
                             onClick={() => closeNow(t)}
