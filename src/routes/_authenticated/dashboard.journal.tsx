@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, BookOpen } from "lucide-react";
+import { Trash2, BookOpen, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
@@ -25,6 +25,7 @@ type Trade = {
   notes: string | null;
   opened_at: string;
   closed_at: string | null;
+  source: "system" | "outside";
 };
 
 
@@ -33,6 +34,7 @@ function Journal() {
   const { features, isLoading } = useCredits();
   const locked = !isLoading && !features.journal;
   const [trades, setTrades] = useState<Trade[]>([]);
+  const [showLog, setShowLog] = useState(false);
 
 
   const load = async () => {
