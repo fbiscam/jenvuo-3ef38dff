@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
 import { useLivePrices } from "@/hooks/useLivePrices";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 
 
