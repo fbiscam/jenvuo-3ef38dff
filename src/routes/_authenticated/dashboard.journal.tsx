@@ -353,7 +353,138 @@ function Journal() {
         </div>
       )}
 
+      {showLog && (
+        <LogTradeModal
+          onClose={() => setShowLog(false)}
+          onSaved={(t) => { setTrades((prev) => [t, ...prev]); setShowLog(false); }}
+        />
+      )}
+
     </div>
     </UpgradeOverlay>
+  );
+}
+
+function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t: Trade) => void }) {
+  const [pair, setPair] = useState("XAUUSD");
+  const [direction, setDirection] = useState<"long" | "short">("long");
+  const [entry, setEntry] = useState("");
+  const [sl, setSl] = useState("");
+  const [tp, setTp] = useState("");
+  const [outcome, setOutcome] = useState<Trade["outcome"]>("open");
+  const [pnl, setPnl] = useState("");
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    const { data: userData } = await supabase.auth.getUser();
+    const uid = userData.user?.id;
+    if (!uid) { toast.error("Not signed in"); setSaving(false); return; }
+
+    const parseNum = (v: string) => v.trim() === "" ? null : Number(v);
+    const now = new Date().toISOString();
+    const closed = outcome === "win" || outcome === "loss" || outcome === "breakeven";
+
+    const payload = {
+      user_id: uid,
+      pair: pair.toUpperCase().trim(),
+      direction,
+      entry: parseNum(entry),
+      stop_loss: parseNum(sl),
+      take_profit: parseNum(tp),
+      outcome,
+      pnl: parseNum(pnl),
+      notes: notes.trim() || null,
+      opened_at: now,
+      closed_at: closed ? now : null,
+      source: "outside" as const,
+    };
+
+    const { data, error } = await supabase.from("trade_journal").insert(payload).select("*").single();
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Trade logged");
+    onSaved(data as unknown as Trade);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <form
+        onClick={(e) => e.stopPropagation()}
+        onSubmit={submit}
+        className="w-full max-w-lg rounded-2xl bg-white shadow-xl"
+      >
+        <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-3">
+          <div>
+            <div className="text-sm font-semibold">Log Trade</div>
+            <div className="text-[11px] text-zinc-500">Manually record a trade taken outside Jenvu.</div>
+          </div>
+          <button type="button" onClick={onClose} className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 p-5">
+          <label className="col-span-1 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Pair</span>
+            <input value={pair} onChange={(e) => setPair(e.target.value)} required className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
+          </label>
+          <label className="col-span-1 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Direction</span>
+            <select value={direction} onChange={(e) => setDirection(e.target.value as "long" | "short")} className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-900">
+              <option value="long">Long</option>
+              <option value="short">Short</option>
+            </select>
+          </label>
+
+          <label className="col-span-2 text-xs sm:col-span-1">
+            <span className="mb-1 block font-medium text-zinc-700">Entry</span>
+            <input value={entry} onChange={(e) => setEntry(e.target.value)} inputMode="decimal" className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
+          </label>
+          <label className="col-span-2 text-xs sm:col-span-1">
+            <span className="mb-1 block font-medium text-zinc-700">Outcome</span>
+            <select value={outcome} onChange={(e) => setOutcome(e.target.value as Trade["outcome"])} className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-900">
+              <option value="pending">Pending</option>
+              <option value="open">Open</option>
+              <option value="win">Win</option>
+              <option value="loss">Loss</option>
+              <option value="breakeven">Breakeven</option>
+            </select>
+          </label>
+
+          <label className="col-span-1 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Stop Loss</span>
+            <input value={sl} onChange={(e) => setSl(e.target.value)} inputMode="decimal" className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
+          </label>
+          <label className="col-span-1 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Take Profit</span>
+            <input value={tp} onChange={(e) => setTp(e.target.value)} inputMode="decimal" className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
+          </label>
+
+          {(outcome === "win" || outcome === "loss" || outcome === "breakeven") && (
+            <label className="col-span-2 text-xs">
+              <span className="mb-1 block font-medium text-zinc-700">P&L (points)</span>
+              <input value={pnl} onChange={(e) => setPnl(e.target.value)} inputMode="decimal" placeholder="e.g. 12.50 or -8.00" className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
+            </label>
+          )}
+
+          <label className="col-span-2 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Notes</span>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-900" />
+          </label>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 border-t border-zinc-100 px-5 py-3">
+          <button type="button" onClick={onClose} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50">
+            Cancel
+          </button>
+          <button type="submit" disabled={saving} className="rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-60">
+            {saving ? "Saving…" : "Save trade"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
