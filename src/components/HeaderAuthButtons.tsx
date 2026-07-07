@@ -47,7 +47,7 @@ export default function HeaderAuthButtons() {
       </Link>
       <Link
         to="/auth"
-        search={{ redirect: "/app" } as never}
+        search={{ redirect: "/dashboard" } as never}
         className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 sm:gap-2 sm:px-3.5 sm:text-sm"
       >
         Try Jenvu
