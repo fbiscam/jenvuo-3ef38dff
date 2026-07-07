@@ -43,7 +43,9 @@ export function useCredits() {
   }
 
   return {
-    isLoading: query.isLoading,
+    // Treat as loading until we actually have plan/features data,
+    // so gated pages don't flash the free-user overlay for Pro/Elite users on refresh.
+    isLoading: !user || query.isLoading || query.isFetching || !query.data,
     state: query.data,
     balance: query.data?.balance ?? 0,
     allowance: query.data?.allowance ?? 0,
