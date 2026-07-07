@@ -308,10 +308,17 @@ function SignalPage() {
       if (!ok) { setLoading(false); return; }
       const p = await fetchPlan({ data: { symbol: symbol || "XAUUSD" } });
       setPlan(p);
-      // Charge for the ICT narration walkthrough (skip narration silently if credits run out).
-      const narrOk = await credits.spend("ict_narration", { symbol: symbol || "XAUUSD" });
-      if (narrOk) {
-        setTimeout(() => runNarration(p), 400);
+      // ICT narration is a Pro/Elite feature — free users get the signal without the full walkthrough.
+      if (credits.features.full_ict) {
+        const narrOk = await credits.spend("ict_narration", { symbol: symbol || "XAUUSD" });
+        if (narrOk) {
+          setTimeout(() => runNarration(p), 400);
+        }
+      } else {
+        toast.info("Full ICT narration is a Pro feature", {
+          description: "Upgrade to unlock the guided multi-timeframe walkthrough.",
+          action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+        });
       }
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
