@@ -128,7 +128,7 @@ const FEATURE_BLOCKS = [
 
 type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
-  { feature: "Voice queries / day", free: "1", pro: "Unlimited", elite: "Unlimited" },
+  { feature: "Voice queries / day", free: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
   { feature: "A+ signal access", free: false, pro: true, elite: true },
   { feature: "Alert latency", free: "4h delay", pro: "Realtime", elite: "< 30s priority" },
   { feature: "ICT / SMC narration", free: false, pro: true, elite: true },
