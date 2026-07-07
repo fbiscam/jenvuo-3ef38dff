@@ -491,3 +491,46 @@ function Cell({ value, highlight }: { value: Mark; highlight?: boolean }) {
   }
   return <td className={`${base} ${MONO} text-[11px] uppercase tracking-wider text-zinc-700`}>{value}</td>;
 }
+
+function CustomTopUp() {
+  const [amount, setAmount] = React.useState<number>(15);
+  const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
+  const credits = safe * 8;
+  return (
+    <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 sm:p-7">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
+        <div>
+          <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Custom top-up</span>
+          <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. Every $1 = 8 credits. Credits never expire.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center rounded-md border border-zinc-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-amber-400">
+            <span className="px-3 text-sm text-zinc-500 border-r border-zinc-200 bg-zinc-50">$</span>
+            <input
+              type="number"
+              min={5}
+              step={1}
+              value={Number.isFinite(amount) ? amount : ""}
+              onChange={(e) => setAmount(parseInt(e.target.value || "0", 10))}
+              className={`w-24 px-3 py-2 text-sm tabular-nums outline-none ${MONO}`}
+            />
+          </div>
+          <div className="text-right">
+            <div className={`text-2xl font-bold tabular-nums ${MONO}`}>{credits}</div>
+            <div className="text-[11px] text-zinc-500">credits</div>
+          </div>
+          <Link
+            to="/contact"
+            className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
+          >
+            Continue
+          </Link>
+        </div>
+      </div>
+      {amount < 5 && (
+        <p className="mt-3 text-[12px] text-rose-600">Minimum top-up is $5.</p>
+      )}
+    </div>
+  );
+}
