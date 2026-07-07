@@ -601,6 +601,7 @@ export type Database = {
           outcome: string
           pair: string
           pnl: number | null
+          source: string
           stop_loss: number | null
           take_profit: number | null
           updated_at: string
@@ -617,6 +618,7 @@ export type Database = {
           outcome?: string
           pair?: string
           pnl?: number | null
+          source?: string
           stop_loss?: number | null
           take_profit?: number | null
           updated_at?: string
@@ -633,6 +635,7 @@ export type Database = {
           outcome?: string
           pair?: string
           pnl?: number | null
+          source?: string
           stop_loss?: number | null
           take_profit?: number | null
           updated_at?: string
