@@ -20,6 +20,18 @@ import { cn } from "@/lib/utils";
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Inter',system-ui,sans-serif]";
 
+function clearStoredAuthSession() {
+  if (typeof window === "undefined") return;
+  for (const storage of [window.localStorage, window.sessionStorage]) {
+    for (let i = storage.length - 1; i >= 0; i--) {
+      const key = storage.key(i);
+      if (key?.startsWith("sb-") && key.endsWith("-auth-token")) {
+        storage.removeItem(key);
+      }
+    }
+  }
+}
+
 /* ---------- ticker (matches homepage) ---------- */
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
@@ -182,9 +194,10 @@ function Home() {
   }, [navigate]);
 
   const signOut = () => {
-    // Clear local session immediately, sign out on server in background.
-    void supabase.auth.signOut({ scope: "local" });
-    void supabase.auth.signOut().catch(() => { /* ignore network errors */ });
+    // Clear the browser session synchronously so refresh/navigation cannot
+    // restore the user before Supabase finishes its async sign-out work.
+    clearStoredAuthSession();
+    void supabase.auth.signOut({ scope: "global" }).catch(() => { /* ignore network errors */ });
     navigate({ to: "/auth", replace: true });
   };
 
