@@ -220,7 +220,7 @@ function CollectionCard({ c }: { c: Collection }) {
       className="group rounded-2xl border border-zinc-200 bg-white p-6 hover:border-zinc-900 hover:shadow-[0_24px_60px_-30px_rgba(0,0,0,0.2)] transition"
     >
       <div className="flex items-center gap-3">
-        <div className="grid place-items-center h-10 w-10 rounded-xl bg-zinc-900 text-white">
+        <div className="grid place-items-center h-10 w-10 rounded-xl bg-white border border-zinc-200 text-zinc-900">
           <Icon className="h-5 w-5" />
         </div>
         <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
