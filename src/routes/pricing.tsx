@@ -66,7 +66,7 @@ const TIERS = [
     cta: "Start free",
     ctaTo: "/auth",
     credits: 10,
-    features: ["10 credits / month included", "Voice agent (1 credit / query)", "Delayed alerts (4h)", "Public market insights", "Community support"],
+    features: ["10 credits / month included", "1 credit per action (signal · voice · narration · alert)", "Delayed alerts (4h)", "Public market insights", "Community support"],
 
     highlight: false,
   },
@@ -79,13 +79,13 @@ const TIERS = [
     tagline: "For serious gold traders.",
     cta: "Notify me when live",
     ctaTo: "/contact",
-    credits: 175,
+    credits: 230,
     features: [
-      "175 credits / month included",
-      "Unlimited voice queries (1 credit each)",
-      "A+ signal access (2 credits)",
-      "Realtime email & push alerts (5 credits)",
-      "Full ICT / SMC narration (3 credits)",
+      "230 credits / month included",
+      "1 credit per action — signal, voice, narration, alert",
+      "A+ / A institutional signals",
+      "Realtime email & push alerts",
+      "Full ICT / SMC narration",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
     ],
@@ -101,9 +101,10 @@ const TIERS = [
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
-    credits: 595,
+    credits: 800,
     features: [
-      "595 credits / month included",
+      "800 credits / month included",
+      "1 credit per action — everything unified",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
       "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF)",
@@ -305,7 +306,7 @@ function PricingPage() {
             <tbody>
               {([
                 { f: "Price", a: "Free", b: "$29/mo", c: "$99/mo", d: "Custom", isHeading: true },
-                { f: "Monthly credits", a: "10", b: "175", c: "595", d: "Custom" },
+                { f: "Monthly credits", a: "10", b: "230", c: "800", d: "Custom" },
                 { f: "Voice queries / day", a: "1", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
                 { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
