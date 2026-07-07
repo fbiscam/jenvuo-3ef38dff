@@ -524,7 +524,8 @@ function SignalPage() {
         .eq("id", id)
         .eq("outcome", "pending");
     };
-    // +1R price — auto-close at first take profit target
+    // +1R checkpoint (informational — matches Trade Management ladder Step 1).
+    // Full trade closes only at the plan's take-profit (tr.tp).
     const risk = Math.abs(tr.entry - tr.sl);
     const tp1 = dir === "BUY" ? tr.entry + risk : tr.entry - risk;
     if (dir === "BUY") {
@@ -534,8 +535,9 @@ function SignalPage() {
         fillJournal();
       }
       if (trackerStatusRef.current === "RUNNING") {
+        if (priceTick >= tp1) fire("tp1", `+1R reached. Close 50% and move SL to entry.`);
         if (priceTick <= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; closeJournal("loss", tr.sl); }
-        if (priceTick >= tp1) { fire("tp", `Take profit 1 (+1R) hit. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tp1); }
+        if (priceTick >= tr.tp) { fire("tp", `Take profit hit. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tr.tp); }
       }
     } else if (dir === "SELL") {
       if (priceTick >= tr.entry - tol && trackerStatusRef.current === "PENDING") {
@@ -544,8 +546,9 @@ function SignalPage() {
         fillJournal();
       }
       if (trackerStatusRef.current === "RUNNING") {
+        if (priceTick <= tp1) fire("tp1", `+1R reached. Close 50% and move SL to entry.`);
         if (priceTick >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; closeJournal("loss", tr.sl); }
-        if (priceTick <= tp1) { fire("tp", `Take profit 1 (+1R) hit. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tp1); }
+        if (priceTick <= tr.tp) { fire("tp", `Take profit hit. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tr.tp); }
       }
     }
 
