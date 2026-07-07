@@ -363,7 +363,7 @@ function Home() {
   const ticker = useLiveTicker();
 
   if (!authReady) {
-    return <div className="fixed inset-0 bg-black" />;
+    return <div className="fixed inset-0 bg-white" />;
   }
 
   return (
