@@ -2285,7 +2285,7 @@ export const getSignalPlan = createServerFn({ method: "POST" })
       if (cached) return cached;
     }
 
-    await _spendUserCredits(context.userId, 3, "ict_narration");
+    await _spendUserCredits(context.userId, 1, "ict_narration");
     const plan = await computeSignalPlan({ symbol: data.symbol });
     setCachedPlan(cacheKey, plan);
     return plan;
