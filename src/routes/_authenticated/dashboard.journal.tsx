@@ -255,10 +255,10 @@ function Journal() {
         <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
           <table className="w-full min-w-[780px] text-sm">
 
-            <thead className="bg-zinc-50 text-left font-mono text-[10px] uppercase tracking-wider text-zinc-500">
+            <thead className="bg-zinc-50 text-center font-mono text-[10px] uppercase tracking-wider text-zinc-500">
               <tr>
                 {["Date", "Pair", "Dir", "Source", "Entry", "Price", "SL", "TP", "Result", "P&L", ""].map((h) => (
-                  <th key={h} className="px-3 py-2 font-medium">{h}</th>
+                  <th key={h} className="px-3 py-2 font-medium text-center">{h}</th>
                 ))}
               </tr>
             </thead>
