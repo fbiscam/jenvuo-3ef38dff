@@ -386,7 +386,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "Signal (chart markings + score) — 1 credit.",
             "Full ICT / SMC narration — 1 credit.",
-            "Voice agent reply (per turn) — 1 credit.",
+            "Voice agent reply (per turn) — free.",
             "A+ push / email alert delivered to you — free.",
           ]},
 
