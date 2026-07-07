@@ -7,6 +7,7 @@ import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import PageLoading from "@/components/PageLoading";
 
 
 
@@ -35,17 +36,25 @@ function Journal() {
   const { features, isLoading } = useCredits();
   const locked = !isLoading && !features.journal;
   const [trades, setTrades] = useState<Trade[]>([]);
+  const [tradesLoading, setTradesLoading] = useState(false);
   const [showLog, setShowLog] = useState(false);
   const { user: authUser, loading: authLoading } = useAuthUser();
 
 
-  const load = async () => {
-    const { data } = await supabase.from("trade_journal").select("*").order("opened_at", { ascending: false });
+  const load = async (userId: string) => {
+    setTradesLoading(true);
+    const { data, error } = await supabase.from("trade_journal").select("*").eq("user_id", userId).order("opened_at", { ascending: false });
+    if (error) {
+      toast.error("Journal data didn't load", { description: "Please refresh once." });
+      setTradesLoading(false);
+      return;
+    }
     setTrades((data as unknown as Trade[]) ?? []);
+    setTradesLoading(false);
   };
   useEffect(() => {
     if (authLoading || !authUser) return;
-    load();
+    load(authUser.id);
   }, [authLoading, authUser?.id]);
 
 
@@ -188,7 +197,7 @@ function Journal() {
     toast.success(`Trade closed · ${outcome.toUpperCase()} · ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}`);
   };
 
-  if (isLoading) return <div className="text-sm text-zinc-500">Loading…</div>;
+  if (authLoading || isLoading || tradesLoading) return <PageLoading label="Opening journal" />;
 
   return (
     <UpgradeOverlay

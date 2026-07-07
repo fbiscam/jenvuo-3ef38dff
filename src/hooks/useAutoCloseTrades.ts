@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { toast } from "sonner";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 type OpenTrade = {
   id: string;
@@ -18,22 +19,29 @@ type OpenTrade = {
  * live price touches SL or TP. Runs on any authenticated page.
  */
 export function useAutoCloseTrades() {
+  const { user, loading } = useAuthUser();
   const [openTrades, setOpenTrades] = useState<OpenTrade[]>([]);
 
   // Refresh open trades every 20s so newly logged trades enter the monitor.
   useEffect(() => {
+    if (loading) return;
+    if (!user) {
+      setOpenTrades([]);
+      return;
+    }
     let stopped = false;
     const fetchOpen = async () => {
       const { data } = await supabase
         .from("trade_journal")
         .select("id, pair, direction, entry, stop_loss, take_profit, outcome")
+        .eq("user_id", user.id)
         .in("outcome", ["open", "pending"]);
       if (!stopped) setOpenTrades((data as unknown as OpenTrade[]) ?? []);
     };
     fetchOpen();
     const id = setInterval(fetchOpen, 20000);
     return () => { stopped = true; clearInterval(id); };
-  }, []);
+  }, [loading, user?.id]);
 
   const symbols = useMemo(
     () => Array.from(new Set(openTrades.filter((t) => t.entry != null).map((t) => t.pair))),

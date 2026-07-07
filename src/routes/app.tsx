@@ -14,6 +14,8 @@ import { analyzeGold, normalizeQuery, type GoldSignal } from "@/lib/gold-analysi
 import { getGoldNews } from "@/lib/news.functions";
 import { useCredits } from "@/hooks/useCredits";
 import { appendVoiceTurn } from "@/lib/voice-history";
+import PageLoading from "@/components/PageLoading";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 import { cn } from "@/lib/utils";
 
@@ -176,22 +178,15 @@ function detectSymbol(query: string): string {
 
 function Home() {
   const navigate = useNavigate();
-  const [authReady, setAuthReady] = useState(false);
+  const { user: authUser, loading: authLoading } = useAuthUser();
   useEffect(() => {
-    let alive = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (!alive) return;
-      if (!data.session) {
-        navigate({ to: "/auth", replace: true });
-      } else {
-        setAuthReady(true);
-      }
-    });
+    if (authLoading || authUser) return;
+    navigate({ to: "/auth", replace: true });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) navigate({ to: "/auth", replace: true });
     });
-    return () => { alive = false; sub.subscription.unsubscribe(); };
-  }, [navigate]);
+    return () => { sub.subscription.unsubscribe(); };
+  }, [authLoading, authUser, navigate]);
 
   const signOut = () => {
     // Clear the browser session synchronously so refresh/navigation cannot
@@ -375,8 +370,8 @@ function Home() {
 
   const ticker = useLiveTicker();
 
-  if (!authReady) {
-    return <div className="fixed inset-0 bg-white" />;
+  if (authLoading || !authUser) {
+    return <PageLoading label="Opening voice terminal" />;
   }
 
   return (
