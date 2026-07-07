@@ -260,7 +260,7 @@ function KillzonesPage() {
           <h1 className="text-[19px] sm:text-4xl font-semibold tracking-tight whitespace-nowrap sm:whitespace-normal">
             Every pair. Every killzone. Live.
           </h1>
-          <p className="text-sm sm:text-[15px] text-zinc-600 mt-2 max-w-2xl sm:max-w-none sm:whitespace-nowrap">
+          <p className="text-sm sm:text-[13px] lg:text-[14px] xl:text-[15px] text-zinc-600 mt-2 max-w-2xl sm:max-w-none sm:whitespace-nowrap">
             ICT / SMC session windows for every instrument Jenvu analyzes — shown in UTC and your local time, with a live IN/OUT status.
           </p>
         </div>
