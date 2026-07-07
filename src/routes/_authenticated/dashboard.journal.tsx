@@ -279,6 +279,11 @@ function Journal() {
                         {t.direction}
                       </span>
                     </td>
+                    <td className="px-3 py-2.5">
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${t.source === "outside" ? "bg-amber-50 text-amber-700" : "bg-indigo-50 text-indigo-700"}`}>
+                        {t.source === "outside" ? "Outside" : "System"}
+                      </span>
+                    </td>
                     <td className="px-3 py-2.5 font-mono text-xs">{t.entry ?? "—"}</td>
                     <td className="px-3 py-2.5 font-mono text-xs">
                       {isOpen ? (
