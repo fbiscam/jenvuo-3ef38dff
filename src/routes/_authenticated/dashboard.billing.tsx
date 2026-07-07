@@ -135,14 +135,24 @@ function Billing() {
           <div className="mt-6">
             <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>&nbsp;</div>
             <div className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
-              {(showAllActivity ? credits.state.recent : credits.state.recent.slice(0, 10)).map((r) => (
-                <div key={r.id} className="flex items-center justify-between px-3 py-2 text-xs">
-                  <span className="text-zinc-600">{r.reason.replace("_", " ")}</span>
-                  <span className={`tabular-nums font-medium ${r.delta < 0 ? "text-rose-600" : "text-emerald-600"}`}>
-                    {r.delta > 0 ? "+" : ""}{r.delta}
-                  </span>
-                </div>
-              ))}
+              {(showAllActivity ? credits.state.recent : credits.state.recent.slice(0, 10)).map((r) => {
+                const d = new Date(r.created_at);
+                const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+                return (
+                  <div key={r.id} className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className={`${MONO} shrink-0 text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums`}>
+                        {dateStr} · {timeStr}
+                      </span>
+                      <span className="truncate text-zinc-700">{r.reason.replace("_", " ")}</span>
+                    </div>
+                    <span className={`tabular-nums font-medium ${r.delta < 0 ? "text-rose-600" : "text-emerald-600"}`}>
+                      {r.delta > 0 ? "+" : ""}{r.delta}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
             {credits.state.recent.length > 10 && (
               <div className="mt-3 flex justify-center">
