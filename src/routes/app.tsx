@@ -181,8 +181,10 @@ function Home() {
     return () => { alive = false; sub.subscription.unsubscribe(); };
   }, [navigate]);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const signOut = () => {
+    // Clear local session immediately, sign out on server in background.
+    void supabase.auth.signOut({ scope: "local" });
+    void supabase.auth.signOut().catch(() => { /* ignore network errors */ });
     navigate({ to: "/auth", replace: true });
   };
 

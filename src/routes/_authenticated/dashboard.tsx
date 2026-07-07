@@ -446,9 +446,12 @@ function DashboardLayout() {
   };
 
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
+  const signOut = () => {
+    // Clear local session immediately so UI reacts without waiting on the
+    // network round-trip, then fire the server sign-out in the background.
+    void supabase.auth.signOut({ scope: "local" });
+    void supabase.auth.signOut().catch(() => { /* ignore network errors */ });
+    window.location.replace("/");
   };
 
   const planTier = ((credits.plan as { tier?: string; name?: string } | null)?.tier
