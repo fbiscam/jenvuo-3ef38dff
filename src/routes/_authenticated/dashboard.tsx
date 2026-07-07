@@ -20,6 +20,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
+function clearStoredAuthSession() {
+  if (typeof window === "undefined") return;
+  for (const storage of [window.localStorage, window.sessionStorage]) {
+    for (let i = storage.length - 1; i >= 0; i--) {
+      const key = storage.key(i);
+      if (key?.startsWith("sb-") && key.endsWith("-auth-token")) {
+        storage.removeItem(key);
+      }
+    }
+  }
+}
+
 const RANGE_LABELS: Record<RangeKey, string> = {
   "24h": "Last 24 hours",
   "7d": "Last 7 days",
@@ -447,10 +459,10 @@ function DashboardLayout() {
 
 
   const signOut = () => {
-    // Clear local session immediately so UI reacts without waiting on the
-    // network round-trip, then fire the server sign-out in the background.
-    void supabase.auth.signOut({ scope: "local" });
-    void supabase.auth.signOut().catch(() => { /* ignore network errors */ });
+    // Clear the browser session synchronously so reloads cannot restore the
+    // signed-in user before Supabase finishes its async sign-out work.
+    clearStoredAuthSession();
+    void supabase.auth.signOut({ scope: "global" }).catch(() => { /* ignore network errors */ });
     window.location.replace("/");
   };
 
