@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCredits } from "@/hooks/useCredits";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, CartesianGrid } from "recharts";
 import { TrendingUp, TrendingDown, Target, Activity, Award, AlertTriangle } from "lucide-react";
@@ -30,8 +31,11 @@ function Analytics() {
   const locked = !isLoading && !features.journal;
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user: authUser, loading: authLoading } = useAuthUser();
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!authUser) { setLoading(false); return; }
     let stopped = false;
     const fetchTrades = async () => {
       const { data } = await supabase
@@ -46,7 +50,7 @@ function Analytics() {
     fetchTrades();
     const id = setInterval(fetchTrades, 30000);
     return () => { stopped = true; clearInterval(id); };
-  }, []);
+  }, [authLoading, authUser?.id]);
 
 
   const stats = useMemo(() => computeStats(trades), [trades]);

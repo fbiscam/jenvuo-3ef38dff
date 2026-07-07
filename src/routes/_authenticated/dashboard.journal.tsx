@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
 import { useLivePrices } from "@/hooks/useLivePrices";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 
 
@@ -35,13 +36,19 @@ function Journal() {
   const locked = !isLoading && !features.journal;
   const [trades, setTrades] = useState<Trade[]>([]);
   const [showLog, setShowLog] = useState(false);
+  const { user: authUser, loading: authLoading } = useAuthUser();
 
 
   const load = async () => {
     const { data } = await supabase.from("trade_journal").select("*").order("opened_at", { ascending: false });
     setTrades((data as unknown as Trade[]) ?? []);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (authLoading || !authUser) return;
+    load();
+  }, [authLoading, authUser?.id]);
+
+
 
   // Live prices for open + pending trades
   const trackedSymbols = useMemo(
