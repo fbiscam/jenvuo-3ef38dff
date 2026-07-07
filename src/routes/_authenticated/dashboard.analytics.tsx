@@ -44,7 +44,7 @@ function Analytics() {
       setLoading(false);
     };
     fetchTrades();
-    const id = setInterval(fetchTrades, 2000);
+    const id = setInterval(fetchTrades, 30000);
     return () => { stopped = true; clearInterval(id); };
   }, []);
 
