@@ -237,14 +237,20 @@ function Journal() {
           <BookOpen className="mx-auto h-8 w-8 text-zinc-400" />
           <h3 className="mt-3 text-base font-semibold">No trades logged yet</h3>
           <p className="mt-1 text-sm text-zinc-500">Track entries, exits and outcomes to surface your real win rate.</p>
+          <button
+            onClick={() => setShowLog(true)}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 transition"
+          >
+            <Plus className="h-3.5 w-3.5" /> Log Trade
+          </button>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
-          <table className="w-full min-w-[720px] text-sm">
+          <table className="w-full min-w-[780px] text-sm">
 
             <thead className="bg-zinc-50 text-left font-mono text-[10px] uppercase tracking-wider text-zinc-500">
               <tr>
-                {["Date", "Pair", "Dir", "Entry", "Price", "SL", "TP", "Result", "P&L", ""].map((h) => (
+                {["Date", "Pair", "Dir", "Source", "Entry", "Price", "SL", "TP", "Result", "P&L", ""].map((h) => (
                   <th key={h} className="px-3 py-2 font-medium">{h}</th>
                 ))}
               </tr>
