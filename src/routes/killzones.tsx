@@ -254,8 +254,8 @@ function KillzonesPage() {
       <main className="mx-auto max-w-[1600px] px-5 py-6 sm:px-6 sm:py-10">
         {/* Hero */}
         <div className="mb-6 sm:mb-8">
-          <div className={`${MONO} text-[10px] tracking-[0.2em] uppercase text-zinc-500 mb-2`}>
-            // Killzone Reference
+          <div className={`${MONO} text-[10px] tracking-[0.2em] uppercase text-zinc-500 mb-2`} aria-hidden="true">
+            &nbsp;
           </div>
           <h1 className="text-[19px] sm:text-4xl font-semibold tracking-tight whitespace-nowrap sm:whitespace-normal">
             Every pair. Every killzone. Live.
