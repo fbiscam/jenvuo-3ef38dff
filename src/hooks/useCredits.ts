@@ -5,7 +5,7 @@ import { getCreditState, spendCredits, CREDIT_COSTS, type CreditAction } from "@
 import { useAuthUser } from "./useAuthUser";
 
 export function useCredits() {
-  const { user } = useAuthUser();
+  const { user, loading: authLoading } = useAuthUser();
   const queryClient = useQueryClient();
   const fetchState = useServerFn(getCreditState);
   const spendFn = useServerFn(spendCredits);
@@ -13,9 +13,12 @@ export function useCredits() {
   const query = useQuery({
     queryKey: ["credit-state", user?.id],
     queryFn: () => fetchState(),
-    enabled: !!user,
+    enabled: !authLoading && !!user,
+    retry: 2,
     staleTime: 15_000,
   });
+
+  const waitingForFirstCreditState = !!user && !query.data && (query.isPending || query.isFetching);
 
   async function spend(action: CreditAction, metadata?: Record<string, unknown>): Promise<boolean> {
     try {
@@ -45,7 +48,8 @@ export function useCredits() {
   return {
     // Treat as loading until we actually have plan/features data,
     // so gated pages don't flash the free-user overlay for Pro/Elite users on refresh.
-    isLoading: !user || query.isLoading || query.isFetching || !query.data,
+    isLoading: authLoading || waitingForFirstCreditState,
+    isError: query.isError,
     state: query.data,
     balance: query.data?.balance ?? 0,
     allowance: query.data?.allowance ?? 0,

@@ -19,6 +19,8 @@ import { appendVoiceTurn } from "@/lib/voice-history";
 import AlertOptInCard from "@/components/AlertOptInCard";
 import AlertsHistoryPanel from "@/components/AlertsHistoryPanel";
 import { useCredits } from "@/hooks/useCredits";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import PageLoading from "@/components/PageLoading";
 import { killzoneForPair, getPairProfile } from "@/lib/analysis/engine";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -127,7 +129,8 @@ function SignalPage() {
   const credits = useCredits();
 
 
-  const [authReady, setAuthReady] = useState(false);
+  const { user: authUser, loading: authLoading } = useAuthUser();
+  const authReady = !authLoading && !!authUser;
   const dark = false;
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
@@ -143,11 +146,8 @@ function SignalPage() {
   const feedScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) navigate({ to: "/auth", replace: true });
-      else setAuthReady(true);
-    });
-  }, [navigate]);
+    if (!authLoading && !authUser) navigate({ to: "/auth", replace: true });
+  }, [authLoading, authUser, navigate]);
 
   // ---------- Killzone warning popup ----------
   const [kzDismissed, setKzDismissed] = useState<boolean | null>(null);
@@ -570,7 +570,7 @@ function SignalPage() {
     return pnl / risk;
   }, [livePrice, plan]);
 
-  if (!authReady) return <div className="fixed inset-0 bg-white" />;
+  if (!authReady) return <PageLoading label="Opening signal desk" />;
 
   const t = plan?.trade;
   const isBuy = t?.direction === "BUY";
