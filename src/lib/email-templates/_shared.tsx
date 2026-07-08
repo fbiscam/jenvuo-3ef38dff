@@ -10,8 +10,9 @@ export const LOGO_URL = `${SITE_URL}/favicon.png`
  */
 export const URBANIST =
   "Urbanist, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-export const MONO =
-  "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+// MONO alias intentionally points to Urbanist too — user wants every text
+// element (including labels and code digits) rendered in Urbanist.
+export const MONO = URBANIST
 
 export const COLORS = {
   bg: '#f5f5f4',
