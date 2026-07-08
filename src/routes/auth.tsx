@@ -118,11 +118,13 @@ function AuthPage() {
   // Terminal-header flash: shows a blinking notification inside the auth-session
   // strip for a few seconds, then reverts to the default label.
   const [flashMsg, setFlashMsg] = React.useState<string | null>(null);
+  const [flashTarget, setFlashTarget] = React.useState<"email" | "password">("email");
   const flashTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const flashInfo = React.useCallback((msg: string) => {
+  const flashInfo = React.useCallback((msg: string, target: "email" | "password" = "email") => {
     if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    setFlashTarget(target);
     setFlashMsg(msg);
-    flashTimerRef.current = setTimeout(() => setFlashMsg(null), 3200);
+    flashTimerRef.current = setTimeout(() => setFlashMsg(null), 3000);
   }, []);
   React.useEffect(() => () => {
     if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
