@@ -100,8 +100,13 @@ function ConfirmEmailChangePage() {
     try { await queryClient.cancelQueries(); } catch {}
     queryClient.clear();
     try { await supabase.auth.signOut(); } catch {}
-    navigate({ to: "/auth", replace: true });
+    navigate({
+      to: "/auth",
+      replace: true,
+      search: newEmail ? { emailChanged: "1", newEmail } : { emailChanged: "1" },
+    });
   };
+
 
   useEffect(() => {
     if (ran.current) return;
