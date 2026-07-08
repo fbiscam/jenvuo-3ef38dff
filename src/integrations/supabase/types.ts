@@ -206,6 +206,53 @@ export type Database = {
         }
         Relationships: []
       }
+      email_change_audit: {
+        Row: {
+          created_at: string
+          error_reason: string | null
+          event: string
+          id: string
+          ip: string | null
+          new_email: string | null
+          old_email: string | null
+          request_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_reason?: string | null
+          event: string
+          id?: string
+          ip?: string | null
+          new_email?: string | null
+          old_email?: string | null
+          request_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_reason?: string | null
+          event?: string
+          id?: string
+          ip?: string | null
+          new_email?: string | null
+          old_email?: string | null
+          request_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_change_audit_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "email_change_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_change_requests: {
         Row: {
           consumed_at: string | null

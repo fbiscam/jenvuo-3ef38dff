@@ -24,24 +24,62 @@ async function sha256Hex(input: string) {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
+type AuditEvent = 'requested' | 'confirmed' | 'failed_request' | 'failed_confirm'
+
+async function writeAudit(row: {
+  userId: string | null
+  event: AuditEvent
+  oldEmail?: string | null
+  newEmail?: string | null
+  requestId?: string | null
+  ip?: string | null
+  userAgent?: string | null
+  errorReason?: string | null
+}) {
+  try {
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+    await (supabaseAdmin as any).from('email_change_audit').insert({
+      user_id: row.userId,
+      event: row.event,
+      old_email: row.oldEmail ?? null,
+      new_email: row.newEmail ?? null,
+      request_id: row.requestId ?? null,
+      ip: row.ip ? row.ip.slice(0, 100) : null,
+      user_agent: row.userAgent ? row.userAgent.slice(0, 500) : null,
+      error_reason: row.errorReason ? row.errorReason.slice(0, 500) : null,
+    })
+  } catch {
+    // audit must never break the primary flow
+  }
+}
+
 export async function createEmailChangeRequest(input: {
   userId: string
   oldEmail: string
   newEmail: string
   siteUrl?: string
+  ip?: string
+  userAgent?: string
 }) {
   const oldEmail = normalizeEmail(input.oldEmail)
   const newEmail = normalizeEmail(input.newEmail)
-  if (oldEmail === newEmail) throw new Error('New email must be different from your current email.')
+  const ctx = { userId: input.userId, oldEmail, newEmail, ip: input.ip, userAgent: input.userAgent }
+
+  const fail = async (reason: string) => {
+    await writeAudit({ ...ctx, event: 'failed_request', errorReason: reason })
+    throw new Error(reason)
+  }
+
+  if (oldEmail === newEmail) return fail('New email must be different from your current email.')
 
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
 
   // Check that new email isn't already in use
   for (let page = 1; page <= 10; page += 1) {
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 })
-    if (error) throw new Error(error.message)
+    if (error) return fail(error.message)
     if (data.users.find((u) => u.email?.toLowerCase() === newEmail)) {
-      throw new Error('That email is already in use by another account.')
+      return fail('That email is already in use by another account.')
     }
     if (!data.nextPage) break
   }
@@ -57,19 +95,31 @@ export async function createEmailChangeRequest(input: {
   const tokenHash = await sha256Hex(token)
   const expiresAt = new Date(Date.now() + TOKEN_TTL_MINUTES * 60_000).toISOString()
 
-  const { error } = await (supabaseAdmin as any).from('email_change_requests').insert({
-    user_id: input.userId,
-    old_email: oldEmail,
-    new_email: newEmail,
-    token_hash: tokenHash,
-    expires_at: expiresAt,
-  })
-  if (error) throw new Error(error.message)
+  const { data: inserted, error } = await (supabaseAdmin as any)
+    .from('email_change_requests')
+    .insert({
+      user_id: input.userId,
+      old_email: oldEmail,
+      new_email: newEmail,
+      token_hash: tokenHash,
+      expires_at: expiresAt,
+    })
+    .select('id')
+    .single()
+  if (error) return fail(error.message)
 
+  const requestId = (inserted as { id: string }).id
   const origin = input.siteUrl && /^https?:\/\//i.test(input.siteUrl) ? input.siteUrl : `https://${ROOT_DOMAIN}`
   const confirmationUrl = `${origin}/confirm-email-change?token=${token}`
 
-  await sendEmailChangeEmail({ to: oldEmail, oldEmail, newEmail, confirmationUrl })
+  try {
+    await sendEmailChangeEmail({ to: oldEmail, oldEmail, newEmail, confirmationUrl })
+  } catch (err) {
+    await writeAudit({ ...ctx, event: 'failed_request', requestId, errorReason: err instanceof Error ? err.message : 'send_failed' })
+    throw err
+  }
+
+  await writeAudit({ ...ctx, event: 'requested', requestId })
 }
 
 async function sendEmailChangeEmail(args: {
@@ -137,8 +187,19 @@ async function sendEmailChangeEmail(args: {
   }
 }
 
-export async function confirmEmailChangeToken(token: string) {
-  if (!token || token.length < 16) return { ok: false as const, error: 'Invalid confirmation link.' }
+export async function confirmEmailChangeToken(
+  token: string,
+  meta?: { ip?: string; userAgent?: string },
+) {
+  const ip = meta?.ip
+  const userAgent = meta?.userAgent
+
+  const failNoRow = async (reason: string) => {
+    await writeAudit({ userId: null, event: 'failed_confirm', ip, userAgent, errorReason: reason })
+    return { ok: false as const, error: reason }
+  }
+
+  if (!token || token.length < 16) return failNoRow('Invalid confirmation link.')
   const tokenHash = await sha256Hex(token)
 
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
@@ -148,10 +209,24 @@ export async function confirmEmailChangeToken(token: string) {
     .eq('token_hash', tokenHash)
     .maybeSingle()
 
-  if (error) return { ok: false as const, error: error.message }
-  if (!row) return { ok: false as const, error: 'This confirmation link is invalid or has already been used.' }
-  if (row.consumed_at) return { ok: false as const, error: 'This confirmation link has already been used.' }
+  if (error) return failNoRow(error.message)
+  if (!row) return failNoRow('This confirmation link is invalid or has already been used.')
+
+  const ctx = {
+    userId: row.user_id as string,
+    oldEmail: row.old_email as string,
+    newEmail: row.new_email as string,
+    requestId: row.id as string,
+    ip,
+    userAgent,
+  }
+
+  if (row.consumed_at) {
+    await writeAudit({ ...ctx, event: 'failed_confirm', errorReason: 'already_used' })
+    return { ok: false as const, error: 'This confirmation link has already been used.' }
+  }
   if (new Date(row.expires_at).getTime() < Date.now()) {
+    await writeAudit({ ...ctx, event: 'failed_confirm', errorReason: 'expired' })
     return { ok: false as const, error: 'This confirmation link has expired. Please request a new one.' }
   }
 
@@ -159,12 +234,16 @@ export async function confirmEmailChangeToken(token: string) {
     email: row.new_email,
     email_confirm: true,
   })
-  if (updErr) return { ok: false as const, error: updErr.message }
+  if (updErr) {
+    await writeAudit({ ...ctx, event: 'failed_confirm', errorReason: updErr.message })
+    return { ok: false as const, error: updErr.message }
+  }
 
   await (supabaseAdmin as any)
     .from('email_change_requests')
     .update({ consumed_at: new Date().toISOString() })
     .eq('id', row.id)
 
+  await writeAudit({ ...ctx, event: 'confirmed' })
   return { ok: true as const, newEmail: row.new_email as string }
 }
