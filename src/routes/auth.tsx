@@ -91,6 +91,16 @@ function AuthPage() {
   const recoveryOtpInputRef = React.useRef<HTMLInputElement | null>(null);
   const [resendCooldown, setResendCooldown] = React.useState(0);
 
+  // --- MFA (TOTP) challenge state ---
+  const [mfaChallenge, setMfaChallenge] = React.useState<null | {
+    factorId: string;
+    challengeId: string;
+  }>(null);
+  const [mfaCode, setMfaCode] = React.useState("");
+  const [mfaError, setMfaError] = React.useState<string | null>(null);
+  const [mfaShake, setMfaShake] = React.useState(false);
+  const mfaInputRef = React.useRef<HTMLInputElement | null>(null);
+
   React.useEffect(() => {
     if (resendCooldown <= 0) return;
     const t = setInterval(() => setResendCooldown((s) => (s <= 1 ? 0 : s - 1)), 1000);
