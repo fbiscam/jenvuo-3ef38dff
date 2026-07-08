@@ -681,6 +681,7 @@ function AuthPage() {
                           </label>
                           <input
                             ref={recoveryOtpInputRef}
+                            onPaste={handleOtpPaste}
                             type="text"
                             inputMode="numeric"
                             autoComplete="one-time-code"
