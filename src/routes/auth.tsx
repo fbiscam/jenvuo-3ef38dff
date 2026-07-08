@@ -276,7 +276,7 @@ function AuthPage() {
       setErrorMsg(result.error || "Could not send verification code");
       return;
     }
-    toast.success("6-digit verification code sent to your email");
+    toast.success("6-digit verification code sent to your email"); flashInfo("6-digit verification code sent to your email");
     setOtpStep(true);
     setOtpCode("");
     setResendCooldown(60);
@@ -310,7 +310,7 @@ function AuthPage() {
     }
     setMfaChallenge(null);
     setMfaCode("");
-    toast.success("Verified");
+    toast.success("Verified"); flashInfo("Verified");
     navigate({ to: redirectTo as "/dashboard", replace: true });
   };
 
@@ -416,7 +416,7 @@ function AuthPage() {
       setErrorMsg(sessionError.message);
       return;
     }
-    toast.success("Email verified — welcome to Jenvu");
+    toast.success("Email verified — welcome to Jenvu"); flashInfo("Email verified — welcome to Jenvu");
   };
 
 
@@ -432,7 +432,7 @@ function AuthPage() {
       setErrorMsg(result.error || "Could not send code");
       return;
     }
-    toast.success("New 6-digit code sent");
+    toast.success("New 6-digit code sent"); flashInfo("New 6-digit code sent");
     setResendCooldown(60);
   };
 
@@ -457,7 +457,7 @@ function AuthPage() {
       setErrorMsg(result.error || "Could not send reset code");
       return;
     }
-    toast.success("6-digit reset code sent to your email");
+    toast.success("6-digit reset code sent to your email"); flashInfo("6-digit reset code sent to your email");
     setForgotStep("code");
     setOtpCode("");
     setResendCooldown(60);
@@ -506,7 +506,7 @@ function AuthPage() {
       setErrorMsg(result.error || "Could not send code");
       return;
     }
-    toast.success("New 6-digit code sent");
+    toast.success("New 6-digit code sent"); flashInfo("New 6-digit code sent");
     setResendCooldown(60);
   };
 
@@ -525,7 +525,7 @@ function AuthPage() {
       setErrorMsg(error.message);
       return;
     }
-    toast.success("Password updated");
+    toast.success("Password updated"); flashInfo("Password updated");
     recoveryModeRef.current = false;
     setNewPassword("");
     navigate({ to: redirectTo as "/dashboard", replace: true });
