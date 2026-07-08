@@ -215,7 +215,9 @@ function AuthPage() {
             if (totp) {
               const { data: chal, error } = await supabase.auth.mfa.challenge({ factorId: totp.id });
               if (error || !chal) {
-                setErrorMsg(error?.message || "Could not start MFA challenge");
+                const msg = error?.message || "Could not start MFA challenge";
+                setErrorMsg(msg);
+                toast.error("Two-factor step failed", { description: msg });
                 return;
               }
               setMfaChallenge({ factorId: totp.id, challengeId: chal.id });
@@ -350,7 +352,9 @@ function AuthPage() {
     setMfaError(null);
     if (!mfaChallenge) return;
     if (!/^\d{6}$/.test(mfaCode)) {
-      setMfaError("Enter the 6-digit code from your authenticator app.");
+      const msg = "Enter the 6-digit code from your authenticator app.";
+      setMfaError(msg);
+      toast.error("Invalid code format", { description: msg });
       setMfaShake(true);
       setTimeout(() => setMfaShake(false), 500);
       mfaInputRef.current?.focus();
@@ -364,7 +368,15 @@ function AuthPage() {
     });
     setLoading(false);
     if (error) {
-      setMfaError(error.message || "That code doesn't match. Try again.");
+      const raw = error.message || "";
+      const lower = raw.toLowerCase();
+      const friendly = lower.includes("expired")
+        ? "That code expired. Generate a fresh one in your authenticator app."
+        : lower.includes("invalid") || lower.includes("incorrect") || lower.includes("mismatch")
+          ? "That code doesn't match. Double-check your authenticator app and try again."
+          : raw || "That code doesn't match. Try again.";
+      setMfaError(friendly);
+      toast.error("Verification failed", { description: friendly });
       setMfaCode("");
       setMfaShake(true);
       setTimeout(() => setMfaShake(false), 500);
