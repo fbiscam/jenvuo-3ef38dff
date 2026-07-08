@@ -21,6 +21,10 @@ export const Route = createFileRoute("/auth")({
     redirect: typeof search.redirect === "string" ? search.redirect : undefined,
   }),
   beforeLoad: async ({ search }) => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash || "";
+      if (hash.includes("type=recovery") || hash.includes("error")) return;
+    }
     const { data } = await supabase.auth.getUser();
     if (data.user) {
       throw redirect({ to: sanitizeRedirect(search.redirect) as "/dashboard" });
