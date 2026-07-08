@@ -149,7 +149,7 @@ function ConfirmEmailChangePage() {
                 Redirecting to sign in in <span className="font-semibold">{countdown}</span>…
               </p>
               <button
-                onClick={() => navigate({ to: "/auth" })}
+                onClick={goToSignIn}
                 className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
               >
                 Go to sign in
