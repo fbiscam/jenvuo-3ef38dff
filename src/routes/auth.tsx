@@ -115,6 +115,19 @@ function AuthPage() {
   const [mfaShake, setMfaShake] = React.useState(false);
   const mfaInputRef = React.useRef<HTMLInputElement | null>(null);
 
+  // Terminal-header flash: shows a blinking notification inside the auth-session
+  // strip for a few seconds, then reverts to the default label.
+  const [flashMsg, setFlashMsg] = React.useState<string | null>(null);
+  const flashTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flashInfo = React.useCallback((msg: string) => {
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    setFlashMsg(msg);
+    flashTimerRef.current = setTimeout(() => setFlashMsg(null), 3200);
+  }, []);
+  React.useEffect(() => () => {
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+  }, []);
+
   React.useEffect(() => {
     if (resendCooldown <= 0) return;
     const t = setInterval(() => setResendCooldown((s) => (s <= 1 ? 0 : s - 1)), 1000);
