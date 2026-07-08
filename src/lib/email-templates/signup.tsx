@@ -83,14 +83,9 @@ export const SignupEmail = ({
             <Hr style={s.hr} />
 
             <Text style={s.footer}>
-              You're receiving this because someone used{' '}
-              <span style={mono}>{recipient}</span> to sign up at{' '}
-              <Link href={siteUrl} style={s.footerLink}>
-                {siteName}
-              </Link>
-              . If that wasn't you, ignore this email — no account is created
-              without a verified code.
+              Didn't sign up? Ignore this email — no account is created without a verified code.
             </Text>
+
             <Text style={s.legal}>
               JENVU · Voice-native gold trading intelligence · {siteUrl.replace(/^https?:\/\//, '')}
             </Text>
