@@ -203,6 +203,7 @@ function AuthPage() {
       toast.success("Verification code sent to your email");
       setOtpStep(true);
       setOtpCode("");
+      setResendCooldown(60);
     }
   };
 
