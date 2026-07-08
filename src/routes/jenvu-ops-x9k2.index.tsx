@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Lock, Loader2 } from "lucide-react";
 import { adminLogin, adminMe } from "@/lib/admin-gate.functions";
 
-export const Route = createFileRoute("/admin/")({
+export const Route = createFileRoute("/jenvu-ops-x9k2/")({
   head: () => ({
     meta: [
       { title: "Admin Sign In — Jenvu" },
@@ -27,7 +27,7 @@ function AdminLogin() {
   useEffect(() => {
     me()
       .then((r) => {
-        if (r.unlocked) navigate({ to: "/admin/inbox", replace: true });
+        if (r.unlocked) navigate({ to: "/jenvu-ops-x9k2/inbox", replace: true });
       })
       .finally(() => setChecking(false));
   }, [me, navigate]);
@@ -40,7 +40,7 @@ function AdminLogin() {
     try {
       const r = await login({ data: { username, password } });
       if (r.ok) {
-        navigate({ to: "/admin/inbox", replace: true });
+        navigate({ to: "/jenvu-ops-x9k2/inbox", replace: true });
       } else {
         setError(r.error || "Invalid credentials");
       }

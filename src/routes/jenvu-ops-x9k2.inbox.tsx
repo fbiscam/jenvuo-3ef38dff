@@ -24,7 +24,7 @@ import {
   adminCloseSession,
 } from "@/lib/admin-gate.functions";
 
-export const Route = createFileRoute("/admin/inbox")({
+export const Route = createFileRoute("/jenvu-ops-x9k2/inbox")({
   head: () => ({
     meta: [
       { title: "Support Inbox — Admin" },
@@ -89,7 +89,7 @@ function AdminInbox() {
   useEffect(() => {
     me().then((r) => {
       if (!r.unlocked) {
-        navigate({ to: "/admin", replace: true });
+        navigate({ to: "/jenvu-ops-x9k2", replace: true });
       } else {
         setUsername(r.username);
         setReady(true);
@@ -189,7 +189,7 @@ function AdminInbox() {
 
   async function handleLogout() {
     await logoutFn();
-    navigate({ to: "/admin", replace: true });
+    navigate({ to: "/jenvu-ops-x9k2", replace: true });
   }
 
   if (!ready) {
