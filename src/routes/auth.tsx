@@ -347,8 +347,6 @@ function AuthPage() {
     setMfaChallenge(null);
     setMfaCode("");
     navigate({ to: redirectTo as "/dashboard", replace: true });
-    return;
-    navigate({ to: redirectTo as "/dashboard", replace: true });
   };
 
   const cancelMfa = async () => {
