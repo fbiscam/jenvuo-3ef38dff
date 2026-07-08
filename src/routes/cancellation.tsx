@@ -27,7 +27,7 @@ function CancellationPage() {
         <P>You can cancel your subscription whenever you like:</P>
         <UL>
           <li>From your <Link to="/dashboard" className="underline">Dashboard</Link> → Billing section.</li>
-          <li>Or by emailing <a href="mailto:support@jenvu.com" className="underline">support@jenvu.com</a> from your account email.</li>
+          <li>Or by emailing <a href="mailto:support@jenvu.net" className="underline">support@jenvu.net</a> from your account email.</li>
         </UL>
       </section>
 
@@ -67,7 +67,7 @@ function CancellationPage() {
 
       <section className="space-y-3">
         <H2>8. Contact</H2>
-        <P>Questions about cancellation? Email <a href="mailto:support@jenvu.com" className="underline">support@jenvu.com</a>.</P>
+        <P>Questions about cancellation? Email <a href="mailto:support@jenvu.net" className="underline">support@jenvu.net</a>.</P>
       </section>
     </PageShell>
   );

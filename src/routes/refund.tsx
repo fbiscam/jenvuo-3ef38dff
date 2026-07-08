@@ -54,7 +54,7 @@ function RefundPage() {
 
       <section className="space-y-3">
         <H2>5. Duplicate or accidental charges</H2>
-        <P>If you were charged twice for the same purchase, or a charge was clearly made in error, contact us within 7 days at <a href="mailto:support@jenvu.com" className="underline">support@jenvu.com</a>. If none of the associated credits have been used, we will refund the duplicate/erroneous charge in full.</P>
+        <P>If you were charged twice for the same purchase, or a charge was clearly made in error, contact us within 7 days at <a href="mailto:support@jenvu.net" className="underline">support@jenvu.net</a>. If none of the associated credits have been used, we will refund the duplicate/erroneous charge in full.</P>
       </section>
 
       <section className="space-y-3">
@@ -74,7 +74,7 @@ function RefundPage() {
 
       <section className="space-y-3">
         <H2>9. How to request a refund</H2>
-        <P>Email <a href="mailto:support@jenvu.com" className="underline">support@jenvu.com</a> within 7 days of purchase with your account email and order ID. We usually respond within 2 business days.</P>
+        <P>Email <a href="mailto:support@jenvu.net" className="underline">support@jenvu.net</a> within 7 days of purchase with your account email and order ID. We usually respond within 2 business days.</P>
       </section>
     </PageShell>
   );
