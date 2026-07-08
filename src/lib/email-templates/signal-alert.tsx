@@ -189,7 +189,7 @@ export const template = {
 // ===== Styles =====
 const main: React.CSSProperties = {
   backgroundColor: '#ffffff',
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif",
+  fontFamily: "Urbanist, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   margin: 0,
   padding: '24px 0',
   color: '#18181b',
