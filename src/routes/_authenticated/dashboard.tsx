@@ -440,6 +440,48 @@ function DashboardLayout() {
     return () => { cancelled = true; };
   }, [range, refreshTick, authUser?.id, authLoading]);
 
+  // ---------- Unread badge counts (per tab, cleared when user opens tab) ----------
+  const lsKey = useCallback(
+    (tab: "saved" | "alerts" | "journal") => `dash:lastSeen:${authUser?.id ?? "anon"}:${tab}`,
+    [authUser?.id],
+  );
+  const getLastSeen = useCallback((tab: "saved" | "alerts" | "journal") => {
+    if (typeof window === "undefined") return new Date(0).toISOString();
+    return window.localStorage.getItem(lsKey(tab)) ?? new Date(0).toISOString();
+  }, [lsKey]);
+
+  useEffect(() => {
+    if (authLoading || !authUser) return;
+    let cancelled = false;
+    (async () => {
+      const savedSince = getLastSeen("saved");
+      const alertsSince = getLastSeen("alerts");
+      const journalSince = getLastSeen("journal");
+      const [s, a, j] = await Promise.all([
+        supabase.from("saved_signals").select("id", { count: "exact", head: true }).gt("created_at", savedSince),
+        supabase.from("signal_alerts").select("id", { count: "exact", head: true }).gt("created_at", alertsSince),
+        supabase.from("trade_journal").select("id", { count: "exact", head: true }).eq("user_id", authUser.id).gt("created_at", journalSince),
+      ]);
+      if (cancelled) return;
+      setNewCounts({ saved: s.count ?? 0, alerts7d: a.count ?? 0, journalTotal: j.count ?? 0 });
+    })();
+    return () => { cancelled = true; };
+  }, [authUser?.id, authLoading, refreshTick, getLastSeen]);
+
+  const markTabSeen = useCallback((countKey?: string) => {
+    if (!countKey || typeof window === "undefined") return;
+    const map: Record<string, "saved" | "alerts" | "journal"> = {
+      saved: "saved",
+      alerts7d: "alerts",
+      journalTotal: "journal",
+    };
+    const tab = map[countKey];
+    if (!tab) return;
+    window.localStorage.setItem(lsKey(tab), new Date().toISOString());
+    setNewCounts((prev) => ({ ...prev, [countKey]: 0 } as typeof prev));
+  }, [lsKey]);
+
+
   const openSymbols = useMemo(
     () => Array.from(new Set(counts.openTrades.map(t => t.pair.toUpperCase()))),
     [counts.openTrades],
