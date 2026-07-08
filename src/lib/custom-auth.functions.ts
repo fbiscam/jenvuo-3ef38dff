@@ -44,7 +44,7 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
   )
   .handler(async ({ data }) => {
     try {
-      await createSignupOtp(data)
+      await createSignupOtp({ ...data, ip: readClientIp() })
       return { ok: true as const }
     } catch (error) {
       return { ok: false as const, error: error instanceof Error ? error.message : 'Could not send code.' }
