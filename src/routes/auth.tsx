@@ -144,11 +144,48 @@ function AuthPage() {
       toast.success("Account created");
       navigate({ to: redirectTo as "/dashboard", replace: true });
     } else {
-      toast.success("Check your email to confirm your account");
-      setMode("signin");
-      setPassword("");
+      toast.success("Verification code sent to your email");
+      setOtpStep(true);
+      setOtpCode("");
     }
   };
+
+  const verifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    if (!/^\d{6}$/.test(otpCode)) {
+      setErrorMsg("Enter the 6-digit code from your email");
+      return;
+    }
+    setLoading(true);
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token: otpCode,
+      type: "signup",
+    });
+    setLoading(false);
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+    if (data.session) {
+      toast.success("Email verified");
+      navigate({ to: redirectTo as "/dashboard", replace: true });
+    }
+  };
+
+  const resendCode = async () => {
+    setErrorMsg(null);
+    setResending(true);
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    setResending(false);
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+    toast.success("New code sent");
+  };
+
 
 
   return (
