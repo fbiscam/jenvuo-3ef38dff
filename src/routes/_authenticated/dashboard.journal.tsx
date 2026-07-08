@@ -49,6 +49,11 @@ function Journal() {
   const { user: authUser, loading: authLoading } = useAuthUser();
 
 
+  const [setups, setSetups] = useState<SetupRow[]>([]);
+  const [tradeTags, setTradeTags] = useState<Record<string, string[]>>({});
+  const fetchSetups = useServerFn(listSetups);
+  const fetchLinks = useServerFn(getTradeSetupLinks);
+
   const load = async (userId: string) => {
     setTradesLoading(true);
     const { data, error } = await supabase.from("trade_journal").select("*").eq("user_id", userId).order("opened_at", { ascending: false });
@@ -57,12 +62,25 @@ function Journal() {
       setTradesLoading(false);
       return;
     }
-    setTrades((data as unknown as Trade[]) ?? []);
+    const rows = (data as unknown as Trade[]) ?? [];
+    setTrades(rows);
     setTradesLoading(false);
+    // load setups + links in parallel
+    try {
+      const [s, links] = await Promise.all([
+        fetchSetups(),
+        rows.length ? fetchLinks({ data: { tradeIds: rows.map((r) => r.id) } }) : Promise.resolve({} as Record<string, string[]>),
+      ]);
+      setSetups(s);
+      setTradeTags(links);
+    } catch {
+      /* non-fatal */
+    }
   };
   useEffect(() => {
     if (authLoading || !authUser) return;
     load(authUser.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, authUser?.id]);
 
 
