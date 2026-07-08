@@ -31,7 +31,7 @@ function TermsPage() {
         <UL>
           <li>Provide accurate information when signing up and keep it current.</li>
           <li>You are responsible for safeguarding your credentials and all activity under your account.</li>
-          <li>Notify us at <a href="mailto:support@jenvu.com" className="underline">support@jenvu.com</a> immediately of any unauthorised access.</li>
+          <li>Notify us at <a href="mailto:support@jenvu.net" className="underline">support@jenvu.net</a> immediately of any unauthorised access.</li>
           <li>One person per account; do not share or resell your credentials.</li>
         </UL>
       </section>
@@ -101,7 +101,7 @@ function TermsPage() {
 
       <section className="space-y-3">
         <H2>14. Contact</H2>
-        <P>Questions about these Terms: <a href="mailto:support@jenvu.com" className="underline">support@jenvu.com</a>.</P>
+        <P>Questions about these Terms: <a href="mailto:support@jenvu.net" className="underline">support@jenvu.net</a>.</P>
       </section>
     </PageShell>
   );

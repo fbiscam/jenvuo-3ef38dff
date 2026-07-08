@@ -77,7 +77,7 @@ function PrivacyPage() {
 
       <section className="space-y-3">
         <H2>7. Your rights</H2>
-        <P>Depending on your jurisdiction, you may have the right to access, correct, port, delete, or restrict processing of your personal data, and to object to processing or withdraw consent. To exercise any right, email <a href="mailto:support@jenvu.com" className="underline">support@jenvu.com</a> from the address linked to your account. We respond within 30 days.</P>
+        <P>Depending on your jurisdiction, you may have the right to access, correct, port, delete, or restrict processing of your personal data, and to object to processing or withdraw consent. To exercise any right, email <a href="mailto:support@jenvu.net" className="underline">support@jenvu.net</a> from the address linked to your account. We respond within 30 days.</P>
       </section>
 
       <section className="space-y-3">
@@ -97,7 +97,7 @@ function PrivacyPage() {
 
       <section className="space-y-3">
         <H2>11. Changes & contact</H2>
-        <P>We may update this policy as the product evolves. Material changes are announced in-app or by email. For any privacy question, write to <a href="mailto:support@jenvu.com" className="underline">support@jenvu.com</a>.</P>
+        <P>We may update this policy as the product evolves. Material changes are announced in-app or by email. For any privacy question, write to <a href="mailto:support@jenvu.net" className="underline">support@jenvu.net</a>.</P>
       </section>
     </PageShell>
   );

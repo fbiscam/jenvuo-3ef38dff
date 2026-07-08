@@ -459,7 +459,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "Check your Spam / Promotions folders.",
             "Confirm you used the same email address you signed up with.",
-            "Add support@jenvu.com to your contacts and try again.",
+            "Add support@jenvu.net to your contacts and try again.",
           ]},
         ],
       },
@@ -493,7 +493,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "How to request deletion" },
           { type: "ol", items: [
-            "Email support@jenvu.com from the address on your account.",
+            "Email support@jenvu.net from the address on your account.",
             "Use the subject line 'Delete account'.",
             "We reply within one business day to confirm.",
             "Deletion completes within 7 days of your confirmation.",
