@@ -104,6 +104,38 @@ function AuthPage() {
     return () => sub.subscription.unsubscribe();
   }, [navigate, redirectTo]);
 
+  // Reset submitted-otp tracker when leaving OTP screens or clearing the code
+  React.useEffect(() => {
+    if (otpCode.length === 0) lastSubmittedOtpRef.current = "";
+  }, [otpCode]);
+
+  // Autofocus OTP inputs when the step opens
+  React.useEffect(() => {
+    if (mode === "signup" && otpStep) {
+      otpInputRef.current?.focus();
+    } else if (mode === "forgot" && forgotStep === "code") {
+      recoveryOtpInputRef.current?.focus();
+    }
+  }, [mode, otpStep, forgotStep]);
+
+  // Auto-submit OTP on complete 6-digit entry
+  React.useEffect(() => {
+    if (otpCode.length !== 6 || loading) return;
+    if (lastSubmittedOtpRef.current === otpCode) return;
+
+    const isSignupOtp = mode === "signup" && otpStep;
+    const isRecoveryOtp = mode === "forgot" && forgotStep === "code";
+    if (!isSignupOtp && !isRecoveryOtp) return;
+
+    lastSubmittedOtpRef.current = otpCode;
+    const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+    if (isSignupOtp) {
+      void verifyOtp(fakeEvent);
+    } else {
+      void verifyRecoveryOtp(fakeEvent);
+    }
+  }, [otpCode, loading, mode, otpStep, forgotStep]);
+
   const signInSchema = z.object({
     email: z.string().trim().email("Enter a valid email").max(255),
     password: z.string().min(1, "Password is required"),
