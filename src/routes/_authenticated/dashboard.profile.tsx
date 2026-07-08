@@ -116,8 +116,9 @@ function Profile() {
           </button>
         ) : (
           <div className="mt-4 flex gap-2">
-            <button onClick={deleteAccount} className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700">Confirm delete</button>
-            <button onClick={() => setConfirmDelete(false)} className="rounded-lg px-4 py-2 text-sm">Cancel</button>
+            <button onClick={deleteAccount} disabled={deleting} className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50">{deleting ? "Deleting…" : "Confirm delete"}</button>
+            <button onClick={() => setConfirmDelete(false)} disabled={deleting} className="rounded-lg px-4 py-2 text-sm">Cancel</button>
+
           </div>
         )}
       </section>
