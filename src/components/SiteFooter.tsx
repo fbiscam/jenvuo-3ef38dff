@@ -32,31 +32,27 @@ function NewsletterSubscribe() {
   };
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-zinc-900 p-4 shadow-sm">
-      <div className="text-center text-[13px] font-semibold text-white">
-        Get gold desk insights in your inbox
-      </div>
-      <form onSubmit={onSubmit} className="mt-3 flex flex-col gap-2 sm:flex-row">
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          maxLength={255}
-          className="flex-1 rounded-lg bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none"
-        />
-        <button
-          type="submit"
-          disabled={loading || done}
-          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-amber-400 disabled:opacity-60"
-        >
-          {done ? "Subscribed" : loading ? "…" : "Subscribe"}
-        </button>
-      </form>
-    </div>
+    <form onSubmit={onSubmit} className="flex w-full max-w-md flex-col gap-2 sm:flex-row">
+      <input
+        type="email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="you@example.com"
+        maxLength={255}
+        className="flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none"
+      />
+      <button
+        type="submit"
+        disabled={loading || done}
+        className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60"
+      >
+        {done ? "Subscribed" : loading ? "…" : "Subscribe"}
+      </button>
+    </form>
   );
 }
+
 
 
 const columns = [
