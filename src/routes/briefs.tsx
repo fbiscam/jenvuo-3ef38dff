@@ -108,9 +108,9 @@ function BriefsPage() {
           <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
             The gold desk, in your<span className="md:hidden"> </span><br className="hidden md:inline" />ear — every session.
           </h1>
-          <p className="mt-5 max-w-2xl text-base text-zinc-600 leading-relaxed sm:text-lg">
-            60- to 120-second audio briefs on gold before the London, New York, and Asia killzones open.
-            Structured spoken analysis by Jenvu AI, referencing the desk's live signal.
+          <p className="mt-5 max-w-2xl text-base text-zinc-600 leading-relaxed sm:text-lg md:max-w-none">
+            60- to 120-second audio briefs on gold before the London, New York, and Asia killzones open.<br className="hidden md:inline" />
+            <span className="md:hidden"> </span>Structured spoken analysis by Jenvu AI, referencing the desk's live signal.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <a
