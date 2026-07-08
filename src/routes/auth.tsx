@@ -233,6 +233,7 @@ function AuthPage() {
               setMfaChallenge({ factorId: totp.id, challengeId: chal.id });
               setMfaCode("");
               setMfaError(null);
+              setMfaResendCooldown(30);
               return;
             }
           }
