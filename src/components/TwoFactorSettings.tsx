@@ -1,4 +1,5 @@
 import * as React from "react";
+import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Shield, ShieldCheck, ShieldOff, Copy, Check } from "lucide-react";
@@ -55,23 +56,32 @@ export function TwoFactorSettings() {
     for (const f of existingUnverified) {
       await supabase.auth.mfa.unenroll({ factorId: f.id });
     }
+    const { data: userData } = await supabase.auth.getUser();
+    const userEmail = userData.user?.email || "account";
     const { data, error } = await supabase.auth.mfa.enroll({
       factorType: "totp",
       friendlyName: `Jenvu · ${new Date().toISOString().slice(0, 10)}`,
+      issuer: "Jenvu.com",
     });
     setBusy(false);
     if (error || !data) {
       toast.error(error?.message || "Could not start 2FA setup");
       return;
     }
+    // Rewrite the otpauth URI + QR so the authenticator app shows
+    // "Jenvu.com" as issuer and the user's email as account label,
+    // instead of the default project URL.
+    const rebuiltUri = `otpauth://totp/${encodeURIComponent("Jenvu.com")}:${encodeURIComponent(userEmail)}?secret=${data.totp.secret}&issuer=${encodeURIComponent("Jenvu.com")}&algorithm=SHA1&digits=6&period=30`;
+    const qrSrc = await QRCode.toDataURL(rebuiltUri, { margin: 1, width: 240 });
     setEnroll({
       factorId: data.id,
-      qr: data.totp.qr_code,
+      qr: qrSrc,
       secret: data.totp.secret,
-      uri: data.totp.uri,
+      uri: rebuiltUri,
     });
     setCode("");
   };
+
 
   const cancelEnroll = async () => {
     if (!enroll) return;
