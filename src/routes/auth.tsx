@@ -701,6 +701,7 @@ function AuthPage() {
                             autoComplete="one-time-code"
                             maxLength={6}
                             required
+                            disabled={loading}
                             aria-invalid={otpError ? true : undefined}
                             aria-describedby={otpError ? "otp-error-recovery" : undefined}
                             value={otpCode}
