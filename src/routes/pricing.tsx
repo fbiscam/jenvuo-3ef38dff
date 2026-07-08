@@ -278,8 +278,8 @@ function PricingPage() {
                 </th>
                 {[
                   { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false, key: "free" },
-                  { name: "Pro", price: "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
-                  { name: "Elite", price: "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
+                  { name: "Pro", price: billing === "annual" ? "$290" : "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: billing === "annual" ? "$990" : "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
                   { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false, key: "custom" },
                 ].map((p) => {
                   const isCurrent = currentPlan === p.key;
@@ -304,7 +304,7 @@ function PricingPage() {
                     <div className="mt-2 flex items-baseline gap-1">
                       <span className="text-2xl font-bold tracking-tight text-zinc-900">{p.price}</span>
                       {p.price.startsWith("$") && p.price !== "$0" && (
-                        <span className="text-[11px] text-zinc-500">/month</span>
+                        <span className="text-[11px] text-zinc-500">{billing === "annual" ? "/year" : "/month"}</span>
                       )}
                     </div>
                     <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
