@@ -598,7 +598,58 @@ function AuthPage() {
                     </button>
                   </div>
 
-                  {mode === "signup" ? (
+                  {mfaChallenge ? (
+                    <form onSubmit={verifyMfa} className="mt-4 space-y-3">
+                      <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
+                        <p className="leading-relaxed">
+                          Two-factor authentication is enabled. Enter the 6-digit code from your authenticator app to continue.
+                        </p>
+                      </div>
+                      <div>
+                        <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                          Authenticator Code
+                        </label>
+                        <input
+                          ref={mfaInputRef}
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="one-time-code"
+                          maxLength={6}
+                          required
+                          disabled={loading}
+                          aria-invalid={mfaError ? true : undefined}
+                          value={mfaCode}
+                          onChange={(e) => { setMfaError(null); setMfaCode(e.target.value.replace(/\D/g, "").slice(0, 6)); }}
+                          className={`w-full rounded-xl border bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${mfaError ? "border-red-400 text-red-600 focus:border-red-500" : "border-zinc-200 text-zinc-900 focus:border-zinc-900"} ${mfaShake ? "animate-otp-shake" : ""}`}
+                          placeholder="••••••"
+                        />
+                        {mfaError && (
+                          <p className={`mt-2 text-[12px] text-red-600 ${MONO}`} role="alert" aria-live="polite">
+                            {mfaError}
+                          </p>
+                        )}
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading || mfaCode.length !== 6}
+                        className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                      >
+                        {loading ? btnLoading("Verifying...") : (<>Verify <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                      </button>
+
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={cancelMfa}
+                          disabled={loading}
+                          className="text-xs text-zinc-500 hover:text-zinc-900 transition disabled:opacity-40"
+                        >
+                          ← Sign in with a different account
+                        </button>
+                      </div>
+                    </form>
+                  ) : mode === "signup" ? (
                     otpStep ? (
                       <form onSubmit={verifyOtp} className="mt-4 space-y-3">
                         <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
