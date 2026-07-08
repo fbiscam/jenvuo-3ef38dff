@@ -477,10 +477,16 @@ function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t:
     };
 
     const { data, error } = await supabase.from("trade_journal").insert(payload as never).select("*").single();
+    if (error) { setSaving(false); toast.error(error.message); return; }
+    const trade = data as unknown as Trade;
+    if (tagIds.length > 0) {
+      try {
+        await applyTags({ data: { tradeId: trade.id, setupIds: tagIds } });
+      } catch { /* non-fatal */ }
+    }
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
     toast.success("Trade logged");
-    onSaved(data as unknown as Trade);
+    onSaved(trade, tagIds);
   };
 
   return (
