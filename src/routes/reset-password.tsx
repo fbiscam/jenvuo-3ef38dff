@@ -102,7 +102,7 @@ function ResetPasswordPage() {
               <CheckCircle2 className="mt-0.5 h-4 w-4" />
               <div>
                 <p className="font-medium">Password updated.</p>
-                <p className="mt-1 text-emerald-700">
+                <p className="mt-1 text-[10px] sm:text-xs text-emerald-700 whitespace-nowrap">
                   You've been signed out of all devices. Redirecting to sign-in…
                 </p>
               </div>
