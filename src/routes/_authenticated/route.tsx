@@ -21,7 +21,24 @@ function AuthenticatedLayout() {
   useEffect(() => {
     if (!mounted) return;
     if (loading) return;
-    if (user) return;
+    if (user) {
+      // Block unverified emails from reaching the dashboard.
+      // Confirmed users have email_confirmed_at (or confirmed_at) set.
+      const confirmedAt =
+        (user as { email_confirmed_at?: string | null; confirmed_at?: string | null })
+          .email_confirmed_at ??
+        (user as { confirmed_at?: string | null }).confirmed_at;
+      if (!confirmedAt) {
+        supabase.auth.signOut().finally(() => {
+          navigate({
+            to: "/auth",
+            search: { verify: "1" } as never,
+            replace: true,
+          });
+        });
+      }
+      return;
+    }
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session?.user) {
         navigate({ to: "/auth", replace: true });
