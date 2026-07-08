@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
+import OnboardingTour from "@/components/OnboardingTour";
 import { useCredits } from "@/hooks/useCredits";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
@@ -571,6 +572,7 @@ function DashboardLayout() {
               <span className="text-zinc-300">·</span>
               <Link
                 to="/dashboard/billing"
+                data-tour="plan-pill"
                 className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold tracking-wide ${planTierStyle.pill} hover:opacity-90`}
                 title="Manage your plan"
               >
@@ -582,6 +584,7 @@ function DashboardLayout() {
           <div className="flex items-center gap-1.5 lg:self-end lg:mb-6">
             <Link
               to="/app"
+              data-tour="launch-ai"
               className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium text-zinc-900 shadow-sm hover:bg-zinc-50"
             >
               <Plus className="h-4 w-4" /> Launch AI
@@ -626,7 +629,7 @@ function DashboardLayout() {
         </div>
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
-        <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <section data-tour="analytics" className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
           <Card>
             <CardHeader icon={ShieldCheck} title="Credits & Plan" />
             <div className="flex divide-x divide-zinc-200">
@@ -691,6 +694,7 @@ function DashboardLayout() {
 
         {/* Row 2 — Market Pulse + two CTA cards */}
         <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div data-tour="market-pulse">
           <Card>
             <CardHeader
               icon={LineChart}
@@ -711,6 +715,8 @@ function DashboardLayout() {
               <TickerRow label="DXY" symbol="DXY" decimals={3} />
             </div>
           </Card>
+          </div>
+
 
           <Card className="flex flex-col">
             <CardHeader
@@ -745,7 +751,7 @@ function DashboardLayout() {
           <h2 className="text-[15px] font-semibold text-zinc-900">Workspace</h2>
         </div>
 
-        <div className="mt-3 rounded-xl border border-zinc-200 bg-white">
+        <div data-tour="workspace" className="mt-3 rounded-xl border border-zinc-200 bg-white">
           <nav className="grid grid-cols-3 gap-1 border-b border-zinc-200 p-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-0.5">
             {TABS.map((t) => {
               const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
@@ -786,6 +792,7 @@ function DashboardLayout() {
       </main>
 
       <SiteFooter />
+      <OnboardingTour />
     </div>
   );
 }
