@@ -67,18 +67,66 @@ export const adminMe = createServerFn({ method: "GET" }).handler(async () => {
   };
 });
 
-// ---- Chat inbox data (gated) ----
+// ---- Unified inbox (chat sessions + contact form messages) ----
+
+type UnifiedItem = {
+  id: string; // "chat:<uuid>" or "form:<uuid>"
+  source: "chat" | "form";
+  guest_name: string | null;
+  guest_email: string | null;
+  status: string;
+  last_message_at: string;
+  unread_admin: number;
+  created_at: string;
+  subject?: string | null;
+};
 
 export const adminListSessions = createServerFn({ method: "GET" }).handler(async () => {
   await requireUnlocked();
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
-    .from("chat_sessions")
-    .select("id,guest_name,guest_email,status,last_message_at,unread_admin,created_at")
-    .order("last_message_at", { ascending: false })
-    .limit(200);
-  if (error) throw new Error(error.message);
-  return { sessions: data ?? [] };
+
+  const [chatsRes, formsRes] = await Promise.all([
+    supabaseAdmin
+      .from("chat_sessions")
+      .select("id,guest_name,guest_email,status,last_message_at,unread_admin,created_at")
+      .order("last_message_at", { ascending: false })
+      .limit(200),
+    supabaseAdmin
+      .from("contact_messages")
+      .select("id,name,email,subject,message,status,created_at")
+      .order("created_at", { ascending: false })
+      .limit(200),
+  ]);
+  if (chatsRes.error) throw new Error(chatsRes.error.message);
+  if (formsRes.error) throw new Error(formsRes.error.message);
+
+  const chats: UnifiedItem[] = (chatsRes.data ?? []).map((c: any) => ({
+    id: `chat:${c.id}`,
+    source: "chat",
+    guest_name: c.guest_name,
+    guest_email: c.guest_email,
+    status: c.status,
+    last_message_at: c.last_message_at,
+    unread_admin: c.unread_admin || 0,
+    created_at: c.created_at,
+  }));
+
+  const forms: UnifiedItem[] = (formsRes.data ?? []).map((f: any) => ({
+    id: `form:${f.id}`,
+    source: "form",
+    guest_name: f.name,
+    guest_email: f.email,
+    status: f.status === "archived" || f.status === "replied" ? "closed" : "open",
+    last_message_at: f.created_at,
+    unread_admin: f.status === "new" ? 1 : 0,
+    created_at: f.created_at,
+    subject: f.subject,
+  }));
+
+  const sessions = [...chats, ...forms].sort(
+    (a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime(),
+  );
+  return { sessions };
 });
 
 export const adminGetMessages = createServerFn({ method: "POST" })
@@ -86,17 +134,47 @@ export const adminGetMessages = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireUnlocked();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    if (data.sessionId.startsWith("form:")) {
+      const realId = data.sessionId.slice(5);
+      const { data: row, error } = await supabaseAdmin
+        .from("contact_messages")
+        .select("id,name,email,subject,message,status,created_at")
+        .eq("id", realId)
+        .single();
+      if (error) throw new Error(error.message);
+      if (row.status === "new") {
+        await supabaseAdmin
+          .from("contact_messages")
+          .update({ status: "read" })
+          .eq("id", realId);
+      }
+      const content = row.subject
+        ? `Subject: ${row.subject}\n\n${row.message}`
+        : row.message;
+      return {
+        messages: [
+          {
+            id: row.id,
+            sender: "guest" as const,
+            content,
+            created_at: row.created_at,
+          },
+        ],
+      };
+    }
+
+    const realId = data.sessionId.startsWith("chat:") ? data.sessionId.slice(5) : data.sessionId;
     const { data: rows, error } = await supabaseAdmin
       .from("chat_messages")
       .select("id,sender,content,created_at")
-      .eq("session_id", data.sessionId)
+      .eq("session_id", realId)
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
-    // mark read
     await supabaseAdmin
       .from("chat_sessions")
       .update({ unread_admin: 0 })
-      .eq("id", data.sessionId);
+      .eq("id", realId);
     return { messages: rows ?? [] };
   });
 
@@ -109,10 +187,14 @@ export const adminReply = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     await requireUnlocked();
+    if (data.sessionId.startsWith("form:")) {
+      throw new Error("Reply to form messages by email");
+    }
+    const realId = data.sessionId.startsWith("chat:") ? data.sessionId.slice(5) : data.sessionId;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const now = new Date().toISOString();
     const { error: mErr } = await supabaseAdmin.from("chat_messages").insert({
-      session_id: data.sessionId,
+      session_id: realId,
       sender: "admin",
       content: data.content,
     });
@@ -120,7 +202,7 @@ export const adminReply = createServerFn({ method: "POST" })
     const { error: sErr } = await supabaseAdmin
       .from("chat_sessions")
       .update({ last_message_at: now, status: "open" })
-      .eq("id", data.sessionId);
+      .eq("id", realId);
     if (sErr) throw new Error(sErr.message);
     return { ok: true as const };
   });
@@ -130,10 +212,20 @@ export const adminCloseSession = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireUnlocked();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (data.sessionId.startsWith("form:")) {
+      const realId = data.sessionId.slice(5);
+      const { error } = await supabaseAdmin
+        .from("contact_messages")
+        .update({ status: "archived" })
+        .eq("id", realId);
+      if (error) throw new Error(error.message);
+      return { ok: true as const };
+    }
+    const realId = data.sessionId.startsWith("chat:") ? data.sessionId.slice(5) : data.sessionId;
     const { error } = await supabaseAdmin
       .from("chat_sessions")
       .update({ status: "closed" })
-      .eq("id", data.sessionId);
+      .eq("id", realId);
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });

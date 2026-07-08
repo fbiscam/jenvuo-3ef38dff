@@ -36,12 +36,14 @@ export const Route = createFileRoute("/jenvu-ops-x9k2/inbox")({
 
 type Session = {
   id: string;
+  source: "chat" | "form";
   guest_name: string | null;
   guest_email: string | null;
   status: string;
   last_message_at: string;
   unread_admin: number;
   created_at: string;
+  subject?: string | null;
 };
 
 type Message = {
@@ -295,7 +297,10 @@ function AdminInbox() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="truncate text-sm font-medium text-zinc-900">{name}</span>
+                          <div className="flex min-w-0 items-center gap-1.5">
+                            <span className="truncate text-sm font-medium text-zinc-900">{name}</span>
+                            <SourceBadge source={s.source} />
+                          </div>
                           <span className="shrink-0 text-[10px] text-zinc-400">{timeAgo(s.last_message_at)}</span>
                         </div>
                         <div className="mt-0.5 flex items-center justify-between gap-2">
@@ -344,6 +349,7 @@ function AdminInbox() {
                       <span className="truncate text-sm font-semibold text-zinc-900">
                         {activeSession.guest_name || "Anonymous visitor"}
                       </span>
+                      <SourceBadge source={activeSession.source} />
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
                           activeSession.status === "open"
@@ -428,38 +434,57 @@ function AdminInbox() {
                   })}
                 </div>
 
-                <form onSubmit={handleReply} className="border-t border-zinc-200 bg-white p-3">
-                  {activeSession.status === "closed" ? (
-                    <div className="flex items-center justify-center gap-2 rounded-md bg-zinc-50 py-3 text-xs text-zinc-500">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
+                {activeSession.source === "form" ? (
+                  <div className="flex items-center justify-between gap-2 border-t border-zinc-200 bg-white p-3">
+                    <div className="text-xs text-zinc-500">
+                      Contact form submission — reply directly via email.
                     </div>
-                  ) : (
-                    <div className="flex items-end gap-2 rounded-lg border border-zinc-200 bg-white p-2 focus-within:border-zinc-400">
-                      <textarea
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            handleReply(e as unknown as React.FormEvent);
-                          }
-                        }}
-                        placeholder="Type your reply…  (Shift+Enter for new line)"
-                        rows={1}
-                        maxLength={4000}
-                        className="max-h-40 min-h-[36px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
-                      />
-                      <button
-                        type="submit"
-                        disabled={sending || !input.trim()}
-                        className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                    {activeSession.guest_email && (
+                      <a
+                        href={`mailto:${activeSession.guest_email}${
+                          activeSession.subject ? `?subject=${encodeURIComponent("Re: " + activeSession.subject)}` : ""
+                        }`}
+                        className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800"
                       >
-                        {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                        <span className="hidden sm:inline">Send</span>
-                      </button>
-                    </div>
-                  )}
-                </form>
+                        <Mail className="h-4 w-4" />
+                        <span>Reply via email</span>
+                      </a>
+                    )}
+                  </div>
+                ) : (
+                  <form onSubmit={handleReply} className="border-t border-zinc-200 bg-white p-3">
+                    {activeSession.status === "closed" ? (
+                      <div className="flex items-center justify-center gap-2 rounded-md bg-zinc-50 py-3 text-xs text-zinc-500">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
+                      </div>
+                    ) : (
+                      <div className="flex items-end gap-2 rounded-lg border border-zinc-200 bg-white p-2 focus-within:border-zinc-400">
+                        <textarea
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              handleReply(e as unknown as React.FormEvent);
+                            }
+                          }}
+                          placeholder="Type your reply…  (Shift+Enter for new line)"
+                          rows={1}
+                          maxLength={4000}
+                          className="max-h-40 min-h-[36px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
+                        />
+                        <button
+                          type="submit"
+                          disabled={sending || !input.trim()}
+                          className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                          <span className="hidden sm:inline">Send</span>
+                        </button>
+                      </div>
+                    )}
+                  </form>
+                )}
               </>
             )}
           </section>
@@ -488,5 +513,20 @@ function StatCard({
         <div className="text-sm font-semibold text-zinc-900">{value}</div>
       </div>
     </div>
+  );
+}
+
+function SourceBadge({ source }: { source: "chat" | "form" }) {
+  if (source === "form") {
+    return (
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200">
+        <Mail className="h-2.5 w-2.5" /> Form
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-blue-700 ring-1 ring-blue-200">
+      <MessageSquare className="h-2.5 w-2.5" /> Live chat
+    </span>
   );
 }
