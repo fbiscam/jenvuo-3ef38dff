@@ -504,6 +504,153 @@ function AuthPage() {
                         </p>
                       </form>
                     )
+                  ) : mode === "forgot" ? (
+                    forgotStep === "email" ? (
+                      <form onSubmit={sendResetLink} className="mt-4 space-y-3">
+                        <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
+                          <p className="leading-relaxed">
+                            Enter your email. We'll send a reset link and a 6-digit code.
+                          </p>
+                        </div>
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            Email
+                          </label>
+                          <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                              type="email"
+                              required
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              placeholder="Institutional email..."
+                            />
+                          </div>
+                        </div>
+
+                        {errorMsg && (
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                            <span className="leading-snug">{errorMsg}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                        >
+                          {loading ? "Sending..." : (<>Send Reset <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                        </button>
+
+                        <div className="pt-2">
+                          <button
+                            type="button"
+                            onClick={() => { setMode("signin"); setErrorMsg(null); }}
+                            className="text-xs text-zinc-500 hover:text-zinc-900 transition"
+                          >
+                            ← Back to Sign in
+                          </button>
+                        </div>
+                      </form>
+                    ) : forgotStep === "code" ? (
+                      <form onSubmit={verifyRecoveryOtp} className="mt-4 space-y-3">
+                        <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
+                          <p className="leading-relaxed">
+                            Check <span className="font-semibold text-zinc-900">{email}</span>. Click the link in the email, or enter the 6-digit code below.
+                          </p>
+                        </div>
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            Verification Code
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="one-time-code"
+                            maxLength={6}
+                            required
+                            value={otpCode}
+                            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                            className={`w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300 ${MONO}`}
+                            placeholder="••••••"
+                          />
+                        </div>
+
+                        {errorMsg && (
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                            <span className="leading-snug">{errorMsg}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                        >
+                          {loading ? "Verifying..." : (<>Verify Code <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                        </button>
+
+                        <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
+                          <button
+                            type="button"
+                            onClick={() => { setForgotStep("email"); setErrorMsg(null); }}
+                            className="hover:text-zinc-900 transition"
+                          >
+                            ← Change email
+                          </button>
+                          <button
+                            type="button"
+                            onClick={resendResetCode}
+                            disabled={resending}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50"
+                          >
+                            {resending ? "Sending..." : "Resend code"}
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <form onSubmit={updatePassword} className="mt-4 space-y-3">
+                        <div className={`rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] text-emerald-900 ${MONO}`}>
+                          <p className="leading-relaxed">
+                            Verified. Set a new password to continue.
+                          </p>
+                        </div>
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            New Password
+                          </label>
+                          <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                              type="password"
+                              required
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              placeholder="Min 8 characters..."
+                            />
+                          </div>
+                        </div>
+
+                        {errorMsg && (
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                            <span className="leading-snug">{errorMsg}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                        >
+                          {loading ? "Updating..." : (<>Update Password <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                        </button>
+                      </form>
+                    )
                   ) : (
                     <>
                       <form onSubmit={signIn} className="mt-4 space-y-3">
