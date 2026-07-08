@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { confirmEmailChange } from "@/lib/email-change.functions";
 
@@ -57,12 +58,22 @@ const FRIENDLY: Record<ErrorKind, { title: string; body: string }> = {
 function ConfirmEmailChangePage() {
   const { token } = Route.useSearch();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<Status>("loading");
   const [message, setMessage] = useState("Verifying your email change…");
   const [errorKind, setErrorKind] = useState<ErrorKind>("generic");
   const [newEmail, setNewEmail] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(5);
   const ran = useRef(false);
+
+  // Ordered teardown: cancel in-flight queries, clear cache, sign out, then
+  // navigate with replace so Back can't restore an authenticated shell.
+  const goToSignIn = async () => {
+    try { await queryClient.cancelQueries(); } catch {}
+    queryClient.clear();
+    try { await supabase.auth.signOut(); } catch {}
+    navigate({ to: "/auth", replace: true });
+  };
 
   useEffect(() => {
     if (ran.current) return;
@@ -86,7 +97,10 @@ function ConfirmEmailChangePage() {
         setNewEmail(res.newEmail);
         setStatus("success");
         setMessage("Your email has been updated. Signing you out…");
-        await supabase.auth.signOut();
+        // Teardown immediately on success so any protected queries stop.
+        try { await queryClient.cancelQueries(); } catch {}
+        queryClient.clear();
+        try { await supabase.auth.signOut(); } catch {}
       } catch (e: any) {
         const err = e?.message || "Could not confirm email change.";
         setStatus("error");
@@ -94,12 +108,12 @@ function ConfirmEmailChangePage() {
         setMessage(err);
       }
     })();
-  }, [token]);
+  }, [token, queryClient]);
 
   useEffect(() => {
     if (status !== "success") return;
     if (countdown <= 0) {
-      navigate({ to: "/auth" });
+      navigate({ to: "/auth", replace: true });
       return;
     }
     const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
@@ -135,7 +149,7 @@ function ConfirmEmailChangePage() {
                 Redirecting to sign in in <span className="font-semibold">{countdown}</span>…
               </p>
               <button
-                onClick={() => navigate({ to: "/auth" })}
+                onClick={goToSignIn}
                 className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
               >
                 Go to sign in
@@ -158,7 +172,7 @@ function ConfirmEmailChangePage() {
                   Restart email change
                 </button>
                 <button
-                  onClick={() => navigate({ to: "/auth" })}
+                  onClick={goToSignIn}
                   className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50"
                 >
                   Back to sign in
