@@ -186,6 +186,17 @@
 .animate-ticker { animation: ticker-marquee 60s linear infinite; will-change: transform; }
 .animate-ticker:hover { animation-play-state: paused; }
 
+@keyframes otp-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+.animate-otp-shake { animation: otp-shake 0.42s cubic-bezier(.36,.07,.19,.97) both; }
+
+
+
 /* Mobile perf: silence heavy GPU animations on small screens to prevent lag */
 @media (max-width: 767px) {
   .animate-ticker { animation-duration: 90s; }
