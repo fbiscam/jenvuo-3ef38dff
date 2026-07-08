@@ -46,9 +46,9 @@ export const EmailChangeEmail = ({
             Confirm Email Change →
           </Link>
           <Text style={{ ...s.footer, marginTop: '24px' }}>
-            Didn't request this? Secure your account immediately by resetting
-            your password.
+            Didn't request this? Reset your password immediately to secure your account.
           </Text>
+
         </Section>
       </Container>
     </Body>
