@@ -593,21 +593,22 @@ function DashboardLayout() {
               <RefreshCw className={`h-3.5 w-3.5 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
             </button>
             <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
-              <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
+            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-[14px]">
+              <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> {RANGE_LABELS[range]}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44">
+            <DropdownMenuContent align="end" className="w-44 sm:w-56">
               {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
                 <DropdownMenuCheckboxItem
                   key={k}
                   checked={range === k}
                   onCheckedChange={() => setRange(k)}
-                  className="text-[12px]"
+                  className="text-[12px] sm:text-[14px] sm:py-2"
                 >
                   {RANGE_LABELS[k]}
                 </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
+
             </DropdownMenu>
           </div>
         </div>
