@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { listTrustedDevices, revokeTrustedDevice } from "@/lib/trusted-devices.functions";
-import { revokeCurrentTrustedDevice, TRUSTED_DEVICE_KEY } from "@/lib/trusted-devices.client";
+import { revokeCurrentTrustedDevice, TRUSTED_DEVICE_KEY } from "@/lib/trusted-devices-local";
 
 type Device = {
   id: string;
