@@ -791,7 +791,7 @@ function AuthPage() {
                           {loading ? btnLoading("Creating...") : (<>Create Desk <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
-                        <p className="pt-2 text-xs text-zinc-500 leading-relaxed">
+                        <p className="pt-2 text-[10px] sm:text-xs text-zinc-500 leading-relaxed whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
                           By continuing you agree to receive a verification code at your email.
                         </p>
                       </form>
