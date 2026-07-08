@@ -406,8 +406,9 @@ function AuthPage() {
       const friendly = lower.includes("expired")
         ? "That code expired. Generate a fresh one in your authenticator app."
         : lower.includes("invalid") || lower.includes("incorrect") || lower.includes("mismatch")
-          ? "That code doesn't match. Double-check your authenticator app and try again."
+          ? "That code doesn't match. Try again."
           : raw || "That code doesn't match. Try again.";
+
       setMfaError(friendly);
       toast.error("Verification failed", { description: friendly });
       setMfaCode("");
