@@ -116,8 +116,27 @@ function AuthPage() {
         setErrorMsg(null);
         return;
       }
-      if (evt === "SIGNED_IN" && session && !recoveryModeRef.current) {
-        navigate({ to: redirectTo as "/dashboard", replace: true });
+      if (evt === "SIGNED_IN" && session && !recoveryModeRef.current && !mfaChallenge) {
+        // Check if MFA elevation is required before navigating to dashboard
+        void (async () => {
+          const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+          if (data && data.currentLevel === "aal1" && data.nextLevel === "aal2") {
+            const { data: fac } = await supabase.auth.mfa.listFactors();
+            const totp = fac?.totp?.find((f) => f.status === "verified");
+            if (totp) {
+              const { data: chal, error } = await supabase.auth.mfa.challenge({ factorId: totp.id });
+              if (error || !chal) {
+                setErrorMsg(error?.message || "Could not start MFA challenge");
+                return;
+              }
+              setMfaChallenge({ factorId: totp.id, challengeId: chal.id });
+              setMfaCode("");
+              setMfaError(null);
+              return;
+            }
+          }
+          navigate({ to: redirectTo as "/dashboard", replace: true });
+        })();
       }
     });
     return () => sub.subscription.unsubscribe();
