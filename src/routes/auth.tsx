@@ -663,10 +663,14 @@ function AuthPage() {
                           <button
                             type="button"
                             onClick={resendResetCode}
-                            disabled={resending}
-                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50"
+                            disabled={resending || resendCooldown > 0}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
                           >
-                            {resending ? "Sending..." : "Resend code"}
+                            {resending
+                              ? "Sending..."
+                              : resendCooldown > 0
+                                ? `Resend in ${resendCooldown}s`
+                                : "Resend code"}
                           </button>
                         </div>
                       </form>
