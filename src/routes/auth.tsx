@@ -606,6 +606,7 @@ function AuthPage() {
                             Verification Code
                           </label>
                           <input
+                            ref={recoveryOtpInputRef}
                             type="text"
                             inputMode="numeric"
                             autoComplete="one-time-code"
