@@ -13,6 +13,9 @@ import {
   requestSignupOtp,
 } from "@/lib/custom-auth.functions";
 import { applyReferralCode } from "@/lib/referrals.functions";
+import { registerTrustedDevice, verifyTrustedDevice } from "@/lib/trusted-devices.functions";
+
+const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 
 
 type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string };
@@ -142,7 +145,10 @@ function AuthPage() {
   const [mfaShake, setMfaShake] = React.useState(false);
   const [mfaResendCooldown, setMfaResendCooldown] = React.useState(0);
   const [mfaResending, setMfaResending] = React.useState(false);
+  const [rememberDevice, setRememberDevice] = React.useState(true);
   const mfaInputRef = React.useRef<HTMLInputElement | null>(null);
+  const verifyTrustedDeviceFn = useServerFn(verifyTrustedDevice);
+  const registerTrustedDeviceFn = useServerFn(registerTrustedDevice);
 
   // Terminal-header flash: shows a blinking notification inside the auth-session
   // strip for a few seconds, then reverts to the default label.
@@ -223,6 +229,22 @@ function AuthPage() {
             const { data: fac } = await supabase.auth.mfa.listFactors();
             const totp = fac?.totp?.find((f) => f.status === "verified");
             if (totp) {
+              // Try trusted-device fast path first.
+              try {
+                const uid = session.user.id;
+                const savedToken = window.localStorage.getItem(TRUSTED_DEVICE_KEY(uid));
+                if (savedToken) {
+                  const res = await verifyTrustedDeviceFn({ data: { token: savedToken } });
+                  if (res?.valid) {
+                    await applyPendingReferral();
+                    navigate({ to: redirectTo as "/dashboard", replace: true });
+                    return;
+                  }
+                  // Stale/expired — clear it so we don't retry every login.
+                  window.localStorage.removeItem(TRUSTED_DEVICE_KEY(uid));
+                }
+              } catch { /* fall through to MFA prompt */ }
+
               const { data: chal, error } = await supabase.auth.mfa.challenge({ factorId: totp.id });
               if (error || !chal) {
                 const msg = error?.message || "Could not start MFA challenge";
@@ -243,7 +265,7 @@ function AuthPage() {
       }
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate, redirectTo, applyPendingReferral, mfaChallenge]);
+  }, [navigate, redirectTo, applyPendingReferral, mfaChallenge, verifyTrustedDeviceFn]);
 
   // Reset submitted-otp tracker when leaving OTP screens or clearing the code
   React.useEffect(() => {
@@ -396,6 +418,24 @@ function AuthPage() {
     }
     setMfaChallenge(null);
     setMfaCode("");
+    // Optionally persist this device so MFA is skipped for 30 days.
+    if (rememberDevice) {
+      try {
+        const { data: sess } = await supabase.auth.getUser();
+        const uid = sess.user?.id;
+        if (uid) {
+          const ua = typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : undefined;
+          const res = await registerTrustedDeviceFn({ data: { userAgent: ua } });
+          if (res?.token) {
+            window.localStorage.setItem(TRUSTED_DEVICE_KEY(uid), res.token);
+          }
+        }
+      } catch {
+        toast.error("Couldn't remember this device", {
+          description: "You'll still need MFA next time. You can try again from settings.",
+        });
+      }
+    }
     navigate({ to: redirectTo as "/dashboard", replace: true });
   };
 
@@ -795,6 +835,18 @@ function AuthPage() {
                           </p>
                         )}
                       </div>
+
+                      <label className={`flex items-center gap-2 text-xs text-zinc-600 select-none cursor-pointer ${MONO}`}>
+                        <input
+                          type="checkbox"
+                          checked={rememberDevice}
+                          onChange={(e) => setRememberDevice(e.target.checked)}
+                          disabled={loading}
+                          className="h-3.5 w-3.5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900"
+                        />
+                        <span>Remember this device for 30 days</span>
+                      </label>
+
 
                       <button
                         type="submit"
