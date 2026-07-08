@@ -269,6 +269,7 @@ function AuthPage() {
     toast.success("Reset link and code sent to your email");
     setForgotStep("code");
     setOtpCode("");
+    setResendCooldown(60);
   };
 
   const verifyRecoveryOtp = async (e: React.FormEvent) => {
@@ -294,6 +295,7 @@ function AuthPage() {
   };
 
   const resendResetCode = async () => {
+    if (resendCooldown > 0) return;
     setErrorMsg(null);
     setResending(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -305,7 +307,9 @@ function AuthPage() {
       return;
     }
     toast.success("New code sent");
+    setResendCooldown(60);
   };
+
 
   const updatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
