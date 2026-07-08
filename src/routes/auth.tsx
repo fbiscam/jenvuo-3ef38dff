@@ -245,6 +245,18 @@ function AuthPage() {
     }, 30);
   };
 
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const raw = e.clipboardData.getData("text");
+    const digits = (raw || "").replace(/\D/g, "").slice(0, 6);
+    if (!digits) return;
+    e.preventDefault();
+    setOtpError(null);
+    setOtpCode(digits);
+    // Auto-submit effect will fire when length hits 6.
+  };
+
+
+
   const verifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
