@@ -21,12 +21,45 @@ export const Route = createFileRoute("/confirm-email-change")({
 });
 
 type Status = "loading" | "success" | "error";
+type ErrorKind = "expired" | "used" | "invalid" | "missing" | "generic";
+
+function classifyError(msg: string): ErrorKind {
+  const m = msg.toLowerCase();
+  if (m.includes("expired")) return "expired";
+  if (m.includes("already been used") || m.includes("already used")) return "used";
+  if (m.includes("invalid") || m.includes("missing")) return "invalid";
+  return "generic";
+}
+
+const FRIENDLY: Record<ErrorKind, { title: string; body: string }> = {
+  expired: {
+    title: "This link has expired",
+    body: "Confirmation links are valid for 60 minutes. Head back to your dashboard and start the email change again to get a fresh link.",
+  },
+  used: {
+    title: "This link was already used",
+    body: "Looks like this confirmation link has already been clicked. If your email is still wrong, start a new email change from your dashboard.",
+  },
+  invalid: {
+    title: "This link isn't valid",
+    body: "The confirmation link is malformed or no longer recognised. Please start the email change again from your dashboard.",
+  },
+  missing: {
+    title: "Missing confirmation token",
+    body: "This page needs a confirmation token from the email we sent. Open the link from that email, or restart the email change from your dashboard.",
+  },
+  generic: {
+    title: "Confirmation failed",
+    body: "We couldn't confirm your email change. Please try starting it again from your dashboard.",
+  },
+};
 
 function ConfirmEmailChangePage() {
   const { token } = Route.useSearch();
   const navigate = useNavigate();
   const [status, setStatus] = useState<Status>("loading");
   const [message, setMessage] = useState("Verifying your email change…");
+  const [errorKind, setErrorKind] = useState<ErrorKind>("generic");
   const [newEmail, setNewEmail] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(5);
   const ran = useRef(false);
@@ -37,24 +70,28 @@ function ConfirmEmailChangePage() {
     (async () => {
       if (!token) {
         setStatus("error");
+        setErrorKind("missing");
         setMessage("Missing confirmation token.");
         return;
       }
       try {
         const res = await confirmEmailChange({ data: { token } });
         if (!res.ok) {
+          const err = res.error || "Could not confirm email change.";
           setStatus("error");
-          setMessage(res.error || "Could not confirm email change.");
+          setErrorKind(classifyError(err));
+          setMessage(err);
           return;
         }
         setNewEmail(res.newEmail);
         setStatus("success");
         setMessage("Your email has been updated. Signing you out…");
-        // Sign the user out so they can sign in with the new email.
         await supabase.auth.signOut();
       } catch (e: any) {
+        const err = e?.message || "Could not confirm email change.";
         setStatus("error");
-        setMessage(e?.message || "Could not confirm email change.");
+        setErrorKind(classifyError(err));
+        setMessage(err);
       }
     })();
   }, [token]);
@@ -78,7 +115,7 @@ function ConfirmEmailChangePage() {
         <h1 className="mt-2 text-2xl font-semibold text-zinc-900">
           {status === "loading" && "Verifying…"}
           {status === "success" && "Email updated"}
-          {status === "error" && "Confirmation failed"}
+          {status === "error" && FRIENDLY[errorKind].title}
         </h1>
 
         <div className="mt-6 space-y-4">
@@ -108,13 +145,25 @@ function ConfirmEmailChangePage() {
 
           {status === "error" && (
             <>
-              <p className="text-sm text-rose-600">{message}</p>
-              <button
-                onClick={() => navigate({ to: "/auth" })}
-                className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50"
-              >
-                Back to sign in
-              </button>
+              <p className="text-sm text-zinc-700">{FRIENDLY[errorKind].body}</p>
+              <details className="text-xs text-zinc-500">
+                <summary className="cursor-pointer">Technical details</summary>
+                <p className="mt-1 break-words">{message}</p>
+              </details>
+              <div className="flex flex-wrap gap-2 pt-2">
+                <button
+                  onClick={() => navigate({ to: "/dashboard/profile", hash: "change-email" })}
+                  className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                >
+                  Restart email change
+                </button>
+                <button
+                  onClick={() => navigate({ to: "/auth" })}
+                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50"
+                >
+                  Back to sign in
+                </button>
+              </div>
             </>
           )}
         </div>

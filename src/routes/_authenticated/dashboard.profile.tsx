@@ -121,7 +121,7 @@ function Profile() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section id="change-email" className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-white p-6">
         <h2 className="text-base font-semibold">Change email</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Enter a new email and we'll send a confirmation link to your current email address. Your email changes only after you click that link.
