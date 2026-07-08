@@ -484,6 +484,13 @@ function DashboardLayout() {
     setNewCounts((prev) => ({ ...prev, [countKey]: 0 } as typeof prev));
   }, [lsKey]);
 
+  // Auto-mark the currently active tab as seen so its badge clears after the first visit
+  // and does not re-appear on future dashboard loads until new items arrive.
+  useEffect(() => {
+    const activeTab = TABS.find((t) => (t.exact ? pathname === t.to : pathname.startsWith(t.to)));
+    if (activeTab?.countKey) markTabSeen(activeTab.countKey);
+  }, [pathname, markTabSeen]);
+
 
   const openSymbols = useMemo(
     () => Array.from(new Set(counts.openTrades.map(t => t.pair.toUpperCase()))),
