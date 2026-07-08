@@ -418,6 +418,24 @@ function AuthPage() {
     }
     setMfaChallenge(null);
     setMfaCode("");
+    // Optionally persist this device so MFA is skipped for 30 days.
+    if (rememberDevice) {
+      try {
+        const { data: sess } = await supabase.auth.getUser();
+        const uid = sess.user?.id;
+        if (uid) {
+          const ua = typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : undefined;
+          const res = await registerTrustedDeviceFn({ data: { userAgent: ua } });
+          if (res?.token) {
+            window.localStorage.setItem(TRUSTED_DEVICE_KEY(uid), res.token);
+          }
+        }
+      } catch {
+        toast.error("Couldn't remember this device", {
+          description: "You'll still need MFA next time. You can try again from settings.",
+        });
+      }
+    }
     navigate({ to: redirectTo as "/dashboard", replace: true });
   };
 
