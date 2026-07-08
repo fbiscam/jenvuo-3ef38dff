@@ -93,6 +93,28 @@ function AuthPage() {
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const [emailChangedBanner, setEmailChangedBanner] = React.useState<string | null>(null);
+
+  // Show a banner + toast when redirected here after a successful email change.
+  React.useEffect(() => {
+    if (search.emailChanged !== "1") return;
+    const ne = search.newEmail || "";
+    if (ne) setEmail(ne);
+    setEmailChangedBanner(ne || "your new email");
+    toast.success("Email change complete", {
+      description: ne
+        ? `Please sign in again with ${ne}.`
+        : "Please sign in again with your new email.",
+      duration: 8000,
+    });
+    // Strip the params from the URL so a refresh doesn't re-fire the toast.
+    navigate({
+      to: "/auth",
+      search: (prev) => ({ ...prev, emailChanged: undefined, newEmail: undefined }),
+      replace: true,
+    });
+  }, []);
+
   const [otpStep, setOtpStep] = React.useState(false);
   const [otpCode, setOtpCode] = React.useState("");
   const [otpError, setOtpError] = React.useState<string | null>(null);
