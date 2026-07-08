@@ -103,6 +103,7 @@ export async function sendCustomAuthEmail({ to, type, code, siteUrl }: CustomAut
         purpose: 'transactional',
         label: type,
         idempotency_key: idempotencyKey,
+        unsubscribe_token: unsubscribeToken,
       },
       { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
     )
