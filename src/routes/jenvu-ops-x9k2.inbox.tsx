@@ -434,38 +434,57 @@ function AdminInbox() {
                   })}
                 </div>
 
-                <form onSubmit={handleReply} className="border-t border-zinc-200 bg-white p-3">
-                  {activeSession.status === "closed" ? (
-                    <div className="flex items-center justify-center gap-2 rounded-md bg-zinc-50 py-3 text-xs text-zinc-500">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
+                {activeSession.source === "form" ? (
+                  <div className="flex items-center justify-between gap-2 border-t border-zinc-200 bg-white p-3">
+                    <div className="text-xs text-zinc-500">
+                      Contact form submission — reply directly via email.
                     </div>
-                  ) : (
-                    <div className="flex items-end gap-2 rounded-lg border border-zinc-200 bg-white p-2 focus-within:border-zinc-400">
-                      <textarea
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            handleReply(e as unknown as React.FormEvent);
-                          }
-                        }}
-                        placeholder="Type your reply…  (Shift+Enter for new line)"
-                        rows={1}
-                        maxLength={4000}
-                        className="max-h-40 min-h-[36px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
-                      />
-                      <button
-                        type="submit"
-                        disabled={sending || !input.trim()}
-                        className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                    {activeSession.guest_email && (
+                      <a
+                        href={`mailto:${activeSession.guest_email}${
+                          activeSession.subject ? `?subject=${encodeURIComponent("Re: " + activeSession.subject)}` : ""
+                        }`}
+                        className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800"
                       >
-                        {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                        <span className="hidden sm:inline">Send</span>
-                      </button>
-                    </div>
-                  )}
-                </form>
+                        <Mail className="h-4 w-4" />
+                        <span>Reply via email</span>
+                      </a>
+                    )}
+                  </div>
+                ) : (
+                  <form onSubmit={handleReply} className="border-t border-zinc-200 bg-white p-3">
+                    {activeSession.status === "closed" ? (
+                      <div className="flex items-center justify-center gap-2 rounded-md bg-zinc-50 py-3 text-xs text-zinc-500">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
+                      </div>
+                    ) : (
+                      <div className="flex items-end gap-2 rounded-lg border border-zinc-200 bg-white p-2 focus-within:border-zinc-400">
+                        <textarea
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              handleReply(e as unknown as React.FormEvent);
+                            }
+                          }}
+                          placeholder="Type your reply…  (Shift+Enter for new line)"
+                          rows={1}
+                          maxLength={4000}
+                          className="max-h-40 min-h-[36px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
+                        />
+                        <button
+                          type="submit"
+                          disabled={sending || !input.trim()}
+                          className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                          <span className="hidden sm:inline">Send</span>
+                        </button>
+                      </div>
+                    )}
+                  </form>
+                )}
               </>
             )}
           </section>
