@@ -80,6 +80,8 @@ function AuthPage() {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [otpStep, setOtpStep] = React.useState(false);
   const [otpCode, setOtpCode] = React.useState("");
+  const [otpError, setOtpError] = React.useState<string | null>(null);
+  const [otpShake, setOtpShake] = React.useState(false);
   const [resending, setResending] = React.useState(false);
   const [forgotStep, setForgotStep] = React.useState<"email" | "code" | "reset">("email");
   const [newPassword, setNewPassword] = React.useState("");
@@ -220,11 +222,35 @@ function AuthPage() {
     }
   };
 
+  const humanizeOtpError = (msg: string): string => {
+    const m = msg.toLowerCase();
+    if (m.includes("expired")) return "This code has expired. Tap Resend to get a new one.";
+    if (m.includes("invalid") || m.includes("token") || m.includes("otp"))
+      return "That code doesn't match. Double-check your email and try again.";
+    if (m.includes("rate") || m.includes("too many"))
+      return "Too many attempts. Please wait a moment before trying again.";
+    return msg || "Verification failed. Try again.";
+  };
+
+  const triggerOtpError = (msg: string, isRecovery = false) => {
+    setOtpError(humanizeOtpError(msg));
+    setOtpShake(true);
+    setOtpCode("");
+    lastSubmittedOtpRef.current = "";
+    window.setTimeout(() => setOtpShake(false), 500);
+    window.setTimeout(() => {
+      const el = isRecovery ? recoveryOtpInputRef.current : otpInputRef.current;
+      el?.focus();
+      el?.select?.();
+    }, 30);
+  };
+
   const verifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+    setOtpError(null);
     if (!/^\d{6}$/.test(otpCode)) {
-      setErrorMsg("Enter the 6-digit code from your email");
+      triggerOtpError("Enter the 6-digit code from your email");
       return;
     }
     setLoading(true);
@@ -235,7 +261,7 @@ function AuthPage() {
     });
     setLoading(false);
     if (error) {
-      setErrorMsg(error.message);
+      triggerOtpError(error.message);
       return;
     }
     if (data.session) {
@@ -243,6 +269,7 @@ function AuthPage() {
       navigate({ to: redirectTo as "/dashboard", replace: true });
     }
   };
+
 
   const resendCode = async () => {
     if (resendCooldown > 0) return;
@@ -288,8 +315,9 @@ function AuthPage() {
   const verifyRecoveryOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+    setOtpError(null);
     if (!/^\d{6}$/.test(otpCode)) {
-      setErrorMsg("Enter the 6-digit code from your email");
+      triggerOtpError("Enter the 6-digit code from your email", true);
       return;
     }
     setLoading(true);
@@ -301,11 +329,12 @@ function AuthPage() {
     });
     setLoading(false);
     if (error) {
-      setErrorMsg(error.message);
+      triggerOtpError(error.message, true);
       return;
     }
     setForgotStep("reset");
   };
+
 
   const resendResetCode = async () => {
     if (resendCooldown > 0) return;
@@ -458,19 +487,20 @@ function AuthPage() {
                             autoComplete="one-time-code"
                             maxLength={6}
                             required
+                            aria-invalid={otpError ? true : undefined}
+                            aria-describedby={otpError ? "otp-error" : undefined}
                             value={otpCode}
-                            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                            className={`w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300 ${MONO}`}
+                            onChange={(e) => { setOtpError(null); setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6)); }}
+                            className={`w-full rounded-xl border bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${otpError ? "border-red-400 text-red-600 focus:border-red-500" : "border-zinc-200 text-zinc-900 focus:border-zinc-900"} ${otpShake ? "animate-otp-shake" : ""}`}
                             placeholder="••••••"
                           />
+                          {otpError && (
+                            <p id="otp-error" className={`mt-2 text-[12px] text-red-600 ${MONO}`} role="alert" aria-live="polite">
+                              {otpError}
+                            </p>
+                          )}
                         </div>
 
-                        {errorMsg && (
-                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
-                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
-                            <span className="leading-snug">{errorMsg}</span>
-                          </div>
-                        )}
 
                         <button
                           type="submit"
@@ -643,19 +673,20 @@ function AuthPage() {
                             autoComplete="one-time-code"
                             maxLength={6}
                             required
+                            aria-invalid={otpError ? true : undefined}
+                            aria-describedby={otpError ? "otp-error-recovery" : undefined}
                             value={otpCode}
-                            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                            className={`w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300 ${MONO}`}
+                            onChange={(e) => { setOtpError(null); setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6)); }}
+                            className={`w-full rounded-xl border bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${otpError ? "border-red-400 text-red-600 focus:border-red-500" : "border-zinc-200 text-zinc-900 focus:border-zinc-900"} ${otpShake ? "animate-otp-shake" : ""}`}
                             placeholder="••••••"
                           />
+                          {otpError && (
+                            <p id="otp-error-recovery" className={`mt-2 text-[12px] text-red-600 ${MONO}`} role="alert" aria-live="polite">
+                              {otpError}
+                            </p>
+                          )}
                         </div>
 
-                        {errorMsg && (
-                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
-                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
-                            <span className="leading-snug">{errorMsg}</span>
-                          </div>
-                        )}
 
                         <button
                           type="submit"
