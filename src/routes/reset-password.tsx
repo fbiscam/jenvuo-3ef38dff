@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Lock, Loader2, CheckCircle2 } from "lucide-react";
+import { Lock, Loader2, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/reset-password")({
@@ -25,6 +25,9 @@ function ResetPasswordPage() {
   const [saving, setSaving] = React.useState(false);
   const [done, setDone] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirm, setShowConfirm] = React.useState(false);
+
 
   // Wait for Supabase to pick up the recovery token from the URL fragment / query
   // and either establish a recovery session or leave us signed out.
@@ -125,7 +128,7 @@ function ResetPasswordPage() {
               <div className="mt-1 flex items-center gap-2 rounded-lg border border-zinc-200 px-3 py-2">
                 <Lock className="h-4 w-4 text-zinc-400" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -133,14 +136,18 @@ function ResetPasswordPage() {
                   placeholder="At least 8 characters"
                   required
                 />
+                <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="text-zinc-400 hover:text-zinc-700">
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
+
             </label>
             <label className="block text-xs font-medium text-zinc-600">
               Confirm new password
               <div className="mt-1 flex items-center gap-2 rounded-lg border border-zinc-200 px-3 py-2">
                 <Lock className="h-4 w-4 text-zinc-400" />
                 <input
-                  type="password"
+                  type={showConfirm ? "text" : "password"}
                   autoComplete="new-password"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
@@ -148,7 +155,11 @@ function ResetPasswordPage() {
                   placeholder="Retype the new password"
                   required
                 />
+                <button type="button" onClick={() => setShowConfirm((v) => !v)} aria-label={showConfirm ? "Hide password" : "Show password"} className="text-zinc-400 hover:text-zinc-700">
+                  {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
+
             </label>
             {error && (
               <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">

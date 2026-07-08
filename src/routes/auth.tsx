@@ -2,7 +2,7 @@ import * as React from "react";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Mail, Lock, ArrowRight, User, Loader2 } from "lucide-react";
+import { Mail, Lock, ArrowRight, User, Loader2, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { CloudOrb } from "@/components/CloudOrb";
@@ -96,6 +96,9 @@ function AuthPage() {
   const [resending, setResending] = React.useState(false);
   const [forgotStep, setForgotStep] = React.useState<"email" | "code" | "reset">("email");
   const [newPassword, setNewPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showNewPassword, setShowNewPassword] = React.useState(false);
+
   const recoveryModeRef = React.useRef(false);
   const lastSubmittedOtpRef = React.useRef<string>("");
   const otpInputRef = React.useRef<HTMLInputElement | null>(null);
@@ -779,15 +782,19 @@ function AuthPage() {
                           <div className="relative">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                             <input
-                              type="password"
+                              type={showPassword ? "text" : "password"}
                               required
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-11 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                               placeholder="Min 8 characters..."
                             />
+                            <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700">
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
                           </div>
                         </div>
+
 
                         {errorMsg && (
                           <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
@@ -944,15 +951,19 @@ function AuthPage() {
                           <div className="relative">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                             <input
-                              type="password"
+                              type={showNewPassword ? "text" : "password"}
                               required
                               value={newPassword}
                               onChange={(e) => setNewPassword(e.target.value)}
-                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-11 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                               placeholder="Min 8 characters..."
                             />
+                            <button type="button" onClick={() => setShowNewPassword((v) => !v)} aria-label={showNewPassword ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700">
+                              {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
                           </div>
                         </div>
+
 
                         {errorMsg && (
                           <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
@@ -997,14 +1008,18 @@ function AuthPage() {
                           <div className="relative">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                             <input
-                              type="password"
+                              type={showPassword ? "text" : "password"}
                               required
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-11 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
                               placeholder="Enter password..."
                             />
+                            <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700">
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
                           </div>
+
                         </div>
 
                         <div className="flex justify-end -mt-1">
