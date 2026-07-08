@@ -185,45 +185,123 @@ function ReferralsPage() {
         </div>
       )}
 
-      {/* Table */}
-      <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
-        <div className="border-b border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-900">
-          Your referrals
-        </div>
-        {info.referrals.length === 0 ? (
-          <div className="px-6 py-12 text-center text-sm text-zinc-500">
-            No referrals yet. Share your link to get started.
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-zinc-50 text-[11px] uppercase text-zinc-500">
-              <tr>
-                <th className="px-4 py-2 text-left font-medium">Date</th>
-                <th className="px-4 py-2 text-left font-medium">Status</th>
-                <th className="px-4 py-2 text-right font-medium">Credits</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100">
-              {info.referrals.map((r) => (
-                <tr key={r.id}>
-                  <td className="px-4 py-2.5 text-zinc-600">{new Date(r.created_at).toLocaleDateString()}</td>
-                  <td className="px-4 py-2.5">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                      r.status === "converted" ? "bg-emerald-100 text-emerald-700"
-                      : r.status === "void" ? "bg-zinc-100 text-zinc-500"
-                      : "bg-amber-100 text-amber-700"
-                    }`}>{r.status}</span>
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-mono text-zinc-900">{r.credits_awarded}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {/* History table */}
+      <ReferralHistory referrals={info.referrals} />
     </div>
   );
 }
+
+type FilterKey = "all" | "new" | "converted" | "upgraded";
+
+function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }) {
+  const [filter, setFilter] = useState<FilterKey>("all");
+
+  const counts = {
+    all: referrals.length,
+    new: referrals.filter((r) => r.status === "pending").length,
+    converted: referrals.filter((r) => r.status === "converted").length,
+    upgraded: referrals.filter((r) => r.status === "converted" && r.credits_awarded > 0).length,
+  };
+
+  const filtered = referrals.filter((r) => {
+    if (filter === "all") return true;
+    if (filter === "new") return r.status === "pending";
+    if (filter === "converted") return r.status === "converted";
+    if (filter === "upgraded") return r.status === "converted" && r.credits_awarded > 0;
+    return true;
+  });
+
+  const FILTERS: { key: FilterKey; label: string; hint: string }[] = [
+    { key: "all", label: "All", hint: "Every referral" },
+    { key: "new", label: "New", hint: "Signed up, not upgraded" },
+    { key: "converted", label: "Converted", hint: "Completed referral" },
+    { key: "upgraded", label: "Upgraded", hint: "Paid plan — credits earned" },
+  ];
+
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+      <div className="flex flex-col gap-3 border-b border-zinc-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="text-sm font-semibold text-zinc-900">Referral history</div>
+          <div className="text-[11px] text-zinc-500">{FILTERS.find((f) => f.key === filter)?.hint}</div>
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {FILTERS.map((f) => {
+            const active = filter === f.key;
+            return (
+              <button
+                key={f.key}
+                type="button"
+                onClick={() => setFilter(f.key)}
+                className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition ${
+                  active
+                    ? "bg-zinc-900 text-white"
+                    : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                }`}
+              >
+                {f.label}
+                <span
+                  className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${
+                    active ? "bg-white/20 text-white" : "bg-zinc-100 text-zinc-600"
+                  }`}
+                >
+                  {counts[f.key]}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="px-6 py-12 text-center text-sm text-zinc-500">
+          {referrals.length === 0
+            ? "No referrals yet. Share your link to get started."
+            : "No referrals match this filter."}
+        </div>
+      ) : (
+        <table className="w-full text-sm">
+          <thead className="bg-zinc-50 text-[11px] uppercase text-zinc-500">
+            <tr>
+              <th className="px-4 py-2 text-left font-medium">Date</th>
+              <th className="px-4 py-2 text-left font-medium">Stage</th>
+              <th className="px-4 py-2 text-left font-medium">Upgraded on</th>
+              <th className="px-4 py-2 text-right font-medium">Credits</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-zinc-100">
+            {filtered.map((r) => {
+              const upgraded = r.status === "converted" && r.credits_awarded > 0;
+              const stageLabel = upgraded ? "Upgraded" : r.status === "converted" ? "Converted" : r.status === "void" ? "Void" : "New";
+              const stageClass = upgraded
+                ? "bg-emerald-100 text-emerald-700"
+                : r.status === "converted"
+                ? "bg-sky-100 text-sky-700"
+                : r.status === "void"
+                ? "bg-zinc-100 text-zinc-500"
+                : "bg-amber-100 text-amber-700";
+              return (
+                <tr key={r.id}>
+                  <td className="px-4 py-2.5 text-zinc-600">{new Date(r.created_at).toLocaleDateString()}</td>
+                  <td className="px-4 py-2.5">
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${stageClass}`}>
+                      {stageLabel}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 text-zinc-600">
+                    {r.converted_at ? new Date(r.converted_at).toLocaleDateString() : <span className="text-zinc-300">—</span>}
+                  </td>
+                  <td className="px-4 py-2.5 text-right font-mono text-zinc-900">{r.credits_awarded}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
 
 function StatCard({ icon: Icon, label, value, accent }: { icon: typeof Users; label: string; value: number; accent?: "emerald" }) {
   return (
