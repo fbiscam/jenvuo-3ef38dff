@@ -18,6 +18,10 @@ function Profile() {
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [changingEmail, setChangingEmail] = useState(false);
+  const [emailPending, setEmailPending] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
 
   useEffect(() => {
