@@ -177,7 +177,6 @@ export type Database = {
           purpose: string
           recovery_link: string | null
           updated_at: string
-          user_id: string | null
         }
         Insert: {
           attempts?: number
@@ -191,7 +190,6 @@ export type Database = {
           purpose: string
           recovery_link?: string | null
           updated_at?: string
-          user_id?: string | null
         }
         Update: {
           attempts?: number
@@ -205,7 +203,6 @@ export type Database = {
           purpose?: string
           recovery_link?: string | null
           updated_at?: string
-          user_id?: string | null
         }
         Relationships: []
       }
