@@ -44,8 +44,14 @@ export const RecoveryEmail = ({
               <strong style={{ color: COLORS.ink }}>
                 {recipient || 'your account'}
               </strong>
-              . Use the 6-digit code below on the reset screen.
+              . Click the button below to open the reset page, or use the 6-digit code.
             </Text>
+
+            {showLink && (
+              <Link href={confirmationUrl} style={s.button}>
+                Reset your password →
+              </Link>
+            )}
 
             <Section style={s.codeBox}>
               <Text style={s.codeLabel}>RESET CODE</Text>
@@ -53,11 +59,6 @@ export const RecoveryEmail = ({
               <Text style={s.codeExpiry}>Expires in 15 minutes · One-time use</Text>
             </Section>
 
-            {showLink && (
-              <Link href={confirmationUrl} style={s.button}>
-                Open Reset Screen →
-              </Link>
-            )}
 
             <Text style={{ ...s.footer, marginTop: '24px' }}>
               If you didn't request a reset, ignore this email — your password
