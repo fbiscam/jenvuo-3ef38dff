@@ -177,20 +177,13 @@ const logoWrap = {
 }
 
 const logoMark = {
-  display: 'inline-block',
   width: '34px',
   height: '34px',
-  lineHeight: '34px',
-  textAlign: 'center' as const,
-  backgroundColor: COLORS.ink,
-  color: '#ffffff',
-  fontFamily: URBANIST,
-  fontSize: '17px',
-  fontWeight: 700 as const,
+  padding: 0,
+  verticalAlign: 'middle' as const,
   borderRadius: '9px',
-  verticalAlign: 'middle',
-  border: '1px solid #18181b',
-  boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+  overflow: 'hidden' as const,
+  lineHeight: 0,
 }
 
 const logoWord = {
