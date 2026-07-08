@@ -993,6 +993,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_subscriptions: {
         Row: {
           billing_interval: string
@@ -1095,6 +1116,13 @@ export type Database = {
         Returns: number
       }
       grant_monthly_credits: { Args: never; Returns: number }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       journal_stats: { Args: { _from?: string; _to?: string }; Returns: Json }
       move_to_dlq: {
         Args: {
@@ -1139,6 +1167,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user"
       killzone_session: "london" | "new_york" | "asia"
     }
     CompositeTypes: {
@@ -1267,6 +1296,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user"],
       killzone_session: ["london", "new_york", "asia"],
     },
   },
