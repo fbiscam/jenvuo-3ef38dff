@@ -183,6 +183,8 @@ async function sendEmailChangeEmail(args: {
   const html = await render(element)
   const text = await render(element, { plainText: true })
 
+  const unsubscribeToken = await getOrCreateUnsubscribeToken(supabaseAdmin, args.to)
+
   await supabaseAdmin.from('email_send_log').insert({
     message_id: messageId,
     template_name: 'email_change',
@@ -203,6 +205,7 @@ async function sendEmailChangeEmail(args: {
         purpose: 'transactional',
         label: 'email_change',
         idempotency_key: `email-change-${messageId}`,
+        unsubscribe_token: unsubscribeToken,
       },
       { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
     )
