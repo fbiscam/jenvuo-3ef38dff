@@ -149,6 +149,10 @@ const FAQ = [
 
 function PricingPage() {
   const currentPlan = useCurrentPlan();
+  const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
+  const priceOf = (t: { id: string; price: number }) =>
+    billing === "annual" && t.price > 0 ? Math.round((t.price * 12 * 0.83) / 10) * 10 : t.price;
+  const suffix = billing === "annual" ? "/yr" : "/mo";
   return (
     <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased md:[zoom:1.25]`}>
 
