@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { sendLovableEmail } from '@lovable.dev/email-js'
 import { render } from '@react-email/render'
 import { SignupEmail } from '@/lib/email-templates/signup'
 import { RecoveryEmail } from '@/lib/email-templates/recovery'
@@ -17,9 +18,12 @@ const SENDER_DOMAIN = 'notify.jenvu.net'
 
 export async function sendCustomAuthEmail({ to, type, code, siteUrl }: CustomAuthEmailInput) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  const apiKey = process.env.LOVABLE_API_KEY
+  if (!apiKey) throw new Error('Server is missing email configuration.')
+
   const origin = siteUrl && /^https?:\/\//i.test(siteUrl) ? siteUrl : `https://${ROOT_DOMAIN}`
   const messageId = crypto.randomUUID()
-  const runId = `custom-auth-${type}-${messageId}`
+  const idempotencyKey = `custom-auth-${type}-${messageId}`
 
   const element =
     type === 'signup' ? (
@@ -52,30 +56,36 @@ export async function sendCustomAuthEmail({ to, type, code, siteUrl }: CustomAut
     status: 'pending',
   })
 
-  const { error } = await supabaseAdmin.rpc('enqueue_email', {
-    queue_name: 'auth_emails',
-    payload: {
-      run_id: runId,
-      message_id: messageId,
-      to,
-      from: `Jenvu <noreply@${FROM_DOMAIN}>`,
-      sender_domain: SENDER_DOMAIN,
-      subject,
-      html,
-      text,
-      purpose: 'transactional',
-      label: type,
-      queued_at: new Date().toISOString(),
-    },
-  })
+  try {
+    await sendLovableEmail(
+      {
+        message_id: messageId,
+        to,
+        from: `Jenvu <noreply@${FROM_DOMAIN}>`,
+        sender_domain: SENDER_DOMAIN,
+        subject,
+        html,
+        text,
+        purpose: 'transactional',
+        label: type,
+        idempotency_key: idempotencyKey,
+      },
+      { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
+    )
 
-  if (error) {
+    await supabaseAdmin.from('email_send_log').insert({
+      message_id: messageId,
+      template_name: type,
+      recipient_email: to,
+      status: 'sent',
+    })
+  } catch (error) {
     await supabaseAdmin.from('email_send_log').insert({
       message_id: messageId,
       template_name: type,
       recipient_email: to,
       status: 'failed',
-      error_message: 'Failed to enqueue email',
+      error_message: error instanceof Error ? error.message.slice(0, 1000) : 'Failed to send email',
     })
     throw new Error('Could not send verification email. Please try again.')
   }
