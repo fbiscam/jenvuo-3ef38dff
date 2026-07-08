@@ -1,10 +1,17 @@
 import * as React from "react";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Mail, Lock, ArrowRight, User, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { CloudOrb } from "@/components/CloudOrb";
+import {
+  confirmRecoveryOtp,
+  confirmSignupOtp,
+  requestRecoveryOtp,
+  requestSignupOtp,
+} from "@/lib/custom-auth.functions";
 
 
 type AuthSearch = { redirect?: string };
@@ -70,6 +77,10 @@ const INITIAL_TICKER: TickerRow[] = [
 
 function AuthPage() {
   const navigate = useNavigate();
+  const sendSignupOtp = useServerFn(requestSignupOtp);
+  const verifySignupCode = useServerFn(confirmSignupOtp);
+  const sendRecoveryOtp = useServerFn(requestRecoveryOtp);
+  const verifyRecoveryCode = useServerFn(confirmRecoveryOtp);
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
   const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">("signin");
@@ -241,28 +252,18 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: parsed.data.email,
-      password: parsed.data.password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-        data: { full_name: parsed.data.fullName },
-      },
+    const result = await sendSignupOtp({
+      data: { ...parsed.data, siteUrl: window.location.origin },
     });
     setLoading(false);
-    if (error) {
-      setErrorMsg(error.message);
+    if (!result.ok) {
+      setErrorMsg(result.error || "Could not send verification code");
       return;
     }
-    if (data.session) {
-      toast.success("Account created");
-      navigate({ to: redirectTo as "/dashboard", replace: true });
-    } else {
-      toast.success("Verification code sent to your email");
-      setOtpStep(true);
-      setOtpCode("");
-      setResendCooldown(60);
-    }
+    toast.success("6-digit verification code sent to your email");
+    setOtpStep(true);
+    setOtpCode("");
+    setResendCooldown(60);
   };
 
   const verifyMfa = async (e: React.FormEvent) => {
@@ -384,52 +385,22 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const { data, error } = await supabase.auth.verifyOtp({
-      email,
-      token: otpCode,
-      type: "signup",
+    const result = await verifySignupCode({ data: { email, code: otpCode, password } });
+    if (!result.ok || !result.session) {
+      setLoading(false);
+      triggerOtpError(result.error || "Verification failed. Try again.");
+      return;
+    }
+    const { error: sessionError } = await supabase.auth.setSession({
+      access_token: result.session.access_token,
+      refresh_token: result.session.refresh_token,
     });
-    if (error) {
-      setLoading(false);
-      triggerOtpError(error.message);
-      return;
-    }
-
-    // Email is now confirmed and the account is fully persisted in the
-    // database. If Supabase returned a session, use it directly. Otherwise
-    // (rare — some Supabase auth configurations do not auto-sign after
-    // verify), sign the user in with the password they just used on the
-    // sign-up form so they land on the dashboard without a manual step.
-    if (data.session) {
-      setLoading(false);
-      toast.success("Email verified — welcome to Jenvu");
-      navigate({ to: redirectTo as "/dashboard", replace: true });
-      return;
-    }
-
-    if (password) {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      setLoading(false);
-      if (signInError) {
-        toast.success("Email verified — please sign in");
-        setOtpStep(false);
-        setMode("signin");
-        setOtpCode("");
-        return;
-      }
-      toast.success("Email verified — welcome to Jenvu");
-      // onAuthStateChange will navigate.
-      return;
-    }
-
     setLoading(false);
-    toast.success("Email verified — please sign in");
-    setOtpStep(false);
-    setMode("signin");
-    setOtpCode("");
+    if (sessionError) {
+      setErrorMsg(sessionError.message);
+      return;
+    }
+    toast.success("Email verified — welcome to Jenvu");
   };
 
 
@@ -437,13 +408,15 @@ function AuthPage() {
     if (resendCooldown > 0) return;
     setErrorMsg(null);
     setResending(true);
-    const { error } = await supabase.auth.resend({ type: "signup", email });
+    const result = await sendSignupOtp({
+      data: { email, password, fullName, siteUrl: window.location.origin },
+    });
     setResending(false);
-    if (error) {
-      setErrorMsg(error.message);
+    if (!result.ok) {
+      setErrorMsg(result.error || "Could not send code");
       return;
     }
-    toast.success("New code sent");
+    toast.success("New 6-digit code sent");
     setResendCooldown(60);
   };
 
@@ -460,15 +433,15 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-      redirectTo: `${window.location.origin}/auth`,
+    const result = await sendRecoveryOtp({
+      data: { email: parsed.data.email, siteUrl: window.location.origin },
     });
     setLoading(false);
-    if (error) {
-      setErrorMsg(error.message);
+    if (!result.ok) {
+      setErrorMsg(result.error || "Could not send reset code");
       return;
     }
-    toast.success("Reset link and code sent to your email");
+    toast.success("6-digit reset code sent to your email");
     setForgotStep("code");
     setOtpCode("");
     setResendCooldown(60);
@@ -484,14 +457,21 @@ function AuthPage() {
     }
     setLoading(true);
     recoveryModeRef.current = true;
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token: otpCode,
-      type: "recovery",
+    const result = await verifyRecoveryCode({
+      data: { email, code: otpCode, siteUrl: window.location.origin },
+    });
+    if (!result.ok || !result.session) {
+      setLoading(false);
+      triggerOtpError(result.error || "Verification failed. Try again.", true);
+      return;
+    }
+    const { error: sessionError } = await supabase.auth.setSession({
+      access_token: result.session.access_token,
+      refresh_token: result.session.refresh_token,
     });
     setLoading(false);
-    if (error) {
-      triggerOtpError(error.message, true);
+    if (sessionError) {
+      triggerOtpError(sessionError.message, true);
       return;
     }
     setForgotStep("reset");
@@ -502,15 +482,15 @@ function AuthPage() {
     if (resendCooldown > 0) return;
     setErrorMsg(null);
     setResending(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth`,
+    const result = await sendRecoveryOtp({
+      data: { email, siteUrl: window.location.origin },
     });
     setResending(false);
-    if (error) {
-      setErrorMsg(error.message);
+    if (!result.ok) {
+      setErrorMsg(result.error || "Could not send code");
       return;
     }
-    toast.success("New code sent");
+    toast.success("New 6-digit code sent");
     setResendCooldown(60);
   };
 
@@ -834,7 +814,7 @@ function AuthPage() {
                       <form onSubmit={sendResetLink} className="mt-4 space-y-3">
                         <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
                           <p className="leading-relaxed">
-                            Enter your email. We'll send a reset link and a 6-digit code.
+                            Enter your email. We'll send a 6-digit reset code.
                           </p>
                         </div>
                         <div>
@@ -883,7 +863,7 @@ function AuthPage() {
                       <form onSubmit={verifyRecoveryOtp} className="mt-4 space-y-3">
                         <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
                           <p className="leading-relaxed">
-                            Check <span className="font-semibold text-zinc-900">{email}</span>. Click the link in the email, or enter the 6-digit code below.
+                            Check <span className="font-semibold text-zinc-900">{email}</span>. Enter the 6-digit code below.
                           </p>
                         </div>
                         <div>
