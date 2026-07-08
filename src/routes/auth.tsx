@@ -385,7 +385,7 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const result = await verifySignupCode({ data: { email, code: otpCode } });
+    const result = await verifySignupCode({ data: { email, code: otpCode, password } });
     if (!result.ok || !result.session) {
       setLoading(false);
       triggerOtpError(result.error || "Verification failed. Try again.");

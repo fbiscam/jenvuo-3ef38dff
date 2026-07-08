@@ -10,7 +10,6 @@ type OtpRow = {
   email: string
   purpose: OtpPurpose
   code_hash: string
-  signup_password: string | null
   full_name: string | null
   expires_at: string
   consumed_at: string | null
@@ -29,7 +28,6 @@ const OTP_TTL_MINUTES = 15
 const MAX_ATTEMPTS = 5
 
 const encoder = new TextEncoder()
-const decoder = new TextDecoder()
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase()
@@ -43,10 +41,6 @@ function serverSecret() {
 
 function toBase64(bytes: ArrayBuffer | Uint8Array) {
   return Buffer.from(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)).toString('base64')
-}
-
-function fromBase64(value: string) {
-  return Uint8Array.from(Buffer.from(value, 'base64'))
 }
 
 async function hmacCode(email: string, purpose: OtpPurpose, code: string) {
@@ -70,24 +64,6 @@ function safeEqual(a: string, b: string) {
   return diff === 0
 }
 
-async function aesKey() {
-  const digest = await crypto.subtle.digest('SHA-256', encoder.encode(serverSecret()))
-  return crypto.subtle.importKey('raw', digest, 'AES-GCM', false, ['encrypt', 'decrypt'])
-}
-
-async function encryptPassword(password: string) {
-  const iv = crypto.getRandomValues(new Uint8Array(12))
-  const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await aesKey(), encoder.encode(password))
-  return `v1:${toBase64(iv)}:${toBase64(cipher)}`
-}
-
-async function decryptPassword(value: string) {
-  const [version, iv, cipher] = value.split(':')
-  if (version !== 'v1' || !iv || !cipher) throw new Error('Stored signup code is invalid. Please request a new code.')
-  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromBase64(iv) }, await aesKey(), fromBase64(cipher))
-  return decoder.decode(plain)
-}
-
 function publicAuthClient() {
   return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
@@ -103,7 +79,7 @@ async function latestValidOtp(email: string, purpose: OtpPurpose): Promise<OtpRo
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const { data, error } = await (supabaseAdmin as any)
     .from('custom_auth_otps')
-    .select('id,email,purpose,code_hash,signup_password,full_name,expires_at,consumed_at,attempts')
+    .select('id,email,purpose,code_hash,full_name,expires_at,consumed_at,attempts')
     .eq('email', email)
     .eq('purpose', purpose)
     .is('consumed_at', null)
@@ -159,7 +135,6 @@ export async function createSignupOtp(input: { email: string; password: string; 
   const email = normalizeEmail(input.email)
   const code = generateSixDigitCode()
   const codeHash = await hmacCode(email, 'signup', code)
-  const encryptedPassword = await encryptPassword(input.password)
 
   await (supabaseAdmin as any)
     .from('custom_auth_otps')
@@ -172,7 +147,6 @@ export async function createSignupOtp(input: { email: string; password: string; 
     email,
     purpose: 'signup',
     code_hash: codeHash,
-    signup_password: encryptedPassword,
     full_name: input.fullName.trim(),
     expires_at: new Date(Date.now() + OTP_TTL_MINUTES * 60_000).toISOString(),
   })
@@ -209,14 +183,13 @@ export async function createRecoveryOtp(input: { email: string; siteUrl?: string
   await sendCustomAuthEmail({ to: email, type: 'recovery', code, siteUrl: input.siteUrl })
 }
 
-export async function verifySignupOtp(input: { email: string; code: string }): Promise<CustomAuthResult> {
+export async function verifySignupOtp(input: { email: string; code: string; password: string }): Promise<CustomAuthResult> {
   const email = normalizeEmail(input.email)
   const verified = await verifyCustomOtp(email, 'signup', input.code)
   if (!verified.ok) return { ok: false, error: verified.error }
-  if (!verified.row.signup_password) return { ok: false, error: 'Code expired. Tap Resend.' }
 
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-  const password = await decryptPassword(verified.row.signup_password)
+  const password = input.password
   const fullName = verified.row.full_name?.trim() || undefined
   const existingUser = await findUserByEmail(email)
 

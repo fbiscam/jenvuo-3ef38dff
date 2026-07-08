@@ -40,6 +40,7 @@ export const confirmSignupOtp = createServerFn({ method: 'POST' })
       .object({
         email: z.string().trim().email('Enter a valid email').max(255),
         code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
+        password: z.string().min(8, 'Password must be at least 8 characters').max(72),
       })
       .parse(data),
   )
