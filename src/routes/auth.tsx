@@ -14,7 +14,7 @@ import {
 } from "@/lib/custom-auth.functions";
 
 
-type AuthSearch = { redirect?: string };
+type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string };
 
 function sanitizeRedirect(r?: string): string {
   if (!r || typeof r !== "string") return "/dashboard";
@@ -26,12 +26,16 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   validateSearch: (search: Record<string, unknown>): AuthSearch => ({
     redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+    emailChanged: search.emailChanged === "1" ? "1" : undefined,
+    newEmail: typeof search.newEmail === "string" ? search.newEmail : undefined,
   }),
   beforeLoad: async ({ search }) => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash || "";
       if (hash.includes("type=recovery") || hash.includes("error")) return;
+      if (search.emailChanged === "1") return;
     }
+
     const { data } = await supabase.auth.getUser();
     if (data.user) {
       throw redirect({ to: sanitizeRedirect(search.redirect) as "/dashboard" });
