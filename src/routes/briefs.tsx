@@ -106,7 +106,7 @@ function BriefsPage() {
             <Headphones className="h-3.5 w-3.5" /> Killzone audio briefs
           </div>
           <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
-            The gold desk, in your ear — every session.
+            The gold desk, in your<span className="md:hidden"> </span><br className="hidden md:inline" />ear — every session.
           </h1>
           <p className="mt-5 max-w-2xl text-base text-zinc-600 leading-relaxed sm:text-lg">
             60- to 120-second audio briefs on gold before the London, New York, and Asia killzones open.
