@@ -527,7 +527,7 @@ function AuthPage() {
                           disabled={loading}
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                          {loading ? "Verifying..." : (<>Verify & Continue <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                          {loading ? btnLoading("Verifying...") : (<>Verify & Continue <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
                         <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
@@ -617,7 +617,7 @@ function AuthPage() {
                           disabled={loading}
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                          {loading ? "Creating..." : (<>Create Desk <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                          {loading ? btnLoading("Creating...") : (<>Create Desk <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
                         <p className="pt-2 text-xs text-zinc-500 leading-relaxed">
@@ -662,7 +662,7 @@ function AuthPage() {
                           disabled={loading}
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                          {loading ? "Sending..." : (<>Send Reset <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                          {loading ? btnLoading("Sending...") : (<>Send Reset <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
                         <div className="pt-2">
@@ -714,7 +714,7 @@ function AuthPage() {
                           disabled={loading}
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                          {loading ? "Verifying..." : (<>Verify Code <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                          {loading ? btnLoading("Verifying...") : (<>Verify Code <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
                         <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
@@ -775,7 +775,7 @@ function AuthPage() {
                           disabled={loading}
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                          {loading ? "Updating..." : (<>Update Password <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                          {loading ? btnLoading("Updating...") : (<>Update Password <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
                       </form>
                     )
@@ -840,7 +840,7 @@ function AuthPage() {
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading
-                            ? "Authenticating..."
+                            ? btnLoading("Authenticating...")
                             : (<>Authenticate <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
                       </form>
