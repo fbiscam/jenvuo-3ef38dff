@@ -528,6 +528,8 @@ export type Database = {
       }
       plans: {
         Row: {
+          annual_discount_pct: number | null
+          annual_price_usd: number | null
           created_at: string
           feature_full_ict: boolean
           feature_journal: boolean
@@ -541,6 +543,8 @@ export type Database = {
           sort_order: number
         }
         Insert: {
+          annual_discount_pct?: number | null
+          annual_price_usd?: number | null
           created_at?: string
           feature_full_ict?: boolean
           feature_journal?: boolean
@@ -554,6 +558,8 @@ export type Database = {
           sort_order?: number
         }
         Update: {
+          annual_discount_pct?: number | null
+          annual_price_usd?: number | null
           created_at?: string
           feature_full_ict?: boolean
           feature_journal?: boolean
@@ -592,6 +598,57 @@ export type Database = {
           killzone_notice_dismissed?: boolean
           plan?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          code: string
+          converted_at: string | null
+          created_at: string
+          credits_awarded: number
+          id: string
+          referred_user_id: string
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          code: string
+          converted_at?: string | null
+          created_at?: string
+          credits_awarded?: number
+          id?: string
+          referred_user_id: string
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          code?: string
+          converted_at?: string | null
+          created_at?: string
+          credits_awarded?: number
+          id?: string
+          referred_user_id?: string
+          referrer_id?: string
+          status?: string
         }
         Relationships: []
       }
@@ -905,6 +962,7 @@ export type Database = {
       }
       user_subscriptions: {
         Row: {
+          billing_interval: string
           created_at: string
           current_period_end: string
           current_period_start: string
@@ -915,6 +973,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          billing_interval?: string
           created_at?: string
           current_period_end?: string
           current_period_start?: string
@@ -925,6 +984,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          billing_interval?: string
           created_at?: string
           current_period_end?: string
           current_period_start?: string
@@ -976,6 +1036,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_referral_code: { Args: { _code: string }; Returns: Json }
+      convert_referral: { Args: { _user_id: string }; Returns: undefined }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -986,6 +1048,10 @@ export type Database = {
         Returns: number
       }
       expire_credits: { Args: never; Returns: number }
+      get_or_create_referral_code: {
+        Args: { _user_id: string }
+        Returns: string
+      }
       grant_credits: {
         Args: {
           _amount: number
@@ -1015,10 +1081,16 @@ export type Database = {
         }[]
       }
       seed_default_setups: { Args: { _user_id: string }; Returns: undefined }
-      set_user_plan: {
-        Args: { _plan_id: string; _user_id: string }
-        Returns: undefined
-      }
+      set_user_plan:
+        | { Args: { _plan_id: string; _user_id: string }; Returns: undefined }
+        | {
+            Args: {
+              _billing_interval?: string
+              _plan_id: string
+              _user_id: string
+            }
+            Returns: undefined
+          }
       spend_credits: {
         Args: {
           _amount: number
