@@ -25,6 +25,9 @@ function ResetPasswordPage() {
   const [saving, setSaving] = React.useState(false);
   const [done, setDone] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirm, setShowConfirm] = React.useState(false);
+
 
   // Wait for Supabase to pick up the recovery token from the URL fragment / query
   // and either establish a recovery session or leave us signed out.
