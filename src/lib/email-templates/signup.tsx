@@ -18,6 +18,7 @@ interface SignupEmailProps {
   recipient: string
   confirmationUrl: string
   token?: string
+  showLink?: boolean
 }
 
 export const SignupEmail = ({
@@ -26,6 +27,7 @@ export const SignupEmail = ({
   recipient,
   confirmationUrl,
   token,
+  showLink = true,
 }: SignupEmailProps) => {
   const code = token || '••••••'
   return (
@@ -64,15 +66,19 @@ export const SignupEmail = ({
               <strong style={stepNum}>3.</strong> Your desk activates — no link required.
             </Text>
 
-            <Hr style={s.hr} />
+            {showLink && (
+              <>
+                <Hr style={s.hr} />
 
-            <Text style={stepsHeading}>OR ONE-TAP LINK</Text>
-            <Text style={s.text}>
-              Prefer a link? Tap below to verify and open your desk directly.
-            </Text>
-            <Link href={confirmationUrl} style={s.button}>
-              Verify & Open Desk →
-            </Link>
+                <Text style={stepsHeading}>OR ONE-TAP LINK</Text>
+                <Text style={s.text}>
+                  Prefer a link? Tap below to verify and open your desk directly.
+                </Text>
+                <Link href={confirmationUrl} style={s.button}>
+                  Verify & Open Desk →
+                </Link>
+              </>
+            )}
 
             <Hr style={s.hr} />
 

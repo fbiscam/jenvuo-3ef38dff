@@ -16,6 +16,7 @@ interface RecoveryEmailProps {
   confirmationUrl: string
   token?: string
   recipient?: string
+  showLink?: boolean
 }
 
 export const RecoveryEmail = ({
@@ -23,6 +24,7 @@ export const RecoveryEmail = ({
   confirmationUrl,
   token,
   recipient,
+  showLink = true,
 }: RecoveryEmailProps) => {
   const code = token || '••••••'
   return (
@@ -42,8 +44,7 @@ export const RecoveryEmail = ({
               <strong style={{ color: COLORS.ink }}>
                 {recipient || 'your account'}
               </strong>
-              . Use the 6-digit code below on the reset screen, or tap the
-              button to open it directly.
+              . Use the 6-digit code below on the reset screen.
             </Text>
 
             <Section style={s.codeBox}>
@@ -52,9 +53,11 @@ export const RecoveryEmail = ({
               <Text style={s.codeExpiry}>Expires in 60 minutes · One-time use</Text>
             </Section>
 
-            <Link href={confirmationUrl} style={s.button}>
-              Open Reset Screen →
-            </Link>
+            {showLink && (
+              <Link href={confirmationUrl} style={s.button}>
+                Open Reset Screen →
+              </Link>
+            )}
 
             <Text style={{ ...s.footer, marginTop: '24px' }}>
               If you didn't request a reset, ignore this email — your password
