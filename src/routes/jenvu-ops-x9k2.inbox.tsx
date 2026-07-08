@@ -349,6 +349,7 @@ function AdminInbox() {
                       <span className="truncate text-sm font-semibold text-zinc-900">
                         {activeSession.guest_name || "Anonymous visitor"}
                       </span>
+                      <SourceBadge source={activeSession.source} />
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
                           activeSession.status === "open"
