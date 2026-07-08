@@ -12,6 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 import type { TemplateEntry } from './registry'
+import { EmailFonts } from './_shared'
 
 interface Props {
   pair?: string
@@ -60,7 +61,7 @@ const Email = ({
   const dirColor = direction === 'BUY' ? '#059669' : '#dc2626'
   return (
     <Html lang="en" dir="ltr">
-      <Head />
+      <Head><EmailFonts /></Head>
       <Preview>{`${grade} ${direction} ${pair} · Entry ${entry} · TP ${tp}`}</Preview>
       <Body style={main}>
         <Container style={outer}>
@@ -189,7 +190,7 @@ export const template = {
 // ===== Styles =====
 const main: React.CSSProperties = {
   backgroundColor: '#ffffff',
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif",
+  fontFamily: "Urbanist, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   margin: 0,
   padding: '24px 0',
   color: '#18181b',

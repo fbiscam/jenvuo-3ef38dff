@@ -12,6 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 import type { TemplateEntry } from './registry'
+import { EmailFonts } from './_shared'
 
 interface Props {
   title?: string
@@ -48,7 +49,7 @@ const Email = ({
   publishedAt,
 }: Props) => (
   <Html lang="en" dir="ltr">
-    <Head />
+    <Head><EmailFonts /></Head>
     <Preview>{`${title} — ${excerpt.slice(0, 90)}`}</Preview>
     <Body style={main}>
       <Container style={outer}>
@@ -153,7 +154,7 @@ export const template = {
 const main: React.CSSProperties = {
   backgroundColor: '#ffffff',
   fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif",
+    "Urbanist, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   margin: 0,
   padding: '24px 0',
   color: '#18181b',
