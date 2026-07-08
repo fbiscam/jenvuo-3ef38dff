@@ -88,7 +88,7 @@ function UnsubscribePage() {
   return (
     <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] flex flex-col">
       <header className="border-b border-zinc-100">
-        <div className="mx-auto max-w-3xl px-6 py-5 flex items-center justify-between">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
             <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
             <span className="font-semibold tracking-tight">JENVU AI</span>
