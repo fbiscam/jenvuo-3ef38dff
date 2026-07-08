@@ -836,6 +836,18 @@ function AuthPage() {
                         )}
                       </div>
 
+                      <label className={`flex items-center gap-2 text-xs text-zinc-600 select-none cursor-pointer ${MONO}`}>
+                        <input
+                          type="checkbox"
+                          checked={rememberDevice}
+                          onChange={(e) => setRememberDevice(e.target.checked)}
+                          disabled={loading}
+                          className="h-3.5 w-3.5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900"
+                        />
+                        <span>Remember this device for 30 days</span>
+                      </label>
+
+
                       <button
                         type="submit"
                         disabled={loading || mfaCode.length !== 6}
