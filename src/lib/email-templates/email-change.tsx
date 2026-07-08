@@ -49,7 +49,6 @@ export const EmailChangeEmail = ({
             Didn't request this? Secure your account immediately by resetting
             your password.
           </Text>
-          <Text style={s.legal}>JENVU · {siteName}</Text>
         </Section>
       </Container>
     </Body>

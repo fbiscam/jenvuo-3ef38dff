@@ -42,7 +42,6 @@ export const MagicLinkEmail = ({
             Didn't request this? You can safely ignore this email — no session
             is created without you tapping the link.
           </Text>
-          <Text style={s.legal}>JENVU · {siteName}</Text>
         </Section>
       </Container>
     </Body>
