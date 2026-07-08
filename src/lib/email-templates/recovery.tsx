@@ -72,9 +72,9 @@ export const RecoveryEmail = ({
 
 
             <Text style={{ ...s.footer, marginTop: '24px' }}>
-              If you didn't request a reset, ignore this email — your password
-              stays the same.
+              Didn't request this? Ignore this email — your password stays the same.
             </Text>
+
           </Section>
         </Container>
       </Body>
