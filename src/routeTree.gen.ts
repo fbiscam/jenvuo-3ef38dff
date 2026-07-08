@@ -26,6 +26,7 @@ import { Route as DevelopmentRouteImport } from './routes/development'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ConfirmEmailChangeRouteImport } from './routes/confirm-email-change'
 import { Route as CancellationRouteImport } from './routes/cancellation'
+import { Route as BriefsRouteImport } from './routes/briefs'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AiEngineRouteImport } from './routes/ai-engine'
@@ -36,11 +37,13 @@ import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as BriefIdRouteImport } from './routes/brief.$id'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
+import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
@@ -54,6 +57,8 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
 import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/api/public/hooks/notify-subscribers'
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
+import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
+import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/brief-audio.$id'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -140,6 +145,11 @@ const CancellationRoute = CancellationRouteImport.update({
   path: '/cancellation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BriefsRoute = BriefsRouteImport.update({
+  id: '/briefs',
+  path: '/briefs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -189,6 +199,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BriefIdRoute = BriefIdRouteImport.update({
+  id: '/brief/$id',
+  path: '/brief/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -213,6 +228,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
 const HelpCollectionSlugRoute = HelpCollectionSlugRouteImport.update({
   id: '/help/$collection/$slug',
   path: '/help/$collection/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPodcastDotxmlRoute = ApiPublicPodcastDotxmlRouteImport.update({
+  id: '/api/public/podcast.xml',
+  path: '/api/public/podcast.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardProfileRoute =
@@ -291,6 +311,17 @@ const ApiPublicHooksGenerateInsightRoute =
     path: '/api/public/hooks/generate-insight',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksGenerateBriefRoute =
+  ApiPublicHooksGenerateBriefRouteImport.update({
+    id: '/api/public/hooks/generate-brief',
+    path: '/api/public/hooks/generate-brief',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicBriefAudioIdRoute = ApiPublicBriefAudioIdRouteImport.update({
+  id: '/api/public/brief-audio/$id',
+  path: '/api/public/brief-audio/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -298,6 +329,7 @@ export interface FileRoutesByFullPath {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/briefs': typeof BriefsRoute
   '/cancellation': typeof CancellationRoute
   '/confirm-email-change': typeof ConfirmEmailChangeRoute
   '/contact': typeof ContactRoute
@@ -316,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/help/': typeof HelpIndexRoute
@@ -325,10 +358,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
+  '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
+  '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
@@ -344,6 +380,7 @@ export interface FileRoutesByTo {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/briefs': typeof BriefsRoute
   '/cancellation': typeof CancellationRoute
   '/confirm-email-change': typeof ConfirmEmailChangeRoute
   '/contact': typeof ContactRoute
@@ -360,6 +397,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/help': typeof HelpIndexRoute
@@ -369,10 +407,13 @@ export interface FileRoutesByTo {
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
+  '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
+  '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
@@ -390,6 +431,7 @@ export interface FileRoutesById {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/briefs': typeof BriefsRoute
   '/cancellation': typeof CancellationRoute
   '/confirm-email-change': typeof ConfirmEmailChangeRoute
   '/contact': typeof ContactRoute
@@ -408,6 +450,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/help/': typeof HelpIndexRoute
@@ -417,10 +460,13 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
+  '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
+  '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
@@ -438,6 +484,7 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
+    | '/briefs'
     | '/cancellation'
     | '/confirm-email-change'
     | '/contact'
@@ -456,6 +503,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/dashboard'
+    | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/help/'
@@ -465,10 +513,13 @@ export interface FileRouteTypes {
     | '/dashboard/billing'
     | '/dashboard/journal'
     | '/dashboard/profile'
+    | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
     | '/dashboard/'
     | '/help/$collection/'
+    | '/api/public/brief-audio/$id'
+    | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/scan-signals'
@@ -484,6 +535,7 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
+    | '/briefs'
     | '/cancellation'
     | '/confirm-email-change'
     | '/contact'
@@ -500,6 +552,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
+    | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/help'
@@ -509,10 +562,13 @@ export interface FileRouteTypes {
     | '/dashboard/billing'
     | '/dashboard/journal'
     | '/dashboard/profile'
+    | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
     | '/dashboard'
     | '/help/$collection'
+    | '/api/public/brief-audio/$id'
+    | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/scan-signals'
@@ -529,6 +585,7 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
+    | '/briefs'
     | '/cancellation'
     | '/confirm-email-change'
     | '/contact'
@@ -547,6 +604,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/_authenticated/dashboard'
+    | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/help/'
@@ -556,10 +614,13 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/journal'
     | '/_authenticated/dashboard/profile'
+    | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
+    | '/api/public/brief-audio/$id'
+    | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/scan-signals'
@@ -577,6 +638,7 @@ export interface RootRouteChildren {
   AiEngineRoute: typeof AiEngineRoute
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
+  BriefsRoute: typeof BriefsRoute
   CancellationRoute: typeof CancellationRoute
   ConfirmEmailChangeRoute: typeof ConfirmEmailChangeRoute
   ContactRoute: typeof ContactRoute
@@ -594,11 +656,15 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  BriefIdRoute: typeof BriefIdRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   HelpIndexRoute: typeof HelpIndexRoute
+  ApiPublicPodcastDotxmlRoute: typeof ApiPublicPodcastDotxmlRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   HelpCollectionIndexRoute: typeof HelpCollectionIndexRoute
+  ApiPublicBriefAudioIdRoute: typeof ApiPublicBriefAudioIdRoute
+  ApiPublicHooksGenerateBriefRoute: typeof ApiPublicHooksGenerateBriefRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
   ApiPublicHooksNotifySubscribersRoute: typeof ApiPublicHooksNotifySubscribersRoute
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
@@ -730,6 +796,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CancellationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/briefs': {
+      id: '/briefs'
+      path: '/briefs'
+      fullPath: '/briefs'
+      preLoaderRoute: typeof BriefsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -800,6 +873,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brief/$id': {
+      id: '/brief/$id'
+      path: '/brief/$id'
+      fullPath: '/brief/$id'
+      preLoaderRoute: typeof BriefIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -833,6 +913,13 @@ declare module '@tanstack/react-router' {
       path: '/help/$collection/$slug'
       fullPath: '/help/$collection/$slug'
       preLoaderRoute: typeof HelpCollectionSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/podcast.xml': {
+      id: '/api/public/podcast.xml'
+      path: '/api/public/podcast.xml'
+      fullPath: '/api/public/podcast.xml'
+      preLoaderRoute: typeof ApiPublicPodcastDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/profile': {
@@ -926,6 +1013,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksGenerateInsightRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/generate-brief': {
+      id: '/api/public/hooks/generate-brief'
+      path: '/api/public/hooks/generate-brief'
+      fullPath: '/api/public/hooks/generate-brief'
+      preLoaderRoute: typeof ApiPublicHooksGenerateBriefRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/brief-audio/$id': {
+      id: '/api/public/brief-audio/$id'
+      path: '/api/public/brief-audio/$id'
+      fullPath: '/api/public/brief-audio/$id'
+      preLoaderRoute: typeof ApiPublicBriefAudioIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -985,6 +1086,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiEngineRoute: AiEngineRoute,
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
+  BriefsRoute: BriefsRoute,
   CancellationRoute: CancellationRoute,
   ConfirmEmailChangeRoute: ConfirmEmailChangeRoute,
   ContactRoute: ContactRoute,
@@ -1002,11 +1104,15 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  BriefIdRoute: BriefIdRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   HelpIndexRoute: HelpIndexRoute,
+  ApiPublicPodcastDotxmlRoute: ApiPublicPodcastDotxmlRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   HelpCollectionIndexRoute: HelpCollectionIndexRoute,
+  ApiPublicBriefAudioIdRoute: ApiPublicBriefAudioIdRoute,
+  ApiPublicHooksGenerateBriefRoute: ApiPublicHooksGenerateBriefRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
   ApiPublicHooksNotifySubscribersRoute: ApiPublicHooksNotifySubscribersRoute,
   ApiPublicHooksScanSignalsRoute: ApiPublicHooksScanSignalsRoute,
@@ -1019,3 +1125,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

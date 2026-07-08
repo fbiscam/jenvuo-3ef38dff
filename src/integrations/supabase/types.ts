@@ -448,6 +448,54 @@ export type Database = {
         }
         Relationships: []
       }
+      killzone_briefs: {
+        Row: {
+          audio_duration_seconds: number | null
+          audio_path: string | null
+          created_at: string
+          headline: string
+          id: string
+          is_public: boolean
+          metadata: Json
+          published_at: string
+          script: string
+          session: Database["public"]["Enums"]["killzone_session"]
+          summary: string | null
+          transcript: string
+          updated_at: string
+        }
+        Insert: {
+          audio_duration_seconds?: number | null
+          audio_path?: string | null
+          created_at?: string
+          headline: string
+          id?: string
+          is_public?: boolean
+          metadata?: Json
+          published_at?: string
+          script: string
+          session: Database["public"]["Enums"]["killzone_session"]
+          summary?: string | null
+          transcript: string
+          updated_at?: string
+        }
+        Update: {
+          audio_duration_seconds?: number | null
+          audio_path?: string | null
+          created_at?: string
+          headline?: string
+          id?: string
+          is_public?: boolean
+          metadata?: Json
+          published_at?: string
+          script?: string
+          session?: Database["public"]["Enums"]["killzone_session"]
+          summary?: string | null
+          transcript?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -915,7 +963,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      killzone_session: "london" | "new_york" | "asia"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1042,6 +1090,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      killzone_session: ["london", "new_york", "asia"],
+    },
   },
 } as const
