@@ -17,6 +17,7 @@ interface RecoveryEmailProps {
   token?: string
   recipient?: string
   showLink?: boolean
+  showCode?: boolean
 }
 
 export const RecoveryEmail = ({
@@ -25,12 +26,19 @@ export const RecoveryEmail = ({
   token,
   recipient,
   showLink = true,
+  showCode,
 }: RecoveryEmailProps) => {
   const code = token || '••••••'
+  const displayCode = showCode ?? Boolean(token)
+  const bodyLine = displayCode && showLink
+    ? 'Click the button below to open the reset page, or use the 6-digit code.'
+    : displayCode
+      ? 'Use the 6-digit code below on the reset screen.'
+      : 'Click the button below to open the reset page and choose a new password.'
   return (
     <Html lang="en" dir="ltr">
       <EmailHead />
-      <Preview>Reset your {siteName} password · code {code}</Preview>
+      <Preview>Reset your {siteName} password{displayCode ? ` · code ${code}` : ''}</Preview>
       <Body style={s.main}>
         <Container style={s.container}>
           <LogoHeader tagline="JENVU · PASSWORD RESET" />
@@ -44,7 +52,7 @@ export const RecoveryEmail = ({
               <strong style={{ color: COLORS.ink }}>
                 {recipient || 'your account'}
               </strong>
-              . Click the button below to open the reset page, or use the 6-digit code.
+              . {bodyLine}
             </Text>
 
             {showLink && (
@@ -53,11 +61,14 @@ export const RecoveryEmail = ({
               </Link>
             )}
 
-            <Section style={s.codeBox}>
-              <Text style={s.codeLabel}>RESET CODE</Text>
-              <Text style={s.codeValue}>{code}</Text>
-              <Text style={s.codeExpiry}>Expires in 15 minutes · One-time use</Text>
-            </Section>
+            {displayCode && (
+              <Section style={s.codeBox}>
+                <Text style={s.codeLabel}>RESET CODE</Text>
+                <Text style={s.codeValue}>{code}</Text>
+                <Text style={s.codeExpiry}>Expires in 15 minutes · One-time use</Text>
+              </Section>
+            )}
+
 
 
             <Text style={{ ...s.footer, marginTop: '24px' }}>

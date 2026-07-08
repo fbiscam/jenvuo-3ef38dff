@@ -132,16 +132,21 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
         }
 
         // Build template props from payload.data (HookData structure)
+        const isRecovery = emailType === 'recovery'
         const templateProps = {
           siteName: SITE_NAME,
           siteUrl: `https://${ROOT_DOMAIN}`,
           recipient: payload.data.email,
           confirmationUrl: payload.data.url,
-          token: payload.data.token,
+          // Recovery emails triggered from Profile settings should show ONLY the link.
+          token: isRecovery ? undefined : payload.data.token,
+          showCode: isRecovery ? false : undefined,
+          showLink: isRecovery ? true : undefined,
           email: payload.data.email,
           oldEmail: payload.data.old_email,
           newEmail: payload.data.new_email,
         }
+
 
         // Render React Email to HTML and plain text
         const element = React.createElement(EmailTemplate, templateProps)
