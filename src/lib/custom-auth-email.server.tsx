@@ -52,7 +52,7 @@ export async function sendCustomAuthEmail({ to, type, code, siteUrl }: CustomAut
   const apiKey = process.env.LOVABLE_API_KEY
   if (!apiKey) throw new Error('Server is missing email configuration.')
 
-  const origin = siteUrl && /^https?:\/\//i.test(siteUrl) ? siteUrl : `https://${ROOT_DOMAIN}`
+  const origin = `https://${ROOT_DOMAIN}`
   const messageId = crypto.randomUUID()
   const idempotencyKey = `custom-auth-${type}-${messageId}`
 
