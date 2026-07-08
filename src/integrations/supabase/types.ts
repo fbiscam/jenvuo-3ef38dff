@@ -176,7 +176,6 @@ export type Database = {
           id: string
           purpose: string
           recovery_link: string | null
-          signup_password: string | null
           updated_at: string
           user_id: string | null
         }
@@ -191,7 +190,6 @@ export type Database = {
           id?: string
           purpose: string
           recovery_link?: string | null
-          signup_password?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -206,7 +204,6 @@ export type Database = {
           id?: string
           purpose?: string
           recovery_link?: string | null
-          signup_password?: string | null
           updated_at?: string
           user_id?: string | null
         }
