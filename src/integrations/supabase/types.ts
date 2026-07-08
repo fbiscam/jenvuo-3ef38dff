@@ -663,6 +663,27 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_attempts: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          ip: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string

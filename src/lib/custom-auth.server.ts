@@ -130,9 +130,34 @@ async function findUserByEmail(email: string): Promise<User | null> {
   return null
 }
 
-export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string }) {
+const SIGNUP_IP_LIMIT_PER_HOUR = 5
+
+export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string; ip?: string }) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const email = normalizeEmail(input.email)
+
+  // 1. Block disposable / throwaway email providers.
+  const { isDisposableEmail } = await import('./disposable-email-domains')
+  if (isDisposableEmail(email)) {
+    throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
+  }
+
+  // 2. Per-IP signup rate limit: at most N attempts per hour from one IP.
+  const ip = (input.ip || '').trim().slice(0, 100)
+  if (ip) {
+    const since = new Date(Date.now() - 60 * 60_000).toISOString()
+    const { count, error: countErr } = await (supabaseAdmin as any)
+      .from('signup_attempts')
+      .select('id', { count: 'exact', head: true })
+      .eq('ip', ip)
+      .gte('created_at', since)
+    if (!countErr && typeof count === 'number' && count >= SIGNUP_IP_LIMIT_PER_HOUR) {
+      throw new Error('Too many signup attempts from your network. Please try again in an hour.')
+    }
+    try {
+      await (supabaseAdmin as any).from('signup_attempts').insert({ ip, email })
+    } catch { /* logging failure must not block signup */ }
+  }
 
   const existingUser = await findUserByEmail(email)
   if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
@@ -160,6 +185,7 @@ export async function createSignupOtp(input: { email: string; password: string; 
 
   await sendCustomAuthEmail({ to: email, type: 'signup', code, siteUrl: input.siteUrl })
 }
+
 
 export async function createRecoveryOtp(input: { email: string; siteUrl?: string }) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')

@@ -1,5 +1,22 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getRequest } from '@tanstack/react-start/server'
 import { z } from 'zod'
+
+function readClientIp(): string {
+  try {
+    const req = getRequest()
+    const h = req.headers
+    const raw =
+      h.get('cf-connecting-ip') ||
+      h.get('x-forwarded-for')?.split(',')[0] ||
+      h.get('x-real-ip') ||
+      ''
+    return raw.trim()
+  } catch {
+    return ''
+  }
+}
+
 import {
   createRecoveryOtp,
   createSignupOtp,
@@ -27,7 +44,7 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
   )
   .handler(async ({ data }) => {
     try {
-      await createSignupOtp(data)
+      await createSignupOtp({ ...data, ip: readClientIp() })
       return { ok: true as const }
     } catch (error) {
       return { ok: false as const, error: error instanceof Error ? error.message : 'Could not send code.' }
