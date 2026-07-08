@@ -10,7 +10,7 @@ import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
-import { revokeCurrentTrustedDevice } from "@/lib/trusted-devices-local";
+
 import {
   Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
