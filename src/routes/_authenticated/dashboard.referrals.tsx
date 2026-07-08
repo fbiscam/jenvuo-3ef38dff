@@ -341,12 +341,15 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
 function StatCard({ icon: Icon, label, value, accent }: { icon: typeof Users; label: string; value: number; accent?: "emerald" }) {
   return (
     <div className="rounded-xl border border-zinc-200 bg-white p-4">
-      <div className="flex items-center gap-2 text-xs text-zinc-500">
-        <Icon className="h-3.5 w-3.5" /> {label}
-      </div>
-      <div className={`mt-1 text-2xl font-semibold tracking-tight ${accent === "emerald" ? "text-emerald-600" : "text-zinc-900"}`}>
-        {value}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs text-zinc-500">
+          <Icon className="h-3.5 w-3.5" /> {label}
+        </div>
+        <div className={`text-2xl font-semibold tracking-tight ${accent === "emerald" ? "text-emerald-600" : "text-zinc-900"}`}>
+          {value}
+        </div>
       </div>
     </div>
+
   );
 }
