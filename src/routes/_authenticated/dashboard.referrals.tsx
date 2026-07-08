@@ -108,10 +108,9 @@ function ReferralsPage() {
       </div>
 
       {/* Share card */}
-      <div className="rounded-2xl border border-zinc-200 bg-gradient-to-br from-emerald-50 via-white to-white p-6">
-        <div className="flex items-center gap-2 text-emerald-700">
-          <Sparkles className="h-4 w-4" />
-          <span className="text-xs font-semibold uppercase tracking-wider">Your referral link</span>
+      <div className="rounded-2xl border border-zinc-200 bg-white p-6">
+        <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+          Your referral link
         </div>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
           <input
