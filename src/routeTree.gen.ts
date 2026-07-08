@@ -68,7 +68,6 @@ import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/pu
 import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/brief-audio.$id'
 import { Route as AuthenticatedDashboardAdminSubscribersRouteImport } from './routes/_authenticated/dashboard.admin.subscribers'
 import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './routes/_authenticated/dashboard.admin.messages'
-import { Route as AuthenticatedDashboardAdminChatRouteImport } from './routes/_authenticated/dashboard.admin.chat'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -382,12 +381,6 @@ const AuthenticatedDashboardAdminMessagesRoute =
     path: '/admin/messages',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardAdminChatRoute =
-  AuthenticatedDashboardAdminChatRouteImport.update({
-    id: '/admin/chat',
-    path: '/admin/chat',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -436,7 +429,6 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
-  '/dashboard/admin/chat': typeof AuthenticatedDashboardAdminChatRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
@@ -494,7 +486,6 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
-  '/dashboard/admin/chat': typeof AuthenticatedDashboardAdminChatRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
@@ -557,7 +548,6 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
-  '/_authenticated/dashboard/admin/chat': typeof AuthenticatedDashboardAdminChatRoute
   '/_authenticated/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/_authenticated/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
@@ -620,7 +610,6 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/dashboard/'
     | '/help/$collection/'
-    | '/dashboard/admin/chat'
     | '/dashboard/admin/messages'
     | '/dashboard/admin/subscribers'
     | '/api/public/brief-audio/$id'
@@ -678,7 +667,6 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/dashboard'
     | '/help/$collection'
-    | '/dashboard/admin/chat'
     | '/dashboard/admin/messages'
     | '/dashboard/admin/subscribers'
     | '/api/public/brief-audio/$id'
@@ -740,7 +728,6 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
-    | '/_authenticated/dashboard/admin/chat'
     | '/_authenticated/dashboard/admin/messages'
     | '/_authenticated/dashboard/admin/subscribers'
     | '/api/public/brief-audio/$id'
@@ -1215,13 +1202,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminMessagesRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/admin/chat': {
-      id: '/_authenticated/dashboard/admin/chat'
-      path: '/admin/chat'
-      fullPath: '/dashboard/admin/chat'
-      preLoaderRoute: typeof AuthenticatedDashboardAdminChatRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
   }
 }
 
@@ -1235,7 +1215,6 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
   AuthenticatedDashboardSecurityRoute: typeof AuthenticatedDashboardSecurityRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
-  AuthenticatedDashboardAdminChatRoute: typeof AuthenticatedDashboardAdminChatRoute
   AuthenticatedDashboardAdminMessagesRoute: typeof AuthenticatedDashboardAdminMessagesRoute
   AuthenticatedDashboardAdminSubscribersRoute: typeof AuthenticatedDashboardAdminSubscribersRoute
 }
@@ -1252,7 +1231,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardReferralsRoute: AuthenticatedDashboardReferralsRoute,
     AuthenticatedDashboardSecurityRoute: AuthenticatedDashboardSecurityRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
-    AuthenticatedDashboardAdminChatRoute: AuthenticatedDashboardAdminChatRoute,
     AuthenticatedDashboardAdminMessagesRoute:
       AuthenticatedDashboardAdminMessagesRoute,
     AuthenticatedDashboardAdminSubscribersRoute:
