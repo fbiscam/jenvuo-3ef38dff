@@ -333,7 +333,7 @@ function AuthPage() {
                       </form>
 
                       <div className="mt-4 pt-3 border-t border-zinc-100">
-                        <p className="text-sm text-zinc-500 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed whitespace-nowrap">
                           Jenvu is invite-only. Contact the administrator for access.
                         </p>
                       </div>
