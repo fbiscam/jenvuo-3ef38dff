@@ -792,6 +792,7 @@ function DashboardLayout() {
       </main>
 
       <SiteFooter />
+      <OnboardingTour />
     </div>
   );
 }
