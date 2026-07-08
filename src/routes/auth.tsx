@@ -425,6 +425,7 @@ function AuthPage() {
                             Verification Code
                           </label>
                           <input
+                            ref={otpInputRef}
                             type="text"
                             inputMode="numeric"
                             autoComplete="one-time-code"
