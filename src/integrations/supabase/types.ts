@@ -44,6 +44,80 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          sender: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          sender: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          sender?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          created_at: string
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          last_message_at: string
+          session_token: string
+          status: string
+          unread_admin: number
+          unread_guest: number
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          last_message_at?: string
+          session_token?: string
+          status?: string
+          unread_admin?: number
+          unread_guest?: number
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          last_message_at?: string
+          session_token?: string
+          status?: string
+          unread_admin?: number
+          unread_guest?: number
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -1091,7 +1165,15 @@ export type Database = {
     }
     Functions: {
       apply_referral_code: { Args: { _code: string }; Returns: Json }
+      close_chat_session: { Args: { _session_id: string }; Returns: undefined }
       convert_referral: { Args: { _user_id: string }; Returns: undefined }
+      create_chat_session: {
+        Args: { _email: string; _name: string; _user_agent?: string }
+        Returns: {
+          session_id: string
+          session_token: string
+        }[]
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -1102,6 +1184,16 @@ export type Database = {
         Returns: number
       }
       expire_credits: { Args: never; Returns: number }
+      get_guest_messages: {
+        Args: { _token: string }
+        Returns: {
+          content: string
+          created_at: string
+          id: string
+          sender: string
+          session_status: string
+        }[]
+      }
       get_or_create_referral_code: {
         Args: { _user_id: string }
         Returns: string
@@ -1124,6 +1216,7 @@ export type Database = {
         Returns: boolean
       }
       journal_stats: { Args: { _from?: string; _to?: string }; Returns: Json }
+      mark_chat_read: { Args: { _session_id: string }; Returns: undefined }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -1132,6 +1225,14 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      post_admin_message: {
+        Args: { _content: string; _session_id: string }
+        Returns: string
+      }
+      post_guest_message: {
+        Args: { _content: string; _token: string }
+        Returns: string
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
