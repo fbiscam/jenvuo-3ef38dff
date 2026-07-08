@@ -398,7 +398,7 @@ function AuthPage() {
                   <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
                   <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
                 </div>
-                <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
+                <span className={`hidden sm:inline ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
                   Jenvu // AUTH_SESSION
                 </span>
               </div>
