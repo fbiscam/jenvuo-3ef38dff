@@ -196,7 +196,7 @@ function PricingPage() {
       <section className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
         <div className="mb-10">
           
-          <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">Pick your tier, line by line.</h2>
+          <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
         </div>
 
         {/* Mobile stacked plan cards */}
