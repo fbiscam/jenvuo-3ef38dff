@@ -157,22 +157,23 @@ function ReferralsPage() {
           <p className="mt-1 text-xs text-zinc-500">
             Enter it before upgrading to earn 50 bonus credits.
           </p>
-          <div className="mt-3 flex gap-2">
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <input
               value={codeInput}
               onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
               placeholder="ABC12345"
               maxLength={12}
-              className="flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 font-mono text-sm uppercase text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+              className="w-full min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 font-mono text-sm uppercase text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
             />
             <button
               onClick={submitCode}
               disabled={submitting || codeInput.trim().length < 4}
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+              className="w-full shrink-0 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50 sm:w-auto"
             >
               Apply
             </button>
           </div>
+
         </div>
       )}
 
