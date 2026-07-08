@@ -14,7 +14,7 @@ type Device = {
   expires_at: string;
 };
 
-const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
+
 
 function summarizeUA(ua: string | null): string {
   if (!ua) return "Unknown device";
