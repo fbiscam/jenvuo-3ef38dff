@@ -70,7 +70,7 @@ function SavedSignals() {
           <Bookmark className="h-6 w-6 text-zinc-700" />
         </div>
         <h3 className="mt-4 text-lg font-semibold tracking-tight">No saved setups yet</h3>
-        <p className="mx-auto mt-1.5 max-w-md text-sm text-zinc-500">
+        <p className="mx-auto mt-1.5 max-w-md text-sm text-zinc-500 sm:max-w-none sm:whitespace-nowrap">
           On the Signal Desk, tap <span className="font-medium text-zinc-700">Save Signal</span> to keep an A+ setup here for later.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
