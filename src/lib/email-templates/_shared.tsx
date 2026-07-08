@@ -125,8 +125,9 @@ export const shellStyles = {
   },
   button: {
     display: 'inline-block',
-    backgroundColor: COLORS.ink,
-    color: '#ffffff',
+    backgroundColor: '#ffffff',
+    color: '#000000',
+    border: `1px solid ${COLORS.border}`,
     fontFamily: INTER,
     fontSize: '14px',
     fontWeight: 500 as const,
@@ -135,6 +136,7 @@ export const shellStyles = {
     textDecoration: 'none',
     margin: '4px 0 0',
   },
+
   footer: {
     fontFamily: INTER,
     fontSize: '13px',
