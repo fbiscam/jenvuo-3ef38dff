@@ -44,6 +44,7 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
 import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
+import { Route as AuthenticatedDashboardReferralsRouteImport } from './routes/_authenticated/dashboard.referrals'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
 import { Route as AuthenticatedDashboardJournalStatsRouteImport } from './routes/_authenticated/dashboard.journal-stats'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
@@ -236,6 +237,12 @@ const ApiPublicPodcastDotxmlRoute = ApiPublicPodcastDotxmlRouteImport.update({
   path: '/api/public/podcast.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardReferralsRoute =
+  AuthenticatedDashboardReferralsRouteImport.update({
+    id: '/referrals',
+    path: '/referrals',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardProfileRoute =
   AuthenticatedDashboardProfileRouteImport.update({
     id: '/profile',
@@ -366,6 +373,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/journal-stats': typeof AuthenticatedDashboardJournalStatsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -416,6 +424,7 @@ export interface FileRoutesByTo {
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/journal-stats': typeof AuthenticatedDashboardJournalStatsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -470,6 +479,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/_authenticated/dashboard/journal-stats': typeof AuthenticatedDashboardJournalStatsRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/_authenticated/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -524,6 +534,7 @@ export interface FileRouteTypes {
     | '/dashboard/journal'
     | '/dashboard/journal-stats'
     | '/dashboard/profile'
+    | '/dashboard/referrals'
     | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
@@ -574,6 +585,7 @@ export interface FileRouteTypes {
     | '/dashboard/journal'
     | '/dashboard/journal-stats'
     | '/dashboard/profile'
+    | '/dashboard/referrals'
     | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
@@ -627,6 +639,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/journal'
     | '/_authenticated/dashboard/journal-stats'
     | '/_authenticated/dashboard/profile'
+    | '/_authenticated/dashboard/referrals'
     | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
@@ -935,6 +948,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPodcastDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/referrals': {
+      id: '/_authenticated/dashboard/referrals'
+      path: '/referrals'
+      fullPath: '/dashboard/referrals'
+      preLoaderRoute: typeof AuthenticatedDashboardReferralsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/profile': {
       id: '/_authenticated/dashboard/profile'
       path: '/profile'
@@ -1057,6 +1077,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
   AuthenticatedDashboardJournalStatsRoute: typeof AuthenticatedDashboardJournalStatsRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
+  AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
 
@@ -1069,6 +1090,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardJournalStatsRoute:
       AuthenticatedDashboardJournalStatsRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
+    AuthenticatedDashboardReferralsRoute: AuthenticatedDashboardReferralsRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }
 
