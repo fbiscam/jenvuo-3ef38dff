@@ -62,10 +62,10 @@ export const getJournalStats = createServerFn({ method: "POST" })
     // Ensure default setups seeded
     await context.supabase.rpc("seed_default_setups", { _user_id: context.userId });
 
-    const { data: stats, error } = await context.supabase.rpc("journal_stats", {
-      _from: data.from ?? null,
-      _to: data.to ?? null,
-    });
+    const args: { _from?: string; _to?: string } = {};
+    if (data.from) args._from = data.from;
+    if (data.to) args._to = data.to;
+    const { data: stats, error } = await context.supabase.rpc("journal_stats", args);
     if (error) throw new Error(error.message);
     return stats as unknown as JournalStats;
   });
