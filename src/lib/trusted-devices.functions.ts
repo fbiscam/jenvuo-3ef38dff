@@ -96,3 +96,22 @@ export const revokeTrustedDevice = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+/**
+ * Revoke the trusted-device row that matches a raw token (i.e. "this browser").
+ * Idempotent — returns { ok: true, removed } even if nothing matched.
+ */
+export const revokeTrustedDeviceByToken = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ token: z.string().min(16).max(200) }).parse(data))
+  .handler(async ({ data, context }) => {
+    const tokenHash = await sha256Hex(data.token);
+    const { data: rows, error } = await context.supabase
+      .from("trusted_devices")
+      .delete()
+      .eq("user_id", context.userId)
+      .eq("token_hash", tokenHash)
+      .select("id");
+    if (error) throw new Error(error.message);
+    return { ok: true as const, removed: rows?.length ?? 0 };
+  });
