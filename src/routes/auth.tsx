@@ -527,7 +527,7 @@ function AuthPage() {
       setErrorMsg(error.message);
       return;
     }
-    toast.success("Password updated"); flashInfo("Password updated");
+    toast.success("Password updated"); flashInfo("Password updated", "password");
     recoveryModeRef.current = false;
     setNewPassword("");
     navigate({ to: redirectTo as "/dashboard", replace: true });
