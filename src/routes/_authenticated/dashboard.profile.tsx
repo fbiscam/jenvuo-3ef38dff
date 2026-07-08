@@ -172,6 +172,11 @@ function Profile() {
           <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Two-Factor Authentication</p>
           <TwoFactorSettings />
         </div>
+
+        <div className="mt-6 border-t border-zinc-100 pt-4">
+          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Trusted Devices</p>
+          <TrustedDevicesSettings />
+        </div>
       </section>
 
       <section className="rounded-2xl border border-rose-200 bg-rose-50/40 p-6">
