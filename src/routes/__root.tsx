@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { Toaster as SonnerToaster } from "sonner";
+import { LiveChatWidget } from "@/components/LiveChatWidget";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -183,6 +184,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <LiveChatWidget />
       <SonnerToaster
         theme="light"
         position={isMobile ? "bottom-center" : "top-right"}
