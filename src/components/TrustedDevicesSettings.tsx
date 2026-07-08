@@ -46,6 +46,8 @@ export function TrustedDevicesSettings() {
   const [loading, setLoading] = useState(true);
   const [revoking, setRevoking] = useState<string | null>(null);
   const [currentUid, setCurrentUid] = useState<string | null>(null);
+  const [hasCurrentTrust, setHasCurrentTrust] = useState(false);
+  const [forgetting, setForgetting] = useState(false);
   const listFn = useServerFn(listTrustedDevices);
   const revokeFn = useServerFn(revokeTrustedDevice);
 
