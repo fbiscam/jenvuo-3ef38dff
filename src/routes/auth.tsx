@@ -12,6 +12,7 @@ import {
   requestRecoveryOtp,
   requestSignupOtp,
 } from "@/lib/custom-auth.functions";
+import { applyReferralCode } from "@/lib/referrals.functions";
 
 
 type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string };
