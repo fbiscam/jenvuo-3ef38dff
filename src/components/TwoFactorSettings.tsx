@@ -72,7 +72,7 @@ export function TwoFactorSettings() {
     // "Jenvu.com" as issuer and the user's email as account label,
     // instead of the default project URL.
     const rebuiltUri = `otpauth://totp/${encodeURIComponent("Jenvu.com")}:${encodeURIComponent(userEmail)}?secret=${data.totp.secret}&issuer=${encodeURIComponent("Jenvu.com")}&algorithm=SHA1&digits=6&period=30`;
-    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(rebuiltUri)}`;
+    const qrSrc = await QRCode.toDataURL(rebuiltUri, { margin: 1, width: 240 });
     setEnroll({
       factorId: data.id,
       qr: qrSrc,
