@@ -602,7 +602,7 @@ function DashboardLayout() {
                   key={k}
                   checked={range === k}
                   onCheckedChange={() => setRange(k)}
-                  className="text-[12px]"
+                  className="text-[12px] md:text-[14px]"
                 >
                   {RANGE_LABELS[k]}
                 </DropdownMenuCheckboxItem>
