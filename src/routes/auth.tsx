@@ -84,6 +84,9 @@ function AuthPage() {
   const [forgotStep, setForgotStep] = React.useState<"email" | "code" | "reset">("email");
   const [newPassword, setNewPassword] = React.useState("");
   const recoveryModeRef = React.useRef(false);
+  const lastSubmittedOtpRef = React.useRef<string>("");
+  const otpInputRef = React.useRef<HTMLInputElement | null>(null);
+  const recoveryOtpInputRef = React.useRef<HTMLInputElement | null>(null);
 
   React.useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
