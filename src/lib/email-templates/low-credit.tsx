@@ -33,7 +33,7 @@ const LowCreditEmail = ({
 }: Props) => (
   <Html lang="en" dir="ltr">
     <EmailHead />
-    <Preview>Only {creditsRemaining} credits left on your {plan} plan</Preview>
+    <Preview>{`Only ${creditsRemaining} credits left on your ${plan} plan`}</Preview>
     <Body style={s.main}>
       <Container style={s.container}>
         <LogoHeader tagline="JENVU · BILLING" />
