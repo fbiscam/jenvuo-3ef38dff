@@ -66,10 +66,9 @@ const NewDeviceEmail = ({
           </Link>
 
           <Text style={{ ...s.footer, marginTop: '24px' }}>
-            Recognize this sign-in? You can safely ignore this email. We send
-            this alert whenever your desk is accessed from a new device or
-            location.
+            Was this you? Ignore this email — we alert on every new device or location.
           </Text>
+
           <Text style={s.legal}>JENVU · Security notifications</Text>
         </Section>
       </Container>
