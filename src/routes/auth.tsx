@@ -215,7 +215,9 @@ function AuthPage() {
             if (totp) {
               const { data: chal, error } = await supabase.auth.mfa.challenge({ factorId: totp.id });
               if (error || !chal) {
-                setErrorMsg(error?.message || "Could not start MFA challenge");
+                const msg = error?.message || "Could not start MFA challenge";
+                setErrorMsg(msg);
+                toast.error("Two-factor step failed", { description: msg });
                 return;
               }
               setMfaChallenge({ factorId: totp.id, challengeId: chal.id });
