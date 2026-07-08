@@ -74,6 +74,9 @@ function AuthPage() {
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const [otpStep, setOtpStep] = React.useState(false);
+  const [otpCode, setOtpCode] = React.useState("");
+  const [resending, setResending] = React.useState(false);
 
   React.useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
