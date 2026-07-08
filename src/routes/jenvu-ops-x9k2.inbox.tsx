@@ -297,7 +297,10 @@ function AdminInbox() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="truncate text-sm font-medium text-zinc-900">{name}</span>
+                          <div className="flex min-w-0 items-center gap-1.5">
+                            <span className="truncate text-sm font-medium text-zinc-900">{name}</span>
+                            <SourceBadge source={s.source} />
+                          </div>
                           <span className="shrink-0 text-[10px] text-zinc-400">{timeAgo(s.last_message_at)}</span>
                         </div>
                         <div className="mt-0.5 flex items-center justify-between gap-2">
