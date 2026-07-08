@@ -66,6 +66,7 @@ const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: bo
   { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
   { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { to: "/dashboard/profile", label: "Profile", icon: User },
+  { to: "/security", label: "Security", icon: ShieldCheck },
 ];
 
 /* ---------- helpers ---------- */
