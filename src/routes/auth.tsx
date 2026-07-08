@@ -173,6 +173,14 @@ function AuthPage() {
     return () => clearInterval(t);
   }, [resendCooldown]);
 
+  React.useEffect(() => {
+    if (mfaResendCooldown <= 0) return;
+    const t = setInterval(() => setMfaResendCooldown((s) => (s <= 1 ? 0 : s - 1)), 1000);
+    return () => clearInterval(t);
+  }, [mfaResendCooldown]);
+
+
+
   // Capture ?ref=CODE and stash it for post-signup application.
   React.useEffect(() => {
     try {
