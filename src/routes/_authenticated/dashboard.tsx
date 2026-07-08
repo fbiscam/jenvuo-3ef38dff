@@ -693,8 +693,7 @@ function DashboardLayout() {
 
         {/* Row 2 — Market Pulse + two CTA cards */}
         <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div>
-          <Card>
+          <Card className="flex flex-col">
             <CardHeader
               icon={LineChart}
               title="Market Pulse"
@@ -704,7 +703,7 @@ function DashboardLayout() {
                 </Link>
               }
             />
-            <div className="max-h-[360px] overflow-y-auto scrollbar-auto-hide">
+            <div className="flex-1 overflow-y-auto scrollbar-auto-hide">
               <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
               <TickerRow label="XAU / EUR" symbol="XAUEUR" decimals={2} />
               <TickerRow label="XAU / GBP" symbol="XAUGBP" decimals={2} />
@@ -714,7 +713,7 @@ function DashboardLayout() {
               <TickerRow label="DXY" symbol="DXY" decimals={3} />
             </div>
           </Card>
-          </div>
+
 
 
           <Card className="flex flex-col">
