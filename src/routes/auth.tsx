@@ -91,6 +91,16 @@ function AuthPage() {
   const recoveryOtpInputRef = React.useRef<HTMLInputElement | null>(null);
   const [resendCooldown, setResendCooldown] = React.useState(0);
 
+  // --- MFA (TOTP) challenge state ---
+  const [mfaChallenge, setMfaChallenge] = React.useState<null | {
+    factorId: string;
+    challengeId: string;
+  }>(null);
+  const [mfaCode, setMfaCode] = React.useState("");
+  const [mfaError, setMfaError] = React.useState<string | null>(null);
+  const [mfaShake, setMfaShake] = React.useState(false);
+  const mfaInputRef = React.useRef<HTMLInputElement | null>(null);
+
   React.useEffect(() => {
     if (resendCooldown <= 0) return;
     const t = setInterval(() => setResendCooldown((s) => (s <= 1 ? 0 : s - 1)), 1000);
@@ -106,8 +116,27 @@ function AuthPage() {
         setErrorMsg(null);
         return;
       }
-      if (evt === "SIGNED_IN" && session && !recoveryModeRef.current) {
-        navigate({ to: redirectTo as "/dashboard", replace: true });
+      if (evt === "SIGNED_IN" && session && !recoveryModeRef.current && !mfaChallenge) {
+        // Check if MFA elevation is required before navigating to dashboard
+        void (async () => {
+          const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+          if (data && data.currentLevel === "aal1" && data.nextLevel === "aal2") {
+            const { data: fac } = await supabase.auth.mfa.listFactors();
+            const totp = fac?.totp?.find((f) => f.status === "verified");
+            if (totp) {
+              const { data: chal, error } = await supabase.auth.mfa.challenge({ factorId: totp.id });
+              if (error || !chal) {
+                setErrorMsg(error?.message || "Could not start MFA challenge");
+                return;
+              }
+              setMfaChallenge({ factorId: totp.id, challengeId: chal.id });
+              setMfaCode("");
+              setMfaError(null);
+              return;
+            }
+          }
+          navigate({ to: redirectTo as "/dashboard", replace: true });
+        })();
       }
     });
     return () => sub.subscription.unsubscribe();
@@ -199,7 +228,8 @@ function AuthPage() {
       setErrorMsg(msg);
       return;
     }
-    navigate({ to: redirectTo as "/dashboard", replace: true });
+    // Do NOT navigate here — the onAuthStateChange listener above will
+    // check MFA level and either open the MFA challenge or navigate.
   };
 
   const signUp = async (e: React.FormEvent) => {
@@ -234,6 +264,56 @@ function AuthPage() {
       setResendCooldown(60);
     }
   };
+
+  const verifyMfa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMfaError(null);
+    if (!mfaChallenge) return;
+    if (!/^\d{6}$/.test(mfaCode)) {
+      setMfaError("Enter the 6-digit code from your authenticator app.");
+      setMfaShake(true);
+      setTimeout(() => setMfaShake(false), 500);
+      mfaInputRef.current?.focus();
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.mfa.verify({
+      factorId: mfaChallenge.factorId,
+      challengeId: mfaChallenge.challengeId,
+      code: mfaCode,
+    });
+    setLoading(false);
+    if (error) {
+      setMfaError(error.message || "That code doesn't match. Try again.");
+      setMfaCode("");
+      setMfaShake(true);
+      setTimeout(() => setMfaShake(false), 500);
+      setTimeout(() => mfaInputRef.current?.focus(), 30);
+      return;
+    }
+    setMfaChallenge(null);
+    setMfaCode("");
+    toast.success("Verified");
+    navigate({ to: redirectTo as "/dashboard", replace: true });
+  };
+
+  const cancelMfa = async () => {
+    setMfaChallenge(null);
+    setMfaCode("");
+    setMfaError(null);
+    await supabase.auth.signOut();
+  };
+
+  // Auto-focus + auto-submit for MFA input
+  React.useEffect(() => {
+    if (mfaChallenge) mfaInputRef.current?.focus();
+  }, [mfaChallenge]);
+  React.useEffect(() => {
+    if (mfaChallenge && mfaCode.length === 6 && !loading && !mfaError) {
+      void verifyMfa({ preventDefault: () => {} } as React.FormEvent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mfaCode, mfaChallenge]);
 
   const humanizeOtpError = (msg: string): string => {
     const m = msg.toLowerCase();
@@ -500,25 +580,78 @@ function AuthPage() {
                   </p>
 
 
-                  {/* Tabs */}
-                  <div className="mt-4 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
-                    <button
-                      type="button"
-                      onClick={() => { setMode("signin"); setErrorMsg(null); }}
-                      className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signin" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
-                    >
-                      Sign in
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
-                      className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
-                    >
-                      Sign up
-                    </button>
-                  </div>
+                  {/* Tabs — hidden during MFA challenge */}
+                  {!mfaChallenge && (
+                    <div className="mt-4 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
+                      <button
+                        type="button"
+                        onClick={() => { setMode("signin"); setErrorMsg(null); }}
+                        className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signin" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
+                      >
+                        Sign in
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
+                        className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
+                      >
+                        Sign up
+                      </button>
+                    </div>
+                  )}
 
-                  {mode === "signup" ? (
+                  {mfaChallenge ? (
+                    <form onSubmit={verifyMfa} className="mt-4 space-y-3">
+                      <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
+                        <p className="leading-relaxed">
+                          Two-factor authentication is enabled. Enter the 6-digit code from your authenticator app to continue.
+                        </p>
+                      </div>
+                      <div>
+                        <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                          Authenticator Code
+                        </label>
+                        <input
+                          ref={mfaInputRef}
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="one-time-code"
+                          maxLength={6}
+                          required
+                          disabled={loading}
+                          aria-invalid={mfaError ? true : undefined}
+                          value={mfaCode}
+                          onChange={(e) => { setMfaError(null); setMfaCode(e.target.value.replace(/\D/g, "").slice(0, 6)); }}
+                          className={`w-full rounded-xl border bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${mfaError ? "border-red-400 text-red-600 focus:border-red-500" : "border-zinc-200 text-zinc-900 focus:border-zinc-900"} ${mfaShake ? "animate-otp-shake" : ""}`}
+                          placeholder="••••••"
+                        />
+                        {mfaError && (
+                          <p className={`mt-2 text-[12px] text-red-600 ${MONO}`} role="alert" aria-live="polite">
+                            {mfaError}
+                          </p>
+                        )}
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading || mfaCode.length !== 6}
+                        className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                      >
+                        {loading ? btnLoading("Verifying...") : (<>Verify <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                      </button>
+
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={cancelMfa}
+                          disabled={loading}
+                          className="text-xs text-zinc-500 hover:text-zinc-900 transition disabled:opacity-40"
+                        >
+                          ← Sign in with a different account
+                        </button>
+                      </div>
+                    </form>
+                  ) : mode === "signup" ? (
                     otpStep ? (
                       <form onSubmit={verifyOtp} className="mt-4 space-y-3">
                         <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>

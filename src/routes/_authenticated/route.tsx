@@ -36,7 +36,14 @@ function AuthenticatedLayout() {
             replace: true,
           });
         });
+        return;
       }
+      // Block dashboard if MFA elevation is required but not completed.
+      supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data }) => {
+        if (data && data.currentLevel === "aal1" && data.nextLevel === "aal2") {
+          navigate({ to: "/auth", replace: true });
+        }
+      });
       return;
     }
     supabase.auth.getSession().then(({ data }) => {
