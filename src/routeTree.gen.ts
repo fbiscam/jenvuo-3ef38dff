@@ -38,6 +38,7 @@ import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BriefIdRouteImport } from './routes/brief.$id'
+import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
@@ -208,6 +209,11 @@ const BriefIdRoute = BriefIdRouteImport.update({
   path: '/brief/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -376,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
@@ -429,6 +436,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
@@ -486,6 +494,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
@@ -543,6 +552,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/dashboard'
+    | '/inbox'
     | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
@@ -596,6 +606,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
+    | '/inbox'
     | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
@@ -652,6 +663,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/_authenticated/dashboard'
+    | '/_authenticated/inbox'
     | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
@@ -932,6 +944,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BriefIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/inbox': {
+      id: '/_authenticated/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AuthenticatedInboxRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -1146,10 +1165,12 @@ const AuthenticatedDashboardRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
+  AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
+  AuthenticatedInboxRoute: AuthenticatedInboxRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
