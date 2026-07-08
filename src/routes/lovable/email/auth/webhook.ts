@@ -31,7 +31,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "jenvuo"
+const SITE_NAME = "Jenvu"
 const SENDER_DOMAIN = "notify.jenvu.net"
 const ROOT_DOMAIN = "jenvu.net"
 const FROM_DOMAIN = "jenvu.net"
