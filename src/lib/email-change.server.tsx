@@ -24,6 +24,29 @@ async function sha256Hex(input: string) {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
+async function getOrCreateUnsubscribeToken(supabaseAdmin: any, email: string): Promise<string> {
+  const normalized = email.toLowerCase()
+  const { data: existing } = await supabaseAdmin
+    .from('email_unsubscribe_tokens')
+    .select('token')
+    .eq('email', normalized)
+    .maybeSingle()
+  if (existing?.token) return existing.token
+
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  const token = Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('')
+  await supabaseAdmin
+    .from('email_unsubscribe_tokens')
+    .upsert({ token, email: normalized }, { onConflict: 'email', ignoreDuplicates: true })
+  const { data: stored } = await supabaseAdmin
+    .from('email_unsubscribe_tokens')
+    .select('token')
+    .eq('email', normalized)
+    .maybeSingle()
+  return stored?.token ?? token
+}
+
 type AuditEvent = 'requested' | 'confirmed' | 'failed_request' | 'failed_confirm'
 
 async function writeAudit(row: {
@@ -160,6 +183,8 @@ async function sendEmailChangeEmail(args: {
   const html = await render(element)
   const text = await render(element, { plainText: true })
 
+  const unsubscribeToken = await getOrCreateUnsubscribeToken(supabaseAdmin, args.to)
+
   await supabaseAdmin.from('email_send_log').insert({
     message_id: messageId,
     template_name: 'email_change',
@@ -180,6 +205,7 @@ async function sendEmailChangeEmail(args: {
         purpose: 'transactional',
         label: 'email_change',
         idempotency_key: `email-change-${messageId}`,
+        unsubscribe_token: unsubscribeToken,
       },
       { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
     )
