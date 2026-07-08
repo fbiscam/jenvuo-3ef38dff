@@ -58,72 +58,148 @@ export const EmailFonts = () => (
   </>
 )
 
-/** Jenvu logo band — sits at the very top of every email. */
+/** Jenvu terminal-style header — sits at the very top of every email. */
 export const LogoHeader = ({
   tagline = 'JENVU · VOICE-NATIVE TERMINAL',
 }: {
   tagline?: string
 }) => (
-  <Section style={logoWrap}>
-    <table
-      width="100%"
-      cellPadding={0}
-      cellSpacing={0}
-      role="presentation"
-      style={{ borderCollapse: 'collapse' as const }}
-    >
-      <tbody>
-        <tr>
-          <td style={{ verticalAlign: 'middle' }}>
-            <table cellPadding={0} cellSpacing={0} role="presentation">
-              <tbody>
-                <tr>
-                  <td style={logoMark}>J</td>
-                  <td style={{ paddingLeft: '10px' }}>
-                    <Text style={logoWord}>JENVU</Text>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-          <td style={{ verticalAlign: 'middle', textAlign: 'right' as const }}>
-            <Text style={logoTag}>{tagline}</Text>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </Section>
+  <>
+    {/* Row 1 — traffic-light terminal chrome */}
+    <Section style={termBar}>
+      <table
+        width="100%"
+        cellPadding={0}
+        cellSpacing={0}
+        role="presentation"
+        style={{ borderCollapse: 'collapse' as const }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ verticalAlign: 'middle', width: '40%' }}>
+              <span style={dot} />
+              <span style={dot} />
+              <span style={dot} />
+              <span style={termSession}>JENVU // SESSION</span>
+            </td>
+            <td style={{ verticalAlign: 'middle', textAlign: 'right' as const }}>
+              <span style={termStatus}>● LIVE · AES-256</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </Section>
+
+    {/* Row 2 — logo mark + wordmark + tagline */}
+    <Section style={logoWrap}>
+      <table
+        width="100%"
+        cellPadding={0}
+        cellSpacing={0}
+        role="presentation"
+        style={{ borderCollapse: 'collapse' as const }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ verticalAlign: 'middle' }}>
+              <table cellPadding={0} cellSpacing={0} role="presentation">
+                <tbody>
+                  <tr>
+                    <td style={logoMark}>J</td>
+                    <td style={{ paddingLeft: '10px' }}>
+                      <Text style={logoWord}>JENVU</Text>
+                      <Text style={logoSub}>/ voice_terminal</Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td style={{ verticalAlign: 'middle', textAlign: 'right' as const }}>
+              <Text style={logoTag}>{tagline}</Text>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </Section>
+  </>
 )
 
+const termBar = {
+  padding: '10px 20px',
+  backgroundColor: '#09090b',
+  borderBottom: '1px solid #18181b',
+}
+
+const dot = {
+  display: 'inline-block',
+  width: '9px',
+  height: '9px',
+  borderRadius: '50%',
+  backgroundColor: '#3f3f46',
+  marginRight: '6px',
+  verticalAlign: 'middle',
+}
+
+const termSession = {
+  display: 'inline-block',
+  marginLeft: '10px',
+  fontFamily: MONO,
+  fontSize: '10px',
+  letterSpacing: '0.22em',
+  color: '#a1a1aa',
+  textTransform: 'uppercase' as const,
+  verticalAlign: 'middle',
+}
+
+const termStatus = {
+  fontFamily: MONO,
+  fontSize: '10px',
+  letterSpacing: '0.18em',
+  color: '#4ade80',
+  textTransform: 'uppercase' as const,
+}
+
 const logoWrap = {
-  padding: '18px 24px 14px',
+  padding: '16px 24px 14px',
   borderBottom: `1px solid ${COLORS.hairline}`,
   backgroundColor: '#ffffff',
 }
 
 const logoMark = {
   display: 'inline-block',
-  width: '30px',
-  height: '30px',
-  lineHeight: '30px',
+  width: '34px',
+  height: '34px',
+  lineHeight: '34px',
   textAlign: 'center' as const,
   backgroundColor: COLORS.ink,
   color: '#ffffff',
   fontFamily: URBANIST,
-  fontSize: '16px',
+  fontSize: '17px',
   fontWeight: 700 as const,
-  borderRadius: '8px',
+  borderRadius: '9px',
   verticalAlign: 'middle',
+  border: '1px solid #18181b',
+  boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
 }
 
 const logoWord = {
   margin: 0,
   fontFamily: URBANIST,
-  fontSize: '15px',
+  fontSize: '16px',
   fontWeight: 700 as const,
-  letterSpacing: '0.18em',
+  letterSpacing: '0.2em',
   color: COLORS.ink,
   textTransform: 'uppercase' as const,
+  lineHeight: '1.1',
+}
+
+const logoSub = {
+  margin: '2px 0 0',
+  fontFamily: MONO,
+  fontSize: '9.5px',
+  letterSpacing: '0.14em',
+  color: COLORS.soft,
+  textTransform: 'lowercase' as const,
 }
 
 const logoTag = {
