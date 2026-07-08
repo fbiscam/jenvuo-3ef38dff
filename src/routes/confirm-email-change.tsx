@@ -55,6 +55,33 @@ const FRIENDLY: Record<ErrorKind, { title: string; body: string }> = {
   },
 };
 
+const STORAGE_PREFIX = "jenvu:email-change-done:";
+
+async function hashToken(token: string) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function readCompleted(hash: string): { newEmail: string; at: number } | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_PREFIX + hash) ?? localStorage.getItem(STORAGE_PREFIX + hash);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (typeof parsed?.newEmail !== "string") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeCompleted(hash: string, newEmail: string) {
+  const payload = JSON.stringify({ newEmail, at: Date.now() });
+  try { sessionStorage.setItem(STORAGE_PREFIX + hash, payload); } catch {}
+  try { localStorage.setItem(STORAGE_PREFIX + hash, payload); } catch {}
+}
+
 function ConfirmEmailChangePage() {
   const { token } = Route.useSearch();
   const navigate = useNavigate();
@@ -63,6 +90,7 @@ function ConfirmEmailChangePage() {
   const [message, setMessage] = useState("Verifying your email change…");
   const [errorKind, setErrorKind] = useState<ErrorKind>("generic");
   const [newEmail, setNewEmail] = useState<string | null>(null);
+  const [alreadyDone, setAlreadyDone] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const ran = useRef(false);
 
@@ -85,6 +113,20 @@ function ConfirmEmailChangePage() {
         setMessage("Missing confirmation token.");
         return;
       }
+
+      // Client-side guard: if we've already completed this token in this
+      // browser, skip the server call entirely and show the completed view.
+      const hash = await hashToken(token);
+      const cached = readCompleted(hash);
+      if (cached) {
+        setNewEmail(cached.newEmail);
+        setAlreadyDone(true);
+        setStatus("success");
+        setMessage("This email change has already been completed.");
+        try { await supabase.auth.signOut(); } catch {}
+        return;
+      }
+
       try {
         const res = await confirmEmailChange({ data: { token } });
         if (!res.ok) {
@@ -95,6 +137,7 @@ function ConfirmEmailChangePage() {
           return;
         }
         setNewEmail(res.newEmail);
+        writeCompleted(hash, res.newEmail);
         setStatus("success");
         setMessage("Your email has been updated. Signing you out…");
         // Teardown immediately on success so any protected queries stop.
