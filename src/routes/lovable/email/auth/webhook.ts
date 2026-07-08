@@ -167,6 +167,36 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
 
         const supabase = createClient(supabaseUrl, supabaseServiceKey)
         const messageId = crypto.randomUUID()
+        const idempotencyKey = `auth-${emailType}-${run_id}-${messageId}`
+
+        // Ensure an unsubscribe token exists for this recipient (required by
+        // Lovable's transactional send path). Auth emails still won't render
+        // an unsubscribe footer because templates omit it.
+        let unsubscribeToken: string | undefined
+        try {
+          const email = String(payload.data.email).toLowerCase()
+          const { data: existing } = await supabase
+            .from('email_unsubscribe_tokens')
+            .select('token')
+            .eq('email', email)
+            .maybeSingle()
+          if (existing?.token) {
+            unsubscribeToken = existing.token
+          } else {
+            const newToken = crypto.randomUUID().replace(/-/g, '')
+            await supabase
+              .from('email_unsubscribe_tokens')
+              .upsert({ token: newToken, email }, { onConflict: 'email', ignoreDuplicates: true })
+            const { data: stored } = await supabase
+              .from('email_unsubscribe_tokens')
+              .select('token')
+              .eq('email', email)
+              .maybeSingle()
+            unsubscribeToken = stored?.token ?? newToken
+          }
+        } catch (e) {
+          console.error('Failed to prepare unsubscribe token', { error: e })
+        }
 
         // Log pending BEFORE enqueue so we have a record even if enqueue crashes
         await supabase.from('email_send_log').insert({
@@ -187,7 +217,10 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
             subject: EMAIL_SUBJECTS[emailType] || 'Notification',
             html,
             text,
-            purpose: 'authentication',
+            // Lovable's send API only accepts purpose="transactional".
+            purpose: 'transactional',
+            idempotency_key: idempotencyKey,
+            unsubscribe_token: unsubscribeToken,
             label: emailType,
             queued_at: new Date().toISOString(),
           },
