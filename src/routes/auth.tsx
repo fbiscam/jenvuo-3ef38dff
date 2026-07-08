@@ -467,8 +467,15 @@ function AuthPage() {
                       </form>
 
                       <div className="mt-4 pt-3 border-t border-zinc-100">
-                        <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed whitespace-nowrap">
-                          Jenvu is invite-only. Contact the administrator for access.
+                        <p className="text-sm text-zinc-500 leading-relaxed">
+                          New here?{" "}
+                          <button
+                            type="button"
+                            onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline"
+                          >
+                            Create an account
+                          </button>.
                         </p>
                       </div>
                     </>
