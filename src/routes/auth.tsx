@@ -14,7 +14,7 @@ import {
 } from "@/lib/custom-auth.functions";
 
 
-type AuthSearch = { redirect?: string };
+type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string };
 
 function sanitizeRedirect(r?: string): string {
   if (!r || typeof r !== "string") return "/dashboard";
@@ -26,12 +26,16 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   validateSearch: (search: Record<string, unknown>): AuthSearch => ({
     redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+    emailChanged: search.emailChanged === "1" ? "1" : undefined,
+    newEmail: typeof search.newEmail === "string" ? search.newEmail : undefined,
   }),
   beforeLoad: async ({ search }) => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash || "";
       if (hash.includes("type=recovery") || hash.includes("error")) return;
+      if (search.emailChanged === "1") return;
     }
+
     const { data } = await supabase.auth.getUser();
     if (data.user) {
       throw redirect({ to: sanitizeRedirect(search.redirect) as "/dashboard" });
@@ -89,6 +93,28 @@ function AuthPage() {
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const [emailChangedBanner, setEmailChangedBanner] = React.useState<string | null>(null);
+
+  // Show a banner + toast when redirected here after a successful email change.
+  React.useEffect(() => {
+    if (search.emailChanged !== "1") return;
+    const ne = search.newEmail || "";
+    if (ne) setEmail(ne);
+    setEmailChangedBanner(ne || "your new email");
+    toast.success("Email change complete", {
+      description: ne
+        ? `Please sign in again with ${ne}.`
+        : "Please sign in again with your new email.",
+      duration: 8000,
+    });
+    // Strip the params from the URL so a refresh doesn't re-fire the toast.
+    navigate({
+      to: "/auth",
+      search: (prev: AuthSearch) => ({ ...prev, emailChanged: undefined, newEmail: undefined }),
+      replace: true,
+    });
+  }, []);
+
   const [otpStep, setOtpStep] = React.useState(false);
   const [otpCode, setOtpCode] = React.useState("");
   const [otpError, setOtpError] = React.useState<string | null>(null);
@@ -627,6 +653,24 @@ function AuthPage() {
                   <p className="mt-2 text-sm text-zinc-600 leading-relaxed sm:text-base">
                     Voice-native institutional intelligence, on call.
                   </p>
+
+                  {emailChangedBanner && (
+                    <div
+                      role="status"
+                      className="mt-4 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
+                    >
+                      <Mail className="mt-0.5 h-4 w-4 shrink-0" />
+                      <div className="leading-snug">
+                        <div className="font-medium">Email change complete</div>
+                        <div className="text-emerald-800">
+                          Please sign in again with{" "}
+                          <span className="font-semibold">{emailChangedBanner}</span>.
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+
 
 
                   {/* Tabs — hidden during MFA challenge */}

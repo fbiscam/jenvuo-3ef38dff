@@ -100,8 +100,13 @@ function ConfirmEmailChangePage() {
     try { await queryClient.cancelQueries(); } catch {}
     queryClient.clear();
     try { await supabase.auth.signOut(); } catch {}
-    navigate({ to: "/auth", replace: true });
+    navigate({
+      to: "/auth",
+      replace: true,
+      search: newEmail ? { emailChanged: "1", newEmail } : { emailChanged: "1" },
+    });
   };
+
 
   useEffect(() => {
     if (ran.current) return;
@@ -156,9 +161,14 @@ function ConfirmEmailChangePage() {
   useEffect(() => {
     if (status !== "success" || alreadyDone) return;
     if (countdown <= 0) {
-      navigate({ to: "/auth", replace: true });
+      navigate({
+        to: "/auth",
+        replace: true,
+        search: newEmail ? { emailChanged: "1", newEmail } : { emailChanged: "1" },
+      });
       return;
     }
+
     const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(t);
   }, [status, alreadyDone, countdown, navigate]);
