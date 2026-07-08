@@ -145,7 +145,10 @@ function AuthPage() {
   const [mfaShake, setMfaShake] = React.useState(false);
   const [mfaResendCooldown, setMfaResendCooldown] = React.useState(0);
   const [mfaResending, setMfaResending] = React.useState(false);
+  const [rememberDevice, setRememberDevice] = React.useState(true);
   const mfaInputRef = React.useRef<HTMLInputElement | null>(null);
+  const verifyTrustedDeviceFn = useServerFn(verifyTrustedDevice);
+  const registerTrustedDeviceFn = useServerFn(registerTrustedDevice);
 
   // Terminal-header flash: shows a blinking notification inside the auth-session
   // strip for a few seconds, then reverts to the default label.
