@@ -66,7 +66,7 @@ function AdminLogin() {
           <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white ring-1 ring-zinc-200 shadow-sm overflow-hidden">
             <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 object-contain" />
           </div>
-          <h1 className="mt-3 text-lg font-semibold text-zinc-900">Admin Access</h1>
+          <h1 className="mt-3 text-lg font-semibold text-zinc-900">Support Access</h1>
           <p className="mt-1 text-xs text-zinc-500">
             Restricted area. Enter your admin credentials to continue.
           </p>
