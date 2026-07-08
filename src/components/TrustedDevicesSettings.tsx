@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { listTrustedDevices, revokeTrustedDevice } from "@/lib/trusted-devices.functions";
+import { revokeCurrentTrustedDevice, TRUSTED_DEVICE_KEY } from "@/lib/trusted-devices.client";
 
 type Device = {
   id: string;
@@ -13,7 +14,7 @@ type Device = {
   expires_at: string;
 };
 
-const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
+
 
 function summarizeUA(ua: string | null): string {
   if (!ua) return "Unknown device";
@@ -45,6 +46,8 @@ export function TrustedDevicesSettings() {
   const [loading, setLoading] = useState(true);
   const [revoking, setRevoking] = useState<string | null>(null);
   const [currentUid, setCurrentUid] = useState<string | null>(null);
+  const [hasCurrentTrust, setHasCurrentTrust] = useState(false);
+  const [forgetting, setForgetting] = useState(false);
   const listFn = useServerFn(listTrustedDevices);
   const revokeFn = useServerFn(revokeTrustedDevice);
 
@@ -66,10 +69,25 @@ export function TrustedDevicesSettings() {
   useEffect(() => {
     void (async () => {
       const { data } = await supabase.auth.getUser();
-      setCurrentUid(data.user?.id ?? null);
+      const uid = data.user?.id ?? null;
+      setCurrentUid(uid);
+      if (uid) setHasCurrentTrust(!!window.localStorage.getItem(TRUSTED_DEVICE_KEY(uid)));
     })();
     void load();
   }, [load]);
+
+  const forgetThisDevice = async () => {
+    setForgetting(true);
+    try {
+      await revokeCurrentTrustedDevice();
+      setHasCurrentTrust(false);
+      toast.success("This device forgotten", { description: "You'll need MFA the next time you sign in here." });
+      await load();
+    } finally {
+      setForgetting(false);
+    }
+  };
+
 
   const revoke = async (id: string) => {
     setRevoking(id);
@@ -115,14 +133,25 @@ export function TrustedDevicesSettings() {
           Browsers where you ticked <span className="font-medium text-zinc-700">Remember this device</span> during
           two-factor sign-in. Revoke any browser you don't recognize.
         </p>
-        {devices && devices.length > 0 && (
-          <button
-            onClick={revokeAll}
-            className="shrink-0 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
-          >
-            Revoke all
-          </button>
-        )}
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {hasCurrentTrust && (
+            <button
+              onClick={forgetThisDevice}
+              disabled={forgetting}
+              className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+            >
+              {forgetting ? "Forgetting…" : "Forget this device"}
+            </button>
+          )}
+          {devices && devices.length > 0 && (
+            <button
+              onClick={revokeAll}
+              className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+            >
+              Revoke all
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 space-y-2">

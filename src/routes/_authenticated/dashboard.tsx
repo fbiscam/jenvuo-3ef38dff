@@ -10,6 +10,7 @@ import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
+import { revokeCurrentTrustedDevice } from "@/lib/trusted-devices.client";
 import {
   Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
@@ -503,7 +504,9 @@ function DashboardLayout() {
   };
 
 
-  const signOut = () => {
+  const signOut = async () => {
+    // Revoke this browser's trusted-device row before the bearer disappears.
+    await revokeCurrentTrustedDevice();
     // Clear the browser session synchronously so reloads cannot restore the
     // signed-in user before Supabase finishes its async sign-out work.
     clearStoredAuthSession();
