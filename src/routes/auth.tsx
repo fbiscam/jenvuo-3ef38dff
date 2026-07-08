@@ -229,6 +229,22 @@ function AuthPage() {
             const { data: fac } = await supabase.auth.mfa.listFactors();
             const totp = fac?.totp?.find((f) => f.status === "verified");
             if (totp) {
+              // Try trusted-device fast path first.
+              try {
+                const uid = session.user.id;
+                const savedToken = window.localStorage.getItem(TRUSTED_DEVICE_KEY(uid));
+                if (savedToken) {
+                  const res = await verifyTrustedDeviceFn({ data: { token: savedToken } });
+                  if (res?.valid) {
+                    await applyPendingReferral();
+                    navigate({ to: redirectTo as "/dashboard", replace: true });
+                    return;
+                  }
+                  // Stale/expired — clear it so we don't retry every login.
+                  window.localStorage.removeItem(TRUSTED_DEVICE_KEY(uid));
+                }
+              } catch { /* fall through to MFA prompt */ }
+
               const { data: chal, error } = await supabase.auth.mfa.challenge({ factorId: totp.id });
               if (error || !chal) {
                 const msg = error?.message || "Could not start MFA challenge";
@@ -249,7 +265,7 @@ function AuthPage() {
       }
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate, redirectTo, applyPendingReferral, mfaChallenge]);
+  }, [navigate, redirectTo, applyPendingReferral, mfaChallenge, verifyTrustedDeviceFn]);
 
   // Reset submitted-otp tracker when leaving OTP screens or clearing the code
   React.useEffect(() => {
