@@ -59,6 +59,7 @@ function ConfirmEmailChangePage() {
   const navigate = useNavigate();
   const [status, setStatus] = useState<Status>("loading");
   const [message, setMessage] = useState("Verifying your email change…");
+  const [errorKind, setErrorKind] = useState<ErrorKind>("generic");
   const [newEmail, setNewEmail] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(5);
   const ran = useRef(false);
@@ -69,24 +70,28 @@ function ConfirmEmailChangePage() {
     (async () => {
       if (!token) {
         setStatus("error");
+        setErrorKind("missing");
         setMessage("Missing confirmation token.");
         return;
       }
       try {
         const res = await confirmEmailChange({ data: { token } });
         if (!res.ok) {
+          const err = res.error || "Could not confirm email change.";
           setStatus("error");
-          setMessage(res.error || "Could not confirm email change.");
+          setErrorKind(classifyError(err));
+          setMessage(err);
           return;
         }
         setNewEmail(res.newEmail);
         setStatus("success");
         setMessage("Your email has been updated. Signing you out…");
-        // Sign the user out so they can sign in with the new email.
         await supabase.auth.signOut();
       } catch (e: any) {
+        const err = e?.message || "Could not confirm email change.";
         setStatus("error");
-        setMessage(e?.message || "Could not confirm email change.");
+        setErrorKind(classifyError(err));
+        setMessage(err);
       }
     })();
   }, [token]);
