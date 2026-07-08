@@ -413,7 +413,7 @@ function PricingPage() {
           <div>
             <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Credit top-ups</span>
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more credits this month?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600">One-time packs that never expire. Stack on top of any plan, including Free. Every $1 = 8 credits.</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time packs that never expire. Stack on top of any plan, including Free. Every $1 = 8 credits.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
