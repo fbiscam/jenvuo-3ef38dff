@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Mail, Lock, ArrowRight, User } from "lucide-react";
+import { Mail, Lock, ArrowRight, User, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { CloudOrb } from "@/components/CloudOrb";
@@ -154,6 +154,13 @@ function AuthPage() {
     email: z.string().trim().email("Enter a valid email").max(255),
     password: z.string().min(8, "Password must be at least 8 characters").max(72),
   });
+
+  const btnLoading = (label: string) => (
+    <>
+      <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+      <span>{label}</span>
+    </>
+  );
 
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -500,6 +507,7 @@ function AuthPage() {
                             autoComplete="one-time-code"
                             maxLength={6}
                             required
+                            disabled={loading}
                             aria-invalid={otpError ? true : undefined}
                             aria-describedby={otpError ? "otp-error" : undefined}
                             value={otpCode}
@@ -520,28 +528,34 @@ function AuthPage() {
                           disabled={loading}
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                          {loading ? "Verifying..." : (<>Verify & Continue <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                          {loading ? btnLoading("Verifying...") : (<>Verify & Continue <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
                         <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
                           <button
                             type="button"
-                            onClick={() => { setOtpStep(false); setErrorMsg(null); }}
-                            className="hover:text-zinc-900 transition"
+                            onClick={() => { setOtpStep(false); setErrorMsg(null); setOtpError(null); }}
+                            disabled={loading}
+                            className="hover:text-zinc-900 transition disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             ← Change email
                           </button>
                           <button
                             type="button"
                             onClick={resendCode}
-                            disabled={resending || resendCooldown > 0}
-                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
+                            disabled={loading || resending || resendCooldown > 0}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                           >
-                            {resending
-                              ? "Sending..."
-                              : resendCooldown > 0
-                                ? `Resend in ${resendCooldown}s`
-                                : "Resend code"}
+                            {resending ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
+                                Sending...
+                              </>
+                            ) : resendCooldown > 0 ? (
+                              `Resend in ${resendCooldown}s`
+                            ) : (
+                              "Resend code"
+                            )}
                           </button>
                         </div>
                       </form>
@@ -610,7 +624,7 @@ function AuthPage() {
                           disabled={loading}
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                          {loading ? "Creating..." : (<>Create Desk <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                          {loading ? btnLoading("Creating...") : (<>Create Desk <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
                         <p className="pt-2 text-xs text-zinc-500 leading-relaxed">
@@ -655,7 +669,7 @@ function AuthPage() {
                           disabled={loading}
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                          {loading ? "Sending..." : (<>Send Reset <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                          {loading ? btnLoading("Sending...") : (<>Send Reset <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
                         <div className="pt-2">
@@ -687,6 +701,7 @@ function AuthPage() {
                             autoComplete="one-time-code"
                             maxLength={6}
                             required
+                            disabled={loading}
                             aria-invalid={otpError ? true : undefined}
                             aria-describedby={otpError ? "otp-error-recovery" : undefined}
                             value={otpCode}
@@ -707,28 +722,34 @@ function AuthPage() {
                           disabled={loading}
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                          {loading ? "Verifying..." : (<>Verify Code <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                          {loading ? btnLoading("Verifying...") : (<>Verify Code <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
                         <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
                           <button
                             type="button"
-                            onClick={() => { setForgotStep("email"); setErrorMsg(null); }}
-                            className="hover:text-zinc-900 transition"
+                            onClick={() => { setForgotStep("email"); setErrorMsg(null); setOtpError(null); }}
+                            disabled={loading}
+                            className="hover:text-zinc-900 transition disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             ← Change email
                           </button>
                           <button
                             type="button"
                             onClick={resendResetCode}
-                            disabled={resending || resendCooldown > 0}
-                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
+                            disabled={loading || resending || resendCooldown > 0}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                           >
-                            {resending
-                              ? "Sending..."
-                              : resendCooldown > 0
-                                ? `Resend in ${resendCooldown}s`
-                                : "Resend code"}
+                            {resending ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
+                                Sending...
+                              </>
+                            ) : resendCooldown > 0 ? (
+                              `Resend in ${resendCooldown}s`
+                            ) : (
+                              "Resend code"
+                            )}
                           </button>
                         </div>
                       </form>
@@ -768,7 +789,7 @@ function AuthPage() {
                           disabled={loading}
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
-                          {loading ? "Updating..." : (<>Update Password <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                          {loading ? btnLoading("Updating...") : (<>Update Password <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
                       </form>
                     )
@@ -833,7 +854,7 @@ function AuthPage() {
                           className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading
-                            ? "Authenticating..."
+                            ? btnLoading("Authenticating...")
                             : (<>Authenticate <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
                       </form>
