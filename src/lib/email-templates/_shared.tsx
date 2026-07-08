@@ -5,55 +5,66 @@ export const SITE_URL = 'https://jenvu.com'
 export const LOGO_URL = `${SITE_URL}/favicon.png`
 
 /**
- * Shared design tokens for all Jenvu emails.
- * All templates use Urbanist for body/headings and JetBrains Mono for code/labels.
+ * Shared design tokens for Jenvu emails — clean, minimal, professional.
+ * Inter for everything (headings, body, labels, code digits).
  */
-export const URBANIST =
-  "Urbanist, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-// MONO alias intentionally points to Urbanist too — user wants every text
-// element (including labels and code digits) rendered in Urbanist.
-export const MONO = URBANIST
+export const INTER =
+  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+
+// Legacy aliases so existing templates keep compiling without edits.
+export const URBANIST = INTER
+export const MONO = INTER
 
 export const COLORS = {
-  bg: '#f5f5f4',
+  bg: '#f7f7f8',
   card: '#ffffff',
-  ink: '#09090b',
-  body: '#3f3f46',
-  muted: '#71717a',
-  soft: '#a1a1aa',
-  border: '#e4e4e7',
-  hairline: '#f1f1f1',
-  accent: '#09090b',
+  ink: '#111827',
+  body: '#4b5563',
+  muted: '#6b7280',
+  soft: '#9ca3af',
+  border: '#e5e7eb',
+  hairline: '#f1f2f4',
+  accent: '#111827',
 }
 
-/** Drop this into every <Head /> to load Urbanist across email clients that support web fonts. */
+/** Load Inter across email clients that support web fonts. */
 export const EmailFonts = () => (
   <>
     <Font
-      fontFamily="Urbanist"
+      fontFamily="Inter"
       fallbackFontFamily="Arial"
       webFont={{
-        url: 'https://fonts.gstatic.com/s/urbanist/v15/L0xjDF02iFML4hGCyMqrZLlnusK5Wm5hpDwKMDNo6fA.woff2',
+        url: 'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2',
         format: 'woff2',
       }}
       fontWeight={400}
       fontStyle="normal"
     />
     <Font
-      fontFamily="Urbanist"
+      fontFamily="Inter"
       fallbackFontFamily="Arial"
       webFont={{
-        url: 'https://fonts.gstatic.com/s/urbanist/v15/L0xjDF02iFML4hGCyMqrZLlnusG_Wmxhpjw.woff2',
+        url: 'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7.woff2',
+        format: 'woff2',
+      }}
+      fontWeight={500}
+      fontStyle="normal"
+    />
+    <Font
+      fontFamily="Inter"
+      fallbackFontFamily="Arial"
+      webFont={{
+        url: 'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1pL7.woff2',
         format: 'woff2',
       }}
       fontWeight={600}
       fontStyle="normal"
     />
     <Font
-      fontFamily="Urbanist"
+      fontFamily="Inter"
       fallbackFontFamily="Arial"
       webFont={{
-        url: 'https://fonts.gstatic.com/s/urbanist/v15/L0xjDF02iFML4hGCyMqrZLlnusG_Wmxhpjw.woff2',
+        url: 'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa25L7.woff2',
         format: 'woff2',
       }}
       fontWeight={700}
@@ -62,165 +73,56 @@ export const EmailFonts = () => (
   </>
 )
 
-/** Jenvu terminal-style header — sits at the very top of every email. */
-export const LogoHeader = ({
-  tagline = 'JENVU · VOICE-NATIVE TERMINAL',
-}: {
-  tagline?: string
-}) => (
-  <>
-    {/* Row 1 — traffic-light terminal chrome */}
-    <Section style={termBar}>
-      <table
-        width="100%"
-        cellPadding={0}
-        cellSpacing={0}
-        role="presentation"
-        style={{ borderCollapse: 'collapse' as const }}
-      >
-        <tbody>
-          <tr>
-            <td style={{ verticalAlign: 'middle', width: '40%' }}>
-              <span style={dot} />
-              <span style={dot} />
-              <span style={dot} />
-              <span style={termSession}>JENVU // SESSION</span>
-            </td>
-            <td style={{ verticalAlign: 'middle', textAlign: 'right' as const }}>
-              <span style={termStatus}>● LIVE · AES-256</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </Section>
-
-    {/* Row 2 — logo mark + wordmark + tagline */}
-    <Section style={logoWrap}>
-      <table
-        width="100%"
-        cellPadding={0}
-        cellSpacing={0}
-        role="presentation"
-        style={{ borderCollapse: 'collapse' as const }}
-      >
-        <tbody>
-          <tr>
-            <td style={{ verticalAlign: 'middle' }}>
-              <table cellPadding={0} cellSpacing={0} role="presentation">
-                <tbody>
-                  <tr>
-                    <td style={logoMark}>
-                      <Img
-                        src={LOGO_URL}
-                        width="34"
-                        height="34"
-                        alt="Jenvu"
-                        style={{ display: 'block', borderRadius: '9px' }}
-                      />
-                    </td>
-                    <td style={{ paddingLeft: '10px' }}>
-                      <Text style={logoWord}>JENVU</Text>
-                      <Text style={logoSub}>/ voice_terminal</Text>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
-            <td style={{ verticalAlign: 'middle', textAlign: 'right' as const }}>
-              <Text style={logoTag}>{tagline}</Text>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </Section>
-  </>
+/** Simple, clean header — favicon + Jenvu wordmark on a hairline-divided band. */
+export const LogoHeader = (_props: { tagline?: string } = {}) => (
+  <Section style={logoWrap}>
+    <table
+      cellPadding={0}
+      cellSpacing={0}
+      role="presentation"
+      style={{ borderCollapse: 'collapse' as const }}
+    >
+      <tbody>
+        <tr>
+          <td style={{ verticalAlign: 'middle' }}>
+            <Img
+              src={LOGO_URL}
+              width="28"
+              height="28"
+              alt="Jenvu"
+              style={{ display: 'block', borderRadius: '6px' }}
+            />
+          </td>
+          <td style={{ paddingLeft: '10px', verticalAlign: 'middle' }}>
+            <Text style={logoWord}>Jenvu</Text>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </Section>
 )
 
-const termBar = {
-  padding: '10px 20px',
-  backgroundColor: '#09090b',
-  borderBottom: '1px solid #18181b',
-}
-
-const dot = {
-  display: 'inline-block',
-  width: '9px',
-  height: '9px',
-  borderRadius: '50%',
-  backgroundColor: '#3f3f46',
-  marginRight: '6px',
-  verticalAlign: 'middle',
-}
-
-const termSession = {
-  display: 'inline-block',
-  marginLeft: '10px',
-  fontFamily: MONO,
-  fontSize: '10px',
-  letterSpacing: '0.22em',
-  color: '#a1a1aa',
-  textTransform: 'uppercase' as const,
-  verticalAlign: 'middle',
-}
-
-const termStatus = {
-  fontFamily: MONO,
-  fontSize: '10px',
-  letterSpacing: '0.18em',
-  color: '#4ade80',
-  textTransform: 'uppercase' as const,
-}
-
 const logoWrap = {
-  padding: '16px 24px 14px',
+  padding: '22px 28px 18px',
   borderBottom: `1px solid ${COLORS.hairline}`,
   backgroundColor: '#ffffff',
 }
 
-const logoMark = {
-  width: '34px',
-  height: '34px',
-  padding: 0,
-  verticalAlign: 'middle' as const,
-  borderRadius: '9px',
-  overflow: 'hidden' as const,
-  lineHeight: 0,
-}
-
 const logoWord = {
   margin: 0,
-  fontFamily: URBANIST,
-  fontSize: '16px',
-  fontWeight: 700 as const,
-  letterSpacing: '0.2em',
+  fontFamily: INTER,
+  fontSize: '17px',
+  fontWeight: 600 as const,
+  letterSpacing: '-0.01em',
   color: COLORS.ink,
-  textTransform: 'uppercase' as const,
-  lineHeight: '1.1',
+  lineHeight: '1',
 }
 
-const logoSub = {
-  margin: '2px 0 0',
-  fontFamily: MONO,
-  fontSize: '9.5px',
-  letterSpacing: '0.14em',
-  color: COLORS.soft,
-  textTransform: 'lowercase' as const,
-}
-
-const logoTag = {
-  margin: 0,
-  fontFamily: MONO,
-  fontSize: '9.5px',
-  letterSpacing: '0.22em',
-  color: COLORS.soft,
-  textTransform: 'uppercase' as const,
-}
-
-/* Shared container / body styles other templates can reuse. */
+/** Shared container / body styles reused across all templates. */
 export const shellStyles = {
   main: {
     backgroundColor: COLORS.bg,
-    fontFamily: URBANIST,
+    fontFamily: INTER,
     padding: '32px 12px',
     margin: 0,
   },
@@ -228,35 +130,33 @@ export const shellStyles = {
     maxWidth: '560px',
     margin: '0 auto',
     backgroundColor: COLORS.card,
-    borderRadius: '16px',
+    borderRadius: '12px',
     border: `1px solid ${COLORS.border}`,
     overflow: 'hidden' as const,
-    boxShadow: '0 20px 40px -20px rgba(0,0,0,0.08)',
   },
   card: { padding: '28px 28px 24px' },
   eyebrow: {
-    fontFamily: MONO,
-    fontSize: '11px',
-    fontWeight: 700 as const,
-    letterSpacing: '0.2em',
-    color: COLORS.soft,
-    textTransform: 'uppercase' as const,
-    margin: '0 0 10px',
+    fontFamily: INTER,
+    fontSize: '12px',
+    fontWeight: 500 as const,
+    letterSpacing: '0.02em',
+    color: COLORS.muted,
+    margin: '0 0 8px',
   },
   h1: {
-    fontFamily: URBANIST,
-    fontSize: '26px',
-    fontWeight: 700 as const,
+    fontFamily: INTER,
+    fontSize: '22px',
+    fontWeight: 600 as const,
     color: COLORS.ink,
-    letterSpacing: '-0.01em',
+    letterSpacing: '-0.02em',
     margin: '0 0 14px',
-    lineHeight: '1.2',
+    lineHeight: '1.25',
   },
   text: {
-    fontFamily: URBANIST,
-    fontSize: '14px',
+    fontFamily: INTER,
+    fontSize: '15px',
     color: COLORS.body,
-    lineHeight: '1.65',
+    lineHeight: '1.6',
     margin: '0 0 16px',
     fontWeight: 400 as const,
   },
@@ -269,18 +169,18 @@ export const shellStyles = {
     display: 'inline-block',
     backgroundColor: COLORS.ink,
     color: '#ffffff',
-    fontFamily: URBANIST,
+    fontFamily: INTER,
     fontSize: '14px',
-    fontWeight: 600 as const,
-    borderRadius: '10px',
-    padding: '12px 22px',
+    fontWeight: 500 as const,
+    borderRadius: '8px',
+    padding: '11px 20px',
     textDecoration: 'none',
     margin: '4px 0 0',
   },
   footer: {
-    fontFamily: URBANIST,
-    fontSize: '12px',
-    color: COLORS.soft,
+    fontFamily: INTER,
+    fontSize: '13px',
+    color: COLORS.muted,
     lineHeight: '1.6',
     margin: '0 0 10px',
     fontWeight: 400 as const,
@@ -291,47 +191,45 @@ export const shellStyles = {
     textUnderlineOffset: '2px',
   },
   legal: {
-    fontFamily: MONO,
-    fontSize: '10px',
-    color: '#d4d4d8',
-    letterSpacing: '0.1em',
+    fontFamily: INTER,
+    fontSize: '12px',
+    color: COLORS.soft,
+    letterSpacing: '0',
     margin: '18px 0 0',
-    textTransform: 'uppercase' as const,
+    fontWeight: 400 as const,
   },
   codeBox: {
     backgroundColor: '#ffffff',
-    borderRadius: '14px',
-    padding: '24px 20px',
-    margin: '20px 0 24px',
+    borderRadius: '10px',
+    padding: '20px 20px',
+    margin: '18px 0 22px',
     textAlign: 'center' as const,
-    border: `1.5px solid ${COLORS.ink}`,
-    boxShadow: '0 2px 0 0 ' + COLORS.ink,
+    border: `1px solid ${COLORS.border}`,
   },
   codeLabel: {
-    fontFamily: MONO,
-    fontSize: '10px',
-    fontWeight: 700 as const,
-    letterSpacing: '0.28em',
+    fontFamily: INTER,
+    fontSize: '12px',
+    fontWeight: 500 as const,
+    letterSpacing: '0.02em',
     color: COLORS.muted,
-    textTransform: 'uppercase' as const,
-    margin: '0 0 12px',
+    margin: '0 0 10px',
   },
   codeValue: {
-    fontFamily: MONO,
-    fontSize: '38px',
+    fontFamily: INTER,
+    fontSize: '34px',
     fontWeight: 700 as const,
     color: COLORS.ink,
-    letterSpacing: '0.35em',
-    margin: '0 0 12px',
-    padding: '0 0 0 12px',
+    letterSpacing: '0.18em',
+    margin: '0 0 10px',
+    padding: '0 0 0 6px',
   },
   codeExpiry: {
-    fontFamily: MONO,
-    fontSize: '10px',
+    fontFamily: INTER,
+    fontSize: '12px',
     color: COLORS.soft,
-    letterSpacing: '0.15em',
+    letterSpacing: '0',
     margin: 0,
-    textTransform: 'uppercase' as const,
+    fontWeight: 400 as const,
   },
 }
 
