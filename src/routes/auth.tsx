@@ -110,7 +110,7 @@ function AuthPage() {
     // Strip the params from the URL so a refresh doesn't re-fire the toast.
     navigate({
       to: "/auth",
-      search: (prev) => ({ ...prev, emailChanged: undefined, newEmail: undefined }),
+      search: (prev: AuthSearch) => ({ ...prev, emailChanged: undefined, newEmail: undefined }),
       replace: true,
     });
   }, []);
