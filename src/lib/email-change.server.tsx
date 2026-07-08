@@ -74,6 +74,20 @@ export async function createEmailChangeRequest(input: {
 
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
 
+  // Per-user rate limit: at most 3 email-change requests per rolling hour.
+  const RATE_LIMIT = 3
+  const since = new Date(Date.now() - 60 * 60_000).toISOString()
+  const { count: recentCount } = await (supabaseAdmin as any)
+    .from('email_change_audit')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', input.userId)
+    .eq('event', 'requested')
+    .gte('created_at', since)
+  if (typeof recentCount === 'number' && recentCount >= RATE_LIMIT) {
+    return fail('Too many email change requests. Please try again in an hour.')
+  }
+
+
   // Check that new email isn't already in use
   for (let page = 1; page <= 10; page += 1) {
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 })
