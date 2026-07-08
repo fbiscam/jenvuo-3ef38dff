@@ -74,6 +74,9 @@ function AuthPage() {
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const [otpStep, setOtpStep] = React.useState(false);
+  const [otpCode, setOtpCode] = React.useState("");
+  const [resending, setResending] = React.useState(false);
 
   React.useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
@@ -141,11 +144,48 @@ function AuthPage() {
       toast.success("Account created");
       navigate({ to: redirectTo as "/dashboard", replace: true });
     } else {
-      toast.success("Check your email to confirm your account");
-      setMode("signin");
-      setPassword("");
+      toast.success("Verification code sent to your email");
+      setOtpStep(true);
+      setOtpCode("");
     }
   };
+
+  const verifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    if (!/^\d{6}$/.test(otpCode)) {
+      setErrorMsg("Enter the 6-digit code from your email");
+      return;
+    }
+    setLoading(true);
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token: otpCode,
+      type: "signup",
+    });
+    setLoading(false);
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+    if (data.session) {
+      toast.success("Email verified");
+      navigate({ to: redirectTo as "/dashboard", replace: true });
+    }
+  };
+
+  const resendCode = async () => {
+    setErrorMsg(null);
+    setResending(true);
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    setResending(false);
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+    toast.success("New code sent");
+  };
+
 
 
   return (
@@ -233,50 +273,144 @@ function AuthPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => { setMode("signup"); setErrorMsg(null); }}
-                      className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-400 hover:text-zinc-600"}`}
-                      title="Invite only"
+                      onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
+                      className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
                     >
                       Sign up
                     </button>
                   </div>
 
                   {mode === "signup" ? (
-                    <div className="mt-4 space-y-4">
-                      <div className={`rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-900 ${MONO}`}>
-                        <div className="flex items-start gap-2">
-                          <Lock className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
-                          <div className="space-y-1.5">
-                            <p className="font-semibold uppercase tracking-widest text-[11px] text-amber-800">
-                              Invite Only
-                            </p>
-                            <p className="leading-relaxed text-[13px] text-amber-900 font-sans">
-                              Jenvu is currently invite-only. Public sign-up is closed.
-                              To request access, contact the administrator.
-                            </p>
-                          </div>
+                    otpStep ? (
+                      <form onSubmit={verifyOtp} className="mt-4 space-y-3">
+                        <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
+                          <p className="leading-relaxed">
+                            We sent a 6-digit code to <span className="font-semibold text-zinc-900">{email}</span>. Enter it below to activate your desk.
+                          </p>
                         </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => { setMode("signin"); setErrorMsg(null); }}
-                        className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2"
-                      >
-                        Back to Sign in <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} />
-                      </button>
-                      <div className="pt-3 border-t border-zinc-100">
-                        <p className="text-sm text-zinc-500 leading-relaxed">
-                          Already have an account?{" "}
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            Verification Code
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="one-time-code"
+                            maxLength={6}
+                            required
+                            value={otpCode}
+                            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                            className={`w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300 ${MONO}`}
+                            placeholder="••••••"
+                          />
+                        </div>
+
+                        {errorMsg && (
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                            <span className="leading-snug">{errorMsg}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                        >
+                          {loading ? "Verifying..." : (<>Verify & Continue <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                        </button>
+
+                        <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
                           <button
                             type="button"
-                            onClick={() => { setMode("signin"); setErrorMsg(null); }}
-                            className="font-medium text-zinc-900 underline-offset-2 hover:underline"
+                            onClick={() => { setOtpStep(false); setErrorMsg(null); }}
+                            className="hover:text-zinc-900 transition"
                           >
-                            Sign in
-                          </button>.
+                            ← Change email
+                          </button>
+                          <button
+                            type="button"
+                            onClick={resendCode}
+                            disabled={resending}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50"
+                          >
+                            {resending ? "Sending..." : "Resend code"}
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <form onSubmit={signUp} className="mt-4 space-y-3">
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            Full Name
+                          </label>
+                          <div className="relative">
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                              type="text"
+                              required
+                              value={fullName}
+                              onChange={(e) => setFullName(e.target.value)}
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              placeholder="Your name..."
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            Email
+                          </label>
+                          <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                              type="email"
+                              required
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              placeholder="Institutional email..."
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            Access Key
+                          </label>
+                          <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                              type="password"
+                              required
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              placeholder="Min 8 characters..."
+                            />
+                          </div>
+                        </div>
+
+                        {errorMsg && (
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                            <span className="leading-snug">{errorMsg}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                        >
+                          {loading ? "Creating..." : (<>Create Desk <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                        </button>
+
+                        <p className="pt-2 text-xs text-zinc-500 leading-relaxed">
+                          By continuing you agree to receive a verification code at your email.
                         </p>
-                      </div>
-                    </div>
+                      </form>
+                    )
                   ) : (
                     <>
                       <form onSubmit={signIn} className="mt-4 space-y-3">
@@ -333,8 +467,15 @@ function AuthPage() {
                       </form>
 
                       <div className="mt-4 pt-3 border-t border-zinc-100">
-                        <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed whitespace-nowrap">
-                          Jenvu is invite-only. Contact the administrator for access.
+                        <p className="text-sm text-zinc-500 leading-relaxed">
+                          New here?{" "}
+                          <button
+                            type="button"
+                            onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline"
+                          >
+                            Create an account
+                          </button>.
                         </p>
                       </div>
                     </>
