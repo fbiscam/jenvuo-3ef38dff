@@ -85,7 +85,8 @@ const LowCreditEmail = ({
 
 const mono = { color: COLORS.ink, fontFamily: MONO, fontSize: '13px' }
 const meterBox = {
-  backgroundColor: '#09090b',
+  backgroundColor: '#ffffff',
+  border: `1px solid ${COLORS.border}`,
   borderRadius: '12px',
   padding: '22px 20px',
   margin: '4px 0 22px',
@@ -95,7 +96,7 @@ const meterLabel = {
   fontFamily: MONO,
   fontSize: '10px',
   letterSpacing: '0.28em',
-  color: COLORS.soft,
+  color: COLORS.ink,
   textTransform: 'uppercase' as const,
   margin: '0 0 8px',
 }
@@ -103,7 +104,7 @@ const meterValue = {
   fontFamily: MONO,
   fontSize: '38px',
   fontWeight: 700 as const,
-  color: '#ffffff',
+  color: COLORS.ink,
   letterSpacing: '0.06em',
   margin: '0 0 6px',
 }
@@ -111,7 +112,7 @@ const meterHint = {
   fontFamily: MONO,
   fontSize: '10px',
   letterSpacing: '0.15em',
-  color: COLORS.muted,
+  color: COLORS.ink,
   textTransform: 'uppercase' as const,
   margin: 0,
 }
