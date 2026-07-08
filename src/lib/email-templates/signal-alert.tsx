@@ -205,9 +205,10 @@ const outer: React.CSSProperties = {
   backgroundColor: '#ffffff',
 }
 const headerBar: React.CSSProperties = {
-  backgroundColor: '#09090b',
+  backgroundColor: '#ffffff',
   padding: '14px 24px',
-  color: '#ffffff',
+  color: '#09090b',
+  borderBottom: '1px solid #e4e4e7',
 }
 const brandWordmark: React.CSSProperties = {
   display: 'inline-block',
@@ -216,26 +217,27 @@ const brandWordmark: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.02em',
   fontSize: 14,
-  color: '#ffffff',
+  color: '#09090b',
 }
 const headerMeta: React.CSSProperties = {
   fontFamily: "'JetBrains Mono', ui-monospace, monospace",
   fontSize: 10,
   letterSpacing: '0.22em',
-  color: '#a1a1aa',
+  color: '#71717a',
 }
 const liveBar: React.CSSProperties = {
-  backgroundColor: '#dc2626',
-  padding: '8px 24px',
-  color: '#ffffff',
+  backgroundColor: '#ffffff',
+  padding: '10px 24px',
+  color: '#09090b',
+  borderBottom: '1px solid #e4e4e7',
 }
-const liveDot: React.CSSProperties = { fontSize: 10, marginRight: 8, color: '#ffffff' }
+const liveDot: React.CSSProperties = { fontSize: 10, marginRight: 8, color: '#dc2626' }
 const liveText: React.CSSProperties = {
   fontFamily: "'JetBrains Mono', ui-monospace, monospace",
   fontSize: 11,
   letterSpacing: '0.2em',
   fontWeight: 700,
-  color: '#ffffff',
+  color: '#09090b',
 }
 const bodySection: React.CSSProperties = { padding: '24px 32px 8px' }
 const categoryLabel: React.CSSProperties = {
