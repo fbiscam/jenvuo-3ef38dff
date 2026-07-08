@@ -389,15 +389,47 @@ function AuthPage() {
       token: otpCode,
       type: "signup",
     });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       triggerOtpError(error.message);
       return;
     }
+
+    // Email is now confirmed and the account is fully persisted in the
+    // database. If Supabase returned a session, use it directly. Otherwise
+    // (rare — some Supabase auth configurations do not auto-sign after
+    // verify), sign the user in with the password they just used on the
+    // sign-up form so they land on the dashboard without a manual step.
     if (data.session) {
-      toast.success("Email verified");
+      setLoading(false);
+      toast.success("Email verified — welcome to Jenvu");
       navigate({ to: redirectTo as "/dashboard", replace: true });
+      return;
     }
+
+    if (password) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      setLoading(false);
+      if (signInError) {
+        toast.success("Email verified — please sign in");
+        setOtpStep(false);
+        setMode("signin");
+        setOtpCode("");
+        return;
+      }
+      toast.success("Email verified — welcome to Jenvu");
+      // onAuthStateChange will navigate.
+      return;
+    }
+
+    setLoading(false);
+    toast.success("Email verified — please sign in");
+    setOtpStep(false);
+    setMode("signin");
+    setOtpCode("");
   };
 
 
