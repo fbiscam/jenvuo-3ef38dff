@@ -122,7 +122,7 @@ export function TwoFactorSettings() {
       setCode("");
       return;
     }
-    toast.success("Two-factor authentication enabled");
+    
     setEnroll(null);
     setCode("");
     void refresh();
