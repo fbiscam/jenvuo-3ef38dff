@@ -515,3 +515,18 @@ function StatCard({
     </div>
   );
 }
+
+function SourceBadge({ source }: { source: "chat" | "form" }) {
+  if (source === "form") {
+    return (
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200">
+        <Mail className="h-2.5 w-2.5" /> Form
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-blue-700 ring-1 ring-blue-200">
+      <MessageSquare className="h-2.5 w-2.5" /> Live chat
+    </span>
+  );
+}
