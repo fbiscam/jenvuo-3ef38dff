@@ -36,9 +36,9 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
             <Text style={s.codeExpiry}>Expires shortly · One-time use</Text>
           </Section>
           <Text style={{ ...s.footer, marginTop: '10px' }}>
-            Didn't ask for this? Ignore this email — no action is taken without
-            the code.
+            Didn't request this? Ignore this email — no action is taken without the code.
           </Text>
+
           <Text style={s.legal}>JENVU · Voice-native terminal</Text>
         </Section>
       </Container>

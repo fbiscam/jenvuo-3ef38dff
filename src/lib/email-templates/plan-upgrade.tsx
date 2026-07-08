@@ -74,9 +74,9 @@ const PlanUpgradeEmail = ({
           </Link>
 
           <Text style={{ ...s.footer, marginTop: '24px' }}>
-            Questions about your plan or invoice? Reply to this email and
-            we'll help within one business day.
+            Questions about your plan or invoice? Reply to this email.
           </Text>
+
           <Text style={s.legal}>JENVU · Subscription updates</Text>
         </Section>
       </Container>
