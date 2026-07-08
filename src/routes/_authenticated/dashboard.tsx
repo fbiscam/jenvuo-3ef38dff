@@ -762,7 +762,7 @@ function DashboardLayout() {
                   <Icon className="h-3.5 w-3.5 shrink-0" />
                   {t.label}
                   {typeof count === "number" && count > 0 && (
-                    <span className="ml-0.5 rounded-full bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                    <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold leading-none text-white tabular-nums ring-2 ring-white">
                       {count}
                     </span>
                   )}
