@@ -55,6 +55,33 @@ const FRIENDLY: Record<ErrorKind, { title: string; body: string }> = {
   },
 };
 
+const STORAGE_PREFIX = "jenvu:email-change-done:";
+
+async function hashToken(token: string) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function readCompleted(hash: string): { newEmail: string; at: number } | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_PREFIX + hash) ?? localStorage.getItem(STORAGE_PREFIX + hash);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (typeof parsed?.newEmail !== "string") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeCompleted(hash: string, newEmail: string) {
+  const payload = JSON.stringify({ newEmail, at: Date.now() });
+  try { sessionStorage.setItem(STORAGE_PREFIX + hash, payload); } catch {}
+  try { localStorage.setItem(STORAGE_PREFIX + hash, payload); } catch {}
+}
+
 function ConfirmEmailChangePage() {
   const { token } = Route.useSearch();
   const navigate = useNavigate();
@@ -63,6 +90,7 @@ function ConfirmEmailChangePage() {
   const [message, setMessage] = useState("Verifying your email change…");
   const [errorKind, setErrorKind] = useState<ErrorKind>("generic");
   const [newEmail, setNewEmail] = useState<string | null>(null);
+  const [alreadyDone, setAlreadyDone] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const ran = useRef(false);
 
@@ -85,6 +113,20 @@ function ConfirmEmailChangePage() {
         setMessage("Missing confirmation token.");
         return;
       }
+
+      // Client-side guard: if we've already completed this token in this
+      // browser, skip the server call entirely and show the completed view.
+      const hash = await hashToken(token);
+      const cached = readCompleted(hash);
+      if (cached) {
+        setNewEmail(cached.newEmail);
+        setAlreadyDone(true);
+        setStatus("success");
+        setMessage("This email change has already been completed.");
+        try { await supabase.auth.signOut(); } catch {}
+        return;
+      }
+
       try {
         const res = await confirmEmailChange({ data: { token } });
         if (!res.ok) {
@@ -95,6 +137,7 @@ function ConfirmEmailChangePage() {
           return;
         }
         setNewEmail(res.newEmail);
+        writeCompleted(hash, res.newEmail);
         setStatus("success");
         setMessage("Your email has been updated. Signing you out…");
         // Teardown immediately on success so any protected queries stop.
@@ -111,14 +154,14 @@ function ConfirmEmailChangePage() {
   }, [token, queryClient]);
 
   useEffect(() => {
-    if (status !== "success") return;
+    if (status !== "success" || alreadyDone) return;
     if (countdown <= 0) {
       navigate({ to: "/auth", replace: true });
       return;
     }
     const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(t);
-  }, [status, countdown, navigate]);
+  }, [status, alreadyDone, countdown, navigate]);
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md items-center px-6">
@@ -128,7 +171,7 @@ function ConfirmEmailChangePage() {
         </p>
         <h1 className="mt-2 text-2xl font-semibold text-zinc-900">
           {status === "loading" && "Verifying…"}
-          {status === "success" && "Email updated"}
+          {status === "success" && (alreadyDone ? "Already completed" : "Email updated")}
           {status === "error" && FRIENDLY[errorKind].title}
         </h1>
 
@@ -143,11 +186,15 @@ function ConfirmEmailChangePage() {
           {status === "success" && (
             <>
               <p className="text-sm text-zinc-600">
-                Your account email is now <span className="font-medium text-zinc-900">{newEmail}</span>.
+                {alreadyDone
+                  ? <>This confirmation link was already used. Your account email is <span className="font-medium text-zinc-900">{newEmail}</span>.</>
+                  : <>Your account email is now <span className="font-medium text-zinc-900">{newEmail}</span>.</>}
               </p>
-              <p className="text-sm text-zinc-600">
-                Redirecting to sign in in <span className="font-semibold">{countdown}</span>…
-              </p>
+              {!alreadyDone && (
+                <p className="text-sm text-zinc-600">
+                  Redirecting to sign in in <span className="font-semibold">{countdown}</span>…
+                </p>
+              )}
               <button
                 onClick={goToSignIn}
                 className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
