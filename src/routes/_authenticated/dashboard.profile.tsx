@@ -47,9 +47,20 @@ function Profile() {
   };
 
   const deleteAccount = async () => {
-    toast.info("Please email support@jenvu.com to delete your account.");
-    setConfirmDelete(false);
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      await deleteMyAccount();
+      await supabase.auth.signOut();
+      toast.success("Account deleted");
+      navigate({ to: "/auth" });
+    } catch (e: any) {
+      toast.error(e?.message || "Could not delete account");
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
   };
+
 
   return (
     <div className="max-w-2xl space-y-6">
