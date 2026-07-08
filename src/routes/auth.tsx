@@ -196,6 +196,89 @@ function AuthPage() {
     toast.success("New code sent");
   };
 
+  const forgotEmailSchema = z.object({
+    email: z.string().trim().email("Enter a valid email").max(255),
+  });
+
+  const sendResetLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    const parsed = forgotEmailSchema.safeParse({ email });
+    if (!parsed.success) {
+      setErrorMsg(parsed.error.issues[0]?.message ?? "Invalid input");
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+    setLoading(false);
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+    toast.success("Reset link and code sent to your email");
+    setForgotStep("code");
+    setOtpCode("");
+  };
+
+  const verifyRecoveryOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    if (!/^\d{6}$/.test(otpCode)) {
+      setErrorMsg("Enter the 6-digit code from your email");
+      return;
+    }
+    setLoading(true);
+    recoveryModeRef.current = true;
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: otpCode,
+      type: "recovery",
+    });
+    setLoading(false);
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+    setForgotStep("reset");
+  };
+
+  const resendResetCode = async () => {
+    setErrorMsg(null);
+    setResending(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+    setResending(false);
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+    toast.success("New code sent");
+  };
+
+  const updatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    if (newPassword.length < 8 || newPassword.length > 72) {
+      setErrorMsg("Password must be 8-72 characters");
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setLoading(false);
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+    toast.success("Password updated");
+    recoveryModeRef.current = false;
+    setNewPassword("");
+    navigate({ to: redirectTo as "/dashboard", replace: true });
+  };
+
+
 
 
   return (
