@@ -301,9 +301,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
     </div>
   );
 }
-    </div>
-  );
-}
+
 
 function StatCard({ icon: Icon, label, value, accent }: { icon: typeof Users; label: string; value: number; accent?: "emerald" }) {
   return (
