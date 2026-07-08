@@ -38,7 +38,7 @@ export const Route = createFileRoute("/contact")({
           mainEntity: {
             "@type": "Organization",
             name: "Jenvu AI",
-            email: "support@jenvu.com",
+            email: "support@jenvu.net",
             url: "https://jenvu.com",
           },
         }),
@@ -166,7 +166,7 @@ function ContactPage() {
                   </span>
                 </div>
                 <div className="mt-5 space-y-5">
-                  <InfoRow label="Email" value="support@jenvu.com" href="mailto:support@jenvu.com" />
+                  <InfoRow label="Email" value="support@jenvu.net" href="mailto:support@jenvu.net" />
                   <InfoRow label="Response time" value="Within 1 business day" />
                   <InfoRow label="Hours" value="Mon – Fri · 09:00 – 18:00 GMT" />
                   <InfoRow label="Security" value="End-to-end TLS. No data sold." />
