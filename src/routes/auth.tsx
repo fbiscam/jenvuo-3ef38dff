@@ -13,6 +13,9 @@ import {
   requestSignupOtp,
 } from "@/lib/custom-auth.functions";
 import { applyReferralCode } from "@/lib/referrals.functions";
+import { registerTrustedDevice, verifyTrustedDevice } from "@/lib/trusted-devices.functions";
+
+const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 
 
 type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string };
