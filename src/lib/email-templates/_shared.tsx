@@ -9,7 +9,7 @@ export const LOGO_URL = `${SITE_URL}/favicon.png`
  * Inter for everything (headings, body, labels, code digits).
  */
 export const INTER =
-  "Verdana, Geneva, 'DejaVu Sans', Tahoma, sans-serif"
+  "'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 // Legacy aliases so existing templates keep compiling without edits.
 export const URBANIST = INTER
@@ -27,8 +27,24 @@ export const COLORS = {
   accent: '#111827',
 }
 
-/** Verdana is a system font — no web font loading required. */
-export const EmailFonts = () => <></>
+/** Load Urbanist from Google Fonts inside <Head>. Falls back to system sans-serif in clients that block web fonts. */
+export const EmailFonts = () => (
+  <>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossOrigin=""
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </>
+)
 
 
 /** Simple, clean header — favicon + Jenvu wordmark on a hairline-divided band. */
