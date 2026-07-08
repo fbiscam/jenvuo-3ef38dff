@@ -118,15 +118,25 @@ function AuthPage() {
   // Terminal-header flash: shows a blinking notification inside the auth-session
   // strip for a few seconds, then reverts to the default label.
   const [flashMsg, setFlashMsg] = React.useState<string | null>(null);
+  const [flashTarget, setFlashTarget] = React.useState<"email" | "password">("email");
   const flashTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const flashInfo = React.useCallback((msg: string) => {
+  const flashInfo = React.useCallback((msg: string, target: "email" | "password" = "email") => {
     if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    setFlashTarget(target);
     setFlashMsg(msg);
-    flashTimerRef.current = setTimeout(() => setFlashMsg(null), 3200);
+    flashTimerRef.current = setTimeout(() => setFlashMsg(null), 3000);
   }, []);
   React.useEffect(() => () => {
     if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
   }, []);
+
+  const flashInline = (target: "email" | "password") =>
+    flashMsg && flashTarget === target ? (
+      <div key={flashMsg} className={`mt-2 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-[12px] text-emerald-700 ${MONO} animate-terminal-blink`}>
+        <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+        <span className="leading-snug">{flashMsg}</span>
+      </div>
+    ) : null;
 
   React.useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -525,7 +535,7 @@ function AuthPage() {
       setErrorMsg(error.message);
       return;
     }
-    toast.success("Password updated"); flashInfo("Password updated");
+    toast.success("Password updated"); flashInfo("Password updated", "password");
     recoveryModeRef.current = false;
     setNewPassword("");
     navigate({ to: redirectTo as "/dashboard", replace: true });
@@ -797,6 +807,7 @@ function AuthPage() {
                               placeholder="Institutional email..."
                             />
                           </div>
+                          {flashInline("email")}
                         </div>
 
                         <div>
@@ -817,7 +828,10 @@ function AuthPage() {
                               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                           </div>
+                          {flashInline("password")}
                         </div>
+
+
 
 
                         {errorMsg && (
@@ -863,6 +877,7 @@ function AuthPage() {
                               placeholder="Institutional email..."
                             />
                           </div>
+                          {flashInline("email")}
                         </div>
 
                         {errorMsg && (
@@ -986,6 +1001,7 @@ function AuthPage() {
                               {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                           </div>
+                          {flashInline("password")}
                         </div>
 
 
@@ -1023,6 +1039,7 @@ function AuthPage() {
                               placeholder="Institutional email..."
                             />
                           </div>
+                          {flashInline("email")}
                         </div>
 
                         <div>
@@ -1043,7 +1060,7 @@ function AuthPage() {
                               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                           </div>
-
+                          {flashInline("password")}
                         </div>
 
                         <div className="flex justify-end -mt-1">
