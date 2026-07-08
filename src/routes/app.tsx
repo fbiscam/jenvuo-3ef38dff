@@ -188,7 +188,11 @@ function Home() {
     return () => { sub.subscription.unsubscribe(); };
   }, [authLoading, authUser, navigate]);
 
-  const signOut = () => {
+  const signOut = async () => {
+    // Revoke this browser's trusted-device row FIRST — the auth session is
+    // still valid, so the server fn will authorize. After signOut the bearer
+    // is gone and the call would 401.
+    await revokeCurrentTrustedDevice();
     // Clear the browser session synchronously so refresh/navigation cannot
     // restore the user before Supabase finishes its async sign-out work.
     clearStoredAuthSession();
