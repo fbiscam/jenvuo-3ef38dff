@@ -323,7 +323,25 @@ function Journal() {
                 return (
                   <tr key={t.id} className="hover:bg-zinc-50/50 text-center">
                     <td className="px-3 py-2.5 text-xs text-zinc-500 text-center">{new Date(t.opened_at).toLocaleDateString()}</td>
-                    <td className="px-3 py-2.5 font-mono text-xs text-center">{t.pair}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs text-center">
+                      <div>{t.pair}</div>
+                      {(tradeTags[t.id]?.length ?? 0) > 0 && (
+                        <div className="mt-0.5 flex flex-wrap justify-center gap-0.5">
+                          {tradeTags[t.id].map((sid) => {
+                            const s = setups.find((x) => x.id === sid);
+                            if (!s) return null;
+                            return (
+                              <span
+                                key={sid}
+                                title={s.name}
+                                className="inline-block h-1.5 w-1.5 rounded-full"
+                                style={{ backgroundColor: s.color }}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
+                    </td>
                     <td className="px-3 py-2.5 text-center">
                       <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${t.direction === "long" ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
                         {t.direction}
