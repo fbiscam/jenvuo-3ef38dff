@@ -115,7 +115,7 @@ function ConfirmEmailChangePage() {
         <h1 className="mt-2 text-2xl font-semibold text-zinc-900">
           {status === "loading" && "Verifying…"}
           {status === "success" && "Email updated"}
-          {status === "error" && "Confirmation failed"}
+          {status === "error" && FRIENDLY[errorKind].title}
         </h1>
 
         <div className="mt-6 space-y-4">
@@ -145,13 +145,25 @@ function ConfirmEmailChangePage() {
 
           {status === "error" && (
             <>
-              <p className="text-sm text-rose-600">{message}</p>
-              <button
-                onClick={() => navigate({ to: "/auth" })}
-                className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50"
-              >
-                Back to sign in
-              </button>
+              <p className="text-sm text-zinc-700">{FRIENDLY[errorKind].body}</p>
+              <details className="text-xs text-zinc-500">
+                <summary className="cursor-pointer">Technical details</summary>
+                <p className="mt-1 break-words">{message}</p>
+              </details>
+              <div className="flex flex-wrap gap-2 pt-2">
+                <button
+                  onClick={() => navigate({ to: "/dashboard/profile", hash: "change-email" })}
+                  className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                >
+                  Restart email change
+                </button>
+                <button
+                  onClick={() => navigate({ to: "/auth" })}
+                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50"
+                >
+                  Back to sign in
+                </button>
+              </div>
             </>
           )}
         </div>
