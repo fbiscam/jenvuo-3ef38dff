@@ -127,14 +127,20 @@ function AuthPage() {
     }
   }, [mode, otpStep, forgotStep]);
 
-  // Auto-submit OTP on complete 6-digit entry
+  // Auto-submit OTP — only when a full 6 digits are present, no error is showing,
+  // no verify is already in flight, and the code matches the CURRENT OTP step.
   React.useEffect(() => {
-    if (otpCode.length !== 6 || loading) return;
+    // Hard length guard — never fire on partial input / partial paste
+    if (otpCode.length !== 6) return;
+    if (!/^\d{6}$/.test(otpCode)) return;
+    if (loading) return;
+    if (otpError) return; // don't retry while an error is being shown
     if (lastSubmittedOtpRef.current === otpCode) return;
 
     const isSignupOtp = mode === "signup" && otpStep;
     const isRecoveryOtp = mode === "forgot" && forgotStep === "code";
-    if (!isSignupOtp && !isRecoveryOtp) return;
+    // Exactly one flow must be active for auto-submit
+    if (isSignupOtp === isRecoveryOtp) return;
 
     lastSubmittedOtpRef.current = otpCode;
     const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
@@ -143,7 +149,7 @@ function AuthPage() {
     } else {
       void verifyRecoveryOtp(fakeEvent);
     }
-  }, [otpCode, loading, mode, otpStep, forgotStep]);
+  }, [otpCode, loading, mode, otpStep, forgotStep, otpError]);
 
   const signInSchema = z.object({
     email: z.string().trim().email("Enter a valid email").max(255),
