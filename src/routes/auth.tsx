@@ -228,7 +228,8 @@ function AuthPage() {
       setErrorMsg(msg);
       return;
     }
-    navigate({ to: redirectTo as "/dashboard", replace: true });
+    // Do NOT navigate here — the onAuthStateChange listener above will
+    // check MFA level and either open the MFA challenge or navigate.
   };
 
   const signUp = async (e: React.FormEvent) => {
