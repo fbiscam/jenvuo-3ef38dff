@@ -133,6 +133,12 @@ async function findUserByEmail(email: string): Promise<User | null> {
 export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string }) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const email = normalizeEmail(input.email)
+
+  const existingUser = await findUserByEmail(email)
+  if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
+    throw new Error('An account with this email already exists. Please sign in instead.')
+  }
+
   const code = generateSixDigitCode()
   const codeHash = await hmacCode(email, 'signup', code)
 
