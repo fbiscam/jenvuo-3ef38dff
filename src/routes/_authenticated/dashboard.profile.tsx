@@ -2,8 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { TwoFactorSettings } from "@/components/TwoFactorSettings";
-import { TrustedDevicesSettings } from "@/components/TrustedDevicesSettings";
 import { deleteMyAccount } from "@/lib/delete-account.functions";
 import { requestEmailChange } from "@/lib/email-change.functions";
 
