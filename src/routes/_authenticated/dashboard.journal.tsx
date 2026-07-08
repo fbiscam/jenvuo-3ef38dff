@@ -424,7 +424,11 @@ function Journal() {
       {showLog && (
         <LogTradeModal
           onClose={() => setShowLog(false)}
-          onSaved={(t) => { setTrades((prev) => [t, ...prev]); setShowLog(false); }}
+          onSaved={(t, tagIds) => {
+            setTrades((prev) => [t, ...prev]);
+            if (tagIds.length) setTradeTags((m) => ({ ...m, [t.id]: tagIds }));
+            setShowLog(false);
+          }}
         />
       )}
 
