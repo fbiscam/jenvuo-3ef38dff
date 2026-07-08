@@ -494,6 +494,7 @@ function AuthPage() {
                           </label>
                           <input
                             ref={otpInputRef}
+                            onPaste={handleOtpPaste}
                             type="text"
                             inputMode="numeric"
                             autoComplete="one-time-code"
