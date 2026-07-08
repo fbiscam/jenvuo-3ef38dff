@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Toaster as SonnerToaster } from "sonner";
 
 import appCss from "../styles.css?url";
@@ -162,6 +162,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     // Native (Capacitor) bootstrap: status bar + hide splash. No-op on web.
@@ -170,11 +171,24 @@ function RootComponent() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <SonnerToaster theme="light" position="top-right" offset={96} toastOptions={{ style: { background: "#ffffff", color: "#000000", border: "1px solid #e4e4e7", whiteSpace: "nowrap", width: "max-content", maxWidth: "min(92vw, 640px)" } }} />
+      <SonnerToaster
+        theme="light"
+        position={isMobile ? "bottom-center" : "top-right"}
+        offset={isMobile ? 24 : 96}
+        toastOptions={{ style: { background: "#ffffff", color: "#000000", border: "1px solid #e4e4e7", whiteSpace: "nowrap", width: "max-content", maxWidth: "min(92vw, 640px)" } }}
+      />
     </QueryClientProvider>
   );
 }
