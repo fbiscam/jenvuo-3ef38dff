@@ -128,7 +128,7 @@ function ResetPasswordPage() {
               <div className="mt-1 flex items-center gap-2 rounded-lg border border-zinc-200 px-3 py-2">
                 <Lock className="h-4 w-4 text-zinc-400" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -136,7 +136,11 @@ function ResetPasswordPage() {
                   placeholder="At least 8 characters"
                   required
                 />
+                <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="text-zinc-400 hover:text-zinc-700">
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
+
             </label>
             <label className="block text-xs font-medium text-zinc-600">
               Confirm new password
