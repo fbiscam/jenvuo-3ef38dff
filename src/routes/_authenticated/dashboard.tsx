@@ -571,6 +571,7 @@ function DashboardLayout() {
               <span className="text-zinc-300">·</span>
               <Link
                 to="/dashboard/billing"
+                data-tour="plan-pill"
                 className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold tracking-wide ${planTierStyle.pill} hover:opacity-90`}
                 title="Manage your plan"
               >
@@ -582,6 +583,7 @@ function DashboardLayout() {
           <div className="flex items-center gap-1.5 lg:self-end lg:mb-6">
             <Link
               to="/app"
+              data-tour="launch-ai"
               className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium text-zinc-900 shadow-sm hover:bg-zinc-50"
             >
               <Plus className="h-4 w-4" /> Launch AI
