@@ -93,7 +93,7 @@ function UnsubscribePage() {
             <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
             <span className="font-semibold tracking-tight">JENVU AI</span>
           </Link>
-          <span className={`${MONO} text-[10px] uppercase tracking-[0.28em] text-zinc-500`}>
+          <span className={`hidden sm:inline ${MONO} text-[10px] uppercase tracking-[0.28em] text-zinc-500`}>
             BRIEFINGS · SUBSCRIPTION
           </span>
         </div>
