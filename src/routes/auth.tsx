@@ -581,16 +581,27 @@ function AuthPage() {
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex gap-1.5 shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                  <div className={`w-2.5 h-2.5 rounded-full ${flashMsg ? "bg-emerald-500 animate-pulse" : "bg-zinc-200"}`} />
+                  <div className={`w-2.5 h-2.5 rounded-full ${flashMsg ? "bg-emerald-500 animate-pulse" : "bg-zinc-200"}`} />
+                  <div className={`w-2.5 h-2.5 rounded-full ${flashMsg ? "bg-emerald-500 animate-pulse" : "bg-zinc-200"}`} />
                 </div>
-                <span className={`hidden sm:inline ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
-                  Jenvu // AUTH_SESSION
-                </span>
+                {flashMsg ? (
+                  <span
+                    key={flashMsg}
+                    className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest uppercase text-emerald-700 truncate animate-terminal-blink`}
+                  >
+                    ▸ {flashMsg}
+                  </span>
+                ) : (
+                  <span className={`hidden sm:inline ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
+                    Jenvu // AUTH_SESSION
+                  </span>
+                )}
               </div>
               <div className="flex shrink-0 items-center gap-4">
-                <span className={`text-[11px] ${MONO} text-zinc-400`}>ENCRYPTION · AES-256</span>
+                <span className={`text-[11px] ${MONO} ${flashMsg ? "text-emerald-600 animate-terminal-blink" : "text-zinc-400"}`}>
+                  {flashMsg ? "TRANSMITTING…" : "ENCRYPTION · AES-256"}
+                </span>
               </div>
             </div>
 
