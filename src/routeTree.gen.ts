@@ -45,6 +45,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
 import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
+import { Route as AuthenticatedDashboardJournalStatsRouteImport } from './routes/_authenticated/dashboard.journal-stats'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
@@ -241,6 +242,12 @@ const AuthenticatedDashboardProfileRoute =
     path: '/profile',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardJournalStatsRoute =
+  AuthenticatedDashboardJournalStatsRouteImport.update({
+    id: '/journal-stats',
+    path: '/journal-stats',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardJournalRoute =
   AuthenticatedDashboardJournalRouteImport.update({
     id: '/journal',
@@ -357,6 +364,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/dashboard/journal-stats': typeof AuthenticatedDashboardJournalStatsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -406,6 +414,7 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/dashboard/journal-stats': typeof AuthenticatedDashboardJournalStatsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -459,6 +468,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/_authenticated/dashboard/journal-stats': typeof AuthenticatedDashboardJournalStatsRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -512,6 +522,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/billing'
     | '/dashboard/journal'
+    | '/dashboard/journal-stats'
     | '/dashboard/profile'
     | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
@@ -561,6 +572,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/billing'
     | '/dashboard/journal'
+    | '/dashboard/journal-stats'
     | '/dashboard/profile'
     | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
@@ -613,6 +625,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/journal'
+    | '/_authenticated/dashboard/journal-stats'
     | '/_authenticated/dashboard/profile'
     | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
@@ -929,6 +942,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardProfileRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/journal-stats': {
+      id: '/_authenticated/dashboard/journal-stats'
+      path: '/journal-stats'
+      fullPath: '/dashboard/journal-stats'
+      preLoaderRoute: typeof AuthenticatedDashboardJournalStatsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/journal': {
       id: '/_authenticated/dashboard/journal'
       path: '/journal'
@@ -1035,6 +1055,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
+  AuthenticatedDashboardJournalStatsRoute: typeof AuthenticatedDashboardJournalStatsRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
@@ -1045,6 +1066,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
+    AuthenticatedDashboardJournalStatsRoute:
+      AuthenticatedDashboardJournalStatsRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }
@@ -1125,13 +1148,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

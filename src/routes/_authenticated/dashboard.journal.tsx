@@ -1,13 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, BookOpen, Plus, X } from "lucide-react";
+import { Trash2, BookOpen, Plus, X, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import PageLoading from "@/components/PageLoading";
+import SetupPicker from "@/components/SetupPicker";
+import {
+  listSetups,
+  setTradeSetups,
+  getTradeSetupLinks,
+  type SetupRow,
+} from "@/lib/journal-stats.functions";
 
 
 
@@ -41,6 +49,11 @@ function Journal() {
   const { user: authUser, loading: authLoading } = useAuthUser();
 
 
+  const [setups, setSetups] = useState<SetupRow[]>([]);
+  const [tradeTags, setTradeTags] = useState<Record<string, string[]>>({});
+  const fetchSetups = useServerFn(listSetups);
+  const fetchLinks = useServerFn(getTradeSetupLinks);
+
   const load = async (userId: string) => {
     setTradesLoading(true);
     const { data, error } = await supabase.from("trade_journal").select("*").eq("user_id", userId).order("opened_at", { ascending: false });
@@ -49,12 +62,25 @@ function Journal() {
       setTradesLoading(false);
       return;
     }
-    setTrades((data as unknown as Trade[]) ?? []);
+    const rows = (data as unknown as Trade[]) ?? [];
+    setTrades(rows);
     setTradesLoading(false);
+    // load setups + links in parallel
+    try {
+      const [s, links] = await Promise.all([
+        fetchSetups(),
+        rows.length ? fetchLinks({ data: { tradeIds: rows.map((r) => r.id) } }) : Promise.resolve({} as Record<string, string[]>),
+      ]);
+      setSetups(s);
+      setTradeTags(links);
+    } catch {
+      /* non-fatal */
+    }
   };
   useEffect(() => {
     if (authLoading || !authUser) return;
     load(authUser.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, authUser?.id]);
 
 
@@ -212,12 +238,20 @@ function Journal() {
           <h2 className="text-lg font-semibold tracking-tight">Trades</h2>
           <p className="text-xs text-zinc-500">System = executed via Jenvu signal. Outside = manually logged.</p>
         </div>
-        <button
-          onClick={() => setShowLog(true)}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 transition"
-        >
-          <Plus className="h-3.5 w-3.5" /> Log Trade
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/dashboard/journal-stats"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50 transition"
+          >
+            <BarChart3 className="h-3.5 w-3.5" /> Stats
+          </Link>
+          <button
+            onClick={() => setShowLog(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 transition"
+          >
+            <Plus className="h-3.5 w-3.5" /> Log Trade
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -289,7 +323,25 @@ function Journal() {
                 return (
                   <tr key={t.id} className="hover:bg-zinc-50/50 text-center">
                     <td className="px-3 py-2.5 text-xs text-zinc-500 text-center">{new Date(t.opened_at).toLocaleDateString()}</td>
-                    <td className="px-3 py-2.5 font-mono text-xs text-center">{t.pair}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs text-center">
+                      <div>{t.pair}</div>
+                      {(tradeTags[t.id]?.length ?? 0) > 0 && (
+                        <div className="mt-0.5 flex flex-wrap justify-center gap-0.5">
+                          {tradeTags[t.id].map((sid) => {
+                            const s = setups.find((x) => x.id === sid);
+                            if (!s) return null;
+                            return (
+                              <span
+                                key={sid}
+                                title={s.name}
+                                className="inline-block h-1.5 w-1.5 rounded-full"
+                                style={{ backgroundColor: s.color }}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
+                    </td>
                     <td className="px-3 py-2.5 text-center">
                       <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${t.direction === "long" ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
                         {t.direction}
@@ -372,7 +424,11 @@ function Journal() {
       {showLog && (
         <LogTradeModal
           onClose={() => setShowLog(false)}
-          onSaved={(t) => { setTrades((prev) => [t, ...prev]); setShowLog(false); }}
+          onSaved={(t, tagIds) => {
+            setTrades((prev) => [t, ...prev]);
+            if (tagIds.length) setTradeTags((m) => ({ ...m, [t.id]: tagIds }));
+            setShowLog(false);
+          }}
         />
       )}
 
@@ -381,7 +437,7 @@ function Journal() {
   );
 }
 
-function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t: Trade) => void }) {
+function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t: Trade, tagIds: string[]) => void }) {
   const [pair, setPair] = useState("XAUUSD");
   const [direction, setDirection] = useState<"long" | "short">("long");
   const [entry, setEntry] = useState("");
@@ -390,7 +446,9 @@ function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t:
   const [outcome, setOutcome] = useState<Trade["outcome"]>("open");
   const [pnl, setPnl] = useState("");
   const [notes, setNotes] = useState("");
+  const [tagIds, setTagIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const applyTags = useServerFn(setTradeSetups);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -419,10 +477,16 @@ function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t:
     };
 
     const { data, error } = await supabase.from("trade_journal").insert(payload as never).select("*").single();
+    if (error) { setSaving(false); toast.error(error.message); return; }
+    const trade = data as unknown as Trade;
+    if (tagIds.length > 0) {
+      try {
+        await applyTags({ data: { tradeId: trade.id, setupIds: tagIds } });
+      } catch { /* non-fatal */ }
+    }
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
     toast.success("Trade logged");
-    onSaved(data as unknown as Trade);
+    onSaved(trade, tagIds);
   };
 
   return (
@@ -485,6 +549,11 @@ function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t:
               <input value={pnl} onChange={(e) => setPnl(e.target.value)} inputMode="decimal" placeholder="e.g. 12.50 or -8.00" className="w-full rounded-lg border border-zinc-200 px-3 py-2 font-mono text-sm outline-none focus:border-zinc-900" />
             </label>
           )}
+
+          <div className="col-span-2 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Setup tags</span>
+            <SetupPicker value={tagIds} onChange={setTagIds} />
+          </div>
 
           <label className="col-span-2 text-xs">
             <span className="mb-1 block font-medium text-zinc-700">Notes</span>

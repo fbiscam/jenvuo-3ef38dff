@@ -834,6 +834,75 @@ export type Database = {
         }
         Relationships: []
       }
+      trade_setup_links: {
+        Row: {
+          created_at: string
+          setup_id: string
+          trade_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          setup_id: string
+          trade_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          setup_id?: string
+          trade_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_setup_links_setup_id_fkey"
+            columns: ["setup_id"]
+            isOneToOne: false
+            referencedRelation: "trade_setups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_setup_links_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "trade_journal"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trade_setups: {
+        Row: {
+          category: string
+          color: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_subscriptions: {
         Row: {
           created_at: string
@@ -927,6 +996,7 @@ export type Database = {
         Returns: number
       }
       grant_monthly_credits: { Args: never; Returns: number }
+      journal_stats: { Args: { _from?: string; _to?: string }; Returns: Json }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -944,6 +1014,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      seed_default_setups: { Args: { _user_id: string }; Returns: undefined }
       set_user_plan: {
         Args: { _plan_id: string; _user_id: string }
         Returns: undefined
