@@ -36,12 +36,14 @@ export const Route = createFileRoute("/jenvu-ops-x9k2/inbox")({
 
 type Session = {
   id: string;
+  source: "chat" | "form";
   guest_name: string | null;
   guest_email: string | null;
   status: string;
   last_message_at: string;
   unread_admin: number;
   created_at: string;
+  subject?: string | null;
 };
 
 type Message = {
