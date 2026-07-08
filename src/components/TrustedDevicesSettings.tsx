@@ -133,14 +133,25 @@ export function TrustedDevicesSettings() {
           Browsers where you ticked <span className="font-medium text-zinc-700">Remember this device</span> during
           two-factor sign-in. Revoke any browser you don't recognize.
         </p>
-        {devices && devices.length > 0 && (
-          <button
-            onClick={revokeAll}
-            className="shrink-0 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
-          >
-            Revoke all
-          </button>
-        )}
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {hasCurrentTrust && (
+            <button
+              onClick={forgetThisDevice}
+              disabled={forgetting}
+              className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+            >
+              {forgetting ? "Forgetting…" : "Forget this device"}
+            </button>
+          )}
+          {devices && devices.length > 0 && (
+            <button
+              onClick={revokeAll}
+              className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+            >
+              Revoke all
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 space-y-2">
