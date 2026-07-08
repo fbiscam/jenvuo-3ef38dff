@@ -1,6 +1,63 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const MONO = "font-mono";
+
+function NewsletterSubscribe() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const target = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(target)) {
+      toast.error("Please enter a valid email.");
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase
+      .from("newsletter_subscribers")
+      .insert({ email: target });
+    setLoading(false);
+    if (error && !/duplicate|unique/i.test(error.message)) {
+      toast.error("Could not subscribe. Try again.");
+      return;
+    }
+    setDone(true);
+    setEmail("");
+    toast.success("Subscribed — thank you!");
+  };
+
+  return (
+    <div className="w-full max-w-md rounded-2xl bg-zinc-900 p-4 shadow-sm">
+      <div className="text-center text-[13px] font-semibold text-white">
+        Get gold desk insights in your inbox
+      </div>
+      <form onSubmit={onSubmit} className="mt-3 flex flex-col gap-2 sm:flex-row">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          maxLength={255}
+          className="flex-1 rounded-lg bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none"
+        />
+        <button
+          type="submit"
+          disabled={loading || done}
+          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-amber-400 disabled:opacity-60"
+        >
+          {done ? "Subscribed" : loading ? "…" : "Subscribe"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
 
 const columns = [
   {
@@ -166,16 +223,8 @@ export default function SiteFooter() {
           >
             © {year} JENVU AI · ALL RIGHTS RESERVED
           </div>
-          <div
-            className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-900 flex items-center gap-3`}
-          >
-            <a
-              href="mailto:support@jenvu.com"
-              className="hover:text-zinc-700 transition-colors"
-            >
-              support@jenvu.com
-            </a>
-          </div>
+          <NewsletterSubscribe />
+
 
         </div>
       </div>
