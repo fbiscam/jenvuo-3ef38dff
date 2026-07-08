@@ -155,6 +155,13 @@ function AuthPage() {
     password: z.string().min(8, "Password must be at least 8 characters").max(72),
   });
 
+  const btnLoading = (label: string) => (
+    <>
+      <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+      <span>{label}</span>
+    </>
+  );
+
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
