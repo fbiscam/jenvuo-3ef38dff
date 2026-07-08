@@ -39,9 +39,9 @@ export const MagicLinkEmail = ({
             Sign In →
           </Link>
           <Text style={{ ...s.footer, marginTop: '24px' }}>
-            Didn't request this? You can safely ignore this email — no session
-            is created without you tapping the link.
+            Didn't request this? Ignore this email — no session is created without your tap.
           </Text>
+
         </Section>
       </Container>
     </Body>
