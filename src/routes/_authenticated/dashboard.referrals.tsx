@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, Share2, Gift, Users, Check, Sparkles, ArrowRight } from "lucide-react";
+import { Copy, Share2, Gift, Users, Check, Sparkles, ArrowRight, Download } from "lucide-react";
 import { getReferralInfo, applyReferralCode, type ReferralInfo } from "@/lib/referrals.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/referrals")({
