@@ -628,7 +628,7 @@ function DashboardLayout() {
         </div>
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
-        <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <section data-tour="analytics" className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
           <Card>
             <CardHeader icon={ShieldCheck} title="Credits & Plan" />
             <div className="flex divide-x divide-zinc-200">
