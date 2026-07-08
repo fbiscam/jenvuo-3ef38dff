@@ -21,6 +21,38 @@ export const Route = createFileRoute("/confirm-email-change")({
 });
 
 type Status = "loading" | "success" | "error";
+type ErrorKind = "expired" | "used" | "invalid" | "missing" | "generic";
+
+function classifyError(msg: string): ErrorKind {
+  const m = msg.toLowerCase();
+  if (m.includes("expired")) return "expired";
+  if (m.includes("already been used") || m.includes("already used")) return "used";
+  if (m.includes("invalid") || m.includes("missing")) return "invalid";
+  return "generic";
+}
+
+const FRIENDLY: Record<ErrorKind, { title: string; body: string }> = {
+  expired: {
+    title: "This link has expired",
+    body: "Confirmation links are valid for 60 minutes. Head back to your dashboard and start the email change again to get a fresh link.",
+  },
+  used: {
+    title: "This link was already used",
+    body: "Looks like this confirmation link has already been clicked. If your email is still wrong, start a new email change from your dashboard.",
+  },
+  invalid: {
+    title: "This link isn't valid",
+    body: "The confirmation link is malformed or no longer recognised. Please start the email change again from your dashboard.",
+  },
+  missing: {
+    title: "Missing confirmation token",
+    body: "This page needs a confirmation token from the email we sent. Open the link from that email, or restart the email change from your dashboard.",
+  },
+  generic: {
+    title: "Confirmation failed",
+    body: "We couldn't confirm your email change. Please try starting it again from your dashboard.",
+  },
+};
 
 function ConfirmEmailChangePage() {
   const { token } = Route.useSearch();
