@@ -62,6 +62,7 @@ import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/ap
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
 import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/brief-audio.$id'
+import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './routes/_authenticated/dashboard.admin.messages'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -343,6 +344,12 @@ const ApiPublicBriefAudioIdRoute = ApiPublicBriefAudioIdRouteImport.update({
   path: '/api/public/brief-audio/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardAdminMessagesRoute =
+  AuthenticatedDashboardAdminMessagesRouteImport.update({
+    id: '/admin/messages',
+    path: '/admin/messages',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -387,6 +394,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
+  '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
@@ -439,6 +447,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
+  '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
@@ -495,6 +504,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
+  '/_authenticated/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
@@ -551,6 +561,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/dashboard/'
     | '/help/$collection/'
+    | '/dashboard/admin/messages'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
@@ -603,6 +614,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/dashboard'
     | '/help/$collection'
+    | '/dashboard/admin/messages'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
@@ -658,6 +670,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
+    | '/_authenticated/dashboard/admin/messages'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
@@ -1087,6 +1100,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBriefAudioIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/admin/messages': {
+      id: '/_authenticated/dashboard/admin/messages'
+      path: '/admin/messages'
+      fullPath: '/dashboard/admin/messages'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminMessagesRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
   }
 }
 
@@ -1100,6 +1120,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
   AuthenticatedDashboardSecurityRoute: typeof AuthenticatedDashboardSecurityRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardAdminMessagesRoute: typeof AuthenticatedDashboardAdminMessagesRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -1114,6 +1135,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardReferralsRoute: AuthenticatedDashboardReferralsRoute,
     AuthenticatedDashboardSecurityRoute: AuthenticatedDashboardSecurityRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+    AuthenticatedDashboardAdminMessagesRoute:
+      AuthenticatedDashboardAdminMessagesRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =
