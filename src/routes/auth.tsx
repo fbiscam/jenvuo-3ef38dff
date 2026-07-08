@@ -877,6 +877,7 @@ function AuthPage() {
                               placeholder="Institutional email..."
                             />
                           </div>
+                          {flashInline("email")}
                         </div>
 
                         {errorMsg && (
