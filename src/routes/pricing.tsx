@@ -203,6 +203,29 @@ function PricingPage() {
           <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
         </div>
 
+        {/* Billing interval toggle */}
+        <div className="mb-8 flex justify-center">
+          <div className="inline-flex items-center rounded-full border border-zinc-200 bg-white p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setBilling("monthly")}
+              className={`rounded-full px-4 py-1.5 font-medium transition ${billing === "monthly" ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"}`}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              onClick={() => setBilling("annual")}
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 font-medium transition ${billing === "annual" ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"}`}
+            >
+              Annual
+              <span className={`rounded-sm px-1 py-0.5 text-[9px] font-bold ${billing === "annual" ? "bg-emerald-400 text-zinc-900" : "bg-emerald-100 text-emerald-700"}`}>
+                −17%
+              </span>
+            </button>
+          </div>
+        </div>
+
         {/* Mobile stacked plan cards */}
         <div className="mb-10 grid gap-4 sm:hidden">
           {TIERS.map((t) => {
