@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
-import OnboardingTour, { resetOnboardingTour } from "@/components/OnboardingTour";
+import OnboardingTour from "@/components/OnboardingTour";
 import { useCredits } from "@/hooks/useCredits";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
