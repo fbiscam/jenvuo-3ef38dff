@@ -152,17 +152,17 @@ export function LiveChatWidget() {
       {open && (
         <div className="fixed bottom-24 right-5 z-[9999] flex h-[520px] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl sm:right-5">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-zinc-200 bg-zinc-900 px-4 py-3 text-white">
+          <div className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 text-black">
             <div>
               <div className="text-sm font-semibold">Jenvu Support</div>
-              <div className="text-[11px] text-zinc-400">
+              <div className="text-[11px] text-zinc-600">
                 {token ? (status === "closed" ? "Chat closed" : "Typically replies within a few minutes") : "Start a conversation"}
               </div>
             </div>
             <button
               onClick={() => setOpen(false)}
               aria-label="Close"
-              className="rounded p-1 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+              className="rounded p-1 text-zinc-700 hover:bg-zinc-100 hover:text-black"
             >
               <X className="h-4 w-4" />
             </button>
