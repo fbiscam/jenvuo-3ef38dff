@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -384,6 +384,8 @@ function DashboardLayout() {
   const [email, setEmail] = useState<string>("");
   const [fullName, setFullName] = useState<string>("");
   const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0, closedWins: 0, closedDecided: 0, openTrades: [] });
+  const [newCounts, setNewCounts] = useState<{ saved: number; alerts7d: number; journalTotal: number }>({ saved: 0, alerts7d: 0, journalTotal: 0 });
+
   const [range, setRange] = useState<RangeKey>("7d");
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
@@ -437,6 +439,48 @@ function DashboardLayout() {
     })();
     return () => { cancelled = true; };
   }, [range, refreshTick, authUser?.id, authLoading]);
+
+  // ---------- Unread badge counts (per tab, cleared when user opens tab) ----------
+  const lsKey = useCallback(
+    (tab: "saved" | "alerts" | "journal") => `dash:lastSeen:${authUser?.id ?? "anon"}:${tab}`,
+    [authUser?.id],
+  );
+  const getLastSeen = useCallback((tab: "saved" | "alerts" | "journal") => {
+    if (typeof window === "undefined") return new Date(0).toISOString();
+    return window.localStorage.getItem(lsKey(tab)) ?? new Date(0).toISOString();
+  }, [lsKey]);
+
+  useEffect(() => {
+    if (authLoading || !authUser) return;
+    let cancelled = false;
+    (async () => {
+      const savedSince = getLastSeen("saved");
+      const alertsSince = getLastSeen("alerts");
+      const journalSince = getLastSeen("journal");
+      const [s, a, j] = await Promise.all([
+        supabase.from("saved_signals").select("id", { count: "exact", head: true }).gt("created_at", savedSince),
+        supabase.from("signal_alerts").select("id", { count: "exact", head: true }).gt("created_at", alertsSince),
+        supabase.from("trade_journal").select("id", { count: "exact", head: true }).eq("user_id", authUser.id).gt("created_at", journalSince),
+      ]);
+      if (cancelled) return;
+      setNewCounts({ saved: s.count ?? 0, alerts7d: a.count ?? 0, journalTotal: j.count ?? 0 });
+    })();
+    return () => { cancelled = true; };
+  }, [authUser?.id, authLoading, refreshTick, getLastSeen]);
+
+  const markTabSeen = useCallback((countKey?: string) => {
+    if (!countKey || typeof window === "undefined") return;
+    const map: Record<string, "saved" | "alerts" | "journal"> = {
+      saved: "saved",
+      alerts7d: "alerts",
+      journalTotal: "journal",
+    };
+    const tab = map[countKey];
+    if (!tab) return;
+    window.localStorage.setItem(lsKey(tab), new Date().toISOString());
+    setNewCounts((prev) => ({ ...prev, [countKey]: 0 } as typeof prev));
+  }, [lsKey]);
+
 
   const openSymbols = useMemo(
     () => Array.from(new Set(counts.openTrades.map(t => t.pair.toUpperCase()))),
@@ -693,12 +737,13 @@ function DashboardLayout() {
             {TABS.map((t) => {
               const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
               const Icon = t.icon;
-              const count = t.countKey ? counts[t.countKey] : undefined;
+              const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
               return (
                 <Link
                   key={t.to}
                   to={t.to as "/dashboard"}
                   resetScroll={false}
+                  onClick={() => markTabSeen(t.countKey)}
                   className={`inline-flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 rounded-md px-2 sm:px-3 py-1.5 text-[12px] sm:text-[13px] whitespace-nowrap transition ${
                     active
                       ? "bg-white text-zinc-900 border border-zinc-200 shadow-sm"
@@ -710,13 +755,14 @@ function DashboardLayout() {
                   <Icon className="h-3.5 w-3.5 shrink-0" />
                   {t.label}
                   {typeof count === "number" && count > 0 && (
-                    <span className="ml-0.5 rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-zinc-900">
+                    <span className="ml-0.5 rounded-full bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
                       {count}
                     </span>
                   )}
                 </Link>
               );
             })}
+
           </nav>
           <div className="p-5">
             <Outlet />
