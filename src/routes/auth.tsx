@@ -654,6 +654,24 @@ function AuthPage() {
                     Voice-native institutional intelligence, on call.
                   </p>
 
+                  {emailChangedBanner && (
+                    <div
+                      role="status"
+                      className="mt-4 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
+                    >
+                      <Mail className="mt-0.5 h-4 w-4 shrink-0" />
+                      <div className="leading-snug">
+                        <div className="font-medium">Email change complete</div>
+                        <div className="text-emerald-800">
+                          Please sign in again with{" "}
+                          <span className="font-semibold">{emailChangedBanner}</span>.
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+
+
 
                   {/* Tabs — hidden during MFA challenge */}
                   {!mfaChallenge && (
