@@ -171,6 +171,31 @@ function AuthPage() {
     return () => clearInterval(t);
   }, [resendCooldown]);
 
+  // Capture ?ref=CODE and stash it for post-signup application.
+  React.useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      const ref = url.searchParams.get("ref");
+      if (ref && ref.trim()) {
+        window.sessionStorage.setItem("pending_ref_code", ref.trim().toUpperCase());
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const applyRefFn = useServerFn(applyReferralCode);
+  const applyPendingReferral = React.useCallback(async () => {
+    if (typeof window === "undefined") return;
+    const code = window.sessionStorage.getItem("pending_ref_code");
+    if (!code) return;
+    window.sessionStorage.removeItem("pending_ref_code");
+    try {
+      const res = await applyRefFn({ data: { code } });
+      if (res?.ok) {
+        toast.success("Referral applied — 50 credits unlock when you upgrade");
+      }
+    } catch { /* silent */ }
+  }, [applyRefFn]);
+
   React.useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
       if (evt === "PASSWORD_RECOVERY") {
