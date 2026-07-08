@@ -807,6 +807,7 @@ function AuthPage() {
                               placeholder="Institutional email..."
                             />
                           </div>
+                          {flashInline("email")}
                         </div>
 
                         <div>
@@ -827,7 +828,10 @@ function AuthPage() {
                               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                           </div>
+                          {flashInline("password")}
                         </div>
+
+
 
 
                         {errorMsg && (
