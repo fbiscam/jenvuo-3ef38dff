@@ -140,6 +140,8 @@ function AuthPage() {
   const [mfaCode, setMfaCode] = React.useState("");
   const [mfaError, setMfaError] = React.useState<string | null>(null);
   const [mfaShake, setMfaShake] = React.useState(false);
+  const [mfaResendCooldown, setMfaResendCooldown] = React.useState(0);
+  const [mfaResending, setMfaResending] = React.useState(false);
   const mfaInputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Terminal-header flash: shows a blinking notification inside the auth-session
@@ -170,6 +172,14 @@ function AuthPage() {
     const t = setInterval(() => setResendCooldown((s) => (s <= 1 ? 0 : s - 1)), 1000);
     return () => clearInterval(t);
   }, [resendCooldown]);
+
+  React.useEffect(() => {
+    if (mfaResendCooldown <= 0) return;
+    const t = setInterval(() => setMfaResendCooldown((s) => (s <= 1 ? 0 : s - 1)), 1000);
+    return () => clearInterval(t);
+  }, [mfaResendCooldown]);
+
+
 
   // Capture ?ref=CODE and stash it for post-signup application.
   React.useEffect(() => {
@@ -223,6 +233,7 @@ function AuthPage() {
               setMfaChallenge({ factorId: totp.id, challengeId: chal.id });
               setMfaCode("");
               setMfaError(null);
+              setMfaResendCooldown(30);
               return;
             }
           }
@@ -393,6 +404,28 @@ function AuthPage() {
     setMfaCode("");
     setMfaError(null);
     await supabase.auth.signOut();
+  };
+
+  const resendMfaChallenge = async () => {
+    if (!mfaChallenge || mfaResendCooldown > 0 || mfaResending) return;
+    setMfaResending(true);
+    setMfaError(null);
+    try {
+      const { data: chal, error } = await supabase.auth.mfa.challenge({ factorId: mfaChallenge.factorId });
+      if (error || !chal) {
+        const msg = error?.message || "Could not request a new code";
+        setMfaError(msg);
+        toast.error("Couldn't refresh code", { description: msg });
+        return;
+      }
+      setMfaChallenge({ factorId: mfaChallenge.factorId, challengeId: chal.id });
+      setMfaCode("");
+      setMfaResendCooldown(30);
+      toast.success("New challenge ready", { description: "Enter the current 6-digit code from your authenticator app." });
+      setTimeout(() => mfaInputRef.current?.focus(), 30);
+    } finally {
+      setMfaResending(false);
+    }
   };
 
   // Auto-focus + auto-submit for MFA input
@@ -771,7 +804,7 @@ function AuthPage() {
                         {loading ? btnLoading("Verifying...") : (<>Verify <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                       </button>
 
-                      <div className="pt-2">
+                      <div className="flex items-center justify-between pt-2 gap-3">
                         <button
                           type="button"
                           onClick={cancelMfa}
@@ -779,6 +812,19 @@ function AuthPage() {
                           className="text-xs text-zinc-500 hover:text-zinc-900 transition disabled:opacity-40"
                         >
                           ← Sign in with a different account
+                        </button>
+                        <button
+                          type="button"
+                          onClick={resendMfaChallenge}
+                          disabled={loading || mfaResending || mfaResendCooldown > 0}
+                          className={`text-xs text-zinc-500 hover:text-zinc-900 transition disabled:opacity-40 ${MONO}`}
+                          aria-live="polite"
+                        >
+                          {mfaResending
+                            ? "Requesting…"
+                            : mfaResendCooldown > 0
+                              ? `Resend in ${mfaResendCooldown}s`
+                              : "Resend code"}
                         </button>
                       </div>
                     </form>
