@@ -1,18 +1,23 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TwoFactorSettings } from "@/components/TwoFactorSettings";
+import { deleteMyAccount } from "@/lib/delete-account.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: Profile,
 });
 
+
 function Profile() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
 
   useEffect(() => {
     (async () => {
@@ -42,9 +47,20 @@ function Profile() {
   };
 
   const deleteAccount = async () => {
-    toast.info("Please email support@jenvu.com to delete your account.");
-    setConfirmDelete(false);
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      await deleteMyAccount();
+      await supabase.auth.signOut();
+      toast.success("Account deleted");
+      navigate({ to: "/auth" });
+    } catch (e: any) {
+      toast.error(e?.message || "Could not delete account");
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
   };
+
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -100,8 +116,9 @@ function Profile() {
           </button>
         ) : (
           <div className="mt-4 flex gap-2">
-            <button onClick={deleteAccount} className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700">Confirm delete</button>
-            <button onClick={() => setConfirmDelete(false)} className="rounded-lg px-4 py-2 text-sm">Cancel</button>
+            <button onClick={deleteAccount} disabled={deleting} className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50">{deleting ? "Deleting…" : "Confirm delete"}</button>
+            <button onClick={() => setConfirmDelete(false)} disabled={deleting} className="rounded-lg px-4 py-2 text-sm">Cancel</button>
+
           </div>
         )}
       </section>
