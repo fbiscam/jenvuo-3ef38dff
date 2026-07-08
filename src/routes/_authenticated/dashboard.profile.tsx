@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TwoFactorSettings } from "@/components/TwoFactorSettings";
+import { TrustedDevicesSettings } from "@/components/TrustedDevicesSettings";
 import { deleteMyAccount } from "@/lib/delete-account.functions";
 import { requestEmailChange } from "@/lib/email-change.functions";
 
@@ -170,6 +171,11 @@ function Profile() {
         <div className="mt-6 border-t border-zinc-100 pt-4">
           <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Two-Factor Authentication</p>
           <TwoFactorSettings />
+        </div>
+
+        <div className="mt-6 border-t border-zinc-100 pt-4">
+          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Trusted Devices</p>
+          <TrustedDevicesSettings />
         </div>
       </section>
 
