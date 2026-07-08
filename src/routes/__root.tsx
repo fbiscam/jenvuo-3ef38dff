@@ -162,7 +162,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const [isMobile, setIsMobile] = React.useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     // Native (Capacitor) bootstrap: status bar + hide splash. No-op on web.
