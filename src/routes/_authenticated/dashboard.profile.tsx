@@ -1,12 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TwoFactorSettings } from "@/components/TwoFactorSettings";
+import { deleteMyAccount } from "@/lib/delete-account.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: Profile,
 });
+
 
 function Profile() {
   const [email, setEmail] = useState("");
