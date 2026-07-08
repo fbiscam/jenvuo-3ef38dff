@@ -174,7 +174,7 @@ function ResetPasswordPage() {
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {saving ? "Updating…" : "Update password"}
             </button>
-            <p className="text-center text-xs text-zinc-500">
+            <p className="text-center text-[10px] sm:text-xs text-zinc-500 whitespace-nowrap">
               After updating, you'll be signed out everywhere and asked to sign in again.
             </p>
           </form>
