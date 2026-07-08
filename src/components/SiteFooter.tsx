@@ -32,7 +32,7 @@ function NewsletterSubscribe() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-md flex-col gap-2 sm:flex-row">
+    <form onSubmit={onSubmit} className="flex w-full max-w-xs flex-col gap-1.5 sm:flex-row sm:-translate-y-1">
       <input
         type="email"
         required
@@ -40,12 +40,12 @@ function NewsletterSubscribe() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@example.com"
         maxLength={255}
-        className="flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none"
+        className="flex-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-900 placeholder:text-zinc-400 outline-none"
       />
       <button
         type="submit"
         disabled={loading || done}
-        className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60"
+        className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-zinc-800 disabled:opacity-60"
       >
         {done ? "Subscribed" : loading ? "…" : "Subscribe"}
       </button>
