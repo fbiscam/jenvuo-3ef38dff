@@ -30,14 +30,17 @@ import { Route as BriefsRouteImport } from './routes/briefs'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AiEngineRouteImport } from './routes/ai-engine'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BriefIdRouteImport } from './routes/brief.$id'
+import { Route as AdminInboxRouteImport } from './routes/admin.inbox'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
@@ -172,6 +175,11 @@ const AiEngineRoute = AiEngineRouteImport.update({
   path: '/ai-engine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -196,6 +204,11 @@ const HelpIndexRoute = HelpIndexRouteImport.update({
   path: '/help/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -210,6 +223,11 @@ const BriefIdRoute = BriefIdRouteImport.update({
   id: '/brief/$id',
   path: '/brief/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminInboxRoute = AdminInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
   id: '/inbox',
@@ -374,6 +392,7 @@ const AuthenticatedDashboardAdminChatRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
@@ -397,9 +416,11 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
+  '/admin/inbox': typeof AdminInboxRoute
   '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
@@ -453,9 +474,11 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/inbox': typeof AuthenticatedInboxRoute
+  '/admin/inbox': typeof AdminInboxRoute
   '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
@@ -490,6 +513,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
@@ -513,9 +537,11 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
+  '/admin/inbox': typeof AdminInboxRoute
   '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
@@ -550,6 +576,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/ai-engine'
     | '/app'
     | '/auth'
@@ -573,9 +600,11 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/dashboard'
     | '/inbox'
+    | '/admin/inbox'
     | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
+    | '/admin/'
     | '/help/'
     | '/insights/'
     | '/dashboard/alerts'
@@ -629,9 +658,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/inbox'
+    | '/admin/inbox'
     | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
+    | '/admin'
     | '/help'
     | '/insights'
     | '/dashboard/alerts'
@@ -665,6 +696,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/about'
+    | '/admin'
     | '/ai-engine'
     | '/app'
     | '/auth'
@@ -688,9 +720,11 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
+    | '/admin/inbox'
     | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
+    | '/admin/'
     | '/help/'
     | '/insights/'
     | '/_authenticated/dashboard/alerts'
@@ -725,6 +759,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AiEngineRoute: typeof AiEngineRoute
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
@@ -914,6 +949,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiEngineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -949,6 +991,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/insights/$slug': {
       id: '/insights/$slug'
       path: '/$slug'
@@ -969,6 +1018,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/brief/$id'
       preLoaderRoute: typeof BriefIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/inbox': {
+      id: '/admin/inbox'
+      path: '/inbox'
+      fullPath: '/admin/inbox'
+      preLoaderRoute: typeof AdminInboxRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_authenticated/inbox': {
       id: '/_authenticated/inbox'
@@ -1221,6 +1277,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AdminRouteChildren {
+  AdminInboxRoute: typeof AdminInboxRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminInboxRoute: AdminInboxRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 interface InsightsRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
@@ -1239,6 +1307,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
   AiEngineRoute: AiEngineRoute,
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
