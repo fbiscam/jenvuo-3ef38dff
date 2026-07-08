@@ -9,7 +9,9 @@ type CustomAuthEmailInput = {
   type: 'signup' | 'recovery'
   code: string
   siteUrl?: string
+  resetLink?: string
 }
+
 
 const SITE_NAME = 'Jenvu'
 const ROOT_DOMAIN = 'jenvu.com'
