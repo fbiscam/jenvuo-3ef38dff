@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Font, Head, Img, Section, Text } from '@react-email/components'
+import { Head, Img, Section, Text } from '@react-email/components'
 
 export const SITE_URL = 'https://jenvu.com'
 export const LOGO_URL = `${SITE_URL}/favicon.png`
@@ -9,7 +9,7 @@ export const LOGO_URL = `${SITE_URL}/favicon.png`
  * Inter for everything (headings, body, labels, code digits).
  */
 export const INTER =
-  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+  "Verdana, Geneva, 'DejaVu Sans', Tahoma, sans-serif"
 
 // Legacy aliases so existing templates keep compiling without edits.
 export const URBANIST = INTER
@@ -27,51 +27,9 @@ export const COLORS = {
   accent: '#111827',
 }
 
-/** Load Inter across email clients that support web fonts. */
-export const EmailFonts = () => (
-  <>
-    <Font
-      fontFamily="Inter"
-      fallbackFontFamily="Arial"
-      webFont={{
-        url: 'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2',
-        format: 'woff2',
-      }}
-      fontWeight={400}
-      fontStyle="normal"
-    />
-    <Font
-      fontFamily="Inter"
-      fallbackFontFamily="Arial"
-      webFont={{
-        url: 'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7.woff2',
-        format: 'woff2',
-      }}
-      fontWeight={500}
-      fontStyle="normal"
-    />
-    <Font
-      fontFamily="Inter"
-      fallbackFontFamily="Arial"
-      webFont={{
-        url: 'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1pL7.woff2',
-        format: 'woff2',
-      }}
-      fontWeight={600}
-      fontStyle="normal"
-    />
-    <Font
-      fontFamily="Inter"
-      fallbackFontFamily="Arial"
-      webFont={{
-        url: 'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa25L7.woff2',
-        format: 'woff2',
-      }}
-      fontWeight={700}
-      fontStyle="normal"
-    />
-  </>
-)
+/** Verdana is a system font — no web font loading required. */
+export const EmailFonts = () => <></>
+
 
 /** Simple, clean header — favicon + Jenvu wordmark on a hairline-divided band. */
 export const LogoHeader = (_props: { tagline?: string } = {}) => (
