@@ -16,6 +16,7 @@ import { useCredits } from "@/hooks/useCredits";
 import { appendVoiceTurn } from "@/lib/voice-history";
 import PageLoading from "@/components/PageLoading";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { revokeCurrentTrustedDevice } from "@/lib/trusted-devices.client";
 
 import { cn } from "@/lib/utils";
 
