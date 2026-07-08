@@ -406,6 +406,28 @@ function AuthPage() {
     await supabase.auth.signOut();
   };
 
+  const resendMfaChallenge = async () => {
+    if (!mfaChallenge || mfaResendCooldown > 0 || mfaResending) return;
+    setMfaResending(true);
+    setMfaError(null);
+    try {
+      const { data: chal, error } = await supabase.auth.mfa.challenge({ factorId: mfaChallenge.factorId });
+      if (error || !chal) {
+        const msg = error?.message || "Could not request a new code";
+        setMfaError(msg);
+        toast.error("Couldn't refresh code", { description: msg });
+        return;
+      }
+      setMfaChallenge({ factorId: mfaChallenge.factorId, challengeId: chal.id });
+      setMfaCode("");
+      setMfaResendCooldown(30);
+      toast.success("New challenge ready", { description: "Enter the current 6-digit code from your authenticator app." });
+      setTimeout(() => mfaInputRef.current?.focus(), 30);
+    } finally {
+      setMfaResending(false);
+    }
+  };
+
   // Auto-focus + auto-submit for MFA input
   React.useEffect(() => {
     if (mfaChallenge) mfaInputRef.current?.focus();
