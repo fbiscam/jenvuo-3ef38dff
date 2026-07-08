@@ -96,6 +96,9 @@ function AuthPage() {
   const [resending, setResending] = React.useState(false);
   const [forgotStep, setForgotStep] = React.useState<"email" | "code" | "reset">("email");
   const [newPassword, setNewPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showNewPassword, setShowNewPassword] = React.useState(false);
+
   const recoveryModeRef = React.useRef(false);
   const lastSubmittedOtpRef = React.useRef<string>("");
   const otpInputRef = React.useRef<HTMLInputElement | null>(null);
