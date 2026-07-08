@@ -82,9 +82,9 @@ export function LiveChatWidget() {
     setStarting(true);
     try {
       const { data, error } = await supabase.rpc("create_chat_session", {
-        _name: name || null,
-        _email: email || null,
-        _user_agent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 500) : null,
+        _name: name || "",
+        _email: email || "",
+        _user_agent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 500) : "",
       });
       if (error) throw error;
       const row = Array.isArray(data) ? data[0] : data;
