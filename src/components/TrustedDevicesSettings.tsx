@@ -170,13 +170,13 @@ export function TrustedDevicesSettings() {
             return (
               <div
                 key={d.id}
-                className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-white px-4 py-3"
+                className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-zinc-900">
                     {d.label || summarizeUA(d.user_agent)}
                   </p>
-                  <p className="mt-0.5 truncate text-xs text-zinc-500">
+                  <p className="mt-0.5 text-xs text-zinc-500 break-words">
                     Last used {fmt(d.last_used_at)}
                     {" · "}
                     {expired ? (
@@ -189,11 +189,12 @@ export function TrustedDevicesSettings() {
                 <button
                   onClick={() => revoke(d.id)}
                   disabled={revoking === d.id}
-                  className="shrink-0 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+                  className="self-start rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 sm:shrink-0 sm:self-auto"
                 >
                   {revoking === d.id ? "Revoking…" : "Revoke"}
                 </button>
               </div>
+
             );
           })
         )}
