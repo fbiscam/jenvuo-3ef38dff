@@ -230,7 +230,7 @@ function AuthPage() {
       }
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate, redirectTo]);
+  }, [navigate, redirectTo, applyPendingReferral, mfaChallenge]);
 
   // Reset submitted-otp tracker when leaving OTP screens or clearing the code
   React.useEffect(() => {
