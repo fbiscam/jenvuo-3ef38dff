@@ -656,7 +656,7 @@ function AuthPage() {
                       <form onSubmit={verifyOtp} className="mt-4 space-y-3">
                         <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-3 sm:px-4 py-3 text-[10.5px] sm:text-[11.5px] text-zinc-700 ${MONO}`}>
                           <p className="leading-relaxed sm:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis">
-                            <span className="sm:hidden">Code sent to <span className="font-semibold text-zinc-900 break-all">{email}</span>. Enter it to continue.</span>
+                            <span className="sm:hidden">Code sent to <span className="font-semibold text-zinc-900 break-all">{email}</span>.<br />Enter it to continue.</span>
                             <span className="hidden sm:inline">We sent a 6-digit code to <span className="font-semibold text-zinc-900">{email}</span>. Enter it below to activate your desk.</span>
                           </p>
                         </div>
