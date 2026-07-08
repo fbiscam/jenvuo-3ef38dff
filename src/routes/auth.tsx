@@ -541,6 +541,17 @@ function AuthPage() {
                           </div>
                         </div>
 
+                        <div className="flex justify-end -mt-1">
+                          <button
+                            type="button"
+                            onClick={() => { setMode("forgot"); setForgotStep("email"); setErrorMsg(null); setOtpCode(""); }}
+                            className={`text-[11px] uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition ${MONO}`}
+                          >
+                            Forgot password?
+                          </button>
+                        </div>
+
+
                         {errorMsg && (
                           <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
                             <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
