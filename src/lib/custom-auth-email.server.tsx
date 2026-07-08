@@ -71,12 +71,13 @@ export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomA
     ) : (
       <RecoveryEmail
         siteName={SITE_NAME}
-        confirmationUrl={`${origin}/auth`}
+        confirmationUrl={resetLink || `${origin}/reset-password`}
         recipient={to}
         token={code}
-        showLink={false}
+        showLink={Boolean(resetLink)}
       />
     )
+
 
   const html = await render(element)
   const text = await render(element, { plainText: true })
