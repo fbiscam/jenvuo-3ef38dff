@@ -108,7 +108,15 @@ export const LogoHeader = ({
               <table cellPadding={0} cellSpacing={0} role="presentation">
                 <tbody>
                   <tr>
-                    <td style={logoMark}>J</td>
+                    <td style={logoMark}>
+                      <Img
+                        src={LOGO_URL}
+                        width="34"
+                        height="34"
+                        alt="Jenvu"
+                        style={{ display: 'block', borderRadius: '9px' }}
+                      />
+                    </td>
                     <td style={{ paddingLeft: '10px' }}>
                       <Text style={logoWord}>JENVU</Text>
                       <Text style={logoSub}>/ voice_terminal</Text>
