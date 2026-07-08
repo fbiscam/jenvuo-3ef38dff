@@ -224,6 +224,7 @@ function AuthPage() {
               return;
             }
           }
+          await applyPendingReferral();
           navigate({ to: redirectTo as "/dashboard", replace: true });
         })();
       }
