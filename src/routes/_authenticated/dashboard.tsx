@@ -750,7 +750,7 @@ function DashboardLayout() {
         </div>
 
         <div className="mt-3 rounded-xl border border-zinc-200 bg-white">
-          <nav className="grid grid-cols-2 gap-1 border-b border-zinc-200 p-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-0.5">
+          <nav className="grid grid-cols-4 gap-1 border-b border-zinc-200 p-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-0.5">
             {TABS.map((t) => {
               const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
               const Icon = t.icon;
