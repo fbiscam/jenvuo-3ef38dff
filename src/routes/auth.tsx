@@ -253,14 +253,39 @@ function AuthPage() {
   };
 
   const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const raw = e.clipboardData.getData("text");
-    const digits = (raw || "").replace(/\D/g, "").slice(0, 6);
-    if (!digits) return;
     e.preventDefault();
+    const raw = e.clipboardData.getData("text") || "";
+    const digits = raw.replace(/\D/g, "");
+    const isRecovery = e.currentTarget === recoveryOtpInputRef.current;
+
+    if (digits.length === 0) {
+      triggerOtpError("Clipboard doesn't contain a numeric code.", isRecovery);
+      return;
+    }
+    if (digits.length < 6) {
+      setOtpCode(digits); // let user see what came through
+      triggerOtpError(
+        `Pasted only ${digits.length} digit${digits.length === 1 ? "" : "s"} — the code is 6 digits.`,
+        isRecovery,
+      );
+      // Refocus AFTER the trigger's clear so user can retype
+      window.setTimeout(() => {
+        setOtpCode(digits);
+      }, 0);
+      return;
+    }
+    if (digits.length > 6) {
+      triggerOtpError(
+        `Pasted ${digits.length} digits — the code is 6 digits. Check your email again.`,
+        isRecovery,
+      );
+      return;
+    }
+    // Exactly 6 — good; auto-submit effect will pick it up.
     setOtpError(null);
     setOtpCode(digits);
-    // Auto-submit effect will fire when length hits 6.
   };
+
 
 
 
