@@ -68,7 +68,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
-  const [mode, setMode] = React.useState<"signin" | "signup">("signin");
+  const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">("signin");
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -77,10 +77,20 @@ function AuthPage() {
   const [otpStep, setOtpStep] = React.useState(false);
   const [otpCode, setOtpCode] = React.useState("");
   const [resending, setResending] = React.useState(false);
+  const [forgotStep, setForgotStep] = React.useState<"email" | "code" | "reset">("email");
+  const [newPassword, setNewPassword] = React.useState("");
+  const recoveryModeRef = React.useRef(false);
 
   React.useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
-      if (evt === "SIGNED_IN" && session) {
+      if (evt === "PASSWORD_RECOVERY") {
+        recoveryModeRef.current = true;
+        setMode("forgot");
+        setForgotStep("reset");
+        setErrorMsg(null);
+        return;
+      }
+      if (evt === "SIGNED_IN" && session && !recoveryModeRef.current) {
         navigate({ to: redirectTo as "/dashboard", replace: true });
       }
     });
