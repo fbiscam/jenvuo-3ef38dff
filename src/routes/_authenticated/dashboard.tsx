@@ -10,7 +10,7 @@ import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
-import { revokeCurrentTrustedDevice } from "@/lib/trusted-devices-local";
+
 import {
   Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
@@ -512,14 +512,15 @@ function DashboardLayout() {
 
 
   const signOut = async () => {
-    // Revoke this browser's trusted-device row before the bearer disappears.
-    await revokeCurrentTrustedDevice();
-    // Clear the browser session synchronously so reloads cannot restore the
-    // signed-in user before Supabase finishes its async sign-out work.
+    // NOTE: Do NOT revoke the trusted-device row here — a normal sign-out
+    // must keep this browser trusted so the user isn't prompted for MFA on
+    // every subsequent login. Trusted devices are only cleared when the user
+    // explicitly uses "Forget this device" / "Revoke" in Security settings.
     clearStoredAuthSession();
     void supabase.auth.signOut({ scope: "global" }).catch(() => { /* ignore network errors */ });
     window.location.replace("/");
   };
+
 
   const planTier = ((credits.plan as { tier?: string; name?: string } | null)?.tier
     ?? (credits.plan as { name?: string } | null)?.name ?? "free").toString().toUpperCase();
