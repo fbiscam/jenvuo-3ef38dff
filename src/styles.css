@@ -195,6 +195,13 @@
 }
 .animate-otp-shake { animation: otp-shake 0.42s cubic-bezier(.36,.07,.19,.97) both; }
 
+@keyframes terminal-blink {
+  0%, 40%, 80%, 100% { opacity: 1; }
+  20%, 60% { opacity: 0.15; }
+}
+.animate-terminal-blink { animation: terminal-blink 1s steps(1, end) infinite; }
+
+
 
 
 /* Mobile perf: silence heavy GPU animations on small screens to prevent lag */
