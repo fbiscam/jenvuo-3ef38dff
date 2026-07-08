@@ -224,7 +224,7 @@ export async function confirmEmailChangeToken(
     .maybeSingle()
 
   if (error) return failNoRow(error.message)
-  if (!row) return failNoRow('This confirmation link is invalid or has already been used.')
+  if (!row) return failNoRow('This confirmation link is not valid.')
 
   const ctx = {
     userId: row.user_id as string,
