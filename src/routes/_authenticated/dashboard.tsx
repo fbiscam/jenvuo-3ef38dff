@@ -714,6 +714,8 @@ function DashboardLayout() {
               <TickerRow label="DXY" symbol="DXY" decimals={3} />
             </div>
           </Card>
+          </div>
+
 
           <Card className="flex flex-col">
             <CardHeader
