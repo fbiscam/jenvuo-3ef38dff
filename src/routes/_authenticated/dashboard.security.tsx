@@ -77,9 +77,9 @@ function SecurityPage() {
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <h2 className="text-base font-semibold">Session</h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Signing out clears your local session and revokes the current browser's trusted-device token, so your next
-          sign-in will require 2FA again.
+          Signing out clears your local session on this browser. Trusted-device status stays until you revoke it above.
         </p>
+
         <button
           onClick={async () => {
             await supabase.auth.signOut();
