@@ -726,22 +726,28 @@ function AuthPage() {
                         <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
                           <button
                             type="button"
-                            onClick={() => { setForgotStep("email"); setErrorMsg(null); }}
-                            className="hover:text-zinc-900 transition"
+                            onClick={() => { setForgotStep("email"); setErrorMsg(null); setOtpError(null); }}
+                            disabled={loading}
+                            className="hover:text-zinc-900 transition disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             ← Change email
                           </button>
                           <button
                             type="button"
                             onClick={resendResetCode}
-                            disabled={resending || resendCooldown > 0}
-                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
+                            disabled={loading || resending || resendCooldown > 0}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                           >
-                            {resending
-                              ? "Sending..."
-                              : resendCooldown > 0
-                                ? `Resend in ${resendCooldown}s`
-                                : "Resend code"}
+                            {resending ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
+                                Sending...
+                              </>
+                            ) : resendCooldown > 0 ? (
+                              `Resend in ${resendCooldown}s`
+                            ) : (
+                              "Resend code"
+                            )}
                           </button>
                         </div>
                       </form>
