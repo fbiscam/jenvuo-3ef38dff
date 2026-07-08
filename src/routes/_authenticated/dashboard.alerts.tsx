@@ -131,13 +131,13 @@ function AlertPrefs() {
     >
     <div className="max-w-3xl space-y-6">
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <div className="flex items-center justify-between gap-3">
+      <section className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-base font-semibold">Recent alerts</h2>
             <p className="mt-1 text-sm text-zinc-500">Live A+ setups across all pairs & coins. Updates in realtime.</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-start sm:self-auto">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> LIVE
             </span>
@@ -154,7 +154,7 @@ function AlertPrefs() {
           </div>
         </div>
 
-        <div className="mt-4 -mx-2 max-h-[420px] overflow-y-auto">
+        <div className="mt-4 -mx-1 max-h-[420px] overflow-y-auto">
           {alertsLoading ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">Loading alerts…</div>
           ) : alerts.length === 0 ? (
@@ -166,23 +166,20 @@ function AlertPrefs() {
                 const time = new Date(a.fired_at);
                 const ago = relativeTime(time);
                 return (
-                  <li key={a.id} className="flex items-center gap-3 px-2 py-3 hover:bg-zinc-50/60 rounded-lg">
+                  <li key={a.id} className="flex items-start gap-3 px-2 py-3 hover:bg-zinc-50/60 rounded-lg">
                     <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold ${isBuy ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
                       {isBuy ? "BUY" : "SELL"}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                         <span className="text-sm font-semibold text-zinc-900">{a.pair}</span>
                         <span className="rounded-md bg-zinc-900 px-1.5 py-0.5 text-[10px] font-bold text-white">{a.grade}</span>
                         {a.session && <span className="text-[11px] text-zinc-500">· {a.session}</span>}
+                        <span className="ml-auto text-[10px] font-medium text-zinc-500">{a.confidence}% · {ago}</span>
                       </div>
-                      <div className="mt-0.5 truncate text-[11px] text-zinc-500">
+                      <div className="mt-1 text-[11px] leading-relaxed text-zinc-500 break-words">
                         Entry <span className="font-medium text-zinc-700">{a.entry}</span> · SL <span className="font-medium text-rose-600">{a.sl}</span> · TP <span className="font-medium text-emerald-600">{a.tp}</span> · RR <span className="font-medium text-zinc-700">{a.rr}</span>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-[11px] font-medium text-zinc-700">{a.confidence}%</div>
-                      <div className="text-[10px] text-zinc-400">{ago}</div>
                     </div>
                   </li>
                 );
@@ -191,6 +188,7 @@ function AlertPrefs() {
           )}
         </div>
       </section>
+
 
 
 
