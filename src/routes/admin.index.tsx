@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { Lock, Loader2, ShieldCheck } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
 import { adminLogin, adminMe } from "@/lib/admin-gate.functions";
 
 export const Route = createFileRoute("/admin/")({
