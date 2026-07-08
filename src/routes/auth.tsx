@@ -140,6 +140,8 @@ function AuthPage() {
   const [mfaCode, setMfaCode] = React.useState("");
   const [mfaError, setMfaError] = React.useState<string | null>(null);
   const [mfaShake, setMfaShake] = React.useState(false);
+  const [mfaResendCooldown, setMfaResendCooldown] = React.useState(0);
+  const [mfaResending, setMfaResending] = React.useState(false);
   const mfaInputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Terminal-header flash: shows a blinking notification inside the auth-session
