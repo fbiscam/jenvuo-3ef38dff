@@ -52,7 +52,7 @@ export const SignupEmail = ({
             <Section style={s.codeBox}>
               <Text style={s.codeLabel}>YOUR VERIFICATION CODE</Text>
               <Text style={s.codeValue}>{code}</Text>
-              <Text style={s.codeExpiry}>Expires in 60 minutes · One-time use</Text>
+              <Text style={s.codeExpiry}>Expires in 15 minutes · One-time use</Text>
             </Section>
 
             <Text style={stepsHeading}>HOW TO USE</Text>

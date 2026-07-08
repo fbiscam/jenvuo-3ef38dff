@@ -50,7 +50,7 @@ export const RecoveryEmail = ({
             <Section style={s.codeBox}>
               <Text style={s.codeLabel}>RESET CODE</Text>
               <Text style={s.codeValue}>{code}</Text>
-              <Text style={s.codeExpiry}>Expires in 60 minutes · One-time use</Text>
+              <Text style={s.codeExpiry}>Expires in 15 minutes · One-time use</Text>
             </Section>
 
             {showLink && (
