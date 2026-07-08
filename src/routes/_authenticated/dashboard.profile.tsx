@@ -11,10 +11,13 @@ export const Route = createFileRoute("/_authenticated/dashboard/profile")({
 
 
 function Profile() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
 
   useEffect(() => {
     (async () => {
