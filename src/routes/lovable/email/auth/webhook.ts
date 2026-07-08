@@ -131,13 +131,21 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           )
         }
 
+        // Force the OTP to 6 digits in emails, even if the auth project is
+        // configured to send an 8-digit token. Non-digit tokens (magic-link
+        // hashed tokens) are passed through untouched.
+        const rawToken: string = payload.data.token ?? ''
+        const sixDigitToken = /^\d+$/.test(rawToken)
+          ? rawToken.slice(0, 6).padStart(6, '0')
+          : rawToken
+
         // Build template props from payload.data (HookData structure)
         const templateProps = {
           siteName: SITE_NAME,
           siteUrl: `https://${ROOT_DOMAIN}`,
           recipient: payload.data.email,
           confirmationUrl: payload.data.url,
-          token: payload.data.token,
+          token: sixDigitToken,
           email: payload.data.email,
           oldEmail: payload.data.old_email,
           newEmail: payload.data.new_email,
