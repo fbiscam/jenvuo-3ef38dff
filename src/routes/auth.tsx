@@ -80,6 +80,8 @@ function AuthPage() {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [otpStep, setOtpStep] = React.useState(false);
   const [otpCode, setOtpCode] = React.useState("");
+  const [otpError, setOtpError] = React.useState<string | null>(null);
+  const [otpShake, setOtpShake] = React.useState(false);
   const [resending, setResending] = React.useState(false);
   const [forgotStep, setForgotStep] = React.useState<"email" | "code" | "reset">("email");
   const [newPassword, setNewPassword] = React.useState("");
