@@ -218,6 +218,31 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
     { key: "upgraded", label: "Upgraded", hint: "Paid plan — credits earned" },
   ];
 
+  const exportCsv = () => {
+    const header = ["Date", "Stage", "Upgraded on", "Credits"];
+    const rows = filtered.map((r) => {
+      const upgraded = r.status === "converted" && r.credits_awarded > 0;
+      const stage = upgraded ? "Upgraded" : r.status === "converted" ? "Converted" : r.status === "void" ? "Void" : "New";
+      return [
+        new Date(r.created_at).toISOString().slice(0, 10),
+        stage,
+        r.converted_at ? new Date(r.converted_at).toISOString().slice(0, 10) : "",
+        String(r.credits_awarded),
+      ];
+    });
+    const escape = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+    const csv = [header, ...rows].map((r) => r.map(escape).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `referrals-${filter}-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
       <div className="flex flex-col gap-3 border-b border-zinc-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
@@ -225,7 +250,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
           <div className="text-sm font-semibold text-zinc-900">Referral history</div>
           <div className="text-[11px] text-zinc-500">{FILTERS.find((f) => f.key === filter)?.hint}</div>
         </div>
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap items-center gap-1">
           {FILTERS.map((f) => {
             const active = filter === f.key;
             return (
@@ -250,8 +275,18 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
               </button>
             );
           })}
+          <button
+            type="button"
+            onClick={exportCsv}
+            disabled={filtered.length === 0}
+            className="ml-1 inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Download current filter as CSV"
+          >
+            <Download className="h-3.5 w-3.5" /> Export CSV
+          </button>
         </div>
       </div>
+
 
       {filtered.length === 0 ? (
         <div className="px-6 py-12 text-center text-sm text-zinc-500">
