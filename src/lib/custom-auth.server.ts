@@ -175,7 +175,6 @@ export async function createRecoveryOtp(input: { email: string; siteUrl?: string
     email,
     purpose: 'recovery',
     code_hash: codeHash,
-    user_id: existingUser.id,
     expires_at: new Date(Date.now() + OTP_TTL_MINUTES * 60_000).toISOString(),
   })
   if (error) throw new Error(error.message)
