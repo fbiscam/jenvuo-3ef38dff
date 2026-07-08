@@ -437,7 +437,7 @@ function Journal() {
   );
 }
 
-function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t: Trade) => void }) {
+function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t: Trade, tagIds: string[]) => void }) {
   const [pair, setPair] = useState("XAUUSD");
   const [direction, setDirection] = useState<"long" | "short">("long");
   const [entry, setEntry] = useState("");
@@ -446,7 +446,9 @@ function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t:
   const [outcome, setOutcome] = useState<Trade["outcome"]>("open");
   const [pnl, setPnl] = useState("");
   const [notes, setNotes] = useState("");
+  const [tagIds, setTagIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const applyTags = useServerFn(setTradeSetups);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
