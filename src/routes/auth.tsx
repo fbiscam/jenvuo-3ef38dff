@@ -673,19 +673,20 @@ function AuthPage() {
                             autoComplete="one-time-code"
                             maxLength={6}
                             required
+                            aria-invalid={otpError ? true : undefined}
+                            aria-describedby={otpError ? "otp-error-recovery" : undefined}
                             value={otpCode}
-                            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                            className={`w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300 ${MONO}`}
+                            onChange={(e) => { setOtpError(null); setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6)); }}
+                            className={`w-full rounded-xl border bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${otpError ? "border-red-400 text-red-600 focus:border-red-500" : "border-zinc-200 text-zinc-900 focus:border-zinc-900"} ${otpShake ? "animate-otp-shake" : ""}`}
                             placeholder="••••••"
                           />
+                          {otpError && (
+                            <p id="otp-error-recovery" className={`mt-2 text-[12px] text-red-600 ${MONO}`} role="alert" aria-live="polite">
+                              {otpError}
+                            </p>
+                          )}
                         </div>
 
-                        {errorMsg && (
-                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
-                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
-                            <span className="leading-snug">{errorMsg}</span>
-                          </div>
-                        )}
 
                         <button
                           type="submit"
