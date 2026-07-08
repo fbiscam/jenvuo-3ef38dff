@@ -737,12 +737,13 @@ function DashboardLayout() {
             {TABS.map((t) => {
               const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
               const Icon = t.icon;
-              const count = t.countKey ? counts[t.countKey] : undefined;
+              const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
               return (
                 <Link
                   key={t.to}
                   to={t.to as "/dashboard"}
                   resetScroll={false}
+                  onClick={() => markTabSeen(t.countKey)}
                   className={`inline-flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 rounded-md px-2 sm:px-3 py-1.5 text-[12px] sm:text-[13px] whitespace-nowrap transition ${
                     active
                       ? "bg-white text-zinc-900 border border-zinc-200 shadow-sm"
@@ -754,13 +755,14 @@ function DashboardLayout() {
                   <Icon className="h-3.5 w-3.5 shrink-0" />
                   {t.label}
                   {typeof count === "number" && count > 0 && (
-                    <span className="ml-0.5 rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-zinc-900">
+                    <span className="ml-0.5 rounded-full bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
                       {count}
                     </span>
                   )}
                 </Link>
               );
             })}
+
           </nav>
           <div className="p-5">
             <Outlet />
