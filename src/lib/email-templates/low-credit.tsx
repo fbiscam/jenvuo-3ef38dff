@@ -73,9 +73,9 @@ const LowCreditEmail = ({
           </table>
 
           <Text style={{ ...s.footer, marginTop: '24px' }}>
-            Want to change how often we ping you? Update your alert
-            preferences from your Jenvu dashboard.
+            Manage alert frequency from your Jenvu dashboard.
           </Text>
+
           <Text style={s.legal}>JENVU · Billing notifications</Text>
         </Section>
       </Container>
