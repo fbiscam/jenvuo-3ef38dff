@@ -130,6 +130,14 @@ function AuthPage() {
     if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
   }, []);
 
+  const flashInline = (target: "email" | "password") =>
+    flashMsg && flashTarget === target ? (
+      <div key={flashMsg} className={`mt-2 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-[12px] text-emerald-700 ${MONO} animate-terminal-blink`}>
+        <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+        <span className="leading-snug">{flashMsg}</span>
+      </div>
+    ) : null;
+
   React.useEffect(() => {
     if (resendCooldown <= 0) return;
     const t = setInterval(() => setResendCooldown((s) => (s <= 1 ? 0 : s - 1)), 1000);
