@@ -187,7 +187,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
             subject: EMAIL_SUBJECTS[emailType] || 'Notification',
             html,
             text,
-            purpose: 'transactional',
+            purpose: 'authentication',
             label: emailType,
             queued_at: new Date().toISOString(),
           },
