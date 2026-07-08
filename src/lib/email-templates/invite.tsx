@@ -47,7 +47,6 @@ export const InviteEmail = ({
           <Text style={{ ...s.footer, marginTop: '24px' }}>
             Not expecting this? You can safely ignore this email.
           </Text>
-          <Text style={s.legal}>JENVU · {siteName}</Text>
         </Section>
       </Container>
     </Body>
