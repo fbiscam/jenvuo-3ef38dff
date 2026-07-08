@@ -346,7 +346,6 @@ function AuthPage() {
     }
     setMfaChallenge(null);
     setMfaCode("");
-    toast.success("Verified"); flashInfo("Verified");
     navigate({ to: redirectTo as "/dashboard", replace: true });
   };
 
