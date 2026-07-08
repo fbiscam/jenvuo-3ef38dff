@@ -171,7 +171,7 @@ function ConfirmEmailChangePage() {
         </p>
         <h1 className="mt-2 text-2xl font-semibold text-zinc-900">
           {status === "loading" && "Verifying…"}
-          {status === "success" && "Email updated"}
+          {status === "success" && (alreadyDone ? "Already completed" : "Email updated")}
           {status === "error" && FRIENDLY[errorKind].title}
         </h1>
 
@@ -186,11 +186,15 @@ function ConfirmEmailChangePage() {
           {status === "success" && (
             <>
               <p className="text-sm text-zinc-600">
-                Your account email is now <span className="font-medium text-zinc-900">{newEmail}</span>.
+                {alreadyDone
+                  ? <>This confirmation link was already used. Your account email is <span className="font-medium text-zinc-900">{newEmail}</span>.</>
+                  : <>Your account email is now <span className="font-medium text-zinc-900">{newEmail}</span>.</>}
               </p>
-              <p className="text-sm text-zinc-600">
-                Redirecting to sign in in <span className="font-semibold">{countdown}</span>…
-              </p>
+              {!alreadyDone && (
+                <p className="text-sm text-zinc-600">
+                  Redirecting to sign in in <span className="font-semibold">{countdown}</span>…
+                </p>
+              )}
               <button
                 onClick={goToSignIn}
                 className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
