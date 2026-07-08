@@ -406,8 +406,9 @@ function AuthPage() {
       const friendly = lower.includes("expired")
         ? "That code expired. Generate a fresh one in your authenticator app."
         : lower.includes("invalid") || lower.includes("incorrect") || lower.includes("mismatch")
-          ? "That code doesn't match. Double-check your authenticator app and try again."
+          ? "That code doesn't match. Try again."
           : raw || "That code doesn't match. Try again.";
+
       setMfaError(friendly);
       toast.error("Verification failed", { description: friendly });
       setMfaCode("");
@@ -830,10 +831,11 @@ function AuthPage() {
                           placeholder="••••••"
                         />
                         {mfaError && (
-                          <p className={`mt-2 text-[12px] text-red-600 ${MONO}`} role="alert" aria-live="polite">
+                          <p className={`mt-2 text-[12px] text-red-600 md:whitespace-nowrap ${MONO}`} role="alert" aria-live="polite">
                             {mfaError}
                           </p>
                         )}
+
                       </div>
 
                       <label className={`flex items-center gap-2 text-xs text-zinc-600 select-none cursor-pointer ${MONO}`}>
