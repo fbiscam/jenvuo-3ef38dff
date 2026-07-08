@@ -206,8 +206,8 @@ function AdminInbox() {
       <div className="border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-zinc-900 text-white">
-              <MessageSquare className="h-4 w-4" />
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-white ring-1 ring-zinc-200 overflow-hidden">
+              <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 object-contain" />
             </span>
             <div>
               <div className="text-sm font-semibold text-zinc-900">Support Inbox</div>
