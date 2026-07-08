@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { Font, Head, Section, Text } from '@react-email/components'
+import { Font, Head, Img, Section, Text } from '@react-email/components'
+
+export const SITE_URL = 'https://jenvu.com'
+export const LOGO_URL = `${SITE_URL}/favicon.png`
 
 /**
  * Shared design tokens for all Jenvu emails.
