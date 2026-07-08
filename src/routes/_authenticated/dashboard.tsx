@@ -484,11 +484,10 @@ function DashboardLayout() {
     setNewCounts((prev) => ({ ...prev, [countKey]: 0 } as typeof prev));
   }, [lsKey]);
 
-  // Auto-mark the currently active tab as seen so its badge clears after the first visit
-  // and does not re-appear on future dashboard loads until new items arrive.
+  // Auto-mark ALL count-carrying tabs as seen the moment the user lands anywhere
+  // in the dashboard, so badges do not reappear once they've been noticed once.
   useEffect(() => {
-    const activeTab = TABS.find((t) => (t.exact ? pathname === t.to : pathname.startsWith(t.to)));
-    if (activeTab?.countKey) markTabSeen(activeTab.countKey);
+    for (const t of TABS) if (t.countKey) markTabSeen(t.countKey);
   }, [pathname, markTabSeen]);
 
 
