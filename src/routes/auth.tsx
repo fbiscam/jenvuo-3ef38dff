@@ -265,6 +265,56 @@ function AuthPage() {
     }
   };
 
+  const verifyMfa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMfaError(null);
+    if (!mfaChallenge) return;
+    if (!/^\d{6}$/.test(mfaCode)) {
+      setMfaError("Enter the 6-digit code from your authenticator app.");
+      setMfaShake(true);
+      setTimeout(() => setMfaShake(false), 500);
+      mfaInputRef.current?.focus();
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.mfa.verify({
+      factorId: mfaChallenge.factorId,
+      challengeId: mfaChallenge.challengeId,
+      code: mfaCode,
+    });
+    setLoading(false);
+    if (error) {
+      setMfaError(error.message || "That code doesn't match. Try again.");
+      setMfaCode("");
+      setMfaShake(true);
+      setTimeout(() => setMfaShake(false), 500);
+      setTimeout(() => mfaInputRef.current?.focus(), 30);
+      return;
+    }
+    setMfaChallenge(null);
+    setMfaCode("");
+    toast.success("Verified");
+    navigate({ to: redirectTo as "/dashboard", replace: true });
+  };
+
+  const cancelMfa = async () => {
+    setMfaChallenge(null);
+    setMfaCode("");
+    setMfaError(null);
+    await supabase.auth.signOut();
+  };
+
+  // Auto-focus + auto-submit for MFA input
+  React.useEffect(() => {
+    if (mfaChallenge) mfaInputRef.current?.focus();
+  }, [mfaChallenge]);
+  React.useEffect(() => {
+    if (mfaChallenge && mfaCode.length === 6 && !loading && !mfaError) {
+      void verifyMfa({ preventDefault: () => {} } as React.FormEvent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mfaCode, mfaChallenge]);
+
   const humanizeOtpError = (msg: string): string => {
     const m = msg.toLowerCase();
     if (m.includes("expired")) return "This code has expired. Tap Resend to get a new one.";
