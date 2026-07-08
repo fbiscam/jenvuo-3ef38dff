@@ -63,8 +63,8 @@ function AdminLogin() {
     <div className="grid min-h-screen place-items-center bg-gradient-to-br from-white via-zinc-50 to-zinc-100 px-4">
       <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white/90 p-6 shadow-xl backdrop-blur">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="grid h-12 w-12 place-items-center rounded-full bg-zinc-900 ring-1 ring-zinc-200">
-            <ShieldCheck className="h-5 w-5 text-white" />
+          <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white ring-1 ring-zinc-200 shadow-sm overflow-hidden">
+            <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 object-contain" />
           </div>
           <h1 className="mt-3 text-lg font-semibold text-zinc-900">Admin Access</h1>
           <p className="mt-1 text-xs text-zinc-500">
