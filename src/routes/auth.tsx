@@ -222,11 +222,35 @@ function AuthPage() {
     }
   };
 
+  const humanizeOtpError = (msg: string): string => {
+    const m = msg.toLowerCase();
+    if (m.includes("expired")) return "This code has expired. Tap Resend to get a new one.";
+    if (m.includes("invalid") || m.includes("token") || m.includes("otp"))
+      return "That code doesn't match. Double-check your email and try again.";
+    if (m.includes("rate") || m.includes("too many"))
+      return "Too many attempts. Please wait a moment before trying again.";
+    return msg || "Verification failed. Try again.";
+  };
+
+  const triggerOtpError = (msg: string, isRecovery = false) => {
+    setOtpError(humanizeOtpError(msg));
+    setOtpShake(true);
+    setOtpCode("");
+    lastSubmittedOtpRef.current = "";
+    window.setTimeout(() => setOtpShake(false), 500);
+    window.setTimeout(() => {
+      const el = isRecovery ? recoveryOtpInputRef.current : otpInputRef.current;
+      el?.focus();
+      el?.select?.();
+    }, 30);
+  };
+
   const verifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+    setOtpError(null);
     if (!/^\d{6}$/.test(otpCode)) {
-      setErrorMsg("Enter the 6-digit code from your email");
+      triggerOtpError("Enter the 6-digit code from your email");
       return;
     }
     setLoading(true);
@@ -237,7 +261,7 @@ function AuthPage() {
     });
     setLoading(false);
     if (error) {
-      setErrorMsg(error.message);
+      triggerOtpError(error.message);
       return;
     }
     if (data.session) {
@@ -245,6 +269,7 @@ function AuthPage() {
       navigate({ to: redirectTo as "/dashboard", replace: true });
     }
   };
+
 
   const resendCode = async () => {
     if (resendCooldown > 0) return;
