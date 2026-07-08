@@ -299,45 +299,48 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
             : "No referrals match this filter."}
         </div>
       ) : (
-        <table className="w-full text-sm">
-          <thead className="bg-zinc-50 text-[11px] uppercase text-zinc-500">
-            <tr>
-              <th className="px-4 py-2 text-left font-medium">Date</th>
-              <th className="px-4 py-2 text-left font-medium">Stage</th>
-              <th className="px-4 py-2 text-left font-medium">Upgraded on</th>
-              <th className="px-4 py-2 text-right font-medium">Credits</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-100">
-            {filtered.map((r) => {
-              const upgraded = r.status === "converted" && r.credits_awarded > 0;
-              const stageLabel = upgraded ? "Upgraded" : r.status === "converted" ? "Converted" : r.status === "void" ? "Void" : "New";
-              const stageClass = upgraded
-                ? "bg-emerald-100 text-emerald-700"
-                : r.status === "converted"
-                ? "bg-sky-100 text-sky-700"
-                : r.status === "void"
-                ? "bg-zinc-100 text-zinc-500"
-                : "bg-amber-100 text-amber-700";
-              return (
-                <tr key={r.id}>
-                  <td className="px-4 py-2.5 text-zinc-600">{new Date(r.created_at).toLocaleDateString()}</td>
-                  <td className="px-4 py-2.5">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${stageClass}`}>
-                      {stageLabel}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5 text-zinc-600">
-                    {r.converted_at ? new Date(r.converted_at).toLocaleDateString() : <span className="text-zinc-300">—</span>}
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-mono text-zinc-900">{r.credits_awarded}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[540px] text-sm">
+            <thead className="bg-zinc-50 text-[11px] uppercase text-zinc-500">
+              <tr>
+                <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Date</th>
+                <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Stage</th>
+                <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Upgraded on</th>
+                <th className="px-4 py-2 text-right font-medium whitespace-nowrap">Credits</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100">
+              {filtered.map((r) => {
+                const upgraded = r.status === "converted" && r.credits_awarded > 0;
+                const stageLabel = upgraded ? "Upgraded" : r.status === "converted" ? "Converted" : r.status === "void" ? "Void" : "New";
+                const stageClass = upgraded
+                  ? "bg-emerald-100 text-emerald-700"
+                  : r.status === "converted"
+                  ? "bg-sky-100 text-sky-700"
+                  : r.status === "void"
+                  ? "bg-zinc-100 text-zinc-500"
+                  : "bg-amber-100 text-amber-700";
+                return (
+                  <tr key={r.id}>
+                    <td className="px-4 py-2.5 text-zinc-600 whitespace-nowrap">{new Date(r.created_at).toLocaleDateString()}</td>
+                    <td className="px-4 py-2.5 whitespace-nowrap">
+                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${stageClass}`}>
+                        {stageLabel}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5 text-zinc-600 whitespace-nowrap">
+                      {r.converted_at ? new Date(r.converted_at).toLocaleDateString() : <span className="text-zinc-300">—</span>}
+                    </td>
+                    <td className="px-4 py-2.5 text-right font-mono text-zinc-900 whitespace-nowrap">{r.credits_awarded}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
+
   );
 }
 
