@@ -9,7 +9,9 @@ type CustomAuthEmailInput = {
   type: 'signup' | 'recovery'
   code: string
   siteUrl?: string
+  resetLink?: string
 }
+
 
 const SITE_NAME = 'Jenvu'
 const ROOT_DOMAIN = 'jenvu.com'
@@ -47,7 +49,7 @@ async function getOrCreateUnsubscribeToken(
   return stored?.token ?? token
 }
 
-export async function sendCustomAuthEmail({ to, type, code, siteUrl }: CustomAuthEmailInput) {
+export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomAuthEmailInput) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const apiKey = process.env.LOVABLE_API_KEY
   if (!apiKey) throw new Error('Server is missing email configuration.')
@@ -69,12 +71,13 @@ export async function sendCustomAuthEmail({ to, type, code, siteUrl }: CustomAut
     ) : (
       <RecoveryEmail
         siteName={SITE_NAME}
-        confirmationUrl={`${origin}/auth`}
+        confirmationUrl={resetLink || `${origin}/reset-password`}
         recipient={to}
         token={code}
-        showLink={false}
+        showLink={Boolean(resetLink)}
       />
     )
+
 
   const html = await render(element)
   const text = await render(element, { plainText: true })

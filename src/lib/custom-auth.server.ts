@@ -179,8 +179,24 @@ export async function createRecoveryOtp(input: { email: string; siteUrl?: string
   })
   if (error) throw new Error(error.message)
 
-  await sendCustomAuthEmail({ to: email, type: 'recovery', code, siteUrl: input.siteUrl })
+  // Generate a real Supabase recovery magic link that redirects to /reset-password.
+  const origin =
+    input.siteUrl && /^https?:\/\//i.test(input.siteUrl) ? input.siteUrl : 'https://jenvu.com'
+  let resetLink: string | undefined
+  try {
+    const link = await supabaseAdmin.auth.admin.generateLink({
+      type: 'recovery',
+      email,
+      options: { redirectTo: `${origin}/reset-password` },
+    })
+    resetLink = link.data?.properties?.action_link || undefined
+  } catch (e) {
+    console.error('generateLink failed', e)
+  }
+
+  await sendCustomAuthEmail({ to: email, type: 'recovery', code, siteUrl: input.siteUrl, resetLink })
 }
+
 
 export async function verifySignupOtp(input: { email: string; code: string; password: string }): Promise<CustomAuthResult> {
   const email = normalizeEmail(input.email)
