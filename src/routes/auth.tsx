@@ -216,13 +216,13 @@ function AuthPage() {
       const notConfirmed =
         /confirm/i.test(msg) || /verify/i.test(msg) || /not.*confirmed/i.test(msg);
       if (notConfirmed) {
-        // Kick straight into OTP verification and resend a fresh code.
-        setMode("signup");
-        setOtpStep(true);
-        setOtpCode("");
-        setErrorMsg("Email not verified yet. We sent you a new code.");
-        void supabase.auth.resend({ type: "signup", email: parsed.data.email });
-        setResendCooldown(60);
+        // User exists but hasn't verified — do NOT auto-resend a code.
+        // Treat as invalid until they complete signup properly.
+        setErrorMsg("Invalid credentials. Please sign up.");
+        return;
+      }
+      if (/invalid.*(login|credential)/i.test(msg)) {
+        setErrorMsg("Invalid credentials. Please sign up.");
         return;
       }
       setErrorMsg(msg);
