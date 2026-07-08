@@ -190,16 +190,15 @@ function Home() {
   }, [authLoading, authUser, navigate]);
 
   const signOut = async () => {
-    // Revoke this browser's trusted-device row FIRST — the auth session is
-    // still valid, so the server fn will authorize. After signOut the bearer
-    // is gone and the call would 401.
-    await revokeCurrentTrustedDevice();
-    // Clear the browser session synchronously so refresh/navigation cannot
-    // restore the user before Supabase finishes its async sign-out work.
+    // NOTE: Do NOT revoke the trusted-device row here — a normal sign-out
+    // must keep this browser trusted so the user isn't prompted for MFA on
+    // every subsequent login. Trusted devices are only cleared when the user
+    // explicitly uses "Forget this device" / "Revoke" in Security settings.
     clearStoredAuthSession();
     void supabase.auth.signOut({ scope: "global" }).catch(() => { /* ignore network errors */ });
     navigate({ to: "/auth", replace: true });
   };
+
 
   const analyze = useServerFn(analyzeGold);
   const credits = useCredits();
