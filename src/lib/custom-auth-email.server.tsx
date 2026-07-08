@@ -83,8 +83,6 @@ export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomA
   const text = await render(element, { plainText: true })
   const subject = type === 'signup' ? 'Confirm your email' : 'Reset your password'
 
-  const unsubscribeToken = await getOrCreateUnsubscribeToken(supabaseAdmin, to)
-
   await supabaseAdmin.from('email_send_log').insert({
     message_id: messageId,
     template_name: type,
@@ -103,11 +101,13 @@ export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomA
         subject,
         html,
         text,
-        purpose: 'transactional',
+        // Auth emails must always be delivered and must NOT include an
+        // unsubscribe footer.
+        purpose: 'authentication',
         label: type,
         idempotency_key: idempotencyKey,
-        unsubscribe_token: unsubscribeToken,
       },
+
       { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
     )
 
