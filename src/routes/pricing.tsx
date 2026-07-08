@@ -149,6 +149,10 @@ const FAQ = [
 
 function PricingPage() {
   const currentPlan = useCurrentPlan();
+  const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
+  const priceOf = (t: { id: string; price: number }) =>
+    billing === "annual" && t.price > 0 ? Math.round((t.price * 12 * 0.83) / 10) * 10 : t.price;
+  const suffix = billing === "annual" ? "/yr" : "/mo";
   return (
     <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased md:[zoom:1.25]`}>
 
@@ -199,6 +203,29 @@ function PricingPage() {
           <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
         </div>
 
+        {/* Billing interval toggle */}
+        <div className="mb-8 flex justify-center">
+          <div className="inline-flex items-center rounded-full border border-zinc-200 bg-white p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setBilling("monthly")}
+              className={`rounded-full px-4 py-1.5 font-medium transition ${billing === "monthly" ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"}`}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              onClick={() => setBilling("annual")}
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 font-medium transition ${billing === "annual" ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"}`}
+            >
+              Annual
+              <span className={`rounded-sm px-1 py-0.5 text-[9px] font-bold ${billing === "annual" ? "bg-emerald-400 text-zinc-900" : "bg-emerald-100 text-emerald-700"}`}>
+                −17%
+              </span>
+            </button>
+          </div>
+        </div>
+
         {/* Mobile stacked plan cards */}
         <div className="mb-10 grid gap-4 sm:hidden">
           {TIERS.map((t) => {
@@ -214,8 +241,8 @@ function PricingPage() {
                   </div>
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold tracking-tight text-zinc-900">${t.price}</span>
-                  {t.price > 0 && <span className="text-[11px] text-zinc-500">/mo</span>}
+                  <span className="text-2xl font-bold tracking-tight text-zinc-900">${priceOf(t)}</span>
+                  {t.price > 0 && <span className="text-[11px] text-zinc-500">{suffix}</span>}
                 </div>
                 <p className={`${MONO} mt-0.5 text-[10px] uppercase tracking-wider text-zinc-500`}>{t.bestFor}</p>
                 <ul className="mt-4 space-y-1.5 text-sm text-zinc-700">
@@ -251,8 +278,8 @@ function PricingPage() {
                 </th>
                 {[
                   { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false, key: "free" },
-                  { name: "Pro", price: "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
-                  { name: "Elite", price: "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
+                  { name: "Pro", price: billing === "annual" ? "$290" : "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: billing === "annual" ? "$990" : "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
                   { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false, key: "custom" },
                 ].map((p) => {
                   const isCurrent = currentPlan === p.key;
@@ -277,7 +304,7 @@ function PricingPage() {
                     <div className="mt-2 flex items-baseline gap-1">
                       <span className="text-2xl font-bold tracking-tight text-zinc-900">{p.price}</span>
                       {p.price.startsWith("$") && p.price !== "$0" && (
-                        <span className="text-[11px] text-zinc-500">/month</span>
+                        <span className="text-[11px] text-zinc-500">{billing === "annual" ? "/year" : "/month"}</span>
                       )}
                     </div>
                     <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
