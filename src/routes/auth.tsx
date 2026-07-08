@@ -317,9 +317,9 @@ function AuthPage() {
 
   const humanizeOtpError = (msg: string): string => {
     const m = msg.toLowerCase();
-    if (m.includes("expired")) return "This code has expired. Tap Resend to get a new one.";
+    if (m.includes("expired")) return "Code expired. Tap Resend.";
     if (m.includes("invalid") || m.includes("token") || m.includes("otp"))
-      return "That code doesn't match. Double-check your email and try again.";
+      return "Invalid code. Try again.";
     if (m.includes("rate") || m.includes("too many"))
       return "Too many attempts. Please wait a moment before trying again.";
     return msg || "Verification failed. Try again.";
