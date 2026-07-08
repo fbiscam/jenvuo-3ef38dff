@@ -168,7 +168,20 @@ function AuthPage() {
     });
     setLoading(false);
     if (error) {
-      setErrorMsg(error.message);
+      const msg = error.message || "";
+      const notConfirmed =
+        /confirm/i.test(msg) || /verify/i.test(msg) || /not.*confirmed/i.test(msg);
+      if (notConfirmed) {
+        // Kick straight into OTP verification and resend a fresh code.
+        setMode("signup");
+        setOtpStep(true);
+        setOtpCode("");
+        setErrorMsg("Email not verified yet. We sent you a new code.");
+        void supabase.auth.resend({ type: "signup", email: parsed.data.email });
+        setResendCooldown(60);
+        return;
+      }
+      setErrorMsg(msg);
       return;
     }
     navigate({ to: redirectTo as "/dashboard", replace: true });
