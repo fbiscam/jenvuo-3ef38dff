@@ -693,7 +693,7 @@ function DashboardLayout() {
 
         {/* Row 2 — Market Pulse + two CTA cards */}
         <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div data-tour="market-pulse" className="contents" />
+          <div data-tour="market-pulse">
           <Card>
             <CardHeader
               icon={LineChart}
