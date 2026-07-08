@@ -113,12 +113,15 @@ function ReferralsPage() {
           Your referral link
         </div>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <input
-            readOnly
-            value={info.shareUrl}
-            className="flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 font-mono text-[13px] text-zinc-900"
-            onFocus={(e) => e.currentTarget.select()}
-          />
+          <div className="flex-1 min-w-0 overflow-x-auto rounded-lg border border-zinc-200 bg-white">
+            <input
+              readOnly
+              value={info.shareUrl}
+              className="w-full min-w-max bg-transparent px-3 py-2.5 font-mono text-[13px] text-zinc-900 whitespace-nowrap focus:outline-none"
+              onFocus={(e) => e.currentTarget.select()}
+            />
+          </div>
+
           <div className="flex gap-2">
             <button
               onClick={copyLink}
