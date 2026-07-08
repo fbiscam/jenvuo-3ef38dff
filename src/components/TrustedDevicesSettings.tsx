@@ -69,10 +69,25 @@ export function TrustedDevicesSettings() {
   useEffect(() => {
     void (async () => {
       const { data } = await supabase.auth.getUser();
-      setCurrentUid(data.user?.id ?? null);
+      const uid = data.user?.id ?? null;
+      setCurrentUid(uid);
+      if (uid) setHasCurrentTrust(!!window.localStorage.getItem(TRUSTED_DEVICE_KEY(uid)));
     })();
     void load();
   }, [load]);
+
+  const forgetThisDevice = async () => {
+    setForgetting(true);
+    try {
+      await revokeCurrentTrustedDevice();
+      setHasCurrentTrust(false);
+      toast.success("This device forgotten", { description: "You'll need MFA the next time you sign in here." });
+      await load();
+    } finally {
+      setForgetting(false);
+    }
+  };
+
 
   const revoke = async (id: string) => {
     setRevoking(id);
