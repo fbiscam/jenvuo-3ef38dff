@@ -804,7 +804,7 @@ function AuthPage() {
                         {loading ? btnLoading("Verifying...") : (<>Verify <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                       </button>
 
-                      <div className="pt-2">
+                      <div className="flex items-center justify-between pt-2 gap-3">
                         <button
                           type="button"
                           onClick={cancelMfa}
@@ -812,6 +812,19 @@ function AuthPage() {
                           className="text-xs text-zinc-500 hover:text-zinc-900 transition disabled:opacity-40"
                         >
                           ← Sign in with a different account
+                        </button>
+                        <button
+                          type="button"
+                          onClick={resendMfaChallenge}
+                          disabled={loading || mfaResending || mfaResendCooldown > 0}
+                          className={`text-xs text-zinc-500 hover:text-zinc-900 transition disabled:opacity-40 ${MONO}`}
+                          aria-live="polite"
+                        >
+                          {mfaResending
+                            ? "Requesting…"
+                            : mfaResendCooldown > 0
+                              ? `Resend in ${mfaResendCooldown}s`
+                              : "Resend code"}
                         </button>
                       </div>
                     </form>
