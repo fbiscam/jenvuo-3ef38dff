@@ -154,7 +154,7 @@ function ConfirmEmailChangePage() {
   }, [token, queryClient]);
 
   useEffect(() => {
-    if (status !== "success") return;
+    if (status !== "success" || alreadyDone) return;
     if (countdown <= 0) {
       navigate({ to: "/auth", replace: true });
       return;
