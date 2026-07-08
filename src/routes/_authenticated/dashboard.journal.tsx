@@ -550,6 +550,11 @@ function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t:
             </label>
           )}
 
+          <div className="col-span-2 text-xs">
+            <span className="mb-1 block font-medium text-zinc-700">Setup tags</span>
+            <SetupPicker value={tagIds} onChange={setTagIds} />
+          </div>
+
           <label className="col-span-2 text-xs">
             <span className="mb-1 block font-medium text-zinc-700">Notes</span>
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-900" />
