@@ -87,6 +87,13 @@ function AuthPage() {
   const lastSubmittedOtpRef = React.useRef<string>("");
   const otpInputRef = React.useRef<HTMLInputElement | null>(null);
   const recoveryOtpInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [resendCooldown, setResendCooldown] = React.useState(0);
+
+  React.useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setInterval(() => setResendCooldown((s) => (s <= 1 ? 0 : s - 1)), 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
 
   React.useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
@@ -196,6 +203,7 @@ function AuthPage() {
       toast.success("Verification code sent to your email");
       setOtpStep(true);
       setOtpCode("");
+      setResendCooldown(60);
     }
   };
 
@@ -224,6 +232,7 @@ function AuthPage() {
   };
 
   const resendCode = async () => {
+    if (resendCooldown > 0) return;
     setErrorMsg(null);
     setResending(true);
     const { error } = await supabase.auth.resend({ type: "signup", email });
@@ -233,6 +242,7 @@ function AuthPage() {
       return;
     }
     toast.success("New code sent");
+    setResendCooldown(60);
   };
 
   const forgotEmailSchema = z.object({
@@ -259,6 +269,7 @@ function AuthPage() {
     toast.success("Reset link and code sent to your email");
     setForgotStep("code");
     setOtpCode("");
+    setResendCooldown(60);
   };
 
   const verifyRecoveryOtp = async (e: React.FormEvent) => {
@@ -284,6 +295,7 @@ function AuthPage() {
   };
 
   const resendResetCode = async () => {
+    if (resendCooldown > 0) return;
     setErrorMsg(null);
     setResending(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -295,7 +307,9 @@ function AuthPage() {
       return;
     }
     toast.success("New code sent");
+    setResendCooldown(60);
   };
+
 
   const updatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -464,10 +478,14 @@ function AuthPage() {
                           <button
                             type="button"
                             onClick={resendCode}
-                            disabled={resending}
-                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50"
+                            disabled={resending || resendCooldown > 0}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
                           >
-                            {resending ? "Sending..." : "Resend code"}
+                            {resending
+                              ? "Sending..."
+                              : resendCooldown > 0
+                                ? `Resend in ${resendCooldown}s`
+                                : "Resend code"}
                           </button>
                         </div>
                       </form>
@@ -645,10 +663,14 @@ function AuthPage() {
                           <button
                             type="button"
                             onClick={resendResetCode}
-                            disabled={resending}
-                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50"
+                            disabled={resending || resendCooldown > 0}
+                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
                           >
-                            {resending ? "Sending..." : "Resend code"}
+                            {resending
+                              ? "Sending..."
+                              : resendCooldown > 0
+                                ? `Resend in ${resendCooldown}s`
+                                : "Resend code"}
                           </button>
                         </div>
                       </form>
