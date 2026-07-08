@@ -172,7 +172,7 @@ function ConfirmEmailChangePage() {
                   Restart email change
                 </button>
                 <button
-                  onClick={() => navigate({ to: "/auth" })}
+                  onClick={goToSignIn}
                   className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50"
                 >
                   Back to sign in
