@@ -96,6 +96,41 @@ function Profile() {
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+        <h2 className="text-base font-semibold">Change email</h2>
+        <p className="mt-1 text-sm text-zinc-500">
+          Enter a new email and we'll send a confirmation link to your current email address. Your email changes only after you click that link.
+        </p>
+        <div className="mt-4 space-y-3">
+          <label className="block text-xs font-medium text-zinc-600">
+            New email
+            <input
+              type="email"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="mt-1 block w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm"
+            />
+          </label>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={changeEmail}
+              disabled={changingEmail || !newEmail}
+              className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+            >
+              {changingEmail ? "Sending…" : "Change email"}
+            </button>
+            {emailPending && (
+              <span className="text-xs font-medium text-amber-600">
+                Verification pending — check {email} for a confirmation link.
+              </span>
+            )}
+          </div>
+          {emailError && <p className="text-xs font-medium text-rose-600">{emailError}</p>}
+        </div>
+      </section>
+
+
+      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <h2 className="text-base font-semibold">Security</h2>
         <p className="mt-1 text-sm text-zinc-500">Protect your account with a password reset link or two-factor authentication.</p>
 
