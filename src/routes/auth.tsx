@@ -232,6 +232,7 @@ function AuthPage() {
   };
 
   const resendCode = async () => {
+    if (resendCooldown > 0) return;
     setErrorMsg(null);
     setResending(true);
     const { error } = await supabase.auth.resend({ type: "signup", email });
@@ -241,6 +242,7 @@ function AuthPage() {
       return;
     }
     toast.success("New code sent");
+    setResendCooldown(60);
   };
 
   const forgotEmailSchema = z.object({
