@@ -223,16 +223,8 @@ export default function SiteFooter() {
           >
             © {year} JENVU AI · ALL RIGHTS RESERVED
           </div>
-          <div
-            className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-900 flex items-center gap-3`}
-          >
-            <a
-              href="mailto:support@jenvu.com"
-              className="hover:text-zinc-700 transition-colors"
-            >
-              support@jenvu.com
-            </a>
-          </div>
+          <NewsletterSubscribe />
+
 
         </div>
       </div>
