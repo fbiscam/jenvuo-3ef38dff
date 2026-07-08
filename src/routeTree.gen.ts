@@ -19,6 +19,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LlmRouteImport } from './routes/llm'
 import { Route as KillzonesRouteImport } from './routes/killzones'
+import { Route as JenvuOpsX9k2RouteImport } from './routes/jenvu-ops-x9k2'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
@@ -30,17 +31,16 @@ import { Route as BriefsRouteImport } from './routes/briefs'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AiEngineRouteImport } from './routes/ai-engine'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BriefIdRouteImport } from './routes/brief.$id'
-import { Route as AdminInboxRouteImport } from './routes/admin.inbox'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
@@ -119,6 +119,11 @@ const KillzonesRoute = KillzonesRouteImport.update({
   path: '/killzones',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JenvuOpsX9k2Route = JenvuOpsX9k2RouteImport.update({
+  id: '/jenvu-ops-x9k2',
+  path: '/jenvu-ops-x9k2',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InsightsRoute = InsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
@@ -174,11 +179,6 @@ const AiEngineRoute = AiEngineRouteImport.update({
   path: '/ai-engine',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -193,6 +193,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JenvuOpsX9k2IndexRoute = JenvuOpsX9k2IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => JenvuOpsX9k2Route,
+} as any)
 const InsightsIndexRoute = InsightsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -203,10 +208,10 @@ const HelpIndexRoute = HelpIndexRouteImport.update({
   path: '/help/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
+const JenvuOpsX9k2InboxRoute = JenvuOpsX9k2InboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => JenvuOpsX9k2Route,
 } as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/$slug',
@@ -222,11 +227,6 @@ const BriefIdRoute = BriefIdRouteImport.update({
   id: '/brief/$id',
   path: '/brief/$id',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AdminInboxRoute = AdminInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => AdminRoute,
 } as any)
 const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
   id: '/inbox',
@@ -385,7 +385,6 @@ const AuthenticatedDashboardAdminMessagesRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
@@ -397,6 +396,7 @@ export interface FileRoutesByFullPath {
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
   '/insights': typeof InsightsRouteWithChildren
+  '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
@@ -409,13 +409,13 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
-  '/admin/inbox': typeof AdminInboxRoute
   '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
-  '/admin/': typeof AdminIndexRoute
+  '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -466,13 +466,13 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/inbox': typeof AuthenticatedInboxRoute
-  '/admin/inbox': typeof AdminInboxRoute
   '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
-  '/admin': typeof AdminIndexRoute
+  '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
+  '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -504,7 +504,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
@@ -516,6 +515,7 @@ export interface FileRoutesById {
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
   '/insights': typeof InsightsRouteWithChildren
+  '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
@@ -528,13 +528,13 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
-  '/admin/inbox': typeof AdminInboxRoute
   '/brief/$id': typeof BriefIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
-  '/admin/': typeof AdminIndexRoute
+  '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -566,7 +566,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/admin'
     | '/ai-engine'
     | '/app'
     | '/auth'
@@ -578,6 +577,7 @@ export interface FileRouteTypes {
     | '/disclaimer'
     | '/download'
     | '/insights'
+    | '/jenvu-ops-x9k2'
     | '/killzones'
     | '/llm'
     | '/pricing'
@@ -590,13 +590,13 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/dashboard'
     | '/inbox'
-    | '/admin/inbox'
     | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
-    | '/admin/'
+    | '/jenvu-ops-x9k2/inbox'
     | '/help/'
     | '/insights/'
+    | '/jenvu-ops-x9k2/'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -647,13 +647,13 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/inbox'
-    | '/admin/inbox'
     | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
-    | '/admin'
+    | '/jenvu-ops-x9k2/inbox'
     | '/help'
     | '/insights'
+    | '/jenvu-ops-x9k2'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -684,7 +684,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/about'
-    | '/admin'
     | '/ai-engine'
     | '/app'
     | '/auth'
@@ -696,6 +695,7 @@ export interface FileRouteTypes {
     | '/disclaimer'
     | '/download'
     | '/insights'
+    | '/jenvu-ops-x9k2'
     | '/killzones'
     | '/llm'
     | '/pricing'
@@ -708,13 +708,13 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
-    | '/admin/inbox'
     | '/brief/$id'
     | '/email/unsubscribe'
     | '/insights/$slug'
-    | '/admin/'
+    | '/jenvu-ops-x9k2/inbox'
     | '/help/'
     | '/insights/'
+    | '/jenvu-ops-x9k2/'
     | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
@@ -746,7 +746,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRouteWithChildren
   AiEngineRoute: typeof AiEngineRoute
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
@@ -758,6 +757,7 @@ export interface RootRouteChildren {
   DisclaimerRoute: typeof DisclaimerRoute
   DownloadRoute: typeof DownloadRoute
   InsightsRoute: typeof InsightsRouteWithChildren
+  JenvuOpsX9k2Route: typeof JenvuOpsX9k2RouteWithChildren
   KillzonesRoute: typeof KillzonesRoute
   LlmRoute: typeof LlmRoute
   PricingRoute: typeof PricingRoute
@@ -859,6 +859,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KillzonesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jenvu-ops-x9k2': {
+      id: '/jenvu-ops-x9k2'
+      path: '/jenvu-ops-x9k2'
+      fullPath: '/jenvu-ops-x9k2'
+      preLoaderRoute: typeof JenvuOpsX9k2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/insights': {
       id: '/insights'
       path: '/insights'
@@ -936,13 +943,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiEngineRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -964,6 +964,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jenvu-ops-x9k2/': {
+      id: '/jenvu-ops-x9k2/'
+      path: '/'
+      fullPath: '/jenvu-ops-x9k2/'
+      preLoaderRoute: typeof JenvuOpsX9k2IndexRouteImport
+      parentRoute: typeof JenvuOpsX9k2Route
+    }
     '/insights/': {
       id: '/insights/'
       path: '/'
@@ -978,12 +985,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
+    '/jenvu-ops-x9k2/inbox': {
+      id: '/jenvu-ops-x9k2/inbox'
+      path: '/inbox'
+      fullPath: '/jenvu-ops-x9k2/inbox'
+      preLoaderRoute: typeof JenvuOpsX9k2InboxRouteImport
+      parentRoute: typeof JenvuOpsX9k2Route
     }
     '/insights/$slug': {
       id: '/insights/$slug'
@@ -1005,13 +1012,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/brief/$id'
       preLoaderRoute: typeof BriefIdRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/admin/inbox': {
-      id: '/admin/inbox'
-      path: '/inbox'
-      fullPath: '/admin/inbox'
-      preLoaderRoute: typeof AdminInboxRouteImport
-      parentRoute: typeof AdminRoute
     }
     '/_authenticated/inbox': {
       id: '/_authenticated/inbox'
@@ -1255,18 +1255,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface AdminRouteChildren {
-  AdminInboxRoute: typeof AdminInboxRoute
-  AdminIndexRoute: typeof AdminIndexRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminInboxRoute: AdminInboxRoute,
-  AdminIndexRoute: AdminIndexRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
-
 interface InsightsRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
@@ -1281,11 +1269,24 @@ const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
   InsightsRouteChildren,
 )
 
+interface JenvuOpsX9k2RouteChildren {
+  JenvuOpsX9k2InboxRoute: typeof JenvuOpsX9k2InboxRoute
+  JenvuOpsX9k2IndexRoute: typeof JenvuOpsX9k2IndexRoute
+}
+
+const JenvuOpsX9k2RouteChildren: JenvuOpsX9k2RouteChildren = {
+  JenvuOpsX9k2InboxRoute: JenvuOpsX9k2InboxRoute,
+  JenvuOpsX9k2IndexRoute: JenvuOpsX9k2IndexRoute,
+}
+
+const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
+  JenvuOpsX9k2RouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRouteWithChildren,
   AiEngineRoute: AiEngineRoute,
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
@@ -1297,6 +1298,7 @@ const rootRouteChildren: RootRouteChildren = {
   DisclaimerRoute: DisclaimerRoute,
   DownloadRoute: DownloadRoute,
   InsightsRoute: InsightsRouteWithChildren,
+  JenvuOpsX9k2Route: JenvuOpsX9k2RouteWithChildren,
   KillzonesRoute: KillzonesRoute,
   LlmRoute: LlmRoute,
   PricingRoute: PricingRoute,
