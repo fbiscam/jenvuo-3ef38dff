@@ -315,8 +315,9 @@ function AuthPage() {
   const verifyRecoveryOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+    setOtpError(null);
     if (!/^\d{6}$/.test(otpCode)) {
-      setErrorMsg("Enter the 6-digit code from your email");
+      triggerOtpError("Enter the 6-digit code from your email", true);
       return;
     }
     setLoading(true);
@@ -328,11 +329,12 @@ function AuthPage() {
     });
     setLoading(false);
     if (error) {
-      setErrorMsg(error.message);
+      triggerOtpError(error.message, true);
       return;
     }
     setForgotStep("reset");
   };
+
 
   const resendResetCode = async () => {
     if (resendCooldown > 0) return;
