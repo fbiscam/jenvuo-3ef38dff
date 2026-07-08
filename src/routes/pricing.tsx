@@ -241,8 +241,8 @@ function PricingPage() {
                   </div>
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold tracking-tight text-zinc-900">${t.price}</span>
-                  {t.price > 0 && <span className="text-[11px] text-zinc-500">/mo</span>}
+                  <span className="text-2xl font-bold tracking-tight text-zinc-900">${priceOf(t)}</span>
+                  {t.price > 0 && <span className="text-[11px] text-zinc-500">{suffix}</span>}
                 </div>
                 <p className={`${MONO} mt-0.5 text-[10px] uppercase tracking-wider text-zinc-500`}>{t.bestFor}</p>
                 <ul className="mt-4 space-y-1.5 text-sm text-zinc-700">
