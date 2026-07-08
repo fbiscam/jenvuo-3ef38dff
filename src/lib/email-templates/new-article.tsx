@@ -12,6 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 import type { TemplateEntry } from './registry'
+import { EmailFonts } from './_shared'
 
 interface Props {
   title?: string
@@ -48,7 +49,7 @@ const Email = ({
   publishedAt,
 }: Props) => (
   <Html lang="en" dir="ltr">
-    <Head />
+    <Head><EmailFonts /></Head>
     <Preview>{`${title} — ${excerpt.slice(0, 90)}`}</Preview>
     <Body style={main}>
       <Container style={outer}>
