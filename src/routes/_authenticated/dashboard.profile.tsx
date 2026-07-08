@@ -43,6 +43,32 @@ function Profile() {
     if (error) toast.error("Could not save"); else toast.success("Profile updated");
   };
 
+  const changeEmail = async () => {
+    setEmailError(null);
+    const target = newEmail.trim().toLowerCase();
+    if (!target) return;
+    if (target === email.toLowerCase()) {
+      setEmailError("New email must be different from your current email.");
+      return;
+    }
+    setChangingEmail(true);
+    try {
+      const res = await requestEmailChange({ data: { newEmail: target, siteUrl: window.location.origin } });
+      if (!res.ok) {
+        setEmailError(res.error || "Could not send confirmation email.");
+        setEmailPending(null);
+      } else {
+        setEmailPending(target);
+        setNewEmail("");
+        toast.success("Confirmation link sent to your current email.");
+      }
+    } catch (e: any) {
+      setEmailError(e?.message || "Could not send confirmation email.");
+    } finally {
+      setChangingEmail(false);
+    }
+  };
+
   const sendPasswordReset = async () => {
     if (!email) return;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
