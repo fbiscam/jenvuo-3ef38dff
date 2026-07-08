@@ -1,5 +1,22 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getRequest } from '@tanstack/react-start/server'
 import { z } from 'zod'
+
+function readClientIp(): string {
+  try {
+    const req = getRequest()
+    const h = req.headers
+    const raw =
+      h.get('cf-connecting-ip') ||
+      h.get('x-forwarded-for')?.split(',')[0] ||
+      h.get('x-real-ip') ||
+      ''
+    return raw.trim()
+  } catch {
+    return ''
+  }
+}
+
 import {
   createRecoveryOtp,
   createSignupOtp,
