@@ -159,6 +159,7 @@ export function LiveChatWidget() {
     lastCountRef.current = 0;
   };
 
+  if (!allowed) return null;
   return (
     <>
       {/* Floating Button */}
