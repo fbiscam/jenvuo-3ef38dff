@@ -580,23 +580,25 @@ function AuthPage() {
                   </p>
 
 
-                  {/* Tabs */}
-                  <div className="mt-4 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
-                    <button
-                      type="button"
-                      onClick={() => { setMode("signin"); setErrorMsg(null); }}
-                      className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signin" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
-                    >
-                      Sign in
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
-                      className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
-                    >
-                      Sign up
-                    </button>
-                  </div>
+                  {/* Tabs — hidden during MFA challenge */}
+                  {!mfaChallenge && (
+                    <div className="mt-4 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
+                      <button
+                        type="button"
+                        onClick={() => { setMode("signin"); setErrorMsg(null); }}
+                        className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signin" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
+                      >
+                        Sign in
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
+                        className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
+                      >
+                        Sign up
+                      </button>
+                    </div>
+                  )}
 
                   {mfaChallenge ? (
                     <form onSubmit={verifyMfa} className="mt-4 space-y-3">
