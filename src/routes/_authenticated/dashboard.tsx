@@ -504,7 +504,9 @@ function DashboardLayout() {
   };
 
 
-  const signOut = () => {
+  const signOut = async () => {
+    // Revoke this browser's trusted-device row before the bearer disappears.
+    await revokeCurrentTrustedDevice();
     // Clear the browser session synchronously so reloads cannot restore the
     // signed-in user before Supabase finishes its async sign-out work.
     clearStoredAuthSession();
