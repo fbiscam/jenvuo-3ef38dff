@@ -161,7 +161,7 @@ function ConfirmEmailChangePage() {
     }
     const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(t);
-  }, [status, countdown, navigate]);
+  }, [status, alreadyDone, countdown, navigate]);
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md items-center px-6">
