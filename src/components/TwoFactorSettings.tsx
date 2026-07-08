@@ -260,10 +260,8 @@ export function TwoFactorSettings() {
         <Shield className="mt-0.5 h-5 w-5 shrink-0 text-zinc-500" />
         <div className="flex-1">
           <p className="text-sm font-medium text-zinc-900">Two-factor authentication</p>
-          <p className="mt-1 text-xs text-zinc-500">
-            Add an extra layer of security. When enabled, every sign-in will require a 6-digit code
-            from an authenticator app (Google Authenticator, 1Password, Authy, etc.).
-          </p>
+          <p className="mt-1 text-xs text-zinc-500">Require a 6-digit code from an authenticator app on every sign-in.</p>
+
         </div>
         <button
           onClick={startEnroll}
