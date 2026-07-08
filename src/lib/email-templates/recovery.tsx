@@ -64,9 +64,6 @@ export const RecoveryEmail = ({
               If you didn't request a reset, ignore this email — your password
               stays the same.
             </Text>
-            <Text style={s.legal}>
-              JENVU · {siteName}
-            </Text>
           </Section>
         </Container>
       </Body>
