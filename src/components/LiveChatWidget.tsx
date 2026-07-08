@@ -14,6 +14,33 @@ const NAME_KEY = "jenvu_chat_name_v1";
 const POLL_MS = 2500;
 
 export function LiveChatWidget() {
+  const [pathname, setPathname] = useState<string>(() =>
+    typeof window !== "undefined" ? window.location.pathname : ""
+  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const update = () => setPathname(window.location.pathname);
+    window.addEventListener("popstate", update);
+    const push = history.pushState;
+    const replace = history.replaceState;
+    history.pushState = function (...args) {
+      const r = push.apply(this, args as any);
+      update();
+      return r;
+    };
+    history.replaceState = function (...args) {
+      const r = replace.apply(this, args as any);
+      update();
+      return r;
+    };
+    return () => {
+      window.removeEventListener("popstate", update);
+      history.pushState = push;
+      history.replaceState = replace;
+    };
+  }, []);
+  const allowed = pathname === "/contact" || pathname.startsWith("/help");
+
   const [open, setOpen] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -132,6 +159,7 @@ export function LiveChatWidget() {
     lastCountRef.current = 0;
   };
 
+  if (!allowed) return null;
   return (
     <>
       {/* Floating Button */}
