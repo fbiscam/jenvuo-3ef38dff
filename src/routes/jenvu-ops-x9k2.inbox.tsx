@@ -30,29 +30,18 @@ export const Route = createFileRoute("/jenvu-ops-x9k2/inbox")({
       { title: "Support Inbox — Admin" },
       { name: "robots", content: "noindex, nofollow" },
     ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap",
-      },
-    ],
   }),
   component: AdminInbox,
 });
 
-const SERIF = { fontFamily: "'Instrument Serif', ui-serif, Georgia, serif" } as const;
-const SANS = { fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif" } as const;
-
 type Session = {
   id: string;
-  source: "chat" | "form";
   guest_name: string | null;
   guest_email: string | null;
   status: string;
   last_message_at: string;
   unread_admin: number;
   created_at: string;
-  subject?: string | null;
 };
 
 type Message = {
@@ -212,64 +201,59 @@ function AdminInbox() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50" style={SANS}>
+    <div className="min-h-screen bg-zinc-50">
       {/* Top bar */}
-      <div className="border-b border-stone-200 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-white ring-1 ring-stone-200 overflow-hidden shadow-sm">
-              <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 object-contain" />
+      <div className="border-b border-zinc-200 bg-white">
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-2">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-zinc-900 text-white">
+              <MessageSquare className="h-4 w-4" />
             </span>
             <div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-[22px] leading-none text-stone-900" style={SERIF}>Support</span>
-                <span className="text-[22px] leading-none italic text-stone-500" style={SERIF}>Inbox</span>
-              </div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-stone-500">
-                Signed in · <span className="font-semibold text-stone-700">{username}</span>
+              <div className="text-sm font-semibold text-zinc-900">Support Inbox</div>
+              <div className="text-[10px] text-zinc-500">
+                Signed in as <span className="font-medium text-zinc-700">{username}</span>
               </div>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3.5 py-1.5 text-xs font-medium text-stone-700 shadow-sm transition hover:border-stone-300 hover:bg-stone-50"
+            className="flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
           >
             <LogOut className="h-3.5 w-3.5" /> Sign out
           </button>
         </div>
       </div>
 
-      <div className="mx-auto flex h-[calc(100vh-4.5rem)] max-w-[1400px] flex-col gap-4 p-4 sm:p-6">
-        <div className="grid grid-cols-3 gap-3 sm:max-w-xl">
-          <StatCard icon={<Inbox className="h-3.5 w-3.5" />} label="Open" value={stats.open} accent="text-emerald-600" dot="bg-emerald-500" />
-          <StatCard icon={<Mail className="h-3.5 w-3.5" />} label="Unread" value={stats.unread} accent="text-rose-600" dot="bg-rose-500" />
-          <StatCard icon={<Users className="h-3.5 w-3.5" />} label="Total" value={stats.total} accent="text-stone-700" dot="bg-stone-400" />
+      <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-[1400px] flex-col gap-4 p-4 sm:p-6">
+        <div className="grid grid-cols-3 gap-2 sm:max-w-md sm:gap-3">
+          <StatCard icon={<Inbox className="h-3.5 w-3.5" />} label="Open" value={stats.open} accent="text-emerald-600" />
+          <StatCard icon={<Mail className="h-3.5 w-3.5" />} label="Unread" value={stats.unread} accent="text-red-600" />
+          <StatCard icon={<Users className="h-3.5 w-3.5" />} label="Total" value={stats.total} accent="text-zinc-700" />
         </div>
 
-        <div className="flex flex-1 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.08)]">
+        <div className="flex flex-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
           {/* Sidebar */}
           <aside
-            className={`flex w-full flex-col border-r border-stone-200 sm:w-80 ${activeId ? "hidden sm:flex" : "flex"}`}
+            className={`flex w-full flex-col border-r border-zinc-200 sm:w-80 ${activeId ? "hidden sm:flex" : "flex"}`}
           >
-            <div className="border-b border-stone-200 p-3">
+            <div className="border-b border-zinc-200 p-3">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search name or email…"
-                  className="w-full rounded-full border border-stone-200 bg-stone-50 py-2 pl-9 pr-3 text-sm placeholder:text-stone-400 focus:border-stone-400 focus:bg-white focus:outline-none"
+                  className="w-full rounded-md border border-zinc-200 bg-zinc-50 py-2 pl-9 pr-3 text-sm placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none"
                 />
               </div>
-              <div className="mt-2 flex gap-1 rounded-full bg-stone-100 p-1 text-xs">
+              <div className="mt-2 flex gap-1 rounded-md bg-zinc-100 p-1 text-xs">
                 {(["open", "closed", "all"] as const).map((k) => (
                   <button
                     key={k}
                     onClick={() => setFilter(k)}
-                    className={`flex-1 rounded-full px-2 py-1 capitalize transition ${
-                      filter === k
-                        ? "bg-white text-stone-900 shadow-sm ring-1 ring-stone-200"
-                        : "text-stone-600 hover:text-stone-900"
+                    className={`flex-1 rounded px-2 py-1 capitalize transition ${
+                      filter === k ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-600 hover:text-zinc-900"
                     }`}
                   >
                     {k}
@@ -281,11 +265,9 @@ function AdminInbox() {
             <div className="flex-1 overflow-y-auto">
               {filtered.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                  <div className="grid h-12 w-12 place-items-center rounded-full bg-stone-100 ring-1 ring-stone-200">
-                    <Inbox className="h-5 w-5 text-stone-400" />
-                  </div>
-                  <p className="mt-3 text-base text-stone-800" style={SERIF}>No conversations</p>
-                  <p className="mt-1 text-xs text-stone-500">
+                  <Inbox className="h-8 w-8 text-zinc-300" />
+                  <p className="mt-2 text-sm font-medium text-zinc-700">No conversations</p>
+                  <p className="mt-1 text-xs text-zinc-500">
                     {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
                   </p>
                 </div>
@@ -297,34 +279,29 @@ function AdminInbox() {
                     <button
                       key={s.id}
                       onClick={() => setActiveId(s.id)}
-                      className={`flex w-full items-start gap-3 border-b border-stone-100 px-4 py-3 text-left transition ${
-                        isActive
-                          ? "bg-stone-50/80 border-l-2 border-l-stone-900"
-                          : "border-l-2 border-l-transparent hover:bg-stone-50/60"
+                      className={`flex w-full items-start gap-3 border-b border-zinc-100 px-3 py-3 text-left transition ${
+                        isActive ? "bg-zinc-50" : "hover:bg-zinc-50/60"
                       }`}
                     >
                       <div className="relative shrink-0">
-                        <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-stone-800 to-stone-600 text-[11px] font-semibold text-white ring-1 ring-stone-900/10">
+                        <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-zinc-800 to-zinc-600 text-[11px] font-semibold text-white">
                           {initials(s.guest_name, s.guest_email)}
                         </div>
                         <span
                           className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${
-                            s.status === "open" ? "bg-emerald-500" : "bg-stone-300"
+                            s.status === "open" ? "bg-emerald-500" : "bg-zinc-300"
                           }`}
                         />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <div className="flex min-w-0 items-center gap-1.5">
-                            <span className="truncate text-sm font-semibold text-stone-900">{name}</span>
-                            <SourceBadge source={s.source} />
-                          </div>
-                          <span className="shrink-0 text-[10px] font-medium text-stone-400">{timeAgo(s.last_message_at)}</span>
+                          <span className="truncate text-sm font-medium text-zinc-900">{name}</span>
+                          <span className="shrink-0 text-[10px] text-zinc-400">{timeAgo(s.last_message_at)}</span>
                         </div>
                         <div className="mt-0.5 flex items-center justify-between gap-2">
-                          <span className="truncate text-xs text-stone-500">{s.guest_email || "No email"}</span>
+                          <span className="truncate text-xs text-zinc-500">{s.guest_email || "No email"}</span>
                           {s.unread_admin > 0 && (
-                            <span className="grid h-4 min-w-4 shrink-0 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white shadow-sm">
+                            <span className="grid h-4 min-w-4 shrink-0 place-items-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
                               {s.unread_admin}
                             </span>
                           )}
@@ -338,16 +315,14 @@ function AdminInbox() {
           </aside>
 
           {/* Conversation */}
-          <section className={`flex flex-1 flex-col bg-stone-50/40 ${activeId ? "flex" : "hidden sm:flex"}`}>
+          <section className={`flex flex-1 flex-col ${activeId ? "flex" : "hidden sm:flex"}`}>
             {!activeSession ? (
-              <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-                <div className="grid h-16 w-16 place-items-center rounded-full bg-white ring-1 ring-stone-200 shadow-sm">
-                  <MessageSquare className="h-7 w-7 text-stone-400" />
+              <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
+                <div className="grid h-14 w-14 place-items-center rounded-full bg-zinc-100">
+                  <MessageSquare className="h-6 w-6 text-zinc-400" />
                 </div>
-                <p className="text-2xl text-stone-900" style={SERIF}>
-                  Select a <span className="italic text-stone-500">conversation</span>
-                </p>
-                <p className="max-w-xs text-xs text-stone-500 leading-relaxed">
+                <p className="text-sm font-medium text-zinc-800">Select a conversation</p>
+                <p className="max-w-xs text-xs text-zinc-500">
                   Pick a chat from the left to view messages and reply to your visitor.
                 </p>
               </div>
@@ -369,7 +344,6 @@ function AdminInbox() {
                       <span className="truncate text-sm font-semibold text-zinc-900">
                         {activeSession.guest_name || "Anonymous visitor"}
                       </span>
-                      <SourceBadge source={activeSession.source} />
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
                           activeSession.status === "open"
@@ -454,57 +428,38 @@ function AdminInbox() {
                   })}
                 </div>
 
-                {activeSession.source === "form" ? (
-                  <div className="flex items-center justify-between gap-2 border-t border-zinc-200 bg-white p-3">
-                    <div className="text-xs text-zinc-500">
-                      Contact form submission — reply directly via email.
+                <form onSubmit={handleReply} className="border-t border-zinc-200 bg-white p-3">
+                  {activeSession.status === "closed" ? (
+                    <div className="flex items-center justify-center gap-2 rounded-md bg-zinc-50 py-3 text-xs text-zinc-500">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
                     </div>
-                    {activeSession.guest_email && (
-                      <a
-                        href={`mailto:${activeSession.guest_email}${
-                          activeSession.subject ? `?subject=${encodeURIComponent("Re: " + activeSession.subject)}` : ""
-                        }`}
-                        className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800"
+                  ) : (
+                    <div className="flex items-end gap-2 rounded-lg border border-zinc-200 bg-white p-2 focus-within:border-zinc-400">
+                      <textarea
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleReply(e as unknown as React.FormEvent);
+                          }
+                        }}
+                        placeholder="Type your reply…  (Shift+Enter for new line)"
+                        rows={1}
+                        maxLength={4000}
+                        className="max-h-40 min-h-[36px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
+                      />
+                      <button
+                        type="submit"
+                        disabled={sending || !input.trim()}
+                        className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
                       >
-                        <Mail className="h-4 w-4" />
-                        <span>Reply via email</span>
-                      </a>
-                    )}
-                  </div>
-                ) : (
-                  <form onSubmit={handleReply} className="border-t border-zinc-200 bg-white p-3">
-                    {activeSession.status === "closed" ? (
-                      <div className="flex items-center justify-center gap-2 rounded-md bg-zinc-50 py-3 text-xs text-zinc-500">
-                        <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
-                      </div>
-                    ) : (
-                      <div className="flex items-end gap-2 rounded-lg border border-zinc-200 bg-white p-2 focus-within:border-zinc-400">
-                        <textarea
-                          value={input}
-                          onChange={(e) => setInput(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                              e.preventDefault();
-                              handleReply(e as unknown as React.FormEvent);
-                            }
-                          }}
-                          placeholder="Type your reply…  (Shift+Enter for new line)"
-                          rows={1}
-                          maxLength={4000}
-                          className="max-h-40 min-h-[36px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
-                        />
-                        <button
-                          type="submit"
-                          disabled={sending || !input.trim()}
-                          className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
-                        >
-                          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                          <span className="hidden sm:inline">Send</span>
-                        </button>
-                      </div>
-                    )}
-                  </form>
-                )}
+                        {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                        <span className="hidden sm:inline">Send</span>
+                      </button>
+                    </div>
+                  )}
+                </form>
               </>
             )}
           </section>
@@ -519,41 +474,19 @@ function StatCard({
   label,
   value,
   accent,
-  dot,
 }: {
   icon: React.ReactNode;
   label: string;
   value: number;
   accent: string;
-  dot: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm transition hover:border-stone-300">
-      <div className="flex items-center gap-3">
-        <span className={`grid h-8 w-8 place-items-center rounded-full bg-stone-50 ring-1 ring-stone-200/60 ${accent}`}>{icon}</span>
-        <div className="leading-tight">
-          <div className="flex items-center gap-1.5">
-            <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
-            <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-stone-500">{label}</span>
-          </div>
-          <div className="mt-0.5 text-2xl leading-none text-stone-900" style={SERIF}>{value}</div>
-        </div>
+    <div className="flex min-w-[92px] items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+      <span className={`grid h-6 w-6 place-items-center rounded-md bg-zinc-50 ${accent}`}>{icon}</span>
+      <div className="leading-tight">
+        <div className="text-[10px] uppercase tracking-wide text-zinc-500">{label}</div>
+        <div className="text-sm font-semibold text-zinc-900">{value}</div>
       </div>
     </div>
-  );
-}
-
-function SourceBadge({ source }: { source: "chat" | "form" }) {
-  if (source === "form") {
-    return (
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200">
-        <Mail className="h-2.5 w-2.5" /> Form
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-blue-700 ring-1 ring-blue-200">
-      <MessageSquare className="h-2.5 w-2.5" /> Live chat
-    </span>
   );
 }
