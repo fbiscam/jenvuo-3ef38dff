@@ -345,7 +345,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Free" },
           { type: "ul", items: [
-            "5 signal scans per month.",
+            "2 signal scans per month.",
             "Voice agent with basic narration (unlimited & free).",
             "Signal engine on Gold.",
             "Standard A+ alerts (delayed by ~4 hours).",
