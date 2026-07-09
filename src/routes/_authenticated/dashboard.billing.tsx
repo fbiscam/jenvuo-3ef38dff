@@ -124,11 +124,15 @@ function Billing() {
             style={{ left: `${pct}%` }}
           />
         </div>
-        {credits.state?.recent && credits.state.recent.length > 0 && (
+        {(() => {
+          const scanReasons = new Set(["signal", "ict_narration", "alert", "voice_query"]);
+          const filtered = (credits.state?.recent ?? []).filter((r) => scanReasons.has(r.reason));
+          if (filtered.length === 0) return null;
+          return (
           <div className="mt-6">
             <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Scan history</div>
             <div className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
-              {(showAllActivity ? credits.state.recent : credits.state.recent.slice(0, 10)).map((r) => {
+              {(showAllActivity ? filtered : filtered.slice(0, 10)).map((r) => {
                 const d = new Date(r.created_at);
                 const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
                 const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
