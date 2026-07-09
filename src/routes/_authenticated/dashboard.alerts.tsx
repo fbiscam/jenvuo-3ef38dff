@@ -170,7 +170,7 @@ function AlertPrefs() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
-                {alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter).map((a) => {
+                {alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter).slice(0, visibleCount).map((a) => {
                   const isBuy = a.direction === "BUY";
                   const ago = relativeTime(new Date(a.fired_at));
                   return (
@@ -198,6 +198,20 @@ function AlertPrefs() {
             </table>
           )}
         </div>
+        {(() => {
+          const filtered = alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter);
+          if (filtered.length <= visibleCount) return null;
+          return (
+            <div className="mt-3 flex justify-center">
+              <button
+                onClick={() => setVisibleCount((c) => c + 10)}
+                className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+              >
+                Show more ({filtered.length - visibleCount} remaining)
+              </button>
+            </div>
+          );
+        })()}
 
       </section>
 
