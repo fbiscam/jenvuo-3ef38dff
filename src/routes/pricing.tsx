@@ -439,17 +439,16 @@ function PricingPage() {
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Credit top-ups</span>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more credits this month?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time packs that never expire. Stack on top of any plan, including Free. Every $1 = 8 credits.</p>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more scans this month?</h2>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time packs that never expire. Stack on top of any plan, including Free.</p>
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { credits: 40, price: 5, sub: "Starter" },
-            { credits: 80, price: 10, sub: "Boost" },
-            { credits: 160, price: 20, sub: "Trader", accent: true },
-            { credits: 400, price: 50, sub: "Power" },
-            { credits: 800, price: 100, sub: "Desk" },
+            { credits: 15, price: 5, sub: "Starter" },
+            { credits: 35, price: 10, sub: "Boost" },
+            { credits: 90, price: 25, sub: "Trader", accent: true },
+            { credits: 200, price: 50, sub: "Power" },
           ].map((p) => (
             <div key={p.credits} className={`rounded-2xl border ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
               <div className="flex items-center justify-between">
