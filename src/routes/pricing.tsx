@@ -545,7 +545,7 @@ function CustomTopUp() {
           </div>
           <div className="text-right">
             <div className={`text-2xl font-bold tabular-nums ${MONO}`}>{credits}</div>
-            <div className="text-[11px] text-zinc-500">credits</div>
+            <div className="text-[11px] text-zinc-500">scans</div>
           </div>
           <Link
             to="/contact"
