@@ -586,7 +586,7 @@ function AdminInbox() {
               </div>
 
               {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-white">
                 <div className="mx-auto max-w-3xl space-y-1 p-5">
                   {messages.length === 0 && (
                     <div className="py-8 text-center text-[11.5px] text-zinc-500">No messages yet.</div>
