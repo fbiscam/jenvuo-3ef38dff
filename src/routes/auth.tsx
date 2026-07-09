@@ -15,6 +15,7 @@ import {
 import { applyReferralCode } from "@/lib/referrals.functions";
 import { registerTrustedDevice, verifyTrustedDevice } from "@/lib/trusted-devices.functions";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { createUserNotification } from "@/lib/notifications.functions";
 
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 
@@ -626,6 +627,15 @@ function AuthPage() {
       recipientEmail: email,
       idempotencyKey: `welcome-${email.toLowerCase()}`,
       templateData: { fullName, siteUrl: window.location.origin },
+    });
+    // Mirror the welcome email as an in-app notification
+    void createUserNotification({
+      data: {
+        type: "welcome",
+        title: `Welcome to Jenvu${fullName ? ", " + fullName.split(" ")[0] : ""} 👋`,
+        body: "Your account is ready. Explore signals, dashboard, and referrals.",
+        dedupeKey: `welcome-${email.toLowerCase()}`,
+      },
     });
   };
 
