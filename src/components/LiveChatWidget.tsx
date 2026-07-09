@@ -166,7 +166,7 @@ export function LiveChatWidget() {
       console.error("send error", err);
       setMessages((m) => m.filter((x) => x.id !== tempId));
       setInput(content);
-      alert("Message failed to send.");
+      toast.error("Message failed to send", { description: "Please try again." });
     } finally {
       setSending(false);
     }
