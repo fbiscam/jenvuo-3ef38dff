@@ -235,7 +235,7 @@ function SignalDeskHistory() {
   }
 
   return (
-    <div className="flex-1 divide-y divide-zinc-100 overflow-y-auto scrollbar-auto-hide max-h-[360px]">
+    <div className="flex-1 divide-y divide-zinc-100 overflow-y-auto scrollbar-auto-hide max-h-[260px]">
       {alerts.map((a) => {
         const isBuy = a.direction?.toLowerCase().includes("long") || a.direction?.toLowerCase().includes("buy");
         const when = new Date(a.fired_at);
