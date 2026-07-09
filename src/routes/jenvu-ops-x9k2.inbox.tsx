@@ -272,15 +272,15 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="flex h-screen flex-col bg-gradient-to-br from-white via-white to-emerald-50/40 text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
+    <div className="flex h-screen flex-col bg-gradient-to-br bg-white text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Top bar */}
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-emerald-100/70 bg-white/70 px-4 backdrop-blur-md">
+      <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200/80 bg-white/70 px-4 backdrop-blur-md">
         <div className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-emerald-50 to-white shadow-sm ring-1 ring-emerald-100">
+          <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-zinc-100 to-white shadow-sm ring-1 ring-zinc-200">
             <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 object-contain" />
           </span>
-          <span className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-700 bg-clip-text text-[16px] font-bold tracking-tight text-transparent">Jenvu</span>
-          <span className="text-emerald-300">/</span>
+          <span className="bg-gradient-to-r from-black via-zinc-800 to-black bg-clip-text text-[16px] font-bold tracking-tight text-transparent">Jenvu</span>
+          <span className="text-zinc-300">/</span>
           <span className="text-[13px] font-medium tracking-tight text-zinc-500">Support Inbox</span>
         </div>
         <div className="flex items-center gap-2">
@@ -300,8 +300,8 @@ function AdminInbox() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
-        <nav className="hidden w-60 shrink-0 flex-col border-r border-emerald-100/70 bg-white/50 p-2.5 md:flex">
-          <div className="mb-2 px-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-emerald-600/80">
+        <nav className="hidden w-60 shrink-0 flex-col border-r border-zinc-200/80 bg-white/50 p-2.5 md:flex">
+          <div className="mb-2 px-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
             Inboxes
           </div>
           <ul className="space-y-1">
@@ -313,8 +313,8 @@ function AdminInbox() {
                     onClick={() => setFilter(f.key)}
                     className={`flex w-full items-center justify-between rounded-md px-2.5 py-2 text-[14px] transition ${
                       active
-                        ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-sm shadow-emerald-500/20"
-                        : "text-zinc-700 hover:bg-emerald-50/60"
+                        ? "bg-gradient-to-r from-black to-zinc-800 text-white shadow-sm shadow-black/20"
+                        : "text-zinc-700 hover:bg-zinc-100/70"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
@@ -334,7 +334,7 @@ function AdminInbox() {
             })}
           </ul>
 
-          <div className="mb-2 mt-5 px-2 text-[11px] font-semibold uppercase tracking-wider text-emerald-600/80">
+          <div className="mb-2 mt-5 px-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
             Shortcuts
           </div>
           <ul className="space-y-1.5 px-2 text-[13px] text-zinc-600">
@@ -344,11 +344,11 @@ function AdminInbox() {
             <Shortcut k="/" label="Search" />
           </ul>
 
-          <div className="mt-auto rounded-lg border border-emerald-100 bg-gradient-to-br from-emerald-50/80 to-white p-3">
-            <div className="flex items-center gap-1.5 text-[13px] font-medium text-emerald-900">
+          <div className="mt-auto rounded-lg border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-3">
+            <div className="flex items-center gap-1.5 text-[13px] font-medium text-zinc-900">
               <Zap className="h-3.5 w-3.5 text-amber-500" /> {counts.unreadMsgs} unread msgs
             </div>
-            <div className="mt-0.5 text-[12px] text-emerald-700/80">across {counts.unread} threads</div>
+            <div className="mt-0.5 text-[12px] text-zinc-600">across {counts.unread} threads</div>
           </div>
         </nav>
 
@@ -400,22 +400,22 @@ function AdminInbox() {
                       <button
                         onClick={() => setActiveId(s.id)}
                         className={`group relative flex w-full items-start gap-2.5 border-b border-zinc-100 px-3 py-2.5 text-left transition ${
-                          isActive ? "bg-emerald-50/60" : "hover:bg-emerald-50/40"
+                          isActive ? "bg-zinc-100/70" : "hover:bg-zinc-50/70"
                         }`}
                       >
                         {isActive && (
-                          <span className="absolute inset-y-2 left-0 w-0.5 rounded-r bg-gradient-to-b from-emerald-500 to-emerald-600" />
+                          <span className="absolute inset-y-2 left-0 w-0.5 rounded-r bg-gradient-to-b from-zinc-900 to-black" />
                         )}
                         {hasUnread && !isActive && (
-                          <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-emerald-500" />
+                          <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-black" />
                         )}
                         <div className="relative mt-0.5 shrink-0">
-                          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-emerald-500 to-emerald-600 text-[10px] font-semibold text-white">
+                          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-zinc-900 to-black text-[10px] font-semibold text-white">
                             {initials(s.guest_name, s.guest_email)}
                           </div>
                           <span
                             className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full ring-2 ring-white ${
-                              s.status === "open" ? "bg-emerald-500" : "bg-zinc-300"
+                              s.status === "open" ? "bg-black" : "bg-zinc-300"
                             }`}
                           />
                         </div>
@@ -437,7 +437,7 @@ function AdminInbox() {
                               {s.guest_email || "No email provided"}
                             </span>
                             {hasUnread && (
-                              <span className="grid h-4 min-w-[16px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 px-1 text-[10px] font-semibold text-white tabular-nums shadow-sm shadow-emerald-500/30">
+                              <span className="grid h-4 min-w-[16px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-zinc-900 to-black px-1 text-[10px] font-semibold text-white tabular-nums shadow-sm shadow-black/30">
                                 {s.unread_admin}
                               </span>
                             )}
@@ -486,7 +486,7 @@ function AdminInbox() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-emerald-500 to-emerald-600 text-[10px] font-semibold text-white">
+                <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-zinc-900 to-black text-[10px] font-semibold text-white">
                   {initials(activeSession.guest_name, activeSession.guest_email)}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -546,7 +546,7 @@ function AdminInbox() {
               </div>
 
               {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gradient-to-b from-white via-white to-emerald-50/30">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gradient-to-b bg-white">
                 <div className="mx-auto max-w-3xl space-y-1 p-4">
                   {messages.length === 0 && (
                     <div className="py-8 text-center text-[11.5px] text-zinc-500">No messages yet.</div>
@@ -572,8 +572,8 @@ function AdminInbox() {
                           <div
                             className={`max-w-[78%] whitespace-pre-wrap break-words rounded-lg px-3 py-2 text-[13px] leading-relaxed ${
                               isAdminMsg
-                                ? "bg-gradient-to-br from-emerald-600 to-emerald-500 text-white shadow-sm shadow-emerald-500/20"
-                                : "border border-emerald-100 bg-white text-zinc-900 shadow-sm"
+                                ? "bg-gradient-to-br from-black to-zinc-800 text-white shadow-sm shadow-black/20"
+                                : "border border-zinc-200 bg-white text-zinc-900 shadow-sm"
                             }`}
                           >
                             {m.content}
@@ -593,7 +593,7 @@ function AdminInbox() {
                   </div>
                 ) : (
                   <div className="mx-auto max-w-3xl">
-                    <div className="relative rounded-lg border border-emerald-100 bg-white shadow-sm transition focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/15">
+                    <div className="relative rounded-lg border border-zinc-200 bg-white shadow-sm transition focus-within:border-black focus-within:ring-2 focus-within:ring-black/10">
                       <textarea
                         ref={inputRef}
                         value={input}
@@ -659,7 +659,7 @@ function AdminInbox() {
                           <button
                             type="submit"
                             disabled={sending || !input.trim()}
-                            className="inline-flex h-7 items-center gap-1.5 rounded-md bg-gradient-to-r from-emerald-600 to-emerald-500 px-2.5 text-[12px] font-medium text-white shadow-sm shadow-emerald-500/25 transition hover:from-emerald-500 hover:to-emerald-400 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="inline-flex h-7 items-center gap-1.5 rounded-md bg-gradient-to-r from-black to-zinc-800 px-2.5 text-[12px] font-medium text-white shadow-sm shadow-black/25 transition hover:from-zinc-800 hover:to-zinc-900 disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {sending ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -683,12 +683,12 @@ function AdminInbox() {
 
         {/* Details rail */}
         {activeSession && (
-          <aside className="hidden w-64 shrink-0 flex-col border-l border-emerald-100/70 bg-white/50 p-4 xl:flex">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-600/80">
+          <aside className="hidden w-64 shrink-0 flex-col border-l border-zinc-200/80 bg-white/50 p-4 xl:flex">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
               Visitor
             </div>
             <div className="mt-2 flex items-center gap-2.5">
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 text-[12px] font-semibold text-white shadow-sm shadow-emerald-500/20">
+              <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-zinc-900 to-black text-[12px] font-semibold text-white shadow-sm shadow-black/20">
                 {initials(activeSession.guest_name, activeSession.guest_email)}
               </div>
               <div className="min-w-0">
