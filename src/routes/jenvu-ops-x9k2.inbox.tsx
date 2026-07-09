@@ -201,24 +201,24 @@ function AdminInbox() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-white">
       {/* Top bar */}
-      <div className="border-b border-zinc-200 bg-white">
+      <div className="sticky top-0 z-10 border-b border-zinc-200/80 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-zinc-900 text-white">
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-700 text-white shadow-sm ring-1 ring-zinc-900/5">
               <MessageSquare className="h-4 w-4" />
             </span>
-            <div>
-              <div className="text-sm font-semibold text-zinc-900">Support Inbox</div>
-              <div className="text-[10px] text-zinc-500">
+            <div className="leading-tight">
+              <div className="text-sm font-semibold tracking-tight text-zinc-900">Support Inbox</div>
+              <div className="text-[10.5px] text-zinc-500">
                 Signed in as <span className="font-medium text-zinc-700">{username}</span>
               </div>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-50 hover:text-zinc-900"
           >
             <LogOut className="h-3.5 w-3.5" /> Sign out
           </button>
@@ -227,12 +227,12 @@ function AdminInbox() {
 
       <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-[1400px] flex-col gap-4 p-4 sm:p-6">
         <div className="grid grid-cols-3 gap-2 sm:max-w-md sm:gap-3">
-          <StatCard icon={<Inbox className="h-3.5 w-3.5" />} label="Open" value={stats.open} accent="text-emerald-600" />
-          <StatCard icon={<Mail className="h-3.5 w-3.5" />} label="Unread" value={stats.unread} accent="text-red-600" />
-          <StatCard icon={<Users className="h-3.5 w-3.5" />} label="Total" value={stats.total} accent="text-zinc-700" />
+          <StatCard icon={<Inbox className="h-3.5 w-3.5" />} label="Open" value={stats.open} accent="text-emerald-600" dot="bg-emerald-500" />
+          <StatCard icon={<Mail className="h-3.5 w-3.5" />} label="Unread" value={stats.unread} accent="text-red-600" dot="bg-red-500" />
+          <StatCard icon={<Users className="h-3.5 w-3.5" />} label="Total" value={stats.total} accent="text-zinc-700" dot="bg-zinc-400" />
         </div>
 
-        <div className="flex flex-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
+        <div className="flex flex-1 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_1px_0_rgba(0,0,0,0.02),0_10px_30px_-15px_rgba(0,0,0,0.10)]">
           {/* Sidebar */}
           <aside
             className={`flex w-full flex-col border-r border-zinc-200 sm:w-80 ${activeId ? "hidden sm:flex" : "flex"}`}
@@ -405,14 +405,14 @@ function AdminInbox() {
                           </div>
                         )}
                         <div
-                          className={`max-w-[75%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm shadow-sm ${
+                          className={`max-w-[75%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm shadow-sm ring-1 ${
                             isAdminMsg
-                              ? "rounded-br-sm bg-zinc-900 text-white"
-                              : "rounded-bl-sm bg-white text-zinc-900 ring-1 ring-zinc-200"
+                              ? "rounded-br-sm bg-zinc-900 text-white ring-zinc-900/10"
+                              : "rounded-bl-sm bg-white text-zinc-900 ring-zinc-200"
                           }`}
                         >
                           {m.content}
-                          <div className="mt-1 text-[9px] text-zinc-400">
+                          <div className={`mt-1 text-[9px] ${isAdminMsg ? "text-white/50" : "text-zinc-400"}`}>
                             {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </div>
                         </div>
@@ -434,7 +434,7 @@ function AdminInbox() {
                       <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
                     </div>
                   ) : (
-                    <div className="flex items-end gap-2 rounded-lg border border-zinc-200 bg-white p-2 focus-within:border-zinc-400">
+                    <div className="flex items-end gap-2 rounded-xl border border-zinc-200 bg-white p-2 shadow-sm transition focus-within:border-zinc-400 focus-within:ring-4 focus-within:ring-zinc-900/5">
                       <textarea
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
@@ -452,7 +452,7 @@ function AdminInbox() {
                       <button
                         type="submit"
                         disabled={sending || !input.trim()}
-                        className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="flex h-9 items-center gap-2 rounded-lg bg-gradient-to-b from-zinc-900 to-zinc-800 px-3.5 text-sm font-medium text-white shadow-sm transition hover:from-zinc-800 hover:to-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                         <span className="hidden sm:inline">Send</span>
@@ -474,18 +474,23 @@ function StatCard({
   label,
   value,
   accent,
+  dot,
 }: {
   icon: React.ReactNode;
   label: string;
   value: number;
   accent: string;
+  dot: string;
 }) {
   return (
-    <div className="flex min-w-[92px] items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
-      <span className={`grid h-6 w-6 place-items-center rounded-md bg-zinc-50 ${accent}`}>{icon}</span>
+    <div className="group flex min-w-[92px] items-center gap-2.5 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 shadow-sm transition hover:border-zinc-300 hover:shadow">
+      <span className={`relative grid h-7 w-7 place-items-center rounded-lg bg-zinc-50 ring-1 ring-zinc-100 ${accent}`}>
+        {icon}
+        <span className={`absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full ${dot} ring-2 ring-white`} />
+      </span>
       <div className="leading-tight">
-        <div className="text-[10px] uppercase tracking-wide text-zinc-500">{label}</div>
-        <div className="text-sm font-semibold text-zinc-900">{value}</div>
+        <div className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">{label}</div>
+        <div className="text-base font-semibold tabular-nums tracking-tight text-zinc-900">{value}</div>
       </div>
     </div>
   );
