@@ -181,7 +181,7 @@ function ReferralsPage() {
           {info.incoming.status === "converted" ? (
             <>Referral bonus of {info.incoming.credits_awarded} scans applied. </>
           ) : (
-            <>A referral is attached to your account. Upgrade to Pro, Elite, or Ultra to unlock your 50 bonus scans.{" "}
+            <>A referral is attached to your account. Upgrade to Pro, Elite, or Ultra to unlock your 17 bonus scans.{" "}
               <Link to="/pricing" className="font-medium underline">See plans <ArrowRight className="inline h-3 w-3" /></Link>
             </>
           )}
