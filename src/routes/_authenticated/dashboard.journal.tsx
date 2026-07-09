@@ -239,12 +239,6 @@ function Journal() {
           <p className="text-xs text-zinc-500">System = executed via Jenvu signal. Outside = manually logged.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            to="/dashboard/journal-stats"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50 transition"
-          >
-            <BarChart3 className="h-3.5 w-3.5" /> Stats
-          </Link>
           <button
             onClick={() => setShowLog(true)}
             className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 transition"
