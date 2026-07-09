@@ -400,17 +400,17 @@ function AdminInbox() {
                       <button
                         onClick={() => setActiveId(s.id)}
                         className={`group relative flex w-full items-start gap-2.5 border-b border-zinc-100 px-3 py-2.5 text-left transition ${
-                          isActive ? "bg-zinc-50" : "hover:bg-zinc-50/70"
+                          isActive ? "bg-indigo-50/60" : "hover:bg-indigo-50/30"
                         }`}
                       >
                         {isActive && (
-                          <span className="absolute inset-y-2 left-0 w-0.5 rounded-r bg-zinc-900" />
+                          <span className="absolute inset-y-2 left-0 w-0.5 rounded-r bg-gradient-to-b from-indigo-500 to-violet-600" />
                         )}
                         {hasUnread && !isActive && (
-                          <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-blue-500" />
+                          <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-indigo-500" />
                         )}
                         <div className="relative mt-0.5 shrink-0">
-                          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-zinc-700 to-zinc-900 text-[10px] font-semibold text-white">
+                          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-indigo-500 to-violet-600 text-[10px] font-semibold text-white">
                             {initials(s.guest_name, s.guest_email)}
                           </div>
                           <span
