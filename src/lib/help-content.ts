@@ -363,7 +363,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Elite — $50 / month" },
           { type: "ul", items: [
-            "180 signal scans per month.",
+            "85 signal scans per month.",
             "Everything in Pro.",
             "Priority A+ alerts (< 30 seconds).",
             "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF).",
