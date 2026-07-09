@@ -167,7 +167,7 @@ async function scanOnePair(
               .neq('plan_id', 'free')
             recipients = (paidSubs ?? [])
               .map((r: { user_id: string }) => emailById.get(r.user_id))
-              .filter((e): e is string => Boolean(e))
+              .filter((e: string | undefined): e is string => Boolean(e))
           }
         }
 
