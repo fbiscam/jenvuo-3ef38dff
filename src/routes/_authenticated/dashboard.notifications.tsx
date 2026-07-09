@@ -170,7 +170,7 @@ function NotificationsPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="max-w-3xl">
       {/* Header */}
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2.5">
