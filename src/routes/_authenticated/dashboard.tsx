@@ -645,8 +645,8 @@ function DashboardLayout() {
                 seed={3}
               />
               <Metric
-                label={`Monthly scans · ${planTier}`}
-                value={credits.isLoading ? "…" : `${Math.max(0, (credits.allowance || 0) - (credits.balance || 0))} / ${credits.allowance || 0}`}
+                label={`Monthly allowance · ${planTier}`}
+                value={credits.isLoading ? "…" : (credits.allowance || 0)}
                 delta={credits.allowance ? `${usedPct}% used` : null}
                 tone="zinc"
                 seed={5}
