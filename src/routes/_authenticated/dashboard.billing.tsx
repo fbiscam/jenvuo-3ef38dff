@@ -125,7 +125,7 @@ function Billing() {
           />
         </div>
         {(() => {
-          const scanReasons = new Set(["signal", "ict_narration", "alert", "voice_query"]);
+          const scanReasons = new Set(["signal"]);
           const filtered = (credits.state?.recent ?? []).filter((r) => scanReasons.has(r.reason));
           if (filtered.length === 0) return null;
           return (
