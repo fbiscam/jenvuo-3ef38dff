@@ -101,9 +101,9 @@ function ReferralsPage() {
       <div>
         <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Refer & Earn</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Share your link. When a friend upgrades to Pro or Elite, you get{" "}
-          <span className="font-medium text-emerald-600">100 credits</span> and they get{" "}
-          <span className="font-medium text-emerald-600">50 credits</span>.
+          Share your link. When a friend upgrades to Pro, Elite, or Ultra, you get{" "}
+          <span className="font-medium text-emerald-600">100 bonus scans</span> and they get{" "}
+          <span className="font-medium text-emerald-600">50 bonus scans</span>.
         </p>
       </div>
 
