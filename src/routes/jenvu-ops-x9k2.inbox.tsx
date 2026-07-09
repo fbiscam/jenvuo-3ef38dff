@@ -305,10 +305,10 @@ function AdminInbox() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
-        <nav className="hidden w-60 shrink-0 flex-col border-r border-zinc-200/80 bg-white/50 p-2.5 md:flex">
-          <div className="mb-2 px-2 pt-1 text-[11px] font-bold uppercase tracking-wider text-black">
+        <nav className="hidden w-60 shrink-0 flex-col border-r border-zinc-900/[0.06] bg-white/40 p-3 backdrop-blur-sm md:flex">
+          <div className="mb-2 px-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
             Inboxes
           </div>
           <ul className="space-y-1">
@@ -318,19 +318,19 @@ function AdminInbox() {
                 <li key={f.key}>
                   <button
                     onClick={() => setFilter(f.key)}
-                    className={`flex w-full items-center justify-between rounded-md px-2.5 py-2 text-[14px] font-medium transition ${
+                    className={`group relative flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-[14px] font-medium transition ${
                       active
-                        ? "bg-gradient-to-r from-black to-zinc-800 text-white shadow-sm shadow-black/20"
-                        : "text-black hover:bg-zinc-100/70"
+                        ? "bg-zinc-900 text-white shadow-[0_1px_2px_rgba(0,0,0,0.15),0_8px_24px_-12px_rgba(0,0,0,0.5)]"
+                        : "text-zinc-900 hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-black/5"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={active ? "text-white/80" : "text-black"}>{f.icon}</span>
+                      <span className={active ? "text-white/70" : "text-zinc-500"}>{f.icon}</span>
                       {f.label}
                     </span>
                     <span
-                      className={`tabular-nums text-[12px] ${
-                        active ? "text-white/70" : "text-black"
+                      className={`rounded-md px-1.5 py-0.5 tabular-nums text-[11px] font-semibold ${
+                        active ? "bg-white/15 text-white" : "bg-zinc-100 text-zinc-700"
                       }`}
                     >
                       {f.count}
@@ -341,21 +341,24 @@ function AdminInbox() {
             })}
           </ul>
 
-          <div className="mb-2 mt-5 px-2 text-[11px] font-bold uppercase tracking-wider text-black">
+          <div className="mb-2 mt-6 px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
             Shortcuts
           </div>
-          <ul className="space-y-1.5 px-2 text-[13px] font-medium text-black">
+          <ul className="space-y-1.5 px-2 text-[13px] font-medium text-zinc-800">
             <Shortcut k="J / K" label="Navigate" />
             <Shortcut k="R" label="Reply" />
             <Shortcut k="E" label="Close chat" />
             <Shortcut k="/" label="Search" />
           </ul>
 
-          <div className="mt-auto rounded-lg border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-3">
-            <div className="flex items-center gap-1.5 text-[13px] font-semibold text-black">
-              <Zap className="h-3.5 w-3.5 text-amber-500" /> {counts.unreadMsgs} unread msgs
+          <div className="mt-auto overflow-hidden rounded-xl border border-black/5 bg-gradient-to-br from-zinc-900 to-black p-3.5 text-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)]">
+            <div className="flex items-center gap-1.5 text-[13px] font-semibold">
+              <span className="grid h-5 w-5 place-items-center rounded-md bg-white/10 ring-1 ring-white/15">
+                <Zap className="h-3 w-3 text-amber-300" />
+              </span>
+              {counts.unreadMsgs} unread msgs
             </div>
-            <div className="mt-0.5 text-[12px] font-medium text-black">across {counts.unread} threads</div>
+            <div className="mt-1 text-[11.5px] font-medium text-white/60">across {counts.unread} threads</div>
           </div>
         </nav>
 
