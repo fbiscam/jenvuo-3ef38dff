@@ -2317,12 +2317,9 @@ export const getSignalPlan = createServerFn({ method: "POST" })
       if (cached) return cached;
     }
 
-    // Charge ONLY after a successful compute that produced an actionable
-    // trade (BUY/SELL). WAIT / errors are free.
+    // Billing is handled by the caller (client) via credits.spend("signal") once per scan.
+    // Do NOT charge here — otherwise a single scan would be double/triple-billed.
     const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId);
-    if (plan?.trade?.direction === "BUY" || plan?.trade?.direction === "SELL") {
-      await _spendUserCredits(context.userId, 1, "ict_narration");
-    }
     setCachedPlan(cacheKey, plan);
     return plan;
   });
