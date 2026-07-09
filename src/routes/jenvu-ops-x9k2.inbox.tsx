@@ -368,9 +368,6 @@ function AdminInbox() {
           </ul>
 
 
-          <div className="mt-auto px-2 py-2 text-[13px] font-medium text-zinc-700">
-            {counts.unreadMsgs} unread
-          </div>
 
         </nav>
 
