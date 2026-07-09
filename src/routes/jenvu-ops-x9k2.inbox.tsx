@@ -390,7 +390,7 @@ function AdminInbox() {
 
         {/* Middle — conversation list */}
         <aside
-          className={`flex w-full shrink-0 flex-col border-r border-zinc-900/[0.06] bg-white/60 backdrop-blur-sm md:w-[340px] ${
+          className={`flex w-full shrink-0 flex-col border-r border-zinc-900/[0.06] bg-white md:w-[340px] ${
             activeId ? "hidden md:flex" : "flex"
           }`}
         >
