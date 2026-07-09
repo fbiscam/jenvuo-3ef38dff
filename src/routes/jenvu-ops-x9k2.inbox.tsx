@@ -300,29 +300,29 @@ function AdminInbox() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
-        <nav className="hidden w-52 shrink-0 flex-col border-r border-zinc-200 bg-white/60 p-2 md:flex">
-          <div className="mb-2 px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+        <nav className="hidden w-60 shrink-0 flex-col border-r border-zinc-200 bg-white/60 p-2.5 md:flex">
+          <div className="mb-2 px-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
             Inboxes
           </div>
-          <ul className="space-y-0.5">
+          <ul className="space-y-1">
             {filters.map((f) => {
               const active = filter === f.key;
               return (
                 <li key={f.key}>
                   <button
                     onClick={() => setFilter(f.key)}
-                    className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-[12.5px] transition ${
+                    className={`flex w-full items-center justify-between rounded-md px-2.5 py-2 text-[14px] transition ${
                       active
                         ? "bg-zinc-900 text-white"
                         : "text-zinc-700 hover:bg-zinc-100"
                     }`}
                   >
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-2.5">
                       <span className={active ? "text-white/80" : "text-zinc-400"}>{f.icon}</span>
                       {f.label}
                     </span>
                     <span
-                      className={`tabular-nums text-[11px] ${
+                      className={`tabular-nums text-[12px] ${
                         active ? "text-white/70" : "text-zinc-400"
                       }`}
                     >
@@ -334,21 +334,21 @@ function AdminInbox() {
             })}
           </ul>
 
-          <div className="mb-2 mt-5 px-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+          <div className="mb-2 mt-5 px-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
             Shortcuts
           </div>
-          <ul className="space-y-1 px-2 text-[11.5px] text-zinc-500">
+          <ul className="space-y-1.5 px-2 text-[13px] text-zinc-600">
             <Shortcut k="J / K" label="Navigate" />
             <Shortcut k="R" label="Reply" />
             <Shortcut k="E" label="Close chat" />
             <Shortcut k="/" label="Search" />
           </ul>
 
-          <div className="mt-auto rounded-lg border border-zinc-200 bg-white p-2.5">
-            <div className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-700">
-              <Zap className="h-3 w-3 text-amber-500" /> {counts.unreadMsgs} unread msgs
+          <div className="mt-auto rounded-lg border border-zinc-200 bg-white p-3">
+            <div className="flex items-center gap-1.5 text-[13px] font-medium text-zinc-800">
+              <Zap className="h-3.5 w-3.5 text-amber-500" /> {counts.unreadMsgs} unread msgs
             </div>
-            <div className="mt-0.5 text-[10.5px] text-zinc-500">across {counts.unread} threads</div>
+            <div className="mt-0.5 text-[12px] text-zinc-500">across {counts.unread} threads</div>
           </div>
         </nav>
 
