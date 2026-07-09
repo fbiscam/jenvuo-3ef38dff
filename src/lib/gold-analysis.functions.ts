@@ -535,7 +535,7 @@ async function _analyzeGoldCompute(data: { timeframe: string; query: string }, _
     const wantsTradingSetup = isTradingSetupIntent(data.query);
     if (wantsTradingSetup) {
       try {
-        const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) });
+        const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) }, __userId);
         const dec = plan.instrument.decimals;
         const prefix = plan.instrument.kind === "crypto" ? "" : "$";
         const fmt = (n?: number) => typeof n === "number" && isFinite(n) ? `${prefix}${n.toFixed(dec)}` : "-";
