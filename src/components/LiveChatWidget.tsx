@@ -222,7 +222,7 @@ export function LiveChatWidget() {
               {token && (
                 <button
                   onClick={() => {
-                    if (!confirm("Start a new chat? Your current conversation will be cleared from this device.")) return;
+                    
                     localStorage.removeItem(STORAGE_KEY);
                     setToken(null);
                     setMessages([]);
