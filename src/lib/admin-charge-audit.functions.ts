@@ -13,7 +13,7 @@ export type ChargeAuditRow = {
   symbol: string | null;
   user_agent: string | null;
   request_ip: string | null;
-  metadata: Record<string, unknown>;
+  metadata: any;
   created_at: string;
   user_email?: string | null;
 };
