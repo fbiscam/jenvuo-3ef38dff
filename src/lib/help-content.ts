@@ -393,8 +393,8 @@ export const collections: Collection[] = [
           { type: "h2", content: "How scans refresh" },
           { type: "ul", items: [
             "Free: 2 scans per month.",
-            "Pro: 60 scans added on each billing date.",
-            "Elite: 180 scans added on each billing date.",
+            "Pro: 35 scans added on each billing date.",
+            "Elite: 85 scans added on each billing date.",
             "Top-up packs never expire and stack on top of your plan.",
           ]},
 
