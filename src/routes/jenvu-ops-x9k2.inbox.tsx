@@ -211,7 +211,7 @@ function AdminInbox() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50" style={SANS}>
+    <div className="min-h-screen bg-stone-50" style={FONT}>
       {/* Top bar */}
       <div className="border-b border-stone-200 bg-white/80 backdrop-blur">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-4 sm:px-6">
@@ -221,8 +221,8 @@ function AdminInbox() {
             </span>
             <div>
               <div className="flex items-baseline gap-2">
-                <span className="text-[22px] leading-none text-stone-900" style={SERIF}>Support</span>
-                <span className="text-[22px] leading-none italic text-stone-500" style={SERIF}>Inbox</span>
+                <span className="text-[20px] font-medium leading-none text-stone-900" style={FONT}>Support</span>
+                <span className="text-[20px] font-medium leading-none text-stone-500" style={FONT}>Inbox</span>
               </div>
               <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-stone-500">
                 Signed in · <span className="font-semibold text-stone-700">{username}</span>
@@ -283,7 +283,7 @@ function AdminInbox() {
                   <div className="grid h-12 w-12 place-items-center rounded-full bg-stone-100 ring-1 ring-stone-200">
                     <Inbox className="h-5 w-5 text-stone-400" />
                   </div>
-                  <p className="mt-3 text-base text-stone-800" style={SERIF}>No conversations</p>
+                  <p className="mt-3 text-base font-medium text-stone-800" style={FONT}>No conversations</p>
                   <p className="mt-1 text-xs text-stone-500">
                     {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
                   </p>
@@ -343,8 +343,8 @@ function AdminInbox() {
                 <div className="grid h-16 w-16 place-items-center rounded-full bg-white ring-1 ring-stone-200 shadow-sm">
                   <MessageSquare className="h-7 w-7 text-stone-400" />
                 </div>
-                <p className="text-2xl text-stone-900" style={SERIF}>
-                  Select a <span className="italic text-stone-500">conversation</span>
+                <p className="text-2xl font-medium text-stone-900" style={FONT}>
+                  Select a conversation
                 </p>
                 <p className="max-w-xs text-xs text-stone-500 leading-relaxed">
                   Pick a chat from the left to view messages and reply to your visitor.
@@ -535,7 +535,7 @@ function StatCard({
             <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
             <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-stone-500">{label}</span>
           </div>
-          <div className="mt-0.5 text-2xl leading-none text-stone-900" style={SERIF}>{value}</div>
+          <div className="mt-0.5 text-2xl font-medium leading-none text-stone-900" style={FONT}>{value}</div>
         </div>
       </div>
     </div>
