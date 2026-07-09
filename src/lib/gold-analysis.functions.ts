@@ -10,15 +10,51 @@ import {
   MODEL_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
 } from "@/lib/ai-gateway";
 
-async function _spendUserCredits(userId: string, amount: number, reason: string) {
+async function _spendUserCredits(
+  userId: string,
+  amount: number,
+  reason: string,
+  ctx?: { scanId?: string | null; symbol?: string | null; caller?: string },
+) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { error } = await supabaseAdmin.rpc("spend_credits", {
-    _user_id: userId, _amount: amount, _reason: reason, _metadata: {} as any,
+  const meta: Record<string, unknown> = {};
+  if (ctx?.scanId) meta.scanId = ctx.scanId;
+  if (ctx?.symbol) meta.symbol = ctx.symbol;
+  if (ctx?.caller) meta.caller = ctx.caller;
+
+  const { data: newBalance, error } = await supabaseAdmin.rpc("spend_credits", {
+    _user_id: userId, _amount: amount, _reason: reason, _metadata: meta as any,
   });
   if (error) {
+    await supabaseAdmin.rpc("log_charge_audit", {
+      _user_id: userId,
+      _reason: reason,
+      _amount: 0,
+      _balance_after: null,
+      _source: "rpc_direct_failed",
+      _caller: ctx?.caller ?? "gold-analysis._spendUserCredits",
+      _scan_id: ctx?.scanId ?? null,
+      _symbol: ctx?.symbol ?? null,
+      _user_agent: null,
+      _request_ip: null,
+      _metadata: { error: error.message } as any,
+    } as any);
     if (error.message?.includes("INSUFFICIENT_CREDITS")) throw new Error("INSUFFICIENT_CREDITS");
     throw new Error(error.message);
   }
+  await supabaseAdmin.rpc("log_charge_audit", {
+    _user_id: userId,
+    _reason: reason,
+    _amount: amount,
+    _balance_after: (newBalance as number) ?? null,
+    _source: "rpc_direct",
+    _caller: ctx?.caller ?? "gold-analysis._spendUserCredits",
+    _scan_id: ctx?.scanId ?? null,
+    _symbol: ctx?.symbol ?? null,
+    _user_agent: null,
+    _request_ip: null,
+    _metadata: meta as any,
+  } as any);
 }
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
