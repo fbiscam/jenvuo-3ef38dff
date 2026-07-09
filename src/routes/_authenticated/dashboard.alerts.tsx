@@ -49,6 +49,7 @@ function AlertPrefs() {
   const [alerts, setAlerts] = useState<FiredAlert[]>([]);
   const [alertsLoading, setAlertsLoading] = useState(true);
   const [pairFilter, setPairFilter] = useState<string>("ALL");
+  const [visibleCount, setVisibleCount] = useState<number>(10);
 
   useEffect(() => {
     (async () => {
