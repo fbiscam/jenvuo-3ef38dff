@@ -8,6 +8,7 @@ import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib
 import { getBacktestStats, type BacktestStats } from "@/lib/backtest.functions";
 import { runHistoricalBacktest, type HistoricalBacktestResult } from "@/lib/backtest-historical.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
+import { broadcastCurrentSignal } from "@/lib/broadcast-alert.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 
 import { useSpeech } from "@/hooks/useSpeech";
@@ -136,6 +137,59 @@ function SignalPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(-1);
   const [playing, setPlaying] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [broadcasting, setBroadcasting] = useState(false);
+  const broadcastFn = useServerFn(broadcastCurrentSignal);
+
+  useEffect(() => {
+    if (!authUser) { setIsAdmin(false); return; }
+    (async () => {
+      try {
+        const { data } = await supabase.rpc("has_role", { _user_id: authUser.id, _role: "admin" });
+        setIsAdmin(!!data);
+      } catch { setIsAdmin(false); }
+    })();
+  }, [authUser]);
+
+  const handleBroadcast = useCallback(async () => {
+    if (!plan) return;
+    if (plan.trade.direction === "WAIT") {
+      toast.error("No active trade — plan is in WAIT.");
+      return;
+    }
+    const ok = window.confirm(
+      `Send this ${plan.trade.direction} ${plan.instrument.symbol} alert to all paid subscribers?`,
+    );
+    if (!ok) return;
+    setBroadcasting(true);
+    try {
+      const res = await broadcastFn({
+        data: {
+          pair: plan.instrument.symbol,
+          grade: plan.setupGrade,
+          direction: plan.trade.direction as "BUY" | "SELL",
+          entry: plan.trade.entry,
+          sl: plan.trade.sl,
+          tp: plan.trade.tp,
+          rr: plan.trade.rr,
+          confidence: plan.trade.confidence,
+          session: plan.session,
+          killzone: plan.killzone,
+          htfBias: plan.htfBias,
+          rationale: plan.trade.summary?.slice(0, 500) ?? "",
+          decimals: plan.instrument.decimals,
+          setupScore: plan.setupScore,
+        },
+      });
+      toast.success(
+        `Alert sent — ${res.enqueued} emails queued, ${res.notified_in_app} in-app notifications.`,
+      );
+    } catch (e: any) {
+      toast.error(e?.message ?? "Broadcast failed");
+    } finally {
+      setBroadcasting(false);
+    }
+  }, [plan, broadcastFn]);
 
   const alertsPair = (plan?.instrument.symbol ?? symbol ?? "XAUUSD").toUpperCase();
   const { alerts: alertHistory, loading: alertsLoading } = useSignalAlerts(alertsPair);
@@ -643,6 +697,17 @@ function SignalPage() {
               <button onClick={load} disabled={loading} className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50 transition">
                 {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
                 Re-analyze
+              </button>
+            )}
+            {isAdmin && plan && plan.trade.direction !== "WAIT" && (
+              <button
+                onClick={handleBroadcast}
+                disabled={broadcasting}
+                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-amber-500 text-[12px] font-semibold text-white hover:bg-amber-600 disabled:opacity-50 transition"
+                title="Send this signal to all paid subscribers"
+              >
+                {broadcasting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                Alert Everyone
               </button>
             )}
           </div>
