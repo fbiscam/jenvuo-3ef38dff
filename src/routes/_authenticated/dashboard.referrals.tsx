@@ -219,7 +219,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
     { key: "all", label: "All", hint: "Every referral" },
     { key: "new", label: "New", hint: "Signed up, not upgraded" },
     { key: "converted", label: "Converted", hint: "Completed referral" },
-    { key: "upgraded", label: "Upgraded", hint: "Paid plan — credits earned" },
+    { key: "upgraded", label: "Upgraded", hint: "Paid plan — scans earned" },
   ];
 
   const exportCsv = () => {
