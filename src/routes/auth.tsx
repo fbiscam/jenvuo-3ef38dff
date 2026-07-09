@@ -254,7 +254,7 @@ function AuthPage() {
       toast.error("Two-factor step failed", { description: msg });
       return true;
     }
-    setMfaChallenge({ factorId: totp.id, challengeId: chal.id });
+    setMfaChallenge({ factorId: totp.id, challengeId: chal.id, userId: session.user.id });
     setMfaCode("");
     setMfaError(null);
     setMfaResendCooldown(30);
