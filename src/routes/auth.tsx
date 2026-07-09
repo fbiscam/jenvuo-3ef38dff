@@ -18,7 +18,7 @@ import { registerTrustedDevice, verifyTrustedDevice } from "@/lib/trusted-device
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 
 
-type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string };
+type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string; mfa?: "1" };
 
 function sanitizeRedirect(r?: string): string {
   if (!r || typeof r !== "string") return "/dashboard";
@@ -32,16 +32,23 @@ export const Route = createFileRoute("/auth")({
     redirect: typeof search.redirect === "string" ? search.redirect : undefined,
     emailChanged: search.emailChanged === "1" ? "1" : undefined,
     newEmail: typeof search.newEmail === "string" ? search.newEmail : undefined,
+    mfa: search.mfa === "1" ? "1" : undefined,
   }),
   beforeLoad: async ({ search }) => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash || "";
       if (hash.includes("type=recovery") || hash.includes("error")) return;
       if (search.emailChanged === "1") return;
+      if (search.mfa === "1") return;
     }
 
     const { data } = await supabase.auth.getUser();
     if (data.user) {
+      // If MFA elevation is required but not yet completed, stay on /auth so
+      // the user can enter their 6-digit code — do NOT redirect to /dashboard,
+      // which would just bounce back here (redirect loop).
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aal && aal.currentLevel === "aal1" && aal.nextLevel === "aal2") return;
       throw redirect({ to: sanitizeRedirect(search.redirect) as "/dashboard" });
     }
   },
@@ -211,6 +218,53 @@ function AuthPage() {
       }
     } catch { /* silent */ }
   }, [applyRefFn]);
+
+  // Shared: open the TOTP challenge for a user who's already signed in
+  // but stuck at AAL1 (needs to complete MFA). Also handles trusted-device
+  // fast path.
+  const openMfaChallengeIfNeeded = React.useCallback(async () => {
+    const { data: sess } = await supabase.auth.getSession();
+    const session = sess.session;
+    if (!session) return false;
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (!aal || aal.currentLevel !== "aal1" || aal.nextLevel !== "aal2") return false;
+    const { data: fac } = await supabase.auth.mfa.listFactors();
+    const totp = fac?.totp?.find((f) => f.status === "verified");
+    if (!totp) return false;
+    try {
+      const uid = session.user.id;
+      const savedToken = window.localStorage.getItem(TRUSTED_DEVICE_KEY(uid));
+      if (savedToken) {
+        const res = await verifyTrustedDeviceFn({ data: { token: savedToken } });
+        if (res?.valid) {
+          await applyPendingReferral();
+          navigate({ to: redirectTo as "/dashboard", replace: true });
+          return true;
+        }
+        window.localStorage.removeItem(TRUSTED_DEVICE_KEY(uid));
+      }
+    } catch { /* fall through */ }
+    const { data: chal, error } = await supabase.auth.mfa.challenge({ factorId: totp.id });
+    if (error || !chal) {
+      const msg = error?.message || "Could not start MFA challenge";
+      setErrorMsg(msg);
+      toast.error("Two-factor step failed", { description: msg });
+      return true;
+    }
+    setMfaChallenge({ factorId: totp.id, challengeId: chal.id });
+    setMfaCode("");
+    setMfaError(null);
+    setMfaResendCooldown(30);
+    return true;
+  }, [navigate, redirectTo, applyPendingReferral, verifyTrustedDeviceFn]);
+
+  // On mount / when arriving with ?mfa=1, if the session is already at AAL1
+  // needing AAL2, open the challenge — no SIGNED_IN event fires on plain page
+  // loads, so this is required to avoid a redirect loop with the dashboard.
+  React.useEffect(() => {
+    void openMfaChallengeIfNeeded();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   React.useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {

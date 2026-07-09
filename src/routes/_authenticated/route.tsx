@@ -41,7 +41,7 @@ function AuthenticatedLayout() {
       // Block dashboard if MFA elevation is required but not completed.
       supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data }) => {
         if (data && data.currentLevel === "aal1" && data.nextLevel === "aal2") {
-          navigate({ to: "/auth", replace: true });
+          navigate({ to: "/auth", search: { mfa: "1" } as never, replace: true });
         }
       });
       return;
