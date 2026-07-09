@@ -334,7 +334,7 @@ function AdminInbox() {
             })}
           </ul>
 
-          <div className="mb-2 mt-5 px-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+          <div className="mb-2 mt-5 px-2 text-[11px] font-semibold uppercase tracking-wider text-indigo-500/80">
             Shortcuts
           </div>
           <ul className="space-y-1.5 px-2 text-[13px] text-zinc-600">
@@ -344,11 +344,11 @@ function AdminInbox() {
             <Shortcut k="/" label="Search" />
           </ul>
 
-          <div className="mt-auto rounded-lg border border-zinc-200 bg-white p-3">
-            <div className="flex items-center gap-1.5 text-[13px] font-medium text-zinc-800">
+          <div className="mt-auto rounded-lg border border-indigo-100 bg-gradient-to-br from-indigo-50/70 to-sky-50/70 p-3">
+            <div className="flex items-center gap-1.5 text-[13px] font-medium text-indigo-900">
               <Zap className="h-3.5 w-3.5 text-amber-500" /> {counts.unreadMsgs} unread msgs
             </div>
-            <div className="mt-0.5 text-[12px] text-zinc-500">across {counts.unread} threads</div>
+            <div className="mt-0.5 text-[12px] text-indigo-700/70">across {counts.unread} threads</div>
           </div>
         </nav>
 
