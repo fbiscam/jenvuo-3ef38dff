@@ -107,8 +107,8 @@ function Billing() {
           <div>
             <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Scans remaining</div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-4xl font-semibold tabular-nums">{credits.balance}</span>
-              <span className="text-sm text-zinc-500">/ {credits.allowance} scans this cycle</span>
+              <span className="text-4xl font-semibold tabular-nums">{remaining}</span>
+              <span className="text-sm text-zinc-500">/ {credits.allowance} scans · {plan.toUpperCase()}</span>
             </div>
             {resetsAt && (
               <p className="mt-1 text-xs text-zinc-500">Resets {resetsAt.toLocaleDateString()}</p>
