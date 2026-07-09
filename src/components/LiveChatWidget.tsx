@@ -253,6 +253,11 @@ export function LiveChatWidget() {
           ) : (
             <>
               <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-3">
+                {loadError && (
+                  <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
+                    {loadError}
+                  </div>
+                )}
                 {messages.length === 0 && (
                   <div className="mt-8 text-center text-xs text-zinc-500">
                     Send us your first message — we'll get back to you here.
