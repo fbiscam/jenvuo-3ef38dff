@@ -37,16 +37,19 @@ type Visual = {
   Icon: React.ComponentType<{ className?: string }>;
   wrap: string;
   href: string;
+  search?: Record<string, string>;
 };
 
 function visualFor(n: NotificationRow): Visual {
   const t = n.type;
   if (t === "signal_alert") {
     const isBuy = (n.data?.direction as string) === "BUY";
+    const alertId = (n.data?.alert_id as string) || undefined;
     return {
       Icon: isBuy ? TrendingUp : TrendingDown,
       wrap: isBuy ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600",
       href: "/signal",
+      search: alertId ? { alertId } : undefined,
     };
   }
   if (t === "welcome")
