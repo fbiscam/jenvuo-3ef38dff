@@ -6,13 +6,16 @@ BEGIN;
 
 DO $test$
 DECLARE
-  _uid uuid := gen_random_uuid();
+  -- Use an existing auth.users id (haseeb@jenvu.com). Whole test is rolled back,
+  -- so no state changes persist.
+  _uid uuid := '5af751fb-de3b-4a24-aefd-aed53ef44378';
   _bal int;
   _lots int;
   _alw int;
   _spend_result int;
   _insuff boolean := false;
 BEGIN
+
   -- No auth.users insert needed — credit tables have no FK, and convert_referral
   -- returns early when no referral row exists for this uid.
 
