@@ -16,17 +16,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/messages")
       { title: "Contact Inbox — Jenvu Admin" },
       { name: "robots", content: "noindex" },
     ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap",
-      },
-    ],
   }),
   component: AdminMessagesPage,
 });
 
-const FONT = { fontFamily: "'Roboto', ui-sans-serif, system-ui, sans-serif" } as const;
+
 
 type Filter = "all" | "new" | "read" | "replied" | "archived";
 
@@ -123,9 +117,9 @@ function AdminMessagesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 space-y-6" style={FONT}>
+    <div className="mx-auto max-w-6xl px-4 py-8 space-y-6 font-sans">
       <div>
-        <h1 className="text-3xl font-medium text-zinc-900 tracking-tight" style={FONT}>
+        <h1 className="text-3xl font-medium text-zinc-900 tracking-tight font-display">
           Contact Inbox
         </h1>
         <p className="mt-1 text-sm text-zinc-500">Messages submitted from your website contact form.</p>
