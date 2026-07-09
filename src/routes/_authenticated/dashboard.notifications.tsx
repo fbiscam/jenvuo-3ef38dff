@@ -242,15 +242,39 @@ function NotificationsPage() {
           ))}
         </div>
 
-        <button
-          onClick={markAll}
-          disabled={unreadCount === 0}
-          className="shrink-0 inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-zinc-200 bg-white text-[11px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-        >
-          <CheckCheck className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Mark all read</span>
-        </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {filtered.length > 0 && (
+            <label className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-zinc-200 bg-white text-[11px] font-medium text-zinc-700 hover:bg-zinc-50 cursor-pointer transition">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleSelectAll}
+                className="h-3 w-3 accent-zinc-900"
+              />
+              <span className="hidden sm:inline">Select all</span>
+            </label>
+          )}
+          {selected.size > 0 && (
+            <button
+              onClick={deleteSelected}
+              className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-red-200 bg-red-50 text-[11px] font-medium text-red-600 hover:bg-red-100 transition"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete ({selected.size})
+            </button>
+          )}
+          <button
+            onClick={markAll}
+            disabled={unreadCount === 0}
+            className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-zinc-200 bg-white text-[11px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+          >
+            <CheckCheck className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Mark all read</span>
+          </button>
+        </div>
       </div>
+
+
 
 
       {/* Content */}
