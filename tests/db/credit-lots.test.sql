@@ -13,10 +13,9 @@ DECLARE
   _spend_result int;
   _insuff boolean := false;
 BEGIN
-  -- Seed a fake auth.users row (required by convert_referral / FKs).
-  INSERT INTO auth.users (id, email, aud, role, instance_id, created_at, updated_at)
-  VALUES (_uid, 'test-' || _uid || '@example.test', 'authenticated', 'authenticated',
-          '00000000-0000-0000-0000-000000000000', now(), now());
+  -- No auth.users insert needed — credit tables have no FK, and convert_referral
+  -- returns early when no referral row exists for this uid.
+
 
   ------------------------------------------------------------------
   -- TEST 1: set_user_plan('elite') creates matching lots
