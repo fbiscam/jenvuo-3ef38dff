@@ -341,29 +341,29 @@ export const collections: Collection[] = [
         summary: "Free, Pro and Elite — credits, limits and features.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu uses a hybrid subscription + credit model. Your plan unlocks features and discounts; credits meter usage so heavy users pay fairly and casual users aren't overcharged." },
+          { type: "p", content: "Jenvu uses a simple subscription model. Your plan unlocks features and includes a monthly quota of signal scans. Only successful BUY / SELL scans are counted — WAIT results and errors are free." },
 
           { type: "h2", content: "Free" },
           { type: "ul", items: [
-            "10 credits per month.",
-            "Voice agent with basic narration.",
+            "5 signal scans per month.",
+            "Voice agent with basic narration (unlimited & free).",
             "Signal engine on Gold.",
-            "Standard A+ alerts (delayed by ~2 minutes).",
+            "Standard A+ alerts (delayed by ~4 hours).",
           ]},
 
-          { type: "h2", content: "Pro — $29 / month" },
+          { type: "h2", content: "Pro — $15 / month" },
           { type: "ul", items: [
-            "230 monthly credits included.",
-            "Pay per action — signal 2, narration 3, alert 2, voice free.",
+            "60 signal scans per month.",
+            "Unlimited voice queries.",
             "Full signal engine on all supported XAU cross-pairs.",
             "Realtime A+ email & push alerts (no delay).",
             "Full ICT / SMC narration, trade journal & analytics.",
             "Multi-timeframe bias engine.",
           ]},
 
-          { type: "h2", content: "Elite — $99 / month" },
+          { type: "h2", content: "Elite — $50 / month" },
           { type: "ul", items: [
-            "800 monthly credits included.",
+            "180 signal scans per month.",
             "Everything in Pro.",
             "Priority A+ alerts (< 30 seconds).",
             "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF).",
@@ -371,32 +371,33 @@ export const collections: Collection[] = [
             "Dedicated onboarding & SLA.",
           ]},
 
-          { type: "note", tone: "info", content: "See the Pricing page for the full feature matrix and the exact per-credit cost on each plan." },
+          { type: "note", tone: "info", content: "See the Pricing page for the full feature matrix and one-time scan top-up packs." },
         ],
       },
       {
         slug: "credit-costs",
-        title: "How much does each action cost?",
-        summary: "Signals, narrated walkthroughs and voice replies each have a credit cost.",
-        updatedAt: "2026-06-30",
+        title: "How scans are counted",
+        summary: "Only BUY / SELL signals count toward your monthly quota.",
+        updatedAt: "2026-07-09",
         body: [
-          { type: "p", content: "Credits are the unit of compute on Jenvu. Each billable action has its own cost — no hidden multipliers, no per-feature pricing." },
+          { type: "p", content: "Scans are the unit of usage on Jenvu. Only actionable BUY / SELL results consume one scan from your quota — dead-market WAIT signals and any errors are free." },
 
-          { type: "h2", content: "Action costs" },
+          { type: "h2", content: "What counts as a scan" },
           { type: "ul", items: [
-            "Signal (chart markings + score) — 2 credits.",
-            "Full ICT / SMC narration — 3 credits.",
+            "Signal analysis returning BUY or SELL — 1 scan.",
+            "Signal returning WAIT (dead market) — free.",
             "Voice agent reply (per turn) — free.",
-            "A+ push / email alert delivered to you — 2 credits.",
+            "A+ broadcast alert delivered to you — free.",
           ]},
 
-          { type: "h2", content: "How credits refresh" },
+          { type: "h2", content: "How scans refresh" },
           { type: "ul", items: [
-            "Free: 10 credits per month.",
-            "Pro: 230 credits added on each billing date.",
-            "Elite: 800 credits added on each billing date.",
-            "Unused credits roll over for one billing cycle.",
+            "Free: 5 scans per month.",
+            "Pro: 60 scans added on each billing date.",
+            "Elite: 180 scans added on each billing date.",
+            "Top-up packs never expire and stack on top of your plan.",
           ]},
+
 
           { type: "note", tone: "tip", content: "Track usage live from Dashboard → Billing. The sparkline turns red when you've dropped below 30% of your monthly balance." },
         ],

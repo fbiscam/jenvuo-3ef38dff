@@ -21,7 +21,7 @@ export const Route = createFileRoute("/pricing")({
       { title: "Pricing Plans — Jenvu" },
       { name: "description", content: "Pro and Elite plans for institutional-grade gold trading intelligence. Voice agent, A+ realtime alerts, full ICT & SMC analysis." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
-      { property: "og:description", content: "Realtime A+ gold setups, voice intelligence, and trade journal — Pro $29/mo, Elite $99/mo." },
+      { property: "og:description", content: "Realtime A+ gold setups, voice intelligence, and trade journal — Pro $15/mo, Elite $50/mo." },
       { property: "og:url", content: "https://jenvu.com/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/pricing" }],
@@ -73,7 +73,7 @@ const TIERS = [
   {
     id: "pro",
     name: "Pro",
-    price: 29,
+    price: 15,
     icon: Zap,
     bestFor: "Active trader",
     tagline: "For serious gold traders.",
@@ -95,7 +95,7 @@ const TIERS = [
   {
     id: "elite",
     name: "Elite",
-    price: 99,
+    price: 50,
     icon: Crown,
     bestFor: "Desk / fund",
     tagline: "For prop desks & funds.",
@@ -278,8 +278,8 @@ function PricingPage() {
                 </th>
                 {[
                   { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false, key: "free" },
-                  { name: "Pro", price: billing === "annual" ? "$290" : "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
-                  { name: "Elite", price: billing === "annual" ? "$990" : "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
+                  { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
                   { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false, key: "custom" },
                 ].map((p) => {
                   const isCurrent = currentPlan === p.key;
@@ -332,7 +332,7 @@ function PricingPage() {
 
             <tbody>
               {([
-                { f: "Price", a: "Free", b: "$29/mo", c: "$99/mo", d: "Custom", isHeading: true },
+                { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "Custom", isHeading: true },
                 { f: "Signal scans / month", a: "5", b: "60", c: "180", d: "Custom" },
                 { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
@@ -439,17 +439,16 @@ function PricingPage() {
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Credit top-ups</span>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more credits this month?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time packs that never expire. Stack on top of any plan, including Free. Every $1 = 8 credits.</p>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more scans this month?</h2>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time packs that never expire. Stack on top of any plan, including Free.</p>
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { credits: 40, price: 5, sub: "Starter" },
-            { credits: 80, price: 10, sub: "Boost" },
-            { credits: 160, price: 20, sub: "Trader", accent: true },
-            { credits: 400, price: 50, sub: "Power" },
-            { credits: 800, price: 100, sub: "Desk" },
+            { credits: 15, price: 5, sub: "Starter" },
+            { credits: 35, price: 10, sub: "Boost" },
+            { credits: 90, price: 25, sub: "Trader", accent: true },
+            { credits: 200, price: 50, sub: "Power" },
           ].map((p) => (
             <div key={p.credits} className={`rounded-2xl border ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
               <div className="flex items-center justify-between">
@@ -460,7 +459,7 @@ function PricingPage() {
               </div>
               <div className="mt-4 flex items-baseline gap-1">
                 <span className="text-3xl font-bold tabular-nums">{p.credits}</span>
-                <span className="text-xs text-zinc-500">credits</span>
+                <span className="text-xs text-zinc-500">scans</span>
               </div>
               <div className="mt-1 text-sm text-zinc-700">${p.price} one-time</div>
               <Link to="/contact" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
@@ -523,14 +522,14 @@ function Cell({ value, highlight }: { value: Mark; highlight?: boolean }) {
 function CustomTopUp() {
   const [amount, setAmount] = React.useState<number>(15);
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
-  const credits = safe * 8;
+  const credits = safe * 3;
   return (
     <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 sm:p-7">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
         <div>
           <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Custom top-up</span>
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. Every $1 = 8 credits. Credits never expire.</p>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. Every $1 = 3 scans. Scans never expire.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center rounded-md border border-zinc-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-amber-400">
@@ -546,7 +545,7 @@ function CustomTopUp() {
           </div>
           <div className="text-right">
             <div className={`text-2xl font-bold tabular-nums ${MONO}`}>{credits}</div>
-            <div className="text-[11px] text-zinc-500">credits</div>
+            <div className="text-[11px] text-zinc-500">scans</div>
           </div>
           <Link
             to="/contact"

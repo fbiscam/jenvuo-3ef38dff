@@ -648,8 +648,8 @@ function HomePage() {
           <div className="mt-10 grid gap-4 sm:hidden">
             {[
               { name: "Free", key: "free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", credits: "5 scans / mo", bullets: ["Unlimited voice queries (free)", "4h delayed alerts", "Community support"] },
-              { name: "Pro", key: "pro", price: "$29/mo", tag: "Active trader", to: "/contact" as const, cta: "Notify me", credits: "60 scans / mo", accent: true, bullets: ["Unlimited voice queries", "Realtime A+ alerts", "Full ICT / SMC narration", "Trade journal"] },
-              { name: "Elite", key: "elite", price: "$99/mo", tag: "Desk / fund", to: "/contact" as const, cta: "Talk to sales", credits: "180 scans / mo", bullets: ["Everything in Pro", "< 30s priority alerts", "Multi-pair scanner", "API & webhooks"] },
+              { name: "Pro", key: "pro", price: "$15/mo", tag: "Active trader", to: "/contact" as const, cta: "Notify me", credits: "60 scans / mo", accent: true, bullets: ["Unlimited voice queries", "Realtime A+ alerts", "Full ICT / SMC narration", "Trade journal"] },
+              { name: "Elite", key: "elite", price: "$50/mo", tag: "Desk / fund", to: "/contact" as const, cta: "Talk to sales", credits: "180 scans / mo", bullets: ["Everything in Pro", "< 30s priority alerts", "Multi-pair scanner", "API & webhooks"] },
             ].map((p) => {
               const isCurrent = currentPlan === p.key;
               return (
@@ -699,8 +699,8 @@ function HomePage() {
                   </th>
                   {[
                     { name: "Free", key: "free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false },
-                    { name: "Pro", key: "pro", price: "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
-                    { name: "Elite", key: "elite", price: "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
+                    { name: "Pro", key: "pro", price: "$15", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
+                    { name: "Elite", key: "elite", price: "$50", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
                     { name: "Custom", key: "custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false },
                   ].map((p) => {
                     const isCurrent = currentPlan === p.key;
@@ -753,7 +753,7 @@ function HomePage() {
 
               <tbody>
                 {([
-                  { f: "Price", a: "Free", b: "$29/mo", c: "$99/mo", d: "Custom", isHeading: true },
+                  { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "Custom", isHeading: true },
                   { f: "Signal scans / month", a: "5", b: "60", c: "180", d: "Custom" },
                   { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
                   { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
