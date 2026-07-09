@@ -139,7 +139,7 @@ export const getScanCostReport = createServerFn({ method: "POST" })
       s.avg_cost_usd = s.calls > 0 ? s.total_cost_usd / s.calls : 0;
     }
 
-    const planOrder = ["free", "pro", "elite"];
+    const planOrder = ["free", "pro", "elite", "ultra"];
     const byPlan = [...byPlanMap.values()].sort((a, b) => {
       const ai = planOrder.indexOf(a.plan_id);
       const bi = planOrder.indexOf(b.plan_id);
