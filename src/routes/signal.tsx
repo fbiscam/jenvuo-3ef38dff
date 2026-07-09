@@ -382,12 +382,10 @@ function SignalPage() {
       if (!ok) { setLoading(false); return; }
       const p = await fetchPlan({ data: { symbol: symbol || "XAUUSD" } });
       setPlan(p);
-      // ICT narration is a Pro/Elite feature — free users get the signal without the full walkthrough.
+      // ICT narration is included in the single "signal" charge above — no extra deduction.
+      // Free users still don't get the guided narration.
       if (credits.features.full_ict) {
-        const narrOk = await credits.spend("ict_narration", { symbol: symbol || "XAUUSD" });
-        if (narrOk) {
-          setTimeout(() => runNarration(p), 400);
-        }
+        setTimeout(() => runNarration(p), 400);
       } else {
         toast.info("Full ICT narration is a Pro feature", {
           description: "Upgrade to unlock the guided multi-timeframe walkthrough.",
