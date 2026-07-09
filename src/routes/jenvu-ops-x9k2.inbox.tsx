@@ -300,8 +300,8 @@ function AdminInbox() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
-        <nav className="hidden w-60 shrink-0 flex-col border-r border-zinc-200 bg-white/60 p-2.5 md:flex">
-          <div className="mb-2 px-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+        <nav className="hidden w-60 shrink-0 flex-col border-r border-indigo-100/70 bg-white/50 p-2.5 md:flex">
+          <div className="mb-2 px-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-indigo-500/80">
             Inboxes
           </div>
           <ul className="space-y-1">
@@ -313,8 +313,8 @@ function AdminInbox() {
                     onClick={() => setFilter(f.key)}
                     className={`flex w-full items-center justify-between rounded-md px-2.5 py-2 text-[14px] transition ${
                       active
-                        ? "bg-zinc-900 text-white"
-                        : "text-zinc-700 hover:bg-zinc-100"
+                        ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm shadow-indigo-500/20"
+                        : "text-zinc-700 hover:bg-indigo-50/60"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
