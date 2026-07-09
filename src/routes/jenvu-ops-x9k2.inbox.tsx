@@ -405,14 +405,14 @@ function AdminInbox() {
                           </div>
                         )}
                         <div
-                          className={`max-w-[75%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm shadow-sm ${
+                          className={`max-w-[75%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm shadow-sm ring-1 ${
                             isAdminMsg
-                              ? "rounded-br-sm bg-zinc-900 text-white"
-                              : "rounded-bl-sm bg-white text-zinc-900 ring-1 ring-zinc-200"
+                              ? "rounded-br-sm bg-zinc-900 text-white ring-zinc-900/10"
+                              : "rounded-bl-sm bg-white text-zinc-900 ring-zinc-200"
                           }`}
                         >
                           {m.content}
-                          <div className="mt-1 text-[9px] text-zinc-400">
+                          <div className={`mt-1 text-[9px] ${isAdminMsg ? "text-white/50" : "text-zinc-400"}`}>
                             {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </div>
                         </div>
