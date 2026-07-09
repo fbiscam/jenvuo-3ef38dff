@@ -268,6 +268,6 @@ export const MODEL_CHAIN = {
   // Senior 25-year-trader review — highest reasoning, stays on Lovable premium.
   seniorReview: ["openai/gpt-5.5", "openai/gpt-5.4"],
 
-  // Conversational chat around signals.
-  chat: ["openai/gpt-5.4-mini", "google/gemini-3-flash-preview"],
+  // Conversational chat around signals — free-tier Gemini models to keep voice queries near-zero cost.
+  chat: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview", "google/gemini-2.5-flash-lite"],
 } as const;
