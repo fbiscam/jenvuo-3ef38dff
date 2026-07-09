@@ -123,14 +123,6 @@ function Billing() {
             style={{ left: `${pct}%` }}
           />
         </div>
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {(Object.entries(CREDIT_COSTS) as [keyof typeof CREDIT_COSTS, number][]).map(([k, v]) => (
-            <div key={k} className="rounded-xl border border-zinc-200 bg-white p-3">
-              <div className={`${MONO} text-[9px] uppercase tracking-[0.2em] text-zinc-900`}>{k.replace("_", " ")}</div>
-              <div className="mt-1 text-sm font-semibold text-zinc-900">{v} scan{v > 1 ? "s" : ""}</div>
-            </div>
-          ))}
-        </div>
         {credits.state?.recent && credits.state.recent.length > 0 && (
           <div className="mt-6">
             <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Scan history</div>
