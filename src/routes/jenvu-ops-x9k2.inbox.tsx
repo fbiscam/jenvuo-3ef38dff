@@ -502,7 +502,7 @@ function AdminInbox() {
         </aside>
 
         {/* Right — conversation */}
-        <section className={`flex flex-1 flex-col bg-white/40 backdrop-blur-sm ${activeId ? "flex" : "hidden md:flex"}`}>
+        <section className={`flex flex-1 flex-col bg-white ${activeId ? "flex" : "hidden md:flex"}`}>
           {!activeSession ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
               <div className="relative grid h-16 w-16 place-items-center rounded-2xl bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_20px_40px_-20px_rgba(0,0,0,0.2)] ring-1 ring-black/5">
@@ -586,7 +586,7 @@ function AdminInbox() {
               </div>
 
               {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-white">
                 <div className="mx-auto max-w-3xl space-y-1 p-5">
                   {messages.length === 0 && (
                     <div className="py-8 text-center text-[11.5px] text-zinc-500">No messages yet.</div>
