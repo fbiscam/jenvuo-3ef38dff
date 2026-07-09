@@ -223,7 +223,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
   ];
 
   const exportCsv = () => {
-    const header = ["Date", "Stage", "Upgraded on", "Credits"];
+    const header = ["Date", "Stage", "Upgraded on", "Scans"];
     const rows = filtered.map((r) => {
       const upgraded = r.status === "converted" && r.credits_awarded > 0;
       const stage = upgraded ? "Upgraded" : r.status === "converted" ? "Converted" : r.status === "void" ? "Void" : "New";
