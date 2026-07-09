@@ -657,6 +657,7 @@ function DashboardLayout() {
                 value={credits.isLoading ? "…" : `${displayRemaining} / ${credits.allowance || 0}`}
                 delta={credits.allowance ? `${remainingPct}% left` : null}
                 tone={balanceTone}
+                trend={scansTrend}
                 seed={3}
               />
               <Metric
