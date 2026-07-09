@@ -212,50 +212,53 @@ function AdminInbox() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-stone-50" style={SANS}>
       {/* Top bar */}
-      <div className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-white ring-1 ring-zinc-200 overflow-hidden">
+      <div className="border-b border-stone-200 bg-white/80 backdrop-blur">
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-white ring-1 ring-stone-200 overflow-hidden shadow-sm">
               <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 object-contain" />
             </span>
             <div>
-              <div className="text-sm font-semibold text-zinc-900">Support Inbox</div>
-              <div className="text-[10px] text-zinc-500">
-                Signed in as <span className="font-medium text-zinc-700">{username}</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-[22px] leading-none text-stone-900" style={SERIF}>Support</span>
+                <span className="text-[22px] leading-none italic text-stone-500" style={SERIF}>Inbox</span>
+              </div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-stone-500">
+                Signed in · <span className="font-semibold text-stone-700">{username}</span>
               </div>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+            className="flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3.5 py-1.5 text-xs font-medium text-stone-700 shadow-sm transition hover:border-stone-300 hover:bg-stone-50"
           >
             <LogOut className="h-3.5 w-3.5" /> Sign out
           </button>
         </div>
       </div>
 
-      <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-[1400px] flex-col gap-4 p-4 sm:p-6">
-        <div className="grid grid-cols-3 gap-2 sm:max-w-md sm:gap-3">
-          <StatCard icon={<Inbox className="h-3.5 w-3.5" />} label="Open" value={stats.open} accent="text-emerald-600" />
-          <StatCard icon={<Mail className="h-3.5 w-3.5" />} label="Unread" value={stats.unread} accent="text-red-600" />
-          <StatCard icon={<Users className="h-3.5 w-3.5" />} label="Total" value={stats.total} accent="text-zinc-700" />
+      <div className="mx-auto flex h-[calc(100vh-4.5rem)] max-w-[1400px] flex-col gap-4 p-4 sm:p-6">
+        <div className="grid grid-cols-3 gap-3 sm:max-w-xl">
+          <StatCard icon={<Inbox className="h-3.5 w-3.5" />} label="Open" value={stats.open} accent="text-emerald-600" dot="bg-emerald-500" />
+          <StatCard icon={<Mail className="h-3.5 w-3.5" />} label="Unread" value={stats.unread} accent="text-rose-600" dot="bg-rose-500" />
+          <StatCard icon={<Users className="h-3.5 w-3.5" />} label="Total" value={stats.total} accent="text-stone-700" dot="bg-stone-400" />
         </div>
 
-        <div className="flex flex-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
+        <div className="flex flex-1 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.08)]">
           {/* Sidebar */}
           <aside
-            className={`flex w-full flex-col border-r border-zinc-200 sm:w-80 ${activeId ? "hidden sm:flex" : "flex"}`}
+            className={`flex w-full flex-col border-r border-stone-200 sm:w-80 ${activeId ? "hidden sm:flex" : "flex"}`}
           >
-            <div className="border-b border-zinc-200 p-3">
+            <div className="border-b border-stone-200 p-3">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search name or email…"
-                  className="w-full rounded-md border border-zinc-200 bg-zinc-50 py-2 pl-9 pr-3 text-sm placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none"
+                  className="w-full rounded-full border border-stone-200 bg-stone-50 py-2 pl-9 pr-3 text-sm placeholder:text-stone-400 focus:border-stone-400 focus:bg-white focus:outline-none"
                 />
               </div>
               <div className="mt-2 flex gap-1 rounded-md bg-zinc-100 p-1 text-xs">
