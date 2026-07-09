@@ -444,7 +444,7 @@ function AdminInbox() {
                           </div>
                           <div className="mt-1 flex flex-wrap items-center gap-1">
                             <Chip
-                              tone={s.status === "open" ? "emerald" : "zinc"}
+                              tone="zinc"
                               icon={s.status === "open" ? <CircleDot className="h-2.5 w-2.5" /> : <Circle className="h-2.5 w-2.5" />}
                             >
                               {s.status}
@@ -495,7 +495,7 @@ function AdminInbox() {
                       {activeSession.guest_name || "Anonymous visitor"}
                     </span>
                     <Chip
-                      tone={activeSession.status === "open" ? "emerald" : "zinc"}
+                      tone="zinc"
                       icon={activeSession.status === "open" ? <CircleDot className="h-2.5 w-2.5" /> : <CheckCircle2 className="h-2.5 w-2.5" />}
                     >
                       {activeSession.status}
@@ -511,7 +511,7 @@ function AdminInbox() {
                         <Mail className="h-3 w-3" />
                         <span className="truncate">{activeSession.guest_email}</span>
                         {copied ? (
-                          <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                          <CheckCircle2 className="h-3 w-3 text-black" />
                         ) : (
                           <Copy className="h-3 w-3 opacity-0 transition group-hover:opacity-100" />
                         )}
