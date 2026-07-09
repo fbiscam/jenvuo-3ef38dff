@@ -147,7 +147,7 @@ function ReferralsPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard icon={Users} label="Invites sent" value={info.totals.pending + info.totals.converted} />
         <StatCard icon={Check} label="Converted" value={info.totals.converted} accent="emerald" />
-        <StatCard icon={Gift} label="Credits earned" value={info.totals.credits_earned} accent="emerald" />
+        <StatCard icon={Gift} label="Scans earned" value={info.totals.credits_earned} accent="emerald" />
       </div>
 
       {/* Redeem code (if not yet referred) */}
