@@ -306,7 +306,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
                 <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Date</th>
                 <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Stage</th>
                 <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Upgraded on</th>
-                <th className="px-4 py-2 text-right font-medium whitespace-nowrap">Credits</th>
+                <th className="px-4 py-2 text-right font-medium whitespace-nowrap">Scans</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
