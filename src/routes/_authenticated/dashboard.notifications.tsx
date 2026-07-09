@@ -83,10 +83,13 @@ function NotificationsPage() {
   const listFn = useServerFn(listNotifications);
   const markFn = useServerFn(markNotificationRead);
   const markAllFn = useServerFn(markAllNotificationsRead);
+  const deleteOneFn = useServerFn(deleteNotification);
+  const deleteManyFn = useServerFn(deleteNotifications);
 
   const [items, setItems] = useState<NotificationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     try {
