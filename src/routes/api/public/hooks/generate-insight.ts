@@ -46,9 +46,8 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
           return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
         }
         const lovableKey = process.env.LOVABLE_API_KEY;
-        const blackboxKey = process.env.BLACKBOX_API_KEY;
-        if (!blackboxKey) {
-          return new Response(JSON.stringify({ error: "BLACKBOX_API_KEY missing" }), { status: 500 });
+        if (!lovableKey) {
+          return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), { status: 500 });
         }
 
 
