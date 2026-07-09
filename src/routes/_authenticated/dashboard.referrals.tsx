@@ -57,7 +57,7 @@ function ReferralsPage() {
       try {
         await navigator.share({
           title: "Jenvu — precision gold trade signals",
-          text: "Join me on Jenvu. Use my link to get 50 bonus scans when you upgrade.",
+          text: "Join me on Jenvu. Use my link to get 17 bonus scans when you upgrade.",
           url: info.shareUrl,
         });
       } catch { /* user cancelled */ }
