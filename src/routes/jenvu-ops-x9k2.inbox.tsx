@@ -426,7 +426,7 @@ function AdminInbox() {
                         }`}
                       >
                         {isActive && (
-                          <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-zinc-900" />
+                          <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-blue-600" />
                         )}
                         {hasUnread && !isActive && (
                           <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-zinc-900" />
