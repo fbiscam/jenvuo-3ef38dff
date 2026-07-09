@@ -90,6 +90,7 @@ function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selectionMode, setSelectionMode] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -177,6 +178,11 @@ function NotificationsPage() {
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
 
   const toggleSelectAll = () => {
+    if (!selectionMode) {
+      setSelectionMode(true);
+      setSelected(new Set(visibleIds));
+      return;
+    }
     setSelected((prev) => {
       if (allSelected) {
         const next = new Set(prev);
@@ -189,7 +195,10 @@ function NotificationsPage() {
     });
   };
 
-  const clearSelection = () => setSelected(new Set());
+  const clearSelection = () => {
+    setSelected(new Set());
+    setSelectionMode(false);
+  };
 
   const deleteOne = async (id: string) => {
     setItems((prev) => prev.filter((it) => it.id !== id));
@@ -244,17 +253,15 @@ function NotificationsPage() {
 
         <div className="flex items-center gap-1.5 shrink-0">
           {filtered.length > 0 && (
-            <label className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-zinc-200 bg-white text-[11px] font-medium text-zinc-700 hover:bg-zinc-50 cursor-pointer transition">
-              <input
-                type="checkbox"
-                checked={allSelected}
-                onChange={toggleSelectAll}
-                className="h-3 w-3 accent-zinc-900"
-              />
-              <span className="hidden sm:inline">Select all</span>
-            </label>
+            <button
+              onClick={selectionMode ? clearSelection : toggleSelectAll}
+              className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-zinc-200 bg-white text-[11px] font-medium text-zinc-700 hover:bg-zinc-50 transition"
+            >
+              <span className="hidden sm:inline">{selectionMode ? "Cancel" : "Select all"}</span>
+              <span className="sm:hidden">{selectionMode ? "✕" : "☑"}</span>
+            </button>
           )}
-          {selected.size > 0 && (
+          {selectionMode && selected.size > 0 && (
             <button
               onClick={deleteSelected}
               className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-red-200 bg-red-50 text-[11px] font-medium text-red-600 hover:bg-red-100 transition"
@@ -320,23 +327,25 @@ function NotificationsPage() {
                           isUnread && "bg-blue-50/30",
                         )}
                       >
-                        <div
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleSelect(n.id);
-                          }}
-                          className="shrink-0 flex items-center pt-1.5"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selected.has(n.id)}
-                            onChange={() => toggleSelect(n.id)}
-                            onClick={(e) => e.stopPropagation()}
-                            className="h-3.5 w-3.5 accent-zinc-900 cursor-pointer"
-                            aria-label="Select notification"
-                          />
-                        </div>
+                        {selectionMode && (
+                          <div
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              toggleSelect(n.id);
+                            }}
+                            className="shrink-0 flex items-center pt-1.5"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selected.has(n.id)}
+                              onChange={() => toggleSelect(n.id)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="h-3.5 w-3.5 accent-zinc-900 cursor-pointer"
+                              aria-label="Select notification"
+                            />
+                          </div>
+                        )}
                         <div
                           className={cn(
                             "shrink-0 h-9 w-9 rounded-full flex items-center justify-center",
