@@ -216,7 +216,7 @@ function AdminMessagesPage() {
                 <div className="text-[11px] uppercase tracking-wider text-zinc-500">
                   {new Date(selected.created_at).toLocaleString()}
                 </div>
-              <h2 className="mt-1 text-xl font-medium text-zinc-900" style={FONT}>{selected.subject}</h2>
+              <h2 className="mt-1 text-xl font-medium text-zinc-900 font-display">{selected.subject}</h2>
                 <div className="mt-1 text-sm text-zinc-600">
                   From <span className="font-medium text-zinc-900">{selected.name}</span>{" "}
                   <a href={`mailto:${selected.email}`} className="text-emerald-700 underline">
