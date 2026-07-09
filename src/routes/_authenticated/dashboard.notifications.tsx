@@ -327,23 +327,25 @@ function NotificationsPage() {
                           isUnread && "bg-blue-50/30",
                         )}
                       >
-                        <div
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleSelect(n.id);
-                          }}
-                          className="shrink-0 flex items-center pt-1.5"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selected.has(n.id)}
-                            onChange={() => toggleSelect(n.id)}
-                            onClick={(e) => e.stopPropagation()}
-                            className="h-3.5 w-3.5 accent-zinc-900 cursor-pointer"
-                            aria-label="Select notification"
-                          />
-                        </div>
+                        {selectionMode && (
+                          <div
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              toggleSelect(n.id);
+                            }}
+                            className="shrink-0 flex items-center pt-1.5"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selected.has(n.id)}
+                              onChange={() => toggleSelect(n.id)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="h-3.5 w-3.5 accent-zinc-900 cursor-pointer"
+                              aria-label="Select notification"
+                            />
+                          </div>
+                        )}
                         <div
                           className={cn(
                             "shrink-0 h-9 w-9 rounded-full flex items-center justify-center",
