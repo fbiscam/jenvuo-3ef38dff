@@ -204,16 +204,16 @@ export function LiveChatWidget() {
       {open && (
         <div className="fixed bottom-24 right-5 z-[9999] flex h-[560px] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-3xl border border-black/5 bg-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)] sm:right-5">
           {/* Header */}
-          <div className="relative flex items-center justify-between bg-black px-4 py-4 text-white">
+          <div className="relative flex items-center justify-between border-b border-black/5 bg-white px-4 py-4 text-black">
             <div className="flex items-center gap-3">
-              <div className="relative grid h-10 w-10 place-items-center rounded-full bg-white/10 ring-1 ring-white/15">
+              <div className="relative grid h-10 w-10 place-items-center rounded-full bg-zinc-100 ring-1 ring-black/5">
                 <img src="/favicon.ico" alt="" className="h-6 w-6 rounded-sm" />
-                <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-black" />
+                <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white" />
               </div>
               <div>
                 <div className="text-[15px] font-semibold leading-tight">Jenvu Support</div>
-                <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-white/70">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-zinc-600">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                   {token ? (status === "closed" ? "Chat closed" : "Online · replies in minutes") : "We're online now"}
                 </div>
               </div>
@@ -221,11 +221,12 @@ export function LiveChatWidget() {
             <button
               onClick={() => setOpen(false)}
               aria-label="Close"
-              className="rounded-full p-1.5 text-white/80 transition hover:bg-white/10 hover:text-white"
+              className="rounded-full p-1.5 text-zinc-600 transition hover:bg-zinc-100 hover:text-black"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
+
 
           {/* Body */}
           {!token ? (
