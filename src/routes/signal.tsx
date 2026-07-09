@@ -143,9 +143,12 @@ function SignalPage() {
 
   useEffect(() => {
     if (!authUser) { setIsAdmin(false); return; }
-    supabase.rpc("has_role", { _user_id: authUser.id, _role: "admin" }).then(({ data }) => {
-      setIsAdmin(!!data);
-    }).catch(() => setIsAdmin(false));
+    (async () => {
+      try {
+        const { data } = await supabase.rpc("has_role", { _user_id: authUser.id, _role: "admin" });
+        setIsAdmin(!!data);
+      } catch { setIsAdmin(false); }
+    })();
   }, [authUser]);
 
   const handleBroadcast = useCallback(async () => {
