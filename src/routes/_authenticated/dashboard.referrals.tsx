@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/referrals")({
   head: () => ({
     meta: [
       { title: "Referrals — Jenvu" },
-      { name: "description", content: "Invite friends, earn credits when they upgrade." },
+      { name: "description", content: "Invite friends, earn bonus scans when they upgrade." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -57,7 +57,7 @@ function ReferralsPage() {
       try {
         await navigator.share({
           title: "Jenvu — precision gold trade signals",
-          text: "Join me on Jenvu. Use my link to get 50 bonus credits when you upgrade.",
+          text: "Join me on Jenvu. Use my link to get 50 bonus scans when you upgrade.",
           url: info.shareUrl,
         });
       } catch { /* user cancelled */ }
@@ -73,7 +73,7 @@ function ReferralsPage() {
     try {
       const res = await applyCode({ data: { code: c } });
       if (res.ok) {
-        toast.success("Referral applied. You'll earn 50 credits when you upgrade to a paid plan.");
+        toast.success("Referral applied. You'll earn 50 bonus scans when you upgrade to a paid plan.");
         setCodeInput("");
         await load();
       } else {
@@ -101,9 +101,9 @@ function ReferralsPage() {
       <div>
         <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Refer & Earn</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Share your link. When a friend upgrades to Pro or Elite, you get{" "}
-          <span className="font-medium text-emerald-600">100 credits</span> and they get{" "}
-          <span className="font-medium text-emerald-600">50 credits</span>.
+          Share your link. When a friend upgrades to Pro, Elite, or Ultra, you get{" "}
+          <span className="font-medium text-emerald-600">100 bonus scans</span> and they get{" "}
+          <span className="font-medium text-emerald-600">50 bonus scans</span>.
         </p>
       </div>
 
@@ -147,7 +147,7 @@ function ReferralsPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard icon={Users} label="Invites sent" value={info.totals.pending + info.totals.converted} />
         <StatCard icon={Check} label="Converted" value={info.totals.converted} accent="emerald" />
-        <StatCard icon={Gift} label="Credits earned" value={info.totals.credits_earned} accent="emerald" />
+        <StatCard icon={Gift} label="Scans earned" value={info.totals.credits_earned} accent="emerald" />
       </div>
 
       {/* Redeem code (if not yet referred) */}
@@ -155,7 +155,7 @@ function ReferralsPage() {
         <div className="rounded-xl border border-zinc-200 bg-white p-5">
           <h2 className="text-sm font-semibold text-zinc-900">Have a friend's code?</h2>
           <p className="mt-1 text-xs text-zinc-500">
-            Enter it before upgrading to earn 50 bonus credits.
+            Enter it before upgrading to earn 50 bonus scans.
           </p>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <input
@@ -180,9 +180,9 @@ function ReferralsPage() {
       {info.incoming && (
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
           {info.incoming.status === "converted" ? (
-            <>Referral bonus of {info.incoming.credits_awarded} credits applied. </>
+            <>Referral bonus of {info.incoming.credits_awarded} scans applied. </>
           ) : (
-            <>A referral is attached to your account. Upgrade to Pro or Elite to unlock your 50 bonus credits.{" "}
+            <>A referral is attached to your account. Upgrade to Pro, Elite, or Ultra to unlock your 50 bonus scans.{" "}
               <Link to="/pricing" className="font-medium underline">See plans <ArrowRight className="inline h-3 w-3" /></Link>
             </>
           )}
@@ -219,11 +219,11 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
     { key: "all", label: "All", hint: "Every referral" },
     { key: "new", label: "New", hint: "Signed up, not upgraded" },
     { key: "converted", label: "Converted", hint: "Completed referral" },
-    { key: "upgraded", label: "Upgraded", hint: "Paid plan — credits earned" },
+    { key: "upgraded", label: "Upgraded", hint: "Paid plan — scans earned" },
   ];
 
   const exportCsv = () => {
-    const header = ["Date", "Stage", "Upgraded on", "Credits"];
+    const header = ["Date", "Stage", "Upgraded on", "Scans"];
     const rows = filtered.map((r) => {
       const upgraded = r.status === "converted" && r.credits_awarded > 0;
       const stage = upgraded ? "Upgraded" : r.status === "converted" ? "Converted" : r.status === "void" ? "Void" : "New";
@@ -306,7 +306,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
                 <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Date</th>
                 <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Stage</th>
                 <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Upgraded on</th>
-                <th className="px-4 py-2 text-right font-medium whitespace-nowrap">Credits</th>
+                <th className="px-4 py-2 text-right font-medium whitespace-nowrap">Scans</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">

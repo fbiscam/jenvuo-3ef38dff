@@ -74,11 +74,7 @@ export const askSignalAgent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => d as { question: string; context?: AgentContext })
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error: spendErr } = await supabaseAdmin.rpc("spend_credits", {
-      _user_id: context.userId, _amount: 1, _reason: "voice_query", _metadata: {} as any,
-    });
-    if (spendErr) throw new Error(spendErr.message?.includes("INSUFFICIENT_CREDITS") ? "INSUFFICIENT_CREDITS" : spendErr.message);
+    // Voice queries are free (0 scans). No ledger deduction.
 
     const ctx = data.context ?? {};
     const currentSym = (ctx.symbol ?? "").toUpperCase().replace(/[\s_\-/]/g, "");
