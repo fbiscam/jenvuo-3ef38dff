@@ -600,14 +600,14 @@ function AdminInbox() {
               </div>
 
               {/* Composer */}
-              <form onSubmit={handleReply} className="shrink-0 border-t border-zinc-200 bg-white p-3">
+              <form onSubmit={handleReply} className="shrink-0 border-t border-zinc-900/[0.06] bg-white/70 p-4 backdrop-blur-xl">
                 {activeSession.status === "closed" ? (
-                  <div className="flex items-center justify-center gap-2 rounded-md bg-zinc-50 py-2.5 text-[11.5px] text-zinc-500">
+                  <div className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200/80 bg-white py-3 text-[12px] font-medium text-zinc-500">
                     <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
                   </div>
                 ) : (
                   <div className="mx-auto max-w-3xl">
-                    <div className="relative rounded-lg border border-zinc-200 bg-white shadow-sm transition focus-within:border-black focus-within:ring-2 focus-within:ring-black/10">
+                    <div className="relative rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_30px_-15px_rgba(0,0,0,0.15)] transition focus-within:border-zinc-900/40 focus-within:ring-4 focus-within:ring-zinc-900/5">
                       <textarea
                         ref={inputRef}
                         value={input}
@@ -621,14 +621,14 @@ function AdminInbox() {
                         placeholder="Reply to visitor…  (Enter to send, Shift+Enter for newline)"
                         rows={2}
                         maxLength={4000}
-                        className="max-h-48 min-h-[56px] w-full resize-none bg-transparent px-3 py-2.5 text-[13px] outline-none placeholder:text-zinc-400"
+                        className="max-h-48 min-h-[60px] w-full resize-none bg-transparent px-4 py-3 text-[13.5px] leading-relaxed outline-none placeholder:text-zinc-400"
                       />
-                      <div className="flex items-center justify-between gap-2 border-t border-zinc-100 px-2 py-1.5">
+                      <div className="flex items-center justify-between gap-2 border-t border-zinc-900/[0.05] px-2.5 py-2">
                         <div className="relative">
                           <button
                             type="button"
                             onClick={() => setShowCanned((v) => !v)}
-                            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11.5px] font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-zinc-600 transition hover:bg-zinc-900/5 hover:text-zinc-900"
                           >
                             <Zap className="h-3 w-3" /> Canned
                           </button>
@@ -640,8 +640,8 @@ function AdminInbox() {
                                 className="fixed inset-0 z-10 cursor-default"
                                 aria-label="Close"
                               />
-                              <div className="absolute bottom-full left-0 z-20 mb-1 w-72 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-lg">
-                                <div className="border-b border-zinc-100 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                              <div className="absolute bottom-full left-0 z-20 mb-1.5 w-80 overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
+                                <div className="border-b border-zinc-100 bg-zinc-50/60 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">
                                   Quick replies
                                 </div>
                                 <ul className="max-h-64 overflow-y-auto py-1">
@@ -656,7 +656,7 @@ function AdminInbox() {
                                         }}
                                         className="block w-full px-3 py-2 text-left transition hover:bg-zinc-50"
                                       >
-                                        <div className="text-[12px] font-medium text-zinc-800">{c.label}</div>
+                                        <div className="text-[12.5px] font-semibold text-zinc-800">{c.label}</div>
                                         <div className="mt-0.5 line-clamp-2 text-[11px] text-zinc-500">{c.text}</div>
                                       </button>
                                     </li>
@@ -673,7 +673,7 @@ function AdminInbox() {
                           <button
                             type="submit"
                             disabled={sending || !input.trim()}
-                            className="inline-flex h-7 items-center gap-1.5 rounded-md bg-gradient-to-r from-black to-zinc-800 px-2.5 text-[12px] font-medium text-white shadow-sm shadow-black/25 transition hover:from-zinc-800 hover:to-zinc-900 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-gradient-to-b from-zinc-800 to-black px-3 text-[12.5px] font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.15)_inset,0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/20 transition hover:from-zinc-900 hover:to-black disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {sending ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
