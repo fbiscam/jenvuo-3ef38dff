@@ -542,17 +542,22 @@ function DashboardLayout() {
   const usedPct = credits.allowance ? Math.max(0, 100 - remainingPct) : 0;
   const balanceTone: "blue" | "rose" | "zinc" = remainingPct < 30 ? "rose" : remainingPct < 60 ? "zinc" : "blue";
 
-  // Track scan changes to show up/down trend
+  // Track scan changes to show up/down trend.
+  // Default: if any scans have been consumed (remaining < allowance) => downtrend (red).
+  // If balance increases (recharge/top-up/upgrade) => uptrend (green) until it decreases again.
   const prevRemainingRef = useRef<number | null>(null);
   const [scansTrend, setScansTrend] = useState<"up" | "down" | "flat">("flat");
   useEffect(() => {
     if (credits.isLoading) return;
     const prev = prevRemainingRef.current;
+    const allowance = credits.allowance || 0;
     if (prev !== null && prev !== displayRemaining) {
       setScansTrend(displayRemaining > prev ? "up" : "down");
+    } else if (prev === null) {
+      setScansTrend(allowance > 0 && displayRemaining < allowance ? "down" : "flat");
     }
     prevRemainingRef.current = displayRemaining;
-  }, [displayRemaining, credits.isLoading]);
+  }, [displayRemaining, credits.isLoading, credits.allowance]);
 
   return (
     <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
