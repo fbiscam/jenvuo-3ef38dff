@@ -133,7 +133,7 @@ export const spendCredits = createServerFn({ method: "POST" })
       _user_agent: userAgent,
       _request_ip: requestIp,
       _metadata: meta as any,
-    });
+    } as any);
 
     return { balance: newBalance as number, spent: amount };
   });
