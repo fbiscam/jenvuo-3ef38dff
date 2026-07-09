@@ -219,7 +219,54 @@ function AuthPage() {
     } catch { /* silent */ }
   }, [applyRefFn]);
 
+  // Shared: open the TOTP challenge for a user who's already signed in
+  // but stuck at AAL1 (needs to complete MFA). Also handles trusted-device
+  // fast path.
+  const openMfaChallengeIfNeeded = React.useCallback(async () => {
+    const { data: sess } = await supabase.auth.getSession();
+    const session = sess.session;
+    if (!session) return false;
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (!aal || aal.currentLevel !== "aal1" || aal.nextLevel !== "aal2") return false;
+    const { data: fac } = await supabase.auth.mfa.listFactors();
+    const totp = fac?.totp?.find((f) => f.status === "verified");
+    if (!totp) return false;
+    try {
+      const uid = session.user.id;
+      const savedToken = window.localStorage.getItem(TRUSTED_DEVICE_KEY(uid));
+      if (savedToken) {
+        const res = await verifyTrustedDeviceFn({ data: { token: savedToken } });
+        if (res?.valid) {
+          await applyPendingReferral();
+          navigate({ to: redirectTo as "/dashboard", replace: true });
+          return true;
+        }
+        window.localStorage.removeItem(TRUSTED_DEVICE_KEY(uid));
+      }
+    } catch { /* fall through */ }
+    const { data: chal, error } = await supabase.auth.mfa.challenge({ factorId: totp.id });
+    if (error || !chal) {
+      const msg = error?.message || "Could not start MFA challenge";
+      setErrorMsg(msg);
+      toast.error("Two-factor step failed", { description: msg });
+      return true;
+    }
+    setMfaChallenge({ factorId: totp.id, challengeId: chal.id });
+    setMfaCode("");
+    setMfaError(null);
+    setMfaResendCooldown(30);
+    return true;
+  }, [navigate, redirectTo, applyPendingReferral, verifyTrustedDeviceFn]);
+
+  // On mount / when arriving with ?mfa=1, if the session is already at AAL1
+  // needing AAL2, open the challenge — no SIGNED_IN event fires on plain page
+  // loads, so this is required to avoid a redirect loop with the dashboard.
   React.useEffect(() => {
+    void openMfaChallengeIfNeeded();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
       if (evt === "PASSWORD_RECOVERY") {
         recoveryModeRef.current = true;
