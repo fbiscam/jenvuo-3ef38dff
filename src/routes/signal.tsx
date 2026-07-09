@@ -8,6 +8,7 @@ import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib
 import { getBacktestStats, type BacktestStats } from "@/lib/backtest.functions";
 import { runHistoricalBacktest, type HistoricalBacktestResult } from "@/lib/backtest-historical.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
+import { broadcastCurrentSignal } from "@/lib/broadcast-alert.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 
 import { useSpeech } from "@/hooks/useSpeech";
