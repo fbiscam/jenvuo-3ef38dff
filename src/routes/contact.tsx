@@ -296,7 +296,7 @@ function ContactPage() {
                     </div>
                   )}
 
-                  <div className="flex flex-col-reverse sm:flex-row sm:items-start sm:justify-between gap-3 pt-2">
+                  <div className="flex justify-end pt-2">
                     <button
                       type="submit"
                       disabled={busy}
