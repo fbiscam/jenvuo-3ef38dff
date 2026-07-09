@@ -549,8 +549,8 @@ function DashboardLayout() {
             <span className="ml-2 hidden text-[11px] text-zinc-400 sm:inline">/ Dashboard</span>
           </Link>
           <div className="flex items-center gap-2">
-            <span className="hidden text-xs text-zinc-500 sm:inline">{email}</span>
             <NotificationBell />
+
             <button
               onClick={signOut}
               className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
