@@ -63,7 +63,8 @@ function Billing() {
 
   const plan = currentPlan;
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
-  const pct = credits.allowance > 0 ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
+  const remaining = Math.min(credits.balance, credits.allowance);
+  const pct = credits.allowance > 0 ? Math.min(100, Math.round((remaining / credits.allowance) * 100)) : 0;
   const resetsAt = credits.state?.periodResetsAt ? new Date(credits.state.periodResetsAt) : null;
 
 
