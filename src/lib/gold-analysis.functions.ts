@@ -2298,8 +2298,12 @@ export const getSignalPlan = createServerFn({ method: "POST" })
       if (cached) return cached;
     }
 
-    await _spendUserCredits(context.userId, 1, "ict_narration");
+    // Charge ONLY after a successful compute that produced an actionable
+    // trade (BUY/SELL). WAIT / errors are free.
     const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId);
+    if (plan?.trade?.direction === "BUY" || plan?.trade?.direction === "SELL") {
+      await _spendUserCredits(context.userId, 1, "ict_narration");
+    }
     setCachedPlan(cacheKey, plan);
     return plan;
   });
