@@ -301,7 +301,7 @@ function AdminInbox() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
         <nav className="hidden w-60 shrink-0 flex-col border-r border-zinc-200/80 bg-white/50 p-2.5 md:flex">
-          <div className="mb-2 px-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+          <div className="mb-2 px-2 pt-1 text-[11px] font-bold uppercase tracking-wider text-black">
             Inboxes
           </div>
           <ul className="space-y-1">
@@ -311,19 +311,19 @@ function AdminInbox() {
                 <li key={f.key}>
                   <button
                     onClick={() => setFilter(f.key)}
-                    className={`flex w-full items-center justify-between rounded-md px-2.5 py-2 text-[14px] transition ${
+                    className={`flex w-full items-center justify-between rounded-md px-2.5 py-2 text-[14px] font-medium transition ${
                       active
                         ? "bg-gradient-to-r from-black to-zinc-800 text-white shadow-sm shadow-black/20"
-                        : "text-zinc-700 hover:bg-zinc-100/70"
+                        : "text-black hover:bg-zinc-100/70"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={active ? "text-white/80" : "text-zinc-400"}>{f.icon}</span>
+                      <span className={active ? "text-white/80" : "text-black"}>{f.icon}</span>
                       {f.label}
                     </span>
                     <span
                       className={`tabular-nums text-[12px] ${
-                        active ? "text-white/70" : "text-zinc-400"
+                        active ? "text-white/70" : "text-black"
                       }`}
                     >
                       {f.count}
@@ -334,10 +334,10 @@ function AdminInbox() {
             })}
           </ul>
 
-          <div className="mb-2 mt-5 px-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+          <div className="mb-2 mt-5 px-2 text-[11px] font-bold uppercase tracking-wider text-black">
             Shortcuts
           </div>
-          <ul className="space-y-1.5 px-2 text-[13px] text-zinc-600">
+          <ul className="space-y-1.5 px-2 text-[13px] font-medium text-black">
             <Shortcut k="J / K" label="Navigate" />
             <Shortcut k="R" label="Reply" />
             <Shortcut k="E" label="Close chat" />
@@ -345,10 +345,10 @@ function AdminInbox() {
           </ul>
 
           <div className="mt-auto rounded-lg border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-3">
-            <div className="flex items-center gap-1.5 text-[13px] font-medium text-zinc-900">
+            <div className="flex items-center gap-1.5 text-[13px] font-semibold text-black">
               <Zap className="h-3.5 w-3.5 text-amber-500" /> {counts.unreadMsgs} unread msgs
             </div>
-            <div className="mt-0.5 text-[12px] text-zinc-600">across {counts.unread} threads</div>
+            <div className="mt-0.5 text-[12px] font-medium text-black">across {counts.unread} threads</div>
           </div>
         </nav>
 
