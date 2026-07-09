@@ -135,11 +135,41 @@ async function scanOnePair(
     return { error: 'insert_failed' }
   }
 
-  const { data: subs } = await admin
-    .from('signal_alert_subscribers')
-    .select('email')
-    .eq('status', 'active')
-  const recipients = (subs ?? []).map((s: { email: string | null }) => s.email).filter(Boolean)
+        // Only email subscribers who are on a paid, active plan.
+        // Match subscriber emails to auth.users via a secure RPC / view join.
+        const { data: subs } = await admin
+          .from('signal_alert_subscribers')
+          .select('email')
+          .eq('status', 'active')
+        const subEmails = (subs ?? [])
+          .map((s: { email: string | null }) => (s.email ?? '').toLowerCase())
+          .filter(Boolean)
+
+        let recipients: string[] = []
+        if (subEmails.length > 0) {
+          // Look up auth.users by email, then keep only those with an active non-free plan.
+          const { data: authUsers } = await admin
+            .schema('auth')
+            .from('users')
+            .select('id, email')
+            .in('email', subEmails)
+          const emailById = new Map<string, string>(
+            (authUsers ?? []).map((u: { id: string; email: string }) => [u.id, u.email.toLowerCase()]),
+          )
+          const userIds = Array.from(emailById.keys())
+
+          if (userIds.length > 0) {
+            const { data: paidSubs } = await admin
+              .from('user_subscriptions')
+              .select('user_id, plan_id, status')
+              .in('user_id', userIds)
+              .eq('status', 'active')
+              .neq('plan_id', 'free')
+            recipients = (paidSubs ?? [])
+              .map((r: { user_id: string }) => emailById.get(r.user_id))
+              .filter((e): e is string => Boolean(e))
+          }
+        }
 
   let enqueued = 0
   if (recipients.length > 0) {
