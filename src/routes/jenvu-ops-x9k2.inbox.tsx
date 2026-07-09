@@ -272,7 +272,7 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="flex h-screen flex-col bg-zinc-50 font-[system-ui,-apple-system,'SF_Pro_Text',Inter,sans-serif] text-[13px] text-zinc-900 antialiased">
+    <div className="flex h-screen flex-col bg-zinc-50 text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Top bar */}
       <header className="flex h-11 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-3">
         <div className="flex items-center gap-2">
