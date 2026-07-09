@@ -201,24 +201,24 @@ function AdminInbox() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-white">
       {/* Top bar */}
-      <div className="border-b border-zinc-200 bg-white">
+      <div className="sticky top-0 z-10 border-b border-zinc-200/80 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-zinc-900 text-white">
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-700 text-white shadow-sm ring-1 ring-zinc-900/5">
               <MessageSquare className="h-4 w-4" />
             </span>
-            <div>
-              <div className="text-sm font-semibold text-zinc-900">Support Inbox</div>
-              <div className="text-[10px] text-zinc-500">
+            <div className="leading-tight">
+              <div className="text-sm font-semibold tracking-tight text-zinc-900">Support Inbox</div>
+              <div className="text-[10.5px] text-zinc-500">
                 Signed in as <span className="font-medium text-zinc-700">{username}</span>
               </div>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-50 hover:text-zinc-900"
           >
             <LogOut className="h-3.5 w-3.5" /> Sign out
           </button>
@@ -227,12 +227,12 @@ function AdminInbox() {
 
       <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-[1400px] flex-col gap-4 p-4 sm:p-6">
         <div className="grid grid-cols-3 gap-2 sm:max-w-md sm:gap-3">
-          <StatCard icon={<Inbox className="h-3.5 w-3.5" />} label="Open" value={stats.open} accent="text-emerald-600" />
-          <StatCard icon={<Mail className="h-3.5 w-3.5" />} label="Unread" value={stats.unread} accent="text-red-600" />
-          <StatCard icon={<Users className="h-3.5 w-3.5" />} label="Total" value={stats.total} accent="text-zinc-700" />
+          <StatCard icon={<Inbox className="h-3.5 w-3.5" />} label="Open" value={stats.open} accent="text-emerald-600" dot="bg-emerald-500" />
+          <StatCard icon={<Mail className="h-3.5 w-3.5" />} label="Unread" value={stats.unread} accent="text-red-600" dot="bg-red-500" />
+          <StatCard icon={<Users className="h-3.5 w-3.5" />} label="Total" value={stats.total} accent="text-zinc-700" dot="bg-zinc-400" />
         </div>
 
-        <div className="flex flex-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
+        <div className="flex flex-1 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_1px_0_rgba(0,0,0,0.02),0_10px_30px_-15px_rgba(0,0,0,0.10)]">
           {/* Sidebar */}
           <aside
             className={`flex w-full flex-col border-r border-zinc-200 sm:w-80 ${activeId ? "hidden sm:flex" : "flex"}`}
