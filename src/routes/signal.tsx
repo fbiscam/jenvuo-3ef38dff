@@ -142,6 +142,25 @@ function SignalPage() {
   const [broadcasting, setBroadcasting] = useState(false);
   const broadcastFn = useServerFn(broadcastCurrentSignal);
 
+  type BroadcastedAlert = {
+    id: string;
+    pair: string;
+    grade: string;
+    direction: "BUY" | "SELL";
+    entry: number;
+    sl: number;
+    tp: number;
+    rr: number;
+    confidence: number;
+    session: string | null;
+    killzone: string | null;
+    htf_bias: string | null;
+    rationale: string | null;
+    fired_at: string;
+  };
+  const [broadcastedAlert, setBroadcastedAlert] = useState<BroadcastedAlert | null>(null);
+  const [broadcastedLoading, setBroadcastedLoading] = useState(false);
+
   useEffect(() => {
     if (!authUser) { setIsAdmin(false); return; }
     (async () => {
