@@ -75,13 +75,13 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
 
     let recipients: Array<{ email: string; user_id: string }> = []
     if (subEmails.length > 0) {
-      const { data: authUsers } = await supabaseAdmin
+      const { data: authUsers } = await (supabaseAdmin as any)
         .schema('auth')
         .from('users')
         .select('id, email')
         .in('email', subEmails)
       const emailById = new Map<string, string>(
-        (authUsers ?? []).map((u: { id: string; email: string }) => [u.id, u.email.toLowerCase()]),
+        ((authUsers ?? []) as Array<{ id: string; email: string }>).map((u) => [u.id, u.email.toLowerCase()]),
       )
       const userIds = Array.from(emailById.keys())
       if (userIds.length > 0) {
