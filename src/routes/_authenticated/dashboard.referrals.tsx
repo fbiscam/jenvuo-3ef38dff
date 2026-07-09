@@ -180,9 +180,9 @@ function ReferralsPage() {
       {info.incoming && (
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
           {info.incoming.status === "converted" ? (
-            <>Referral bonus of {info.incoming.credits_awarded} credits applied. </>
+            <>Referral bonus of {info.incoming.credits_awarded} scans applied. </>
           ) : (
-            <>A referral is attached to your account. Upgrade to Pro or Elite to unlock your 50 bonus credits.{" "}
+            <>A referral is attached to your account. Upgrade to Pro, Elite, or Ultra to unlock your 50 bonus scans.{" "}
               <Link to="/pricing" className="font-medium underline">See plans <ArrowRight className="inline h-3 w-3" /></Link>
             </>
           )}
