@@ -2292,7 +2292,7 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     }
 
     await _spendUserCredits(context.userId, 1, "ict_narration");
-    const plan = await computeSignalPlan({ symbol: data.symbol });
+    const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId);
     setCachedPlan(cacheKey, plan);
     return plan;
   });
