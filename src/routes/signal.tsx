@@ -447,6 +447,22 @@ function SignalPage() {
 
   useEffect(() => {
     if (!authReady) return;
+    // If opening from a broadcasted alert notification, show the stored admin
+    // signal directly — do NOT run a fresh AI analysis (saves credits).
+    if (alertId) {
+      setBroadcastedLoading(true);
+      (async () => {
+        const { data, error } = await supabase
+          .from("signal_alerts")
+          .select("id, pair, grade, direction, entry, sl, tp, rr, confidence, session, killzone, htf_bias, rationale, fired_at")
+          .eq("id", alertId)
+          .maybeSingle();
+        if (!error && data) setBroadcastedAlert(data as BroadcastedAlert);
+        else toast.error("This alert is no longer available.");
+        setBroadcastedLoading(false);
+      })();
+      return () => { abortRef.current = true; speech.stopSpeaking(); };
+    }
     if (savedId) loadSaved(savedId);
     else load();
     return () => {
@@ -454,7 +470,7 @@ function SignalPage() {
       speech.stopSpeaking();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authReady, symbol, savedId]);
+  }, [authReady, symbol, savedId, alertId]);
 
   // Killzone popup: fire once per pair-symbol when analysis returns outside its killzone
   useEffect(() => {
