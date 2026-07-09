@@ -213,7 +213,7 @@ export function LiveChatWidget() {
               <div>
                 <div className="text-[15px] font-semibold leading-tight">Jenvu Support</div>
                 <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-zinc-600">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  
                   {token ? (status === "closed" ? "Chat closed" : "Online · replies in minutes") : "We're online now"}
                 </div>
               </div>
