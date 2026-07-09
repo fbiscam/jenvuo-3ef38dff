@@ -65,8 +65,8 @@ const TIERS = [
     tagline: "Try the voice agent.",
     cta: "Start free",
     ctaTo: "/auth",
-    credits: 10,
-    features: ["10 credits / month included", "Pay per action: signal 2, narration 3, alert 2, voice free", "Delayed alerts (4h)", "Public market insights", "Community support"],
+    credits: 5,
+    features: ["5 signal scans / month", "Voice queries free", "Delayed alerts (4h)", "Public market insights", "Community support"],
 
     highlight: false,
   },
@@ -79,10 +79,10 @@ const TIERS = [
     tagline: "For serious gold traders.",
     cta: "Notify me when live",
     ctaTo: "/contact",
-    credits: 230,
+    credits: 60,
     features: [
-      "230 credits / month included",
-      "Pay per action — signal 2, narration 3, alert 2, voice free",
+      "60 signal scans / month",
+      "Voice queries free",
       "A+ / A institutional signals",
       "Realtime email & push alerts",
       "Full ICT / SMC narration",
@@ -101,10 +101,10 @@ const TIERS = [
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
-    credits: 800,
+    credits: 180,
     features: [
-      "800 credits / month included",
-      "Pay per action — signal 2, narration 3, alert 2, voice free",
+      "180 signal scans / month",
+      "Voice queries free",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
       "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF)",
@@ -333,7 +333,7 @@ function PricingPage() {
             <tbody>
               {([
                 { f: "Price", a: "Free", b: "$29/mo", c: "$99/mo", d: "Custom", isHeading: true },
-                { f: "Monthly credits", a: "10", b: "230", c: "800", d: "Custom" },
+                { f: "Signal scans / month", a: "5", b: "60", c: "180", d: "Custom" },
                 { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
                 { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
