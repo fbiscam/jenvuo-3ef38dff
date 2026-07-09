@@ -546,7 +546,7 @@ function AdminInbox() {
               </div>
 
               {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-zinc-50/50">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gradient-to-b from-indigo-50/30 via-white to-sky-50/20">
                 <div className="mx-auto max-w-3xl space-y-1 p-4">
                   {messages.length === 0 && (
                     <div className="py-8 text-center text-[11.5px] text-zinc-500">No messages yet.</div>
@@ -572,8 +572,8 @@ function AdminInbox() {
                           <div
                             className={`max-w-[78%] whitespace-pre-wrap break-words rounded-lg px-3 py-2 text-[13px] leading-relaxed ${
                               isAdminMsg
-                                ? "bg-zinc-900 text-white"
-                                : "border border-zinc-200 bg-white text-zinc-900"
+                                ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm shadow-indigo-500/20"
+                                : "border border-indigo-100 bg-white text-zinc-900 shadow-sm"
                             }`}
                           >
                             {m.content}
