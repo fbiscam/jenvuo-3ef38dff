@@ -135,7 +135,7 @@ function Billing() {
               {(showAllActivity ? filtered : filtered.slice(0, 10)).map((r) => {
                 const d = new Date(r.created_at);
                 const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-                const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+                const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" });
                 const reasonLabels: Record<string, string> = {
                   signal: "Signal scan",
                   ict_narration: "ICT narration",
