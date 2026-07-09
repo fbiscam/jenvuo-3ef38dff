@@ -511,18 +511,25 @@ function StatCard({
   label,
   value,
   accent,
+  dot,
 }: {
   icon: React.ReactNode;
   label: string;
   value: number;
   accent: string;
+  dot: string;
 }) {
   return (
-    <div className="flex min-w-[92px] items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
-      <span className={`grid h-6 w-6 place-items-center rounded-md bg-zinc-50 ${accent}`}>{icon}</span>
-      <div className="leading-tight">
-        <div className="text-[10px] uppercase tracking-wide text-zinc-500">{label}</div>
-        <div className="text-sm font-semibold text-zinc-900">{value}</div>
+    <div className="group relative overflow-hidden rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm transition hover:border-stone-300">
+      <div className="flex items-center gap-3">
+        <span className={`grid h-8 w-8 place-items-center rounded-full bg-stone-50 ring-1 ring-stone-200/60 ${accent}`}>{icon}</span>
+        <div className="leading-tight">
+          <div className="flex items-center gap-1.5">
+            <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+            <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-stone-500">{label}</span>
+          </div>
+          <div className="mt-0.5 text-2xl leading-none text-stone-900" style={SERIF}>{value}</div>
+        </div>
       </div>
     </div>
   );
