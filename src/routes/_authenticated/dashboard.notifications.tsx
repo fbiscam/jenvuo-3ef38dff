@@ -113,7 +113,7 @@ function NotificationsPage() {
       uid = data.user?.id ?? null;
       if (!uid) return;
       channel = supabase
-        .channel(`notifications-page:${uid}`)
+        .channel(`notifications-page:${uid}:${Math.random().toString(36).slice(2)}`)
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "user_notifications", filter: `user_id=eq.${uid}` },
