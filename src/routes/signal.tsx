@@ -137,6 +137,56 @@ function SignalPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(-1);
   const [playing, setPlaying] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [broadcasting, setBroadcasting] = useState(false);
+  const broadcastFn = useServerFn(broadcastCurrentSignal);
+
+  useEffect(() => {
+    if (!authUser) { setIsAdmin(false); return; }
+    supabase.rpc("has_role", { _user_id: authUser.id, _role: "admin" }).then(({ data }) => {
+      setIsAdmin(!!data);
+    }).catch(() => setIsAdmin(false));
+  }, [authUser]);
+
+  const handleBroadcast = useCallback(async () => {
+    if (!plan) return;
+    if (plan.trade.direction === "WAIT") {
+      toast.error("No active trade — plan is in WAIT.");
+      return;
+    }
+    const ok = window.confirm(
+      `Send this ${plan.trade.direction} ${plan.instrument.symbol} alert to all paid subscribers?`,
+    );
+    if (!ok) return;
+    setBroadcasting(true);
+    try {
+      const res = await broadcastFn({
+        data: {
+          pair: plan.instrument.symbol,
+          grade: plan.setupGrade,
+          direction: plan.trade.direction as "BUY" | "SELL",
+          entry: plan.trade.entry,
+          sl: plan.trade.sl,
+          tp: plan.trade.tp,
+          rr: plan.trade.rr,
+          confidence: plan.trade.confidence,
+          session: plan.session,
+          killzone: plan.killzone,
+          htfBias: plan.htfBias,
+          rationale: plan.trade.summary?.slice(0, 500) ?? "",
+          decimals: plan.instrument.decimals,
+          setupScore: plan.setupScore,
+        },
+      });
+      toast.success(
+        `Alert sent — ${res.enqueued} emails queued, ${res.notified_in_app} in-app notifications.`,
+      );
+    } catch (e: any) {
+      toast.error(e?.message ?? "Broadcast failed");
+    } finally {
+      setBroadcasting(false);
+    }
+  }, [plan, broadcastFn]);
 
   const alertsPair = (plan?.instrument.symbol ?? symbol ?? "XAUUSD").toUpperCase();
   const { alerts: alertHistory, loading: alertsLoading } = useSignalAlerts(alertsPair);
