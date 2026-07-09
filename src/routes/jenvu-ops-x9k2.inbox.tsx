@@ -659,7 +659,7 @@ function AdminInbox() {
                           <button
                             type="submit"
                             disabled={sending || !input.trim()}
-                            className="inline-flex h-7 items-center gap-1.5 rounded-md bg-zinc-900 px-2.5 text-[12px] font-medium text-white shadow-sm transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="inline-flex h-7 items-center gap-1.5 rounded-md bg-gradient-to-r from-indigo-600 to-violet-600 px-2.5 text-[12px] font-medium text-white shadow-sm shadow-indigo-500/25 transition hover:from-indigo-500 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {sending ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
