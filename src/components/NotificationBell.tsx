@@ -205,7 +205,7 @@ export default function NotificationBell() {
                 </p>
               </div>
             ) : (
-              items.map((n) => {
+              items.slice(0, 4).map((n) => {
                 const v = visualFor(n);
                 const Icon = v.Icon;
                 return (
