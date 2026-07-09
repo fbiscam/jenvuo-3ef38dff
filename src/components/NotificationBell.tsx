@@ -87,6 +87,36 @@ export default function NotificationBell() {
     return () => clearInterval(t);
   }, [load]);
 
+  // Realtime: refresh on insert/update/delete of this user's notifications
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      const uid = data.user?.id;
+      if (!uid || cancelled) return;
+      channel = supabase
+        .channel(`user_notifications:${uid}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "user_notifications",
+            filter: `user_id=eq.${uid}`,
+          },
+          () => {
+            load();
+          },
+        )
+        .subscribe();
+    })();
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [load]);
+
   useEffect(() => {
     if (!open) return;
     function onClick(e: MouseEvent) {
