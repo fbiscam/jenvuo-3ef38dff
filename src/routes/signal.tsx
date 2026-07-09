@@ -699,6 +699,17 @@ function SignalPage() {
                 Re-analyze
               </button>
             )}
+            {isAdmin && plan && plan.trade.direction !== "WAIT" && (
+              <button
+                onClick={handleBroadcast}
+                disabled={broadcasting}
+                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-amber-500 text-[12px] font-semibold text-white hover:bg-amber-600 disabled:opacity-50 transition"
+                title="Send this signal to all paid subscribers"
+              >
+                {broadcasting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                Alert Everyone
+              </button>
+            )}
           </div>
         </div>
       </header>
