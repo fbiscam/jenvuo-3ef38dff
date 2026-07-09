@@ -16,9 +16,18 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/messages")
       { title: "Contact Inbox — Jenvu Admin" },
       { name: "robots", content: "noindex" },
     ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap",
+      },
+    ],
   }),
   component: AdminMessagesPage,
 });
+
+const SERIF = { fontFamily: "'Instrument Serif', ui-serif, Georgia, serif" } as const;
+const SANS = { fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif" } as const;
 
 type Filter = "all" | "new" | "read" | "replied" | "archived";
 
@@ -115,9 +124,11 @@ function AdminMessagesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 space-y-6">
+    <div className="mx-auto max-w-6xl px-4 py-8 space-y-6" style={SANS}>
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Contact Inbox</h1>
+        <h1 className="text-4xl text-zinc-900 tracking-tight" style={SERIF}>
+          Contact <em className="italic">Inbox</em>
+        </h1>
         <p className="mt-1 text-sm text-zinc-500">Messages submitted from your website contact form.</p>
       </div>
 
@@ -212,7 +223,7 @@ function AdminMessagesPage() {
                 <div className="text-[11px] uppercase tracking-wider text-zinc-500">
                   {new Date(selected.created_at).toLocaleString()}
                 </div>
-                <h2 className="mt-1 text-lg font-semibold text-zinc-900">{selected.subject}</h2>
+                <h2 className="mt-1 text-2xl text-zinc-900" style={SERIF}>{selected.subject}</h2>
                 <div className="mt-1 text-sm text-zinc-600">
                   From <span className="font-medium text-zinc-900">{selected.name}</span>{" "}
                   <a href={`mailto:${selected.email}`} className="text-emerald-700 underline">
