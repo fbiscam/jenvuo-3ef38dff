@@ -46,6 +46,7 @@ const RANGE_DAYS: Record<RangeKey, number | null> = {
 };
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Dashboard — Jenvu" },
