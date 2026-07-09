@@ -143,7 +143,7 @@ export function LiveChatWidget() {
       setToken(newToken);
     } catch (err) {
       console.error("start chat error", err);
-      alert("Couldn't start chat. Please try again.");
+      toast.error("Couldn't start chat", { description: "Please check your connection and try again." });
     } finally {
       setStarting(false);
     }
