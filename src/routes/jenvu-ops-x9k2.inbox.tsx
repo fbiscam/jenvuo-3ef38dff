@@ -596,9 +596,10 @@ function AdminInbox() {
                           <div
                             className={`max-w-[78%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed ${
                               isAdminMsg
-                                ? "rounded-br-md bg-[#d9fdd3] text-zinc-900 shadow-[0_1px_1px_rgba(0,0,0,0.08)]"
+                                ? "rounded-br-md bg-blue-600 text-white shadow-[0_4px_14px_-4px_rgba(37,99,235,0.5)]"
                                 : "rounded-bl-md border border-zinc-900/[0.06] bg-white text-zinc-900 shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
                             }`}
+
                           >
                             {m.content}
                           </div>
