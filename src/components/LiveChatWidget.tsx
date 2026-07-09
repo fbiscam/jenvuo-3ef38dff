@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 type ChatMsg = {
@@ -64,23 +65,43 @@ export function LiveChatWidget() {
     if (n) setName(n);
   }, []);
 
+  const errorCountRef = useRef(0);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   const fetchMessages = useCallback(async (t: string) => {
-    const { data, error } = await supabase.rpc("get_guest_messages", { _token: t });
-    if (error) {
-      console.error("chat fetch error", error);
-      return;
-    }
-    const rows = (data ?? []) as (ChatMsg & { session_status: string })[];
-    setMessages(rows.map((r) => ({ id: r.id, sender: r.sender, content: r.content, created_at: r.created_at })));
-    if (rows.length > 0) setStatus(rows[0].session_status);
-    // Unread badge when closed
-    if (!open) {
-      const admins = rows.filter((r) => r.sender === "admin").length;
-      if (admins > lastCountRef.current) setUnread((u) => u + (admins - lastCountRef.current));
-      lastCountRef.current = admins;
-    } else {
-      lastCountRef.current = rows.filter((r) => r.sender === "admin").length;
-      setUnread(0);
+    try {
+      const { data, error } = await supabase.rpc("get_guest_messages", { _token: t });
+      if (error) throw error;
+      errorCountRef.current = 0;
+      setLoadError(null);
+      const rows = (data ?? []) as (ChatMsg & { session_status: string })[];
+      setMessages(rows.map((r) => ({ id: r.id, sender: r.sender, content: r.content, created_at: r.created_at })));
+      if (rows.length > 0) setStatus(rows[0].session_status);
+      // Unread badge when closed
+      if (!open) {
+        const admins = rows.filter((r) => r.sender === "admin").length;
+        if (admins > lastCountRef.current) setUnread((u) => u + (admins - lastCountRef.current));
+        lastCountRef.current = admins;
+      } else {
+        lastCountRef.current = rows.filter((r) => r.sender === "admin").length;
+        setUnread(0);
+      }
+    } catch (err: any) {
+      console.error("chat fetch error", err);
+      errorCountRef.current += 1;
+      // Show inline banner after 3 consecutive failures; toast once
+      if (errorCountRef.current === 3) {
+        setLoadError("Can't reach chat right now. We'll keep trying…");
+        toast.error("Chat connection lost", { description: "Retrying in the background." });
+      }
+      // If session token is invalid, clear it so user can start fresh
+      if (typeof err?.message === "string" && /invalid session/i.test(err.message)) {
+        localStorage.removeItem(STORAGE_KEY);
+        setToken(null);
+        setMessages([]);
+        setLoadError(null);
+        errorCountRef.current = 0;
+      }
     }
   }, [open]);
 
@@ -122,7 +143,7 @@ export function LiveChatWidget() {
       setToken(newToken);
     } catch (err) {
       console.error("start chat error", err);
-      alert("Couldn't start chat. Please try again.");
+      toast.error("Couldn't start chat", { description: "Please check your connection and try again." });
     } finally {
       setStarting(false);
     }
@@ -145,7 +166,7 @@ export function LiveChatWidget() {
       console.error("send error", err);
       setMessages((m) => m.filter((x) => x.id !== tempId));
       setInput(content);
-      alert("Message failed to send.");
+      toast.error("Message failed to send", { description: "Please try again." });
     } finally {
       setSending(false);
     }
@@ -232,6 +253,11 @@ export function LiveChatWidget() {
           ) : (
             <>
               <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-3">
+                {loadError && (
+                  <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
+                    {loadError}
+                  </div>
+                )}
                 {messages.length === 0 && (
                   <div className="mt-8 text-center text-xs text-zinc-500">
                     Send us your first message — we'll get back to you here.
