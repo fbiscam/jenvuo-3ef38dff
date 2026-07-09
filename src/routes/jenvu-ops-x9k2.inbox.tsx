@@ -437,7 +437,7 @@ function AdminInbox() {
                               {s.guest_email || "No email provided"}
                             </span>
                             {hasUnread && (
-                              <span className="grid h-4 min-w-[16px] shrink-0 place-items-center rounded-full bg-blue-500 px-1 text-[10px] font-semibold text-white tabular-nums">
+                              <span className="grid h-4 min-w-[16px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 px-1 text-[10px] font-semibold text-white tabular-nums shadow-sm shadow-indigo-500/30">
                                 {s.unread_admin}
                               </span>
                             )}
