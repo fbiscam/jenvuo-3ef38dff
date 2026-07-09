@@ -9,7 +9,7 @@ const SENDER_DOMAIN = 'notify.jenvu.com'
 const FROM = 'Jenvu Signal Desk <signals@jenvu.com>'
 const DEDUPE_WINDOW_MS = 90 * 60 * 1000 // 90 minutes
 
-const XAU_PAIRS = ['XAUUSD', 'XAUEUR', 'XAUGBP', 'XAUJPY', 'XAUAUD', 'XAUCHF']
+const XAU_PAIRS = ['XAUUSD', 'XAUEUR', 'XAUGBP']
 
 export const Route = createFileRoute('/api/public/hooks/scan-signals')({
   server: {
