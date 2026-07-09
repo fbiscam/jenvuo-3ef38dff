@@ -64,30 +64,44 @@ async function singleAttempt(
 ): Promise<{ content: string; usage: UsageInfo }> {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
+
+  // Route by prefix: `blackboxai/*` → Blackbox API, else → Lovable AI Gateway.
+  const isBlackbox = model.startsWith("blackboxai/");
+  const blackboxKey = process.env.BLACKBOX_API_KEY;
+
+  const endpoint = isBlackbox
+    ? "https://api.blackbox.ai/v1/chat/completions"
+    : "https://ai.gateway.lovable.dev/v1/chat/completions";
+
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (isBlackbox) {
+    if (!blackboxKey) throw new AiGatewayError("BLACKBOX_API_KEY missing on server", 0, true);
+    headers["Authorization"] = `Bearer ${blackboxKey}`;
+  } else {
+    headers["Lovable-API-Key"] = apiKey;
+  }
+
   const body: Record<string, unknown> = {
     model,
     messages: opts.messages,
   };
   if (opts.jsonMode) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
-    if (model.startsWith("openai/gpt-5")) {
+    if (!isBlackbox && model.startsWith("openai/gpt-5")) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (opts.priority && PRIORITY_TIER_MODELS.has(model)) {
+  if (!isBlackbox && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
     body.service_tier = "priority";
   }
 
   let res: Response;
   try {
-    res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    res = await fetch(endpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Lovable-API-Key": apiKey,
-      },
+      headers,
       body: JSON.stringify(body),
       signal: controller.signal,
     });
@@ -102,11 +116,14 @@ async function singleAttempt(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    const terminal = !(res.status === 429 || res.status >= 500);
+    // Blackbox: treat 400/403 as non-terminal so we fallback to the next model (e.g. unsupported model).
+    const terminal = isBlackbox
+      ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400)
+      : !(res.status === 429 || res.status >= 500);
     let msg: string;
     if (res.status === 429) msg = "AI is rate-limited right now. Please retry in a moment.";
-    else if (res.status === 402) msg = "Lovable AI credits exhausted. Please top up your workspace.";
-    else if (res.status === 401) msg = "Lovable AI key rejected. Please contact support.";
+    else if (res.status === 402) msg = "AI credits exhausted. Please top up your workspace.";
+    else if (res.status === 401) msg = "AI key rejected. Please contact support.";
     else if (res.status === 400) msg = `AI request rejected: ${txt.slice(0, 200)}`;
     else msg = `AI error ${res.status}: ${txt.slice(0, 200)}`;
     throw new AiGatewayError(msg, res.status, terminal);
@@ -238,9 +255,16 @@ export const MODEL_CHAIN = {
   intent: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview"],
 
   // Chart narration — deep ICT/SMC reasoning.
-  narration: ["openai/gpt-5.4", "openai/gpt-5.4-mini", "google/gemini-3.5-flash"],
+  // Primary: Blackbox DeepSeek V4 Pro (~25x cheaper, GPT-4 class reasoning).
+  // Fallbacks: Lovable premium models guarantee identical quality if Blackbox errors.
+  narration: [
+    "blackboxai/deepseek/deepseek-v4-pro",
+    "openai/gpt-5.4",
+    "openai/gpt-5.4-mini",
+    "google/gemini-3.5-flash",
+  ],
 
-  // Senior 25-year-trader review — highest reasoning.
+  // Senior 25-year-trader review — highest reasoning, stays on Lovable premium.
   seniorReview: ["openai/gpt-5.5", "openai/gpt-5.4"],
 
   // Conversational chat around signals.
