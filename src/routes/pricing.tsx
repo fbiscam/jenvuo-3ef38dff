@@ -343,7 +343,7 @@ function PricingPage() {
                 { f: "Trade journal", a: false, b: true, c: true, d: true },
                 { f: "Email + push alerts", a: false, b: true, c: true, d: true },
                 { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
-                { f: "API access & webhooks", a: false, b: false, c: true, d: true, badge: "new" },
+                
                 { f: "Custom alert rules", a: false, b: false, c: true, d: true },
                 { f: "Dedicated onboarding", a: false, b: false, c: false, d: true },
                 { f: "Priority desk support", a: false, b: false, c: false, d: true },
