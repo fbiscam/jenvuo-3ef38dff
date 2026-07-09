@@ -628,6 +628,15 @@ function AuthPage() {
       idempotencyKey: `welcome-${email.toLowerCase()}`,
       templateData: { fullName, siteUrl: window.location.origin },
     });
+    // Mirror the welcome email as an in-app notification
+    void createUserNotification({
+      data: {
+        type: "welcome",
+        title: `Welcome to Jenvu${fullName ? ", " + fullName.split(" ")[0] : ""} 👋`,
+        body: "Your account is ready. Explore signals, dashboard, and referrals.",
+        dedupeKey: `welcome-${email.toLowerCase()}`,
+      },
+    });
   };
 
 
