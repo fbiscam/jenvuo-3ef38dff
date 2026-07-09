@@ -486,7 +486,7 @@ function AdminInbox() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-zinc-700 to-zinc-900 text-[10px] font-semibold text-white">
+                <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-indigo-500 to-violet-600 text-[10px] font-semibold text-white">
                   {initials(activeSession.guest_name, activeSession.guest_email)}
                 </div>
                 <div className="min-w-0 flex-1">
