@@ -474,18 +474,23 @@ function StatCard({
   label,
   value,
   accent,
+  dot,
 }: {
   icon: React.ReactNode;
   label: string;
   value: number;
   accent: string;
+  dot: string;
 }) {
   return (
-    <div className="flex min-w-[92px] items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
-      <span className={`grid h-6 w-6 place-items-center rounded-md bg-zinc-50 ${accent}`}>{icon}</span>
+    <div className="group flex min-w-[92px] items-center gap-2.5 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 shadow-sm transition hover:border-zinc-300 hover:shadow">
+      <span className={`relative grid h-7 w-7 place-items-center rounded-lg bg-zinc-50 ring-1 ring-zinc-100 ${accent}`}>
+        {icon}
+        <span className={`absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full ${dot} ring-2 ring-white`} />
+      </span>
       <div className="leading-tight">
-        <div className="text-[10px] uppercase tracking-wide text-zinc-500">{label}</div>
-        <div className="text-sm font-semibold text-zinc-900">{value}</div>
+        <div className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">{label}</div>
+        <div className="text-base font-semibold tabular-nums tracking-tight text-zinc-900">{value}</div>
       </div>
     </div>
   );
