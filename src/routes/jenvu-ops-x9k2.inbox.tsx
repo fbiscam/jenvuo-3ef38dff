@@ -683,12 +683,12 @@ function AdminInbox() {
 
         {/* Details rail */}
         {activeSession && (
-          <aside className="hidden w-64 shrink-0 flex-col border-l border-zinc-200 bg-white/60 p-4 xl:flex">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+          <aside className="hidden w-64 shrink-0 flex-col border-l border-indigo-100/70 bg-white/50 p-4 xl:flex">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-indigo-500/80">
               Visitor
             </div>
             <div className="mt-2 flex items-center gap-2.5">
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 text-[12px] font-semibold text-white">
+              <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-[12px] font-semibold text-white shadow-sm shadow-indigo-500/20">
                 {initials(activeSession.guest_name, activeSession.guest_email)}
               </div>
               <div className="min-w-0">
