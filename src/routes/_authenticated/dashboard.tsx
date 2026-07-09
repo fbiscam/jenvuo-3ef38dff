@@ -13,7 +13,7 @@ import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
 
 import {
-  Bookmark, Bell, CreditCard, BookOpen, User, LogOut, Mic, Plus,
+  Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift,
 } from "lucide-react";
@@ -62,6 +62,7 @@ type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; 
 const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: boolean; countKey?: keyof Counts }> = [
   { to: "/dashboard", label: "Saved", icon: Bookmark, exact: true, countKey: "saved" },
   { to: "/dashboard/alerts", label: "Alerts", icon: Bell, countKey: "alerts7d" },
+  { to: "/dashboard/notifications", label: "Notifications", icon: BellRing },
   { to: "/dashboard/journal", label: "Trades", icon: BookOpen, countKey: "journalTotal" },
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
