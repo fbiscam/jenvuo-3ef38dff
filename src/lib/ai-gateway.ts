@@ -85,7 +85,8 @@ async function singleAttempt(
     model,
     messages: opts.messages,
   };
-  if (opts.jsonMode) body.response_format = { type: "json_object" };
+  // Blackbox does not support response_format json_object — rely on system prompt instead.
+  if (opts.jsonMode && !isBlackbox) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
     if (!isBlackbox && model.startsWith("openai/gpt-5")) {
       body.max_completion_tokens = opts.maxTokens;
