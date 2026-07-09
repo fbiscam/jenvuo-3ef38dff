@@ -529,7 +529,7 @@ function StatCard({
             <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
             <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-stone-500">{label}</span>
           </div>
-          <div className="mt-0.5 text-2xl font-medium leading-none text-stone-900" style={FONT}>{value}</div>
+          <div className="mt-0.5 text-2xl font-medium leading-none text-stone-900 font-display">{value}</div>
         </div>
       </div>
     </div>
