@@ -187,11 +187,14 @@ export function LiveChatWidget() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? "Close chat" : "Open support chat"}
-        className="fixed bottom-5 right-5 z-[9999] flex h-14 w-14 items-center justify-center rounded-full bg-zinc-900 text-white shadow-lg transition hover:bg-zinc-800 active:scale-95"
+        className="fixed bottom-5 right-5 z-[9999] flex h-14 w-14 items-center justify-center rounded-full bg-black text-white shadow-[0_10px_30px_-8px_rgba(0,0,0,0.45)] ring-1 ring-black/10 transition hover:scale-[1.03] hover:shadow-[0_14px_38px_-10px_rgba(0,0,0,0.55)] active:scale-95"
       >
-        {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+        {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-[22px] w-[22px]" />}
+        {!open && (
+          <span className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-black" />
+        )}
         {!open && unread > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
+          <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white shadow">
             {unread}
           </span>
         )}
@@ -199,19 +202,26 @@ export function LiveChatWidget() {
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-24 right-5 z-[9999] flex h-[520px] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl sm:right-5">
+        <div className="fixed bottom-24 right-5 z-[9999] flex h-[560px] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-3xl border border-black/5 bg-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)] sm:right-5">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 text-black">
-            <div>
-              <div className="text-sm font-semibold">Jenvu Support</div>
-              <div className="text-[11px] text-zinc-600">
-                {token ? (status === "closed" ? "Chat closed" : "Typically replies within a few minutes") : "Start a conversation"}
+          <div className="relative flex items-center justify-between bg-black px-4 py-4 text-white">
+            <div className="flex items-center gap-3">
+              <div className="relative grid h-10 w-10 place-items-center rounded-full bg-white/10 ring-1 ring-white/15">
+                <img src="/favicon.ico" alt="" className="h-6 w-6 rounded-sm" />
+                <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-black" />
+              </div>
+              <div>
+                <div className="text-[15px] font-semibold leading-tight">Jenvu Support</div>
+                <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-white/70">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  {token ? (status === "closed" ? "Chat closed" : "Online · replies in minutes") : "We're online now"}
+                </div>
               </div>
             </div>
             <button
               onClick={() => setOpen(false)}
               aria-label="Close"
-              className="rounded p-1 text-zinc-700 hover:bg-zinc-100 hover:text-black"
+              className="rounded-full p-1.5 text-white/80 transition hover:bg-white/10 hover:text-white"
             >
               <X className="h-4 w-4" />
             </button>
@@ -219,9 +229,10 @@ export function LiveChatWidget() {
 
           {/* Body */}
           {!token ? (
-            <form onSubmit={startChat} className="flex flex-1 flex-col gap-3 p-4">
-              <div className="text-sm text-zinc-700">
-                Hi 👋 Ask us anything — no signup needed.
+            <form onSubmit={startChat} className="flex flex-1 flex-col gap-3 bg-[#fafaf7] p-5">
+              <div className="rounded-2xl bg-white p-4 text-sm text-zinc-800 shadow-sm ring-1 ring-black/5">
+                <div className="mb-1 text-[13px] font-semibold text-black">Hi there 👋</div>
+                Ask us anything — no signup needed. A real human will reply here.
               </div>
               <input
                 type="text"
@@ -229,7 +240,7 @@ export function LiveChatWidget() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name (optional)"
                 maxLength={80}
-                className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
+                className="rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 outline-none transition focus:border-black focus:ring-2 focus:ring-black/5"
               />
               <input
                 type="email"
@@ -237,29 +248,29 @@ export function LiveChatWidget() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email (optional, for follow-up)"
                 maxLength={200}
-                className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
+                className="rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 outline-none transition focus:border-black focus:ring-2 focus:ring-black/5"
               />
               <button
                 type="submit"
                 disabled={starting}
-                className="mt-auto rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-60"
+                className="mt-auto rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 disabled:opacity-60"
               >
                 {starting ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : "Start chat"}
               </button>
-              <p className="text-[10px] text-zinc-400">
+              <p className="text-center text-[10.5px] text-zinc-500">
                 We'll only use your email to reply to this conversation.
               </p>
             </form>
           ) : (
             <>
-              <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-3">
+              <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto bg-[#fafaf7] px-3 py-4">
                 {loadError && (
-                  <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
                     {loadError}
                   </div>
                 )}
                 {messages.length === 0 && (
-                  <div className="mt-8 text-center text-xs text-zinc-500">
+                  <div className="mt-10 px-4 text-center text-xs text-zinc-500">
                     Send us your first message — we'll get back to you here.
                   </div>
                 )}
@@ -269,10 +280,10 @@ export function LiveChatWidget() {
                     className={`flex ${m.sender === "guest" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[80%] whitespace-pre-wrap break-words rounded-2xl px-3 py-2 text-sm ${
+                      className={`max-w-[80%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-[13.5px] leading-relaxed shadow-[0_1px_1px_rgba(0,0,0,0.06)] ${
                         m.sender === "guest"
-                          ? "bg-zinc-900 text-white"
-                          : "bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200"
+                          ? "bg-[#d9fdd3] text-zinc-900 rounded-br-md"
+                          : "bg-white text-zinc-900 ring-1 ring-black/5 rounded-bl-md"
                       }`}
                     >
                       {m.content}
@@ -281,11 +292,11 @@ export function LiveChatWidget() {
                 ))}
               </div>
 
-              <form onSubmit={sendMessage} className="border-t border-zinc-200 bg-white p-2">
+              <form onSubmit={sendMessage} className="border-t border-black/5 bg-white p-2.5">
                 {status === "closed" ? (
                   <div className="flex items-center justify-between px-2 py-1 text-xs text-zinc-500">
                     <span>This chat is closed.</span>
-                    <button type="button" onClick={resetChat} className="text-zinc-900 underline">
+                    <button type="button" onClick={resetChat} className="font-medium text-black underline">
                       Start a new one
                     </button>
                   </div>
@@ -304,13 +315,13 @@ export function LiveChatWidget() {
                       placeholder="Type a message…"
                       rows={1}
                       maxLength={4000}
-                      className="max-h-32 flex-1 resize-none rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
+                      className="max-h-32 flex-1 resize-none rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 outline-none transition focus:border-black focus:ring-2 focus:ring-black/5"
                     />
                     <button
                       type="submit"
                       disabled={sending || !input.trim()}
                       aria-label="Send"
-                      className="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-900 text-white transition hover:bg-zinc-800 disabled:opacity-50"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black text-white shadow-sm transition hover:bg-zinc-800 disabled:opacity-50"
                     >
                       {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     </button>
@@ -324,3 +335,4 @@ export function LiveChatWidget() {
     </>
   );
 }
+
