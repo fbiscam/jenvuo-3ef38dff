@@ -57,9 +57,24 @@ export default function NotificationBell() {
   }, [open]);
 
   const onOpen = async () => {
-    setOpen((v) => !v);
-    if (!open) await load();
+    const willOpen = !open;
+    setOpen(willOpen);
+    if (willOpen) {
+      await load();
+      // Auto-mark everything read as soon as the user opens the panel,
+      // so the unread badge doesn't come back on refresh/next visit.
+      if (unread > 0) {
+        setItems((prev) => prev.map((n) => (n.read_at ? n : { ...n, read_at: new Date().toISOString() })));
+        setUnread(0);
+        try {
+          await markAllFn();
+        } catch {
+          /* keep optimistic */
+        }
+      }
+    }
   };
+
 
   const markOne = async (id: string) => {
     setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)));
