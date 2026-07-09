@@ -475,7 +475,7 @@ function DashboardLayout() {
       setNewCounts({ saved: s.count ?? 0, alerts7d: a.count ?? 0, journalTotal: j.count ?? 0 });
     })();
     return () => { cancelled = true; };
-  }, [authUser?.id, authLoading, refreshTick, getLastSeen]);
+  }, [authUser?.id, authLoading, getLastSeen]);
 
   const markTabSeen = useCallback((countKey?: string) => {
     if (!countKey || typeof window === "undefined") return;
