@@ -212,6 +212,7 @@ export default function NotificationBell() {
                   <Link
                     key={n.id}
                     to={v.href}
+                    search={v.search as never}
                     onClick={() => {
                       if (!n.read_at) markOne(n.id);
                       setOpen(false);
