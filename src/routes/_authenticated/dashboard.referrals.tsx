@@ -73,7 +73,7 @@ function ReferralsPage() {
     try {
       const res = await applyCode({ data: { code: c } });
       if (res.ok) {
-        toast.success("Referral applied. You'll earn 50 bonus scans when you upgrade to a paid plan.");
+        toast.success("Referral applied. You'll earn 17 bonus scans when you upgrade to a paid plan.");
         setCodeInput("");
         await load();
       } else {
