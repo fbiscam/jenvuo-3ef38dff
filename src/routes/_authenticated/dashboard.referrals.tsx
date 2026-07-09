@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/referrals")({
   head: () => ({
     meta: [
       { title: "Referrals — Jenvu" },
-      { name: "description", content: "Invite friends, earn credits when they upgrade." },
+      { name: "description", content: "Invite friends, earn bonus scans when they upgrade." },
       { name: "robots", content: "noindex" },
     ],
   }),
