@@ -24,8 +24,12 @@ export function useCredits() {
   // Realtime: refresh on any credit_ledger change for this user
   useEffect(() => {
     if (!user?.id) return;
+    // Unique channel name per mount to avoid supabase-js returning a
+    // stale, already-subscribed channel (React StrictMode double-invoke)
+    // which throws: "cannot add `postgres_changes` callbacks ... after subscribe()".
+    const channelName = `credit-ledger-${user.id}-${Math.random().toString(36).slice(2)}`;
     const ch = supabase
-      .channel(`credit-ledger-${user.id}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "credit_ledger", filter: `user_id=eq.${user.id}` },
