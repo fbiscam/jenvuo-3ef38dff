@@ -16,12 +16,15 @@ import {
   TrendingDown,
   Info,
   Inbox,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   listNotifications,
   markNotificationRead,
   markAllNotificationsRead,
+  deleteNotification,
+  deleteNotifications,
   type NotificationRow,
 } from "@/lib/notifications.functions";
 
