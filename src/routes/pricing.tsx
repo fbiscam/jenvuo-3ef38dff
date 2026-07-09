@@ -73,7 +73,7 @@ const TIERS = [
   {
     id: "pro",
     name: "Pro",
-    price: 29,
+    price: 15,
     icon: Zap,
     bestFor: "Active trader",
     tagline: "For serious gold traders.",
