@@ -474,23 +474,31 @@ function AuthPage() {
       setTimeout(() => mfaInputRef.current?.focus(), 30);
       return;
     }
+    const rememberedUid = mfaChallenge.userId;
     setMfaChallenge(null);
     setMfaCode("");
     // Optionally persist this device so MFA is skipped for 30 days.
-    if (rememberDevice) {
+    if (rememberDevice && rememberedUid) {
       try {
-        const { data: sess } = await supabase.auth.getUser();
-        const uid = sess.user?.id;
-        if (uid) {
-          const ua = typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : undefined;
-          const res = await registerTrustedDeviceFn({ data: { userAgent: ua } });
-          if (res?.token) {
-            window.localStorage.setItem(TRUSTED_DEVICE_KEY(uid), res.token);
+        const ua = typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : undefined;
+        const res = await registerTrustedDeviceFn({ data: { userAgent: ua } });
+        if (res?.token) {
+          window.localStorage.setItem(TRUSTED_DEVICE_KEY(rememberedUid), res.token);
+          // Verify the write actually landed (some browsers block storage in private mode).
+          const saved = window.localStorage.getItem(TRUSTED_DEVICE_KEY(rememberedUid));
+          if (saved !== res.token) {
+            toast.error("Couldn't remember this device", {
+              description: "Your browser blocked local storage. Disable private mode or allow site data.",
+            });
+          } else {
+            toast.success("Device remembered for 30 days");
           }
+        } else {
+          toast.error("Couldn't remember this device", { description: "The server didn't return a token. Try again from Security settings." });
         }
-      } catch {
+      } catch (err) {
         toast.error("Couldn't remember this device", {
-          description: "You'll still need MFA next time. You can try again from settings.",
+          description: err instanceof Error ? err.message : "You'll still need MFA next time.",
         });
       }
     }
