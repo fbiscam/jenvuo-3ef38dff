@@ -516,7 +516,7 @@ function AuthPage() {
         toast.error("Couldn't refresh code", { description: msg });
         return;
       }
-      setMfaChallenge({ factorId: mfaChallenge.factorId, challengeId: chal.id });
+      setMfaChallenge({ factorId: mfaChallenge.factorId, challengeId: chal.id, userId: mfaChallenge.userId });
       setMfaCode("");
       setMfaResendCooldown(30);
       toast.success("New challenge ready", { description: "Enter the current 6-digit code from your authenticator app." });
