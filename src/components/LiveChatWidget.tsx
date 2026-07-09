@@ -218,13 +218,35 @@ export function LiveChatWidget() {
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => setOpen(false)}
-              aria-label="Close"
-              className="rounded-full p-1.5 text-zinc-600 transition hover:bg-zinc-100 hover:text-black"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-1">
+              {token && (
+                <button
+                  onClick={() => {
+                    if (!confirm("Start a new chat? Your current conversation will be cleared from this device.")) return;
+                    localStorage.removeItem(STORAGE_KEY);
+                    setToken(null);
+                    setMessages([]);
+                    setInput("");
+                    setStatus("open");
+                    setUnread(0);
+                    lastCountRef.current = 0;
+                  }}
+                  aria-label="New chat"
+                  title="New chat"
+                  className="rounded-full p-1.5 text-zinc-600 transition hover:bg-zinc-100 hover:text-black"
+                >
+                  <PenSquare className="h-4 w-4" />
+                </button>
+              )}
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Close"
+                className="rounded-full p-1.5 text-zinc-600 transition hover:bg-zinc-100 hover:text-black"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
           </div>
 
 
