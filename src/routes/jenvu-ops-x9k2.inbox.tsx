@@ -276,12 +276,12 @@ function AdminInbox() {
       {/* Top bar */}
       <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200/80 bg-white/80 px-4 backdrop-blur-md">
         <div className="flex items-center gap-2.5">
-          <span className="grid h-7 w-7 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-zinc-900 to-zinc-700 shadow-sm ring-1 ring-black/5">
-            <img src="/favicon.png" alt="Jenvu" className="h-4 w-4 object-contain invert" />
+          <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-zinc-200">
+            <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 object-contain" />
           </span>
-          <span className="text-[14px] font-semibold tracking-tight">Support</span>
+          <span className="text-[16px] font-bold tracking-tight text-zinc-900">Jenvu</span>
           <span className="text-zinc-300">/</span>
-          <span className="text-[13px] font-medium tracking-tight text-zinc-500">Inbox</span>
+          <span className="text-[13px] font-medium tracking-tight text-zinc-500">Support Inbox</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="hidden items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 font-mono text-[10.5px] text-zinc-500 sm:inline-flex">
