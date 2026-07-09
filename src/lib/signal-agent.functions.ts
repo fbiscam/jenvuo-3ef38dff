@@ -132,7 +132,7 @@ Use the LIVE prices and levels from the context. Be specific, decisive, pro. No 
 
     let reply = "No response.";
     try {
-      const { content } = await callChatCompletion({
+      const { content, model: __aiModel, usage: __aiUsage } = await callChatCompletion({
         models: [...MODEL_CHAIN.chat],
         messages: [
           { role: "system", content: system },
@@ -145,6 +145,7 @@ Use the LIVE prices and levels from the context. Be specific, decisive, pro. No 
         timeoutMs: 20000,
         stage: "voice-chat",
       });
+      import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: context.userId, stage: "voice-chat", model: __aiModel, usage: __aiUsage })).catch(() => {});
       reply = content.trim() || "No response.";
     } catch (err) {
       if (err instanceof AiGatewayError) throw new Error(err.message);
