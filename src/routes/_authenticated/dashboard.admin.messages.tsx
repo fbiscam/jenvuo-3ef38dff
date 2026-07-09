@@ -19,15 +19,14 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/messages")
     links: [
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap",
       },
     ],
   }),
   component: AdminMessagesPage,
 });
 
-const SERIF = { fontFamily: "'Instrument Serif', ui-serif, Georgia, serif" } as const;
-const SANS = { fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif" } as const;
+const FONT = { fontFamily: "'Roboto', ui-sans-serif, system-ui, sans-serif" } as const;
 
 type Filter = "all" | "new" | "read" | "replied" | "archived";
 
