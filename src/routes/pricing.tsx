@@ -101,9 +101,9 @@ const TIERS = [
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
-    credits: 180,
+    credits: 85,
     features: [
-      "180 signal scans / month",
+      "85 signal scans / month",
       "Voice queries free",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
