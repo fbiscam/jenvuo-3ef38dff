@@ -148,6 +148,7 @@ function AuthPage() {
   const [mfaChallenge, setMfaChallenge] = React.useState<null | {
     factorId: string;
     challengeId: string;
+    userId: string;
   }>(null);
   const [mfaCode, setMfaCode] = React.useState("");
   const [mfaError, setMfaError] = React.useState<string | null>(null);
