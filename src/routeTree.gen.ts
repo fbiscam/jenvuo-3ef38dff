@@ -52,7 +52,6 @@ import { Route as AuthenticatedDashboardSecurityRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardReferralsRouteImport } from './routes/_authenticated/dashboard.referrals'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
-import { Route as AuthenticatedDashboardJournalStatsRouteImport } from './routes/_authenticated/dashboard.journal-stats'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
@@ -290,12 +289,6 @@ const AuthenticatedDashboardNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardJournalStatsRoute =
-  AuthenticatedDashboardJournalStatsRouteImport.update({
-    id: '/journal-stats',
-    path: '/journal-stats',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
 const AuthenticatedDashboardJournalRoute =
   AuthenticatedDashboardJournalRouteImport.update({
     id: '/journal',
@@ -434,7 +427,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
-  '/dashboard/journal-stats': typeof AuthenticatedDashboardJournalStatsRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
@@ -493,7 +485,6 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
-  '/dashboard/journal-stats': typeof AuthenticatedDashboardJournalStatsRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
@@ -557,7 +548,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
-  '/_authenticated/dashboard/journal-stats': typeof AuthenticatedDashboardJournalStatsRoute
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
@@ -621,7 +611,6 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/billing'
     | '/dashboard/journal'
-    | '/dashboard/journal-stats'
     | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/referrals'
@@ -680,7 +669,6 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/billing'
     | '/dashboard/journal'
-    | '/dashboard/journal-stats'
     | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/referrals'
@@ -743,7 +731,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/journal'
-    | '/_authenticated/dashboard/journal-stats'
     | '/_authenticated/dashboard/notifications'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/referrals'
@@ -1116,13 +1103,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardNotificationsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/journal-stats': {
-      id: '/_authenticated/dashboard/journal-stats'
-      path: '/journal-stats'
-      fullPath: '/dashboard/journal-stats'
-      preLoaderRoute: typeof AuthenticatedDashboardJournalStatsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
     '/_authenticated/dashboard/journal': {
       id: '/_authenticated/dashboard/journal'
       path: '/journal'
@@ -1250,7 +1230,6 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
-  AuthenticatedDashboardJournalStatsRoute: typeof AuthenticatedDashboardJournalStatsRoute
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
@@ -1267,8 +1246,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
-    AuthenticatedDashboardJournalStatsRoute:
-      AuthenticatedDashboardJournalStatsRoute,
     AuthenticatedDashboardNotificationsRoute:
       AuthenticatedDashboardNotificationsRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
@@ -1376,13 +1353,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
