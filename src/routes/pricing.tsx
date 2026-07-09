@@ -268,7 +268,7 @@ function PricingPage() {
               <col className={`w-[18%] ${currentPlan === "free" ? "bg-emerald-50/50" : ""}`} />
               <col className={`w-[18%] ${currentPlan === "pro" ? "bg-emerald-50/50" : "bg-amber-50/40"}`} />
               <col className={`w-[18%] ${currentPlan === "elite" ? "bg-emerald-50/50" : ""}`} />
-              <col className={`w-[18%] ${currentPlan === "custom" ? "bg-emerald-50/50" : ""}`} />
+              <col className={`w-[18%] ${currentPlan === "ultra" ? "bg-emerald-50/50" : ""}`} />
             </colgroup>
 
             <thead>
