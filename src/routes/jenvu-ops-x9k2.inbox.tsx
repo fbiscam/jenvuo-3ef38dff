@@ -320,17 +320,17 @@ function AdminInbox() {
                     onClick={() => setFilter(f.key)}
                     className={`group relative flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-[14px] font-medium transition ${
                       active
-                        ? "bg-zinc-900 text-white shadow-[0_1px_2px_rgba(0,0,0,0.15),0_8px_24px_-12px_rgba(0,0,0,0.5)]"
+                        ? "bg-white text-black ring-1 ring-black/10 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_8px_24px_-12px_rgba(0,0,0,0.2)]"
                         : "text-zinc-900 hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-black/5"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={active ? "text-white/70" : "text-zinc-500"}>{f.icon}</span>
+                      <span className={active ? "text-black" : "text-zinc-500"}>{f.icon}</span>
                       {f.label}
                     </span>
                     <span
                       className={`rounded-md px-1.5 py-0.5 tabular-nums text-[11px] font-semibold ${
-                        active ? "bg-white/15 text-white" : "bg-zinc-100 text-zinc-700"
+                        active ? "bg-black/5 text-black ring-1 ring-black/10" : "bg-zinc-100 text-zinc-700"
                       }`}
                     >
                       {f.count}
