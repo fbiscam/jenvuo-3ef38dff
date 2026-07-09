@@ -110,14 +110,14 @@ Return STRICT JSON only, no prose, with this exact shape:
   "script": "<the exact words to be read aloud. 150-180 words. Structured spoken paragraphs. No stage directions. No lists. No markdown. It must read like a professional trader speaking. Open with the session name naturally; do NOT start with 'Welcome' or 'In this brief'.>"
 }`;
 
-        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        const aiRes = await fetch("https://api.blackbox.ai/chat/completions", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${lovableKey}`,
+            Authorization: `Bearer ${blackboxKey}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "openai/gpt-5.5",
+            model: "gpt-5.5",
             messages: [
               { role: "system", content: sys },
               { role: "user", content: userPrompt },
@@ -125,6 +125,7 @@ Return STRICT JSON only, no prose, with this exact shape:
             response_format: { type: "json_object" },
           }),
         });
+
 
         if (!aiRes.ok) {
           const txt = await aiRes.text().catch(() => "");
