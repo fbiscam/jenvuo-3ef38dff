@@ -298,7 +298,7 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="relative flex h-screen flex-col bg-[#fafaf7] text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
+    <div className="relative flex h-screen flex-col bg-[#f4f6fb] text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Ambient premium backdrop */}
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle_at_20%_10%,#000_0.5px,transparent_0.5px),radial-gradient(circle_at_80%_60%,#000_0.5px,transparent_0.5px)] [background-size:22px_22px,28px_28px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
 
@@ -346,18 +346,19 @@ function AdminInbox() {
                     onClick={() => setFilter(f.key)}
                     className={`group relative flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-[14px] font-medium transition ${
                       active
-                        ? "bg-white text-black ring-1 ring-black/10 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_8px_24px_-12px_rgba(0,0,0,0.2)]"
-                        : "text-zinc-900 hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-black/5"
+                        ? "bg-blue-600 text-white shadow-[0_6px_16px_-6px_rgba(37,99,235,0.55)]"
+                        : "text-zinc-700 hover:bg-white hover:text-zinc-900 hover:shadow-sm hover:ring-1 hover:ring-black/5"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={active ? "text-black" : "text-zinc-500"}>{f.icon}</span>
+                      <span className={active ? "text-white" : "text-zinc-500"}>{f.icon}</span>
                       {f.label}
                     </span>
                     <span
                       className={`rounded-md px-1.5 py-0.5 tabular-nums text-[11px] font-semibold ${
-                        active ? "bg-black/5 text-black ring-1 ring-black/10" : "bg-zinc-100 text-zinc-700"
+                        active ? "bg-white/20 text-white" : "bg-zinc-100 text-zinc-700"
                       }`}
+
                     >
                       {f.count}
                     </span>
@@ -425,7 +426,7 @@ function AdminInbox() {
                         }`}
                       >
                         {isActive && (
-                          <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-zinc-900" />
+                          <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-blue-600" />
                         )}
                         {hasUnread && !isActive && (
                           <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-zinc-900" />
@@ -595,9 +596,10 @@ function AdminInbox() {
                           <div
                             className={`max-w-[78%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed ${
                               isAdminMsg
-                                ? "rounded-br-md bg-[#d9fdd3] text-zinc-900 shadow-[0_1px_1px_rgba(0,0,0,0.08)]"
+                                ? "rounded-br-md bg-blue-600 text-white shadow-[0_4px_14px_-4px_rgba(37,99,235,0.5)]"
                                 : "rounded-bl-md border border-zinc-900/[0.06] bg-white text-zinc-900 shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
                             }`}
+
                           >
                             {m.content}
                           </div>
@@ -682,18 +684,17 @@ function AdminInbox() {
                           <button
                             type="submit"
                             disabled={sending || !input.trim()}
-                            className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-gradient-to-b from-zinc-800 to-black px-3 text-[12.5px] font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.15)_inset,0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/20 transition hover:from-zinc-900 hover:to-black disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label="Send"
+                            title="Send (Enter)"
+                            className="grid h-10 w-10 place-items-center rounded-full bg-blue-600 text-white shadow-[0_6px_18px_-6px_rgba(37,99,235,0.65)] ring-1 ring-blue-700/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {sending ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                              <Send className="h-3.5 w-3.5" />
+                              <Send className="h-4 w-4" />
                             )}
-                            Send
-                            <span className="ml-1 inline-flex items-center gap-0.5 rounded bg-white/15 px-1 font-mono text-[10px] text-white/70">
-                              <CornerDownLeft className="h-2.5 w-2.5" />
-                            </span>
                           </button>
+
                         </div>
                       </div>
                     </div>
