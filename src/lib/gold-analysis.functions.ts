@@ -140,6 +140,23 @@ const XAU_ALIASES: Record<string, string> = {
 export function resolveInstrument(input: string): ResolvedInstrument {
   const raw = (input || "").trim();
   const cleaned = raw.toUpperCase().replace(/[\s_\-/]/g, "");
+
+  // Non-XAU instruments the ticker/analysis pipelines legitimately request
+  // (e.g. DXY for USD strength context). Return a proper Yahoo-backed
+  // resolution instead of silently masquerading as XAU/USD.
+  if (cleaned === "DXY" || cleaned === "USDX" || cleaned === "DXYUSD") {
+    return {
+      raw: raw || "DXY",
+      key: "INDEX:DXY",
+      display: "DXY",
+      kind: "index",
+      decimals: 3,
+      yahooSymbols: ["DX-Y.NYB", "DX=F"],
+      quote: "USD",
+      needsUsdNews: false,
+    };
+  }
+
   const key = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : "XAUUSD");
   const p = XAU_PAIRS[key];
   // Gold spot from gold-api.com covers XAU/USD; cross-quote pairs derive
