@@ -107,8 +107,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               "@type": "Organization",
               "@id": "https://jenvu.com/#org",
               name: "Jenvu AI",
+              alternateName: "Jenvu",
               url: "https://jenvu.com",
-              logo: "https://jenvu.com/favicon.png",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://jenvu.com/favicon.png",
+                width: 1024,
+                height: 1024,
+              },
+              image: "https://jenvu.com/favicon.png",
             },
             {
               "@type": "WebSite",
