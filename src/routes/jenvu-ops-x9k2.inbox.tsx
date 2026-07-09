@@ -272,25 +272,32 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="flex h-screen flex-col bg-gradient-to-br bg-white text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
+    <div className="relative flex h-screen flex-col bg-[#fafaf7] text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
+      {/* Ambient premium backdrop */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle_at_20%_10%,#000_0.5px,transparent_0.5px),radial-gradient(circle_at_80%_60%,#000_0.5px,transparent_0.5px)] [background-size:22px_22px,28px_28px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
+
       {/* Top bar */}
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200/80 bg-white/70 px-4 backdrop-blur-md">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-zinc-100 to-white shadow-sm ring-1 ring-zinc-200">
+      <header className="relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-zinc-900/[0.06] bg-white/70 px-5 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(0,0,0,0.12)] backdrop-blur-xl">
+        <div className="flex items-center gap-3">
+          <span className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-white shadow-[0_1px_2px_rgba(0,0,0,0.06),0_8px_20px_-8px_rgba(0,0,0,0.15)] ring-1 ring-black/5">
             <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 object-contain" />
+            <span className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-white/60 to-transparent" />
           </span>
-          <span className="bg-gradient-to-r from-black via-zinc-800 to-black bg-clip-text text-[16px] font-bold tracking-tight text-transparent">Jenvu</span>
+          <div className="flex items-baseline gap-2">
+            <span className="text-[17px] font-bold tracking-tight text-zinc-900">Jenvu</span>
+            <span className="rounded-full bg-zinc-900 px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-[0.14em] text-white">Ops</span>
+          </div>
           <span className="text-zinc-300">/</span>
           <span className="text-[13px] font-medium tracking-tight text-zinc-500">Support Inbox</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="hidden items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 font-mono text-[10.5px] text-zinc-500 sm:inline-flex">
+          <span className="hidden items-center gap-1 rounded-md border border-zinc-200/80 bg-white/60 px-1.5 py-0.5 font-mono text-[10.5px] text-zinc-500 shadow-sm sm:inline-flex">
             <Command className="h-2.5 w-2.5" /> K
           </span>
-          <span className="hidden text-[11.5px] text-zinc-500 sm:inline">{username}</span>
+          <span className="hidden rounded-full border border-zinc-200/80 bg-white/60 px-2.5 py-1 text-[11.5px] font-medium text-zinc-700 sm:inline">{username}</span>
           <button
             onClick={handleLogout}
-            className="grid h-7 w-7 place-items-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+            className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-zinc-900 hover:text-white"
             title="Sign out"
           >
             <LogOut className="h-3.5 w-3.5" />
@@ -298,10 +305,10 @@ function AdminInbox() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
-        <nav className="hidden w-60 shrink-0 flex-col border-r border-zinc-200/80 bg-white/50 p-2.5 md:flex">
-          <div className="mb-2 px-2 pt-1 text-[11px] font-bold uppercase tracking-wider text-black">
+        <nav className="hidden w-60 shrink-0 flex-col border-r border-zinc-900/[0.06] bg-white/40 p-3 backdrop-blur-sm md:flex">
+          <div className="mb-2 px-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
             Inboxes
           </div>
           <ul className="space-y-1">
@@ -311,19 +318,19 @@ function AdminInbox() {
                 <li key={f.key}>
                   <button
                     onClick={() => setFilter(f.key)}
-                    className={`flex w-full items-center justify-between rounded-md px-2.5 py-2 text-[14px] font-medium transition ${
+                    className={`group relative flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-[14px] font-medium transition ${
                       active
-                        ? "bg-gradient-to-r from-black to-zinc-800 text-white shadow-sm shadow-black/20"
-                        : "text-black hover:bg-zinc-100/70"
+                        ? "bg-zinc-900 text-white shadow-[0_1px_2px_rgba(0,0,0,0.15),0_8px_24px_-12px_rgba(0,0,0,0.5)]"
+                        : "text-zinc-900 hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-black/5"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={active ? "text-white/80" : "text-black"}>{f.icon}</span>
+                      <span className={active ? "text-white/70" : "text-zinc-500"}>{f.icon}</span>
                       {f.label}
                     </span>
                     <span
-                      className={`tabular-nums text-[12px] ${
-                        active ? "text-white/70" : "text-black"
+                      className={`rounded-md px-1.5 py-0.5 tabular-nums text-[11px] font-semibold ${
+                        active ? "bg-white/15 text-white" : "bg-zinc-100 text-zinc-700"
                       }`}
                     >
                       {f.count}
@@ -334,45 +341,48 @@ function AdminInbox() {
             })}
           </ul>
 
-          <div className="mb-2 mt-5 px-2 text-[11px] font-bold uppercase tracking-wider text-black">
+          <div className="mb-2 mt-6 px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
             Shortcuts
           </div>
-          <ul className="space-y-1.5 px-2 text-[13px] font-medium text-black">
+          <ul className="space-y-1.5 px-2 text-[13px] font-medium text-zinc-800">
             <Shortcut k="J / K" label="Navigate" />
             <Shortcut k="R" label="Reply" />
             <Shortcut k="E" label="Close chat" />
             <Shortcut k="/" label="Search" />
           </ul>
 
-          <div className="mt-auto rounded-lg border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-3">
-            <div className="flex items-center gap-1.5 text-[13px] font-semibold text-black">
-              <Zap className="h-3.5 w-3.5 text-amber-500" /> {counts.unreadMsgs} unread msgs
+          <div className="mt-auto overflow-hidden rounded-xl border border-black/5 bg-gradient-to-br from-zinc-900 to-black p-3.5 text-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)]">
+            <div className="flex items-center gap-1.5 text-[13px] font-semibold">
+              <span className="grid h-5 w-5 place-items-center rounded-md bg-white/10 ring-1 ring-white/15">
+                <Zap className="h-3 w-3 text-amber-300" />
+              </span>
+              {counts.unreadMsgs} unread msgs
             </div>
-            <div className="mt-0.5 text-[12px] font-medium text-black">across {counts.unread} threads</div>
+            <div className="mt-1 text-[11.5px] font-medium text-white/60">across {counts.unread} threads</div>
           </div>
         </nav>
 
         {/* Middle — conversation list */}
         <aside
-          className={`flex w-full shrink-0 flex-col border-r border-zinc-200 bg-white md:w-[340px] ${
+          className={`flex w-full shrink-0 flex-col border-r border-zinc-900/[0.06] bg-white/60 backdrop-blur-sm md:w-[340px] ${
             activeId ? "hidden md:flex" : "flex"
           }`}
         >
-          <div className="flex h-11 items-center gap-2 border-b border-zinc-200 px-3">
+          <div className="flex h-12 items-center gap-2 border-b border-zinc-900/[0.06] px-3.5">
             <Filter className="h-3.5 w-3.5 text-zinc-400" />
-            <span className="text-[12px] font-semibold capitalize">{filter}</span>
-            <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[10.5px] tabular-nums text-zinc-600">
+            <span className="text-[12px] font-semibold capitalize tracking-tight">{filter}</span>
+            <span className="rounded-md bg-zinc-900/5 px-1.5 py-0.5 font-mono text-[10.5px] tabular-nums text-zinc-600">
               {filtered.length}
             </span>
             <div className="ml-auto flex items-center gap-1">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-zinc-400" />
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-zinc-400" />
                 <input
                   ref={searchRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search…"
-                  className="h-7 w-40 rounded-md border border-zinc-200 bg-white pl-6 pr-2 text-[12px] placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5"
+                  className="h-8 w-44 rounded-lg border border-zinc-200/80 bg-white pl-7 pr-2 text-[12px] placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
                 />
               </div>
             </div>
@@ -381,16 +391,16 @@ function AdminInbox() {
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                <div className="grid h-10 w-10 place-items-center rounded-full bg-zinc-100">
+                <div className="grid h-12 w-12 place-items-center rounded-full bg-white shadow-sm ring-1 ring-black/5">
                   <Inbox className="h-4 w-4 text-zinc-400" />
                 </div>
-                <p className="mt-2 text-[13px] font-medium text-zinc-800">No conversations</p>
+                <p className="mt-3 text-[13px] font-semibold text-zinc-800">No conversations</p>
                 <p className="mt-1 text-[11.5px] text-zinc-500">
                   {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
                 </p>
               </div>
             ) : (
-              <ul>
+              <ul className="p-1.5">
                 {filtered.map((s) => {
                   const isActive = s.id === activeId;
                   const name = s.guest_name || s.guest_email?.split("@")[0] || "Anonymous";
@@ -399,30 +409,32 @@ function AdminInbox() {
                     <li key={s.id}>
                       <button
                         onClick={() => setActiveId(s.id)}
-                        className={`group relative flex w-full items-start gap-2.5 border-b border-zinc-100 px-3 py-2.5 text-left transition ${
-                          isActive ? "bg-zinc-100/70" : "hover:bg-zinc-50/70"
+                        className={`group relative flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition ${
+                          isActive
+                            ? "bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.15)] ring-1 ring-black/5"
+                            : "hover:bg-white/70"
                         }`}
                       >
                         {isActive && (
-                          <span className="absolute inset-y-2 left-0 w-0.5 rounded-r bg-gradient-to-b from-zinc-900 to-black" />
+                          <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-zinc-900" />
                         )}
                         {hasUnread && !isActive && (
-                          <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-black" />
+                          <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-zinc-900" />
                         )}
                         <div className="relative mt-0.5 shrink-0">
-                          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-zinc-900 to-black text-[10px] font-semibold text-white">
+                          <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-zinc-800 to-black text-[10.5px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
                             {initials(s.guest_name, s.guest_email)}
                           </div>
                           <span
-                            className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full ring-2 ring-white ${
-                              s.status === "open" ? "bg-black" : "bg-zinc-300"
+                            className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${
+                              s.status === "open" ? "bg-emerald-500" : "bg-zinc-300"
                             }`}
                           />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-baseline justify-between gap-2">
                             <span
-                              className={`truncate text-[12.5px] ${
+                              className={`truncate text-[13px] tracking-tight ${
                                 hasUnread ? "font-semibold text-zinc-900" : "font-medium text-zinc-800"
                               }`}
                             >
@@ -437,12 +449,12 @@ function AdminInbox() {
                               {s.guest_email || "No email provided"}
                             </span>
                             {hasUnread && (
-                              <span className="grid h-4 min-w-[16px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-zinc-900 to-black px-1 text-[10px] font-semibold text-white tabular-nums shadow-sm shadow-black/30">
+                              <span className="grid h-4 min-w-[18px] shrink-0 place-items-center rounded-full bg-zinc-900 px-1.5 text-[10px] font-semibold text-white tabular-nums">
                                 {s.unread_admin}
                               </span>
                             )}
                           </div>
-                          <div className="mt-1 flex flex-wrap items-center gap-1">
+                          <div className="mt-1.5 flex flex-wrap items-center gap-1">
                             <Chip
                               tone="zinc"
                               icon={s.status === "open" ? <CircleDot className="h-2.5 w-2.5" /> : <Circle className="h-2.5 w-2.5" />}
@@ -464,34 +476,36 @@ function AdminInbox() {
         </aside>
 
         {/* Right — conversation */}
-        <section className={`flex flex-1 flex-col bg-white ${activeId ? "flex" : "hidden md:flex"}`}>
+        <section className={`flex flex-1 flex-col bg-white/40 backdrop-blur-sm ${activeId ? "flex" : "hidden md:flex"}`}>
           {!activeSession ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-              <div className="grid h-12 w-12 place-items-center rounded-full bg-zinc-100">
-                <Inbox className="h-5 w-5 text-zinc-400" />
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+              <div className="relative grid h-16 w-16 place-items-center rounded-2xl bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_20px_40px_-20px_rgba(0,0,0,0.2)] ring-1 ring-black/5">
+                <Inbox className="h-6 w-6 text-zinc-400" />
+                <span className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/60 to-transparent" />
               </div>
-              <p className="text-[13px] font-medium text-zinc-800">Select a conversation</p>
-              <p className="max-w-xs text-[11.5px] text-zinc-500">
+              <p className="text-[14px] font-semibold tracking-tight text-zinc-900">Select a conversation</p>
+              <p className="max-w-xs text-[12px] leading-relaxed text-zinc-500">
                 Use <Kbd>J</Kbd> / <Kbd>K</Kbd> to navigate, <Kbd>R</Kbd> to reply, <Kbd>E</Kbd> to close.
               </p>
             </div>
           ) : (
             <>
               {/* Thread header */}
-              <div className="flex h-11 shrink-0 items-center gap-2 border-b border-zinc-200 px-3">
+              <div className="flex h-14 shrink-0 items-center gap-3 border-b border-zinc-900/[0.06] bg-white/70 px-4 backdrop-blur-xl">
                 <button
                   onClick={() => setActiveId(null)}
-                  className="grid h-7 w-7 place-items-center rounded-md text-zinc-600 hover:bg-zinc-100 md:hidden"
+                  className="grid h-8 w-8 place-items-center rounded-lg text-zinc-600 hover:bg-zinc-100 md:hidden"
                   aria-label="Back"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-zinc-900 to-black text-[10px] font-semibold text-white">
+                <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-zinc-800 to-black text-[11px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
                   {initials(activeSession.guest_name, activeSession.guest_email)}
+                  <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${activeSession.status === "open" ? "bg-emerald-500" : "bg-zinc-300"}`} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="truncate text-[13px] font-semibold">
+                    <span className="truncate text-[14px] font-semibold tracking-tight">
                       {activeSession.guest_name || "Anonymous visitor"}
                     </span>
                     <Chip
@@ -505,13 +519,13 @@ function AdminInbox() {
                     {activeSession.guest_email ? (
                       <button
                         onClick={() => copyEmail(activeSession.guest_email!)}
-                        className="flex items-center gap-1 truncate transition hover:text-zinc-900"
+                        className="group flex items-center gap-1 truncate transition hover:text-zinc-900"
                         title="Copy email"
                       >
                         <Mail className="h-3 w-3" />
                         <span className="truncate">{activeSession.guest_email}</span>
                         {copied ? (
-                          <CheckCircle2 className="h-3 w-3 text-black" />
+                          <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                         ) : (
                           <Copy className="h-3 w-3 opacity-0 transition group-hover:opacity-100" />
                         )}
@@ -531,14 +545,14 @@ function AdminInbox() {
                   {activeSession.status === "open" ? (
                     <button
                       onClick={handleClose}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 px-2.5 py-1 text-[11.5px] font-medium text-zinc-700 transition hover:bg-zinc-50"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-white px-2.5 py-1.5 text-[12px] font-medium text-zinc-700 shadow-sm transition hover:border-zinc-900 hover:bg-zinc-900 hover:text-white"
                       title="Close (E)"
                     >
                       <Archive className="h-3 w-3" /> Close
                       <Kbd className="ml-1">E</Kbd>
                     </button>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2.5 py-1 text-[11.5px] font-medium text-zinc-600">
+                    <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-[12px] font-medium text-zinc-600">
                       <CheckCircle2 className="h-3 w-3" /> Closed
                     </span>
                   )}
@@ -546,8 +560,8 @@ function AdminInbox() {
               </div>
 
               {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gradient-to-b bg-white">
-                <div className="mx-auto max-w-3xl space-y-1 p-4">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto">
+                <div className="mx-auto max-w-3xl space-y-1 p-5">
                   {messages.length === 0 && (
                     <div className="py-8 text-center text-[11.5px] text-zinc-500">No messages yet.</div>
                   )}
@@ -557,10 +571,10 @@ function AdminInbox() {
                     const showHeader = !prev || prev.sender !== m.sender ||
                       new Date(m.created_at).getTime() - new Date(prev.created_at).getTime() > 5 * 60 * 1000;
                     return (
-                      <div key={m.id} className={showHeader ? "pt-3" : ""}>
+                      <div key={m.id} className={showHeader ? "pt-4" : ""}>
                         {showHeader && (
-                          <div className={`mb-1 flex items-center gap-1.5 text-[10.5px] ${isAdminMsg ? "justify-end" : ""}`}>
-                            <span className="font-semibold text-zinc-700">
+                          <div className={`mb-1.5 flex items-center gap-1.5 text-[10.5px] ${isAdminMsg ? "justify-end" : ""}`}>
+                            <span className="font-semibold tracking-tight text-zinc-700">
                               {isAdminMsg ? username || "You" : activeSession.guest_name || "Visitor"}
                             </span>
                             <span className="text-zinc-400">
@@ -570,10 +584,10 @@ function AdminInbox() {
                         )}
                         <div className={`flex ${isAdminMsg ? "justify-end" : "justify-start"}`}>
                           <div
-                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-lg px-3 py-2 text-[13px] leading-relaxed ${
+                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed ${
                               isAdminMsg
-                                ? "bg-gradient-to-br from-black to-zinc-800 text-white shadow-sm shadow-black/20"
-                                : "border border-zinc-200 bg-white text-zinc-900 shadow-sm"
+                                ? "rounded-br-md bg-gradient-to-br from-zinc-800 to-black text-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.3)] ring-1 ring-black/20"
+                                : "rounded-bl-md border border-zinc-900/[0.06] bg-white text-zinc-900 shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
                             }`}
                           >
                             {m.content}
@@ -586,14 +600,14 @@ function AdminInbox() {
               </div>
 
               {/* Composer */}
-              <form onSubmit={handleReply} className="shrink-0 border-t border-zinc-200 bg-white p-3">
+              <form onSubmit={handleReply} className="shrink-0 border-t border-zinc-900/[0.06] bg-white/70 p-4 backdrop-blur-xl">
                 {activeSession.status === "closed" ? (
-                  <div className="flex items-center justify-center gap-2 rounded-md bg-zinc-50 py-2.5 text-[11.5px] text-zinc-500">
+                  <div className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200/80 bg-white py-3 text-[12px] font-medium text-zinc-500">
                     <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
                   </div>
                 ) : (
                   <div className="mx-auto max-w-3xl">
-                    <div className="relative rounded-lg border border-zinc-200 bg-white shadow-sm transition focus-within:border-black focus-within:ring-2 focus-within:ring-black/10">
+                    <div className="relative rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_30px_-15px_rgba(0,0,0,0.15)] transition focus-within:border-zinc-900/40 focus-within:ring-4 focus-within:ring-zinc-900/5">
                       <textarea
                         ref={inputRef}
                         value={input}
@@ -607,14 +621,14 @@ function AdminInbox() {
                         placeholder="Reply to visitor…  (Enter to send, Shift+Enter for newline)"
                         rows={2}
                         maxLength={4000}
-                        className="max-h-48 min-h-[56px] w-full resize-none bg-transparent px-3 py-2.5 text-[13px] outline-none placeholder:text-zinc-400"
+                        className="max-h-48 min-h-[60px] w-full resize-none bg-transparent px-4 py-3 text-[13.5px] leading-relaxed outline-none placeholder:text-zinc-400"
                       />
-                      <div className="flex items-center justify-between gap-2 border-t border-zinc-100 px-2 py-1.5">
+                      <div className="flex items-center justify-between gap-2 border-t border-zinc-900/[0.05] px-2.5 py-2">
                         <div className="relative">
                           <button
                             type="button"
                             onClick={() => setShowCanned((v) => !v)}
-                            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11.5px] font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-zinc-600 transition hover:bg-zinc-900/5 hover:text-zinc-900"
                           >
                             <Zap className="h-3 w-3" /> Canned
                           </button>
@@ -626,8 +640,8 @@ function AdminInbox() {
                                 className="fixed inset-0 z-10 cursor-default"
                                 aria-label="Close"
                               />
-                              <div className="absolute bottom-full left-0 z-20 mb-1 w-72 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-lg">
-                                <div className="border-b border-zinc-100 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                              <div className="absolute bottom-full left-0 z-20 mb-1.5 w-80 overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
+                                <div className="border-b border-zinc-100 bg-zinc-50/60 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">
                                   Quick replies
                                 </div>
                                 <ul className="max-h-64 overflow-y-auto py-1">
@@ -642,7 +656,7 @@ function AdminInbox() {
                                         }}
                                         className="block w-full px-3 py-2 text-left transition hover:bg-zinc-50"
                                       >
-                                        <div className="text-[12px] font-medium text-zinc-800">{c.label}</div>
+                                        <div className="text-[12.5px] font-semibold text-zinc-800">{c.label}</div>
                                         <div className="mt-0.5 line-clamp-2 text-[11px] text-zinc-500">{c.text}</div>
                                       </button>
                                     </li>
@@ -659,7 +673,7 @@ function AdminInbox() {
                           <button
                             type="submit"
                             disabled={sending || !input.trim()}
-                            className="inline-flex h-7 items-center gap-1.5 rounded-md bg-gradient-to-r from-black to-zinc-800 px-2.5 text-[12px] font-medium text-white shadow-sm shadow-black/25 transition hover:from-zinc-800 hover:to-zinc-900 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-gradient-to-b from-zinc-800 to-black px-3 text-[12.5px] font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.15)_inset,0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/20 transition hover:from-zinc-900 hover:to-black disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {sending ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -683,16 +697,16 @@ function AdminInbox() {
 
         {/* Details rail */}
         {activeSession && (
-          <aside className="hidden w-64 shrink-0 flex-col border-l border-zinc-200/80 bg-white/50 p-4 xl:flex">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+          <aside className="hidden w-64 shrink-0 flex-col border-l border-zinc-900/[0.06] bg-white/40 p-4 backdrop-blur-sm xl:flex">
+            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
               Visitor
             </div>
-            <div className="mt-2 flex items-center gap-2.5">
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-zinc-900 to-black text-[12px] font-semibold text-white shadow-sm shadow-black/20">
+            <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/5 bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+              <div className="relative grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-zinc-800 to-black text-[13px] font-semibold text-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
                 {initials(activeSession.guest_name, activeSession.guest_email)}
               </div>
               <div className="min-w-0">
-                <div className="truncate text-[13px] font-semibold">
+                <div className="truncate text-[13.5px] font-semibold tracking-tight">
                   {activeSession.guest_name || "Anonymous"}
                 </div>
                 <div className="truncate text-[11px] text-zinc-500">
@@ -719,17 +733,17 @@ function AdminInbox() {
               </DetailRow>
             </div>
 
-            <div className="mt-6 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+            <div className="mt-6 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
               Activity
             </div>
-            <div className="mt-2 rounded-lg border border-zinc-200 bg-white p-2.5 text-[11.5px]">
+            <div className="mt-2 rounded-xl border border-black/5 bg-white p-3 text-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
               <div className="flex items-center justify-between">
                 <span className="text-zinc-500">Messages</span>
                 <span className="font-mono tabular-nums font-semibold text-zinc-900">
                   {messages.length}
                 </span>
               </div>
-              <div className="mt-1.5 flex items-center justify-between">
+              <div className="mt-2 flex items-center justify-between">
                 <span className="text-zinc-500">Last reply</span>
                 <span className="font-mono tabular-nums text-zinc-700">
                   {timeAgo(activeSession.last_message_at)} ago
