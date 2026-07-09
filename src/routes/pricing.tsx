@@ -79,9 +79,9 @@ const TIERS = [
     tagline: "For serious gold traders.",
     cta: "Notify me when live",
     ctaTo: "/contact",
-    credits: 60,
+    credits: 35,
     features: [
-      "60 signal scans / month",
+      "35 signal scans / month",
       "Voice queries free",
       "A+ / A institutional signals",
       "Realtime email & push alerts",
