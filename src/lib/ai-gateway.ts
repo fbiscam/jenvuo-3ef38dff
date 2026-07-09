@@ -256,15 +256,16 @@ export const MODEL_CHAIN = {
   intent: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview"],
 
   // Chart narration — deep ICT/SMC reasoning via Lovable AI Gateway.
+  // Primary + fallback both run on GPT-5.4 for consistent signal quality.
   narration: [
     "openai/gpt-5.4",
-    "openai/gpt-5.4-mini",
-    "google/gemini-3.5-flash",
+    "openai/gpt-5.4",
   ],
 
   // Senior 25-year-trader review (A / A+ verdict) — flagship reasoning.
+  // Fallback also GPT-5.4 for consistent verdict quality.
   seniorReview: [
-    "openai/gpt-5.5",
+    "openai/gpt-5.4",
     "openai/gpt-5.4",
   ],
 
