@@ -74,6 +74,32 @@ function initials(name?: string | null, email?: string | null) {
   return (parts[0]?.[0] || "?").toUpperCase() + (parts[1]?.[0]?.toUpperCase() || "");
 }
 
+const AVATAR_PALETTE = [
+  "bg-gradient-to-br from-emerald-500 to-emerald-700",
+  "bg-gradient-to-br from-teal-500 to-teal-700",
+  "bg-gradient-to-br from-cyan-500 to-cyan-700",
+  "bg-gradient-to-br from-sky-500 to-sky-700",
+  "bg-gradient-to-br from-blue-500 to-blue-700",
+  "bg-gradient-to-br from-indigo-500 to-indigo-700",
+  "bg-gradient-to-br from-violet-500 to-violet-700",
+  "bg-gradient-to-br from-fuchsia-500 to-fuchsia-700",
+  "bg-gradient-to-br from-pink-500 to-pink-700",
+  "bg-gradient-to-br from-rose-500 to-rose-700",
+  "bg-gradient-to-br from-red-500 to-red-700",
+  "bg-gradient-to-br from-orange-500 to-orange-700",
+  "bg-gradient-to-br from-amber-500 to-amber-700",
+  "bg-gradient-to-br from-lime-600 to-lime-800",
+  "bg-gradient-to-br from-green-500 to-green-700",
+];
+
+function avatarColor(name?: string | null, email?: string | null) {
+  const src = (email || name || "?").toLowerCase().trim();
+  let h = 0;
+  for (let i = 0; i < src.length; i++) h = (h * 31 + src.charCodeAt(i)) >>> 0;
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+}
+
+
 function timeAgo(iso: string) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (s < 60) return `${s}s`;
@@ -422,7 +448,7 @@ function AdminInbox() {
                           <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-zinc-900" />
                         )}
                         <div className="relative mt-0.5 shrink-0">
-                          <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-zinc-800 to-black text-[10.5px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
+                          <div className={`grid h-8 w-8 place-items-center rounded-lg ${avatarColor(s.guest_name, s.guest_email)} text-[10.5px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10`}>
                             {initials(s.guest_name, s.guest_email)}
                           </div>
                           <span
@@ -499,7 +525,7 @@ function AdminInbox() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-zinc-800 to-black text-[11px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
+                <div className={`relative grid h-9 w-9 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[11px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10`}>
                   {initials(activeSession.guest_name, activeSession.guest_email)}
                   <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${activeSession.status === "open" ? "bg-emerald-500" : "bg-zinc-300"}`} />
                 </div>
@@ -702,7 +728,7 @@ function AdminInbox() {
               Visitor
             </div>
             <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/5 bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-              <div className="relative grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-zinc-800 to-black text-[13px] font-semibold text-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
+              <div className={`relative grid h-11 w-11 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[13px] font-semibold text-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10`}>
                 {initials(activeSession.guest_name, activeSession.guest_email)}
               </div>
               <div className="min-w-0">
