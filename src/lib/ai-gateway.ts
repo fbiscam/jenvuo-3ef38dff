@@ -54,6 +54,14 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+// Map our OpenRouter-style model IDs to what Blackbox expects.
+// Blackbox uses plain names (e.g. "gpt-5.4", "gemini-2.5-pro") without the
+// vendor prefix. Override per-model with BLACKBOX_MODEL_MAP if needed.
+function mapModelForBlackbox(model: string): string {
+  // Strip known vendor prefixes.
+  return model.replace(/^openai\//i, "").replace(/^google\//i, "");
+}
+
 async function singleAttempt(
   model: string,
   opts: CallChatOptions,
@@ -62,26 +70,25 @@ async function singleAttempt(
 ): Promise<string> {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
+  const bxModel = mapModelForBlackbox(model);
   const body: Record<string, unknown> = {
-    model,
+    model: bxModel,
     messages: opts.messages,
   };
   if (opts.jsonMode) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
     // GPT-5 family requires max_completion_tokens instead of max_tokens
-    if (model.startsWith("openai/gpt-5")) {
+    if (bxModel.startsWith("gpt-5")) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (opts.priority && PRIORITY_TIER_MODELS.has(model)) {
-    body.service_tier = "priority";
-  }
+  // Blackbox does not use service_tier priority — omit it.
 
   let res: Response;
   try {
-    res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    res = await fetch("https://api.blackbox.ai/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -105,9 +112,10 @@ async function singleAttempt(
     const terminal = !(res.status === 429 || res.status >= 500);
     let msg: string;
     if (res.status === 429) msg = "AI is rate-limited right now. Please retry in a moment.";
-    else if (res.status === 402) msg = "AI credits exhausted. Please top up credits in your workspace settings.";
-    else if (res.status === 400) msg = `AI request rejected: ${txt.slice(0, 180)}`;
-    else msg = `AI error ${res.status}: ${txt.slice(0, 180)}`;
+    else if (res.status === 402) msg = "Blackbox credits exhausted. Please top up your Blackbox account.";
+    else if (res.status === 401) msg = "Blackbox API key rejected. Please update BLACKBOX_API_KEY.";
+    else if (res.status === 400) msg = `AI request rejected: ${txt.slice(0, 200)}`;
+    else msg = `AI error ${res.status}: ${txt.slice(0, 200)}`;
     throw new AiGatewayError(msg, res.status, terminal);
   }
 
@@ -118,6 +126,7 @@ async function singleAttempt(
   }
   return content;
 }
+
 
 // Main entrypoint. Returns raw assistant content string.
 // Throws AiGatewayError with `terminal` flag on final failure.
