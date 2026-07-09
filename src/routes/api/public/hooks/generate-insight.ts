@@ -94,14 +94,14 @@ Return STRICT JSON only, no prose, with this exact shape:
   "content": "<full markdown article 900-1300 words with ## H2 sections, lists, and a final ## FAQ section. Use internal links to /signal, /app, /insights, /download where natural>"
 }`;
 
-        const aiRes = await fetch("https://api.blackbox.ai/chat/completions", {
+        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${blackboxKey}`,
+            "Lovable-API-Key": lovableKey,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "gemini-2.5-flash",
+            model: "google/gemini-2.5-flash",
             messages: [
               { role: "system", content: sys },
               { role: "user", content: userPrompt },
