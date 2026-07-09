@@ -699,8 +699,8 @@ function HomePage() {
                   </th>
                   {[
                     { name: "Free", key: "free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false },
-                    { name: "Pro", key: "pro", price: "$29", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
-                    { name: "Elite", key: "elite", price: "$99", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
+                    { name: "Pro", key: "pro", price: "$15", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true },
+                    { name: "Elite", key: "elite", price: "$50", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true },
                     { name: "Custom", key: "custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false },
                   ].map((p) => {
                     const isCurrent = currentPlan === p.key;
