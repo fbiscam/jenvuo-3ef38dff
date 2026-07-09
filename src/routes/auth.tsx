@@ -14,6 +14,7 @@ import {
 } from "@/lib/custom-auth.functions";
 import { applyReferralCode } from "@/lib/referrals.functions";
 import { registerTrustedDevice, verifyTrustedDevice } from "@/lib/trusted-devices.functions";
+import { sendTransactionalEmail } from "@/lib/email/send";
 
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 
