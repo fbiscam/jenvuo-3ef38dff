@@ -434,7 +434,7 @@ function AdminInbox() {
                       <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
                     </div>
                   ) : (
-                    <div className="flex items-end gap-2 rounded-lg border border-zinc-200 bg-white p-2 focus-within:border-zinc-400">
+                    <div className="flex items-end gap-2 rounded-xl border border-zinc-200 bg-white p-2 shadow-sm transition focus-within:border-zinc-400 focus-within:ring-4 focus-within:ring-zinc-900/5">
                       <textarea
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
@@ -452,7 +452,7 @@ function AdminInbox() {
                       <button
                         type="submit"
                         disabled={sending || !input.trim()}
-                        className="flex h-9 items-center gap-2 rounded-md bg-zinc-900 px-3.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="flex h-9 items-center gap-2 rounded-lg bg-gradient-to-b from-zinc-900 to-zinc-800 px-3.5 text-sm font-medium text-white shadow-sm transition hover:from-zinc-800 hover:to-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                         <span className="hidden sm:inline">Send</span>
