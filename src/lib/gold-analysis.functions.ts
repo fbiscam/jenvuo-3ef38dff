@@ -748,13 +748,20 @@ export const analyzeGold = createServerFn({ method: "POST" })
       }
     }
 
-    // Unified pricing: every action = 1 credit (signal, chat, narration, voice).
+    // Billing rule: charge ONLY on a successful actionable analysis
+    // (BUY or SELL with real entry + SL). WAIT, feed-offline fallbacks,
+    // and errors (already short-circuited by throw) cost nothing.
     const result = await _analyzeGoldCompute(data, context.userId);
-    const cost = 1;
-    await _spendUserCredits(context.userId, cost, result.__billable === "signal" ? "signal" : "chat");
-    // Strip internal billing marker before returning to the client.
     const { __billable, ...clean } = result;
-    void __billable;
+    const entryOk = isFinite(parsePx(clean.entry));
+    const slOk = isFinite(parsePx(clean.stopLoss));
+    const shouldCharge =
+      __billable === "signal" &&
+      (clean.direction === "BUY" || clean.direction === "SELL") &&
+      entryOk && slOk;
+    if (shouldCharge) {
+      await _spendUserCredits(context.userId, 1, "signal");
+    }
 
     // Cache actionable signals (BUY/SELL with real entry+SL)
     if (__billable === "signal" && (clean.direction === "BUY" || clean.direction === "SELL")) {
