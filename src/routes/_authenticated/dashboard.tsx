@@ -209,7 +209,7 @@ function SignalDeskHistory() {
       if (!cancelled) { setAlerts((data as DeskAlert[]) ?? []); setLoading(false); }
     })();
     const channel = supabase
-      .channel("dashboard_signal_desk")
+      .channel(`dashboard_signal_desk:${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "signal_alerts" }, (payload) => {
         const a = payload.new as DeskAlert;
         if ((a.confidence ?? 0) < 50) return;
