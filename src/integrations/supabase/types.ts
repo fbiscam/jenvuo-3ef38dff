@@ -1314,6 +1314,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      resync_all_credit_lots: { Args: never; Returns: number }
       seed_default_setups: { Args: { _user_id: string }; Returns: undefined }
       set_user_plan:
         | { Args: { _plan_id: string; _user_id: string }; Returns: undefined }
