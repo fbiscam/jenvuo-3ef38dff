@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { Bell, Check, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  Bell,
+  TrendingUp,
+  TrendingDown,
+  Sparkles,
+  Crown,
+  Coins,
+  Mail,
+  ShieldCheck,
+  Info,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   listNotifications,
@@ -22,6 +32,35 @@ function timeAgo(iso: string): string {
   return `${d}d`;
 }
 
+type Visual = {
+  Icon: React.ComponentType<{ className?: string }>;
+  wrap: string;
+  href: string;
+};
+
+function visualFor(n: NotificationRow): Visual {
+  const t = n.type;
+  if (t === "signal_alert") {
+    const isBuy = (n.data?.direction as string) === "BUY";
+    return {
+      Icon: isBuy ? TrendingUp : TrendingDown,
+      wrap: isBuy ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600",
+      href: "/signal",
+    };
+  }
+  if (t === "welcome")
+    return { Icon: Sparkles, wrap: "bg-violet-50 text-violet-600", href: "/dashboard" };
+  if (t === "plan_upgrade" || t === "plan-upgrade")
+    return { Icon: Crown, wrap: "bg-amber-50 text-amber-600", href: "/dashboard" };
+  if (t === "credits_low" || t === "credits")
+    return { Icon: Coins, wrap: "bg-orange-50 text-orange-600", href: "/dashboard" };
+  if (t === "email" || t === "message")
+    return { Icon: Mail, wrap: "bg-sky-50 text-sky-600", href: "/dashboard" };
+  if (t === "security")
+    return { Icon: ShieldCheck, wrap: "bg-emerald-50 text-emerald-600", href: "/dashboard/security" };
+  return { Icon: Info, wrap: "bg-zinc-100 text-zinc-600", href: "/dashboard" };
+}
+
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationRow[]>([]);
@@ -37,7 +76,7 @@ export default function NotificationBell() {
       setItems(res.items);
       setUnread(res.unread);
     } catch {
-      // silent
+      /* silent */
     }
   }, [listFn]);
 
@@ -61,8 +100,6 @@ export default function NotificationBell() {
     setOpen(willOpen);
     if (willOpen) {
       await load();
-      // Auto-mark everything read as soon as the user opens the panel,
-      // so the unread badge doesn't come back on refresh/next visit.
       if (unread > 0) {
         setItems((prev) => prev.map((n) => (n.read_at ? n : { ...n, read_at: new Date().toISOString() })));
         setUnread(0);
@@ -75,22 +112,11 @@ export default function NotificationBell() {
     }
   };
 
-
   const markOne = async (id: string) => {
     setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)));
     setUnread((u) => Math.max(0, u - 1));
     try {
       await markFn({ data: { id } });
-    } catch {
-      /* revert on fail? keep optimistic */
-    }
-  };
-
-  const markAll = async () => {
-    setItems((prev) => prev.map((n) => (n.read_at ? n : { ...n, read_at: new Date().toISOString() })));
-    setUnread(0);
-    try {
-      await markAllFn();
     } catch {
       /* keep optimistic */
     }
@@ -104,95 +130,93 @@ export default function NotificationBell() {
         className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-transparent text-zinc-700 transition-colors hover:bg-zinc-100/60"
       >
         <Bell className="h-4 w-4" />
-
         {unread > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold leading-none text-white">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-[340px] overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-lg">
+        <div className="absolute right-0 top-11 z-50 w-[300px] overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-[0_8px_28px_-8px_rgba(0,0,0,0.15)]">
           <div className="flex items-center justify-between border-b border-zinc-100 px-3 py-2">
-            <div className="text-sm font-semibold text-zinc-900">Notifications</div>
-            {unread > 0 && (
-              <button
-                onClick={markAll}
-                className="text-[11px] font-medium text-zinc-600 hover:text-zinc-900"
+            <div className="flex items-center gap-2">
+              <span className="text-[13px] font-semibold text-zinc-900">Notifications</span>
+              {unread > 0 && (
+                <span className="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-zinc-900 px-1 text-[10px] font-semibold text-white">
+                  {unread}
+                </span>
+              )}
+            </div>
+            {items.length > 0 && (
+              <Link
+                to="/dashboard"
+                onClick={() => setOpen(false)}
+                className="text-[11px] font-medium text-zinc-500 hover:text-zinc-900"
               >
-                Mark all read
-              </button>
+                View all
+              </Link>
             )}
           </div>
-          <div className="max-h-[440px] overflow-y-auto">
+
+          <div className="max-h-[380px] overflow-y-auto">
             {items.length === 0 ? (
-              <div className="px-4 py-10 text-center text-xs text-zinc-500">
-                No notifications yet.
+              <div className="flex flex-col items-center justify-center px-4 py-10 text-center">
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">
+                  <Bell className="h-4 w-4" />
+                </div>
+                <p className="text-[12px] font-medium text-zinc-700">You're all caught up</p>
+                <p className="mt-0.5 text-[11px] text-zinc-500">
+                  Signals, plan updates & alerts land here.
+                </p>
               </div>
             ) : (
               items.map((n) => {
-                const isSignal = n.type === "signal_alert";
-                const dir = (n.data?.direction as string) || "";
-                const isBuy = dir === "BUY";
+                const v = visualFor(n);
+                const Icon = v.Icon;
                 return (
-                  <div
+                  <Link
                     key={n.id}
+                    to={v.href}
+                    onClick={() => {
+                      if (!n.read_at) markOne(n.id);
+                      setOpen(false);
+                    }}
                     className={cn(
-                      "flex gap-2.5 border-b border-zinc-50 px-3 py-2.5 last:border-b-0",
-                      !n.read_at && "bg-blue-50/40",
+                      "group flex items-start gap-2.5 border-b border-zinc-50 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-zinc-50/70",
+                      !n.read_at && "bg-blue-50/30",
                     )}
                   >
                     <div
                       className={cn(
-                        "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-                        isSignal && isBuy && "bg-emerald-100 text-emerald-700",
-                        isSignal && !isBuy && "bg-red-100 text-red-700",
-                        !isSignal && "bg-zinc-100 text-zinc-600",
+                        "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
+                        v.wrap,
                       )}
                     >
-                      {isSignal ? (
-                        isBuy ? (
-                          <TrendingUp className="h-4 w-4" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4" />
-                        )
-                      ) : (
-                        <Bell className="h-4 w-4" />
-                      )}
+                      <Icon className="h-3.5 w-3.5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <Link
-                          to="/signal"
-                          onClick={() => {
-                            if (!n.read_at) markOne(n.id);
-                            setOpen(false);
-                          }}
-                          className="truncate text-[13px] font-semibold text-zinc-900 hover:text-zinc-700"
-                        >
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="truncate text-[12.5px] font-semibold leading-tight text-zinc-900">
                           {n.title}
-                        </Link>
-                        <span className="shrink-0 text-[10px] text-zinc-400">
+                        </p>
+                        <span className="shrink-0 text-[10px] leading-tight text-zinc-400">
                           {timeAgo(n.created_at)}
                         </span>
                       </div>
                       {n.body && (
-                        <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-zinc-600">
+                        <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-zinc-500">
                           {n.body}
                         </p>
                       )}
                     </div>
                     {!n.read_at && (
-                      <button
-                        onClick={() => markOne(n.id)}
-                        aria-label="Mark read"
-                        className="shrink-0 self-start text-zinc-400 hover:text-zinc-700"
-                      >
-                        <Check className="h-3.5 w-3.5" />
-                      </button>
+                      <span
+                        aria-hidden
+                        className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"
+                      />
                     )}
-                  </div>
+                  </Link>
                 );
               })
             )}
