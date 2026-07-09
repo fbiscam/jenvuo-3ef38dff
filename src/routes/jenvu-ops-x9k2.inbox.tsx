@@ -697,16 +697,16 @@ function AdminInbox() {
 
         {/* Details rail */}
         {activeSession && (
-          <aside className="hidden w-64 shrink-0 flex-col border-l border-zinc-200/80 bg-white/50 p-4 xl:flex">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+          <aside className="hidden w-64 shrink-0 flex-col border-l border-zinc-900/[0.06] bg-white/40 p-4 backdrop-blur-sm xl:flex">
+            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
               Visitor
             </div>
-            <div className="mt-2 flex items-center gap-2.5">
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-zinc-900 to-black text-[12px] font-semibold text-white shadow-sm shadow-black/20">
+            <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/5 bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+              <div className="relative grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-zinc-800 to-black text-[13px] font-semibold text-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
                 {initials(activeSession.guest_name, activeSession.guest_email)}
               </div>
               <div className="min-w-0">
-                <div className="truncate text-[13px] font-semibold">
+                <div className="truncate text-[13.5px] font-semibold tracking-tight">
                   {activeSession.guest_name || "Anonymous"}
                 </div>
                 <div className="truncate text-[11px] text-zinc-500">
@@ -733,17 +733,17 @@ function AdminInbox() {
               </DetailRow>
             </div>
 
-            <div className="mt-6 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+            <div className="mt-6 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
               Activity
             </div>
-            <div className="mt-2 rounded-lg border border-zinc-200 bg-white p-2.5 text-[11.5px]">
+            <div className="mt-2 rounded-xl border border-black/5 bg-white p-3 text-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
               <div className="flex items-center justify-between">
                 <span className="text-zinc-500">Messages</span>
                 <span className="font-mono tabular-nums font-semibold text-zinc-900">
                   {messages.length}
                 </span>
               </div>
-              <div className="mt-1.5 flex items-center justify-between">
+              <div className="mt-2 flex items-center justify-between">
                 <span className="text-zinc-500">Last reply</span>
                 <span className="font-mono tabular-nums text-zinc-700">
                   {timeAgo(activeSession.last_message_at)} ago
