@@ -272,15 +272,15 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="flex h-screen flex-col bg-zinc-50 text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
+    <div className="flex h-screen flex-col bg-gradient-to-br from-indigo-50/40 via-white to-sky-50/30 text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Top bar */}
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200/80 bg-white/80 px-4 backdrop-blur-md">
+      <header className="flex h-12 shrink-0 items-center justify-between border-b border-indigo-100/70 bg-white/70 px-4 backdrop-blur-md">
         <div className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-zinc-200">
+          <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-50 to-sky-50 shadow-sm ring-1 ring-indigo-100">
             <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 object-contain" />
           </span>
-          <span className="text-[16px] font-bold tracking-tight text-zinc-900">Jenvu</span>
-          <span className="text-zinc-300">/</span>
+          <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-sky-600 bg-clip-text text-[16px] font-bold tracking-tight text-transparent">Jenvu</span>
+          <span className="text-indigo-300">/</span>
           <span className="text-[13px] font-medium tracking-tight text-zinc-500">Support Inbox</span>
         </div>
         <div className="flex items-center gap-2">
