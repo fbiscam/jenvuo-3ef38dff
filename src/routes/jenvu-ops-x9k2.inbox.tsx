@@ -274,14 +274,14 @@ function AdminInbox() {
   return (
     <div className="flex h-screen flex-col bg-zinc-50 text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Top bar */}
-      <header className="flex h-11 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-3">
-        <div className="flex items-center gap-2">
-          <span className="grid h-6 w-6 place-items-center overflow-hidden rounded-md bg-zinc-900">
+      <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200/80 bg-white/80 px-4 backdrop-blur-md">
+        <div className="flex items-center gap-2.5">
+          <span className="grid h-7 w-7 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-zinc-900 to-zinc-700 shadow-sm ring-1 ring-black/5">
             <img src="/favicon.png" alt="Jenvu" className="h-4 w-4 object-contain invert" />
           </span>
-          <span className="text-[13px] font-semibold tracking-tight">Support</span>
+          <span className="text-[14px] font-semibold tracking-tight">Support</span>
           <span className="text-zinc-300">/</span>
-          <span className="text-[12.5px] text-zinc-600">Inbox</span>
+          <span className="text-[13px] font-medium tracking-tight text-zinc-500">Inbox</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="hidden items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 font-mono text-[10.5px] text-zinc-500 sm:inline-flex">
