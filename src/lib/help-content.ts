@@ -353,7 +353,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Pro — $15 / month" },
           { type: "ul", items: [
-            "60 signal scans per month.",
+            "35 signal scans per month.",
             "Unlimited voice queries.",
             "Full signal engine on all supported XAU cross-pairs.",
             "Realtime A+ email & push alerts (no delay).",
@@ -363,7 +363,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Elite — $50 / month" },
           { type: "ul", items: [
-            "180 signal scans per month.",
+            "85 signal scans per month.",
             "Everything in Pro.",
             "Priority A+ alerts (< 30 seconds).",
             "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF).",
@@ -393,8 +393,8 @@ export const collections: Collection[] = [
           { type: "h2", content: "How scans refresh" },
           { type: "ul", items: [
             "Free: 2 scans per month.",
-            "Pro: 60 scans added on each billing date.",
-            "Elite: 180 scans added on each billing date.",
+            "Pro: 35 scans added on each billing date.",
+            "Elite: 85 scans added on each billing date.",
             "Top-up packs never expire and stack on top of your plan.",
           ]},
 

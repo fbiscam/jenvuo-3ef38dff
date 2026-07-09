@@ -79,9 +79,9 @@ const TIERS = [
     tagline: "For serious gold traders.",
     cta: "Notify me when live",
     ctaTo: "/contact",
-    credits: 60,
+    credits: 35,
     features: [
-      "60 signal scans / month",
+      "35 signal scans / month",
       "Voice queries free",
       "A+ / A institutional signals",
       "Realtime email & push alerts",
@@ -101,9 +101,9 @@ const TIERS = [
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
-    credits: 180,
+    credits: 85,
     features: [
-      "180 signal scans / month",
+      "85 signal scans / month",
       "Voice queries free",
       "Everything in Pro",
       "Priority A+ alerts (< 30s)",
@@ -333,7 +333,7 @@ function PricingPage() {
             <tbody>
               {([
                 { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
-                { f: "Signal scans / month", a: "2", b: "60", c: "180", d: "400" },
+                { f: "Signal scans / month", a: "2", b: "35", c: "85", d: "165" },
                 { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
                 { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },

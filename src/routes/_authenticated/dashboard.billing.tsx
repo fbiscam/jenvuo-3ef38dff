@@ -15,7 +15,7 @@ type Mark = boolean | string;
 
 const MATRIX_ROWS: ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }> = [
   { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
-  { f: "Signal scans / month", a: "2", b: "60", c: "180", d: "400" },
+  { f: "Signal scans / month", a: "2", b: "35", c: "85", d: "165" },
   { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
   { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
   { f: "A+ signal access", a: false, b: true, c: true, d: true },
