@@ -593,7 +593,7 @@ function AdminInbox() {
                   </div>
                 ) : (
                   <div className="mx-auto max-w-3xl">
-                    <div className="relative rounded-lg border border-zinc-200 bg-white shadow-sm transition focus-within:border-zinc-400 focus-within:ring-2 focus-within:ring-zinc-900/10">
+                    <div className="relative rounded-lg border border-indigo-100 bg-white shadow-sm transition focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/15">
                       <textarea
                         ref={inputRef}
                         value={input}
