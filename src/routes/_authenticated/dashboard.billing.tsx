@@ -164,20 +164,25 @@ function Billing() {
                 );
               })}
             </div>
-            {credits.state.recent.length > 10 && (
+            {filtered.length > 10 && (
               <div className="mt-3 flex justify-center">
                 <button
                   type="button"
                   onClick={() => setShowAllActivity((v) => !v)}
                   className="text-xs font-medium text-zinc-700 hover:text-zinc-900"
                 >
-                  {showAllActivity ? "Show less" : `Show more (${credits.state.recent.length - 10})`}
+                  {showAllActivity ? "Show less" : `Show more (${filtered.length - 10})`}
                 </button>
               </div>
             )}
           </div>
-        )}
+          );
+        })()}
       </section>
+
+
+
+
 
 
 
