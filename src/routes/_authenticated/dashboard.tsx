@@ -554,7 +554,8 @@ function DashboardLayout() {
     if (prev !== null && prev !== displayRemaining) {
       setScansTrend(displayRemaining > prev ? "up" : "down");
     } else if (prev === null) {
-      setScansTrend(allowance > 0 && displayRemaining < allowance ? "down" : "flat");
+      // Full balance = uptrend (green). Partially used = downtrend (red).
+      setScansTrend(allowance > 0 && displayRemaining < allowance ? "down" : "up");
     }
     prevRemainingRef.current = displayRemaining;
   }, [displayRemaining, credits.isLoading, credits.allowance]);
