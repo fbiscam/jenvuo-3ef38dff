@@ -311,7 +311,7 @@ function AdminInbox() {
           </span>
           <div className="flex items-baseline gap-2">
             <span className="text-[17px] font-bold tracking-tight text-zinc-900">Jenvu</span>
-            <span className="rounded-full bg-zinc-900 px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-[0.14em] text-white">Ops</span>
+            
           </div>
           <span className="text-zinc-300">/</span>
           <span className="text-[13px] font-medium tracking-tight text-zinc-500">Support Inbox</span>
