@@ -131,8 +131,9 @@ async function singleAttempt(
 // Main entrypoint. Returns raw assistant content string.
 // Throws AiGatewayError with `terminal` flag on final failure.
 export async function callChatCompletion(opts: CallChatOptions): Promise<{ content: string; model: string }> {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new AiGatewayError("LOVABLE_API_KEY missing on server", 0, true);
+  const apiKey = process.env.BLACKBOX_API_KEY;
+  if (!apiKey) throw new AiGatewayError("BLACKBOX_API_KEY missing on server", 0, true);
+
 
   const timeoutMs = opts.timeoutMs ?? 25000;
   const retriesPerModel = Math.max(1, opts.retriesPerModel ?? 3);
