@@ -1685,7 +1685,7 @@ ${fmt(ltfPrompt)}
 
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
-    const { content } = await callChatCompletion({
+    const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
       models: [...MODEL_CHAIN.narration],
       messages: [
         { role: "system", content: system },
@@ -1700,6 +1700,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       if (err instanceof AiGatewayError) throw new Error(err.message);
       throw err;
     });
+    import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
     const parsed: any = tryParseJsonLoose(content) || {};
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
