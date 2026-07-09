@@ -522,7 +522,7 @@ function Cell({ value, highlight }: { value: Mark; highlight?: boolean }) {
 function CustomTopUp() {
   const [amount, setAmount] = React.useState<number>(15);
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
-  const credits = safe * 8;
+  const credits = safe * 3;
   return (
     <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 sm:p-7">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
