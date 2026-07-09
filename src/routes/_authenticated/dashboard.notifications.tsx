@@ -171,37 +171,35 @@ function NotificationsPage() {
 
   return (
     <div className="max-w-3xl">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <div />
+      {/* Filters + Mark all read */}
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex flex-wrap gap-1.5 min-w-0">
+          {filters.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={cn(
+                "h-7 px-3 rounded-full text-[11px] font-medium transition",
+                filter === f.key
+                  ? "bg-zinc-900 text-white"
+                  : "bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
 
         <button
           onClick={markAll}
           disabled={unreadCount === 0}
-          className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+          className="shrink-0 inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-zinc-200 bg-white text-[11px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
         >
           <CheckCheck className="h-3.5 w-3.5" />
-          Mark all read
+          <span className="hidden sm:inline">Mark all read</span>
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        {filters.map((f) => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={cn(
-              "h-7 px-3 rounded-full text-[11px] font-medium transition",
-              filter === f.key
-                ? "bg-zinc-900 text-white"
-                : "bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-50",
-            )}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
 
       {/* Content */}
       {loading ? (
