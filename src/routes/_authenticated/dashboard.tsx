@@ -645,7 +645,7 @@ function DashboardLayout() {
                 seed={3}
               />
               <Metric
-                label={`Monthly allowance · ${planTier}`}
+                label="Monthly allowance"
                 value={credits.isLoading ? "…" : (credits.allowance || 0)}
                 delta={null}
                 tone="zinc"
