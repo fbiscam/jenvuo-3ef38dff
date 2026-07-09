@@ -1600,6 +1600,25 @@ export async function computeSignalPlan(data: { symbol: string }, __userId: stri
     // ---- WISDOM: compute regime BEFORE AI so narration can reference it ----
     const marketRegime = detectMarketRegime(ltf);
 
+    // ---- PRE-FLIGHT GATE: skip AI entirely when a real setup is impossible.
+    // This saves Lovable AI credits on every "no setup" scan — no tokens burnt.
+    // Skip when: regime is unfavorable (choppy/ranging) AND outside every
+    // killzone AND no high-impact USD news is imminent (news creates its own
+    // volatility even in dead sessions).
+    const outsideKillzone = killzone === "Outside killzone" || killzone === "-" || !killzone;
+    const unfavorableTape = !marketRegime.favorable;
+    const noNewsDriver = !imminentHigh;
+    if (unfavorableTape && outsideKillzone && noNewsDriver) {
+      return buildFeedFallbackPlan({
+        inst,
+        price: last.c,
+        htfRaw: htf,
+        ltfRaw: ltf,
+        reason: `Tape is ${marketRegime.regime} and no killzone is active — waiting for a cleaner window before spending a scan.`,
+      });
+    }
+
+
     const system = `You are Jenvu — an elite institutional trader with 25+ years on bank/prop desks. You are a master of EVERY liquid market: gold, FX majors, indices, crypto, equities. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
 - Market structure: BOS, CHOCH, internal vs external structure, MSS
 - Premium / Discount arrays around equilibrium of the dealing range
