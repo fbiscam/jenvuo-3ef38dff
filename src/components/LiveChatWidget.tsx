@@ -207,7 +207,7 @@ export function LiveChatWidget() {
           <div className="relative flex items-center justify-between border-b border-black/5 bg-white px-4 py-4 text-black">
             <div className="flex items-center gap-3">
               <div className="relative grid h-10 w-10 place-items-center rounded-full bg-zinc-100 ring-1 ring-black/5">
-                <img src="/favicon.ico" alt="" className="h-6 w-6 rounded-sm" />
+                <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
                 <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white" />
               </div>
               <div>
