@@ -522,15 +522,15 @@ function StatCard({
 }) {
   return (
     <div className="group relative overflow-hidden rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm transition hover:border-stone-300">
-      <div className="flex items-center gap-3">
-        <span className={`grid h-8 w-8 place-items-center rounded-full bg-stone-50 ring-1 ring-stone-200/60 ${accent}`}>{icon}</span>
-        <div className="leading-tight">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className={`grid h-8 w-8 place-items-center rounded-full bg-stone-50 ring-1 ring-stone-200/60 ${accent}`}>{icon}</span>
           <div className="flex items-center gap-1.5">
             <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
             <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-stone-500">{label}</span>
           </div>
-          <div className="mt-0.5 text-2xl font-medium leading-none text-stone-900 font-display">{value}</div>
         </div>
+        <div className="text-right text-2xl font-medium leading-none text-stone-900 font-display">{value}</div>
       </div>
     </div>
   );
