@@ -100,14 +100,14 @@ function Billing() {
         </div>
       </section>
 
-      {/* CREDITS BALANCE */}
+      {/* SCANS BALANCE */}
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            
+            <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Scans remaining</div>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-4xl font-semibold tabular-nums">{credits.balance}</span>
-              <span className="text-sm text-zinc-500">/ {credits.allowance} this cycle</span>
+              <span className="text-sm text-zinc-500">/ {credits.allowance} scans this cycle</span>
             </div>
             {resetsAt && (
               <p className="mt-1 text-xs text-zinc-500">Resets {resetsAt.toLocaleDateString()}</p>
@@ -127,7 +127,7 @@ function Billing() {
           {(Object.entries(CREDIT_COSTS) as [keyof typeof CREDIT_COSTS, number][]).map(([k, v]) => (
             <div key={k} className="rounded-xl border border-zinc-200 bg-white p-3">
               <div className={`${MONO} text-[9px] uppercase tracking-[0.2em] text-zinc-900`}>{k.replace("_", " ")}</div>
-              <div className="mt-1 text-sm font-semibold text-zinc-900">{v} credit{v > 1 ? "s" : ""}</div>
+              <div className="mt-1 text-sm font-semibold text-zinc-900">{v} scan{v > 1 ? "s" : ""}</div>
             </div>
           ))}
         </div>
