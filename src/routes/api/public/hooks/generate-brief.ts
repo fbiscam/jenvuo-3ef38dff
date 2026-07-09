@@ -54,12 +54,8 @@ export const Route = createFileRoute("/api/public/hooks/generate-brief")({
         }
 
         const lovableKey = process.env.LOVABLE_API_KEY;
-        const blackboxKey = process.env.BLACKBOX_API_KEY;
         if (!lovableKey) {
-          return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing (needed for TTS)" }), { status: 500 });
-        }
-        if (!blackboxKey) {
-          return new Response(JSON.stringify({ error: "BLACKBOX_API_KEY missing" }), { status: 500 });
+          return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), { status: 500 });
         }
 
 
