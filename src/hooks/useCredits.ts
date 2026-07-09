@@ -1,8 +1,11 @@
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { getCreditState, spendCredits, CREDIT_COSTS, type CreditAction } from "@/lib/credits.functions";
 import { useAuthUser } from "./useAuthUser";
+import { supabase } from "@/integrations/supabase/client";
+
 
 export function useCredits() {
   const { user, loading: authLoading } = useAuthUser();
@@ -17,6 +20,22 @@ export function useCredits() {
     retry: 2,
     staleTime: 15_000,
   });
+
+  // Realtime: refresh on any credit_ledger change for this user
+  useEffect(() => {
+    if (!user?.id) return;
+    const ch = supabase
+      .channel(`credit-ledger-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "credit_ledger", filter: `user_id=eq.${user.id}` },
+        () => queryClient.invalidateQueries({ queryKey: ["credit-state", user.id] }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [user?.id, queryClient]);
 
   const waitingForFirstCreditState = !!user && !query.data && (query.isPending || query.isFetching);
 
