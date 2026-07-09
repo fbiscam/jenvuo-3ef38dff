@@ -95,7 +95,7 @@ const TIERS = [
   {
     id: "elite",
     name: "Elite",
-    price: 99,
+    price: 50,
     icon: Crown,
     bestFor: "Desk / fund",
     tagline: "For prop desks & funds.",
