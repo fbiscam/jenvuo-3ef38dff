@@ -49,3 +49,37 @@ export const markAllNotificationsRead = createServerFn({ method: 'POST' })
       .is('read_at', null)
     return { ok: true }
   })
+
+export const createUserNotification = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        type: z.string().min(1).max(64),
+        title: z.string().min(1).max(200),
+        body: z.string().max(1000).optional().nullable(),
+        data: z.record(z.string(), z.any()).optional(),
+        dedupeKey: z.string().max(200).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    if (data.dedupeKey) {
+      const { data: existing } = await context.supabase
+        .from('user_notifications')
+        .select('id')
+        .eq('user_id', context.userId)
+        .eq('type', data.type)
+        .contains('data', { dedupeKey: data.dedupeKey })
+        .limit(1)
+      if (existing && existing.length > 0) return { ok: true, skipped: true }
+    }
+    await context.supabase.from('user_notifications').insert({
+      user_id: context.userId,
+      type: data.type,
+      title: data.title,
+      body: data.body ?? null,
+      data: { ...(data.data ?? {}), ...(data.dedupeKey ? { dedupeKey: data.dedupeKey } : {}) },
+    })
+    return { ok: true }
+  })
