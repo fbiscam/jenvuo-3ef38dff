@@ -534,7 +534,8 @@ function DashboardLayout() {
     if (t.includes("custom")) return { pill: "bg-amber-50 border-amber-300 text-amber-700",   dot: "bg-amber-500" };
     return { pill: "bg-zinc-100 border-zinc-300 text-zinc-700", dot: "bg-zinc-400" };
   })();
-  const remainingPct = credits.allowance ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
+  const displayRemaining = Math.min(credits.balance || 0, credits.allowance || 0);
+  const remainingPct = credits.allowance ? Math.min(100, Math.round((displayRemaining / credits.allowance) * 100)) : 0;
   const usedPct = credits.allowance ? Math.max(0, 100 - remainingPct) : 0;
   const balanceTone: "blue" | "rose" | "zinc" = remainingPct < 30 ? "rose" : remainingPct < 60 ? "zinc" : "blue";
 
@@ -637,9 +638,9 @@ function DashboardLayout() {
             <CardHeader icon={ShieldCheck} title="Scans & Plan" />
             <div className="flex divide-x divide-zinc-200">
               <Metric
-                label="Scans remaining"
-                value={credits.isLoading ? "…" : credits.balance}
-                delta={credits.allowance ? (usedPct > 0 ? `-${usedPct}%` : `${remainingPct}%`) : null}
+                label={`Scans remaining · ${planTier}`}
+                value={credits.isLoading ? "…" : `${displayRemaining} / ${credits.allowance || 0}`}
+                delta={credits.allowance ? `${remainingPct}% left` : null}
                 tone={balanceTone}
                 seed={3}
               />
