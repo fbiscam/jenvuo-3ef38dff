@@ -784,20 +784,13 @@ export const analyzeGold = createServerFn({ method: "POST" })
       }
     }
 
-    // Billing rule: charge ONLY on a successful actionable analysis
-    // (BUY or SELL with real entry + SL). WAIT, feed-offline fallbacks,
-    // and errors (already short-circuited by throw) cost nothing.
+    // Billing note: the client (signal.tsx) charges once per scan via
+    // credits.spend("signal"). Do NOT charge again here or scans double-cut.
+    // See comment at end of this file confirming client is the authoritative
+    // billing site.
     const result = await _analyzeGoldCompute(data, context.userId);
-    const { __billable, ...clean } = result;
-    const entryOk = isFinite(parsePx(clean.entry));
-    const slOk = isFinite(parsePx(clean.stopLoss));
-    const shouldCharge =
-      __billable === "signal" &&
-      (clean.direction === "BUY" || clean.direction === "SELL") &&
-      entryOk && slOk;
-    if (shouldCharge) {
-      await _spendUserCredits(context.userId, 1, "signal");
-    }
+    const { __billable: _billable, ...clean } = result;
+    void _billable;
 
     // Cache actionable signals (BUY/SELL with real entry+SL)
     if (__billable === "signal" && (clean.direction === "BUY" || clean.direction === "SELL")) {
