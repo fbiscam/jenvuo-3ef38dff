@@ -261,13 +261,15 @@ function AdminInbox() {
                   className="w-full rounded-full border border-stone-200 bg-stone-50 py-2 pl-9 pr-3 text-sm placeholder:text-stone-400 focus:border-stone-400 focus:bg-white focus:outline-none"
                 />
               </div>
-              <div className="mt-2 flex gap-1 rounded-md bg-zinc-100 p-1 text-xs">
+              <div className="mt-2 flex gap-1 rounded-full bg-stone-100 p-1 text-xs">
                 {(["open", "closed", "all"] as const).map((k) => (
                   <button
                     key={k}
                     onClick={() => setFilter(k)}
-                    className={`flex-1 rounded px-2 py-1 capitalize transition ${
-                      filter === k ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-600 hover:text-zinc-900"
+                    className={`flex-1 rounded-full px-2 py-1 capitalize transition ${
+                      filter === k
+                        ? "bg-white text-stone-900 shadow-sm ring-1 ring-stone-200"
+                        : "text-stone-600 hover:text-stone-900"
                     }`}
                   >
                     {k}
@@ -279,9 +281,11 @@ function AdminInbox() {
             <div className="flex-1 overflow-y-auto">
               {filtered.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                  <Inbox className="h-8 w-8 text-zinc-300" />
-                  <p className="mt-2 text-sm font-medium text-zinc-700">No conversations</p>
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <div className="grid h-12 w-12 place-items-center rounded-full bg-stone-100 ring-1 ring-stone-200">
+                    <Inbox className="h-5 w-5 text-stone-400" />
+                  </div>
+                  <p className="mt-3 text-base text-stone-800" style={SERIF}>No conversations</p>
+                  <p className="mt-1 text-xs text-stone-500">
                     {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
                   </p>
                 </div>
@@ -293,32 +297,34 @@ function AdminInbox() {
                     <button
                       key={s.id}
                       onClick={() => setActiveId(s.id)}
-                      className={`flex w-full items-start gap-3 border-b border-zinc-100 px-3 py-3 text-left transition ${
-                        isActive ? "bg-zinc-50" : "hover:bg-zinc-50/60"
+                      className={`flex w-full items-start gap-3 border-b border-stone-100 px-4 py-3 text-left transition ${
+                        isActive
+                          ? "bg-stone-50/80 border-l-2 border-l-stone-900"
+                          : "border-l-2 border-l-transparent hover:bg-stone-50/60"
                       }`}
                     >
                       <div className="relative shrink-0">
-                        <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-zinc-800 to-zinc-600 text-[11px] font-semibold text-white">
+                        <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-stone-800 to-stone-600 text-[11px] font-semibold text-white ring-1 ring-stone-900/10">
                           {initials(s.guest_name, s.guest_email)}
                         </div>
                         <span
                           className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${
-                            s.status === "open" ? "bg-emerald-500" : "bg-zinc-300"
+                            s.status === "open" ? "bg-emerald-500" : "bg-stone-300"
                           }`}
                         />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex min-w-0 items-center gap-1.5">
-                            <span className="truncate text-sm font-medium text-zinc-900">{name}</span>
+                            <span className="truncate text-sm font-semibold text-stone-900">{name}</span>
                             <SourceBadge source={s.source} />
                           </div>
-                          <span className="shrink-0 text-[10px] text-zinc-400">{timeAgo(s.last_message_at)}</span>
+                          <span className="shrink-0 text-[10px] font-medium text-stone-400">{timeAgo(s.last_message_at)}</span>
                         </div>
                         <div className="mt-0.5 flex items-center justify-between gap-2">
-                          <span className="truncate text-xs text-zinc-500">{s.guest_email || "No email"}</span>
+                          <span className="truncate text-xs text-stone-500">{s.guest_email || "No email"}</span>
                           {s.unread_admin > 0 && (
-                            <span className="grid h-4 min-w-4 shrink-0 place-items-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+                            <span className="grid h-4 min-w-4 shrink-0 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white shadow-sm">
                               {s.unread_admin}
                             </span>
                           )}
@@ -332,14 +338,16 @@ function AdminInbox() {
           </aside>
 
           {/* Conversation */}
-          <section className={`flex flex-1 flex-col ${activeId ? "flex" : "hidden sm:flex"}`}>
+          <section className={`flex flex-1 flex-col bg-stone-50/40 ${activeId ? "flex" : "hidden sm:flex"}`}>
             {!activeSession ? (
-              <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-                <div className="grid h-14 w-14 place-items-center rounded-full bg-zinc-100">
-                  <MessageSquare className="h-6 w-6 text-zinc-400" />
+              <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+                <div className="grid h-16 w-16 place-items-center rounded-full bg-white ring-1 ring-stone-200 shadow-sm">
+                  <MessageSquare className="h-7 w-7 text-stone-400" />
                 </div>
-                <p className="text-sm font-medium text-zinc-800">Select a conversation</p>
-                <p className="max-w-xs text-xs text-zinc-500">
+                <p className="text-2xl text-stone-900" style={SERIF}>
+                  Select a <span className="italic text-stone-500">conversation</span>
+                </p>
+                <p className="max-w-xs text-xs text-stone-500 leading-relaxed">
                   Pick a chat from the left to view messages and reply to your visitor.
                 </p>
               </div>
