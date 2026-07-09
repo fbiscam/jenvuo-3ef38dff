@@ -4,9 +4,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const CREDIT_COSTS = {
   voice_query: 0,
-  signal: 2,
-  ict_narration: 3,
-  alert: 2,
+  signal: 1,
+  ict_narration: 1,
+  alert: 1,
 } as const;
 
 export type CreditAction = keyof typeof CREDIT_COSTS;
