@@ -260,11 +260,11 @@ const RISK_PROFILE: Record<
     maxRiskPct: number;
   }
 > = {
-  crypto: { pctBuffer: 0.0025, minRiskPct: 0.0030, atrMult: 0.90, maxDistPct: 0.0250, entryWindowPct: 0.0025, maxRiskPct: 0.0250 },
-  metal:  { pctBuffer: 0.0012, minRiskPct: 0.0018, atrMult: 0.65, maxDistPct: 0.0150, entryWindowPct: 0.0009, maxRiskPct: 0.0120 },
-  forex:  { pctBuffer: 0.0005, minRiskPct: 0.0008, atrMult: 0.45, maxDistPct: 0.0090, entryWindowPct: 0.0006, maxRiskPct: 0.0080 },
-  index:  { pctBuffer: 0.0010, minRiskPct: 0.0015, atrMult: 0.65, maxDistPct: 0.0150, entryWindowPct: 0.0010, maxRiskPct: 0.0150 },
-  stock:  { pctBuffer: 0.0015, minRiskPct: 0.0020, atrMult: 0.65, maxDistPct: 0.0200, entryWindowPct: 0.0015, maxRiskPct: 0.0180 },
+  crypto: { pctBuffer: 0.0025, minRiskPct: 0.0030, atrMult: 0.90, maxDistPct: 0.0120, entryWindowPct: 0.0040, maxRiskPct: 0.0250 },
+  metal:  { pctBuffer: 0.0012, minRiskPct: 0.0018, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0120 },
+  forex:  { pctBuffer: 0.0005, minRiskPct: 0.0008, atrMult: 0.45, maxDistPct: 0.0035, entryWindowPct: 0.0015, maxRiskPct: 0.0080 },
+  index:  { pctBuffer: 0.0010, minRiskPct: 0.0015, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0150 },
+  stock:  { pctBuffer: 0.0015, minRiskPct: 0.0020, atrMult: 0.65, maxDistPct: 0.0080, entryWindowPct: 0.0030, maxRiskPct: 0.0180 },
 
 };
 
