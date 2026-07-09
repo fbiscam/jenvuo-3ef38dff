@@ -30,17 +30,11 @@ export const Route = createFileRoute("/jenvu-ops-x9k2/inbox")({
       { title: "Support Inbox — Admin" },
       { name: "robots", content: "noindex, nofollow" },
     ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap",
-      },
-    ],
   }),
   component: AdminInbox,
 });
 
-const FONT = { fontFamily: "'Roboto', ui-sans-serif, system-ui, sans-serif" } as const;
+
 
 type Session = {
   id: string;
