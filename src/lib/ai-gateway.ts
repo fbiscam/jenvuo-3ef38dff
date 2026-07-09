@@ -255,26 +255,19 @@ export const MODEL_CHAIN = {
   // Voice / intent detection — cheap, fast classifier.
   intent: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview"],
 
-  // Chart narration — deep ICT/SMC reasoning.
-  // Primary: Blackbox DeepSeek V4 Pro (~25x cheaper, GPT-4 class reasoning).
-  // Fallbacks: Lovable premium models guarantee identical quality if Blackbox errors.
+  // Chart narration — deep ICT/SMC reasoning via Lovable AI Gateway.
   narration: [
-    "blackboxai/deepseek/deepseek-v4-pro",
     "openai/gpt-5.4",
     "openai/gpt-5.4-mini",
     "google/gemini-3.5-flash",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict) — flagship reasoning models.
-  // Primary: GLM-5.2 (Zhipu frontier, GPT-5 class deep reasoning, ~$0.004/call).
-  // Fallback: DeepSeek V4 Pro, then Lovable premium if Blackbox is down.
+  // Senior 25-year-trader review (A / A+ verdict) — flagship reasoning.
   seniorReview: [
-    "blackboxai/z-ai/glm-5.2",
-    "blackboxai/deepseek/deepseek-v4-pro",
     "openai/gpt-5.5",
     "openai/gpt-5.4",
   ],
 
-  // Conversational chat around signals — free-tier Gemini models to keep voice queries near-zero cost.
+  // Conversational chat around signals — free-tier Gemini models.
   chat: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview", "google/gemini-2.5-flash-lite"],
 } as const;
