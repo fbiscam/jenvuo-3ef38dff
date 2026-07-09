@@ -262,11 +262,10 @@ export const MODEL_CHAIN = {
     "openai/gpt-5.4",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict) — flagship reasoning.
-  // Fallback also GPT-5.4 for consistent verdict quality.
+  // Senior 25-year-trader review (A / A+ verdict) — flagship reasoning on GPT-5.5.
   seniorReview: [
-    "openai/gpt-5.4",
-    "openai/gpt-5.4",
+    "openai/gpt-5.5",
+    "openai/gpt-5.5",
   ],
 
   // Conversational chat around signals — free-tier Gemini models.
