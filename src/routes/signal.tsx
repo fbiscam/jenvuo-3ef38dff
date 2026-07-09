@@ -678,6 +678,123 @@ function SignalPage() {
   const priceStr = plan && displayPrice != null ? `${plan.instrument.kind === "crypto" ? "" : "$"}${displayPrice.toFixed(plan.instrument.decimals)}` : "—";
 
 
+  // Broadcasted alert view (from notification click) — no AI, no credits.
+  if (alertId) {
+    return (
+      <div className="min-h-dvh w-full bg-[#F8FAFC] text-slate-900 font-['Inter',system-ui,sans-serif] antialiased">
+        <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+          <div className="mx-auto flex max-w-[900px] items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
+            <button
+              onClick={() => navigate({ to: "/app" })}
+              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Back
+            </button>
+            <div className="flex items-center gap-2.5">
+              <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded-md object-contain" />
+              <span className="font-semibold tracking-tight text-sm">Broadcasted Alert</span>
+            </div>
+            <button
+              onClick={() => navigate({ to: "/signal", search: { symbol: broadcastedAlert?.pair || "XAUUSD" }, replace: true })}
+              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 transition"
+              title="Run a fresh AI analysis (uses credits)"
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Fresh analysis
+            </button>
+          </div>
+        </header>
+
+        <main className="mx-auto max-w-[900px] px-5 py-8 sm:px-6">
+          {broadcastedLoading && (
+            <div className="flex items-center justify-center py-16 text-zinc-500">
+              <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading alert…
+            </div>
+          )}
+          {!broadcastedLoading && !broadcastedAlert && (
+            <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center">
+              <AlertTriangle className="mx-auto h-6 w-6 text-amber-500 mb-2" />
+              <p className="text-sm text-zinc-700 font-medium">Alert not available</p>
+              <p className="mt-1 text-[12px] text-zinc-500">It may have expired or you don't have access.</p>
+            </div>
+          )}
+          {broadcastedAlert && (
+            <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_4px_20px_-8px_rgba(0,0,0,0.08)] overflow-hidden">
+              <div className={cn(
+                "px-6 py-5 flex items-center justify-between border-b border-zinc-100",
+                broadcastedAlert.direction === "BUY" ? "bg-emerald-50/60" : "bg-red-50/60",
+              )}>
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "h-10 w-10 rounded-full flex items-center justify-center",
+                    broadcastedAlert.direction === "BUY" ? "bg-emerald-500 text-white" : "bg-red-500 text-white",
+                  )}>
+                    {broadcastedAlert.direction === "BUY" ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
+                  </div>
+                  <div>
+                    <div className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">{broadcastedAlert.pair}</div>
+                    <div className="text-lg font-bold text-zinc-900">
+                      {broadcastedAlert.direction} · Grade {broadcastedAlert.grade}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">Confidence</div>
+                  <div className="text-xl font-bold text-zinc-900">{broadcastedAlert.confidence}%</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 divide-x divide-zinc-100 border-b border-zinc-100">
+                {[
+                  { label: "Entry", value: broadcastedAlert.entry, tone: "text-zinc-900" },
+                  { label: "Stop Loss", value: broadcastedAlert.sl, tone: "text-red-600" },
+                  { label: "Take Profit", value: broadcastedAlert.tp, tone: "text-emerald-600" },
+                ].map((row) => (
+                  <div key={row.label} className="px-4 py-4 text-center">
+                    <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">{row.label}</div>
+                    <div className={cn(`${MONO} mt-1 text-base font-bold`, row.tone)}>{row.value}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-zinc-100 border-b border-zinc-100 text-[12px]">
+                <div className="px-4 py-3">
+                  <div className="text-[10px] uppercase tracking-wider text-zinc-500">R:R</div>
+                  <div className={`${MONO} mt-0.5 font-semibold text-zinc-900`}>1:{broadcastedAlert.rr.toFixed(2)}</div>
+                </div>
+                <div className="px-4 py-3">
+                  <div className="text-[10px] uppercase tracking-wider text-zinc-500">HTF Bias</div>
+                  <div className="mt-0.5 font-semibold text-zinc-900 capitalize">{broadcastedAlert.htf_bias || "—"}</div>
+                </div>
+                <div className="px-4 py-3">
+                  <div className="text-[10px] uppercase tracking-wider text-zinc-500">Session</div>
+                  <div className="mt-0.5 font-semibold text-zinc-900">{broadcastedAlert.session || "—"}</div>
+                </div>
+                <div className="px-4 py-3">
+                  <div className="text-[10px] uppercase tracking-wider text-zinc-500">Killzone</div>
+                  <div className="mt-0.5 font-semibold text-zinc-900">{broadcastedAlert.killzone || "—"}</div>
+                </div>
+              </div>
+
+              {broadcastedAlert.rationale && (
+                <div className="px-6 py-4 border-b border-zinc-100">
+                  <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold mb-1">Rationale</div>
+                  <p className="text-[13px] leading-relaxed text-zinc-700 whitespace-pre-wrap">{broadcastedAlert.rationale}</p>
+                </div>
+              )}
+
+              <div className="px-6 py-3 flex items-center justify-between text-[11px] text-zinc-500">
+                <span>Broadcasted {new Date(broadcastedAlert.fired_at).toLocaleString()}</span>
+                <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">
+                  <Check className="h-3 w-3" /> No credits used
+                </span>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-dvh w-full bg-[#F8FAFC] text-slate-900 font-['Inter',system-ui,sans-serif] antialiased">
       {/* HEADER */}
