@@ -7,7 +7,7 @@ export type NotificationRow = {
   type: string
   title: string
   body: string | null
-  data: Record<string, unknown>
+  data: Record<string, any>
   read_at: string | null
   created_at: string
 }
