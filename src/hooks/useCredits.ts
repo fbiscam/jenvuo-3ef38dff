@@ -1,8 +1,11 @@
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { getCreditState, spendCredits, CREDIT_COSTS, type CreditAction } from "@/lib/credits.functions";
 import { useAuthUser } from "./useAuthUser";
+import { supabase } from "@/integrations/supabase/client";
+
 
 export function useCredits() {
   const { user, loading: authLoading } = useAuthUser();
