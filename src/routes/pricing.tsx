@@ -332,7 +332,7 @@ function PricingPage() {
 
             <tbody>
               {([
-                { f: "Price", a: "Free", b: "$29/mo", c: "$99/mo", d: "Custom", isHeading: true },
+                { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "Custom", isHeading: true },
                 { f: "Signal scans / month", a: "5", b: "60", c: "180", d: "Custom" },
                 { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
