@@ -30,9 +30,18 @@ export const Route = createFileRoute("/jenvu-ops-x9k2/inbox")({
       { title: "Support Inbox — Admin" },
       { name: "robots", content: "noindex, nofollow" },
     ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap",
+      },
+    ],
   }),
   component: AdminInbox,
 });
+
+const SERIF = { fontFamily: "'Instrument Serif', ui-serif, Georgia, serif" } as const;
+const SANS = { fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif" } as const;
 
 type Session = {
   id: string;
