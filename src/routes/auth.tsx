@@ -18,7 +18,7 @@ import { registerTrustedDevice, verifyTrustedDevice } from "@/lib/trusted-device
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 
 
-type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string };
+type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string; mfa?: "1" };
 
 function sanitizeRedirect(r?: string): string {
   if (!r || typeof r !== "string") return "/dashboard";
@@ -32,16 +32,23 @@ export const Route = createFileRoute("/auth")({
     redirect: typeof search.redirect === "string" ? search.redirect : undefined,
     emailChanged: search.emailChanged === "1" ? "1" : undefined,
     newEmail: typeof search.newEmail === "string" ? search.newEmail : undefined,
+    mfa: search.mfa === "1" ? "1" : undefined,
   }),
   beforeLoad: async ({ search }) => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash || "";
       if (hash.includes("type=recovery") || hash.includes("error")) return;
       if (search.emailChanged === "1") return;
+      if (search.mfa === "1") return;
     }
 
     const { data } = await supabase.auth.getUser();
     if (data.user) {
+      // If MFA elevation is required but not yet completed, stay on /auth so
+      // the user can enter their 6-digit code — do NOT redirect to /dashboard,
+      // which would just bounce back here (redirect loop).
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aal && aal.currentLevel === "aal1" && aal.nextLevel === "aal2") return;
       throw redirect({ to: sanitizeRedirect(search.redirect) as "/dashboard" });
     }
   },
