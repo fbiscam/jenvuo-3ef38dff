@@ -74,6 +74,32 @@ function initials(name?: string | null, email?: string | null) {
   return (parts[0]?.[0] || "?").toUpperCase() + (parts[1]?.[0]?.toUpperCase() || "");
 }
 
+const AVATAR_PALETTE = [
+  "bg-gradient-to-br from-emerald-500 to-emerald-700",
+  "bg-gradient-to-br from-teal-500 to-teal-700",
+  "bg-gradient-to-br from-cyan-500 to-cyan-700",
+  "bg-gradient-to-br from-sky-500 to-sky-700",
+  "bg-gradient-to-br from-blue-500 to-blue-700",
+  "bg-gradient-to-br from-indigo-500 to-indigo-700",
+  "bg-gradient-to-br from-violet-500 to-violet-700",
+  "bg-gradient-to-br from-fuchsia-500 to-fuchsia-700",
+  "bg-gradient-to-br from-pink-500 to-pink-700",
+  "bg-gradient-to-br from-rose-500 to-rose-700",
+  "bg-gradient-to-br from-red-500 to-red-700",
+  "bg-gradient-to-br from-orange-500 to-orange-700",
+  "bg-gradient-to-br from-amber-500 to-amber-700",
+  "bg-gradient-to-br from-lime-600 to-lime-800",
+  "bg-gradient-to-br from-green-500 to-green-700",
+];
+
+function avatarColor(name?: string | null, email?: string | null) {
+  const src = (email || name || "?").toLowerCase().trim();
+  let h = 0;
+  for (let i = 0; i < src.length; i++) h = (h * 31 + src.charCodeAt(i)) >>> 0;
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+}
+
+
 function timeAgo(iso: string) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (s < 60) return `${s}s`;
