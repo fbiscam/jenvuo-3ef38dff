@@ -114,7 +114,7 @@ export const spendCredits = createServerFn({ method: "POST" })
         _user_agent: userAgent,
         _request_ip: requestIp,
         _metadata: { ...meta, error: error.message } as any,
-      });
+      } as any);
       if (error.message?.includes("INSUFFICIENT_CREDITS")) {
         throw new Error("INSUFFICIENT_CREDITS");
       }
