@@ -154,7 +154,7 @@ function ReferralsPage() {
         <div className="rounded-xl border border-zinc-200 bg-white p-5">
           <h2 className="text-sm font-semibold text-zinc-900">Have a friend's code?</h2>
           <p className="mt-1 text-xs text-zinc-500">
-            Enter it before upgrading to earn 50 bonus scans.
+            Enter it before upgrading to earn 17 bonus scans.
           </p>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <input
