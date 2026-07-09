@@ -54,12 +54,14 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+export type UsageInfo = { promptTokens: number; completionTokens: number; totalTokens: number };
+
 async function singleAttempt(
   model: string,
   opts: CallChatOptions,
   apiKey: string,
   timeoutMs: number,
-): Promise<string> {
+): Promise<{ content: string; usage: UsageInfo }> {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
   const body: Record<string, unknown> = {
@@ -115,13 +117,19 @@ async function singleAttempt(
   if (typeof content !== "string" || !content.length) {
     throw new AiGatewayError("AI returned empty response.", 0, false);
   }
-  return content;
+  const u = json?.usage ?? {};
+  const usage: UsageInfo = {
+    promptTokens: Number(u.prompt_tokens ?? u.promptTokens ?? 0) || 0,
+    completionTokens: Number(u.completion_tokens ?? u.completionTokens ?? 0) || 0,
+    totalTokens: Number(u.total_tokens ?? u.totalTokens ?? 0) || 0,
+  };
+  return { content, usage };
 }
 
 
-// Main entrypoint. Returns raw assistant content string.
+// Main entrypoint. Returns raw assistant content string plus model/usage.
 // Throws AiGatewayError with `terminal` flag on final failure.
-export async function callChatCompletion(opts: CallChatOptions): Promise<{ content: string; model: string }> {
+export async function callChatCompletion(opts: CallChatOptions): Promise<{ content: string; model: string; usage: UsageInfo }> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new AiGatewayError("LOVABLE_API_KEY missing on server", 0, true);
 
@@ -136,24 +144,18 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
   for (const model of models) {
     for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
       try {
-        const content = await singleAttempt(model, opts, apiKey, timeoutMs);
-        return { content, model };
+        const { content, usage } = await singleAttempt(model, opts, apiKey, timeoutMs);
+        return { content, model, usage };
       } catch (err) {
         lastErr = err instanceof AiGatewayError
           ? err
           : new AiGatewayError(String((err as any)?.message ?? err), 0, false);
 
-        // Terminal (400 / 402 / missing key) → do not retry, do not fall back.
         if (lastErr.terminal) throw lastErr;
-
-        // Retryable but this was the last try for this model → break to fallback.
         if (attempt === retriesPerModel) break;
-
-        // Backoff: 500ms, 1s, 2s
         await sleep(500 * Math.pow(2, attempt - 1));
       }
     }
-    // Fall through to next model in the chain.
   }
 
   throw lastErr ?? new AiGatewayError("AI call failed with no error captured", 0, false);

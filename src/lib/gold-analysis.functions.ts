@@ -529,13 +529,13 @@ function isTradingSetupIntent(q: string): boolean {
   return /\b(analyze|analysis|setup|signal|entry|stop\s*loss|take\s*profit|\btp\b|\bsl\b|order\s*block|fvg|liquidity|bos|choch|killzone|scalp|swing\s+trade|give\s+me\s+(a|the)\s+trade|find\s+(a|me)\s+trade|best\s+trade|any\s+trade|trade\s+idea|trade\s+plan|a\+\s*setup|xauusd|xaueur|xaugbp|xaujpy|xauaud|xauchf)\b/i.test(n);
 }
 
-async function _analyzeGoldCompute(data: { timeframe: string; query: string }): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
+async function _analyzeGoldCompute(data: { timeframe: string; query: string }, __userId: string | null = null): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
     const wantsTradingSetup = isTradingSetupIntent(data.query);
     if (wantsTradingSetup) {
       try {
-        const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) });
+        const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) }, __userId);
         const dec = plan.instrument.decimals;
         const prefix = plan.instrument.kind === "crypto" ? "" : "$";
         const fmt = (n?: number) => typeof n === "number" && isFinite(n) ? `${prefix}${n.toFixed(dec)}` : "-";
@@ -644,7 +644,7 @@ ${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fi
 
 ${isTradingIntent ? "User wants trading view but live feed offline — answer conversationally, set direction='WAIT', confidence<=40, mention feed offline in fullAnalysis." : "User is just chatting — answer naturally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty."}`;
 
-    const { content } = await callChatCompletion({
+    const { content, model: __aiModel, usage: __aiUsage } = await callChatCompletion({
       models: [...MODEL_CHAIN.chat],
       messages: [
         { role: "system", content: system },
@@ -658,6 +658,7 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
       if (err instanceof AiGatewayError) throw new Error(err.message);
       throw err;
     });
+    import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "chat-signal", model: __aiModel, usage: __aiUsage })).catch(() => {});
     const parsed: any = tryParseJsonLoose(content);
 
     const signal: GoldSignal = {
@@ -748,7 +749,7 @@ export const analyzeGold = createServerFn({ method: "POST" })
     }
 
     // Unified pricing: every action = 1 credit (signal, chat, narration, voice).
-    const result = await _analyzeGoldCompute(data);
+    const result = await _analyzeGoldCompute(data, context.userId);
     const cost = 1;
     await _spendUserCredits(context.userId, cost, result.__billable === "signal" ? "signal" : "chat");
     // Strip internal billing marker before returning to the client.
@@ -1491,7 +1492,7 @@ function buildFeedFallbackPlan(args: {
   };
 }
 
-export async function computeSignalPlan(data: { symbol: string }): Promise<SignalPlan> {
+export async function computeSignalPlan(data: { symbol: string }, __userId: string | null = null): Promise<SignalPlan> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
     const inst = resolveInstrument(data.symbol);
@@ -1684,7 +1685,7 @@ ${fmt(ltfPrompt)}
 
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
-    const { content } = await callChatCompletion({
+    const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
       models: [...MODEL_CHAIN.narration],
       messages: [
         { role: "system", content: system },
@@ -1699,6 +1700,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       if (err instanceof AiGatewayError) throw new Error(err.message);
       throw err;
     });
+    import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
     const parsed: any = tryParseJsonLoose(content) || {};
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
@@ -1928,7 +1930,7 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
 VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only for true A+ institutional setups.`;
 
-        const { content: rc } = await callChatCompletion({
+        const { content: rc, model: __aiModel3, usage: __aiUsage3 } = await callChatCompletion({
           models: [...MODEL_CHAIN.seniorReview],
           messages: [
             { role: "system", content: reviewSystem },
@@ -1941,6 +1943,7 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           retriesPerModel: 2,
           stage: "senior-review",
         });
+        import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: __aiModel3, usage: __aiUsage3 })).catch(() => {});
         const review: any = tryParseJsonLoose(rc) || {};
         const verdict = String(review.verdict || "").toUpperCase();
         if (verdict === "VETO") {
@@ -2289,7 +2292,7 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     }
 
     await _spendUserCredits(context.userId, 1, "ict_narration");
-    const plan = await computeSignalPlan({ symbol: data.symbol });
+    const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId);
     setCachedPlan(cacheKey, plan);
     return plan;
   });
