@@ -351,14 +351,14 @@ function AdminInbox() {
             <Shortcut k="/" label="Search" />
           </ul>
 
-          <div className="mt-auto overflow-hidden rounded-xl border border-black/5 bg-gradient-to-br from-zinc-900 to-black p-3.5 text-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)]">
+          <div className="mt-auto overflow-hidden rounded-xl border border-black/10 bg-white p-3.5 text-black shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_30px_-15px_rgba(0,0,0,0.15)]">
             <div className="flex items-center gap-1.5 text-[13px] font-semibold">
-              <span className="grid h-5 w-5 place-items-center rounded-md bg-white/10 ring-1 ring-white/15">
-                <Zap className="h-3 w-3 text-amber-300" />
+              <span className="grid h-5 w-5 place-items-center rounded-md bg-black/5 ring-1 ring-black/10">
+                <Zap className="h-3 w-3 text-black" />
               </span>
               {counts.unreadMsgs} unread msgs
             </div>
-            <div className="mt-1 text-[11.5px] font-medium text-white/60">across {counts.unread} threads</div>
+            <div className="mt-1 text-[11.5px] font-medium text-black/70">across {counts.unread} threads</div>
           </div>
         </nav>
 
