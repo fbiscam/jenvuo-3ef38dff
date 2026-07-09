@@ -268,7 +268,7 @@ function PricingPage() {
               <col className={`w-[18%] ${currentPlan === "free" ? "bg-emerald-50/50" : ""}`} />
               <col className={`w-[18%] ${currentPlan === "pro" ? "bg-emerald-50/50" : "bg-amber-50/40"}`} />
               <col className={`w-[18%] ${currentPlan === "elite" ? "bg-emerald-50/50" : ""}`} />
-              <col className={`w-[18%] ${currentPlan === "custom" ? "bg-emerald-50/50" : ""}`} />
+              <col className={`w-[18%] ${currentPlan === "ultra" ? "bg-emerald-50/50" : ""}`} />
             </colgroup>
 
             <thead>
@@ -280,7 +280,7 @@ function PricingPage() {
                   { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false, key: "free" },
                   { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
                   { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
-                  { name: "Custom", price: "Let's talk", tag: "Fund", to: "/contact" as const, cta: "Contact", dark: false, key: "custom" },
+                  { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", to: "/contact" as const, cta: "Talk to sales", dark: false, key: "ultra" },
                 ].map((p) => {
                   const isCurrent = currentPlan === p.key;
                   return (
@@ -332,8 +332,8 @@ function PricingPage() {
 
             <tbody>
               {([
-                { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "Custom", isHeading: true },
-                { f: "Signal scans / month", a: "5", b: "60", c: "180", d: "Custom" },
+                { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
+                { f: "Signal scans / month", a: "5", b: "60", c: "180", d: "400" },
                 { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
                 { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
@@ -365,7 +365,7 @@ function PricingPage() {
                     </div>
                   </td>
                   {[row.a, row.b, row.c, row.d].map((v, i) => {
-                    const colKey = (["free", "pro", "elite", "custom"] as const)[i];
+                    const colKey = (["free", "pro", "elite", "ultra"] as const)[i];
                     const isCurrentCol = currentPlan === colKey;
                     return (
                     <td
