@@ -448,7 +448,7 @@ function AdminInbox() {
                           <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-zinc-900" />
                         )}
                         <div className="relative mt-0.5 shrink-0">
-                          <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-zinc-800 to-black text-[10.5px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
+                          <div className={`grid h-8 w-8 place-items-center rounded-lg ${avatarColor(s.guest_name, s.guest_email)} text-[10.5px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10`}>
                             {initials(s.guest_name, s.guest_email)}
                           </div>
                           <span
