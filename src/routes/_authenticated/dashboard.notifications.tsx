@@ -90,6 +90,7 @@ function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selectionMode, setSelectionMode] = useState(false);
 
   const load = useCallback(async () => {
     try {
