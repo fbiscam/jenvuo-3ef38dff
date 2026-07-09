@@ -476,34 +476,36 @@ function AdminInbox() {
         </aside>
 
         {/* Right — conversation */}
-        <section className={`flex flex-1 flex-col bg-white ${activeId ? "flex" : "hidden md:flex"}`}>
+        <section className={`flex flex-1 flex-col bg-white/40 backdrop-blur-sm ${activeId ? "flex" : "hidden md:flex"}`}>
           {!activeSession ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-              <div className="grid h-12 w-12 place-items-center rounded-full bg-zinc-100">
-                <Inbox className="h-5 w-5 text-zinc-400" />
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+              <div className="relative grid h-16 w-16 place-items-center rounded-2xl bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_20px_40px_-20px_rgba(0,0,0,0.2)] ring-1 ring-black/5">
+                <Inbox className="h-6 w-6 text-zinc-400" />
+                <span className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/60 to-transparent" />
               </div>
-              <p className="text-[13px] font-medium text-zinc-800">Select a conversation</p>
-              <p className="max-w-xs text-[11.5px] text-zinc-500">
+              <p className="text-[14px] font-semibold tracking-tight text-zinc-900">Select a conversation</p>
+              <p className="max-w-xs text-[12px] leading-relaxed text-zinc-500">
                 Use <Kbd>J</Kbd> / <Kbd>K</Kbd> to navigate, <Kbd>R</Kbd> to reply, <Kbd>E</Kbd> to close.
               </p>
             </div>
           ) : (
             <>
               {/* Thread header */}
-              <div className="flex h-11 shrink-0 items-center gap-2 border-b border-zinc-200 px-3">
+              <div className="flex h-14 shrink-0 items-center gap-3 border-b border-zinc-900/[0.06] bg-white/70 px-4 backdrop-blur-xl">
                 <button
                   onClick={() => setActiveId(null)}
-                  className="grid h-7 w-7 place-items-center rounded-md text-zinc-600 hover:bg-zinc-100 md:hidden"
+                  className="grid h-8 w-8 place-items-center rounded-lg text-zinc-600 hover:bg-zinc-100 md:hidden"
                   aria-label="Back"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-zinc-900 to-black text-[10px] font-semibold text-white">
+                <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-zinc-800 to-black text-[11px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
                   {initials(activeSession.guest_name, activeSession.guest_email)}
+                  <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${activeSession.status === "open" ? "bg-emerald-500" : "bg-zinc-300"}`} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="truncate text-[13px] font-semibold">
+                    <span className="truncate text-[14px] font-semibold tracking-tight">
                       {activeSession.guest_name || "Anonymous visitor"}
                     </span>
                     <Chip
@@ -517,13 +519,13 @@ function AdminInbox() {
                     {activeSession.guest_email ? (
                       <button
                         onClick={() => copyEmail(activeSession.guest_email!)}
-                        className="flex items-center gap-1 truncate transition hover:text-zinc-900"
+                        className="group flex items-center gap-1 truncate transition hover:text-zinc-900"
                         title="Copy email"
                       >
                         <Mail className="h-3 w-3" />
                         <span className="truncate">{activeSession.guest_email}</span>
                         {copied ? (
-                          <CheckCircle2 className="h-3 w-3 text-black" />
+                          <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                         ) : (
                           <Copy className="h-3 w-3 opacity-0 transition group-hover:opacity-100" />
                         )}
@@ -543,14 +545,14 @@ function AdminInbox() {
                   {activeSession.status === "open" ? (
                     <button
                       onClick={handleClose}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 px-2.5 py-1 text-[11.5px] font-medium text-zinc-700 transition hover:bg-zinc-50"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-white px-2.5 py-1.5 text-[12px] font-medium text-zinc-700 shadow-sm transition hover:border-zinc-900 hover:bg-zinc-900 hover:text-white"
                       title="Close (E)"
                     >
                       <Archive className="h-3 w-3" /> Close
                       <Kbd className="ml-1">E</Kbd>
                     </button>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2.5 py-1 text-[11.5px] font-medium text-zinc-600">
+                    <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-[12px] font-medium text-zinc-600">
                       <CheckCircle2 className="h-3 w-3" /> Closed
                     </span>
                   )}
@@ -558,8 +560,8 @@ function AdminInbox() {
               </div>
 
               {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gradient-to-b bg-white">
-                <div className="mx-auto max-w-3xl space-y-1 p-4">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto">
+                <div className="mx-auto max-w-3xl space-y-1 p-5">
                   {messages.length === 0 && (
                     <div className="py-8 text-center text-[11.5px] text-zinc-500">No messages yet.</div>
                   )}
@@ -569,10 +571,10 @@ function AdminInbox() {
                     const showHeader = !prev || prev.sender !== m.sender ||
                       new Date(m.created_at).getTime() - new Date(prev.created_at).getTime() > 5 * 60 * 1000;
                     return (
-                      <div key={m.id} className={showHeader ? "pt-3" : ""}>
+                      <div key={m.id} className={showHeader ? "pt-4" : ""}>
                         {showHeader && (
-                          <div className={`mb-1 flex items-center gap-1.5 text-[10.5px] ${isAdminMsg ? "justify-end" : ""}`}>
-                            <span className="font-semibold text-zinc-700">
+                          <div className={`mb-1.5 flex items-center gap-1.5 text-[10.5px] ${isAdminMsg ? "justify-end" : ""}`}>
+                            <span className="font-semibold tracking-tight text-zinc-700">
                               {isAdminMsg ? username || "You" : activeSession.guest_name || "Visitor"}
                             </span>
                             <span className="text-zinc-400">
@@ -582,10 +584,10 @@ function AdminInbox() {
                         )}
                         <div className={`flex ${isAdminMsg ? "justify-end" : "justify-start"}`}>
                           <div
-                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-lg px-3 py-2 text-[13px] leading-relaxed ${
+                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed ${
                               isAdminMsg
-                                ? "bg-gradient-to-br from-black to-zinc-800 text-white shadow-sm shadow-black/20"
-                                : "border border-zinc-200 bg-white text-zinc-900 shadow-sm"
+                                ? "rounded-br-md bg-gradient-to-br from-zinc-800 to-black text-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.3)] ring-1 ring-black/20"
+                                : "rounded-bl-md border border-zinc-900/[0.06] bg-white text-zinc-900 shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
                             }`}
                           >
                             {m.content}
