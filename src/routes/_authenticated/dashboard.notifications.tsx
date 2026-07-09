@@ -178,6 +178,11 @@ function NotificationsPage() {
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
 
   const toggleSelectAll = () => {
+    if (!selectionMode) {
+      setSelectionMode(true);
+      setSelected(new Set(visibleIds));
+      return;
+    }
     setSelected((prev) => {
       if (allSelected) {
         const next = new Set(prev);
@@ -190,7 +195,10 @@ function NotificationsPage() {
     });
   };
 
-  const clearSelection = () => setSelected(new Set());
+  const clearSelection = () => {
+    setSelected(new Set());
+    setSelectionMode(false);
+  };
 
   const deleteOne = async (id: string) => {
     setItems((prev) => prev.filter((it) => it.id !== id));
