@@ -529,7 +529,7 @@ function CustomTopUp() {
         <div>
           <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Custom top-up</span>
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. Every $1 = 8 credits. Credits never expire.</p>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. Every $1 = 3 scans. Scans never expire.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center rounded-md border border-zinc-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-amber-400">
