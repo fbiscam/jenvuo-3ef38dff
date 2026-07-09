@@ -70,20 +70,70 @@ export const spendCredits = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const amount = CREDIT_COSTS[data.action];
+    const meta = (data.metadata ?? {}) as Record<string, unknown>;
+    const scanId = typeof meta.scanId === "string" ? meta.scanId : null;
+    const symbol = typeof meta.symbol === "string" ? meta.symbol : null;
+    const caller = typeof meta.caller === "string" ? meta.caller : "credits.spend";
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Best-effort request context
+    let userAgent: string | null = null;
+    let requestIp: string | null = null;
+    try {
+      const mod: any = await import("@tanstack/react-start/server");
+      const getRequestHeader = mod.getRequestHeader as ((n: string) => string | undefined) | undefined;
+      if (getRequestHeader) {
+        userAgent = getRequestHeader("user-agent") ?? null;
+        requestIp =
+          getRequestHeader("cf-connecting-ip") ??
+          getRequestHeader("x-forwarded-for") ??
+          null;
+      }
+    } catch {
+      /* noop */
+    }
+
     const { data: newBalance, error } = await supabaseAdmin.rpc("spend_credits", {
       _user_id: userId,
       _amount: amount,
       _reason: data.action,
-      _metadata: (data.metadata ?? {}) as any,
+      _metadata: meta as any,
     });
 
     if (error) {
+      await supabaseAdmin.rpc("log_charge_audit", {
+        _user_id: userId,
+        _reason: data.action,
+        _amount: 0,
+        _balance_after: null,
+        _source: "server_spend_failed",
+        _caller: caller,
+        _scan_id: scanId,
+        _symbol: symbol,
+        _user_agent: userAgent,
+        _request_ip: requestIp,
+        _metadata: { ...meta, error: error.message } as any,
+      });
       if (error.message?.includes("INSUFFICIENT_CREDITS")) {
         throw new Error("INSUFFICIENT_CREDITS");
       }
       throw new Error(error.message);
     }
+
+    await supabaseAdmin.rpc("log_charge_audit", {
+      _user_id: userId,
+      _reason: data.action,
+      _amount: amount,
+      _balance_after: newBalance as number,
+      _source: "server_spend",
+      _caller: caller,
+      _scan_id: scanId,
+      _symbol: symbol,
+      _user_agent: userAgent,
+      _request_ip: requestIp,
+      _metadata: meta as any,
+    });
+
     return { balance: newBalance as number, spent: amount };
   });
