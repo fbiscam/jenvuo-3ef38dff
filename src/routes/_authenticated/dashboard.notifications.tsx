@@ -16,12 +16,15 @@ import {
   TrendingDown,
   Info,
   Inbox,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   listNotifications,
   markNotificationRead,
   markAllNotificationsRead,
+  deleteNotification,
+  deleteNotifications,
   type NotificationRow,
 } from "@/lib/notifications.functions";
 
@@ -80,10 +83,13 @@ function NotificationsPage() {
   const listFn = useServerFn(listNotifications);
   const markFn = useServerFn(markNotificationRead);
   const markAllFn = useServerFn(markAllNotificationsRead);
+  const deleteOneFn = useServerFn(deleteNotification);
+  const deleteManyFn = useServerFn(deleteNotifications);
 
   const [items, setItems] = useState<NotificationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     try {
@@ -158,6 +164,52 @@ function NotificationsPage() {
     await markAllFn();
   };
 
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const visibleIds = useMemo(() => filtered.map((n) => n.id), [filtered]);
+  const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
+
+  const toggleSelectAll = () => {
+    setSelected((prev) => {
+      if (allSelected) {
+        const next = new Set(prev);
+        for (const id of visibleIds) next.delete(id);
+        return next;
+      }
+      const next = new Set(prev);
+      for (const id of visibleIds) next.add(id);
+      return next;
+    });
+  };
+
+  const clearSelection = () => setSelected(new Set());
+
+  const deleteOne = async (id: string) => {
+    setItems((prev) => prev.filter((it) => it.id !== id));
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    await deleteOneFn({ data: { id } });
+  };
+
+  const deleteSelected = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (!confirm(`Delete ${ids.length} notification${ids.length > 1 ? "s" : ""}?`)) return;
+    setItems((prev) => prev.filter((it) => !selected.has(it.id)));
+    clearSelection();
+    await deleteManyFn({ data: { ids } });
+  };
+
   const filters: Array<{ key: Filter; label: string }> = [
     { key: "all", label: "All" },
     { key: "unread", label: `Unread${unreadCount ? ` (${unreadCount})` : ""}` },
@@ -190,15 +242,39 @@ function NotificationsPage() {
           ))}
         </div>
 
-        <button
-          onClick={markAll}
-          disabled={unreadCount === 0}
-          className="shrink-0 inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-zinc-200 bg-white text-[11px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-        >
-          <CheckCheck className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Mark all read</span>
-        </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {filtered.length > 0 && (
+            <label className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-zinc-200 bg-white text-[11px] font-medium text-zinc-700 hover:bg-zinc-50 cursor-pointer transition">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleSelectAll}
+                className="h-3 w-3 accent-zinc-900"
+              />
+              <span className="hidden sm:inline">Select all</span>
+            </label>
+          )}
+          {selected.size > 0 && (
+            <button
+              onClick={deleteSelected}
+              className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-red-200 bg-red-50 text-[11px] font-medium text-red-600 hover:bg-red-100 transition"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete ({selected.size})
+            </button>
+          )}
+          <button
+            onClick={markAll}
+            disabled={unreadCount === 0}
+            className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-zinc-200 bg-white text-[11px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+          >
+            <CheckCheck className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Mark all read</span>
+          </button>
+        </div>
       </div>
+
+
 
 
       {/* Content */}
@@ -245,6 +321,23 @@ function NotificationsPage() {
                         )}
                       >
                         <div
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleSelect(n.id);
+                          }}
+                          className="shrink-0 flex items-center pt-1.5"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selected.has(n.id)}
+                            onChange={() => toggleSelect(n.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-3.5 w-3.5 accent-zinc-900 cursor-pointer"
+                            aria-label="Select notification"
+                          />
+                        </div>
+                        <div
                           className={cn(
                             "shrink-0 h-9 w-9 rounded-full flex items-center justify-center",
                             v.wrap,
@@ -253,44 +346,57 @@ function NotificationsPage() {
                           <v.Icon className="h-4 w-4" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-start gap-2">
                             <p
                               className={cn(
-                                "text-[13px] leading-tight truncate",
+                                "text-[13px] leading-tight truncate flex-1 min-w-0",
                                 isUnread ? "font-semibold text-zinc-900" : "font-medium text-zinc-800",
                               )}
                             >
                               {n.title}
                             </p>
-                            {isUnread && (
-                              <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-blue-500" aria-hidden />
-                            )}
+                            <div className="shrink-0 flex items-center gap-1.5 text-[10px] text-zinc-400 pt-0.5">
+                              {isUnread && (
+                                <span className="h-1.5 w-1.5 rounded-full bg-blue-500" aria-hidden />
+                              )}
+                              <span className="inline-flex items-center gap-1">
+                                <Bell className="h-2.5 w-2.5" />
+                                <span className="hidden sm:inline">{v.label}</span>
+                              </span>
+                              <span>·</span>
+                              <span>{timeAgo(n.created_at)}</span>
+                            </div>
                           </div>
                           {n.body && (
                             <p className="mt-0.5 text-[12px] text-zinc-500 line-clamp-2">{n.body}</p>
                           )}
-                          <div className="mt-1 flex items-center gap-2 text-[10px] text-zinc-400">
-                            <span className="inline-flex items-center gap-1">
-                              <Bell className="h-2.5 w-2.5" />
-                              {v.label}
-                            </span>
-                            <span>·</span>
-                            <span>{timeAgo(n.created_at)}</span>
-                          </div>
                         </div>
-                        {isUnread && (
+                        <div className="shrink-0 flex items-center gap-0.5 self-center">
+                          {isUnread && (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                markOne(n.id);
+                              }}
+                              className="opacity-0 group-hover:opacity-100 h-7 w-7 rounded-md hover:bg-zinc-100 flex items-center justify-center text-zinc-500 transition"
+                              title="Mark as read"
+                            >
+                              <Check className="h-3.5 w-3.5" />
+                            </button>
+                          )}
                           <button
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              markOne(n.id);
+                              deleteOne(n.id);
                             }}
-                            className="opacity-0 group-hover:opacity-100 shrink-0 h-7 w-7 rounded-md hover:bg-zinc-100 flex items-center justify-center text-zinc-500 transition"
-                            title="Mark as read"
+                            className="opacity-0 group-hover:opacity-100 h-7 w-7 rounded-md hover:bg-red-50 flex items-center justify-center text-zinc-500 hover:text-red-600 transition"
+                            title="Delete"
                           >
-                            <Check className="h-3.5 w-3.5" />
+                            <Trash2 className="h-3.5 w-3.5" />
                           </button>
-                        )}
+                        </div>
                       </Link>
                     );
                   })}

@@ -83,3 +83,29 @@ export const createUserNotification = createServerFn({ method: 'POST' })
     })
     return { ok: true }
   })
+
+export const deleteNotification = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await context.supabase
+      .from('user_notifications')
+      .delete()
+      .eq('id', data.id)
+      .eq('user_id', context.userId)
+    return { ok: true }
+  })
+
+export const deleteNotifications = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).min(1).max(200) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await context.supabase
+      .from('user_notifications')
+      .delete()
+      .in('id', data.ids)
+      .eq('user_id', context.userId)
+    return { ok: true }
+  })
