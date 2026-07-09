@@ -101,9 +101,10 @@ export default function NotificationBell() {
       <button
         onClick={onOpen}
         aria-label="Notifications"
-        className="relative inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent text-zinc-700 hover:bg-zinc-100/50"
+        className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-transparent text-zinc-700 transition-colors hover:bg-zinc-100/60"
       >
         <Bell className="h-4 w-4" />
+
         {unread > 0 && (
           <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
             {unread > 9 ? "9+" : unread}
