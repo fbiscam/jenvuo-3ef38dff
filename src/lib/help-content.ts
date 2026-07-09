@@ -353,7 +353,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Pro — $15 / month" },
           { type: "ul", items: [
-            "60 signal scans per month.",
+            "35 signal scans per month.",
             "Unlimited voice queries.",
             "Full signal engine on all supported XAU cross-pairs.",
             "Realtime A+ email & push alerts (no delay).",
