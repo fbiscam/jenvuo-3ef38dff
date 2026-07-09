@@ -793,7 +793,7 @@ export const analyzeGold = createServerFn({ method: "POST" })
     void _billable;
 
     // Cache actionable signals (BUY/SELL with real entry+SL)
-    if (__billable === "signal" && (clean.direction === "BUY" || clean.direction === "SELL")) {
+    if (_billable === "signal" && (clean.direction === "BUY" || clean.direction === "SELL")) {
       const entryPx = parsePx(clean.entry);
       const slPx = parsePx(clean.stopLoss);
       if (isFinite(entryPx) && isFinite(slPx)) {
