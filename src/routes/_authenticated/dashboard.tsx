@@ -459,6 +459,31 @@ function DashboardLayout() {
     return window.localStorage.getItem(lsKey(tab)) ?? new Date(0).toISOString();
   }, [lsKey]);
 
+  const markTabSeen = useCallback((countKey?: string) => {
+    if (!countKey || typeof window === "undefined") return;
+    const map: Record<string, "saved" | "alerts" | "journal"> = {
+      saved: "saved",
+      alerts7d: "alerts",
+      journalTotal: "journal",
+    };
+    const tab = map[countKey];
+    if (!tab) return;
+    window.localStorage.setItem(lsKey(tab), new Date().toISOString());
+    setNewCounts((prev) => ({ ...prev, [countKey]: 0 } as typeof prev));
+  }, [lsKey]);
+
+  // Auto-mark ALL count-carrying tabs as seen the moment the user lands anywhere
+  // in the dashboard, so badges do not reappear once they've been noticed once.
+  // This MUST run before the fetch below writes fresh counts.
+  useEffect(() => {
+    if (authLoading || !authUser || typeof window === "undefined") return;
+    const now = new Date().toISOString();
+    for (const tab of ["saved", "alerts", "journal"] as const) {
+      window.localStorage.setItem(lsKey(tab), now);
+    }
+    setNewCounts({ saved: 0, alerts7d: 0, journalTotal: 0 });
+  }, [pathname, authUser?.id, authLoading, lsKey]);
+
   useEffect(() => {
     if (authLoading || !authUser) return;
     let cancelled = false;
@@ -475,26 +500,9 @@ function DashboardLayout() {
       setNewCounts({ saved: s.count ?? 0, alerts7d: a.count ?? 0, journalTotal: j.count ?? 0 });
     })();
     return () => { cancelled = true; };
-  }, [authUser?.id, authLoading, getLastSeen]);
+  }, [authUser?.id, authLoading, getLastSeen, pathname]);
 
-  const markTabSeen = useCallback((countKey?: string) => {
-    if (!countKey || typeof window === "undefined") return;
-    const map: Record<string, "saved" | "alerts" | "journal"> = {
-      saved: "saved",
-      alerts7d: "alerts",
-      journalTotal: "journal",
-    };
-    const tab = map[countKey];
-    if (!tab) return;
-    window.localStorage.setItem(lsKey(tab), new Date().toISOString());
-    setNewCounts((prev) => ({ ...prev, [countKey]: 0 } as typeof prev));
-  }, [lsKey]);
 
-  // Auto-mark ALL count-carrying tabs as seen the moment the user lands anywhere
-  // in the dashboard, so badges do not reappear once they've been noticed once.
-  useEffect(() => {
-    for (const t of TABS) if (t.countKey) markTabSeen(t.countKey);
-  }, [pathname, markTabSeen]);
 
 
   const openSymbols = useMemo(
