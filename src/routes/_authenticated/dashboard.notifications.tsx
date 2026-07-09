@@ -173,17 +173,8 @@ function NotificationsPage() {
     <div className="max-w-3xl">
       {/* Header */}
       <div className="flex items-center justify-between gap-3 mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="h-9 w-9 rounded-full bg-zinc-900 text-white flex items-center justify-center">
-            <BellRing className="h-4 w-4" />
-          </div>
-          <div>
-            <h1 className="text-[15px] font-semibold text-zinc-900 leading-tight">Notifications</h1>
-            <p className="text-[11px] text-zinc-500">
-              {unreadCount > 0 ? `${unreadCount} unread` : "You're all caught up"}
-            </p>
-          </div>
-        </div>
+        <div />
+
         <button
           onClick={markAll}
           disabled={unreadCount === 0}
