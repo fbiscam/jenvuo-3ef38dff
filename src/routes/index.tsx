@@ -765,7 +765,7 @@ function HomePage() {
                   { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
                   
                   { f: "Custom alert rules", a: false, b: false, c: true, d: true },
-                  { f: "Dedicated onboarding", a: false, b: false, c: false, d: true },
+                  
                   { f: "Priority desk support", a: false, b: false, c: false, d: true },
                 ] as ReadonlyArray<{ f: string; a: string | boolean; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
                   <tr
