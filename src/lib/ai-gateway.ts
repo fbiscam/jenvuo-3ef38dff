@@ -54,14 +54,6 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-// Map our OpenRouter-style model IDs to what Blackbox expects.
-// Blackbox uses plain names (e.g. "gpt-5.4", "gemini-2.5-pro") without the
-// vendor prefix. Override per-model with BLACKBOX_MODEL_MAP if needed.
-function mapModelForBlackbox(model: string): string {
-  // Strip known vendor prefixes.
-  return model.replace(/^openai\//i, "").replace(/^google\//i, "");
-}
-
 async function singleAttempt(
   model: string,
   opts: CallChatOptions,
@@ -70,29 +62,29 @@ async function singleAttempt(
 ): Promise<string> {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
-  const bxModel = mapModelForBlackbox(model);
   const body: Record<string, unknown> = {
-    model: bxModel,
+    model,
     messages: opts.messages,
   };
   if (opts.jsonMode) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
-    // GPT-5 family requires max_completion_tokens instead of max_tokens
-    if (bxModel.startsWith("gpt-5")) {
+    if (model.startsWith("openai/gpt-5")) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  // Blackbox does not use service_tier priority — omit it.
+  if (opts.priority && PRIORITY_TIER_MODELS.has(model)) {
+    body.service_tier = "priority";
+  }
 
   let res: Response;
   try {
-    res = await fetch("https://api.blackbox.ai/chat/completions", {
+    res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        "Lovable-API-Key": apiKey,
       },
       body: JSON.stringify(body),
       signal: controller.signal,
@@ -108,12 +100,11 @@ async function singleAttempt(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    // 429 & 5xx = retryable. 402 (credits) & 400 (bad request) = terminal.
     const terminal = !(res.status === 429 || res.status >= 500);
     let msg: string;
     if (res.status === 429) msg = "AI is rate-limited right now. Please retry in a moment.";
-    else if (res.status === 402) msg = "Blackbox credits exhausted. Please top up your Blackbox account.";
-    else if (res.status === 401) msg = "Blackbox API key rejected. Please update BLACKBOX_API_KEY.";
+    else if (res.status === 402) msg = "Lovable AI credits exhausted. Please top up your workspace.";
+    else if (res.status === 401) msg = "Lovable AI key rejected. Please contact support.";
     else if (res.status === 400) msg = `AI request rejected: ${txt.slice(0, 200)}`;
     else msg = `AI error ${res.status}: ${txt.slice(0, 200)}`;
     throw new AiGatewayError(msg, res.status, terminal);
@@ -131,8 +122,8 @@ async function singleAttempt(
 // Main entrypoint. Returns raw assistant content string.
 // Throws AiGatewayError with `terminal` flag on final failure.
 export async function callChatCompletion(opts: CallChatOptions): Promise<{ content: string; model: string }> {
-  const apiKey = process.env.BLACKBOX_API_KEY;
-  if (!apiKey) throw new AiGatewayError("BLACKBOX_API_KEY missing on server", 0, true);
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) throw new AiGatewayError("LOVABLE_API_KEY missing on server", 0, true);
 
 
   const timeoutMs = opts.timeoutMs ?? 25000;
