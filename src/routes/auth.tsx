@@ -266,7 +266,7 @@ function AuthPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
+  React.useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((evt, session) => {
       if (evt === "PASSWORD_RECOVERY") {
         recoveryModeRef.current = true;
