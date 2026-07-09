@@ -459,7 +459,7 @@ function PricingPage() {
               </div>
               <div className="mt-4 flex items-baseline gap-1">
                 <span className="text-3xl font-bold tabular-nums">{p.credits}</span>
-                <span className="text-xs text-zinc-500">credits</span>
+                <span className="text-xs text-zinc-500">scans</span>
               </div>
               <div className="mt-1 text-sm text-zinc-700">${p.price} one-time</div>
               <Link to="/contact" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
