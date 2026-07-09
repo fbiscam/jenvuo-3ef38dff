@@ -265,8 +265,13 @@ export const MODEL_CHAIN = {
     "google/gemini-3.5-flash",
   ],
 
-  // Senior 25-year-trader review — highest reasoning, stays on Lovable premium.
-  seniorReview: ["openai/gpt-5.5", "openai/gpt-5.4"],
+  // Senior 25-year-trader review (A / A+ verdict) — Blackbox reasoning primary,
+  // Lovable premium fallback preserves quality if Blackbox errors.
+  seniorReview: [
+    "blackboxai/deepseek/deepseek-v4-pro",
+    "openai/gpt-5.5",
+    "openai/gpt-5.4",
+  ],
 
   // Conversational chat around signals — free-tier Gemini models to keep voice queries near-zero cost.
   chat: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview", "google/gemini-2.5-flash-lite"],
