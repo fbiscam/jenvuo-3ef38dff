@@ -2,18 +2,25 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  MessageSquare,
   Send,
   Loader2,
-  X,
   Search,
   Inbox,
   CheckCircle2,
-  Users,
   Mail,
-  Clock,
   ChevronLeft,
   LogOut,
+  Filter,
+  Zap,
+  Command,
+  CornerDownLeft,
+  CircleDot,
+  Circle,
+  Archive,
+  Copy,
+  User as UserIcon,
+  Calendar,
+  Hash,
 } from "lucide-react";
 import {
   adminMe,
@@ -51,6 +58,16 @@ type Message = {
   created_at: string;
 };
 
+type FilterKey = "open" | "unread" | "closed" | "all";
+
+const CANNED = [
+  { key: "hello", label: "Greeting", text: "Hi! Thanks for reaching out — how can I help today?" },
+  { key: "checking", label: "Investigating", text: "Thanks for the details. Let me check this and get back to you shortly." },
+  { key: "resolved", label: "Resolved", text: "This should be resolved on our end. Please refresh and let me know if it works." },
+  { key: "credits", label: "About scans", text: "Each plan includes a monthly scan allowance. You can see your current balance on the dashboard." },
+  { key: "closing", label: "Closing", text: "Glad I could help! I'll close this chat — feel free to open a new one anytime." },
+];
+
 function initials(name?: string | null, email?: string | null) {
   const src = (name || email || "?").trim();
   const parts = src.split(/[\s@._-]+/).filter(Boolean);
@@ -81,11 +98,14 @@ function AdminInbox() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
-  const [filter, setFilter] = useState<"open" | "closed" | "all">("open");
+  const [filter, setFilter] = useState<FilterKey>("open");
   const [query, setQuery] = useState("");
+  const [showCanned, setShowCanned] = useState(false);
+  const [copied, setCopied] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Gate check
   useEffect(() => {
     me().then((r) => {
       if (!r.unlocked) {
@@ -118,7 +138,6 @@ function AdminInbox() {
     [messagesFn],
   );
 
-  // Initial + polling
   useEffect(() => {
     if (!ready) return;
     loadSessions();
@@ -126,7 +145,6 @@ function AdminInbox() {
     return () => clearInterval(id);
   }, [ready, loadSessions]);
 
-  // Active session messages + polling
   useEffect(() => {
     if (!ready || !activeId) return;
     loadMessages(activeId);
@@ -141,7 +159,9 @@ function AdminInbox() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return sessions.filter((s) => {
-      if (filter !== "all" && s.status !== filter) return false;
+      if (filter === "open" && s.status !== "open") return false;
+      if (filter === "closed" && s.status !== "closed") return false;
+      if (filter === "unread" && !(s.unread_admin > 0)) return false;
       if (!q) return true;
       return (
         (s.guest_name || "").toLowerCase().includes(q) ||
@@ -150,13 +170,50 @@ function AdminInbox() {
     });
   }, [sessions, filter, query]);
 
-  const stats = useMemo(() => {
+  const counts = useMemo(() => {
     const open = sessions.filter((s) => s.status === "open").length;
-    const unread = sessions.reduce((a, s) => a + (s.unread_admin || 0), 0);
-    return { open, total: sessions.length, unread };
+    const closed = sessions.filter((s) => s.status === "closed").length;
+    const unread = sessions.filter((s) => s.unread_admin > 0).length;
+    const unreadMsgs = sessions.reduce((a, s) => a + (s.unread_admin || 0), 0);
+    return { open, closed, unread, all: sessions.length, unreadMsgs };
   }, [sessions]);
 
   const activeSession = sessions.find((s) => s.id === activeId) ?? null;
+
+  // Keyboard shortcuts: j/k navigate, r reply, e close, / search, esc back
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement)?.tagName;
+      const inField = tag === "INPUT" || tag === "TEXTAREA";
+      if (e.key === "/" && !inField) {
+        e.preventDefault();
+        searchRef.current?.focus();
+        return;
+      }
+      if (e.key === "Escape" && inField) {
+        (e.target as HTMLElement).blur();
+        return;
+      }
+      if (inField) return;
+      if (e.key === "j" || e.key === "k") {
+        e.preventDefault();
+        const idx = filtered.findIndex((s) => s.id === activeId);
+        const next = e.key === "j" ? Math.min(filtered.length - 1, idx + 1) : Math.max(0, idx - 1);
+        if (filtered[next]) setActiveId(filtered[next].id);
+      }
+      if (e.key === "r" && activeId) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+      if (e.key === "e" && activeId && activeSession?.status === "open") {
+        e.preventDefault();
+        handleClose();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtered, activeId, activeSession?.status]);
 
   async function handleReply(e: React.FormEvent) {
     e.preventDefault();
@@ -192,6 +249,13 @@ function AdminInbox() {
     navigate({ to: "/jenvu-ops-x9k2", replace: true });
   }
 
+  function copyEmail(email: string) {
+    navigator.clipboard.writeText(email).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    });
+  }
+
   if (!ready) {
     return (
       <div className="grid min-h-screen place-items-center bg-zinc-50">
@@ -200,298 +264,545 @@ function AdminInbox() {
     );
   }
 
+  const filters: { key: FilterKey; label: string; count: number; icon: React.ReactNode }[] = [
+    { key: "open", label: "Open", count: counts.open, icon: <CircleDot className="h-3.5 w-3.5" /> },
+    { key: "unread", label: "Unread", count: counts.unread, icon: <Zap className="h-3.5 w-3.5" /> },
+    { key: "closed", label: "Closed", count: counts.closed, icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
+    { key: "all", label: "All", count: counts.all, icon: <Inbox className="h-3.5 w-3.5" /> },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-white">
+    <div className="flex h-screen flex-col bg-zinc-50 font-[system-ui,-apple-system,'SF_Pro_Text',Inter,sans-serif] text-[13px] text-zinc-900 antialiased">
       {/* Top bar */}
-      <div className="sticky top-0 z-10 border-b border-zinc-200/80 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-zinc-200">
-              <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 object-contain" />
+      <header className="flex h-11 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-3">
+        <div className="flex items-center gap-2">
+          <span className="grid h-6 w-6 place-items-center overflow-hidden rounded-md bg-zinc-900">
+            <img src="/favicon.png" alt="Jenvu" className="h-4 w-4 object-contain invert" />
+          </span>
+          <span className="text-[13px] font-semibold tracking-tight">Support</span>
+          <span className="text-zinc-300">/</span>
+          <span className="text-[12.5px] text-zinc-600">Inbox</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="hidden items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 font-mono text-[10.5px] text-zinc-500 sm:inline-flex">
+            <Command className="h-2.5 w-2.5" /> K
+          </span>
+          <span className="hidden text-[11.5px] text-zinc-500 sm:inline">{username}</span>
+          <button
+            onClick={handleLogout}
+            className="grid h-7 w-7 place-items-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+            title="Sign out"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left rail — filters/nav */}
+        <nav className="hidden w-52 shrink-0 flex-col border-r border-zinc-200 bg-white/60 p-2 md:flex">
+          <div className="mb-2 px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+            Inboxes
+          </div>
+          <ul className="space-y-0.5">
+            {filters.map((f) => {
+              const active = filter === f.key;
+              return (
+                <li key={f.key}>
+                  <button
+                    onClick={() => setFilter(f.key)}
+                    className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-[12.5px] transition ${
+                      active
+                        ? "bg-zinc-900 text-white"
+                        : "text-zinc-700 hover:bg-zinc-100"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className={active ? "text-white/80" : "text-zinc-400"}>{f.icon}</span>
+                      {f.label}
+                    </span>
+                    <span
+                      className={`tabular-nums text-[11px] ${
+                        active ? "text-white/70" : "text-zinc-400"
+                      }`}
+                    >
+                      {f.count}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="mb-2 mt-5 px-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+            Shortcuts
+          </div>
+          <ul className="space-y-1 px-2 text-[11.5px] text-zinc-500">
+            <Shortcut k="J / K" label="Navigate" />
+            <Shortcut k="R" label="Reply" />
+            <Shortcut k="E" label="Close chat" />
+            <Shortcut k="/" label="Search" />
+          </ul>
+
+          <div className="mt-auto rounded-lg border border-zinc-200 bg-white p-2.5">
+            <div className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-700">
+              <Zap className="h-3 w-3 text-amber-500" /> {counts.unreadMsgs} unread msgs
+            </div>
+            <div className="mt-0.5 text-[10.5px] text-zinc-500">across {counts.unread} threads</div>
+          </div>
+        </nav>
+
+        {/* Middle — conversation list */}
+        <aside
+          className={`flex w-full shrink-0 flex-col border-r border-zinc-200 bg-white md:w-[340px] ${
+            activeId ? "hidden md:flex" : "flex"
+          }`}
+        >
+          <div className="flex h-11 items-center gap-2 border-b border-zinc-200 px-3">
+            <Filter className="h-3.5 w-3.5 text-zinc-400" />
+            <span className="text-[12px] font-semibold capitalize">{filter}</span>
+            <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[10.5px] tabular-nums text-zinc-600">
+              {filtered.length}
             </span>
-            <div className="leading-tight">
-              <div className="text-sm font-semibold tracking-tight text-zinc-900">Support Inbox</div>
-              <div className="text-[10.5px] text-zinc-500">
-                Signed in as <span className="font-medium text-zinc-700">{username}</span>
+            <div className="ml-auto flex items-center gap-1">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-zinc-400" />
+                <input
+                  ref={searchRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search…"
+                  className="h-7 w-40 rounded-md border border-zinc-200 bg-white pl-6 pr-2 text-[12px] placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5"
+                />
               </div>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-50 hover:text-zinc-900"
-          >
-            <LogOut className="h-3.5 w-3.5" /> Sign out
-          </button>
-        </div>
-      </div>
 
-      <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-[1400px] flex-col gap-4 p-4 sm:p-6">
-        <div className="grid grid-cols-3 gap-2 sm:max-w-md sm:gap-3">
-          <StatCard icon={<Inbox className="h-3.5 w-3.5" />} label="Open" value={stats.open} accent="text-emerald-600" dot="bg-emerald-500" />
-          <StatCard icon={<Mail className="h-3.5 w-3.5" />} label="Unread" value={stats.unread} accent="text-red-600" dot="bg-red-500" />
-          <StatCard icon={<Users className="h-3.5 w-3.5" />} label="Total" value={stats.total} accent="text-zinc-700" dot="bg-zinc-400" />
-        </div>
-
-        <div className="flex flex-1 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_1px_0_rgba(0,0,0,0.02),0_10px_30px_-15px_rgba(0,0,0,0.10)]">
-          {/* Sidebar */}
-          <aside
-            className={`flex w-full flex-col border-r border-zinc-200 sm:w-80 ${activeId ? "hidden sm:flex" : "flex"}`}
-          >
-            <div className="border-b border-zinc-200 p-3">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search name or email…"
-                  className="w-full rounded-md border border-zinc-200 bg-zinc-50 py-2 pl-9 pr-3 text-sm placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none"
-                />
-              </div>
-              <div className="mt-2 flex gap-1 rounded-md bg-zinc-100 p-1 text-xs">
-                {(["open", "closed", "all"] as const).map((k) => (
-                  <button
-                    key={k}
-                    onClick={() => setFilter(k)}
-                    className={`flex-1 rounded px-2 py-1 capitalize transition ${
-                      filter === k ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-600 hover:text-zinc-900"
-                    }`}
-                  >
-                    {k}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto">
-              {filtered.length === 0 ? (
-                <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                  <Inbox className="h-8 w-8 text-zinc-300" />
-                  <p className="mt-2 text-sm font-medium text-zinc-700">No conversations</p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
-                  </p>
+          <div className="flex-1 overflow-y-auto">
+            {filtered.length === 0 ? (
+              <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
+                <div className="grid h-10 w-10 place-items-center rounded-full bg-zinc-100">
+                  <Inbox className="h-4 w-4 text-zinc-400" />
                 </div>
-              ) : (
-                filtered.map((s) => {
-                  const isActive = s.id === activeId;
-                  const name = s.guest_name || s.guest_email?.split("@")[0] || "Anonymous";
-                  return (
-                    <button
-                      key={s.id}
-                      onClick={() => setActiveId(s.id)}
-                      className={`flex w-full items-start gap-3 border-b border-zinc-100 px-3 py-3 text-left transition ${
-                        isActive ? "bg-zinc-50" : "hover:bg-zinc-50/60"
-                      }`}
-                    >
-                      <div className="relative shrink-0">
-                        <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-zinc-800 to-zinc-600 text-[11px] font-semibold text-white">
-                          {initials(s.guest_name, s.guest_email)}
-                        </div>
-                        <span
-                          className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${
-                            s.status === "open" ? "bg-emerald-500" : "bg-zinc-300"
-                          }`}
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="truncate text-sm font-medium text-zinc-900">{name}</span>
-                          <span className="shrink-0 text-[10px] text-zinc-400">{timeAgo(s.last_message_at)}</span>
-                        </div>
-                        <div className="mt-0.5 flex items-center justify-between gap-2">
-                          <span className="truncate text-xs text-zinc-500">{s.guest_email || "No email"}</span>
-                          {s.unread_admin > 0 && (
-                            <span className="grid h-4 min-w-4 shrink-0 place-items-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
-                              {s.unread_admin}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-          </aside>
-
-          {/* Conversation */}
-          <section className={`flex flex-1 flex-col ${activeId ? "flex" : "hidden sm:flex"}`}>
-            {!activeSession ? (
-              <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-                <div className="grid h-14 w-14 place-items-center rounded-full bg-zinc-100">
-                  <MessageSquare className="h-6 w-6 text-zinc-400" />
-                </div>
-                <p className="text-sm font-medium text-zinc-800">Select a conversation</p>
-                <p className="max-w-xs text-xs text-zinc-500">
-                  Pick a chat from the left to view messages and reply to your visitor.
+                <p className="mt-2 text-[13px] font-medium text-zinc-800">No conversations</p>
+                <p className="mt-1 text-[11.5px] text-zinc-500">
+                  {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
                 </p>
               </div>
             ) : (
-              <>
-                <div className="flex items-center gap-3 border-b border-zinc-200 bg-white px-4 py-3">
-                  <button
-                    onClick={() => setActiveId(null)}
-                    className="grid h-8 w-8 place-items-center rounded-md text-zinc-600 hover:bg-zinc-100 sm:hidden"
-                    aria-label="Back"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-zinc-800 to-zinc-600 text-xs font-semibold text-white">
-                    {initials(activeSession.guest_name, activeSession.guest_email)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate text-sm font-semibold text-zinc-900">
-                        {activeSession.guest_name || "Anonymous visitor"}
-                      </span>
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                          activeSession.status === "open"
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "bg-zinc-100 text-zinc-600"
+              <ul>
+                {filtered.map((s) => {
+                  const isActive = s.id === activeId;
+                  const name = s.guest_name || s.guest_email?.split("@")[0] || "Anonymous";
+                  const hasUnread = s.unread_admin > 0;
+                  return (
+                    <li key={s.id}>
+                      <button
+                        onClick={() => setActiveId(s.id)}
+                        className={`group relative flex w-full items-start gap-2.5 border-b border-zinc-100 px-3 py-2.5 text-left transition ${
+                          isActive ? "bg-zinc-50" : "hover:bg-zinc-50/70"
                         }`}
                       >
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            activeSession.status === "open" ? "bg-emerald-500" : "bg-zinc-400"
-                          }`}
-                        />
-                        {activeSession.status}
-                      </span>
-                    </div>
-                    <div className="mt-0.5 flex items-center gap-3 text-[11px] text-zinc-500">
-                      {activeSession.guest_email && (
-                        <span className="flex items-center gap-1 truncate">
-                          <Mail className="h-3 w-3" /> {activeSession.guest_email}
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" /> Started {new Date(activeSession.created_at).toLocaleString()}
-                      </span>
-                    </div>
+                        {isActive && (
+                          <span className="absolute inset-y-2 left-0 w-0.5 rounded-r bg-zinc-900" />
+                        )}
+                        {hasUnread && !isActive && (
+                          <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-blue-500" />
+                        )}
+                        <div className="relative mt-0.5 shrink-0">
+                          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-zinc-700 to-zinc-900 text-[10px] font-semibold text-white">
+                            {initials(s.guest_name, s.guest_email)}
+                          </div>
+                          <span
+                            className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full ring-2 ring-white ${
+                              s.status === "open" ? "bg-emerald-500" : "bg-zinc-300"
+                            }`}
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span
+                              className={`truncate text-[12.5px] ${
+                                hasUnread ? "font-semibold text-zinc-900" : "font-medium text-zinc-800"
+                              }`}
+                            >
+                              {name}
+                            </span>
+                            <span className="shrink-0 font-mono text-[10px] tabular-nums text-zinc-400">
+                              {timeAgo(s.last_message_at)}
+                            </span>
+                          </div>
+                          <div className="mt-0.5 flex items-center justify-between gap-2">
+                            <span className="truncate text-[11.5px] text-zinc-500">
+                              {s.guest_email || "No email provided"}
+                            </span>
+                            {hasUnread && (
+                              <span className="grid h-4 min-w-[16px] shrink-0 place-items-center rounded-full bg-blue-500 px-1 text-[10px] font-semibold text-white tabular-nums">
+                                {s.unread_admin}
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-1 flex flex-wrap items-center gap-1">
+                            <Chip
+                              tone={s.status === "open" ? "emerald" : "zinc"}
+                              icon={s.status === "open" ? <CircleDot className="h-2.5 w-2.5" /> : <Circle className="h-2.5 w-2.5" />}
+                            >
+                              {s.status}
+                            </Chip>
+                            <Chip tone="zinc" icon={<Hash className="h-2.5 w-2.5" />}>
+                              {s.id.slice(0, 6)}
+                            </Chip>
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </aside>
+
+        {/* Right — conversation */}
+        <section className={`flex flex-1 flex-col bg-white ${activeId ? "flex" : "hidden md:flex"}`}>
+          {!activeSession ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
+              <div className="grid h-12 w-12 place-items-center rounded-full bg-zinc-100">
+                <Inbox className="h-5 w-5 text-zinc-400" />
+              </div>
+              <p className="text-[13px] font-medium text-zinc-800">Select a conversation</p>
+              <p className="max-w-xs text-[11.5px] text-zinc-500">
+                Use <Kbd>J</Kbd> / <Kbd>K</Kbd> to navigate, <Kbd>R</Kbd> to reply, <Kbd>E</Kbd> to close.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Thread header */}
+              <div className="flex h-11 shrink-0 items-center gap-2 border-b border-zinc-200 px-3">
+                <button
+                  onClick={() => setActiveId(null)}
+                  className="grid h-7 w-7 place-items-center rounded-md text-zinc-600 hover:bg-zinc-100 md:hidden"
+                  aria-label="Back"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-zinc-700 to-zinc-900 text-[10px] font-semibold text-white">
+                  {initials(activeSession.guest_name, activeSession.guest_email)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="truncate text-[13px] font-semibold">
+                      {activeSession.guest_name || "Anonymous visitor"}
+                    </span>
+                    <Chip
+                      tone={activeSession.status === "open" ? "emerald" : "zinc"}
+                      icon={activeSession.status === "open" ? <CircleDot className="h-2.5 w-2.5" /> : <CheckCircle2 className="h-2.5 w-2.5" />}
+                    >
+                      {activeSession.status}
+                    </Chip>
                   </div>
+                  <div className="mt-0.5 flex items-center gap-2 text-[11px] text-zinc-500">
+                    {activeSession.guest_email ? (
+                      <button
+                        onClick={() => copyEmail(activeSession.guest_email!)}
+                        className="flex items-center gap-1 truncate transition hover:text-zinc-900"
+                        title="Copy email"
+                      >
+                        <Mail className="h-3 w-3" />
+                        <span className="truncate">{activeSession.guest_email}</span>
+                        {copied ? (
+                          <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                        ) : (
+                          <Copy className="h-3 w-3 opacity-0 transition group-hover:opacity-100" />
+                        )}
+                      </button>
+                    ) : (
+                      <span className="flex items-center gap-1 text-zinc-400">
+                        <Mail className="h-3 w-3" /> No email
+                      </span>
+                    )}
+                    <span className="text-zinc-300">·</span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" /> {new Date(activeSession.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
                   {activeSession.status === "open" ? (
                     <button
                       onClick={handleClose}
-                      className="hidden items-center gap-1 rounded-md border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50 sm:inline-flex"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 px-2.5 py-1 text-[11.5px] font-medium text-zinc-700 transition hover:bg-zinc-50"
+                      title="Close (E)"
                     >
-                      <X className="h-3.5 w-3.5" /> Close chat
+                      <Archive className="h-3 w-3" /> Close
+                      <Kbd className="ml-1">E</Kbd>
                     </button>
                   ) : (
-                    <span className="hidden items-center gap-1 rounded-md bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-600 sm:inline-flex">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Closed
+                    <span className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2.5 py-1 text-[11.5px] font-medium text-zinc-600">
+                      <CheckCircle2 className="h-3 w-3" /> Closed
                     </span>
                   )}
                 </div>
+              </div>
 
-                <div
-                  ref={scrollRef}
-                  className="flex-1 space-y-3 overflow-y-auto bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.04)_1px,transparent_0)] bg-[length:16px_16px] bg-zinc-50 p-4"
-                >
+              {/* Messages */}
+              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-zinc-50/50">
+                <div className="mx-auto max-w-3xl space-y-1 p-4">
                   {messages.length === 0 && (
-                    <div className="py-8 text-center text-xs text-zinc-500">No messages yet.</div>
+                    <div className="py-8 text-center text-[11.5px] text-zinc-500">No messages yet.</div>
                   )}
                   {messages.map((m, i) => {
                     const isAdminMsg = m.sender === "admin";
                     const prev = messages[i - 1];
-                    const showAvatar = !prev || prev.sender !== m.sender;
+                    const showHeader = !prev || prev.sender !== m.sender ||
+                      new Date(m.created_at).getTime() - new Date(prev.created_at).getTime() > 5 * 60 * 1000;
                     return (
-                      <div key={m.id} className={`flex items-end gap-2 ${isAdminMsg ? "justify-end" : "justify-start"}`}>
-                        {!isAdminMsg && (
-                          <div className={`h-7 w-7 shrink-0 ${showAvatar ? "" : "invisible"}`}>
-                            <div className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-zinc-700 to-zinc-500 text-[10px] font-semibold text-white">
-                              {initials(activeSession.guest_name, activeSession.guest_email)}
-                            </div>
+                      <div key={m.id} className={showHeader ? "pt-3" : ""}>
+                        {showHeader && (
+                          <div className={`mb-1 flex items-center gap-1.5 text-[10.5px] ${isAdminMsg ? "justify-end" : ""}`}>
+                            <span className="font-semibold text-zinc-700">
+                              {isAdminMsg ? username || "You" : activeSession.guest_name || "Visitor"}
+                            </span>
+                            <span className="text-zinc-400">
+                              {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </span>
                           </div>
                         )}
-                        <div
-                          className={`max-w-[75%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm shadow-sm ring-1 ${
-                            isAdminMsg
-                              ? "rounded-br-sm bg-zinc-900 text-white ring-zinc-900/10"
-                              : "rounded-bl-sm bg-white text-zinc-900 ring-zinc-200"
-                          }`}
-                        >
-                          {m.content}
-                          <div className={`mt-1 text-[9px] ${isAdminMsg ? "text-white/50" : "text-zinc-400"}`}>
-                            {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        <div className={`flex ${isAdminMsg ? "justify-end" : "justify-start"}`}>
+                          <div
+                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-lg px-3 py-2 text-[13px] leading-relaxed ${
+                              isAdminMsg
+                                ? "bg-zinc-900 text-white"
+                                : "border border-zinc-200 bg-white text-zinc-900"
+                            }`}
+                          >
+                            {m.content}
                           </div>
                         </div>
-                        {isAdminMsg && (
-                          <div className={`h-7 w-7 shrink-0 ${showAvatar ? "" : "invisible"}`}>
-                            <div className="grid h-7 w-7 place-items-center rounded-full bg-zinc-900 text-[10px] font-semibold text-white">
-                              J
-                            </div>
-                          </div>
-                        )}
                       </div>
                     );
                   })}
                 </div>
+              </div>
 
-                <form onSubmit={handleReply} className="border-t border-zinc-200 bg-white p-3">
-                  {activeSession.status === "closed" ? (
-                    <div className="flex items-center justify-center gap-2 rounded-md bg-zinc-50 py-3 text-xs text-zinc-500">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
-                    </div>
-                  ) : (
-                    <div className="flex items-end gap-2 rounded-xl border border-zinc-200 bg-white p-2 shadow-sm transition focus-within:border-zinc-400 focus-within:ring-4 focus-within:ring-zinc-900/5">
+              {/* Composer */}
+              <form onSubmit={handleReply} className="shrink-0 border-t border-zinc-200 bg-white p-3">
+                {activeSession.status === "closed" ? (
+                  <div className="flex items-center justify-center gap-2 rounded-md bg-zinc-50 py-2.5 text-[11.5px] text-zinc-500">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
+                  </div>
+                ) : (
+                  <div className="mx-auto max-w-3xl">
+                    <div className="relative rounded-lg border border-zinc-200 bg-white shadow-sm transition focus-within:border-zinc-400 focus-within:ring-2 focus-within:ring-zinc-900/10">
                       <textarea
+                        ref={inputRef}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey) {
+                          if ((e.key === "Enter" && (e.metaKey || e.ctrlKey)) || (e.key === "Enter" && !e.shiftKey)) {
                             e.preventDefault();
                             handleReply(e as unknown as React.FormEvent);
                           }
                         }}
-                        placeholder="Type your reply…  (Shift+Enter for new line)"
-                        rows={1}
+                        placeholder="Reply to visitor…  (Enter to send, Shift+Enter for newline)"
+                        rows={2}
                         maxLength={4000}
-                        className="max-h-40 min-h-[36px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
+                        className="max-h-48 min-h-[56px] w-full resize-none bg-transparent px-3 py-2.5 text-[13px] outline-none placeholder:text-zinc-400"
                       />
-                      <button
-                        type="submit"
-                        disabled={sending || !input.trim()}
-                        className="flex h-9 items-center gap-2 rounded-lg bg-gradient-to-b from-zinc-900 to-zinc-800 px-3.5 text-sm font-medium text-white shadow-sm transition hover:from-zinc-800 hover:to-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                        <span className="hidden sm:inline">Send</span>
-                      </button>
+                      <div className="flex items-center justify-between gap-2 border-t border-zinc-100 px-2 py-1.5">
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setShowCanned((v) => !v)}
+                            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11.5px] font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                          >
+                            <Zap className="h-3 w-3" /> Canned
+                          </button>
+                          {showCanned && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => setShowCanned(false)}
+                                className="fixed inset-0 z-10 cursor-default"
+                                aria-label="Close"
+                              />
+                              <div className="absolute bottom-full left-0 z-20 mb-1 w-72 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-lg">
+                                <div className="border-b border-zinc-100 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                                  Quick replies
+                                </div>
+                                <ul className="max-h-64 overflow-y-auto py-1">
+                                  {CANNED.map((c) => (
+                                    <li key={c.key}>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setInput((prev) => (prev ? prev + "\n\n" + c.text : c.text));
+                                          setShowCanned(false);
+                                          inputRef.current?.focus();
+                                        }}
+                                        className="block w-full px-3 py-2 text-left transition hover:bg-zinc-50"
+                                      >
+                                        <div className="text-[12px] font-medium text-zinc-800">{c.label}</div>
+                                        <div className="mt-0.5 line-clamp-2 text-[11px] text-zinc-500">{c.text}</div>
+                                      </button>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="hidden font-mono text-[10.5px] text-zinc-400 sm:inline">
+                            {input.length}/4000
+                          </span>
+                          <button
+                            type="submit"
+                            disabled={sending || !input.trim()}
+                            className="inline-flex h-7 items-center gap-1.5 rounded-md bg-zinc-900 px-2.5 text-[12px] font-medium text-white shadow-sm transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            {sending ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <Send className="h-3.5 w-3.5" />
+                            )}
+                            Send
+                            <span className="ml-1 inline-flex items-center gap-0.5 rounded bg-white/15 px-1 font-mono text-[10px] text-white/70">
+                              <CornerDownLeft className="h-2.5 w-2.5" />
+                            </span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </form>
-              </>
-            )}
-          </section>
-        </div>
+                  </div>
+                )}
+              </form>
+            </>
+          )}
+        </section>
+
+        {/* Details rail */}
+        {activeSession && (
+          <aside className="hidden w-64 shrink-0 flex-col border-l border-zinc-200 bg-white/60 p-4 xl:flex">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+              Visitor
+            </div>
+            <div className="mt-2 flex items-center gap-2.5">
+              <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 text-[12px] font-semibold text-white">
+                {initials(activeSession.guest_name, activeSession.guest_email)}
+              </div>
+              <div className="min-w-0">
+                <div className="truncate text-[13px] font-semibold">
+                  {activeSession.guest_name || "Anonymous"}
+                </div>
+                <div className="truncate text-[11px] text-zinc-500">
+                  {activeSession.guest_email || "No email"}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 space-y-2.5 text-[11.5px]">
+              <DetailRow icon={<UserIcon className="h-3 w-3" />} label="Name">
+                {activeSession.guest_name || "—"}
+              </DetailRow>
+              <DetailRow icon={<Mail className="h-3 w-3" />} label="Email">
+                {activeSession.guest_email || "—"}
+              </DetailRow>
+              <DetailRow icon={<Hash className="h-3 w-3" />} label="Session">
+                <span className="font-mono text-[10.5px]">{activeSession.id.slice(0, 8)}</span>
+              </DetailRow>
+              <DetailRow icon={<Calendar className="h-3 w-3" />} label="Started">
+                {new Date(activeSession.created_at).toLocaleString()}
+              </DetailRow>
+              <DetailRow icon={<CircleDot className="h-3 w-3" />} label="Status">
+                <span className="capitalize">{activeSession.status}</span>
+              </DetailRow>
+            </div>
+
+            <div className="mt-6 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+              Activity
+            </div>
+            <div className="mt-2 rounded-lg border border-zinc-200 bg-white p-2.5 text-[11.5px]">
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-500">Messages</span>
+                <span className="font-mono tabular-nums font-semibold text-zinc-900">
+                  {messages.length}
+                </span>
+              </div>
+              <div className="mt-1.5 flex items-center justify-between">
+                <span className="text-zinc-500">Last reply</span>
+                <span className="font-mono tabular-nums text-zinc-700">
+                  {timeAgo(activeSession.last_message_at)} ago
+                </span>
+              </div>
+            </div>
+          </aside>
+        )}
       </div>
     </div>
   );
 }
 
-function StatCard({
+function Shortcut({ k, label }: { k: string; label: string }) {
+  return (
+    <li className="flex items-center justify-between">
+      <span>{label}</span>
+      <Kbd>{k}</Kbd>
+    </li>
+  );
+}
+
+function Kbd({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <kbd
+      className={`inline-flex h-4 min-w-[16px] items-center justify-center rounded border border-zinc-200 bg-white px-1 font-mono text-[10px] font-medium text-zinc-600 shadow-[0_1px_0_rgba(0,0,0,0.04)] ${className}`}
+    >
+      {children}
+    </kbd>
+  );
+}
+
+function Chip({
+  children,
+  tone,
+  icon,
+}: {
+  children: React.ReactNode;
+  tone: "emerald" | "zinc" | "blue" | "amber";
+  icon?: React.ReactNode;
+}) {
+  const map: Record<string, string> = {
+    emerald: "bg-emerald-50 text-emerald-700 ring-emerald-200/60",
+    zinc: "bg-zinc-100 text-zinc-600 ring-zinc-200/60",
+    blue: "bg-blue-50 text-blue-700 ring-blue-200/60",
+    amber: "bg-amber-50 text-amber-700 ring-amber-200/60",
+  };
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded px-1.5 py-[1px] text-[10px] font-medium capitalize ring-1 ring-inset ${map[tone]}`}
+    >
+      {icon}
+      {children}
+    </span>
+  );
+}
+
+function DetailRow({
   icon,
   label,
-  value,
-  accent,
-  dot,
+  children,
 }: {
   icon: React.ReactNode;
   label: string;
-  value: number;
-  accent: string;
-  dot: string;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="group flex min-w-[92px] items-center gap-2.5 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 shadow-sm transition hover:border-zinc-300 hover:shadow">
-      <span className={`relative grid h-7 w-7 place-items-center rounded-lg bg-zinc-50 ring-1 ring-zinc-100 ${accent}`}>
+    <div className="flex items-start justify-between gap-2">
+      <span className="flex items-center gap-1.5 text-zinc-500">
         {icon}
-        <span className={`absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full ${dot} ring-2 ring-white`} />
+        {label}
       </span>
-      <div className="leading-tight">
-        <div className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">{label}</div>
-        <div className="text-base font-semibold tabular-nums tracking-tight text-zinc-900">{value}</div>
-      </div>
+      <span className="min-w-0 truncate text-right font-medium text-zinc-800">{children}</span>
     </div>
   );
 }
