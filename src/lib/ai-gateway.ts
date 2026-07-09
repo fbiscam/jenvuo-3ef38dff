@@ -265,9 +265,11 @@ export const MODEL_CHAIN = {
     "google/gemini-3.5-flash",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict) — Blackbox reasoning primary,
-  // Lovable premium fallback preserves quality if Blackbox errors.
+  // Senior 25-year-trader review (A / A+ verdict) — flagship reasoning models.
+  // Primary: GLM-5.2 (Zhipu frontier, GPT-5 class deep reasoning, ~$0.004/call).
+  // Fallback: DeepSeek V4 Pro, then Lovable premium if Blackbox is down.
   seniorReview: [
+    "blackboxai/z-ai/glm-5.2",
     "blackboxai/deepseek/deepseek-v4-pro",
     "openai/gpt-5.5",
     "openai/gpt-5.4",
