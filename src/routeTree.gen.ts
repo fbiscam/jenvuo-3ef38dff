@@ -68,6 +68,7 @@ import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
 import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/brief-audio.$id'
 import { Route as AuthenticatedDashboardAdminSubscribersRouteImport } from './routes/_authenticated/dashboard.admin.subscribers'
+import { Route as AuthenticatedDashboardAdminScanAuditRouteImport } from './routes/_authenticated/dashboard.admin.scan-audit'
 import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './routes/_authenticated/dashboard.admin.messages'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
@@ -382,6 +383,12 @@ const AuthenticatedDashboardAdminSubscribersRoute =
     path: '/admin/subscribers',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardAdminScanAuditRoute =
+  AuthenticatedDashboardAdminScanAuditRouteImport.update({
+    id: '/admin/scan-audit',
+    path: '/admin/scan-audit',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardAdminMessagesRoute =
   AuthenticatedDashboardAdminMessagesRouteImport.update({
     id: '/admin/messages',
@@ -438,6 +445,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
+  '/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
@@ -496,6 +504,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
+  '/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
@@ -559,6 +568,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/_authenticated/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
+  '/_authenticated/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/_authenticated/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
@@ -622,6 +632,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/help/$collection/'
     | '/dashboard/admin/messages'
+    | '/dashboard/admin/scan-audit'
     | '/dashboard/admin/subscribers'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/generate-brief'
@@ -680,6 +691,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/help/$collection'
     | '/dashboard/admin/messages'
+    | '/dashboard/admin/scan-audit'
     | '/dashboard/admin/subscribers'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/generate-brief'
@@ -742,6 +754,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
     | '/_authenticated/dashboard/admin/messages'
+    | '/_authenticated/dashboard/admin/scan-audit'
     | '/_authenticated/dashboard/admin/subscribers'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/generate-brief'
@@ -1215,6 +1228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminSubscribersRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/admin/scan-audit': {
+      id: '/_authenticated/dashboard/admin/scan-audit'
+      path: '/admin/scan-audit'
+      fullPath: '/dashboard/admin/scan-audit'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminScanAuditRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/admin/messages': {
       id: '/_authenticated/dashboard/admin/messages'
       path: '/admin/messages'
@@ -1237,6 +1257,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardSecurityRoute: typeof AuthenticatedDashboardSecurityRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardAdminMessagesRoute: typeof AuthenticatedDashboardAdminMessagesRoute
+  AuthenticatedDashboardAdminScanAuditRoute: typeof AuthenticatedDashboardAdminScanAuditRoute
   AuthenticatedDashboardAdminSubscribersRoute: typeof AuthenticatedDashboardAdminSubscribersRoute
 }
 
@@ -1256,6 +1277,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
     AuthenticatedDashboardAdminMessagesRoute:
       AuthenticatedDashboardAdminMessagesRoute,
+    AuthenticatedDashboardAdminScanAuditRoute:
+      AuthenticatedDashboardAdminScanAuditRoute,
     AuthenticatedDashboardAdminSubscribersRoute:
       AuthenticatedDashboardAdminSubscribersRoute,
   }

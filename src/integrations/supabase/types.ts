@@ -214,6 +214,54 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_charge_audit: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          caller: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          reason: string
+          request_ip: string | null
+          scan_id: string | null
+          source: string
+          symbol: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          caller?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          reason: string
+          request_ip?: string | null
+          scan_id?: string | null
+          source: string
+          symbol?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          caller?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          reason?: string
+          request_ip?: string | null
+          scan_id?: string | null
+          source?: string
+          symbol?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       credit_ledger: {
         Row: {
           balance_after: number
@@ -1233,7 +1281,20 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_scan_charge_mismatches: {
+        Row: {
+          callers: string[] | null
+          charge_count: number | null
+          first_at: string | null
+          last_at: string | null
+          reasons: string[] | null
+          scan_id: string | null
+          sources: string[] | null
+          total_amount: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       apply_referral_code: { Args: { _code: string }; Returns: Json }
@@ -1288,6 +1349,22 @@ export type Database = {
         Returns: boolean
       }
       journal_stats: { Args: { _from?: string; _to?: string }; Returns: Json }
+      log_charge_audit: {
+        Args: {
+          _amount: number
+          _balance_after: number
+          _caller: string
+          _metadata?: Json
+          _reason: string
+          _request_ip: string
+          _scan_id: string
+          _source: string
+          _symbol: string
+          _user_agent: string
+          _user_id: string
+        }
+        Returns: string
+      }
       mark_chat_read: { Args: { _session_id: string }; Returns: undefined }
       move_to_dlq: {
         Args: {
