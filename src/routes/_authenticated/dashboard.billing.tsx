@@ -63,7 +63,8 @@ function Billing() {
 
   const plan = currentPlan;
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
-  const pct = credits.allowance > 0 ? Math.min(100, Math.round((credits.balance / credits.allowance) * 100)) : 0;
+  const remaining = Math.min(credits.balance, credits.allowance);
+  const pct = credits.allowance > 0 ? Math.min(100, Math.round((remaining / credits.allowance) * 100)) : 0;
   const resetsAt = credits.state?.periodResetsAt ? new Date(credits.state.periodResetsAt) : null;
 
 
@@ -106,8 +107,8 @@ function Billing() {
           <div>
             <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Scans remaining</div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-4xl font-semibold tabular-nums">{credits.balance}</span>
-              <span className="text-sm text-zinc-500">/ {credits.allowance} scans this cycle</span>
+              <span className="text-4xl font-semibold tabular-nums">{remaining}</span>
+              <span className="text-sm text-zinc-500">/ {credits.allowance} scans · {plan.toUpperCase()}</span>
             </div>
             {resetsAt && (
               <p className="mt-1 text-xs text-zinc-500">Resets {resetsAt.toLocaleDateString()}</p>
