@@ -46,9 +46,11 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
           return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
         }
         const lovableKey = process.env.LOVABLE_API_KEY;
-        if (!lovableKey) {
-          return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), { status: 500 });
+        const blackboxKey = process.env.BLACKBOX_API_KEY;
+        if (!blackboxKey) {
+          return new Response(JSON.stringify({ error: "BLACKBOX_API_KEY missing" }), { status: 500 });
         }
+
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -93,14 +95,14 @@ Return STRICT JSON only, no prose, with this exact shape:
   "content": "<full markdown article 900-1300 words with ## H2 sections, lists, and a final ## FAQ section. Use internal links to /signal, /app, /insights, /download where natural>"
 }`;
 
-        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        const aiRes = await fetch("https://api.blackbox.ai/chat/completions", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${lovableKey}`,
+            Authorization: `Bearer ${blackboxKey}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: "gemini-2.5-flash",
             messages: [
               { role: "system", content: sys },
               { role: "user", content: userPrompt },
@@ -108,6 +110,7 @@ Return STRICT JSON only, no prose, with this exact shape:
             response_format: { type: "json_object" },
           }),
         });
+
 
         if (!aiRes.ok) {
           const txt = await aiRes.text();
