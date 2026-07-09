@@ -638,9 +638,9 @@ function DashboardLayout() {
             <CardHeader icon={ShieldCheck} title="Scans & Plan" />
             <div className="flex divide-x divide-zinc-200">
               <Metric
-                label="Scans remaining"
-                value={credits.isLoading ? "…" : credits.balance}
-                delta={credits.allowance ? (usedPct > 0 ? `-${usedPct}%` : `${remainingPct}%`) : null}
+                label={`Scans remaining · ${planTier}`}
+                value={credits.isLoading ? "…" : `${displayRemaining} / ${credits.allowance || 0}`}
+                delta={credits.allowance ? `${remainingPct}% left` : null}
                 tone={balanceTone}
                 seed={3}
               />
