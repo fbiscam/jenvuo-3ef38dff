@@ -57,9 +57,24 @@ export default function NotificationBell() {
   }, [open]);
 
   const onOpen = async () => {
-    setOpen((v) => !v);
-    if (!open) await load();
+    const willOpen = !open;
+    setOpen(willOpen);
+    if (willOpen) {
+      await load();
+      // Auto-mark everything read as soon as the user opens the panel,
+      // so the unread badge doesn't come back on refresh/next visit.
+      if (unread > 0) {
+        setItems((prev) => prev.map((n) => (n.read_at ? n : { ...n, read_at: new Date().toISOString() })));
+        setUnread(0);
+        try {
+          await markAllFn();
+        } catch {
+          /* keep optimistic */
+        }
+      }
+    }
   };
+
 
   const markOne = async (id: string) => {
     setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)));
@@ -86,9 +101,10 @@ export default function NotificationBell() {
       <button
         onClick={onOpen}
         aria-label="Notifications"
-        className="relative inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent text-zinc-700 hover:bg-zinc-100/50"
+        className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-transparent text-zinc-700 transition-colors hover:bg-zinc-100/60"
       >
         <Bell className="h-4 w-4" />
+
         {unread > 0 && (
           <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
             {unread > 9 ? "9+" : unread}
