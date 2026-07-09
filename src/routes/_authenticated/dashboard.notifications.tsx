@@ -164,6 +164,52 @@ function NotificationsPage() {
     await markAllFn();
   };
 
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const visibleIds = useMemo(() => filtered.map((n) => n.id), [filtered]);
+  const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
+
+  const toggleSelectAll = () => {
+    setSelected((prev) => {
+      if (allSelected) {
+        const next = new Set(prev);
+        for (const id of visibleIds) next.delete(id);
+        return next;
+      }
+      const next = new Set(prev);
+      for (const id of visibleIds) next.add(id);
+      return next;
+    });
+  };
+
+  const clearSelection = () => setSelected(new Set());
+
+  const deleteOne = async (id: string) => {
+    setItems((prev) => prev.filter((it) => it.id !== id));
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    await deleteOneFn({ data: { id } });
+  };
+
+  const deleteSelected = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (!confirm(`Delete ${ids.length} notification${ids.length > 1 ? "s" : ""}?`)) return;
+    setItems((prev) => prev.filter((it) => !selected.has(it.id)));
+    clearSelection();
+    await deleteManyFn({ data: { ids } });
+  };
+
   const filters: Array<{ key: Filter; label: string }> = [
     { key: "all", label: "All" },
     { key: "unread", label: `Unread${unreadCount ? ` (${unreadCount})` : ""}` },
