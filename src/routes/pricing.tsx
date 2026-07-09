@@ -66,7 +66,7 @@ const TIERS = [
     cta: "Start free",
     ctaTo: "/auth",
     credits: 5,
-    features: ["5 signal scans / month", "Voice queries free", "Delayed alerts (4h)", "Public market insights", "Community support"],
+    features: ["2 signal scans / month", "Voice queries free", "Delayed alerts (4h)", "Public market insights", "Community support"],
 
     highlight: false,
   },
