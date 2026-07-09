@@ -75,7 +75,6 @@ export const askSignalAgent = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as { question: string; context?: AgentContext })
   .handler(async ({ data, context }) => {
     // Voice queries are free (0 scans). No ledger deduction.
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const ctx = data.context ?? {};
     const currentSym = (ctx.symbol ?? "").toUpperCase().replace(/[\s_\-/]/g, "");
