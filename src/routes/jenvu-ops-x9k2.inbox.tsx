@@ -525,7 +525,7 @@ function AdminInbox() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-zinc-800 to-black text-[11px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
+                <div className={`relative grid h-9 w-9 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[11px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10`}>
                   {initials(activeSession.guest_name, activeSession.guest_email)}
                   <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${activeSession.status === "open" ? "bg-emerald-500" : "bg-zinc-300"}`} />
                 </div>
