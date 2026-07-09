@@ -684,18 +684,17 @@ function AdminInbox() {
                           <button
                             type="submit"
                             disabled={sending || !input.trim()}
-                            className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-gradient-to-b from-zinc-800 to-black px-3 text-[12.5px] font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.15)_inset,0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/20 transition hover:from-zinc-900 hover:to-black disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label="Send"
+                            title="Send (Enter)"
+                            className="grid h-10 w-10 place-items-center rounded-full bg-blue-600 text-white shadow-[0_6px_18px_-6px_rgba(37,99,235,0.65)] ring-1 ring-blue-700/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {sending ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                              <Send className="h-3.5 w-3.5" />
+                              <Send className="h-4 w-4" />
                             )}
-                            Send
-                            <span className="ml-1 inline-flex items-center gap-0.5 rounded bg-white/15 px-1 font-mono text-[10px] text-white/70">
-                              <CornerDownLeft className="h-2.5 w-2.5" />
-                            </span>
                           </button>
+
                         </div>
                       </div>
                     </div>
