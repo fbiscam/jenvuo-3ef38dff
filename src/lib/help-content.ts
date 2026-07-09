@@ -345,7 +345,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Free" },
           { type: "ul", items: [
-            "5 signal scans per month.",
+            "2 signal scans per month.",
             "Voice agent with basic narration (unlimited & free).",
             "Signal engine on Gold.",
             "Standard A+ alerts (delayed by ~4 hours).",
@@ -392,7 +392,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "How scans refresh" },
           { type: "ul", items: [
-            "Free: 5 scans per month.",
+            "Free: 2 scans per month.",
             "Pro: 60 scans added on each billing date.",
             "Elite: 180 scans added on each billing date.",
             "Top-up packs never expire and stack on top of your plan.",

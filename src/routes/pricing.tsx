@@ -66,7 +66,7 @@ const TIERS = [
     cta: "Start free",
     ctaTo: "/auth",
     credits: 5,
-    features: ["5 signal scans / month", "Voice queries free", "Delayed alerts (4h)", "Public market insights", "Community support"],
+    features: ["2 signal scans / month", "Voice queries free", "Delayed alerts (4h)", "Public market insights", "Community support"],
 
     highlight: false,
   },
@@ -333,7 +333,7 @@ function PricingPage() {
             <tbody>
               {([
                 { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
-                { f: "Signal scans / month", a: "5", b: "60", c: "180", d: "400" },
+                { f: "Signal scans / month", a: "2", b: "60", c: "180", d: "400" },
                 { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
                 { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
