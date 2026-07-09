@@ -620,6 +620,13 @@ function AuthPage() {
       return;
     }
     toast.success("Email verified — welcome to Jenvu"); flashInfo("Email verified — welcome to Jenvu");
+    // Fire-and-forget welcome email
+    void sendTransactionalEmail({
+      templateName: "welcome",
+      recipientEmail: email,
+      idempotencyKey: `welcome-${email.toLowerCase()}`,
+      templateData: { fullName, siteUrl: window.location.origin },
+    });
   };
 
 
