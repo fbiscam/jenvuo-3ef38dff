@@ -1930,7 +1930,7 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
 VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only for true A+ institutional setups.`;
 
-        const { content: rc } = await callChatCompletion({
+        const { content: rc, model: __aiModel3, usage: __aiUsage3 } = await callChatCompletion({
           models: [...MODEL_CHAIN.seniorReview],
           messages: [
             { role: "system", content: reviewSystem },
@@ -1943,6 +1943,7 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           retriesPerModel: 2,
           stage: "senior-review",
         });
+        import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: __aiModel3, usage: __aiUsage3 })).catch(() => {});
         const review: any = tryParseJsonLoose(rc) || {};
         const verdict = String(review.verdict || "").toUpperCase();
         if (verdict === "VETO") {
