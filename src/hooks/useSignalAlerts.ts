@@ -95,7 +95,7 @@ export function useSignalAlerts(pair: string = 'XAUUSD') {
   // Realtime subscription
   useEffect(() => {
     const channel = supabase
-      .channel(`signal_alerts:${pair}`)
+      .channel(`signal_alerts:${pair}:${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'signal_alerts', filter: `pair=eq.${pair}` },

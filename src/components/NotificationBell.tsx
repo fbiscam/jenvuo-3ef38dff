@@ -99,7 +99,7 @@ export default function NotificationBell() {
       const uid = data.user?.id;
       if (!uid || cancelled) return;
       channel = supabase
-        .channel(`user_notifications:${uid}`)
+        .channel(`user_notifications:${uid}:${Math.random().toString(36).slice(2)}`)
         .on(
           "postgres_changes",
           {

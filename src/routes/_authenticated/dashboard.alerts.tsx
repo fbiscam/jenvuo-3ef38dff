@@ -77,7 +77,7 @@ function AlertPrefs() {
     };
     fetchAlerts();
     const channel = supabase
-      .channel("signal_alerts_feed")
+      .channel(`signal_alerts_feed:${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "signal_alerts" }, (payload) => {
         setAlerts((prev) => [payload.new as FiredAlert, ...prev].slice(0, 50));
       })
