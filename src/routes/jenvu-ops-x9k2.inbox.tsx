@@ -364,25 +364,25 @@ function AdminInbox() {
 
         {/* Middle — conversation list */}
         <aside
-          className={`flex w-full shrink-0 flex-col border-r border-zinc-200 bg-white md:w-[340px] ${
+          className={`flex w-full shrink-0 flex-col border-r border-zinc-900/[0.06] bg-white/60 backdrop-blur-sm md:w-[340px] ${
             activeId ? "hidden md:flex" : "flex"
           }`}
         >
-          <div className="flex h-11 items-center gap-2 border-b border-zinc-200 px-3">
+          <div className="flex h-12 items-center gap-2 border-b border-zinc-900/[0.06] px-3.5">
             <Filter className="h-3.5 w-3.5 text-zinc-400" />
-            <span className="text-[12px] font-semibold capitalize">{filter}</span>
-            <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[10.5px] tabular-nums text-zinc-600">
+            <span className="text-[12px] font-semibold capitalize tracking-tight">{filter}</span>
+            <span className="rounded-md bg-zinc-900/5 px-1.5 py-0.5 font-mono text-[10.5px] tabular-nums text-zinc-600">
               {filtered.length}
             </span>
             <div className="ml-auto flex items-center gap-1">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-zinc-400" />
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-zinc-400" />
                 <input
                   ref={searchRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search…"
-                  className="h-7 w-40 rounded-md border border-zinc-200 bg-white pl-6 pr-2 text-[12px] placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5"
+                  className="h-8 w-44 rounded-lg border border-zinc-200/80 bg-white pl-7 pr-2 text-[12px] placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
                 />
               </div>
             </div>
@@ -391,16 +391,16 @@ function AdminInbox() {
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                <div className="grid h-10 w-10 place-items-center rounded-full bg-zinc-100">
+                <div className="grid h-12 w-12 place-items-center rounded-full bg-white shadow-sm ring-1 ring-black/5">
                   <Inbox className="h-4 w-4 text-zinc-400" />
                 </div>
-                <p className="mt-2 text-[13px] font-medium text-zinc-800">No conversations</p>
+                <p className="mt-3 text-[13px] font-semibold text-zinc-800">No conversations</p>
                 <p className="mt-1 text-[11.5px] text-zinc-500">
                   {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
                 </p>
               </div>
             ) : (
-              <ul>
+              <ul className="p-1.5">
                 {filtered.map((s) => {
                   const isActive = s.id === activeId;
                   const name = s.guest_name || s.guest_email?.split("@")[0] || "Anonymous";
@@ -409,30 +409,32 @@ function AdminInbox() {
                     <li key={s.id}>
                       <button
                         onClick={() => setActiveId(s.id)}
-                        className={`group relative flex w-full items-start gap-2.5 border-b border-zinc-100 px-3 py-2.5 text-left transition ${
-                          isActive ? "bg-zinc-100/70" : "hover:bg-zinc-50/70"
+                        className={`group relative flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition ${
+                          isActive
+                            ? "bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.15)] ring-1 ring-black/5"
+                            : "hover:bg-white/70"
                         }`}
                       >
                         {isActive && (
-                          <span className="absolute inset-y-2 left-0 w-0.5 rounded-r bg-gradient-to-b from-zinc-900 to-black" />
+                          <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-zinc-900" />
                         )}
                         {hasUnread && !isActive && (
-                          <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-black" />
+                          <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-zinc-900" />
                         )}
                         <div className="relative mt-0.5 shrink-0">
-                          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-zinc-900 to-black text-[10px] font-semibold text-white">
+                          <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-zinc-800 to-black text-[10.5px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10">
                             {initials(s.guest_name, s.guest_email)}
                           </div>
                           <span
-                            className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full ring-2 ring-white ${
-                              s.status === "open" ? "bg-black" : "bg-zinc-300"
+                            className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${
+                              s.status === "open" ? "bg-emerald-500" : "bg-zinc-300"
                             }`}
                           />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-baseline justify-between gap-2">
                             <span
-                              className={`truncate text-[12.5px] ${
+                              className={`truncate text-[13px] tracking-tight ${
                                 hasUnread ? "font-semibold text-zinc-900" : "font-medium text-zinc-800"
                               }`}
                             >
@@ -447,12 +449,12 @@ function AdminInbox() {
                               {s.guest_email || "No email provided"}
                             </span>
                             {hasUnread && (
-                              <span className="grid h-4 min-w-[16px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-zinc-900 to-black px-1 text-[10px] font-semibold text-white tabular-nums shadow-sm shadow-black/30">
+                              <span className="grid h-4 min-w-[18px] shrink-0 place-items-center rounded-full bg-zinc-900 px-1.5 text-[10px] font-semibold text-white tabular-nums">
                                 {s.unread_admin}
                               </span>
                             )}
                           </div>
-                          <div className="mt-1 flex flex-wrap items-center gap-1">
+                          <div className="mt-1.5 flex flex-wrap items-center gap-1">
                             <Chip
                               tone="zinc"
                               icon={s.status === "open" ? <CircleDot className="h-2.5 w-2.5" /> : <Circle className="h-2.5 w-2.5" />}
