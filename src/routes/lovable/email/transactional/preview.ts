@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { render } from 'react-email'
+import { render } from '@react-email/render'
 import { createFileRoute } from '@tanstack/react-router'
 import { TEMPLATES } from '@/lib/email-templates/registry'
 

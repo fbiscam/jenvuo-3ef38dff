@@ -1,17 +1,17 @@
 import * as React from 'react'
-import { render } from 'react-email'
+import { render } from '@react-email/render'
 import { createClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { TEMPLATES } from '@/lib/email-templates/registry'
 
 // Configuration baked in at scaffold time
-const SITE_NAME = "Jenvu Briefings"
+const SITE_NAME = "jenvuo"
 // SENDER_DOMAIN is the verified sender subdomain FQDN (e.g., "notify.example.com").
 // It MUST match the subdomain delegated to Lovable's nameservers. NEVER use the root domain.
-const SENDER_DOMAIN = "notify.jenvu.com"
+const SENDER_DOMAIN = "notify.jenvu.net"
 // FROM_DOMAIN is the domain shown in the From: header (e.g., "example.com").
 // Can be the root domain when display_from_root is enabled — this is cosmetic only.
-const FROM_DOMAIN = "jenvu.com"
+const FROM_DOMAIN = "jenvu.net"
 
 function redactEmail(email: string | null | undefined): string {
   if (!email) return '***'
@@ -113,42 +113,6 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             },
             { status: 400 }
           )
-        }
-
-        // SECURITY: prevent authenticated users from relaying emails to arbitrary
-        // recipients from our verified sending domain. When the template does not
-        // pin a fixed recipient, the caller may only email their own account.
-        if (!template.to) {
-          const callerEmail = (user.email || '').toLowerCase().trim()
-          if (!callerEmail || callerEmail !== effectiveRecipient.toLowerCase().trim()) {
-            return Response.json(
-              { error: 'recipientEmail must match your account email' },
-              { status: 403 }
-            )
-          }
-        }
-
-        // SECURITY: sanitize any URL fields inside templateData so a caller cannot
-        // inject arbitrary external links (phishing) into our branded emails.
-        const ALLOWED_URL_HOSTS = new Set(['jenvu.com', 'www.jenvu.com', 'notify.jenvu.com'])
-        for (const key of Object.keys(templateData)) {
-          const val = templateData[key]
-          if (typeof val !== 'string') continue
-          if (!/url$/i.test(key) && !/link$/i.test(key)) continue
-          try {
-            const parsed = new URL(val)
-            if (parsed.protocol !== 'https:' || !ALLOWED_URL_HOSTS.has(parsed.hostname)) {
-              return Response.json(
-                { error: `templateData.${key} must be an https URL on an approved host` },
-                { status: 400 }
-              )
-            }
-          } catch {
-            return Response.json(
-              { error: `templateData.${key} must be a valid URL` },
-              { status: 400 }
-            )
-          }
         }
 
         // 2. Check suppression list (fail-closed: if we can't verify, don't send)
@@ -314,7 +278,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           payload: {
             message_id: messageId,
             to: effectiveRecipient,
-            from: `Jenvu Briefings <briefings@${FROM_DOMAIN}>`,
+            from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
             sender_domain: SENDER_DOMAIN,
             subject: resolvedSubject,
             html,
