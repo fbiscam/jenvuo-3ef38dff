@@ -130,7 +130,8 @@ function Metric({
 }: {
   label: string; value: React.ReactNode; delta?: string | null; tone?: "blue" | "rose" | "zinc" | "emerald"; seed?: number; trend?: "up" | "down" | "flat"; magnitude?: number;
 }) {
-  const negative = delta?.startsWith("-");
+  const negative = trend ? trend === "down" : delta?.startsWith("-");
+  const positive = trend ? trend === "up" : (delta ? !delta.startsWith("-") : false);
   const raw = typeof value === "string" || typeof value === "number" ? String(value).trim() : "";
   const numeric = parseFloat(raw.replace(/[^0-9.\-]/g, ""));
   const isEmpty = raw === "" || raw === "—" || raw === "…" || (!Number.isNaN(numeric) && numeric === 0);
@@ -139,6 +140,8 @@ function Metric({
   const derivedTrend: "up" | "down" | "flat" = trend
     ?? (delta ? (negative ? "down" : "up") : "flat");
   const derivedMag = magnitude ?? (delta ? Math.min(60, Math.abs(parseFloat(delta.replace(/[^0-9.\-]/g, ""))) || 30) : 0);
+
+  const chipColor = negative ? "text-rose-600" : positive ? "text-emerald-600" : "text-zinc-500";
 
   return (
     <div className="flex-1 min-w-0 px-4 pt-2 pb-4">
@@ -149,7 +152,7 @@ function Metric({
       <div className="mt-1 flex items-baseline gap-2">
         <span className={`text-[22px] font-semibold tracking-tight ${isEmpty ? "text-zinc-400" : "text-zinc-900"}`}>{value}</span>
         {delta && !isEmpty && (
-          <span className={`inline-flex items-center text-[11px] font-medium ${negative ? "text-rose-600" : "text-emerald-600"}`}>
+          <span className={`inline-flex items-center text-[11px] font-medium ${chipColor}`}>
             <ArrowUpRight className={`h-3 w-3 ${negative ? "rotate-90" : ""}`} />
             {delta.replace("-", "")}
           </span>
