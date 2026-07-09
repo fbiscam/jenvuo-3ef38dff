@@ -367,15 +367,6 @@ function AdminInbox() {
             })}
           </ul>
 
-          <div className="mb-2 mt-6 px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
-            Shortcuts
-          </div>
-          <ul className="space-y-1.5 px-2 text-[13px] font-medium text-zinc-800">
-            <Shortcut k="J / K" label="Navigate" />
-            <Shortcut k="R" label="Reply" />
-            <Shortcut k="E" label="Close chat" />
-            <Shortcut k="/" label="Search" />
-          </ul>
 
           <div className="mt-auto overflow-hidden rounded-xl border border-black/10 bg-white p-3.5 text-black shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_30px_-15px_rgba(0,0,0,0.15)]">
             <div className="flex items-center gap-1.5 text-[13px] font-semibold">
