@@ -29,11 +29,12 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
-type SignalSearch = { symbol?: string; savedId?: string };
+type SignalSearch = { symbol?: string; savedId?: string; alertId?: string };
 export const Route = createFileRoute("/signal")({
   validateSearch: (s: Record<string, unknown>): SignalSearch => ({
     symbol: typeof s.symbol === "string" ? s.symbol : undefined,
     savedId: typeof s.savedId === "string" ? s.savedId : undefined,
+    alertId: typeof s.alertId === "string" ? s.alertId : undefined,
   }),
   head: () => ({
     meta: [
