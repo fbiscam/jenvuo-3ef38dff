@@ -368,15 +368,10 @@ function AdminInbox() {
           </ul>
 
 
-          <div className="mt-auto overflow-hidden rounded-xl border border-black/10 bg-white p-3.5 text-black shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_30px_-15px_rgba(0,0,0,0.15)]">
-            <div className="flex items-center gap-1.5 text-[13px] font-semibold">
-              <span className="grid h-5 w-5 place-items-center rounded-md bg-black/5 ring-1 ring-black/10">
-                <Zap className="h-3 w-3 text-black" />
-              </span>
-              {counts.unreadMsgs} unread msgs
-            </div>
-            <div className="mt-1 text-[11.5px] font-medium text-black/70">across {counts.unread} threads</div>
+          <div className="mt-auto px-2 py-2 text-[13px] font-medium text-zinc-700">
+            {counts.unreadMsgs} unread
           </div>
+
         </nav>
 
         {/* Middle — conversation list */}
