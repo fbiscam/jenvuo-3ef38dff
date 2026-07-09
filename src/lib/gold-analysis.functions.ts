@@ -1809,7 +1809,10 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       return true;
     };
     const aiMarkings: Marking[] = (Array.isArray(parsed.markings) ? parsed.markings : [])
-      .filter(isValidAiMark) as Marking[];
+      .filter(isValidAiMark)
+      // Strip AI-provided entry/sl/tp — engine is the single source of truth for
+      // trade prices. Keeping AI copies causes chart vs sidebar mismatch.
+      .filter((m: any) => m?.type !== "entry" && m?.type !== "sl" && m?.type !== "tp") as Marking[];
     const pdOte = buildPremiumDiscountAndOTE(htf, "htf", last.c);
     const eqHL = [...detectEqualLevels(htf, "htf", dec), ...detectEqualLevels(ltf, "ltf", dec)];
     const liqPools = [...detectLiquidityPools(htf, "htf"), ...detectLiquidityPools(ltf, "ltf")];
