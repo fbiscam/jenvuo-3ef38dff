@@ -1189,7 +1189,7 @@ function SignalPage() {
                   <NewsCountdownChip plan={plan} />
 
                   {(() => {
-                    const LOW_CONF = 60;
+                    const LOW_CONF = 59;
                     const isLowConf = (t.confidence ?? 0) < LOW_CONF;
                     const dec = plan.instrument.decimals;
                     const riskAbs = Math.abs(t.entry - t.sl);
@@ -1201,7 +1201,7 @@ function SignalPage() {
                       <>
                         {isLowConf && (isBuy || isSell) && (
                           <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800 leading-relaxed">
-                            <span className="font-semibold">Low-confidence setup</span> — Confidence {t.confidence ?? 0}% (min {LOW_CONF}% recommended). Trade at your own risk or wait for stronger confluence alignment.
+                            <span className="font-semibold">Low-confidence setup</span> — Confidence {t.confidence ?? 0}% (min {LOW_CONF}% recommended). Take 50% profit at TP1, then look for the next long trade setup. Trade at your own risk or wait for stronger confluence alignment.
                           </div>
                         )}
                         {(isBuy || isSell) && (
