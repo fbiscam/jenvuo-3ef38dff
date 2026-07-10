@@ -281,13 +281,18 @@ export async function confirmEmailChangeToken(
 
   // Sign out all sessions across all devices for this user after email change
   try {
-    await (supabaseAdmin as any).auth.admin.signOut(row.user_id, 'global')
-  } catch {
-    // Fallback: revoke via the Admin API endpoint
-    try {
-      await (supabaseAdmin as any).auth.admin.signOut(row.user_id)
-    } catch {}
-  }
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    const url = `${process.env.SUPABASE_URL}/auth/v1/admin/users/${row.user_id}/logout?scope=global`
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
+      },
+    })
+  } catch {}
+
 
 
 
