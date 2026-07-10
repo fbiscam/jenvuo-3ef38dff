@@ -471,6 +471,8 @@ function PricingPage() {
         </div>
 
         {/* CUSTOM AMOUNT */}
+        <CustomTopUp />
+
         
       </section>
 
