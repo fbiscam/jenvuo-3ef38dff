@@ -270,18 +270,16 @@ export const MODEL_CHAIN = {
   intent: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview"],
 
   // Chart narration — deep ICT/SMC reasoning.
-  // Primary: NVIDIA DeepSeek V4 Pro (top-tier reasoning + math for SL/TP/RR).
-  // Fallback: NVIDIA DeepSeek V4 Flash → Lovable Gateway GPT-5.4.
+  // Primary: NVIDIA DeepSeek V4 Pro (top-tier reasoning + math for SL/TP/RR, ~3s response).
+  // Fallback: Lovable Gateway GPT-5.4.
   narration: [
     "nvapi/deepseek-ai/deepseek-v4-pro",
-    "nvapi/deepseek-ai/deepseek-v4-flash",
     "openai/gpt-5.4",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict) — finance-tuned primary.
-  // Primary: Palmyra-Fin (SEC/finance-tuned). Fallback: DeepSeek V4 Pro → GPT-5.5.
+  // Senior 25-year-trader review (A / A+ verdict).
+  // Primary: NVIDIA DeepSeek V4 Pro. Fallback: Lovable Gateway GPT-5.5.
   seniorReview: [
-    "nvapi/writer/palmyra-fin-70b-32k",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "openai/gpt-5.5",
   ],
