@@ -1769,6 +1769,8 @@ ${fmt(ltfPrompt)}
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     let parsed: any = {};
+    let __usedNarrationModel: string | null = null;
+    let __usedSeniorModel: string | null = null;
     try {
       const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
         models: [...MODEL_CHAIN.narration],
@@ -1783,6 +1785,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         priority: true,
         stage: "signal-narration",
       });
+      __usedNarrationModel = __aiModel2 ?? null;
       import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
       parsed = tryParseJsonLoose(content) || {};
     } catch {
