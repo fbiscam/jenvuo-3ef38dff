@@ -1778,6 +1778,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let parsed: any = {};
     let __usedNarrationModel: string | null = null;
     let __usedSeniorModel: string | null = null;
+    let __totalPromptTokens = 0;
+    let __totalCompletionTokens = 0;
     try {
       const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
         models: [...MODEL_CHAIN.narration],
@@ -1793,6 +1795,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         stage: "signal-narration",
       });
       __usedNarrationModel = __aiModel2 ?? null;
+      __totalPromptTokens += __aiUsage2?.promptTokens ?? 0;
+      __totalCompletionTokens += __aiUsage2?.completionTokens ?? 0;
       import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
       parsed = tryParseJsonLoose(content) || {};
     } catch {
