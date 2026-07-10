@@ -32,7 +32,7 @@ export const getUsageStats = createServerFn({ method: "GET" })
     const [{ data: bal }, { data: ledger }] = await Promise.all([
       supabase
         .from("credit_balances")
-        .select("balance, monthly_allowance, period_resets_at, period_started_at")
+        .select("balance, monthly_allowance, period_resets_at")
         .eq("user_id", userId)
         .maybeSingle(),
       supabase
