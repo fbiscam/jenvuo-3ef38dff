@@ -130,7 +130,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
                     console.error('Invalid webhook fallback payload', { error: fallbackError.message })
                     return Response.json(
                       { error: fallbackError.code === 'body_too_large' ? 'Webhook body too large' : 'Invalid webhook payload' },
-                      { status: fallbackError.code === 'body_too_large' ? 400 : 400 }
+                      { status: 400 }
                     )
                   }
                 }
@@ -150,11 +150,13 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
             }
           }
 
-          console.error('Webhook verification failed', { error })
-          return Response.json(
-            { error: 'Invalid webhook payload' },
-            { status: 400 }
-          )
+          if (!payload) {
+            console.error('Webhook verification failed', { error })
+            return Response.json(
+              { error: 'Invalid webhook payload' },
+              { status: 400 }
+            )
+          }
         }
 
         if (!run_id) {
