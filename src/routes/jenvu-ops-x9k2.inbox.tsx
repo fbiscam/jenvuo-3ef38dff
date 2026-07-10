@@ -536,14 +536,13 @@ function AdminInbox() {
                   {activeSession.status === "open" ? (
                     <button
                       onClick={handleClose}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-white px-2.5 py-1.5 text-[12px] font-medium text-zinc-700 shadow-sm transition hover:border-zinc-900 hover:bg-zinc-900 hover:text-white"
+                      className="inline-flex items-center gap-1.5 rounded-sm border border-neutral-200 bg-white px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-700 transition hover:border-black hover:bg-black hover:text-white"
                       title="Close (E)"
                     >
                       <Archive className="h-3 w-3" /> Close
-                      <Kbd className="ml-1">E</Kbd>
                     </button>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-[12px] font-medium text-zinc-600">
+                    <span className="inline-flex items-center gap-1 rounded-sm bg-neutral-100 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-500">
                       <CheckCircle2 className="h-3 w-3" /> Closed
                     </span>
                   )}
