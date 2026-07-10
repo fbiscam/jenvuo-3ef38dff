@@ -346,7 +346,7 @@ function buildSyntheticCandles(inst: ResolvedInstrument, tf: string, price: numb
   return candles;
 }
 
-async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 3500): Promise<Response> {
+async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 1800): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -365,10 +365,7 @@ function coinbaseProductFromSymbol(sym: string): string | null {
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-  let lastErr: any = null;
-  for (const host of hosts) {
-    for (const sym of symbols) {
-      try {
+  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
         const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${cfg.interval}&range=${cfg.range}`;
         const res = await fetchWithTimeout(url, {
           headers: {
@@ -377,10 +374,10 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
             Accept: "application/json",
           },
         });
-        if (!res.ok) { lastErr = new Error(`Yahoo ${sym}: ${res.status}`); continue; }
+        if (!res.ok) throw new Error(`Yahoo ${sym}: ${res.status}`);
         const json: any = await res.json();
         const result = json?.chart?.result?.[0];
-        if (!result) { lastErr = new Error("No price data"); continue; }
+        if (!result) throw new Error("No price data");
         const ts: number[] = result.timestamp ?? [];
         const q = result.indicators?.quote?.[0] ?? {};
         const candles: Candle[] = [];
@@ -390,10 +387,13 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
           candles.push({ t: ts[i] * 1000, o, h, l, c, v });
         }
         if (candles.length >= 10) return candles.slice(-200);
-      } catch (e) { lastErr = e; }
-    }
+        throw new Error("Too few Yahoo candles");
+  }));
+  try {
+    return await Promise.any(attempts);
+  } catch (e) {
+    throw e instanceof Error ? e : new Error("Yahoo unavailable");
   }
-  throw lastErr ?? new Error("Yahoo unavailable");
 }
 
 async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<Candle[]> {
@@ -403,22 +403,22 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
   };
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
-  let lastErr: any = null;
-  for (const host of hosts) {
-    for (const sym of symbols) {
-      try {
+  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
         const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
         const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) { lastErr = new Error(`Binance ${sym}: ${res.status}`); continue; }
+        if (!res.ok) throw new Error(`Binance ${sym}: ${res.status}`);
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
           t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
         })).filter((c) => isFinite(c.c));
         if (candles.length >= 10) return candles.slice(-200);
-      } catch (e) { lastErr = e; }
-    }
+        throw new Error("Too few Binance candles");
+  }));
+  try {
+    return await Promise.any(attempts);
+  } catch (e) {
+    throw e instanceof Error ? e : new Error("Binance unavailable");
   }
-  throw lastErr ?? new Error("Binance unavailable");
 }
 
 async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<Candle[]> {
@@ -553,9 +553,10 @@ export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: strin
   // Cross-pairs: derive from XAU/USD × FX proxy FIRST (most reliable), then
   // fall back to Yahoo's direct cross-pair symbol.
   if (hasProxy) tries.push(() => fetchCrossPairCandlesFromProxy(inst, tf));
+  if (inst.kind === "metal" && inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
   if (inst.binanceSymbols?.length) tries.push(() => fetchFromBinanceSymbols(inst.binanceSymbols!, tf));
   if (inst.kind === "crypto" && inst.binanceSymbols?.length) tries.push(() => fetchFromCoinbaseSymbols(inst.binanceSymbols!, tf));
-  if (inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
+  if (inst.kind !== "metal" && inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
 
   let lastErr: any = null;
   for (const f of tries) {
