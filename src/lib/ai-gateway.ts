@@ -267,23 +267,21 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Voice / intent detection — NVIDIA-only to avoid Lovable credit usage.
-  intent: ["nvapi/openai/gpt-oss-120b", "nvapi/deepseek-ai/deepseek-v4-pro"],
+  // Voice / intent detection — DeepSeek V4 Pro primary for stronger reasoning.
+  intent: ["nvapi/deepseek-ai/deepseek-v4-pro", "nvapi/openai/gpt-oss-120b"],
 
-  // Chart narration — deep ICT/SMC reasoning.
-  // NVIDIA-only: prevents scans from falling back to Lovable Gateway credits.
+  // Chart narration — deep ICT/SMC reasoning. DeepSeek V4 Pro primary.
   narration: [
-    "nvapi/openai/gpt-oss-120b",
     "nvapi/deepseek-ai/deepseek-v4-pro",
+    "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict).
-  // NVIDIA-only: if NVIDIA is down, fail visibly instead of spending Lovable credits.
+  // Senior 25-year-trader review (A / A+ verdict). DeepSeek V4 Pro primary.
   seniorReview: [
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Conversational chat around signals — NVIDIA-only to avoid Lovable credit usage.
-  chat: ["nvapi/openai/gpt-oss-120b", "nvapi/deepseek-ai/deepseek-v4-pro"],
+  // Conversational chat around signals — DeepSeek V4 Pro primary.
+  chat: ["nvapi/deepseek-ai/deepseek-v4-pro", "nvapi/openai/gpt-oss-120b"],
 } as const;
