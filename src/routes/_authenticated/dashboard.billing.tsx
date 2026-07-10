@@ -101,64 +101,52 @@ function Billing() {
         </div>
       </section>
 
-      {/* SCANS BALANCE */}
+      {/* WALLET BALANCE */}
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Scans remaining</div>
+            <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Wallet balance</div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-4xl font-semibold tabular-nums">{remaining}</span>
-              <span className="text-sm text-zinc-500">/ {credits.allowance} scans · {plan.toUpperCase()}</span>
+              <span className="text-4xl font-semibold tabular-nums">${Number(remaining).toFixed(2)}</span>
+              <span className="text-sm text-zinc-500">/ ${Number(credits.allowance).toFixed(2)} · {plan.toUpperCase()}</span>
             </div>
             {resetsAt && (
               <p className="mt-1 text-xs text-zinc-500">Resets {resetsAt.toLocaleDateString()}</p>
             )}
+            <p className="mt-2 text-[11px] text-zinc-500">Per-scan cost = actual AI usage × 2. Cheaper models = more scans.</p>
           </div>
           <Link to="/pricing" className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
             Buy top-up
           </Link>
         </div>
-        <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-zinc-900">
-          <div
-            className="absolute top-1/2 h-4 w-[3px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-900 shadow-[0_0_0_2px_rgba(255,255,255,0.9)] transition-all duration-500"
-            style={{ left: `${pct}%` }}
-          />
+        <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+          <div className="h-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
         </div>
         {(() => {
-          const scanReasons = new Set(["signal"]);
-          const filtered = (credits.state?.recent ?? []).filter((r) => scanReasons.has(r.reason));
+          const filtered = (credits.state?.recent ?? []).filter((r) => r.delta < 0);
           if (filtered.length === 0) return null;
           return (
           <div className="mt-6">
-            <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Scan history</div>
+            <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Recent scans</div>
             <div className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
               {(showAllActivity ? filtered : filtered.slice(0, 10)).map((r) => {
                 const d = new Date(r.created_at);
                 const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-                const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-                const reasonLabels: Record<string, string> = {
-                  signal: "Signal scan",
-                  ict_narration: "ICT narration",
-                  alert: "Alert broadcast",
-                  voice_query: "Voice query (free)",
-                  monthly_reset: "Monthly reset",
-                  plan_change: "Plan change",
-                  topup: "Top-up purchase",
-                  referral_bonus: "Referral bonus",
-                };
-                const label = reasonLabels[r.reason] ?? r.reason.replace(/_/g, " ");
-                const isSpend = r.delta < 0;
-                const scanCount = Math.abs(r.delta);
+                const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+                const amt = Math.abs(Number(r.delta));
                 return (
-                  <div key={r.id} className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <span className={`${MONO} shrink-0 text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums`}>
-                        {dateStr} · {timeStr}
-                      </span>
-                      <span className="truncate text-zinc-700">{label}</span>
+                  <div key={r.id} className="flex flex-col gap-0.5 px-3 py-2 text-xs sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className={`${MONO} shrink-0 text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums`}>
+                          {dateStr} · {timeStr}
+                        </span>
+                        <span className="text-zinc-700">{r.stage ?? r.reason.replace(/_/g, " ")}</span>
+                      </div>
+                      {r.model && <span className={`${MONO} truncate text-[10px] text-zinc-500`}>{r.model}</span>}
                     </div>
-                    <span className={`tabular-nums font-medium ${isSpend ? "text-rose-600" : "text-emerald-600"}`}>
-                      {isSpend ? "−" : "+"}{scanCount} scan{scanCount === 1 ? "" : "s"}
+                    <span className="tabular-nums font-medium text-rose-600">
+                      −${amt.toFixed(4)}
                     </span>
                   </div>
                 );
@@ -166,11 +154,8 @@ function Billing() {
             </div>
             {filtered.length > 10 && (
               <div className="mt-3 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setShowAllActivity((v) => !v)}
-                  className="text-xs font-medium text-zinc-700 hover:text-zinc-900"
-                >
+                <button type="button" onClick={() => setShowAllActivity((v) => !v)}
+                  className="text-xs font-medium text-zinc-700 hover:text-zinc-900">
                   {showAllActivity ? "Show less" : `Show more (${filtered.length - 10})`}
                 </button>
               </div>

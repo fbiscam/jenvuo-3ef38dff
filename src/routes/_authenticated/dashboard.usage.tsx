@@ -7,8 +7,8 @@ import { getUsageStats } from "@/lib/usage.functions";
 export const Route = createFileRoute("/_authenticated/dashboard/usage")({
   head: () => ({
     meta: [
-      { title: "Scan Usage — Jenvu" },
-      { name: "description", content: "Track your signal scan usage, daily activity, and history." },
+      { title: "Wallet Usage — Jenvu" },
+      { name: "description", content: "Track your USD wallet usage, per-scan model + cost history." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -18,18 +18,29 @@ export const Route = createFileRoute("/_authenticated/dashboard/usage")({
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
 const REASON_LABEL: Record<string, string> = {
+  ai_scan: "AI scan",
   signal: "Signal scan",
   ict_narration: "ICT narration",
   alert: "Alert broadcast",
   voice_query: "Voice query",
   monthly_reset: "Monthly reset",
+  monthly_grant: "Monthly wallet",
   plan_change: "Plan change",
   topup: "Top-up",
   referral_bonus: "Referral bonus",
+  signup_grant: "Signup bonus",
+  usd_migration: "Wallet migration",
 };
 
 function label(reason: string) {
   return REASON_LABEL[reason] ?? reason.replace(/_/g, " ");
+}
+
+function fmtUsd(n: number, decimals = 4) {
+  if (!Number.isFinite(n)) return "$0.0000";
+  const abs = Math.abs(n);
+  const d = abs >= 1 ? 2 : decimals;
+  return `$${n.toFixed(d)}`;
 }
 
 function UsagePage() {
@@ -43,7 +54,7 @@ function UsagePage() {
 
   const maxDaily = useMemo(() => {
     if (!data) return 1;
-    return Math.max(1, ...data.daily.map((d) => d.spent + d.earned));
+    return Math.max(0.01, ...data.daily.map((d) => d.spent + d.earned));
   }, [data]);
 
   if (isLoading) {
@@ -66,25 +77,23 @@ function UsagePage() {
     );
   }
 
-  const remaining = Math.min(data.balance, data.allowance);
+  const remaining = Math.max(0, Math.min(data.balance, data.allowance));
   const pct = data.allowance > 0 ? Math.min(100, Math.round((remaining / data.allowance) * 100)) : 0;
   const usedPct = 100 - pct;
   const resetsAt = data.periodResetsAt ? new Date(data.periodResetsAt) : null;
-  const ledger = showAll ? data.ledger : data.ledger.slice(0, 15);
+  const ledger = showAll ? data.ledger : data.ledger.slice(0, 20);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Scan usage</h1>
-        <p className="mt-1 text-sm text-zinc-500">Monitor your scan consumption and activity for this billing period.</p>
+        <h1 className="text-2xl font-semibold text-zinc-900">Wallet usage</h1>
+        <p className="mt-1 text-sm text-zinc-500">Actual $ cost per scan · model used · tokens processed.</p>
       </div>
 
-      {/* Stat cards */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Remaining" value={remaining} sub={`of ${data.allowance}`} accent="emerald" />
-        <StatCard label="Used this period" value={data.spentThisPeriod} sub={`${usedPct}% of allowance`} accent="rose" />
-        <StatCard label="Earned / refunded" value={data.earnedThisPeriod} sub="top-ups, resets, bonuses" accent="blue" />
+        <StatCard label="Balance" value={fmtUsd(remaining, 2)} sub={`of ${fmtUsd(data.allowance, 2)}`} accent="emerald" />
+        <StatCard label="Spent this period" value={fmtUsd(data.spentThisPeriod)} sub={`${usedPct}% of wallet`} accent="rose" />
+        <StatCard label="Added" value={fmtUsd(data.earnedThisPeriod, 2)} sub="top-ups, resets, bonuses" accent="blue" />
         <StatCard
           label="Resets"
           value={resetsAt ? resetsAt.toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "—"}
@@ -93,12 +102,11 @@ function UsagePage() {
         />
       </div>
 
-      {/* Progress bar */}
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <div className="flex items-baseline justify-between">
           <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Balance</div>
           <div className="text-sm text-zinc-600 tabular-nums">
-            <span className="font-semibold text-zinc-900">{remaining}</span> / {data.allowance} scans
+            <span className="font-semibold text-zinc-900">{fmtUsd(remaining, 2)}</span> / {fmtUsd(data.allowance, 2)}
           </div>
         </div>
         <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
@@ -106,17 +114,12 @@ function UsagePage() {
         </div>
       </section>
 
-      {/* Daily chart */}
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <div className="flex items-center justify-between">
           <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Last 30 days</div>
           <div className="flex items-center gap-3 text-[11px] text-zinc-500">
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block h-2 w-2 rounded-sm bg-rose-500" /> Spent
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block h-2 w-2 rounded-sm bg-emerald-500" /> Earned
-            </span>
+            <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-sm bg-rose-500" /> Spent</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-sm bg-emerald-500" /> Added</span>
           </div>
         </div>
         <div className="mt-5 flex h-32 items-end gap-1">
@@ -127,7 +130,7 @@ function UsagePage() {
             return (
               <div key={d.date} className="group relative flex flex-1 flex-col items-center justify-end">
                 <div className="pointer-events-none absolute -top-8 z-10 hidden whitespace-nowrap rounded bg-zinc-900 px-2 py-1 text-[10px] text-white group-hover:block">
-                  {new Date(d.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })} · −{d.spent} / +{d.earned}
+                  {new Date(d.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })} · −{fmtUsd(d.spent)} / +{fmtUsd(d.earned)}
                 </div>
                 <div className="flex w-full flex-col justify-end" style={{ height: "100%" }}>
                   {earnedH > 0 && <div className="w-full bg-emerald-500" style={{ height: `${earnedH}%` }} />}
@@ -140,62 +143,58 @@ function UsagePage() {
         </div>
       </section>
 
-      {/* Breakdown by reason */}
-      {data.byReason.length > 0 && (
-        <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-          <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Breakdown this period</div>
-          <div className="mt-4 space-y-3">
-            {data.byReason.map((b) => {
-              const w = data.spentThisPeriod > 0 ? Math.round((b.scans / data.spentThisPeriod) * 100) : 0;
-              return (
-                <div key={b.reason}>
-                  <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="text-zinc-700">{label(b.reason)}</span>
-                    <span className="tabular-nums font-medium text-zinc-900">{b.scans} · {w}%</span>
-                  </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
-                    <div className="h-full bg-zinc-900" style={{ width: `${w}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* Full ledger */}
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <div className="flex items-center justify-between">
           <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Activity log</div>
-          <div className="text-[11px] text-zinc-500">{data.ledger.length} entries</div>
+          <div className="text-[11px] text-zinc-500">{data.ledger.length} entries · model + cost per row</div>
         </div>
         {data.ledger.length === 0 ? (
           <p className="mt-6 text-center text-sm text-zinc-500">No activity yet.</p>
         ) : (
           <>
-            <div className="mt-4 max-h-[420px] overflow-y-scroll divide-y divide-zinc-100 rounded-lg border border-zinc-200 [scrollbar-width:thin] [scrollbar-color:#a1a1aa_#f4f4f5] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-zinc-100 [&::-webkit-scrollbar-thumb]:bg-zinc-400 [&::-webkit-scrollbar-thumb]:rounded-full">
-              {data.ledger.map((r) => {
+            <div className="mt-4 max-h-[520px] overflow-y-auto divide-y divide-zinc-100 rounded-lg border border-zinc-200 [scrollbar-width:thin]">
+              {ledger.map((r) => {
                 const d = new Date(r.created_at);
                 const isSpend = r.delta < 0;
-                const amt = Math.abs(r.delta);
+                const model = r.model ?? null;
+                const stage = r.stage ?? null;
+                const toks = (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0);
                 return (
-                  <div key={r.id} className="flex items-center justify-between gap-3 px-3 py-2 text-xs overflow-x-auto sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    <div className="flex min-w-0 items-center gap-3 whitespace-nowrap">
-                      <span className={`${MONO} shrink-0 text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums`}>
-                        {d.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · {d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                      <span className="shrink-0 text-zinc-700 sm:truncate">{label(r.reason)}</span>
+                  <div key={r.id} className="flex flex-col gap-1 px-3 py-2.5 text-xs sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 flex-col gap-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className={`${MONO} shrink-0 text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums`}>
+                          {d.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · {d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                        <span className="text-zinc-800 font-medium">{label(r.reason)}</span>
+                        {stage && <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-zinc-600">{stage}</span>}
+                      </div>
+                      {(model || toks > 0) && (
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10.5px] text-zinc-500">
+                          {model && <span className={`${MONO} truncate`}>{model}</span>}
+                          {toks > 0 && <span className="tabular-nums">{r.prompt_tokens ?? 0} in · {r.completion_tokens ?? 0} out</span>}
+                          {r.raw_cost_usd != null && <span className="tabular-nums">raw {fmtUsd(Number(r.raw_cost_usd))}</span>}
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-3 tabular-nums">
-                      <span className={`font-medium ${isSpend ? "text-rose-600" : "text-emerald-600"}`}>
-                        {isSpend ? "−" : "+"}{amt}
+                      <span className={`font-semibold ${isSpend ? "text-rose-600" : "text-emerald-600"}`}>
+                        {isSpend ? "−" : "+"}{fmtUsd(Math.abs(r.delta))}
                       </span>
-                      <span className="text-[10px] text-zinc-400">bal {r.balance_after}</span>
+                      <span className="text-[10px] text-zinc-400">bal {fmtUsd(Number(r.balance_after), 2)}</span>
                     </div>
                   </div>
                 );
               })}
             </div>
+            {data.ledger.length > 20 && (
+              <div className="mt-3 flex justify-center">
+                <button type="button" onClick={() => setShowAll((v) => !v)}
+                  className="text-xs font-medium text-zinc-700 hover:text-zinc-900">
+                  {showAll ? "Show less" : `Show more (${data.ledger.length - 20})`}
+                </button>
+              </div>
+            )}
           </>
         )}
       </section>
@@ -203,23 +202,11 @@ function UsagePage() {
   );
 }
 
-function StatCard({
-  label,
-  value,
-  sub,
-  accent,
-}: {
-  label: string;
-  value: React.ReactNode;
-  sub?: string;
+function StatCard({ label, value, sub, accent }: {
+  label: string; value: React.ReactNode; sub?: string;
   accent: "emerald" | "rose" | "blue" | "zinc";
 }) {
-  const dot = {
-    emerald: "bg-emerald-500",
-    rose: "bg-rose-500",
-    blue: "bg-blue-500",
-    zinc: "bg-zinc-400",
-  }[accent];
+  const dot = { emerald: "bg-emerald-500", rose: "bg-rose-500", blue: "bg-blue-500", zinc: "bg-zinc-400" }[accent];
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-4">
       <div className="flex items-center gap-2">
