@@ -158,6 +158,7 @@ function Billing() {
             promptTokens: number | null;
             completionTokens: number | null;
             scanId: string | null;
+            metadata: Record<string, unknown> | null;
           };
           const rows: Row[] = (credits.state?.recent ?? [])
             .filter((r) => r.delta < 0)
@@ -171,6 +172,7 @@ function Billing() {
               promptTokens: r.prompt_tokens ?? null,
               completionTokens: r.completion_tokens ?? null,
               scanId: (r.metadata?.scanId as string | undefined) ?? null,
+              metadata: (r.metadata as Record<string, unknown> | undefined) ?? null,
             }));
           if (rows.length === 0) return null;
           const shown = showAllActivity ? rows : rows.slice(0, 12);
