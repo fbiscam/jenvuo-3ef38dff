@@ -265,29 +265,44 @@ export type Database = {
       credit_ledger: {
         Row: {
           balance_after: number
+          completion_tokens: number | null
           created_at: string
           delta: number
           id: string
           metadata: Json
+          model: string | null
+          prompt_tokens: number | null
+          raw_cost_usd: number | null
           reason: string
+          stage: string | null
           user_id: string
         }
         Insert: {
           balance_after: number
+          completion_tokens?: number | null
           created_at?: string
           delta: number
           id?: string
           metadata?: Json
+          model?: string | null
+          prompt_tokens?: number | null
+          raw_cost_usd?: number | null
           reason: string
+          stage?: string | null
           user_id: string
         }
         Update: {
           balance_after?: number
+          completion_tokens?: number | null
           created_at?: string
           delta?: number
           id?: string
           metadata?: Json
+          model?: string | null
+          prompt_tokens?: number | null
+          raw_cost_usd?: number | null
           reason?: string
+          stage?: string | null
           user_id?: string
         }
         Relationships: []
@@ -697,11 +712,13 @@ export type Database = {
           feature_realtime_alerts: boolean
           feature_scanner: boolean
           id: string
+          markup_multiplier: number
           monthly_credits: number
           name: string
           price_usd: number
           rollover_months: number
           sort_order: number
+          wallet_usd: number
         }
         Insert: {
           annual_discount_pct?: number | null
@@ -712,11 +729,13 @@ export type Database = {
           feature_realtime_alerts?: boolean
           feature_scanner?: boolean
           id: string
+          markup_multiplier?: number
           monthly_credits?: number
           name: string
           price_usd?: number
           rollover_months?: number
           sort_order?: number
+          wallet_usd?: number
         }
         Update: {
           annual_discount_pct?: number | null
@@ -727,11 +746,13 @@ export type Database = {
           feature_realtime_alerts?: boolean
           feature_scanner?: boolean
           id?: string
+          markup_multiplier?: number
           monthly_credits?: number
           name?: string
           price_usd?: number
           rollover_months?: number
           sort_order?: number
+          wallet_usd?: number
         }
         Relationships: []
       }
@@ -1393,16 +1414,10 @@ export type Database = {
       }
       resync_all_credit_lots: { Args: never; Returns: number }
       seed_default_setups: { Args: { _user_id: string }; Returns: undefined }
-      set_user_plan:
-        | { Args: { _plan_id: string; _user_id: string }; Returns: undefined }
-        | {
-            Args: {
-              _billing_interval?: string
-              _plan_id: string
-              _user_id: string
-            }
-            Returns: undefined
-          }
+      set_user_plan: {
+        Args: { _billing_interval?: string; _plan_id: string; _user_id: string }
+        Returns: undefined
+      }
       spend_credits: {
         Args: {
           _amount: number

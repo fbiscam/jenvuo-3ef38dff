@@ -666,19 +666,19 @@ function DashboardLayout() {
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
         <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
           <Card>
-            <CardHeader icon={ShieldCheck} title="Scans & Plan" />
+            <CardHeader icon={ShieldCheck} title="Wallet & Plan" />
             <div className="flex divide-x divide-zinc-200">
               <Metric
-                label={`Scans remaining · ${planTier}`}
-                value={credits.isLoading ? "…" : `${displayRemaining}`}
+                label={`Balance · ${planTier}`}
+                value={credits.isLoading ? "…" : `$${Number(displayRemaining).toFixed(2)}`}
                 delta={credits.allowance ? `${remainingPct}% left` : null}
                 tone={balanceTone}
                 trend={scansTrend}
                 seed={3}
               />
               <Metric
-                label="Monthly allowance"
-                value={credits.isLoading ? "…" : (credits.allowance || 0)}
+                label="Monthly wallet"
+                value={credits.isLoading ? "…" : `$${Number(credits.allowance || 0).toFixed(2)}`}
                 delta={null}
                 tone="zinc"
                 seed={5}
