@@ -11,6 +11,31 @@ export const Route = createFileRoute("/_authenticated/dashboard/billing")({
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
+function formatModelLabel(rawModel: string | null | undefined): string {
+  if (!rawModel) return "—";
+  const m = String(rawModel).toLowerCase();
+  const bare = m.replace(/^(bmind|openai|nvapi|google|nvapi\/openai|nvapi\/deepseek-ai|bmind\/deepseek-ai)\//g, "").replace(/^deepseek-ai\//, "");
+  if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
+  if (bare.startsWith("gpt-5.5")) return "ChatGPT 5.5";
+  if (bare.startsWith("gpt-5.4-pro")) return "ChatGPT 5.4 Pro";
+  if (bare.startsWith("gpt-5.4-mini")) return "ChatGPT 5.4 Mini";
+  if (bare.startsWith("gpt-5.4-nano")) return "ChatGPT 5.4 Nano";
+  if (bare.startsWith("gpt-5.4")) return "ChatGPT 5.4";
+  if (bare.startsWith("gpt-5.2")) return "ChatGPT 5.2";
+  if (bare.startsWith("gpt-5-mini")) return "ChatGPT 5 Mini";
+  if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
+  if (bare.startsWith("gpt-5")) return "ChatGPT 5";
+  if (bare.startsWith("gpt-oss-120b")) return "GPT-OSS 120B";
+  if (bare.startsWith("deepseek-v4-pro")) return "DeepSeek V4 Pro";
+  if (bare.startsWith("gemini-3.1-pro")) return "Gemini 3.1 Pro";
+  if (bare.startsWith("gemini-3.5-flash")) return "Gemini 3.5 Flash";
+  if (bare.startsWith("gemini-3-flash")) return "Gemini 3 Flash";
+  if (bare.startsWith("gemini-2.5-pro")) return "Gemini 2.5 Pro";
+  if (bare.startsWith("gemini-2.5-flash-lite")) return "Gemini 2.5 Flash Lite";
+  if (bare.startsWith("gemini-2.5-flash")) return "Gemini 2.5 Flash";
+  return bare.replace(/^gpt-/, "GPT ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 type Mark = boolean | string;
 
 const MATRIX_ROWS: ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }> = [
