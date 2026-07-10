@@ -68,16 +68,21 @@ async function singleAttempt(
   // Route by prefix:
   //   `blackboxai/*` → Blackbox API
   //   `nvapi/*`      → NVIDIA Integrate API (strip prefix to get real model id)
+  //   `bmind/*`      → Bluesminds unified gateway (OpenAI-compatible)
   //   else           → Lovable AI Gateway
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
+  const isBmind = model.startsWith("bmind/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
   const nvidiaKey = process.env.NVIDIA_API_KEY;
+  const bmindKey = process.env.BLUESMINDS_API_KEY;
 
   const endpoint = isBlackbox
     ? "https://api.blackbox.ai/v1/chat/completions"
     : isNvidia
     ? "https://integrate.api.nvidia.com/v1/chat/completions"
+    : isBmind
+    ? "https://api.bluesminds.com/v1/chat/completions"
     : "https://ai.gateway.lovable.dev/v1/chat/completions";
 
   const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -87,29 +92,37 @@ async function singleAttempt(
   } else if (isNvidia) {
     if (!nvidiaKey) throw new AiGatewayError("NVIDIA_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${nvidiaKey}`;
+  } else if (isBmind) {
+    if (!bmindKey) throw new AiGatewayError("BLUESMINDS_API_KEY missing on server", 0, true);
+    headers["Authorization"] = `Bearer ${bmindKey}`;
   } else {
     headers["Lovable-API-Key"] = apiKey;
   }
 
-  // Strip `nvapi/` prefix to expose the real NVIDIA model id (e.g. `deepseek-ai/deepseek-v4-pro`).
-  const wireModel = isNvidia ? model.slice("nvapi/".length) : model;
+  // Strip provider prefixes to expose the real upstream model id.
+  const wireModel = isNvidia
+    ? model.slice("nvapi/".length)
+    : isBmind
+    ? model.slice("bmind/".length)
+    : model;
 
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
   };
-  // Neither Blackbox nor NVIDIA reliably support json_object response_format — rely on system prompt.
-  if (opts.jsonMode && !isBlackbox && !isNvidia) body.response_format = { type: "json_object" };
+  // Blackbox/NVIDIA/Bluesminds: don't force response_format — rely on system prompt.
+  if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
-    if (!isBlackbox && !isNvidia && model.startsWith("openai/gpt-5")) {
+    if (!isBlackbox && !isNvidia && !isBmind && model.startsWith("openai/gpt-5")) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (!isBlackbox && !isNvidia && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
+  if (!isBlackbox && !isNvidia && !isBmind && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
     body.service_tier = "priority";
   }
+
 
 
   let res: Response;
