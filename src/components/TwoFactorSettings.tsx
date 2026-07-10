@@ -243,7 +243,7 @@ export function TwoFactorSettings() {
     return (
       <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-          <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-700 sm:mt-0.5" />
+          
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-emerald-900 whitespace-nowrap">Two-factor authentication is ON</p>
             <p className="mt-1 text-xs text-emerald-800/80">
