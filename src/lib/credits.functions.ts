@@ -60,7 +60,7 @@ export const getCreditState = createServerFn({ method: "GET" })
         .eq("user_id", userId).order("created_at", { ascending: false }).limit(60),
     ]);
 
-    const plan = (sub?.plans as any) ?? { id: "free", name: "Free", price_usd: 0, wallet_usd: 0.30, feature_journal: false, feature_realtime_alerts: false, feature_full_ict: false, feature_scanner: false };
+    const plan = (sub?.plans as any) ?? { id: "free", name: "Free", price_usd: 0, wallet_usd: 2.00, feature_journal: false, feature_realtime_alerts: false, feature_full_ict: false, feature_scanner: false };
     const walletUsd = Number(plan.wallet_usd ?? 0);
 
     return {
