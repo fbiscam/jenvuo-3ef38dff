@@ -146,6 +146,17 @@ function SignalPage() {
   const dark = false;
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
+  const [analyzeElapsed, setAnalyzeElapsed] = useState(0);
+  const ANALYZE_ETA_SEC = 40;
+  useEffect(() => {
+    if (!loading) { setAnalyzeElapsed(0); return; }
+    const started = Date.now();
+    setAnalyzeElapsed(0);
+    const id = window.setInterval(() => {
+      setAnalyzeElapsed(Math.floor((Date.now() - started) / 1000));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [loading]);
   const [step, setStep] = useState(-1);
   const [playing, setPlaying] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
