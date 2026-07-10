@@ -46,7 +46,9 @@ export const getUsageStats = createServerFn({ method: "GET" })
     const balance = bal?.balance ?? 0;
     const allowance = bal?.monthly_allowance ?? 0;
     const periodResetsAt = bal?.period_resets_at ?? null;
-    const periodStart = (bal as { period_started_at?: string | null } | null)?.period_started_at ?? null;
+    const periodStart: string | null = periodResetsAt
+      ? new Date(new Date(periodResetsAt).getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
+      : null;
     const rows = (ledger ?? []) as LedgerRow[];
 
     // Period window
