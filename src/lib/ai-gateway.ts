@@ -280,21 +280,37 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Voice / intent detection — DeepSeek V4 Pro primary for stronger reasoning.
-  intent: ["nvapi/deepseek-ai/deepseek-v4-pro", "nvapi/openai/gpt-oss-120b"],
+  // Bluesminds ($100 credit, unlimited quota, top models) is PRIMARY.
+  // NVIDIA free tier is fallback. Lovable credits never used for these stages.
+  intent: [
+    "bmind/gpt-5.5",
+    "bmind/deepseek-ai/deepseek-v4-pro",
+    "nvapi/deepseek-ai/deepseek-v4-pro",
+    "nvapi/openai/gpt-oss-120b",
+  ],
 
-  // Chart narration — deep ICT/SMC reasoning. DeepSeek V4 Pro primary.
+  // Chart narration — deep ICT/SMC reasoning. GPT-5.5 primary via Bluesminds.
   narration: [
+    "bmind/gpt-5.5",
+    "bmind/deepseek-ai/deepseek-v4-pro",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict). DeepSeek V4 Pro primary.
+  // Senior 25-year-trader review (A / A+ verdict). DeepSeek V4 Pro primary via Bluesminds.
   seniorReview: [
+    "bmind/deepseek-ai/deepseek-v4-pro",
+    "bmind/gpt-5.5",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Conversational chat around signals — DeepSeek V4 Pro primary.
-  chat: ["nvapi/deepseek-ai/deepseek-v4-pro", "nvapi/openai/gpt-oss-120b"],
+  // Conversational chat around signals — GPT-5.5 primary (fast + accurate).
+  chat: [
+    "bmind/gpt-5.5",
+    "bmind/deepseek-ai/deepseek-v4-pro",
+    "nvapi/deepseek-ai/deepseek-v4-pro",
+    "nvapi/openai/gpt-oss-120b",
+  ],
 } as const;
+
