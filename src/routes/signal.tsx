@@ -1261,7 +1261,7 @@ function SignalPage() {
                   </div>
 
                   {/* Position sizing calculator */}
-                  {(isBuy || isSell) && (t.confidence ?? 0) >= 60 && (
+                  {(isBuy || isSell) && (t.confidence ?? 0) >= 59 && (
                     <PositionSizer plan={plan} />
                   )}
 
