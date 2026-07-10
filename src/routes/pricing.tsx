@@ -435,44 +435,8 @@ function PricingPage() {
         </div>
       </section>
 
-      {/* TOP-UP PACKS */}
-      <section className="mx-auto max-w-7xl px-5 sm:px-8 py-12 sm:py-16">
-        <div className="mb-8 flex items-end justify-between gap-4">
-          <div>
-            <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Credit top-ups</span>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time top-ups that never expire. $1 top-up = $1 wallet — same as plans. Each real signal costs $0.20.</p>
-          </div>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { price: 5, sub: "Starter" },
-            { price: 10, sub: "Boost" },
-            { price: 25, sub: "Trader", accent: true },
-            { price: 50, sub: "Power" },
-          ].map((p) => (
-            <div key={p.price} className={`rounded-2xl border ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
-              <div className="flex items-center justify-between">
-                <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>{p.sub}</span>
-                {p.accent && (
-                  <span className={`${MONO} text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Best value</span>
-                )}
-              </div>
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-3xl font-bold tabular-nums">${p.price}</span>
-                <span className="text-xs text-zinc-500">wallet</span>
-              </div>
-              <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · ~{Math.floor(p.price / 0.2)} signals</div>
-              <Link to="/contact" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
-                Notify me
-              </Link>
-            </div>
-          ))}
-        </div>
 
-        {/* CUSTOM AMOUNT */}
-        
-      </section>
+
 
 
       {/* FAQ */}
