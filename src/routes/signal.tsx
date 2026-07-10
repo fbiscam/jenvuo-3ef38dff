@@ -147,7 +147,7 @@ function SignalPage() {
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
   const [analyzeElapsed, setAnalyzeElapsed] = useState(0);
-  const ANALYZE_ETA_SEC = 75;
+  const ANALYZE_ETA_SEC = 90;
   useEffect(() => {
     if (!loading) { setAnalyzeElapsed(0); return; }
     const started = Date.now();
