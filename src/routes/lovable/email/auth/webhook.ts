@@ -43,6 +43,45 @@ function redactEmail(email: string | null | undefined): string {
   return `${localPart[0]}***@${domain}`
 }
 
+const MAX_AUTH_WEBHOOK_BODY_BYTES = 1 << 20
+
+function constantTimeEqual(a: string, b: string): boolean {
+  const left = new TextEncoder().encode(a)
+  const right = new TextEncoder().encode(b)
+  let diff = left.length ^ right.length
+  const max = Math.max(left.length, right.length)
+
+  for (let i = 0; i < max; i += 1) {
+    diff |= (left[i] ?? 0) ^ (right[i] ?? 0)
+  }
+
+  return diff === 0
+}
+
+function getBearerToken(request: Request): string | null {
+  const authHeader = request.headers.get('Authorization')
+  if (!authHeader?.toLowerCase().startsWith('bearer ')) return null
+  return authHeader.slice('Bearer '.length).trim()
+}
+
+async function parseBearerAuthorizedPayload(request: Request, apiKey: string) {
+  const bearerToken = getBearerToken(request)
+  if (!bearerToken || !constantTimeEqual(bearerToken, apiKey)) {
+    return null
+  }
+
+  const body = await request.text()
+  if (new TextEncoder().encode(body).length > MAX_AUTH_WEBHOOK_BODY_BYTES) {
+    throw new WebhookError('body_too_large', 'Webhook body exceeds size limit')
+  }
+
+  try {
+    return parseEmailWebhookPayload(body)
+  } catch {
+    throw new WebhookError('invalid_payload', 'Failed to parse webhook payload')
+  }
+}
+
 export const Route = createFileRoute("/lovable/email/auth/webhook")({
   server: {
     handlers: {
@@ -62,7 +101,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
         let run_id = ''
         try {
           const verified = await verifyWebhookRequest({
-            req: request,
+            req: request.clone(),
             secret: apiKey,
             parser: parseEmailWebhookPayload,
           })
@@ -75,6 +114,27 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
               case 'missing_timestamp':
               case 'invalid_timestamp':
               case 'stale_timestamp':
+                try {
+                  const bearerPayload = await parseBearerAuthorizedPayload(request, apiKey)
+                  if (bearerPayload) {
+                    payload = bearerPayload
+                    run_id = payload.run_id
+                    console.warn('Auth email webhook accepted with bearer fallback', {
+                      reason: error.code,
+                      run_id,
+                    })
+                    break
+                  }
+                } catch (fallbackError) {
+                  if (fallbackError instanceof WebhookError) {
+                    console.error('Invalid webhook fallback payload', { error: fallbackError.message })
+                    return Response.json(
+                      { error: fallbackError.code === 'body_too_large' ? 'Webhook body too large' : 'Invalid webhook payload' },
+                      { status: 400 }
+                    )
+                  }
+                }
+
                 console.error('Invalid webhook signature', { error: error.message })
                 return Response.json(
                   { error: 'Invalid signature' },
@@ -90,11 +150,13 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
             }
           }
 
-          console.error('Webhook verification failed', { error })
-          return Response.json(
-            { error: 'Invalid webhook payload' },
-            { status: 400 }
-          )
+          if (!payload) {
+            console.error('Webhook verification failed', { error })
+            return Response.json(
+              { error: 'Invalid webhook payload' },
+              { status: 400 }
+            )
+          }
         }
 
         if (!run_id) {
