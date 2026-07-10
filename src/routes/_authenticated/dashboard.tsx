@@ -15,7 +15,7 @@ import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, typ
 import {
   Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
-  MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift,
+  MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
@@ -67,6 +67,7 @@ const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: bo
   { to: "/dashboard/journal", label: "Trades", icon: BookOpen, countKey: "journalTotal" },
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
+  { to: "/dashboard/usage", label: "Usage", icon: PieChart },
   { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { to: "/dashboard/profile", label: "Profile", icon: User },
   { to: "/dashboard/security", label: "Security", icon: ShieldCheck },
