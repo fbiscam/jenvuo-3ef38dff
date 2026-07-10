@@ -2331,6 +2331,16 @@ function SignalVoiceAgent({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
+  // Stop any ongoing speech/listening when the agent panel unmounts (e.g. leaving the signal page)
+  useEffect(() => {
+    return () => {
+      try { speech.stopSpeaking(); } catch { /* noop */ }
+      try { speech.stopListening(); } catch { /* noop */ }
+      try { window.speechSynthesis?.cancel(); } catch { /* noop */ }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const highlightFromText = (text: string) => {
     if (!plan) return;
     const lower = text.toLowerCase();
