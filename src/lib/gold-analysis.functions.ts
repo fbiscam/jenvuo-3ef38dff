@@ -1986,7 +1986,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // Only run the expensive pro model when the engine already thinks it's A/A+.
     // The pro model acts as a "25-year veteran" second opinion — it can veto or confirm.
     // Failure here should NEVER block the plan — Stage-1 result stands.
-    if ((setupGrade === "A+" || setupGrade === "A") && built.direction !== "WAIT") {
+    if (setupGrade === "A+" && built.direction !== "WAIT") {
       try {
         const reviewSystem = `You are a 25-year institutional trader reviewing a junior's ICT/SMC setup. Be brutally honest — most setups are NOT A+. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case against this trade>","chasing_price":true|false}`;
         const reviewUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
