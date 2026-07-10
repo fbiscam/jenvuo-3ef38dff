@@ -114,12 +114,6 @@ function AuthPage() {
     const ne = search.newEmail || "";
     if (ne) setEmail(ne);
     setEmailChangedBanner(ne || "your new email");
-    toast.success("Email change complete", {
-      description: ne
-        ? `Please sign in again with ${ne}.`
-        : "Please sign in again with your new email.",
-      duration: 8000,
-    });
     // Strip the params from the URL so a refresh doesn't re-fire the toast.
     navigate({
       to: "/auth",
