@@ -154,7 +154,7 @@ function Metric({
       <div className="mt-1 flex items-baseline gap-2">
         <span className={`text-[22px] font-semibold tracking-tight ${isEmpty ? "text-zinc-400" : "text-zinc-900"}`}>{value}</span>
         {delta && !isEmpty && (
-          <span className={`inline-flex items-center text-[11px] font-medium ${chipColor}`}>
+          <span className={`inline-flex items-center whitespace-nowrap text-[11px] font-medium ${chipColor}`}>
             <ArrowUpRight className={`h-3 w-3 ${negative ? "rotate-90" : ""}`} />
             {delta.replace("-", "")}
           </span>
