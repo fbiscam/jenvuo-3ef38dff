@@ -52,23 +52,32 @@ export async function logAiCost(params: {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     let plan_id: string | null = null;
-    let markup = 2.0;
+    let walletUsd = 2.0;
+    let monthlyScans = 5;
     if (params.userId) {
       const { data } = await supabaseAdmin
         .from("user_subscriptions")
-        .select("plan_id, plans:plan_id ( markup_multiplier )")
+        .select("plan_id, plans:plan_id ( wallet_usd, monthly_credits )")
         .eq("user_id", params.userId)
         .maybeSingle();
       plan_id = (data?.plan_id as string | undefined) ?? null;
-      const m = Number((data as any)?.plans?.markup_multiplier);
-      if (Number.isFinite(m) && m > 0) markup = m;
+      const w = Number((data as any)?.plans?.wallet_usd);
+      const m = Number((data as any)?.plans?.monthly_credits);
+      if (Number.isFinite(w) && w > 0) walletUsd = w;
+      if (Number.isFinite(m) && m > 0) monthlyScans = m;
     }
 
     const promptTokens = Math.max(0, params.usage.promptTokens | 0);
     const completionTokens = Math.max(0, params.usage.completionTokens | 0);
     const totalTokens = params.usage.totalTokens ?? promptTokens + completionTokens;
     const rawCost = estimateCostUsd(params.model, promptTokens, completionTokens);
-    const chargeUsd = Number((rawCost * markup).toFixed(6));
+
+    // Flat per-scan price tied to advertised plan quota (wallet ÷ monthly scans).
+    // Charge ONLY on the primary narration stage so senior review doesn't
+    // double-bill. Raw cost is still logged for transparency.
+    const perScanCharge = Number((walletUsd / monthlyScans).toFixed(4));
+    const isPrimaryStage = params.stage === "signal-narration";
+    const chargeUsd = isPrimaryStage ? perScanCharge : 0;
 
     await supabaseAdmin.from("ai_cost_log").insert({
       user_id: params.userId, plan_id, stage: params.stage, model: params.model,
@@ -76,9 +85,6 @@ export async function logAiCost(params: {
       total_tokens: totalTokens, cost_usd: rawCost,
     });
 
-    // Deduct from user's USD wallet (only if we know user + charge > 0).
-    // spend_credits will clamp/error if insufficient; we swallow that so the
-    // AI response is never blocked mid-flight — pre-flight check gated entry.
     if (params.userId && chargeUsd > 0) {
       const meta = {
         model: params.model,
@@ -86,7 +92,8 @@ export async function logAiCost(params: {
         prompt_tokens: promptTokens,
         completion_tokens: completionTokens,
         raw_cost_usd: rawCost,
-        markup,
+        per_scan_charge: perScanCharge,
+        plan_id,
       };
       const { error } = await supabaseAdmin.rpc("spend_credits", {
         _user_id: params.userId,
