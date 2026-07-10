@@ -338,14 +338,14 @@ export const collections: Collection[] = [
       {
         slug: "plans-overview",
         title: "Plan comparison",
-        summary: "Free, Pro and Elite — credits, limits and features.",
-        updatedAt: "2026-06-30",
+        summary: "Free, Pro, Elite and Ultra — wallets, scan estimates and features.",
+        updatedAt: "2026-07-10",
         body: [
-          { type: "p", content: "Jenvu uses a simple subscription model. Your plan unlocks features and includes a monthly quota of signal scans. Only successful BUY / SELL scans are counted — WAIT results and errors are free." },
+          { type: "p", content: "Jenvu uses a USD-wallet subscription model. Every plan comes with a monthly USD wallet — each signal scan deducts its real AI cost (typically $0.30–$0.50 per scan). Only successful BUY / SELL scans are billed; WAIT results and errors are free." },
 
           { type: "h2", content: "Free" },
           { type: "ul", items: [
-            "2 signal scans per month.",
+            "$2 wallet per month (~5 scans).",
             "Voice agent with basic narration (unlimited & free).",
             "Signal engine on Gold.",
             "Standard A+ alerts (delayed by ~4 hours).",
@@ -353,7 +353,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Pro — $15 / month" },
           { type: "ul", items: [
-            "35 signal scans per month.",
+            "$15 wallet per month (~35 scans).",
             "Unlimited voice queries.",
             "Full signal engine on all supported XAU cross-pairs.",
             "Realtime A+ email & push alerts (no delay).",
@@ -363,7 +363,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Elite — $50 / month" },
           { type: "ul", items: [
-            "85 signal scans per month.",
+            "$50 wallet per month (~85 scans).",
             "Everything in Pro.",
             "Priority A+ alerts (< 30 seconds).",
             "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF).",
@@ -371,32 +371,42 @@ export const collections: Collection[] = [
             "Dedicated onboarding & SLA.",
           ]},
 
-          { type: "note", tone: "info", content: "See the Pricing page for the full feature matrix and one-time scan top-up packs." },
+          { type: "h2", content: "Ultra — $100 / month" },
+          { type: "ul", items: [
+            "$100 wallet per month (~165 scans).",
+            "Everything in Elite.",
+            "< 10s SLA priority alerts.",
+            "Priority desk support.",
+          ]},
+
+          { type: "note", tone: "info", content: "See the Pricing page for the full feature matrix and one-time top-up packs ($1 = 3 scans, never expire)." },
         ],
       },
       {
         slug: "credit-costs",
         title: "How scans are counted",
-        summary: "Only BUY / SELL signals count toward your monthly quota.",
-        updatedAt: "2026-07-09",
+        summary: "Only BUY / SELL signals draw from your USD wallet.",
+        updatedAt: "2026-07-10",
         body: [
-          { type: "p", content: "Scans are the unit of usage on Jenvu. Only actionable BUY / SELL results consume one scan from your quota — dead-market WAIT signals and any errors are free." },
+          { type: "p", content: "Scans deduct their real AI cost from your USD wallet. Typical cost is $0.30–$0.50 per scan depending on the models used. WAIT signals and errors are free." },
 
           { type: "h2", content: "What counts as a scan" },
           { type: "ul", items: [
-            "Signal analysis returning BUY or SELL — 1 scan.",
+            "Signal analysis returning BUY or SELL — deducted from wallet at real cost.",
             "Signal returning WAIT (dead market) — free.",
             "Voice agent reply (per turn) — free.",
             "A+ broadcast alert delivered to you — free.",
           ]},
 
-          { type: "h2", content: "How scans refresh" },
+          { type: "h2", content: "How wallets refresh" },
           { type: "ul", items: [
-            "Free: 2 scans per month.",
-            "Pro: 35 scans added on each billing date.",
-            "Elite: 85 scans added on each billing date.",
+            "Free: $2 wallet each month (~5 scans).",
+            "Pro: $15 wallet added on each billing date (~35 scans).",
+            "Elite: $50 wallet added on each billing date (~85 scans).",
+            "Ultra: $100 wallet added on each billing date (~165 scans).",
             "Top-up packs never expire and stack on top of your plan.",
           ]},
+
 
 
           { type: "note", tone: "tip", content: "Track usage live from Dashboard → Billing. The sparkline turns red when you've dropped below 30% of your monthly balance." },
