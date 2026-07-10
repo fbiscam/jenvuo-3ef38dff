@@ -467,22 +467,22 @@ function AdminInbox() {
         </aside>
 
         {/* Right — conversation */}
-        <section className={`flex flex-1 flex-col bg-white ${activeId ? "flex" : "hidden md:flex"}`}>
+        <section className={`flex flex-1 flex-col bg-[#FDFDFB] ${activeId ? "flex" : "hidden md:flex"}`}>
           {!activeSession ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-              <div className="relative grid h-16 w-16 place-items-center rounded-2xl bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_20px_40px_-20px_rgba(0,0,0,0.2)] ring-1 ring-black/5">
-                <Inbox className="h-6 w-6 text-zinc-400" />
-                <span className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/60 to-transparent" />
+              <div className="grid h-16 w-16 place-items-center rounded-sm border border-neutral-200 bg-white">
+                <Inbox className="h-6 w-6 text-neutral-400" />
               </div>
               <p className="text-[14px] font-semibold tracking-tight text-zinc-900">Select a conversation</p>
-              <p className="max-w-xs text-[12px] leading-relaxed text-zinc-500">
+              <p className="max-w-xs text-[12px] leading-relaxed text-neutral-500">
                 Use <Kbd>J</Kbd> / <Kbd>K</Kbd> to navigate, <Kbd>R</Kbd> to reply, <Kbd>E</Kbd> to close.
               </p>
             </div>
           ) : (
             <>
               {/* Thread header */}
-              <div className="flex h-14 shrink-0 items-center gap-3 border-b border-zinc-900/[0.06] bg-white/70 px-4 backdrop-blur-xl">
+              <div className="flex h-16 shrink-0 items-center gap-3 border-b border-neutral-200 bg-[#FDFDFB] px-6">
+
                 <button
                   onClick={() => setActiveId(null)}
                   className="grid h-8 w-8 place-items-center rounded-lg text-zinc-600 hover:bg-zinc-100 md:hidden"
