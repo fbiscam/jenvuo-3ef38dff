@@ -146,6 +146,17 @@ function SignalPage() {
   const dark = false;
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
+  const [analyzeElapsed, setAnalyzeElapsed] = useState(0);
+  const ANALYZE_ETA_SEC = 40;
+  useEffect(() => {
+    if (!loading) { setAnalyzeElapsed(0); return; }
+    const started = Date.now();
+    setAnalyzeElapsed(0);
+    const id = window.setInterval(() => {
+      setAnalyzeElapsed(Math.floor((Date.now() - started) / 1000));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [loading]);
   const [step, setStep] = useState(-1);
   const [playing, setPlaying] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -863,7 +874,12 @@ function SignalPage() {
             ) : (
               <button onClick={load} disabled={loading} className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50 transition">
                 {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-                Re-analyze
+                {loading ? (
+                  <span className="tabular-nums">
+                    Analyzing… {analyzeElapsed}s
+                    {analyzeElapsed < ANALYZE_ETA_SEC && <span className="opacity-70"> / ~{ANALYZE_ETA_SEC}s</span>}
+                  </span>
+                ) : "Re-analyze"}
               </button>
             )}
             {isAdmin && plan && plan.trade.direction !== "WAIT" && (
@@ -1489,7 +1505,7 @@ function SignalPage() {
             <div className="flex gap-4 sm:gap-6 items-center">
               <div className="flex items-center gap-1.5">
                 <span className={`text-[10px] ${MONO} text-zinc-900`}>STATE</span>
-                <span className={`text-[10px] ${MONO}`}>{playing ? "NARRATING" : loading ? "ANALYZING" : "READY"}</span>
+                <span className={`text-[10px] ${MONO} tabular-nums`}>{playing ? "NARRATING" : loading ? `ANALYZING ${analyzeElapsed}s` : "READY"}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className={`text-[10px] ${MONO} text-zinc-900`}>STEP</span>
