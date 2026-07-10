@@ -130,7 +130,7 @@ export function TrustedDevicesSettings() {
     <div className="mt-2">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <p className="text-sm text-zinc-500 sm:max-w-2xl lg:max-w-3xl">
-          Browsers where you ticked <span className="font-medium text-zinc-700">Remember this device</span> during two-factor sign-in. Revoke any browser you don't recognize.
+          Browsers where you ticked <span className="font-medium text-zinc-700">Remember this device</span> during two-factor sign-in. Revoke browser you don't recognize.
         </p>
         <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
           {hasCurrentTrust && (
