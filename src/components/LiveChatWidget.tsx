@@ -187,11 +187,12 @@ export function LiveChatWidget() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? "Close chat" : "Open support chat"}
-        className="fixed bottom-5 right-5 z-[9999] flex h-14 w-14 items-center justify-center rounded-full bg-black text-white shadow-[0_10px_30px_-8px_rgba(0,0,0,0.45)] ring-1 ring-black/10 transition hover:scale-[1.03] hover:shadow-[0_14px_38px_-10px_rgba(0,0,0,0.55)] active:scale-95"
+        className="fixed bottom-5 right-5 z-[9999] flex h-14 w-14 items-center justify-center rounded-full bg-white text-black shadow-[0_10px_30px_-8px_rgba(0,0,0,0.25)] ring-1 ring-black/10 transition hover:scale-[1.03] hover:shadow-[0_14px_38px_-10px_rgba(0,0,0,0.35)] active:scale-95"
       >
         {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-[22px] w-[22px]" />}
         {!open && (
-          <span className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-black" />
+          <span className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
+
         )}
         {!open && unread > 0 && (
           <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white shadow">
