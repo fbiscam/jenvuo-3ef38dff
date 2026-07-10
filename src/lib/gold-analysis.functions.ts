@@ -1765,7 +1765,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       ],
       jsonMode: true,
       maxTokens: 8192,
-      timeoutMs: 30000,
+      timeoutMs: 50000,
+      retriesPerModel: 1,
       priority: true,
       stage: "signal-narration",
     }).catch((err: unknown) => {
@@ -2013,9 +2014,9 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           ],
           jsonMode: true,
           maxTokens: 400,
-          timeoutMs: 20000,
+          timeoutMs: 45000,
           priority: true,
-          retriesPerModel: 2,
+          retriesPerModel: 1,
           stage: "senior-review",
         });
         import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: __aiModel3, usage: __aiUsage3 })).catch(() => {});
