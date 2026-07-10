@@ -323,33 +323,28 @@ function AdminInbox() {
 
       <div className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
-        <nav className="hidden w-60 shrink-0 flex-col border-r border-zinc-900/[0.06] bg-white/40 p-3 backdrop-blur-sm md:flex">
-          <div className="mb-2 px-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
-            Inboxes
+        <nav className="hidden w-60 shrink-0 flex-col border-r border-neutral-200 bg-[#FDFDFB] p-4 md:flex">
+          <div className="mb-3 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400">
+            Inbox
           </div>
-          <ul className="space-y-1">
+          <ul className="space-y-0.5">
             {filters.map((f) => {
               const active = filter === f.key;
               return (
                 <li key={f.key}>
                   <button
                     onClick={() => setFilter(f.key)}
-                    className={`group relative flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-[14px] font-medium transition ${
+                    className={`group flex w-full items-center justify-between rounded-sm px-3 py-2 text-[13px] font-medium transition ${
                       active
-                        ? "bg-blue-600 text-white shadow-[0_6px_16px_-6px_rgba(37,99,235,0.55)]"
-                        : "text-zinc-700 hover:bg-white hover:text-zinc-900 hover:shadow-sm hover:ring-1 hover:ring-black/5"
+                        ? "bg-neutral-100 text-black"
+                        : "text-neutral-500 hover:bg-neutral-50 hover:text-black"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={active ? "text-white" : "text-zinc-500"}>{f.icon}</span>
+                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-emerald-400" : "border border-neutral-300"}`} />
                       {f.label}
                     </span>
-                    <span
-                      className={`rounded-md px-1.5 py-0.5 tabular-nums text-[11px] font-semibold ${
-                        active ? "bg-white/20 text-white" : "bg-zinc-100 text-zinc-700"
-                      }`}
-
-                    >
+                    <span className={`font-mono text-[10px] tabular-nums ${active ? "text-neutral-500" : "text-neutral-400"}`}>
                       {f.count}
                     </span>
                   </button>
@@ -357,9 +352,6 @@ function AdminInbox() {
               );
             })}
           </ul>
-
-
-
         </nav>
 
         {/* Middle — conversation list */}
