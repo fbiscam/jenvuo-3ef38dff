@@ -523,14 +523,14 @@ function Cell({ value, highlight }: { value: Mark; highlight?: boolean }) {
 function CustomTopUp() {
   const [amount, setAmount] = React.useState<number>(15);
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
-  const credits = safe * 3;
+  const estSignals = Math.floor(safe / 0.2);
   return (
     <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 sm:p-7">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
         <div>
           <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Custom top-up</span>
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. Every $1 = 3 scans. Scans never expire.</p>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Each real signal costs $0.20. Balance never expires.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center rounded-md border border-zinc-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-amber-400">
@@ -545,8 +545,8 @@ function CustomTopUp() {
             />
           </div>
           <div className="text-right">
-            <div className={`text-2xl font-bold tabular-nums ${MONO}`}>{credits}</div>
-            <div className="text-[11px] text-zinc-500">scans</div>
+            <div className={`text-2xl font-bold tabular-nums ${MONO}`}>${safe}</div>
+            <div className="text-[11px] text-zinc-500">wallet · ~{estSignals} signals</div>
           </div>
           <Link
             to="/contact"
