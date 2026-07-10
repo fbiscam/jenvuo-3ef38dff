@@ -1778,6 +1778,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let parsed: any = {};
     let __usedNarrationModel: string | null = null;
     let __usedSeniorModel: string | null = null;
+    let __totalPromptTokens = 0;
+    let __totalCompletionTokens = 0;
     try {
       const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
         models: [...MODEL_CHAIN.narration],
@@ -1793,6 +1795,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         stage: "signal-narration",
       });
       __usedNarrationModel = __aiModel2 ?? null;
+      __totalPromptTokens += __aiUsage2?.promptTokens ?? 0;
+      __totalCompletionTokens += __aiUsage2?.completionTokens ?? 0;
       import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
       parsed = tryParseJsonLoose(content) || {};
     } catch {
@@ -2045,6 +2049,8 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           stage: "senior-review",
         });
         __usedSeniorModel = __aiModel3 ?? null;
+        __totalPromptTokens += __aiUsage3?.promptTokens ?? 0;
+        __totalCompletionTokens += __aiUsage3?.completionTokens ?? 0;
         import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: __aiModel3, usage: __aiUsage3 })).catch(() => {});
         const review: any = tryParseJsonLoose(rc) || {};
         const verdict = String(review.verdict || "").toUpperCase();
@@ -2367,12 +2373,16 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
 
     // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
     // WAIT / no-trade returns are free.
+    const __scanId = (globalThis as any).crypto?.randomUUID?.() ?? `scan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
     import("@/lib/ai-cost-log.server").then((m) => m.chargeSignalScan({
       userId: __userId,
       direction: plan.trade.direction,
       model: __usedNarrationModel ?? MODEL_CHAIN.narration[0] ?? null,
       seniorModel: __usedSeniorModel,
       symbol: canonicalSymbol,
+      scanId: __scanId,
+      promptTokens: __totalPromptTokens,
+      completionTokens: __totalCompletionTokens,
     })).catch(() => {});
     return plan;
 }
