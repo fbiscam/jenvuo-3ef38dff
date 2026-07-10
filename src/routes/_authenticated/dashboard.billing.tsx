@@ -172,7 +172,13 @@ function Billing() {
                       const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
                       const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
                       const amt = Math.abs(r.delta);
-                      const modelLabel = r.model ?? (r.reason === "signal" ? "legacy (pre-USD billing)" : "—");
+                      const rawModel = r.model ?? ((r.metadata as any)?.model as string | undefined) ?? null;
+                      const prettyFromMeta = (r.metadata as any)?.model_label as string | undefined;
+                      const seniorPretty = (r.metadata as any)?.senior_model_label as string | undefined;
+                      const modelLabel = prettyFromMeta
+                        ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—"))
+                        ?? "—";
+                      const modelWithSenior = seniorPretty ? `${modelLabel} + ${seniorPretty}` : modelLabel;
                       const stageLabel = r.stage ?? r.reason.replace(/_/g, " ");
                       const tokens =
                         r.promptTokens != null || r.completionTokens != null
