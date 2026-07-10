@@ -279,6 +279,18 @@ export async function confirmEmailChangeToken(
     return { ok: false as const, error: updErr.message }
   }
 
+  // Sign out all sessions across all devices for this user after email change
+  try {
+    await (supabaseAdmin as any).auth.admin.signOut(row.user_id, 'global')
+  } catch {
+    // Fallback: revoke via the Admin API endpoint
+    try {
+      await (supabaseAdmin as any).auth.admin.signOut(row.user_id)
+    } catch {}
+  }
+
+
+
   await (supabaseAdmin as any)
     .from('email_change_requests')
     .update({ consumed_at: new Date().toISOString() })
