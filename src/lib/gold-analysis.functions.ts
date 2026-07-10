@@ -2014,7 +2014,7 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           ],
           jsonMode: true,
           maxTokens: 400,
-          timeoutMs: 18000,
+          timeoutMs: 45000,
           priority: true,
           retriesPerModel: 1,
           stage: "senior-review",
