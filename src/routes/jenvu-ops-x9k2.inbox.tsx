@@ -302,8 +302,8 @@ function AdminInbox() {
       {/* Top bar */}
       <header className="relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-neutral-200 bg-[#FDFDFB] px-5">
         <div className="flex items-center gap-3">
-          <span className="grid h-8 w-8 place-items-center rounded-sm bg-black">
-            <img src="/favicon.png" alt="Jenvu" className="h-5 w-5 object-contain invert" />
+          <span className="grid h-8 w-8 place-items-center">
+            <img src="/favicon.png" alt="Jenvu" className="h-8 w-8 object-contain" />
           </span>
           <span className="text-[17px] font-semibold tracking-tight text-zinc-900">Jenvu</span>
           <span className="text-neutral-300">/</span>
