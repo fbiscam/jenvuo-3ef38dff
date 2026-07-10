@@ -118,12 +118,16 @@ export async function chargeSignalScan(params: {
   seniorModel?: string | null;
   symbol?: string | null;
   scanId?: string | null;
+  promptTokens?: number | null;
+  completionTokens?: number | null;
 }): Promise<void> {
   if (!params.userId) return;
   const dir = String(params.direction || "").toUpperCase();
   if (dir !== "BUY" && dir !== "SELL") return;
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const pTok = Math.max(0, params.promptTokens ?? 0);
+    const cTok = Math.max(0, params.completionTokens ?? 0);
     const meta: Record<string, unknown> = {
       model: params.model ?? null,
       model_label: params.model ? formatModelLabel(params.model) : null,
@@ -131,6 +135,8 @@ export async function chargeSignalScan(params: {
       senior_model_label: params.seniorModel ? formatModelLabel(params.seniorModel) : null,
       stage: "signal",
       direction: dir,
+      prompt_tokens: pTok,
+      completion_tokens: cTok,
     };
     if (params.symbol) meta.symbol = params.symbol;
     if (params.scanId) meta.scanId = params.scanId;
