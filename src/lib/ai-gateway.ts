@@ -294,20 +294,12 @@ export const MODEL_CHAIN = {
   // Chart narration — fast + accurate. GPT-5.5 primary (8-15s), Pro as fallback.
   narration: [
     "bmind/gpt-5.5",
-    "bmind/gpt-5.5-pro",
-    "bmind/deepseek-ai/deepseek-v4-pro",
-    "nvapi/deepseek-ai/deepseek-v4-pro",
-    "nvapi/openai/gpt-oss-120b",
   ],
 
   // Senior 25-year-trader review (A / A+ verdict).
   // Primary: GPT-5.4-Pro (independent second opinion from a different model family).
   seniorReview: [
     "bmind/gpt-5.4-pro",
-    "bmind/deepseek-ai/deepseek-v4-pro",
-    "bmind/gpt-5.5-pro",
-    "nvapi/deepseek-ai/deepseek-v4-pro",
-    "nvapi/openai/gpt-oss-120b",
   ],
 
   // Conversational chat around signals — GPT-5.5 primary (fast + accurate).

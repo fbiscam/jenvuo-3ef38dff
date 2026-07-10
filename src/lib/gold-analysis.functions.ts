@@ -346,6 +346,16 @@ function buildSyntheticCandles(inst: ResolvedInstrument, tf: string, price: numb
   return candles;
 }
 
+async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 1800): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: init.signal ?? controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function coinbaseProductFromSymbol(sym: string): string | null {
   const m = sym.match(/^([A-Z0-9]{2,15})(USDT|USDC|USD)$/);
   if (!m) return null;
@@ -355,22 +365,19 @@ function coinbaseProductFromSymbol(sym: string): string | null {
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-  let lastErr: any = null;
-  for (const host of hosts) {
-    for (const sym of symbols) {
-      try {
+  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
         const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${cfg.interval}&range=${cfg.range}`;
-        const res = await fetch(url, {
+        const res = await fetchWithTimeout(url, {
           headers: {
             "User-Agent":
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
             Accept: "application/json",
           },
         });
-        if (!res.ok) { lastErr = new Error(`Yahoo ${sym}: ${res.status}`); continue; }
+        if (!res.ok) throw new Error(`Yahoo ${sym}: ${res.status}`);
         const json: any = await res.json();
         const result = json?.chart?.result?.[0];
-        if (!result) { lastErr = new Error("No price data"); continue; }
+        if (!result) throw new Error("No price data");
         const ts: number[] = result.timestamp ?? [];
         const q = result.indicators?.quote?.[0] ?? {};
         const candles: Candle[] = [];
@@ -380,10 +387,13 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
           candles.push({ t: ts[i] * 1000, o, h, l, c, v });
         }
         if (candles.length >= 10) return candles.slice(-200);
-      } catch (e) { lastErr = e; }
-    }
+        throw new Error("Too few Yahoo candles");
+  }));
+  try {
+    return await Promise.any(attempts);
+  } catch (e) {
+    throw e instanceof Error ? e : new Error("Yahoo unavailable");
   }
-  throw lastErr ?? new Error("Yahoo unavailable");
 }
 
 async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<Candle[]> {
@@ -393,22 +403,22 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
   };
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
-  let lastErr: any = null;
-  for (const host of hosts) {
-    for (const sym of symbols) {
-      try {
+  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
         const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
-        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) { lastErr = new Error(`Binance ${sym}: ${res.status}`); continue; }
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        if (!res.ok) throw new Error(`Binance ${sym}: ${res.status}`);
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
           t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
         })).filter((c) => isFinite(c.c));
         if (candles.length >= 10) return candles.slice(-200);
-      } catch (e) { lastErr = e; }
-    }
+        throw new Error("Too few Binance candles");
+  }));
+  try {
+    return await Promise.any(attempts);
+  } catch (e) {
+    throw e instanceof Error ? e : new Error("Binance unavailable");
   }
-  throw lastErr ?? new Error("Binance unavailable");
 }
 
 async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<Candle[]> {
@@ -426,7 +436,7 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
     const product = coinbaseProductFromSymbol(sym);
     if (!product) continue;
     try {
-      const res = await fetch(`https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}`, {
+      const res = await fetchWithTimeout(`https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
       });
       if (!res.ok) { lastErr = new Error(`Coinbase ${product}: ${res.status}`); continue; }
@@ -543,9 +553,10 @@ export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: strin
   // Cross-pairs: derive from XAU/USD × FX proxy FIRST (most reliable), then
   // fall back to Yahoo's direct cross-pair symbol.
   if (hasProxy) tries.push(() => fetchCrossPairCandlesFromProxy(inst, tf));
+  if (inst.kind === "metal" && inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
   if (inst.binanceSymbols?.length) tries.push(() => fetchFromBinanceSymbols(inst.binanceSymbols!, tf));
   if (inst.kind === "crypto" && inst.binanceSymbols?.length) tries.push(() => fetchFromCoinbaseSymbols(inst.binanceSymbols!, tf));
-  if (inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
+  if (inst.kind !== "metal" && inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
 
   let lastErr: any = null;
   for (const f of tries) {
@@ -939,7 +950,7 @@ function detectKillzone(d: Date): { session: string; killzone: string } {
 
 async function fetchGoldNewsInline(): Promise<NewsItem[]> {
   try {
-    const r = await fetch("https://nfs.faireconomy.media/ff_calendar_thisweek.json", {
+    const r = await fetchWithTimeout("https://nfs.faireconomy.media/ff_calendar_thisweek.json", {
       headers: { "User-Agent": "Mozilla/5.0" },
     });
     if (!r.ok) return [];
@@ -1153,7 +1164,7 @@ async function fetchYahooQuote(symbols: string[]): Promise<LiveTick | null> {
     for (const sym of symbols) {
       try {
         const url = `https://${host}/v7/finance/quote?symbols=${encodeURIComponent(sym)}`;
-        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
         if (!res.ok) continue;
         const j: any = await res.json();
         const q = j?.quoteResponse?.result?.[0];
@@ -1182,7 +1193,7 @@ async function fetchBinanceQuote(symbols: string[]): Promise<LiveTick | null> {
     for (const sym of symbols) {
       try {
         const url = `https://${host}/api/v3/ticker/price?symbol=${sym}`;
-        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
         if (!res.ok) continue;
         const j: any = await res.json();
         const p = parseFloat(j?.price);
@@ -1213,7 +1224,7 @@ async function fetchFxProxyRate(symbol: string): Promise<number | null> {
   if (!m) return null;
   const [, base, quote] = m;
   try {
-    const res = await fetch(`https://open.er-api.com/v6/latest/${base}`, {
+    const res = await fetchWithTimeout(`https://open.er-api.com/v6/latest/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -1237,7 +1248,7 @@ async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick |
   if (inst.kind !== "metal") return null;
   const base = inst.key === "METAL:XAGUSD" ? "XAG" : "XAU";
   try {
-    const res = await fetch(`https://api.gold-api.com/price/${base}`, {
+    const res = await fetchWithTimeout(`https://api.gold-api.com/price/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -1277,7 +1288,7 @@ async function fetchFxSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | nu
   if (!m) return null;
   const [, base, quote] = m;
   try {
-    const res = await fetch(`https://open.er-api.com/v6/latest/${base}`, {
+    const res = await fetchWithTimeout(`https://open.er-api.com/v6/latest/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -1300,7 +1311,7 @@ async function fetchCoinbaseQuote(symbols: string[]): Promise<LiveTick | null> {
     if (!m) continue;
     const base = m[1];
     try {
-      const res = await fetch(`https://api.coinbase.com/v2/prices/${base}-USD/spot`, {
+      const res = await fetchWithTimeout(`https://api.coinbase.com/v2/prices/${base}-USD/spot`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
       });
       if (!res.ok) continue;
@@ -1582,8 +1593,8 @@ export async function computeSignalPlan(data: { symbol: string }, __userId: stri
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
     // Trimmed slices sent to the AI prompt — full arrays remain for engine math.
-    const htfPrompt = htf.slice(-90);
-    const ltfPrompt = ltf.slice(-110);
+    const htfPrompt = htf.slice(-54);
+    const ltfPrompt = ltf.slice(-72);
     const last = ltf[ltf.length - 1];
     // Prefer real-time tick over last-candle close for all downstream analysis.
     const livePrice = liveTick?.price && isFinite(liveTick.price) ? liveTick.price : last.c;
@@ -1686,9 +1697,9 @@ Return ONLY valid JSON (no markdown) with this exact shape:
 {
   "htfBias": "bullish" | "bearish" | "neutral",
   "intro": "One short sentence to open the analysis (spoken aloud)",
-  "htfNarrative": "2-3 sentence written HTF read: structure, bias, premium/discount, key zones, DXY context.",
-  "ltfNarrative": "2-3 sentence written LTF read: refinement, FVG/OB, inducement, expected sweep, trigger.",
-  "confluences": ["6-10 short bullet confluences supporting the trade — be specific (e.g. 'HTF 1H bullish BOS at 2378.40', 'LTF FVG aligned with HTF demand', 'NY AM killzone open')"],
+  "htfNarrative": "1 short sentence HTF read: structure, bias, premium/discount, key zone.",
+  "ltfNarrative": "1 short sentence LTF read: refinement, FVG/OB, trigger.",
+  "confluences": ["4-6 short confluences supporting the trade"],
   "keyLevels": [
     { "label":"PDH","price":<n>,"kind":"resistance" },
     { "label":"PDL","price":<n>,"kind":"support" },
@@ -1720,8 +1731,8 @@ STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - Timestamps: fromTime/toTime MUST be unix-SECONDS copied EXACTLY from the provided candles. Never invent, round, or extrapolate. If unsure, use the timestamp of the closest real candle.
 - Prices: every price/priceLow/priceHigh MUST be within ±20% of CURRENT PRICE ${last.c.toFixed(dec)}. Use realistic values pulled from the OHLC data provided, not round-number guesses.
 - Direction: LTF entry/sl/tp MUST respect current price ${last.c.toFixed(dec)}. RR must be ≥ 1.8, prefer 1:2 to 1:4. Entry must sit inside a real HTF/LTF OB or FVG that you also emit as a marking.
-- Markings coverage: emit MINIMUM 10 and MAXIMUM 16 markings. You MUST include ALL of: 1× HTF BOS or CHOCH, 1× HTF Order Block or Zone, 1× HTF liquidity (PDH/PDL/BSL/SSL/equal-high/equal-low), 1× premium or discount array, 1× LTF FVG, 1× LTF Order Block, 1× LTF liquidity, plus entry/sl/tp triangle. Add breakers/IFVGs/OTE when they exist.
-- Narration: produce EXACTLY 12–14 steps, each 14–28 words, senior institutional tone. Order strictly: (1) HTF bias/structure, (2) HTF BOS/CHOCH, (3) HTF OB/zone, (4) Premium vs Discount, (5) HTF liquidity, (6) shift to LTF, (7) LTF MSS/structure, (8) LTF FVG, (9) LTF OB/breaker, (10) inducement + expected sweep, (11) killzone + DXY/correlation, (12) entry trigger, (13) SL logic, (14) TP + invalidation. Every narration step MUST reference its marking via markingIndex.
+- Markings coverage: emit 7-10 markings only: HTF BOS/CHOCH, HTF OB/zone, HTF liquidity, LTF FVG, LTF OB, LTF liquidity, plus entry/sl/tp when active.
+- Narration: produce 7-9 steps, each 10-18 words, senior institutional tone. Keep it concise. Every narration step should reference its marking via markingIndex when possible.
 - Killzone: state the current session/killzone (${session} / ${killzone}) and the premium-vs-discount read (${inPremium ? "PREMIUM" : "DISCOUNT"}) explicitly in both htfNarrative and the confluences array.
 - News veto: if a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, direction="WAIT", confidence ≤ 50, call out the news title in summary and invalidation.
 - Quality gate: only issue BUY/SELL if HTF and LTF are aligned AND a fresh unmitigated OB or FVG is present in the direction of the trade AND liquidity is sitting on the other side of entry. Otherwise direction="WAIT", confidence ≤ 55, and summary MUST list the specific missing confluence (e.g. "HTF bullish but no unmitigated LTF demand").
@@ -1757,24 +1768,28 @@ ${fmt(ltfPrompt)}
 
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
-    const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
-      models: [...MODEL_CHAIN.narration],
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      jsonMode: true,
-      maxTokens: 8192,
-      timeoutMs: 55000,
-      retriesPerModel: 1,
-      priority: true,
-      stage: "signal-narration",
-    }).catch((err: unknown) => {
-      if (err instanceof AiGatewayError) throw new Error(err.message);
-      throw err;
-    });
-    import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
-    const parsed: any = tryParseJsonLoose(content) || {};
+    let parsed: any = {};
+    try {
+      const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
+        models: [...MODEL_CHAIN.narration],
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        jsonMode: true,
+        maxTokens: 2200,
+        timeoutMs: 18000,
+        retriesPerModel: 1,
+        priority: true,
+        stage: "signal-narration",
+      });
+      import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
+      parsed = tryParseJsonLoose(content) || {};
+    } catch {
+      // Do not make the user wait forever for prose. The deterministic engine
+      // below still produces entry, SL, TP, grade, chart markings and narration.
+      parsed = {};
+    }
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
       ? "high"
@@ -2013,8 +2028,8 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
             { role: "user", content: reviewUser },
           ],
           jsonMode: true,
-          maxTokens: 400,
-          timeoutMs: 45000,
+          maxTokens: 260,
+          timeoutMs: 8000,
           priority: true,
           retriesPerModel: 1,
           stage: "senior-review",
