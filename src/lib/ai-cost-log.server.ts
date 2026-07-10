@@ -42,6 +42,39 @@ export function estimateCostUsd(model: string, promptTokens: number, completionT
   return (promptTokens / 1_000_000) * p.in + (completionTokens / 1_000_000) * p.out;
 }
 
+// Flat charge per real signal (BUY/SELL only). WAIT/no-trade scans are free.
+export const SIGNAL_SCAN_CHARGE_USD = 0.20;
+
+// Pretty label for the AI model used, shown in billing history.
+export function formatModelLabel(rawModel: string | null | undefined): string {
+  if (!rawModel) return "—";
+  const m = String(rawModel).toLowerCase();
+  // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
+  const bare = m.replace(/^(bmind|openai|nvapi|google|nvapi\/openai|nvapi\/deepseek-ai|bmind\/deepseek-ai)\//g, "").replace(/^deepseek-ai\//, "");
+  if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
+  if (bare.startsWith("gpt-5.5")) return "ChatGPT 5.5";
+  if (bare.startsWith("gpt-5.4-pro")) return "ChatGPT 5.4 Pro";
+  if (bare.startsWith("gpt-5.4-mini")) return "ChatGPT 5.4 Mini";
+  if (bare.startsWith("gpt-5.4-nano")) return "ChatGPT 5.4 Nano";
+  if (bare.startsWith("gpt-5.4")) return "ChatGPT 5.4";
+  if (bare.startsWith("gpt-5.2")) return "ChatGPT 5.2";
+  if (bare.startsWith("gpt-5-mini")) return "ChatGPT 5 Mini";
+  if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
+  if (bare.startsWith("gpt-5")) return "ChatGPT 5";
+  if (bare.startsWith("gpt-oss-120b")) return "GPT-OSS 120B";
+  if (bare.startsWith("deepseek-v4-pro")) return "DeepSeek V4 Pro";
+  if (bare.startsWith("gemini-3.1-pro")) return "Gemini 3.1 Pro";
+  if (bare.startsWith("gemini-3.5-flash")) return "Gemini 3.5 Flash";
+  if (bare.startsWith("gemini-3-flash")) return "Gemini 3 Flash";
+  if (bare.startsWith("gemini-2.5-pro")) return "Gemini 2.5 Pro";
+  if (bare.startsWith("gemini-2.5-flash-lite")) return "Gemini 2.5 Flash Lite";
+  if (bare.startsWith("gemini-2.5-flash")) return "Gemini 2.5 Flash";
+  return bare.replace(/^gpt-/, "GPT ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+// Pure logging — writes tokens & raw cost to ai_cost_log. Does NOT deduct
+// from the user's wallet. Actual billing is a single flat charge per real
+// signal, applied via chargeSignalScan() below.
 export async function logAiCost(params: {
   userId: string | null;
   stage: string;
@@ -52,19 +85,13 @@ export async function logAiCost(params: {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     let plan_id: string | null = null;
-    let walletUsd = 2.0;
-    let monthlyScans = 5;
     if (params.userId) {
       const { data } = await supabaseAdmin
         .from("user_subscriptions")
-        .select("plan_id, plans:plan_id ( wallet_usd, monthly_credits )")
+        .select("plan_id")
         .eq("user_id", params.userId)
         .maybeSingle();
       plan_id = (data?.plan_id as string | undefined) ?? null;
-      const w = Number((data as any)?.plans?.wallet_usd);
-      const m = Number((data as any)?.plans?.monthly_credits);
-      if (Number.isFinite(w) && w > 0) walletUsd = w;
-      if (Number.isFinite(m) && m > 0) monthlyScans = m;
     }
 
     const promptTokens = Math.max(0, params.usage.promptTokens | 0);
@@ -72,40 +99,51 @@ export async function logAiCost(params: {
     const totalTokens = params.usage.totalTokens ?? promptTokens + completionTokens;
     const rawCost = estimateCostUsd(params.model, promptTokens, completionTokens);
 
-    // Flat per-scan price tied to advertised plan quota (wallet ÷ monthly scans).
-    // Charge ONLY on the primary narration stage so senior review doesn't
-    // double-bill. Raw cost is still logged for transparency.
-    const perScanCharge = Number((walletUsd / monthlyScans).toFixed(4));
-    const isPrimaryStage = params.stage === "signal-narration";
-    const chargeUsd = isPrimaryStage ? perScanCharge : 0;
-
     await supabaseAdmin.from("ai_cost_log").insert({
       user_id: params.userId, plan_id, stage: params.stage, model: params.model,
       prompt_tokens: promptTokens, completion_tokens: completionTokens,
       total_tokens: totalTokens, cost_usd: rawCost,
     });
-
-    if (params.userId && chargeUsd > 0) {
-      const meta = {
-        model: params.model,
-        stage: params.stage,
-        prompt_tokens: promptTokens,
-        completion_tokens: completionTokens,
-        raw_cost_usd: rawCost,
-        per_scan_charge: perScanCharge,
-        plan_id,
-      };
-      const { error } = await supabaseAdmin.rpc("spend_credits", {
-        _user_id: params.userId,
-        _amount: chargeUsd as any,
-        _reason: "ai_scan",
-        _metadata: meta as any,
-      });
-      if (error && !error.message?.includes("INSUFFICIENT_CREDITS")) {
-        console.warn("spend_credits (ai_scan) failed:", error.message);
-      }
-    }
   } catch (e) {
     console.warn("logAiCost failed:", (e as Error)?.message ?? e);
+  }
+}
+
+// Flat per-signal billing. Charges SIGNAL_SCAN_CHARGE_USD only if the
+// analysis produced a real BUY or SELL. WAIT / no-trade returns are free.
+export async function chargeSignalScan(params: {
+  userId: string | null;
+  direction: "BUY" | "SELL" | "WAIT" | string;
+  model: string | null;
+  seniorModel?: string | null;
+  symbol?: string | null;
+  scanId?: string | null;
+}): Promise<void> {
+  if (!params.userId) return;
+  const dir = String(params.direction || "").toUpperCase();
+  if (dir !== "BUY" && dir !== "SELL") return;
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const meta: Record<string, unknown> = {
+      model: params.model ?? null,
+      model_label: params.model ? formatModelLabel(params.model) : null,
+      senior_model: params.seniorModel ?? null,
+      senior_model_label: params.seniorModel ? formatModelLabel(params.seniorModel) : null,
+      stage: "signal",
+      direction: dir,
+    };
+    if (params.symbol) meta.symbol = params.symbol;
+    if (params.scanId) meta.scanId = params.scanId;
+    const { error } = await supabaseAdmin.rpc("spend_credits", {
+      _user_id: params.userId,
+      _amount: SIGNAL_SCAN_CHARGE_USD as any,
+      _reason: "ai_scan",
+      _metadata: meta as any,
+    });
+    if (error && !error.message?.includes("INSUFFICIENT_CREDITS")) {
+      console.warn("chargeSignalScan spend_credits failed:", error.message);
+    }
+  } catch (e) {
+    console.warn("chargeSignalScan failed:", (e as Error)?.message ?? e);
   }
 }

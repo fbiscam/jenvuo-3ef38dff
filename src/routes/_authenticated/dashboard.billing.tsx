@@ -11,6 +11,31 @@ export const Route = createFileRoute("/_authenticated/dashboard/billing")({
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
+function formatModelLabel(rawModel: string | null | undefined): string {
+  if (!rawModel) return "—";
+  const m = String(rawModel).toLowerCase();
+  const bare = m.replace(/^(bmind|openai|nvapi|google|nvapi\/openai|nvapi\/deepseek-ai|bmind\/deepseek-ai)\//g, "").replace(/^deepseek-ai\//, "");
+  if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
+  if (bare.startsWith("gpt-5.5")) return "ChatGPT 5.5";
+  if (bare.startsWith("gpt-5.4-pro")) return "ChatGPT 5.4 Pro";
+  if (bare.startsWith("gpt-5.4-mini")) return "ChatGPT 5.4 Mini";
+  if (bare.startsWith("gpt-5.4-nano")) return "ChatGPT 5.4 Nano";
+  if (bare.startsWith("gpt-5.4")) return "ChatGPT 5.4";
+  if (bare.startsWith("gpt-5.2")) return "ChatGPT 5.2";
+  if (bare.startsWith("gpt-5-mini")) return "ChatGPT 5 Mini";
+  if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
+  if (bare.startsWith("gpt-5")) return "ChatGPT 5";
+  if (bare.startsWith("gpt-oss-120b")) return "GPT-OSS 120B";
+  if (bare.startsWith("deepseek-v4-pro")) return "DeepSeek V4 Pro";
+  if (bare.startsWith("gemini-3.1-pro")) return "Gemini 3.1 Pro";
+  if (bare.startsWith("gemini-3.5-flash")) return "Gemini 3.5 Flash";
+  if (bare.startsWith("gemini-3-flash")) return "Gemini 3 Flash";
+  if (bare.startsWith("gemini-2.5-pro")) return "Gemini 2.5 Pro";
+  if (bare.startsWith("gemini-2.5-flash-lite")) return "Gemini 2.5 Flash Lite";
+  if (bare.startsWith("gemini-2.5-flash")) return "Gemini 2.5 Flash";
+  return bare.replace(/^gpt-/, "GPT ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 type Mark = boolean | string;
 
 const MATRIX_ROWS: ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }> = [
@@ -113,7 +138,7 @@ function Billing() {
             {resetsAt && (
               <p className="mt-1 text-xs text-zinc-500">Resets {resetsAt.toLocaleDateString()}</p>
             )}
-            <p className="mt-2 text-[11px] text-zinc-500">Per-scan cost = actual AI usage × 2. Cheaper models = more scans.</p>
+            <p className="mt-2 text-[11px] text-zinc-500">Flat $0.20 per real signal (BUY/SELL). WAIT / no-trade scans are free.</p>
           </div>
           <Link to="/pricing" className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
             Buy top-up
@@ -133,6 +158,7 @@ function Billing() {
             promptTokens: number | null;
             completionTokens: number | null;
             scanId: string | null;
+            metadata: Record<string, unknown> | null;
           };
           const rows: Row[] = (credits.state?.recent ?? [])
             .filter((r) => r.delta < 0)
@@ -146,6 +172,7 @@ function Billing() {
               promptTokens: r.prompt_tokens ?? null,
               completionTokens: r.completion_tokens ?? null,
               scanId: (r.metadata?.scanId as string | undefined) ?? null,
+              metadata: (r.metadata as Record<string, unknown> | undefined) ?? null,
             }));
           if (rows.length === 0) return null;
           const shown = showAllActivity ? rows : rows.slice(0, 12);
@@ -172,7 +199,13 @@ function Billing() {
                       const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
                       const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
                       const amt = Math.abs(r.delta);
-                      const modelLabel = r.model ?? (r.reason === "signal" ? "legacy (pre-USD billing)" : "—");
+                      const rawModel = r.model ?? ((r.metadata as any)?.model as string | undefined) ?? null;
+                      const prettyFromMeta = (r.metadata as any)?.model_label as string | undefined;
+                      const seniorPretty = (r.metadata as any)?.senior_model_label as string | undefined;
+                      const modelLabel = prettyFromMeta
+                        ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—"))
+                        ?? "—";
+                      const modelWithSenior = seniorPretty ? `${modelLabel} + ${seniorPretty}` : modelLabel;
                       const stageLabel = r.stage ?? r.reason.replace(/_/g, " ");
                       const tokens =
                         r.promptTokens != null || r.completionTokens != null
@@ -180,7 +213,7 @@ function Billing() {
                           : "—";
                       return (
                         <tr key={r.id} className="hover:bg-zinc-50/60">
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}>{modelLabel}</td>
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}>{modelWithSenior}</td>
                           <td className="whitespace-nowrap px-3 py-2">
                             <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-zinc-600">
                               {stageLabel}

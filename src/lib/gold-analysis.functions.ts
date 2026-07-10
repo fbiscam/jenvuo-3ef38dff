@@ -745,6 +745,13 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
       generatedAt: new Date().toISOString(),
     };
 
+    // Flat $0.20 charge only when a real BUY/SELL comes back.
+    import("@/lib/ai-cost-log.server").then((m) => m.chargeSignalScan({
+      userId: __userId,
+      direction: signal.direction,
+      model: __aiModel,
+    })).catch(() => {});
+
     return { ...signal, __billable: "chat" };
 }
 
@@ -1769,6 +1776,8 @@ ${fmt(ltfPrompt)}
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     let parsed: any = {};
+    let __usedNarrationModel: string | null = null;
+    let __usedSeniorModel: string | null = null;
     try {
       const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
         models: [...MODEL_CHAIN.narration],
@@ -1783,6 +1792,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         priority: true,
         stage: "signal-narration",
       });
+      __usedNarrationModel = __aiModel2 ?? null;
       import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
       parsed = tryParseJsonLoose(content) || {};
     } catch {
@@ -2034,6 +2044,7 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           retriesPerModel: 1,
           stage: "senior-review",
         });
+        __usedSeniorModel = __aiModel3 ?? null;
         import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: __aiModel3, usage: __aiUsage3 })).catch(() => {});
         const review: any = tryParseJsonLoose(rc) || {};
         const verdict = String(review.verdict || "").toUpperCase();
@@ -2354,6 +2365,15 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
       },
     };
 
+    // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
+    // WAIT / no-trade returns are free.
+    import("@/lib/ai-cost-log.server").then((m) => m.chargeSignalScan({
+      userId: __userId,
+      direction: plan.trade.direction,
+      model: __usedNarrationModel,
+      seniorModel: __usedSeniorModel,
+      symbol: canonicalSymbol,
+    })).catch(() => {});
     return plan;
 }
 
