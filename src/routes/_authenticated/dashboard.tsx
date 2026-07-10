@@ -147,7 +147,7 @@ function Metric({
 
   return (
     <div className="flex-1 min-w-0 px-4 pt-2 pb-4">
-      <div className="flex items-center gap-1 text-[12px] text-zinc-500">
+      <div className="flex items-center gap-1 whitespace-nowrap text-[12px] text-zinc-500">
         {label}
         
       </div>
