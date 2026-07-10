@@ -647,9 +647,9 @@ function HomePage() {
           {/* Mobile stacked plan cards (table is unreadable below sm) */}
           <div className="mt-10 grid gap-4 sm:hidden">
             {[
-              { name: "Free", key: "free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", credits: "2 scans / mo", bullets: ["Unlimited voice queries (free)", "4h delayed alerts", "Community support"] },
-              { name: "Pro", key: "pro", price: "$15/mo", tag: "Active trader", to: "/contact" as const, cta: "Notify me", credits: "35 scans / mo", accent: true, bullets: ["Unlimited voice queries", "Realtime A+ alerts", "Full ICT / SMC narration", "Trade journal"] },
-              { name: "Elite", key: "elite", price: "$50/mo", tag: "Desk / fund", to: "/contact" as const, cta: "Talk to sales", credits: "85 scans / mo", bullets: ["Everything in Pro", "< 30s priority alerts", "Multi-pair scanner", "API & webhooks"] },
+              { name: "Free", key: "free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", credits: "$2 wallet · ~5 scans", bullets: ["Unlimited voice queries (free)", "4h delayed alerts", "Community support"] },
+              { name: "Pro", key: "pro", price: "$15/mo", tag: "Active trader", to: "/contact" as const, cta: "Notify me", credits: "$15 wallet · ~35 scans", accent: true, bullets: ["Unlimited voice queries", "Realtime A+ alerts", "Full ICT / SMC narration", "Trade journal"] },
+              { name: "Elite", key: "elite", price: "$50/mo", tag: "Desk / fund", to: "/contact" as const, cta: "Talk to sales", credits: "$50 wallet · ~85 scans", bullets: ["Everything in Pro", "< 30s priority alerts", "Multi-pair scanner", "API & webhooks"] },
             ].map((p) => {
               const isCurrent = currentPlan === p.key;
               return (
