@@ -169,6 +169,8 @@ When the user wants an analysis / setup / signal on a XAU pair, deliver a full A
 
 For casual gold questions (greeting, "why this bias?", "explain FVG", "what moved gold today?"), answer naturally in 2-4 sentences using ICT/SMC vocabulary.
 
+ACCOUNT AWARENESS: If the user asks about THEIR account, balance, wallet, credits, scans used, current plan, subscription renewal, referral code, trade journal stats, win rate, profit/loss, best/worst trade, expectancy, or performance per pair — answer accurately using ONLY the ACCOUNT section in the context. Give exact numbers with $ where relevant. Never invent figures. If a field is "—" or missing, say it's not available yet. Never volunteer account info unless the user asked; keep private data private.
+
 Use the LIVE prices and levels from the context. Be specific, decisive, pro. No disclaimers. IMPORTANT: Reply in PLAIN TEXT only — never use markdown formatting. No asterisks (*, **, ***), no hashes (#, ##, ###), no backticks, no underscores for emphasis, no bullet dashes. Use simple numbered lines like "1) ..." and plain sentences. Keep it clean so it reads naturally when spoken aloud.`;
 
 
@@ -180,8 +182,9 @@ Use the LIVE prices and levels from the context. Be specific, decisive, pro. No 
           { role: "system", content: system },
           {
             role: "user",
-            content: `${switchedDisplay ? `(User is asking about ${switchedDisplay} — use the live context below for that instrument.)\n\n` : ""}CONTEXT:\n${contextStr}\n\nQUESTION: ${data.question}`,
+            content: `${switchedDisplay ? `(User is asking about ${switchedDisplay} — use the live context below for that instrument.)\n\n` : ""}CONTEXT:\n${contextStr}\n\n${isAccountIntent ? `${accountStr}\n\n` : ""}QUESTION: ${data.question}`,
           },
+
         ],
         priority: true,
         timeoutMs: 20000,
