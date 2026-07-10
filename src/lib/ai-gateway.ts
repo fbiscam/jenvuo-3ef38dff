@@ -267,24 +267,23 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Voice / intent detection — cheap, fast classifier.
-  intent: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview"],
+  // Voice / intent detection — NVIDIA-only to avoid Lovable credit usage.
+  intent: ["nvapi/openai/gpt-oss-120b", "nvapi/deepseek-ai/deepseek-v4-pro"],
 
   // Chart narration — deep ICT/SMC reasoning.
-  // Primary: NVIDIA DeepSeek V4 Pro (top-tier reasoning + math for SL/TP/RR, ~3s response).
-  // Fallback: Lovable Gateway GPT-5.4.
+  // NVIDIA-only: prevents scans from falling back to Lovable Gateway credits.
   narration: [
+    "nvapi/openai/gpt-oss-120b",
     "nvapi/deepseek-ai/deepseek-v4-pro",
-    "openai/gpt-5.4",
   ],
 
   // Senior 25-year-trader review (A / A+ verdict).
-  // Primary: NVIDIA DeepSeek V4 Pro. Fallback: Lovable Gateway GPT-5.5.
+  // NVIDIA-only: if NVIDIA is down, fail visibly instead of spending Lovable credits.
   seniorReview: [
     "nvapi/deepseek-ai/deepseek-v4-pro",
-    "openai/gpt-5.5",
+    "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Conversational chat around signals — free-tier Gemini models.
-  chat: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview", "google/gemini-2.5-flash-lite"],
+  // Conversational chat around signals — NVIDIA-only to avoid Lovable credit usage.
+  chat: ["nvapi/openai/gpt-oss-120b", "nvapi/deepseek-ai/deepseek-v4-pro"],
 } as const;
