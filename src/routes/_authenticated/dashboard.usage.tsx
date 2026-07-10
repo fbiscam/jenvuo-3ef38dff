@@ -173,7 +173,7 @@ function UsagePage() {
           <p className="mt-6 text-center text-sm text-zinc-500">No activity yet.</p>
         ) : (
           <>
-            <div className="mt-4 max-h-[420px] overflow-y-auto divide-y divide-zinc-100 rounded-lg border border-zinc-200">
+            <div className="mt-4 max-h-[420px] overflow-y-scroll divide-y divide-zinc-100 rounded-lg border border-zinc-200 [scrollbar-width:thin] [scrollbar-color:#a1a1aa_#f4f4f5] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-zinc-100 [&::-webkit-scrollbar-thumb]:bg-zinc-400 [&::-webkit-scrollbar-thumb]:rounded-full">
               {data.ledger.map((r) => {
                 const d = new Date(r.created_at);
                 const isSpend = r.delta < 0;
