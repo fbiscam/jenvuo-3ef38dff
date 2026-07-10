@@ -279,6 +279,23 @@ export async function confirmEmailChangeToken(
     return { ok: false as const, error: updErr.message }
   }
 
+  // Sign out all sessions across all devices for this user after email change
+  try {
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    const url = `${process.env.SUPABASE_URL}/auth/v1/admin/users/${row.user_id}/logout?scope=global`
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
+      },
+    })
+  } catch {}
+
+
+
+
   await (supabaseAdmin as any)
     .from('email_change_requests')
     .update({ consumed_at: new Date().toISOString() })
