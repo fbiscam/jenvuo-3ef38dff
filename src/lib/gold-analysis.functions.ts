@@ -2358,6 +2358,15 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
       },
     };
 
+    // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
+    // WAIT / no-trade returns are free.
+    import("@/lib/ai-cost-log.server").then((m) => m.chargeSignalScan({
+      userId: __userId,
+      direction: plan.trade.direction,
+      model: __usedNarrationModel,
+      seniorModel: __usedSeniorModel,
+      symbol: canonicalSymbol,
+    })).catch(() => {});
     return plan;
 }
 
