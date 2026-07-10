@@ -1582,8 +1582,8 @@ export async function computeSignalPlan(data: { symbol: string }, __userId: stri
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
     // Trimmed slices sent to the AI prompt — full arrays remain for engine math.
-    const htfPrompt = htf.slice(-90);
-    const ltfPrompt = ltf.slice(-110);
+    const htfPrompt = htf.slice(-54);
+    const ltfPrompt = ltf.slice(-72);
     const last = ltf[ltf.length - 1];
     // Prefer real-time tick over last-candle close for all downstream analysis.
     const livePrice = liveTick?.price && isFinite(liveTick.price) ? liveTick.price : last.c;
@@ -1686,9 +1686,9 @@ Return ONLY valid JSON (no markdown) with this exact shape:
 {
   "htfBias": "bullish" | "bearish" | "neutral",
   "intro": "One short sentence to open the analysis (spoken aloud)",
-  "htfNarrative": "2-3 sentence written HTF read: structure, bias, premium/discount, key zones, DXY context.",
-  "ltfNarrative": "2-3 sentence written LTF read: refinement, FVG/OB, inducement, expected sweep, trigger.",
-  "confluences": ["6-10 short bullet confluences supporting the trade — be specific (e.g. 'HTF 1H bullish BOS at 2378.40', 'LTF FVG aligned with HTF demand', 'NY AM killzone open')"],
+  "htfNarrative": "1 short sentence HTF read: structure, bias, premium/discount, key zone.",
+  "ltfNarrative": "1 short sentence LTF read: refinement, FVG/OB, trigger.",
+  "confluences": ["4-6 short confluences supporting the trade"],
   "keyLevels": [
     { "label":"PDH","price":<n>,"kind":"resistance" },
     { "label":"PDL","price":<n>,"kind":"support" },
@@ -1720,8 +1720,8 @@ STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - Timestamps: fromTime/toTime MUST be unix-SECONDS copied EXACTLY from the provided candles. Never invent, round, or extrapolate. If unsure, use the timestamp of the closest real candle.
 - Prices: every price/priceLow/priceHigh MUST be within ±20% of CURRENT PRICE ${last.c.toFixed(dec)}. Use realistic values pulled from the OHLC data provided, not round-number guesses.
 - Direction: LTF entry/sl/tp MUST respect current price ${last.c.toFixed(dec)}. RR must be ≥ 1.8, prefer 1:2 to 1:4. Entry must sit inside a real HTF/LTF OB or FVG that you also emit as a marking.
-- Markings coverage: emit MINIMUM 10 and MAXIMUM 16 markings. You MUST include ALL of: 1× HTF BOS or CHOCH, 1× HTF Order Block or Zone, 1× HTF liquidity (PDH/PDL/BSL/SSL/equal-high/equal-low), 1× premium or discount array, 1× LTF FVG, 1× LTF Order Block, 1× LTF liquidity, plus entry/sl/tp triangle. Add breakers/IFVGs/OTE when they exist.
-- Narration: produce EXACTLY 12–14 steps, each 14–28 words, senior institutional tone. Order strictly: (1) HTF bias/structure, (2) HTF BOS/CHOCH, (3) HTF OB/zone, (4) Premium vs Discount, (5) HTF liquidity, (6) shift to LTF, (7) LTF MSS/structure, (8) LTF FVG, (9) LTF OB/breaker, (10) inducement + expected sweep, (11) killzone + DXY/correlation, (12) entry trigger, (13) SL logic, (14) TP + invalidation. Every narration step MUST reference its marking via markingIndex.
+- Markings coverage: emit 7-10 markings only: HTF BOS/CHOCH, HTF OB/zone, HTF liquidity, LTF FVG, LTF OB, LTF liquidity, plus entry/sl/tp when active.
+- Narration: produce 7-9 steps, each 10-18 words, senior institutional tone. Keep it concise. Every narration step should reference its marking via markingIndex when possible.
 - Killzone: state the current session/killzone (${session} / ${killzone}) and the premium-vs-discount read (${inPremium ? "PREMIUM" : "DISCOUNT"}) explicitly in both htfNarrative and the confluences array.
 - News veto: if a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, direction="WAIT", confidence ≤ 50, call out the news title in summary and invalidation.
 - Quality gate: only issue BUY/SELL if HTF and LTF are aligned AND a fresh unmitigated OB or FVG is present in the direction of the trade AND liquidity is sitting on the other side of entry. Otherwise direction="WAIT", confidence ≤ 55, and summary MUST list the specific missing confluence (e.g. "HTF bullish but no unmitigated LTF demand").
@@ -1764,8 +1764,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         { role: "user", content: user },
       ],
       jsonMode: true,
-      maxTokens: 8192,
-      timeoutMs: 55000,
+      maxTokens: 2200,
+      timeoutMs: 18000,
       retriesPerModel: 1,
       priority: true,
       stage: "signal-narration",
@@ -2013,8 +2013,8 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
             { role: "user", content: reviewUser },
           ],
           jsonMode: true,
-          maxTokens: 400,
-          timeoutMs: 45000,
+          maxTokens: 260,
+          timeoutMs: 8000,
           priority: true,
           retriesPerModel: 1,
           stage: "senior-review",
