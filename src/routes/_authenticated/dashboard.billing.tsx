@@ -154,41 +154,47 @@ function Billing() {
               <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>
                 Recent scans — model & cost
               </div>
-              <div className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
-                {shown.map((r) => {
-                  const d = new Date(r.created_at);
-                  const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-                  const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
-                  const amt = Math.abs(r.delta);
-                  const modelLabel = r.model ?? (r.reason === "signal" ? "legacy (pre-USD billing)" : "—");
-                  const stageLabel = r.stage ?? r.reason.replace(/_/g, " ");
-                  const tokens =
-                    r.promptTokens != null || r.completionTokens != null
-                      ? `${r.promptTokens ?? 0} in / ${r.completionTokens ?? 0} out tok`
-                      : null;
-                  return (
-                    <div key={r.id} className="flex flex-col gap-1 px-3 py-2.5 text-xs sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex min-w-0 flex-col gap-0.5">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={`${MONO} truncate text-[11px] font-medium text-zinc-900`}>
-                            {modelLabel}
-                          </span>
-                          <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-zinc-600">
-                            {stageLabel}
-                          </span>
-                        </div>
-                        <div className={`${MONO} flex flex-wrap items-center gap-2 text-[10px] text-zinc-500`}>
-                          <span className="tabular-nums">{dateStr} · {timeStr}</span>
-                          {tokens && <span>· {tokens}</span>}
-                          {r.scanId && <span className="truncate">· scan {r.scanId.slice(0, 8)}</span>}
-                        </div>
-                      </div>
-                      <span className="tabular-nums font-semibold text-rose-600 sm:text-sm">
-                        −${amt.toFixed(4)}
-                      </span>
-                    </div>
-                  );
-                })}
+              <div className="overflow-x-auto rounded-lg border border-zinc-200">
+                <table className="w-full min-w-[640px] text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-zinc-200 bg-zinc-50/60 text-left">
+                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Model</th>
+                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Stage</th>
+                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Date</th>
+                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Tokens</th>
+                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Scan</th>
+                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium text-right`}>Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-100">
+                    {shown.map((r) => {
+                      const d = new Date(r.created_at);
+                      const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                      const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+                      const amt = Math.abs(r.delta);
+                      const modelLabel = r.model ?? (r.reason === "signal" ? "legacy (pre-USD billing)" : "—");
+                      const stageLabel = r.stage ?? r.reason.replace(/_/g, " ");
+                      const tokens =
+                        r.promptTokens != null || r.completionTokens != null
+                          ? `${r.promptTokens ?? 0} / ${r.completionTokens ?? 0}`
+                          : "—";
+                      return (
+                        <tr key={r.id} className="hover:bg-zinc-50/60">
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}>{modelLabel}</td>
+                          <td className="whitespace-nowrap px-3 py-2">
+                            <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-zinc-600">
+                              {stageLabel}
+                            </span>
+                          </td>
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums text-zinc-500`}>{dateStr} · {timeStr}</td>
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums text-zinc-500`}>{tokens}</td>
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] text-zinc-500`}>{r.scanId ? r.scanId.slice(0, 8) : "—"}</td>
+                          <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums font-semibold text-rose-600">−${amt.toFixed(4)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
               {rows.length > 12 && (
                 <div className="mt-3 flex justify-center">
