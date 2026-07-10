@@ -590,14 +590,15 @@ function AdminInbox() {
               </div>
 
               {/* Composer */}
-              <form onSubmit={handleReply} className="shrink-0 border-t border-zinc-900/[0.06] bg-white/70 p-4 backdrop-blur-xl">
+              <form onSubmit={handleReply} className="shrink-0 border-t border-neutral-200 bg-[#FDFDFB] p-5">
                 {activeSession.status === "closed" ? (
-                  <div className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200/80 bg-white py-3 text-[12px] font-medium text-zinc-500">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed.
+                  <div className="flex items-center justify-center gap-2 rounded-sm border border-neutral-200 bg-white py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed
                   </div>
                 ) : (
                   <div className="mx-auto max-w-3xl">
-                    <div className="relative rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_30px_-15px_rgba(0,0,0,0.15)] transition focus-within:border-zinc-900/40 focus-within:ring-4 focus-within:ring-zinc-900/5">
+                    <div className="relative rounded-sm border border-neutral-200 bg-white transition focus-within:border-black">
+
                       <textarea
                         ref={inputRef}
                         value={input}
