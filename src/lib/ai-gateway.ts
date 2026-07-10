@@ -131,8 +131,8 @@ async function singleAttempt(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    // Blackbox: treat 400/403 as non-terminal so we fallback to the next model (e.g. unsupported model).
-    const terminal = isBlackbox
+    // Blackbox/NVIDIA: treat 400/403 as non-terminal so we fallback to the next model.
+    const terminal = (isBlackbox || isNvidia)
       ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400)
       : !(res.status === 429 || res.status >= 500);
     let msg: string;
