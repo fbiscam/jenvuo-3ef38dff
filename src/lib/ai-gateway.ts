@@ -281,26 +281,32 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 
 export const MODEL_CHAIN = {
   // Bluesminds ($100 credit, unlimited quota, top models) is PRIMARY.
+  // Accuracy-first tier: GPT-5.5-Pro (extended reasoning) for analysis,
+  // GPT-5.4-Pro for independent senior review on A/A+ setups.
   // NVIDIA free tier is fallback. Lovable credits never used for these stages.
   intent: [
     "bmind/gpt-5.5",
-    "bmind/deepseek-ai/deepseek-v4-pro",
+    "bmind/gpt-5.5-pro",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Chart narration — deep ICT/SMC reasoning. GPT-5.5 primary via Bluesminds.
+  // Chart narration — deep ICT/SMC reasoning.
+  // Primary: GPT-5.5-Pro (extended reasoning, best pattern recognition).
   narration: [
+    "bmind/gpt-5.5-pro",
     "bmind/gpt-5.5",
     "bmind/deepseek-ai/deepseek-v4-pro",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict). DeepSeek V4 Pro primary via Bluesminds.
+  // Senior 25-year-trader review (A / A+ verdict).
+  // Primary: GPT-5.4-Pro (independent second opinion from a different model family).
   seniorReview: [
+    "bmind/gpt-5.4-pro",
     "bmind/deepseek-ai/deepseek-v4-pro",
-    "bmind/gpt-5.5",
+    "bmind/gpt-5.5-pro",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "nvapi/openai/gpt-oss-120b",
   ],
