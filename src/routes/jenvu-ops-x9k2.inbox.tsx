@@ -298,32 +298,22 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="relative flex h-screen flex-col bg-[#f4f6fb] text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
-      {/* Ambient premium backdrop */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle_at_20%_10%,#000_0.5px,transparent_0.5px),radial-gradient(circle_at_80%_60%,#000_0.5px,transparent_0.5px)] [background-size:22px_22px,28px_28px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
-
+    <div className="relative flex h-screen flex-col bg-[#F5F5F3] text-[13px] text-zinc-900 antialiased [font-family:'Urbanist_Variable',Urbanist,system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Top bar */}
-      <header className="relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-zinc-900/[0.06] bg-white/70 px-5 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(0,0,0,0.12)] backdrop-blur-xl">
+      <header className="relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-neutral-200 bg-[#FDFDFB] px-5">
         <div className="flex items-center gap-3">
-          <span className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-white shadow-[0_1px_2px_rgba(0,0,0,0.06),0_8px_20px_-8px_rgba(0,0,0,0.15)] ring-1 ring-black/5">
-            <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 object-contain" />
-            <span className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-white/60 to-transparent" />
+          <span className="grid h-8 w-8 place-items-center rounded-sm bg-black">
+            <img src="/favicon.png" alt="Jenvu" className="h-5 w-5 object-contain invert" />
           </span>
-          <div className="flex items-baseline gap-2">
-            <span className="text-[17px] font-bold tracking-tight text-zinc-900">Jenvu</span>
-            
-          </div>
-          <span className="text-zinc-300">/</span>
-          <span className="text-[13px] font-medium tracking-tight text-zinc-500">Support Inbox</span>
+          <span className="text-[17px] font-semibold tracking-tight text-zinc-900">Jenvu</span>
+          <span className="text-neutral-300">/</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400">Support Inbox</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="hidden items-center gap-1 rounded-md border border-zinc-200/80 bg-white/60 px-1.5 py-0.5 font-mono text-[10.5px] text-zinc-500 shadow-sm sm:inline-flex">
-            <Command className="h-2.5 w-2.5" /> K
-          </span>
-          <span className="hidden rounded-full border border-zinc-200/80 bg-white/60 px-2.5 py-1 text-[11.5px] font-medium text-zinc-700 sm:inline">{username}</span>
+        <div className="flex items-center gap-3">
+          <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-400 sm:inline">{username}</span>
           <button
             onClick={handleLogout}
-            className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-zinc-900 hover:text-white"
+            className="grid h-8 w-8 place-items-center rounded-sm text-neutral-500 transition hover:bg-black hover:text-white"
             title="Sign out"
           >
             <LogOut className="h-3.5 w-3.5" />
