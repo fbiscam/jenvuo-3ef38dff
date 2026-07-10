@@ -146,7 +146,7 @@ async function singleAttempt(
     const txt = await res.text().catch(() => "");
     // Blackbox/NVIDIA: treat 400/403 as non-terminal so we fallback to the next model.
     // Blackbox/NVIDIA: treat 400/401/403/404/429/5xx as non-terminal so we fall back to Lovable Gateway.
-    const terminal = (isBlackbox || isNvidia)
+    const terminal = (isBlackbox || isNvidia || isBmind)
       ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400 || res.status === 401 || res.status === 404)
       : !(res.status === 429 || res.status >= 500);
     let msg: string;
