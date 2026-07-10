@@ -113,7 +113,7 @@ function Billing() {
             {resetsAt && (
               <p className="mt-1 text-xs text-zinc-500">Resets {resetsAt.toLocaleDateString()}</p>
             )}
-            <p className="mt-2 text-[11px] text-zinc-500">Per-scan cost = actual AI usage × 2. Cheaper models = more scans.</p>
+            <p className="mt-2 text-[11px] text-zinc-500">Flat $0.20 per real signal (BUY/SELL). WAIT / no-trade scans are free.</p>
           </div>
           <Link to="/pricing" className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
             Buy top-up
