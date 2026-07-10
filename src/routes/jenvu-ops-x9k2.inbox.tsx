@@ -550,10 +550,10 @@ function AdminInbox() {
               </div>
 
               {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-white">
-                <div className="mx-auto max-w-3xl space-y-1 p-5">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-[#FDFDFB]">
+                <div className="mx-auto max-w-3xl space-y-1 p-8">
                   {messages.length === 0 && (
-                    <div className="py-8 text-center text-[11.5px] text-zinc-500">No messages yet.</div>
+                    <div className="py-8 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400">No messages yet</div>
                   )}
                   {messages.map((m, i) => {
                     const isAdminMsg = m.sender === "admin";
@@ -561,25 +561,24 @@ function AdminInbox() {
                     const showHeader = !prev || prev.sender !== m.sender ||
                       new Date(m.created_at).getTime() - new Date(prev.created_at).getTime() > 5 * 60 * 1000;
                     return (
-                      <div key={m.id} className={showHeader ? "pt-4" : ""}>
+                      <div key={m.id} className={showHeader ? "pt-6" : "pt-1"}>
                         {showHeader && (
-                          <div className={`mb-1.5 flex items-center gap-1.5 text-[10.5px] ${isAdminMsg ? "justify-end" : ""}`}>
-                            <span className="font-semibold tracking-tight text-zinc-700">
+                          <div className={`mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-400 ${isAdminMsg ? "justify-end" : ""}`}>
+                            <span className="font-medium text-neutral-600">
                               {isAdminMsg ? username || "You" : activeSession.guest_name || "Visitor"}
                             </span>
-                            <span className="text-zinc-400">
+                            <span>
                               {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                             </span>
                           </div>
                         )}
                         <div className={`flex ${isAdminMsg ? "justify-end" : "justify-start"}`}>
                           <div
-                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed ${
+                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-sm px-4 py-3 text-[13.5px] leading-relaxed ${
                               isAdminMsg
-                                ? "rounded-br-md bg-blue-600 text-white shadow-[0_4px_14px_-4px_rgba(37,99,235,0.5)]"
-                                : "rounded-bl-md border border-zinc-900/[0.06] bg-white text-zinc-900 shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                                ? "bg-neutral-100 text-zinc-900"
+                                : "border border-neutral-200 bg-white text-zinc-900"
                             }`}
-
                           >
                             {m.content}
                           </div>
