@@ -179,12 +179,12 @@ function UsagePage() {
                 const isSpend = r.delta < 0;
                 const amt = Math.abs(r.delta);
                 return (
-                  <div key={r.id} className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
-                    <div className="flex min-w-0 items-center gap-3">
+                  <div key={r.id} className="flex items-center justify-between gap-3 px-3 py-2 text-xs overflow-x-auto sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <div className="flex min-w-0 items-center gap-3 whitespace-nowrap">
                       <span className={`${MONO} shrink-0 text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums`}>
                         {d.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · {d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
                       </span>
-                      <span className="truncate text-zinc-700">{label(r.reason)}</span>
+                      <span className="shrink-0 text-zinc-700 sm:truncate">{label(r.reason)}</span>
                     </div>
                     <div className="flex items-center gap-3 tabular-nums">
                       <span className={`font-medium ${isSpend ? "text-rose-600" : "text-emerald-600"}`}>
