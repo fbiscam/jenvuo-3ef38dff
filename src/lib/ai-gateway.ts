@@ -65,38 +65,52 @@ async function singleAttempt(
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
 
-  // Route by prefix: `blackboxai/*` → Blackbox API, else → Lovable AI Gateway.
+  // Route by prefix:
+  //   `blackboxai/*` → Blackbox API
+  //   `nvapi/*`      → NVIDIA Integrate API (strip prefix to get real model id)
+  //   else           → Lovable AI Gateway
   const isBlackbox = model.startsWith("blackboxai/");
+  const isNvidia = model.startsWith("nvapi/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
+  const nvidiaKey = process.env.NVIDIA_API_KEY;
 
   const endpoint = isBlackbox
     ? "https://api.blackbox.ai/v1/chat/completions"
+    : isNvidia
+    ? "https://integrate.api.nvidia.com/v1/chat/completions"
     : "https://ai.gateway.lovable.dev/v1/chat/completions";
 
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (isBlackbox) {
     if (!blackboxKey) throw new AiGatewayError("BLACKBOX_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${blackboxKey}`;
+  } else if (isNvidia) {
+    if (!nvidiaKey) throw new AiGatewayError("NVIDIA_API_KEY missing on server", 0, true);
+    headers["Authorization"] = `Bearer ${nvidiaKey}`;
   } else {
     headers["Lovable-API-Key"] = apiKey;
   }
 
+  // Strip `nvapi/` prefix to expose the real NVIDIA model id (e.g. `deepseek-ai/deepseek-v4-pro`).
+  const wireModel = isNvidia ? model.slice("nvapi/".length) : model;
+
   const body: Record<string, unknown> = {
-    model,
+    model: wireModel,
     messages: opts.messages,
   };
-  // Blackbox does not support response_format json_object — rely on system prompt instead.
-  if (opts.jsonMode && !isBlackbox) body.response_format = { type: "json_object" };
+  // Neither Blackbox nor NVIDIA reliably support json_object response_format — rely on system prompt.
+  if (opts.jsonMode && !isBlackbox && !isNvidia) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
-    if (!isBlackbox && model.startsWith("openai/gpt-5")) {
+    if (!isBlackbox && !isNvidia && model.startsWith("openai/gpt-5")) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (!isBlackbox && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
+  if (!isBlackbox && !isNvidia && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
     body.service_tier = "priority";
   }
+
 
   let res: Response;
   try {
@@ -117,8 +131,8 @@ async function singleAttempt(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    // Blackbox: treat 400/403 as non-terminal so we fallback to the next model (e.g. unsupported model).
-    const terminal = isBlackbox
+    // Blackbox/NVIDIA: treat 400/403 as non-terminal so we fallback to the next model.
+    const terminal = (isBlackbox || isNvidia)
       ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400)
       : !(res.status === 429 || res.status >= 500);
     let msg: string;
@@ -255,16 +269,18 @@ export const MODEL_CHAIN = {
   // Voice / intent detection — cheap, fast classifier.
   intent: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview"],
 
-  // Chart narration — deep ICT/SMC reasoning via Lovable AI Gateway.
-  // Primary + fallback both run on GPT-5.4 for consistent signal quality.
+  // Chart narration — deep ICT/SMC reasoning.
+  // Primary: NVIDIA DeepSeek V4 Pro (top-tier reasoning + math for SL/TP/RR, ~3s response).
+  // Fallback: Lovable Gateway GPT-5.4.
   narration: [
-    "openai/gpt-5.4",
+    "nvapi/deepseek-ai/deepseek-v4-pro",
     "openai/gpt-5.4",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict) — flagship reasoning on GPT-5.5.
+  // Senior 25-year-trader review (A / A+ verdict).
+  // Primary: NVIDIA DeepSeek V4 Pro. Fallback: Lovable Gateway GPT-5.5.
   seniorReview: [
-    "openai/gpt-5.5",
+    "nvapi/deepseek-ai/deepseek-v4-pro",
     "openai/gpt-5.5",
   ],
 
