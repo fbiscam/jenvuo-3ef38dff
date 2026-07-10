@@ -2049,6 +2049,8 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           stage: "senior-review",
         });
         __usedSeniorModel = __aiModel3 ?? null;
+        __totalPromptTokens += __aiUsage3?.promptTokens ?? 0;
+        __totalCompletionTokens += __aiUsage3?.completionTokens ?? 0;
         import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: __aiModel3, usage: __aiUsage3 })).catch(() => {});
         const review: any = tryParseJsonLoose(rc) || {};
         const verdict = String(review.verdict || "").toUpperCase();
