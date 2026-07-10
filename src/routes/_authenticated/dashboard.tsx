@@ -67,6 +67,7 @@ const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: bo
   { to: "/dashboard/journal", label: "Trades", icon: BookOpen, countKey: "journalTotal" },
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
+  { to: "/dashboard/usage", label: "Usage", icon: PieChart },
   { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { to: "/dashboard/profile", label: "Profile", icon: User },
   { to: "/dashboard/security", label: "Security", icon: ShieldCheck },
