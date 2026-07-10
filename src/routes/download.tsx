@@ -4,13 +4,13 @@ import SiteFooter from "@/components/SiteFooter";
 export const Route = createFileRoute("/download")({
   head: () => ({
     meta: [
-      { title: "Download App — Jenvu" },
+      { title: "Download our app" },
       {
         name: "description",
         content:
           "Get Jenvu on your device. Native iOS, Android APK and desktop PWA — the institutional voice-native gold trading agent covering every XAU cross-pair in your pocket.",
       },
-      { property: "og:title", content: "Download Our Application — Jenvu" },
+      { property: "og:title", content: "Download our app" },
       {
         property: "og:description",
         content:
