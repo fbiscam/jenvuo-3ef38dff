@@ -388,12 +388,16 @@ function SignalPage() {
       // Free users still don't get the guided narration.
       if (credits.features.full_ict) {
         setTimeout(() => runNarration(p), 400);
-      } else {
+      } else if (!credits.isLoading && credits.plan?.id === "free") {
         toast.info("Full ICT narration is a Pro feature", {
           description: "Upgrade to unlock the guided multi-timeframe walkthrough.",
           action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
         });
+      } else {
+        // Credits still loading or paid plan — assume entitled and run narration
+        setTimeout(() => runNarration(p), 400);
       }
+
     } catch (e: any) {
       toast.error(e?.message || "Failed to load signal");
     } finally {
