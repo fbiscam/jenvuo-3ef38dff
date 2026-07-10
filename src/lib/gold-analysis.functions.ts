@@ -2370,7 +2370,7 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
     import("@/lib/ai-cost-log.server").then((m) => m.chargeSignalScan({
       userId: __userId,
       direction: plan.trade.direction,
-      model: __usedNarrationModel,
+      model: __usedNarrationModel ?? MODEL_CHAIN.narration[0] ?? null,
       seniorModel: __usedSeniorModel,
       symbol: canonicalSymbol,
     })).catch(() => {});
