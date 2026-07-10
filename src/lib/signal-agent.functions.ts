@@ -70,6 +70,46 @@ KEY LEVELS: ${(ctx.keyLevels ?? []).map((k) => `${k.label}=${k.price}`).join(" �
 `.trim();
 }
 
+async function fetchAccountContext(supabase: any, userId: string): Promise<string> {
+  try {
+    const [balRes, subRes, statsRes, ledgerRes, refRes, profRes] = await Promise.all([
+      supabase.from("credit_balances").select("balance,monthly_allowance,period_resets_at").eq("user_id", userId).maybeSingle(),
+      supabase.from("user_subscriptions").select("plan_id,status,billing_interval,current_period_end").eq("user_id", userId).maybeSingle(),
+      supabase.rpc("journal_stats", { _from: null, _to: null }),
+      supabase.from("credit_ledger").select("delta,reason,created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(50),
+      supabase.from("referral_codes").select("code").eq("user_id", userId).maybeSingle(),
+      supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
+    ]);
+    const bal = balRes?.data ?? {};
+    const sub = subRes?.data ?? {};
+    const stats = (statsRes?.data as any) ?? {};
+    const totals = stats.totals ?? {};
+    const byPair = Array.isArray(stats.by_pair) ? stats.by_pair.slice(0, 5) : [];
+    const ledger = Array.isArray(ledgerRes?.data) ? ledgerRes.data : [];
+    const spentThisPeriod = ledger
+      .filter((r: any) => Number(r.delta) < 0 && (r.reason === "signal_scan" || r.reason === "voice-chat"))
+      .reduce((s: number, r: any) => s + Math.abs(Number(r.delta)), 0);
+    const scansCount = ledger.filter((r: any) => Number(r.delta) < 0 && r.reason === "signal_scan").length;
+    const ref = refRes?.data?.code ?? "—";
+    const name = profRes?.data?.full_name ?? "—";
+
+    const pairsStr = byPair.map((p: any) => `${p.pair}: ${p.trades}t ${p.win_rate}% $${Number(p.pnl).toFixed(2)}`).join(" · ") || "—";
+
+    return `
+ACCOUNT (private — use only if user asks about their account/balance/trades/stats):
+NAME: ${name}
+PLAN: ${sub.plan_id ?? "free"} (${sub.status ?? "—"}, ${sub.billing_interval ?? "—"}, renews ${sub.current_period_end ?? "—"})
+WALLET BALANCE: $${Number(bal.balance ?? 0).toFixed(4)} (monthly allowance $${Number(bal.monthly_allowance ?? 0).toFixed(2)}, resets ${bal.period_resets_at ?? "—"})
+SPENT (last 50 entries): $${spentThisPeriod.toFixed(4)} · SCANS COUNT: ${scansCount}
+TRADE JOURNAL: total=${totals.total ?? 0} wins=${totals.wins ?? 0} losses=${totals.losses ?? 0} BE=${totals.breakeven ?? 0} win_rate=${totals.win_rate ?? 0}% total_pnl=$${Number(totals.total_pnl ?? 0).toFixed(2)} avg_win=$${Number(totals.avg_win ?? 0).toFixed(2)} avg_loss=$${Number(totals.avg_loss ?? 0).toFixed(2)} best=$${Number(totals.best ?? 0).toFixed(2)} worst=$${Number(totals.worst ?? 0).toFixed(2)} expectancy=$${Number(totals.expectancy ?? 0).toFixed(2)}
+TOP PAIRS: ${pairsStr}
+REFERRAL CODE: ${ref}
+`.trim();
+  } catch {
+    return "ACCOUNT: (unavailable)";
+  }
+}
+
 export const askSignalAgent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => d as { question: string; context?: AgentContext })
@@ -84,6 +124,7 @@ export const askSignalAgent = createServerFn({ method: "POST" })
     let switchedDisplay: string | null = null;
     let contextStr = buildContextFromCtx(ctx);
     let isAnalysisIntent = /\b(analy[sz]e|analysis|setup|signal|entry|trade|bias|prediction|forecast|target|levels?|setup|plan|view|outlook|short|long|buy|sell|breakdown)\b/i.test(data.question);
+
 
     if (detected) {
       const resolved = resolveInstrument(detected);
