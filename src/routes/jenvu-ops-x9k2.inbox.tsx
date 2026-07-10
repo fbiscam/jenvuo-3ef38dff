@@ -666,7 +666,7 @@ function AdminInbox() {
                             disabled={sending || !input.trim()}
                             aria-label="Send"
                             title="Send (Enter)"
-                            className="grid h-10 w-10 place-items-center rounded-full bg-blue-600 text-white shadow-[0_6px_18px_-6px_rgba(37,99,235,0.65)] ring-1 ring-blue-700/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="grid h-10 w-10 place-items-center rounded-sm bg-black text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {sending ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
