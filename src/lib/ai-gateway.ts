@@ -291,11 +291,10 @@ export const MODEL_CHAIN = {
     "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Chart narration — deep ICT/SMC reasoning.
-  // Primary: GPT-5.5-Pro (extended reasoning, best pattern recognition).
+  // Chart narration — fast + accurate. GPT-5.5 primary (8-15s), Pro as fallback.
   narration: [
-    "bmind/gpt-5.5-pro",
     "bmind/gpt-5.5",
+    "bmind/gpt-5.5-pro",
     "bmind/deepseek-ai/deepseek-v4-pro",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "nvapi/openai/gpt-oss-120b",
