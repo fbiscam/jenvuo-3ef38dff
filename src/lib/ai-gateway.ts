@@ -269,16 +269,20 @@ export const MODEL_CHAIN = {
   // Voice / intent detection — cheap, fast classifier.
   intent: ["google/gemini-3.1-flash-lite", "google/gemini-3-flash-preview"],
 
-  // Chart narration — deep ICT/SMC reasoning via Lovable AI Gateway.
-  // Primary + fallback both run on GPT-5.4 for consistent signal quality.
+  // Chart narration — deep ICT/SMC reasoning.
+  // Primary: NVIDIA DeepSeek V4 Pro (top-tier reasoning + math for SL/TP/RR).
+  // Fallback: NVIDIA DeepSeek V4 Flash → Lovable Gateway GPT-5.4.
   narration: [
-    "openai/gpt-5.4",
+    "nvapi/deepseek-ai/deepseek-v4-pro",
+    "nvapi/deepseek-ai/deepseek-v4-flash",
     "openai/gpt-5.4",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict) — flagship reasoning on GPT-5.5.
+  // Senior 25-year-trader review (A / A+ verdict) — finance-tuned primary.
+  // Primary: Palmyra-Fin (SEC/finance-tuned). Fallback: DeepSeek V4 Pro → GPT-5.5.
   seniorReview: [
-    "openai/gpt-5.5",
+    "nvapi/writer/palmyra-fin-70b-32k",
+    "nvapi/deepseek-ai/deepseek-v4-pro",
     "openai/gpt-5.5",
   ],
 
