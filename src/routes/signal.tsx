@@ -130,6 +130,16 @@ function SignalPage() {
   const speech = useSpeech();
   const credits = useCredits();
 
+  // Kill any narration / listening when the signal page unmounts
+  useEffect(() => {
+    return () => {
+      try { speech.stopSpeaking(); } catch { /* noop */ }
+      try { speech.stopListening(); } catch { /* noop */ }
+      try { window.speechSynthesis?.cancel(); } catch { /* noop */ }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   const { user: authUser, loading: authLoading } = useAuthUser();
   const authReady = !authLoading && !!authUser;
