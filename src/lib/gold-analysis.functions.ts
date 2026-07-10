@@ -1765,7 +1765,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       ],
       jsonMode: true,
       maxTokens: 8192,
-      timeoutMs: 22000,
+      timeoutMs: 55000,
       retriesPerModel: 1,
       priority: true,
       stage: "signal-narration",
