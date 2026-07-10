@@ -68,16 +68,21 @@ async function singleAttempt(
   // Route by prefix:
   //   `blackboxai/*` → Blackbox API
   //   `nvapi/*`      → NVIDIA Integrate API (strip prefix to get real model id)
+  //   `bmind/*`      → Bluesminds unified gateway (OpenAI-compatible)
   //   else           → Lovable AI Gateway
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
+  const isBmind = model.startsWith("bmind/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
   const nvidiaKey = process.env.NVIDIA_API_KEY;
+  const bmindKey = process.env.BLUESMINDS_API_KEY;
 
   const endpoint = isBlackbox
     ? "https://api.blackbox.ai/v1/chat/completions"
     : isNvidia
     ? "https://integrate.api.nvidia.com/v1/chat/completions"
+    : isBmind
+    ? "https://api.bluesminds.com/v1/chat/completions"
     : "https://ai.gateway.lovable.dev/v1/chat/completions";
 
   const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -87,29 +92,37 @@ async function singleAttempt(
   } else if (isNvidia) {
     if (!nvidiaKey) throw new AiGatewayError("NVIDIA_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${nvidiaKey}`;
+  } else if (isBmind) {
+    if (!bmindKey) throw new AiGatewayError("BLUESMINDS_API_KEY missing on server", 0, true);
+    headers["Authorization"] = `Bearer ${bmindKey}`;
   } else {
     headers["Lovable-API-Key"] = apiKey;
   }
 
-  // Strip `nvapi/` prefix to expose the real NVIDIA model id (e.g. `deepseek-ai/deepseek-v4-pro`).
-  const wireModel = isNvidia ? model.slice("nvapi/".length) : model;
+  // Strip provider prefixes to expose the real upstream model id.
+  const wireModel = isNvidia
+    ? model.slice("nvapi/".length)
+    : isBmind
+    ? model.slice("bmind/".length)
+    : model;
 
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
   };
-  // Neither Blackbox nor NVIDIA reliably support json_object response_format — rely on system prompt.
-  if (opts.jsonMode && !isBlackbox && !isNvidia) body.response_format = { type: "json_object" };
+  // Blackbox/NVIDIA/Bluesminds: don't force response_format — rely on system prompt.
+  if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
-    if (!isBlackbox && !isNvidia && model.startsWith("openai/gpt-5")) {
+    if (!isBlackbox && !isNvidia && !isBmind && model.startsWith("openai/gpt-5")) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (!isBlackbox && !isNvidia && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
+  if (!isBlackbox && !isNvidia && !isBmind && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
     body.service_tier = "priority";
   }
+
 
 
   let res: Response;
@@ -133,7 +146,7 @@ async function singleAttempt(
     const txt = await res.text().catch(() => "");
     // Blackbox/NVIDIA: treat 400/403 as non-terminal so we fallback to the next model.
     // Blackbox/NVIDIA: treat 400/401/403/404/429/5xx as non-terminal so we fall back to Lovable Gateway.
-    const terminal = (isBlackbox || isNvidia)
+    const terminal = (isBlackbox || isNvidia || isBmind)
       ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400 || res.status === 401 || res.status === 404)
       : !(res.status === 429 || res.status >= 500);
     let msg: string;
@@ -267,21 +280,37 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Voice / intent detection — DeepSeek V4 Pro primary for stronger reasoning.
-  intent: ["nvapi/deepseek-ai/deepseek-v4-pro", "nvapi/openai/gpt-oss-120b"],
+  // Bluesminds ($100 credit, unlimited quota, top models) is PRIMARY.
+  // NVIDIA free tier is fallback. Lovable credits never used for these stages.
+  intent: [
+    "bmind/gpt-5.5",
+    "bmind/deepseek-ai/deepseek-v4-pro",
+    "nvapi/deepseek-ai/deepseek-v4-pro",
+    "nvapi/openai/gpt-oss-120b",
+  ],
 
-  // Chart narration — deep ICT/SMC reasoning. DeepSeek V4 Pro primary.
+  // Chart narration — deep ICT/SMC reasoning. GPT-5.5 primary via Bluesminds.
   narration: [
+    "bmind/gpt-5.5",
+    "bmind/deepseek-ai/deepseek-v4-pro",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict). DeepSeek V4 Pro primary.
+  // Senior 25-year-trader review (A / A+ verdict). DeepSeek V4 Pro primary via Bluesminds.
   seniorReview: [
+    "bmind/deepseek-ai/deepseek-v4-pro",
+    "bmind/gpt-5.5",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Conversational chat around signals — DeepSeek V4 Pro primary.
-  chat: ["nvapi/deepseek-ai/deepseek-v4-pro", "nvapi/openai/gpt-oss-120b"],
+  // Conversational chat around signals — GPT-5.5 primary (fast + accurate).
+  chat: [
+    "bmind/gpt-5.5",
+    "bmind/deepseek-ai/deepseek-v4-pro",
+    "nvapi/deepseek-ai/deepseek-v4-pro",
+    "nvapi/openai/gpt-oss-120b",
+  ],
 } as const;
+
