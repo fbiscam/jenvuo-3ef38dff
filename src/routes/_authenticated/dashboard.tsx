@@ -541,7 +541,7 @@ function DashboardLayout() {
     ?? (credits.plan as { name?: string } | null)?.name ?? "free").toString().toUpperCase();
   const planTierStyle = (() => {
     const t = planTier.toLowerCase();
-    if (t.includes("ultra")) return { pill: "bg-fuchsia-50 border-fuchsia-300 text-fuchsia-700", dot: "bg-fuchsia-500" };
+    if (t.includes("ultra")) return { pill: "bg-blue-50 border-blue-300 text-blue-700", dot: "bg-blue-500" };
     if (t.includes("elite")) return { pill: "bg-emerald-50 border-emerald-300 text-emerald-700", dot: "bg-emerald-500" };
     if (t.includes("pro"))   return { pill: "bg-blue-50 border-blue-300 text-blue-700",       dot: "bg-blue-500" };
     if (t.includes("plus") || t.includes("starter")) return { pill: "bg-violet-50 border-violet-300 text-violet-700", dot: "bg-violet-500" };
