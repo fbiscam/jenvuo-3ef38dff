@@ -11,6 +11,40 @@ export const Route = createFileRoute("/_authenticated/dashboard/billing")({
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
+function modelLogoUrl(rawModel: string | null | undefined): string | null {
+  if (!rawModel) return null;
+  const m = String(rawModel).toLowerCase();
+  let domain: string | null = null;
+  if (m.includes("gpt") || m.includes("openai")) domain = "openai.com";
+  else if (m.includes("gemini") || m.startsWith("google/")) domain = "gemini.google.com";
+  else if (m.includes("deepseek")) domain = "deepseek.com";
+  else if (m.includes("nvapi") || m.includes("nvidia")) domain = "nvidia.com";
+  else if (m.includes("claude") || m.includes("anthropic")) domain = "anthropic.com";
+  if (!domain) return null;
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+}
+
+function ModelWithLogo({ raw, label }: { raw: string | null; label: string }) {
+  const parts = label.split(" + ");
+  const raws = raw ? [raw, ...parts.slice(1).map((p) => p.toLowerCase())] : parts.map(() => null);
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {parts.map((p, i) => {
+        const url = modelLogoUrl(raws[i] ?? p);
+        return (
+          <span key={i} className="inline-flex items-center gap-1">
+            {i > 0 && <span className="text-zinc-400">+</span>}
+            {url ? (
+              <img src={url} alt="" width={14} height={14} className="h-3.5 w-3.5 rounded-sm" loading="lazy" />
+            ) : null}
+            <span>{p}</span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 function formatModelLabel(rawModel: string | null | undefined): string {
   if (!rawModel) return "—";
   const m = String(rawModel).toLowerCase();
