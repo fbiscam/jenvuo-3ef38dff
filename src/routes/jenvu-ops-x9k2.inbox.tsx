@@ -400,24 +400,28 @@ function AdminInbox() {
                     <li key={s.id}>
                       <button
                         onClick={() => setActiveId(s.id)}
-                        className={`group relative flex w-full items-start gap-4 border-b border-neutral-100 px-5 py-4 text-left transition ${
+                        className={`group relative flex w-full items-start gap-3.5 border-b border-neutral-100 px-5 py-3.5 text-left transition-all duration-200 ${
                           isActive
-                            ? "bg-[#F9F9F7]"
-                            : "hover:bg-neutral-50/60"
+                            ? "bg-gradient-to-r from-neutral-50 to-transparent"
+                            : "hover:bg-neutral-50/70"
                         }`}
                       >
+                        {/* Active accent bar */}
+                        <span
+                          className={`absolute left-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-r-full bg-zinc-900 transition-all duration-200 ${
+                            isActive ? "opacity-100" : "opacity-0 group-hover:opacity-30"
+                          }`}
+                        />
+                        {/* Unread dot */}
                         {hasUnread && !isActive && (
-                          <span className="absolute left-1.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-emerald-400" />
-                        )}
-                        {hasUnread && !isActive && (
-                          <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-zinc-900" />
+                          <span className="absolute left-1.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.15)]" />
                         )}
                         <div className="relative mt-0.5 shrink-0">
-                          <div className={`grid h-8 w-8 place-items-center rounded-lg ${avatarColor(s.guest_name, s.guest_email)} text-[10.5px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10`}>
+                          <div className={`grid h-10 w-10 place-items-center rounded-xl ${avatarColor(s.guest_name, s.guest_email)} text-[12px] font-semibold text-white shadow-[0_4px_12px_-4px_rgba(0,0,0,0.35)] ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105`}>
                             {initials(s.guest_name, s.guest_email)}
                           </div>
                           <span
-                            className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${
+                            className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-white ${
                               s.status === "open" ? "bg-emerald-500" : "bg-zinc-300"
                             }`}
                           />
@@ -425,7 +429,7 @@ function AdminInbox() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-baseline justify-between gap-2">
                             <span
-                              className={`truncate text-[13px] tracking-tight ${
+                              className={`truncate text-[13.5px] tracking-tight ${
                                 hasUnread ? "font-semibold text-zinc-900" : "font-medium text-zinc-800"
                               }`}
                             >
@@ -440,7 +444,7 @@ function AdminInbox() {
                               {s.guest_email || "No email provided"}
                             </span>
                             {hasUnread && (
-                              <span className="grid h-4 min-w-[18px] shrink-0 place-items-center rounded-full bg-zinc-900 px-1.5 text-[10px] font-semibold text-white tabular-nums">
+                              <span className="grid h-[18px] min-w-[18px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-zinc-900 to-zinc-700 px-1.5 text-[10px] font-semibold text-white tabular-nums shadow-[0_2px_6px_-1px_rgba(0,0,0,0.3)]">
                                 {s.unread_admin}
                               </span>
                             )}
@@ -459,6 +463,7 @@ function AdminInbox() {
                         </div>
                       </button>
                     </li>
+
                   );
                 })}
               </ul>
