@@ -247,7 +247,7 @@ function Billing() {
                           : "—";
                       return (
                         <tr key={r.id} className="hover:bg-zinc-50/60">
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}>{modelWithSenior}</td>
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}><ModelWithLogo raw={rawModel} label={modelWithSenior} /></td>
                           <td className="whitespace-nowrap px-3 py-2">
                             <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-emerald-700">
                               {stageLabel}
