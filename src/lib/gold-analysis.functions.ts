@@ -1757,24 +1757,28 @@ ${fmt(ltfPrompt)}
 
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
-    const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
-      models: [...MODEL_CHAIN.narration],
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      jsonMode: true,
-      maxTokens: 2200,
-      timeoutMs: 18000,
-      retriesPerModel: 1,
-      priority: true,
-      stage: "signal-narration",
-    }).catch((err: unknown) => {
-      if (err instanceof AiGatewayError) throw new Error(err.message);
-      throw err;
-    });
-    import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
-    const parsed: any = tryParseJsonLoose(content) || {};
+    let parsed: any = {};
+    try {
+      const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
+        models: [...MODEL_CHAIN.narration],
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        jsonMode: true,
+        maxTokens: 2200,
+        timeoutMs: 18000,
+        retriesPerModel: 1,
+        priority: true,
+        stage: "signal-narration",
+      });
+      import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
+      parsed = tryParseJsonLoose(content) || {};
+    } catch {
+      // Do not make the user wait forever for prose. The deterministic engine
+      // below still produces entry, SL, TP, grade, chart markings and narration.
+      parsed = {};
+    }
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
       ? "high"
