@@ -1505,7 +1505,7 @@ function SignalPage() {
             <div className="flex gap-4 sm:gap-6 items-center">
               <div className="flex items-center gap-1.5">
                 <span className={`text-[10px] ${MONO} text-zinc-900`}>STATE</span>
-                <span className={`text-[10px] ${MONO}`}>{playing ? "NARRATING" : loading ? "ANALYZING" : "READY"}</span>
+                <span className={`text-[10px] ${MONO} tabular-nums`}>{playing ? "NARRATING" : loading ? `ANALYZING ${analyzeElapsed}s` : "READY"}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className={`text-[10px] ${MONO} text-zinc-900`}>STEP</span>
