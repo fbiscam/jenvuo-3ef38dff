@@ -356,25 +356,24 @@ function AdminInbox() {
 
         {/* Middle — conversation list */}
         <aside
-          className={`flex w-full shrink-0 flex-col border-r border-zinc-900/[0.06] bg-white md:w-[340px] ${
+          className={`flex w-full shrink-0 flex-col border-r border-neutral-200 bg-white md:w-[360px] ${
             activeId ? "hidden md:flex" : "flex"
           }`}
         >
-          <div className="flex h-12 items-center gap-2 border-b border-zinc-900/[0.06] px-3.5">
-            <Filter className="h-3.5 w-3.5 text-zinc-400" />
-            <span className="text-[12px] font-semibold capitalize tracking-tight">{filter}</span>
-            <span className="rounded-md bg-zinc-900/5 px-1.5 py-0.5 font-mono text-[10.5px] tabular-nums text-zinc-600">
+          <div className="flex h-14 items-center gap-3 border-b border-neutral-200 px-5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400 capitalize">{filter}</span>
+            <span className="font-mono text-[10px] tabular-nums text-neutral-400">
               {filtered.length}
             </span>
-            <div className="ml-auto flex items-center gap-1">
+            <div className="ml-auto flex items-center">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-zinc-400" />
+                <Search className="pointer-events-none absolute left-0 top-1/2 h-3 w-3 -translate-y-1/2 text-neutral-300" />
                 <input
                   ref={searchRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search…"
-                  className="h-8 w-44 rounded-lg border border-zinc-200/80 bg-white pl-7 pr-2 text-[12px] placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+                  className="h-7 w-40 border-b border-neutral-200 bg-transparent pl-5 pr-1 font-mono text-[11px] placeholder:text-neutral-300 focus:border-black focus:outline-none"
                 />
               </div>
             </div>
@@ -383,16 +382,16 @@ function AdminInbox() {
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                <div className="grid h-12 w-12 place-items-center rounded-full bg-white shadow-sm ring-1 ring-black/5">
-                  <Inbox className="h-4 w-4 text-zinc-400" />
+                <div className="grid h-12 w-12 place-items-center rounded-sm border border-neutral-200 bg-[#FDFDFB]">
+                  <Inbox className="h-4 w-4 text-neutral-400" />
                 </div>
                 <p className="mt-3 text-[13px] font-semibold text-zinc-800">No conversations</p>
-                <p className="mt-1 text-[11.5px] text-zinc-500">
+                <p className="mt-1 text-[11.5px] text-neutral-500">
                   {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
                 </p>
               </div>
             ) : (
-              <ul className="p-1.5">
+              <ul>
                 {filtered.map((s) => {
                   const isActive = s.id === activeId;
                   const name = s.guest_name || s.guest_email?.split("@")[0] || "Anonymous";
@@ -401,14 +400,14 @@ function AdminInbox() {
                     <li key={s.id}>
                       <button
                         onClick={() => setActiveId(s.id)}
-                        className={`group relative flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition ${
+                        className={`group relative flex w-full items-start gap-4 border-b border-neutral-100 px-5 py-4 text-left transition ${
                           isActive
-                            ? "bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.15)] ring-1 ring-black/5"
-                            : "hover:bg-white/70"
+                            ? "bg-[#F9F9F7]"
+                            : "hover:bg-neutral-50/60"
                         }`}
                       >
-                        {isActive && (
-                          <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-blue-600" />
+                        {hasUnread && !isActive && (
+                          <span className="absolute left-1.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-emerald-400" />
                         )}
                         {hasUnread && !isActive && (
                           <span className="absolute left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-zinc-900" />
