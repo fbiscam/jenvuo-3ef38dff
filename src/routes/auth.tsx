@@ -56,19 +56,19 @@ export const Route = createFileRoute("/auth")({
   },
   head: () => ({
     meta: [
-      { title: "Sign In — Jenvu" }, { name: "robots", content: "noindex, nofollow" },
+      { title: "Sign in to your Desk" },
       {
         name: "description",
         content:
           "Sign in to your Jenvu account to access the voice-native institutional gold trading terminal — live ICT/SMC analysis for every XAU cross-pair.",
       },
       { name: "robots", content: "index, follow" },
-      { property: "og:title", content: "Sign In Your Account — Jenvu" },
+      { property: "og:title", content: "Sign in to your Desk" },
       { property: "og:description", content: "Access your voice-native institutional trading terminal." },
       { property: "og:url", content: "https://jenvu.com/auth" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Sign In Your Account — Jenvu" },
+      { name: "twitter:title", content: "Sign in to your Desk" },
       { name: "twitter:description", content: "Access your voice-native institutional trading terminal." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/auth" }],
