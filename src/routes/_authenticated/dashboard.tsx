@@ -15,7 +15,7 @@ import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, typ
 import {
   Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
-  MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift,
+  MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
