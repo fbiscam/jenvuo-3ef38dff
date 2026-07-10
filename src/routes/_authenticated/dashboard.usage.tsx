@@ -173,8 +173,8 @@ function UsagePage() {
           <p className="mt-6 text-center text-sm text-zinc-500">No activity yet.</p>
         ) : (
           <>
-            <div className="mt-4 divide-y divide-zinc-100 rounded-lg border border-zinc-200">
-              {ledger.map((r) => {
+            <div className="mt-4 max-h-[420px] overflow-y-auto divide-y divide-zinc-100 rounded-lg border border-zinc-200">
+              {data.ledger.map((r) => {
                 const d = new Date(r.created_at);
                 const isSpend = r.delta < 0;
                 const amt = Math.abs(r.delta);
@@ -196,17 +196,6 @@ function UsagePage() {
                 );
               })}
             </div>
-            {data.ledger.length > 15 && (
-              <div className="mt-3 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setShowAll((v) => !v)}
-                  className="text-xs font-medium text-zinc-700 hover:text-zinc-900"
-                >
-                  {showAll ? "Show less" : `Show all (${data.ledger.length})`}
-                </button>
-              </div>
-            )}
           </>
         )}
       </section>
