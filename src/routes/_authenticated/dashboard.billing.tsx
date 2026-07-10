@@ -123,44 +123,82 @@ function Billing() {
           <div className="h-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
         </div>
         {(() => {
-          const filtered = (credits.state?.recent ?? []).filter((r) => r.delta < 0);
-          if (filtered.length === 0) return null;
+          type Row = {
+            id: string;
+            created_at: string;
+            model: string | null;
+            stage: string | null;
+            reason: string;
+            delta: number;
+            promptTokens: number | null;
+            completionTokens: number | null;
+            scanId: string | null;
+          };
+          const rows: Row[] = (credits.state?.recent ?? [])
+            .filter((r) => r.delta < 0)
+            .map((r) => ({
+              id: r.id,
+              created_at: r.created_at,
+              model: r.model ?? null,
+              stage: r.stage ?? null,
+              reason: r.reason,
+              delta: Number(r.delta),
+              promptTokens: r.prompt_tokens ?? null,
+              completionTokens: r.completion_tokens ?? null,
+              scanId: (r.metadata?.scanId as string | undefined) ?? null,
+            }));
+          if (rows.length === 0) return null;
+          const shown = showAllActivity ? rows : rows.slice(0, 12);
           return (
-          <div className="mt-6">
-            <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Recent scans</div>
-            <div className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
-              {(showAllActivity ? filtered : filtered.slice(0, 10)).map((r) => {
-                const d = new Date(r.created_at);
-                const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-                const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
-                const amt = Math.abs(Number(r.delta));
-                return (
-                  <div key={r.id} className="flex flex-col gap-0.5 px-3 py-2 text-xs sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex min-w-0 flex-col">
-                      <div className="flex items-center gap-2">
-                        <span className={`${MONO} shrink-0 text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums`}>
-                          {dateStr} · {timeStr}
-                        </span>
-                        <span className="text-zinc-700">{r.stage ?? r.reason.replace(/_/g, " ")}</span>
-                      </div>
-                      {r.model && <span className={`${MONO} truncate text-[10px] text-zinc-500`}>{r.model}</span>}
-                    </div>
-                    <span className="tabular-nums font-medium text-rose-600">
-                      −${amt.toFixed(4)}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            {filtered.length > 10 && (
-              <div className="mt-3 flex justify-center">
-                <button type="button" onClick={() => setShowAllActivity((v) => !v)}
-                  className="text-xs font-medium text-zinc-700 hover:text-zinc-900">
-                  {showAllActivity ? "Show less" : `Show more (${filtered.length - 10})`}
-                </button>
+            <div className="mt-6">
+              <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>
+                Recent scans — model & cost
               </div>
-            )}
-          </div>
+              <div className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
+                {shown.map((r) => {
+                  const d = new Date(r.created_at);
+                  const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                  const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+                  const amt = Math.abs(r.delta);
+                  const modelLabel = r.model ?? (r.reason === "signal" ? "legacy (pre-USD billing)" : "—");
+                  const stageLabel = r.stage ?? r.reason.replace(/_/g, " ");
+                  const tokens =
+                    r.promptTokens != null || r.completionTokens != null
+                      ? `${r.promptTokens ?? 0} in / ${r.completionTokens ?? 0} out tok`
+                      : null;
+                  return (
+                    <div key={r.id} className="flex flex-col gap-1 px-3 py-2.5 text-xs sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex min-w-0 flex-col gap-0.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={`${MONO} truncate text-[11px] font-medium text-zinc-900`}>
+                            {modelLabel}
+                          </span>
+                          <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-zinc-600">
+                            {stageLabel}
+                          </span>
+                        </div>
+                        <div className={`${MONO} flex flex-wrap items-center gap-2 text-[10px] text-zinc-500`}>
+                          <span className="tabular-nums">{dateStr} · {timeStr}</span>
+                          {tokens && <span>· {tokens}</span>}
+                          {r.scanId && <span className="truncate">· scan {r.scanId.slice(0, 8)}</span>}
+                        </div>
+                      </div>
+                      <span className="tabular-nums font-semibold text-rose-600 sm:text-sm">
+                        −${amt.toFixed(4)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              {rows.length > 12 && (
+                <div className="mt-3 flex justify-center">
+                  <button type="button" onClick={() => setShowAllActivity((v) => !v)}
+                    className="text-xs font-medium text-zinc-700 hover:text-zinc-900">
+                    {showAllActivity ? "Show less" : `Show more (${rows.length - 12})`}
+                  </button>
+                </div>
+              )}
+            </div>
           );
         })()}
       </section>

@@ -31,6 +31,7 @@ export type LedgerEntry = {
   prompt_tokens?: number | null;
   completion_tokens?: number | null;
   raw_cost_usd?: number | null;
+  metadata?: Record<string, any> | null;
 };
 
 export type CreditState = {
@@ -55,7 +56,7 @@ export const getCreditState = createServerFn({ method: "GET" })
         .maybeSingle(),
       supabase.from("credit_balances").select("balance, monthly_allowance, period_resets_at").eq("user_id", userId).maybeSingle(),
       supabase.from("credit_ledger")
-        .select("id, delta, reason, balance_after, created_at, model, stage, prompt_tokens, completion_tokens, raw_cost_usd")
+        .select("id, delta, reason, balance_after, created_at, model, stage, prompt_tokens, completion_tokens, raw_cost_usd, metadata")
         .eq("user_id", userId).order("created_at", { ascending: false }).limit(60),
     ]);
 
@@ -73,12 +74,19 @@ export const getCreditState = createServerFn({ method: "GET" })
       balance: Number(bal?.balance ?? 0),
       allowance: Number(bal?.monthly_allowance ?? walletUsd),
       periodResetsAt: bal?.period_resets_at ?? null,
-      recent: (ledger ?? []).map((r: any) => ({
-        id: r.id, delta: Number(r.delta), reason: r.reason, balance_after: Number(r.balance_after),
-        created_at: r.created_at, model: r.model, stage: r.stage,
-        prompt_tokens: r.prompt_tokens, completion_tokens: r.completion_tokens,
-        raw_cost_usd: r.raw_cost_usd == null ? null : Number(r.raw_cost_usd),
-      })),
+      recent: (ledger ?? []).map((r: any) => {
+        const meta = (r.metadata ?? {}) as Record<string, any>;
+        return {
+          id: r.id, delta: Number(r.delta), reason: r.reason, balance_after: Number(r.balance_after),
+          created_at: r.created_at,
+          model: r.model ?? meta.model ?? null,
+          stage: r.stage ?? meta.stage ?? null,
+          prompt_tokens: r.prompt_tokens ?? meta.prompt_tokens ?? null,
+          completion_tokens: r.completion_tokens ?? meta.completion_tokens ?? null,
+          raw_cost_usd: r.raw_cost_usd == null ? (meta.raw_cost_usd == null ? null : Number(meta.raw_cost_usd)) : Number(r.raw_cost_usd),
+          metadata: meta,
+        };
+      }),
     };
   });
 
