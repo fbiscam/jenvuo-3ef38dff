@@ -324,7 +324,7 @@ function AdminInbox() {
       <div className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
         <nav className="hidden w-60 shrink-0 flex-col border-r border-neutral-200 bg-[#FDFDFB] p-4 md:flex">
-          <div className="mb-3 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400">
+          <div className="mb-3 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-900 font-semibold">
             Inbox
           </div>
           <ul className="space-y-0.5">
@@ -334,20 +334,21 @@ function AdminInbox() {
                 <li key={f.key}>
                   <button
                     onClick={() => setFilter(f.key)}
-                    className={`group flex w-full items-center justify-between rounded-sm px-3 py-2 text-[13px] font-medium transition ${
+                    className={`group flex w-full items-center justify-between rounded-sm px-3 py-2 text-[13px] font-semibold transition ${
                       active
                         ? "bg-neutral-100 text-black"
-                        : "text-neutral-500 hover:bg-neutral-50 hover:text-black"
+                        : "text-zinc-900 hover:bg-neutral-50"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-emerald-400" : "border border-neutral-300"}`} />
+                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-emerald-500" : "border border-zinc-500"}`} />
                       {f.label}
                     </span>
-                    <span className={`font-mono text-[10px] tabular-nums ${active ? "text-neutral-500" : "text-neutral-400"}`}>
+                    <span className={`font-mono text-[10px] tabular-nums ${active ? "text-zinc-800" : "text-zinc-700"}`}>
                       {f.count}
                     </span>
                   </button>
+
                 </li>
               );
             })}
