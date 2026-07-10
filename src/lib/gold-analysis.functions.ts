@@ -346,6 +346,16 @@ function buildSyntheticCandles(inst: ResolvedInstrument, tf: string, price: numb
   return candles;
 }
 
+async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 3500): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: init.signal ?? controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function coinbaseProductFromSymbol(sym: string): string | null {
   const m = sym.match(/^([A-Z0-9]{2,15})(USDT|USDC|USD)$/);
   if (!m) return null;
@@ -360,7 +370,7 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
     for (const sym of symbols) {
       try {
         const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${cfg.interval}&range=${cfg.range}`;
-        const res = await fetch(url, {
+        const res = await fetchWithTimeout(url, {
           headers: {
             "User-Agent":
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
@@ -398,7 +408,7 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
     for (const sym of symbols) {
       try {
         const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
-        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
         if (!res.ok) { lastErr = new Error(`Binance ${sym}: ${res.status}`); continue; }
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
@@ -426,7 +436,7 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
     const product = coinbaseProductFromSymbol(sym);
     if (!product) continue;
     try {
-      const res = await fetch(`https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}`, {
+      const res = await fetchWithTimeout(`https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
       });
       if (!res.ok) { lastErr = new Error(`Coinbase ${product}: ${res.status}`); continue; }
@@ -939,7 +949,7 @@ function detectKillzone(d: Date): { session: string; killzone: string } {
 
 async function fetchGoldNewsInline(): Promise<NewsItem[]> {
   try {
-    const r = await fetch("https://nfs.faireconomy.media/ff_calendar_thisweek.json", {
+    const r = await fetchWithTimeout("https://nfs.faireconomy.media/ff_calendar_thisweek.json", {
       headers: { "User-Agent": "Mozilla/5.0" },
     });
     if (!r.ok) return [];
@@ -1153,7 +1163,7 @@ async function fetchYahooQuote(symbols: string[]): Promise<LiveTick | null> {
     for (const sym of symbols) {
       try {
         const url = `https://${host}/v7/finance/quote?symbols=${encodeURIComponent(sym)}`;
-        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
         if (!res.ok) continue;
         const j: any = await res.json();
         const q = j?.quoteResponse?.result?.[0];
@@ -1182,7 +1192,7 @@ async function fetchBinanceQuote(symbols: string[]): Promise<LiveTick | null> {
     for (const sym of symbols) {
       try {
         const url = `https://${host}/api/v3/ticker/price?symbol=${sym}`;
-        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
         if (!res.ok) continue;
         const j: any = await res.json();
         const p = parseFloat(j?.price);
@@ -1213,7 +1223,7 @@ async function fetchFxProxyRate(symbol: string): Promise<number | null> {
   if (!m) return null;
   const [, base, quote] = m;
   try {
-    const res = await fetch(`https://open.er-api.com/v6/latest/${base}`, {
+    const res = await fetchWithTimeout(`https://open.er-api.com/v6/latest/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -1237,7 +1247,7 @@ async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick |
   if (inst.kind !== "metal") return null;
   const base = inst.key === "METAL:XAGUSD" ? "XAG" : "XAU";
   try {
-    const res = await fetch(`https://api.gold-api.com/price/${base}`, {
+    const res = await fetchWithTimeout(`https://api.gold-api.com/price/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -1277,7 +1287,7 @@ async function fetchFxSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | nu
   if (!m) return null;
   const [, base, quote] = m;
   try {
-    const res = await fetch(`https://open.er-api.com/v6/latest/${base}`, {
+    const res = await fetchWithTimeout(`https://open.er-api.com/v6/latest/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -1300,7 +1310,7 @@ async function fetchCoinbaseQuote(symbols: string[]): Promise<LiveTick | null> {
     if (!m) continue;
     const base = m[1];
     try {
-      const res = await fetch(`https://api.coinbase.com/v2/prices/${base}-USD/spot`, {
+      const res = await fetchWithTimeout(`https://api.coinbase.com/v2/prices/${base}-USD/spot`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
       });
       if (!res.ok) continue;
