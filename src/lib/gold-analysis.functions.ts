@@ -649,7 +649,7 @@ async function _analyzeGoldCompute(data: { timeframe: string; query: string }, _
     }
     const hasData = candles.length >= 10;
     const last = hasData ? candles[candles.length - 1] : null;
-    const recent = candles.slice(-50);
+    const recent = candles.slice(-150);
     const highs = recent.map((c) => c.h);
     const lows = recent.map((c) => c.l);
     const swingHigh = hasData ? Math.max(...highs) : 0;
@@ -698,9 +698,9 @@ CONTEXT (use ONLY if user is asking about gold trading):
 TIMEFRAME: ${data.timeframe.toUpperCase()}
 SYMBOL: XAU/USD (Gold)
 CURRENT PRICE: ${last!.c.toFixed(2)}
-RECENT SWING HIGH (50): ${swingHigh.toFixed(2)}
-RECENT SWING LOW (50): ${swingLow.toFixed(2)}
-LAST 50 CANDLES (OHLC):
+RECENT SWING HIGH (150): ${swingHigh.toFixed(2)}
+RECENT SWING LOW (150): ${swingLow.toFixed(2)}
+LAST 150 CANDLES (OHLC):
 ${compact}
 
 ${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fill trading fields confidently." : "User is just chatting / asking general thing — REPLY conversationally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty. Do NOT push a signal."}`
