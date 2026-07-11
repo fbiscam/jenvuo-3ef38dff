@@ -148,7 +148,7 @@ function Billing() {
                 </span>
               )}
             </div>
-            <p className="mt-2 max-w-xl text-sm text-zinc-500">
+            <p className="mt-2 max-w-xl text-[12px] leading-snug sm:text-sm sm:leading-normal text-zinc-500">
               {plan === "free"
                 ? "Upgrade to unlock realtime A+ alerts, unlimited signals, and the trade journal."
                 : "Your plan renews automatically. Manage billing via the customer portal."}
