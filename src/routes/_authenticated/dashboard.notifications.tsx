@@ -372,7 +372,7 @@ function NotificationsPage() {
                                 <Bell className="h-2.5 w-2.5" />
                                 <span className="hidden sm:inline">{v.label}</span>
                               </span>
-                              <span>·</span>
+                              <span className="hidden sm:inline">·</span>
                               <span>{timeAgo(n.created_at)}</span>
                             </div>
                           </div>
