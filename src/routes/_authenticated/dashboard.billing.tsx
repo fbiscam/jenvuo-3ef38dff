@@ -343,7 +343,7 @@ function Billing() {
                       ) : (
                         <Link
                           to={p.to}
-                          className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                          className={`mt-3 inline-flex w-full items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition ${
                             p.accent || p.dark
                               ? "bg-zinc-900 text-white hover:bg-black"
                               : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
