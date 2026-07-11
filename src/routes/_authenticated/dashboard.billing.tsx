@@ -134,7 +134,6 @@ function Billing() {
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Current plan</div>
             <div className="mt-2 flex items-center gap-3">
               <h2 className="text-2xl font-semibold">{planLabel}</h2>
               {plan === "free" && (
