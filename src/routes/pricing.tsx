@@ -439,7 +439,7 @@ function PricingPage() {
       <section className="mx-auto max-w-7xl px-5 sm:px-8 py-12 sm:py-16">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
-            <span className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Credit top-ups</span>
+            
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
             <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time top-ups that never expire. $1 top-up = $1 wallet — same as plans. Each real signal costs $0.20.</p>
           </div>
