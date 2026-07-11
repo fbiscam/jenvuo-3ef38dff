@@ -767,6 +767,7 @@ type SignalLockEntry = {
   direction: "BUY" | "SELL";
   entryPx: number;
   slPx: number;
+  tp1Px: number;
 };
 const SIGNAL_LOCK_TTL_MS = 20 * 60 * 1000;
 
@@ -775,6 +776,7 @@ function parsePx(s: string | undefined): number {
   const n = Number(String(s).replace(/[^\d.\-]/g, ""));
   return isFinite(n) ? n : NaN;
 }
+
 
 export const analyzeGold = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -789,7 +791,7 @@ export const analyzeGold = createServerFn({ method: "POST" })
     // DB-backed signal lock (persists across serverless workers).
     const { data: lockRow } = await context.supabase
       .from("signal_locks")
-      .select("direction, entry_px, sl_px, signal, expires_at")
+      .select("direction, entry_px, sl_px, tp1_px, signal, expires_at")
       .eq("user_id", context.userId)
       .eq("instrument", instSym)
       .eq("timeframe", data.timeframe)
@@ -802,6 +804,7 @@ export const analyzeGold = createServerFn({ method: "POST" })
           direction: lockRow.direction as "BUY" | "SELL",
           entryPx: Number(lockRow.entry_px),
           slPx: Number(lockRow.sl_px),
+          tp1Px: Number((lockRow as any).tp1_px ?? NaN),
         }
       : null;
 
@@ -810,17 +813,23 @@ export const analyzeGold = createServerFn({ method: "POST" })
         const inst = resolveInstrument(instSym);
         const tick = await resolveLiveTick(inst);
         const px = tick?.price;
-        const invalidated =
-          typeof px === "number" && isFinite(px) &&
-          ((cached.direction === "BUY" && px <= cached.slPx) ||
-           (cached.direction === "SELL" && px >= cached.slPx));
+        const hasPx = typeof px === "number" && isFinite(px);
+        const slHit = hasPx &&
+          ((cached.direction === "BUY" && px! <= cached.slPx) ||
+           (cached.direction === "SELL" && px! >= cached.slPx));
+        const tpHit = hasPx && isFinite(cached.tp1Px) &&
+          ((cached.direction === "BUY" && px! >= cached.tp1Px) ||
+           (cached.direction === "SELL" && px! <= cached.tp1Px));
+        // Structural invalidation: price ran > 1.5R against entry (beyond SL),
+        // OR ran past TP1 (trade played out) → allow a fresh setup.
+        const invalidated = slHit || tpHit;
 
         if (!invalidated) {
           const minsLeft = Math.max(1, Math.round((cached.expiresAt - now) / 60000));
-          const lockedNote = `\n\n🔒 Signal locked — this ${cached.direction} setup stays active for ~${minsLeft} more min or until price ${cached.direction === "BUY" ? "breaks below" : "breaks above"} ${cached.slPx}. Re-analyze free while locked; no flip-flop.`;
+          const lockedNote = `\n\n🔒 Signal locked — this ${cached.direction} setup stays active for ~${minsLeft} more min. Lock releases automatically if price hits SL (${cached.slPx})${isFinite(cached.tp1Px) ? ` or TP1 (${cached.tp1Px})` : ""}. Re-analyze free while locked; no flip-flop.`;
           return {
             ...cached.signal,
-            currentPrice: typeof px === "number" && isFinite(px) ? px : cached.signal.currentPrice,
+            currentPrice: hasPx ? px : cached.signal.currentPrice,
             fullAnalysis: (cached.signal.fullAnalysis || "") + lockedNote,
           } as GoldSignal;
         }
@@ -843,6 +852,7 @@ export const analyzeGold = createServerFn({ method: "POST" })
     if (_billable === "signal" && (clean.direction === "BUY" || clean.direction === "SELL")) {
       const entryPx = parsePx(clean.entry);
       const slPx = parsePx(clean.stopLoss);
+      const tp1Px = parsePx(Array.isArray(clean.takeProfits) ? clean.takeProfits[0] : undefined);
       if (isFinite(entryPx) && isFinite(slPx)) {
         await context.supabase.from("signal_locks").upsert({
           user_id: context.userId,
@@ -851,11 +861,13 @@ export const analyzeGold = createServerFn({ method: "POST" })
           direction: clean.direction,
           entry_px: entryPx,
           sl_px: slPx,
+          tp1_px: isFinite(tp1Px) ? tp1Px : null,
           signal: clean as any,
           expires_at: new Date(now + SIGNAL_LOCK_TTL_MS).toISOString(),
         }, { onConflict: "user_id,instrument,timeframe" });
       }
     }
+
 
     return clean as GoldSignal;
   });
