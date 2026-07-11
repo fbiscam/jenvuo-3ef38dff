@@ -851,7 +851,7 @@ export const analyzeGold = createServerFn({ method: "POST" })
           direction: clean.direction,
           entry_px: entryPx,
           sl_px: slPx,
-          signal: clean as unknown as Record<string, unknown>,
+          signal: clean as any,
           expires_at: new Date(now + SIGNAL_LOCK_TTL_MS).toISOString(),
         }, { onConflict: "user_id,instrument,timeframe" });
       }
