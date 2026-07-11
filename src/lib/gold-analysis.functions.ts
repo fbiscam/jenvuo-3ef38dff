@@ -767,6 +767,7 @@ type SignalLockEntry = {
   direction: "BUY" | "SELL";
   entryPx: number;
   slPx: number;
+  tp1Px: number;
 };
 const SIGNAL_LOCK_TTL_MS = 20 * 60 * 1000;
 
@@ -775,6 +776,7 @@ function parsePx(s: string | undefined): number {
   const n = Number(String(s).replace(/[^\d.\-]/g, ""));
   return isFinite(n) ? n : NaN;
 }
+
 
 export const analyzeGold = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
