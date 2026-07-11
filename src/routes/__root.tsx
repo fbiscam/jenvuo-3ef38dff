@@ -195,6 +195,30 @@ function RootComponent() {
     return () => mq.removeEventListener("change", update);
   }, []);
 
+  // Normalize OS-level display scaling (e.g. Windows 150% zoom) so the site
+  // renders at a consistent size across laptops. Only applies on Windows
+  // desktop where DPR > 1 causes system-level UI scaling; skips
+  // macOS/retina, mobile, and tablets so those keep their crisp rendering.
+  useEffect(() => {
+    const apply = () => {
+      const ua = navigator.userAgent;
+      const isWindows = /Windows/i.test(ua);
+      const isTouch = window.matchMedia("(pointer: coarse)").matches;
+      const dpr = window.devicePixelRatio || 1;
+      const el = document.documentElement as HTMLElement & { style: CSSStyleDeclaration & { zoom?: string } };
+      if (isWindows && !isTouch && dpr > 1.1) {
+        // Inverse of system scaling: 1.5 -> ~0.667, 1.25 -> 0.8
+        el.style.zoom = String(1 / dpr);
+      } else {
+        el.style.zoom = "";
+      }
+    };
+    apply();
+    window.addEventListener("resize", apply);
+    return () => window.removeEventListener("resize", apply);
+  }, []);
+
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
