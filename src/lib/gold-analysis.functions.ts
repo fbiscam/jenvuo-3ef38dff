@@ -769,7 +769,6 @@ type SignalLockEntry = {
   slPx: number;
 };
 const SIGNAL_LOCK_TTL_MS = 20 * 60 * 1000;
-const signalLockCache = new Map<string, SignalLockEntry>();
 
 function parsePx(s: string | undefined): number {
   if (!s) return NaN;
@@ -784,15 +783,29 @@ export const analyzeGold = createServerFn({ method: "POST" })
     query: String(d?.query || "Give me the best A+ setup right now"),
   }))
   .handler(async ({ data, context }) => {
-    // Lock key MUST include the instrument — different XAU pairs on the same
-    // timeframe are different setups and must not share a cache slot.
     const instSym = inferInstrumentFromText(data.query);
-    const lockKey = `${context.userId}::${instSym}::${data.timeframe}`;
     const now = Date.now();
-    const cached = signalLockCache.get(lockKey);
+
+    // DB-backed signal lock (persists across serverless workers).
+    const { data: lockRow } = await context.supabase
+      .from("signal_locks")
+      .select("direction, entry_px, sl_px, signal, expires_at")
+      .eq("user_id", context.userId)
+      .eq("instrument", instSym)
+      .eq("timeframe", data.timeframe)
+      .maybeSingle();
+
+    const cached: SignalLockEntry | null = lockRow
+      ? {
+          signal: lockRow.signal as GoldSignal,
+          expiresAt: new Date(lockRow.expires_at as string).getTime(),
+          direction: lockRow.direction as "BUY" | "SELL",
+          entryPx: Number(lockRow.entry_px),
+          slPx: Number(lockRow.sl_px),
+        }
+      : null;
 
     if (cached && cached.expiresAt > now) {
-      // Check invalidation against live price of the SAME instrument.
       try {
         const inst = resolveInstrument(instSym);
         const tick = await resolveLiveTick(inst);
@@ -812,38 +825,41 @@ export const analyzeGold = createServerFn({ method: "POST" })
           } as GoldSignal;
         }
         // invalidated → release and compute fresh
-        signalLockCache.delete(lockKey);
+        await context.supabase
+          .from("signal_locks")
+          .delete()
+          .eq("user_id", context.userId)
+          .eq("instrument", instSym)
+          .eq("timeframe", data.timeframe);
       } catch {
-        // if live tick fails, still serve cache (don't punish the user)
         return cached.signal;
       }
     }
 
-    // Billing note: the client (signal.tsx) charges once per scan via
-    // credits.spend("signal"). Do NOT charge again here or scans double-cut.
-    // See comment at end of this file confirming client is the authoritative
-    // billing site.
     const result = await _analyzeGoldCompute(data, context.userId);
     const { __billable: _billable, ...clean } = result;
     void _billable;
 
-    // Cache actionable signals (BUY/SELL with real entry+SL)
     if (_billable === "signal" && (clean.direction === "BUY" || clean.direction === "SELL")) {
       const entryPx = parsePx(clean.entry);
       const slPx = parsePx(clean.stopLoss);
       if (isFinite(entryPx) && isFinite(slPx)) {
-        signalLockCache.set(lockKey, {
-          signal: clean as GoldSignal,
-          expiresAt: now + SIGNAL_LOCK_TTL_MS,
+        await context.supabase.from("signal_locks").upsert({
+          user_id: context.userId,
+          instrument: instSym,
+          timeframe: data.timeframe,
           direction: clean.direction,
-          entryPx,
-          slPx,
-        });
+          entry_px: entryPx,
+          sl_px: slPx,
+          signal: clean as unknown as Record<string, unknown>,
+          expires_at: new Date(now + SIGNAL_LOCK_TTL_MS).toISOString(),
+        }, { onConflict: "user_id,instrument,timeframe" });
       }
     }
 
     return clean as GoldSignal;
   });
+
 
 
 
