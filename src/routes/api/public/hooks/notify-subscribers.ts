@@ -100,7 +100,7 @@ export const Route = createFileRoute('/api/public/hooks/notify-subscribers')({
             ? template.subject(templateData)
             : template.subject
 
-        const SENDER_DOMAIN = 'notify.jenvu.com'
+        const SENDER_DOMAIN = 'notify.jenvu.net'
         const FROM = `Jenvu Briefings <briefings@jenvu.com>`
 
         let enqueued = 0
