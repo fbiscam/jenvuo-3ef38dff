@@ -164,11 +164,24 @@ async function singleAttempt(
     throw new AiGatewayError("AI returned empty response.", 0, false);
   }
   const u = json?.usage ?? {};
-  const usage: UsageInfo = {
-    promptTokens: Number(u.prompt_tokens ?? u.promptTokens ?? 0) || 0,
-    completionTokens: Number(u.completion_tokens ?? u.completionTokens ?? 0) || 0,
-    totalTokens: Number(u.total_tokens ?? u.totalTokens ?? 0) || 0,
-  };
+  let promptTokens = Number(u.prompt_tokens ?? u.promptTokens ?? 0) || 0;
+  let completionTokens = Number(u.completion_tokens ?? u.completionTokens ?? 0) || 0;
+  let totalTokens = Number(u.total_tokens ?? u.totalTokens ?? 0) || 0;
+  // Fallback: some providers (e.g. Bluesminds/bmind) omit `usage`. Approximate
+  // from character counts (~4 chars/token) so the billing history isn't blank.
+  if (promptTokens === 0 && completionTokens === 0) {
+    try {
+      const promptChars = (opts.messages ?? []).reduce(
+        (n, m) => n + (typeof m?.content === "string" ? m.content.length : 0),
+        0,
+      );
+      promptTokens = Math.max(1, Math.round(promptChars / 4));
+      completionTokens = Math.max(1, Math.round(String(content).length / 4));
+      totalTokens = promptTokens + completionTokens;
+    } catch {}
+  }
+  if (totalTokens === 0) totalTokens = promptTokens + completionTokens;
+  const usage: UsageInfo = { promptTokens, completionTokens, totalTokens };
   return { content, usage };
 }
 
