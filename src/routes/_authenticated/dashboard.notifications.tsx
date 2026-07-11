@@ -233,8 +233,8 @@ function NotificationsPage() {
   return (
     <div className="max-w-3xl">
       {/* Filters + Mark all read */}
-      <div className="flex items-center justify-between gap-2 mb-4">
-        <div className="flex flex-wrap gap-1.5 min-w-0">
+      <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex gap-1.5 min-w-0 overflow-x-auto no-scrollbar -mx-1 px-1 sm:flex-wrap sm:overflow-visible sm:mx-0 sm:px-0">
           {filters.map((f) => (
             <button
               key={f.key}
@@ -251,7 +251,7 @@ function NotificationsPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0 justify-end sm:justify-start">
           {filtered.length > 0 && (
             <button
               onClick={selectionMode ? clearSelection : toggleSelectAll}

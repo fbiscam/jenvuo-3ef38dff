@@ -250,3 +250,9 @@
 @media (min-width: 1024px) { .jenvu-zoom-dashboard { zoom: 1.32; } }
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
 @media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { width: 0; height: 0; background: transparent; }
+}
