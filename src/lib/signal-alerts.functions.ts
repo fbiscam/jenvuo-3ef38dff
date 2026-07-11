@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
 
 export type SignalAlertRow = {
   id: string
@@ -70,4 +71,18 @@ export const subscribeToAlerts = createServerFn({ method: 'POST' })
       return { ok: false, error: error.message }
     }
     return { ok: true }
+  })
+
+export const isAlertSubscribed = createServerFn({ method: 'GET' })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const email = (context.claims?.email as string | undefined)?.toLowerCase()
+    if (!email) return { subscribed: false }
+    const sb = publicClient()
+    const { data } = await sb
+      .from('signal_alert_subscribers')
+      .select('email')
+      .eq('email', email)
+      .maybeSingle()
+    return { subscribed: !!data }
   })

@@ -1,20 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Bell, BellRing, Check, Loader2, Mail } from 'lucide-react'
 import { useServerFn } from '@tanstack/react-start'
-import { subscribeToAlerts } from '@/lib/signal-alerts.functions'
+import { subscribeToAlerts, isAlertSubscribed } from '@/lib/signal-alerts.functions'
 import { requestAlertPermission } from '@/hooks/useSignalAlerts'
 
 const MONO = 'font-mono'
 
 export default function AlertOptInCard() {
   const subscribe = useServerFn(subscribeToAlerts)
+  const checkSubscribed = useServerFn(isAlertSubscribed)
   const [perm, setPerm] = useState<NotificationPermission | 'unsupported'>('default')
   const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [done, setDone] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return window.localStorage.getItem('jenvu:alerts:subscribed') === '1'
-  })
+  const [done, setDone] = useState(false)
   const [err, setErr] = useState<string | null>(null)
 
   useEffect(() => {
@@ -23,7 +21,23 @@ export default function AlertOptInCard() {
     } else {
       setPerm(Notification.permission)
     }
-  }, [])
+    // Local cache
+    if (typeof window !== 'undefined' && window.localStorage.getItem('jenvu:alerts:subscribed') === '1') {
+      setDone(true)
+      return
+    }
+    // Server-side check against the signed-in user's email
+    checkSubscribed({})
+      .then((r) => {
+        if (r?.subscribed) {
+          setDone(true)
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem('jenvu:alerts:subscribed', '1')
+          }
+        }
+      })
+      .catch(() => {})
+  }, [checkSubscribed])
 
 
   const enableBrowser = async () => {
