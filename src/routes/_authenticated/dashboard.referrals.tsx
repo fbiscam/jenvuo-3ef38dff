@@ -253,36 +253,38 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
           <div className="text-sm font-semibold text-zinc-900">Referral history</div>
           <div className="text-[11px] text-zinc-500">{FILTERS.find((f) => f.key === filter)?.hint}</div>
         </div>
-        <div className="flex flex-wrap items-center gap-1">
-          {FILTERS.map((f) => {
-            const active = filter === f.key;
-            return (
-              <button
-                key={f.key}
-                type="button"
-                onClick={() => setFilter(f.key)}
-                className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition ${
-                  active
-                    ? "border border-zinc-900 bg-white text-zinc-900"
-                    : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
-                }`}
-              >
-                {f.label}
-                <span
-                  className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${
-                    active ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600"
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-1">
+          <div className="grid grid-cols-4 gap-1 sm:flex sm:flex-wrap sm:items-center">
+            {FILTERS.map((f) => {
+              const active = filter === f.key;
+              return (
+                <button
+                  key={f.key}
+                  type="button"
+                  onClick={() => setFilter(f.key)}
+                  className={`inline-flex items-center justify-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition sm:gap-1.5 sm:px-2.5 sm:text-[12px] ${
+                    active
+                      ? "border border-zinc-900 bg-white text-zinc-900"
+                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
                   }`}
                 >
-                  {counts[f.key]}
-                </span>
-              </button>
-            );
-          })}
+                  <span className="truncate">{f.label}</span>
+                  <span
+                    className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${
+                      active ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600"
+                    }`}
+                  >
+                    {counts[f.key]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
           <button
             type="button"
             onClick={exportCsv}
             disabled={filtered.length === 0}
-            className="ml-1 inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed sm:ml-1"
             title="Download current filter as CSV"
           >
             <Download className="h-3.5 w-3.5" /> Export CSV
