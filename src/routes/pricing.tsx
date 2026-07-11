@@ -424,7 +424,7 @@ function PricingPage() {
                     <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
                       {b.tone}
                     </span>
-                    <span className={`${MONO} text-[10px] uppercase tracking-wider text-amber-600`}>
+                    <span className={`${MONO} text-[10px] uppercase tracking-wider text-emerald-600`}>
                       Included →
                     </span>
                   </div>
