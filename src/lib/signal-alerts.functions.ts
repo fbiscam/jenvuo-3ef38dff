@@ -72,3 +72,17 @@ export const subscribeToAlerts = createServerFn({ method: 'POST' })
     }
     return { ok: true }
   })
+
+export const isAlertSubscribed = createServerFn({ method: 'GET' })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const email = (context.claims?.email as string | undefined)?.toLowerCase()
+    if (!email) return { subscribed: false }
+    const sb = publicClient()
+    const { data } = await sb
+      .from('signal_alert_subscribers')
+      .select('email')
+      .eq('email', email)
+      .maybeSingle()
+    return { subscribed: !!data }
+  })
