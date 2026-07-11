@@ -960,6 +960,7 @@ export type Database = {
           signal: Json
           sl_px: number
           timeframe: string
+          tp1_px: number | null
           user_id: string
         }
         Insert: {
@@ -971,6 +972,7 @@ export type Database = {
           signal: Json
           sl_px: number
           timeframe: string
+          tp1_px?: number | null
           user_id: string
         }
         Update: {
@@ -982,6 +984,7 @@ export type Database = {
           signal?: Json
           sl_px?: number
           timeframe?: string
+          tp1_px?: number | null
           user_id?: string
         }
         Relationships: []
