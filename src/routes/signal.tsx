@@ -1421,7 +1421,7 @@ function SignalPage() {
                     Market Closed
                   </div>
                   <p className="text-[11px] text-zinc-700 leading-snug">
-                    {plan.instrument.symbol} session band hai. AI ne live entry / SL / TP issue nahi kiya — sirf last session ke key levels, FVG aur OB reference ke liye dikha rahe hain. Session open hote hi plan auto-revalidate hoga.
+                    {plan.instrument.symbol} session is closed. The AI has not issued a live entry / SL / TP — only key levels, FVGs and OBs from the last session are shown for reference. The plan will auto-revalidate as soon as the session opens.
                   </p>
                   <p className={`text-[10px] ${MONO} text-zinc-500 uppercase tracking-wider`}>
                     Opens Sun 22:00 UTC
