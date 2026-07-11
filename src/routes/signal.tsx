@@ -2559,19 +2559,6 @@ function SignalVoiceAgent({
           className="flex-1 bg-transparent text-[12px] text-zinc-900 placeholder:text-zinc-400 outline-none"
         />
         <button
-          onClick={toggleMic}
-          tabIndex={showInput ? 0 : -1}
-          className={cn(
-            "h-7 w-7 inline-flex items-center justify-center rounded-md transition",
-            speech.listening
-              ? "bg-emerald-500 text-white animate-pulse"
-              : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200",
-          )}
-          aria-label="Toggle microphone"
-        >
-          <Mic className="h-3.5 w-3.5" />
-        </button>
-        <button
           onClick={() => submit()}
           disabled={busy || !q.trim()}
           tabIndex={showInput ? 0 : -1}
