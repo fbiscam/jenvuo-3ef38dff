@@ -21,19 +21,30 @@ export function useCredits() {
     staleTime: 15_000,
   });
 
-  // Realtime: refresh on any credit_ledger change for this user
+  // Realtime: refresh whenever wallet, ledger, or subscription changes for this user
   useEffect(() => {
     if (!user?.id) return;
+    const invalidate = () =>
+      queryClient.invalidateQueries({ queryKey: ["credit-state", user.id] });
     // Unique channel name per mount to avoid supabase-js returning a
-    // stale, already-subscribed channel (React StrictMode double-invoke)
-    // which throws: "cannot add `postgres_changes` callbacks ... after subscribe()".
-    const channelName = `credit-ledger-${user.id}-${Math.random().toString(36).slice(2)}`;
+    // stale, already-subscribed channel (React StrictMode double-invoke).
+    const channelName = `credit-state-${user.id}-${Math.random().toString(36).slice(2)}`;
     const ch = supabase
       .channel(channelName)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "credit_ledger", filter: `user_id=eq.${user.id}` },
-        () => queryClient.invalidateQueries({ queryKey: ["credit-state", user.id] }),
+        invalidate,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "credit_balances", filter: `user_id=eq.${user.id}` },
+        invalidate,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "user_subscriptions", filter: `user_id=eq.${user.id}` },
+        invalidate,
       )
       .subscribe();
     return () => {
