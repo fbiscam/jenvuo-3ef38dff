@@ -119,17 +119,18 @@ function SavedSignals() {
             <p className="mt-3 text-sm text-zinc-700 line-clamp-3">{summary}</p>
             <dl className="mt-4 grid grid-cols-4 gap-2 text-[11px]">
               {([
-                ["Entry", entry, "bg-amber-50 ring-amber-200/70", "text-amber-700", "text-amber-900"],
-                ["SL", sl, "bg-rose-50 ring-rose-200/70", "text-rose-700", "text-rose-900"],
-                ["TP", tp, "bg-emerald-50 ring-emerald-200/70", "text-emerald-700", "text-emerald-900"],
-                ["R:R", rr ? `${Number(rr).toFixed(1)}` : "—", "bg-sky-50 ring-sky-200/70", "text-sky-700", "text-sky-900"],
-              ] as const).map(([k, v, boxCls, dtCls, ddCls]) => (
-                <div key={k} className={`rounded-md px-2 py-1.5 ring-1 ring-inset ${boxCls}`}>
-                  <dt className={`font-mono uppercase tracking-wider ${dtCls}`}>{k}</dt>
-                  <dd className={`mt-0.5 font-mono ${ddCls}`}>{v ?? "—"}</dd>
+                ["Entry", entry],
+                ["SL", sl],
+                ["TP", tp],
+                ["R:R", rr ? `${Number(rr).toFixed(1)}` : "—"],
+              ] as const).map(([k, v]) => (
+                <div key={k} className="rounded-md bg-zinc-50 px-2 py-1.5 ring-1 ring-inset ring-zinc-200/70">
+                  <dt className="font-mono uppercase tracking-wider text-zinc-500">{k}</dt>
+                  <dd className="mt-0.5 font-mono text-zinc-900">{v ?? "—"}</dd>
                 </div>
               ))}
             </dl>
+
 
             <footer className="mt-4 flex items-center justify-between text-[11px] text-zinc-400">
               <span className="font-mono uppercase tracking-wider">Saved {new Date(r.created_at).toLocaleDateString()}</span>
