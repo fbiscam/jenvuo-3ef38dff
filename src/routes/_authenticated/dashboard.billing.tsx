@@ -164,7 +164,7 @@ function Billing() {
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Wallet balance</div>
+            
             <div className="mt-2 flex items-baseline gap-2 flex-nowrap whitespace-nowrap">
               <span className="text-3xl sm:text-4xl font-semibold tabular-nums">${Number(remaining).toFixed(2)}</span>
               <span className="text-[11px] sm:text-sm text-zinc-500">/ ${Number(credits.allowance).toFixed(2)} · {plan.toUpperCase()}</span>
