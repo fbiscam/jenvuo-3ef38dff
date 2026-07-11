@@ -165,9 +165,9 @@ function Billing() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Wallet balance</div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-4xl font-semibold tabular-nums">${Number(remaining).toFixed(2)}</span>
-              <span className="text-sm text-zinc-500">/ ${Number(credits.allowance).toFixed(2)} · {plan.toUpperCase()}</span>
+            <div className="mt-2 flex items-baseline gap-2 flex-nowrap whitespace-nowrap">
+              <span className="text-3xl sm:text-4xl font-semibold tabular-nums">${Number(remaining).toFixed(2)}</span>
+              <span className="text-[11px] sm:text-sm text-zinc-500">/ ${Number(credits.allowance).toFixed(2)} · {plan.toUpperCase()}</span>
             </div>
             {resetsAt && (
               <p className="mt-1 text-xs text-zinc-500">Resets {resetsAt.toLocaleDateString()}</p>
