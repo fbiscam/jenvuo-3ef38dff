@@ -950,6 +950,42 @@ export type Database = {
         }
         Relationships: []
       }
+      signal_locks: {
+        Row: {
+          created_at: string
+          direction: string
+          entry_px: number
+          expires_at: string
+          instrument: string
+          signal: Json
+          sl_px: number
+          timeframe: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          entry_px: number
+          expires_at: string
+          instrument: string
+          signal: Json
+          sl_px: number
+          timeframe: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          entry_px?: number
+          expires_at?: string
+          instrument?: string
+          signal?: Json
+          sl_px?: number
+          timeframe?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       signup_attempts: {
         Row: {
           created_at: string
