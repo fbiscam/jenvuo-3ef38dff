@@ -25,7 +25,11 @@ type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string; mf
 function sanitizeRedirect(r?: string): string {
   if (!r || typeof r !== "string") return "/dashboard";
   if (!r.startsWith("/") || r.startsWith("//")) return "/dashboard";
-  return r;
+  // Strip query/hash — TanStack's navigate({ to }) expects a route path only.
+  // Lovable preview appends cache-buster params (__lovable_sha, __lovable_load_id)
+  // that break route matching and cause sign-in to silently stall on /auth.
+  const path = r.split("?")[0].split("#")[0];
+  return path || "/dashboard";
 }
 
 export const Route = createFileRoute("/auth")({
