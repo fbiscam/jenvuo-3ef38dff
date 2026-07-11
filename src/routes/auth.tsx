@@ -19,6 +19,17 @@ import { createUserNotification } from "@/lib/notifications.functions";
 
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 
+async function waitForMfaElevation(): Promise<boolean> {
+  for (let i = 0; i < 10; i += 1) {
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) return false;
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (!aal || aal.currentLevel === "aal2" || aal.nextLevel !== "aal2") return true;
+    await new Promise((resolve) => window.setTimeout(resolve, 150));
+  }
+  return false;
+}
+
 
 type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string; mfa?: "1" };
 
@@ -454,8 +465,8 @@ function AuthPage() {
       challengeId: mfaChallenge.challengeId,
       code: mfaCode,
     });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       const raw = error.message || "";
       const lower = raw.toLowerCase();
       const friendly = lower.includes("expired")
@@ -469,6 +480,16 @@ function AuthPage() {
       setMfaCode("");
       setMfaShake(true);
       setTimeout(() => setMfaShake(false), 500);
+      setTimeout(() => mfaInputRef.current?.focus(), 30);
+      return;
+    }
+    const elevated = await waitForMfaElevation();
+    if (!elevated) {
+      setLoading(false);
+      const msg = "Two-factor session is still updating. Please try again.";
+      setMfaError(msg);
+      toast.error("Verification delayed", { description: msg });
+      setMfaCode("");
       setTimeout(() => mfaInputRef.current?.focus(), 30);
       return;
     }
@@ -500,6 +521,7 @@ function AuthPage() {
         });
       }
     }
+    setLoading(false);
     navigate({ to: redirectTo as "/dashboard", replace: true });
   };
 
