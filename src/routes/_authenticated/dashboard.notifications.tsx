@@ -377,7 +377,7 @@ function NotificationsPage() {
                             </div>
                           </div>
                           {n.body && (
-                            <p className="mt-0.5 text-[12px] text-zinc-500 line-clamp-2">{n.body}</p>
+                            <p className="mt-0.5 text-[12px] text-zinc-500 line-clamp-2 break-words">{n.body}</p>
                           )}
                         </div>
                         <div className="shrink-0 flex items-center gap-0.5 self-center">
