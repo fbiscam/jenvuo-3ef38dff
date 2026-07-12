@@ -1296,7 +1296,7 @@ function ReferralSnapshot() {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    const refresh = async () => {
       try {
         const { getReferralInfo } = await import("@/lib/referrals.functions");
         const info = await getReferralInfo();
@@ -1306,9 +1306,26 @@ function ReferralSnapshot() {
         setCount(info.totals.converted);
         setEarned(info.totals.credits_earned);
       } catch { /* ignore */ }
+    };
+    refresh();
+
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      const uid = data.user?.id;
+      if (!uid || cancelled) return;
+      channel = supabase
+        .channel(`referrals-snapshot-${uid}`)
+        .on("postgres_changes", { event: "*", schema: "public", table: "referrals", filter: `referrer_id=eq.${uid}` }, () => { refresh(); })
+        .subscribe();
     })();
-    return () => { cancelled = true; };
+
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
+
 
   const link = shareUrl || (code && typeof window !== "undefined" ? `${window.location.origin}/auth?ref=${code}` : "");
 
