@@ -1006,7 +1006,7 @@ function DashboardLayout() {
         )}
 
         </main>
-        <DashboardFooter />
+        <DashboardFooter sidebarCollapsed={sidebarCollapsed} />
        </div>
 
     </div>
