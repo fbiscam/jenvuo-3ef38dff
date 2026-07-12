@@ -655,7 +655,7 @@ function DashboardLayout() {
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
             <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             {!sidebarCollapsed && (
-              <span className="truncate text-[15px] font-semibold tracking-tight" style={{ color: "#5e5e5e" }}>{"{ Jenvu }"}</span>
+              <span className="truncate text-[16px] font-normal tracking-tight" style={{ color: "#5e5e5e" }}>Jenvu</span>
             )}
           </Link>
           <button
