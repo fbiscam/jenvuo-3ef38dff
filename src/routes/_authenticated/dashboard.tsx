@@ -721,10 +721,10 @@ function DashboardLayout() {
                         className="material-symbols-rounded shrink-0"
                         aria-hidden
                         style={{
-                          fontSize: 18,
+                          fontSize: 20,
                           lineHeight: 1,
-                          color: active ? "#18181b" : (iconColor ?? "#626262"),
-                          fontVariationSettings: `'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20`,
+                          color: active ? "#18181b" : (iconColor ?? "#5E5E5E"),
+                          fontVariationSettings: `'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 24`,
                         }}
                       >
                         {iconName}
