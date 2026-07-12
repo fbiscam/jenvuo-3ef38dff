@@ -652,7 +652,7 @@ function DashboardLayout() {
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
       >
         {/* Brand */}
-        <div className={`flex h-10 shrink-0 items-center gap-2.5 ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
+        <div className={`flex h-11 shrink-0 items-center gap-2.5 ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
             <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             {!sidebarCollapsed && (
