@@ -11,9 +11,8 @@ const LINKS: { label: string; to: string }[] = [
 export default function DashboardFooter(_props: { sidebarCollapsed?: boolean } = {}) {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-10 border-t border-zinc-200 bg-transparent">
-
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-5 gap-y-1 px-4 py-2 text-center text-[12px] text-zinc-600 sm:px-6">
+    <footer className="mt-8 h-11 shrink-0 border-t border-zinc-200 bg-transparent">
+      <div className="mx-auto flex h-full max-w-7xl flex-wrap items-center justify-center gap-x-5 gap-y-1 px-4 text-center text-[12px] text-zinc-600 sm:px-6">
         {LINKS.map((l) => (
           <Link
             key={l.to}

@@ -788,7 +788,7 @@ function DashboardLayout() {
 
 
       {/* Right column */}
-      <div className={`flex min-w-0 flex-1 flex-col ${sidebarCollapsed ? "lg:pl-[60px]" : "lg:pl-[200px]"}`}>
+      <div className={`flex min-h-screen min-w-0 flex-1 flex-col ${sidebarCollapsed ? "lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
       {/* Mobile menu toggle (floating) */}
       <button
@@ -800,7 +800,7 @@ function DashboardLayout() {
         <Menu className="h-4 w-4" />
       </button>
 
-      <main className="mx-auto w-full max-w-7xl px-5 py-7 sm:px-8">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-7 sm:px-8">
 
         {pathname === "/dashboard" ? (
         <>
