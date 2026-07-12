@@ -671,7 +671,7 @@ function DashboardLayout() {
 
         {/* Nav */}
 
-        <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 [scrollbar-width:thin]">
+        <nav className="flex-1 px-2 py-2">
 
           {NAV_GROUPS.map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
