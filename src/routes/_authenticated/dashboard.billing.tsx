@@ -96,8 +96,10 @@ function Billing() {
   const credits = useCredits();
   const [showAllActivity, setShowAllActivity] = useState(false);
 
-  // Wait for both plan + credits so we never flash "Free" before the real plan resolves.
-  const isLoading = currentPlan === null || credits.isLoading;
+  // Only show skeleton on the very first load — once we've resolved plan/credits
+  // once, keep showing the previous values during background refetches so the
+  // "Current plan" / balance don't blink on realtime updates or tab focus.
+  const isLoading = currentPlan === null || (credits.isLoading && !credits.state);
 
   if (isLoading) {
     return (
