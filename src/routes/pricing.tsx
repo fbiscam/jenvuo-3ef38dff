@@ -137,11 +137,11 @@ const FEATURE_BLOCKS = [
 type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Voice queries / day", free: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
-  { feature: "A+ signal access", free: false, pro: true, elite: true },
-  { feature: "Alert latency", free: "4h delay", pro: "Realtime", elite: "< 30s priority" },
-  { feature: "ICT / SMC narration", free: false, pro: true, elite: true },
-  { feature: "Multi-timeframe bias", free: false, pro: true, elite: true },
-  { feature: "Trade journal", free: false, pro: true, elite: true },
+  { feature: "A+ signal access", free: true, pro: true, elite: true },
+  { feature: "Alert latency", free: "No alerts", pro: "Realtime", elite: "< 30s priority" },
+  { feature: "ICT / SMC narration", free: true, pro: true, elite: true },
+  { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
+  { feature: "Trade journal", free: true, pro: true, elite: true },
   { feature: "Multi-pair scanner", free: false, pro: false, elite: true },
   { feature: "API & webhooks", free: false, pro: false, elite: true },
   { feature: "Custom alert rules", free: false, pro: false, elite: true },
