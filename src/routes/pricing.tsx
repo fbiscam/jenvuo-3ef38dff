@@ -62,7 +62,7 @@ const TIERS = [
     price: 0,
     icon: Sparkles,
     bestFor: "Curious",
-    tagline: "Full platform. Realtime alerts.",
+    tagline: "Full platform. No alerts.",
     cta: "Start free",
     ctaTo: "/auth",
     credits: 5,
@@ -73,7 +73,7 @@ const TIERS = [
       "Full ICT / SMC narration",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
-      "Realtime email & push alerts",
+      "No realtime alerts",
     ],
 
     highlight: false,
@@ -138,7 +138,7 @@ type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Voice queries / day", free: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
   { feature: "A+ signal access", free: true, pro: true, elite: true },
-  { feature: "Alert latency", free: "Realtime", pro: "Realtime", elite: "< 30s priority" },
+  { feature: "Alert latency", free: "No alerts", pro: "Realtime", elite: "Realtime" },
   { feature: "ICT / SMC narration", free: true, pro: true, elite: true },
   { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
   { feature: "Trade journal", free: true, pro: true, elite: true },
@@ -345,12 +345,12 @@ function PricingPage() {
                 
                 { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
-                { f: "Signal latency", a: "Realtime", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
+                { f: "Signal latency", a: "No alerts", b: "Realtime", c: "Realtime", d: "Realtime" },
                 { f: "A+ signal access", a: true, b: true, c: true, d: true },
                 { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
                 { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
                 { f: "Trade journal", a: true, b: true, c: true, d: true },
-                { f: "Email + push alerts", a: true, b: true, c: true, d: true },
+                { f: "Email + push alerts", a: false, b: true, c: true, d: true },
                 { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
                 
                 { f: "Custom alert rules", a: false, b: false, c: true, d: true },
