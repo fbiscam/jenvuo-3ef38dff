@@ -169,7 +169,7 @@ function Billing() {
               <span className="text-[11px] sm:text-sm text-zinc-500">/ ${Number(credits.allowance).toFixed(2)} · {plan.toUpperCase()}</span>
             </div>
             {resetsAt && (
-              <p className="mt-1 text-xs text-zinc-500">Resets {resetsAt.toLocaleDateString()}</p>
+              <p className="mt-1 text-xs text-zinc-500">Next billing date: {resetsAt.toLocaleDateString()}</p>
             )}
             <p className="mt-2 text-[11px] text-zinc-500">Flat $0.20 per real signal (BUY/SELL). WAIT / no-trade scans are free.</p>
           </div>
