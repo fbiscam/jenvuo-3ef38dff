@@ -729,13 +729,13 @@ function DashboardLayout() {
                       </span>
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
-                        <span className="ml-auto grid h-[14px] w-[14px] aspect-square place-items-center rounded-full bg-rose-600 text-[9px] font-semibold leading-none text-white tabular-nums text-center">
-                          <span className="block translate-y-[0.5px]">{count > 9 ? "9+" : count}</span>
+                        <span className="ml-auto inline-flex h-4 w-4 shrink-0 aspect-square items-center justify-center rounded-full bg-rose-600 font-semibold text-white tabular-nums" style={{ fontSize: 9, lineHeight: 1, fontFamily: "'Inter', system-ui, sans-serif" }}>
+                          {count > 9 ? "9+" : count}
                         </span>
                       )}
                       {!sidebarCollapsed && hasUnread && (
-                        <span className="ml-auto grid h-[14px] w-[14px] aspect-square place-items-center rounded-full bg-rose-600 text-[9px] font-semibold leading-none text-white tabular-nums text-center">
-                          <span className="block translate-y-[0.5px]">{unreadNotifs > 9 ? "9+" : unreadNotifs}</span>
+                        <span className="ml-auto inline-flex h-4 w-4 shrink-0 aspect-square items-center justify-center rounded-full bg-rose-600 font-semibold text-white tabular-nums" style={{ fontSize: 9, lineHeight: 1, fontFamily: "'Inter', system-ui, sans-serif" }}>
+                          {unreadNotifs > 9 ? "9+" : unreadNotifs}
                         </span>
                       )}
                       {sidebarCollapsed && ((typeof count === "number" && count > 0 && !active) || hasUnread) && (
