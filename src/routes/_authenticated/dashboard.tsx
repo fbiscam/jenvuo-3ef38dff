@@ -765,16 +765,18 @@ function DashboardLayout() {
         })()}
 
         {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
-        <div className="mt-auto shrink-0 flex items-center justify-between border-t border-zinc-100 bg-white px-2 py-2">
-          <button
-            type="button"
-            onClick={signOut}
-            title="Sign out"
-            aria-label="Sign out"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-rose-600 hover:bg-rose-50"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-          </button>
+        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-100 bg-white px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
+          {!sidebarCollapsed && (
+            <button
+              type="button"
+              onClick={signOut}
+              title="Sign out"
+              aria-label="Sign out"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-rose-600 hover:bg-rose-50"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setSidebarCollapsed((v) => !v)}
