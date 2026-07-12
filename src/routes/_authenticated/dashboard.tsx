@@ -664,7 +664,7 @@ function DashboardLayout() {
                         ${sidebarCollapsed ? "justify-center px-2 py-1" : "gap-2 px-2.5 py-1"}
                         ${active ? "bg-zinc-900 text-white" : "text-[#6B6C6B] hover:bg-zinc-100 hover:text-[#6B6C6B]"}`}
                     >
-                      <Icon className="h-4 w-4 shrink-0" />
+                      <Icon className="h-3.5 w-3.5 shrink-0" />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
                         <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold leading-none text-white tabular-nums">
