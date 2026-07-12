@@ -730,7 +730,7 @@ function DashboardLayout() {
 
 
       {/* Right column */}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className={`flex min-w-0 flex-1 flex-col ${sidebarCollapsed ? "lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
       {/* Top bar */}
       <header className="sticky top-0 z-30 border-b border-zinc-200 bg-white">
