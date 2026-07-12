@@ -652,7 +652,7 @@ function DashboardLayout() {
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
       >
         {/* Brand */}
-        <div className={`flex h-11 shrink-0 items-center gap-2.5 ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
+        <div className={`flex h-10 shrink-0 items-center gap-2.5 ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
             <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             {!sidebarCollapsed && (
@@ -671,17 +671,17 @@ function DashboardLayout() {
 
         {/* Nav */}
 
-        <nav className="flex-1 px-2 py-2">
+        <nav className="flex-1 px-2 py-1">
 
           {NAV_GROUPS.map((group, gi) => (
-            <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
+            <div key={group.label} className={gi > 0 ? "mt-1 pt-1.5 border-t border-zinc-200" : ""}>
               {!sidebarCollapsed && group.label && (
-                <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
+                <div className="mb-0.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
                   {group.label}
                 </div>
               )}
               {sidebarCollapsed && gi > 0 && <div className="mx-3 mb-1 h-px bg-zinc-100" />}
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-0.5">
                 {group.items.map((t) => {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                   const iconName = t.icon;
@@ -697,7 +697,7 @@ function DashboardLayout() {
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
                       className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition
-                        ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}
+                        ${sidebarCollapsed ? "justify-center px-2 py-1" : "gap-3 px-2.5 py-1"}
                         ${active
                           ? "bg-zinc-100 text-zinc-900 font-semibold"
                           : hasUnread
@@ -789,7 +789,7 @@ function DashboardLayout() {
 
 
         {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
-        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-white px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
+        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-white px-2 py-1.5 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
           {!sidebarCollapsed && (
             <button
               type="button"
