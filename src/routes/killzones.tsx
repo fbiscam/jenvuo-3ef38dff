@@ -244,12 +244,7 @@ function KillzonesPage() {
               aria-label="Jenvu home"
               className="pointer-events-auto shrink-0 inline-flex items-center justify-center rounded-md hover:opacity-80 transition"
             >
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-zinc-900 text-white">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden="true">
-                  <path d="M4 17l5-5 4 4 7-9" />
-                  <path d="M14 7h6v6" />
-                </svg>
-              </span>
+              <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded-md" />
             </Link>
             <span className="truncate text-[22px] tracking-tight leading-none select-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </div>
