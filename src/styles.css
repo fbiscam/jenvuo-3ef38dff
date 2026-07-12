@@ -1,5 +1,4 @@
 @import "tailwindcss" source(none);
-@import "@fontsource-variable/urbanist";
 @source "../src";
 @import "tw-animate-css";
 
@@ -20,8 +19,8 @@
  */
 
 @theme inline {
-  --font-display: "Sora", system-ui, sans-serif;
-  --font-sans: "Manrope", system-ui, sans-serif;
+  --font-display: "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
+  --font-sans: "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -153,7 +152,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: "Urbanist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    font-family: "Google Sans", "Product Sans", "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   }
 
 }
