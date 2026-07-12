@@ -1063,8 +1063,8 @@ function DashboardLayout() {
         )}
 
         </main>
+        <DashboardFooter />
        </div>
-       <DashboardFooter />
 
     </div>
   );
