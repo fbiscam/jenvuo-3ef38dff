@@ -670,17 +670,17 @@ function DashboardLayout() {
 
         {/* Nav */}
 
-        <nav className="min-h-0 flex-1 overflow-y-auto scrollbar-auto-hide px-2 py-3">
+        <nav className="min-h-0 flex-1 overflow-hidden px-2 py-2">
 
           {NAV_GROUPS.map((group, gi) => (
-            <div key={group.label} className={gi > 0 ? "mt-3 pt-3 border-t border-zinc-100" : ""}>
+            <div key={group.label} className={gi > 0 ? "mt-1.5 pt-1.5 border-t border-zinc-100" : ""}>
               {!sidebarCollapsed && group.label && (
-                <div className="mb-1 px-2.5 text-[8px] font-normal uppercase tracking-wider text-[#9B9C9B]">
+                <div className="mb-0.5 px-2.5 text-[8px] font-normal uppercase tracking-wider text-[#9B9C9B]">
                   {group.label}
                 </div>
               )}
-              {sidebarCollapsed && gi > 0 && <div className="mx-3 mb-2 h-px bg-zinc-100" />}
-              <div className="flex flex-col gap-0.5">
+              {sidebarCollapsed && gi > 0 && <div className="mx-3 mb-1 h-px bg-zinc-100" />}
+              <div className="flex flex-col">
                 {group.items.map((t) => {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                   const Icon = t.icon;
@@ -695,7 +695,7 @@ function DashboardLayout() {
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
                       className={`group relative flex items-center rounded-md text-[11.5px] font-medium transition
-                        ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-2 px-2.5 py-1.5"}
+                        ${sidebarCollapsed ? "justify-center px-2 py-1" : "gap-2 px-2.5 py-1"}
                         ${active
                           ? "bg-zinc-100 text-zinc-900 font-semibold"
                           : hasUnread
