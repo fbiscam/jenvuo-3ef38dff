@@ -647,7 +647,7 @@ function DashboardLayout() {
 
       {/* Sidebar (Firebase-style) */}
       <aside
-        className={`max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
+        className={`max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-y-auto overflow-x-hidden [scrollbar-width:thin] border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
           ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"}
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
       >
@@ -671,12 +671,12 @@ function DashboardLayout() {
 
         {/* Nav */}
 
-        <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 [scrollbar-width:thin]">
+        <nav className="flex-1 px-2 py-2">
 
           {NAV_GROUPS.map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
               {!sidebarCollapsed && group.label && (
-                <div className="mb-1.5 px-2.5 text-[8px] font-normal tracking-wider text-[#9B9C9B]">
+                <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
                   {group.label}
                 </div>
               )}
@@ -696,8 +696,8 @@ function DashboardLayout() {
                       resetScroll={false}
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
-                      className={`group relative flex items-center rounded-full text-[11px] font-medium transition
-                        ${sidebarCollapsed ? "justify-center px-2 py-1" : "gap-3 px-2.5 py-1"}
+                      className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition
+                        ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}
                         ${active
                           ? "bg-zinc-100 text-zinc-900 font-semibold"
                           : hasUnread
@@ -771,8 +771,8 @@ function DashboardLayout() {
             <div className="mx-2 border-t border-b border-zinc-200 px-2.5 py-2">
               <div className="flex items-center gap-2">
                 <div className="min-w-0 flex-1 flex items-center gap-1.5">
-                  <span className="truncate text-[11px] font-semibold text-zinc-900">{info.name}</span>
-                  <span className="truncate text-[9.5px] text-zinc-500">({info.price})</span>
+                  <span className="truncate text-[12px] font-semibold text-zinc-900">{info.name}</span>
+                  <span className="truncate text-[10.5px] text-zinc-500">({info.price})</span>
                 </div>
                 {t !== "ultra" && (
                   <Link
