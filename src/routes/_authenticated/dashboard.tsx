@@ -17,7 +17,7 @@ import {
   Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
-  ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy,
+  ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
@@ -1273,9 +1273,10 @@ function DailyTip() {
   }, []);
   return (
     <div className="flex flex-1 flex-col gap-2 px-5 py-5">
-      <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-700">
-        <Sparkles className="h-3 w-3" /> Tip of the day
+      <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-zinc-900 bg-zinc-900 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white">
+        <Lightbulb className="h-3 w-3" /> Tip of the day
       </div>
+
       <h4 className="mt-1 text-[14px] font-semibold text-zinc-900">{tip.title}</h4>
       <p className="text-[12px] leading-relaxed text-zinc-600">{tip.body}</p>
       <div className="mt-auto pt-3">
