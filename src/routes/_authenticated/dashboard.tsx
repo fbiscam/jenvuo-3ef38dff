@@ -1007,7 +1007,7 @@ function DashboardLayout() {
           </Card>
 
           <Card className="flex flex-col">
-            <CardHeader icon={Sparkles} title="Pro Tip" />
+            <CardHeader icon={Lightbulb} title="Pro Tip" />
             <DailyTip />
           </Card>
 
