@@ -39,7 +39,7 @@ export const collections: Collection[] = [
     slug: "getting-started",
     title: "Getting Started",
     description: "New to Jenvu? Start here for the basics.",
-    icon: "Sparkles",
+    icon: "Compass",
     articles: [
       {
         slug: "what-is-jenvu",
