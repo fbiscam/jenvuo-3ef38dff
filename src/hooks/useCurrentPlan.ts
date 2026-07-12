@@ -9,7 +9,6 @@ export function useCurrentPlan() {
     const load = async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) {
-        if (mounted) setPlan(null);
         return;
       }
       const { data } = await supabase
