@@ -620,10 +620,9 @@ function DashboardLayout() {
 
       {/* Sidebar (Firebase-style) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex h-dvh flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
+        className={`max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:sticky lg:top-0 flex h-dvh shrink-0 flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
           ${sidebarCollapsed ? "w-[68px]" : "w-[240px]"}
-          ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:sticky lg:top-0 lg:translate-x-0`}
+          ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
       >
         {/* Brand */}
         <div className={`flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-100 ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
