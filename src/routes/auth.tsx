@@ -628,7 +628,9 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const result = await verifySignupCode({ data: { email, code: otpCode, password } });
+    const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
+    const fingerprint = await getDeviceFingerprint();
+    const result = await verifySignupCode({ data: { email, code: otpCode, password, fingerprint } });
     if (!result.ok || !result.session) {
       setLoading(false);
       triggerOtpError(result.error || "Verification failed. Try again.");
