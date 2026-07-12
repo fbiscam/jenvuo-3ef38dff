@@ -688,7 +688,46 @@ function DashboardLayout() {
           ))}
         </nav>
 
+        {/* Plan card + collapse (bottom) */}
+        <div className="shrink-0 border-t border-zinc-100 p-2">
+          {!sidebarCollapsed ? (
+            <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3">
+              <div className="flex items-center gap-2">
+                <span className={`inline-block h-1.5 w-1.5 rounded-full ${planTierStyle.dot}`} />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[12px] font-semibold text-zinc-900">{planTier} plan</div>
+                  <div className="truncate text-[10.5px] text-zinc-500">
+                    ${Number(displayRemaining).toFixed(2)} balance
+                  </div>
+                </div>
+                <Link
+                  to="/dashboard/billing"
+                  className="rounded-md px-2 py-1 text-[11px] font-medium text-blue-600 hover:bg-blue-50"
+                >
+                  Upgrade
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <Link
+              to="/dashboard/billing"
+              title={`${planTier} plan · Upgrade`}
+              className="flex items-center justify-center rounded-md p-2 text-blue-600 hover:bg-blue-50"
+            >
+              <Sparkles className="h-4 w-4" />
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            className="mt-2 hidden w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-[11.5px] text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 lg:inline-flex"
+          >
+            {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <><ChevronsLeft className="h-3.5 w-3.5" /> Collapse</>}
+          </button>
+        </div>
+
       </aside>
+
 
       {/* Right column */}
       <div className="flex min-w-0 flex-1 flex-col">
