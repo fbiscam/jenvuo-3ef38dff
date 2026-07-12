@@ -788,7 +788,7 @@ function DashboardLayout() {
 
 
       {/* Right column */}
-      <div className={`flex min-w-0 flex-1 flex-col ${sidebarCollapsed ? "lg:pl-[60px]" : "lg:pl-[200px]"}`}>
+      <div className={`flex min-h-screen min-w-0 flex-1 flex-col ${sidebarCollapsed ? "lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
       {/* Mobile menu toggle (floating) */}
       <button
