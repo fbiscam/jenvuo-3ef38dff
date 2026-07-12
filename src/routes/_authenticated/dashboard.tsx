@@ -912,7 +912,7 @@ function BestTimeWidget() {
         ))}
       </div>
 
-      <p className="mt-1 text-center text-[9px] sm:text-[10.5px] leading-relaxed text-zinc-500 whitespace-nowrap sm:whitespace-normal">
+      <p className="mt-1 text-center text-[9px] sm:text-[10.5px] leading-relaxed text-zinc-500 whitespace-nowrap">
         Please check time according to your region to make A+ signals.
       </p>
     </div>
