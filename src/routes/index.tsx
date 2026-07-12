@@ -556,7 +556,7 @@ function HomePage() {
                 Four steps. One voice.
               </h2>
             </div>
-            <p className="max-w-md text-zinc-900 leading-relaxed">
+            <p className="max-w-[19rem] sm:max-w-md text-zinc-900 leading-relaxed">
               From spoken intent to executable plan — JENVU compresses a full trading desk into one voice loop.
             </p>
 
