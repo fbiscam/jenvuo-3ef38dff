@@ -52,9 +52,9 @@ export function CookieBanner() {
       style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif" }}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-[13px] leading-relaxed text-zinc-700">
-          We use cookies to keep you signed in, remember your preferences, and understand how the desk is used. You can accept or reject non-essential cookies. See our{" "}
-          <a href="/cookies" className="underline underline-offset-2 hover:text-zinc-900">Cookie Policy</a>.
+        <div className="max-w-[480px] text-[13px] leading-snug text-zinc-900 line-clamp-2">
+          We use cookies to keep you signed in and understand how the desk is used.{" "}
+          <a href="/cookies" className="underline underline-offset-2 font-medium hover:text-black">Learn more</a>.
         </div>
         <div className="flex shrink-0 gap-2">
           <button
