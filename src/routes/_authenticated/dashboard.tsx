@@ -16,6 +16,7 @@ import {
   Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
+  ChevronsLeft, ChevronsRight, Menu, X, Sparkles,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
@@ -60,18 +61,36 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type OpenTrade = { pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null };
 type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number; closedWins: number; closedDecided: number; openTrades: OpenTrade[] };
 
-const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: boolean; countKey?: keyof Counts }> = [
-  { to: "/dashboard", label: "Saved", icon: Bookmark, exact: true, countKey: "saved" },
-  { to: "/dashboard/alerts", label: "Alerts", icon: Bell, countKey: "alerts7d" },
-  { to: "/dashboard/notifications", label: "Notifications", icon: BellRing },
-  { to: "/dashboard/journal", label: "Trades", icon: BookOpen, countKey: "journalTotal" },
-  { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-  { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
-  
-  { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
-  { to: "/dashboard/profile", label: "Profile", icon: User },
-  { to: "/dashboard/security", label: "Security", icon: ShieldCheck },
+type TabItem = { to: string; label: string; icon: typeof Bookmark; exact?: boolean; countKey?: keyof Counts };
+
+const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
+  {
+    label: "Workspace",
+    items: [
+      { to: "/dashboard", label: "Overview", icon: Bookmark, exact: true, countKey: "saved" },
+      { to: "/dashboard/alerts", label: "Alerts", icon: Bell, countKey: "alerts7d" },
+      { to: "/dashboard/notifications", label: "Notifications", icon: BellRing },
+    ],
+  },
+  {
+    label: "Trading",
+    items: [
+      { to: "/dashboard/journal", label: "Trades", icon: BookOpen, countKey: "journalTotal" },
+      { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+      { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
+      { to: "/dashboard/profile", label: "Profile", icon: User },
+      { to: "/dashboard/security", label: "Security", icon: ShieldCheck },
+    ],
+  },
 ];
+
+const TABS: TabItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
 /* ---------- helpers ---------- */
 
@@ -399,10 +418,25 @@ function DashboardLayout() {
   const [range, setRange] = useState<RangeKey>("7d");
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
   const greetingText = pickGreeting(localHour);
+
+  // Persist sidebar collapsed state
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("jenvu:dash:sidebar-collapsed");
+    if (stored === "1") setSidebarCollapsed(true);
+  }, []);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("jenvu:dash:sidebar-collapsed", sidebarCollapsed ? "1" : "0");
+  }, [sidebarCollapsed]);
+  // Close mobile drawer on route change
+  useEffect(() => { setMobileNavOpen(false); }, [pathname]);
 
   useEffect(() => {
     // Wait until Supabase has restored the session; otherwise RLS-gated
@@ -572,19 +606,143 @@ function DashboardLayout() {
   }, [displayRemaining, credits.isLoading, credits.allowance]);
 
   return (
-    <div className="min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
+    <div className="min-h-dvh flex bg-[#FAFAFA] text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
+
+      {/* Mobile overlay */}
+      {mobileNavOpen && (
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setMobileNavOpen(false)}
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] lg:hidden"
+        />
+      )}
+
+      {/* Sidebar (Firebase-style) */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex h-dvh flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
+          ${sidebarCollapsed ? "w-[68px]" : "w-[240px]"}
+          ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:sticky lg:top-0 lg:translate-x-0`}
+      >
+        {/* Brand */}
+        <div className={`flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-100 ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
+          <Link to="/" className="flex items-center gap-2.5 min-w-0">
+            <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
+            {!sidebarCollapsed && (
+              <span className="truncate text-[15px] font-semibold tracking-tight text-zinc-900">JENVU</span>
+            )}
+          </Link>
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={() => setMobileNavOpen(false)}
+            className="ml-auto rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 lg:hidden"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto scrollbar-auto-hide px-2 py-3">
+          {NAV_GROUPS.map((group, gi) => (
+            <div key={group.label} className={gi > 0 ? "mt-4" : ""}>
+              {!sidebarCollapsed && (
+                <div className="mb-1 px-3 text-[10.5px] font-medium uppercase tracking-wider text-zinc-400">
+                  {group.label}
+                </div>
+              )}
+              {sidebarCollapsed && gi > 0 && <div className="mx-3 mb-2 h-px bg-zinc-100" />}
+              <div className="flex flex-col gap-0.5">
+                {group.items.map((t) => {
+                  const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
+                  const Icon = t.icon;
+                  const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
+                  return (
+                    <Link
+                      key={t.to}
+                      to={t.to as "/dashboard"}
+                      resetScroll={false}
+                      onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
+                      title={sidebarCollapsed ? t.label : undefined}
+                      className={`group relative flex items-center rounded-md text-[13px] font-medium transition
+                        ${sidebarCollapsed ? "justify-center px-2 py-2" : "gap-3 px-3 py-2"}
+                        ${active ? "bg-zinc-900 text-white" : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"}`}
+                    >
+                      <Icon className="h-4 w-4 shrink-0" />
+                      {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
+                      {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
+                        <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold leading-none text-white tabular-nums">
+                          {count}
+                        </span>
+                      )}
+                      {sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
+                        <span className="absolute right-1.5 top-1.5 inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        {/* Footer: plan card + collapse */}
+        <div className="shrink-0 border-t border-zinc-100 p-2">
+          {!sidebarCollapsed ? (
+            <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3">
+              <div className="flex items-center gap-2">
+                <span className={`inline-block h-1.5 w-1.5 rounded-full ${planTierStyle.dot}`} />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[12px] font-semibold text-zinc-900">{planTier} plan</div>
+                  <div className="truncate text-[10.5px] text-zinc-500">
+                    ${Number(displayRemaining).toFixed(2)} balance
+                  </div>
+                </div>
+                <Link
+                  to="/dashboard/billing"
+                  className="rounded-md px-2 py-1 text-[11px] font-medium text-blue-600 hover:bg-blue-50"
+                >
+                  Upgrade
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <Link
+              to="/dashboard/billing"
+              title={`${planTier} plan · Upgrade`}
+              className="flex items-center justify-center rounded-md p-2 text-blue-600 hover:bg-blue-50"
+            >
+              <Sparkles className="h-4 w-4" />
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            className="mt-2 hidden w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-[11.5px] text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 lg:inline-flex"
+          >
+            {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <><ChevronsLeft className="h-3.5 w-3.5" /> Collapse</>}
+          </button>
+        </div>
+      </aside>
+
+      {/* Right column */}
+      <div className="flex min-w-0 flex-1 flex-col">
 
       {/* Top bar */}
-      <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-5 py-3 sm:px-8">
-          <Link to="/" className="flex items-center gap-2.5">
-            <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
-            <span className="font-semibold tracking-tight">JENVU AI</span>
-            <span className="ml-2 hidden text-[11px] text-zinc-400 sm:inline">/ Dashboard</span>
-          </Link>
-          <div className="flex items-center gap-2">
+      <header className="sticky top-0 z-30 border-b border-zinc-200 bg-white">
+        <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setMobileNavOpen(true)}
+            className="inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 hover:bg-zinc-50 lg:hidden"
+          >
+            <Menu className="h-4 w-4" />
+          </button>
+          <div className="hidden text-[12px] text-zinc-400 lg:block">Dashboard</div>
+          <div className="ml-auto flex items-center gap-2">
             <NotificationBell />
-
             <button
               onClick={signOut}
               className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
@@ -595,7 +753,8 @@ function DashboardLayout() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-5 py-7 sm:px-8">
+      <main className="mx-auto w-full max-w-7xl px-5 py-7 sm:px-8">
+
         {/* Identity row */}
         <div className="flex flex-wrap items-start justify-between gap-4 lg:items-end">
           <div className="min-w-0">
@@ -782,52 +941,22 @@ function DashboardLayout() {
           </Card>
         </section>
 
-        {/* Workspace tabs + outlet */}
+        {/* Workspace outlet */}
         <div className="mt-8 flex items-center justify-between">
           <h2 className="text-[15px] font-semibold text-zinc-900">Workspace</h2>
         </div>
 
-        <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 bg-white lg:grid lg:grid-cols-[220px_1fr]">
-          <aside className="border-b border-zinc-200 bg-white lg:border-b-0 lg:border-r">
-            <nav className="flex gap-1.5 overflow-x-auto p-2 lg:flex-col lg:gap-1 lg:overflow-visible lg:p-3">
-              {TABS.map((t) => {
-                const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
-                const Icon = t.icon;
-                const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
-                return (
-                  <Link
-                    key={t.to}
-                    to={t.to as "/dashboard"}
-                    resetScroll={false}
-                    onClick={() => markTabSeen(t.countKey)}
-                    className={`inline-flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-[13px] font-medium transition lg:w-full ${
-                      active
-                        ? "bg-zinc-100 text-zinc-900"
-                        : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    <span className="truncate">{t.label}</span>
-                    {typeof count === "number" && count > 0 && !active && (
-                      <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold leading-none text-white tabular-nums">
-                        {count}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-          </aside>
+        <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 bg-white">
           <div className="bg-white p-5">
             <Outlet />
           </div>
         </div>
 
-
         <div className="h-12" />
       </main>
 
-      <SiteFooter />
+        <SiteFooter />
+      </div>
     </div>
   );
 }
