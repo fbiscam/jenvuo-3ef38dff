@@ -496,31 +496,23 @@ function AuthPage() {
     const rememberedUid = mfaChallenge.userId;
     setMfaChallenge(null);
     setMfaCode("");
-    // Optionally persist this device so MFA is skipped for 30 days.
+    // Optionally persist this device so MFA is skipped for 30 days (silent — no toast).
     if (rememberDevice && rememberedUid) {
       try {
         const ua = typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : undefined;
         const res = await registerTrustedDeviceFn({ data: { userAgent: ua } });
         if (res?.token) {
-          window.localStorage.setItem(TRUSTED_DEVICE_KEY(rememberedUid), res.token);
-          // Verify the write actually landed (some browsers block storage in private mode).
-          const saved = window.localStorage.getItem(TRUSTED_DEVICE_KEY(rememberedUid));
-          if (saved !== res.token) {
-            toast.error("Couldn't remember this device", {
-              description: "Your browser blocked local storage. Disable private mode or allow site data.",
-            });
-          } else {
-            toast.success("Device remembered for 30 days");
+          try {
+            window.localStorage.setItem(TRUSTED_DEVICE_KEY(rememberedUid), res.token);
+          } catch {
+            // storage blocked — fail silently
           }
-        } else {
-          toast.error("Couldn't remember this device", { description: "The server didn't return a token. Try again from Security settings." });
         }
-      } catch (err) {
-        toast.error("Couldn't remember this device", {
-          description: err instanceof Error ? err.message : "You'll still need MFA next time.",
-        });
+      } catch {
+        // fail silently — user is signed in either way
       }
     }
+
     setLoading(false);
     navigate({ to: redirectTo as "/dashboard", replace: true });
   };
