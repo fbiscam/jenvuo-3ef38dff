@@ -208,9 +208,6 @@ function Billing() {
           const shown = showAllActivity ? rows : rows.slice(0, 12);
           return (
             <div className="mt-6">
-              <div className={`${MONO} mb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>
-                Recent scans — model & cost
-              </div>
               <div className="overflow-x-auto rounded-lg border border-zinc-200">
                 <table className="w-full min-w-[640px] text-xs border-collapse">
                   <thead>
