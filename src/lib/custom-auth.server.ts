@@ -181,10 +181,11 @@ export async function createSignupOtp(input: { email: string; password: string; 
   // 2. Hard cap: max N confirmed accounts per IP or device fingerprint.
   await assertDeviceUnderCap(input.ip, input.fingerprint)
 
-  // 3. Per-email-domain rate limit: max N attempts per hour from same domain (e.g. gmail.com).
+  // 3. Per-email-domain rate limit: skipped for public providers (gmail/yahoo/etc.);
+  //    applied only to custom/corporate domains where bulk abuse is actually meaningful.
   const domain = email.split('@')[1]?.toLowerCase().trim()
   const since = new Date(Date.now() - 60 * 60_000).toISOString()
-  if (domain) {
+  if (domain && !PUBLIC_EMAIL_PROVIDERS.has(domain)) {
     const { count: domainCount, error: domainErr } = await (supabaseAdmin as any)
       .from('signup_attempts')
       .select('id', { count: 'exact', head: true })
