@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { RouteSpinner } from "./components/RouteSpinner";
 
 export const getRouter = () => {
   const queryClient = new QueryClient({
@@ -22,7 +23,9 @@ export const getRouter = () => {
     defaultPreloadStaleTime: 0,
     defaultPendingMs: 200,
     defaultPendingMinMs: 100,
+    defaultPendingComponent: RouteSpinner,
   });
 
   return router;
 };
+
