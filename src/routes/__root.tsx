@@ -206,6 +206,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <LiveChatWidget />
+      <CookieBanner />
       <SonnerToaster
         theme="light"
         position={isMobile ? "bottom-center" : "top-right"}
