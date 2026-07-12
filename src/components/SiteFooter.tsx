@@ -218,7 +218,7 @@ export default function SiteFooter() {
             className="whitespace-nowrap text-[12px] sm:text-[14px] tracking-tight"
             style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 500, color: "#3c4043" }}
           >
-            © {year} Jenvu ai · All rights reserved
+            © {year} Jenvu AI. All rights reserved
           </div>
 
 
