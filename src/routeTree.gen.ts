@@ -48,6 +48,7 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
 import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
+import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_authenticated/dashboard.workspace'
 import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authenticated/dashboard.usage'
 import { Route as AuthenticatedDashboardSecurityRouteImport } from './routes/_authenticated/dashboard.security'
 import { Route as AuthenticatedDashboardReferralsRouteImport } from './routes/_authenticated/dashboard.referrals'
@@ -266,6 +267,12 @@ const ApiPublicPodcastDotxmlRoute = ApiPublicPodcastDotxmlRouteImport.update({
   path: '/api/public/podcast.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardWorkspaceRoute =
+  AuthenticatedDashboardWorkspaceRouteImport.update({
+    id: '/workspace',
+    path: '/workspace',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardUsageRoute =
   AuthenticatedDashboardUsageRouteImport.update({
     id: '/usage',
@@ -439,6 +446,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
+  '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -498,6 +506,7 @@ export interface FileRoutesByTo {
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
+  '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -562,6 +571,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/_authenticated/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/_authenticated/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
+  '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -626,6 +636,7 @@ export interface FileRouteTypes {
     | '/dashboard/referrals'
     | '/dashboard/security'
     | '/dashboard/usage'
+    | '/dashboard/workspace'
     | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
@@ -685,6 +696,7 @@ export interface FileRouteTypes {
     | '/dashboard/referrals'
     | '/dashboard/security'
     | '/dashboard/usage'
+    | '/dashboard/workspace'
     | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
@@ -748,6 +760,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/referrals'
     | '/_authenticated/dashboard/security'
     | '/_authenticated/dashboard/usage'
+    | '/_authenticated/dashboard/workspace'
     | '/api/public/podcast.xml'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
@@ -1088,6 +1101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPodcastDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/workspace': {
+      id: '/_authenticated/dashboard/workspace'
+      path: '/workspace'
+      fullPath: '/dashboard/workspace'
+      preLoaderRoute: typeof AuthenticatedDashboardWorkspaceRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/usage': {
       id: '/_authenticated/dashboard/usage'
       path: '/usage'
@@ -1255,6 +1275,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
   AuthenticatedDashboardSecurityRoute: typeof AuthenticatedDashboardSecurityRoute
   AuthenticatedDashboardUsageRoute: typeof AuthenticatedDashboardUsageRoute
+  AuthenticatedDashboardWorkspaceRoute: typeof AuthenticatedDashboardWorkspaceRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardAdminMessagesRoute: typeof AuthenticatedDashboardAdminMessagesRoute
   AuthenticatedDashboardAdminScanAuditRoute: typeof AuthenticatedDashboardAdminScanAuditRoute
@@ -1273,6 +1294,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardReferralsRoute: AuthenticatedDashboardReferralsRoute,
     AuthenticatedDashboardSecurityRoute: AuthenticatedDashboardSecurityRoute,
     AuthenticatedDashboardUsageRoute: AuthenticatedDashboardUsageRoute,
+    AuthenticatedDashboardWorkspaceRoute: AuthenticatedDashboardWorkspaceRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
     AuthenticatedDashboardAdminMessagesRoute:
       AuthenticatedDashboardAdminMessagesRoute,

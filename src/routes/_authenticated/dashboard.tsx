@@ -16,7 +16,7 @@ import {
   Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
-  ChevronsLeft, ChevronsRight, Menu, X, Sparkles,
+  ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
@@ -68,6 +68,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "Workspace",
     items: [
       { to: "/dashboard", label: "Dashboard", icon: Bookmark, exact: true, countKey: "saved" },
+      { to: "/dashboard/workspace", label: "Workspace", icon: LayoutGrid },
       { to: "/dashboard/alerts", label: "Alerts", icon: Bell, countKey: "alerts7d" },
       { to: "/dashboard/notifications", label: "Notifications", icon: BellRing },
     ],
@@ -951,17 +952,6 @@ function DashboardLayout() {
             <SignalDeskHistory />
           </Card>
         </section>
-
-        {/* Workspace outlet */}
-        <div className="mt-8 flex items-center justify-between">
-          <h2 className="text-[15px] font-semibold text-zinc-900">Workspace</h2>
-        </div>
-
-        <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 bg-white">
-          <div className="bg-white p-5">
-            <Outlet />
-          </div>
-        </div>
 
         <div className="h-12" />
         </>
