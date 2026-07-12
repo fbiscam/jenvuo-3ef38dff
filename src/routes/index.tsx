@@ -992,9 +992,11 @@ function HomePage() {
                 Boot the terminal.&nbsp;<br />
                 Speak to the market now.
               </h2>
-              <p className="mt-3 text-zinc-900">
-                Your voice agent is one tap away listening<br className="hidden md:inline" />{" "}
-                reasoning, thinking, research & narrating.
+              <p className="mt-3 text-zinc-900 text-[15px] sm:text-base leading-snug">
+                Your voice agent is one tap away<br className="md:hidden" />
+                <span className="hidden md:inline"> listening<br className="hidden md:inline" /> </span>
+                <span className="md:hidden">listening, thinking &amp; narrating.</span>
+                <span className="hidden md:inline">reasoning, thinking, research &amp; narrating.</span>
               </p>
               <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row md:justify-start">
                 <Link
