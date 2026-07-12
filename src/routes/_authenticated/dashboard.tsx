@@ -671,17 +671,17 @@ function DashboardLayout() {
 
         {/* Nav */}
 
-        <nav className="flex-1 px-2 py-1">
+        <nav className="flex-1 px-2 py-2">
 
           {NAV_GROUPS.map((group, gi) => (
-            <div key={group.label} className={gi > 0 ? "mt-1 pt-1.5 border-t border-zinc-200" : ""}>
+            <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
               {!sidebarCollapsed && group.label && (
-                <div className="mb-0.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
+                <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
                   {group.label}
                 </div>
               )}
               {sidebarCollapsed && gi > 0 && <div className="mx-3 mb-1 h-px bg-zinc-100" />}
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-1.5">
                 {group.items.map((t) => {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                   const iconName = t.icon;
