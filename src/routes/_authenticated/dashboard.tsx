@@ -745,18 +745,20 @@ function DashboardLayout() {
             );
           }
           return (
-            <div className="border-t border-b border-zinc-100 px-3 py-2.5">
+            <div className="border-t border-b border-zinc-100 px-3 py-2">
               <div className="flex items-center gap-2">
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-[12px] font-semibold text-zinc-900">{info.name}</div>
-                  <div className="truncate text-[10.5px] text-zinc-500">{info.price}</div>
+                  <div className="truncate text-[11px] font-semibold text-zinc-900">{info.name}</div>
+                  <div className="truncate text-[9.5px] text-zinc-500">{info.price}</div>
                 </div>
-                <Link
-                  to="/dashboard/billing"
-                  className="shrink-0 rounded-md px-2 py-1 text-[11px] font-medium text-blue-600 hover:bg-blue-50"
-                >
-                  Upgrade
-                </Link>
+                {t !== "ultra" && (
+                  <Link
+                    to="/dashboard/billing"
+                    className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium text-blue-600 hover:bg-blue-50"
+                  >
+                    Upgrade
+                  </Link>
+                )}
               </div>
             </div>
           );
