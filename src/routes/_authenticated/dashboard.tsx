@@ -1062,8 +1062,9 @@ function DashboardLayout() {
           <Outlet />
         )}
 
-       </main>
-      </div>
+        </main>
+       </div>
+       <DashboardFooter />
 
     </div>
   );
