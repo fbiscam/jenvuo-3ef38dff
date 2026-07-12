@@ -681,7 +681,7 @@ function DashboardLayout() {
                 </div>
               )}
               {sidebarCollapsed && gi > 0 && <div className="mx-3 mb-1 h-px bg-zinc-100" />}
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-1.5">
                 {group.items.map((t) => {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                   const iconName = t.icon;
