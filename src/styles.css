@@ -152,7 +152,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: "Urbanist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    font-family: "Google Sans", "Product Sans", "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   }
 
 }
