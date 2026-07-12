@@ -763,7 +763,7 @@ function DashboardLayout() {
               onClick={signOut}
               title="Sign out"
               aria-label="Sign out"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900 hover:bg-zinc-100"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900 hover:bg-red-50 hover:text-red-600"
             >
               <Power className="h-3.5 w-3.5" strokeWidth={2.25} />
             </button>
