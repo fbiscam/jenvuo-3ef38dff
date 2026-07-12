@@ -1542,7 +1542,7 @@ function SignalPage() {
                   <DialogTitle className={`text-[15px] font-semibold text-zinc-900 leading-tight ${MONO}`}>
                     Outside optimal killzone
                   </DialogTitle>
-                  <DialogDescription className="pt-2 text-[13px] text-zinc-600 leading-relaxed">
+                  <DialogDescription className="pt-2 text-[11px] sm:text-[12px] text-zinc-600 leading-relaxed whitespace-nowrap">
                     You are not in the killzone for better A+ scaling for good signal.
                   </DialogDescription>
                 </div>
