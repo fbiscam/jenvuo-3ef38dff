@@ -215,7 +215,7 @@ export default function SiteFooter() {
         {/* Divider + sub bar */}
         <div className="mt-8 pt-4 pb-4 border-t border-zinc-100 flex flex-col md:flex-row items-start justify-between gap-3 md:translate-y-2">
           <div
-            className="whitespace-nowrap text-[10px] sm:text-[12px] tracking-tight"
+            className="whitespace-nowrap text-[12px] sm:text-[14px] tracking-tight"
             style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 500, color: "#3c4043" }}
           >
             © {year} Jenvu ai · All rights reserved
