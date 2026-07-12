@@ -65,7 +65,7 @@ type TabItem = { to: string; label: string; icon: typeof Bookmark; exact?: boole
 
 const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
-    label: "Workspace",
+    label: "",
     items: [
       { to: "/dashboard", label: "Dashboard", icon: Bookmark, exact: true, countKey: "saved" },
       { to: "/dashboard/workspace", label: "Workspace", icon: LayoutGrid },
