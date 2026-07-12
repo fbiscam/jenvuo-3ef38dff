@@ -131,6 +131,7 @@ async function findUserByEmail(email: string): Promise<User | null> {
 }
 
 const SIGNUP_IP_LIMIT_PER_HOUR = 5
+const SIGNUP_DOMAIN_LIMIT_PER_HOUR = 3
 const MAX_ACCOUNTS_PER_DEVICE = 2
 
 async function assertDeviceUnderCap(ip: string | undefined, fingerprint: string | undefined) {
