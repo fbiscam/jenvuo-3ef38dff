@@ -1303,7 +1303,7 @@ function ReferralSnapshot() {
         if (cancelled) return;
         setCode(info.code);
         setShareUrl(info.shareUrl);
-        setCount(info.totals.converted);
+        setCount(info.totals.converted + info.totals.pending);
         setEarned(info.totals.credits_earned);
       } catch { /* ignore */ }
     };
