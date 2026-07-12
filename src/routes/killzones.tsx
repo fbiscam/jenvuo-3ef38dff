@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Search, Clock, MapPin, Zap } from "lucide-react";
+import { ArrowLeft, Search, Clock, MapPin, Radar } from "lucide-react";
 import { PAIR_PROFILES, type PairProfile } from "@/lib/analysis/engine";
 
 export const Route = createFileRoute("/killzones")({
@@ -252,7 +252,7 @@ function KillzonesPage() {
             to="/signal"
             className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 transition"
           >
-            <Zap className="h-3.5 w-3.5" /> Signal Desk
+            <Radar className="h-3.5 w-3.5" /> Signal Desk
           </Link>
         </div>
       </header>
