@@ -674,7 +674,7 @@ function DashboardLayout() {
         <nav className="min-h-0 flex-1 overflow-hidden px-2 py-2">
 
           {NAV_GROUPS.map((group, gi) => (
-            <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-100" : ""}>
+            <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
               {!sidebarCollapsed && group.label && (
                 <div className="mb-1.5 px-2.5 text-[8px] font-normal tracking-wider text-[#9B9C9B]">
                   {group.label}
@@ -740,10 +740,10 @@ function DashboardLayout() {
         {(() => {
           if (credits.isLoading) {
             if (sidebarCollapsed) {
-              return <div className="mx-2 border-t border-zinc-100 py-2" aria-hidden />;
+              return <div className="mx-2 border-t border-zinc-200 py-2" aria-hidden />;
             }
             return (
-              <div className="mx-2 border-t border-b border-zinc-100 px-2.5 py-2">
+              <div className="mx-2 border-t border-b border-zinc-200 px-2.5 py-2">
                 <div className="h-4 w-24 animate-pulse rounded bg-zinc-100" />
               </div>
             );
@@ -761,14 +761,14 @@ function DashboardLayout() {
               <Link
                 to="/dashboard/billing"
                 title={`${info.name} · Upgrade`}
-                className="mx-2 flex items-center justify-center border-t border-zinc-100 py-2 text-blue-600 hover:bg-blue-50"
+                className="mx-2 flex items-center justify-center border-t border-zinc-200 py-2 text-blue-600 hover:bg-blue-50"
               >
                 <Sparkles className="h-4 w-4" />
               </Link>
             );
           }
           return (
-            <div className="mx-2 border-t border-b border-zinc-100 px-2.5 py-2">
+            <div className="mx-2 border-t border-b border-zinc-200 px-2.5 py-2">
               <div className="flex items-center gap-2">
                 <div className="min-w-0 flex-1 flex items-center gap-1.5">
                   <span className="truncate text-[11px] font-semibold text-zinc-900">{info.name}</span>
@@ -789,7 +789,7 @@ function DashboardLayout() {
 
 
         {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
-        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-100 bg-white px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
+        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-white px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
           {!sidebarCollapsed && (
             <button
               type="button"
