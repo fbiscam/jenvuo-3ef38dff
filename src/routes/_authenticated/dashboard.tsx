@@ -68,7 +68,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/dashboard", label: "Account Overview", icon: "dashboard", exact: true, countKey: "saved" },
-      { to: "/dashboard/workspace", label: "Workspace", icon: "grid_view" },
+      { to: "/dashboard/workspace", label: "Saved Signals", icon: "grid_view" },
       { to: "/dashboard/alerts", label: "Alerts", icon: "notifications_active", countKey: "alerts7d" },
       { to: "/dashboard/notifications", label: "Notifications", icon: "campaign" },
     ],
