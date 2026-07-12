@@ -191,8 +191,9 @@ function HelpCenterPage() {
               <h3 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
                 Talk to a human.
               </h3>
-              <p className="mt-2 text-zinc-600 max-w-md">
-                Our team replies within one business day. Send a message and we'll get back to you.
+              <p className="mt-2 text-zinc-600 max-w-md whitespace-pre-line">
+                Our team replies within one business day.&nbsp;
+                Send a message and we'll get back to you.
               </p>
             </div>
             <Link
