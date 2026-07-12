@@ -669,8 +669,10 @@ function AuthPage() {
     if (resendCooldown > 0) return;
     setErrorMsg(null);
     setResending(true);
+    const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
+    const fingerprint = await getDeviceFingerprint();
     const result = await sendSignupOtp({
-      data: { email, password, fullName, siteUrl: window.location.origin },
+      data: { email, password, fullName, siteUrl: window.location.origin, fingerprint },
     });
     setResending(false);
     if (!result.ok) {
