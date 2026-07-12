@@ -5,8 +5,8 @@
 
 @utility price-font {
   font-family: "Inter Variable", "Inter", system-ui, sans-serif;
-  font-weight: 400;
-  font-variation-settings: "wght" 400;
+  font-weight: 700;
+  font-variation-settings: "wght" 700;
 }
 
 @custom-variant dark (&:is(.dark *));
