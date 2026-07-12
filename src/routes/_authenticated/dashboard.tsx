@@ -1349,9 +1349,10 @@ function ReferralSnapshot() {
         </div>
       </div>
 
-      <p className="mt-auto text-[11px] text-zinc-500">
+      <p className="mt-auto whitespace-nowrap text-[10.5px] text-zinc-500">
         Earn <span className="font-medium text-zinc-700">$1.00</span> for you and your friend on their first paid scan.
       </p>
+
     </div>
   );
 }
