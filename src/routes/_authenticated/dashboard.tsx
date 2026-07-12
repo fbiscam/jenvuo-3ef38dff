@@ -61,32 +61,32 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type OpenTrade = { pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null };
 type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number; closedWins: number; closedDecided: number; openTrades: OpenTrade[] };
 
-type TabItem = { to: string; label: string; icon: typeof Bookmark; exact?: boolean; countKey?: keyof Counts };
+type TabItem = { to: string; label: string; icon: string; iconColor?: string; exact?: boolean; countKey?: keyof Counts };
 
 const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard", label: "Dashboard", icon: Bookmark, exact: true, countKey: "saved" },
-      { to: "/dashboard/workspace", label: "Workspace", icon: LayoutGrid },
-      { to: "/dashboard/alerts", label: "Alerts", icon: Bell, countKey: "alerts7d" },
-      { to: "/dashboard/notifications", label: "Notifications", icon: BellRing },
+      { to: "/dashboard", label: "Dashboard", icon: "dashboard", exact: true, countKey: "saved" },
+      { to: "/dashboard/workspace", label: "Workspace", icon: "grid_view" },
+      { to: "/dashboard/alerts", label: "Alerts", icon: "notifications_active", iconColor: "#EA4335", countKey: "alerts7d" },
+      { to: "/dashboard/notifications", label: "Notifications", icon: "campaign" },
     ],
   },
   {
     label: "Trading",
     items: [
-      { to: "/dashboard/journal", label: "Trades", icon: BookOpen, countKey: "journalTotal" },
-      { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-      { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
+      { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
+      { to: "/dashboard/analytics", label: "Analytics", icon: "monitoring" },
+      { to: "/dashboard/referrals", label: "Referrals", icon: "redeem", iconColor: "#34A853" },
     ],
   },
   {
     label: "Account",
     items: [
-      { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
-      { to: "/dashboard/profile", label: "Profile", icon: User },
-      { to: "/dashboard/security", label: "Security", icon: ShieldCheck },
+      { to: "/dashboard/billing", label: "Billing", icon: "credit_card" },
+      { to: "/dashboard/profile", label: "Profile", icon: "account_circle" },
+      { to: "/dashboard/security", label: "Security", icon: "shield_person" },
     ],
   },
 ];
@@ -683,7 +683,8 @@ function DashboardLayout() {
               <div className="flex flex-col gap-0.5">
                 {group.items.map((t) => {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
-                  const Icon = t.icon;
+                  const iconName = t.icon;
+                  const iconColor = t.iconColor;
                   const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
                   const isNotifs = t.to === "/dashboard/notifications";
                   const hasUnread = isNotifs && unreadNotifs > 0 && !active;
@@ -702,7 +703,18 @@ function DashboardLayout() {
                             ? "text-rose-600 hover:bg-rose-50 hover:text-rose-700"
                             : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
-                      <Icon className="h-3.5 w-3.5 shrink-0" fill="#626262" stroke="#626262" strokeWidth={1.5} />
+                      <span
+                        className="material-symbols-rounded shrink-0"
+                        aria-hidden
+                        style={{
+                          fontSize: 18,
+                          lineHeight: 1,
+                          color: iconColor ?? "#626262",
+                          fontVariationSettings: `'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20`,
+                        }}
+                      >
+                        {iconName}
+                      </span>
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
                         <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold leading-none text-white tabular-nums">
