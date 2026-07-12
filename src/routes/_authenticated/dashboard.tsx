@@ -749,56 +749,6 @@ function DashboardLayout() {
           ))}
         </nav>
 
-        {/* Plan block (directly below nav, under Security) */}
-        {(() => {
-          if (credits.isLoading) {
-            if (sidebarCollapsed) {
-              return <div className="mx-2 border-t border-zinc-200 py-2" aria-hidden />;
-            }
-            return (
-              <div className="mx-2 border-t border-b border-zinc-200 px-2.5 py-2">
-                <div className="h-4 w-24 animate-pulse rounded bg-zinc-100" />
-              </div>
-            );
-          }
-          const t = planTier.toLowerCase();
-          const info = t === "pro"
-            ? { name: "Pro", price: "$15/month" }
-            : t === "elite"
-              ? { name: "Elite", price: "$50/month" }
-              : t === "ultra"
-                ? { name: "Ultra", price: "$100/month" }
-                : { name: "Spark", price: "No-cost ($0/month)" };
-          if (sidebarCollapsed) {
-            return (
-              <Link
-                to="/dashboard/billing"
-                title={`${info.name} · Upgrade`}
-                className="mx-2 flex items-center justify-center border-t border-zinc-200 py-2 text-blue-600 hover:bg-blue-50"
-              >
-                <Sparkles className="h-4 w-4" />
-              </Link>
-            );
-          }
-          return (
-            <div className="mx-2 border-t border-b border-zinc-200 px-2.5 py-2">
-              <div className="flex items-center gap-2">
-                <div className="min-w-0 flex-1 flex items-center gap-1.5">
-                  <span className="truncate text-[12px] font-semibold text-zinc-900">{info.name}</span>
-                  <span className="truncate text-[10.5px] text-zinc-500">({info.price})</span>
-                </div>
-                {t !== "ultra" && (
-                  <Link
-                    to="/dashboard/billing"
-                    className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium text-blue-600 hover:bg-blue-50"
-                  >
-                    Upgrade
-                  </Link>
-                )}
-              </div>
-            </div>
-          );
-        })()}
 
 
         {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
