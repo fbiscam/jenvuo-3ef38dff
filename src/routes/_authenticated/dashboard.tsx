@@ -646,7 +646,7 @@ function DashboardLayout() {
 
       {/* Sidebar (Firebase-style) */}
       <aside
-        className={`max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:top-0 lg:left-0 flex h-dvh shrink-0 flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
+        className={`max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:top-0 lg:left-0 flex h-dvh min-h-0 shrink-0 flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
           ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"}
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
       >
@@ -670,7 +670,7 @@ function DashboardLayout() {
 
         {/* Nav */}
 
-        <nav className="flex-1 overflow-y-auto scrollbar-auto-hide px-2 py-3">
+        <nav className="min-h-0 flex-1 overflow-y-auto scrollbar-auto-hide px-2 py-3">
 
           {NAV_GROUPS.map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-3 pt-3 border-t border-zinc-100" : ""}>
@@ -724,7 +724,7 @@ function DashboardLayout() {
         </nav>
 
         {/* Plan card + collapse (bottom) */}
-        <div className="shrink-0 border-t border-zinc-100 p-2">
+        <div className="mt-auto shrink-0 border-t border-zinc-100 bg-white p-2">
           {!sidebarCollapsed ? (
             <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3">
               <div className="flex items-center gap-2">
@@ -754,12 +754,12 @@ function DashboardLayout() {
           )}
 
           {/* Quick actions: Collapse + Sign out */}
-          <div className={`mt-2 ${sidebarCollapsed ? "flex flex-col items-center gap-1" : "flex items-center gap-1"}`}>
+          <div className={`mt-2 ${sidebarCollapsed ? "flex flex-col items-center gap-1" : "flex flex-col gap-1"}`}>
             <button
               type="button"
               onClick={() => setSidebarCollapsed((v) => !v)}
               title={sidebarCollapsed ? "Expand" : "Collapse"}
-              className={`hidden lg:inline-flex items-center justify-center gap-1.5 rounded-md py-1.5 text-[11.5px] text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 ${sidebarCollapsed ? "w-9 px-0" : "flex-1 px-2"}`}
+              className={`inline-flex items-center justify-center gap-1.5 rounded-md py-1.5 text-[11.5px] text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 ${sidebarCollapsed ? "w-9 px-0" : "w-full px-2"}`}
             >
               {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <><ChevronsLeft className="h-3.5 w-3.5" /> <span>Collapse</span></>}
             </button>
@@ -767,7 +767,7 @@ function DashboardLayout() {
               type="button"
               onClick={signOut}
               title="Sign out"
-              className={`flex items-center justify-center rounded-md py-1.5 text-[11.5px] font-medium text-rose-600 hover:bg-rose-50 ${sidebarCollapsed ? "w-9 px-0" : "flex-1 gap-1.5 px-2"}`}
+              className={`flex items-center justify-center rounded-md py-1.5 text-[11.5px] font-medium text-rose-600 hover:bg-rose-50 ${sidebarCollapsed ? "w-9 px-0" : "w-full gap-1.5 px-2"}`}
             >
               <LogOut className="h-3.5 w-3.5 shrink-0" />
               {!sidebarCollapsed && <span>Sign out</span>}
