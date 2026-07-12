@@ -131,8 +131,20 @@ async function findUserByEmail(email: string): Promise<User | null> {
 }
 
 const SIGNUP_IP_LIMIT_PER_HOUR = 5
-const SIGNUP_DOMAIN_LIMIT_PER_HOUR = 3
+const SIGNUP_DOMAIN_LIMIT_PER_HOUR = 20
 const MAX_ACCOUNTS_PER_DEVICE = 2
+
+// Public email providers — skip domain-level rate limit (millions of legit users share these).
+// Abuse from these is caught by device fingerprint + IP caps instead.
+const PUBLIC_EMAIL_PROVIDERS = new Set([
+  'gmail.com', 'googlemail.com',
+  'yahoo.com', 'yahoo.co.uk', 'yahoo.co.in', 'ymail.com', 'rocketmail.com',
+  'outlook.com', 'hotmail.com', 'live.com', 'msn.com', 'hotmail.co.uk',
+  'icloud.com', 'me.com', 'mac.com',
+  'aol.com', 'protonmail.com', 'proton.me', 'pm.me',
+  'zoho.com', 'gmx.com', 'gmx.de', 'mail.com', 'yandex.com', 'yandex.ru',
+  'fastmail.com', 'tutanota.com', 'hey.com',
+])
 
 async function assertDeviceUnderCap(ip: string | undefined, fingerprint: string | undefined) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
@@ -169,10 +181,11 @@ export async function createSignupOtp(input: { email: string; password: string; 
   // 2. Hard cap: max N confirmed accounts per IP or device fingerprint.
   await assertDeviceUnderCap(input.ip, input.fingerprint)
 
-  // 3. Per-email-domain rate limit: max N attempts per hour from same domain (e.g. gmail.com).
+  // 3. Per-email-domain rate limit: skipped for public providers (gmail/yahoo/etc.);
+  //    applied only to custom/corporate domains where bulk abuse is actually meaningful.
   const domain = email.split('@')[1]?.toLowerCase().trim()
   const since = new Date(Date.now() - 60 * 60_000).toISOString()
-  if (domain) {
+  if (domain && !PUBLIC_EMAIL_PROVIDERS.has(domain)) {
     const { count: domainCount, error: domainErr } = await (supabaseAdmin as any)
       .from('signup_attempts')
       .select('id', { count: 'exact', head: true })
