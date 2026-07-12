@@ -192,7 +192,7 @@ function HelpCenterPage() {
                 Talk to a human.
               </h3>
               <p className="mt-2 text-zinc-600 max-w-md whitespace-pre-line">
-                Our team replies within one business day.&nbsp;
+                Our team replies within one business day.&nbsp;&nbsp;
                 Send a message and we'll get back to you.
               </p>
             </div>
