@@ -723,57 +723,66 @@ function DashboardLayout() {
           ))}
         </nav>
 
-        {/* Plan card + collapse (bottom) */}
-        <div className="mt-auto shrink-0 border-t border-zinc-100 bg-white p-2">
-          {!sidebarCollapsed ? (
-            <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3">
+        {/* Plan block (directly below nav, under Security) */}
+        {(() => {
+          const t = planTier.toLowerCase();
+          const info = t === "pro"
+            ? { name: "Pro", price: "$15/month" }
+            : t === "elite"
+              ? { name: "Elite", price: "$50/month" }
+              : t === "ultra"
+                ? { name: "Ultra", price: "$100/month" }
+                : { name: "Spark", price: "No-cost ($0/month)" };
+          if (sidebarCollapsed) {
+            return (
+              <Link
+                to="/dashboard/billing"
+                title={`${info.name} · Upgrade`}
+                className="mx-2 flex items-center justify-center border-t border-zinc-100 py-2 text-blue-600 hover:bg-blue-50"
+              >
+                <Sparkles className="h-4 w-4" />
+              </Link>
+            );
+          }
+          return (
+            <div className="border-t border-b border-zinc-100 px-3 py-2.5">
               <div className="flex items-center gap-2">
-                <span className={`inline-block h-1.5 w-1.5 rounded-full ${planTierStyle.dot}`} />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-[12px] font-semibold text-zinc-900">{planTier} plan</div>
-                  <div className="truncate text-[10.5px] text-zinc-500">
-                    ${Number(displayRemaining).toFixed(2)} balance
-                  </div>
+                  <div className="truncate text-[12px] font-semibold text-zinc-900">{info.name}</div>
+                  <div className="truncate text-[10.5px] text-zinc-500">{info.price}</div>
                 </div>
                 <Link
                   to="/dashboard/billing"
-                  className="rounded-md px-2 py-1 text-[11px] font-medium text-blue-600 hover:bg-blue-50"
+                  className="shrink-0 rounded-md px-2 py-1 text-[11px] font-medium text-blue-600 hover:bg-blue-50"
                 >
                   Upgrade
                 </Link>
               </div>
             </div>
-          ) : (
-            <Link
-              to="/dashboard/billing"
-              title={`${planTier} plan · Upgrade`}
-              className="flex items-center justify-center rounded-md p-2 text-blue-600 hover:bg-blue-50"
-            >
-              <Sparkles className="h-4 w-4" />
-            </Link>
-          )}
+          );
+        })()}
 
-          {/* Quick actions: Collapse + Sign out */}
-          <div className={`mt-2 ${sidebarCollapsed ? "flex flex-col items-center gap-1" : "flex flex-col gap-1"}`}>
-            <button
-              type="button"
-              onClick={() => setSidebarCollapsed((v) => !v)}
-              title={sidebarCollapsed ? "Expand" : "Collapse"}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-md py-1.5 text-[11.5px] text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 ${sidebarCollapsed ? "w-9 px-0" : "w-full px-2"}`}
-            >
-              {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <><ChevronsLeft className="h-3.5 w-3.5" /> <span>Collapse</span></>}
-            </button>
-            <button
-              type="button"
-              onClick={signOut}
-              title="Sign out"
-              className={`flex items-center justify-center rounded-md py-1.5 text-[11.5px] font-medium text-rose-600 hover:bg-rose-50 ${sidebarCollapsed ? "w-9 px-0" : "w-full gap-1.5 px-2"}`}
-            >
-              <LogOut className="h-3.5 w-3.5 shrink-0" />
-              {!sidebarCollapsed && <span>Sign out</span>}
-            </button>
-          </div>
+        {/* Quick actions: Collapse + Sign out (bottom) */}
+        <div className={`mt-auto shrink-0 border-t border-zinc-100 bg-white p-2 ${sidebarCollapsed ? "flex flex-col items-center gap-1" : "flex flex-col gap-1"}`}>
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            title={sidebarCollapsed ? "Expand" : "Collapse"}
+            className={`inline-flex items-center justify-center gap-1.5 rounded-md py-1.5 text-[11.5px] text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 ${sidebarCollapsed ? "w-9 px-0" : "w-full px-2"}`}
+          >
+            {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <><ChevronsLeft className="h-3.5 w-3.5" /> <span>Collapse</span></>}
+          </button>
+          <button
+            type="button"
+            onClick={signOut}
+            title="Sign out"
+            className={`flex items-center justify-center rounded-md py-1.5 text-[11.5px] font-medium text-rose-600 hover:bg-rose-50 ${sidebarCollapsed ? "w-9 px-0" : "w-full gap-1.5 px-2"}`}
+          >
+            <LogOut className="h-3.5 w-3.5 shrink-0" />
+            {!sidebarCollapsed && <span>Sign out</span>}
+          </button>
         </div>
+
 
 
       </aside>
