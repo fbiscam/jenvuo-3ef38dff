@@ -713,9 +713,7 @@ function DashboardLayout() {
                         ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}
                         ${active
                           ? "bg-zinc-100 text-zinc-900 font-semibold"
-                          : hasUnread
-                            ? "text-rose-600 hover:bg-rose-50 hover:text-rose-700"
-                            : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
+                          : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
                       <span
                         className="material-symbols-rounded shrink-0"
@@ -736,11 +734,16 @@ function DashboardLayout() {
                         </span>
                       )}
                       {!sidebarCollapsed && hasUnread && (
-                        <span className="ml-auto inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
+                        <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold leading-none text-white tabular-nums">
+                          {unreadNotifs > 99 ? "99+" : unreadNotifs}
+                        </span>
                       )}
                       {sidebarCollapsed && ((typeof count === "number" && count > 0 && !active) || hasUnread) && (
-                        <span className="absolute right-1.5 top-1.5 inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
+                        <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[9px] font-semibold leading-none text-white tabular-nums">
+                          {hasUnread ? (unreadNotifs > 9 ? "9+" : unreadNotifs) : count}
+                        </span>
                       )}
+
                     </Link>
                   );
                 })}
