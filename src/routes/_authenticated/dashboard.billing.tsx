@@ -221,7 +221,7 @@ function Billing() {
                       <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Model</th>
                       <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Stage</th>
                       <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Date</th>
-                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Tokens</th>
+                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Signal</th>
                       <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Scan</th>
                       <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium text-right`}>Cost</th>
                     </tr>
@@ -240,10 +240,17 @@ function Billing() {
                         ?? "—";
                       const modelWithSenior = seniorPretty ? `${modelLabel} + ${seniorPretty}` : modelLabel;
                       const stageLabel = r.stage ?? r.reason.replace(/_/g, " ");
-                      const tokens =
-                        r.promptTokens != null || r.completionTokens != null
-                          ? `${r.promptTokens ?? 0} / ${r.completionTokens ?? 0}`
-                          : "—";
+                      const meta = (r.metadata as any) ?? {};
+                      const sideRaw = (meta.signal ?? meta.side ?? meta.direction ?? meta.action ?? "").toString().toUpperCase();
+                      const sideLabel = sideRaw === "BUY" || sideRaw === "SELL" || sideRaw === "WAIT" ? sideRaw : "—";
+                      const sideClass = sideLabel === "BUY"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : sideLabel === "SELL"
+                          ? "bg-rose-100 text-rose-700"
+                          : sideLabel === "WAIT"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-zinc-100 text-zinc-500";
+
                       return (
                         <tr key={r.id} className="hover:bg-zinc-50/60">
                           <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}><ModelWithLogo raw={rawModel} label={modelWithSenior} /></td>
@@ -253,7 +260,7 @@ function Billing() {
                             </span>
                           </td>
                           <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums text-zinc-500`}>{dateStr} · {timeStr}</td>
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums text-zinc-500`}>{tokens}</td>
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums`}><span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${sideClass}`}>{sideLabel}</span></td>
                           <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] text-zinc-500`}>{r.scanId ? r.scanId.slice(0, 8) : "—"}</td>
                           <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums font-semibold text-rose-600">−${amt.toFixed(4)}</td>
                         </tr>
