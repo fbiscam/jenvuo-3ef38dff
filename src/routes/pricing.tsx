@@ -62,7 +62,7 @@ const TIERS = [
     price: 0,
     icon: Sparkles,
     bestFor: "Curious",
-    tagline: "Full platform. Realtime alerts.",
+    tagline: "Full platform. No alerts.",
     cta: "Start free",
     ctaTo: "/auth",
     credits: 5,
@@ -73,7 +73,7 @@ const TIERS = [
       "Full ICT / SMC narration",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
-      "Realtime email & push alerts",
+      "No realtime alerts",
     ],
 
     highlight: false,
