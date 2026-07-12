@@ -702,7 +702,7 @@ function DashboardLayout() {
                             ? "text-rose-600 hover:bg-rose-50 hover:text-rose-700"
                             : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
-                      <Icon className="h-3.5 w-3.5 shrink-0" />
+                      <Icon className="h-3.5 w-3.5 shrink-0" fill="#626262" stroke="#626262" strokeWidth={1.5} />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
                         <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold leading-none text-white tabular-nums">
