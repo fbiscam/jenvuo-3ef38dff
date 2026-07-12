@@ -732,30 +732,15 @@ function DashboardLayout() {
       {/* Right column */}
       <div className={`flex min-w-0 flex-1 flex-col ${sidebarCollapsed ? "lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
-      {/* Top bar */}
-      <header className="sticky top-0 z-30 border-b border-zinc-200 bg-white">
-        <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
-          <button
-            type="button"
-            aria-label="Open menu"
-            onClick={() => setMobileNavOpen(true)}
-            className="inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 hover:bg-zinc-50 lg:hidden"
-          >
-            <Menu className="h-4 w-4" />
-          </button>
-          
-
-          <div className="ml-auto flex items-center gap-2">
-            <NotificationBell />
-            <button
-              onClick={signOut}
-              className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
-            >
-              <LogOut className="h-3.5 w-3.5" /> Sign out
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Mobile menu toggle (floating) */}
+      <button
+        type="button"
+        aria-label="Open menu"
+        onClick={() => setMobileNavOpen(true)}
+        className="fixed top-3 left-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 lg:hidden"
+      >
+        <Menu className="h-4 w-4" />
+      </button>
 
       <main className="mx-auto w-full max-w-7xl px-5 py-7 sm:px-8">
 
