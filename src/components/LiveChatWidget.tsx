@@ -197,7 +197,14 @@ export function LiveChatWidget() {
     <>
       {/* Floating Button */}
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          if (open) {
+            setOpen(false);
+            if (!nativeAllowed) setForceShow(false);
+          } else {
+            setOpen(true);
+          }
+        }}
         aria-label={open ? "Close chat" : "Open support chat"}
         className="fixed bottom-5 right-5 z-[9999] flex h-14 w-14 items-center justify-center rounded-full bg-white text-black shadow-[0_10px_30px_-8px_rgba(0,0,0,0.25)] ring-1 ring-black/10 transition hover:scale-[1.03] hover:shadow-[0_14px_38px_-10px_rgba(0,0,0,0.35)] active:scale-95"
       >
