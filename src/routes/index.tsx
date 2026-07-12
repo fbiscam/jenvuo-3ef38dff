@@ -758,11 +758,11 @@ function HomePage() {
                   { f: "Monthly wallet (USD)", a: "$2", b: "$15", c: "$50", d: "$100" },
                   
                   { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
-                  { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
-                  { f: "A+ signal access", a: false, b: true, c: true, d: true },
-                  { f: "ICT / SMC narration", a: false, b: true, c: true, d: true },
-                  { f: "Multi-timeframe bias", a: false, b: true, c: true, d: true },
-                  { f: "Trade journal", a: false, b: true, c: true, d: true },
+                  { f: "Signal latency", a: "No alerts", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
+                  { f: "A+ signal access", a: true, b: true, c: true, d: true },
+                  { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
+                  { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
+                  { f: "Trade journal", a: true, b: true, c: true, d: true },
                   { f: "Email + push alerts", a: false, b: true, c: true, d: true },
                   { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
                   
