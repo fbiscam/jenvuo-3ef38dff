@@ -19,7 +19,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing Plans — Jenvu" },
-      { name: "description", content: "Pro and Elite plans for institutional-grade gold trading intelligence. Voice agent, A+ realtime alerts, full ICT & SMC analysis." },
+      { name: "description", content: "Every plan includes the full platform — voice agent, A+ signals, ICT & SMC narration, trade journal. Pro & Elite add realtime alerts. Free forever." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
       { property: "og:description", content: "Realtime A+ gold setups, voice intelligence, and trade journal — Pro $15/mo, Elite $50/mo." },
       { property: "og:url", content: "https://jenvu.com/pricing" },
