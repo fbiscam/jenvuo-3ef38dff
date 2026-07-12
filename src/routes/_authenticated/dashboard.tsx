@@ -83,11 +83,22 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     ],
   },
   {
+    label: "Tools & Market",
+    items: [
+      { to: "/signal", label: "Signal Desk", icon: "insights" },
+      { to: "/killzones", label: "Killzones", icon: "schedule" },
+      { to: "/ai-engine", label: "AI Engine", icon: "smart_toy" },
+      { to: "/insights", label: "Insights", icon: "article" },
+      { to: "/pricing", label: "Pricing", icon: "sell" },
+    ],
+  },
+  {
     label: "Account & Billing",
     items: [
       { to: "/dashboard/billing", label: "Billing", icon: "credit_card" },
       { to: "/dashboard/profile", label: "Profile", icon: "account_circle" },
       { to: "/dashboard/security", label: "Security", icon: "shield_person" },
+      { to: "/help", label: "Help Center", icon: "help" },
     ],
   },
 ];
