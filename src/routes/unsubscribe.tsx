@@ -86,7 +86,7 @@ function UnsubscribePage() {
   }
 
   return (
-    <div className="min-h-dvh w-full bg-white text-zinc-900 font-['Inter',system-ui,sans-serif] flex flex-col">
+    <div className="min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 font-['Inter',system-ui,sans-serif] flex flex-col">
       <header className="border-b border-zinc-100">
         <div className="mx-auto max-w-6xl px-5 sm:px-6 py-5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">

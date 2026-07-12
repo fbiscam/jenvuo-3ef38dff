@@ -34,7 +34,7 @@ export const Route = createFileRoute("/brief/$id")({
     };
   },
   errorComponent: ({ error, reset }) => (
-    <div className="min-h-dvh flex items-center justify-center bg-white p-8">
+    <div className="min-h-dvh flex items-center justify-center bg-[#FAFAFA] p-8">
       <div className="max-w-md text-center">
         <h2 className="text-xl font-semibold text-zinc-900">Couldn't load this brief</h2>
         <p className="mt-2 text-sm text-zinc-600">{error.message}</p>
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/brief/$id")({
     </div>
   ),
   notFoundComponent: () => (
-    <div className="min-h-dvh flex items-center justify-center bg-white p-8 text-center">
+    <div className="min-h-dvh flex items-center justify-center bg-[#FAFAFA] p-8 text-center">
       <div>
         <h2 className="text-xl font-semibold text-zinc-900">Brief not found</h2>
         <Link to="/briefs" className="mt-3 inline-block text-sm text-zinc-700 underline">
@@ -63,7 +63,7 @@ function sessionLabel(s: BriefDetail["session"]) {
 
 function BriefPage() {
   return (
-    <div className="jenvu-zoom min-h-dvh w-full bg-white text-zinc-900 antialiased">
+    <div className="jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased">
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">

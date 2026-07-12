@@ -62,14 +62,14 @@ export const Route = createFileRoute("/insights/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(insightsQueryOptions),
   component: InsightsPage,
   errorComponent: ({ error }) => (
-    <div className="min-h-dvh w-full bg-white text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
+    <div className="min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
       <div className="text-xs font-mono uppercase tracking-widest text-red-600 mb-3">Insights unavailable</div>
       <h1 className="text-2xl font-semibold mb-3">We couldn't load the insights feed.</h1>
       <p className="text-sm text-zinc-500 max-w-md">{error?.message || "Please refresh and try again."}</p>
     </div>
   ),
   notFoundComponent: () => (
-    <div className="min-h-dvh w-full bg-white text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
+    <div className="min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
       <h1 className="text-2xl font-semibold mb-3">Insights not found</h1>
     </div>
   ),
@@ -111,7 +111,7 @@ function InsightsPage() {
 
   return (
     <>
-      <div className={`jenvu-zoom min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+      <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
         {/* NAV */}
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
