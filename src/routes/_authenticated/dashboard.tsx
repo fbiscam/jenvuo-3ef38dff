@@ -16,7 +16,7 @@ import {
   Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
-  ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid,
+  ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
@@ -801,15 +801,28 @@ function DashboardLayout() {
               <LogOut className="h-3.5 w-3.5" />
             </button>
           )}
-          <button
-            type="button"
-            onClick={() => setSidebarCollapsed((v) => !v)}
-            title={sidebarCollapsed ? "Expand" : "Collapse"}
-            aria-label={sidebarCollapsed ? "Expand" : "Collapse"}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-          >
-            {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <ChevronsLeft className="h-3.5 w-3.5" />}
-          </button>
+          <div className="flex items-center gap-1">
+            {!sidebarCollapsed && (
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event("jenvu:open-live-chat"))}
+                title="Support chat"
+                aria-label="Support chat"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+              >
+                <LifeBuoy className="h-3.5 w-3.5" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setSidebarCollapsed((v) => !v)}
+              title={sidebarCollapsed ? "Expand" : "Collapse"}
+              aria-label={sidebarCollapsed ? "Expand" : "Collapse"}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+            >
+              {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <ChevronsLeft className="h-3.5 w-3.5" />}
+            </button>
+          </div>
         </div>
 
 
