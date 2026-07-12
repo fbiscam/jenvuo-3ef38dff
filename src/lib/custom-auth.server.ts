@@ -131,8 +131,20 @@ async function findUserByEmail(email: string): Promise<User | null> {
 }
 
 const SIGNUP_IP_LIMIT_PER_HOUR = 5
-const SIGNUP_DOMAIN_LIMIT_PER_HOUR = 3
+const SIGNUP_DOMAIN_LIMIT_PER_HOUR = 20
 const MAX_ACCOUNTS_PER_DEVICE = 2
+
+// Public email providers — skip domain-level rate limit (millions of legit users share these).
+// Abuse from these is caught by device fingerprint + IP caps instead.
+const PUBLIC_EMAIL_PROVIDERS = new Set([
+  'gmail.com', 'googlemail.com',
+  'yahoo.com', 'yahoo.co.uk', 'yahoo.co.in', 'ymail.com', 'rocketmail.com',
+  'outlook.com', 'hotmail.com', 'live.com', 'msn.com', 'hotmail.co.uk',
+  'icloud.com', 'me.com', 'mac.com',
+  'aol.com', 'protonmail.com', 'proton.me', 'pm.me',
+  'zoho.com', 'gmx.com', 'gmx.de', 'mail.com', 'yandex.com', 'yandex.ru',
+  'fastmail.com', 'tutanota.com', 'hey.com',
+])
 
 async function assertDeviceUnderCap(ip: string | undefined, fingerprint: string | undefined) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
