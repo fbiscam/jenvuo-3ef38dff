@@ -621,7 +621,7 @@ function DashboardLayout() {
 
       {/* Sidebar (Firebase-style) */}
       <aside
-        className={`max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:sticky lg:top-0 flex h-dvh shrink-0 flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
+        className={`max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:top-0 lg:left-0 flex h-dvh shrink-0 flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
           ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"}
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
       >
@@ -730,7 +730,7 @@ function DashboardLayout() {
 
 
       {/* Right column */}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className={`flex min-w-0 flex-1 flex-col ${sidebarCollapsed ? "lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
       {/* Top bar */}
       <header className="sticky top-0 z-30 border-b border-zinc-200 bg-white">
