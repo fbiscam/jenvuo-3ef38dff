@@ -187,9 +187,9 @@ function Metric({
   );
 }
 
-function CardHeader({ icon: Icon, title, right }: { icon: typeof ShieldCheck; title: string; right?: React.ReactNode }) {
+function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof ShieldCheck; title: string; right?: React.ReactNode; className?: string }) {
   return (
-    <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-2.5">
+    <div className={`flex items-center justify-between rounded-t-xl border-b border-zinc-200 px-4 py-2.5 ${className}`}>
       <div className="flex items-center gap-2 text-[13px] font-medium text-zinc-700">
         <Icon className="h-4 w-4 text-zinc-500" />
         {title}
@@ -198,6 +198,7 @@ function CardHeader({ icon: Icon, title, right }: { icon: typeof ShieldCheck; ti
     </div>
   );
 }
+
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
@@ -927,8 +928,8 @@ function DashboardLayout() {
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
         <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card className="!bg-[#F8F8F8]">
-            <CardHeader icon={ShieldCheck} title="Wallet & Plan" />
+          <Card>
+            <CardHeader icon={ShieldCheck} title="Wallet & Plan" className="bg-[#F8F8F8]" />
             <div className="flex divide-x divide-zinc-200">
               <Metric
                 label={`Balance · ${planTier}`}
