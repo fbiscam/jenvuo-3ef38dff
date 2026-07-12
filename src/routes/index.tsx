@@ -648,7 +648,7 @@ function HomePage() {
           {/* Mobile stacked plan cards (table is unreadable below sm) */}
           <div className="mt-10 grid gap-4 sm:hidden">
             {[
-              { name: "Free", key: "free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", credits: "$2 wallet", bullets: ["Unlimited voice queries", "A+ signals & ICT/SMC narration", "Trade journal & MTF bias", "Realtime email & push alerts"] },
+              { name: "Free", key: "free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", credits: "$2 wallet", bullets: ["Unlimited voice queries", "A+ signals & ICT/SMC narration", "Trade journal & MTF bias", "No realtime alerts"] },
               { name: "Pro", key: "pro", price: "$15/mo", tag: "Active trader", to: "/contact" as const, cta: "Notify me", credits: "$15 wallet", accent: true, bullets: ["Unlimited voice queries", "Realtime A+ alerts", "Full ICT / SMC narration", "Trade journal"] },
               { name: "Elite", key: "elite", price: "$50/mo", tag: "Desk / fund", to: "/contact" as const, cta: "Talk to sales", credits: "$50 wallet", bullets: ["Everything in Pro", "< 30s priority alerts", "Multi-pair scanner", "API & webhooks"] },
             ].map((p) => {
