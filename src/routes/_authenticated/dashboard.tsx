@@ -622,7 +622,7 @@ function DashboardLayout() {
       {/* Sidebar (Firebase-style) */}
       <aside
         className={`max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:sticky lg:top-0 flex h-dvh shrink-0 flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
-          ${sidebarCollapsed ? "w-[68px]" : "w-[240px]"}
+          ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"}
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
       >
         {/* Brand */}
@@ -648,7 +648,7 @@ function DashboardLayout() {
           {NAV_GROUPS.map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-4" : ""}>
               {!sidebarCollapsed && (
-                <div className="mb-1 px-3 text-[10.5px] font-medium uppercase tracking-wider text-zinc-400">
+                <div className="mb-1 px-3 text-[9.5px] font-medium uppercase tracking-wider text-[#FAFAFA]">
                   {group.label}
                 </div>
               )}
@@ -665,9 +665,9 @@ function DashboardLayout() {
                       resetScroll={false}
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
-                      className={`group relative flex items-center rounded-md text-[13px] font-medium transition
-                        ${sidebarCollapsed ? "justify-center px-2 py-2" : "gap-3 px-3 py-2"}
-                        ${active ? "bg-zinc-900 text-white" : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"}`}
+                      className={`group relative flex items-center rounded-md text-[12px] font-medium transition
+                        ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-2.5 px-2.5 py-1.5"}
+                        ${active ? "bg-zinc-900 text-white" : "text-[#FAFAFA] hover:bg-zinc-100 hover:text-[#FAFAFA]"}`}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
