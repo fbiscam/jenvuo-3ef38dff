@@ -98,17 +98,12 @@ function Billing() {
 
   // Only show skeleton on the very first load — once we've resolved plan/credits
   // once, keep showing the previous values during background refetches so the
-  // "Current plan" / balance don't blink on realtime updates or tab focus.
+  // Balance doesn't blink on realtime updates or tab focus.
   const isLoading = currentPlan === null || (credits.isLoading && !credits.state);
 
   if (isLoading) {
     return (
       <div className="space-y-10">
-        <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
-          <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Current plan</div>
-          <div className="mt-3 h-8 w-40 animate-pulse rounded bg-zinc-100" />
-          <div className="mt-3 h-4 w-72 animate-pulse rounded bg-zinc-100" />
-        </section>
         <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
           <div className="h-10 w-32 animate-pulse rounded bg-zinc-100" />
           <div className="mt-4 h-2 w-full animate-pulse rounded-full bg-zinc-100" />
