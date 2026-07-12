@@ -22,12 +22,13 @@ export default function DashboardFooter() {
             {l.label}
           </Link>
         ))}
-        <Link
-          to="/cookies"
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event("jenvu:open-cookie-preferences"))}
           className="inline-flex items-center gap-1.5 text-zinc-700 hover:underline underline-offset-4"
         >
           Cookie Preferences
-        </Link>
+        </button>
         <span className="text-zinc-500">© {year} Jenvu, Inc.</span>
       </div>
     </footer>
