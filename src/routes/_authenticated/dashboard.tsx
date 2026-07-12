@@ -751,7 +751,7 @@ function DashboardLayout() {
           >
             {sidebarCollapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
           </button>
-          <div className="hidden text-[12px] text-zinc-400 lg:block">Dashboard</div>
+          
 
           <div className="ml-auto flex items-center gap-2">
             <NotificationBell />
