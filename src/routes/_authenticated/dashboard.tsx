@@ -189,7 +189,7 @@ function Metric({
 
 function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof ShieldCheck; title: string; right?: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex items-center justify-between rounded-t-xl border-b border-zinc-200 px-4 py-2.5 ${className}`}>
+    <div className={`flex items-center justify-between rounded-t-xl border-b border-zinc-200 bg-[#F8F8F8] px-4 py-2.5 ${className}`}>
       <div className="flex items-center gap-2 text-[13px] font-medium text-zinc-700">
         <Icon className="h-4 w-4 text-zinc-500" />
         {title}
