@@ -661,7 +661,7 @@ function HomePage() {
                     {p.accent && !isCurrent && <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>}
                   </div>
                 </div>
-                <div className="mt-2 text-2xl font-bold tracking-tight text-zinc-900">{p.price}</div>
+                <div className="mt-2 text-2xl tracking-tight text-zinc-900 price-font">{p.price}</div>
                 <p className={`${MONO} mt-0.5 text-[10px] uppercase tracking-wider text-zinc-500`}>{p.tag} · {p.credits}</p>
                 <ul className="mt-4 space-y-1.5 text-sm text-zinc-700">
                   {p.bullets.map((b) => (
@@ -723,9 +723,9 @@ function HomePage() {
                         )}
                       </div>
                       <div className="mt-2 flex items-baseline gap-1">
-                        <span className="text-2xl font-bold tracking-tight text-zinc-900">{p.price}</span>
+                        <span className="text-2xl tracking-tight text-zinc-900 price-font">{p.price}</span>
                         {p.price.startsWith("$") && p.price !== "$0" && (
-                          <span className="text-[11px] text-zinc-500">/month</span>
+                          <span className="text-[11px] text-zinc-500 price-font">/month</span>
                         )}
                       </div>
                       <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>

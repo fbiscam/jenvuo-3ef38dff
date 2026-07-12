@@ -241,8 +241,8 @@ function PricingPage() {
                   </div>
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold tracking-tight text-zinc-900">${priceOf(t)}</span>
-                  {t.price > 0 && <span className="text-[11px] text-zinc-500">{suffix}</span>}
+                  <span className="text-2xl tracking-tight text-zinc-900 price-font">${priceOf(t)}</span>
+                  {t.price > 0 && <span className="text-[11px] text-zinc-500 price-font">{suffix}</span>}
                 </div>
                 <p className={`${MONO} mt-0.5 text-[10px] uppercase tracking-wider text-zinc-500`}>{t.bestFor}</p>
                 <ul className="mt-4 space-y-1.5 text-sm text-zinc-700">
@@ -302,9 +302,9 @@ function PricingPage() {
                       )}
                     </div>
                     <div className="mt-2 flex items-baseline gap-1">
-                      <span className="text-2xl font-bold tracking-tight text-zinc-900">{p.price}</span>
+                      <span className="text-2xl tracking-tight text-zinc-900 price-font">{p.price}</span>
                       {p.price.startsWith("$") && p.price !== "$0" && (
-                        <span className="text-[11px] text-zinc-500">{billing === "annual" ? "/year" : "/month"}</span>
+                        <span className="text-[11px] text-zinc-500 price-font">{billing === "annual" ? "/year" : "/month"}</span>
                       )}
                     </div>
                     <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
@@ -459,7 +459,7 @@ function PricingPage() {
                 )}
               </div>
               <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-3xl font-bold tabular-nums">${p.price}</span>
+                <span className="text-3xl tabular-nums price-font">${p.price}</span>
                 <span className="text-xs text-zinc-500">wallet</span>
               </div>
               <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · ~{Math.floor(p.price / 0.2)} signals</div>
