@@ -39,12 +39,14 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
         email: z.string().trim().email('Enter a valid email').max(255),
         password: z.string().min(8, 'Password must be at least 8 characters').max(72),
         siteUrl: siteUrlSchema,
+        fingerprint: z.string().trim().max(128).optional(),
       })
       .parse(data),
   )
   .handler(async ({ data }) => {
     try {
-      await createSignupOtp({ ...data, ip: readClientIp() })
+      const ua = (() => { try { return getRequest().headers.get('user-agent') || '' } catch { return '' } })()
+      await createSignupOtp({ ...data, ip: readClientIp(), fingerprint: data.fingerprint, userAgent: ua })
       return { ok: true as const }
     } catch (error) {
       return { ok: false as const, error: error instanceof Error ? error.message : 'Could not send code.' }
@@ -58,10 +60,14 @@ export const confirmSignupOtp = createServerFn({ method: 'POST' })
         email: z.string().trim().email('Enter a valid email').max(255),
         code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
         password: z.string().min(8, 'Password must be at least 8 characters').max(72),
+        fingerprint: z.string().trim().max(128).optional(),
       })
       .parse(data),
   )
-  .handler(async ({ data }) => verifySignupOtp(data))
+  .handler(async ({ data }) => {
+    const ua = (() => { try { return getRequest().headers.get('user-agent') || '' } catch { return '' } })()
+    return verifySignupOtp({ ...data, ip: readClientIp(), fingerprint: data.fingerprint, userAgent: ua })
+  })
 
 export const requestRecoveryOtp = createServerFn({ method: 'POST' })
   .inputValidator((data) =>

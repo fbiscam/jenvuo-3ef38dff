@@ -131,8 +131,31 @@ async function findUserByEmail(email: string): Promise<User | null> {
 }
 
 const SIGNUP_IP_LIMIT_PER_HOUR = 5
+const MAX_ACCOUNTS_PER_DEVICE = 2
 
-export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string; ip?: string }) {
+async function assertDeviceUnderCap(ip: string | undefined, fingerprint: string | undefined) {
+  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  const admin = supabaseAdmin as any
+  const checks: Array<Promise<{ count: number | null } | null>> = []
+  if (ip) {
+    checks.push(
+      admin.from('account_devices').select('user_id', { count: 'exact', head: true }).eq('ip', ip).then((r: any) => ({ count: r.count })),
+    )
+  }
+  if (fingerprint) {
+    checks.push(
+      admin.from('account_devices').select('user_id', { count: 'exact', head: true }).eq('fingerprint', fingerprint).then((r: any) => ({ count: r.count })),
+    )
+  }
+  const results = await Promise.all(checks)
+  for (const r of results) {
+    if (r && typeof r.count === 'number' && r.count >= MAX_ACCOUNTS_PER_DEVICE) {
+      throw new Error('This device or network already has the maximum number of accounts. Please sign in to your existing account.')
+    }
+  }
+}
+
+export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string; ip?: string; fingerprint?: string; userAgent?: string }) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const email = normalizeEmail(input.email)
 
@@ -142,7 +165,10 @@ export async function createSignupOtp(input: { email: string; password: string; 
     throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
   }
 
-  // 2. Per-IP signup rate limit: at most N attempts per hour from one IP.
+  // 2. Hard cap: max N confirmed accounts per IP or device fingerprint.
+  await assertDeviceUnderCap(input.ip, input.fingerprint)
+
+  // 3. Per-IP signup rate limit: at most N attempts per hour from one IP.
   const ip = (input.ip || '').trim().slice(0, 100)
   if (ip) {
     const since = new Date(Date.now() - 60 * 60_000).toISOString()
@@ -218,7 +244,7 @@ export async function createRecoveryOtp(input: { email: string; siteUrl?: string
 
 
 
-export async function verifySignupOtp(input: { email: string; code: string; password: string }): Promise<CustomAuthResult> {
+export async function verifySignupOtp(input: { email: string; code: string; password: string; ip?: string; fingerprint?: string; userAgent?: string }): Promise<CustomAuthResult> {
   const email = normalizeEmail(input.email)
   const verified = await verifyCustomOtp(email, 'signup', input.code)
   if (!verified.ok) return { ok: false, error: verified.error }
@@ -230,6 +256,13 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
 
   if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
     return { ok: false, error: 'Account already exists. Please sign in.' }
+  }
+
+  // Re-check device cap at the confirm step, in case someone tried to bypass the request step.
+  try {
+    await assertDeviceUnderCap(input.ip, input.fingerprint)
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Signup not allowed on this device.' }
   }
 
   const userResult = existingUser
@@ -250,6 +283,19 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
   const auth = publicAuthClient()
   const { data, error } = await auth.auth.signInWithPassword({ email, password })
   if (error || !data.session) return { ok: false, error: error?.message || 'Account verified. Please sign in.' }
+
+  // Log this confirmed account against the device / IP so the cap holds for future signups.
+  try {
+    const uid = data.session.user.id
+    if (uid) {
+      await (supabaseAdmin as any).from('account_devices').insert({
+        user_id: uid,
+        ip: (input.ip || '').slice(0, 100) || null,
+        fingerprint: (input.fingerprint || '').slice(0, 128) || null,
+        user_agent: (input.userAgent || '').slice(0, 300) || null,
+      })
+    }
+  } catch { /* logging failure must not block signup */ }
 
   await consumeOtp(verified.row.id)
   return { ok: true, session: data.session }

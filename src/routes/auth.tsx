@@ -432,8 +432,10 @@ function AuthPage() {
       return;
     }
     setLoading(true);
+    const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
+    const fingerprint = await getDeviceFingerprint();
     const result = await sendSignupOtp({
-      data: { ...parsed.data, siteUrl: window.location.origin },
+      data: { ...parsed.data, siteUrl: window.location.origin, fingerprint },
     });
     setLoading(false);
     if (!result.ok) {
@@ -626,7 +628,9 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const result = await verifySignupCode({ data: { email, code: otpCode, password } });
+    const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
+    const fingerprint = await getDeviceFingerprint();
+    const result = await verifySignupCode({ data: { email, code: otpCode, password, fingerprint } });
     if (!result.ok || !result.session) {
       setLoading(false);
       triggerOtpError(result.error || "Verification failed. Try again.");
@@ -665,8 +669,10 @@ function AuthPage() {
     if (resendCooldown > 0) return;
     setErrorMsg(null);
     setResending(true);
+    const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
+    const fingerprint = await getDeviceFingerprint();
     const result = await sendSignupOtp({
-      data: { email, password, fullName, siteUrl: window.location.origin },
+      data: { email, password, fullName, siteUrl: window.location.origin, fingerprint },
     });
     setResending(false);
     if (!result.ok) {
