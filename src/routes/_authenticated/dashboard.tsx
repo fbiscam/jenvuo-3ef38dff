@@ -745,7 +745,7 @@ function DashboardLayout() {
             );
           }
           return (
-            <div className="border-t border-b border-zinc-100 px-3 py-2">
+            <div className="border-t border-b border-zinc-100 px-2.5 py-2">
               <div className="flex items-center gap-2">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[11px] font-semibold text-zinc-900">{info.name}</div>
