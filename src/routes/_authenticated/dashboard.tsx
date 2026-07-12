@@ -697,7 +697,7 @@ function DashboardLayout() {
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
                       className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition
-                        ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}
+                        ${sidebarCollapsed ? "justify-center px-2 py-1" : "gap-3 px-2.5 py-1"}
                         ${active
                           ? "bg-zinc-100 text-zinc-900 font-semibold"
                           : hasUnread
