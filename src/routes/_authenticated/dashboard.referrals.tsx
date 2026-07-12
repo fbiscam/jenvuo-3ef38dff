@@ -332,7 +332,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
                     <td className="px-4 py-2.5 text-zinc-600 whitespace-nowrap">
                       {r.converted_at ? new Date(r.converted_at).toLocaleDateString() : <span className="text-zinc-300">—</span>}
                     </td>
-                    <td className="px-4 py-2.5 text-right font-mono text-zinc-900 whitespace-nowrap">{r.credits_awarded}</td>
+                    <td className="px-4 py-2.5 text-right font-mono text-zinc-900 whitespace-nowrap tabular-nums">{r.credits_awarded > 0 ? `$${Number(r.credits_awarded).toFixed(2)}` : <span className="text-zinc-300">—</span>}</td>
                   </tr>
                 );
               })}
