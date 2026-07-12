@@ -74,7 +74,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     ],
   },
   {
-    label: "Trading",
+    label: "Trades & Insights",
     items: [
       { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
       { to: "/dashboard/analytics", label: "Analytics", icon: "monitoring" },
@@ -82,7 +82,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     ],
   },
   {
-    label: "Account",
+    label: "Account & Billing",
     items: [
       { to: "/dashboard/billing", label: "Billing", icon: "credit_card" },
       { to: "/dashboard/profile", label: "Profile", icon: "account_circle" },
