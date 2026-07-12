@@ -771,8 +771,8 @@ function DashboardLayout() {
             <div className="mx-2 border-t border-b border-zinc-200 px-2.5 py-2">
               <div className="flex items-center gap-2">
                 <div className="min-w-0 flex-1 flex items-center gap-1.5">
-                  <span className="truncate text-[11px] font-semibold text-zinc-900">{info.name}</span>
-                  <span className="truncate text-[9.5px] text-zinc-500">({info.price})</span>
+                  <span className="truncate text-[12px] font-semibold text-zinc-900">{info.name}</span>
+                  <span className="truncate text-[10.5px] text-zinc-500">({info.price})</span>
                 </div>
                 {t !== "ultra" && (
                   <Link
