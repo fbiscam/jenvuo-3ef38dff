@@ -835,7 +835,7 @@ function SignalPage() {
             <Link to="/" aria-label="Jenvu home" className="pointer-events-auto shrink-0 inline-flex items-center justify-center rounded-md hover:opacity-80 transition">
               <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded-md object-contain" />
             </Link>
-            <span className="font-semibold tracking-tight text-sm select-none">JENVU AI</span>
+            <span className="truncate text-[22px] tracking-tight leading-none select-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </div>
           <div className="flex items-center gap-2 justify-end">
             <Link

@@ -90,8 +90,8 @@ function UnsubscribePage() {
       <header className="border-b border-zinc-100">
         <div className="mx-auto max-w-6xl px-5 sm:px-6 py-5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
-            <img src="/favicon.png" alt="JENVU AI" className="h-6 w-6 rounded-md object-contain" />
-            <span className="font-semibold tracking-tight">JENVU AI</span>
+            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
+            <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
           <span className={`hidden sm:inline ${MONO} text-[10px] uppercase tracking-[0.28em] text-zinc-500`}>
             BRIEFINGS · SUBSCRIPTION

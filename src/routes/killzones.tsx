@@ -240,7 +240,7 @@ function KillzonesPage() {
             >
               <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded-md object-contain" />
             </Link>
-            <span className="font-semibold tracking-tight text-sm select-none">JENVU AI</span>
+            <span className="truncate text-[22px] tracking-tight leading-none select-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </div>
           <Link
             to="/signal"
