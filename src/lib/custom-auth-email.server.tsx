@@ -15,7 +15,7 @@ type CustomAuthEmailInput = {
 
 const SITE_NAME = 'Jenvu'
 const ROOT_DOMAIN = 'jenvu.com'
-const FROM_DOMAIN = 'jenvu.net'
+const FROM_DOMAIN = 'notify.jenvu.net'
 const SENDER_DOMAIN = 'notify.jenvu.net'
 
 function generateUnsubToken(): string {
