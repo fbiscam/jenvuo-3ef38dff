@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 
 const LINKS: { label: string; to: string }[] = [
-  { label: "About", to: "/about" },
-  { label: "Contact", to: "/contact" },
-  { label: "Privacy", to: "/privacy" },
-  { label: "Terms", to: "/terms" },
-  { label: "Help", to: "/help" },
+  { label: "About Us", to: "/about" },
+  { label: "Contact Us", to: "/contact" },
+  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Terms Conditions", to: "/terms" },
+  { label: "Help Center", to: "/help" },
 ];
 
 export default function DashboardFooter() {
