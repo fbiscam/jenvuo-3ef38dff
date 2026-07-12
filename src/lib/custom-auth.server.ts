@@ -131,6 +131,7 @@ async function findUserByEmail(email: string): Promise<User | null> {
 }
 
 const SIGNUP_IP_LIMIT_PER_HOUR = 5
+const SIGNUP_DOMAIN_LIMIT_PER_HOUR = 3
 const MAX_ACCOUNTS_PER_DEVICE = 2
 
 async function assertDeviceUnderCap(ip: string | undefined, fingerprint: string | undefined) {
@@ -168,10 +169,23 @@ export async function createSignupOtp(input: { email: string; password: string; 
   // 2. Hard cap: max N confirmed accounts per IP or device fingerprint.
   await assertDeviceUnderCap(input.ip, input.fingerprint)
 
-  // 3. Per-IP signup rate limit: at most N attempts per hour from one IP.
+  // 3. Per-email-domain rate limit: max N attempts per hour from same domain (e.g. gmail.com).
+  const domain = email.split('@')[1]?.toLowerCase().trim()
+  const since = new Date(Date.now() - 60 * 60_000).toISOString()
+  if (domain) {
+    const { count: domainCount, error: domainErr } = await (supabaseAdmin as any)
+      .from('signup_attempts')
+      .select('id', { count: 'exact', head: true })
+      .ilike('email', `%@${domain}`)
+      .gte('created_at', since)
+    if (!domainErr && typeof domainCount === 'number' && domainCount >= SIGNUP_DOMAIN_LIMIT_PER_HOUR) {
+      throw new Error(`Too many signup attempts from ${domain} recently. Please try again in an hour.`)
+    }
+  }
+
+  // 4. Per-IP signup rate limit: at most N attempts per hour from one IP.
   const ip = (input.ip || '').trim().slice(0, 100)
   if (ip) {
-    const since = new Date(Date.now() - 60 * 60_000).toISOString()
     const { count, error: countErr } = await (supabaseAdmin as any)
       .from('signup_attempts')
       .select('id', { count: 'exact', head: true })
