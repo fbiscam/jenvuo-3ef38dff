@@ -646,7 +646,7 @@ function DashboardLayout() {
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto scrollbar-auto-hide px-2 py-3">
           {NAV_GROUPS.map((group, gi) => (
-            <div key={group.label} className={gi > 0 ? "mt-4" : ""}>
+            <div key={group.label} className={gi > 0 ? "mt-2" : ""}>
               {sidebarCollapsed && gi > 0 && <div className="mx-3 mb-2 h-px bg-zinc-100" />}
               <div className="flex flex-col gap-0.5">
                 {group.items.map((t) => {
@@ -660,11 +660,11 @@ function DashboardLayout() {
                       resetScroll={false}
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
-                      className={`group relative flex items-center rounded-md text-[12px] font-medium transition
-                        ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-2.5 px-2.5 py-1.5"}
+                      className={`group relative flex items-center rounded-md text-[11px] font-medium transition
+                        ${sidebarCollapsed ? "justify-center px-2 py-1" : "gap-2 px-2.5 py-1"}
                         ${active ? "bg-zinc-900 text-white" : "text-[#6B6C6B] hover:bg-zinc-100 hover:text-[#6B6C6B]"}`}
                     >
-                      <Icon className="h-4 w-4 shrink-0" />
+                      <Icon className="h-3.5 w-3.5 shrink-0" />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
                         <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold leading-none text-white tabular-nums">
