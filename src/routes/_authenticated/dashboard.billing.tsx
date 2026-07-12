@@ -76,12 +76,12 @@ const MATRIX_ROWS: ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark
   { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
   { f: "Wallet balance", a: "$2.00", b: "$15", c: "$50", d: "$100" },
   { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
-  { f: "Signal latency", a: "No alerts", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
+  { f: "Signal latency", a: "Realtime", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
   { f: "A+ signal access", a: true, b: true, c: true, d: true },
   { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
   { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
   { f: "Trade journal", a: true, b: true, c: true, d: true },
-  { f: "Email + push alerts", a: false, b: true, c: true, d: true },
+  { f: "Email + push alerts", a: true, b: true, c: true, d: true },
   { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
   
   { f: "Custom alert rules", a: false, b: false, c: true, d: true },
@@ -146,7 +146,7 @@ function Billing() {
             </div>
             <p className="mt-2 max-w-xl text-[12px] leading-snug sm:text-sm sm:leading-normal text-zinc-500">
               {plan === "free"
-                ? "Upgrade to unlock realtime A+ alerts, unlimited signals, and the trade journal."
+                ? "Upgrade for a bigger monthly wallet, priority alerts, and multi-pair scanning."
                 : "Your plan renews automatically. Manage billing via the customer portal."}
             </p>
           </div>
