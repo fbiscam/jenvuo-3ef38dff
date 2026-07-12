@@ -700,7 +700,7 @@ function DashboardLayout() {
                           ? "bg-zinc-100 text-zinc-900 font-semibold"
                           : hasUnread
                             ? "text-rose-600 hover:bg-rose-50 hover:text-rose-700"
-                            : "text-[#6B6C6B] hover:bg-zinc-50 hover:text-zinc-900"}`}
+                            : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
                       <Icon className="h-3.5 w-3.5 shrink-0" />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
