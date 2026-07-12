@@ -668,9 +668,30 @@ function DashboardLayout() {
           </button>
         </div>
 
+        {/* Quick actions: Collapse + Sign out (always visible) */}
+        <div className={`shrink-0 border-b border-zinc-100 px-2 py-2 ${sidebarCollapsed ? "flex flex-col items-center gap-1" : "flex items-center gap-1"}`}>
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            title={sidebarCollapsed ? "Expand" : "Collapse"}
+            className={`hidden lg:inline-flex items-center justify-center gap-1.5 rounded-md py-1.5 text-[11.5px] text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 ${sidebarCollapsed ? "w-9 px-0" : "flex-1 px-2"}`}
+          >
+            {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <><ChevronsLeft className="h-3.5 w-3.5" /> <span>Collapse</span></>}
+          </button>
+          <button
+            type="button"
+            onClick={signOut}
+            title="Sign out"
+            className={`flex items-center justify-center rounded-md py-1.5 text-[11.5px] font-medium text-rose-600 hover:bg-rose-50 ${sidebarCollapsed ? "w-9 px-0" : "flex-1 gap-1.5 px-2"}`}
+          >
+            <LogOut className="h-3.5 w-3.5 shrink-0" />
+            {!sidebarCollapsed && <span>Sign out</span>}
+          </button>
+        </div>
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto scrollbar-auto-hide px-2 py-3">
+
           {NAV_GROUPS.map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-3 pt-3 border-t border-zinc-100" : ""}>
               {!sidebarCollapsed && group.label && (
@@ -751,22 +772,6 @@ function DashboardLayout() {
               <Sparkles className="h-4 w-4" />
             </Link>
           )}
-          <button
-            type="button"
-            onClick={signOut}
-            title="Sign out"
-            className={`mt-2 flex w-full items-center rounded-md py-1.5 text-[11.5px] font-medium text-rose-600 hover:bg-rose-50 ${sidebarCollapsed ? "justify-center px-2" : "gap-2 px-2.5"}`}
-          >
-            <LogOut className="h-3.5 w-3.5 shrink-0" />
-            {!sidebarCollapsed && <span>Sign out</span>}
-          </button>
-          <button
-            type="button"
-            onClick={() => setSidebarCollapsed((v) => !v)}
-            className="mt-1 hidden w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-[11.5px] text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 lg:inline-flex"
-          >
-            {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <><ChevronsLeft className="h-3.5 w-3.5" /> Collapse</>}
-          </button>
         </div>
 
       </aside>
