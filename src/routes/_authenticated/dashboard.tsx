@@ -964,6 +964,11 @@ function DashboardLayout() {
         </div>
 
         <div className="h-12" />
+        </>
+        ) : (
+          <Outlet />
+        )}
+
        </main>
       </div>
 
