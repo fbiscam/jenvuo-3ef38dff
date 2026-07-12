@@ -764,26 +764,28 @@ function DashboardLayout() {
           );
         })()}
 
-        {/* Quick actions: Collapse + Sign out (bottom) */}
-        <div className={`mt-auto shrink-0 border-t border-zinc-100 bg-white p-2 ${sidebarCollapsed ? "flex flex-col items-center gap-1" : "flex flex-col gap-1"}`}>
-          <button
-            type="button"
-            onClick={() => setSidebarCollapsed((v) => !v)}
-            title={sidebarCollapsed ? "Expand" : "Collapse"}
-            className={`inline-flex items-center justify-center gap-1.5 rounded-md py-1.5 text-[11.5px] text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 ${sidebarCollapsed ? "w-9 px-0" : "w-full px-2"}`}
-          >
-            {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <><ChevronsLeft className="h-3.5 w-3.5" /> <span>Collapse</span></>}
-          </button>
+        {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
+        <div className="mt-auto shrink-0 flex items-center justify-between border-t border-zinc-100 bg-white px-2 py-2">
           <button
             type="button"
             onClick={signOut}
             title="Sign out"
-            className={`flex items-center justify-center rounded-md py-1.5 text-[11.5px] font-medium text-rose-600 hover:bg-rose-50 ${sidebarCollapsed ? "w-9 px-0" : "w-full gap-1.5 px-2"}`}
+            aria-label="Sign out"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-rose-600 hover:bg-rose-50"
           >
-            <LogOut className="h-3.5 w-3.5 shrink-0" />
-            {!sidebarCollapsed && <span>Sign out</span>}
+            <LogOut className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            title={sidebarCollapsed ? "Expand" : "Collapse"}
+            aria-label={sidebarCollapsed ? "Expand" : "Collapse"}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+          >
+            {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <ChevronsLeft className="h-3.5 w-3.5" />}
           </button>
         </div>
+
 
 
 
