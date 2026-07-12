@@ -186,6 +186,20 @@ export async function createSignupOtp(input: { email: string; password: string; 
     } catch { /* logging failure must not block signup */ }
   }
 
+  // 4. Per-email-domain rate limit: max N signup attempts per hour from same domain (e.g. gmail.com).
+  const domain = email.split('@')[1]?.toLowerCase().trim()
+  if (domain) {
+    const since = new Date(Date.now() - 60 * 60_000).toISOString()
+    const { count: domainCount, error: domainErr } = await (supabaseAdmin as any)
+      .from('signup_attempts')
+      .select('id', { count: 'exact', head: true })
+      .ilike('email', `%@${domain}`)
+      .gte('created_at', since)
+    if (!domainErr && typeof domainCount === 'number' && domainCount >= SIGNUP_DOMAIN_LIMIT_PER_HOUR) {
+      throw new Error(`Too many signup attempts from ${domain} recently. Please try again in an hour.`)
+    }
+  }
+
   const existingUser = await findUserByEmail(email)
   if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
     throw new Error('An account with this email already exists. Please sign in instead.')
