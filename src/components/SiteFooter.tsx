@@ -215,11 +215,12 @@ export default function SiteFooter() {
         {/* Divider + sub bar */}
         <div className="mt-8 pt-4 pb-4 border-t border-zinc-100 flex flex-col md:flex-row items-start justify-between gap-3 md:translate-y-2">
           <div
-            className="whitespace-nowrap text-[9px] tracking-[0.15em] sm:text-[11px] sm:tracking-[0.25em] text-zinc-950"
-            style={{ fontFamily: '"Google Sans", "Product Sans", system-ui, sans-serif' }}
+            className="whitespace-nowrap text-[10px] sm:text-[12px] tracking-tight"
+            style={{ fontFamily: '"Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif', fontWeight: 500, color: "#3c4043" }}
           >
             © {year} Jenvu ai · All rights reserved
           </div>
+
 
 
           <NewsletterSubscribe />
