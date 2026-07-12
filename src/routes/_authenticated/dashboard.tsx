@@ -739,7 +739,16 @@ function DashboardLayout() {
           >
             <Menu className="h-4 w-4" />
           </button>
+          <button
+            type="button"
+            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            className="hidden items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 hover:bg-zinc-50 lg:inline-flex"
+          >
+            {sidebarCollapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
+          </button>
           <div className="hidden text-[12px] text-zinc-400 lg:block">Dashboard</div>
+
           <div className="ml-auto flex items-center gap-2">
             <NotificationBell />
             <button
