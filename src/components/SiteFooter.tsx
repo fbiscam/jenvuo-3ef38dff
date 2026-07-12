@@ -92,7 +92,7 @@ const columns = [
       { to: "/terms", label: "Terms of Service" },
       { to: "/privacy", label: "Privacy Policy" },
       { to: "/refund", label: "Refund Policy" },
-      { to: "/cancellation", label: "Cancellation Policy" },
+      { to: "/cancellation", label: "Cancellation" },
       { to: "/disclaimer", label: "Risk Disclaimer" },
     ],
   },
