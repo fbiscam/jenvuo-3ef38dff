@@ -618,7 +618,7 @@ function HomePage() {
             <div className="max-w-2xl">
               
               <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
-                Trade gold with an institutional edge.
+                Trade gold with<br /> an institutional edge.
               </h2>
             </div>
           </div>
