@@ -262,7 +262,7 @@ function KillzonesPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1600px] px-5 py-6 sm:px-6 sm:py-10">
+      <main className="mx-auto max-w-[1600px] px-5 py-6 sm:px-6 sm:py-10" style={{ fontFamily: '"Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif' }}>
         {/* Hero */}
         <div className="mb-6 sm:mb-8">
           <div className={`${MONO} text-[10px] tracking-[0.2em] uppercase text-zinc-500 mb-2`} aria-hidden="true">
