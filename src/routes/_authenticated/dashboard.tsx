@@ -675,7 +675,7 @@ function DashboardLayout() {
           {NAV_GROUPS.map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-3 pt-3 border-t border-zinc-100" : ""}>
               {!sidebarCollapsed && group.label && (
-                <div className="mb-1 px-2.5 text-[8px] font-semibold uppercase tracking-wider text-[#9B9C9B]">
+                <div className="mb-1 px-2.5 text-[8px] font-normal uppercase tracking-wider text-[#9B9C9B]">
                   {group.label}
                 </div>
               )}
