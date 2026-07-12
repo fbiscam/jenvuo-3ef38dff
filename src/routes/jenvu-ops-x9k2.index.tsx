@@ -53,7 +53,7 @@ function AdminLogin() {
 
   if (checking) {
     return (
-      <div className="grid min-h-screen place-items-center bg-white">
+      <div className="grid min-h-screen place-items-center bg-[#FAFAFA]">
         <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
       </div>
     );

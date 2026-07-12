@@ -59,7 +59,7 @@ function HelpCenterPage() {
 
   return (
     <>
-      <div className={`jenvu-zoom min-h-dvh bg-white text-zinc-900 ${SANS} antialiased`}>
+      <div className={`jenvu-zoom min-h-dvh bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
         {/* NAV */}
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
