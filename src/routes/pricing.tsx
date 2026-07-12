@@ -19,7 +19,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing Plans — Jenvu" },
-      { name: "description", content: "Pro and Elite plans for institutional-grade gold trading intelligence. Voice agent, A+ realtime alerts, full ICT & SMC analysis." },
+      { name: "description", content: "Every plan includes the full platform — voice agent, A+ signals, ICT & SMC narration, trade journal. Pro & Elite add realtime alerts. Free forever." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
       { property: "og:description", content: "Realtime A+ gold setups, voice intelligence, and trade journal — Pro $15/mo, Elite $50/mo." },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -62,11 +62,19 @@ const TIERS = [
     price: 0,
     icon: Sparkles,
     bestFor: "Curious",
-    tagline: "Try the voice agent.",
+    tagline: "Full platform. No alerts.",
     cta: "Start free",
     ctaTo: "/auth",
     credits: 5,
-    features: ["$2 wallet / month", "Voice queries free", "Delayed alerts (4h)", "Public market insights", "Community support"],
+    features: [
+      "$2 wallet / month",
+      "Unlimited voice queries",
+      "A+ / A institutional signals",
+      "Full ICT / SMC narration",
+      "Trade journal & analytics",
+      "Multi-timeframe bias engine",
+      "No realtime alerts",
+    ],
 
     highlight: false,
   },
@@ -119,9 +127,9 @@ const TIERS = [
 
 const FEATURE_BLOCKS = [
   { img: pricingVoice, tag: "01 / VOICE", title: "Voice-first analysis", desc: "Speak your query. Get an institutional narration in seconds — no typing.", tone: "Free · Pro · Elite" },
-  { img: pricingIct, tag: "02 / ICT · SMC", title: "ICT & SMC narration", desc: "Fair value gaps, order blocks, liquidity sweeps and BOS — all called live on chart.", tone: "Pro · Elite" },
+  { img: pricingIct, tag: "02 / ICT · SMC", title: "ICT & SMC narration", desc: "Fair value gaps, order blocks, liquidity sweeps and BOS — all called live on chart.", tone: "Free · Pro · Elite" },
   { img: pricingAlerts, tag: "03 / ALERTS", title: "Realtime A+ alerts", desc: "Email + push the instant a 4★ confluence setup forms. No noise. Only A+.", tone: "Pro · Elite" },
-  { img: pricingJournal, tag: "04 / JOURNAL", title: "Trade journal & analytics", desc: "Auto-log every trade. Track equity curve, win rate, RR and emotional state.", tone: "Pro · Elite" },
+  { img: pricingJournal, tag: "04 / JOURNAL", title: "Trade journal & analytics", desc: "Auto-log every trade. Track equity curve, win rate, RR and emotional state.", tone: "Free · Pro · Elite" },
   { img: pricingScanner, tag: "05 / SCANNER", title: "XAU cross-pair scanner", desc: "Bias engine across every XAU cross plus DXY — synced timeframes.", tone: "Elite" },
   { img: pricingApi, tag: "06 / API", title: "API access & webhooks", desc: "Pipe signals into your stack. JSON webhooks, REST endpoints, custom rules.", tone: "Elite" },
 ];
@@ -129,11 +137,11 @@ const FEATURE_BLOCKS = [
 type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Voice queries / day", free: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
-  { feature: "A+ signal access", free: false, pro: true, elite: true },
-  { feature: "Alert latency", free: "4h delay", pro: "Realtime", elite: "< 30s priority" },
-  { feature: "ICT / SMC narration", free: false, pro: true, elite: true },
-  { feature: "Multi-timeframe bias", free: false, pro: true, elite: true },
-  { feature: "Trade journal", free: false, pro: true, elite: true },
+  { feature: "A+ signal access", free: true, pro: true, elite: true },
+  { feature: "Alert latency", free: "No alerts", pro: "Realtime", elite: "< 30s priority" },
+  { feature: "ICT / SMC narration", free: true, pro: true, elite: true },
+  { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
+  { feature: "Trade journal", free: true, pro: true, elite: true },
   { feature: "Multi-pair scanner", free: false, pro: false, elite: true },
   { feature: "API & webhooks", free: false, pro: false, elite: true },
   { feature: "Custom alert rules", free: false, pro: false, elite: true },
@@ -337,11 +345,11 @@ function PricingPage() {
                 
                 { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
-                { f: "Signal latency", a: "4h delay", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
-                { f: "A+ signal access", a: false, b: true, c: true, d: true },
-                { f: "ICT / SMC narration", a: false, b: true, c: true, d: true },
-                { f: "Multi-timeframe bias", a: false, b: true, c: true, d: true },
-                { f: "Trade journal", a: false, b: true, c: true, d: true },
+                { f: "Signal latency", a: "No alerts", b: "Realtime", c: "< 30s", d: "< 10s SLA" },
+                { f: "A+ signal access", a: true, b: true, c: true, d: true },
+                { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
+                { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
+                { f: "Trade journal", a: true, b: true, c: true, d: true },
                 { f: "Email + push alerts", a: false, b: true, c: true, d: true },
                 { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
                 

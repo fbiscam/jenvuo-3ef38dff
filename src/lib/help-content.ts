@@ -346,9 +346,12 @@ export const collections: Collection[] = [
           { type: "h2", content: "Free" },
           { type: "ul", items: [
             "$2 wallet per month (~5 scans).",
-            "Voice agent with basic narration (unlimited & free).",
-            "Signal engine on Gold.",
-            "Standard A+ alerts (delayed by ~4 hours).",
+            "Unlimited voice queries (free).",
+            "Full signal engine — A+ / A institutional signals.",
+            "Full ICT / SMC narration.",
+            "Trade journal & analytics.",
+            "Multi-timeframe bias engine.",
+            "No realtime alerts (upgrade to Pro for email & push).",
           ]},
 
           { type: "h2", content: "Pro — $15 / month" },
@@ -598,7 +601,7 @@ export const collections: Collection[] = [
             "Killzone open reminders (London / NY) if enabled.",
           ]},
 
-          { type: "note", tone: "info", content: "Free plan alerts are delayed by ~2 minutes. Pro and Elite receive them in real time." },
+          { type: "note", tone: "info", content: "Free plan does not receive realtime alerts — upgrade to Pro for email & push alerts the moment an A+ setup forms." },
         ],
       },
     ],
