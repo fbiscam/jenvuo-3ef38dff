@@ -24,13 +24,13 @@ export default function DashboardFooter() {
         ))}
         <Link
           to="/cookies"
-          className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-zinc-700 shadow-sm hover:bg-zinc-50"
+          className="inline-flex items-center gap-1.5 text-zinc-700 hover:underline underline-offset-4"
         >
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#1a73e8] text-white">
-            <svg viewBox="0 0 20 20" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="4,10 8,14 16,6" />
-            </svg>
-          </span>
+          <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+            <circle cx="12" cy="12" r="11" fill="#1a73e8" />
+            <path d="M6 12.5 L10 16 L15 9" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M15.5 13.5 L19 17 M19 13.5 L15.5 17" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
           Cookie Preferences
         </Link>
         <span className="text-zinc-500">© {year} Jenvu, Inc.</span>
