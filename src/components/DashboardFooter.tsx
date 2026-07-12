@@ -12,9 +12,9 @@ const LINKS: { label: string; to: string }[] = [
 export default function DashboardFooter() {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-10 border-t border-zinc-200 bg-white">
-      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-[12px] text-zinc-600 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+    <footer className="mt-10 border-t border-zinc-200 bg-[#FAFAFA]">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-3 px-4 py-5 text-center text-[12px] text-zinc-600 sm:px-6">
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           {LINKS.map((l) => (
             <Link
               key={l.to}
