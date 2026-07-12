@@ -810,7 +810,7 @@ function DashboardLayout() {
                 aria-label="Support chat"
                 className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
               >
-                <LifeBuoy className="h-3.5 w-3.5" />
+                <span className="material-symbols-rounded" aria-hidden style={{ fontSize: 18, lineHeight: 1, fontVariationSettings: `'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20` }}>support_agent</span>
               </button>
             )}
             <button
