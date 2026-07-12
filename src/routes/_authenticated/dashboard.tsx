@@ -61,32 +61,32 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type OpenTrade = { pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null };
 type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number; closedWins: number; closedDecided: number; openTrades: OpenTrade[] };
 
-type TabItem = { to: string; label: string; icon: typeof Bookmark; exact?: boolean; countKey?: keyof Counts };
+type TabItem = { to: string; label: string; icon: string; iconColor?: string; exact?: boolean; countKey?: keyof Counts };
 
 const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard", label: "Dashboard", icon: Bookmark, exact: true, countKey: "saved" },
-      { to: "/dashboard/workspace", label: "Workspace", icon: LayoutGrid },
-      { to: "/dashboard/alerts", label: "Alerts", icon: Bell, countKey: "alerts7d" },
-      { to: "/dashboard/notifications", label: "Notifications", icon: BellRing },
+      { to: "/dashboard", label: "Dashboard", icon: "dashboard", exact: true, countKey: "saved" },
+      { to: "/dashboard/workspace", label: "Workspace", icon: "grid_view" },
+      { to: "/dashboard/alerts", label: "Alerts", icon: "notifications_active", iconColor: "#EA4335", countKey: "alerts7d" },
+      { to: "/dashboard/notifications", label: "Notifications", icon: "campaign" },
     ],
   },
   {
     label: "Trading",
     items: [
-      { to: "/dashboard/journal", label: "Trades", icon: BookOpen, countKey: "journalTotal" },
-      { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-      { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
+      { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
+      { to: "/dashboard/analytics", label: "Analytics", icon: "monitoring" },
+      { to: "/dashboard/referrals", label: "Referrals", icon: "redeem", iconColor: "#34A853" },
     ],
   },
   {
     label: "Account",
     items: [
-      { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
-      { to: "/dashboard/profile", label: "Profile", icon: User },
-      { to: "/dashboard/security", label: "Security", icon: ShieldCheck },
+      { to: "/dashboard/billing", label: "Billing", icon: "credit_card" },
+      { to: "/dashboard/profile", label: "Profile", icon: "account_circle" },
+      { to: "/dashboard/security", label: "Security", icon: "shield_person" },
     ],
   },
 ];
