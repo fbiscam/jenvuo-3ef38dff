@@ -683,7 +683,8 @@ function DashboardLayout() {
               <div className="flex flex-col gap-0.5">
                 {group.items.map((t) => {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
-                  const Icon = t.icon;
+                  const iconName = t.icon;
+                  const iconColor = t.iconColor;
                   const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
                   const isNotifs = t.to === "/dashboard/notifications";
                   const hasUnread = isNotifs && unreadNotifs > 0 && !active;
