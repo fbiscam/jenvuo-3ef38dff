@@ -24,13 +24,14 @@ export type Collection = {
   description: string;
   // Lucide icon name kept as string label so we map on render
   icon:
-    | "Sparkles"
+    | "Compass"
     | "Mic"
     | "LineChart"
     | "CreditCard"
     | "Shield"
     | "Smartphone";
   articles: Article[];
+
 };
 
 export const collections: Collection[] = [
