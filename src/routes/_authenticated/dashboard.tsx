@@ -763,7 +763,10 @@ function DashboardLayout() {
 
       <main className="mx-auto w-full max-w-7xl px-5 py-7 sm:px-8">
 
+        {pathname === "/dashboard" ? (
+        <>
         {/* Identity row */}
+
         <div className="flex flex-wrap items-start justify-between gap-4 lg:items-end">
           <div className="min-w-0">
             <div className="text-[12px] text-zinc-500">Account home</div>
@@ -961,6 +964,11 @@ function DashboardLayout() {
         </div>
 
         <div className="h-12" />
+        </>
+        ) : (
+          <Outlet />
+        )}
+
        </main>
       </div>
 
