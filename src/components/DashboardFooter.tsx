@@ -23,7 +23,7 @@ export default function DashboardFooter() {
             {l.label}
           </Link>
         ))}
-        <span className="text-zinc-500">, © {year} Jenvu, Inc.</span>
+        <span className="text-zinc-500">© {year} Jenvu, Inc.</span>
       </div>
     </footer>
   );
