@@ -170,11 +170,11 @@ function Metric({
       <div className="truncate text-[12px] text-zinc-500" title={label}>
         {label}
       </div>
-      <div className="mt-1 flex min-h-[26px] flex-wrap items-baseline gap-x-2 gap-y-0.5 sm:min-h-[28px]">
+      <div className="mt-1 flex min-h-[26px] items-baseline gap-2 sm:min-h-[28px]">
         <span className={`text-[20px] font-semibold leading-none tracking-tight sm:text-[22px] ${isEmpty ? "text-zinc-400" : "text-zinc-900"}`}>{value}</span>
         {delta && !isEmpty && (
-          <span className={`inline-flex items-center whitespace-nowrap text-[11px] font-medium ${chipColor}`}>
-            <ArrowUpRight className={`h-3 w-3 ${negative ? "rotate-90" : ""}`} />
+          <span className={`ml-auto inline-flex shrink-0 items-center whitespace-nowrap text-[10px] font-medium leading-none ${chipColor}`}>
+            <ArrowUpRight className={`h-2.5 w-2.5 ${negative ? "rotate-90" : ""}`} />
             {delta.replace("-", "")}
           </span>
         )}
