@@ -866,7 +866,7 @@ function DashboardLayout() {
               <Metric
                 label={`Balance · ${planTier}`}
                 value={credits.isLoading ? "…" : `$${Number(displayRemaining).toFixed(2)}`}
-                delta={credits.allowance ? `${remainingPct}% left` : null}
+                delta={credits.allowance ? `${remainingPct}%` : null}
                 tone={balanceTone}
                 trend={scansTrend}
                 seed={3}
