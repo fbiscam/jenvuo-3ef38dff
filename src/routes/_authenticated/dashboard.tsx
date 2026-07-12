@@ -999,8 +999,35 @@ function DashboardLayout() {
           </Card>
         </section>
 
+        {/* Row 3 — Quick Actions + Pro Tip + Referral */}
+        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Card className="flex flex-col">
+            <CardHeader icon={LayoutGrid} title="Quick Actions" />
+            <QuickActions />
+          </Card>
+
+          <Card className="flex flex-col">
+            <CardHeader icon={Sparkles} title="Pro Tip" />
+            <DailyTip />
+          </Card>
+
+          <Card className="flex flex-col">
+            <CardHeader
+              icon={Gift}
+              title="Invite & Earn"
+              right={
+                <Link to="/dashboard/referrals" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                  Manage <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              }
+            />
+            <ReferralSnapshot />
+          </Card>
+        </section>
+
         <div className="h-12" />
         </>
+
         ) : (
           <Outlet />
         )}
@@ -1198,4 +1225,134 @@ function VoiceAgentHistory() {
     </div>
   );
 }
+
+function QuickActions() {
+  const actions: { label: string; to: string; icon: typeof Activity; tone: string }[] = [
+    { label: "New Scan",   to: "/signal",                 icon: Activity,    tone: "bg-blue-50 text-blue-700 border-blue-100" },
+    { label: "Journal",    to: "/dashboard/trades",       icon: BookOpen,    tone: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+    { label: "Killzones",  to: "/killzones",              icon: Calendar,    tone: "bg-amber-50 text-amber-700 border-amber-100" },
+    { label: "Insights",   to: "/insights",               icon: LineChart,   tone: "bg-violet-50 text-violet-700 border-violet-100" },
+    { label: "Saved",      to: "/dashboard/workspace",    icon: Bookmark,    tone: "bg-rose-50 text-rose-700 border-rose-100" },
+    { label: "Billing",    to: "/dashboard/billing",      icon: CreditCard,  tone: "bg-zinc-50 text-zinc-700 border-zinc-200" },
+  ];
+  return (
+    <div className="grid flex-1 grid-cols-3 gap-2 px-5 py-5">
+      {actions.map((a) => {
+        const Icon = a.icon;
+        return (
+          <Link
+            key={a.to}
+            to={a.to as "/signal"}
+            className="group flex flex-col items-center justify-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2 py-3 text-center transition hover:border-zinc-300 hover:bg-zinc-50"
+          >
+            <span className={`inline-flex h-8 w-8 items-center justify-center rounded-md border ${a.tone}`}>
+              <Icon className="h-4 w-4" />
+            </span>
+            <span className="text-[11.5px] font-medium text-zinc-800">{a.label}</span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+const PRO_TIPS: { title: string; body: string }[] = [
+  { title: "Trade the killzone, not the clock", body: "London and New York opens carry the deepest liquidity — most A+ setups print inside those windows." },
+  { title: "Confirm with structure", body: "A signal without a break of structure or clear liquidity sweep is just a guess. Wait for the tell." },
+  { title: "Risk fixed, not felt", body: "Size every trade off a fixed % of equity. Emotion-scaled positions blow accounts faster than bad setups do." },
+  { title: "One pair, one plan", body: "Master XAUUSD's rhythm before spreading focus. Depth beats breadth for consistent execution." },
+  { title: "Journal every scan", body: "The scans you skipped teach as much as the ones you took. Write both — patterns emerge fast." },
+  { title: "Respect the DXY", body: "Gold's cleanest moves start when the dollar shows its hand. Check DXY before pulling the trigger." },
+  { title: "Skip low-conviction days", body: "No setup is a setup. Cash is a position when the tape is choppy." },
+];
+
+function DailyTip() {
+  const tip = useMemo(() => {
+    const day = Math.floor(Date.now() / 86_400_000);
+    return PRO_TIPS[day % PRO_TIPS.length];
+  }, []);
+  return (
+    <div className="flex flex-1 flex-col gap-2 px-5 py-5">
+      <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-700">
+        <Sparkles className="h-3 w-3" /> Tip of the day
+      </div>
+      <h4 className="mt-1 text-[14px] font-semibold text-zinc-900">{tip.title}</h4>
+      <p className="text-[12px] leading-relaxed text-zinc-600">{tip.body}</p>
+      <div className="mt-auto pt-3">
+        <Link to="/insights" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+          Read more insights <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function ReferralSnapshot() {
+  const [code, setCode] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string>("");
+  const [count, setCount] = useState<number>(0);
+  const [earned, setEarned] = useState<number>(0);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { getReferralInfo } = await import("@/lib/referrals.functions");
+        const info = await getReferralInfo();
+        if (cancelled) return;
+        setCode(info.code);
+        setShareUrl(info.shareUrl);
+        setCount(info.totals.converted);
+        setEarned(info.totals.credits_earned);
+      } catch { /* ignore */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const link = shareUrl || (code && typeof window !== "undefined" ? `${window.location.origin}/auth?ref=${code}` : "");
+
+
+  return (
+    <div className="flex flex-1 flex-col gap-3 px-5 py-5">
+      <div className="flex divide-x divide-zinc-200 rounded-md border border-zinc-200 bg-white">
+        <div className="flex-1 px-3 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-zinc-500">Referrals</div>
+          <div className="text-[16px] font-semibold text-zinc-900">{count}</div>
+        </div>
+        <div className="flex-1 px-3 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-zinc-500">Earned</div>
+          <div className="text-[16px] font-semibold text-emerald-700">${earned.toFixed(2)}</div>
+        </div>
+      </div>
+
+      <div>
+        <div className="text-[10px] uppercase tracking-wide text-zinc-500">Your link</div>
+        <div className="mt-1 flex items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5">
+          <span className="flex-1 truncate text-[11.5px] text-zinc-700">{link || "Generating…"}</span>
+          <button
+            type="button"
+            disabled={!link}
+            onClick={() => {
+              if (!link) return;
+              navigator.clipboard.writeText(link).then(() => {
+                setCopied(true);
+                toast.success("Referral link copied");
+                setTimeout(() => setCopied(false), 1500);
+              });
+            }}
+            className="rounded border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
+          >
+            {copied ? "Copied" : "Copy"}
+          </button>
+        </div>
+      </div>
+
+      <p className="mt-auto text-[11px] text-zinc-500">
+        Earn <span className="font-medium text-zinc-700">$1.00</span> for you and your friend on their first paid scan.
+      </p>
+    </div>
+  );
+}
+
 
