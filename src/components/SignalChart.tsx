@@ -83,7 +83,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       layout: {
         background: { color: "transparent" },
         textColor: dark ? "#d4d4d8" : "#262626",
-        fontFamily: "Urbanist, sans-serif",
+        fontFamily: '"Google Sans", "Product Sans", system-ui, sans-serif',
       },
       grid: {
         vertLines: { color: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)" },
