@@ -24,13 +24,14 @@ export type Collection = {
   description: string;
   // Lucide icon name kept as string label so we map on render
   icon:
-    | "Sparkles"
+    | "Compass"
     | "Mic"
     | "LineChart"
     | "CreditCard"
     | "Shield"
     | "Smartphone";
   articles: Article[];
+
 };
 
 export const collections: Collection[] = [
@@ -38,7 +39,7 @@ export const collections: Collection[] = [
     slug: "getting-started",
     title: "Getting Started",
     description: "New to Jenvu? Start here for the basics.",
-    icon: "Sparkles",
+    icon: "Compass",
     articles: [
       {
         slug: "what-is-jenvu",

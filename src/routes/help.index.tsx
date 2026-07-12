@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
-  Sparkles, Mic, LineChart, CreditCard, Shield, Smartphone,
+  Compass, Mic, LineChart, CreditCard, Shield, Smartphone,
   Search, ArrowRight, HelpCircle, MessageCircle,
 } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/help/")({
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
-const ICONS = { Sparkles, Mic, LineChart, CreditCard, Shield, Smartphone } as const;
+const ICONS = { Compass, Mic, LineChart, CreditCard, Shield, Smartphone } as const;
 
 function HelpCenterPage() {
   const [q, setQ] = React.useState("");
