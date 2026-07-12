@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_devices: {
+        Row: {
+          created_at: string
+          fingerprint: string | null
+          id: string
+          ip: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_cost_log: {
         Row: {
           completion_tokens: number
