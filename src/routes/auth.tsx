@@ -432,8 +432,10 @@ function AuthPage() {
       return;
     }
     setLoading(true);
+    const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
+    const fingerprint = await getDeviceFingerprint();
     const result = await sendSignupOtp({
-      data: { ...parsed.data, siteUrl: window.location.origin },
+      data: { ...parsed.data, siteUrl: window.location.origin, fingerprint },
     });
     setLoading(false);
     if (!result.ok) {
