@@ -122,10 +122,10 @@ export default function SiteFooter() {
                 JENVU AI
               </span>
             </Link>
-            <p className="text-sm text-zinc-600 leading-relaxed max-w-xs">
-              Institutional-grade voice intelligence for gold traders. ICT & SMC
-              analysis, narrated live.
+            <p className="text-sm text-zinc-600 leading-relaxed max-w-sm">
+              Institutional-grade voice intelligence for gold traders — ICT & SMC analysis, narrated live.
             </p>
+
             <div className="flex items-center gap-2.5 pt-1">
               {[
                 {
