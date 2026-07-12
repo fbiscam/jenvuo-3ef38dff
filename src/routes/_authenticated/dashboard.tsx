@@ -14,7 +14,7 @@ import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
 
 import {
-  Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Mic, Plus,
+  Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Power, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
@@ -763,9 +763,9 @@ function DashboardLayout() {
               onClick={signOut}
               title="Sign out"
               aria-label="Sign out"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-rose-600 hover:bg-rose-50"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900 hover:bg-zinc-100"
             >
-              <LogOut className="h-3.5 w-3.5" />
+              <Power className="h-3.5 w-3.5" strokeWidth={2.25} />
             </button>
           )}
           <div className="flex items-center gap-1">
