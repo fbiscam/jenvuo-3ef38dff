@@ -647,7 +647,7 @@ function DashboardLayout() {
 
       {/* Sidebar (Firebase-style) */}
       <aside
-        className={`sidebar-hover-scroll max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-y-auto overflow-x-hidden border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
+        className={`max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
           ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"}
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
       >
@@ -671,7 +671,7 @@ function DashboardLayout() {
 
         {/* Nav */}
 
-        <nav className="flex-1 px-2 py-2">
+        <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-2 py-2">
 
           {NAV_GROUPS.map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
