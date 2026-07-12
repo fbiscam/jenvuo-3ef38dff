@@ -222,7 +222,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
   ];
 
   const exportCsv = () => {
-    const header = ["Date", "Stage", "Upgraded on", "Scans"];
+    const header = ["Date", "Stage", "Upgraded on", "Earned (USD)"];
     const rows = filtered.map((r) => {
       const upgraded = r.status === "converted" && r.credits_awarded > 0;
       const stage = upgraded ? "Upgraded" : r.status === "converted" ? "Converted" : r.status === "void" ? "Void" : "New";
@@ -307,7 +307,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
                 <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Date</th>
                 <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Stage</th>
                 <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Upgraded on</th>
-                <th className="px-4 py-2 text-right font-medium whitespace-nowrap">Scans</th>
+                <th className="px-4 py-2 text-right font-medium whitespace-nowrap">Earned</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
@@ -332,7 +332,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
                     <td className="px-4 py-2.5 text-zinc-600 whitespace-nowrap">
                       {r.converted_at ? new Date(r.converted_at).toLocaleDateString() : <span className="text-zinc-300">—</span>}
                     </td>
-                    <td className="px-4 py-2.5 text-right font-mono text-zinc-900 whitespace-nowrap">{r.credits_awarded}</td>
+                    <td className="px-4 py-2.5 text-right font-mono text-zinc-900 whitespace-nowrap tabular-nums">{r.credits_awarded > 0 ? `$${Number(r.credits_awarded).toFixed(2)}` : <span className="text-zinc-300">—</span>}</td>
                   </tr>
                 );
               })}
