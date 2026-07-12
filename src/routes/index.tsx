@@ -677,7 +677,7 @@ function HomePage() {
               </div>
               );
             })}
-            <Link to="/pricing" className="text-center text-sm font-medium text-zinc-900 underline underline-offset-4">See full comparison →</Link>
+            <Link to="/pricing" className="text-center text-sm font-medium text-zinc-900 underline underline-offset-4 mt-4 sm:mt-0">See full comparison →</Link>
           </div>
 
           {/* Beanstalk-style pricing table (sm and up) */}
