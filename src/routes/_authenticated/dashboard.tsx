@@ -667,7 +667,7 @@ function DashboardLayout() {
                       title={sidebarCollapsed ? t.label : undefined}
                       className={`group relative flex items-center rounded-md text-[12px] font-medium transition
                         ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-2.5 px-2.5 py-1.5"}
-                        ${active ? "bg-zinc-900 text-white" : "text-[#FAFAFA] hover:bg-zinc-100 hover:text-[#FAFAFA]"}`}
+                        ${active ? "bg-zinc-900 text-white" : "text-[#9B9C9B] hover:bg-zinc-100 hover:text-[#9B9C9B]"}`}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
