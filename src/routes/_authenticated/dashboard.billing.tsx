@@ -240,10 +240,17 @@ function Billing() {
                         ?? "—";
                       const modelWithSenior = seniorPretty ? `${modelLabel} + ${seniorPretty}` : modelLabel;
                       const stageLabel = r.stage ?? r.reason.replace(/_/g, " ");
-                      const tokens =
-                        r.promptTokens != null || r.completionTokens != null
-                          ? `${r.promptTokens ?? 0} / ${r.completionTokens ?? 0}`
-                          : "—";
+                      const meta = (r.metadata as any) ?? {};
+                      const sideRaw = (meta.signal ?? meta.side ?? meta.direction ?? meta.action ?? "").toString().toUpperCase();
+                      const sideLabel = sideRaw === "BUY" || sideRaw === "SELL" || sideRaw === "WAIT" ? sideRaw : "—";
+                      const sideClass = sideLabel === "BUY"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : sideLabel === "SELL"
+                          ? "bg-rose-100 text-rose-700"
+                          : sideLabel === "WAIT"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-zinc-100 text-zinc-500";
+
                       return (
                         <tr key={r.id} className="hover:bg-zinc-50/60">
                           <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}><ModelWithLogo raw={rawModel} label={modelWithSenior} /></td>
