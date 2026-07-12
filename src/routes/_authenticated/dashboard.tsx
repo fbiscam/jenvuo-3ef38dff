@@ -927,7 +927,7 @@ function DashboardLayout() {
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
         <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card>
+          <Card className="!bg-[#F8F8F8]">
             <CardHeader icon={ShieldCheck} title="Wallet & Plan" />
             <div className="flex divide-x divide-zinc-200">
               <Metric
