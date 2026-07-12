@@ -787,42 +787,42 @@ function DashboardLayout() {
           <h2 className="text-[15px] font-semibold text-zinc-900">Workspace</h2>
         </div>
 
-        <div className="mt-3 rounded-xl border border-zinc-200 bg-white">
-          <nav className="grid grid-cols-3 gap-1.5 border-b border-zinc-200 p-2 sm:flex sm:flex-wrap sm:items-center sm:gap-0.5 sm:p-1.5">
-            {TABS.map((t) => {
-              const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
-              const Icon = t.icon;
-              const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
-              return (
-                <Link
-                  key={t.to}
-                  to={t.to as "/dashboard"}
-                  resetScroll={false}
-                  onClick={() => markTabSeen(t.countKey)}
-                  className={`inline-flex min-w-0 items-center justify-center sm:justify-start gap-1.5 sm:gap-2 rounded-lg sm:rounded-md px-2 sm:px-3 py-2 sm:py-1.5 text-[11.5px] sm:text-[13px] font-medium truncate transition ${
-                    active
-                      ? "bg-white text-zinc-900 border border-zinc-200 shadow-sm"
-                      : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-                  }`}
-
-
-                >
-                  <Icon className="h-3.5 w-3.5 shrink-0" />
-                  {t.label}
-                  {typeof count === "number" && count > 0 && !active && (
-                    <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold leading-none text-white tabular-nums ring-2 ring-white">
-                      {count}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-
-          </nav>
-          <div className="p-5">
+        <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 bg-white lg:grid lg:grid-cols-[220px_1fr]">
+          <aside className="border-b border-zinc-200 bg-white lg:border-b-0 lg:border-r">
+            <nav className="flex gap-1.5 overflow-x-auto p-2 lg:flex-col lg:gap-1 lg:overflow-visible lg:p-3">
+              {TABS.map((t) => {
+                const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
+                const Icon = t.icon;
+                const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
+                return (
+                  <Link
+                    key={t.to}
+                    to={t.to as "/dashboard"}
+                    resetScroll={false}
+                    onClick={() => markTabSeen(t.countKey)}
+                    className={`inline-flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-[13px] font-medium transition lg:w-full ${
+                      active
+                        ? "bg-zinc-100 text-zinc-900"
+                        : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    <span className="truncate">{t.label}</span>
+                    {typeof count === "number" && count > 0 && !active && (
+                      <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold leading-none text-white tabular-nums">
+                        {count}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+          </aside>
+          <div className="bg-white p-5">
             <Outlet />
           </div>
         </div>
+
 
         <div className="h-12" />
       </main>
