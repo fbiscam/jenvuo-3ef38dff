@@ -8,11 +8,15 @@ const LINKS: { label: string; to: string }[] = [
   { label: "Help Center", to: "/help" },
 ];
 
-export default function DashboardFooter({ sidebarCollapsed: _sidebarCollapsed = false }: { sidebarCollapsed?: boolean }) {
+export default function DashboardFooter({ sidebarCollapsed = false }: { sidebarCollapsed?: boolean }) {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-10 border-t border-zinc-200 bg-[#FAFAFA]">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-4 text-center text-[12px] text-zinc-600 sm:px-6">
+    <footer
+      className={`fixed bottom-0 right-0 left-0 z-30 border-t border-zinc-200 bg-[#FAFAFA] ${
+        sidebarCollapsed ? "lg:left-[60px]" : "lg:left-[200px]"
+      }`}
+    >
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-3 text-center text-[12px] text-zinc-600 sm:px-6">
         {LINKS.map((l) => (
           <Link
             key={l.to}
