@@ -557,9 +557,9 @@ function HomePage() {
               </h2>
             </div>
             <p className="max-w-md text-zinc-900 leading-relaxed">
-              From spoken intent to executable plan — JENVU compresses an entire trading desk
-              into a single voice loop.
+              From spoken intent to executable plan — JENVU compresses a full trading desk into one voice loop.
             </p>
+
           </div>
 
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
