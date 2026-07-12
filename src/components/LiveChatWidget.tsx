@@ -40,9 +40,21 @@ export function LiveChatWidget() {
       history.replaceState = replace;
     };
   }, []);
-  const allowed = pathname === "/contact" || pathname.startsWith("/help");
+  const nativeAllowed = pathname === "/contact" || pathname.startsWith("/help");
+  const [forceShow, setForceShow] = useState(false);
+  const allowed = nativeAllowed || forceShow;
 
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => {
+      setForceShow(true);
+      setOpen(true);
+    };
+    window.addEventListener("jenvu:open-live-chat", handler as EventListener);
+    return () => window.removeEventListener("jenvu:open-live-chat", handler as EventListener);
+  }, []);
   const [token, setToken] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [name, setName] = useState("");
