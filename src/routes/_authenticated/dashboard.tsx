@@ -61,18 +61,36 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type OpenTrade = { pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null };
 type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number; closedWins: number; closedDecided: number; openTrades: OpenTrade[] };
 
-const TABS: Array<{ to: string; label: string; icon: typeof Bookmark; exact?: boolean; countKey?: keyof Counts }> = [
-  { to: "/dashboard", label: "Saved", icon: Bookmark, exact: true, countKey: "saved" },
-  { to: "/dashboard/alerts", label: "Alerts", icon: Bell, countKey: "alerts7d" },
-  { to: "/dashboard/notifications", label: "Notifications", icon: BellRing },
-  { to: "/dashboard/journal", label: "Trades", icon: BookOpen, countKey: "journalTotal" },
-  { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-  { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
-  
-  { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
-  { to: "/dashboard/profile", label: "Profile", icon: User },
-  { to: "/dashboard/security", label: "Security", icon: ShieldCheck },
+type TabItem = { to: string; label: string; icon: typeof Bookmark; exact?: boolean; countKey?: keyof Counts };
+
+const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
+  {
+    label: "Workspace",
+    items: [
+      { to: "/dashboard", label: "Overview", icon: Bookmark, exact: true, countKey: "saved" },
+      { to: "/dashboard/alerts", label: "Alerts", icon: Bell, countKey: "alerts7d" },
+      { to: "/dashboard/notifications", label: "Notifications", icon: BellRing },
+    ],
+  },
+  {
+    label: "Trading",
+    items: [
+      { to: "/dashboard/journal", label: "Trades", icon: BookOpen, countKey: "journalTotal" },
+      { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+      { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
+      { to: "/dashboard/profile", label: "Profile", icon: User },
+      { to: "/dashboard/security", label: "Security", icon: ShieldCheck },
+    ],
+  },
 ];
+
+const TABS: TabItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
 /* ---------- helpers ---------- */
 
