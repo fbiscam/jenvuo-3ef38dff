@@ -223,8 +223,9 @@ function Billing() {
                   <tbody className="divide-y divide-zinc-100">
                     {shown.map((r) => {
                       const d = new Date(r.created_at);
-                      const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-                      const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+                      const userTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : undefined;
+                      const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: userTz });
+                      const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", timeZone: userTz, timeZoneName: "short" });
                       const amt = Math.abs(r.delta);
                       const rawModel = r.model ?? ((r.metadata as any)?.model as string | undefined) ?? null;
                       const prettyFromMeta = (r.metadata as any)?.model_label as string | undefined;
