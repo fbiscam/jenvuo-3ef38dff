@@ -684,6 +684,8 @@ function DashboardLayout() {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                   const Icon = t.icon;
                   const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
+                  const isNotifs = t.to === "/dashboard/notifications";
+                  const hasUnread = isNotifs && unreadNotifs > 0 && !active;
                   return (
                     <Link
                       key={t.to}
@@ -693,7 +695,11 @@ function DashboardLayout() {
                       title={sidebarCollapsed ? t.label : undefined}
                       className={`group relative flex items-center rounded-md text-[11.5px] font-medium transition
                         ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-2 px-2.5 py-1.5"}
-                        ${active ? "bg-zinc-100 text-zinc-900 font-semibold" : "text-[#6B6C6B] hover:bg-zinc-50 hover:text-zinc-900"}`}
+                        ${active
+                          ? "bg-zinc-100 text-zinc-900 font-semibold"
+                          : hasUnread
+                            ? "text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+                            : "text-[#6B6C6B] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
                       <Icon className="h-3.5 w-3.5 shrink-0" />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
@@ -702,7 +708,10 @@ function DashboardLayout() {
                           {count}
                         </span>
                       )}
-                      {sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
+                      {!sidebarCollapsed && hasUnread && (
+                        <span className="ml-auto inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
+                      )}
+                      {sidebarCollapsed && ((typeof count === "number" && count > 0 && !active) || hasUnread) && (
                         <span className="absolute right-1.5 top-1.5 inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
                       )}
                     </Link>
