@@ -439,6 +439,31 @@ function DashboardLayout() {
   // Close mobile drawer on route change
   useEffect(() => { setMobileNavOpen(false); }, [pathname]);
 
+  // Unread notifications count (for red label indicator)
+  useEffect(() => {
+    if (authLoading || !authUser) { setUnreadNotifs(0); return; }
+    let cancelled = false;
+    const load = async () => {
+      const { count } = await supabase
+        .from("user_notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", authUser.id)
+        .is("read_at", null);
+      if (!cancelled) setUnreadNotifs(count ?? 0);
+    };
+    load();
+    const ch = supabase
+      .channel(`notifs-nav:${authUser.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_notifications", filter: `user_id=eq.${authUser.id}` }, load)
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [authUser?.id, authLoading]);
+
+  // Clear red indicator when user visits the notifications page
+  useEffect(() => {
+    if (pathname.startsWith("/dashboard/notifications")) setUnreadNotifs(0);
+  }, [pathname]);
+
   useEffect(() => {
     // Wait until Supabase has restored the session; otherwise RLS-gated
     // queries return empty because auth.uid() is null on a hard refresh.
