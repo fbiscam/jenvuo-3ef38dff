@@ -601,7 +601,7 @@ export const collections: Collection[] = [
             "Killzone open reminders (London / NY) if enabled.",
           ]},
 
-          { type: "note", tone: "info", content: "Free plan alerts are delayed by ~2 minutes. Pro and Elite receive them in real time." },
+          { type: "note", tone: "info", content: "Free plan does not receive realtime alerts — upgrade to Pro for email & push alerts the moment an A+ setup forms." },
         ],
       },
     ],
