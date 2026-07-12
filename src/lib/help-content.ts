@@ -332,7 +332,7 @@ export const collections: Collection[] = [
   {
     slug: "plans-credits-billing",
     title: "Plans, Credits & Billing",
-    description: "Pricing, credit usage and managing your subscription.",
+    description: "Pricing, credit usage and subscription.",
     icon: "CreditCard",
     articles: [
       {
