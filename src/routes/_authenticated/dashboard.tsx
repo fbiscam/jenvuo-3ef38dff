@@ -420,6 +420,7 @@ function DashboardLayout() {
   const [refreshTick, setRefreshTick] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
