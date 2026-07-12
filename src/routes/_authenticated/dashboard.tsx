@@ -709,7 +709,7 @@ function DashboardLayout() {
                         style={{
                           fontSize: 18,
                           lineHeight: 1,
-                          color: iconColor ?? "#626262",
+                          color: active ? "#18181b" : (iconColor ?? "#626262"),
                           fontVariationSettings: `'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20`,
                         }}
                       >
