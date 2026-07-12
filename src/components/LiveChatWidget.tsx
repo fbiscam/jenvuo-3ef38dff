@@ -259,7 +259,10 @@ export function LiveChatWidget() {
                 </button>
               )}
               <button
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  if (!nativeAllowed) setForceShow(false);
+                }}
                 aria-label="Close"
                 className="rounded-full p-1.5 text-zinc-600 transition hover:bg-zinc-100 hover:text-black"
               >
