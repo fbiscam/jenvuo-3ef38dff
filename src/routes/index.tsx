@@ -557,7 +557,7 @@ function HomePage() {
               </h2>
             </div>
             <p className="max-w-md text-zinc-900 leading-relaxed">
-              <span className="sm:hidden whitespace-nowrap text-[11px]">Spoken intent to plan — one voice loop.</span>
+              <span className="sm:hidden">Spoken intent to plan — one voice loop.</span>
               <span className="hidden sm:inline">From spoken intent to executable plan — JENVU compresses a full trading desk into one voice loop.</span>
             </p>
 
