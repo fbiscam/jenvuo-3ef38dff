@@ -826,7 +826,7 @@ function DashboardLayout() {
         type="button"
         aria-label="Open menu"
         onClick={() => setMobileNavOpen(true)}
-        className="fixed top-3 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 lg:hidden"
+        className="fixed top-3 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
       >
         <Menu className="h-4 w-4" />
       </button>
