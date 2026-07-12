@@ -53,7 +53,7 @@ export function CookieBanner() {
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="max-w-[480px] text-[13px] leading-snug text-zinc-900 line-clamp-2">
-          We use cookies to keep you signed in and understand how the desk is used.{" "}
+          We use cookies to keep you signed in, understand how the desk is used, and to improve your overall trading experience.{" "}
           <a href="/cookies" className="underline underline-offset-2 font-medium hover:text-black">Learn more</a>.
         </div>
         <div className="flex shrink-0 gap-2">
