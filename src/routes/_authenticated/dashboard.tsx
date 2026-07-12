@@ -572,7 +572,7 @@ function DashboardLayout() {
   }, [displayRemaining, credits.isLoading, credits.allowance]);
 
   return (
-    <div className="min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 font-['Inter',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
+    <div className="min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
 
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white">

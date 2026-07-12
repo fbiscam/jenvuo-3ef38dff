@@ -13,7 +13,7 @@ import pricingScanner from "@/assets/pricing-scanner.jpg";
 import pricingApi from "@/assets/pricing-api.jpg";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
-const SANS = "font-['Inter',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({

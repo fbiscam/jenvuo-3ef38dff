@@ -37,7 +37,7 @@ export const Route = createFileRoute("/help/$collection/")({
 });
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
-const SANS = "font-['Inter',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 function CollectionPage() {
   const { collection } = Route.useLoaderData();
