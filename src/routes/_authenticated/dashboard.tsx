@@ -647,11 +647,6 @@ function DashboardLayout() {
         <nav className="flex-1 overflow-y-auto scrollbar-auto-hide px-2 py-3">
           {NAV_GROUPS.map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-4" : ""}>
-              {!sidebarCollapsed && (
-                <div className="mb-1 px-3 text-[9.5px] font-medium uppercase tracking-wider text-[#FAFAFA]">
-                  {group.label}
-                </div>
-              )}
               {sidebarCollapsed && gi > 0 && <div className="mx-3 mb-2 h-px bg-zinc-100" />}
               <div className="flex flex-col gap-0.5">
                 {group.items.map((t) => {
