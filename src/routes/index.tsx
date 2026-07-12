@@ -507,7 +507,7 @@ function HomePage() {
               ].map(([k, v]) => (
                 <div key={k} className="bg-white p-5 text-left sm:text-left">
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
-                  <div className="mt-2 text-sm font-medium tracking-tight">{v}</div>
+                  <div className="mt-2 text-sm font-medium tracking-tight whitespace-nowrap">{v}</div>
                 </div>
               ))}
             </div>
