@@ -233,7 +233,6 @@ function Billing() {
                         ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—"))
                         ?? "—";
                       const modelWithSenior = seniorPretty ? `${modelLabel} + ${seniorPretty}` : modelLabel;
-                      const stageLabel = r.stage ?? r.reason.replace(/_/g, " ");
                       const meta = (r.metadata as any) ?? {};
                       const sideRaw = (meta.signal ?? meta.side ?? meta.direction ?? meta.action ?? "").toString().toUpperCase();
                       const sideLabel = sideRaw === "BUY" || sideRaw === "SELL" || sideRaw === "WAIT" ? sideRaw : "—";
@@ -244,13 +243,27 @@ function Billing() {
                           : sideLabel === "WAIT"
                             ? "bg-amber-100 text-amber-700"
                             : "bg-zinc-100 text-zinc-500";
+                      const gradeRaw = (meta.grade ?? meta.letter_grade ?? meta.rating ?? "").toString().toUpperCase();
+                      const confRaw = meta.confidence ?? meta.confidence_score ?? meta.score;
+                      const confNum = typeof confRaw === "number" ? confRaw : (confRaw ? Number(confRaw) : NaN);
+                      const confPct = Number.isFinite(confNum) ? (confNum <= 1 ? Math.round(confNum * 100) : Math.round(confNum)) : null;
+                      const gradeLabel = gradeRaw || (confPct !== null ? `${confPct}%` : "—");
+                      const gradeClass = gradeRaw.startsWith("A")
+                        ? "bg-emerald-100 text-emerald-700"
+                        : gradeRaw.startsWith("B")
+                          ? "bg-sky-100 text-sky-700"
+                          : gradeRaw.startsWith("C")
+                            ? "bg-amber-100 text-amber-700"
+                            : gradeRaw
+                              ? "bg-rose-100 text-rose-700"
+                              : "bg-zinc-100 text-zinc-500";
 
                       return (
                         <tr key={r.id} className="hover:bg-zinc-50/60">
                           <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}><ModelWithLogo raw={rawModel} label={modelWithSenior} /></td>
                           <td className="whitespace-nowrap px-3 py-2">
-                            <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-emerald-700">
-                              {stageLabel}
+                            <span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${gradeClass}`}>
+                              {gradeLabel}
                             </span>
                           </td>
                           <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums text-zinc-500`}>{dateStr} · {timeStr}</td>
