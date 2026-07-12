@@ -160,7 +160,7 @@ export const collections: Collection[] = [
   {
     slug: "voice-agent",
     title: "Voice Agent",
-    description: "Talk to Jenvu like Jarvis — wake words, commands, mic.",
+    description: "Talk to Jenvu like Jarvis, commands, mic.",
     icon: "Mic",
     articles: [
       {
