@@ -1288,38 +1288,30 @@ function DailyTip() {
 }
 
 function ReferralSnapshot() {
-  const { user } = useAuthUser();
   const [code, setCode] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string>("");
   const [count, setCount] = useState<number>(0);
   const [earned, setEarned] = useState<number>(0);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (!user?.id) return;
     let cancelled = false;
     (async () => {
       try {
-        const { data: prof } = await supabase
-          .from("profiles")
-          .select("referral_code")
-          .eq("id", user.id)
-          .maybeSingle();
-        if (!cancelled && prof?.referral_code) setCode(prof.referral_code);
-        const { count: n } = await supabase
-          .from("referrals")
-          .select("id", { count: "exact", head: true })
-          .eq("referrer_id", user.id)
-          .eq("status", "converted");
-        if (!cancelled) {
-          setCount(n || 0);
-          setEarned((n || 0) * 1);
-        }
+        const { getReferralInfo } = await import("@/lib/referrals.functions");
+        const info = await getReferralInfo();
+        if (cancelled) return;
+        setCode(info.code);
+        setShareUrl(info.shareUrl);
+        setCount(info.totals.converted);
+        setEarned(info.totals.credits_earned);
       } catch { /* ignore */ }
     })();
     return () => { cancelled = true; };
-  }, [user?.id]);
+  }, []);
 
-  const link = code ? `${typeof window !== "undefined" ? window.location.origin : ""}/auth?ref=${code}` : "";
+  const link = shareUrl || (code && typeof window !== "undefined" ? `${window.location.origin}/auth?ref=${code}` : "");
+
 
   return (
     <div className="flex flex-1 flex-col gap-3 px-5 py-5">
