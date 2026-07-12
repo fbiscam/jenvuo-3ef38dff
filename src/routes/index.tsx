@@ -983,7 +983,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="border-t border-zinc-100">
+      <section className="border-t border-zinc-100 overflow-hidden">
 
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
           <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
