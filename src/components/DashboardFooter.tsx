@@ -1,10 +1,22 @@
 import { Link } from "@tanstack/react-router";
 
 const LINKS: { label: string; to: string }[] = [
-  { label: "Support", to: "/help" },
-  { label: "System Status", to: "/status" },
-  { label: "Terms of Use", to: "/terms" },
-  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Home", to: "/" },
+  { label: "Pricing", to: "/pricing" },
+  { label: "About", to: "/about" },
+  { label: "Contact", to: "/contact" },
+  { label: "Insights", to: "/insights" },
+  { label: "Briefs", to: "/briefs" },
+  { label: "Killzones", to: "/killzones" },
+  { label: "AI Engine", to: "/ai-engine" },
+  { label: "Help", to: "/help" },
+  { label: "Status", to: "/status" },
+  { label: "Download", to: "/download" },
+  { label: "Terms", to: "/terms" },
+  { label: "Privacy", to: "/privacy" },
+  { label: "Disclaimer", to: "/disclaimer" },
+  { label: "Refund", to: "/refund" },
+  { label: "Cancellation", to: "/cancellation" },
   { label: "Report Security Issues", to: "/security" },
 ];
 
