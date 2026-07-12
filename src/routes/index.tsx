@@ -490,7 +490,7 @@ function HomePage() {
             <div className="text-left lg:col-span-4 lg:text-left">
               
               <h2 className="mt-4 text-xl font-semibold tracking-tight sm:text-3xl">
-                One terminal. Every gold cross.
+                One terminal.&nbsp;<br />Every gold cross.
               </h2>
               <p className="mt-4 text-zinc-900 leading-relaxed">
                 Jenvu routes liquidity, structure and news context across every XAU pair&nbsp;
