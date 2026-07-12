@@ -49,7 +49,7 @@ export const Route = createFileRoute("/contact")({
 });
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
-const SANS = "font-['Inter',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 const ClientSchema = z.object({
   name: z.string().trim().min(1, "Enter your name").max(100),
