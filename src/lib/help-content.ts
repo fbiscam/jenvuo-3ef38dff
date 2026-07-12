@@ -352,7 +352,7 @@ export const collections: Collection[] = [
             "Full ICT / SMC narration.",
             "Trade journal & analytics.",
             "Multi-timeframe bias engine.",
-            "No realtime alerts (upgrade to Pro for email & push).",
+            "Realtime email & push alerts.",
           ]},
 
           { type: "h2", content: "Pro — $15 / month" },
@@ -602,7 +602,7 @@ export const collections: Collection[] = [
             "Killzone open reminders (London / NY) if enabled.",
           ]},
 
-          { type: "note", tone: "info", content: "Free plan does not receive realtime alerts — upgrade to Pro for email & push alerts the moment an A+ setup forms." },
+          { type: "note", tone: "info", content: "All plans receive realtime email & push alerts the moment an A+ setup forms." },
         ],
       },
     ],
