@@ -952,10 +952,9 @@ function DashboardLayout() {
         </div>
 
         <div className="h-12" />
-      </main>
-
-        <SiteFooter />
+       </main>
       </div>
+
     </div>
   );
 }
