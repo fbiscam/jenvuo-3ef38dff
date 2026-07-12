@@ -729,13 +729,13 @@ function DashboardLayout() {
                       </span>
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
-                        <span className="ml-auto inline-flex h-[14px] w-[14px] aspect-square items-center justify-center rounded-full bg-rose-600 text-[9px] font-semibold leading-none text-white tabular-nums">
-                          {count > 9 ? "9+" : count}
+                        <span className="ml-auto grid h-[14px] w-[14px] aspect-square place-items-center rounded-full bg-rose-600 text-[9px] font-semibold leading-none text-white tabular-nums text-center">
+                          <span className="block translate-y-[0.5px]">{count > 9 ? "9+" : count}</span>
                         </span>
                       )}
                       {!sidebarCollapsed && hasUnread && (
-                        <span className="ml-auto inline-flex h-[14px] w-[14px] aspect-square items-center justify-center rounded-full bg-rose-600 text-[9px] font-semibold leading-none text-white tabular-nums">
-                          {unreadNotifs > 9 ? "9+" : unreadNotifs}
+                        <span className="ml-auto grid h-[14px] w-[14px] aspect-square place-items-center rounded-full bg-rose-600 text-[9px] font-semibold leading-none text-white tabular-nums text-center">
+                          <span className="block translate-y-[0.5px]">{unreadNotifs > 9 ? "9+" : unreadNotifs}</span>
                         </span>
                       )}
                       {sidebarCollapsed && ((typeof count === "number" && count > 0 && !active) || hasUnread) && (
