@@ -166,12 +166,12 @@ function Metric({
   const chipColor = negative ? "text-rose-600" : positive ? "text-emerald-600" : "text-zinc-500";
 
   return (
-    <div className="flex-1 min-w-0 px-3 pt-2 pb-4 sm:px-4">
-      <div className="flex items-center gap-1 truncate text-[12px] text-zinc-500" title={label}>
+    <div className="flex flex-1 min-w-0 flex-col px-3 pt-2 pb-4 sm:px-4">
+      <div className="truncate text-[12px] text-zinc-500" title={label}>
         {label}
       </div>
-      <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-        <span className={`text-[20px] font-semibold tracking-tight sm:text-[22px] ${isEmpty ? "text-zinc-400" : "text-zinc-900"}`}>{value}</span>
+      <div className="mt-1 flex min-h-[26px] flex-wrap items-baseline gap-x-2 gap-y-0.5 sm:min-h-[28px]">
+        <span className={`text-[20px] font-semibold leading-none tracking-tight sm:text-[22px] ${isEmpty ? "text-zinc-400" : "text-zinc-900"}`}>{value}</span>
         {delta && !isEmpty && (
           <span className={`inline-flex items-center whitespace-nowrap text-[11px] font-medium ${chipColor}`}>
             <ArrowUpRight className={`h-3 w-3 ${negative ? "rotate-90" : ""}`} />
@@ -179,7 +179,7 @@ function Metric({
           </span>
         )}
       </div>
-      <div className="mt-2 -mb-1 opacity-90">
+      <div className="mt-auto pt-2 -mb-1 opacity-90">
         <Sparkline seed={seed} tone={tone ?? (derivedTrend === "down" ? "rose" : derivedTrend === "up" ? "emerald" : "blue")} empty={isEmpty} trend={derivedTrend} magnitude={derivedMag} />
       </div>
     </div>
