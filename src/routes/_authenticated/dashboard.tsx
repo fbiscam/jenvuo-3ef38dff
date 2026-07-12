@@ -763,9 +763,9 @@ function DashboardLayout() {
               onClick={signOut}
               title="Sign out"
               aria-label="Sign out"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-rose-600 hover:bg-rose-50"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900 hover:bg-zinc-100"
             >
-              <LogOut className="h-3.5 w-3.5" />
+              <Power className="h-3.5 w-3.5" strokeWidth={2.25} />
             </button>
           )}
           <div className="flex items-center gap-1">
