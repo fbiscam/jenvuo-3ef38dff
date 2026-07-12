@@ -166,13 +166,12 @@ function Metric({
   const chipColor = negative ? "text-rose-600" : positive ? "text-emerald-600" : "text-zinc-500";
 
   return (
-    <div className="flex-1 min-w-0 px-4 pt-2 pb-4">
-      <div className="flex items-center gap-1 whitespace-nowrap text-[12px] text-zinc-500">
+    <div className="flex-1 min-w-0 px-3 pt-2 pb-4 sm:px-4">
+      <div className="flex items-center gap-1 truncate text-[12px] text-zinc-500" title={label}>
         {label}
-        
       </div>
-      <div className="mt-1 flex items-baseline gap-2">
-        <span className={`text-[22px] font-semibold tracking-tight ${isEmpty ? "text-zinc-400" : "text-zinc-900"}`}>{value}</span>
+      <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+        <span className={`text-[20px] font-semibold tracking-tight sm:text-[22px] ${isEmpty ? "text-zinc-400" : "text-zinc-900"}`}>{value}</span>
         {delta && !isEmpty && (
           <span className={`inline-flex items-center whitespace-nowrap text-[11px] font-medium ${chipColor}`}>
             <ArrowUpRight className={`h-3 w-3 ${negative ? "rotate-90" : ""}`} />
