@@ -602,7 +602,7 @@ export const collections: Collection[] = [
             "Killzone open reminders (London / NY) if enabled.",
           ]},
 
-          { type: "note", tone: "info", content: "Free plan does not receive realtime alerts — upgrade to Pro for email & push alerts the moment an A+ setup forms." },
+          { type: "note", tone: "info", content: "All plans receive realtime email & push alerts the moment an A+ setup forms." },
         ],
       },
     ],
