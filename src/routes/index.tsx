@@ -813,7 +813,7 @@ function HomePage() {
           </div>
 
           {/* Footer strip */}
-          <div className="mt-12 flex flex-col items-start justify-between gap-4 rounded-2xl border border-zinc-200 bg-white px-6 py-5 sm:flex-row">
+          <div className="mt-12 flex flex-col items-center justify-center gap-4 rounded-2xl border border-zinc-200 bg-white px-6 py-5 sm:flex-row sm:justify-between sm:items-start">
             <div />
 
             <Link to="/pricing" className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900 hover:gap-2.5 transition-all">
