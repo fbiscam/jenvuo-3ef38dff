@@ -953,17 +953,6 @@ function DashboardLayout() {
           </Card>
         </section>
 
-        {/* Workspace outlet */}
-        <div className="mt-8 flex items-center justify-between">
-          <h2 className="text-[15px] font-semibold text-zinc-900">Workspace</h2>
-        </div>
-
-        <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 bg-white">
-          <div className="bg-white p-5">
-            <Outlet />
-          </div>
-        </div>
-
         <div className="h-12" />
         </>
         ) : (
