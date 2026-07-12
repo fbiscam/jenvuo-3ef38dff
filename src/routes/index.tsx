@@ -815,7 +815,7 @@ function HomePage() {
           <div className="mt-12 flex flex-col items-start justify-between gap-4 rounded-2xl border border-zinc-200 bg-white px-6 py-5 sm:flex-row">
             <div className="flex items-center gap-3">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <p className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-600`}>
+              <p className={`${SANS} text-[10px] uppercase tracking-[0.25em] text-zinc-600`}>
                 Early-access pricing · Billing activating soon
               </p>
             </div>
