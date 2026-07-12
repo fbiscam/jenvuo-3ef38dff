@@ -800,7 +800,7 @@ function DashboardLayout() {
         <Menu className="h-4 w-4" />
       </button>
 
-      <main className="mx-auto w-full max-w-7xl px-5 py-7 sm:px-8">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-7 sm:px-8">
 
         {pathname === "/dashboard" ? (
         <>
