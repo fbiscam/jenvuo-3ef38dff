@@ -420,6 +420,7 @@ function DashboardLayout() {
   const [refreshTick, setRefreshTick] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
@@ -437,6 +438,31 @@ function DashboardLayout() {
   }, [sidebarCollapsed]);
   // Close mobile drawer on route change
   useEffect(() => { setMobileNavOpen(false); }, [pathname]);
+
+  // Unread notifications count (for red label indicator)
+  useEffect(() => {
+    if (authLoading || !authUser) { setUnreadNotifs(0); return; }
+    let cancelled = false;
+    const load = async () => {
+      const { count } = await supabase
+        .from("user_notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", authUser.id)
+        .is("read_at", null);
+      if (!cancelled) setUnreadNotifs(count ?? 0);
+    };
+    load();
+    const ch = supabase
+      .channel(`notifs-nav:${authUser.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_notifications", filter: `user_id=eq.${authUser.id}` }, load)
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [authUser?.id, authLoading]);
+
+  // Clear red indicator when user visits the notifications page
+  useEffect(() => {
+    if (pathname.startsWith("/dashboard/notifications")) setUnreadNotifs(0);
+  }, [pathname]);
 
   useEffect(() => {
     // Wait until Supabase has restored the session; otherwise RLS-gated
@@ -658,6 +684,8 @@ function DashboardLayout() {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                   const Icon = t.icon;
                   const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
+                  const isNotifs = t.to === "/dashboard/notifications";
+                  const hasUnread = isNotifs && unreadNotifs > 0 && !active;
                   return (
                     <Link
                       key={t.to}
@@ -667,7 +695,11 @@ function DashboardLayout() {
                       title={sidebarCollapsed ? t.label : undefined}
                       className={`group relative flex items-center rounded-md text-[11.5px] font-medium transition
                         ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-2 px-2.5 py-1.5"}
-                        ${active ? "bg-zinc-100 text-zinc-900 font-semibold" : "text-[#6B6C6B] hover:bg-zinc-50 hover:text-zinc-900"}`}
+                        ${active
+                          ? "bg-zinc-100 text-zinc-900 font-semibold"
+                          : hasUnread
+                            ? "text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+                            : "text-[#6B6C6B] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
                       <Icon className="h-3.5 w-3.5 shrink-0" />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
@@ -676,7 +708,10 @@ function DashboardLayout() {
                           {count}
                         </span>
                       )}
-                      {sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
+                      {!sidebarCollapsed && hasUnread && (
+                        <span className="ml-auto inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
+                      )}
+                      {sidebarCollapsed && ((typeof count === "number" && count > 0 && !active) || hasUnread) && (
                         <span className="absolute right-1.5 top-1.5 inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
                       )}
                     </Link>
