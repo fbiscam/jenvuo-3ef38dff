@@ -660,8 +660,8 @@ function DashboardLayout() {
                       resetScroll={false}
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
-                      className={`group relative flex items-center rounded-md text-[12px] font-medium transition
-                        ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-2.5 px-2.5 py-1.5"}
+                      className={`group relative flex items-center rounded-md text-[11px] font-medium transition
+                        ${sidebarCollapsed ? "justify-center px-2 py-1" : "gap-2 px-2.5 py-1"}
                         ${active ? "bg-zinc-900 text-white" : "text-[#6B6C6B] hover:bg-zinc-100 hover:text-[#6B6C6B]"}`}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
