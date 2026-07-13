@@ -638,13 +638,23 @@ function SignalPage() {
       if (!id) return;
       journalRowIdRef.current = null;
       const pnl = dir === "BUY" ? exit - tr.entry : tr.entry - exit;
-      supabase.from("trade_journal").update({
+      const patch: Record<string, unknown> = {
         outcome,
         pnl: Number(pnl.toFixed(plan.instrument.decimals)),
         closed_at: new Date().toISOString(),
-      }).eq("id", id).then(({ error }) => {
+      };
+      if (outcome === "win") patch.tp2_hit_at = new Date().toISOString();
+      supabase.from("trade_journal").update(patch).eq("id", id).then(({ error }) => {
         if (!error) toast.success(`Journal updated · ${outcome.toUpperCase()}`);
       });
+    };
+    const markTp1 = () => {
+      const id = journalRowIdRef.current;
+      if (!id) return;
+      supabase.from("trade_journal")
+        .update({ tp1_hit_at: new Date().toISOString() })
+        .eq("id", id)
+        .is("tp1_hit_at", null);
     };
     const fillJournal = () => {
       const id = journalRowIdRef.current;
@@ -665,7 +675,7 @@ function SignalPage() {
         fillJournal();
       }
       if (trackerStatusRef.current === "RUNNING") {
-        if (priceTick >= tp1) fire("tp1", `+1R reached. Close 50% and move SL to entry.`);
+        if (priceTick >= tp1) { fire("tp1", `+1R reached. Close 50% and move SL to entry.`); markTp1(); }
         if (priceTick <= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; closeJournal("loss", tr.sl); }
         if (priceTick >= tr.tp) { fire("tp", `Take profit hit. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tr.tp); }
       }
@@ -676,7 +686,7 @@ function SignalPage() {
         fillJournal();
       }
       if (trackerStatusRef.current === "RUNNING") {
-        if (priceTick <= tp1) fire("tp1", `+1R reached. Close 50% and move SL to entry.`);
+        if (priceTick <= tp1) { fire("tp1", `+1R reached. Close 50% and move SL to entry.`); markTp1(); }
         if (priceTick >= tr.sl) { fire("sl", `Stop loss hit. Risk contained.`); setTrackerStatus("LOSS"); stoppedRef.current = true; closeJournal("loss", tr.sl); }
         if (priceTick <= tr.tp) { fire("tp", `Take profit hit. Trade closed in profit.`); setTrackerStatus("WIN"); stoppedRef.current = true; closeJournal("win", tr.tp); }
       }
