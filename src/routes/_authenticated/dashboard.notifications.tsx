@@ -112,14 +112,14 @@ function NotificationsPage() {
   }, [listFn]);
 
   useEffect(() => {
-    load();
-  }, [load]);
-
-  // Auto mark all as read when the page opens
-  useEffect(() => {
+    let cancelled = false;
     (async () => {
+      await load();
+      if (cancelled) return;
+      // Auto mark all as read when the page opens (after load so items reflect it)
       try {
         await markAllFn();
+        if (cancelled) return;
         setItems((prev) =>
           prev.map((it) => ({ ...it, read_at: it.read_at ?? new Date().toISOString() })),
         );
@@ -127,9 +127,12 @@ function NotificationsPage() {
         // ignore
       }
     })();
-    // run once on mount
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   // Realtime updates
   useEffect(() => {
