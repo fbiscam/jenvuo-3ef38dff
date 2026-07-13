@@ -155,14 +155,14 @@ function AlertPrefs() {
           </div>
         </div>
 
-        <div className="mt-4 max-h-[420px] overflow-y-auto overflow-x-auto sm:overflow-x-hidden rounded-xl border border-zinc-100">
+        <div className="mt-4 overflow-x-auto sm:overflow-x-hidden rounded-xl border border-zinc-100">
           {alertsLoading ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">Loading alerts…</div>
           ) : alerts.length === 0 ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">No alerts have fired yet. Sit tight — the scanner runs every 15 minutes.</div>
           ) : (
             <table className="w-full min-w-[720px] sm:min-w-0 text-sm">
-              <thead className="sticky top-0 z-10 bg-zinc-50 text-center font-mono text-[10px] uppercase tracking-wider text-zinc-500">
+              <thead className="bg-zinc-50 text-center font-mono text-[10px] uppercase tracking-wider text-zinc-500">
                 <tr>
                   {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Time"].map((h) => (
                     <th key={h} className="px-3 py-2 font-medium">{h}</th>
