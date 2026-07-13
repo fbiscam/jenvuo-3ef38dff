@@ -27,7 +27,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 
 
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 type SignalSearch = { symbol?: string; savedId?: string; alertId?: string };
 export const Route = createFileRoute("/signal")({
