@@ -652,9 +652,9 @@ function SignalPage() {
       const id = journalRowIdRef.current;
       if (!id) return;
       supabase.from("trade_journal")
-        .update({ tp1_hit_at: new Date().toISOString() })
+        .update({ tp1_hit_at: new Date().toISOString() } as never)
         .eq("id", id)
-        .is("tp1_hit_at", null);
+        .is("tp1_hit_at", null as never);
     };
     const fillJournal = () => {
       const id = journalRowIdRef.current;
