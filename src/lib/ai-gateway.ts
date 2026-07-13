@@ -54,6 +54,14 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+function providerConfigured(model: string): boolean {
+  if (model.startsWith("blackboxai/")) return Boolean(process.env.BLACKBOX_API_KEY);
+  if (model.startsWith("nvapi/")) return Boolean(process.env.NVIDIA_API_KEY);
+  if (model.startsWith("bmind/")) return Boolean(process.env.BLUESMINDS_API_KEY);
+  if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
+  return Boolean(process.env.LOVABLE_API_KEY);
+}
+
 export type UsageInfo = { promptTokens: number; completionTokens: number; totalTokens: number };
 
 async function singleAttempt(
@@ -205,8 +213,8 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
 
   const timeoutMs = opts.timeoutMs ?? 25000;
   const retriesPerModel = Math.max(1, opts.retriesPerModel ?? 3);
-  const models = opts.models.filter(Boolean);
-  if (!models.length) throw new AiGatewayError("No models configured", 0, true);
+  const models = opts.models.filter(Boolean).filter(providerConfigured);
+  if (!models.length) throw new AiGatewayError(`No configured AI provider for ${opts.stage ?? "AI call"}`, 0, true);
 
   let lastErr: AiGatewayError | null = null;
 
@@ -306,12 +314,10 @@ export const MODEL_CHAIN = {
   // Primary analyzer: gpt-5.4 (accuracy locked, no fallback).
   intent: ["bmind/gpt-5.4"],
   narration: ["bmind/gpt-5.4"],
-  // Senior review = DeepSeek reasoning model.
-  // Primary: NVIDIA-hosted DeepSeek V4 Pro for fastest review completion.
-  // Fallbacks: DeepSeek official + Bluesminds relabeled variants for redundancy.
+  // Senior review = DeepSeek V4 Pro only.
+  // Try every configured V4 Pro route, but do not downgrade to other DeepSeek models.
   seniorReview: [
     "nvapi/deepseek-ai/deepseek-v4-pro",
-    "dsofficial/deepseek-reasoner",
     "bmind/orion/deepseek-ai/deepseek-v4-pro",
     "bmind/deepseek-ai/deepseek-v4-pro",
   ],
