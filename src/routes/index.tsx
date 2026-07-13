@@ -646,7 +646,7 @@ function HomePage() {
           )}
 
           {/* Mobile stacked plan cards (table is unreadable below sm) */}
-          <div className="mt-10 grid gap-4 sm:hidden">
+          <div className="mt-10 hidden">
             {[
               { name: "Free", key: "free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", credits: "$2 wallet", bullets: ["Unlimited voice queries", "A+ signals & ICT/SMC narration", "Trade journal & MTF bias", "No realtime alerts"] },
               { name: "Pro", key: "pro", price: "$15/mo", tag: "Active trader", to: "/contact" as const, cta: "Notify me", credits: "$15 wallet", accent: true, bullets: ["Unlimited voice queries", "Realtime A+ alerts", "Full ICT / SMC narration", "Trade journal"] },
@@ -681,7 +681,7 @@ function HomePage() {
           </div>
 
           {/* Beanstalk-style pricing table (sm and up) */}
-          <div className="mt-14 hidden sm:block overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+          <div className="mt-10 sm:mt-14 block overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
 
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
