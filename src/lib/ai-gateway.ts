@@ -293,11 +293,12 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // ACCURACY LOCKED — bmind/gpt-5.4 only. No fallback models.
-  // On timeout/failure, retriesPerModel re-requests the SAME model.
+  // Primary analyzer: gpt-5.4 (accuracy locked, no fallback).
   intent: ["bmind/gpt-5.4"],
   narration: ["bmind/gpt-5.4"],
-  seniorReview: ["bmind/gpt-5.4"],
+  // Senior review = independent second opinion from a different model.
+  // deepseek-v4-pro (strong reasoning) reviews gpt-5.4's A/A+ trades.
+  seniorReview: ["bmind/deepseek-ai/deepseek-v4-pro"],
   chat: ["bmind/gpt-5.4"],
 } as const;
 
