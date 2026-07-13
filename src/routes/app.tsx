@@ -157,6 +157,7 @@ function parseTimeframe(text: string, fallback: string): string {
 }
 
 const SYMBOL_KEYWORDS: Array<{ rx: RegExp; sym: string }> = [
+  // XAU cross-pairs (fiat)
   { rx: /\b(gold\s*(?:in\s*)?(?:eur|euro))\b/i, sym: "XAUEUR" },
   { rx: /\b(gold\s*(?:in\s*)?(?:gbp|pound|sterling))\b/i, sym: "XAUGBP" },
   { rx: /\b(gold\s*(?:in\s*)?(?:jpy|yen))\b/i, sym: "XAUJPY" },
@@ -167,8 +168,24 @@ const SYMBOL_KEYWORDS: Array<{ rx: RegExp; sym: string }> = [
   { rx: /\bxau\s*\/?\s*jpy\b/i, sym: "XAUJPY" },
   { rx: /\bxau\s*\/?\s*aud\b/i, sym: "XAUAUD" },
   { rx: /\bxau\s*\/?\s*chf\b/i, sym: "XAUCHF" },
-  { rx: /\b(gold|xau(?:\/?usd)?|bullion)\b/i, sym: "XAUUSD" },
-  { rx: /\bdxy\b/i, sym: "DXY" },
+  // Silver
+  { rx: /\b(silver|xag(?:\/?usd)?|chandi)\b/i, sym: "XAGUSD" },
+  // Crypto
+  { rx: /\b(btc|bitcoin|bit\s*coin)\b/i, sym: "BTCUSDT" },
+  { rx: /\b(eth|ether(?:eum)?)\b/i, sym: "ETHUSDT" },
+  { rx: /\b(sol|solana)\b/i, sym: "SOLUSDT" },
+  { rx: /\b(xrp|ripple)\b/i, sym: "XRPUSDT" },
+  // Forex majors
+  { rx: /\beur\s*\/?\s*usd\b|\beuro?\s*dollar\b/i, sym: "EURUSD" },
+  { rx: /\bgbp\s*\/?\s*usd\b|\bcable\b|\bpound\s*dollar\b/i, sym: "GBPUSD" },
+  { rx: /\busd\s*\/?\s*jpy\b|\bdollar\s*yen\b/i, sym: "USDJPY" },
+  { rx: /\baud\s*\/?\s*usd\b/i, sym: "AUDUSD" },
+  { rx: /\bnzd\s*\/?\s*usd\b/i, sym: "NZDUSD" },
+  { rx: /\busd\s*\/?\s*cad\b/i, sym: "USDCAD" },
+  { rx: /\busd\s*\/?\s*chf\b/i, sym: "USDCHF" },
+  // Gold default (last, so specific crosses win)
+  { rx: /\b(gold|sona|xau(?:\/?usd)?|bullion)\b/i, sym: "XAUUSD" },
+  { rx: /\bdxy\b|\bdollar\s*index\b/i, sym: "DXY" },
 ];
 
 function detectSymbol(query: string): string {
@@ -176,6 +193,15 @@ function detectSymbol(query: string): string {
   for (const { rx, sym } of SYMBOL_KEYWORDS) if (rx.test(q)) return sym;
   return "XAUUSD";
 }
+
+// Broad intent detection. `normalizeQuery` already folds Roman-Urdu variants
+// ("anlyze", "analays", "kro analysis" → "analyze"), so we just need a wide
+// English keyword net. Explicit Urdu/Hindi verbs are added for phrases the
+// normalizer can't fully rewrite ("signal do", "trade batao", "chart dekho").
+const ANALYZE_INTENT_RX =
+  /\b(signal|setup|trade\s*idea|trade\s*plan|analyze|analys(?:i|e)s|scan|scanning|new\s*signal|full\s*analysis|market\s*analysis|forecast|prediction|forecast|read\s*(?:the\s*)?market|check\s*(?:the\s*)?(?:market|chart|price)|entry|buy\s*or\s*sell|buy\/sell|long\s*or\s*short|do\s*analysis|run\s*analysis|analyze\s*kar|signal\s*de|signal\s*do|trade\s*batao|batao|dekho|chart\s*pe|kya\s*trade|kya\s*setup)\b/i;
+const OPEN_CHART_RX =
+  /\b(live\s*chart|show\s*chart|chart\s*open|open\s*chart|view\s*chart|signal\s*desk|charts?\s*kholo|desk\s*kholo)\b/i;
 
 function signalPlanToGoldSignal(plan: SignalPlan): GoldSignal {
   const d = Math.max(0, Math.min(6, plan.instrument.decimals ?? 2));
@@ -290,7 +316,7 @@ function Home() {
     const q = normalizeQuery(query);
 
     // "open chart / show chart / live chart" → still route to the full desk
-    if (/\b(live\s*chart|show\s*chart|chart\s*open|open\s*chart|view\s*chart|signal\s*desk)\b/i.test(q)) {
+    if (OPEN_CHART_RX.test(q)) {
       const symbol = detectSymbol(query);
       speech.stopSpeaking();
       speech.pauseListening();
@@ -301,7 +327,7 @@ function Home() {
     // Analyze / signal / setup / trade-idea intent → run the SAME full
     // killzone-quality plan the /signal desk runs (getSignalPlan), inline
     // on /app. Narrate the summary and show the SignalCard.
-    const analyzeIntent = /\b(signal|setup|trade\s*idea|trade\s*plan|analyze|analysis|scan|new\s*signal)\b/i.test(q);
+    const analyzeIntent = ANALYZE_INTENT_RX.test(q);
 
     loadingRef.current = true;
     setLoading(true);
