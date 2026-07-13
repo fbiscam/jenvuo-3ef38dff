@@ -183,7 +183,7 @@ Return STRICT JSON only, no prose, with this exact shape:
           ok: true,
           id: inserted.id,
           session,
-          audio_path: audioPath,
+          audio_path: null,
           duration: estimatedSeconds,
         });
       },
