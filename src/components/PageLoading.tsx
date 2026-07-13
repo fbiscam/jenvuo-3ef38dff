@@ -8,7 +8,7 @@ export default function PageLoading({ label = "Opening page" }: PageLoadingProps
       <div className="flex flex-col items-center gap-3 text-center">
         <img src="/favicon.png" alt="JENVU AI" className="h-8 w-8 rounded-md object-contain" />
         <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-900" />
-        <p className="font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] text-[10px] uppercase tracking-[0.22em] text-zinc-500">{label}</p>
+        <p className="font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] text-[10px] uppercase tracking-[0.22em] text-zinc-800">{label}</p>
       </div>
     </div>
   );
