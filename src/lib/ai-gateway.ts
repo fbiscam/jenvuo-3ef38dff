@@ -293,21 +293,20 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // SPEED OPTIMIZED — narration/intent/chat use fast models. Senior review keeps quality.
+  // ACCURACY FIRST — Bluesminds top model (gpt-5.4) primary everywhere.
+  // Fallback: deepseek-v4-pro (strong reasoning), then Lovable Gateway gpt-5.5.
   intent: [
-    "bmind/deepseek-v4-flash",
-    "bmind/gpt-5.2-chat",
     "bmind/gpt-5.4",
-  ],
-
-  // Narration = main scan path. gpt-5.2-chat is much faster than gpt-5.4 with strong quality.
-  narration: [
-    "bmind/gpt-5.2-chat",
-    "bmind/gpt-5.4",
+    "bmind/deepseek-ai/deepseek-v4-pro",
     "openai/gpt-5.5",
   ],
 
-  // Senior review only fires for A+ — keep the strongest model here.
+  narration: [
+    "bmind/gpt-5.4",
+    "bmind/deepseek-ai/deepseek-v4-pro",
+    "openai/gpt-5.5",
+  ],
+
   seniorReview: [
     "bmind/gpt-5.4",
     "bmind/deepseek-ai/deepseek-v4-pro",
@@ -315,8 +314,8 @@ export const MODEL_CHAIN = {
   ],
 
   chat: [
-    "bmind/gpt-5.2-chat",
     "bmind/gpt-5.4",
+    "bmind/deepseek-ai/deepseek-v4-pro",
     "openai/gpt-5.5",
   ],
 } as const;
