@@ -44,6 +44,7 @@ export function estimateCostUsd(model: string, promptTokens: number, completionT
 
 // Flat charge per real signal (BUY/SELL only). WAIT/no-trade scans are free.
 export const SIGNAL_SCAN_CHARGE_USD = 0.20;
+export const SIGNAL_SCAN_CHARGE_WITH_SENIOR_USD = 0.25;
 
 // Pretty label for the AI model used, shown in billing history.
 export function formatModelLabel(rawModel: string | null | undefined): string {
@@ -130,6 +131,8 @@ export async function chargeSignalScan(params: {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const pTok = Math.max(0, params.promptTokens ?? 0);
     const cTok = Math.max(0, params.completionTokens ?? 0);
+    const seniorRan = Boolean(params.seniorModel);
+    const amount = seniorRan ? SIGNAL_SCAN_CHARGE_WITH_SENIOR_USD : SIGNAL_SCAN_CHARGE_USD;
     const meta: Record<string, unknown> = {
       model: params.model ?? null,
       model_label: params.model ? formatModelLabel(params.model) : null,
@@ -141,12 +144,14 @@ export async function chargeSignalScan(params: {
       completion_tokens: cTok,
       grade: params.grade ?? null,
       score: params.score ?? null,
+      senior_review: seniorRan,
+      charge_usd: amount,
     };
     if (params.symbol) meta.symbol = params.symbol;
     if (params.scanId) meta.scanId = params.scanId;
     const { error } = await supabaseAdmin.rpc("spend_credits", {
       _user_id: params.userId,
-      _amount: SIGNAL_SCAN_CHARGE_USD as any,
+      _amount: amount as any,
       _reason: "ai_scan",
       _metadata: meta as any,
     });
