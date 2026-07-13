@@ -531,7 +531,7 @@ function Home() {
       )}>
         <div className="flex flex-col items-center justify-center gap-4 flex-1 min-h-0 w-full">
           <div className="flex-1 min-h-0 flex items-center justify-center w-full">
-            <div className="aspect-square w-[min(54vw,12rem)] sm:w-[14rem] lg:w-[17rem]">
+            <div className="aspect-square w-[min(32vw,7.2rem)] sm:w-[8.4rem] lg:w-[10.2rem]">
               <SharedCloudOrb status={status} pulse={speech.wordPulse} />
             </div>
           </div>
