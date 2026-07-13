@@ -293,31 +293,12 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // ACCURACY FIRST — Bluesminds top model (gpt-5.4) primary everywhere.
-  // Fallback: deepseek-v4-pro (strong reasoning), then Lovable Gateway gpt-5.5.
-  intent: [
-    "bmind/gpt-5.4",
-    "bmind/deepseek-ai/deepseek-v4-pro",
-    "openai/gpt-5.5",
-  ],
-
-  narration: [
-    "bmind/gpt-5.4",
-    "bmind/deepseek-ai/deepseek-v4-pro",
-    "openai/gpt-5.5",
-  ],
-
-  seniorReview: [
-    "bmind/gpt-5.4",
-    "bmind/deepseek-ai/deepseek-v4-pro",
-    "openai/gpt-5.5",
-  ],
-
-  chat: [
-    "bmind/gpt-5.4",
-    "bmind/deepseek-ai/deepseek-v4-pro",
-    "openai/gpt-5.5",
-  ],
+  // ACCURACY LOCKED — bmind/gpt-5.4 only. No fallback models.
+  // On timeout/failure, retriesPerModel re-requests the SAME model.
+  intent: ["bmind/gpt-5.4"],
+  narration: ["bmind/gpt-5.4"],
+  seniorReview: ["bmind/gpt-5.4"],
+  chat: ["bmind/gpt-5.4"],
 } as const;
 
 

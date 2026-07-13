@@ -1873,8 +1873,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         ],
         jsonMode: true,
         maxTokens: 1600,
-        timeoutMs: 14000,
-        retriesPerModel: 1,
+        timeoutMs: 22000,
+        retriesPerModel: 2,
         priority: true,
         stage: "signal-narration",
 
@@ -2129,9 +2129,9 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           ],
           jsonMode: true,
           maxTokens: 220,
-          timeoutMs: 7000,
+          timeoutMs: 12000,
           priority: true,
-          retriesPerModel: 1,
+          retriesPerModel: 2,
           stage: "senior-review",
 
         });
