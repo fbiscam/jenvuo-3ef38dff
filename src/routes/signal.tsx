@@ -1320,7 +1320,7 @@ function SignalPage() {
                         <span>◆</span> Trade Management — Final Recommendation
                       </div>
                       <div className="leading-relaxed">
-                        When profit reaches <b>30% of your invested amount</b>, close <b>70% of the position</b> and move SL to <b>entry (breakeven)</b>. Let the remaining <b>30% runner</b> ride toward TP2 / 50% profit — free upside with zero risk. If price returns, you exit at breakeven; if it runs, bonus profit locked. <b>Best of both worlds.</b>
+                        When profit reaches <b>30% of your invested amount</b>, close <b>70% of the position</b> and move SL to <b>entry (breakeven)</b>. Let the <b>30% runner</b> ride toward TP2 / 50% profit — if price returns you exit flat, if it runs you lock bonus profit. <b>Best of both worlds.</b>
                       </div>
                     </div>
                   )}
