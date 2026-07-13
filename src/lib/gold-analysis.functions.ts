@@ -2413,19 +2413,28 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
     };
 
     // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
-    // WAIT / no-trade returns are free.
+    // WAIT / no-trade returns are free. MUST be awaited — Cloudflare Workers
+    // cancel post-response async work, so fire-and-forget charges get dropped.
     const __scanId = (globalThis as any).crypto?.randomUUID?.() ?? `scan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-    import("@/lib/ai-cost-log.server").then((m) => m.chargeSignalScan({
-      userId: __userId,
-      direction: plan.trade.direction,
-      model: __usedNarrationModel ?? MODEL_CHAIN.narration[0] ?? null,
-      seniorModel: __usedSeniorModel,
-      symbol: canonicalSymbol,
-      scanId: __scanId,
-      promptTokens: __totalPromptTokens,
-      completionTokens: __totalCompletionTokens,
-    })).catch(() => {});
+    if (plan.trade.direction === "BUY" || plan.trade.direction === "SELL") {
+      try {
+        const { chargeSignalScan } = await import("@/lib/ai-cost-log.server");
+        await chargeSignalScan({
+          userId: __userId,
+          direction: plan.trade.direction,
+          model: __usedNarrationModel ?? MODEL_CHAIN.narration[0] ?? null,
+          seniorModel: __usedSeniorModel,
+          symbol: canonicalSymbol,
+          scanId: __scanId,
+          promptTokens: __totalPromptTokens,
+          completionTokens: __totalCompletionTokens,
+        });
+      } catch (e) {
+        console.warn("computeSignalPlan: chargeSignalScan failed:", (e as Error)?.message ?? e);
+      }
+    }
     return plan;
+
 }
 
 export const getSignalPlan = createServerFn({ method: "POST" })
