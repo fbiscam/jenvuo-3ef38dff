@@ -241,7 +241,7 @@ function Journal() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowLog(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 transition"
+            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 transition"
           >
             <Plus className="h-3.5 w-3.5" /> Log Trade
           </button>
