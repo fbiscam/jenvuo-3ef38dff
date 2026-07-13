@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// Cron endpoint. Generates a ~150-word killzone brief, synthesizes MP3 via
-// Lovable AI TTS, uploads to the private `briefs` bucket, inserts a row.
+// Cron endpoint. Generates a ~150-word killzone brief (text-only) via
+// Bluesminds and inserts a row. TTS audio is disabled — Lovable no longer used.
 // Auth: shared `x-cron-secret` header matching CRON_SECRET (same pattern as
 // generate-insight / notify-subscribers).
 
