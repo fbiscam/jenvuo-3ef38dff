@@ -17,6 +17,7 @@ import {
   Info,
   Inbox,
   Trash2,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
