@@ -1303,6 +1303,28 @@ function SignalPage() {
                     <PositionSizer plan={plan} />
                   )}
 
+                  {/* Trade Management Rules — profit protection */}
+                  {(isBuy || isSell) && (
+                    <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2.5 text-[11px] text-emerald-900 leading-relaxed space-y-1.5">
+                      <div className="flex items-center gap-1.5 font-semibold text-emerald-800 uppercase tracking-wider text-[10px]">
+                        <span>◆</span> Trade Management
+                      </div>
+                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">1.</span><span><b>TP1 hit (+1R)</b> → Close <b>50%</b> position &amp; move SL to entry (breakeven). Baaki profit ab risk-free.</span></div>
+                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">2.</span><span>Agar profit <b>invested amount ka 30%+</b> ho jaye (e.g. $10 invest → $3+ profit) → <b>trade close karna better hai</b>, secure the win.</span></div>
+                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">3.</span><span>Warna trade <b>on your own risk</b> — TP2 tak hold sirf tab jab HTF bias intact ho aur koi news event na ho.</span></div>
+                    </div>
+                  )}
+
+                  {/* Live profit-protect nudge */}
+                  {(isBuy || isSell) && rMultiple >= 0.6 && trackerStatus !== "WIN" && trackerStatus !== "LOSS" && (
+                    <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-[11px] text-amber-900 leading-snug">
+                      <span className="mt-0.5 shrink-0">💡</span>
+                      <span>
+                        Current profit ≈ <b>{rMultiple.toFixed(2)}R</b> — 30%-of-investment threshold ke qareeb. <b>50% close karo abhi</b> &amp; SL ko entry pe move karo. Locking profit is smarter than chasing TP2.
+                      </span>
+                    </div>
+                  )}
+
                   {/* Backtest history badge */}
                   {/* backtest badge removed — sparse sample was misleading */}
 
