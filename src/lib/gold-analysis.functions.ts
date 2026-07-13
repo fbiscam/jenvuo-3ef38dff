@@ -2453,6 +2453,43 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
         trendStrength: marketRegime.trendStrength,
         volatility: marketRegime.volatility,
       },
+      // ---- Additive AI intelligence layers (never blocks BUY/SELL) ----
+      htfLock: (() => {
+        const h = parsed.htfLock;
+        if (!h || typeof h !== "object") return undefined;
+        const bias = h.bias === "bullish" || h.bias === "bearish" ? h.bias : "neutral";
+        return {
+          bias: bias as "bullish" | "bearish" | "neutral",
+          reason: String(h.reason ?? "").slice(0, 300),
+          ltfAligned: h.ltfAligned === true,
+        };
+      })(),
+      selfCritique: (() => {
+        const s = parsed.selfCritique;
+        if (!s || typeof s !== "object") return undefined;
+        const arr = (v: any) => (Array.isArray(v) ? v.map(String).slice(0, 6) : []);
+        const n = Number(s.confidenceSelfScore);
+        return {
+          risks: arr(s.risks),
+          invalidationTriggers: arr(s.invalidationTriggers),
+          confidenceSelfScore: Number.isFinite(n) ? Math.max(0, Math.min(10, n)) : 0,
+        };
+      })(),
+      scenarios: (() => {
+        const s = parsed.scenarios;
+        if (!s || typeof s !== "object") return undefined;
+        const one = (o: any) => {
+          if (!o || typeof o !== "object") return { probability: 0, path: "", keyLevel: null };
+          const p = Number(o.probability);
+          const kl = Number(o.keyLevel);
+          return {
+            probability: Number.isFinite(p) ? Math.max(0, Math.min(100, Math.round(p))) : 0,
+            path: String(o.path ?? "").slice(0, 240),
+            keyLevel: Number.isFinite(kl) ? +kl.toFixed(dec) : null,
+          };
+        };
+        return { bearish: one(s.bearish), base: one(s.base), bullish: one(s.bullish) };
+      })(),
     };
 
     // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
