@@ -976,6 +976,24 @@ export type SignalPlan = {
     trendStrength: number;
     volatility: number;
   };
+  // ---- Accuracy upgrade: additive AI intelligence layers ----
+  // These are pure enrichment — they never block a BUY/SELL that the
+  // deterministic engine has already produced.
+  selfCritique?: {
+    risks: string[];          // what could kill this trade
+    invalidationTriggers: string[]; // concrete price/structure triggers
+    confidenceSelfScore: number;   // AI's own 0-10 confidence
+  };
+  scenarios?: {
+    bearish: { probability: number; path: string; keyLevel: number | null };
+    base:    { probability: number; path: string; keyLevel: number | null };
+    bullish: { probability: number; path: string; keyLevel: number | null };
+  };
+  htfLock?: {
+    bias: "bullish" | "bearish" | "neutral";
+    reason: string;         // 1-line HTF-first read the LTF setup must respect
+    ltfAligned: boolean;    // did LTF setup align with locked HTF bias?
+  };
 };
 
 
