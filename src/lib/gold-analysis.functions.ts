@@ -856,6 +856,8 @@ export const analyzeGold = createServerFn({ method: "POST" })
           direction: clean.direction,
           model: null,
           symbol: instSym,
+          grade: (clean as any).setupGrade ?? null,
+          score: (clean as any).setupScore ?? null,
         });
       } catch (e) {
         console.warn("analyzeGold: chargeSignalScan failed:", (e as Error)?.message ?? e);
