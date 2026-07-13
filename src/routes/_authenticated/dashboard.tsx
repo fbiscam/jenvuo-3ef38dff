@@ -900,7 +900,7 @@ function DashboardLayout() {
                   <span className="text-[10px] font-medium text-zinc-800">DeepSeek V4 Pro</span>
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5 hover:bg-zinc-50">
-                  <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><defs><linearGradient id="gemgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#4285F4"/><stop offset="0.5" stopColor="#9B72F2"/><stop offset="1" stopColor="#D96570"/></linearGradient></defs><path fill="url(#gemgrad)" d="M12 2c.4 4.6 3.4 7.6 8 8-4.6.4-7.6 3.4-8 8-.4-4.6-3.4-7.6-8-8 4.6-.4 7.6-3.4 8-8z"/></svg>
+                  <svg viewBox="2 2 20 20" width="14" height="14" aria-hidden="true"><defs><linearGradient id="gemgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#4285F4"/><stop offset="0.5" stopColor="#9B72F2"/><stop offset="1" stopColor="#D96570"/></linearGradient></defs><path fill="url(#gemgrad)" d="M12 2c.4 4.6 3.4 7.6 8 8-4.6.4-7.6 3.4-8 8-.4-4.6-3.4-7.6-8-8 4.6-.4 7.6-3.4 8-8z"/></svg>
                   <span className="text-[10px] font-medium text-zinc-800">Gemini 3.5 Pro</span>
                 </span>
               </Link>
