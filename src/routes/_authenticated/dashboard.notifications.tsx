@@ -332,7 +332,7 @@ function NotificationsPage() {
                   <span className="text-[10px] font-medium text-zinc-400">{rows.length}</span>
                   <div className="flex-1 h-px bg-gradient-to-r from-zinc-200 to-transparent ml-1" />
                 </div>
-                <div className="rounded-2xl border border-zinc-200/80 bg-white overflow-hidden divide-y divide-zinc-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+                <div className="rounded-2xl border border-zinc-200/70 bg-white overflow-hidden divide-y divide-zinc-100 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_8px_24px_-16px_rgba(0,0,0,0.08)]">
                   {rows.map((n) => {
                     const v = visualFor(n);
                     const isUnread = !n.read_at;
@@ -345,12 +345,16 @@ function NotificationsPage() {
                           if (isUnread) markOne(n.id);
                         }}
                         className={cn(
-                          "relative flex items-start gap-3 px-4 py-3.5 hover:bg-zinc-50 transition-colors group",
-                          isUnread && "bg-blue-50/40",
+                          "relative flex items-start gap-3 px-4 sm:px-5 py-4 transition-all duration-200 group",
+                          "hover:bg-gradient-to-r hover:from-zinc-50/80 hover:to-transparent",
+                          isUnread && "bg-gradient-to-r from-blue-50/60 via-blue-50/20 to-transparent",
                         )}
                       >
                         {isUnread && (
-                          <span aria-hidden className="absolute left-0 top-2.5 bottom-2.5 w-[3px] rounded-r-full bg-blue-500" />
+                          <span
+                            aria-hidden
+                            className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full bg-gradient-to-b from-blue-500 to-blue-600 shadow-[0_0_8px_rgba(59,130,246,0.4)]"
+                          />
                         )}
                         {selectionMode && (
                           <div
@@ -373,36 +377,49 @@ function NotificationsPage() {
                         )}
                         <div
                           className={cn(
-                            "shrink-0 h-9 w-9 rounded-full flex items-center justify-center ring-1 ring-inset ring-white/40 shadow-sm",
+                            "shrink-0 h-10 w-10 rounded-xl flex items-center justify-center ring-1 ring-inset ring-white/50 shadow-sm transition-transform group-hover:scale-[1.03]",
                             v.wrap,
                           )}
                         >
-                          <v.Icon className="h-4 w-4" />
+                          <v.Icon className="h-[18px] w-[18px]" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start gap-2">
                             <p
                               className={cn(
-                                "text-[13px] leading-tight truncate flex-1 min-w-0",
-                                isUnread ? "font-semibold text-zinc-900" : "font-medium text-zinc-800",
+                                "text-[13px] leading-tight truncate flex-1 min-w-0 tracking-[-0.01em]",
+                                isUnread ? "font-semibold text-zinc-900" : "font-medium text-zinc-700",
                               )}
                             >
                               {n.title}
                             </p>
-                            <div className="shrink-0 flex items-center gap-1.5 text-[10px] text-zinc-400 pt-0.5">
-                              <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-600">
+                            <div className="shrink-0 flex items-center gap-1.5 text-[10px] text-zinc-400 pt-[3px]">
+                              <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-zinc-100/80 px-2 py-0.5 text-[9px] font-medium text-zinc-600 ring-1 ring-inset ring-zinc-200/60">
                                 <Bell className="h-2.5 w-2.5" />
                                 {v.label}
                               </span>
-                              <span className="tabular-nums">{timeAgo(n.created_at)}</span>
+                              <span className="tabular-nums font-medium text-zinc-500">{timeAgo(n.created_at)}</span>
+                              {isUnread && (
+                                <span
+                                  aria-hidden
+                                  className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)] animate-pulse"
+                                />
+                              )}
                             </div>
                           </div>
                           {n.body && (
-                            <p className="mt-1 text-[12px] leading-[1.5] text-zinc-500 line-clamp-2 break-words">{n.body}</p>
+                            <p
+                              className={cn(
+                                "mt-1.5 text-[12px] leading-[1.55] line-clamp-2 break-words",
+                                isUnread ? "text-zinc-600" : "text-zinc-500",
+                              )}
+                            >
+                              {n.body}
+                            </p>
                           )}
                         </div>
 
-                        <div className="shrink-0 flex items-center gap-0.5 self-center">
+                        <div className="shrink-0 flex items-center gap-1 self-center">
                           {isUnread && (
                             <button
                               onClick={(e) => {
@@ -410,7 +427,7 @@ function NotificationsPage() {
                                 e.stopPropagation();
                                 markOne(n.id);
                               }}
-                              className="opacity-0 group-hover:opacity-100 h-7 w-7 rounded-md hover:bg-zinc-100 flex items-center justify-center text-zinc-500 transition"
+                              className="opacity-0 group-hover:opacity-100 h-7 w-7 rounded-lg hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center text-zinc-500 transition-all"
                               title="Mark as read"
                             >
                               <Check className="h-3.5 w-3.5" />
@@ -422,7 +439,7 @@ function NotificationsPage() {
                               e.stopPropagation();
                               deleteOne(n.id);
                             }}
-                            className="opacity-0 group-hover:opacity-100 h-7 w-7 rounded-md hover:bg-red-50 flex items-center justify-center text-zinc-500 hover:text-red-600 transition"
+                            className="opacity-0 group-hover:opacity-100 h-7 w-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-zinc-500 hover:text-red-600 transition-all"
                             title="Delete"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -432,6 +449,7 @@ function NotificationsPage() {
                     );
                   })}
                 </div>
+
               </section>
             );
           })}
