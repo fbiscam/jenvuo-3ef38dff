@@ -324,10 +324,15 @@ function NotificationsPage() {
             const label = bucket === "today" ? "Today" : bucket === "yesterday" ? "Yesterday" : "Earlier";
             return (
               <section key={bucket}>
-                <div className="text-[10px] uppercase tracking-wider font-semibold text-zinc-400 mb-2 px-1">
-                  {label}
+                <div className="flex items-center gap-2 mb-2 px-1">
+                  <div className="text-[10px] uppercase tracking-[0.12em] font-semibold text-zinc-500">
+                    {label}
+                  </div>
+                  <span className="text-[10px] font-medium text-zinc-400">·</span>
+                  <span className="text-[10px] font-medium text-zinc-400">{rows.length}</span>
+                  <div className="flex-1 h-px bg-gradient-to-r from-zinc-200 to-transparent ml-1" />
                 </div>
-                <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden divide-y divide-zinc-100">
+                <div className="rounded-2xl border border-zinc-200/80 bg-white overflow-hidden divide-y divide-zinc-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                   {rows.map((n) => {
                     const v = visualFor(n);
                     const isUnread = !n.read_at;
@@ -340,10 +345,13 @@ function NotificationsPage() {
                           if (isUnread) markOne(n.id);
                         }}
                         className={cn(
-                          "flex items-start gap-3 px-4 py-3 hover:bg-zinc-50/70 transition group",
-                          isUnread && "bg-blue-50/30",
+                          "relative flex items-start gap-3 px-4 py-3.5 hover:bg-zinc-50 transition-colors group",
+                          isUnread && "bg-blue-50/40",
                         )}
                       >
+                        {isUnread && (
+                          <span aria-hidden className="absolute left-0 top-2.5 bottom-2.5 w-[3px] rounded-r-full bg-blue-500" />
+                        )}
                         {selectionMode && (
                           <div
                             onClick={(e) => {
@@ -365,7 +373,7 @@ function NotificationsPage() {
                         )}
                         <div
                           className={cn(
-                            "shrink-0 h-9 w-9 rounded-full flex items-center justify-center",
+                            "shrink-0 h-9 w-9 rounded-full flex items-center justify-center ring-1 ring-inset ring-white/40 shadow-sm",
                             v.wrap,
                           )}
                         >
@@ -382,21 +390,18 @@ function NotificationsPage() {
                               {n.title}
                             </p>
                             <div className="shrink-0 flex items-center gap-1.5 text-[10px] text-zinc-400 pt-0.5">
-                              {isUnread && (
-                                <span className="h-1.5 w-1.5 rounded-full bg-blue-500" aria-hidden />
-                              )}
-                              <span className="inline-flex items-center gap-1">
+                              <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-600">
                                 <Bell className="h-2.5 w-2.5" />
-                                <span className="hidden sm:inline">{v.label}</span>
+                                {v.label}
                               </span>
-                              <span className="hidden sm:inline">·</span>
-                              <span>{timeAgo(n.created_at)}</span>
+                              <span className="tabular-nums">{timeAgo(n.created_at)}</span>
                             </div>
                           </div>
                           {n.body && (
-                            <p className="mt-0.5 text-[12px] text-zinc-500 line-clamp-2 break-words">{n.body}</p>
+                            <p className="mt-1 text-[12px] leading-[1.5] text-zinc-500 line-clamp-2 break-words">{n.body}</p>
                           )}
                         </div>
+
                         <div className="shrink-0 flex items-center gap-0.5 self-center">
                           {isUnread && (
                             <button
