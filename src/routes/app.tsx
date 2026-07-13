@@ -15,6 +15,7 @@ import { getGoldNews } from "@/lib/news.functions";
 import { useCredits } from "@/hooks/useCredits";
 import { appendVoiceTurn } from "@/lib/voice-history";
 import PageLoading from "@/components/PageLoading";
+import { CloudOrb as SharedCloudOrb } from "@/components/CloudOrb";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
 
