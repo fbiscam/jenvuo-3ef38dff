@@ -45,9 +45,9 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
         if (provided !== cronSecret) {
           return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
         }
-        const lovableKey = process.env.LOVABLE_API_KEY;
-        if (!lovableKey) {
-          return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), { status: 500 });
+        const bmindKey = process.env.BLUESMINDS_API_KEY;
+        if (!bmindKey) {
+          return new Response(JSON.stringify({ error: "BLUESMINDS_API_KEY missing" }), { status: 500 });
         }
 
 
@@ -94,19 +94,18 @@ Return STRICT JSON only, no prose, with this exact shape:
   "content": "<full markdown article 900-1300 words with ## H2 sections, lists, and a final ## FAQ section. Use internal links to /signal, /app, /insights, /download where natural>"
 }`;
 
-        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        const aiRes = await fetch("https://api.bluesminds.com/v1/chat/completions", {
           method: "POST",
           headers: {
-            "Lovable-API-Key": lovableKey,
+            Authorization: `Bearer ${bmindKey}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: "gpt-5.5",
             messages: [
               { role: "system", content: sys },
               { role: "user", content: userPrompt },
             ],
-            response_format: { type: "json_object" },
           }),
         });
 
