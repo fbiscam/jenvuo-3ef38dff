@@ -1546,10 +1546,10 @@ function SignalPage() {
               {/* Confluences */}
               {plan && plan.confluences.length > 0 && (
                 <div className="space-y-2">
-                  <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Confluences</span>
-                  <ul className="space-y-1">
+                  <span className={`text-[11px] ${MONO} tracking-widest uppercase text-zinc-500`}>Confluences</span>
+                  <ul className="space-y-1.5">
                     {plan.confluences.map((c, i) => (
-                      <li key={i} className="text-[11px] text-zinc-800 leading-snug flex gap-1.5" title={c}>
+                      <li key={i} className="text-[13px] text-zinc-800 leading-relaxed flex gap-1.5" title={c}>
                         <span className="text-zinc-400 shrink-0">+</span>
                         <span className="line-clamp-2">{c}</span>
                       </li>
