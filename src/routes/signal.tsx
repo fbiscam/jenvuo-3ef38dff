@@ -1715,7 +1715,7 @@ function SignalPage() {
           {/* Header */}
           <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-zinc-100">
             <span className="text-[11px] font-medium text-zinc-500">Killzone Advisory</span>
-            <span className="text-[10px] text-zinc-400">Live</span>
+            
           </div>
 
           <div className="px-5 pt-4 pb-4">
