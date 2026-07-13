@@ -2433,17 +2433,17 @@ function TradeManagementLadder({
 
   const steps = [
     {
-      label: "Step 1 · +1R hit",
+      label: "Step 1 · 30% profit hit",
       price: p1R,
-      action: "Close 50% · Move SL to Entry",
-      why: "Half profit booked. Trade is now risk-free.",
+      action: "Close 70% · Move SL to Entry",
+      why: "Bulk profit booked. Trade is now risk-free (breakeven).",
       hit: rMultiple >= 1,
     },
     {
-      label: "Step 2 · TP hit",
+      label: "Step 2 · Runner to TP2 / 50%",
       price: t.tp,
-      action: "Close remaining 50%",
-      why: "Full target reached. Trade complete.",
+      action: "Let 30% runner ride",
+      why: "Free upside with zero risk — if price returns, exit flat; if it runs, bonus locked.",
       hit: rMultiple >= 3 || status === "WIN",
     },
   ];
@@ -2455,7 +2455,7 @@ function TradeManagementLadder({
     <div className="rounded-md border border-zinc-100 bg-zinc-50/60 p-2 space-y-1.5">
       <div className={`flex items-center justify-between text-[10px] ${MONO} uppercase tracking-widest text-zinc-500`}>
         <span>Trade Management</span>
-        <span className="text-[9px] text-zinc-400">Partial + Trailing SL</span>
+        <span className="text-[9px] text-zinc-400">70/30 + Breakeven Runner</span>
       </div>
       <ol className="space-y-1">
         {steps.map((s, i) => (
@@ -2495,7 +2495,7 @@ function TradeManagementLadder({
       </ol>
       {status === "RUNNING" && rMultiple >= 1 && rMultiple < 3 && (
         <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
-          ⚡ <b>Action now:</b> Close 50%, move SL to entry ({t.entry.toFixed(dec)}).
+          ⚡ <b>Action now:</b> Close 70%, move SL to entry ({t.entry.toFixed(dec)}) and let the 30% runner ride.
         </div>
       )}
 
