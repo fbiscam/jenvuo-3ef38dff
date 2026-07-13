@@ -316,7 +316,7 @@ function Home() {
     const q = normalizeQuery(query);
 
     // "open chart / show chart / live chart" → still route to the full desk
-    if (/\b(live\s*chart|show\s*chart|chart\s*open|open\s*chart|view\s*chart|signal\s*desk)\b/i.test(q)) {
+    if (OPEN_CHART_RX.test(q)) {
       const symbol = detectSymbol(query);
       speech.stopSpeaking();
       speech.pauseListening();
@@ -327,7 +327,7 @@ function Home() {
     // Analyze / signal / setup / trade-idea intent → run the SAME full
     // killzone-quality plan the /signal desk runs (getSignalPlan), inline
     // on /app. Narrate the summary and show the SignalCard.
-    const analyzeIntent = /\b(signal|setup|trade\s*idea|trade\s*plan|analyze|analysis|scan|new\s*signal)\b/i.test(q);
+    const analyzeIntent = ANALYZE_INTENT_RX.test(q);
 
     loadingRef.current = true;
     setLoading(true);
