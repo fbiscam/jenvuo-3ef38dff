@@ -268,7 +268,7 @@ function NotificationsPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0 justify-end sm:justify-start">
+        <div className="flex items-center gap-1.5 shrink-0 justify-end sm:justify-start ml-3 pl-2 border-l border-zinc-200">
           {filtered.length > 0 && (
             <button
               onClick={selectionMode ? clearSelection : toggleSelectAll}
