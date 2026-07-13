@@ -47,11 +47,11 @@ export const listNotifications = createServerFn({ method: 'GET' })
 
         const score = Number(alert.setup_score ?? alert.confidence)
         const derivedGrade = Number.isFinite(score)
-          ? score >= 85
+          ? score >= 90
             ? 'A+'
-            : score >= 70
+            : score >= 80
               ? 'A'
-              : score >= 55
+              : score >= 65
                 ? 'B'
                 : 'C'
           : alert.grade
