@@ -499,7 +499,14 @@ function NotificationsPage() {
 
                                   {/* Rationale */}
                                   {rationale && (
-                                    <p className="text-[12px] leading-[1.5] text-zinc-500 line-clamp-2 break-words">
+                                    <p
+                                      className="text-[12px] leading-[1.5] text-zinc-500 break-words overflow-hidden"
+                                      style={{
+                                        display: "-webkit-box",
+                                        WebkitBoxOrient: "vertical",
+                                        WebkitLineClamp: 2,
+                                      }}
+                                    >
                                       {rationale}
                                     </p>
                                   )}
