@@ -93,11 +93,12 @@ function useLiveTicker(): TickerRow[] {
 
     const fetchOne = async (yahooSym: string): Promise<number | null> => {
       try {
-        const url = `/api/public/yahoo-price?symbol=${encodeURIComponent(yahooSym)}`;
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSym)}?interval=5m&range=1d`;
         const r = await fetch(url);
         if (!r.ok) return null;
         const j: any = await r.json();
-        const p = Number(j?.price);
+        const meta = j?.chart?.result?.[0]?.meta;
+        const p = Number(meta?.regularMarketPrice);
         return Number.isFinite(p) ? p : null;
       } catch {
         return null;
