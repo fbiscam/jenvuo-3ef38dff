@@ -582,13 +582,30 @@ function DashboardLayout() {
       setNewCounts({ saved: s.count ?? 0, alerts7d: a.count ?? 0, journalTotal: j.count ?? 0 });
     };
     load();
-    // Realtime: new signal alerts should light up the sidebar badge instantly
+    // Realtime: new signal alerts, saved signals, and trade journal entries
+    // should light up the sidebar badges instantly (no refresh needed).
     const ch = supabase
-      .channel(`alerts-nav:${authUser.id}`)
+      .channel(`sidebar-nav:${authUser.id}:${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "signal_alerts" }, () => {
-        if (pathname.startsWith("/dashboard/alerts")) return; // on that page, keep it cleared
+        if (pathname.startsWith("/dashboard/alerts")) return;
         load();
       })
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "saved_signals", filter: `user_id=eq.${authUser.id}` },
+        () => {
+          if (pathname === "/dashboard" || pathname.startsWith("/dashboard/workspace")) return;
+          load();
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "trade_journal", filter: `user_id=eq.${authUser.id}` },
+        () => {
+          if (pathname.startsWith("/dashboard/journal")) return;
+          load();
+        },
+      )
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [authUser?.id, authLoading, getLastSeen, pathname]);
