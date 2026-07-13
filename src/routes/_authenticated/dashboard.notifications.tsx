@@ -243,7 +243,7 @@ function NotificationsPage() {
     { key: "credits", label: "Credits" },
     { key: "email", label: "Messages" },
     { key: "security", label: "Security" },
-    { key: "welcome", label: "Welcome" },
+    
   ];
 
   return (
