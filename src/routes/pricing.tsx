@@ -260,6 +260,7 @@ function PricingPage() {
                 <ul className="mt-4 space-y-1.5 text-sm text-zinc-700">
                   {t.features.slice(0, 5).map((f) => {
                     const isModels = f.startsWith("Powered by");
+                    const hasDeepSeek = f.includes("DeepSeek");
                     return (
                       <li key={f} className="flex gap-2">
                         <span className="text-zinc-400">·</span>
