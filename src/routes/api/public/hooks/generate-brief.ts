@@ -109,7 +109,7 @@ Return STRICT JSON only, no prose, with this exact shape:
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "gpt-5.5",
+            model: "gpt-5.4",
             messages: [
               { role: "system", content: sys },
               { role: "user", content: userPrompt },
