@@ -399,23 +399,53 @@ function NotificationsPage() {
                               const rationale = n.body?.includes(" — ") ? n.body.split(" — ").slice(1).join(" — ") : "";
                               return (
                                 <>
-                                  <div className="flex items-center gap-2 mb-1.5 min-w-0">
-                                    <span className="text-[15px] sm:text-[16px] font-bold text-zinc-900 tracking-tight truncate">
+                                  {/* Header row: pair + direction + timestamp */}
+                                  <div className="flex items-center gap-2 mb-2 min-w-0">
+                                    <span className="text-[15px] font-bold text-zinc-900 tracking-tight truncate">
                                       {pair || n.title}
                                     </span>
                                     {direction && (
                                       <span
                                         className={cn(
-                                          "shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight",
+                                          "shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide ring-1 ring-inset",
                                           isBuy
-                                            ? "bg-emerald-100 text-emerald-700"
-                                            : "bg-red-100 text-red-700",
+                                            ? "bg-emerald-50 text-emerald-700 ring-emerald-200/70"
+                                            : "bg-rose-50 text-rose-700 ring-rose-200/70",
                                         )}
                                       >
+                                        {isBuy ? (
+                                          <TrendingUp className="h-2.5 w-2.5" />
+                                        ) : (
+                                          <TrendingDown className="h-2.5 w-2.5" />
+                                        )}
                                         {direction}
                                       </span>
                                     )}
-                                    <div className="ml-auto shrink-0 flex items-center gap-1.5 text-[10px] text-zinc-400 pt-0.5">
+                                    {grade && (
+                                      <span
+                                        className={cn(
+                                          "shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold ring-1 ring-inset",
+                                          grade.startsWith("A+")
+                                            ? "bg-amber-50 text-amber-700 ring-amber-200/70"
+                                            : grade.startsWith("A")
+                                              ? "bg-yellow-50 text-yellow-700 ring-yellow-200/70"
+                                              : grade.startsWith("B")
+                                                ? "bg-blue-50 text-blue-700 ring-blue-200/70"
+                                                : "bg-zinc-50 text-zinc-600 ring-zinc-200/70",
+                                        )}
+                                      >
+                                        <Star
+                                          className={cn(
+                                            "h-2.5 w-2.5",
+                                            grade.startsWith("A+") || grade.startsWith("A")
+                                              ? "fill-current"
+                                              : "",
+                                          )}
+                                        />
+                                        {grade}
+                                      </span>
+                                    )}
+                                    <div className="ml-auto shrink-0 flex items-center gap-1.5 text-[10px] pt-0.5">
                                       <span className="tabular-nums font-medium text-zinc-500">
                                         {timeAgo(n.created_at)}
                                       </span>
@@ -427,53 +457,43 @@ function NotificationsPage() {
                                       )}
                                     </div>
                                   </div>
+
+                                  {/* Stats row: Entry / SL / TP / R:R with dividers */}
                                   {(entry || sl || tp || rr) && (
-                                    <div className="flex items-center gap-3 sm:gap-4 mb-2 flex-wrap">
+                                    <div className="flex items-stretch gap-0 mb-2 rounded-lg border border-zinc-200/80 bg-zinc-50/60 divide-x divide-zinc-200/80 overflow-hidden">
                                       {entry && (
-                                        <div className="flex flex-col">
-                                          <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-tight">Entry</span>
-                                          <span className="text-[13px] font-semibold text-zinc-800 font-mono tabular-nums">{entry}</span>
+                                        <div className="flex-1 flex flex-col px-3 py-1.5 min-w-0">
+                                          <span className="text-[9px] text-zinc-500 uppercase font-semibold tracking-wider">Entry</span>
+                                          <span className="text-[13px] font-semibold text-zinc-900 font-mono tabular-nums truncate">{entry}</span>
                                         </div>
                                       )}
                                       {sl && (
-                                        <div className="flex flex-col">
-                                          <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-tight">SL</span>
-                                          <span className="text-[13px] font-semibold text-red-600 font-mono tabular-nums">{sl}</span>
+                                        <div className="flex-1 flex flex-col px-3 py-1.5 min-w-0">
+                                          <span className="text-[9px] text-zinc-500 uppercase font-semibold tracking-wider">SL</span>
+                                          <span className="text-[13px] font-semibold text-rose-600 font-mono tabular-nums truncate">{sl}</span>
                                         </div>
                                       )}
                                       {tp && (
-                                        <div className="flex flex-col">
-                                          <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-tight">TP</span>
-                                          <span className="text-[13px] font-semibold text-emerald-600 font-mono tabular-nums">{tp}</span>
+                                        <div className="flex-1 flex flex-col px-3 py-1.5 min-w-0">
+                                          <span className="text-[9px] text-zinc-500 uppercase font-semibold tracking-wider">TP</span>
+                                          <span className="text-[13px] font-semibold text-emerald-600 font-mono tabular-nums truncate">{tp}</span>
                                         </div>
                                       )}
                                       {rr && (
-                                        <div className="ml-auto flex flex-col items-end">
-                                          <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-tight">R:R</span>
-                                          <span className="text-[13px] font-bold text-zinc-900 tabular-nums">1:{rr}</span>
+                                        <div className="flex-1 flex flex-col px-3 py-1.5 min-w-0">
+                                          <span className="text-[9px] text-zinc-500 uppercase font-semibold tracking-wider">R:R</span>
+                                          <span className="text-[13px] font-bold text-zinc-900 font-mono tabular-nums truncate">1:{rr}</span>
                                         </div>
                                       )}
                                     </div>
                                   )}
-                                  <div className="flex items-center gap-2 min-w-0">
-                                    {grade && (
-                                      <span className="shrink-0 inline-flex items-center gap-1 text-[11px] font-medium text-zinc-600">
-                                        <Star
-                                          className={cn(
-                                            "h-3 w-3",
-                                            grade.startsWith("A") ? "text-amber-500 fill-amber-400" : "text-zinc-400",
-                                          )}
-                                        />
-                                        Grade {grade}
-                                      </span>
-                                    )}
-                                    {rationale && (
-                                      <>
-                                        {grade && <span className="text-zinc-300">·</span>}
-                                        <span className="text-[11px] text-zinc-500 truncate">{rationale}</span>
-                                      </>
-                                    )}
-                                  </div>
+
+                                  {/* Rationale */}
+                                  {rationale && (
+                                    <p className="text-[12px] leading-[1.5] text-zinc-500 line-clamp-2 break-words">
+                                      {rationale}
+                                    </p>
+                                  )}
                                 </>
                               );
                             })()
