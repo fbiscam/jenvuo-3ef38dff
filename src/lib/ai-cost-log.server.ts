@@ -142,7 +142,7 @@ export async function chargeSignalScan(params: {
     const pTok = Math.max(0, params.promptTokens ?? 0);
     const cTok = Math.max(0, params.completionTokens ?? 0);
     const seniorRequired = params.seniorReviewRequired === true;
-    const seniorModel = params.seniorModel ?? (seniorRequired ? "dsofficial/deepseek-reasoner" : null);
+    const seniorModel = params.seniorModel ?? (seniorRequired ? "nvapi/deepseek-ai/deepseek-v4-pro" : null);
     const seniorRan = Boolean(seniorModel) || seniorRequired;
     const amount = seniorRan ? SIGNAL_SCAN_CHARGE_WITH_SENIOR_USD : SIGNAL_SCAN_CHARGE_USD;
     const meta: Record<string, unknown> = {
