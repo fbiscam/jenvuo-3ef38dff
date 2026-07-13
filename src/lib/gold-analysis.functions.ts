@@ -2129,10 +2129,11 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           ],
           jsonMode: true,
           maxTokens: 220,
-          timeoutMs: 12000,
+          timeoutMs: 7000,
           priority: true,
-          retriesPerModel: 2,
+          retriesPerModel: 1,
           stage: "senior-review",
+
         });
         __usedSeniorModel = __aiModel3 ?? null;
         __totalPromptTokens += __aiUsage3?.promptTokens ?? 0;
