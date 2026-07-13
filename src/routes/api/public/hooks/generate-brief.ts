@@ -102,20 +102,28 @@ Return STRICT JSON only, no prose, with this exact shape:
   "script": "<the exact words to be read aloud. 150-180 words. Structured spoken paragraphs. No stage directions. No lists. No markdown. It must read like a professional trader speaking. Open with the session name naturally; do NOT start with 'Welcome' or 'In this brief'.>"
 }`;
 
-        const aiRes = await fetch("https://api.bluesminds.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${bmindKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "gpt-5.5",
+        // Route via Lovable AI Gateway (primary GPT-5.5, Bluesminds fallback).
+        const { callChatCompletion, MODEL_CHAIN } = await import("@/lib/ai-gateway");
+        let aiContent = "";
+        try {
+          const { content } = await callChatCompletion({
+            models: [...MODEL_CHAIN.narration],
             messages: [
               { role: "system", content: sys },
               { role: "user", content: userPrompt },
             ],
-          }),
-        });
+            jsonMode: true,
+            maxTokens: 900,
+            stage: "killzone-brief",
+          });
+          aiContent = content;
+        } catch (err: any) {
+          return new Response(
+            JSON.stringify({ error: "ai-failed", body: String(err?.message ?? err).slice(0, 400) }),
+            { status: 502 },
+          );
+        }
+        const aiRes = { ok: true, json: async () => ({ choices: [{ message: { content: aiContent } }] }) } as any;
 
 
         if (!aiRes.ok) {
