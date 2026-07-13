@@ -249,8 +249,9 @@ function NotificationsPage() {
   return (
     <div className="max-w-3xl">
       {/* Filters + Mark all read */}
-      <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-1.5 min-w-0 overflow-x-auto no-scrollbar -mx-1 px-1 sm:flex-wrap sm:overflow-visible sm:mx-0 sm:px-0">
+      <div className="flex flex-row items-center gap-2 mb-4">
+        <div className="flex gap-1.5 min-w-0 flex-1 overflow-x-auto no-scrollbar -mx-1 px-1 sm:flex-wrap sm:overflow-visible sm:mx-0 sm:px-0">
+
           {filters.map((f) => (
             <button
               key={f.key}
