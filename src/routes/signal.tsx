@@ -879,7 +879,6 @@ function SignalPage() {
                 {loading ? (
                   <span className="tabular-nums">
                     Analyzing… {analyzeElapsed}s
-                    {analyzeElapsed < ANALYZE_ETA_SEC && <span className="opacity-70"> / ~{ANALYZE_ETA_SEC}s</span>}
                   </span>
                 ) : "Re-analyze"}
               </button>
