@@ -201,6 +201,7 @@ function Home() {
 
 
   const analyze = useServerFn(analyzeGold);
+  const fetchSignalPlan = useServerFn(getSignalPlan);
   const credits = useCredits();
 
   const fetchNews = useServerFn(getGoldNews);
