@@ -2081,14 +2081,14 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only for true A+ institutional setups.`;
 
         const { content: rc, model: __aiModel3, usage: __aiUsage3 } = await callChatCompletion({
-          models: [MODEL_CHAIN.seniorReview[0]],
+          models: [...MODEL_CHAIN.seniorReview],
           messages: [
             { role: "system", content: reviewSystem },
             { role: "user", content: reviewUser },
           ],
           jsonMode: true,
           maxTokens: 180,
-          timeoutMs: 4500,
+          timeoutMs: 9000,
           priority: true,
           retriesPerModel: 1,
           stage: "senior-review",
