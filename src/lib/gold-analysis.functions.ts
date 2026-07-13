@@ -1792,23 +1792,9 @@ Return ONLY valid JSON (no markdown) with this exact shape:
     "confidence": 0-95,
     "summary":"Final spoken summary in English — direction, entry, SL, TP, R:R, confidence and the one-line reason.",
     "invalidation":"One sentence explaining exactly what price action invalidates this setup."
-  },
-  "htfLock": {
-    "bias":"bullish"|"bearish"|"neutral",
-    "reason":"1 sentence — locked HTF read the LTF setup must respect (structure + premium/discount + key zone).",
-    "ltfAligned": true|false
-  },
-  "selfCritique": {
-    "risks":["2-4 short concrete risks that could kill this trade"],
-    "invalidationTriggers":["2-3 exact price/structure events that flip the thesis"],
-    "confidenceSelfScore": 0-10
-  },
-  "scenarios": {
-    "bearish":{"probability":0-100,"path":"1 sentence — how price plays out if bears take control","keyLevel":<price|null>},
-    "base":   {"probability":0-100,"path":"1 sentence — most likely path per your bias","keyLevel":<price|null>},
-    "bullish":{"probability":0-100,"path":"1 sentence — how price plays out if bulls dominate","keyLevel":<price|null>}
   }
 }
+
 
 STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - Timestamps: fromTime/toTime MUST be unix-SECONDS copied EXACTLY from the provided candles. Never invent, round, or extrapolate. If unsure, use the timestamp of the closest real candle.
@@ -1821,11 +1807,10 @@ STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - Quality gate: only issue BUY/SELL if HTF and LTF are aligned AND a fresh unmitigated OB or FVG is present in the direction of the trade AND liquidity is sitting on the other side of entry. Otherwise direction="WAIT", confidence ≤ 55, and summary MUST list the specific missing confluence (e.g. "HTF bullish but no unmitigated LTF demand").
 - Language: professional English only — no Hindi/Urdu/Roman Urdu, no emojis, no hedging fluff ("maybe", "possibly", "could be"). Speak like a 25-year desk head.
 
-CHAINED ANALYSIS PROTOCOL — think in this exact order, no shortcuts:
-1) HTF FIRST: lock the HTF bias from 1H structure + premium/discount + macro. Populate htfLock BEFORE deciding LTF entry. The LTF setup MUST respect this locked bias — if LTF disagrees with HTF, either WAIT or reduce confidence and flag it in selfCritique.risks.
-2) LTF REFINEMENT: only after HTF is locked, hunt for the LTF trigger (FVG / OB / breaker / IFVG) that aligns with the locked HTF direction. Set htfLock.ltfAligned accordingly.
-3) SELF-CRITIQUE (mandatory): after you draft the trade, argue AGAINST it. Populate selfCritique.risks with the 2-4 strongest counter-points (what a bearish/bullish opponent would say). List concrete invalidationTriggers (e.g. "15M close back above 3450", "sweep of 3402 without CHoCH"). Give confidenceSelfScore (0-10) as your honest read AFTER the critique — this is a sanity check on the numeric confidence.
-4) 3-SCENARIO FORECAST: assign probabilities to bearish/base/bullish paths — probabilities MUST sum to ~100. Base = your primary thesis path; the other two are the "what if we're wrong" branches. Each keyLevel is the price that confirms/invalidates that scenario.
+ANALYSIS PROTOCOL — think in this exact order, no shortcuts:
+1) HTF FIRST: read 1H structure + premium/discount + macro. Lock the HTF bias in your head — the LTF setup MUST respect it. If LTF disagrees with HTF, WAIT.
+2) LTF REFINEMENT: only after HTF is set, hunt for the LTF trigger (FVG / OB / breaker / IFVG) that aligns with the HTF direction.
+
 
 VETERAN WISDOM LAYER — read this like a 25-year prop desk head, not a textbook student:
 - Context first: BEFORE the setup, judge the tape. Current market regime is "${marketRegime.regime}" (trend strength ${marketRegime.trendStrength}%, ATR ${marketRegime.volatility}% of price). ${marketRegime.favorable ? "This regime is FAVORABLE — ICT setups typically work." : `This regime is NOT ideal for textbook ICT — ${marketRegime.warning}`}
@@ -1872,7 +1857,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
           { role: "user", content: user },
         ],
         jsonMode: true,
-        maxTokens: 1600,
+        maxTokens: 1200,
         timeoutMs: 22000,
         retriesPerModel: 2,
         priority: true,
