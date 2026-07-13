@@ -811,12 +811,13 @@ function DashboardLayout() {
         type="button"
         aria-label="Open menu"
         onClick={() => setMobileNavOpen(true)}
-        className="fixed top-6 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
+        className="fixed top-3 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
       >
         <Menu className="h-4 w-4" />
       </button>
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-7 sm:px-8">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
+
 
         {pathname === "/dashboard" ? (
         <>
