@@ -2101,7 +2101,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // A / A+ setup — it can veto, downgrade, or confirm. Widened from A+
     // only so borderline A trades also get a sanity check before firing.
     // Failure here should NEVER block the plan — Stage-1 result stands.
-    if ((setupGrade === "A+" || setupGrade === "A") && built.direction !== "WAIT") {
+    if (setupGrade === "A+" && built.direction !== "WAIT") {
       try {
         const reviewSystem = `You are a 25-year institutional trader reviewing a junior's ICT/SMC setup. Be brutally honest — most setups are NOT A+. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case against this trade>","chasing_price":true|false}`;
         const reviewUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
