@@ -809,27 +809,36 @@ export type Database = {
       }
       profiles: {
         Row: {
+          alerts_last_seen_at: string | null
           created_at: string
           full_name: string | null
           id: string
+          journal_last_seen_at: string | null
           killzone_notice_dismissed: boolean
           plan: string
+          saved_last_seen_at: string | null
           updated_at: string
         }
         Insert: {
+          alerts_last_seen_at?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          journal_last_seen_at?: string | null
           killzone_notice_dismissed?: boolean
           plan?: string
+          saved_last_seen_at?: string | null
           updated_at?: string
         }
         Update: {
+          alerts_last_seen_at?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          journal_last_seen_at?: string | null
           killzone_notice_dismissed?: boolean
           plan?: string
+          saved_last_seen_at?: string | null
           updated_at?: string
         }
         Relationships: []
