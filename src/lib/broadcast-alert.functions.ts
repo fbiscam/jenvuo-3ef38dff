@@ -144,7 +144,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
 
       const templateData = {
         pair,
-        grade: grade as 'A+' | 'A',
+        grade,
         direction: data.direction,
         entry: round(data.entry).toFixed(data.decimals),
         sl: round(data.sl).toFixed(data.decimals),
