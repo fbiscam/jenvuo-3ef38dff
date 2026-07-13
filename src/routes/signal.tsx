@@ -1321,7 +1321,8 @@ function SignalPage() {
                       </div>
                       <div className="flex gap-2"><span className="text-emerald-600 font-bold">1.</span><span><b>TP1 hit (+1R)</b> → Close <b>50%</b> of position &amp; move SL to entry (breakeven). Remaining profit is now risk-free.</span></div>
                       <div className="flex gap-2"><span className="text-emerald-600 font-bold">2.</span><span>If profit reaches <b>30%+ of your invested amount</b> (e.g. $10 invested → $3+ profit) → <b>closing the trade is recommended</b> to secure the win.</span></div>
-                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">3.</span><span>Otherwise, hold at your <b>own risk</b> — only run to TP2 if HTF bias remains intact and no news event is imminent.</span></div>
+                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">3.</span><span>If profit reaches <b>50% (half) of your invested amount</b> (e.g. $10 invested → $5 profit) → <b>exit the full trade immediately</b>. Do not be greedy — book the win.</span></div>
+                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">4.</span><span>Otherwise, hold at your <b>own risk</b> — only run to TP2 if HTF bias remains intact and no news event is imminent.</span></div>
                     </div>
                   )}
 
