@@ -2,6 +2,24 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 type SR = any;
 
+export function stopAllBrowserSpeech() {
+  if (typeof window === "undefined") return;
+  try {
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    synth.pause();
+    synth.cancel();
+    synth.resume();
+    synth.cancel();
+    window.setTimeout(() => {
+      try { window.speechSynthesis?.cancel(); } catch { /* ignore */ }
+    }, 50);
+    window.setTimeout(() => {
+      try { window.speechSynthesis?.cancel(); } catch { /* ignore */ }
+    }, 250);
+  } catch { /* ignore */ }
+}
+
 export type VoicePresetKey = "aria" | "orion" | "nova" | "atlas";
 
 export const VOICE_PRESETS: {
@@ -36,6 +54,9 @@ export function useSpeech() {
   const startingRef = useRef(false);
   const pausedRef = useRef(false);
   const restartTimerRef = useRef<number | null>(null);
+  const mountedRef = useRef(false);
+  const pendingPlayTimerRef = useRef<number | null>(null);
+  const keepAliveTimerRef = useRef<number | null>(null);
 
   const safeStart = useCallback((deferred = false) => {
     if (startingRef.current) return;
@@ -68,11 +89,44 @@ export function useSpeech() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    mountedRef.current = true;
+    const stopLocalSpeech = () => {
+      wantListeningRef.current = false;
+      pausedRef.current = false;
+      if (restartTimerRef.current) {
+        window.clearTimeout(restartTimerRef.current);
+        restartTimerRef.current = null;
+      }
+      if (pendingPlayTimerRef.current) {
+        window.clearTimeout(pendingPlayTimerRef.current);
+        pendingPlayTimerRef.current = null;
+      }
+      if (keepAliveTimerRef.current) {
+        window.clearInterval(keepAliveTimerRef.current);
+        keepAliveTimerRef.current = null;
+      }
+      currentIdRef.current++;
+      queueRef.current = [];
+      currentJobRef.current = null;
+      currentCharRef.current = 0;
+      setSpeaking(false);
+      setListening(false);
+      try { recognitionRef.current?.stop(); } catch { /* ignore */ }
+      stopAllBrowserSpeech();
+    };
+
+    window.addEventListener("jenvu:speech:stop-all", stopLocalSpeech);
+
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setSupported(false);
-      return;
+      return () => {
+        mountedRef.current = false;
+        window.removeEventListener("jenvu:speech:stop-all", stopLocalSpeech);
+        stopLocalSpeech();
+      };
     }
     const rec = new SpeechRecognition();
     rec.continuous = true;
@@ -143,17 +197,9 @@ export function useSpeech() {
     (window as any).__jenvuPickVoice = pickVoice;
 
     return () => {
-      wantListeningRef.current = false;
-      if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
-      try { rec.stop(); } catch { /* ignore */ }
-      // Stop any in-flight TTS so voice doesn't bleed into the next page
-      try {
-        currentIdRef.current++;
-        queueRef.current = [];
-        currentJobRef.current = null;
-        currentCharRef.current = 0;
-        window.speechSynthesis?.cancel();
-      } catch { /* ignore */ }
+      mountedRef.current = false;
+      window.removeEventListener("jenvu:speech:stop-all", stopLocalSpeech);
+      stopLocalSpeech();
     };
   }, [safeStart]);
 
@@ -197,6 +243,7 @@ export function useSpeech() {
   const currentIdRef = useRef<number>(0);
 
   const _playNext = useCallback(() => {
+    if (!mountedRef.current) return;
     const next = queueRef.current.shift();
     if (!next) {
       currentJobRef.current = null;
@@ -227,15 +274,19 @@ export function useSpeech() {
       if (!ev || ev.name === undefined || ev.name === "word") setWordPulse((n) => n + 1);
     };
     // Chrome bug: speechSynthesis silently stops after ~15s. Pulse pause/resume to keep alive.
+    if (keepAliveTimerRef.current) window.clearInterval(keepAliveTimerRef.current);
     const keepAlive = window.setInterval(() => {
       try {
+        if (!mountedRef.current) return;
         if (!window.speechSynthesis.speaking) return;
         window.speechSynthesis.pause();
         window.speechSynthesis.resume();
       } catch { /* ignore */ }
     }, 8000);
+    keepAliveTimerRef.current = keepAlive;
     const advance = () => {
       window.clearInterval(keepAlive);
+      if (keepAliveTimerRef.current === keepAlive) keepAliveTimerRef.current = null;
       if (id !== currentIdRef.current) return; // invalidated by interrupt
       const done = next.onDone;
       currentJobRef.current = null;
@@ -270,9 +321,16 @@ export function useSpeech() {
       ...previous,
     ];
     currentIdRef.current++; // invalidate any in-flight onend handlers
+    if (pendingPlayTimerRef.current) {
+      window.clearTimeout(pendingPlayTimerRef.current);
+      pendingPlayTimerRef.current = null;
+    }
     window.speechSynthesis.cancel();
     // small delay so cancel() finishes before the new utterance starts (Chrome quirk)
-    setTimeout(() => _playNext(), 80);
+    pendingPlayTimerRef.current = window.setTimeout(() => {
+      pendingPlayTimerRef.current = null;
+      if (mountedRef.current) _playNext();
+    }, 80);
   }, [_playNext]);
 
   const stopSpeaking = useCallback(() => {
@@ -280,7 +338,15 @@ export function useSpeech() {
     queueRef.current = [];
     currentJobRef.current = null;
     currentCharRef.current = 0;
-    window.speechSynthesis.cancel();
+    if (pendingPlayTimerRef.current) {
+      window.clearTimeout(pendingPlayTimerRef.current);
+      pendingPlayTimerRef.current = null;
+    }
+    if (keepAliveTimerRef.current) {
+      window.clearInterval(keepAliveTimerRef.current);
+      keepAliveTimerRef.current = null;
+    }
+    stopAllBrowserSpeech();
     setSpeaking(false);
   }, []);
 
@@ -291,7 +357,7 @@ export function useSpeech() {
     try { (window as any).__jenvuPickVoice?.(); } catch { /* ignore */ }
     // preview the chosen voice
     try {
-      window.speechSynthesis.cancel();
+      stopAllBrowserSpeech();
       const preset = VOICE_PRESETS.find((p) => p.key === key) ?? VOICE_PRESETS[0];
       const u = new SpeechSynthesisUtterance(`Voice set to ${preset.label}.`);
       const voices = window.speechSynthesis.getVoices();
