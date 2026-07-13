@@ -1133,6 +1133,8 @@ export type Database = {
           source: string
           stop_loss: number | null
           take_profit: number | null
+          tp1_hit_at: string | null
+          tp2_hit_at: string | null
           updated_at: string
           user_id: string
         }
@@ -1150,6 +1152,8 @@ export type Database = {
           source?: string
           stop_loss?: number | null
           take_profit?: number | null
+          tp1_hit_at?: string | null
+          tp2_hit_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1167,6 +1171,8 @@ export type Database = {
           source?: string
           stop_loss?: number | null
           take_profit?: number | null
+          tp1_hit_at?: string | null
+          tp2_hit_at?: string | null
           updated_at?: string
           user_id?: string
         }
