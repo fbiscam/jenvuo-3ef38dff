@@ -50,7 +50,6 @@ export const Route = createFileRoute("/api/public/hooks/generate-brief")({
         }
 
         const bmindKey = process.env.BLUESMINDS_API_KEY;
-        const lovableKey = process.env.LOVABLE_API_KEY; // still used only for TTS audio
         if (!bmindKey) {
           return new Response(JSON.stringify({ error: "BLUESMINDS_API_KEY missing" }), { status: 500 });
         }
