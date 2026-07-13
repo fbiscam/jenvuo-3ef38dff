@@ -844,7 +844,7 @@ function SignalPage() {
     <div className="min-h-dvh w-full bg-[#FAFAFA] text-slate-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
       {/* HEADER */}
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
-        <div className="relative mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
+        <div className="relative mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4 min-w-0">
           <button
             onClick={() => { stop(); navigate({ to: "/app" }); }}
             className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
@@ -857,7 +857,7 @@ function SignalPage() {
             </Link>
             <span className="truncate text-[22px] tracking-tight leading-none select-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </div>
-          <div className="flex items-center gap-2 justify-end">
+          <div className="flex items-center gap-2 justify-end flex-nowrap overflow-x-auto min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <Link
               to="/killzones"
               className="hidden sm:inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
@@ -881,14 +881,14 @@ function SignalPage() {
                   setVoiceBlocked(false);
                   if (plan) runNarration(plan);
                 }}
-                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-amber-200 bg-amber-50 text-[12px] font-medium text-amber-800 hover:bg-amber-100 transition"
+                className="shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-amber-200 bg-amber-50 text-[12px] font-medium text-amber-800 hover:bg-amber-100 transition"
                 title="Browser blocked autoplay — tap to enable voice"
               >
                 🔇 Enable voice
               </button>
             )}
             {playing ? (
-              <button onClick={stop} className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-red-200 bg-red-50 text-[12px] font-medium text-red-700 hover:bg-red-100 transition">
+              <button onClick={stop} className="shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-red-200 bg-red-50 text-[12px] font-medium text-red-700 hover:bg-red-100 transition">
                 <Pause className="h-3.5 w-3.5" /> Stop
               </button>
             ) : (
@@ -896,7 +896,7 @@ function SignalPage() {
                 onClick={load}
                 disabled={loading || (!credits.isLoading && credits.balance < 0.20)}
                 title={!credits.isLoading && credits.balance < 0.20 ? "Balance too low — add funds to run an analysis" : "Run a fresh AI analysis"}
-                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
                 {loading ? (
@@ -910,7 +910,7 @@ function SignalPage() {
               <button
                 onClick={handleBroadcast}
                 disabled={broadcasting}
-                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-amber-500 text-[12px] font-semibold text-white hover:bg-amber-600 disabled:opacity-50 transition"
+                className="shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-amber-500 text-[12px] font-semibold text-white hover:bg-amber-600 disabled:opacity-50 transition"
                 title="Send this signal to all paid subscribers"
               >
                 {broadcasting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
