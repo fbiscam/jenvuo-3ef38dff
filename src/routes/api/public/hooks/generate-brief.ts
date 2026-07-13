@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// Cron endpoint. Generates a ~150-word killzone brief, synthesizes MP3 via
-// Lovable AI TTS, uploads to the private `briefs` bucket, inserts a row.
+// Cron endpoint. Generates a ~150-word killzone brief (text-only) via
+// Bluesminds and inserts a row. TTS audio is disabled — Lovable no longer used.
 // Auth: shared `x-cron-secret` header matching CRON_SECRET (same pattern as
 // generate-insight / notify-subscribers).
 
@@ -33,12 +33,8 @@ const SESSION_META: Record<KillzoneSession, { label: string; window: string; foc
   },
 };
 
-function b64ToUint8(b64: string): Uint8Array {
-  const bin = atob(b64);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-  return out;
-}
+
+
 
 export const Route = createFileRoute("/api/public/hooks/generate-brief")({
   server: {
@@ -54,7 +50,6 @@ export const Route = createFileRoute("/api/public/hooks/generate-brief")({
         }
 
         const bmindKey = process.env.BLUESMINDS_API_KEY;
-        const lovableKey = process.env.LOVABLE_API_KEY; // still used only for TTS audio
         if (!bmindKey) {
           return new Response(JSON.stringify({ error: "BLUESMINDS_API_KEY missing" }), { status: 500 });
         }
@@ -143,7 +138,7 @@ Return STRICT JSON only, no prose, with this exact shape:
         }
 
         const headline = (parsed.headline || `${meta.label} — Market brief`).slice(0, 90);
-        const summary = (parsed.summary || `${meta.label} audio brief from Jenvu.`).slice(0, 200);
+        const summary = (parsed.summary || `${meta.label} brief from Jenvu.`).slice(0, 200);
         const script = (parsed.script || "").trim();
         if (script.length < 200) {
           return new Response(JSON.stringify({ error: "script-too-short", len: script.length }), {
@@ -151,67 +146,9 @@ Return STRICT JSON only, no prose, with this exact shape:
           });
         }
 
-        // TTS via Lovable AI Gateway. Non-streaming, MP3.
-        const ttsRes = await fetch("https://ai.gateway.lovable.dev/v1/audio/speech", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${lovableKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-4o-mini-tts",
-            input: script,
-            voice: "alloy",
-            response_format: "mp3",
-            speed: 1.0,
-          }),
-        });
-
-        if (!ttsRes.ok) {
-          const txt = await ttsRes.text().catch(() => "");
-          return new Response(
-            JSON.stringify({ error: "tts-failed", status: ttsRes.status, body: txt.slice(0, 400) }),
-            { status: 502 },
-          );
-        }
-
-        // The response can be either raw audio bytes or an OpenAI-style JSON
-        // envelope depending on how the gateway relays. Handle both.
-        const ct = ttsRes.headers.get("content-type") || "";
-        let audioBytes: Uint8Array;
-        if (ct.includes("application/json")) {
-          const j = (await ttsRes.json()) as { audio?: string; data?: string };
-          const b64 = j.audio || j.data || "";
-          if (!b64) {
-            return new Response(JSON.stringify({ error: "tts-empty-json" }), { status: 502 });
-          }
-          audioBytes = b64ToUint8(b64);
-        } else {
-          audioBytes = new Uint8Array(await ttsRes.arrayBuffer());
-        }
-
-        if (audioBytes.byteLength < 1000) {
-          return new Response(JSON.stringify({ error: "tts-audio-too-small", size: audioBytes.byteLength }), {
-            status: 502,
-          });
-        }
-
         const briefId = crypto.randomUUID();
-        const audioPath = `${session}/${briefId}.mp3`;
 
-        const { error: upErr } = await supabaseAdmin.storage
-          .from("briefs")
-          .upload(audioPath, audioBytes, {
-            contentType: "audio/mpeg",
-            upsert: true,
-          });
-        if (upErr) {
-          return new Response(JSON.stringify({ error: "storage-upload-failed", message: upErr.message }), {
-            status: 500,
-          });
-        }
-
-        // Rough duration estimate: ~150 wpm speech, mp3 avg 128kbps.
+        // Text-only brief — no TTS. Rough read-time estimate (~150 wpm).
         const wordCount = script.split(/\s+/).filter(Boolean).length;
         const estimatedSeconds = Math.max(30, Math.round((wordCount / 150) * 60));
 
@@ -224,7 +161,7 @@ Return STRICT JSON only, no prose, with this exact shape:
             summary,
             script,
             transcript: script,
-            audio_path: audioPath,
+            audio_path: null,
             audio_duration_seconds: estimatedSeconds,
             is_public: true,
             metadata: {
@@ -246,7 +183,7 @@ Return STRICT JSON only, no prose, with this exact shape:
           ok: true,
           id: inserted.id,
           session,
-          audio_path: audioPath,
+          audio_path: null,
           duration: estimatedSeconds,
         });
       },
