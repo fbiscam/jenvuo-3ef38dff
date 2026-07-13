@@ -2127,10 +2127,10 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
             { role: "user", content: reviewUser },
           ],
           jsonMode: true,
-          maxTokens: 180,
-          timeoutMs: 9000,
+          maxTokens: 220,
+          timeoutMs: 12000,
           priority: true,
-          retriesPerModel: 1,
+          retriesPerModel: 2,
           stage: "senior-review",
         });
         __usedSeniorModel = __aiModel3 ?? null;
