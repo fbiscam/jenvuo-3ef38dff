@@ -105,6 +105,22 @@ function NotificationsPage() {
     load();
   }, [load]);
 
+  // Auto mark all as read when the page opens
+  useEffect(() => {
+    (async () => {
+      try {
+        await markAllFn();
+        setItems((prev) =>
+          prev.map((it) => ({ ...it, read_at: it.read_at ?? new Date().toISOString() })),
+        );
+      } catch {
+        // ignore
+      }
+    })();
+    // run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Realtime updates
   useEffect(() => {
     let uid: string | null = null;
