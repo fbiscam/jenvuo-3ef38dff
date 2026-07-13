@@ -1872,11 +1872,12 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
           { role: "user", content: user },
         ],
         jsonMode: true,
-        maxTokens: 1900,
-        timeoutMs: 20000,
-        retriesPerModel: 2,
+        maxTokens: 1600,
+        timeoutMs: 14000,
+        retriesPerModel: 1,
         priority: true,
         stage: "signal-narration",
+
       });
       __usedNarrationModel = __aiModel2 ?? null;
       __totalPromptTokens += __aiUsage2?.promptTokens ?? 0;
@@ -2100,7 +2101,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // A / A+ setup — it can veto, downgrade, or confirm. Widened from A+
     // only so borderline A trades also get a sanity check before firing.
     // Failure here should NEVER block the plan — Stage-1 result stands.
-    if ((setupGrade === "A+" || setupGrade === "A") && built.direction !== "WAIT") {
+    if (setupGrade === "A+" && built.direction !== "WAIT") {
       try {
         const reviewSystem = `You are a 25-year institutional trader reviewing a junior's ICT/SMC setup. Be brutally honest — most setups are NOT A+. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case against this trade>","chasing_price":true|false}`;
         const reviewUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
@@ -2128,10 +2129,11 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           ],
           jsonMode: true,
           maxTokens: 220,
-          timeoutMs: 12000,
+          timeoutMs: 7000,
           priority: true,
-          retriesPerModel: 2,
+          retriesPerModel: 1,
           stage: "senior-review",
+
         });
         __usedSeniorModel = __aiModel3 ?? null;
         __totalPromptTokens += __aiUsage3?.promptTokens ?? 0;
