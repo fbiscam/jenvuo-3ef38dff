@@ -161,7 +161,7 @@ Return STRICT JSON only, no prose, with this exact shape:
             summary,
             script,
             transcript: script,
-            audio_path: audioPath,
+            audio_path: null,
             audio_duration_seconds: estimatedSeconds,
             is_public: true,
             metadata: {
