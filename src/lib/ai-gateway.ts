@@ -293,36 +293,36 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Bluesminds ($100 credit, unlimited quota) is PRIMARY.
-  // NOTE: Bluesminds catalog does NOT include gpt-5.5 / *-pro variants.
-  // Verified available IDs: gpt-5.4, gpt-5.2-chat, gpt-5-mini,
-  // deepseek-ai/deepseek-v4-pro, deepseek-v4-flash, openai/gpt-oss-120b.
+  // Bluesminds is PRIMARY. Original setting: gpt-5.5 first, gpt-5.4 as safety fallback.
   intent: [
+    "bmind/gpt-5.5",
+    "bmind/gpt-5.5-pro",
     "bmind/gpt-5.4",
     "bmind/deepseek-v4-flash",
     "nvapi/deepseek-ai/deepseek-v4-pro",
-    "nvapi/openai/gpt-oss-120b",
   ],
 
-  // Chart narration — accuracy-first on Bluesminds.
+  // Chart narration — accuracy-first.
   narration: [
+    "bmind/gpt-5.5",
+    "bmind/gpt-5.5-pro",
     "bmind/gpt-5.4",
     "bmind/deepseek-ai/deepseek-v4-pro",
   ],
 
-  // Senior 25-year-trader review (A / A+ verdict) — independent second opinion
-  // from a different model family.
+  // Senior 25-year-trader review (A / A+ verdict) — independent second opinion.
   seniorReview: [
+    "bmind/gpt-5.5-pro",
     "bmind/deepseek-ai/deepseek-v4-pro",
     "bmind/gpt-5.4",
   ],
 
   // Conversational chat around signals.
   chat: [
+    "bmind/gpt-5.5",
     "bmind/gpt-5.4",
     "bmind/deepseek-ai/deepseek-v4-pro",
     "nvapi/deepseek-ai/deepseek-v4-pro",
-    "nvapi/openai/gpt-oss-120b",
   ],
 } as const;
 
