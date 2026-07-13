@@ -2113,10 +2113,10 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
             { role: "user", content: reviewUser },
           ],
           jsonMode: true,
-          maxTokens: 220,
-          timeoutMs: 12000,
+          maxTokens: 260,
+          timeoutMs: 28000,
           priority: true,
-          retriesPerModel: 2,
+          retriesPerModel: 3,
           stage: "senior-review",
 
         });
@@ -2125,43 +2125,10 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
         __totalCompletionTokens += __aiUsage3?.completionTokens ?? 0;
         import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: __aiModel3, usage: __aiUsage3 })).catch(() => {});
         const review: any = tryParseJsonLoose(rc) || {};
-        const verdict = String(review.verdict || "").toUpperCase();
-        if (verdict === "VETO") {
-          setupGrade = "C";
-          setupScore = Math.min(setupScore, 50);
-          setupChecks.unshift({
-            key: "senior_veto",
-            label: "⛔ Senior trader veto",
-            pass: false,
-            reason: String(review.reasoning || "Veteran review vetoed this setup"),
-          });
-        } else if (verdict === "DOWNGRADE") {
-          setupGrade = setupGrade === "A+" ? "A" : "B";
-          setupScore = Math.max(60, setupScore - 15);
-          setupChecks.unshift({
-            key: "senior_downgrade",
-            label: "⚠ Senior review downgrade",
-            pass: false,
-            reason: String(review.reasoning || "Not quite A+ material"),
-          });
-        } else if (verdict === "CONFIRM") {
-          setupChecks.unshift({
-            key: "senior_confirm",
-            label: "✓ Senior trader confirms",
-            pass: true,
-            reason: String(review.reasoning || "Institutional-grade setup confirmed"),
-          });
+...
         }
-        if (review.counter_argument) {
-          setupChecks.push({
-            key: "counter_arg",
-            label: "Counter-argument (know your risk)",
-            pass: false,
-            reason: String(review.counter_argument),
-          });
-        }
-      } catch {
-        // Silent failure — Stage-1 grade stands
+      } catch (e) {
+        console.warn("senior-review failed:", (e as Error)?.message ?? e);
       }
     }
 
