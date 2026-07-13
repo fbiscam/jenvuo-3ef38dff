@@ -36,6 +36,8 @@ type Trade = {
   opened_at: string;
   closed_at: string | null;
   source: "system" | "outside";
+  tp1_hit_at?: string | null;
+  tp2_hit_at?: string | null;
 };
 
 
