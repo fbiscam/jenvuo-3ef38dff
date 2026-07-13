@@ -120,6 +120,8 @@ export async function chargeSignalScan(params: {
   scanId?: string | null;
   promptTokens?: number | null;
   completionTokens?: number | null;
+  grade?: string | null;
+  score?: number | null;
 }): Promise<void> {
   if (!params.userId) return;
   const dir = String(params.direction || "").toUpperCase();
@@ -137,6 +139,8 @@ export async function chargeSignalScan(params: {
       direction: dir,
       prompt_tokens: pTok,
       completion_tokens: cTok,
+      grade: params.grade ?? null,
+      score: params.score ?? null,
     };
     if (params.symbol) meta.symbol = params.symbol;
     if (params.scanId) meta.scanId = params.scanId;
