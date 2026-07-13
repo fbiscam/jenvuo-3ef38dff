@@ -2495,7 +2495,7 @@ function TradeManagementLadder({
       </ol>
       {status === "RUNNING" && rMultiple >= 1 && rMultiple < 3 && (
         <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1 leading-snug">
-          ⚡ <b>Action now:</b> Close 50%, move SL to entry ({t.entry.toFixed(dec)}).
+          ⚡ <b>Action now:</b> Close 70%, move SL to entry ({t.entry.toFixed(dec)}) and let the 30% runner ride.
         </div>
       )}
 
