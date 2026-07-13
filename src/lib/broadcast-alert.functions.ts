@@ -38,8 +38,10 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
     const round = (n: number) => Number(n.toFixed(data.decimals))
     const pair = data.pair.toUpperCase().replace(/[^A-Z]/g, '')
 
+    const scoreForGrade = Math.round(data.setupScore ?? data.confidence)
+    const grade = scoreForGrade >= 85 ? 'A+' : scoreForGrade >= 70 ? 'A' : scoreForGrade >= 55 ? 'B' : 'C'
+
     // 1. Insert into signal_alerts
-    const grade = data.grade
     const { data: inserted, error: insertErr } = await supabaseAdmin
       .from('signal_alerts')
       .insert({
@@ -127,6 +129,8 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
           sl: round(data.sl),
           tp: round(data.tp),
           rr: Number(data.rr.toFixed(2)),
+          confidence: Math.round(data.confidence),
+          setup_score: scoreForGrade,
         },
       }))
       // Chunk to avoid oversize inserts

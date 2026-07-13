@@ -54,6 +54,15 @@ function timeAgo(iso: string) {
   return new Date(iso).toLocaleDateString();
 }
 
+function gradeFromScore(score: unknown) {
+  const n = Number(score);
+  if (!Number.isFinite(n)) return "";
+  if (n >= 85) return "A+";
+  if (n >= 70) return "A";
+  if (n >= 55) return "B";
+  return "C";
+}
+
 function visualFor(n: NotificationRow) {
   const t = n.type;
   if (t === "signal_alert") {
@@ -391,7 +400,7 @@ function NotificationsPage() {
                               const pair = String(d.pair ?? "");
                               const direction = String(d.direction ?? "").toUpperCase();
                               const isBuy = direction === "BUY";
-                              const grade = d.grade ? String(d.grade) : "";
+                              const grade = gradeFromScore(d.setup_score ?? d.setupScore ?? d.score ?? d.confidence) || (d.grade ? String(d.grade) : "");
                               const entry = d.entry != null ? String(d.entry) : "";
                               const sl = d.sl != null ? String(d.sl) : "";
                               const tp = d.tp != null ? String(d.tp) : "";

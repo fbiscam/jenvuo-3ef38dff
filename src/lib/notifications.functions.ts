@@ -22,7 +22,60 @@ export const listNotifications = createServerFn({ method: 'GET' })
       .order('created_at', { ascending: false })
       .limit(30)
     if (error) return { items: [], unread: 0 }
-    const items = (data ?? []) as NotificationRow[]
+    let items = (data ?? []) as NotificationRow[]
+
+    const alertIds = Array.from(
+      new Set(
+        items
+          .filter((n) => n.type === 'signal_alert' && n.data?.alert_id)
+          .map((n) => String(n.data.alert_id)),
+      ),
+    )
+
+    if (alertIds.length > 0) {
+      const { data: alerts } = await context.supabase
+        .from('signal_alerts')
+        .select('id,pair,grade,direction,entry,sl,tp,rr,confidence,setup_score,rationale')
+        .in('id', alertIds)
+
+      const byId = new Map((alerts ?? []).map((a: any) => [String(a.id), a]))
+
+      items = items.map((n) => {
+        if (n.type !== 'signal_alert') return n
+        const alert = byId.get(String(n.data?.alert_id ?? ''))
+        if (!alert) return n
+
+        const score = Number(alert.setup_score ?? alert.confidence)
+        const derivedGrade = Number.isFinite(score)
+          ? score >= 85
+            ? 'A+'
+            : score >= 70
+              ? 'A'
+              : score >= 55
+                ? 'B'
+                : 'C'
+          : alert.grade
+
+        return {
+          ...n,
+          title: `${derivedGrade} ${alert.direction} · ${alert.pair}`,
+          data: {
+            ...(n.data ?? {}),
+            pair: alert.pair,
+            grade: derivedGrade,
+            direction: alert.direction,
+            entry: alert.entry,
+            sl: alert.sl,
+            tp: alert.tp,
+            rr: alert.rr,
+            confidence: alert.confidence,
+            setup_score: alert.setup_score,
+            rationale: alert.rationale,
+          },
+        }
+      })
+    }
+
     const unread = items.filter((n) => !n.read_at).length
     return { items, unread }
   })

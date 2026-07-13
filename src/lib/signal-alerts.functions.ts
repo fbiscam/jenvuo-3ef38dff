@@ -6,7 +6,7 @@ import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
 export type SignalAlertRow = {
   id: string
   pair: string
-  grade: 'A+' | 'A'
+  grade: 'A+' | 'A' | 'B' | 'C'
   direction: 'BUY' | 'SELL'
   entry: number
   sl: number
