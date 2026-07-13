@@ -264,6 +264,7 @@ export function useSpeech() {
     const id = ++currentIdRef.current;
     const u = new SpeechSynthesisUtterance(next.text);
     if (voiceRef.current) u.voice = voiceRef.current;
+    u.lang = "en-US";
     const preset = VOICE_PRESETS.find((p) => p.key === voicePresetRef.current) ?? VOICE_PRESETS[0];
     u.rate = preset.rate;
     u.pitch = preset.pitch;
