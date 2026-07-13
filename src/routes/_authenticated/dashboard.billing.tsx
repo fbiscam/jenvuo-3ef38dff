@@ -48,7 +48,7 @@ function ModelWithLogo({ raw, label }: { raw: string | null; label: string }) {
 function formatModelLabel(rawModel: string | null | undefined): string {
   if (!rawModel) return "—";
   const m = String(rawModel).toLowerCase();
-  const bare = m.replace(/^(bmind|openai|nvapi|google|nvapi\/openai|nvapi\/deepseek-ai|bmind\/deepseek-ai)\//g, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
   if (bare.startsWith("gpt-5.5")) return "ChatGPT 5.5";
   if (bare.startsWith("gpt-5.4-pro")) return "ChatGPT 5.4 Pro";
@@ -60,7 +60,9 @@ function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
   if (bare.startsWith("gpt-5")) return "ChatGPT 5";
   if (bare.startsWith("gpt-oss-120b")) return "GPT-OSS 120B";
-  if (bare.startsWith("deepseek-v4-pro")) return "DeepSeek V4 Pro";
+  if (bare.startsWith("deepseek-v4-pro") || bare.startsWith("deepseek-reasoner")) return "DeepSeek V4 Pro";
+  if (bare.startsWith("deepseek-chat")) return "DeepSeek V3";
+
   if (bare.startsWith("gemini-3.1-pro")) return "Gemini 3.1 Pro";
   if (bare.startsWith("gemini-3.5-flash")) return "Gemini 3.5 Flash";
   if (bare.startsWith("gemini-3-flash")) return "Gemini 3 Flash";

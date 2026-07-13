@@ -23,9 +23,14 @@ const MODEL_PRICING: Record<string, Price> = {
   "bmind/gpt-5.4-pro": { in: 3.0, out: 15.0 },
   "bmind/gpt-5.4-mini": { in: 0.25, out: 2.0 },
   "bmind/deepseek-ai/deepseek-v4-pro": { in: 0.55, out: 2.19 },
+  "bmind/orion/deepseek-ai/deepseek-v4-pro": { in: 0.55, out: 2.19 },
+  // DeepSeek official API
+  "dsofficial/deepseek-reasoner": { in: 0.55, out: 2.19 },
+  "dsofficial/deepseek-chat": { in: 0.27, out: 1.10 },
   // NVIDIA integrate (free tier)
   "nvapi/deepseek-ai/deepseek-v4-pro": { in: 0, out: 0 },
   "nvapi/openai/gpt-oss-120b": { in: 0, out: 0 },
+
   // Google
   "google/gemini-2.5-pro": { in: 1.25, out: 10.0 },
   "google/gemini-2.5-flash": { in: 0.075, out: 0.3 },
@@ -51,7 +56,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (!rawModel) return "—";
   const m = String(rawModel).toLowerCase();
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
-  const bare = m.replace(/^(bmind|openai|nvapi|google|nvapi\/openai|nvapi\/deepseek-ai|bmind\/deepseek-ai)\//g, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
   if (bare.startsWith("gpt-5.5")) return "ChatGPT 5.5";
   if (bare.startsWith("gpt-5.4-pro")) return "ChatGPT 5.4 Pro";
@@ -63,7 +68,9 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
   if (bare.startsWith("gpt-5")) return "ChatGPT 5";
   if (bare.startsWith("gpt-oss-120b")) return "GPT-OSS 120B";
-  if (bare.startsWith("deepseek-v4-pro")) return "DeepSeek V4 Pro";
+  if (bare.startsWith("deepseek-v4-pro") || bare.startsWith("deepseek-reasoner")) return "DeepSeek V4 Pro";
+  if (bare.startsWith("deepseek-chat")) return "DeepSeek V3";
+
   if (bare.startsWith("gemini-3.1-pro")) return "Gemini 3.1 Pro";
   if (bare.startsWith("gemini-3.5-flash")) return "Gemini 3.5 Flash";
   if (bare.startsWith("gemini-3-flash")) return "Gemini 3 Flash";
