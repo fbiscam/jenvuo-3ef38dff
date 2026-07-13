@@ -845,6 +845,23 @@ export const analyzeGold = createServerFn({ method: "POST" })
     const { __billable: _billable, ...clean } = result;
     void _billable;
 
+    // Flat $0.20 charge for every fresh BUY/SELL scan (both plan and chat paths).
+    // WAIT / no-trade scans stay free. Awaited so any failure surfaces in logs
+    // instead of silently skipping the deduction.
+    if (clean.direction === "BUY" || clean.direction === "SELL") {
+      try {
+        const { chargeSignalScan } = await import("@/lib/ai-cost-log.server");
+        await chargeSignalScan({
+          userId: context.userId,
+          direction: clean.direction,
+          model: null,
+          symbol: instSym,
+        });
+      } catch (e) {
+        console.warn("analyzeGold: chargeSignalScan failed:", (e as Error)?.message ?? e);
+      }
+    }
+
     if (_billable === "signal" && (clean.direction === "BUY" || clean.direction === "SELL")) {
       const entryPx = parsePx(clean.entry);
       const slPx = parsePx(clean.stopLoss);
