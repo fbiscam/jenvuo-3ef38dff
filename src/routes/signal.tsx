@@ -11,7 +11,7 @@ import { askSignalAgent } from "@/lib/signal-agent.functions";
 import { broadcastCurrentSignal } from "@/lib/broadcast-alert.functions";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 
-import { useSpeech } from "@/hooks/useSpeech";
+import { stopAllBrowserSpeech, useSpeech } from "@/hooks/useSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { cn } from "@/lib/utils";
@@ -133,9 +133,10 @@ function SignalPage() {
   // Kill any narration / listening when the signal page unmounts
   useEffect(() => {
     return () => {
+      try { window.dispatchEvent(new Event("jenvu:speech:stop-all")); } catch { /* noop */ }
       try { speech.stopSpeaking(); } catch { /* noop */ }
       try { speech.stopListening(); } catch { /* noop */ }
-      try { window.speechSynthesis?.cancel(); } catch { /* noop */ }
+      stopAllBrowserSpeech();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -2530,9 +2531,10 @@ function SignalVoiceAgent({
   // Stop any ongoing speech/listening when the agent panel unmounts (e.g. leaving the signal page)
   useEffect(() => {
     return () => {
+      try { window.dispatchEvent(new Event("jenvu:speech:stop-all")); } catch { /* noop */ }
       try { speech.stopSpeaking(); } catch { /* noop */ }
       try { speech.stopListening(); } catch { /* noop */ }
-      try { window.speechSynthesis?.cancel(); } catch { /* noop */ }
+      stopAllBrowserSpeech();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
