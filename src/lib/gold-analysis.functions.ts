@@ -1643,8 +1643,8 @@ export async function computeSignalPlan(data: { symbol: string }, __userId: stri
     const htf = htfRaw.slice(-160);
     const ltf = ltfRaw.slice(-200);
     // Trimmed slices sent to the AI prompt — full arrays remain for engine math.
-    const htfPrompt = htf.slice(-54);
-    const ltfPrompt = ltf.slice(-72);
+    const htfPrompt = htf.slice(-42);
+    const ltfPrompt = ltf.slice(-56);
     const last = ltf[ltf.length - 1];
     // Prefer real-time tick over last-candle close for all downstream analysis.
     const livePrice = liveTick?.price && isFinite(liveTick.price) ? liveTick.price : last.c;
@@ -1825,14 +1825,17 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __totalCompletionTokens = 0;
     try {
       const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
-        models: [...MODEL_CHAIN.narration],
+        // Keep signal speed tight: use the top Bluesminds model only for the
+        // optional narration layer. If it is slow, deterministic analysis below
+        // still returns the accurate setup instead of waiting through fallbacks.
+        models: [MODEL_CHAIN.narration[0]],
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
         ],
         jsonMode: true,
-        maxTokens: 2200,
-        timeoutMs: 18000,
+        maxTokens: 1400,
+        timeoutMs: 6500,
         retriesPerModel: 1,
         priority: true,
         stage: "signal-narration",
@@ -2079,14 +2082,14 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only for true A+ institutional setups.`;
 
         const { content: rc, model: __aiModel3, usage: __aiUsage3 } = await callChatCompletion({
-          models: [...MODEL_CHAIN.seniorReview],
+          models: [MODEL_CHAIN.seniorReview[0]],
           messages: [
             { role: "system", content: reviewSystem },
             { role: "user", content: reviewUser },
           ],
           jsonMode: true,
-          maxTokens: 260,
-          timeoutMs: 8000,
+          maxTokens: 180,
+          timeoutMs: 4500,
           priority: true,
           retriesPerModel: 1,
           stage: "senior-review",
