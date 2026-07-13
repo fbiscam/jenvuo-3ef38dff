@@ -1562,11 +1562,11 @@ function SignalPage() {
               {/* 3-Scenario forecast */}
               {plan?.scenarios && (() => {
                 const s = plan.scenarios;
-                const rows: { key: "bullish" | "base" | "bearish"; label: string; data: typeof s.base; barCls: string; textCls: string }[] = [
-                  { key: "bullish", label: "Bullish", data: s.bullish, barCls: "bg-emerald-500", textCls: "text-emerald-700" },
-                  { key: "base",    label: "Base",    data: s.base,    barCls: "bg-zinc-700",    textCls: "text-zinc-800" },
-                  { key: "bearish", label: "Bearish", data: s.bearish, barCls: "bg-rose-500",    textCls: "text-rose-700" },
-                ].filter((r) => r.data && (r.data.probability > 0 || r.data.path));
+                const rows = ([
+                  { key: "bullish" as const, label: "Bullish", data: s.bullish, barCls: "bg-emerald-500", textCls: "text-emerald-700" },
+                  { key: "base" as const,    label: "Base",    data: s.base,    barCls: "bg-zinc-700",    textCls: "text-zinc-800" },
+                  { key: "bearish" as const, label: "Bearish", data: s.bearish, barCls: "bg-rose-500",    textCls: "text-rose-700" },
+                ]).filter((r) => r.data && (r.data.probability > 0 || r.data.path));
                 if (!rows.length) return null;
                 const dec = plan.instrument.decimals;
                 return (
