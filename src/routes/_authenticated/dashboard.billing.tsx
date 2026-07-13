@@ -77,17 +77,17 @@ const MATRIX_ROWS: ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark
   { f: "Wallet balance", a: "$2.00", b: "$15", c: "$50", d: "$100" },
   { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
   { f: "Signal latency", a: "No alerts", b: "Realtime", c: "Realtime", d: "Realtime" },
+  { f: "AI models", a: "__MODELS__", b: "__MODELS__", c: "__MODELS__", d: "__MODELS__" },
   { f: "A+ signal access", a: true, b: true, c: true, d: true },
   { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
   { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
   { f: "Trade journal", a: true, b: true, c: true, d: true },
   { f: "Email + push alerts", a: false, b: true, c: true, d: true },
   { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
-  
+
   { f: "Custom alert rules", a: false, b: false, c: true, d: true },
-  
+
   { f: "Priority desk support", a: false, b: false, c: false, d: true },
-  { f: "AI models", a: "__MODELS__", b: "__MODELS__", c: "__MODELS__", d: "__MODELS__" },
 ];
 
 const PLAN_KEY_BY_COL: Record<number, string> = { 0: "free", 1: "pro", 2: "elite", 3: "ultra" };
