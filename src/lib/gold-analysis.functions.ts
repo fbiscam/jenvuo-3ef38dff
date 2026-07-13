@@ -1792,23 +1792,9 @@ Return ONLY valid JSON (no markdown) with this exact shape:
     "confidence": 0-95,
     "summary":"Final spoken summary in English — direction, entry, SL, TP, R:R, confidence and the one-line reason.",
     "invalidation":"One sentence explaining exactly what price action invalidates this setup."
-  },
-  "htfLock": {
-    "bias":"bullish"|"bearish"|"neutral",
-    "reason":"1 sentence — locked HTF read the LTF setup must respect (structure + premium/discount + key zone).",
-    "ltfAligned": true|false
-  },
-  "selfCritique": {
-    "risks":["2-4 short concrete risks that could kill this trade"],
-    "invalidationTriggers":["2-3 exact price/structure events that flip the thesis"],
-    "confidenceSelfScore": 0-10
-  },
-  "scenarios": {
-    "bearish":{"probability":0-100,"path":"1 sentence — how price plays out if bears take control","keyLevel":<price|null>},
-    "base":   {"probability":0-100,"path":"1 sentence — most likely path per your bias","keyLevel":<price|null>},
-    "bullish":{"probability":0-100,"path":"1 sentence — how price plays out if bulls dominate","keyLevel":<price|null>}
   }
 }
+
 
 STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - Timestamps: fromTime/toTime MUST be unix-SECONDS copied EXACTLY from the provided candles. Never invent, round, or extrapolate. If unsure, use the timestamp of the closest real candle.
