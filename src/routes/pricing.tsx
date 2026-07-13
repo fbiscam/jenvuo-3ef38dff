@@ -258,9 +258,30 @@ function PricingPage() {
                 </div>
                 <p className={`${MONO} mt-0.5 text-[10px] uppercase tracking-wider text-zinc-500`}>{t.bestFor}</p>
                 <ul className="mt-4 space-y-1.5 text-sm text-zinc-700">
-                  {t.features.slice(0, 5).map((f) => (
-                    <li key={f} className="flex gap-2"><span className="text-zinc-400">·</span><span>{f}</span></li>
-                  ))}
+                  {t.features.slice(0, 5).map((f) => {
+                    const isModels = f.startsWith("Powered by");
+                    return (
+                      <li key={f} className="flex gap-2">
+                        <span className="text-zinc-400">·</span>
+                        {isModels ? (
+                          <span className="inline-flex flex-wrap items-center gap-1.5">
+                            <span className="text-zinc-500">Powered by</span>
+                            <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-1.5 py-0.5">
+                              <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=32" alt="" width={12} height={12} className="h-3 w-3 rounded-sm" loading="lazy" />
+                              <span className="text-[11px] font-medium text-zinc-800">GPT-5.4</span>
+                            </span>
+                            <span className="text-zinc-400">+</span>
+                            <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-1.5 py-0.5">
+                              <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=32" alt="" width={12} height={12} className="h-3 w-3 rounded-sm" loading="lazy" />
+                              <span className="text-[11px] font-medium text-zinc-800">DeepSeek V4 Pro</span>
+                            </span>
+                          </span>
+                        ) : (
+                          <span>{f}</span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
                 {isCurrent ? (
                   <div className="mt-5 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">Active plan</div>
