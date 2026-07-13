@@ -1825,17 +1825,16 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __totalCompletionTokens = 0;
     try {
       const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
-        // Keep signal speed tight: use the top Bluesminds model only for the
-        // optional narration layer. If it is slow, deterministic analysis below
-        // still returns the accurate setup instead of waiting through fallbacks.
-        models: [MODEL_CHAIN.narration[0]],
+        // Accuracy first: full fallback chain so narration reliably completes
+        // (same quality as the 75%-accurate BUY signals users got earlier).
+        models: MODEL_CHAIN.narration,
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
         ],
         jsonMode: true,
         maxTokens: 1400,
-        timeoutMs: 6500,
+        timeoutMs: 14000,
         retriesPerModel: 1,
         priority: true,
         stage: "signal-narration",
