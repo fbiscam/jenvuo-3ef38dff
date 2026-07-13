@@ -15,6 +15,7 @@ import { getGoldNews } from "@/lib/news.functions";
 import { useCredits } from "@/hooks/useCredits";
 import { appendVoiceTurn } from "@/lib/voice-history";
 import PageLoading from "@/components/PageLoading";
+import { CloudOrb as SharedCloudOrb } from "@/components/CloudOrb";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
 
@@ -530,7 +531,9 @@ function Home() {
       )}>
         <div className="flex flex-col items-center justify-center gap-4 flex-1 min-h-0 w-full">
           <div className="flex-1 min-h-0 flex items-center justify-center w-full">
-            <CloudOrb status={status} pulse={speech.wordPulse} />
+            <div className="aspect-square w-[min(54vw,12rem)] sm:w-[14rem] lg:w-[17rem]">
+              <SharedCloudOrb status={status} pulse={speech.wordPulse} />
+            </div>
           </div>
           {!speech.supported && (
             <div className="text-center text-sm text-red-500 px-4">
