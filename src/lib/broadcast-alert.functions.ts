@@ -111,6 +111,8 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       .from('user_subscriptions')
       .select('user_id')
       .eq('status', 'active')
+      .neq('plan_id', 'free')
+
       
     const notifyUserIds = Array.from(new Set((allPaid ?? []).map((r: { user_id: string }) => r.user_id)))
 
