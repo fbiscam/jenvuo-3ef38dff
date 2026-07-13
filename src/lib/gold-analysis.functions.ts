@@ -2113,10 +2113,10 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
             { role: "user", content: reviewUser },
           ],
           jsonMode: true,
-          maxTokens: 220,
-          timeoutMs: 12000,
+          maxTokens: 260,
+          timeoutMs: 28000,
           priority: true,
-          retriesPerModel: 2,
+          retriesPerModel: 3,
           stage: "senior-review",
 
         });
@@ -2160,8 +2160,8 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
             reason: String(review.counter_argument),
           });
         }
-      } catch {
-        // Silent failure — Stage-1 grade stands
+      } catch (e) {
+        console.warn("senior-review failed:", (e as Error)?.message ?? e);
       }
     }
 
