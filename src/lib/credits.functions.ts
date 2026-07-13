@@ -97,8 +97,10 @@ const spendSchema = z.object({
 
 // USD-wallet system: pre-flight balance check only. Actual $ cost is deducted
 // per-AI-call inside logAiCost() based on model tokens × plan markup.
-// A tiny minimum-balance threshold blocks scans when wallet is effectively empty.
-const MIN_BALANCE_USD = 0.01;
+// Minimum balance = $0.20 (flat charge per BUY/SELL signal). Anything lower
+// blocks the scan up-front so the user isn't left mid-analysis with a
+// half-charged wallet.
+const MIN_BALANCE_USD = 0.20;
 
 export const spendCredits = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
