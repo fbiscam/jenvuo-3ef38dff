@@ -541,9 +541,14 @@ function NotificationsPage() {
                               {n.body && (
                                 <p
                                   className={cn(
-                                    "mt-1.5 text-[12px] leading-[1.55] line-clamp-2 break-words",
+                                    "mt-1.5 text-[12px] leading-[1.55] break-words overflow-hidden",
                                     isUnread ? "text-zinc-600" : "text-zinc-500",
                                   )}
+                                  style={{
+                                    display: "-webkit-box",
+                                    WebkitBoxOrient: "vertical",
+                                    WebkitLineClamp: 2,
+                                  }}
                                 >
                                   {n.body}
                                 </p>
