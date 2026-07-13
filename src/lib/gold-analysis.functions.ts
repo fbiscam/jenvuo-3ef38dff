@@ -856,6 +856,8 @@ export const analyzeGold = createServerFn({ method: "POST" })
           direction: clean.direction,
           model: null,
           symbol: instSym,
+          grade: (clean as any).setupGrade ?? null,
+          score: (clean as any).setupScore ?? null,
         });
       } catch (e) {
         console.warn("analyzeGold: chargeSignalScan failed:", (e as Error)?.message ?? e);
@@ -2428,6 +2430,8 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
           scanId: __scanId,
           promptTokens: __totalPromptTokens,
           completionTokens: __totalCompletionTokens,
+          grade: (plan as any).setupGrade ?? null,
+          score: (plan as any).setupScore ?? null,
         });
       } catch (e) {
         console.warn("computeSignalPlan: chargeSignalScan failed:", (e as Error)?.message ?? e);
