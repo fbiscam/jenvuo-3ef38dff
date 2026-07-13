@@ -69,13 +69,16 @@ async function singleAttempt(
   //   `blackboxai/*` → Blackbox API
   //   `nvapi/*`      → NVIDIA Integrate API (strip prefix to get real model id)
   //   `bmind/*`      → Bluesminds unified gateway (OpenAI-compatible)
+  //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
   //   else           → Lovable AI Gateway
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
   const isBmind = model.startsWith("bmind/");
+  const isDsOfficial = model.startsWith("dsofficial/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
   const nvidiaKey = process.env.NVIDIA_API_KEY;
   const bmindKey = process.env.BLUESMINDS_API_KEY;
+  const deepseekKey = process.env.DEEPSEEK_API_KEY;
 
   const endpoint = isBlackbox
     ? "https://api.blackbox.ai/v1/chat/completions"
@@ -83,6 +86,8 @@ async function singleAttempt(
     ? "https://integrate.api.nvidia.com/v1/chat/completions"
     : isBmind
     ? "https://api.bluesminds.com/v1/chat/completions"
+    : isDsOfficial
+    ? "https://api.deepseek.com/chat/completions"
     : "https://ai.gateway.lovable.dev/v1/chat/completions";
 
   const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -95,9 +100,13 @@ async function singleAttempt(
   } else if (isBmind) {
     if (!bmindKey) throw new AiGatewayError("BLUESMINDS_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${bmindKey}`;
+  } else if (isDsOfficial) {
+    if (!deepseekKey) throw new AiGatewayError("DEEPSEEK_API_KEY missing on server", 0, true);
+    headers["Authorization"] = `Bearer ${deepseekKey}`;
   } else {
     headers["Lovable-API-Key"] = apiKey;
   }
+
 
   // Strip provider prefixes to expose the real upstream model id.
   const wireModel = isNvidia
