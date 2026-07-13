@@ -721,11 +721,12 @@ function SignalPage() {
             </div>
             <button
               onClick={() => navigate({ to: "/signal", search: { symbol: broadcastedAlert?.pair || "XAUUSD" }, replace: true })}
-              className="h-8 shrink-0 inline-flex items-center gap-1.5 px-2 sm:px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 transition"
+              className="h-8 shrink-0 inline-flex items-center gap-1.5 px-2.5 sm:px-3 rounded-lg bg-zinc-900 text-[11px] sm:text-[12px] font-medium text-white hover:bg-zinc-800 transition whitespace-nowrap"
               title="Run a fresh AI analysis (uses credits)"
             >
-              <RefreshCw className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Fresh analysis</span>
+              <RefreshCw className="h-3.5 w-3.5 shrink-0" /> Fresh analysis
             </button>
+
           </div>
 
         </header>
