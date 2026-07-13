@@ -745,12 +745,8 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
       generatedAt: new Date().toISOString(),
     };
 
-    // Flat $0.20 charge only when a real BUY/SELL comes back.
-    import("@/lib/ai-cost-log.server").then((m) => m.chargeSignalScan({
-      userId: __userId,
-      direction: signal.direction,
-      model: __aiModel,
-    })).catch(() => {});
+    // Billing for BUY/SELL happens in the outer analyzeGold handler so both
+    // the plan path and this chat fallback path are charged exactly once.
 
     return { ...signal, __billable: "chat" };
 }
