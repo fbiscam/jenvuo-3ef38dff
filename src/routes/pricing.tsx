@@ -70,6 +70,7 @@ const TIERS = [
       "$2 wallet / month",
       "Unlimited voice queries",
       "A+ / A institutional signals",
+      "Powered by GPT-5.4 + DeepSeek V4 Pro",
       "Full ICT / SMC narration",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
@@ -92,6 +93,7 @@ const TIERS = [
       
       "Voice queries free",
       "A+ / A institutional signals",
+      "Powered by GPT-5.4 + DeepSeek V4 Pro",
       "Realtime email & push alerts",
       "Full ICT / SMC narration",
       "Trade journal & analytics",
@@ -114,6 +116,7 @@ const TIERS = [
       
       "Voice queries free",
       "Everything in Pro",
+      "Powered by GPT-5.4 + DeepSeek V4 Pro",
       "Priority A+ alerts (< 30s)",
       "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF)",
       "API access & webhooks",
@@ -138,6 +141,7 @@ type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Voice queries / day", free: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
   { feature: "A+ signal access", free: true, pro: true, elite: true },
+  { feature: "AI models", free: "GPT-5.4 + DeepSeek V4 Pro", pro: "GPT-5.4 + DeepSeek V4 Pro", elite: "GPT-5.4 + DeepSeek V4 Pro" },
   { feature: "Alert latency", free: "No alerts", pro: "Realtime", elite: "Realtime" },
   { feature: "ICT / SMC narration", free: true, pro: true, elite: true },
   { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
