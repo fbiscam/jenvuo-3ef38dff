@@ -1800,6 +1800,9 @@ STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - Timestamps: fromTime/toTime MUST be unix-SECONDS copied EXACTLY from the provided candles. Never invent, round, or extrapolate. If unsure, use the timestamp of the closest real candle.
 - Prices: every price/priceLow/priceHigh MUST be within ±20% of CURRENT PRICE ${last.c.toFixed(dec)}. Use realistic values pulled from the OHLC data provided, not round-number guesses.
 - Direction: LTF entry/sl/tp MUST respect current price ${last.c.toFixed(dec)}. RR must be ≥ 1.8, prefer 1:2 to 1:4. Entry must sit inside a real HTF/LTF OB or FVG that you also emit as a marking.
+- ENTRY placement (sniper, not chase): Entry MUST be inside a real unmitigated OB/FVG you emit as a marking. For BUY: entry ≤ current price, inside a discount demand OB/FVG. For SELL: entry ≥ current price, inside a premium supply OB/FVG. Never enter mid-range with no zone. If price already ran past the zone and left it mitigated, WAIT — do not chase.
+- STOP LOSS placement (structural, buffered): SL MUST sit just beyond the swing/OB that invalidates the setup, with a small ATR-based buffer (~10-25% of recent ATR). BUY: sl < entry, below the demand OB / swing low. SELL: sl > entry, above the supply OB / swing high. Never place SL inside the entry zone or tighter than the wick that formed the OB. Stop distance must be realistic vs ATR — not 2 pips, not absurd.
+- TAKE PROFIT placement (liquidity target): TP MUST target a nameable liquidity pool or opposing structure — BSL/SSL, equal highs/lows, PDH/PDL, HTF swing, equilibrium, or opposing OB. BUY: tp > entry. SELL: tp < entry. State the exact TP target in summary (e.g. "TP at PDH liquidity 2678.40"). Recompute RR = |tp-entry| / |entry-sl| and verify RR ≥ 1.8 before returning; if it fails, either re-anchor entry or WAIT — do not force the trade.
 - Markings coverage: emit 7-10 markings only: HTF BOS/CHOCH, HTF OB/zone, HTF liquidity, LTF FVG, LTF OB, LTF liquidity, plus entry/sl/tp when active.
 - Narration: produce 7-9 steps, each 10-18 words, senior institutional tone. Keep it concise. Every narration step should reference its marking via markingIndex when possible.
 - Killzone: state the current session/killzone (${session} / ${killzone}) and the premium-vs-discount read (${inPremium ? "PREMIUM" : "DISCOUNT"}) explicitly in both htfNarrative and the confluences array.
@@ -2088,7 +2091,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // Failure here should NEVER block the plan — Stage-1 result stands.
     if (built.direction !== "WAIT" && (setupGrade === "A+" || setupGrade === "A" || setupScore >= 59)) {
       try {
-        const reviewSystem = `You are a 25-year institutional trader reviewing a junior's ICT/SMC setup. Be brutally honest — most setups are NOT A+. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case against this trade>","chasing_price":true|false}`;
+        const reviewSystem = `You are a 25-year institutional trader (bank/prop desk head) reviewing a junior analyst's ICT/SMC setup for real money risk. Your job is to protect capital. Be brutally honest — most setups are NOT A+. Verify the ENTRY, STOP LOSS, and TAKE PROFIT are placed correctly, not just the direction. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case>","chasing_price":true|false,"levels_ok":true|false,"levels_note":"<one line on entry/SL/TP quality>"}`;
         const reviewUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
 CURRENT PRICE: ${last.c.toFixed(dec)} | HTF BIAS: ${htfA.trend} | LTF BIAS: ${ltfA.trend}
 KILLZONE: ${kz.killzone} | NATIVE SESSION: ${kz.nativeSession ? "yes" : "no"}
@@ -2099,12 +2102,14 @@ DXY CONFIRMS: ${dxyConfirms === true ? "yes" : dxyConfirms === false ? "no" : "N
 ENGINE GRADE: ${setupGrade} (score ${setupScore}/100)
 BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
-3 checks — answer honestly:
-1) Would a 25-year desk trader take this? Why/why not?
-2) Strongest counter-argument?
-3) Is entry CHASING price (already extended) or WAITING at premium/discount?
+5 checks — answer honestly:
+1) Would a 25-year desk trader risk real money on this? Why/why not?
+2) Strongest counter-argument (what kills this trade)?
+3) Is entry CHASING price (already extended past the zone) or WAITING at premium/discount?
+4) LEVELS CHECK — Is entry inside a real OB/FVG? Is SL beyond structure with sensible buffer (not too tight, not too wide vs ATR)? Is TP at a nameable liquidity pool (BSL/SSL/PDH/PDL/HTF swing) with RR ≥ 1.8?
+5) If any of entry/SL/TP is placed poorly → set levels_ok=false and DOWNGRADE or VETO.
 
-VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only for true A+ institutional setups.`;
+VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine but not A+. CONFIRM only for true A+ institutional setups with clean entry/SL/TP.`;
 
         const { content: rc, model: __aiModel3, usage: __aiUsage3 } = await callChatCompletion({
           models: [...MODEL_CHAIN.seniorReview],
