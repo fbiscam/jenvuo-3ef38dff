@@ -113,22 +113,24 @@ async function singleAttempt(
     ? model.slice("nvapi/".length)
     : isBmind
     ? model.slice("bmind/".length)
+    : isDsOfficial
+    ? model.slice("dsofficial/".length)
     : model;
 
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
   };
-  // Blackbox/NVIDIA/Bluesminds: don't force response_format — rely on system prompt.
-  if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind) body.response_format = { type: "json_object" };
+  // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
+  if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isDsOfficial) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
-    if (!isBlackbox && !isNvidia && !isBmind && model.startsWith("openai/gpt-5")) {
+    if (!isBlackbox && !isNvidia && !isBmind && !isDsOfficial && model.startsWith("openai/gpt-5")) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (!isBlackbox && !isNvidia && !isBmind && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
+  if (!isBlackbox && !isNvidia && !isBmind && !isDsOfficial && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
     body.service_tier = "priority";
   }
 
@@ -153,11 +155,10 @@ async function singleAttempt(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    // Blackbox/NVIDIA: treat 400/403 as non-terminal so we fallback to the next model.
-    // Blackbox/NVIDIA: treat 400/401/403/404/429/5xx as non-terminal so we fall back to Lovable Gateway.
-    const terminal = (isBlackbox || isNvidia || isBmind)
+    const terminal = (isBlackbox || isNvidia || isBmind || isDsOfficial)
       ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400 || res.status === 401 || res.status === 404)
       : !(res.status === 429 || res.status >= 500);
+
     let msg: string;
     if (res.status === 429) msg = "AI is rate-limited right now. Please retry in a moment.";
     else if (res.status === 402) msg = "AI credits exhausted. Please top up your workspace.";
