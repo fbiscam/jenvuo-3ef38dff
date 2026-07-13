@@ -87,6 +87,7 @@ const MATRIX_ROWS: ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark
   { f: "Custom alert rules", a: false, b: false, c: true, d: true },
   
   { f: "Priority desk support", a: false, b: false, c: false, d: true },
+  { f: "AI models", a: "__MODELS__", b: "__MODELS__", c: "__MODELS__", d: "__MODELS__" },
 ];
 
 const PLAN_KEY_BY_COL: Record<number, string> = { 0: "free", 1: "pro", 2: "elite", 3: "ultra" };
