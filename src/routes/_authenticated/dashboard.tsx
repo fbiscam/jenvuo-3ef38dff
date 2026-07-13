@@ -1229,7 +1229,7 @@ function VoiceAgentHistory() {
 function QuickActions() {
   const actions: { label: string; to: string; icon: typeof Activity; tone: string }[] = [
     { label: "New Scan",   to: "/signal",                 icon: Activity,    tone: "bg-blue-50 text-blue-700 border-blue-100" },
-    { label: "Journal",    to: "/dashboard/trades",       icon: BookOpen,    tone: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+    { label: "Journal",    to: "/dashboard/journal",       icon: BookOpen,    tone: "bg-emerald-50 text-emerald-700 border-emerald-100" },
     { label: "Killzones",  to: "/killzones",              icon: Calendar,    tone: "bg-amber-50 text-amber-700 border-amber-100" },
     { label: "Insights",   to: "/insights",               icon: LineChart,   tone: "bg-violet-50 text-violet-700 border-violet-100" },
     { label: "Saved",      to: "/dashboard/workspace",    icon: Bookmark,    tone: "bg-rose-50 text-rose-700 border-rose-100" },
