@@ -401,10 +401,9 @@ function SignalPage() {
     try {
       const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
       const sym = symbol || "XAUUSD";
-      const spendPromise = credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
-      const planPromise = fetchPlan({ data: { symbol: sym } });
-      const [ok, p] = await Promise.all([spendPromise, planPromise]);
+      const ok = await credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
       if (!ok) { setLoading(false); return; }
+      const p = await fetchPlan({ data: { symbol: sym } });
       setPlan(p);
       // ICT narration is included in the single "signal" charge above — no extra deduction.
       // Free users still don't get the guided narration.
