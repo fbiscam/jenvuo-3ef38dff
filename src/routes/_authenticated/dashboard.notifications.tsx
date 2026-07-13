@@ -257,7 +257,7 @@ function NotificationsPage() {
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={cn(
-                "h-7 px-3 rounded-full text-[11px] font-medium transition",
+                "h-7 px-3 rounded-full text-[11px] font-medium transition shrink-0 whitespace-nowrap",
                 filter === f.key
                   ? "bg-zinc-900 text-white"
                   : "bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-50",
