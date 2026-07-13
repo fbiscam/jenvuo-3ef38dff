@@ -976,6 +976,24 @@ export type SignalPlan = {
     trendStrength: number;
     volatility: number;
   };
+  // ---- Accuracy upgrade: additive AI intelligence layers ----
+  // These are pure enrichment — they never block a BUY/SELL that the
+  // deterministic engine has already produced.
+  selfCritique?: {
+    risks: string[];          // what could kill this trade
+    invalidationTriggers: string[]; // concrete price/structure triggers
+    confidenceSelfScore: number;   // AI's own 0-10 confidence
+  };
+  scenarios?: {
+    bearish: { probability: number; path: string; keyLevel: number | null };
+    base:    { probability: number; path: string; keyLevel: number | null };
+    bullish: { probability: number; path: string; keyLevel: number | null };
+  };
+  htfLock?: {
+    bias: "bullish" | "bearish" | "neutral";
+    reason: string;         // 1-line HTF-first read the LTF setup must respect
+    ltfAligned: boolean;    // did LTF setup align with locked HTF bias?
+  };
 };
 
 
@@ -1774,6 +1792,21 @@ Return ONLY valid JSON (no markdown) with this exact shape:
     "confidence": 0-95,
     "summary":"Final spoken summary in English — direction, entry, SL, TP, R:R, confidence and the one-line reason.",
     "invalidation":"One sentence explaining exactly what price action invalidates this setup."
+  },
+  "htfLock": {
+    "bias":"bullish"|"bearish"|"neutral",
+    "reason":"1 sentence — locked HTF read the LTF setup must respect (structure + premium/discount + key zone).",
+    "ltfAligned": true|false
+  },
+  "selfCritique": {
+    "risks":["2-4 short concrete risks that could kill this trade"],
+    "invalidationTriggers":["2-3 exact price/structure events that flip the thesis"],
+    "confidenceSelfScore": 0-10
+  },
+  "scenarios": {
+    "bearish":{"probability":0-100,"path":"1 sentence — how price plays out if bears take control","keyLevel":<price|null>},
+    "base":   {"probability":0-100,"path":"1 sentence — most likely path per your bias","keyLevel":<price|null>},
+    "bullish":{"probability":0-100,"path":"1 sentence — how price plays out if bulls dominate","keyLevel":<price|null>}
   }
 }
 
@@ -1787,6 +1820,12 @@ STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - News veto: if a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, direction="WAIT", confidence ≤ 50, call out the news title in summary and invalidation.
 - Quality gate: only issue BUY/SELL if HTF and LTF are aligned AND a fresh unmitigated OB or FVG is present in the direction of the trade AND liquidity is sitting on the other side of entry. Otherwise direction="WAIT", confidence ≤ 55, and summary MUST list the specific missing confluence (e.g. "HTF bullish but no unmitigated LTF demand").
 - Language: professional English only — no Hindi/Urdu/Roman Urdu, no emojis, no hedging fluff ("maybe", "possibly", "could be"). Speak like a 25-year desk head.
+
+CHAINED ANALYSIS PROTOCOL — think in this exact order, no shortcuts:
+1) HTF FIRST: lock the HTF bias from 1H structure + premium/discount + macro. Populate htfLock BEFORE deciding LTF entry. The LTF setup MUST respect this locked bias — if LTF disagrees with HTF, either WAIT or reduce confidence and flag it in selfCritique.risks.
+2) LTF REFINEMENT: only after HTF is locked, hunt for the LTF trigger (FVG / OB / breaker / IFVG) that aligns with the locked HTF direction. Set htfLock.ltfAligned accordingly.
+3) SELF-CRITIQUE (mandatory): after you draft the trade, argue AGAINST it. Populate selfCritique.risks with the 2-4 strongest counter-points (what a bearish/bullish opponent would say). List concrete invalidationTriggers (e.g. "15M close back above 3450", "sweep of 3402 without CHoCH"). Give confidenceSelfScore (0-10) as your honest read AFTER the critique — this is a sanity check on the numeric confidence.
+4) 3-SCENARIO FORECAST: assign probabilities to bearish/base/bullish paths — probabilities MUST sum to ~100. Base = your primary thesis path; the other two are the "what if we're wrong" branches. Each keyLevel is the price that confirms/invalidates that scenario.
 
 VETERAN WISDOM LAYER — read this like a 25-year prop desk head, not a textbook student:
 - Context first: BEFORE the setup, judge the tape. Current market regime is "${marketRegime.regime}" (trend strength ${marketRegime.trendStrength}%, ATR ${marketRegime.volatility}% of price). ${marketRegime.favorable ? "This regime is FAVORABLE — ICT setups typically work." : `This regime is NOT ideal for textbook ICT — ${marketRegime.warning}`}
@@ -1833,7 +1872,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
           { role: "user", content: user },
         ],
         jsonMode: true,
-        maxTokens: 1400,
+        maxTokens: 1900,
         timeoutMs: 14000,
         retriesPerModel: 1,
         priority: true,
@@ -2414,6 +2453,43 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
         trendStrength: marketRegime.trendStrength,
         volatility: marketRegime.volatility,
       },
+      // ---- Additive AI intelligence layers (never blocks BUY/SELL) ----
+      htfLock: (() => {
+        const h = parsed.htfLock;
+        if (!h || typeof h !== "object") return undefined;
+        const bias = h.bias === "bullish" || h.bias === "bearish" ? h.bias : "neutral";
+        return {
+          bias: bias as "bullish" | "bearish" | "neutral",
+          reason: String(h.reason ?? "").slice(0, 300),
+          ltfAligned: h.ltfAligned === true,
+        };
+      })(),
+      selfCritique: (() => {
+        const s = parsed.selfCritique;
+        if (!s || typeof s !== "object") return undefined;
+        const arr = (v: any) => (Array.isArray(v) ? v.map(String).slice(0, 6) : []);
+        const n = Number(s.confidenceSelfScore);
+        return {
+          risks: arr(s.risks),
+          invalidationTriggers: arr(s.invalidationTriggers),
+          confidenceSelfScore: Number.isFinite(n) ? Math.max(0, Math.min(10, n)) : 0,
+        };
+      })(),
+      scenarios: (() => {
+        const s = parsed.scenarios;
+        if (!s || typeof s !== "object") return undefined;
+        const one = (o: any) => {
+          if (!o || typeof o !== "object") return { probability: 0, path: "", keyLevel: null };
+          const p = Number(o.probability);
+          const kl = Number(o.keyLevel);
+          return {
+            probability: Number.isFinite(p) ? Math.max(0, Math.min(100, Math.round(p))) : 0,
+            path: String(o.path ?? "").slice(0, 240),
+            keyLevel: Number.isFinite(kl) ? +kl.toFixed(dec) : null,
+          };
+        };
+        return { bearish: one(s.bearish), base: one(s.base), bullish: one(s.bullish) };
+      })(),
     };
 
     // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
