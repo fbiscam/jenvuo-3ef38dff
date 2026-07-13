@@ -307,9 +307,10 @@ export const MODEL_CHAIN = {
   intent: ["bmind/gpt-5.4"],
   narration: ["bmind/gpt-5.4"],
   // Senior review = DeepSeek reasoning model.
-  // Primary: DeepSeek's official API (fast, reliable, no rate-limit issues).
-  // Fallbacks: Bluesminds relabeled variants (kept for redundancy).
+  // Primary: NVIDIA-hosted DeepSeek V4 Pro for fastest review completion.
+  // Fallbacks: DeepSeek official + Bluesminds relabeled variants for redundancy.
   seniorReview: [
+    "nvapi/deepseek-ai/deepseek-v4-pro",
     "dsofficial/deepseek-reasoner",
     "bmind/orion/deepseek-ai/deepseek-v4-pro",
     "bmind/deepseek-ai/deepseek-v4-pro",
