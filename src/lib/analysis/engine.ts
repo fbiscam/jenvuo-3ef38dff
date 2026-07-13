@@ -565,12 +565,12 @@ export function scoreSetup(args: {
     score = Math.max(25, score - vetos.length * 15);
   }
 
-  // Relaxed thresholds — realistic A+ frequency (a few per pair per day)
+  // Grade thresholds — A reserved for genuinely high-conviction setups
   const grade: "A+" | "A" | "B" | "C" =
     vetos.length >= 2 ? "C" :
-    score >= 85 ? "A+" :
-    score >= 72 ? "A" :
-    score >= 55 ? "B" : "C";
+    score >= 90 ? "A+" :
+    score >= 80 ? "A" :
+    score >= 65 ? "B" : "C";
 
 
   return { score, grade, factors: f, vetos };
