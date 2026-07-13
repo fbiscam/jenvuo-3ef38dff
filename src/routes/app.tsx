@@ -256,9 +256,10 @@ function Home() {
 
   const handleCommand = useCallback(async (query: string) => {
     if (loadingRef.current || !query.trim()) return;
+    const q = normalizeQuery(query);
 
-    // Signal/setup/trade intent → navigate to /signal page for ANY instrument the user names
-    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analyze|analysis|live\s*chart|show\s*chart|new\s*signal|chart\s*open|open\s*chart|view\s*chart)\b/i.test(normalizeQuery(query))) {
+    // "open chart / show chart / live chart" → still route to the full desk
+    if (/\b(live\s*chart|show\s*chart|chart\s*open|open\s*chart|view\s*chart|signal\s*desk)\b/i.test(q)) {
       const symbol = detectSymbol(query);
       speech.stopSpeaking();
       speech.pauseListening();
@@ -266,28 +267,51 @@ function Home() {
       return;
     }
 
+    // Analyze / signal / setup / trade-idea intent → run the SAME full
+    // killzone-quality plan the /signal desk runs (getSignalPlan), inline
+    // on /app. Narrate the summary and show the SignalCard.
+    const analyzeIntent = /\b(signal|setup|trade\s*idea|trade\s*plan|analyze|analysis|scan|new\s*signal)\b/i.test(q);
+
     loadingRef.current = true;
     setLoading(true);
     speech.pauseListening();
     const tf = parseTimeframe(query, timeframe);
     if (tf !== timeframe) setTimeframe(tf);
     try {
-      const ok = await credits.spend("voice_query", { query: query.slice(0, 80) });
-      if (!ok) {
-        loadingRef.current = false;
-        setLoading(false);
-        speech.resumeIfWanted();
-        return;
+      if (analyzeIntent) {
+        const symbol = detectSymbol(query);
+        const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+        const ok = await credits.spend("signal", { symbol, scanId, caller: "app.tsx:handleCommand" });
+        if (!ok) {
+          loadingRef.current = false;
+          setLoading(false);
+          speech.resumeIfWanted();
+          return;
+        }
+        const plan = await fetchSignalPlan({ data: { symbol } });
+        const mapped = signalPlanToGoldSignal(plan);
+        setSignal(mapped);
+        appendVoiceTurn({ query, reply: mapped.spokenSummary });
+        speech.speak(mapped.spokenSummary, () => {
+          speech.resumeIfWanted();
+          armSleep();
+        });
+      } else {
+        const ok = await credits.spend("voice_query", { query: query.slice(0, 80) });
+        if (!ok) {
+          loadingRef.current = false;
+          setLoading(false);
+          speech.resumeIfWanted();
+          return;
+        }
+        const result = await analyze({ data: { timeframe: tf, query } });
+        setSignal(result);
+        appendVoiceTurn({ query, reply: result.spokenSummary });
+        speech.speak(result.spokenSummary, () => {
+          speech.resumeIfWanted();
+          armSleep();
+        });
       }
-      const result = await analyze({ data: { timeframe: tf, query } });
-      setSignal(result);
-      appendVoiceTurn({ query, reply: result.spokenSummary });
-
-
-      speech.speak(result.spokenSummary, () => {
-        speech.resumeIfWanted();
-        armSleep();
-      });
     } catch (e: any) {
       toast.error(e?.message || "Analysis failed");
       speech.speak("Sorry, the analysis failed.", () => {
@@ -298,7 +322,7 @@ function Home() {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [analyze, speech, timeframe, navigate, credits]);
+  }, [analyze, fetchSignalPlan, speech, timeframe, navigate, credits]);
 
   // Accumulate final transcripts into a buffer while listening (do NOT send yet)
   useEffect(() => {
