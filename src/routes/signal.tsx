@@ -1711,58 +1711,48 @@ function SignalPage() {
       </main>
 
       <Dialog open={!!kzDialog} onOpenChange={(o) => { if (!o) setKzDialog(null); }}>
-        <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)]">
-          {/* Accent bar */}
-          <div className="h-1 w-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400" />
-
-          {/* Tape header */}
-          <div className={`flex items-center justify-between pl-5 pr-14 pt-4 pb-3 border-b border-dashed border-zinc-200 ${MONO}`}>
-            <span className="text-[10px] tracking-[0.2em] uppercase text-zinc-500">Killzone · Advisory</span>
-            <span className="text-[10px] tracking-[0.2em] uppercase text-amber-700">Live</span>
+        <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-zinc-100">
+            <span className="text-[11px] font-medium text-zinc-500">Killzone Advisory</span>
+            <span className="text-[10px] text-zinc-400">Live</span>
           </div>
 
-          <div className="px-5 pt-5 pb-4">
+          <div className="px-5 pt-4 pb-4">
             <DialogHeader className="space-y-0">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 border border-amber-200 text-amber-600">
-                  <AlertTriangle className="h-4 w-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <DialogTitle className={`text-[15px] font-semibold text-zinc-900 leading-tight ${MONO}`}>
-                    Outside optimal killzone
-                  </DialogTitle>
-                  <DialogDescription className="pt-2 text-[11px] sm:text-[12px] text-zinc-600 leading-relaxed whitespace-nowrap">
-                    You are not in the killzone for better A+ scaling for good signal.
-                  </DialogDescription>
-                </div>
-              </div>
+              <DialogTitle className="text-[15px] font-semibold text-zinc-900 leading-tight">
+                Outside optimal killzone
+              </DialogTitle>
+              <DialogDescription className="pt-2 text-[12px] text-zinc-600 leading-relaxed">
+                You are not in the killzone for better A+ scaling for good signal.
+              </DialogDescription>
 
               {/* Detail panel */}
-              <div className={`mt-4 rounded-lg border border-zinc-200 bg-zinc-50/60 px-3 py-2.5 flex items-center gap-2 flex-wrap ${MONO}`}>
-                <span className="text-[9px] tracking-[0.2em] uppercase text-zinc-400 shrink-0">Only trade</span>
+              <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] uppercase tracking-wider text-zinc-400 shrink-0">Only trade</span>
                 <span className="text-[12px] font-semibold text-zinc-900 tabular-nums shrink-0">{kzDialog?.pair}</span>
-                <span className="text-[11px] text-rose-700 bg-rose-50 border border-rose-200 rounded px-2 py-0.5 ml-auto font-semibold">
+                <span className="text-[11px] text-zinc-700 ml-auto">
                   {kzDialog?.kzText}
                 </span>
               </div>
-
             </DialogHeader>
           </div>
 
-          <DialogFooter className={`gap-2 sm:gap-2 px-5 py-3 border-t border-zinc-100 bg-zinc-50/40 ${MONO}`}>
+          <DialogFooter className="gap-2 sm:gap-2 px-5 py-3 border-t border-zinc-100 bg-white">
             <button
               onClick={dismissKzForever}
-              className="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-[11px] font-medium tracking-wider uppercase text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700 transition"
+              className="h-9 px-3 rounded-lg text-[12px] text-zinc-500 hover:text-zinc-700 transition"
             >
               Don't show again
             </button>
             <button
               onClick={() => setKzDialog(null)}
-              className="h-9 px-4 rounded-lg bg-zinc-900 text-white text-[11px] font-semibold tracking-wider uppercase hover:bg-zinc-800 transition shadow-[0_4px_12px_-4px_rgba(0,0,0,0.4)]"
+              className="h-9 px-4 rounded-lg bg-zinc-900 text-white text-[12px] font-medium hover:bg-zinc-800 transition"
             >
               I understand
             </button>
           </DialogFooter>
+
         </DialogContent>
 
 
