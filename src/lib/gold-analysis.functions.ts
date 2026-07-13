@@ -2091,7 +2091,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // Failure here should NEVER block the plan — Stage-1 result stands.
     if (built.direction !== "WAIT" && (setupGrade === "A+" || setupGrade === "A" || setupScore >= 59)) {
       try {
-        const reviewSystem = `You are a 25-year institutional trader reviewing a junior's ICT/SMC setup. Be brutally honest — most setups are NOT A+. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case against this trade>","chasing_price":true|false}`;
+        const reviewSystem = `You are a 25-year institutional trader (bank/prop desk head) reviewing a junior analyst's ICT/SMC setup for real money risk. Your job is to protect capital. Be brutally honest — most setups are NOT A+. Verify the ENTRY, STOP LOSS, and TAKE PROFIT are placed correctly, not just the direction. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case>","chasing_price":true|false,"levels_ok":true|false,"levels_note":"<one line on entry/SL/TP quality>"}`;
         const reviewUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
 CURRENT PRICE: ${last.c.toFixed(dec)} | HTF BIAS: ${htfA.trend} | LTF BIAS: ${ltfA.trend}
 KILLZONE: ${kz.killzone} | NATIVE SESSION: ${kz.nativeSession ? "yes" : "no"}
@@ -2102,12 +2102,14 @@ DXY CONFIRMS: ${dxyConfirms === true ? "yes" : dxyConfirms === false ? "no" : "N
 ENGINE GRADE: ${setupGrade} (score ${setupScore}/100)
 BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
-3 checks — answer honestly:
-1) Would a 25-year desk trader take this? Why/why not?
-2) Strongest counter-argument?
-3) Is entry CHASING price (already extended) or WAITING at premium/discount?
+5 checks — answer honestly:
+1) Would a 25-year desk trader risk real money on this? Why/why not?
+2) Strongest counter-argument (what kills this trade)?
+3) Is entry CHASING price (already extended past the zone) or WAITING at premium/discount?
+4) LEVELS CHECK — Is entry inside a real OB/FVG? Is SL beyond structure with sensible buffer (not too tight, not too wide vs ATR)? Is TP at a nameable liquidity pool (BSL/SSL/PDH/PDL/HTF swing) with RR ≥ 1.8?
+5) If any of entry/SL/TP is placed poorly → set levels_ok=false and DOWNGRADE or VETO.
 
-VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only for true A+ institutional setups.`;
+VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine but not A+. CONFIRM only for true A+ institutional setups with clean entry/SL/TP.`;
 
         const { content: rc, model: __aiModel3, usage: __aiUsage3 } = await callChatCompletion({
           models: [...MODEL_CHAIN.seniorReview],
