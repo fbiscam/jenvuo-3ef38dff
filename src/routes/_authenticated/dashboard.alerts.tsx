@@ -155,7 +155,7 @@ function AlertPrefs() {
           </div>
         </div>
 
-        <div className="mt-4 max-h-[420px] overflow-y-auto overflow-x-auto sm:overflow-x-hidden rounded-xl border border-zinc-100">
+        <div className="mt-4 overflow-x-auto sm:overflow-x-hidden rounded-xl border border-zinc-100">
           {alertsLoading ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">Loading alerts…</div>
           ) : alerts.length === 0 ? (
