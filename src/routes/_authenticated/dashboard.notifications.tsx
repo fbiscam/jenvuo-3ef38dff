@@ -57,9 +57,9 @@ function timeAgo(iso: string) {
 function gradeFromScore(score: unknown) {
   const n = Number(score);
   if (!Number.isFinite(n)) return "";
-  if (n >= 85) return "A+";
-  if (n >= 70) return "A";
-  if (n >= 55) return "B";
+  if (n >= 90) return "A+";
+  if (n >= 80) return "A";
+  if (n >= 65) return "B";
   return "C";
 }
 
