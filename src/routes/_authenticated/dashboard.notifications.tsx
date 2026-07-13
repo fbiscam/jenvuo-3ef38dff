@@ -249,7 +249,7 @@ function NotificationsPage() {
   return (
     <div className="max-w-3xl">
       {/* Filters + Mark all read */}
-      <div className="flex flex-row items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
         <div className="flex gap-1.5 min-w-0 flex-1 overflow-x-auto no-scrollbar -mx-1 px-1">
 
           {filters.map((f) => (
@@ -268,7 +268,7 @@ function NotificationsPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0 justify-end sm:justify-start ml-3 pl-2 border-l border-zinc-200">
+        <div className="flex items-center gap-1.5 shrink-0 justify-end sm:ml-3 sm:pl-2 sm:border-l sm:border-zinc-200">
           {filtered.length > 0 && (
             <button
               onClick={selectionMode ? clearSelection : toggleSelectAll}
