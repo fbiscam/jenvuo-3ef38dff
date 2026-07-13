@@ -116,6 +116,7 @@ const TIERS = [
       
       "Voice queries free",
       "Everything in Pro",
+      "Powered by GPT-5.4 + DeepSeek V4 Pro",
       "Priority A+ alerts (< 30s)",
       "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF)",
       "API access & webhooks",
