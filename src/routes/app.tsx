@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SignalCard } from "@/components/SignalCard";
 import { NewsPanel } from "@/components/NewsPanel";
 import { useSpeech, VOICE_PRESETS, type VoicePresetKey } from "@/hooks/useSpeech";
-import { analyzeGold, normalizeQuery, type GoldSignal } from "@/lib/gold-analysis.functions";
+import { analyzeGold, getSignalPlan, normalizeQuery, type GoldSignal, type SignalPlan } from "@/lib/gold-analysis.functions";
 import { getGoldNews } from "@/lib/news.functions";
 import { useCredits } from "@/hooks/useCredits";
 import { appendVoiceTurn } from "@/lib/voice-history";
@@ -177,6 +177,37 @@ function detectSymbol(query: string): string {
   return "XAUUSD";
 }
 
+function signalPlanToGoldSignal(plan: SignalPlan): GoldSignal {
+  const d = Math.max(0, Math.min(6, plan.instrument.decimals ?? 2));
+  const fmt = (n: number) =>
+    n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const tps: string[] = [];
+  if (typeof plan.trade.tp1 === "number") tps.push(fmt(plan.trade.tp1));
+  if (typeof plan.trade.tp2 === "number") tps.push(fmt(plan.trade.tp2));
+  if (typeof plan.trade.tp3 === "number") tps.push(fmt(plan.trade.tp3));
+  if (tps.length === 0) tps.push(fmt(plan.trade.tp));
+  const biasMap = { bullish: "BULLISH", bearish: "BEARISH", neutral: "NEUTRAL" } as const;
+  return {
+    bias: biasMap[plan.htfBias] ?? "NEUTRAL",
+    direction: plan.trade.direction,
+    entry: fmt(plan.trade.entry),
+    stopLoss: fmt(plan.trade.sl),
+    takeProfits: tps,
+    riskReward: `1:${(plan.trade.rr ?? 0).toFixed(2)}`,
+    confidence: plan.trade.confidence,
+    killzone: plan.killzone,
+    confluences: plan.confluences ?? [],
+    ictAnalysis: plan.htfNarrative,
+    smcAnalysis: plan.ltfNarrative,
+    marketStructure: plan.alignmentLabel,
+    spokenSummary: plan.trade.summary,
+    fullAnalysis: `${plan.intro}\n\n${plan.htfNarrative}\n\n${plan.ltfNarrative}`,
+    timeframe: "HTF+LTF",
+    currentPrice: plan.currentPrice,
+    generatedAt: plan.generatedAt,
+  };
+}
+
 function Home() {
   const navigate = useNavigate();
   const { user: authUser, loading: authLoading } = useAuthUser();
@@ -201,6 +232,7 @@ function Home() {
 
 
   const analyze = useServerFn(analyzeGold);
+  const fetchSignalPlan = useServerFn(getSignalPlan);
   const credits = useCredits();
 
   const fetchNews = useServerFn(getGoldNews);
@@ -255,9 +287,10 @@ function Home() {
 
   const handleCommand = useCallback(async (query: string) => {
     if (loadingRef.current || !query.trim()) return;
+    const q = normalizeQuery(query);
 
-    // Signal/setup/trade intent → navigate to /signal page for ANY instrument the user names
-    if (/\b(signal|setup|trade\s*idea|trade\s*plan|analyze|analysis|live\s*chart|show\s*chart|new\s*signal|chart\s*open|open\s*chart|view\s*chart)\b/i.test(normalizeQuery(query))) {
+    // "open chart / show chart / live chart" → still route to the full desk
+    if (/\b(live\s*chart|show\s*chart|chart\s*open|open\s*chart|view\s*chart|signal\s*desk)\b/i.test(q)) {
       const symbol = detectSymbol(query);
       speech.stopSpeaking();
       speech.pauseListening();
@@ -265,28 +298,51 @@ function Home() {
       return;
     }
 
+    // Analyze / signal / setup / trade-idea intent → run the SAME full
+    // killzone-quality plan the /signal desk runs (getSignalPlan), inline
+    // on /app. Narrate the summary and show the SignalCard.
+    const analyzeIntent = /\b(signal|setup|trade\s*idea|trade\s*plan|analyze|analysis|scan|new\s*signal)\b/i.test(q);
+
     loadingRef.current = true;
     setLoading(true);
     speech.pauseListening();
     const tf = parseTimeframe(query, timeframe);
     if (tf !== timeframe) setTimeframe(tf);
     try {
-      const ok = await credits.spend("voice_query", { query: query.slice(0, 80) });
-      if (!ok) {
-        loadingRef.current = false;
-        setLoading(false);
-        speech.resumeIfWanted();
-        return;
+      if (analyzeIntent) {
+        const symbol = detectSymbol(query);
+        const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+        const ok = await credits.spend("signal", { symbol, scanId, caller: "app.tsx:handleCommand" });
+        if (!ok) {
+          loadingRef.current = false;
+          setLoading(false);
+          speech.resumeIfWanted();
+          return;
+        }
+        const plan = await fetchSignalPlan({ data: { symbol } });
+        const mapped = signalPlanToGoldSignal(plan);
+        setSignal(mapped);
+        appendVoiceTurn({ query, reply: mapped.spokenSummary });
+        speech.speak(mapped.spokenSummary, () => {
+          speech.resumeIfWanted();
+          armSleep();
+        });
+      } else {
+        const ok = await credits.spend("voice_query", { query: query.slice(0, 80) });
+        if (!ok) {
+          loadingRef.current = false;
+          setLoading(false);
+          speech.resumeIfWanted();
+          return;
+        }
+        const result = await analyze({ data: { timeframe: tf, query } });
+        setSignal(result);
+        appendVoiceTurn({ query, reply: result.spokenSummary });
+        speech.speak(result.spokenSummary, () => {
+          speech.resumeIfWanted();
+          armSleep();
+        });
       }
-      const result = await analyze({ data: { timeframe: tf, query } });
-      setSignal(result);
-      appendVoiceTurn({ query, reply: result.spokenSummary });
-
-
-      speech.speak(result.spokenSummary, () => {
-        speech.resumeIfWanted();
-        armSleep();
-      });
     } catch (e: any) {
       toast.error(e?.message || "Analysis failed");
       speech.speak("Sorry, the analysis failed.", () => {
@@ -297,7 +353,7 @@ function Home() {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [analyze, speech, timeframe, navigate, credits]);
+  }, [analyze, fetchSignalPlan, speech, timeframe, navigate, credits]);
 
   // Accumulate final transcripts into a buffer while listening (do NOT send yet)
   useEffect(() => {
