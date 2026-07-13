@@ -2433,17 +2433,17 @@ function TradeManagementLadder({
 
   const steps = [
     {
-      label: "Step 1 · +1R hit",
+      label: "Step 1 · 30% profit hit",
       price: p1R,
-      action: "Close 50% · Move SL to Entry",
-      why: "Half profit booked. Trade is now risk-free.",
+      action: "Close 70% · Move SL to Entry",
+      why: "Bulk profit booked. Trade is now risk-free (breakeven).",
       hit: rMultiple >= 1,
     },
     {
-      label: "Step 2 · TP hit",
+      label: "Step 2 · Runner to TP2 / 50%",
       price: t.tp,
-      action: "Close remaining 50%",
-      why: "Full target reached. Trade complete.",
+      action: "Let 30% runner ride",
+      why: "Free upside with zero risk — if price returns, exit flat; if it runs, bonus locked.",
       hit: rMultiple >= 3 || status === "WIN",
     },
   ];
