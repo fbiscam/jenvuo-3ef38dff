@@ -1827,7 +1827,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
         // Accuracy first: full fallback chain so narration reliably completes
         // (same quality as the 75%-accurate BUY signals users got earlier).
-        models: MODEL_CHAIN.narration,
+        models: [...MODEL_CHAIN.narration],
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
