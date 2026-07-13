@@ -293,32 +293,28 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Primary: Lovable AI Gateway (OpenAI GPT-5.5). Bluesminds as fallback.
+  // ALL models routed via Bluesminds. Primary = gpt-5.4 (top OpenAI on
+  // Bluesminds; gpt-5.5 is NOT available in Bluesminds catalog).
   intent: [
-    "openai/gpt-5.5",
     "bmind/gpt-5.4",
     "bmind/deepseek-v4-flash",
+    "bmind/deepseek-ai/deepseek-v4-pro",
   ],
 
-  // Chart narration — accuracy-first on GPT-5.5.
   narration: [
-    "openai/gpt-5.5",
     "bmind/gpt-5.4",
     "bmind/deepseek-ai/deepseek-v4-pro",
   ],
 
-  // Senior 25-year-trader review — second opinion from a different family.
   seniorReview: [
-    "openai/gpt-5.5",
-    "bmind/deepseek-ai/deepseek-v4-pro",
     "bmind/gpt-5.4",
+    "bmind/deepseek-ai/deepseek-v4-pro",
   ],
 
-  // Conversational chat around signals.
   chat: [
-    "openai/gpt-5.5",
     "bmind/gpt-5.4",
     "bmind/deepseek-ai/deepseek-v4-pro",
+    "bmind/deepseek-v4-flash",
   ],
 } as const;
 
