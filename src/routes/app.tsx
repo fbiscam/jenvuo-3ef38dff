@@ -332,7 +332,7 @@ function Home() {
       const symbol = detectSymbol(query);
       speech.stopSpeaking();
       speech.pauseListening();
-      navigate({ to: "/signal", search: { symbol } });
+      navigate({ to: "/signal", search: { symbol }, replace: true });
       return;
     }
 
