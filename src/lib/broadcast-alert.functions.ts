@@ -39,7 +39,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
     const pair = data.pair.toUpperCase().replace(/[^A-Z]/g, '')
 
     // 1. Insert into signal_alerts
-    const grade = ['A+', 'A'].includes(data.grade) ? data.grade : 'A'
+    const grade = data.grade
     const { data: inserted, error: insertErr } = await supabaseAdmin
       .from('signal_alerts')
       .insert({
@@ -144,7 +144,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
 
       const templateData = {
         pair,
-        grade: grade as 'A+' | 'A',
+        grade,
         direction: data.direction,
         entry: round(data.entry).toFixed(data.decimals),
         sl: round(data.sl).toFixed(data.decimals),
