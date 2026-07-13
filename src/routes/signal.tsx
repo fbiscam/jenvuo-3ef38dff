@@ -1488,6 +1488,115 @@ function SignalPage() {
                 </div>
               )}
 
+              {/* HTF Lock — chained analysis anchor */}
+              {plan?.htfLock && plan.htfLock.reason && (
+                <div className="rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>HTF Lock</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className={cn(
+                        `text-[9px] ${MONO} tracking-widest uppercase font-semibold px-1.5 py-0.5 rounded`,
+                        plan.htfLock.bias === "bullish" && "bg-emerald-100 text-emerald-800",
+                        plan.htfLock.bias === "bearish" && "bg-rose-100 text-rose-800",
+                        plan.htfLock.bias === "neutral" && "bg-zinc-100 text-zinc-700",
+                      )}>
+                        {plan.htfLock.bias}
+                      </span>
+                      <span className={cn(
+                        `text-[9px] ${MONO} tracking-widest uppercase font-semibold px-1.5 py-0.5 rounded`,
+                        plan.htfLock.ltfAligned ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200",
+                      )}>
+                        {plan.htfLock.ltfAligned ? "LTF ✓ aligned" : "LTF ✗ diverges"}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-zinc-800 leading-snug">{plan.htfLock.reason}</p>
+                </div>
+              )}
+
+              {/* Self-Critique — what could kill this trade */}
+              {plan?.selfCritique && (plan.selfCritique.risks.length > 0 || plan.selfCritique.invalidationTriggers.length > 0) && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50/40 px-3 py-2.5">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-amber-800`}>AI Self-Critique</span>
+                    {plan.selfCritique.confidenceSelfScore > 0 && (
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-14 h-1 bg-amber-200/70 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-amber-600 rounded-full transition-all"
+                            style={{ width: `${plan.selfCritique.confidenceSelfScore * 10}%` }}
+                          />
+                        </div>
+                        <span className={`text-[10px] ${MONO} tabular-nums font-semibold text-amber-800`}>
+                          {plan.selfCritique.confidenceSelfScore.toFixed(1)}/10
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  {plan.selfCritique.risks.length > 0 && (
+                    <ul className="space-y-1 mb-2">
+                      {plan.selfCritique.risks.map((r, i) => (
+                        <li key={i} className="text-[11px] text-zinc-800 leading-snug flex gap-1.5" title={r}>
+                          <span className="text-amber-700 shrink-0">−</span>
+                          <span className="line-clamp-2">{r}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {plan.selfCritique.invalidationTriggers.length > 0 && (
+                    <div className="pt-1.5 border-t border-amber-200/70">
+                      <div className={`text-[9px] ${MONO} tracking-widest uppercase text-amber-700 mb-1`}>Invalidation triggers</div>
+                      <ul className="space-y-0.5">
+                        {plan.selfCritique.invalidationTriggers.map((t, i) => (
+                          <li key={i} className={`text-[11px] ${MONO} text-zinc-800 leading-snug flex gap-1.5`} title={t}>
+                            <span className="text-amber-700 shrink-0">⚡</span>
+                            <span className="line-clamp-2">{t}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 3-Scenario forecast */}
+              {plan?.scenarios && (() => {
+                const s = plan.scenarios;
+                const rows = ([
+                  { key: "bullish" as const, label: "Bullish", data: s.bullish, barCls: "bg-emerald-500", textCls: "text-emerald-700" },
+                  { key: "base" as const,    label: "Base",    data: s.base,    barCls: "bg-zinc-700",    textCls: "text-zinc-800" },
+                  { key: "bearish" as const, label: "Bearish", data: s.bearish, barCls: "bg-rose-500",    textCls: "text-rose-700" },
+                ]).filter((r) => r.data && (r.data.probability > 0 || r.data.path));
+                if (!rows.length) return null;
+                const dec = plan.instrument.decimals;
+                return (
+                  <div className="rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Scenarios (24h)</span>
+                    <div className="space-y-2 mt-2">
+                      {rows.map((r) => (
+                        <div key={r.key}>
+                          <div className="flex items-center justify-between text-[10px] mb-1">
+                            <span className={`${MONO} tracking-widest uppercase font-semibold ${r.textCls}`}>{r.label}</span>
+                            <div className="flex items-center gap-2">
+                              {r.data.keyLevel != null && (
+                                <span className={`${MONO} tabular-nums text-zinc-500`}>@ {r.data.keyLevel.toFixed(dec)}</span>
+                              )}
+                              <span className={`${MONO} tabular-nums font-semibold ${r.textCls}`}>{r.data.probability}%</span>
+                            </div>
+                          </div>
+                          <div className="h-1 bg-zinc-100 rounded-full overflow-hidden">
+                            <div className={cn("h-full rounded-full transition-all", r.barCls)} style={{ width: `${Math.max(2, r.data.probability)}%` }} />
+                          </div>
+                          {r.data.path && (
+                            <p className="text-[11px] text-zinc-700 leading-snug mt-1 line-clamp-2" title={r.data.path}>{r.data.path}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* A+ alert opt-in + recent fired alerts */}
               <AlertOptInCard />
               <AlertsHistoryPanel alerts={alertHistory} loading={alertsLoading} />
