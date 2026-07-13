@@ -1326,12 +1326,21 @@ function SignalPage() {
                     </div>
                   )}
 
-                  {/* Live profit-protect nudge */}
-                  {(isBuy || isSell) && rMultiple >= 0.6 && trackerStatus !== "WIN" && trackerStatus !== "LOSS" && (
+                  {/* Live profit-protect nudge — 50% (half) of investment = exit fully */}
+                  {(isBuy || isSell) && rMultiple >= 1.0 && trackerStatus !== "WIN" && trackerStatus !== "LOSS" && (
+                    <div className="flex items-start gap-2 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-[11px] text-rose-900 leading-snug">
+                      <span className="mt-0.5 shrink-0">🎯</span>
+                      <span>
+                        Profit ≈ <b>{rMultiple.toFixed(2)}R</b> — around <b>50% (half) of investment</b>. <b>Exit the full trade now</b> and lock the win. Don't be greedy.
+                      </span>
+                    </div>
+                  )}
+                  {/* 30% threshold nudge */}
+                  {(isBuy || isSell) && rMultiple >= 0.6 && rMultiple < 1.0 && trackerStatus !== "WIN" && trackerStatus !== "LOSS" && (
                     <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-[11px] text-amber-900 leading-snug">
                       <span className="mt-0.5 shrink-0">💡</span>
                       <span>
-                        Current profit ≈ <b>{rMultiple.toFixed(2)}R</b> — near the 30%-of-investment threshold. <b>Close 50% now</b> and move SL to entry. Locking in profit is smarter than chasing TP2.
+                        Current profit ≈ <b>{rMultiple.toFixed(2)}R</b> — near the <b>30%-of-investment</b> threshold. <b>Close 50% now</b> and move SL to entry. Locking in profit is smarter than chasing TP2.
                       </span>
                     </div>
                   )}
