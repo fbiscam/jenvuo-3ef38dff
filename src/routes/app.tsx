@@ -177,6 +177,37 @@ function detectSymbol(query: string): string {
   return "XAUUSD";
 }
 
+function signalPlanToGoldSignal(plan: SignalPlan): GoldSignal {
+  const d = Math.max(0, Math.min(6, plan.instrument.decimals ?? 2));
+  const fmt = (n: number) =>
+    n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const tps: string[] = [];
+  if (typeof plan.trade.tp1 === "number") tps.push(fmt(plan.trade.tp1));
+  if (typeof plan.trade.tp2 === "number") tps.push(fmt(plan.trade.tp2));
+  if (typeof plan.trade.tp3 === "number") tps.push(fmt(plan.trade.tp3));
+  if (tps.length === 0) tps.push(fmt(plan.trade.tp));
+  const biasMap = { bullish: "BULLISH", bearish: "BEARISH", neutral: "NEUTRAL" } as const;
+  return {
+    bias: biasMap[plan.htfBias] ?? "NEUTRAL",
+    direction: plan.trade.direction,
+    entry: fmt(plan.trade.entry),
+    stopLoss: fmt(plan.trade.sl),
+    takeProfits: tps,
+    riskReward: `1:${(plan.trade.rr ?? 0).toFixed(2)}`,
+    confidence: plan.trade.confidence,
+    killzone: plan.killzone,
+    confluences: plan.confluences ?? [],
+    ictAnalysis: plan.htfNarrative,
+    smcAnalysis: plan.ltfNarrative,
+    marketStructure: plan.alignmentLabel,
+    spokenSummary: plan.trade.summary,
+    fullAnalysis: `${plan.intro}\n\n${plan.htfNarrative}\n\n${plan.ltfNarrative}`,
+    timeframe: "HTF+LTF",
+    currentPrice: plan.currentPrice,
+    generatedAt: plan.generatedAt,
+  };
+}
+
 function Home() {
   const navigate = useNavigate();
   const { user: authUser, loading: authLoading } = useAuthUser();
