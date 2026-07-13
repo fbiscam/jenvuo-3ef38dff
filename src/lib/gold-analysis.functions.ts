@@ -1873,8 +1873,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         ],
         jsonMode: true,
         maxTokens: 1900,
-        timeoutMs: 14000,
-        retriesPerModel: 1,
+        timeoutMs: 20000,
+        retriesPerModel: 2,
         priority: true,
         stage: "signal-narration",
       });
@@ -2096,10 +2096,11 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
 
     // ============ STAGE 2: SENIOR TRADER DEEP REVIEW ============
-    // Only run the expensive pro model when the engine already thinks it's A/A+.
-    // The pro model acts as a "25-year veteran" second opinion — it can veto or confirm.
+    // Runs the pro model as a "25-year veteran" second opinion on any live
+    // A / A+ setup — it can veto, downgrade, or confirm. Widened from A+
+    // only so borderline A trades also get a sanity check before firing.
     // Failure here should NEVER block the plan — Stage-1 result stands.
-    if (setupGrade === "A+" && built.direction !== "WAIT") {
+    if ((setupGrade === "A+" || setupGrade === "A") && built.direction !== "WAIT") {
       try {
         const reviewSystem = `You are a 25-year institutional trader reviewing a junior's ICT/SMC setup. Be brutally honest — most setups are NOT A+. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case against this trade>","chasing_price":true|false}`;
         const reviewUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
@@ -2126,10 +2127,10 @@ VETO if trader wouldn't take it. DOWNGRADE if it's fine but not A+. CONFIRM only
             { role: "user", content: reviewUser },
           ],
           jsonMode: true,
-          maxTokens: 180,
-          timeoutMs: 9000,
+          maxTokens: 220,
+          timeoutMs: 12000,
           priority: true,
-          retriesPerModel: 1,
+          retriesPerModel: 2,
           stage: "senior-review",
         });
         __usedSeniorModel = __aiModel3 ?? null;
