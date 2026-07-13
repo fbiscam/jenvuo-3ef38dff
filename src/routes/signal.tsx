@@ -2240,7 +2240,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
                 {plan.marketRegime.regime}
               </div>
             </div>
-            <div className={`text-[11px] text-zinc-700 leading-snug mt-1 ${MONO}`}>
+            <div className={`text-[10px] sm:text-[11px] text-zinc-700 leading-snug mt-1 ${MONO} whitespace-nowrap overflow-hidden text-ellipsis`}>
               Trend {plan.marketRegime.trendStrength}% · Vol {plan.marketRegime.volatility}%
               {plan.marketRegime.favorable && " · ICT-favorable tape"}
             </div>
