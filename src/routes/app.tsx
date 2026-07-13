@@ -337,6 +337,21 @@ function Home() {
     try {
       if (analyzeIntent) {
         const symbol = detectSymbol(query);
+        // Pre-flight low-balance guard — block before hitting the server.
+        if (!credits.isLoading && credits.balance < 0.20) {
+          const msg = `Your balance is $${credits.balance.toFixed(2)}. You need at least $0.20 to run a signal scan.`;
+          toast.error("Balance too low", {
+            description: `${msg} Add funds to continue.`,
+            action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
+          });
+          speech.speak("Your balance is too low to run a signal analysis. Please add funds.", () => {
+            speech.resumeIfWanted();
+            armSleep();
+          });
+          loadingRef.current = false;
+          setLoading(false);
+          return;
+        }
         const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
         const ok = await credits.spend("signal", { symbol, scanId, caller: "app.tsx:handleCommand" });
         if (!ok) {
