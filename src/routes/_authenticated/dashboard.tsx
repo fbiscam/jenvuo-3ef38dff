@@ -579,7 +579,8 @@ function DashboardLayout() {
     window.localStorage.setItem(lsKey(tab), nowIso);
     setNewCounts((prev) => ({ ...prev, [countKey]: 0 } as typeof prev));
     if (authUser?.id) {
-      void supabase.from("profiles").update({ [dbCol(tab)]: nowIso }).eq("id", authUser.id);
+      const patch: Record<string, string> = { [dbCol(tab)]: nowIso };
+      void supabase.from("profiles").update(patch as never).eq("id", authUser.id);
     }
   }, [lsKey, authUser?.id]);
 
