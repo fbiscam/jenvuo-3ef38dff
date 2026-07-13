@@ -1872,11 +1872,12 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
           { role: "user", content: user },
         ],
         jsonMode: true,
-        maxTokens: 1900,
-        timeoutMs: 20000,
-        retriesPerModel: 2,
+        maxTokens: 1600,
+        timeoutMs: 14000,
+        retriesPerModel: 1,
         priority: true,
         stage: "signal-narration",
+
       });
       __usedNarrationModel = __aiModel2 ?? null;
       __totalPromptTokens += __aiUsage2?.promptTokens ?? 0;
