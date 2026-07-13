@@ -250,14 +250,14 @@ function NotificationsPage() {
     <div className="max-w-3xl">
       {/* Filters + Mark all read */}
       <div className="flex flex-row items-center gap-2 mb-4">
-        <div className="flex gap-1.5 min-w-0 flex-1 overflow-x-auto no-scrollbar -mx-1 px-1 sm:flex-wrap sm:overflow-visible sm:mx-0 sm:px-0">
+        <div className="flex gap-1.5 min-w-0 flex-1 overflow-x-auto no-scrollbar -mx-1 px-1">
 
           {filters.map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={cn(
-                "h-7 px-3 rounded-full text-[11px] font-medium transition",
+                "h-7 px-3 rounded-full text-[11px] font-medium transition shrink-0 whitespace-nowrap",
                 filter === f.key
                   ? "bg-zinc-900 text-white"
                   : "bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-50",
