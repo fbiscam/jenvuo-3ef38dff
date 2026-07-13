@@ -278,6 +278,8 @@ function PricingPage() {
                                 <span className="text-[11px] font-medium text-zinc-800">DeepSeek V4 Pro</span>
                               </span>
                             )}
+                          </span>
+                        ) : (
                           <span>{f}</span>
                         )}
                       </li>
