@@ -60,7 +60,9 @@ function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
   if (bare.startsWith("gpt-5")) return "ChatGPT 5";
   if (bare.startsWith("gpt-oss-120b")) return "GPT-OSS 120B";
-  if (bare.startsWith("deepseek-v4-pro")) return "DeepSeek V4 Pro";
+  if (bare.startsWith("deepseek-v4-pro") || bare.startsWith("deepseek-reasoner")) return "DeepSeek V4 Pro";
+  if (bare.startsWith("deepseek-chat")) return "DeepSeek V3";
+
   if (bare.startsWith("gemini-3.1-pro")) return "Gemini 3.1 Pro";
   if (bare.startsWith("gemini-3.5-flash")) return "Gemini 3.5 Flash";
   if (bare.startsWith("gemini-3-flash")) return "Gemini 3 Flash";
