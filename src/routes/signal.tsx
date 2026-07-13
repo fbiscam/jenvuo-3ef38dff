@@ -1309,9 +1309,9 @@ function SignalPage() {
                       <div className="flex items-center gap-1.5 font-semibold text-emerald-800 uppercase tracking-wider text-[10px]">
                         <span>◆</span> Trade Management
                       </div>
-                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">1.</span><span><b>TP1 hit (+1R)</b> → Close <b>50%</b> position &amp; move SL to entry (breakeven). Baaki profit ab risk-free.</span></div>
-                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">2.</span><span>Agar profit <b>invested amount ka 30%+</b> ho jaye (e.g. $10 invest → $3+ profit) → <b>trade close karna better hai</b>, secure the win.</span></div>
-                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">3.</span><span>Warna trade <b>on your own risk</b> — TP2 tak hold sirf tab jab HTF bias intact ho aur koi news event na ho.</span></div>
+                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">1.</span><span><b>TP1 hit (+1R)</b> → Close <b>50%</b> of position &amp; move SL to entry (breakeven). Remaining profit is now risk-free.</span></div>
+                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">2.</span><span>If profit reaches <b>30%+ of your invested amount</b> (e.g. $10 invested → $3+ profit) → <b>closing the trade is recommended</b> to secure the win.</span></div>
+                      <div className="flex gap-2"><span className="text-emerald-600 font-bold">3.</span><span>Otherwise, hold at your <b>own risk</b> — only run to TP2 if HTF bias remains intact and no news event is imminent.</span></div>
                     </div>
                   )}
 
@@ -1320,7 +1320,7 @@ function SignalPage() {
                     <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-[11px] text-amber-900 leading-snug">
                       <span className="mt-0.5 shrink-0">💡</span>
                       <span>
-                        Current profit ≈ <b>{rMultiple.toFixed(2)}R</b> — 30%-of-investment threshold ke qareeb. <b>50% close karo abhi</b> &amp; SL ko entry pe move karo. Locking profit is smarter than chasing TP2.
+                        Current profit ≈ <b>{rMultiple.toFixed(2)}R</b> — near the 30%-of-investment threshold. <b>Close 50% now</b> and move SL to entry. Locking in profit is smarter than chasing TP2.
                       </span>
                     </div>
                   )}
