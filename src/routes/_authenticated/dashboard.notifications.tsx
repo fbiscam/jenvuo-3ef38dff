@@ -17,6 +17,7 @@ import {
   Info,
   Inbox,
   Trash2,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -384,40 +385,137 @@ function NotificationsPage() {
                           <v.Icon className="h-[18px] w-[18px]" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-start gap-2">
-                            <p
-                              className={cn(
-                                "text-[13px] leading-tight truncate flex-1 min-w-0 tracking-[-0.01em]",
-                                isUnread ? "font-semibold text-zinc-900" : "font-medium text-zinc-700",
+                          {n.type === "signal_alert" ? (
+                            (() => {
+                              const d = (n.data ?? {}) as Record<string, unknown>;
+                              const pair = String(d.pair ?? "");
+                              const direction = String(d.direction ?? "").toUpperCase();
+                              const isBuy = direction === "BUY";
+                              const grade = d.grade ? String(d.grade) : "";
+                              const entry = d.entry != null ? String(d.entry) : "";
+                              const sl = d.sl != null ? String(d.sl) : "";
+                              const tp = d.tp != null ? String(d.tp) : "";
+                              const rr = d.rr != null ? Number(d.rr).toFixed(2) : "";
+                              const rationale = n.body?.includes(" — ") ? n.body.split(" — ").slice(1).join(" — ") : "";
+                              return (
+                                <>
+                                  <div className="flex items-center gap-2 mb-1.5 min-w-0">
+                                    <span className="text-[15px] sm:text-[16px] font-bold text-zinc-900 tracking-tight truncate">
+                                      {pair || n.title}
+                                    </span>
+                                    {direction && (
+                                      <span
+                                        className={cn(
+                                          "shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight",
+                                          isBuy
+                                            ? "bg-emerald-100 text-emerald-700"
+                                            : "bg-red-100 text-red-700",
+                                        )}
+                                      >
+                                        {direction}
+                                      </span>
+                                    )}
+                                    <div className="ml-auto shrink-0 flex items-center gap-1.5 text-[10px] text-zinc-400 pt-0.5">
+                                      <span className="tabular-nums font-medium text-zinc-500">
+                                        {timeAgo(n.created_at)}
+                                      </span>
+                                      {isUnread && (
+                                        <span
+                                          aria-hidden
+                                          className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)] animate-pulse"
+                                        />
+                                      )}
+                                    </div>
+                                  </div>
+                                  {(entry || sl || tp || rr) && (
+                                    <div className="flex items-center gap-3 sm:gap-4 mb-2 flex-wrap">
+                                      {entry && (
+                                        <div className="flex flex-col">
+                                          <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-tight">Entry</span>
+                                          <span className="text-[13px] font-semibold text-zinc-800 font-mono tabular-nums">{entry}</span>
+                                        </div>
+                                      )}
+                                      {sl && (
+                                        <div className="flex flex-col">
+                                          <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-tight">SL</span>
+                                          <span className="text-[13px] font-semibold text-red-600 font-mono tabular-nums">{sl}</span>
+                                        </div>
+                                      )}
+                                      {tp && (
+                                        <div className="flex flex-col">
+                                          <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-tight">TP</span>
+                                          <span className="text-[13px] font-semibold text-emerald-600 font-mono tabular-nums">{tp}</span>
+                                        </div>
+                                      )}
+                                      {rr && (
+                                        <div className="ml-auto flex flex-col items-end">
+                                          <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-tight">R:R</span>
+                                          <span className="text-[13px] font-bold text-zinc-900 tabular-nums">1:{rr}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    {grade && (
+                                      <span className="shrink-0 inline-flex items-center gap-1 text-[11px] font-medium text-zinc-600">
+                                        <Star
+                                          className={cn(
+                                            "h-3 w-3",
+                                            grade.startsWith("A") ? "text-amber-500 fill-amber-400" : "text-zinc-400",
+                                          )}
+                                        />
+                                        Grade {grade}
+                                      </span>
+                                    )}
+                                    {rationale && (
+                                      <>
+                                        {grade && <span className="text-zinc-300">·</span>}
+                                        <span className="text-[11px] text-zinc-500 truncate">{rationale}</span>
+                                      </>
+                                    )}
+                                  </div>
+                                </>
+                              );
+                            })()
+                          ) : (
+                            <>
+                              <div className="flex items-start gap-2">
+                                <p
+                                  className={cn(
+                                    "text-[13px] leading-tight truncate flex-1 min-w-0 tracking-[-0.01em]",
+                                    isUnread ? "font-semibold text-zinc-900" : "font-medium text-zinc-700",
+                                  )}
+                                >
+                                  {n.title}
+                                </p>
+                                <div className="shrink-0 flex items-center gap-1.5 text-[10px] text-zinc-400 pt-[3px]">
+                                  <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-zinc-100/80 px-2 py-0.5 text-[9px] font-medium text-zinc-600 ring-1 ring-inset ring-zinc-200/60">
+                                    <Bell className="h-2.5 w-2.5" />
+                                    {v.label}
+                                  </span>
+                                  <span className="tabular-nums font-medium text-zinc-500">{timeAgo(n.created_at)}</span>
+                                  {isUnread && (
+                                    <span
+                                      aria-hidden
+                                      className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)] animate-pulse"
+                                    />
+                                  )}
+                                </div>
+                              </div>
+                              {n.body && (
+                                <p
+                                  className={cn(
+                                    "mt-1.5 text-[12px] leading-[1.55] line-clamp-2 break-words",
+                                    isUnread ? "text-zinc-600" : "text-zinc-500",
+                                  )}
+                                >
+                                  {n.body}
+                                </p>
                               )}
-                            >
-                              {n.title}
-                            </p>
-                            <div className="shrink-0 flex items-center gap-1.5 text-[10px] text-zinc-400 pt-[3px]">
-                              <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-zinc-100/80 px-2 py-0.5 text-[9px] font-medium text-zinc-600 ring-1 ring-inset ring-zinc-200/60">
-                                <Bell className="h-2.5 w-2.5" />
-                                {v.label}
-                              </span>
-                              <span className="tabular-nums font-medium text-zinc-500">{timeAgo(n.created_at)}</span>
-                              {isUnread && (
-                                <span
-                                  aria-hidden
-                                  className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)] animate-pulse"
-                                />
-                              )}
-                            </div>
-                          </div>
-                          {n.body && (
-                            <p
-                              className={cn(
-                                "mt-1.5 text-[12px] leading-[1.55] line-clamp-2 break-words",
-                                isUnread ? "text-zinc-600" : "text-zinc-500",
-                              )}
-                            >
-                              {n.body}
-                            </p>
+                            </>
                           )}
                         </div>
+
 
                         <div className="shrink-0 flex items-center gap-1 self-center">
                           {isUnread && (
