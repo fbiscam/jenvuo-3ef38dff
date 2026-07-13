@@ -525,10 +525,42 @@ function DashboardLayout() {
   }, [range, refreshTick, authUser?.id, authLoading]);
 
   // ---------- Unread badge counts (per tab, cleared when user opens tab) ----------
+  // Persist lastSeen to profiles (DB) so badges stay cleared across
+  // sign-ins, browsers, and devices — not just this browser.
   const lsKey = useCallback(
     (tab: "saved" | "alerts" | "journal") => `dash:lastSeen:${authUser?.id ?? "anon"}:${tab}`,
     [authUser?.id],
   );
+  const dbCol = (tab: "saved" | "alerts" | "journal") =>
+    tab === "saved" ? "saved_last_seen_at" : tab === "alerts" ? "alerts_last_seen_at" : "journal_last_seen_at";
+
+  // Hydrate localStorage from DB on sign-in, keeping the max of the two.
+  useEffect(() => {
+    if (authLoading || !authUser || typeof window === "undefined") return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("saved_last_seen_at, alerts_last_seen_at, journal_last_seen_at")
+        .eq("id", authUser.id)
+        .maybeSingle();
+      if (cancelled || !data) return;
+      const merge = (tab: "saved" | "alerts" | "journal", dbVal: string | null) => {
+        if (!dbVal) return;
+        const local = window.localStorage.getItem(lsKey(tab));
+        if (!local || new Date(dbVal).getTime() > new Date(local).getTime()) {
+          window.localStorage.setItem(lsKey(tab), dbVal);
+        }
+      };
+      const d = data as Record<string, string | null>;
+      merge("saved", d.saved_last_seen_at);
+      merge("alerts", d.alerts_last_seen_at);
+      merge("journal", d.journal_last_seen_at);
+      setRefreshTick((t) => t + 1);
+    })();
+    return () => { cancelled = true; };
+  }, [authUser?.id, authLoading, lsKey]);
+
   const getLastSeen = useCallback((tab: "saved" | "alerts" | "journal") => {
     if (typeof window === "undefined") return new Date(0).toISOString();
     return window.localStorage.getItem(lsKey(tab)) ?? new Date(0).toISOString();
@@ -543,9 +575,13 @@ function DashboardLayout() {
     };
     const tab = map[countKey];
     if (!tab) return;
-    window.localStorage.setItem(lsKey(tab), new Date().toISOString());
+    const nowIso = new Date().toISOString();
+    window.localStorage.setItem(lsKey(tab), nowIso);
     setNewCounts((prev) => ({ ...prev, [countKey]: 0 } as typeof prev));
-  }, [lsKey]);
+    if (authUser?.id) {
+      void supabase.from("profiles").update({ [dbCol(tab)]: nowIso }).eq("id", authUser.id);
+    }
+  }, [lsKey, authUser?.id]);
 
   // Auto-mark tabs as seen when the user actually visits that tab's page,
   // so the badge clears on open (like Notifications) but persists otherwise.
