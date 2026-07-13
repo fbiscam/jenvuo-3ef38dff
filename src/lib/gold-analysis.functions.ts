@@ -745,12 +745,8 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
       generatedAt: new Date().toISOString(),
     };
 
-    // Flat $0.20 charge only when a real BUY/SELL comes back.
-    import("@/lib/ai-cost-log.server").then((m) => m.chargeSignalScan({
-      userId: __userId,
-      direction: signal.direction,
-      model: __aiModel,
-    })).catch(() => {});
+    // Billing for BUY/SELL happens in the outer analyzeGold handler so both
+    // the plan path and this chat fallback path are charged exactly once.
 
     return { ...signal, __billable: "chat" };
 }
@@ -848,6 +844,23 @@ export const analyzeGold = createServerFn({ method: "POST" })
     const result = await _analyzeGoldCompute(data, context.userId);
     const { __billable: _billable, ...clean } = result;
     void _billable;
+
+    // Flat $0.20 charge for every fresh BUY/SELL scan (both plan and chat paths).
+    // WAIT / no-trade scans stay free. Awaited so any failure surfaces in logs
+    // instead of silently skipping the deduction.
+    if (clean.direction === "BUY" || clean.direction === "SELL") {
+      try {
+        const { chargeSignalScan } = await import("@/lib/ai-cost-log.server");
+        await chargeSignalScan({
+          userId: context.userId,
+          direction: clean.direction,
+          model: null,
+          symbol: instSym,
+        });
+      } catch (e) {
+        console.warn("analyzeGold: chargeSignalScan failed:", (e as Error)?.message ?? e);
+      }
+    }
 
     if (_billable === "signal" && (clean.direction === "BUY" || clean.direction === "SELL")) {
       const entryPx = parsePx(clean.entry);
