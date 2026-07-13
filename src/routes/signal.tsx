@@ -882,7 +882,12 @@ function SignalPage() {
                 <Pause className="h-3.5 w-3.5" /> Stop
               </button>
             ) : (
-              <button onClick={load} disabled={loading} className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50 transition">
+              <button
+                onClick={load}
+                disabled={loading || (!credits.isLoading && credits.balance < 0.20)}
+                title={!credits.isLoading && credits.balance < 0.20 ? "Balance too low — add funds to run an analysis" : "Run a fresh AI analysis"}
+                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
                 {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
                 {loading ? (
                   <span className="tabular-nums">
