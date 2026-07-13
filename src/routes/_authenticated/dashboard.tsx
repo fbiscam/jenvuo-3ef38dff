@@ -547,22 +547,29 @@ function DashboardLayout() {
     setNewCounts((prev) => ({ ...prev, [countKey]: 0 } as typeof prev));
   }, [lsKey]);
 
-  // Auto-mark ALL count-carrying tabs as seen the moment the user lands anywhere
-  // in the dashboard, so badges do not reappear once they've been noticed once.
-  // This MUST run before the fetch below writes fresh counts.
+  // Auto-mark tabs as seen when the user actually visits that tab's page,
+  // so the badge clears on open (like Notifications) but persists otherwise.
   useEffect(() => {
     if (authLoading || !authUser || typeof window === "undefined") return;
     const now = new Date().toISOString();
-    for (const tab of ["saved", "alerts", "journal"] as const) {
-      window.localStorage.setItem(lsKey(tab), now);
+    if (pathname === "/dashboard" || pathname.startsWith("/dashboard/workspace")) {
+      window.localStorage.setItem(lsKey("saved"), now);
+      setNewCounts((prev) => ({ ...prev, saved: 0 }));
     }
-    setNewCounts({ saved: 0, alerts7d: 0, journalTotal: 0 });
+    if (pathname.startsWith("/dashboard/alerts")) {
+      window.localStorage.setItem(lsKey("alerts"), now);
+      setNewCounts((prev) => ({ ...prev, alerts7d: 0 }));
+    }
+    if (pathname.startsWith("/dashboard/journal")) {
+      window.localStorage.setItem(lsKey("journal"), now);
+      setNewCounts((prev) => ({ ...prev, journalTotal: 0 }));
+    }
   }, [pathname, authUser?.id, authLoading, lsKey]);
 
   useEffect(() => {
     if (authLoading || !authUser) return;
     let cancelled = false;
-    (async () => {
+    const load = async () => {
       const savedSince = getLastSeen("saved");
       const alertsSince = getLastSeen("alerts");
       const journalSince = getLastSeen("journal");
@@ -573,8 +580,17 @@ function DashboardLayout() {
       ]);
       if (cancelled) return;
       setNewCounts({ saved: s.count ?? 0, alerts7d: a.count ?? 0, journalTotal: j.count ?? 0 });
-    })();
-    return () => { cancelled = true; };
+    };
+    load();
+    // Realtime: new signal alerts should light up the sidebar badge instantly
+    const ch = supabase
+      .channel(`alerts-nav:${authUser.id}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "signal_alerts" }, () => {
+        if (pathname.startsWith("/dashboard/alerts")) return; // on that page, keep it cleared
+        load();
+      })
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [authUser?.id, authLoading, getLastSeen, pathname]);
 
 
