@@ -146,25 +146,20 @@ const PUBLIC_EMAIL_PROVIDERS = new Set([
   'fastmail.com', 'tutanota.com', 'hey.com',
 ])
 
-async function assertDeviceUnderCap(ip: string | undefined, fingerprint: string | undefined) {
+async function assertDeviceUnderCap(_ip: string | undefined, fingerprint: string | undefined) {
+  // Only enforce the hard cap by browser fingerprint. IP addresses are shared by
+  // families, offices, co-working spaces, and mobile carrier CGNAT — capping on
+  // IP would lock out legitimate users. Abuse from a single IP is still throttled
+  // by SIGNUP_IP_LIMIT_PER_HOUR above.
+  if (!fingerprint) return
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const admin = supabaseAdmin as any
-  const checks: Array<Promise<{ count: number | null } | null>> = []
-  if (ip) {
-    checks.push(
-      admin.from('account_devices').select('user_id', { count: 'exact', head: true }).eq('ip', ip).then((r: any) => ({ count: r.count })),
-    )
-  }
-  if (fingerprint) {
-    checks.push(
-      admin.from('account_devices').select('user_id', { count: 'exact', head: true }).eq('fingerprint', fingerprint).then((r: any) => ({ count: r.count })),
-    )
-  }
-  const results = await Promise.all(checks)
-  for (const r of results) {
-    if (r && typeof r.count === 'number' && r.count >= MAX_ACCOUNTS_PER_DEVICE) {
-      throw new Error('This device or network already has the maximum number of accounts. Please sign in to your existing account.')
-    }
+  const { count } = await admin
+    .from('account_devices')
+    .select('user_id', { count: 'exact', head: true })
+    .eq('fingerprint', fingerprint)
+  if (typeof count === 'number' && count >= MAX_ACCOUNTS_PER_DEVICE) {
+    throw new Error('This device already has the maximum number of accounts. Please sign in to your existing account.')
   }
 }
 
