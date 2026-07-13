@@ -2085,11 +2085,25 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
 
     // ============ STAGE 2: SENIOR TRADER DEEP REVIEW ============
-    // Runs the pro model as a "25-year veteran" second opinion on any live
-    // A / A+ setup — it can veto, downgrade, or confirm. Widened from A+
-    // only so borderline A trades also get a sanity check before firing.
+    // Runs the pro model (DeepSeek V4 Pro) as a "25-year veteran" second
+    // opinion on any live A / A+ setup — it can veto, downgrade, or confirm.
+    // Gated by plan: only paid plans (pro/elite/ultra) get DeepSeek senior
+    // review per pricing page. Free plan = GPT-5.4 only.
     // Failure here should NEVER block the plan — Stage-1 result stands.
-    if (built.direction !== "WAIT" && (setupGrade === "A+" || setupGrade === "A" || setupScore >= 59)) {
+    let __planAllowsSenior = false;
+    if (__userId) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: sub } = await supabaseAdmin
+          .from("user_subscriptions")
+          .select("plan_id, status")
+          .eq("user_id", __userId)
+          .maybeSingle();
+        const pid = (sub?.plan_id as string | undefined) ?? "free";
+        __planAllowsSenior = sub?.status === "active" && pid !== "free";
+      } catch { __planAllowsSenior = false; }
+    }
+    if (__planAllowsSenior && built.direction !== "WAIT" && (setupGrade === "A+" || setupGrade === "A" || setupScore >= 59)) {
       try {
         const reviewSystem = `You are a 25-year institutional trader (bank/prop desk head) reviewing a junior analyst's ICT/SMC setup for real money risk. Your job is to protect capital. Be brutally honest — most setups are NOT A+. Verify the ENTRY, STOP LOSS, and TAKE PROFIT are placed correctly, not just the direction. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case>","chasing_price":true|false,"levels_ok":true|false,"levels_note":"<one line on entry/SL/TP quality>"}`;
         const reviewUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
