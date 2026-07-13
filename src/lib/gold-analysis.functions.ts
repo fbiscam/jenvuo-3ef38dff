@@ -1203,7 +1203,7 @@ function computeSetupScore(args: {
   const counted = checks.filter((c) => c.pass !== null);
   const passed = counted.filter((c) => c.pass).length;
   const score = counted.length ? Math.round((passed / counted.length) * 100) : 0;
-  const grade: SignalPlan["setupGrade"] = score >= 85 ? "A+" : score >= 70 ? "A" : score >= 55 ? "B" : "C";
+  const grade: SignalPlan["setupGrade"] = score >= 90 ? "A+" : score >= 80 ? "A" : score >= 65 ? "B" : "C";
   return { score, grade, checks };
 }
 
@@ -2037,7 +2037,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       }
       // Keep grade in sync with the (possibly reduced) score so the UI
       // never shows e.g. 59% + grade C (59 is within the B band).
-      setupGrade = setupScore >= 85 ? "A+" : setupScore >= 70 ? "A" : setupScore >= 55 ? "B" : "C";
+      setupGrade = setupScore >= 90 ? "A+" : setupScore >= 80 ? "A" : setupScore >= 65 ? "B" : "C";
       setupChecks.unshift({
         key: "regime_warn",
         label: `⚠ Market regime: ${marketRegime.regime}`,
