@@ -2091,6 +2091,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // review per pricing page. Free plan = GPT-5.4 only.
     // Failure here should NEVER block the plan — Stage-1 result stands.
     let __planAllowsSenior = false;
+    let __requiresSeniorReview = false;
+    let __seniorReviewStatus: "not_required" | "completed" | "confirmed" | "downgraded" | "vetoed" | "failed" = "not_required";
+    let __seniorReviewError: string | null = null;
     if (__userId) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -2103,7 +2106,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         __planAllowsSenior = sub?.status === "active" && pid !== "free";
       } catch { __planAllowsSenior = false; }
     }
-    if (__planAllowsSenior && built.direction !== "WAIT" && (setupGrade === "A+" || setupGrade === "A" || setupScore >= 59)) {
+    __requiresSeniorReview = __planAllowsSenior && built.direction !== "WAIT" && (setupGrade === "A+" || setupGrade === "A" || setupScore >= 59);
+    if (__requiresSeniorReview) {
       try {
         const reviewSystem = `You are a 25-year institutional trader (bank/prop desk head) reviewing a junior analyst's ICT/SMC setup for real money risk. Your job is to protect capital. Be brutally honest — most setups are NOT A+. Verify the ENTRY, STOP LOSS, and TAKE PROFIT are placed correctly, not just the direction. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case>","chasing_price":true|false,"levels_ok":true|false,"levels_note":"<one line on entry/SL/TP quality>"}`;
         const reviewUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
@@ -2132,10 +2136,10 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             { role: "user", content: reviewUser },
           ],
           jsonMode: true,
-          maxTokens: 260,
-          timeoutMs: 28000,
+          maxTokens: 220,
+          timeoutMs: 20000,
           priority: true,
-          retriesPerModel: 3,
+          retriesPerModel: 1,
           stage: "senior-review",
 
         });
@@ -2145,7 +2149,9 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
         import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: __aiModel3, usage: __aiUsage3 })).catch(() => {});
         const review: any = tryParseJsonLoose(rc) || {};
         const verdict = String(review.verdict || "").toUpperCase();
+        __seniorReviewStatus = "completed";
         if (verdict === "VETO") {
+          __seniorReviewStatus = "vetoed";
           setupGrade = "C";
           setupScore = Math.min(setupScore, 50);
           setupChecks.unshift({
@@ -2155,6 +2161,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             reason: String(review.reasoning || "Veteran review vetoed this setup"),
           });
         } else if (verdict === "DOWNGRADE") {
+          __seniorReviewStatus = "downgraded";
           setupGrade = setupGrade === "A+" ? "A" : "B";
           setupScore = Math.max(60, setupScore - 15);
           setupChecks.unshift({
@@ -2164,6 +2171,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             reason: String(review.reasoning || "Not quite A+ material"),
           });
         } else if (verdict === "CONFIRM") {
+          __seniorReviewStatus = "confirmed";
           setupChecks.unshift({
             key: "senior_confirm",
             label: "✓ Senior trader confirms",
@@ -2180,7 +2188,15 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
           });
         }
       } catch (e) {
-        console.warn("senior-review failed:", (e as Error)?.message ?? e);
+        __seniorReviewStatus = "failed";
+        __seniorReviewError = String((e as Error)?.message ?? e).slice(0, 240);
+        setupChecks.unshift({
+          key: "senior_review_attempted",
+          label: "⚠ DeepSeek review attempted",
+          pass: false,
+          reason: "DeepSeek senior review was required for this paid-plan signal but the provider did not respond in time; billing still records the DeepSeek review tier for audit.",
+        });
+        console.warn("senior-review failed:", __seniorReviewError);
       }
     }
 
@@ -2511,6 +2527,9 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
           direction: plan.trade.direction,
           model: __usedNarrationModel ?? MODEL_CHAIN.narration[0] ?? null,
           seniorModel: __usedSeniorModel,
+          seniorReviewRequired: __requiresSeniorReview,
+          seniorReviewStatus: __seniorReviewStatus,
+          seniorReviewError: __seniorReviewError,
           symbol: canonicalSymbol,
           scanId: __scanId,
           promptTokens: __totalPromptTokens,

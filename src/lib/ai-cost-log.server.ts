@@ -124,6 +124,9 @@ export async function chargeSignalScan(params: {
   direction: "BUY" | "SELL" | "WAIT" | string;
   model: string | null;
   seniorModel?: string | null;
+  seniorReviewRequired?: boolean;
+  seniorReviewStatus?: string | null;
+  seniorReviewError?: string | null;
   symbol?: string | null;
   scanId?: string | null;
   promptTokens?: number | null;
@@ -138,13 +141,15 @@ export async function chargeSignalScan(params: {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const pTok = Math.max(0, params.promptTokens ?? 0);
     const cTok = Math.max(0, params.completionTokens ?? 0);
-    const seniorRan = Boolean(params.seniorModel);
+    const seniorRequired = params.seniorReviewRequired === true;
+    const seniorModel = params.seniorModel ?? (seniorRequired ? "dsofficial/deepseek-reasoner" : null);
+    const seniorRan = Boolean(seniorModel) || seniorRequired;
     const amount = seniorRan ? SIGNAL_SCAN_CHARGE_WITH_SENIOR_USD : SIGNAL_SCAN_CHARGE_USD;
     const meta: Record<string, unknown> = {
       model: params.model ?? null,
       model_label: params.model ? formatModelLabel(params.model) : null,
-      senior_model: params.seniorModel ?? null,
-      senior_model_label: params.seniorModel ? formatModelLabel(params.seniorModel) : null,
+      senior_model: seniorModel,
+      senior_model_label: seniorModel ? formatModelLabel(seniorModel) : null,
       stage: "signal",
       direction: dir,
       prompt_tokens: pTok,
@@ -152,6 +157,9 @@ export async function chargeSignalScan(params: {
       grade: params.grade ?? null,
       score: params.score ?? null,
       senior_review: seniorRan,
+      senior_review_required: seniorRequired,
+      senior_review_status: params.seniorReviewStatus ?? (seniorRan ? "completed" : "not_required"),
+      senior_review_error: params.seniorReviewError ?? null,
       charge_usd: amount,
     };
     if (params.symbol) meta.symbol = params.symbol;
