@@ -644,7 +644,7 @@ function SignalPage() {
         closed_at: new Date().toISOString(),
       };
       if (outcome === "win") patch.tp2_hit_at = new Date().toISOString();
-      supabase.from("trade_journal").update(patch).eq("id", id).then(({ error }) => {
+      supabase.from("trade_journal").update(patch as never).eq("id", id).then(({ error }) => {
         if (!error) toast.success(`Journal updated · ${outcome.toUpperCase()}`);
       });
     };
