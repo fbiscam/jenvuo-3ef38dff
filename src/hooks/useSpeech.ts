@@ -146,8 +146,17 @@ export function useSpeech() {
       wantListeningRef.current = false;
       if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
       try { rec.stop(); } catch { /* ignore */ }
+      // Stop any in-flight TTS so voice doesn't bleed into the next page
+      try {
+        currentIdRef.current++;
+        queueRef.current = [];
+        currentJobRef.current = null;
+        currentCharRef.current = 0;
+        window.speechSynthesis?.cancel();
+      } catch { /* ignore */ }
     };
   }, [safeStart]);
+
 
   const startListening = useCallback(() => {
     wantListeningRef.current = true;
