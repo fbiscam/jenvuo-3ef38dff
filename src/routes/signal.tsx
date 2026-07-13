@@ -1210,6 +1210,14 @@ function SignalPage() {
                       )}>
                         {isBuy ? "● BUY" : isSell ? "● SELL" : "WAIT"}
                       </span>
+                      {(isBuy || isSell) && (
+                        <span className={cn(
+                          `text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded border`,
+                          isBuy ? "border-emerald-200 text-emerald-700 bg-emerald-50" : "border-rose-200 text-rose-700 bg-rose-50",
+                        )}>
+                          {isBuy ? "LONG" : "SHORT"}
+                        </span>
+                      )}
                     </div>
                     <span className="text-[11px] text-zinc-500">
                       Conf <span className="font-bold text-zinc-900">{t.confidence}%</span>
