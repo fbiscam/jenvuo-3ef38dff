@@ -16,7 +16,7 @@ import { EmailFonts } from './_shared'
 
 interface Props {
   pair?: string
-  grade?: 'A+' | 'A'
+  grade?: 'A+' | 'A' | 'B' | 'C'
   direction?: 'BUY' | 'SELL'
   entry?: number | string
   sl?: number | string
