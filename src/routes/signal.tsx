@@ -708,25 +708,26 @@ function SignalPage() {
     return (
       <div className="min-h-dvh w-full bg-[#FAFAFA] text-slate-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
         <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
-          <div className="mx-auto flex max-w-[900px] items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
+          <div className="mx-auto flex max-w-[900px] items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
             <button
               onClick={() => navigate({ to: "/app" })}
-              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
+              className="h-8 shrink-0 inline-flex items-center gap-1.5 px-2 sm:px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
             >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back
+              <ArrowLeft className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Back</span>
             </button>
-            <div className="flex items-center gap-2.5">
-              <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 rounded-md object-contain" />
-              <span className="font-semibold tracking-tight text-sm">Broadcasted Alert</span>
+            <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
+              <img src="/favicon.png" alt="JENVU AI" className="h-5 w-5 shrink-0 rounded-md object-contain" />
+              <span className="truncate font-semibold tracking-tight text-[13px] sm:text-sm">Broadcasted Alert</span>
             </div>
             <button
               onClick={() => navigate({ to: "/signal", search: { symbol: broadcastedAlert?.pair || "XAUUSD" }, replace: true })}
-              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 transition"
+              className="h-8 shrink-0 inline-flex items-center gap-1.5 px-2 sm:px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 transition"
               title="Run a fresh AI analysis (uses credits)"
             >
-              <RefreshCw className="h-3.5 w-3.5" /> Fresh analysis
+              <RefreshCw className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Fresh analysis</span>
             </button>
           </div>
+
         </header>
 
         <main className="mx-auto max-w-[900px] px-5 py-8 sm:px-6">
