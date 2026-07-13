@@ -324,10 +324,17 @@ function Home() {
       return;
     }
 
-    // Analyze / signal / setup / trade-idea intent → run the SAME full
-    // killzone-quality plan the /signal desk runs (getSignalPlan), inline
-    // on /app. Narrate the summary and show the SignalCard.
+    // Analyze / signal / setup / trade-idea intent → open the full Signal
+    // Desk at /signal (killzone-quality plan, chart & controls) instead of
+    // running inline on /app.
     const analyzeIntent = ANALYZE_INTENT_RX.test(q);
+    if (analyzeIntent) {
+      const symbol = detectSymbol(query);
+      speech.stopSpeaking();
+      speech.pauseListening();
+      navigate({ to: "/signal", search: { symbol } });
+      return;
+    }
 
     loadingRef.current = true;
     setLoading(true);
