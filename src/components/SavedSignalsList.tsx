@@ -87,7 +87,7 @@ export function SavedSignalsList() {
         const a = r.signal_alerts;
         const direction = (snap?.direction ?? a?.direction ?? "—").toString();
         const isLong = direction.toLowerCase() === "long" || direction.toLowerCase() === "buy";
-        const grade = snap?.confidence ? (snap.confidence >= 85 ? "A+" : snap.confidence >= 70 ? "A" : "B") : (a?.grade ?? "—");
+        const grade = snap?.confidence ? (snap.confidence >= 90 ? "A+" : snap.confidence >= 80 ? "A" : snap.confidence >= 65 ? "B" : "C") : (a?.grade ?? "—");
         const pair = snap?.pair ?? "—";
         const entry = snap?.entry ?? a?.entry;
         const sl = snap?.stop_loss ?? a?.sl;
