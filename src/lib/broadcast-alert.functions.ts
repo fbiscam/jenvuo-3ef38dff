@@ -93,6 +93,8 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
           .select('user_id, plan_id, status')
           .in('user_id', userIds)
           .eq('status', 'active')
+          .neq('plan_id', 'free')
+
           
 
         recipients = (paidSubs ?? [])
