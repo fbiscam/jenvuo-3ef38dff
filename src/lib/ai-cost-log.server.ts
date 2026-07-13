@@ -23,9 +23,14 @@ const MODEL_PRICING: Record<string, Price> = {
   "bmind/gpt-5.4-pro": { in: 3.0, out: 15.0 },
   "bmind/gpt-5.4-mini": { in: 0.25, out: 2.0 },
   "bmind/deepseek-ai/deepseek-v4-pro": { in: 0.55, out: 2.19 },
+  "bmind/orion/deepseek-ai/deepseek-v4-pro": { in: 0.55, out: 2.19 },
+  // DeepSeek official API
+  "dsofficial/deepseek-reasoner": { in: 0.55, out: 2.19 },
+  "dsofficial/deepseek-chat": { in: 0.27, out: 1.10 },
   // NVIDIA integrate (free tier)
   "nvapi/deepseek-ai/deepseek-v4-pro": { in: 0, out: 0 },
   "nvapi/openai/gpt-oss-120b": { in: 0, out: 0 },
+
   // Google
   "google/gemini-2.5-pro": { in: 1.25, out: 10.0 },
   "google/gemini-2.5-flash": { in: 0.075, out: 0.3 },
