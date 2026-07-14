@@ -314,11 +314,11 @@ export const MODEL_CHAIN = {
   // Primary analyzer: Bluesminds GPT-5.4 (5.5 not available on Bluesminds).
   intent: ["bmind/gpt-5.4", "bmind/gpt-5-mini"],
   narration: ["bmind/gpt-5.4", "bmind/gpt-5-mini"],
-  // Senior review: Bluesminds DeepSeek V4 Pro primary, then Grok 4.5, then NVIDIA fallback.
+  // Senior review: DeepSeek V4 Pro + Grok 4.5 (best available), with fast fallbacks.
   seniorReview: [
     "bmind/deepseek-ai/deepseek-v4-pro",
-    "bmind/orion/deepseek-ai/deepseek-v4-pro",
     "bmind/grok-4.5",
+    "bmind/deepseek-v4-flash",
     "nvapi/deepseek-ai/deepseek-v4-pro",
   ],
   chat: ["bmind/gpt-5.4", "bmind/gpt-5-mini"],
