@@ -986,6 +986,10 @@ export type SignalPlan = {
   };
 };
 
+export type SignalPlanResult =
+  | { ok: true; plan: SignalPlan }
+  | { ok: false; error: string };
+
 
 function toDTO(c: Candle): CandleDTO {
   return { time: Math.floor(c.t / 1000), open: c.o, high: c.h, low: c.l, close: c.c };
@@ -1856,8 +1860,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         ],
         jsonMode: true,
         maxTokens: 650,
-        timeoutMs: 30000,
-        retriesPerModel: 1,
+        timeoutMs: 22000,
+        retriesPerModel: 2,
         priority: true,
         stage: "signal-narration",
 
@@ -2571,7 +2575,7 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     //    credit burn from a stuck client.
     const rl = checkAnalyzeRateLimit(context.userId);
     if (!rl.allowed) {
-      throw new Error(`Too many analyze requests. Try again in ~${Math.ceil(rl.retryInSec / 60)} min.`);
+      return { ok: false, error: `Too many analyze requests. Try again in ~${Math.ceil(rl.retryInSec / 60)} min.` } satisfies SignalPlanResult;
     }
 
     // 2. 3-minute per-user per-symbol cache. Same pair asked twice within
@@ -2579,14 +2583,23 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     const cacheKey = `${context.userId}:${data.symbol.toUpperCase()}`;
     if (!data.force) {
       const cached = getCachedPlan<SignalPlan>(cacheKey);
-      if (cached) return cached;
+      if (cached) return { ok: true, plan: cached } satisfies SignalPlanResult;
     }
 
     // Billing is handled by the caller (client) via credits.spend("signal") once per scan.
     // Do NOT charge here — otherwise a single scan would be double/triple-billed.
-    const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId, { scanId: data.scanId });
-    setCachedPlan(cacheKey, plan);
-    return plan;
+    try {
+      const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId, { scanId: data.scanId });
+      setCachedPlan(cacheKey, plan);
+      return { ok: true, plan } satisfies SignalPlanResult;
+    } catch (e) {
+      const raw = (e as Error)?.message || "Server busy — please try again in a moment.";
+      const error = /server busy|too many|credits|balance|key rejected|unauthorized|forbidden/i.test(raw)
+        ? raw
+        : "Server busy — please try again in a moment.";
+      console.warn("getSignalPlan failed:", error);
+      return { ok: false, error } satisfies SignalPlanResult;
+    }
   });
 
 
