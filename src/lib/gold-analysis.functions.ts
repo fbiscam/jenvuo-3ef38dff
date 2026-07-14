@@ -2575,7 +2575,7 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     //    credit burn from a stuck client.
     const rl = checkAnalyzeRateLimit(context.userId);
     if (!rl.allowed) {
-      throw new Error(`Too many analyze requests. Try again in ~${Math.ceil(rl.retryInSec / 60)} min.`);
+      return { ok: false, error: `Too many analyze requests. Try again in ~${Math.ceil(rl.retryInSec / 60)} min.` } satisfies SignalPlanResult;
     }
 
     // 2. 3-minute per-user per-symbol cache. Same pair asked twice within
