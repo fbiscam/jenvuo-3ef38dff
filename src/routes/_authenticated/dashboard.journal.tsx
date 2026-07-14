@@ -339,8 +339,10 @@ function Journal() {
                       )}
                     </td>
                     <td className="px-3 py-2.5 text-center">
-                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${t.direction === "long" ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+                      <span className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${t.direction === "long" ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
                         {t.direction === "long" ? "BUY" : "SELL"}
+                        <span className="opacity-60">·</span>
+                        {t.direction === "long" ? "LONG" : "SHORT"}
                       </span>
                     </td>
                     <td className="px-3 py-2.5 text-center">
