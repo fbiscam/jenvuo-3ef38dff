@@ -168,11 +168,13 @@ async function singleAttempt(
       : !(res.status === 429 || res.status >= 500);
 
     let msg: string;
-    if (res.status === 429) msg = "AI is rate-limited right now. Please retry in a moment.";
+    if (res.status === 429) msg = "Server busy — please try again in a moment.";
+    else if (res.status === 503 || res.status === 502 || res.status === 504) msg = "Server busy — please try again in a moment.";
+    else if (res.status >= 500) msg = "Server busy — please try again in a moment.";
     else if (res.status === 402) msg = "AI credits exhausted. Please top up your workspace.";
     else if (res.status === 401) msg = "AI key rejected. Please contact support.";
-    else if (res.status === 400) msg = `AI request rejected: ${txt.slice(0, 200)}`;
-    else msg = `AI error ${res.status}: ${txt.slice(0, 200)}`;
+    else if (res.status === 400) msg = "Server busy — please try again in a moment.";
+    else msg = "Server busy — please try again in a moment.";
     throw new AiGatewayError(msg, res.status, terminal);
   }
 
