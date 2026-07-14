@@ -2126,8 +2126,14 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
 VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine but not A+. CONFIRM only for true A+ institutional setups with clean entry/SL/TP.`;
 
+        // Plan-gated senior model chain:
+        // Pro → DeepSeek only (no Grok). Elite/Ultra → Grok first, then DeepSeek.
+        const __seniorChain = (__planId === "elite" || __planId === "ultra")
+          ? [...MODEL_CHAIN.seniorReview]
+          : MODEL_CHAIN.seniorReview.filter((m) => !m.includes("grok"));
         const { content: rc, model: __aiModel3, usage: __aiUsage3 } = await callChatCompletion({
-          models: [...MODEL_CHAIN.seniorReview],
+          models: __seniorChain,
+
           messages: [
             { role: "system", content: reviewSystem },
             { role: "user", content: reviewUser },
