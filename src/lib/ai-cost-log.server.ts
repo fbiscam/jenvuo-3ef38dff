@@ -142,6 +142,20 @@ export async function chargeSignalScan(params: {
   if (dir !== "BUY" && dir !== "SELL") return;
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Idempotency guard — never double-charge for the same scanId. If a caller
+    // (voice path, retry, race) invokes chargeSignalScan twice for one scan,
+    // the second write is a no-op.
+    if (params.scanId) {
+      const { data: dupe } = await supabaseAdmin
+        .from("credit_ledger")
+        .select("id")
+        .eq("user_id", params.userId)
+        .eq("reason", "ai_scan")
+        .contains("metadata", { scanId: params.scanId })
+        .limit(1)
+        .maybeSingle();
+      if (dupe?.id) return;
+    }
     const pTok = Math.max(0, params.promptTokens ?? 0);
     const cTok = Math.max(0, params.completionTokens ?? 0);
     const seniorRequired = params.seniorReviewRequired === true;
