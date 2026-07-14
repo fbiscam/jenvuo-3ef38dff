@@ -593,13 +593,17 @@ function isTradingSetupIntent(q: string): boolean {
   return /\b(analyze|analysis|setup|signal|entry|stop\s*loss|take\s*profit|\btp\b|\bsl\b|order\s*block|fvg|liquidity|bos|choch|killzone|scalp|swing\s+trade|give\s+me\s+(a|the)\s+trade|find\s+(a|me)\s+trade|best\s+trade|any\s+trade|trade\s+idea|trade\s+plan|a\+\s*setup|xauusd|xaueur|xaugbp|xaujpy|xauaud|xauchf)\b/i.test(n);
 }
 
-async function _analyzeGoldCompute(data: { timeframe: string; query: string }, __userId: string | null = null): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
+async function _analyzeGoldCompute(
+  data: { timeframe: string; query: string },
+  __userId: string | null = null,
+  __scanId: string | null = null,
+): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
     const wantsTradingSetup = isTradingSetupIntent(data.query);
     if (wantsTradingSetup) {
       try {
-        const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) }, __userId);
+        const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) }, __userId, { scanId: __scanId });
         const dec = plan.instrument.decimals;
         const prefix = plan.instrument.kind === "crypto" ? "" : "$";
         const fmt = (n?: number) => typeof n === "number" && isFinite(n) ? `${prefix}${n.toFixed(dec)}` : "-";
@@ -841,7 +845,8 @@ export const analyzeGold = createServerFn({ method: "POST" })
       }
     }
 
-    const result = await _analyzeGoldCompute(data, context.userId);
+    const scanId = (globalThis as any).crypto?.randomUUID?.() ?? `voice_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+    const result = await _analyzeGoldCompute(data, context.userId, scanId);
     const { __billable: _billable, ...clean } = result;
     void _billable;
 
@@ -1609,7 +1614,11 @@ function buildFeedFallbackPlan(args: {
   };
 }
 
-export async function computeSignalPlan(data: { symbol: string }, __userId: string | null = null): Promise<SignalPlan> {
+export async function computeSignalPlan(
+  data: { symbol: string },
+  __userId: string | null = null,
+  billing?: { scanId?: string | null },
+): Promise<SignalPlan> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
     const inst = resolveInstrument(data.symbol);
@@ -2503,7 +2512,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
     // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
     // WAIT / no-trade returns are free. MUST be awaited — Cloudflare Workers
     // cancel post-response async work, so fire-and-forget charges get dropped.
-    const __scanId = (globalThis as any).crypto?.randomUUID?.() ?? `scan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+    const __scanId = billing?.scanId ?? ((globalThis as any).crypto?.randomUUID?.() ?? `scan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`);
     if (plan.trade.direction === "BUY" || plan.trade.direction === "SELL") {
       try {
         const { chargeSignalScan } = await import("@/lib/ai-cost-log.server");
@@ -2533,10 +2542,11 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
 export const getSignalPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => {
-    const obj = (d ?? {}) as { symbol?: string; force?: boolean };
+    const obj = (d ?? {}) as { symbol?: string; force?: boolean; scanId?: string };
     return {
       symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD",
       force: !!obj.force,
+      scanId: typeof obj.scanId === "string" && obj.scanId.trim() ? obj.scanId.trim() : null,
     };
   })
   .handler(async ({ data, context }) => {
@@ -2557,7 +2567,7 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
     // Billing is handled by the caller (client) via credits.spend("signal") once per scan.
     // Do NOT charge here — otherwise a single scan would be double/triple-billed.
-    const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId);
+    const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId, { scanId: data.scanId });
     setCachedPlan(cacheKey, plan);
     return plan;
   });
