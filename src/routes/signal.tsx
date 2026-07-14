@@ -1211,7 +1211,7 @@ function SignalPage() {
                 <div className="space-y-3">
                   <div className="flex items-end justify-between">
                     <div className="flex items-center gap-2">
-                      <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Trade Plan</span>
+                      <span className={`font-['Urbanist',sans-serif] text-[12px] font-semibold tracking-wide uppercase text-zinc-900`}>Trade Plan</span>
                       <span className={cn(
                         `text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded`,
                         isBuy ? "bg-emerald-100 text-emerald-700" :
