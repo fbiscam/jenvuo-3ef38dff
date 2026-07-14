@@ -176,8 +176,10 @@ function AlertPrefs() {
                   return (
                     <tr key={a.id} className="text-center hover:bg-zinc-50/60">
                       <td className="px-3 py-2.5">
-                        <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${isBuy ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+                        <span className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${isBuy ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
                           {isBuy ? "BUY" : "SELL"}
+                          <span className="opacity-60">·</span>
+                          {isBuy ? "LONG" : "SHORT"}
                         </span>
                       </td>
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-900">{a.pair}</td>
