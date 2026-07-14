@@ -301,13 +301,13 @@ function computeStats(trades: Trade[]): Stats {
     const worst = [...byPair].filter((p) => p.total >= 3).sort((a, b) => a.winRate - b.winRate)[0];
     const best = [...byPair].filter((p) => p.total >= 3).sort((a, b) => b.winRate - a.winRate)[0];
     if (worst && worst.winRate < 40) {
-      insight = { tone: "warn", text: `Aap ${worst.pair} pe sirf ${worst.winRate.toFixed(0)}% jeetate ho (${worst.total} trades). Isko pause karo ya sirf A+ setup pe le.` };
+      insight = { tone: "warn", text: `You only win ${worst.winRate.toFixed(0)}% on ${worst.pair} (${worst.total} trades). Pause it or only take A+ setups.` };
     } else if (best && best.winRate >= 65) {
-      insight = { tone: "good", text: `${best.pair} aapka best pair hai — ${best.winRate.toFixed(0)}% win rate (${best.total} trades). Yahan size increase karne pe consider karo.` };
+      insight = { tone: "good", text: `${best.pair} is your best pair — ${best.winRate.toFixed(0)}% win rate (${best.total} trades). Consider increasing size here.` };
     } else if (byDirection.long.total >= 5 && byDirection.short.total >= 5) {
       const l = byDirection.long.winRate, s = byDirection.short.winRate;
       if (Math.abs(l - s) >= 20) {
-        insight = { tone: "warn", text: `${l > s ? "Long" : "Short"} bias strong — ${l > s ? "long" : "short"} pe ${Math.max(l, s).toFixed(0)}% vs ${l > s ? "short" : "long"} pe ${Math.min(l, s).toFixed(0)}%. Weak side avoid karo.` };
+        insight = { tone: "warn", text: `${l > s ? "Long" : "Short"} bias is strong — ${l > s ? "long" : "short"} wins ${Math.max(l, s).toFixed(0)}% vs ${l > s ? "short" : "long"} at ${Math.min(l, s).toFixed(0)}%. Avoid the weak side.` };
       }
     }
   }
