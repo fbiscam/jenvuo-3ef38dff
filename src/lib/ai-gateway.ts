@@ -337,15 +337,16 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 
 // -------- Model chains (single source of truth) ----------------------------
 
+// Bluesminds catalog (verified live): gpt-5.6-luna, gpt-5.2-chat, gpt-5-mini,
+// deepseek-ai/deepseek-v4-pro, deepseek-v4-flash. Grok and gpt-5.4 are NOT
+// available on Bluesminds anymore. Lovable AI Gateway is the cross-provider
+// fallback so the user never has to refresh.
 export const MODEL_CHAIN = {
-  // Primary is Bluesminds GPT-5.4. If Bluesminds returns 429/503 or times
-  // out, the gateway auto-falls-back to the Lovable AI Gateway (OpenAI
-  // GPT-5.4 → GPT-5.4-mini) so the user never has to refresh.
-  intent: ["bmind/gpt-5.4", "openai/gpt-5.4", "openai/gpt-5.4-mini"],
-  narration: ["bmind/gpt-5.4", "openai/gpt-5.4", "openai/gpt-5.4-mini"],
-  // Senior review: Grok 4.5 primary → DeepSeek V4 Pro → Flash → Lovable GPT-5.5.
-  seniorReview: ["bmind/grok-4.5", "bmind/deepseek-ai/deepseek-v4-pro", "bmind/deepseek-v4-flash", "openai/gpt-5.5"],
-  chat: ["bmind/gpt-5.4", "openai/gpt-5.4", "openai/gpt-5.4-mini"],
+  intent: ["bmind/gpt-5.6-luna", "bmind/gpt-5.2-chat", "openai/gpt-5.5", "openai/gpt-5.4-mini"],
+  narration: ["bmind/gpt-5.6-luna", "bmind/gpt-5.2-chat", "openai/gpt-5.5", "openai/gpt-5.4-mini"],
+  // Senior review: DeepSeek V4 Pro primary → Flash → Lovable GPT-5.5.
+  seniorReview: ["bmind/deepseek-ai/deepseek-v4-pro", "bmind/deepseek-v4-flash", "openai/gpt-5.5"],
+  chat: ["bmind/gpt-5.6-luna", "bmind/gpt-5.2-chat", "openai/gpt-5.5", "openai/gpt-5.4-mini"],
 } as const;
 
 
