@@ -1857,7 +1857,7 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className={`text-[13px] font-bold tabular-nums text-zinc-900 leading-none ${MONO}`}>
-              {passed}<span className="text-zinc-300">/{total}</span>
+              {passed}<span className="text-zinc-300"> / {total}</span>
             </span>
             <span className={`text-[8px] ${MONO} tracking-widest text-zinc-500 mt-0.5`}>{pct}%</span>
           </div>
@@ -2216,7 +2216,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
           <div className="rounded-xl border border-zinc-200 px-3 py-2">
             <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Passed</div>
             <div className={`text-base font-bold tabular-nums ${MONO} text-zinc-900 mt-0.5`}>
-              {passed}<span className="text-zinc-400 text-[11px] font-medium">/{total}</span>
+              {passed}<span className="text-zinc-400 text-[11px] font-medium"> / {total}</span>
             </div>
           </div>
         </div>
