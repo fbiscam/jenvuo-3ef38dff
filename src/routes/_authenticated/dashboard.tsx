@@ -89,10 +89,10 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "Tools & Market",
     items: [
       { to: "/signal", label: "Signal Desk", icon: "radar" },
-      { to: "/killzones", label: "Killzones", icon: "target" },
+      { to: "/killzones", label: "Killzones", icon: "schedule" },
       { to: "/ai-engine", label: "AI Engine", icon: "neurology" },
       { to: "/insights", label: "Insights", icon: "menu_book" },
-      { to: "/pricing", label: "Pricing", icon: "attach_money" },
+      { to: "/pricing", label: "Pricing", icon: "local_offer" },
     ],
   },
   {
