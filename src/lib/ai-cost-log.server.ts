@@ -67,7 +67,10 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("gpt-5-mini")) return "ChatGPT 5 Mini";
   if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
   if (bare.startsWith("gpt-5")) return "ChatGPT 5";
+  if (bare.startsWith("gpt-4o-mini")) return "ChatGPT 4o Mini";
+  if (bare.startsWith("gpt-4o")) return "ChatGPT 4o";
   if (bare.startsWith("gpt-oss-120b")) return "GPT-OSS 120B";
+  if (bare.startsWith("deepseek-v4-flash")) return "DeepSeek V4 Flash";
   if (bare.startsWith("deepseek-v4-pro") || bare.startsWith("deepseek-reasoner")) return "DeepSeek V4 Pro";
   if (bare.startsWith("deepseek-chat")) return "DeepSeek V3";
 

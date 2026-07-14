@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { matchActualAiModels, type AiCostLogRow, type MatchedAiModels } from "@/lib/credits-model-match";
 
 // LEGACY constant kept for import compatibility. All charges are now
 // USD-based and deducted per-AI-call inside logAiCost().
@@ -60,6 +61,24 @@ export const getCreditState = createServerFn({ method: "GET" })
         .eq("user_id", userId).order("created_at", { ascending: false }).limit(60),
     ]);
 
+    const ledgerRows = ledger ?? [];
+    let actualModelMatches = new Map<string, MatchedAiModels>();
+    if (ledgerRows.length > 0) {
+      const times = ledgerRows.map((r: any) => new Date(r.created_at).getTime()).filter(Number.isFinite);
+      if (times.length > 0) {
+        const from = new Date(Math.min(...times) - 10 * 60_000).toISOString();
+        const to = new Date(Math.max(...times) + 60_000).toISOString();
+        const { data: aiLogs } = await supabase
+          .from("ai_cost_log")
+          .select("id, created_at, stage, model, prompt_tokens, completion_tokens")
+          .eq("user_id", userId)
+          .gte("created_at", from)
+          .lte("created_at", to)
+          .order("created_at", { ascending: true });
+        actualModelMatches = matchActualAiModels(ledgerRows, (aiLogs ?? []) as AiCostLogRow[]);
+      }
+    }
+
     const plan = (sub?.plans as any) ?? { id: "free", name: "Free", price_usd: 0, wallet_usd: 2.00, feature_journal: false, feature_realtime_alerts: false, feature_full_ict: false, feature_scanner: false };
     const walletUsd = Number(plan.wallet_usd ?? 0);
 
@@ -74,17 +93,35 @@ export const getCreditState = createServerFn({ method: "GET" })
       balance: Number(bal?.balance ?? 0),
       allowance: Number(bal?.monthly_allowance ?? walletUsd),
       periodResetsAt: bal?.period_resets_at ?? null,
-      recent: (ledger ?? []).map((r: any) => {
+      recent: ledgerRows.map((r: any) => {
         const meta = (r.metadata ?? {}) as Record<string, any>;
+        const actual = actualModelMatches.get(r.id);
+        const actualPrimary = actual?.primary?.model ?? null;
+        const actualSenior = actual?.senior?.model ?? null;
+        const enrichedMeta = {
+          ...meta,
+          ...(actualPrimary ? {
+            actual_model: actualPrimary,
+            actual_model_stage: actual?.primary?.stage ?? null,
+            actual_prompt_tokens: actual?.primary?.prompt_tokens ?? null,
+            actual_completion_tokens: actual?.primary?.completion_tokens ?? null,
+          } : {}),
+          ...(actualSenior ? {
+            actual_senior_model: actualSenior,
+            actual_senior_model_stage: actual?.senior?.stage ?? null,
+            actual_senior_prompt_tokens: actual?.senior?.prompt_tokens ?? null,
+            actual_senior_completion_tokens: actual?.senior?.completion_tokens ?? null,
+          } : {}),
+        };
         return {
           id: r.id, delta: Number(r.delta), reason: r.reason, balance_after: Number(r.balance_after),
           created_at: r.created_at,
-          model: r.model ?? meta.model ?? null,
+          model: actualPrimary ?? r.model ?? meta.model ?? null,
           stage: r.stage ?? meta.stage ?? null,
-          prompt_tokens: r.prompt_tokens ?? meta.prompt_tokens ?? null,
-          completion_tokens: r.completion_tokens ?? meta.completion_tokens ?? null,
+          prompt_tokens: actual?.primary?.prompt_tokens ?? r.prompt_tokens ?? meta.prompt_tokens ?? null,
+          completion_tokens: actual?.primary?.completion_tokens ?? r.completion_tokens ?? meta.completion_tokens ?? null,
           raw_cost_usd: r.raw_cost_usd == null ? (meta.raw_cost_usd == null ? null : Number(meta.raw_cost_usd)) : Number(r.raw_cost_usd),
-          metadata: meta,
+          metadata: enrichedMeta,
         };
       }),
     };

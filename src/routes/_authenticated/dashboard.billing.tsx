@@ -59,7 +59,10 @@ function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("gpt-5-mini")) return "ChatGPT 5 Mini";
   if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
   if (bare.startsWith("gpt-5")) return "ChatGPT 5";
+  if (bare.startsWith("gpt-4o-mini")) return "ChatGPT 4o Mini";
+  if (bare.startsWith("gpt-4o")) return "ChatGPT 4o";
   if (bare.startsWith("gpt-oss-120b")) return "GPT-OSS 120B";
+  if (bare.startsWith("deepseek-v4-flash")) return "DeepSeek V4 Flash";
   if (bare.startsWith("deepseek-v4-pro") || bare.startsWith("deepseek-reasoner")) return "DeepSeek V4 Pro";
   if (bare.startsWith("deepseek-chat")) return "DeepSeek V3";
 
@@ -230,14 +233,22 @@ function Billing() {
                       const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: userTz });
                       const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", timeZone: userTz, timeZoneName: "short" });
                       const amt = Math.abs(r.delta);
-                      const rawModel = r.model ?? ((r.metadata as any)?.model as string | undefined) ?? null;
-                      const prettyFromMeta = (r.metadata as any)?.model_label as string | undefined;
-                      const seniorPretty = (r.metadata as any)?.senior_model_label as string | undefined;
-                      const modelLabel = prettyFromMeta
-                        ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—"))
+                      const meta = (r.metadata as any) ?? {};
+                      const actualModel = (meta.actual_model as string | undefined) ?? null;
+                      const actualSeniorModel = (meta.actual_senior_model as string | undefined) ?? null;
+                      const rawModel = actualModel ?? r.model ?? (meta.model as string | undefined) ?? null;
+                      const prettyFromMeta = actualModel ? undefined : (meta.model_label as string | undefined);
+                      const completedSeniorStatuses = new Set(["completed", "confirmed", "downgraded", "vetoed"]);
+                      const recordedSeniorModel = completedSeniorStatuses.has(String(meta.senior_review_status ?? ""))
+                        ? ((meta.senior_model as string | undefined) ?? null)
+                        : null;
+                      const seniorRaw = actualSeniorModel ?? recordedSeniorModel;
+                      const seniorPretty = seniorRaw ? formatModelLabel(seniorRaw) : undefined;
+                      const modelLabel = actualModel
+                        ? formatModelLabel(actualModel)
+                        : (prettyFromMeta ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—")))
                         ?? "—";
                       const modelWithSenior = seniorPretty ? `${modelLabel} + ${seniorPretty}` : modelLabel;
-                      const meta = (r.metadata as any) ?? {};
                       const sideRaw = (meta.signal ?? meta.side ?? meta.direction ?? meta.action ?? "").toString().toUpperCase();
                       const sideLabel = sideRaw === "BUY" || sideRaw === "SELL" || sideRaw === "WAIT" ? sideRaw : "—";
                       const sideClass = sideLabel === "BUY"
