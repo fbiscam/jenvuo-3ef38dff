@@ -11,6 +11,7 @@ import pricingAlerts from "@/assets/pricing-alerts.jpg";
 import pricingJournal from "@/assets/pricing-journal.jpg";
 import pricingScanner from "@/assets/pricing-scanner.jpg";
 import pricingApi from "@/assets/pricing-api.jpg";
+import xaiLogo from "@/assets/xai-logo.png";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
