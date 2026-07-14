@@ -57,12 +57,15 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   const m = String(rawModel).toLowerCase();
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
   const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  if (bare.startsWith("gpt-5.6-luna")) return "ChatGPT 5.6 Luna";
+  if (bare.startsWith("gpt-5.6")) return "ChatGPT 5.6";
   if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
   if (bare.startsWith("gpt-5.5")) return "ChatGPT 5.5";
   if (bare.startsWith("gpt-5.4-pro")) return "ChatGPT 5.4 Pro";
   if (bare.startsWith("gpt-5.4-mini")) return "ChatGPT 5.4 Mini";
   if (bare.startsWith("gpt-5.4-nano")) return "ChatGPT 5.4 Nano";
   if (bare.startsWith("gpt-5.4")) return "ChatGPT 5.4";
+  if (bare.startsWith("gpt-5.2-chat")) return "ChatGPT 5.2 Chat";
   if (bare.startsWith("gpt-5.2")) return "ChatGPT 5.2";
   if (bare.startsWith("gpt-5-mini")) return "ChatGPT 5 Mini";
   if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
