@@ -2583,7 +2583,7 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     const cacheKey = `${context.userId}:${data.symbol.toUpperCase()}`;
     if (!data.force) {
       const cached = getCachedPlan<SignalPlan>(cacheKey);
-      if (cached) return cached;
+      if (cached) return { ok: true, plan: cached } satisfies SignalPlanResult;
     }
 
     // Billing is handled by the caller (client) via credits.spend("signal") once per scan.

@@ -147,6 +147,7 @@ function SignalPage() {
   const dark = false;
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [analyzeElapsed, setAnalyzeElapsed] = useState(0);
   useEffect(() => {
     if (!loading) { setAnalyzeElapsed(0); return; }
@@ -404,6 +405,7 @@ function SignalPage() {
       return;
     }
     setLoading(true);
+    setAnalysisError(null);
     abortRef.current = true;
     speech.stopSpeaking();
     try {
@@ -411,7 +413,14 @@ function SignalPage() {
       const sym = symbol || "XAUUSD";
       const ok = await credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
       if (!ok) { setLoading(false); return; }
-      const p = await fetchPlan({ data: { symbol: sym, scanId } });
+      const result = await fetchPlan({ data: { symbol: sym, scanId } });
+      if (!result.ok) {
+        setPlan(null);
+        setAnalysisError(result.error);
+        toast.error(result.error);
+        return;
+      }
+      const p = result.plan;
       setPlan(p);
       // ICT narration is included in the single "signal" charge above — no extra deduction.
       // Free users still don't get the guided narration.
@@ -428,7 +437,9 @@ function SignalPage() {
       }
 
     } catch (e: any) {
-      toast.error(e?.message || "Failed to load signal");
+      const msg = e?.message || "Failed to load signal";
+      setAnalysisError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -1054,9 +1065,26 @@ function SignalPage() {
                 ICT Execution Feed
               </h3>
               {!plan && (
-                <div className="text-xs text-zinc-500 flex items-center gap-2">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading narration…
-                </div>
+                analysisError ? (
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+                    <div className="flex items-start gap-2 font-semibold">
+                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                      <span>{analysisError}</span>
+                    </div>
+                    <button
+                      onClick={load}
+                      disabled={loading}
+                      className="mt-3 inline-flex h-7 items-center gap-1.5 rounded-lg bg-zinc-900 px-3 text-[11px] font-medium text-white disabled:opacity-50"
+                    >
+                      {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                      Retry analysis
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-xs text-zinc-500 flex items-center gap-2">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading narration…
+                  </div>
+                )
               )}
               <div ref={feedScrollRef} className="space-y-3 overflow-y-auto pr-1 max-h-[520px]">
                 {plan?.narration.map((n, i) => {
