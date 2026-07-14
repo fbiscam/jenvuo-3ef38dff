@@ -155,9 +155,9 @@ async function singleAttempt(
   } catch (err: any) {
     clearTimeout(t);
     if (err?.name === "AbortError") {
-      throw new AiGatewayError(`Timeout after ${timeoutMs}ms`, 0, false);
+      throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
     }
-    throw new AiGatewayError(`Network error: ${err?.message ?? err}`, 0, false);
+    throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
   }
   clearTimeout(t);
 
