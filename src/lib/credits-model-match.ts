@@ -1,0 +1,48 @@
+export type AiCostLogRow = {
+  id: string;
+  created_at: string;
+  stage: string | null;
+  model: string | null;
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+};
+
+export type MatchedAiModels = {
+  primary?: AiCostLogRow;
+  senior?: AiCostLogRow;
+};
+
+const PRIMARY_AI_STAGES = new Set(["signal-narration", "chat-signal"]);
+const SENIOR_AI_STAGES = new Set(["senior-review"]);
+
+export function matchActualAiModels(ledgerRows: any[], aiLogs: AiCostLogRow[]): Map<string, MatchedAiModels> {
+  const matches = new Map<string, MatchedAiModels>();
+  const usedPrimary = new Set<string>();
+  const usedSenior = new Set<string>();
+  const scanRows = ledgerRows
+    .filter((r) => Number(r.delta) < 0 && r.reason === "ai_scan")
+    .slice()
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+  const pickNearestPrior = (row: any, stages: Set<string>, used: Set<string>, windowMs: number) => {
+    const rowTime = new Date(row.created_at).getTime();
+    let best: AiCostLogRow | undefined;
+    for (const log of aiLogs) {
+      if (!log.id || used.has(log.id) || !log.model || !stages.has(String(log.stage ?? ""))) continue;
+      const logTime = new Date(log.created_at).getTime();
+      const delta = rowTime - logTime;
+      if (delta < -10_000 || delta > windowMs) continue;
+      if (!best || logTime > new Date(best.created_at).getTime()) best = log;
+    }
+    if (best?.id) used.add(best.id);
+    return best;
+  };
+
+  for (const row of scanRows) {
+    matches.set(row.id, {
+      primary: pickNearestPrior(row, PRIMARY_AI_STAGES, usedPrimary, 6 * 60_000),
+      senior: pickNearestPrior(row, SENIOR_AI_STAGES, usedSenior, 6 * 60_000),
+    });
+  }
+  return matches;
+}
