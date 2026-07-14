@@ -1250,9 +1250,9 @@ function SignalPage() {
                     return (
                       <>
                         {isLowConf && (isBuy || isSell) && (
-                          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-[11px] text-amber-800 leading-relaxed">
-                            <div className="font-semibold mb-0.5">Low-confidence setup — no entry shown</div>
-                            <div className="text-[11px]">Confidence {t.confidence ?? 0}% is below the {LOW_CONF}% minimum. Entry / Stop / Target are hidden until a stronger A-grade setup forms. Wait for the next scan.</div>
+                          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 font-['Urbanist',sans-serif] text-[13px] font-medium text-amber-900 leading-relaxed">
+                            <div className="font-semibold text-[14px] mb-1">Low-confidence setup — no entry shown</div>
+                            <div>Confidence {t.confidence ?? 0}% is below the {LOW_CONF}% minimum. Entry / Stop / Target are hidden until a stronger A-grade setup forms. Wait for the next scan.</div>
                           </div>
                         )}
                         {(isBuy || isSell) && !isLowConf && (
