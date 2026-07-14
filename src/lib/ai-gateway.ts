@@ -315,7 +315,8 @@ export const MODEL_CHAIN = {
   // caller surfaces a clean error + auto-refund via low-balance protection.
   intent: ["bmind/gpt-5.4"],
   narration: ["bmind/gpt-5.4"],
-  seniorReview: ["bmind/deepseek-v4-flash"],
+  // Senior review: Grok 4.5 primary, DeepSeek V4 Pro fallback, Flash last-resort.
+  seniorReview: ["bmind/grok-4.5", "bmind/deepseek-ai/deepseek-v4-pro", "bmind/deepseek-v4-flash"],
   chat: ["bmind/gpt-5.4"],
 } as const;
 
