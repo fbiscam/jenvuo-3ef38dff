@@ -920,7 +920,7 @@ function DashboardLayout() {
               </Link>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 lg:self-end lg:mb-6">
+          <div className="flex items-center gap-1.5 lg:self-end lg:mt-8 lg:mb-0">
             <button
               type="button"
               aria-label="Open menu"
