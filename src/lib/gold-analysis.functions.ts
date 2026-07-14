@@ -2519,8 +2519,8 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
         await chargeSignalScan({
           userId: __userId,
           direction: plan.trade.direction,
-          model: __usedNarrationModel,
-          seniorModel: __usedSeniorModel,
+          model: __usedNarrationModel ?? MODEL_CHAIN.narration[0],
+          seniorModel: __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview[0] : null),
           seniorReviewRequired: __requiresSeniorReview,
           seniorReviewStatus: __seniorReviewStatus,
           seniorReviewError: __seniorReviewError,
