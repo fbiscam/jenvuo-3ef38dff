@@ -312,13 +312,14 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 
 export const MODEL_CHAIN = {
   // Primary analyzer: Bluesminds GPT-5.4 (5.5 not available on Bluesminds).
-  intent: ["bmind/gpt-5.4", "bmind/gpt-5-mini"],
-  narration: ["bmind/gpt-5.4", "bmind/gpt-5-mini"],
+  // Fallback to 5.2 (not mini) to preserve signal quality.
+  intent: ["bmind/gpt-5.4", "bmind/gpt-5.2"],
+  narration: ["bmind/gpt-5.4", "bmind/gpt-5.2"],
   // Senior review: DeepSeek V4 Flash only (fastest + most reliable on Bluesminds right now).
   seniorReview: [
     "bmind/deepseek-v4-flash",
   ],
-  chat: ["bmind/gpt-5.4", "bmind/gpt-5-mini"],
+  chat: ["bmind/gpt-5.4", "bmind/gpt-5.2"],
 } as const;
 
 
