@@ -368,7 +368,7 @@ function Home() {
           speech.resumeIfWanted();
           return;
         }
-        const plan = await fetchSignalPlan({ data: { symbol, force: true } });
+        const plan = await fetchSignalPlan({ data: { symbol, force: true, scanId } });
         const mapped = signalPlanToGoldSignal(plan);
         setSignal(mapped);
         appendVoiceTurn({ query, reply: mapped.spokenSummary });
