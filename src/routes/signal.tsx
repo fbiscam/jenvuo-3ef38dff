@@ -2414,9 +2414,9 @@ function TradeManagementLadder({
 
   return (
     <div className="rounded-md border border-zinc-100 bg-zinc-50/60 p-2 space-y-1.5">
-      <div className={`flex items-center justify-between text-[11px] ${MONO} uppercase tracking-widest text-zinc-500`}>
+      <div className={`flex items-center justify-between font-['Urbanist',sans-serif] text-[13px] font-semibold tracking-wide text-zinc-900`}>
         <span>Trade Management</span>
-        <span className="text-[10px] text-zinc-400">70/30 + Breakeven Runner</span>
+        <span className="font-['Urbanist',sans-serif] text-[12px] font-medium text-zinc-600">70/30 + Breakeven Runner</span>
       </div>
       <ol className="space-y-1">
         {steps.map((s, i) => (
@@ -2431,25 +2431,25 @@ function TradeManagementLadder({
           >
             <span
               className={cn(
-                "mt-0.5 h-5 w-5 flex-shrink-0 rounded-full text-[10px] font-bold flex items-center justify-center",
-                s.hit ? "bg-emerald-500 text-white" : "bg-zinc-200 text-zinc-600",
+                "mt-0.5 h-5 w-5 flex-shrink-0 rounded-full font-['Urbanist',sans-serif] text-[11px] font-bold flex items-center justify-center",
+                s.hit ? "bg-emerald-500 text-white" : "bg-zinc-200 text-zinc-700",
               )}
             >
               {s.hit ? "✓" : i + 1}
             </span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <span className={`text-[12px] font-bold ${MONO} ${s.hit ? "text-emerald-700" : "text-zinc-700"}`}>
+                <span className={`font-['Urbanist',sans-serif] text-[13px] font-semibold ${s.hit ? "text-emerald-800" : "text-zinc-900"}`}>
                   {s.label}
                 </span>
-                <span className={`text-[11px] tabular-nums ${MONO} ${s.hit ? "text-emerald-700" : "text-zinc-500"}`}>
+                <span className={`font-['Urbanist',sans-serif] text-[12px] font-medium tabular-nums ${s.hit ? "text-emerald-700" : "text-zinc-600"}`}>
                   @ {s.price.toFixed(dec)}
                 </span>
               </div>
-              <div className={`text-[12px] leading-snug mt-0.5 ${s.hit ? "text-emerald-800" : "text-zinc-700"}`}>
+              <div className={`font-['Urbanist',sans-serif] text-[13px] font-medium leading-relaxed mt-0.5 ${s.hit ? "text-emerald-900" : "text-zinc-900"}`}>
                 {s.action}
               </div>
-              <div className="text-[11px] text-zinc-500 leading-snug mt-0.5">{s.why}</div>
+              <div className="font-['Urbanist',sans-serif] text-[12px] font-medium text-zinc-600 leading-relaxed mt-0.5">{s.why}</div>
             </div>
           </li>
         ))}
