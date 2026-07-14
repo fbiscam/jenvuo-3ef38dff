@@ -305,7 +305,7 @@ function PricingPage() {
           })}
         </div>
 
-        <div className="hidden sm:block overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+        <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
 
           <table className="w-full min-w-[760px] text-sm border-collapse">
             <colgroup>
