@@ -2085,6 +2085,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // review per pricing page. Free plan = GPT-5.4 only.
     // Failure here should NEVER block the plan — Stage-1 result stands.
     let __planAllowsSenior = false;
+    let __planId: string = "free";
     let __requiresSeniorReview = false;
     let __seniorReviewStatus: "not_required" | "completed" | "confirmed" | "downgraded" | "vetoed" | "failed" = "not_required";
     let __seniorReviewError: string | null = null;
@@ -2097,10 +2098,12 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
           .eq("user_id", __userId)
           .maybeSingle();
         const pid = (sub?.plan_id as string | undefined) ?? "free";
+        __planId = sub?.status === "active" ? pid : "free";
         __planAllowsSenior = sub?.status === "active" && pid !== "free";
-      } catch { __planAllowsSenior = false; }
+      } catch { __planAllowsSenior = false; __planId = "free"; }
     }
     __requiresSeniorReview = __planAllowsSenior && built.direction !== "WAIT" && (setupGrade === "A+" || setupGrade === "A" || setupScore >= 59);
+
     if (__requiresSeniorReview) {
       try {
         const reviewSystem = `You are a 25-year institutional trader (bank/prop desk head) reviewing a junior analyst's ICT/SMC setup for real money risk. Your job is to protect capital. Be brutally honest — most setups are NOT A+. Verify the ENTRY, STOP LOSS, and TAKE PROFIT are placed correctly, not just the direction. Answer ONLY as valid JSON: {"verdict":"CONFIRM"|"DOWNGRADE"|"VETO","reasoning":"<2 sentences>","counter_argument":"<strongest bear/bull case>","chasing_price":true|false,"levels_ok":true|false,"levels_note":"<one line on entry/SL/TP quality>"}`;
