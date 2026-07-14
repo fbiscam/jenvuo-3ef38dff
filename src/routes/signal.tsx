@@ -2232,11 +2232,11 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
                 : "border-amber-200 bg-amber-50/40"
           )}>
             <div className="flex items-center justify-between">
-              <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+              <div className={`font-['Urbanist',sans-serif] text-[13px] font-semibold tracking-wide text-zinc-900`}>
                 Market Regime
               </div>
               <div className={cn(
-                `text-[10px] ${MONO} tracking-widest uppercase font-semibold`,
+                `font-['Urbanist',sans-serif] text-[12px] font-semibold uppercase tracking-wide`,
                 plan.marketRegime.favorable ? "text-emerald-700"
                   : plan.marketRegime.regime === "volatile" ? "text-rose-700"
                     : "text-amber-700"
@@ -2244,12 +2244,12 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
                 {plan.marketRegime.regime}
               </div>
             </div>
-            <div className={`text-[10px] sm:text-[11px] text-zinc-700 leading-snug mt-1 ${MONO} whitespace-nowrap overflow-hidden text-ellipsis`}>
+            <div className={`font-['Urbanist',sans-serif] text-[13px] font-medium text-zinc-800 leading-relaxed mt-1 whitespace-nowrap overflow-hidden text-ellipsis`}>
               Trend {plan.marketRegime.trendStrength}% · Vol {plan.marketRegime.volatility}%
               {plan.marketRegime.favorable && " · ICT-favorable tape"}
             </div>
             {plan.marketRegime.warning && (
-              <div className="text-[11px] text-zinc-800 leading-snug mt-1 whitespace-nowrap overflow-hidden text-ellipsis" title={plan.marketRegime.warning}>
+              <div className="font-['Urbanist',sans-serif] text-[13px] font-medium text-zinc-900 leading-relaxed mt-1 whitespace-nowrap overflow-hidden text-ellipsis" title={plan.marketRegime.warning}>
                 ⚠ {plan.marketRegime.warning}
               </div>
             )}
