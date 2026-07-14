@@ -1866,10 +1866,15 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       __totalCompletionTokens += __aiUsage2?.completionTokens ?? 0;
       import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
       parsed = tryParseJsonLoose(content) || {};
-    } catch {
-      // Do not make the user wait forever for prose. The deterministic engine
-      // below still produces entry, SL, TP, grade, chart markings and narration.
-      parsed = {};
+    } catch (aiErr) {
+      // AI narration failed (Bluesminds down / timeout / 5xx). Do NOT fall
+      // back to deterministic-only output — that would emit a BUY/SELL and
+      // charge the user for a scan where no AI model actually ran. Bubble
+      // a UI-friendly "Server busy" error so the client toasts it and the
+      // flat $0.20 per-signal charge below is skipped entirely.
+      const msg = (aiErr as Error)?.message ?? "";
+      if (/server busy|unauthorized|insufficient|payment/i.test(msg)) throw aiErr;
+      throw new Error("Server busy — please try again in a moment.");
     }
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
