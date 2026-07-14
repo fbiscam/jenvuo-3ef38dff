@@ -412,7 +412,7 @@ function SignalPage() {
       const sym = symbol || "XAUUSD";
       const ok = await credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
       if (!ok) { setLoading(false); return; }
-      const p = await fetchPlan({ data: { symbol: sym } });
+      const p = await fetchPlan({ data: { symbol: sym, scanId } });
       setPlan(p);
       // ICT narration is included in the single "signal" charge above — no extra deduction.
       // Free users still don't get the guided narration.
