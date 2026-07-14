@@ -280,6 +280,13 @@ function PricingPage() {
                                 <span className="text-[11px] font-medium text-zinc-800">DeepSeek V4 Pro</span>
                               </span>
                             )}
+                            {hasGrok && <span className="text-zinc-400">+</span>}
+                            {hasGrok && (
+                              <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
+                                <img src={xaiLogo} width={12} height={12} alt="xAI" className="object-contain" />
+                                <span className="text-[11px] font-medium text-zinc-800">Grok 4.5</span>
+                              </span>
+                            )}
                           </span>
                         ) : (
                           <span>{f}</span>
