@@ -338,13 +338,14 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Single-model policy: consistency > variance. If the model is down,
-  // caller surfaces a clean error + auto-refund via low-balance protection.
-  intent: ["bmind/gpt-5.4"],
-  narration: ["bmind/gpt-5.4"],
-  // Senior review: Grok 4.5 primary, DeepSeek V4 Pro fallback, Flash last-resort.
-  seniorReview: ["bmind/grok-4.5", "bmind/deepseek-ai/deepseek-v4-pro", "bmind/deepseek-v4-flash"],
-  chat: ["bmind/gpt-5.4"],
+  // Primary is Bluesminds GPT-5.4. If Bluesminds returns 429/503 or times
+  // out, the gateway auto-falls-back to the Lovable AI Gateway (OpenAI
+  // GPT-5.4 → GPT-5.4-mini) so the user never has to refresh.
+  intent: ["bmind/gpt-5.4", "openai/gpt-5.4", "openai/gpt-5.4-mini"],
+  narration: ["bmind/gpt-5.4", "openai/gpt-5.4", "openai/gpt-5.4-mini"],
+  // Senior review: Grok 4.5 primary → DeepSeek V4 Pro → Flash → Lovable GPT-5.5.
+  seniorReview: ["bmind/grok-4.5", "bmind/deepseek-ai/deepseek-v4-pro", "bmind/deepseek-v4-flash", "openai/gpt-5.5"],
+  chat: ["bmind/gpt-5.4", "openai/gpt-5.4", "openai/gpt-5.4-mini"],
 } as const;
 
 
