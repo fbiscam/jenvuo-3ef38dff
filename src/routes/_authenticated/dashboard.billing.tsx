@@ -238,11 +238,11 @@ function Billing() {
                       const actualSeniorModel = (meta.actual_senior_model as string | undefined) ?? null;
                       const rawModel = actualModel ?? r.model ?? (meta.model as string | undefined) ?? null;
                       const prettyFromMeta = actualModel ? undefined : (meta.model_label as string | undefined);
-                      const completedSeniorStatuses = new Set(["completed", "confirmed", "downgraded", "vetoed"]);
-                      const recordedSeniorModel = completedSeniorStatuses.has(String(meta.senior_review_status ?? ""))
-                        ? ((meta.senior_model as string | undefined) ?? null)
-                        : null;
-                      const seniorRaw = actualSeniorModel ?? recordedSeniorModel;
+                      // Billing must show only the AI models that actually ran for
+                      // this scan. Senior review names come from ai_cost_log only;
+                      // never fall back to metadata because old rows may contain
+                      // planned/default review models that did not execute.
+                      const seniorRaw = actualSeniorModel;
                       const seniorPretty = seniorRaw ? formatModelLabel(seniorRaw) : undefined;
                       const modelLabel = actualModel
                         ? formatModelLabel(actualModel)
