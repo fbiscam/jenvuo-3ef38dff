@@ -441,6 +441,10 @@ function DashboardLayout() {
   const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
   const greetingText = pickGreeting(localHour);
+  const currentPlan = useCurrentPlan();
+  const showDeepSeek = currentPlan === "pro" || currentPlan === "elite" || currentPlan === "ultra";
+  const showGrok = currentPlan === "elite" || currentPlan === "ultra";
+
 
   // Persist sidebar collapsed state
   useEffect(() => {
