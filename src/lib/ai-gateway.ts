@@ -175,7 +175,12 @@ async function singleAttempt(
     else if (res.status === 401) msg = "AI key rejected. Please contact support.";
     else if (res.status === 400) msg = "Server busy — please try again in a moment.";
     else msg = "Server busy — please try again in a moment.";
-    throw new AiGatewayError(msg, res.status, terminal);
+    // Attach Retry-After (seconds) as ms, if provided by the upstream.
+    const ra = res.headers.get("retry-after");
+    const raMs = ra ? (Number.isFinite(+ra) ? +ra * 1000 : Math.max(0, Date.parse(ra) - Date.now())) : 0;
+    const e = new AiGatewayError(msg, res.status, terminal);
+    (e as any).retryAfterMs = Number.isFinite(raMs) && raMs > 0 ? Math.min(raMs, 8000) : 0;
+    throw e;
   }
 
   const json: any = await res.json();
@@ -220,7 +225,9 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
 
   let lastErr: AiGatewayError | null = null;
 
-  for (const model of models) {
+  for (let mi = 0; mi < models.length; mi++) {
+    const model = models[mi];
+    const isLastModel = mi === models.length - 1;
     for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
       try {
         const { content, usage } = await singleAttempt(model, opts, apiKey, timeoutMs);
@@ -230,9 +237,27 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
           ? err
           : new AiGatewayError(String((err as any)?.message ?? err), 0, false);
 
-        if (lastErr.terminal) throw lastErr;
+        // Terminal errors (auth, 402 credits, bad key, etc.) — do not retry
+        // or fall back; caller must surface as-is.
+        if (lastErr.terminal) {
+          const isAuthOrBilling = lastErr.status === 401 || lastErr.status === 402 || lastErr.status === 403;
+          if (isAuthOrBilling) throw lastErr;
+          // Other terminals: still try next provider in the chain.
+          break;
+        }
+
+        // On 429/503/502/504 or timeout (status 0), fall back to the next
+        // provider immediately on the last retry attempt for this model.
+        const busy = lastErr.status === 429 || lastErr.status === 503 || lastErr.status === 502 || lastErr.status === 504;
+        if (busy && attempt >= 2 && !isLastModel) break; // hop provider fast
+
         if (attempt === retriesPerModel) break;
-        await sleep(500 * Math.pow(2, attempt - 1));
+
+        // Exponential backoff w/ jitter, honoring upstream Retry-After (capped).
+        const retryAfterMs = (lastErr as any).retryAfterMs as number | undefined;
+        const base = retryAfterMs && retryAfterMs > 0 ? retryAfterMs : 500 * Math.pow(2, attempt - 1);
+        const jitter = Math.floor(Math.random() * 250);
+        await sleep(Math.min(6000, base + jitter));
       }
     }
   }
@@ -313,13 +338,14 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Single-model policy: consistency > variance. If the model is down,
-  // caller surfaces a clean error + auto-refund via low-balance protection.
-  intent: ["bmind/gpt-5.4"],
-  narration: ["bmind/gpt-5.4"],
-  // Senior review: Grok 4.5 primary, DeepSeek V4 Pro fallback, Flash last-resort.
-  seniorReview: ["bmind/grok-4.5", "bmind/deepseek-ai/deepseek-v4-pro", "bmind/deepseek-v4-flash"],
-  chat: ["bmind/gpt-5.4"],
+  // Primary is Bluesminds GPT-5.4. If Bluesminds returns 429/503 or times
+  // out, the gateway auto-falls-back to the Lovable AI Gateway (OpenAI
+  // GPT-5.4 → GPT-5.4-mini) so the user never has to refresh.
+  intent: ["bmind/gpt-5.4", "openai/gpt-5.4", "openai/gpt-5.4-mini"],
+  narration: ["bmind/gpt-5.4", "openai/gpt-5.4", "openai/gpt-5.4-mini"],
+  // Senior review: Grok 4.5 primary → DeepSeek V4 Pro → Flash → Lovable GPT-5.5.
+  seniorReview: ["bmind/grok-4.5", "bmind/deepseek-ai/deepseek-v4-pro", "bmind/deepseek-v4-flash", "openai/gpt-5.5"],
+  chat: ["bmind/gpt-5.4", "openai/gpt-5.4", "openai/gpt-5.4-mini"],
 } as const;
 
 
