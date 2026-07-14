@@ -142,8 +142,11 @@ export async function chargeSignalScan(params: {
     const pTok = Math.max(0, params.promptTokens ?? 0);
     const cTok = Math.max(0, params.completionTokens ?? 0);
     const seniorRequired = params.seniorReviewRequired === true;
-    const seniorModel = params.seniorModel ?? (seniorRequired ? "nvapi/deepseek-ai/deepseek-v4-pro" : null);
-    const seniorRan = Boolean(seniorModel) || seniorRequired;
+    // Only label + charge senior review when a real senior model actually
+    // ran (i.e. the caller passed the model id it used). Don't fabricate a
+    // model name when senior review was required but failed / skipped.
+    const seniorModel = params.seniorModel ?? null;
+    const seniorRan = Boolean(seniorModel);
     const amount = seniorRan ? SIGNAL_SCAN_CHARGE_WITH_SENIOR_USD : SIGNAL_SCAN_CHARGE_USD;
     const meta: Record<string, unknown> = {
       model: params.model ?? null,
