@@ -903,7 +903,7 @@ function DashboardLayout() {
                   <span className="text-[11px] font-medium text-zinc-800 sm:text-[12px]">DeepSeek V4 Pro</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-1 hover:bg-zinc-50 sm:px-2">
-                  <img src={xaiLogo} width={14} height={14} alt="xAI" className="object-contain" />
+                  <img src={xaiLogo} width={18} height={18} alt="xAI" className="object-contain" />
                   <span className="text-[11px] font-medium text-zinc-800 sm:text-[12px]">Grok 4.5</span>
                 </span>
               </Link>
