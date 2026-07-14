@@ -314,10 +314,12 @@ export const MODEL_CHAIN = {
   // Primary analyzer: gpt-5.4 (accuracy locked, no fallback).
   intent: ["bmind/gpt-5.4"],
   narration: ["bmind/gpt-5.4"],
-  // Senior review = DeepSeek V4 Pro (reasoner).
-  // Order: DeepSeek official (paid, most reliable) → NVIDIA (free tier, rate-limited) → Bluesminds routes.
+  // Senior review chain.
+  // Order: DeepSeek official (paid, most reliable) → Grok 4.5 via Bluesminds → NVIDIA free tier → Bluesminds DeepSeek routes.
   seniorReview: [
     "dsofficial/deepseek-reasoner",
+    "bmind/x-ai/grok-4.5",
+    "bmind/grok-4.5",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "bmind/orion/deepseek-ai/deepseek-v4-pro",
     "bmind/deepseek-ai/deepseek-v4-pro",
