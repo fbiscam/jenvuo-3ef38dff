@@ -384,30 +384,6 @@ function Journal() {
                           : t.outcome === "pending" ? "bg-sky-50 text-sky-700"
                           : "bg-amber-50 text-amber-700"
                         }`}>{t.outcome}</span>
-                        {(t.tp1_hit_at || t.tp2_hit_at || t.outcome === "win") && (
-                          <div className="flex items-center gap-1">
-                            <span
-                              title={t.tp1_hit_at ? `TP1 hit at ${new Date(t.tp1_hit_at).toLocaleString()}` : "TP1 not reached"}
-                              className={`rounded px-1 py-0.5 text-[9px] font-bold tracking-wider ${
-                                (t.tp1_hit_at || t.outcome === "win")
-                                  ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                                  : "bg-zinc-50 text-zinc-400 border border-zinc-200"
-                              }`}
-                            >
-                              {(t.tp1_hit_at || t.outcome === "win") ? "✓ TP1" : "TP1"}
-                            </span>
-                            <span
-                              title={t.tp2_hit_at ? `TP2 hit at ${new Date(t.tp2_hit_at).toLocaleString()}` : "TP2 not reached"}
-                              className={`rounded px-1 py-0.5 text-[9px] font-bold tracking-wider ${
-                                (t.tp2_hit_at || t.outcome === "win")
-                                  ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                                  : "bg-zinc-50 text-zinc-400 border border-zinc-200"
-                              }`}
-                            >
-                              {(t.tp2_hit_at || t.outcome === "win") ? "✓ TP2" : "TP2"}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     </td>
                     <td className={`px-3 py-2.5 font-mono text-xs text-center ${(displayPnl ?? 0) > 0 ? "text-emerald-600" : (displayPnl ?? 0) < 0 ? "text-rose-600" : "text-zinc-500"}`}>
