@@ -383,7 +383,7 @@ function PricingPage() {
                 { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
                 { f: "Signal latency", a: "No alerts", b: "Realtime", c: "Realtime", d: "Realtime" },
-                { f: "AI models", a: "__GPT_ONLY__", b: "__MODELS__", c: "__MODELS__", d: "__MODELS__" },
+                { f: "AI models", a: "__GPT_ONLY__", b: "__MODELS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },
                 { f: "A+ signal access", a: true, b: true, c: true, d: true },
                 { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
                 { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
