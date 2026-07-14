@@ -239,12 +239,15 @@ function Billing() {
                       const actualSeniorModel = (meta.actual_senior_model as string | undefined) ?? null;
                       const rawModel = actualModel ?? r.model ?? (meta.model as string | undefined) ?? null;
                       const prettyFromMeta = actualModel ? undefined : (meta.model_label as string | undefined);
-                      // Billing must show only the AI models that actually ran for
-                      // this scan. Senior review names come from ai_cost_log only;
-                      // never fall back to metadata because old rows may contain
-                      // planned/default review models that did not execute.
-                      const seniorRaw = actualSeniorModel;
-                      const seniorPretty = seniorRaw ? formatModelLabel(seniorRaw) : undefined;
+                      // Prefer the model that actually ran (ai_cost_log match).
+                      // Fall back to metadata's planned senior model so the
+                      // history still shows Grok 4.5 / DeepSeek pills even when
+                      // the senior call errored or timed out.
+                      const seniorRaw = actualSeniorModel ?? (meta.senior_model as string | undefined) ?? null;
+                      const seniorPrettyFromMeta = meta.senior_model_label as string | undefined;
+                      const seniorPretty = actualSeniorModel
+                        ? formatModelLabel(actualSeniorModel)
+                        : (seniorPrettyFromMeta ?? (seniorRaw ? formatModelLabel(seniorRaw) : undefined));
                       const modelLabel = actualModel
                         ? formatModelLabel(actualModel)
                         : (prettyFromMeta ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—")))
