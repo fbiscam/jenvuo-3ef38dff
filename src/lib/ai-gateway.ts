@@ -311,15 +311,15 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Primary analyzer: Bluesminds GPT-5.4 (5.5 not available on Bluesminds).
-  // Fallback to 5.2 (not mini) to preserve signal quality.
-  intent: ["bmind/gpt-5.4", "bmind/gpt-5.2"],
-  narration: ["bmind/gpt-5.4", "bmind/gpt-5.2"],
-  // Senior review: DeepSeek V4 Flash only (fastest + most reliable on Bluesminds right now).
+  // Primary: GPT-5.4. Fallback: GPT-4o (strong, not mini).
+  // gpt-5/5.2/5.5 currently "no channel available" on Bluesminds — kept out.
+  intent: ["bmind/gpt-5.4", "bmind/gpt-4o"],
+  narration: ["bmind/gpt-5.4", "bmind/gpt-4o"],
+  // Senior review: DeepSeek V4 Flash (fastest + most reliable on Bluesminds).
   seniorReview: [
     "bmind/deepseek-v4-flash",
   ],
-  chat: ["bmind/gpt-5.4", "bmind/gpt-5.2"],
+  chat: ["bmind/gpt-5.4", "bmind/gpt-4o"],
 } as const;
 
 
