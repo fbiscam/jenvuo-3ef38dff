@@ -1721,14 +1721,6 @@ function SignalPage() {
                 You are not in the killzone for better A+ scaling for good signal.
               </DialogDescription>
 
-              {/* Detail panel */}
-              <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] uppercase tracking-wider text-zinc-400 shrink-0">Only trade</span>
-                <span className="text-[12px] font-semibold text-zinc-900 tabular-nums shrink-0">{kzDialog?.pair}</span>
-                <span className="text-[11px] text-zinc-700 ml-auto">
-                  {kzDialog?.kzText}
-                </span>
-              </div>
             </DialogHeader>
           </div>
 
