@@ -1857,7 +1857,7 @@ function ConfluenceHeatmap({ plan }: { plan: SignalPlan }) {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className={`text-[13px] font-bold tabular-nums text-zinc-900 leading-none ${MONO}`}>
-              {passed}<span className="text-zinc-300">/{total}</span>
+              {passed}<span className="text-zinc-300"> / {total}</span>
             </span>
             <span className={`text-[8px] ${MONO} tracking-widest text-zinc-500 mt-0.5`}>{pct}%</span>
           </div>
