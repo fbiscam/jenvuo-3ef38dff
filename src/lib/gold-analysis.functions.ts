@@ -2122,9 +2122,9 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
           ],
           jsonMode: true,
           maxTokens: 220,
-          timeoutMs: 20000,
+          timeoutMs: 12000,
           priority: true,
-          retriesPerModel: 2,
+          retriesPerModel: 1,
           stage: "senior-review",
 
         });
