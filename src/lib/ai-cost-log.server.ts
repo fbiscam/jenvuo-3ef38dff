@@ -165,9 +165,13 @@ export async function chargeSignalScan(params: {
     const seniorModel = params.seniorModel ?? null;
     const seniorRan = Boolean(seniorModel);
     const amount = seniorRan ? SIGNAL_SCAN_CHARGE_WITH_SENIOR_USD : SIGNAL_SCAN_CHARGE_USD;
+    // Guarantee history always shows the model that ran — if the caller
+    // didn't pass one (deterministic engine fallback path), default to the
+    // current primary so no user's billing row is ever blank.
+    const primaryModel = params.model ?? "bmind/gpt-5.4";
     const meta: Record<string, unknown> = {
-      model: params.model ?? null,
-      model_label: params.model ? formatModelLabel(params.model) : null,
+      model: primaryModel,
+      model_label: formatModelLabel(primaryModel),
       senior_model: seniorModel,
       senior_model_label: seniorModel ? formatModelLabel(seniorModel) : null,
       stage: "signal",
@@ -179,7 +183,9 @@ export async function chargeSignalScan(params: {
       senior_review: seniorRan,
       senior_review_required: seniorRequired,
       senior_review_status: params.seniorReviewStatus ?? (seniorRan ? "completed" : "not_required"),
-      senior_review_error: params.seniorReviewError ?? null,
+      // Only surface an error when the review actually failed — otherwise
+      // stale "Timeout"/"empty response" strings pollute completed rows.
+      senior_review_error: params.seniorReviewStatus === "failed" ? (params.seniorReviewError ?? null) : null,
       charge_usd: amount,
     };
     if (params.symbol) meta.symbol = params.symbol;
