@@ -986,6 +986,10 @@ export type SignalPlan = {
   };
 };
 
+export type SignalPlanResult =
+  | { ok: true; plan: SignalPlan }
+  | { ok: false; error: string };
+
 
 function toDTO(c: Candle): CandleDTO {
   return { time: Math.floor(c.t / 1000), open: c.o, high: c.h, low: c.l, close: c.c };
@@ -2584,9 +2588,18 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
     // Billing is handled by the caller (client) via credits.spend("signal") once per scan.
     // Do NOT charge here — otherwise a single scan would be double/triple-billed.
-    const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId, { scanId: data.scanId });
-    setCachedPlan(cacheKey, plan);
-    return plan;
+    try {
+      const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId, { scanId: data.scanId });
+      setCachedPlan(cacheKey, plan);
+      return { ok: true, plan } satisfies SignalPlanResult;
+    } catch (e) {
+      const raw = (e as Error)?.message || "Server busy — please try again in a moment.";
+      const error = /server busy|too many|credits|balance|key rejected|unauthorized|forbidden/i.test(raw)
+        ? raw
+        : "Server busy — please try again in a moment.";
+      console.warn("getSignalPlan failed:", error);
+      return { ok: false, error } satisfies SignalPlanResult;
+    }
   });
 
 
