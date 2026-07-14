@@ -142,7 +142,7 @@ type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Voice queries / day", free: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
   { feature: "A+ signal access", free: true, pro: true, elite: true },
-  { feature: "AI models", free: "GPT-5.4", pro: "GPT-5.4 + DeepSeek V4 Pro", elite: "GPT-5.4 + DeepSeek V4 Pro + Grok 4.5" },
+  { feature: "AI models", free: "GPT-5.6 Luna", pro: "GPT-5.6 Luna + DeepSeek V4 Pro", elite: "GPT-5.6 Luna + DeepSeek V4 Pro" },
   { feature: "Alert latency", free: "No alerts", pro: "Realtime", elite: "Realtime" },
   { feature: "ICT / SMC narration", free: true, pro: true, elite: true },
   { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
