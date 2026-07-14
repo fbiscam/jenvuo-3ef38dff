@@ -175,7 +175,12 @@ async function singleAttempt(
     else if (res.status === 401) msg = "AI key rejected. Please contact support.";
     else if (res.status === 400) msg = "Server busy — please try again in a moment.";
     else msg = "Server busy — please try again in a moment.";
-    throw new AiGatewayError(msg, res.status, terminal);
+    // Attach Retry-After (seconds) as ms, if provided by the upstream.
+    const ra = res.headers.get("retry-after");
+    const raMs = ra ? (Number.isFinite(+ra) ? +ra * 1000 : Math.max(0, Date.parse(ra) - Date.now())) : 0;
+    const e = new AiGatewayError(msg, res.status, terminal);
+    (e as any).retryAfterMs = Number.isFinite(raMs) && raMs > 0 ? Math.min(raMs, 8000) : 0;
+    throw e;
   }
 
   const json: any = await res.json();
