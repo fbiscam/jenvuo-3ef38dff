@@ -925,7 +925,7 @@ function SignalPage() {
       {/* XAU PAIR SELECTOR */}
       <div className="border-b border-zinc-100 bg-white/60">
         <div className="mx-auto max-w-[1600px] px-5 py-2 sm:px-6 sm:py-2.5 flex items-center gap-2 overflow-x-auto">
-          <span className={`text-[10px] uppercase tracking-wider text-zinc-500 shrink-0 ${MONO}`}>Gold pair:</span>
+          <span className={`font-['Urbanist',sans-serif] text-[13px] font-semibold uppercase tracking-wide text-zinc-900 shrink-0`}>Gold pair:</span>
           {XAU_PAIRS.map((p) => {
             const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
             return (
@@ -943,11 +943,10 @@ function SignalPage() {
                   navigate({ to: "/signal", search: { symbol: p }, replace: true });
                 }}
                 className={cn(
-                  "shrink-0 h-7 px-2.5 rounded-md text-[11px] font-semibold tracking-wide transition border",
+                  "shrink-0 h-7 px-2.5 rounded-md font-['Urbanist',sans-serif] text-[13px] font-semibold tracking-wide transition border",
                   active
                     ? "bg-zinc-900 text-white border-zinc-900"
-                    : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50",
-                  MONO,
+                    : "bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-50",
                 )}
               >
                 {XAU_LABELS[p]}
