@@ -311,20 +311,19 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Primary analyzer: gpt-5.4 (accuracy locked, no fallback).
-  intent: ["bmind/gpt-5.4"],
-  narration: ["bmind/gpt-5.4"],
-  // Senior review chain.
-  // Order: DeepSeek official (paid, most reliable) → Grok 4.5 via Bluesminds → NVIDIA free tier → Bluesminds DeepSeek routes.
+  // Primary analyzer: GPT-5.5 via Bluesminds (fallback to 5.4 if unavailable).
+  intent: ["bmind/gpt-5.5", "bmind/gpt-5.4"],
+  narration: ["bmind/gpt-5.5", "bmind/gpt-5.4"],
+  // Senior review: Grok 4.5 first, then DeepSeek fallbacks.
   seniorReview: [
-    "dsofficial/deepseek-reasoner",
     "bmind/x-ai/grok-4.5",
     "bmind/grok-4.5",
+    "dsofficial/deepseek-reasoner",
     "nvapi/deepseek-ai/deepseek-v4-pro",
     "bmind/orion/deepseek-ai/deepseek-v4-pro",
     "bmind/deepseek-ai/deepseek-v4-pro",
   ],
-  chat: ["bmind/gpt-5.4"],
+  chat: ["bmind/gpt-5.5", "bmind/gpt-5.4"],
 } as const;
 
 
