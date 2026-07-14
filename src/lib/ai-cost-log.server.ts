@@ -171,7 +171,7 @@ export async function chargeSignalScan(params: {
     // Guarantee history always shows the model that ran — if the caller
     // didn't pass one (deterministic engine fallback path), default to the
     // current primary so no user's billing row is ever blank.
-    const primaryModel = params.model ?? "bmind/gpt-5.4";
+    const primaryModel = params.model ?? "bmind/gpt-5.6-luna";
     const meta: Record<string, unknown> = {
       model: primaryModel,
       model_label: formatModelLabel(primaryModel),
