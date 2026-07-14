@@ -139,7 +139,7 @@ export default function AlertOptInCard() {
         </form>
       )}
 
-      <p className="font-['Urbanist',sans-serif] text-[12px] text-zinc-800 leading-snug max-w-[42ch]">
+      <p className="font-['Urbanist',sans-serif] text-[13px] font-medium text-zinc-900 leading-relaxed tracking-normal max-w-[44ch]">
         We only alert on A+ / A institutional setups — typically 2–5 per week. Unsubscribe anytime.
       </p>
     </div>
