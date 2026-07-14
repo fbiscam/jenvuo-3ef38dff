@@ -71,7 +71,7 @@ const TIERS = [
       "$2 wallet / month",
       "Unlimited voice queries",
       "A+ / A institutional signals",
-      "Powered by GPT-5.4",
+      "Powered by GPT-5.6 Luna",
       "Full ICT / SMC narration",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
