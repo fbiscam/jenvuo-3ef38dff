@@ -70,41 +70,42 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard", label: "Account Overview", icon: "space_dashboard", iconColor: "#4F46E5", exact: true, countKey: "saved" },
-      { to: "/app", label: "Launch AI", icon: "auto_awesome", iconColor: "#7C3AED" },
-      { to: "/dashboard/workspace", label: "Saved Signals", icon: "bookmarks", iconColor: "#E11D48" },
-      { to: "/dashboard/alerts", label: "Signal Alerts", icon: "notifications_active", iconColor: "#F59E0B", countKey: "alerts7d" },
-      { to: "/dashboard/notifications", label: "Notifications", icon: "mark_email_unread", iconColor: "#2563EB" },
+      { to: "/dashboard", label: "Account Overview", icon: "space_dashboard", exact: true, countKey: "saved" },
+      { to: "/app", label: "Launch AI", icon: "auto_awesome" },
+      { to: "/dashboard/workspace", label: "Saved Signals", icon: "bookmarks" },
+      { to: "/dashboard/alerts", label: "Signal Alerts", icon: "notifications_active", countKey: "alerts7d" },
+      { to: "/dashboard/notifications", label: "Notifications", icon: "mark_email_unread" },
     ],
   },
   {
     label: "Trades & Insights",
     items: [
-      { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", iconColor: "#059669", countKey: "journalTotal" },
-      { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats", iconColor: "#0EA5E9" },
-      { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3", iconColor: "#DB2777" },
+      { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
+      { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats" },
+      { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3" },
     ],
   },
   {
     label: "Tools & Market",
     items: [
-      { to: "/signal", label: "Signal Desk", icon: "radar", iconColor: "#0891B2" },
-      { to: "/killzones", label: "Killzones", icon: "target", iconColor: "#DC2626" },
-      { to: "/ai-engine", label: "AI Engine", icon: "neurology", iconColor: "#8B5CF6" },
-      { to: "/insights", label: "Insights", icon: "menu_book", iconColor: "#B45309" },
-      { to: "/pricing", label: "Pricing", icon: "local_offer", iconColor: "#16A34A" },
+      { to: "/signal", label: "Signal Desk", icon: "radar" },
+      { to: "/killzones", label: "Killzones", icon: "target" },
+      { to: "/ai-engine", label: "AI Engine", icon: "neurology" },
+      { to: "/insights", label: "Insights", icon: "menu_book" },
+      { to: "/pricing", label: "Pricing", icon: "local_offer" },
     ],
   },
   {
     label: "Account & Billing",
     items: [
-      { to: "/dashboard/billing", label: "Billing", icon: "account_balance_wallet", iconColor: "#0D9488" },
-      { to: "/dashboard/profile", label: "Profile", icon: "person_pin", iconColor: "#475569" },
-      { to: "/dashboard/security", label: "Security", icon: "encrypted", iconColor: "#1E40AF" },
-      { to: "/help", label: "Help Center", icon: "lightbulb", iconColor: "#EA580C" },
+      { to: "/dashboard/billing", label: "Billing", icon: "account_balance_wallet" },
+      { to: "/dashboard/profile", label: "Profile", icon: "person_pin" },
+      { to: "/dashboard/security", label: "Security", icon: "encrypted" },
+      { to: "/help", label: "Help Center", icon: "lightbulb" },
     ],
   },
 ];
+
 
 
 const TABS: TabItem[] = NAV_GROUPS.flatMap((g) => g.items);
