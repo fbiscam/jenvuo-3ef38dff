@@ -410,7 +410,7 @@ function Billing() {
                     return (
                       <td
                         key={i}
-                        className="px-6 py-3.5 text-center border-l border-zinc-200 bg-white"
+                        className="px-2 py-3.5 text-center border-l border-zinc-200 bg-white min-w-[120px]"
                       >
                         {v === true ? (
                           <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
