@@ -2308,8 +2308,8 @@ function TradeTrackerCard({
       className="rounded-lg border border-zinc-100 bg-white p-3 space-y-3 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
     >
       <div className="flex items-center justify-between">
-        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500 flex items-center gap-1.5`}>
-          <Activity className="h-3 w-3" /> Live Tracker
+        <span className={`font-['Urbanist',sans-serif] text-[12px] font-semibold tracking-wide uppercase text-zinc-900 flex items-center gap-1.5`}>
+          <Activity className="h-3.5 w-3.5" /> Live Tracker
         </span>
         <span className={cn("text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded border", MONO, statusTone)}>
           {status}
