@@ -2124,7 +2124,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
           maxTokens: 220,
           timeoutMs: 20000,
           priority: true,
-          retriesPerModel: 1,
+          retriesPerModel: 2,
           stage: "senior-review",
 
         });
