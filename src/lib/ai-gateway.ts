@@ -311,15 +311,12 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // -------- Model chains (single source of truth) ----------------------------
 
 export const MODEL_CHAIN = {
-  // Primary: GPT-5.4. Fallback: GPT-4o (strong, not mini).
-  // gpt-5/5.2/5.5 currently "no channel available" on Bluesminds — kept out.
-  intent: ["bmind/gpt-5.4", "bmind/gpt-4o"],
-  narration: ["bmind/gpt-5.4", "bmind/gpt-4o"],
-  // Senior review: DeepSeek V4 Flash (fastest + most reliable on Bluesminds).
-  seniorReview: [
-    "bmind/deepseek-v4-flash",
-  ],
-  chat: ["bmind/gpt-5.4", "bmind/gpt-4o"],
+  // Single-model policy: consistency > variance. If the model is down,
+  // caller surfaces a clean error + auto-refund via low-balance protection.
+  intent: ["bmind/gpt-5.4"],
+  narration: ["bmind/gpt-5.4"],
+  seniorReview: ["bmind/deepseek-v4-flash"],
+  chat: ["bmind/gpt-5.4"],
 } as const;
 
 
