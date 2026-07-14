@@ -6,6 +6,7 @@ import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 
 import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
+import xaiLogo from "@/assets/xai-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
