@@ -35,7 +35,7 @@ export default function AlertsHistoryPanel({
       {loading && alerts.length === 0 ? (
         <div className="px-3 py-6 text-center text-[11px] text-zinc-500">Loading…</div>
       ) : alerts.length === 0 ? (
-        <div className="px-3 py-6 text-center text-[11px] text-zinc-500 leading-relaxed">
+        <div className="px-3 py-6 text-center font-['Urbanist',sans-serif] text-[13px] font-medium text-zinc-800 leading-relaxed">
           No A+ setups fired yet.<br />
           The scanner is watching every 15 min.
         </div>
