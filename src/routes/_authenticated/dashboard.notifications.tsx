@@ -430,7 +430,7 @@ function NotificationsPage() {
                                         ) : (
                                           <TrendingDown className="h-2.5 w-2.5" />
                                         )}
-                                        {direction}
+                                        {direction} · {isBuy ? "LONG" : "SHORT"}
                                       </span>
                                     )}
                                     {grade && (
