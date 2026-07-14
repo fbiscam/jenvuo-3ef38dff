@@ -342,11 +342,13 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // available on Bluesminds anymore. Lovable AI Gateway is the cross-provider
 // fallback so the user never has to refresh.
 export const MODEL_CHAIN = {
-  intent: ["bmind/gpt-5.6-luna", "bmind/gpt-5.2-chat"],
-  narration: ["bmind/gpt-5.6-luna", "bmind/gpt-5.2-chat"],
+  // Primary analyzer: GPT-5.6 Luna ONLY. If it fails, surface "Server busy"
+  // to the user — do NOT silently fall back to another model.
+  intent: ["bmind/gpt-5.6-luna"],
+  narration: ["bmind/gpt-5.6-luna"],
   // Senior review: DeepSeek V4 Pro primary → Flash fallback (Bluesminds only).
   seniorReview: ["bmind/deepseek-ai/deepseek-v4-pro", "bmind/deepseek-v4-flash"],
-  chat: ["bmind/gpt-5.6-luna", "bmind/gpt-5.2-chat"],
+  chat: ["bmind/gpt-5.6-luna"],
 } as const;
 
 
