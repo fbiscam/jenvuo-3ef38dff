@@ -16,6 +16,7 @@ function modelLogoUrl(rawModel: string | null | undefined): string | null {
   if (!rawModel) return null;
   const m = String(rawModel).toLowerCase();
   let domain: string | null = null;
+  if (m.includes("grok") || m.includes("xai")) return xaiLogo;
   if (m.includes("gpt") || m.includes("openai")) domain = "openai.com";
   else if (m.includes("gemini") || m.startsWith("google/")) domain = "gemini.google.com";
   else if (m.includes("deepseek")) domain = "deepseek.com";
@@ -27,7 +28,7 @@ function modelLogoUrl(rawModel: string | null | undefined): string | null {
 
 function ModelWithLogo({ raw, label }: { raw: string | null; label: string }) {
   const parts = label.split(" + ");
-  const raws = raw ? [raw, ...parts.slice(1).map((p) => p.toLowerCase())] : parts.map(() => null);
+  const raws = raw ? [raw, ...parts.slice(1).map((p) => p.toLowerCase())] : parts.map((p) => p.toLowerCase());
   return (
     <span className="inline-flex items-center gap-1.5">
       {parts.map((p, i) => {
@@ -36,7 +37,7 @@ function ModelWithLogo({ raw, label }: { raw: string | null; label: string }) {
           <span key={i} className="inline-flex items-center gap-1">
             {i > 0 && <span className="text-zinc-400">+</span>}
             {url ? (
-              <img src={url} alt="" width={14} height={14} className="h-3.5 w-3.5 rounded-sm" loading="lazy" />
+              <img src={url} alt="" width={14} height={14} className="h-3.5 w-3.5 rounded-sm object-contain" loading="lazy" />
             ) : null}
             <span>{p}</span>
           </span>
