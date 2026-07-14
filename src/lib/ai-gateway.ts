@@ -225,7 +225,9 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
 
   let lastErr: AiGatewayError | null = null;
 
-  for (const model of models) {
+  for (let mi = 0; mi < models.length; mi++) {
+    const model = models[mi];
+    const isLastModel = mi === models.length - 1;
     for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
       try {
         const { content, usage } = await singleAttempt(model, opts, apiKey, timeoutMs);
@@ -235,9 +237,27 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
           ? err
           : new AiGatewayError(String((err as any)?.message ?? err), 0, false);
 
-        if (lastErr.terminal) throw lastErr;
+        // Terminal errors (auth, 402 credits, bad key, etc.) — do not retry
+        // or fall back; caller must surface as-is.
+        if (lastErr.terminal) {
+          const isAuthOrBilling = lastErr.status === 401 || lastErr.status === 402 || lastErr.status === 403;
+          if (isAuthOrBilling) throw lastErr;
+          // Other terminals: still try next provider in the chain.
+          break;
+        }
+
+        // On 429/503/502/504 or timeout (status 0), fall back to the next
+        // provider immediately on the last retry attempt for this model.
+        const busy = lastErr.status === 429 || lastErr.status === 503 || lastErr.status === 502 || lastErr.status === 504;
+        if (busy && attempt >= 2 && !isLastModel) break; // hop provider fast
+
         if (attempt === retriesPerModel) break;
-        await sleep(500 * Math.pow(2, attempt - 1));
+
+        // Exponential backoff w/ jitter, honoring upstream Retry-After (capped).
+        const retryAfterMs = (lastErr as any).retryAfterMs as number | undefined;
+        const base = retryAfterMs && retryAfterMs > 0 ? retryAfterMs : 500 * Math.pow(2, attempt - 1);
+        const jitter = Math.floor(Math.random() * 250);
+        await sleep(Math.min(6000, base + jitter));
       }
     }
   }
