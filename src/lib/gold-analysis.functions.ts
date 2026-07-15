@@ -2151,12 +2151,14 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
 VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine but not A+. CONFIRM only for true A+ institutional setups with clean entry/SL/TP.`;
 
-        // Sequential senior-review fallback chain:
-        // Claude Sonnet 4.5 (primary) → DeepSeek V4 Pro → GPT-5 Mini.
-        // callChatCompletion tries each in order; the first success wins.
+        // Senior review — best-effort mode.
+        // Chain: Claude 3.7 Sonnet → GPT-4o Mini → GPT-4.1 Mini → GPT-5 Mini.
+        // These models exist on Bluesminds but are often throttled; retries per
+        // model handle transient 429s, and if all fail the review gracefully skips.
         const seniorChain = [
-          "bmind/claude-sonnet-4.5",
-          "bmind/deepseek-v4-pro",
+          "bmind/claude-3.7-sonnet",
+          "bmind/gpt-4o-mini",
+          "bmind/gpt-4.1-mini",
           "bmind/gpt-5-mini",
         ] as const;
 
@@ -2173,7 +2175,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             maxTokens: 220,
             timeoutMs: 15000,
             priority: false,
-            retriesPerModel: 1,
+            retriesPerModel: 2,
             stage: "senior-review",
           });
         } catch (err) {
