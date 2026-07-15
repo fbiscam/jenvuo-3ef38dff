@@ -2706,6 +2706,15 @@ function SignalVoiceAgent({
   const submit = async (text?: string) => {
     const question = (text ?? q).trim();
     if (!question || busy || analyzing) return;
+    // FREE plan: voice agent limited to XAU/USD only.
+    const sym = (plan?.instrument.symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "");
+    if (!credits.isLoading && credits.plan?.id === "free" && sym !== "XAUUSD") {
+      toast.info("Voice agent for cross-pairs is a Pro feature", {
+        description: "Free plan voice agent is limited to XAU/USD. Upgrade to unlock all pairs.",
+        action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+      });
+      return;
+    }
     setQ("");
     setInputOpen(false);
     setBusy(true);
