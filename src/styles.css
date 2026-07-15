@@ -280,6 +280,36 @@
 @media (min-width: 1500px) { .jenvu-zoom { zoom: 1.4; } .jenvu-zoom-dashboard { zoom: 1.25; } }
 @media (min-width: 1680px) { .jenvu-zoom { zoom: 1.5; } .jenvu-zoom-dashboard { zoom: 1.32; } }
 
+/* Keep sidebar visually identical across all resolutions by countering the
+   parent .jenvu-zoom-dashboard zoom. Sidebar renders at zoom=1 always. */
+@media (min-width: 1024px) { .jenvu-zoom-dashboard .dashboard-sidebar-root { zoom: calc(1 / 0.95); } }
+@media (min-width: 1200px) { .jenvu-zoom-dashboard .dashboard-sidebar-root { zoom: calc(1 / 1.05); } }
+@media (min-width: 1360px) { .jenvu-zoom-dashboard .dashboard-sidebar-root { zoom: calc(1 / 1.15); } }
+@media (min-width: 1500px) { .jenvu-zoom-dashboard .dashboard-sidebar-root { zoom: calc(1 / 1.25); } }
+@media (min-width: 1680px) { .jenvu-zoom-dashboard .dashboard-sidebar-root { zoom: calc(1 / 1.32); } }
+
+/* Match right-column offset to the un-zoomed sidebar's physical width */
+@media (min-width: 1024px) {
+  .jenvu-zoom-dashboard .dashboard-right-col { padding-left: calc(200px / 0.95); }
+  .jenvu-zoom-dashboard .dashboard-right-col.collapsed { padding-left: calc(60px / 0.95); }
+}
+@media (min-width: 1200px) {
+  .jenvu-zoom-dashboard .dashboard-right-col { padding-left: calc(200px / 1.05); }
+  .jenvu-zoom-dashboard .dashboard-right-col.collapsed { padding-left: calc(60px / 1.05); }
+}
+@media (min-width: 1360px) {
+  .jenvu-zoom-dashboard .dashboard-right-col { padding-left: calc(200px / 1.15); }
+  .jenvu-zoom-dashboard .dashboard-right-col.collapsed { padding-left: calc(60px / 1.15); }
+}
+@media (min-width: 1500px) {
+  .jenvu-zoom-dashboard .dashboard-right-col { padding-left: calc(200px / 1.25); }
+  .jenvu-zoom-dashboard .dashboard-right-col.collapsed { padding-left: calc(60px / 1.25); }
+}
+@media (min-width: 1680px) {
+  .jenvu-zoom-dashboard .dashboard-right-col { padding-left: calc(200px / 1.32); }
+  .jenvu-zoom-dashboard .dashboard-right-col.collapsed { padding-left: calc(60px / 1.32); }
+}
+
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
 @media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
 
