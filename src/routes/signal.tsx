@@ -991,7 +991,7 @@ function SignalPage() {
       {/* PLAN LIMITS BANNER (Free) */}
       {!credits.isLoading && (!credits.features.realtime_alerts || !credits.features.full_ict) && (
         <div className="border-b border-amber-100 bg-amber-50/70">
-          <div className="mx-auto max-w-[1600px] px-5 py-2 sm:px-6 flex flex-wrap items-center justify-between gap-2 text-[13px] text-amber-900" style={{ fontFamily: '"Google Sans", "Google Sans Text", system-ui, -apple-system, sans-serif' }}>
+          <div className="mx-auto max-w-[1600px] px-5 py-2 sm:px-6 flex flex-wrap items-center justify-between gap-2 text-[13px] text-amber-900" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
             <div className="flex items-center gap-2">
               <span className={`${MONO} text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Free plan</span>
               <span>
