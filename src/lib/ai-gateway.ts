@@ -337,20 +337,26 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 
 // -------- Model chains (single source of truth) ----------------------------
 
-// Bluesminds catalog (verified live): gpt-5-mini, gpt-5.2-chat,
-// claude-sonnet-4.5, gemini-2.5-pro, deepseek-v4-flash. Luna/Grok/V4 Pro are
-// currently NOT reliable on Bluesminds. Primary uses gpt-5-mini for speed;
-// senior review runs Claude 4.5 + Gemini 2.5 Pro in parallel (worst wins).
+// Senior review is a SEQUENTIAL fallback chain (not parallel).
+// Order: Claude Sonnet 4.5 (primary) → DeepSeek V4 Pro (secondary) → GPT-5 Mini (tertiary).
+// callChatCompletion tries them in order and only falls back on transient errors.
 export const MODEL_CHAIN = {
   intent: ["bmind/gpt-5-mini"],
   narration: ["bmind/gpt-5-mini"],
-  // Parallel dual senior review — both are attempted, verdict is worst-wins.
-  seniorReview: ["bmind/claude-sonnet-4.5", "bmind/gemini-2.5-pro"],
+  seniorReview: [
+    "bmind/claude-sonnet-4.5",
+    "bmind/deepseek-v4-pro",
+    "bmind/gpt-5-mini",
+  ],
   chat: ["bmind/gpt-5-mini"],
 } as const;
 
-// Dedicated dual-review pair used by the parallel senior-review runner.
-export const SENIOR_REVIEW_PAIR = ["bmind/claude-sonnet-4.5", "bmind/gemini-2.5-pro"] as const;
+// Ordered fallback chain for the senior-review runner.
+export const SENIOR_REVIEW_CHAIN = [
+  "bmind/claude-sonnet-4.5",
+  "bmind/deepseek-v4-pro",
+  "bmind/gpt-5-mini",
+] as const;
 
 
 
