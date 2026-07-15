@@ -1157,7 +1157,7 @@ function SignalPage() {
 
               <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-900`}>
+                  <span className="text-[13px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal normal-case text-zinc-900">
                     HTF // 1H · Bias
                   </span>
                   {plan && (
