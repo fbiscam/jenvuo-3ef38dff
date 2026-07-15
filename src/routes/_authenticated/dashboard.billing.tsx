@@ -186,7 +186,7 @@ function Billing() {
             )}
             <p className="mt-2 text-[11px] text-zinc-500">Flat $0.20 per real BUY/SELL signal, or $0.25 when DeepSeek senior review is required. WAIT / no-trade scans are free.</p>
           </div>
-          <Link to="/pricing" className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
+          <Link to="/pricing" className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-normal text-zinc-900 hover:bg-zinc-50">
             Buy top-up
           </Link>
         </div>
