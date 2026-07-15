@@ -144,6 +144,8 @@ function statusFor(profile: PairProfile, now: Date) {
 
 function KillzonesPage() {
   const navigate = useNavigate();
+  const currentPlan = useCurrentPlan();
+  const isFreePlan = currentPlan === "free";
   const [now, setNow] = useState<Date>(() => new Date());
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<(typeof CATEGORIES)[number]>("All");
