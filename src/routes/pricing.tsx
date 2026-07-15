@@ -373,7 +373,7 @@ function PricingPage() {
                               <span className="text-zinc-300">·</span>
                               <img src="https://www.google.com/s2/favicons?domain=google.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
                               <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Google</span>
-                              <span className="ml-0.5 text-[9px] text-zinc-500">Senior Review</span>
+                              
                             </span>
                           )}
                         </span>
