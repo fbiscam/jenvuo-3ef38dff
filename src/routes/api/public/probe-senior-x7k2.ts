@@ -14,7 +14,7 @@ const MODELS = [
   "gpt-5.2-chat",
 ];
 
-export const Route = createFileRoute("/api/public/_probe-senior-x7k2")({
+export const Route = createFileRoute("/api/public/probe-senior-x7k2")({
   server: {
     handlers: {
       GET: async () => {
