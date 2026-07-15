@@ -5,6 +5,7 @@
 type Price = { in: number; out: number };
 
 const MODEL_PRICING: Record<string, Price> = {
+  "rules-engine/ict-smc": { in: 0, out: 0 },
   // OpenAI direct
   "openai/gpt-5.5": { in: 1.25, out: 10.0 },
   "openai/gpt-5.5-pro": { in: 3.0, out: 15.0 },
@@ -55,6 +56,7 @@ export const SIGNAL_SCAN_CHARGE_WITH_SENIOR_USD = 0.25;
 export function formatModelLabel(rawModel: string | null | undefined): string {
   if (!rawModel) return "—";
   const m = String(rawModel).toLowerCase();
+  if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
   const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("gpt-5.6-luna")) return "ChatGPT 5.6 Luna";

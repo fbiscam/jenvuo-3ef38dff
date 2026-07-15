@@ -16,6 +16,7 @@ function modelLogoUrl(rawModel: string | null | undefined): string | null {
   if (!rawModel) return null;
   const m = String(rawModel).toLowerCase();
   let domain: string | null = null;
+  if (m.startsWith("rules-engine/ict-smc")) return null;
   if (m.includes("grok") || m.includes("xai")) return xaiLogo;
   if (m.includes("gpt") || m.includes("openai")) domain = "openai.com";
   else if (m.includes("gemini") || m.startsWith("google/")) domain = "gemini.google.com";
@@ -50,6 +51,7 @@ function ModelWithLogo({ raw, label }: { raw: string | null; label: string }) {
 function formatModelLabel(rawModel: string | null | undefined): string {
   if (!rawModel) return "—";
   const m = String(rawModel).toLowerCase();
+  if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
   const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
   if (bare.startsWith("gpt-5.5")) return "ChatGPT 5.5";
