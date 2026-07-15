@@ -949,10 +949,10 @@ function DashboardLayout() {
             </button>
             <Link
               to="/app"
-             
-              className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium text-zinc-900 shadow-sm hover:bg-zinc-50"
+              className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-1 leading-none text-zinc-900 hover:bg-zinc-50"
             >
-              <Plus className="h-4 w-4" /> Launch AI
+              <Plus className="h-[14px] w-[14px]" />
+              <span className="text-[11px] font-medium leading-none">Launch AI</span>
             </Link>
           </div>
         </div>
