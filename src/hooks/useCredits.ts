@@ -56,7 +56,16 @@ export function useCredits() {
 
   async function spend(action: CreditAction, metadata?: Record<string, unknown>): Promise<boolean> {
     try {
-      const res = await spendFn({ data: { action, metadata } });
+      const res: any = await spendFn({ data: { action, metadata } });
+      if (res && res.ok === false) {
+        if (res.error === "INSUFFICIENT_CREDITS") {
+          toast.error("Low balance", {
+            description: `You need at least $${(res.minRequired ?? 0.2).toFixed(2)} to run a signal scan. Add funds to continue.`,
+            action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
+          });
+        }
+        return false;
+      }
       const uid = user?.id ?? "self";
       queryClient.setQueryData(["credit-state", uid], (prev: any) =>
         prev ? { ...prev, balance: res.balance } : prev,
@@ -65,12 +74,7 @@ export function useCredits() {
       return true;
     } catch (e: any) {
       const msg = String(e?.message ?? "");
-      if (msg.includes("INSUFFICIENT_CREDITS")) {
-        toast.error("Out of credits", {
-          description: "Upgrade your plan or buy a top-up pack.",
-          action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
-        });
-      } else if (msg.toLowerCase().includes("unauthorized")) {
+      if (msg.toLowerCase().includes("unauthorized")) {
         toast.error("Please sign in to continue.");
       } else {
         toast.error("Couldn't spend credits", { description: e?.message ?? "Try again." });
