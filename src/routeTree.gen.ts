@@ -47,7 +47,6 @@ import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collecti
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
-import { Route as ApiPublicProbeSeniorX7k2RouteImport } from './routes/api/public/probe-senior-x7k2'
 import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
 import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_authenticated/dashboard.workspace'
 import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authenticated/dashboard.usage'
@@ -263,12 +262,6 @@ const HelpCollectionSlugRoute = HelpCollectionSlugRouteImport.update({
   path: '/help/$collection/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicProbeSeniorX7k2Route =
-  ApiPublicProbeSeniorX7k2RouteImport.update({
-    id: '/api/public/probe-senior-x7k2',
-    path: '/api/public/probe-senior-x7k2',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicPodcastDotxmlRoute = ApiPublicPodcastDotxmlRouteImport.update({
   id: '/api/public/podcast.xml',
   path: '/api/public/podcast.xml',
@@ -455,7 +448,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
-  '/api/public/probe-senior-x7k2': typeof ApiPublicProbeSeniorX7k2Route
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -516,7 +508,6 @@ export interface FileRoutesByTo {
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
-  '/api/public/probe-senior-x7k2': typeof ApiPublicProbeSeniorX7k2Route
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
@@ -582,7 +573,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
-  '/api/public/probe-senior-x7k2': typeof ApiPublicProbeSeniorX7k2Route
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -648,7 +638,6 @@ export interface FileRouteTypes {
     | '/dashboard/usage'
     | '/dashboard/workspace'
     | '/api/public/podcast.xml'
-    | '/api/public/probe-senior-x7k2'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
     | '/dashboard/'
@@ -709,7 +698,6 @@ export interface FileRouteTypes {
     | '/dashboard/usage'
     | '/dashboard/workspace'
     | '/api/public/podcast.xml'
-    | '/api/public/probe-senior-x7k2'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
     | '/dashboard'
@@ -774,7 +762,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/usage'
     | '/_authenticated/dashboard/workspace'
     | '/api/public/podcast.xml'
-    | '/api/public/probe-senior-x7k2'
     | '/help/$collection/$slug'
     | '/lovable/email/suppression'
     | '/_authenticated/dashboard/'
@@ -824,7 +811,6 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   HelpIndexRoute: typeof HelpIndexRoute
   ApiPublicPodcastDotxmlRoute: typeof ApiPublicPodcastDotxmlRoute
-  ApiPublicProbeSeniorX7k2Route: typeof ApiPublicProbeSeniorX7k2Route
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   HelpCollectionIndexRoute: typeof HelpCollectionIndexRoute
@@ -1106,13 +1092,6 @@ declare module '@tanstack/react-router' {
       path: '/help/$collection/$slug'
       fullPath: '/help/$collection/$slug'
       preLoaderRoute: typeof HelpCollectionSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/probe-senior-x7k2': {
-      id: '/api/public/probe-senior-x7k2'
-      path: '/api/public/probe-senior-x7k2'
-      fullPath: '/api/public/probe-senior-x7k2'
-      preLoaderRoute: typeof ApiPublicProbeSeniorX7k2RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/podcast.xml': {
@@ -1401,7 +1380,6 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   HelpIndexRoute: HelpIndexRoute,
   ApiPublicPodcastDotxmlRoute: ApiPublicPodcastDotxmlRoute,
-  ApiPublicProbeSeniorX7k2Route: ApiPublicProbeSeniorX7k2Route,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   HelpCollectionIndexRoute: HelpCollectionIndexRoute,
@@ -1419,13 +1397,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
