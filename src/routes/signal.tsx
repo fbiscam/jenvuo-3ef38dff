@@ -2243,13 +2243,13 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
         {/* Two KV tiles */}
         <div className="grid grid-cols-2 gap-2">
           <div className="rounded-xl border border-zinc-200 px-3 py-2">
-            <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Grade</div>
+            <div className={`text-[12px] ${MONO} tracking-widest uppercase text-zinc-500`}>Grade</div>
             <div className={`text-base font-bold tabular-nums ${MONO} text-zinc-900 mt-0.5`}>
               {plan.setupGrade}
             </div>
           </div>
           <div className="rounded-xl border border-zinc-200 px-3 py-2">
-            <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>Passed</div>
+            <div className={`text-[12px] ${MONO} tracking-widest uppercase text-zinc-500`}>Passed</div>
             <div className={`text-base font-bold tabular-nums ${MONO} text-zinc-900 mt-0.5`}>
               {passed}<span className="text-zinc-400 text-[11px] font-medium"> / {total}</span>
             </div>
