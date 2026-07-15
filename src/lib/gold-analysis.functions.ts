@@ -7,6 +7,8 @@ import {
   computeDisplacement, detectRejectionConfirmation, detectZoneConfluence, computeZoneFreshness,
   detectEqualHighsLows, detectTurtleSoup, detectHTFPOIAlignment,
   detectSilverBullet, detectPowerOf3, detectMitigationAtEntry,
+  detectCETap, detectLiquidityVoidAtEntry, detectMomentumDivergence,
+  detectVolumeSpikeOnBreak, detectMidnightOpenBias,
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
@@ -2057,6 +2059,15 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       ? detectMitigationAtEntry(ltf, ltfA.swings, { priceLow: built.zone.priceLow, priceHigh: built.zone.priceHigh }, built.direction)
       : null;
 
+    // ---- Elite-tier signals ----
+    const ceTap = built.zone
+      ? detectCETap(ltf, { priceLow: built.zone.priceLow, priceHigh: built.zone.priceHigh }, built.direction)
+      : null;
+    const liquidityVoid = detectLiquidityVoidAtEntry(ltf, built.direction, last.c);
+    const momentumDivergence = detectMomentumDivergence(ltf, ltfA.swings, built.direction);
+    const volumeSpike = detectVolumeSpikeOnBreak(htf, htfStructureEvents);
+    const midnightOpen = detectMidnightOpenBias(htf, built.direction);
+
     // 10+ factor weighted score with hard-veto gates → only ≥88 is A+
     const scored = scoreSetup({
       trade: built,
@@ -2082,6 +2093,11 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       silverBullet,
       powerOf3,
       mitigationBlock,
+      ceTap,
+      liquidityVoid,
+      momentumDivergence,
+      volumeSpike,
+      midnightOpen,
     });
     let setupScore = scored.score;
     let setupGrade = scored.grade;
