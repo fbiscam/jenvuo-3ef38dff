@@ -903,21 +903,22 @@ function DashboardLayout() {
                 className="inline-flex flex-wrap items-center gap-1"
                 title="AI models powering your signals"
               >
-                <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2 py-1 hover:bg-zinc-50">
-                  <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" width={14} height={14} className="h-3.5 w-3.5 rounded-sm object-contain" loading="lazy" />
-                  <span className="text-[12px] font-medium text-zinc-800 sm:text-[13px]">OpenAI</span>
+                <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5 hover:bg-zinc-50">
+                  <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" width={18} height={18} className="h-[18px] w-[18px] rounded-sm object-contain" loading="lazy" />
+                  <span className="text-[11px] font-medium text-zinc-800">OpenAI</span>
                   {showDeepSeek && (
                     <>
                       <span className="text-zinc-300">·</span>
-                      <img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=64" alt="Anthropic" width={14} height={14} className="h-3.5 w-3.5 rounded-sm object-contain" loading="lazy" />
-                      <span className="text-[12px] font-medium text-zinc-800 sm:text-[13px]">Anthropic</span>
+                      <img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=64" alt="Anthropic" width={18} height={18} className="h-[18px] w-[18px] rounded-sm object-contain" loading="lazy" />
+                      <span className="text-[11px] font-medium text-zinc-800">Anthropic</span>
                       <span className="text-zinc-300">·</span>
-                      <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={14} height={14} className="h-3.5 w-3.5 rounded-sm object-contain" loading="lazy" />
-                      <span className="text-[12px] font-medium text-zinc-800 sm:text-[13px]">Google</span>
-                      <span className="ml-1 text-[10px] text-zinc-500 hidden sm:inline">Senior Review</span>
+                      <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={18} height={18} className="h-[18px] w-[18px] rounded-sm object-contain" loading="lazy" />
+                      <span className="text-[11px] font-medium text-zinc-800">Google</span>
+                      <span className="ml-1 text-[9px] text-zinc-500 hidden sm:inline">Senior Review</span>
                     </>
                   )}
                 </span>
+
               </Link>
             </div>
           </div>
