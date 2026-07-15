@@ -50,9 +50,15 @@ function ModelWithLogo({ raw, label }: { raw: string | null; label: string }) {
 
 function formatModelLabel(rawModel: string | null | undefined): string {
   if (!rawModel) return "—";
-  const m = String(rawModel).toLowerCase();
+  const raw = String(rawModel);
+  if (raw.includes(",")) {
+    return raw.split(",").map((s) => formatModelLabel(s.trim())).filter(Boolean).join(" + ");
+  }
+  const m = raw.toLowerCase();
   if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
-  const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google|anthropic)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
+  if (bare.startsWith("claude")) return "Claude";
   if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
   if (bare.startsWith("gpt-5.5")) return "ChatGPT 5.5";
   if (bare.startsWith("gpt-5.4-pro")) return "ChatGPT 5.4 Pro";
