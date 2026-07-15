@@ -67,20 +67,41 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       throw new Error(insertErr?.message ?? 'Failed to record alert')
     }
 
-    // 2. Resolve ALL active email subscribers from the signal page opt-in.
-    //    Emails go to every collected address (paid or not); in-app
-    //    notifications below stay scoped to paid users.
+    // 2. Resolve active email subscribers from the signal page opt-in.
+    //    Only paid-plan users receive the email (match by auth.users.email → user_subscriptions).
     const { data: subs } = await supabaseAdmin
       .from('signal_alert_subscribers')
       .select('email')
       .eq('status', 'active')
-    const recipientEmails = Array.from(
+    const allSubEmails = Array.from(
       new Set(
         (subs ?? [])
           .map((s: { email: string | null }) => (s.email ?? '').toLowerCase().trim())
           .filter((e) => !!e && /.+@.+\..+/.test(e)),
       ),
     )
+
+    let recipientEmails: string[] = []
+    if (allSubEmails.length > 0) {
+      // Fetch paid user_ids first
+      const { data: paidRows } = await supabaseAdmin
+        .from('user_subscriptions')
+        .select('user_id')
+        .eq('status', 'active')
+        .neq('plan_id', 'free')
+      const paidIds = new Set((paidRows ?? []).map((r: { user_id: string }) => r.user_id))
+
+      if (paidIds.size > 0) {
+        // Resolve emails for those user_ids via auth admin
+        const paidEmailSet = new Set<string>()
+        for (const uid of paidIds) {
+          const { data: u } = await supabaseAdmin.auth.admin.getUserById(uid)
+          const e = u?.user?.email?.toLowerCase().trim()
+          if (e) paidEmailSet.add(e)
+        }
+        recipientEmails = allSubEmails.filter((e) => paidEmailSet.has(e))
+      }
+    }
     const recipients: Array<{ email: string }> = recipientEmails.map((email) => ({ email }))
 
     // 3. Insert in-app notifications for all paid users (even non-subscribers)
