@@ -83,7 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
       { name: "google-site-verification", content: "tbza8oQV5Q94J94ETfj9TDnV7gI8eoXIAF6q9nctPnQ" },
       { title: "Voice Powered Gold Trading Intelligence" },
-      { name: "description", content: "Voice-native AI gold desk for XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF. Live ICT/SMC analysis, A+ setups and spoken execution — built on 25+ years of bullion-desk logic." },
+      { name: "description", content: "Voice-native AI gold desk for XAU/USD and every major XAU cross — live ICT/SMC analysis, A+ setups and spoken execution." },
       { name: "author", content: "Jenvu AI" },
       { name: "theme-color", content: "#000000" },
       { property: "og:site_name", content: "Jenvu AI" },

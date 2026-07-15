@@ -42,7 +42,7 @@ export const Route = createFileRoute("/signal")({
       {
         name: "description",
         content:
-          "Institutional ICT/SMC signal desk for XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF. Multi-timeframe bias, A+ setup scoring and voice narration for gold.",
+          "Institutional ICT/SMC signal desk for XAU/USD and every major XAU cross. Multi-timeframe bias, A+ setup scoring and voice narration.",
       },
       { name: "keywords", content: "XAUUSD signals, gold trading, XAU EUR, XAU GBP, XAU JPY, gold ICT SMC, A+ gold setup, gold voice agent, bullion desk" },
       { property: "og:title", content: "Gold Signal Desk — Jenvu" },
