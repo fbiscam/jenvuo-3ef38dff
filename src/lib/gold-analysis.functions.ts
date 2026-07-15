@@ -997,6 +997,14 @@ export type SignalPlan = {
     included: boolean;                // true if senior review actually ran
     confidenceAdjusted: boolean;      // true if senior review changed score/grade
   };
+  // Macro/news narrative AI context — runs when there's a live setup or
+  // upcoming news. Pure enrichment; never blocks the deterministic signal.
+  macroContext?: {
+    narrative: string;
+    impact: "supports" | "conflicts" | "neutral";
+    model: string | null;
+    modelLabel: string | null;
+  };
 };
 
 export type SignalPlanResult =
@@ -2287,6 +2295,79 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
       }
     }
 
+    // ============ STAGE 3: MACRO / NEWS NARRATIVE (Bluesminds) ============
+    // Lightweight AI layer that reads the current macro/news backdrop and
+    // tells the trader if the fundamental context SUPPORTS or CONFLICTS with
+    // the rules-engine bias. Pure enrichment — never blocks the signal.
+    // Triggers whenever there is (a) a live BUY/SELL setup, or (b) upcoming
+    // USD/gold news within the window. Soft-fails on any error.
+    let __macroContext: SignalPlan["macroContext"] = undefined;
+    const __macroShouldRun = built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null;
+    if (__macroShouldRun) {
+      try {
+        const newsLines = upcomingNews.slice(0, 5).map((n) =>
+          `- [${n.impact}] ${n.title} in ${Math.round(n.minutesUntil)}m (${n.country})`
+        ).join("\n") || "- No high-impact events in the window";
+        const macroSystem = `You are a senior macro strategist for a gold trading desk. In 1-2 short sentences, describe the CURRENT macro/news backdrop for ${inst.display} and whether it SUPPORTS or CONFLICTS with the desk's directional bias. Focus on: imminent USD events, DXY tone, rates/risk sentiment. No preamble. Reply ONLY as JSON: {"narrative":"<1-2 sentences>","impact":"supports"|"conflicts"|"neutral"}`;
+        const macroUser = `DESK BIAS: ${built.direction === "WAIT" ? "no trade" : built.direction} ${inst.display}
+HTF/LTF: ${htfA.trend} / ${ltfA.trend} | SESSION: ${session} / ${killzone}
+DXY confirms: ${dxyConfirms === true ? "yes" : dxyConfirms === false ? "no" : "n/a"}
+NEWS WINDOW (next 4h):
+${newsLines}
+IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(imminentHigh.minutesUntil)}m` : "none"}`;
+
+        const macroRes = await callChatCompletion({
+          models: [...MODEL_CHAIN.narration],
+          messages: [
+            { role: "system", content: macroSystem },
+            { role: "user", content: macroUser },
+          ],
+          jsonMode: true,
+          maxTokens: 160,
+          timeoutMs: 12000,
+          priority: false,
+          retriesPerModel: 1,
+          stage: "macro-context",
+        });
+
+        if (macroRes) {
+          __totalPromptTokens += macroRes.usage?.promptTokens ?? 0;
+          __totalCompletionTokens += macroRes.usage?.completionTokens ?? 0;
+          import("@/lib/ai-cost-log.server")
+            .then((m) => m.logAiCost({ userId: __userId, stage: "macro-context", model: macroRes.model, usage: macroRes.usage }))
+            .catch(() => {});
+          const parsedMacro: any = tryParseJsonLoose(macroRes.content) || {};
+          const narrative = String(parsedMacro.narrative ?? "").slice(0, 320).trim();
+          const impactRaw = String(parsedMacro.impact ?? "neutral").toLowerCase();
+          const impact: "supports" | "conflicts" | "neutral" =
+            impactRaw === "supports" || impactRaw === "conflicts" ? impactRaw : "neutral";
+          if (narrative) {
+            const mdlShort = macroRes.model.split("/").pop() ?? macroRes.model;
+            __macroContext = {
+              narrative,
+              impact,
+              model: macroRes.model,
+              modelLabel: mdlShort,
+            };
+            setupChecks.push({
+              key: "macro_context",
+              label: impact === "supports"
+                ? "✓ Macro backdrop supports bias"
+                : impact === "conflicts"
+                  ? "⚠ Macro backdrop conflicts with bias"
+                  : "• Macro backdrop neutral",
+              pass: impact !== "conflicts",
+              reason: narrative,
+            });
+          }
+        }
+      } catch (e) {
+        console.warn("macro-context failed:", (e as Error)?.message ?? e);
+      }
+    }
+
+
+
 
     tradeFromAi.confidence = Math.min(95, setupScore);
     if (built.direction !== "WAIT") {
@@ -2653,6 +2734,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
           confidenceAdjusted: __seniorReviewStatus === "downgraded" || __seniorReviewStatus === "vetoed",
         };
       })(),
+      macroContext: __macroContext,
     };
 
     // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
