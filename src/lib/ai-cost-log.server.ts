@@ -23,8 +23,13 @@ const MODEL_PRICING: Record<string, Price> = {
   "bmind/gpt-5.4": { in: 1.1, out: 8.8 },
   "bmind/gpt-5.4-pro": { in: 3.0, out: 15.0 },
   "bmind/gpt-5.4-mini": { in: 0.25, out: 2.0 },
+  "bmind/gpt-5-mini": { in: 0.25, out: 2.0 },
+  "bmind/gpt-5.2-chat": { in: 1.1, out: 8.8 },
+  "bmind/claude-sonnet-4.5": { in: 3.0, out: 15.0 },
+  "bmind/gemini-2.5-pro": { in: 1.25, out: 10.0 },
   "bmind/deepseek-ai/deepseek-v4-pro": { in: 0.55, out: 2.19 },
   "bmind/orion/deepseek-ai/deepseek-v4-pro": { in: 0.55, out: 2.19 },
+  "bmind/deepseek-v4-flash": { in: 0.27, out: 1.10 },
   // DeepSeek official API
   "dsofficial/deepseek-reasoner": { in: 0.55, out: 2.19 },
   "dsofficial/deepseek-chat": { in: 0.27, out: 1.10 },
