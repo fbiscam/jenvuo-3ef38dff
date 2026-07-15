@@ -1432,7 +1432,7 @@ function SignalPage() {
                         );
                       }}
                       className={cn(
-                        "inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[11px] font-semibold tracking-wider uppercase transition-colors",
+                        "inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13px] font-normal tracking-normal normal-case font-['Google_Sans','Product_Sans',system-ui,sans-serif] transition-colors",
                         tradeLogged
                           ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                           : isBuy
