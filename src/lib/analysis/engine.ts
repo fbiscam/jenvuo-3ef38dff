@@ -1471,3 +1471,307 @@ export function detectJudasSwing(
   }
   return { triggered: false, detail: "No Judas swing detected" };
 }
+
+
+// ============================================================
+// ELITE-TIER DETECTORS — CE, Liquidity Voids, Momentum Divergence,
+// Volume Spikes, Opening Gaps (NWOG/NDOG), Midnight Open, Asian
+// Range Projections, Consolidation Compression, Trap Candles.
+// These are the sharpest tools in a 20+yr trader's bag.
+// ============================================================
+
+// ---------- Consequent Encroachment (CE = 50% of FVG) ----------
+// ICT institutional reference: the 50% line of any FVG is the "consequent
+// encroachment". Price tapping past CE = imbalance considered filled by
+// smart money even if the whole gap isn't closed. Best limit entry level.
+export function computeCE(fvg: { priceLow: number; priceHigh: number }): number {
+  return (fvg.priceLow + fvg.priceHigh) / 2;
+}
+
+export function detectCETap(
+  candles: Candle[],
+  zone: { priceLow: number; priceHigh: number } | null,
+  dir: "BUY" | "SELL" | "WAIT",
+): { tapped: boolean; ce: number | null; detail: string } {
+  if (!zone || dir === "WAIT" || !candles.length) return { tapped: false, ce: null, detail: "No zone/bias" };
+  const ce = computeCE(zone);
+  const recent = candles.slice(-4);
+  const tapped = dir === "BUY"
+    ? recent.some(c => c.l <= ce && c.c >= zone.priceLow)
+    : recent.some(c => c.h >= ce && c.c <= zone.priceHigh);
+  return {
+    tapped, ce,
+    detail: tapped ? `Price tagged CE @ ${ce.toFixed(4)} (50% of zone)` : `CE @ ${ce.toFixed(4)} not yet tapped`,
+  };
+}
+
+// ---------- Liquidity Void (large single-candle imbalance) ----------
+// A single displacement candle whose range >> local ATR leaves a "void".
+// Price statistically retraces to fill part of it before continuing.
+export type LiquidityVoid = {
+  fromTime: number; toTime: number;
+  priceLow: number; priceHigh: number;
+  kind: "bullish" | "bearish";
+  size: number;
+  atrMultiple: number;
+};
+
+export function detectLiquidityVoids(candles: Candle[]): LiquidityVoid[] {
+  if (candles.length < 20) return [];
+  const atr = computeATR(candles, 14);
+  if (atr <= 0) return [];
+  const out: LiquidityVoid[] = [];
+  for (let i = 2; i < candles.length; i++) {
+    const c = candles[i];
+    const range = c.h - c.l;
+    const body = Math.abs(c.c - c.o);
+    // Void = body ≥ 1.8x ATR AND body dominates range (>70%)
+    if (body >= atr * 1.8 && body / Math.max(range, 1e-9) >= 0.7) {
+      const kind: "bullish" | "bearish" = c.c > c.o ? "bullish" : "bearish";
+      out.push({
+        fromTime: Math.floor(c.t / 1000),
+        toTime: Math.floor(c.t / 1000),
+        priceLow: Math.min(c.o, c.c),
+        priceHigh: Math.max(c.o, c.c),
+        kind, size: body,
+        atrMultiple: +(body / atr).toFixed(2),
+      });
+    }
+  }
+  return out.slice(-6);
+}
+
+export function detectLiquidityVoidAtEntry(
+  candles: Candle[],
+  dir: "BUY" | "SELL" | "WAIT",
+  lastPrice: number,
+): { present: boolean; detail: string } {
+  if (dir === "WAIT") return { present: false, detail: "No bias" };
+  const voids = detectLiquidityVoids(candles);
+  const want = dir === "BUY" ? "bullish" : "bearish";
+  const recent = voids.filter(v => v.kind === want).slice(-3);
+  if (!recent.length) return { present: false, detail: "No recent liquidity void aligned with bias" };
+  const strongest = recent.reduce((a, b) => (b.atrMultiple > a.atrMultiple ? b : a));
+  return {
+    present: true,
+    detail: `${strongest.kind} liquidity void at ${strongest.priceLow.toFixed(4)}–${strongest.priceHigh.toFixed(4)} (${strongest.atrMultiple}× ATR)`,
+  };
+}
+
+// ---------- RSI (Wilder) & Momentum Divergence ----------
+export function computeRSI(candles: Candle[], period = 14): number[] {
+  if (candles.length < period + 1) return [];
+  const rsi: number[] = [];
+  let gain = 0, loss = 0;
+  for (let i = 1; i <= period; i++) {
+    const d = candles[i].c - candles[i - 1].c;
+    if (d >= 0) gain += d; else loss -= d;
+  }
+  let avgG = gain / period, avgL = loss / period;
+  rsi[period] = avgL === 0 ? 100 : 100 - 100 / (1 + avgG / avgL);
+  for (let i = period + 1; i < candles.length; i++) {
+    const d = candles[i].c - candles[i - 1].c;
+    const g = Math.max(0, d), l = Math.max(0, -d);
+    avgG = (avgG * (period - 1) + g) / period;
+    avgL = (avgL * (period - 1) + l) / period;
+    rsi[i] = avgL === 0 ? 100 : 100 - 100 / (1 + avgG / avgL);
+  }
+  return rsi;
+}
+
+export function detectMomentumDivergence(
+  candles: Candle[],
+  swings: Swing[],
+  dir: "BUY" | "SELL" | "WAIT",
+): { present: boolean; kind: "regular" | "hidden" | null; detail: string } {
+  if (dir === "WAIT" || candles.length < 30 || swings.length < 2) {
+    return { present: false, kind: null, detail: "Insufficient data" };
+  }
+  const rsi = computeRSI(candles, 14);
+  if (!rsi.length) return { present: false, kind: null, detail: "RSI unavailable" };
+  if (dir === "BUY") {
+    const lows = swings.filter(s => s.kind === "low").slice(-3);
+    if (lows.length < 2) return { present: false, kind: null, detail: "Need 2 recent lows" };
+    const [a, b] = [lows[lows.length - 2], lows[lows.length - 1]];
+    const rsiA = rsi[a.i] ?? null, rsiB = rsi[b.i] ?? null;
+    if (rsiA == null || rsiB == null) return { present: false, kind: null, detail: "RSI missing at swings" };
+    if (b.price < a.price && rsiB > rsiA + 2) {
+      return { present: true, kind: "regular", detail: `Bullish regular divergence: price LL @ ${b.price.toFixed(4)}, RSI HL (${rsiA.toFixed(0)}→${rsiB.toFixed(0)})` };
+    }
+    if (b.price > a.price && rsiB < rsiA - 2) {
+      return { present: true, kind: "hidden", detail: `Bullish hidden divergence: price HL, RSI LL (${rsiA.toFixed(0)}→${rsiB.toFixed(0)})` };
+    }
+  } else {
+    const highs = swings.filter(s => s.kind === "high").slice(-3);
+    if (highs.length < 2) return { present: false, kind: null, detail: "Need 2 recent highs" };
+    const [a, b] = [highs[highs.length - 2], highs[highs.length - 1]];
+    const rsiA = rsi[a.i] ?? null, rsiB = rsi[b.i] ?? null;
+    if (rsiA == null || rsiB == null) return { present: false, kind: null, detail: "RSI missing at swings" };
+    if (b.price > a.price && rsiB < rsiA - 2) {
+      return { present: true, kind: "regular", detail: `Bearish regular divergence: price HH @ ${b.price.toFixed(4)}, RSI LH (${rsiA.toFixed(0)}→${rsiB.toFixed(0)})` };
+    }
+    if (b.price < a.price && rsiB > rsiA + 2) {
+      return { present: true, kind: "hidden", detail: `Bearish hidden divergence: price LH, RSI HH (${rsiA.toFixed(0)}→${rsiB.toFixed(0)})` };
+    }
+  }
+  return { present: false, kind: null, detail: "No divergence" };
+}
+
+// ---------- Volume Spike on BOS/CHoCH ----------
+// Institutional intent leaves a volume footprint. Spike at the break = real.
+export function detectVolumeSpikeOnBreak(
+  candles: Candle[],
+  structure: StructureEvent[],
+): { spike: boolean; multiple: number; detail: string } {
+  const last = structure[structure.length - 1];
+  if (!last || candles.length < 25) return { spike: false, multiple: 0, detail: "No structure/data" };
+  const idx = candles.findIndex(c => Math.floor(c.t / 1000) === last.toTime);
+  if (idx < 20) return { spike: false, multiple: 0, detail: "Break too early to measure volume" };
+  const breakVol = candles[idx].v;
+  const avgVol = candles.slice(Math.max(0, idx - 20), idx).reduce((s, c) => s + c.v, 0) / 20;
+  if (avgVol <= 0) return { spike: false, multiple: 0, detail: "Volume data unavailable" };
+  const multiple = breakVol / avgVol;
+  const spike = multiple >= 1.5;
+  return { spike, multiple: +multiple.toFixed(2), detail: `Break volume ${multiple.toFixed(2)}× 20-bar avg${spike ? " (institutional footprint)" : ""}` };
+}
+
+// ---------- Opening Gaps (NDOG / NWOG) ----------
+// New Day Opening Gap: 17:00 NY (previous close) → 18:00 NY (next open).
+// New Week Opening Gap: Friday 17:00 NY close → Sunday 18:00 NY open.
+// Institutions treat these gaps as high-probability magnets/reference zones.
+export type OpeningGap = {
+  kind: "NDOG" | "NWOG";
+  priceLow: number; priceHigh: number;
+  midpoint: number;
+  filled: boolean;
+};
+
+export function detectOpeningGaps(candles: Candle[]): OpeningGap[] {
+  if (candles.length < 24) return [];
+  const out: OpeningGap[] = [];
+  for (let i = 1; i < candles.length; i++) {
+    const prev = candles[i - 1], cur = candles[i];
+    const gap = Math.min(cur.o, cur.c) - Math.max(prev.o, prev.c);
+    const gapDn = Math.min(prev.o, prev.c) - Math.max(cur.o, cur.c);
+    const dayChange = new Date(prev.t).getUTCDate() !== new Date(cur.t).getUTCDate();
+    const isMonday = new Date(cur.t).getUTCDay() === 1;
+    if (!dayChange) continue;
+    const priceLow = Math.min(prev.c, cur.o);
+    const priceHigh = Math.max(prev.c, cur.o);
+    if (Math.abs(prev.c - cur.o) < 1e-9) continue;
+    const later = candles.slice(i + 1);
+    const filled = later.some(c => c.l <= priceLow && c.h >= priceHigh);
+    if (gap > 0 || gapDn > 0) {
+      out.push({
+        kind: isMonday ? "NWOG" : "NDOG",
+        priceLow, priceHigh,
+        midpoint: (priceLow + priceHigh) / 2,
+        filled,
+      });
+    }
+  }
+  return out.filter(g => !g.filled).slice(-4);
+}
+
+// ---------- Midnight Open (True Day Open reference) ----------
+// The 00:00 NY (05:00 UTC) price is a key institutional reference. Retail
+// stops sit above/below; smart money uses it as bias divider.
+export function computeMidnightOpen(candles: Candle[], d = new Date()): number | null {
+  if (!candles.length) return null;
+  const today = new Date(d); today.setUTCHours(5, 0, 0, 0); // 00:00 NY ≈ 05:00 UTC
+  let closest: Candle | null = null;
+  let bestDelta = Infinity;
+  for (const c of candles) {
+    const delta = Math.abs(c.t - today.getTime());
+    if (delta < bestDelta) { bestDelta = delta; closest = c; }
+  }
+  return closest ? closest.o : null;
+}
+
+export function detectMidnightOpenBias(
+  candles: Candle[],
+  dir: "BUY" | "SELL" | "WAIT",
+): { aligned: boolean; midnight: number | null; detail: string } {
+  if (dir === "WAIT" || !candles.length) return { aligned: false, midnight: null, detail: "No bias" };
+  const mo = computeMidnightOpen(candles);
+  if (mo == null) return { aligned: false, midnight: null, detail: "Midnight open unavailable" };
+  const last = candles[candles.length - 1].c;
+  const aligned = dir === "BUY" ? last > mo : last < mo;
+  return {
+    aligned, midnight: mo,
+    detail: aligned
+      ? `Price ${dir === "BUY" ? "above" : "below"} Midnight Open @ ${mo.toFixed(4)} (bias aligned)`
+      : `Price on wrong side of Midnight Open @ ${mo.toFixed(4)}`,
+  };
+}
+
+// ---------- Asian Range Projections (0.5x / 1x / 2x) ----------
+// Institutions project Asian session range multiples as intraday targets.
+export function computeAsianRangeProjections(
+  htf: Candle[],
+  d = new Date(),
+): { high: number; low: number; range: number; proj: { level: string; up: number; down: number }[] } | null {
+  if (htf.length < 24) return null;
+  const today = new Date(d); today.setUTCHours(0, 0, 0, 0);
+  const asia = htf.filter(c => c.t >= today.getTime() && c.t < today.getTime() + 7 * 3600_000);
+  if (!asia.length) return null;
+  const high = Math.max(...asia.map(c => c.h));
+  const low = Math.min(...asia.map(c => c.l));
+  const range = high - low;
+  return {
+    high, low, range,
+    proj: [
+      { level: "0.5x", up: high + range * 0.5, down: low - range * 0.5 },
+      { level: "1.0x", up: high + range, down: low - range },
+      { level: "2.0x", up: high + range * 2, down: low - range * 2 },
+    ],
+  };
+}
+
+// ---------- Consolidation Compression (Squeeze) ----------
+// Range compression before expansion — like a coiled spring. Detects when
+// the last N candles' range is <60% of the prior N (imminent breakout).
+export function detectCompression(candles: Candle[], window = 10): { compressed: boolean; ratio: number; detail: string } {
+  if (candles.length < window * 2) return { compressed: false, ratio: 1, detail: "Insufficient data" };
+  const recent = candles.slice(-window);
+  const prior = candles.slice(-window * 2, -window);
+  const rRecent = Math.max(...recent.map(c => c.h)) - Math.min(...recent.map(c => c.l));
+  const rPrior = Math.max(...prior.map(c => c.h)) - Math.min(...prior.map(c => c.l));
+  const ratio = rPrior > 0 ? rRecent / rPrior : 1;
+  const compressed = ratio < 0.6;
+  return {
+    compressed, ratio: +ratio.toFixed(2),
+    detail: compressed ? `Range compressed ${(ratio * 100).toFixed(0)}% vs prior — breakout imminent` : `Range ratio ${ratio.toFixed(2)} (no compression)`,
+  };
+}
+
+// ---------- Trap Candle (long wick both sides) ----------
+// A "shark fin" candle with long upper AND lower wicks = whipsaw, both
+// sides' stops taken. Signals indecision / manipulation zone.
+export function detectTrapCandles(candles: Candle[]): { indices: number[]; latest: number | null } {
+  const idxs: number[] = [];
+  for (let i = candles.length - 10; i < candles.length; i++) {
+    if (i < 0) continue;
+    const c = candles[i];
+    const range = Math.max(c.h - c.l, 1e-9);
+    const body = Math.abs(c.c - c.o);
+    const upper = c.h - Math.max(c.o, c.c);
+    const lower = Math.min(c.o, c.c) - c.l;
+    if (body / range < 0.3 && upper / range > 0.3 && lower / range > 0.3) idxs.push(i);
+  }
+  return { indices: idxs, latest: idxs.length ? idxs[idxs.length - 1] : null };
+}
+
+// ---------- Weekly / Daily / H4 Opening (institutional refs) ----------
+export function computeSessionOpens(htf: Candle[], d = new Date()): { dailyOpen: number | null; weeklyOpen: number | null } {
+  if (!htf.length) return { dailyOpen: null, weeklyOpen: null };
+  const today = new Date(d); today.setUTCHours(0, 0, 0, 0);
+  const weekStart = new Date(today);
+  weekStart.setUTCDate(weekStart.getUTCDate() - weekStart.getUTCDay()); // Sunday 00:00 UTC
+  const dailyCandle = htf.find(c => c.t >= today.getTime());
+  const weeklyCandle = htf.find(c => c.t >= weekStart.getTime());
+  return {
+    dailyOpen: dailyCandle?.o ?? null,
+    weeklyOpen: weeklyCandle?.o ?? null,
+  };
+}
