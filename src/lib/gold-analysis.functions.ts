@@ -2600,13 +2600,18 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
         const model = __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview.join(",") : null);
         const labelOne = (mm: string) => {
           const s = mm.toLowerCase();
-          if (s.includes("claude-sonnet-4.5") || s.includes("claude")) return "Claude Sonnet 4.5";
+          if (s.includes("claude-3.7-sonnet")) return "Claude 3.7 Sonnet";
+          if (s.includes("claude-sonnet-4.5") || s.includes("claude-4.5")) return "Claude Sonnet 4.5";
+          if (s.includes("claude")) return "Claude";
           if (s.includes("gemini-2.5-pro")) return "Gemini 2.5 Pro";
           if (s.includes("grok")) return "Grok 4.5";
           if (s.includes("deepseek-v4-pro")) return "DeepSeek V4 Pro";
           if (s.includes("deepseek-v4-flash")) return "DeepSeek V4 Flash";
           if (s.includes("deepseek")) return "DeepSeek";
+          if (s.includes("gpt-5.2-chat") || s.includes("gpt-5.2")) return "ChatGPT 5.2";
           if (s.includes("gpt-5-mini")) return "ChatGPT 5 Mini";
+          if (s.includes("gpt-4o-mini")) return "ChatGPT 4o Mini";
+          if (s.includes("gpt-4.1-mini")) return "ChatGPT 4.1 Mini";
           return mm.split("/").pop() ?? mm;
         };
         const label = model ? model.split(",").map((s) => labelOne(s.trim())).join(" + ") : null;
