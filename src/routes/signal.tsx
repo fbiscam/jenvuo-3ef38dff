@@ -1244,21 +1244,25 @@ function SignalPage() {
                   <div className="flex items-end justify-between">
                     <div className="flex items-center gap-2">
                       <span className={`font-['Urbanist',sans-serif] text-[12px] font-semibold tracking-wide uppercase text-zinc-900`}>Trade Plan</span>
-                      <span className={cn(
-                        `text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded`,
-                        isBuy ? "bg-emerald-100 text-emerald-700" :
-                        isSell ? "bg-rose-100 text-rose-700" :
-                        "bg-zinc-100 text-zinc-600",
-                      )}>
-                        {isBuy ? "● BUY" : isSell ? "● SELL" : "WAIT"}
-                      </span>
-                      {(isBuy || isSell) && (
-                        <span className={cn(
-                          `text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded border`,
-                          isBuy ? "border-emerald-200 text-emerald-700 bg-emerald-50" : "border-rose-200 text-rose-700 bg-rose-50",
-                        )}>
-                          {isBuy ? "LONG" : "SHORT"}
-                        </span>
+                      {(t.confidence ?? 0) >= 59 && (
+                        <>
+                          <span className={cn(
+                            `text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded`,
+                            isBuy ? "bg-emerald-100 text-emerald-700" :
+                            isSell ? "bg-rose-100 text-rose-700" :
+                            "bg-zinc-100 text-zinc-600",
+                          )}>
+                            {isBuy ? "● BUY" : isSell ? "● SELL" : "WAIT"}
+                          </span>
+                          {(isBuy || isSell) && (
+                            <span className={cn(
+                              `text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded border`,
+                              isBuy ? "border-emerald-200 text-emerald-700 bg-emerald-50" : "border-rose-200 text-rose-700 bg-rose-50",
+                            )}>
+                              {isBuy ? "LONG" : "SHORT"}
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
                     <span className="text-[11px] text-zinc-500">
