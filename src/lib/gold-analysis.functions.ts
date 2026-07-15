@@ -8,7 +8,7 @@ import {
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
-  MODEL_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
+  MODEL_CHAIN, SENIOR_REVIEW_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
 } from "@/lib/ai-gateway";
 
 async function _spendUserCredits(
@@ -2151,16 +2151,10 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
 VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine but not A+. CONFIRM only for true A+ institutional setups with clean entry/SL/TP.`;
 
-        // Senior review — best-effort mode.
-        // Chain: Claude 3.7 Sonnet → GPT-4o Mini → GPT-4.1 Mini → GPT-5 Mini.
-        // These models exist on Bluesminds but are often throttled; retries per
-        // model handle transient 429s, and if all fail the review gracefully skips.
-        const seniorChain = [
-          "bmind/claude-3.7-sonnet",
-          "bmind/gpt-4o-mini",
-          "bmind/gpt-4.1-mini",
-          "bmind/gpt-5-mini",
-        ] as const;
+        // Senior review — best-available mode.
+        // Uses SENIOR_REVIEW_CHAIN (best → most reliable) from ai-gateway.
+        // Sequential fallback: strongest live model wins; if all throttled, review skips.
+        const seniorChain = SENIOR_REVIEW_CHAIN;
 
         let reviewResult: { content: string; model: string; usage: any } | null = null;
         let reviewError: any = null;
@@ -2173,7 +2167,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             ],
             jsonMode: true,
             maxTokens: 220,
-            timeoutMs: 15000,
+            timeoutMs: 20000,
             priority: false,
             retriesPerModel: 2,
             stage: "senior-review",
@@ -2189,7 +2183,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             key: "senior_review_attempted",
             label: "⚠ Senior review attempted",
             pass: false,
-            reason: "Senior review (Claude 3.7 Sonnet → GPT-4o Mini → GPT-4.1 Mini → GPT-5 Mini) attempted but all providers throttled; primary narration still applied and signal delivered.",
+            reason: "Senior review chain (Claude 4.5 → DeepSeek V4 Pro → Grok 4.5 → Claude 3.7 → GPT-5 Mini → GPT-4.1 Mini → GPT-4o Mini → DeepSeek V4 Flash) attempted but all providers throttled; primary narration still applied and signal delivered.",
           });
         } else {
           const mdl = reviewResult.model;
