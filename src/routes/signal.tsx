@@ -958,7 +958,7 @@ function SignalPage() {
                   navigate({ to: "/signal", search: { symbol: p }, replace: true });
                 }}
                 className={cn(
-                  "shrink-0 h-7 px-2.5 rounded-md font-['Urbanist',sans-serif] text-[13px] font-semibold tracking-wide transition border",
+                  "shrink-0 h-7 px-2.5 rounded-md font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[13px] font-normal tracking-normal transition border",
                   active
                     ? "bg-zinc-900 text-white border-zinc-900"
                     : "bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-50",
