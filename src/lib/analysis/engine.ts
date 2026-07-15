@@ -439,11 +439,11 @@ export type VetoResult = { key: string; label: string; reason: string };
 // and are dropped from the score (the remaining weights are re-normalised to 100).
 // New factors: structure (BOS/CHoCH quality), smt (correlation divergence), session_align (native session for this pair).
 const FACTOR_WEIGHTS: Record<AssetKind, Record<string, number>> = {
-  metal:  { bias: 16, sweep: 12, zone: 10, pd: 6, killzone: 8, dxy: 8, rr: 6, structure: 6, smt: 4, session_align: 3, displacement: 8, rejection: 7, confluence: 4, freshness: 2 },
-  forex:  { bias: 16, sweep: 12, zone: 10, pd: 6, killzone: 10, dxy: 5, rr: 6, structure: 6, smt: 6, session_align: 3, displacement: 8, rejection: 7, confluence: 3, freshness: 2 },
-  index:  { bias: 18, sweep: 12, zone: 10, pd: 6, killzone: 10, dxy: 0, rr: 6, structure: 8, smt: 6, session_align: 4, displacement: 10, rejection: 6, confluence: 2, freshness: 2 },
-  crypto: { bias: 20, sweep: 16, zone: 12, pd: 6, killzone: 0, dxy: 0, rr: 10, structure: 10, smt: 4, session_align: 2, displacement: 12, rejection: 6, confluence: 2, freshness: 0 },
-  stock:  { bias: 18, sweep: 12, zone: 10, pd: 6, killzone: 10, dxy: 0, rr: 6, structure: 8, smt: 6, session_align: 4, displacement: 10, rejection: 6, confluence: 2, freshness: 2 },
+  metal:  { bias: 14, sweep: 10, zone: 9, pd: 5, killzone: 7, dxy: 7, rr: 5, structure: 5, smt: 4, session_align: 3, displacement: 7, rejection: 6, confluence: 4, freshness: 2, eqhl: 4, turtle: 3, htf_poi: 6, silver_bullet: 3, power3: 3, mitigation: 3 },
+  forex:  { bias: 14, sweep: 10, zone: 9, pd: 5, killzone: 8, dxy: 4, rr: 5, structure: 5, smt: 5, session_align: 3, displacement: 7, rejection: 6, confluence: 3, freshness: 2, eqhl: 5, turtle: 3, htf_poi: 6, silver_bullet: 3, power3: 4, mitigation: 3 },
+  index:  { bias: 16, sweep: 10, zone: 9, pd: 5, killzone: 8, dxy: 0, rr: 5, structure: 7, smt: 5, session_align: 4, displacement: 9, rejection: 5, confluence: 2, freshness: 2, eqhl: 4, turtle: 3, htf_poi: 6, silver_bullet: 4, power3: 3, mitigation: 3 },
+  crypto: { bias: 18, sweep: 14, zone: 10, pd: 5, killzone: 0, dxy: 0, rr: 8, structure: 8, smt: 3, session_align: 2, displacement: 10, rejection: 5, confluence: 2, freshness: 0, eqhl: 5, turtle: 4, htf_poi: 6, silver_bullet: 0, power3: 0, mitigation: 3 },
+  stock:  { bias: 16, sweep: 10, zone: 9, pd: 5, killzone: 8, dxy: 0, rr: 5, structure: 7, smt: 5, session_align: 4, displacement: 9, rejection: 5, confluence: 2, freshness: 2, eqhl: 4, turtle: 3, htf_poi: 6, silver_bullet: 4, power3: 3, mitigation: 3 },
 };
 
 export function scoreSetup(args: {
