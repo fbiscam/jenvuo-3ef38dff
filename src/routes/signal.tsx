@@ -1064,7 +1064,7 @@ function SignalPage() {
               </div>
 
               <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case">
-                ICT Execution Feed
+                ICT&nbsp; & SMC Execution Feed
               </h3>
               {!plan && (
                 analysisError ? (
