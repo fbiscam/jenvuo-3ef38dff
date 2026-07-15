@@ -558,6 +558,29 @@ export function scoreSetup(args: {
       nativeSession ? "Trading in this pair's prime hours" : "Off-hours for this pair");
   }
 
+  // ---- Pro-trader factors ----
+  // Displacement: post-BOS impulse strength (institutional intent)
+  if (displacement) {
+    push("displacement", "Displacement leg after BOS/CHoCH",
+      displacement.passed, displacement.detail);
+  }
+  // Rejection: LTF rejection wick at the entry zone
+  if (rejection) {
+    push("rejection", "Rejection wick confirms zone",
+      rejection.confirmed, rejection.detail);
+  }
+  // Confluence: OB + FVG stacked in the same pocket
+  if (confluence) {
+    push("confluence", "OB + FVG confluence at entry",
+      confluence.confluent, confluence.detail);
+  }
+  // Freshness: entry zone recency (3-15 candles is prime)
+  if (freshness) {
+    push("freshness", "Zone is fresh (unstale)",
+      freshness.fresh, freshness.detail);
+  }
+
+
   const totalWeight = f.reduce((s, x) => s + x.weight, 0) || 1;
   const earned = f.reduce((s, x) => s + (x.pass ? x.weight : 0), 0);
   let score = Math.round((earned / totalWeight) * 100);
