@@ -337,19 +337,20 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 
 // -------- Model chains (single source of truth) ----------------------------
 
-// Bluesminds catalog (verified live): gpt-5.6-luna, gpt-5.2-chat, gpt-5-mini,
-// deepseek-ai/deepseek-v4-pro, deepseek-v4-flash. Grok and gpt-5.4 are NOT
-// available on Bluesminds anymore. Lovable AI Gateway is the cross-provider
-// fallback so the user never has to refresh.
+// Bluesminds catalog (verified live): gpt-5-mini, gpt-5.2-chat,
+// claude-sonnet-4.5, gemini-2.5-pro, deepseek-v4-flash. Luna/Grok/V4 Pro are
+// currently NOT reliable on Bluesminds. Primary uses gpt-5-mini for speed;
+// senior review runs Claude 4.5 + Gemini 2.5 Pro in parallel (worst wins).
 export const MODEL_CHAIN = {
-  // Primary analyzer: GPT-5.6 Luna ONLY. If it fails, surface "Server busy"
-  // to the user — do NOT silently fall back to another model.
-  intent: ["bmind/gpt-5.6-luna"],
-  narration: ["bmind/gpt-5.6-luna"],
-  // Senior review: DeepSeek V4 Pro primary → Flash fallback (Bluesminds only).
-  seniorReview: ["bmind/deepseek-ai/deepseek-v4-pro", "bmind/deepseek-v4-flash"],
-  chat: ["bmind/gpt-5.6-luna"],
+  intent: ["bmind/gpt-5-mini"],
+  narration: ["bmind/gpt-5-mini"],
+  // Parallel dual senior review — both are attempted, verdict is worst-wins.
+  seniorReview: ["bmind/claude-sonnet-4.5", "bmind/gemini-2.5-pro"],
+  chat: ["bmind/gpt-5-mini"],
 } as const;
+
+// Dedicated dual-review pair used by the parallel senior-review runner.
+export const SENIOR_REVIEW_PAIR = ["bmind/claude-sonnet-4.5", "bmind/gemini-2.5-pro"] as const;
 
 
 
