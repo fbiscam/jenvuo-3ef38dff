@@ -2242,6 +2242,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             });
           }
         }
+      } catch (e) {
         __seniorReviewStatus = "failed";
         __seniorReviewError = String((e as Error)?.message ?? e).slice(0, 240);
         setupChecks.unshift({
