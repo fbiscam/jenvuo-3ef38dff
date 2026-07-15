@@ -150,6 +150,8 @@ export const spendCredits = createServerFn({ method: "POST" })
     const { data: bal } = await supabase
       .from("credit_balances").select("balance").eq("user_id", userId).maybeSingle();
     const balance = Number(bal?.balance ?? 0);
-    if (balance < MIN_BALANCE_USD) throw new Error("INSUFFICIENT_CREDITS");
-    return { balance, spent: 0 };
+    if (balance < MIN_BALANCE_USD) {
+      return { balance, spent: 0, ok: false as const, error: "INSUFFICIENT_CREDITS" as const, minRequired: MIN_BALANCE_USD };
+    }
+    return { balance, spent: 0, ok: true as const };
   });
