@@ -10,6 +10,7 @@ export type AiCostLogRow = {
 export type MatchedAiModels = {
   primary?: AiCostLogRow;
   senior?: AiCostLogRow;
+  seniors?: AiCostLogRow[];
 };
 
 const PRIMARY_AI_STAGES = new Set(["signal-narration", "chat-signal"]);
@@ -53,10 +54,26 @@ export function matchActualAiModels(ledgerRows: any[], aiLogs: AiCostLogRow[]): 
     return best;
   };
 
+  const pickAllForScan = (row: any, stages: Set<string>, used: Set<string>) => {
+    const rowScanId = getMetaScanId(row);
+    if (!rowScanId) return [] as AiCostLogRow[];
+    const matched: AiCostLogRow[] = [];
+    for (const log of aiLogs) {
+      if (!log.id || used.has(log.id) || !log.model || !stages.has(String(log.stage ?? ""))) continue;
+      if (getLogScanId(log) !== rowScanId) continue;
+      matched.push(log);
+      used.add(log.id);
+    }
+    return matched;
+  };
+
   for (const row of scanRows) {
+    const seniors = pickAllForScan(row, SENIOR_AI_STAGES, usedSenior);
+    const seniorFallback = seniors.length ? undefined : pickNearestPrior(row, SENIOR_AI_STAGES, usedSenior);
     matches.set(row.id, {
       primary: pickNearestPrior(row, PRIMARY_AI_STAGES, usedPrimary),
-      senior: pickNearestPrior(row, SENIOR_AI_STAGES, usedSenior),
+      senior: seniors[0] ?? seniorFallback,
+      seniors: seniors.length ? seniors : (seniorFallback ? [seniorFallback] : []),
     });
   }
   return matches;
