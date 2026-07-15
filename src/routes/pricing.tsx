@@ -94,7 +94,7 @@ const TIERS = [
       
       "Voice queries free",
       "A+ / A institutional signals",
-      "Powered by OpenAI + Anthropic + Google (Senior Review)",
+      "Institutional-grade signal engine",
       "Realtime email & push alerts",
       "Full ICT / SMC narration",
       "Trade journal & analytics",
