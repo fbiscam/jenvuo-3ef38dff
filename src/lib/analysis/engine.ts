@@ -466,6 +466,13 @@ export function scoreSetup(args: {
   rejection?: { confirmed: boolean; detail: string } | null;
   confluence?: { confluent: boolean; detail: string } | null;
   freshness?: { freshness: number; fresh: boolean; detail: string } | null;
+  // ---- veteran-tier layer ----
+  equalHL?: { present: boolean; detail: string } | null;
+  turtleSoup?: { triggered: boolean; detail: string } | null;
+  htfPOI?: { aligned: boolean; detail: string } | null;
+  silverBullet?: { inWindow: boolean; detail: string } | null;
+  powerOf3?: { phase: "accumulation" | "manipulation" | "distribution" | "unknown"; aligned: boolean; detail: string } | null;
+  mitigationBlock?: { present: boolean; detail: string } | null;
 }): {
   score: number;
   grade: "A+" | "A" | "B" | "C";
@@ -476,6 +483,7 @@ export function scoreSetup(args: {
     trade, htf, ltf, pools, inKillzone, imminentHighNews, dxyConfirms, lastPrice, kind,
     structureQuality, smtDivergence, nativeSession, zoneMitigated,
     displacement, rejection, confluence, freshness,
+    equalHL, turtleSoup, htfPOI, silverBullet, powerOf3, mitigationBlock,
   } = args;
   const w = FACTOR_WEIGHTS[kind] ?? FACTOR_WEIGHTS.metal;
   const f: ScoreFactor[] = [];
