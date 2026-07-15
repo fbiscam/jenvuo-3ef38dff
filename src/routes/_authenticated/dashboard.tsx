@@ -1427,7 +1427,8 @@ function ReferralSnapshot() {
 
 
   return (
-    <div className="flex flex-1 flex-col gap-3 px-5 py-5">
+    <div className="flex flex-1 flex-col gap-3 px-5 py-5" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+
       <div className="flex divide-x divide-zinc-200 rounded-md border border-zinc-200 bg-white">
         <div className="flex-1 px-3 py-2">
           <div className="text-[10px] uppercase tracking-wide text-zinc-500">Referrals</div>
