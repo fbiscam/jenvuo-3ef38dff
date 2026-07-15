@@ -83,22 +83,32 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
 
     let recipientEmails: string[] = []
     if (allSubEmails.length > 0) {
-      // Fetch paid user_ids first
-      const { data: paidRows } = await supabaseAdmin
-        .from('user_subscriptions')
-        .select('user_id')
-        .eq('status', 'active')
-        .neq('plan_id', 'free')
-      const paidIds = new Set((paidRows ?? []).map((r: { user_id: string }) => r.user_id))
-
-      if (paidIds.size > 0) {
-        // Resolve emails for those user_ids via auth admin
-        const paidEmailSet = new Set<string>()
-        for (const uid of paidIds) {
-          const { data: u } = await supabaseAdmin.auth.admin.getUserById(uid)
-          const e = u?.user?.email?.toLowerCase().trim()
-          if (e) paidEmailSet.add(e)
+      // Resolve user_ids for the opt-in emails in one auth.users query,
+      // then intersect with active paid subscriptions. This is bounded by
+      // the actual opted-in list, not the full paid user base.
+      const { data: matchedUsers } = await supabaseAdmin
+        .schema('auth' as never)
+        .from('users' as never)
+        .select('id, email')
+        .in('email', allSubEmails) as unknown as {
+          data: Array<{ id: string; email: string }> | null
         }
+      const emailByUserId = new Map<string, string>()
+      for (const u of matchedUsers ?? []) {
+        if (u?.id && u?.email) emailByUserId.set(u.id, u.email.toLowerCase().trim())
+      }
+      if (emailByUserId.size > 0) {
+        const { data: paidRows } = await supabaseAdmin
+          .from('user_subscriptions')
+          .select('user_id')
+          .eq('status', 'active')
+          .neq('plan_id', 'free')
+          .in('user_id', Array.from(emailByUserId.keys()))
+        const paidEmailSet = new Set(
+          (paidRows ?? [])
+            .map((r: { user_id: string }) => emailByUserId.get(r.user_id))
+            .filter((e): e is string => !!e),
+        )
         recipientEmails = allSubEmails.filter((e) => paidEmailSet.has(e))
       }
     }
