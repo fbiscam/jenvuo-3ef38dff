@@ -5,6 +5,8 @@ import {
   computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
   detectSMTDivergence, killzoneForPair, detectMarketRegime,
   computeDisplacement, detectRejectionConfirmation, detectZoneConfluence, computeZoneFreshness,
+  detectEqualHighsLows, detectTurtleSoup, detectHTFPOIAlignment,
+  detectSilverBullet, detectPowerOf3, detectMitigationAtEntry,
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
