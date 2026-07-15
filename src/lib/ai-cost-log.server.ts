@@ -71,6 +71,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
   const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google|anthropic)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
+  if (bare.startsWith("claude-3.7-sonnet") || bare.startsWith("claude-3-7-sonnet")) return "Claude 3.7 Sonnet";
   if (bare.startsWith("claude-opus")) return "Claude Opus";
   if (bare.startsWith("claude")) return "Claude";
   if (bare.startsWith("gpt-5.6-luna")) return "ChatGPT 5.6 Luna";
