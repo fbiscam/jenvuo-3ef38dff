@@ -1432,7 +1432,7 @@ function SignalPage() {
                         );
                       }}
                       className={cn(
-                        "inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[11px] font-semibold tracking-wider uppercase transition-colors",
+                        "inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13px] font-normal tracking-normal normal-case font-['Google_Sans','Product_Sans',system-ui,sans-serif] transition-colors",
                         tradeLogged
                           ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                           : isBuy
@@ -1481,7 +1481,7 @@ function SignalPage() {
                         toast.success("Signal saved to your dashboard");
                       }}
                       className={cn(
-                        "inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[11px] font-semibold tracking-wider uppercase border transition-colors",
+                        "inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13px] font-normal tracking-normal normal-case font-['Google_Sans','Product_Sans',system-ui,sans-serif] border transition-colors",
                         signalSaved
                           ? "bg-zinc-50 text-zinc-700 border-zinc-200"
                           : "bg-white text-zinc-800 border-zinc-300 hover:bg-zinc-50",
