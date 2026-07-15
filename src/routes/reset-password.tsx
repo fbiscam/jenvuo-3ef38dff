@@ -161,11 +161,17 @@ function ResetPasswordPage() {
               </div>
 
             </label>
-            {error && (
-              <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[10px] sm:text-xs text-rose-700 text-center leading-snug line-clamp-2">
-                {error}
-              </p>
-            )}
+            {error && (() => {
+              const idx = error.toLowerCase().indexOf("please");
+              const first = idx > 0 ? error.slice(0, idx).trim() : error;
+              const second = idx > 0 ? error.slice(idx).trim() : "";
+              return (
+                <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[10px] sm:text-xs text-rose-700 text-center leading-snug">
+                  <span className="block">{first}</span>
+                  {second && <span className="block">{second}</span>}
+                </p>
+              );
+            })()}
             <button
               type="submit"
               disabled={saving}
