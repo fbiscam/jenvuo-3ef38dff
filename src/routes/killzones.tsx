@@ -146,7 +146,7 @@ function KillzonesPage() {
   const navigate = useNavigate();
   const currentPlan = useCurrentPlan();
   const isFreePlan = currentPlan === "free";
-  const [now, setNow] = useState<Date>(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<(typeof CATEGORIES)[number]>("All");
   const [ipTZ, setIpTZ] = useState<string | null>(null);
