@@ -2605,16 +2605,19 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
         return { bearish: one(s.bearish), base: one(s.base), bullish: one(s.bullish) };
       })(),
       seniorReview: (() => {
-        const model = __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview[0] : null);
-        const label = (() => {
-          if (!model) return null;
-          const m = model.toLowerCase();
-          if (m.includes("grok")) return "Grok 4.5";
-          if (m.includes("deepseek-v4-pro")) return "DeepSeek V4 Pro";
-          if (m.includes("deepseek-v4-flash")) return "DeepSeek V4 Flash";
-          if (m.includes("deepseek")) return "DeepSeek";
-          return model.split("/").pop() ?? model;
-        })();
+        const model = __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview.join(",") : null);
+        const labelOne = (mm: string) => {
+          const s = mm.toLowerCase();
+          if (s.includes("claude-sonnet-4.5") || s.includes("claude")) return "Claude Sonnet 4.5";
+          if (s.includes("gemini-2.5-pro")) return "Gemini 2.5 Pro";
+          if (s.includes("grok")) return "Grok 4.5";
+          if (s.includes("deepseek-v4-pro")) return "DeepSeek V4 Pro";
+          if (s.includes("deepseek-v4-flash")) return "DeepSeek V4 Flash";
+          if (s.includes("deepseek")) return "DeepSeek";
+          if (s.includes("gpt-5-mini")) return "ChatGPT 5 Mini";
+          return mm.split("/").pop() ?? mm;
+        };
+        const label = model ? model.split(",").map((s) => labelOne(s.trim())).join(" + ") : null;
         return {
           status: __seniorReviewStatus,
           model,
