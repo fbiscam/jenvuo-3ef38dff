@@ -1507,6 +1507,18 @@ export type Database = {
       }
     }
     Functions: {
+      admin_auto_scan_cron_history: {
+        Args: never
+        Returns: {
+          end_time: string
+          job_pid: number
+          jobid: number
+          return_message: string
+          runid: number
+          start_time: string
+          status: string
+        }[]
+      }
       apply_referral_code: { Args: { _code: string }; Returns: Json }
       close_chat_session: { Args: { _session_id: string }; Returns: undefined }
       convert_referral: { Args: { _user_id: string }; Returns: undefined }
