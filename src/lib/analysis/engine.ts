@@ -461,6 +461,11 @@ export function scoreSetup(args: {
   smtDivergence?: boolean | null;    // true = correlated instrument diverges in our favor
   nativeSession?: boolean | null;    // true = current killzone is the native/prime session for this pair
   zoneMitigated?: boolean;           // true = entry zone already tagged
+  // ---- pro-trader layer ----
+  displacement?: { strength: number; passed: boolean; detail: string } | null;
+  rejection?: { confirmed: boolean; detail: string } | null;
+  confluence?: { confluent: boolean; detail: string } | null;
+  freshness?: { freshness: number; fresh: boolean; detail: string } | null;
 }): {
   score: number;
   grade: "A+" | "A" | "B" | "C";
@@ -470,6 +475,7 @@ export function scoreSetup(args: {
   const {
     trade, htf, ltf, pools, inKillzone, imminentHighNews, dxyConfirms, lastPrice, kind,
     structureQuality, smtDivergence, nativeSession, zoneMitigated,
+    displacement, rejection, confluence, freshness,
   } = args;
   const w = FACTOR_WEIGHTS[kind] ?? FACTOR_WEIGHTS.metal;
   const f: ScoreFactor[] = [];
