@@ -2639,7 +2639,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
           userId: __userId,
           direction: plan.trade.direction,
           model: __usedNarrationModel ?? MODEL_CHAIN.narration[0],
-          seniorModel: __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview[0] : null),
+          seniorModel: __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview.join(",") : null),
           seniorReviewRequired: __requiresSeniorReview,
           seniorReviewStatus: __seniorReviewStatus,
           seniorReviewError: __seniorReviewError,
