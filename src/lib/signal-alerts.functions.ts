@@ -53,6 +53,7 @@ export const listSignalAlerts = createServerFn({ method: 'GET' })
   })
 
 export const subscribeToAlerts = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => {
     const o = (d ?? {}) as { email?: string }
     const email = String(o.email ?? '').trim().toLowerCase()
@@ -61,14 +62,25 @@ export const subscribeToAlerts = createServerFn({ method: 'POST' })
     }
     return { email }
   })
-  .handler(async ({ data }) => {
-    const sb = publicClient()
-    const { error } = await sb
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+    // Upsert by email; attach user_id so this account stays remembered
+    // across browsers even if a different email is entered later.
+    const { error } = await supabaseAdmin
       .from('signal_alert_subscribers')
-      .insert({ email: data.email })
-    // Treat unique-violation as success (already subscribed)
-    if (error && !/duplicate|unique/i.test(error.message)) {
-      return { ok: false, error: error.message }
+      .upsert(
+        { email: data.email, user_id: context.userId, status: 'active' },
+        { onConflict: 'email' },
+      )
+    if (error) return { ok: false, error: error.message }
+    // Also stamp user_id on any pre-existing row for the account email
+    const accountEmail = (context.claims?.email as string | undefined)?.toLowerCase()
+    if (accountEmail && accountEmail !== data.email) {
+      await supabaseAdmin
+        .from('signal_alert_subscribers')
+        .update({ user_id: context.userId })
+        .eq('email', accountEmail)
+        .is('user_id', null)
     }
     return { ok: true }
   })
@@ -77,12 +89,18 @@ export const isAlertSubscribed = createServerFn({ method: 'GET' })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const email = (context.claims?.email as string | undefined)?.toLowerCase()
-    if (!email) return { subscribed: false }
-    const sb = publicClient()
-    const { data } = await sb
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+    // Match by user_id OR by current account email — either counts as subscribed.
+    const filter = email
+      ? `user_id.eq.${context.userId},email.eq.${email}`
+      : `user_id.eq.${context.userId}`
+    const { data } = await supabaseAdmin
       .from('signal_alert_subscribers')
       .select('email')
-      .eq('email', email)
+      .or(filter)
+      .eq('status', 'active')
+      .limit(1)
       .maybeSingle()
     return { subscribed: !!data }
   })
+
