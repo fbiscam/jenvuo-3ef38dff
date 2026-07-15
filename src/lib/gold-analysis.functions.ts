@@ -997,6 +997,14 @@ export type SignalPlan = {
     included: boolean;                // true if senior review actually ran
     confidenceAdjusted: boolean;      // true if senior review changed score/grade
   };
+  // Macro/news narrative AI context — runs when there's a live setup or
+  // upcoming news. Pure enrichment; never blocks the deterministic signal.
+  macroContext?: {
+    narrative: string;
+    impact: "supports" | "conflicts" | "neutral";
+    model: string | null;
+    modelLabel: string | null;
+  };
 };
 
 export type SignalPlanResult =
