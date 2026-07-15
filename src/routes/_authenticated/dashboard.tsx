@@ -938,7 +938,7 @@ function DashboardLayout() {
               </Link>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 lg:self-end lg:mt-8 lg:mb-0">
+          <div className="flex items-center gap-1.5 lg:self-end lg:mt-12 lg:mb-0">
             <button
               type="button"
               aria-label="Open menu"
@@ -949,10 +949,9 @@ function DashboardLayout() {
             </button>
             <Link
               to="/app"
-              className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 leading-none text-zinc-900 hover:bg-zinc-50"
+              className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50"
             >
-              <Plus className="h-4 w-4" />
-              <span className="text-[12px] font-medium leading-none">Launch AI</span>
+              <Plus className="h-3.5 w-3.5" /> Launch AI
             </Link>
           </div>
         </div>
