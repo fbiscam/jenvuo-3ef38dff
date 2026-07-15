@@ -402,7 +402,7 @@ function SignalPage() {
     // Pre-flight: block the scan if wallet is below the flat $0.20 per-signal charge.
     if (!credits.isLoading && credits.balance < 0.20) {
       toast.error("Balance too low to run analysis", {
-        description: `You need at least $0.20 to run a signal scan. Current balance: $${credits.balance.toFixed(2)}.`,
+        description: `Low balance — add funds to continue.`,
         action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
       });
       return;
