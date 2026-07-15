@@ -9,7 +9,7 @@ export const LOGO_URL = `${SITE_URL}/favicon.png`
  * Inter for everything (headings, body, labels, code digits).
  */
 export const INTER =
-  "'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+  "'Google Sans', 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 // Legacy aliases so existing templates keep compiling without edits.
 export const URBANIST = INTER
