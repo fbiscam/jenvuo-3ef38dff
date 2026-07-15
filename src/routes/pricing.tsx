@@ -117,7 +117,7 @@ const TIERS = [
       
       "Voice queries free",
       "Everything in Pro",
-      "Powered by OpenAI + Anthropic + Google (Senior Review)",
+      "Institutional-grade signal engine",
       "Priority A+ alerts (< 30s)",
       "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF)",
       "API access & webhooks",
