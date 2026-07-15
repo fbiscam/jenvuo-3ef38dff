@@ -220,6 +220,14 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               }
             }
 
+            // Regenerate idempotency_key on every retry so a previously-failed
+            // send at Lovable's API doesn't reject subsequent attempts with
+            // 409 "run_failed / send again with a new idempotency key".
+            const retryIdempotencyKey =
+              failedAttempts > 0 && payload.idempotency_key
+                ? `${payload.idempotency_key}-retry-${failedAttempts}`
+                : payload.idempotency_key
+
             try {
               await sendLovableEmail(
                 {
@@ -232,7 +240,7 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   text: payload.text,
                   purpose: payload.purpose,
                   label: payload.label,
-                  idempotency_key: payload.idempotency_key,
+                  idempotency_key: retryIdempotencyKey,
                   unsubscribe_token: payload.unsubscribe_token,
                   message_id: payload.message_id,
                 },
