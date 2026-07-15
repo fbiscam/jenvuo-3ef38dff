@@ -13,7 +13,7 @@ import pricingScanner from "@/assets/pricing-scanner.jpg";
 import pricingApi from "@/assets/pricing-api.jpg";
 import xaiLogo from "@/assets/xai-logo.png";
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 export const Route = createFileRoute("/pricing")({

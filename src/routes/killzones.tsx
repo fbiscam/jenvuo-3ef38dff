@@ -27,7 +27,7 @@ export const Route = createFileRoute("/killzones")({
   component: KillzonesPage,
 });
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 
 type Category = "XAU";
 
