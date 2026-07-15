@@ -439,6 +439,7 @@ function DashboardLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
+  const [isAdminUser, setIsAdminUser] = useState(false);
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
@@ -460,6 +461,17 @@ function DashboardLayout() {
   }, [sidebarCollapsed]);
   // Close mobile drawer on route change
   useEffect(() => { setMobileNavOpen(false); }, [pathname]);
+
+  // Detect admin role to conditionally show admin nav items
+  useEffect(() => {
+    if (authLoading || !authUser) { setIsAdminUser(false); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.rpc("has_role", { _user_id: authUser.id, _role: "admin" });
+      if (!cancelled) setIsAdminUser(Boolean(data));
+    })();
+    return () => { cancelled = true; };
+  }, [authLoading, authUser]);
 
   // Unread notifications count (for red label indicator)
   useEffect(() => {
@@ -766,7 +778,11 @@ function DashboardLayout() {
 
         <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-2 py-2">
 
-          {NAV_GROUPS.map((group, gi) => (
+          {[...NAV_GROUPS, ...(isAdminUser ? [{ label: "Admin", items: [
+            { to: "/dashboard/admin/auto-scan", label: "Auto-Scan Monitor", icon: "radar" },
+            { to: "/dashboard/admin/messages", label: "Inbox", icon: "inbox" },
+            { to: "/dashboard/admin/subscribers", label: "Subscribers", icon: "group" },
+          ] }] : [])].map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
               {!sidebarCollapsed && group.label && (
                 <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
