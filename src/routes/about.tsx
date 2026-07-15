@@ -7,6 +7,7 @@ export const Route = createFileRoute("/about")({
       { title: "About Jenvu — Our Mission" },
       { name: "description", content: "Meet Jenvu — the mission, philosophy and desk behind the voice-native gold trading agent covering every XAU cross-pair." },
       { property: "og:title", content: "Who We Are — Jenvu" },
+      { property: "og:description", content: "The mission, philosophy and desk behind the Jenvu voice-native gold trading agent covering every XAU cross-pair." },
       { property: "og:url", content: "https://jenvu.com/about" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/about" }],
