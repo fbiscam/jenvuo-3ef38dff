@@ -2306,7 +2306,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
     if (__macroShouldRun) {
       try {
         const newsLines = upcomingNews.slice(0, 5).map((n) =>
-          `- [${n.impact}] ${n.title} in ${Math.round(n.minutesUntil)}m (${n.currency})`
+          `- [${n.impact}] ${n.title} in ${Math.round(n.minutesUntil)}m (${n.country})`
         ).join("\n") || "- No high-impact events in the window";
         const macroSystem = `You are a senior macro strategist for a gold trading desk. In 1-2 short sentences, describe the CURRENT macro/news backdrop for ${inst.display} and whether it SUPPORTS or CONFLICTS with the desk's directional bias. Focus on: imminent USD events, DXY tone, rates/risk sentiment. No preamble. Reply ONLY as JSON: {"narrative":"<1-2 sentences>","impact":"supports"|"conflicts"|"neutral"}`;
         const macroUser = `DESK BIAS: ${built.direction === "WAIT" ? "no trade" : built.direction} ${inst.display}
