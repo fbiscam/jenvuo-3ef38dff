@@ -1218,3 +1218,256 @@ export function killzoneForPair(
   const base = killzoneOf(d);
   return { ...base, nativeSession: base.inKillzone };
 }
+
+
+// ============================================================
+// VETERAN-TIER DETECTORS — EQH/EQL, Turtle Soup, HTF POI,
+// Silver Bullet, Power of 3 (AMD), Mitigation Blocks, proper OTE
+// ============================================================
+
+// ---------- Equal Highs / Equal Lows (EQH/EQL) ----------
+// Relative-equal swing tops/bottoms create engineered liquidity pools —
+// prime targets for stop hunts before reversals.
+export function detectEqualHighsLows(
+  candles: Candle[],
+  swings: Swing[],
+  lastPrice: number,
+): { present: boolean; eqh: number | null; eql: number | null; detail: string } {
+  if (swings.length < 4 || !candles.length) {
+    return { present: false, eqh: null, eql: null, detail: "Not enough swings" };
+  }
+  const tol = lastPrice * 0.0006; // ~6bps tolerance
+  const highs = swings.filter(s => s.kind === "high").slice(-8);
+  const lows = swings.filter(s => s.kind === "low").slice(-8);
+  let eqh: number | null = null, eql: number | null = null;
+  for (let i = 0; i < highs.length; i++) {
+    for (let j = i + 1; j < highs.length; j++) {
+      if (Math.abs(highs[i].price - highs[j].price) <= tol) {
+        eqh = Math.max(highs[i].price, highs[j].price);
+        break;
+      }
+    }
+    if (eqh) break;
+  }
+  for (let i = 0; i < lows.length; i++) {
+    for (let j = i + 1; j < lows.length; j++) {
+      if (Math.abs(lows[i].price - lows[j].price) <= tol) {
+        eql = Math.min(lows[i].price, lows[j].price);
+        break;
+      }
+    }
+    if (eql) break;
+  }
+  const present = eqh !== null || eql !== null;
+  const parts: string[] = [];
+  if (eqh) parts.push(`EQH @ ${eqh.toFixed(4)}`);
+  if (eql) parts.push(`EQL @ ${eql.toFixed(4)}`);
+  return {
+    present,
+    eqh, eql,
+    detail: present ? parts.join(" · ") : "No relative-equal levels engineered",
+  };
+}
+
+// ---------- Turtle Soup (failed swing sweep → reversal) ----------
+// Price briefly breaks a prior swing high/low then closes back inside — a
+// textbook stop-run reversal. Aligned with the intended trade direction
+// = high-probability entry.
+export function detectTurtleSoup(
+  candles: Candle[],
+  swings: Swing[],
+  dir: "BUY" | "SELL" | "WAIT",
+): { triggered: boolean; detail: string } {
+  if (dir === "WAIT" || candles.length < 5 || swings.length < 2) {
+    return { triggered: false, detail: "No directional bias for Turtle Soup" };
+  }
+  const recent = candles.slice(-6);
+  if (dir === "BUY") {
+    const priorLow = Math.min(...swings.filter(s => s.kind === "low").slice(-4).map(s => s.price));
+    if (!Number.isFinite(priorLow)) return { triggered: false, detail: "No prior low" };
+    const swept = recent.some(c => c.l < priorLow);
+    const reclaimed = recent[recent.length - 1].c > priorLow;
+    if (swept && reclaimed) {
+      return { triggered: true, detail: `SSL @ ${priorLow.toFixed(4)} swept then reclaimed (Turtle Soup long)` };
+    }
+  } else {
+    const priorHigh = Math.max(...swings.filter(s => s.kind === "high").slice(-4).map(s => s.price));
+    if (!Number.isFinite(priorHigh)) return { triggered: false, detail: "No prior high" };
+    const swept = recent.some(c => c.h > priorHigh);
+    const reclaimed = recent[recent.length - 1].c < priorHigh;
+    if (swept && reclaimed) {
+      return { triggered: true, detail: `BSL @ ${priorHigh.toFixed(4)} swept then reclaimed (Turtle Soup short)` };
+    }
+  }
+  return { triggered: false, detail: "No Turtle Soup pattern" };
+}
+
+// ---------- HTF POI alignment ----------
+// The LTF entry zone should nest inside an HTF Order Block or FVG — that's
+// the confluence institutions actually use. Cheap HTF-agnostic LTF entries
+// are the #1 reason retail SMC fails.
+export function detectHTFPOIAlignment(
+  htf: TFAnalysis,
+  ltfZone: { priceLow: number; priceHigh: number } | null,
+  dir: "BUY" | "SELL" | "WAIT",
+): { aligned: boolean; detail: string } {
+  if (!ltfZone || dir === "WAIT") return { aligned: false, detail: "No LTF zone" };
+  const wantOB = dir === "BUY" ? "demand" : "supply";
+  const wantFvg = dir === "BUY" ? "bullish" : "bearish";
+  const zones = [
+    ...htf.obs.filter(o => !o.mitigated && o.kind === wantOB).map(o => ({ lo: o.priceLow, hi: o.priceHigh, tag: "HTF OB" })),
+    ...htf.fvgs.filter(f => !f.mitigated && f.kind === wantFvg).map(f => ({ lo: f.priceLow, hi: f.priceHigh, tag: "HTF FVG" })),
+  ];
+  for (const z of zones) {
+    const overlap = Math.min(ltfZone.priceHigh, z.hi) - Math.max(ltfZone.priceLow, z.lo);
+    if (overlap > 0) {
+      return { aligned: true, detail: `LTF zone nested inside ${z.tag} (${z.lo.toFixed(4)}–${z.hi.toFixed(4)})` };
+    }
+  }
+  return { aligned: false, detail: "LTF zone not backed by an HTF POI" };
+}
+
+// ---------- Silver Bullet window ----------
+// ICT Silver Bullet = 3 highest-probability 1-hour windows:
+// London 03:00–04:00 NY, AM 10:00–11:00 NY, PM 14:00–15:00 NY.
+// (NY = UTC-5 winter, UTC-4 summer. We use UTC hours 8, 15, 19 as approximation.)
+export function detectSilverBullet(d = new Date()): { inWindow: boolean; detail: string } {
+  const h = d.getUTCHours();
+  if (h === 8) return { inWindow: true, detail: "London Silver Bullet (08:00 UTC)" };
+  if (h === 15) return { inWindow: true, detail: "NY AM Silver Bullet (15:00 UTC)" };
+  if (h === 19) return { inWindow: true, detail: "NY PM Silver Bullet (19:00 UTC)" };
+  return { inWindow: false, detail: "Outside Silver Bullet windows" };
+}
+
+// ---------- Power of 3 (AMD — Accumulation / Manipulation / Distribution) ----------
+// Compare today's session structure vs Asia range:
+// - Asia = accumulation (tight range)
+// - London = manipulation (sweeps Asia extreme)
+// - NY = distribution (expansion in bias direction)
+export function detectPowerOf3(
+  htf: Candle[],
+  dir: "BUY" | "SELL" | "WAIT",
+  d = new Date(),
+): { phase: "accumulation" | "manipulation" | "distribution" | "unknown"; aligned: boolean; detail: string } {
+  if (dir === "WAIT" || htf.length < 24) return { phase: "unknown", aligned: false, detail: "No bias / not enough data" };
+  const today = new Date(d); today.setUTCHours(0, 0, 0, 0);
+  const asia = htf.filter(c => c.t >= today.getTime() && c.t < today.getTime() + 7 * 3600_000);
+  if (!asia.length) return { phase: "unknown", aligned: false, detail: "No Asia session data" };
+  const ah = Math.max(...asia.map(c => c.h));
+  const al = Math.min(...asia.map(c => c.l));
+  const h = d.getUTCHours();
+  const last = htf[htf.length - 1];
+  if (h < 7) {
+    return { phase: "accumulation", aligned: false, detail: `Asia accumulation: ${al.toFixed(4)}–${ah.toFixed(4)}` };
+  }
+  if (h >= 7 && h < 12) {
+    // Manipulation phase — did London sweep Asia extreme against bias?
+    const london = htf.filter(c => c.t >= today.getTime() + 7 * 3600_000 && c.t < today.getTime() + 12 * 3600_000);
+    if (!london.length) return { phase: "manipulation", aligned: false, detail: "London manipulation forming" };
+    const sweptHigh = london.some(c => c.h > ah);
+    const sweptLow = london.some(c => c.l < al);
+    // For BUY we want London to sweep Asia LOW first (manipulation down before expansion up)
+    const aligned = dir === "BUY" ? sweptLow : sweptHigh;
+    return { phase: "manipulation", aligned, detail: aligned ? `London swept Asia ${dir === "BUY" ? "low" : "high"} — expansion likely` : "London manipulation unclear" };
+  }
+  // NY session — distribution / expansion
+  const aligned = dir === "BUY" ? last.c > ah : last.c < al;
+  return { phase: "distribution", aligned, detail: aligned ? `NY expansion beyond Asia ${dir === "BUY" ? "high" : "low"}` : "NY expansion not confirmed" };
+}
+
+// ---------- Mitigation Block ----------
+// Similar to OB but formed from a swing that already mitigated a prior imbalance.
+// Detected as: opposing-color candle whose extreme is beyond a recent swing
+// and price has since retraced without violating the block.
+export function detectMitigationBlocks(
+  candles: Candle[],
+  swings: Swing[],
+): { blocks: { priceLow: number; priceHigh: number; kind: "demand" | "supply" }[] } {
+  const out: { priceLow: number; priceHigh: number; kind: "demand" | "supply" }[] = [];
+  if (candles.length < 10 || swings.length < 3) return { blocks: out };
+  const recentSwings = swings.slice(-6);
+  for (const sw of recentSwings) {
+    if (sw.i < 2 || sw.i >= candles.length - 2) continue;
+    const c = candles[sw.i];
+    if (sw.kind === "low" && c.c < c.o) {
+      // Bearish candle at swing low = potential demand mitigation block
+      const lo = c.l, hi = c.o;
+      const later = candles.slice(sw.i + 1);
+      const violated = later.some(k => k.c < lo);
+      if (!violated && later.length > 0) out.push({ priceLow: lo, priceHigh: hi, kind: "demand" });
+    } else if (sw.kind === "high" && c.c > c.o) {
+      const lo = c.o, hi = c.h;
+      const later = candles.slice(sw.i + 1);
+      const violated = later.some(k => k.c > hi);
+      if (!violated && later.length > 0) out.push({ priceLow: lo, priceHigh: hi, kind: "supply" });
+    }
+  }
+  return { blocks: out.slice(-4) };
+}
+
+export function detectMitigationAtEntry(
+  candles: Candle[],
+  swings: Swing[],
+  zone: { priceLow: number; priceHigh: number } | null,
+  dir: "BUY" | "SELL" | "WAIT",
+): { present: boolean; detail: string } {
+  if (!zone || dir === "WAIT") return { present: false, detail: "No zone/bias" };
+  const { blocks } = detectMitigationBlocks(candles, swings);
+  const want = dir === "BUY" ? "demand" : "supply";
+  const hit = blocks.find(b => b.kind === want && Math.min(b.priceHigh, zone.priceHigh) > Math.max(b.priceLow, zone.priceLow));
+  if (hit) return { present: true, detail: `Mitigation ${hit.kind} block overlaps entry zone` };
+  return { present: false, detail: "No mitigation block at entry" };
+}
+
+// ---------- Proper OTE (Optimal Trade Entry) fib levels ----------
+// Standard ICT OTE = 62%, 70.5%, 79% retracement of the last impulse leg.
+// Returns the three levels + a "sweet spot" (70.5%) for limit entries.
+export function computeOTE(
+  htf: TFAnalysis,
+  dir: "BUY" | "SELL" | "WAIT",
+): { level62: number; level705: number; level79: number; sweet: number; zoneLow: number; zoneHigh: number } | null {
+  if (dir === "WAIT") return null;
+  const range = htf.swingHigh - htf.swingLow;
+  if (range <= 0) return null;
+  if (dir === "BUY") {
+    const level62 = htf.swingHigh - range * 0.62;
+    const level705 = htf.swingHigh - range * 0.705;
+    const level79 = htf.swingHigh - range * 0.79;
+    return { level62, level705, level79, sweet: level705, zoneLow: level79, zoneHigh: level62 };
+  }
+  const level62 = htf.swingLow + range * 0.62;
+  const level705 = htf.swingLow + range * 0.705;
+  const level79 = htf.swingLow + range * 0.79;
+  return { level62, level705, level79, sweet: level705, zoneLow: level62, zoneHigh: level79 };
+}
+
+// ---------- Judas Swing (false open reversal) ----------
+// Early-session (first 1-2 hours of London or NY) prints a fake direction
+// then reverses. Detects if the current move is a Judas by comparing the
+// first hour's high/low to subsequent action.
+export function detectJudasSwing(
+  htf: Candle[],
+  dir: "BUY" | "SELL" | "WAIT",
+  d = new Date(),
+): { triggered: boolean; detail: string } {
+  if (dir === "WAIT" || htf.length < 12) return { triggered: false, detail: "No bias / insufficient data" };
+  const today = new Date(d); today.setUTCHours(0, 0, 0, 0);
+  // London open window 07:00-08:00 UTC
+  const lo = htf.filter(c => c.t >= today.getTime() + 7 * 3600_000 && c.t < today.getTime() + 8 * 3600_000);
+  const after = htf.filter(c => c.t >= today.getTime() + 8 * 3600_000);
+  if (!lo.length || !after.length) return { triggered: false, detail: "London open data unavailable" };
+  const openHigh = Math.max(...lo.map(c => c.h));
+  const openLow = Math.min(...lo.map(c => c.l));
+  const last = after[after.length - 1];
+  if (dir === "BUY") {
+    // Judas long = fake break below open low, then reversal up
+    const faked = after.some(c => c.l < openLow);
+    const reclaimed = last.c > openLow;
+    if (faked && reclaimed) return { triggered: true, detail: `Judas long: fake break of London open low @ ${openLow.toFixed(4)}` };
+  } else {
+    const faked = after.some(c => c.h > openHigh);
+    const reclaimed = last.c < openHigh;
+    if (faked && reclaimed) return { triggered: true, detail: `Judas short: fake break of London open high @ ${openHigh.toFixed(4)}` };
+  }
+  return { triggered: false, detail: "No Judas swing detected" };
+}
