@@ -966,7 +966,7 @@ function DashboardLayout() {
               disabled={refreshing}
               aria-label="Refresh analytics"
               title="Refresh analytics"
-              className="group inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-white p-0 leading-none text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 active:bg-zinc-100 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+              className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border border-zinc-200 bg-white p-0 leading-none text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 active:bg-zinc-100 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
             >
               <RefreshCw className={`h-3.5 w-3.5 shrink-0 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
             </button>
