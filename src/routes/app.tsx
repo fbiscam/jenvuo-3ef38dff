@@ -651,15 +651,18 @@ function StatusPill({ status, supported, dark }: { status: "idle" | "listening" 
   } as const;
   const s = map[status];
   return (
-    <div className={cn(
-      "inline-flex items-center gap-2 rounded-full shadow-sm px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors duration-300",
-      s.bg, s.ring, s.text,
-    )}>
+    <div
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full shadow-sm px-3 py-1.5 text-xs font-normal whitespace-nowrap transition-colors duration-300",
+        s.bg, s.ring, s.text,
+      )}
+      style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif' }}
+    >
       <span className="relative flex h-2 w-2">
         {s.pulse && <span className={cn("absolute inline-flex h-full w-full rounded-full opacity-70 animate-ping", s.dot)} />}
         <span className={cn("relative inline-flex h-2 w-2 rounded-full", s.dot)} />
       </span>
-      <span className="tracking-wide">Voice</span>
+      <span>Voice</span>
       <span className="opacity-50">·</span>
       <span>{s.label}</span>
     </div>
