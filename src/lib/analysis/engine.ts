@@ -439,11 +439,11 @@ export type VetoResult = { key: string; label: string; reason: string };
 // and are dropped from the score (the remaining weights are re-normalised to 100).
 // New factors: structure (BOS/CHoCH quality), smt (correlation divergence), session_align (native session for this pair).
 const FACTOR_WEIGHTS: Record<AssetKind, Record<string, number>> = {
-  metal:  { bias: 14, sweep: 10, zone: 9, pd: 5, killzone: 7, dxy: 7, rr: 5, structure: 5, smt: 4, session_align: 3, displacement: 7, rejection: 6, confluence: 4, freshness: 2, eqhl: 4, turtle: 3, htf_poi: 6, silver_bullet: 3, power3: 3, mitigation: 3 },
-  forex:  { bias: 14, sweep: 10, zone: 9, pd: 5, killzone: 8, dxy: 4, rr: 5, structure: 5, smt: 5, session_align: 3, displacement: 7, rejection: 6, confluence: 3, freshness: 2, eqhl: 5, turtle: 3, htf_poi: 6, silver_bullet: 3, power3: 4, mitigation: 3 },
-  index:  { bias: 16, sweep: 10, zone: 9, pd: 5, killzone: 8, dxy: 0, rr: 5, structure: 7, smt: 5, session_align: 4, displacement: 9, rejection: 5, confluence: 2, freshness: 2, eqhl: 4, turtle: 3, htf_poi: 6, silver_bullet: 4, power3: 3, mitigation: 3 },
-  crypto: { bias: 18, sweep: 14, zone: 10, pd: 5, killzone: 0, dxy: 0, rr: 8, structure: 8, smt: 3, session_align: 2, displacement: 10, rejection: 5, confluence: 2, freshness: 0, eqhl: 5, turtle: 4, htf_poi: 6, silver_bullet: 0, power3: 0, mitigation: 3 },
-  stock:  { bias: 16, sweep: 10, zone: 9, pd: 5, killzone: 8, dxy: 0, rr: 5, structure: 7, smt: 5, session_align: 4, displacement: 9, rejection: 5, confluence: 2, freshness: 2, eqhl: 4, turtle: 3, htf_poi: 6, silver_bullet: 4, power3: 3, mitigation: 3 },
+  metal:  { bias: 12, sweep: 9, zone: 8, pd: 4, killzone: 6, dxy: 6, rr: 5, structure: 5, smt: 3, session_align: 3, displacement: 6, rejection: 5, confluence: 3, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 3, power3: 3, mitigation: 3, ce: 4, liq_void: 4, momentum_div: 4, vol_spike: 3, midnight: 3 },
+  forex:  { bias: 12, sweep: 9, zone: 8, pd: 4, killzone: 7, dxy: 4, rr: 5, structure: 5, smt: 4, session_align: 3, displacement: 6, rejection: 5, confluence: 3, freshness: 2, eqhl: 4, turtle: 3, htf_poi: 5, silver_bullet: 3, power3: 4, mitigation: 3, ce: 4, liq_void: 4, momentum_div: 4, vol_spike: 2, midnight: 3 },
+  index:  { bias: 14, sweep: 9, zone: 8, pd: 4, killzone: 7, dxy: 0, rr: 5, structure: 6, smt: 4, session_align: 4, displacement: 8, rejection: 5, confluence: 2, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 4, power3: 3, mitigation: 3, ce: 4, liq_void: 5, momentum_div: 4, vol_spike: 5, midnight: 3 },
+  crypto: { bias: 16, sweep: 12, zone: 9, pd: 4, killzone: 0, dxy: 0, rr: 7, structure: 7, smt: 3, session_align: 2, displacement: 9, rejection: 5, confluence: 2, freshness: 0, eqhl: 4, turtle: 4, htf_poi: 5, silver_bullet: 0, power3: 0, mitigation: 3, ce: 4, liq_void: 6, momentum_div: 4, vol_spike: 6, midnight: 0 },
+  stock:  { bias: 14, sweep: 9, zone: 8, pd: 4, killzone: 7, dxy: 0, rr: 5, structure: 6, smt: 4, session_align: 4, displacement: 8, rejection: 5, confluence: 2, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 4, power3: 3, mitigation: 3, ce: 4, liq_void: 5, momentum_div: 4, vol_spike: 5, midnight: 3 },
 };
 
 export function scoreSetup(args: {
