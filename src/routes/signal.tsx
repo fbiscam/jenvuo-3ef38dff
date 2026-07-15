@@ -1021,7 +1021,7 @@ function SignalPage() {
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
               </div>
-              <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
+              <span className={`ml-2 sm:ml-4 text-[11px] sm:text-[12px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal tracking-normal text-zinc-900 normal-case truncate`}>
                 Jenvu // SIGNAL_DESK · {sym}
               </span>
             </div>
