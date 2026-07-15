@@ -462,6 +462,17 @@ function DashboardLayout() {
   // Close mobile drawer on route change
   useEffect(() => { setMobileNavOpen(false); }, [pathname]);
 
+  // Detect admin role to conditionally show admin nav items
+  useEffect(() => {
+    if (authLoading || !authUser) { setIsAdminUser(false); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.rpc("has_role", { _user_id: authUser.id, _role: "admin" });
+      if (!cancelled) setIsAdminUser(Boolean(data));
+    })();
+    return () => { cancelled = true; };
+  }, [authLoading, authUser]);
+
   // Unread notifications count (for red label indicator)
   useEffect(() => {
     if (authLoading || !authUser) { setUnreadNotifs(0); return; }
