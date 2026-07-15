@@ -24,10 +24,10 @@ export default function AlertsHistoryPanel({
   return (
     <div className="rounded-lg border border-zinc-200 bg-white">
       <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-100">
-        <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-900 font-bold`}>
+        <span className="text-[14px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal normal-case text-zinc-900">
           Recent Alerts
         </span>
-        <span className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400`}>
+        <span className="text-[12px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal text-zinc-400">
           {alerts.length}
         </span>
       </div>
