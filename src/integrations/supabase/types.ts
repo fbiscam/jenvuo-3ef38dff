@@ -110,6 +110,69 @@ export type Database = {
         }
         Relationships: []
       }
+      auto_scan_pool_ledger: {
+        Row: {
+          ai_cost_usd: number | null
+          alert_id: string | null
+          broadcast_count: number
+          confidence: number
+          cost_usd: number
+          created_at: string
+          direction: string
+          id: string
+          pair: string
+        }
+        Insert: {
+          ai_cost_usd?: number | null
+          alert_id?: string | null
+          broadcast_count?: number
+          confidence: number
+          cost_usd?: number
+          created_at?: string
+          direction: string
+          id?: string
+          pair: string
+        }
+        Update: {
+          ai_cost_usd?: number | null
+          alert_id?: string | null
+          broadcast_count?: number
+          confidence?: number
+          cost_usd?: number
+          created_at?: string
+          direction?: string
+          id?: string
+          pair?: string
+        }
+        Relationships: []
+      }
+      auto_scan_state: {
+        Row: {
+          direction: string
+          first_conf: number
+          first_seen_at: string
+          last_broadcast_at: string | null
+          pair: string
+          updated_at: string
+        }
+        Insert: {
+          direction: string
+          first_conf: number
+          first_seen_at?: string
+          last_broadcast_at?: string | null
+          pair: string
+          updated_at?: string
+        }
+        Update: {
+          direction?: string
+          first_conf?: number
+          first_seen_at?: string
+          last_broadcast_at?: string | null
+          pair?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -1094,6 +1157,24 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+        }
+        Relationships: []
+      }
+      system_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }
