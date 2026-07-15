@@ -1803,7 +1803,7 @@ STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - STOP LOSS placement (structural, buffered): SL MUST sit just beyond the swing/OB that invalidates the setup, with a small ATR-based buffer (~10-25% of recent ATR). BUY: sl < entry, below the demand OB / swing low. SELL: sl > entry, above the supply OB / swing high. Never place SL inside the entry zone or tighter than the wick that formed the OB. Stop distance must be realistic vs ATR — not 2 pips, not absurd.
 - TAKE PROFIT placement (liquidity target): TP MUST target a nameable liquidity pool or opposing structure — BSL/SSL, equal highs/lows, PDH/PDL, HTF swing, equilibrium, or opposing OB. BUY: tp > entry. SELL: tp < entry. State the exact TP target in summary (e.g. "TP at PDH liquidity 2678.40"). Recompute RR = |tp-entry| / |entry-sl| and verify RR ≥ 1.8 before returning; if it fails, either re-anchor entry or WAIT — do not force the trade.
 - Markings coverage: emit 5-8 markings only: HTF BOS/CHOCH, HTF OB/zone, HTF liquidity, LTF FVG/OB, LTF liquidity. Do not add entry/sl/tp; engine computes them.
-- Narration: produce 5-7 steps, each 8-14 words, senior institutional tone. Keep it concise. Every narration step should reference its marking via markingIndex when possible.
+- Narration: produce EXACTLY 7 steps (never fewer), each 8-14 words, senior institutional tone. Cover in this order: (1) HTF bias/BOS, (2) premium/discount + equilibrium, (3) liquidity draw (BSL/SSL/PDH/PDL), (4) LTF FVG or OB entry zone, (5) confluence/killzone, (6) entry + SL rationale, (7) TP + RR + confidence. Do NOT skip any of the 7 slots. Every step should reference its marking via markingIndex when possible.
 - Killzone: state the current session/killzone (${session} / ${killzone}) and the premium-vs-discount read (${inPremium ? "PREMIUM" : "DISCOUNT"}) explicitly in both htfNarrative and the confluences array.
 - News veto: if a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, direction="WAIT", confidence ≤ 50, call out the news title in summary and invalidation.
 - Quality gate: only issue BUY/SELL if HTF and LTF are aligned AND a fresh unmitigated OB or FVG is present in the direction of the trade AND liquidity is sitting on the other side of entry. Otherwise direction="WAIT", confidence ≤ 55, and summary MUST list the specific missing confluence (e.g. "HTF bullish but no unmitigated LTF demand").
@@ -1861,7 +1861,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
           { role: "user", content: user },
         ],
         jsonMode: true,
-        maxTokens: 620,
+        maxTokens: 1100,
         timeoutMs: 180000,
         retriesPerModel: 2,
         priority: true,
