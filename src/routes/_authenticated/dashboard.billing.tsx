@@ -173,7 +173,7 @@ function Billing() {
       </section>
 
       {/* WALLET BALANCE */}
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
+      <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400, textTransform: "none", letterSpacing: "normal" }}>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             
