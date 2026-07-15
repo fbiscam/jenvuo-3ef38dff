@@ -125,9 +125,21 @@ async function singleAttempt(
     ? model.slice("dsofficial/".length)
     : model;
 
+  // Determinism: temperature 0 + top_p 1 + stable seed so the same input
+  // produces the same confidence within a short window. Seed derives from the
+  // conversation content bucketed to the current minute — prevents 61% → 55%
+  // flip-flop on back-to-back scans of the same setup.
+  const seedBase = (opts.messages.map((m) => m.content).join("|") + "|" + Math.floor(Date.now() / 60000));
+  let seed = 0;
+  for (let i = 0; i < seedBase.length; i++) seed = ((seed << 5) - seed + seedBase.charCodeAt(i)) | 0;
+  seed = Math.abs(seed) || 1;
+
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
+    temperature: 0,
+    top_p: 1,
+    seed,
   };
   // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
   if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isDsOfficial) body.response_format = { type: "json_object" };
