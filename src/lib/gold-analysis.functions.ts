@@ -2151,12 +2151,14 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
 VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine but not A+. CONFIRM only for true A+ institutional setups with clean entry/SL/TP.`;
 
-        // Sequential senior-review fallback chain:
-        // Claude Sonnet 4.5 (primary) → DeepSeek V4 Pro → GPT-5 Mini.
-        // callChatCompletion tries each in order; the first success wins.
+        // Senior review — best-effort mode.
+        // Chain: Claude 3.7 Sonnet → GPT-4o Mini → GPT-4.1 Mini → GPT-5 Mini.
+        // These models exist on Bluesminds but are often throttled; retries per
+        // model handle transient 429s, and if all fail the review gracefully skips.
         const seniorChain = [
-          "bmind/claude-sonnet-4.5",
-          "bmind/deepseek-v4-pro",
+          "bmind/claude-3.7-sonnet",
+          "bmind/gpt-4o-mini",
+          "bmind/gpt-4.1-mini",
           "bmind/gpt-5-mini",
         ] as const;
 
@@ -2173,7 +2175,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             maxTokens: 220,
             timeoutMs: 15000,
             priority: false,
-            retriesPerModel: 1,
+            retriesPerModel: 2,
             stage: "senior-review",
           });
         } catch (err) {
@@ -2187,7 +2189,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             key: "senior_review_attempted",
             label: "⚠ Senior review attempted",
             pass: false,
-            reason: "Senior review (Claude 4.5 → DeepSeek V4 Pro → GPT-5 Mini) was required for this paid-plan signal but all providers were unavailable; billing still records the senior review tier for audit.",
+            reason: "Senior review (Claude 3.7 Sonnet → GPT-4o Mini → GPT-4.1 Mini → GPT-5 Mini) attempted but all providers throttled; primary narration still applied and signal delivered.",
           });
         } else {
           const mdl = reviewResult.model;
@@ -2598,13 +2600,18 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
         const model = __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview.join(",") : null);
         const labelOne = (mm: string) => {
           const s = mm.toLowerCase();
-          if (s.includes("claude-sonnet-4.5") || s.includes("claude")) return "Claude Sonnet 4.5";
+          if (s.includes("claude-3.7-sonnet")) return "Claude 3.7 Sonnet";
+          if (s.includes("claude-sonnet-4.5") || s.includes("claude-4.5")) return "Claude Sonnet 4.5";
+          if (s.includes("claude")) return "Claude";
           if (s.includes("gemini-2.5-pro")) return "Gemini 2.5 Pro";
           if (s.includes("grok")) return "Grok 4.5";
           if (s.includes("deepseek-v4-pro")) return "DeepSeek V4 Pro";
           if (s.includes("deepseek-v4-flash")) return "DeepSeek V4 Flash";
           if (s.includes("deepseek")) return "DeepSeek";
+          if (s.includes("gpt-5.2-chat") || s.includes("gpt-5.2")) return "ChatGPT 5.2";
           if (s.includes("gpt-5-mini")) return "ChatGPT 5 Mini";
+          if (s.includes("gpt-4o-mini")) return "ChatGPT 4o Mini";
+          if (s.includes("gpt-4.1-mini")) return "ChatGPT 4.1 Mini";
           return mm.split("/").pop() ?? mm;
         };
         const label = model ? model.split(",").map((s) => labelOne(s.trim())).join(" + ") : null;

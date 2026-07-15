@@ -25,6 +25,9 @@ const MODEL_PRICING: Record<string, Price> = {
   "bmind/gpt-5.4-mini": { in: 0.25, out: 2.0 },
   "bmind/gpt-5-mini": { in: 0.25, out: 2.0 },
   "bmind/gpt-5.2-chat": { in: 1.1, out: 8.8 },
+  "bmind/gpt-4o-mini": { in: 0.15, out: 0.6 },
+  "bmind/gpt-4.1-mini": { in: 0.4, out: 1.6 },
+  "bmind/claude-3.7-sonnet": { in: 3.0, out: 15.0 },
   "bmind/claude-sonnet-4.5": { in: 3.0, out: 15.0 },
   "bmind/gemini-2.5-pro": { in: 1.25, out: 10.0 },
   "bmind/deepseek-ai/deepseek-v4-pro": { in: 0.55, out: 2.19 },
@@ -71,6 +74,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
   const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google|anthropic)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
+  if (bare.startsWith("claude-3.7-sonnet") || bare.startsWith("claude-3-7-sonnet")) return "Claude 3.7 Sonnet";
   if (bare.startsWith("claude-opus")) return "Claude Opus";
   if (bare.startsWith("claude")) return "Claude";
   if (bare.startsWith("gpt-5.6-luna")) return "ChatGPT 5.6 Luna";
@@ -86,6 +90,8 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("gpt-5-mini")) return "ChatGPT 5 Mini";
   if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
   if (bare.startsWith("gpt-5")) return "ChatGPT 5";
+  if (bare.startsWith("gpt-4.1-mini")) return "ChatGPT 4.1 Mini";
+  if (bare.startsWith("gpt-4.1")) return "ChatGPT 4.1";
   if (bare.startsWith("gpt-4o-mini")) return "ChatGPT 4o Mini";
   if (bare.startsWith("gpt-4o")) return "ChatGPT 4o";
   if (bare.startsWith("gpt-oss-120b")) return "GPT-OSS 120B";
