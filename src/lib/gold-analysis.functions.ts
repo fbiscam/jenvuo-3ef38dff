@@ -1851,17 +1851,19 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __totalCompletionTokens = 0;
     try {
       const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
-        // Accuracy first: full fallback chain so narration reliably completes
-        // (same quality as the 75%-accurate BUY signals users got earlier).
+        // Bluesminds bills started requests even if our worker aborts early.
+        // Use ONE primary attempt and wait long enough for Luna to finish, so
+        // the user either gets a signal or sees a friendly error without us
+        // launching duplicate paid upstream calls.
         models: [...MODEL_CHAIN.narration],
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
         ],
         jsonMode: true,
-        maxTokens: 650,
-        timeoutMs: 22000,
-        retriesPerModel: 2,
+        maxTokens: 620,
+        timeoutMs: 45000,
+        retriesPerModel: 1,
         priority: true,
         stage: "signal-narration",
 

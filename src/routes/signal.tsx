@@ -148,6 +148,7 @@ function SignalPage() {
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const activeScanRef = useRef<string | null>(null);
   const [analyzeElapsed, setAnalyzeElapsed] = useState(0);
   useEffect(() => {
     if (!loading) { setAnalyzeElapsed(0); return; }
@@ -396,6 +397,8 @@ function SignalPage() {
 
 
   const load = useCallback(async () => {
+    const sym = symbol || "XAUUSD";
+    if (activeScanRef.current === sym) return;
     // Pre-flight: block the scan if wallet is below the flat $0.20 per-signal charge.
     if (!credits.isLoading && credits.balance < 0.20) {
       toast.error("Balance too low to run analysis", {
@@ -404,13 +407,13 @@ function SignalPage() {
       });
       return;
     }
+    activeScanRef.current = sym;
     setLoading(true);
     setAnalysisError(null);
     abortRef.current = true;
     speech.stopSpeaking();
     try {
       const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
-      const sym = symbol || "XAUUSD";
       const ok = await credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
       if (!ok) { setLoading(false); return; }
       const result = await fetchPlan({ data: { symbol: sym, scanId } });
@@ -441,6 +444,7 @@ function SignalPage() {
       setAnalysisError(msg);
       toast.error(msg);
     } finally {
+      activeScanRef.current = null;
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
