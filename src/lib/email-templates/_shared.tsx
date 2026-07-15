@@ -84,10 +84,12 @@ const logoWrap = {
 
 const logoWord = {
   margin: 0,
-  fontFamily: INTER,
-  fontSize: '17px',
-  fontWeight: 600 as const,
-  letterSpacing: '-0.01em',
+  // Use a web-safe font stack for the wordmark so lowercase "v" doesn't
+  // get mistaken for "u"/"o" in email clients that fall back from Google Sans.
+  fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontSize: '19px',
+  fontWeight: 700 as const,
+  letterSpacing: '0.01em',
   color: COLORS.ink,
   lineHeight: '1',
 }
