@@ -261,7 +261,11 @@ function Billing() {
                         ? formatModelLabel(actualModel)
                         : (prettyFromMeta ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—")))
                         ?? "—";
-                      const modelWithSenior = seniorPretty ? `${modelLabel} + ${seniorPretty}` : modelLabel;
+                      // Show only ONE model per scan: prefer the senior review model that actually ran; otherwise the primary.
+                      const displayRaw = actualSeniorModel ?? rawModel;
+                      const displayLabel = actualSeniorModel ? (seniorPretty ?? formatModelLabel(actualSeniorModel)) : modelLabel;
+                      const modelWithSenior = displayLabel;
+
                       const sideRaw = (meta.signal ?? meta.side ?? meta.direction ?? meta.action ?? "").toString().toUpperCase();
                       const sideLabel = sideRaw === "BUY" || sideRaw === "SELL" || sideRaw === "WAIT" ? sideRaw : "—";
                       const sideClass = sideLabel === "BUY"
