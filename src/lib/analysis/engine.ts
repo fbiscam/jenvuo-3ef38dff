@@ -473,6 +473,12 @@ export function scoreSetup(args: {
   silverBullet?: { inWindow: boolean; detail: string } | null;
   powerOf3?: { phase: "accumulation" | "manipulation" | "distribution" | "unknown"; aligned: boolean; detail: string } | null;
   mitigationBlock?: { present: boolean; detail: string } | null;
+  // ---- elite-tier layer ----
+  ceTap?: { tapped: boolean; detail: string } | null;
+  liquidityVoid?: { present: boolean; detail: string } | null;
+  momentumDivergence?: { present: boolean; detail: string } | null;
+  volumeSpike?: { spike: boolean; detail: string } | null;
+  midnightOpen?: { aligned: boolean; detail: string } | null;
 }): {
   score: number;
   grade: "A+" | "A" | "B" | "C";
@@ -484,6 +490,7 @@ export function scoreSetup(args: {
     structureQuality, smtDivergence, nativeSession, zoneMitigated,
     displacement, rejection, confluence, freshness,
     equalHL, turtleSoup, htfPOI, silverBullet, powerOf3, mitigationBlock,
+    ceTap, liquidityVoid, momentumDivergence, volumeSpike, midnightOpen,
   } = args;
   const w = FACTOR_WEIGHTS[kind] ?? FACTOR_WEIGHTS.metal;
   const f: ScoreFactor[] = [];
