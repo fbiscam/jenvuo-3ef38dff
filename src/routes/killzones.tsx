@@ -213,20 +213,21 @@ function KillzonesPage() {
     return g;
   }, [rows]);
 
-  const utcNow = now.toLocaleTimeString([], {
+  const utcNow = now ? now.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
     timeZone: "UTC",
-  });
-  const localNow = now.toLocaleTimeString([], {
+  }) : "--:--:--";
+  const localNow = now ? now.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
     timeZone: tz,
-  });
+  }) : "--:--:--";
+
 
   return (
     <div className="killzones-root min-h-dvh w-full bg-[#FAFAFA] text-slate-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
