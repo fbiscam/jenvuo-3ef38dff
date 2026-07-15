@@ -795,6 +795,136 @@ export function detectSMTDivergence(
 }
 
 // ============================================================
+// PRO-TRADER LAYER — post-BOS displacement, rejection confirmation,
+// zone confluence stacking, zone freshness. These are what a 25-yr
+// veteran actually checks before pulling the trigger.
+// ============================================================
+
+// ---------- Displacement ----------
+// Measures the impulse leg AFTER the last BOS/CHoCH: strong displacement =
+// large-body candles with minimal wick, in the bias direction. Returns 0..1.
+// Higher = more institutional intent behind the break.
+export function computeDisplacement(
+  candles: Candle[],
+  structure: StructureEvent[],
+): { strength: number; passed: boolean; detail: string } {
+  const last = structure[structure.length - 1];
+  if (!last || candles.length < 6) return { strength: 0, passed: false, detail: "No structure event to measure" };
+  const idx = candles.findIndex((c) => Math.floor(c.t / 1000) === last.toTime);
+  if (idx < 0 || idx >= candles.length - 1) return { strength: 0, passed: false, detail: "Structure at chart edge" };
+  // Inspect the 3 candles AFTER the BOS — that's the displacement leg.
+  const leg = candles.slice(idx, Math.min(candles.length, idx + 4));
+  if (leg.length < 2) return { strength: 0, passed: false, detail: "Displacement leg incomplete" };
+  let bodySum = 0, rangeSum = 0, dirBias = 0;
+  for (const c of leg) {
+    const body = Math.abs(c.c - c.o);
+    const range = Math.max(c.h - c.l, 1e-9);
+    bodySum += body;
+    rangeSum += range;
+    if (last.dir === "bullish" && c.c > c.o) dirBias += 1;
+    else if (last.dir === "bearish" && c.c < c.o) dirBias += 1;
+  }
+  const bodyRatio = rangeSum > 0 ? bodySum / rangeSum : 0;
+  const alignRatio = leg.length > 0 ? dirBias / leg.length : 0;
+  // Strength = weighted mix of body cleanliness and directional agreement
+  const strength = Math.max(0, Math.min(1, bodyRatio * 0.7 + alignRatio * 0.3));
+  const passed = strength >= 0.55;
+  const detail = `Displacement ${(strength * 100).toFixed(0)}% (body ${(bodyRatio * 100).toFixed(0)}% · aligned ${Math.round(alignRatio * 100)}%)`;
+  return { strength, passed, detail };
+}
+
+// ---------- Rejection confirmation ----------
+// Checks the LAST 1-2 LTF candles at or near the entry zone for a rejection
+// wick in the trade direction (pin/hammer/inverted-hammer style). This is
+// the classic "confirmation" veterans wait for before entering a limit zone.
+export function detectRejectionConfirmation(
+  candles: Candle[],
+  zone: { priceLow: number; priceHigh: number } | null,
+  dir: "BUY" | "SELL" | "WAIT",
+): { confirmed: boolean; detail: string } {
+  if (!zone || dir === "WAIT" || candles.length < 2) {
+    return { confirmed: false, detail: "No zone or no directional bias" };
+  }
+  // Look at the last 2 closed candles.
+  const scan = candles.slice(-2);
+  for (const c of scan) {
+    const range = Math.max(c.h - c.l, 1e-9);
+    const body = Math.abs(c.c - c.o);
+    const upperWick = c.h - Math.max(c.o, c.c);
+    const lowerWick = Math.min(c.o, c.c) - c.l;
+    // Touched or wicked into the zone?
+    const touched = dir === "BUY"
+      ? c.l <= zone.priceHigh && c.h >= zone.priceLow
+      : c.h >= zone.priceLow && c.l <= zone.priceHigh;
+    if (!touched) continue;
+    // Rejection = wick opposite the trade direction ≥ 55% of range, body ≤ 40% of range.
+    if (dir === "BUY" && lowerWick / range >= 0.55 && body / range <= 0.40 && c.c > c.o) {
+      return { confirmed: true, detail: `Bullish rejection wick tapped zone (wick ${(lowerWick / range * 100).toFixed(0)}%)` };
+    }
+    if (dir === "SELL" && upperWick / range >= 0.55 && body / range <= 0.40 && c.c < c.o) {
+      return { confirmed: true, detail: `Bearish rejection wick tapped zone (wick ${(upperWick / range * 100).toFixed(0)}%)` };
+    }
+  }
+  return { confirmed: false, detail: "Awaiting rejection confirmation at zone" };
+}
+
+// ---------- Zone confluence (OB + FVG stacked) ----------
+// When an unmitigated OB and unmitigated FVG overlap on the SAME side of the
+// trade, that stacked zone is a premium institutional pocket. Returns the
+// intersected sub-zone if a confluence exists.
+export function detectZoneConfluence(
+  ltf: TFAnalysis,
+  dir: "BUY" | "SELL" | "WAIT",
+): { confluent: boolean; priceLow: number; priceHigh: number; detail: string } | null {
+  if (dir === "WAIT") return null;
+  const wantFvg = dir === "BUY" ? "bullish" : "bearish";
+  const wantOb = dir === "BUY" ? "demand" : "supply";
+  const fvgs = ltf.fvgs.filter((f) => !f.mitigated && f.kind === wantFvg);
+  const obs = ltf.obs.filter((o) => !o.mitigated && o.kind === wantOb);
+  for (const f of fvgs) {
+    for (const o of obs) {
+      const lo = Math.max(f.priceLow, o.priceLow);
+      const hi = Math.min(f.priceHigh, o.priceHigh);
+      if (hi > lo) {
+        return {
+          confluent: true,
+          priceLow: lo,
+          priceHigh: hi,
+          detail: `OB + FVG stacked (${lo.toFixed(4)}–${hi.toFixed(4)})`,
+        };
+      }
+    }
+  }
+  return null;
+}
+
+// ---------- Zone freshness ----------
+// A zone formed 3-15 candles ago is prime. Older zones (>60 candles) are stale
+// and much less likely to hold. Returns freshness 0..1 based on age of the zone
+// used for the entry.
+export function computeZoneFreshness(
+  candles: Candle[],
+  zone: { fromTime: number } | null,
+): { freshness: number; ageCandles: number; fresh: boolean; detail: string } {
+  if (!zone || !candles.length) return { freshness: 0, ageCandles: 999, fresh: false, detail: "No zone" };
+  const lastT = Math.floor(candles[candles.length - 1].t / 1000);
+  const dt = Math.max(0, lastT - zone.fromTime);
+  const tfSec = candles.length >= 2
+    ? Math.max(60, Math.floor((candles[candles.length - 1].t - candles[candles.length - 2].t) / 1000))
+    : 900;
+  const ageCandles = Math.round(dt / tfSec);
+  let freshness = 0;
+  if (ageCandles <= 3) freshness = 0.7;              // very fresh but unconfirmed
+  else if (ageCandles <= 15) freshness = 1.0;         // prime window
+  else if (ageCandles <= 30) freshness = 0.75;
+  else if (ageCandles <= 60) freshness = 0.45;
+  else freshness = 0.20;                              // stale
+  const fresh = freshness >= 0.6;
+  return { freshness, ageCandles, fresh, detail: `${ageCandles} candles old (freshness ${(freshness * 100).toFixed(0)}%)` };
+}
+
+
+// ============================================================
 // PAIR PROFILES — killzones, correlations, native sessions per instrument
 // ============================================================
 
