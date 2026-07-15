@@ -162,7 +162,7 @@ function ResetPasswordPage() {
 
             </label>
             {error && (
-              <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[10px] sm:text-xs text-rose-700 whitespace-nowrap text-center">
+              <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[10px] sm:text-xs text-rose-700 text-center leading-snug line-clamp-2">
                 {error}
               </p>
             )}
