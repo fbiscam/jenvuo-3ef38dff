@@ -163,9 +163,11 @@ function KillzonesPage() {
   }, [tz]);
 
   useEffect(() => {
+    setNow(new Date());
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+
 
   // Detect timezone from user IP (free, no key). Falls back to browser TZ on error.
   useEffect(() => {
