@@ -261,7 +261,11 @@ function Billing() {
                         ? formatModelLabel(actualModel)
                         : (prettyFromMeta ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—")))
                         ?? "—";
-                      const modelWithSenior = seniorPretty ? `${modelLabel} + ${seniorPretty}` : modelLabel;
+                      // Show only ONE model per scan: prefer the senior review model that actually ran; otherwise the primary.
+                      const displayRaw = actualSeniorModel ?? rawModel;
+                      const displayLabel = actualSeniorModel ? (seniorPretty ?? formatModelLabel(actualSeniorModel)) : modelLabel;
+                      const modelWithSenior = displayLabel;
+
                       const sideRaw = (meta.signal ?? meta.side ?? meta.direction ?? meta.action ?? "").toString().toUpperCase();
                       const sideLabel = sideRaw === "BUY" || sideRaw === "SELL" || sideRaw === "WAIT" ? sideRaw : "—";
                       const sideClass = sideLabel === "BUY"
@@ -288,7 +292,7 @@ function Billing() {
 
                       return (
                         <tr key={r.id} className="hover:bg-zinc-50/60">
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}><ModelWithLogo raw={rawModel} label={modelWithSenior} /></td>
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}><ModelWithLogo raw={displayRaw} label={modelWithSenior} /></td>
                           <td className="whitespace-nowrap px-3 py-2">
                             <span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${gradeClass}`}>
                               {gradeLabel}
