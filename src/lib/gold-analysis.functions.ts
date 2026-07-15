@@ -8,7 +8,7 @@ import {
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
-  MODEL_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
+  MODEL_CHAIN, SENIOR_REVIEW_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
 } from "@/lib/ai-gateway";
 
 async function _spendUserCredits(
