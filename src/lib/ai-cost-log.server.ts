@@ -23,8 +23,13 @@ const MODEL_PRICING: Record<string, Price> = {
   "bmind/gpt-5.4": { in: 1.1, out: 8.8 },
   "bmind/gpt-5.4-pro": { in: 3.0, out: 15.0 },
   "bmind/gpt-5.4-mini": { in: 0.25, out: 2.0 },
+  "bmind/gpt-5-mini": { in: 0.25, out: 2.0 },
+  "bmind/gpt-5.2-chat": { in: 1.1, out: 8.8 },
+  "bmind/claude-sonnet-4.5": { in: 3.0, out: 15.0 },
+  "bmind/gemini-2.5-pro": { in: 1.25, out: 10.0 },
   "bmind/deepseek-ai/deepseek-v4-pro": { in: 0.55, out: 2.19 },
   "bmind/orion/deepseek-ai/deepseek-v4-pro": { in: 0.55, out: 2.19 },
+  "bmind/deepseek-v4-flash": { in: 0.27, out: 1.10 },
   // DeepSeek official API
   "dsofficial/deepseek-reasoner": { in: 0.55, out: 2.19 },
   "dsofficial/deepseek-chat": { in: 0.27, out: 1.10 },
@@ -56,10 +61,18 @@ export const SIGNAL_SCAN_CHARGE_WITH_SENIOR_USD = 0.20;
 // Pretty label for the AI model used, shown in billing history.
 export function formatModelLabel(rawModel: string | null | undefined): string {
   if (!rawModel) return "—";
-  const m = String(rawModel).toLowerCase();
+  const raw = String(rawModel);
+  // Support comma-joined multi-model strings (parallel senior review).
+  if (raw.includes(",")) {
+    return raw.split(",").map((s) => formatModelLabel(s.trim())).filter(Boolean).join(" + ");
+  }
+  const m = raw.toLowerCase();
   if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
-  const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google|anthropic)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
+  if (bare.startsWith("claude-opus")) return "Claude Opus";
+  if (bare.startsWith("claude")) return "Claude";
   if (bare.startsWith("gpt-5.6-luna")) return "ChatGPT 5.6 Luna";
   if (bare.startsWith("gpt-5.6")) return "ChatGPT 5.6";
   if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
@@ -79,6 +92,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("deepseek-v4-flash")) return "DeepSeek V4 Flash";
   if (bare.startsWith("deepseek-v4-pro") || bare.startsWith("deepseek-reasoner")) return "DeepSeek V4 Pro";
   if (bare.startsWith("deepseek-chat")) return "DeepSeek V3";
+  if (bare.startsWith("grok")) return "Grok 4.5";
 
   if (bare.startsWith("gemini-3.1-pro")) return "Gemini 3.1 Pro";
   if (bare.startsWith("gemini-3.5-flash")) return "Gemini 3.5 Flash";
@@ -174,7 +188,7 @@ export async function chargeSignalScan(params: {
     // Guarantee history always shows the model that ran — if the caller
     // didn't pass one (deterministic engine fallback path), default to the
     // current primary so no user's billing row is ever blank.
-    const primaryModel = params.model ?? "bmind/gpt-5.6-luna";
+    const primaryModel = params.model ?? "bmind/gpt-5-mini";
     const meta: Record<string, unknown> = {
       model: primaryModel,
       model_label: formatModelLabel(primaryModel),
