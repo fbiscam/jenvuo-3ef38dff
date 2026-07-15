@@ -621,6 +621,29 @@ export function scoreSetup(args: {
       mitigationBlock.present, mitigationBlock.detail);
   }
 
+  // ---- Elite-tier factors ----
+  if (ceTap) {
+    push("ce", "Consequent Encroachment (50% of zone) tapped",
+      ceTap.tapped, ceTap.detail);
+  }
+  if (liquidityVoid) {
+    push("liq_void", "Liquidity void aligned with bias",
+      liquidityVoid.present, liquidityVoid.detail);
+  }
+  if (momentumDivergence) {
+    push("momentum_div", "RSI momentum divergence",
+      momentumDivergence.present, momentumDivergence.detail);
+  }
+  if (volumeSpike) {
+    push("vol_spike", "Institutional volume spike on break",
+      volumeSpike.spike, volumeSpike.detail);
+  }
+  if (midnightOpen) {
+    push("midnight", "Price on correct side of Midnight Open",
+      midnightOpen.aligned, midnightOpen.detail);
+  }
+
+
 
 
   const totalWeight = f.reduce((s, x) => s + x.weight, 0) || 1;
