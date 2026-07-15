@@ -999,7 +999,7 @@ function DashboardLayout() {
             <div className="flex divide-x divide-zinc-200">
               <Metric
                 label={`Balance · ${planTier}`}
-                value={credits.isLoading ? "…" : `$${Number(displayRemaining).toFixed(2)}`}
+                value={credits.isLoading ? "…" : `$${Number(credits.balance || 0).toFixed(2)}`}
                 delta={credits.allowance ? `${remainingPct}%` : null}
                 tone={balanceTone}
                 trend={scansTrend}
