@@ -984,6 +984,14 @@ export type SignalPlan = {
     reason: string;         // 1-line HTF-first read the LTF setup must respect
     ltfAligned: boolean;    // did LTF setup align with locked HTF bias?
   };
+  // Senior review meta — shown as a UI badge on the signal page.
+  seniorReview?: {
+    status: "not_required" | "completed" | "confirmed" | "downgraded" | "vetoed" | "failed";
+    model: string | null;             // e.g. "bmind/deepseek-ai/deepseek-v4-pro"
+    modelLabel: string | null;        // human label e.g. "DeepSeek V4 Pro"
+    included: boolean;                // true if senior review actually ran
+    confidenceAdjusted: boolean;      // true if senior review changed score/grade
+  };
 };
 
 export type SignalPlanResult =
