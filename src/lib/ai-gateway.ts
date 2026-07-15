@@ -337,27 +337,40 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 
 // -------- Model chains (single source of truth) ----------------------------
 
-// Senior review is a SEQUENTIAL fallback chain (best-effort mode).
-// Primary narration uses gpt-5.2-chat (currently the most reliable Bluesminds model).
-// Senior chain tries throttled-but-available models; if all fail, review gracefully skips.
+// Senior review = SEQUENTIAL "best-available" chain.
+// Ordered strongest → weakest. The runner tries #1 first; if that model is
+// down / rate-limited / times out, it hops to the next best one that responds.
+// This way the review is always done by the highest-quality Bluesminds model
+// that is currently live, never by a weaker default when a stronger one is up.
 export const MODEL_CHAIN = {
   intent: ["bmind/gpt-5.2-chat"],
   narration: ["bmind/gpt-5.2-chat"],
   seniorReview: [
+    // Tier 1 — flagship reasoning (best quality when available)
+    "bmind/claude-sonnet-4.5",
+    "bmind/deepseek-v4-pro",
+    "bmind/grok-4.5",
+    // Tier 2 — strong general reasoning
     "bmind/claude-3.7-sonnet",
-    "bmind/gpt-4o-mini",
-    "bmind/gpt-4.1-mini",
     "bmind/gpt-5-mini",
+    // Tier 3 — fast reliable fallbacks (rarely throttled)
+    "bmind/gpt-4.1-mini",
+    "bmind/gpt-4o-mini",
+    "bmind/deepseek-v4-flash",
   ],
   chat: ["bmind/gpt-5.2-chat"],
 } as const;
 
-// Ordered fallback chain for the senior-review runner.
+// Ordered fallback chain for the senior-review runner (best → most reliable).
 export const SENIOR_REVIEW_CHAIN = [
+  "bmind/claude-sonnet-4.5",
+  "bmind/deepseek-v4-pro",
+  "bmind/grok-4.5",
   "bmind/claude-3.7-sonnet",
-  "bmind/gpt-4o-mini",
-  "bmind/gpt-4.1-mini",
   "bmind/gpt-5-mini",
+  "bmind/gpt-4.1-mini",
+  "bmind/gpt-4o-mini",
+  "bmind/deepseek-v4-flash",
 ] as const;
 
 
