@@ -2317,7 +2317,7 @@ ${newsLines}
 IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(imminentHigh.minutesUntil)}m` : "none"}`;
 
         const macroRes = await callChatCompletion({
-          models: [...MODEL_CHAIN.narration],
+          models: [...MACRO_CONTEXT_CHAIN],
           messages: [
             { role: "system", content: macroSystem },
             { role: "user", content: macroUser },
