@@ -974,14 +974,14 @@ function SignalPage() {
       {/* LOW BALANCE BANNER — blocks scan when wallet < $0.20 per-signal charge */}
       {!credits.isLoading && credits.balance < 0.20 && (
         <div className="border-b border-red-200 bg-red-50">
-          <div className="mx-auto max-w-[1600px] px-5 py-2.5 sm:px-6 flex flex-wrap items-center justify-between gap-2 text-[12px] text-red-900">
+          <div className="mx-auto max-w-[1600px] px-5 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-2 text-[14px] text-red-900">
             <div className="flex items-center gap-2">
-              <span className={`${MONO} text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-red-600 text-white font-bold`}>Low balance</span>
+              <span className={`${MONO} text-[11px] uppercase tracking-wider px-2 py-0.5 rounded-sm bg-red-600 text-white font-bold`}>Low balance</span>
               <span>
                 Your balance is <strong className="tabular-nums">${credits.balance.toFixed(2)}</strong> — you need at least <strong>$0.20</strong> per signal scan. Add funds to continue.
               </span>
             </div>
-            <Link to="/dashboard/billing" className="rounded-md bg-zinc-900 px-2.5 py-1 text-[11px] font-medium text-white hover:bg-black">
+            <Link to="/dashboard/billing" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[13px] font-medium text-white hover:bg-black">
               Add funds
             </Link>
           </div>
