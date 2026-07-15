@@ -134,12 +134,15 @@ async function singleAttempt(
   for (let i = 0; i < seedBase.length; i++) seed = ((seed << 5) - seed + seedBase.charCodeAt(i)) | 0;
   seed = Math.abs(seed) || 1;
 
+  // GPT-5 family only accepts default temperature (1); skip temp/top_p there,
+  // keep seed for determinism.
+  const isGpt5Family = /(^|\/)gpt-5/i.test(wireModel);
+
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
-    temperature: 0,
-    top_p: 1,
     seed,
+    ...(isGpt5Family ? {} : { temperature: 0, top_p: 1 }),
   };
   // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
   if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isDsOfficial) body.response_format = { type: "json_object" };
