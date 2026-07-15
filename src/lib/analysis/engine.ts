@@ -588,6 +588,33 @@ export function scoreSetup(args: {
       freshness.fresh, freshness.detail);
   }
 
+  // ---- Veteran-tier factors ----
+  if (equalHL) {
+    push("eqhl", "Equal highs/lows liquidity available",
+      equalHL.present, equalHL.detail);
+  }
+  if (turtleSoup) {
+    push("turtle", "Turtle Soup (failed sweep reversal)",
+      turtleSoup.triggered, turtleSoup.detail);
+  }
+  if (htfPOI) {
+    push("htf_poi", "LTF zone nested inside HTF POI",
+      htfPOI.aligned, htfPOI.detail);
+  }
+  if (silverBullet) {
+    push("silver_bullet", "Silver Bullet window active",
+      silverBullet.inWindow, silverBullet.detail);
+  }
+  if (powerOf3) {
+    push("power3", "Power of 3 (AMD) phase aligned",
+      powerOf3.aligned, powerOf3.detail);
+  }
+  if (mitigationBlock) {
+    push("mitigation", "Mitigation block at entry",
+      mitigationBlock.present, mitigationBlock.detail);
+  }
+
+
 
   const totalWeight = f.reduce((s, x) => s + x.weight, 0) || 1;
   const earned = f.reduce((s, x) => s + (x.pass ? x.weight : 0), 0);
