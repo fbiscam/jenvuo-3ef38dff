@@ -1646,7 +1646,26 @@ export async function computeSignalPlan(
 ): Promise<SignalPlan> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
-    const inst = resolveInstrument(data.symbol);
+    let inst = resolveInstrument(data.symbol);
+
+    // FREE plan: server-side lock to XAU/USD only. Cross-pairs are Pro-tier.
+    if (__userId && inst.key !== "XAUUSD") {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: sub } = await supabaseAdmin
+          .from("user_subscriptions")
+          .select("plan_id, status")
+          .eq("user_id", __userId)
+          .maybeSingle();
+        const pid = (sub?.plan_id as string | undefined) ?? "free";
+        const activePlan = sub?.status === "active" ? pid : "free";
+        if (activePlan === "free") {
+          inst = resolveInstrument("XAUUSD");
+        }
+      } catch { inst = resolveInstrument("XAUUSD"); }
+    }
+
+
 
     const liveTickPromise = resolveLiveTick(inst).catch(() => null);
     const htfKey = `${inst.key}:1h`;

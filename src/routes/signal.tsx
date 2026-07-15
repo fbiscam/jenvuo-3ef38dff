@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
@@ -399,6 +399,15 @@ function SignalPage() {
   const load = useCallback(async () => {
     const sym = symbol || "XAUUSD";
     if (activeScanRef.current === sym) return;
+    // FREE plan: only XAU/USD scans allowed. Force-redirect to XAUUSD.
+    if (!credits.isLoading && credits.plan?.id === "free" && sym.toUpperCase().replace(/[^A-Z]/g, "") !== "XAUUSD") {
+      toast.info("Multi-pair analysis is a Pro feature", {
+        description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
+        action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+      });
+      navigate({ to: "/signal", search: { symbol: "XAUUSD" }, replace: true });
+      return;
+    }
     // Pre-flight: block the scan if wallet is below the flat $0.20 per-signal charge.
     if (!credits.isLoading && credits.balance < 0.20) {
       toast.error("Balance too low to run analysis", {
@@ -943,11 +952,20 @@ function SignalPage() {
           <span className={`font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[15px] font-normal normal-case tracking-normal text-zinc-900 shrink-0`}>Gold pair:</span>
           {XAU_PAIRS.map((p) => {
             const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
+            const isFree = !credits.isLoading && credits.plan?.id === "free";
+            const locked = isFree && p !== "XAUUSD";
             return (
               <button
                 key={p}
                 onClick={() => {
                   if (active) return;
+                  if (locked) {
+                    toast.info("Multi-pair analysis is a Pro feature", {
+                      description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
+                      action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+                    });
+                    return;
+                  }
                   abortRef.current = true;
                   try { speech.stopSpeaking(); } catch {}
                   setPlaying(false);
@@ -958,12 +976,16 @@ function SignalPage() {
                   navigate({ to: "/signal", search: { symbol: p }, replace: true });
                 }}
                 className={cn(
-                  "shrink-0 h-7 px-2.5 rounded-md font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[13px] font-normal tracking-normal transition border",
+                  "shrink-0 h-7 px-2.5 rounded-md font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[13px] font-normal tracking-normal transition border inline-flex items-center gap-1",
                   active
                     ? "bg-zinc-900 text-white border-zinc-900"
-                    : "bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-50",
+                    : locked
+                      ? "bg-zinc-50 text-zinc-400 border-zinc-200 hover:bg-zinc-100 cursor-pointer"
+                      : "bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-50",
                 )}
+                title={locked ? "Pro feature — upgrade to unlock" : undefined}
               >
+                {locked && <Lock className="h-3 w-3" />}
                 {XAU_LABELS[p]}
               </button>
             );
@@ -2684,6 +2706,15 @@ function SignalVoiceAgent({
   const submit = async (text?: string) => {
     const question = (text ?? q).trim();
     if (!question || busy || analyzing) return;
+    // FREE plan: voice agent limited to XAU/USD only.
+    const sym = (plan?.instrument.symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "");
+    if (!credits.isLoading && credits.plan?.id === "free" && sym !== "XAUUSD") {
+      toast.info("Voice agent for cross-pairs is a Pro feature", {
+        description: "Free plan voice agent is limited to XAU/USD. Upgrade to unlock all pairs.",
+        action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+      });
+      return;
+    }
     setQ("");
     setInputOpen(false);
     setBusy(true);
