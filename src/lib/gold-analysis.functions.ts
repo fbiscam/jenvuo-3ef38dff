@@ -5,6 +5,8 @@ import {
   computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
   detectSMTDivergence, killzoneForPair, detectMarketRegime,
   computeDisplacement, detectRejectionConfirmation, detectZoneConfluence, computeZoneFreshness,
+  detectEqualHighsLows, detectTurtleSoup, detectHTFPOIAlignment,
+  detectSilverBullet, detectPowerOf3, detectMitigationAtEntry,
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
@@ -2043,6 +2045,18 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         })())
       : null;
 
+    // ---- Veteran-tier signals ----
+    const equalHL = detectEqualHighsLows(ltf, ltfA.swings, last.c);
+    const turtleSoup = detectTurtleSoup(ltf, ltfA.swings, built.direction);
+    const htfPOI = built.zone
+      ? detectHTFPOIAlignment(htfA, { priceLow: built.zone.priceLow, priceHigh: built.zone.priceHigh }, built.direction)
+      : null;
+    const silverBullet = detectSilverBullet();
+    const powerOf3 = detectPowerOf3(htf, built.direction);
+    const mitigationBlock = built.zone
+      ? detectMitigationAtEntry(ltf, ltfA.swings, { priceLow: built.zone.priceLow, priceHigh: built.zone.priceHigh }, built.direction)
+      : null;
+
     // 10+ factor weighted score with hard-veto gates → only ≥88 is A+
     const scored = scoreSetup({
       trade: built,
@@ -2062,6 +2076,12 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       rejection,
       confluence,
       freshness,
+      equalHL,
+      turtleSoup,
+      htfPOI,
+      silverBullet,
+      powerOf3,
+      mitigationBlock,
     });
     let setupScore = scored.score;
     let setupGrade = scored.grade;
