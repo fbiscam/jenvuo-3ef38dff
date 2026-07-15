@@ -178,7 +178,7 @@ function Billing() {
           <div>
             
             <div className="mt-2 flex items-baseline gap-2 flex-nowrap whitespace-nowrap">
-              <span className="text-3xl sm:text-4xl font-semibold tabular-nums">${Number(remaining).toFixed(2)}</span>
+              <span className="text-3xl sm:text-4xl tabular-nums" style={{ fontWeight: 400 }}>${Number(remaining).toFixed(2)}</span>
               <span className="text-[11px] sm:text-sm text-zinc-500">/ ${Number(credits.allowance).toFixed(2)} · {plan.toUpperCase()}</span>
             </div>
             {resetsAt && (
