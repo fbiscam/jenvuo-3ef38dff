@@ -87,6 +87,8 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("gpt-5-mini")) return "ChatGPT 5 Mini";
   if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
   if (bare.startsWith("gpt-5")) return "ChatGPT 5";
+  if (bare.startsWith("gpt-4.1-mini")) return "ChatGPT 4.1 Mini";
+  if (bare.startsWith("gpt-4.1")) return "ChatGPT 4.1";
   if (bare.startsWith("gpt-4o-mini")) return "ChatGPT 4o Mini";
   if (bare.startsWith("gpt-4o")) return "ChatGPT 4o";
   if (bare.startsWith("gpt-oss-120b")) return "GPT-OSS 120B";
