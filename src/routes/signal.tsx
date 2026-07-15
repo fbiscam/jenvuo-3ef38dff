@@ -974,9 +974,9 @@ function SignalPage() {
       {/* LOW BALANCE BANNER — blocks scan when wallet < $0.20 per-signal charge */}
       {!credits.isLoading && credits.balance < 0.20 && (
         <div className="border-b border-red-200 bg-red-50">
-          <div className="mx-auto max-w-[1600px] px-5 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-2 text-[14px] text-red-900">
+          <div className="mx-auto max-w-[1600px] px-5 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-2 text-[14px] text-red-900" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
             <div className="flex items-center gap-2">
-              <span className={`${MONO} text-[11px] uppercase tracking-wider px-2 py-0.5 rounded-sm bg-red-600 text-white font-bold`}>Low balance</span>
+              <span className="text-[11px] px-2 py-0.5 rounded-sm bg-red-600 text-white font-normal" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif' }}>Low balance</span>
               <span>
                 Your balance is <strong className="tabular-nums">${credits.balance.toFixed(2)}</strong> — you need at least <strong>$0.20</strong> per signal scan. Add funds to continue.
               </span>
