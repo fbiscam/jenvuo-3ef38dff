@@ -2734,6 +2734,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           confidenceAdjusted: __seniorReviewStatus === "downgraded" || __seniorReviewStatus === "vetoed",
         };
       })(),
+      macroContext: __macroContext,
     };
 
     // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
