@@ -1845,46 +1845,15 @@ ${fmt(ltfPrompt)}
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     let parsed: any = {};
-    let __usedNarrationModel: string | null = null;
+    let __usedNarrationModel: string | null = "rules-engine/ict-smc";
     let __usedSeniorModel: string | null = null;
     let __totalPromptTokens = 0;
     let __totalCompletionTokens = 0;
-    try {
-      const { content, model: __aiModel2, usage: __aiUsage2 } = await callChatCompletion({
-        // Bluesminds bills started requests even if our worker aborts early.
-        // Use ONE primary attempt and wait long enough for Luna to finish, so
-        // the user either gets a signal or sees a friendly error without us
-        // launching duplicate paid upstream calls.
-        models: [...MODEL_CHAIN.narration],
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-        jsonMode: true,
-        maxTokens: 1100,
-        timeoutMs: 180000,
-        retriesPerModel: 2,
-        priority: true,
-        stage: "signal-narration",
-
-
-
-      });
-      __usedNarrationModel = __aiModel2 ?? null;
-      __totalPromptTokens += __aiUsage2?.promptTokens ?? 0;
-      __totalCompletionTokens += __aiUsage2?.completionTokens ?? 0;
-      import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "signal-narration", model: __aiModel2, usage: __aiUsage2 })).catch(() => {});
-      parsed = tryParseJsonLoose(content) || {};
-    } catch (aiErr) {
-      // AI narration failed (Bluesminds down / timeout / 5xx). Do NOT fall
-      // back to deterministic-only output — that would emit a BUY/SELL and
-      // charge the user for a scan where no AI model actually ran. Bubble
-      // a UI-friendly "Server busy" error so the client toasts it and the
-      // flat $0.20 per-signal charge below is skipped entirely.
-      const msg = (aiErr as Error)?.message ?? "";
-      if (/server busy|unauthorized|insufficient|payment/i.test(msg)) throw aiErr;
-      throw new Error("Server busy — please try again in a moment.");
-    }
+    void system;
+    void user;
+    // Rules-primary mode: the signal is produced by the deterministic ICT/SMC
+    // engine below. AI narration is intentionally skipped here so Bluesminds
+    // outages never block XAU analysis or leave users stuck on Server busy.
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
       ? "high"
@@ -2457,10 +2426,21 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
 
     const plan: SignalPlan = {
       htfBias: htfBiasLocal,
-      intro: String(parsed.intro ?? `Let's break down ${inst.display} live. I'll walk you through the chart step by step.`),
-      htfNarrative: String(parsed.htfNarrative ?? ""),
-      ltfNarrative: String(parsed.ltfNarrative ?? ""),
-      confluences: Array.isArray(parsed.confluences) ? parsed.confluences.map(String).slice(0, 12) : [],
+      intro: String(parsed.intro ?? `${inst.display} rules-based ICT/SMC scan is complete at ${fmtPx(last.c)}.`),
+      htfNarrative: String(parsed.htfNarrative ?? `${inst.display} HTF structure is ${htfA.trend}; price is in ${inPremium ? "premium" : "discount"} around equilibrium ${fmtPx(equilibrium)}.`),
+      ltfNarrative: String(parsed.ltfNarrative ?? (built.direction === "WAIT"
+        ? `LTF execution is on hold: ${built.reason}`
+        : `LTF execution uses a fresh ${built.zone?.kind ?? "entry zone"} with ${built.direction} entry ${fmtPx(built.entry)}, SL ${fmtPx(built.sl)} and TP ${fmtPx(built.tp)}.`)),
+      confluences: Array.isArray(parsed.confluences) && parsed.confluences.length
+        ? parsed.confluences.map(String).slice(0, 12)
+        : [
+            `HTF structure: ${htfA.trend}`,
+            `LTF structure: ${ltfA.trend}`,
+            `Price in ${inPremium ? "premium" : "discount"} vs equilibrium ${fmtPx(equilibrium)}`,
+            `${session} / ${killzone}`,
+            built.direction === "WAIT" ? built.reason : `${built.zone?.kind ?? "Zone"} entry with ${built.rr.toFixed(2)}R target`,
+            newsWarning,
+          ].filter(Boolean).slice(0, 12),
       keyLevels: Array.isArray(parsed.keyLevels) && parsed.keyLevels.length
         ? parsed.keyLevels.map((k: any) => ({
             label: String(k.label ?? ""),
