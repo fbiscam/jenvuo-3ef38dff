@@ -1497,7 +1497,7 @@ function SignalPage() {
               {/* Key Levels — moved from left rail */}
               {plan && plan.keyLevels.length > 0 && (
                 <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3">
-                  <span className={`text-[12px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal text-zinc-500`}>Key Levels</span>
+                  
                   <div className="space-y-1">
                     {plan.keyLevels.map((k, i) => (
                       <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-zinc-100 last:border-0">
