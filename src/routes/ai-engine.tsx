@@ -7,6 +7,7 @@ export const Route = createFileRoute("/ai-engine")({
       { title: "AI Engine — Jenvu" },
       { name: "description", content: "Inside the Jenvu AI engine: how it listens, reasons and narrates institutional ICT and SMC trade setups in real time." },
       { property: "og:title", content: "Artificial Intelligence Engine — Jenvu" },
+      { property: "og:description", content: "How the Jenvu AI engine listens, reasons and narrates institutional ICT and SMC gold trade setups in real time." },
       { property: "og:url", content: "https://jenvu.com/ai-engine" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/ai-engine" }],
