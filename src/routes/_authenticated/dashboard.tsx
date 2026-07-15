@@ -440,17 +440,6 @@ function DashboardLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [isAdminUser, setIsAdminUser] = useState(false);
-
-  // Detect admin role to conditionally show admin nav items
-  useEffect(() => {
-    if (authLoading || !authUser) { setIsAdminUser(false); return; }
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase.rpc("has_role", { _user_id: authUser.id, _role: "admin" });
-      if (!cancelled) setIsAdminUser(Boolean(data));
-    })();
-    return () => { cancelled = true; };
-  }, [authLoading, authUser]);
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
