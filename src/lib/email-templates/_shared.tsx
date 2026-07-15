@@ -9,7 +9,7 @@ export const LOGO_URL = `${SITE_URL}/favicon.png`
  * Inter for everything (headings, body, labels, code digits).
  */
 export const INTER =
-  "'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+  "'Google Sans', 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 // Legacy aliases so existing templates keep compiling without edits.
 export const URBANIST = INTER
@@ -40,7 +40,7 @@ export const EmailFonts = () => (
       crossOrigin=""
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
   </>
