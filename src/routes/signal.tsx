@@ -1238,7 +1238,7 @@ function SignalPage() {
               {plan && <SetupScoreCard plan={plan} />}
 
               {/* Trade card — moved up to position 2 */}
-              {t && plan && !marketClosed && (t.confidence ?? 0) >= 59 && (
+              {t && plan && !marketClosed && (
                 <div className="space-y-3">
                   <div className="flex items-end justify-between">
                     <div className="flex items-center gap-2">
