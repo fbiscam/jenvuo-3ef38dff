@@ -67,44 +67,21 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       throw new Error(insertErr?.message ?? 'Failed to record alert')
     }
 
-    // 2. Resolve paid subscriber recipients (email + user_id)
+    // 2. Resolve ALL active email subscribers from the signal page opt-in.
+    //    Emails go to every collected address (paid or not); in-app
+    //    notifications below stay scoped to paid users.
     const { data: subs } = await supabaseAdmin
       .from('signal_alert_subscribers')
       .select('email')
       .eq('status', 'active')
-    const subEmails = (subs ?? [])
-      .map((s: { email: string | null }) => (s.email ?? '').toLowerCase())
-      .filter(Boolean)
-
-    let recipients: Array<{ email: string; user_id: string }> = []
-    if (subEmails.length > 0) {
-      const { data: authUsers } = await (supabaseAdmin as any)
-        .schema('auth')
-        .from('users')
-        .select('id, email')
-        .in('email', subEmails)
-      const emailById = new Map<string, string>(
-        ((authUsers ?? []) as Array<{ id: string; email: string }>).map((u) => [u.id, u.email.toLowerCase()]),
-      )
-      const userIds = Array.from(emailById.keys())
-      if (userIds.length > 0) {
-        const { data: paidSubs } = await supabaseAdmin
-          .from('user_subscriptions')
-          .select('user_id, plan_id, status')
-          .in('user_id', userIds)
-          .eq('status', 'active')
-          .neq('plan_id', 'free')
-
-          
-
-        recipients = (paidSubs ?? [])
-          .map((r: { user_id: string }) => {
-            const email = emailById.get(r.user_id)
-            return email ? { email, user_id: r.user_id } : null
-          })
-          .filter((x): x is { email: string; user_id: string } => x !== null)
-      }
-    }
+    const recipientEmails = Array.from(
+      new Set(
+        (subs ?? [])
+          .map((s: { email: string | null }) => (s.email ?? '').toLowerCase().trim())
+          .filter((e) => !!e && /.+@.+\..+/.test(e)),
+      ),
+    )
+    const recipients: Array<{ email: string }> = recipientEmails.map((email) => ({ email }))
 
     // 3. Insert in-app notifications for all paid users (even non-subscribers)
     const { data: allPaid } = await supabaseAdmin
