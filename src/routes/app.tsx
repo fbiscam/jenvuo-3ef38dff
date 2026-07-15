@@ -316,26 +316,38 @@ function Home() {
     if (loadingRef.current || !query.trim()) return;
     const q = normalizeQuery(query);
 
-    // "open chart / show chart / live chart" → still route to the full desk
-    if (OPEN_CHART_RX.test(q)) {
+    const analyzeIntent = ANALYZE_INTENT_RX.test(q);
+    const openChartIntent = OPEN_CHART_RX.test(q);
+
+    // Gold-only guard: if user references a non-XAU instrument, refuse politely.
+    if (analyzeIntent || openChartIntent) {
       const symbol = detectSymbol(query);
+      const mentionsNonGold = /\b(silver|xag|btc|bitcoin|eth|ether|solana|\bsol\b|xrp|ripple|eur\s*\/?\s*usd|gbp\s*\/?\s*usd|usd\s*\/?\s*jpy|aud\s*\/?\s*usd|nzd\s*\/?\s*usd|usd\s*\/?\s*cad|usd\s*\/?\s*chf|dxy|dollar\s*index|cable|euro\s*dollar|dollar\s*yen)\b/i.test(q);
+      if (!symbol.startsWith("XAU") || mentionsNonGold) {
+        const reply = "I can only analyze gold pairs. Please ask about XAU/USD or another XAU cross-pair.";
+        speech.speak(reply, () => {
+          speech.resumeIfWanted();
+          armSleep();
+        });
+        appendVoiceTurn({ query, reply });
+        return;
+      }
+
+      // "open chart / show chart / live chart" → route to the full desk
+      if (openChartIntent) {
+        speech.stopSpeaking();
+        speech.pauseListening();
+        navigate({ to: "/signal", search: { symbol }, replace: true });
+        return;
+      }
+
+      // Analyze / signal / setup / trade-idea intent → open the full Signal Desk
       speech.stopSpeaking();
       speech.pauseListening();
       navigate({ to: "/signal", search: { symbol }, replace: true });
       return;
     }
 
-    // Analyze / signal / setup / trade-idea intent → open the full Signal
-    // Desk at /signal (killzone-quality plan, chart & controls) instead of
-    // running inline on /app.
-    const analyzeIntent = ANALYZE_INTENT_RX.test(q);
-    if (analyzeIntent) {
-      const symbol = detectSymbol(query);
-      speech.stopSpeaking();
-      speech.pauseListening();
-      navigate({ to: "/signal", search: { symbol }, replace: true });
-      return;
-    }
 
     loadingRef.current = true;
     setLoading(true);
