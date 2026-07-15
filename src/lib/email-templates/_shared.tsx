@@ -40,7 +40,7 @@ export const EmailFonts = () => (
       crossOrigin=""
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
   </>
