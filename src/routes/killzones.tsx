@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Search, Clock, MapPin, Radar } from "lucide-react";
+import { ArrowLeft, Search, Clock, MapPin, Radar, Lock } from "lucide-react";
 import { PAIR_PROFILES, type PairProfile } from "@/lib/analysis/engine";
+import { useCurrentPlan } from "@/hooks/useCurrentPlan";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/killzones")({
   head: () => ({
