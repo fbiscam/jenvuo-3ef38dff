@@ -2518,6 +2518,25 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
         };
         return { bearish: one(s.bearish), base: one(s.base), bullish: one(s.bullish) };
       })(),
+      seniorReview: (() => {
+        const model = __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview[0] : null);
+        const label = (() => {
+          if (!model) return null;
+          const m = model.toLowerCase();
+          if (m.includes("grok")) return "Grok 4.5";
+          if (m.includes("deepseek-v4-pro")) return "DeepSeek V4 Pro";
+          if (m.includes("deepseek-v4-flash")) return "DeepSeek V4 Flash";
+          if (m.includes("deepseek")) return "DeepSeek";
+          return model.split("/").pop() ?? model;
+        })();
+        return {
+          status: __seniorReviewStatus,
+          model,
+          modelLabel: label,
+          included: __seniorReviewStatus === "completed" || __seniorReviewStatus === "confirmed" || __seniorReviewStatus === "downgraded" || __seniorReviewStatus === "vetoed",
+          confidenceAdjusted: __seniorReviewStatus === "downgraded" || __seniorReviewStatus === "vetoed",
+        };
+      })(),
     };
 
     // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
