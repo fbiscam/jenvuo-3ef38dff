@@ -274,11 +274,15 @@
 
 /* Per-page zoom scaling — proportional across laptop widths so blocks/text
    keep the same layout and only scale with the viewport (no reflow). */
+/* Laptop range — unchanged */
 @media (min-width: 1024px) { .jenvu-zoom { zoom: 1.05; } .jenvu-zoom-dashboard { zoom: 0.95; } }
 @media (min-width: 1200px) { .jenvu-zoom { zoom: 1.15; } .jenvu-zoom-dashboard { zoom: 1.05; } }
 @media (min-width: 1360px) { .jenvu-zoom { zoom: 1.28; } .jenvu-zoom-dashboard { zoom: 1.15; } }
 @media (min-width: 1500px) { .jenvu-zoom { zoom: 1.4; } .jenvu-zoom-dashboard { zoom: 1.25; } }
-@media (min-width: 1680px) { .jenvu-zoom { zoom: 1.5; } .jenvu-zoom-dashboard { zoom: 1.32; } }
+/* Desktop range — +10% over laptop baseline */
+@media (min-width: 1600px) { .jenvu-zoom-dashboard { zoom: 1.375; } }
+@media (min-width: 1680px) { .jenvu-zoom { zoom: 1.5; } .jenvu-zoom-dashboard { zoom: 1.452; } }
+@media (min-width: 1920px) { .jenvu-zoom-dashboard { zoom: 1.55; } }
 
 
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
