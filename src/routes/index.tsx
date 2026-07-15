@@ -357,9 +357,9 @@ function HomePage() {
 
             {/* RIGHT — intelligence */}
             <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100">
-              <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase mb-4`}>
+              <h2 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase mb-4`}>
                 Intelligence Dashboard
-              </h3>
+              </h2>
               <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
