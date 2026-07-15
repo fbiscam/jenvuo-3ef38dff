@@ -97,7 +97,10 @@ export const getCreditState = createServerFn({ method: "GET" })
         const meta = (r.metadata ?? {}) as Record<string, any>;
         const actual = actualModelMatches.get(r.id);
         const actualPrimary = actual?.primary?.model ?? null;
-        const actualSenior = actual?.senior?.model ?? null;
+        const seniorsArr = actual?.seniors ?? (actual?.senior ? [actual.senior] : []);
+        const actualSenior = seniorsArr.length ? seniorsArr.map((s) => s.model).filter(Boolean).join(",") : null;
+        const seniorPromptTokens = seniorsArr.reduce((n, s) => n + (s.prompt_tokens ?? 0), 0);
+        const seniorCompletionTokens = seniorsArr.reduce((n, s) => n + (s.completion_tokens ?? 0), 0);
         const enrichedMeta = {
           ...meta,
           ...(actualPrimary ? {
@@ -108,9 +111,9 @@ export const getCreditState = createServerFn({ method: "GET" })
           } : {}),
           ...(actualSenior ? {
             actual_senior_model: actualSenior,
-            actual_senior_model_stage: actual?.senior?.stage ?? null,
-            actual_senior_prompt_tokens: actual?.senior?.prompt_tokens ?? null,
-            actual_senior_completion_tokens: actual?.senior?.completion_tokens ?? null,
+            actual_senior_model_stage: seniorsArr[0]?.stage ?? null,
+            actual_senior_prompt_tokens: seniorPromptTokens || null,
+            actual_senior_completion_tokens: seniorCompletionTokens || null,
           } : {}),
         };
         return {
