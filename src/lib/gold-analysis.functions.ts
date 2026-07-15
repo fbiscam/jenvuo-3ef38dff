@@ -4,6 +4,7 @@ import {
   analyzeTF, buildLiquidityPools, buildTrade, scoreSetup,
   computeATR, computeStructureQuality, detectBreakerBlocks, detectIFVGs,
   detectSMTDivergence, killzoneForPair, detectMarketRegime,
+  computeDisplacement, detectRejectionConfirmation, detectZoneConfluence, computeZoneFreshness,
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
