@@ -984,6 +984,14 @@ export type SignalPlan = {
     reason: string;         // 1-line HTF-first read the LTF setup must respect
     ltfAligned: boolean;    // did LTF setup align with locked HTF bias?
   };
+  // Senior review meta — shown as a UI badge on the signal page.
+  seniorReview?: {
+    status: "not_required" | "completed" | "confirmed" | "downgraded" | "vetoed" | "failed";
+    model: string | null;             // e.g. "bmind/deepseek-ai/deepseek-v4-pro"
+    modelLabel: string | null;        // human label e.g. "DeepSeek V4 Pro"
+    included: boolean;                // true if senior review actually ran
+    confidenceAdjusted: boolean;      // true if senior review changed score/grade
+  };
 };
 
 export type SignalPlanResult =
@@ -2509,6 +2517,25 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
           };
         };
         return { bearish: one(s.bearish), base: one(s.base), bullish: one(s.bullish) };
+      })(),
+      seniorReview: (() => {
+        const model = __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview[0] : null);
+        const label = (() => {
+          if (!model) return null;
+          const m = model.toLowerCase();
+          if (m.includes("grok")) return "Grok 4.5";
+          if (m.includes("deepseek-v4-pro")) return "DeepSeek V4 Pro";
+          if (m.includes("deepseek-v4-flash")) return "DeepSeek V4 Flash";
+          if (m.includes("deepseek")) return "DeepSeek";
+          return model.split("/").pop() ?? model;
+        })();
+        return {
+          status: __seniorReviewStatus,
+          model,
+          modelLabel: label,
+          included: __seniorReviewStatus === "completed" || __seniorReviewStatus === "confirmed" || __seniorReviewStatus === "downgraded" || __seniorReviewStatus === "vetoed",
+          confidenceAdjusted: __seniorReviewStatus === "downgraded" || __seniorReviewStatus === "vetoed",
+        };
       })(),
     };
 
