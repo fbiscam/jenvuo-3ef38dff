@@ -2151,82 +2151,120 @@ BREAKERS DETECTED: ${breakers.length} | IFVG DETECTED: ${ifvgs.length}
 
 VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine but not A+. CONFIRM only for true A+ institutional setups with clean entry/SL/TP.`;
 
-        // Plan-gated senior model chain:
-        // Pro → DeepSeek only (no Grok). Elite/Ultra → Grok first, then DeepSeek.
-        const __seniorChain = (__planId === "elite" || __planId === "ultra")
-          ? [...MODEL_CHAIN.seniorReview]
-          : MODEL_CHAIN.seniorReview.filter((m) => !m.includes("grok"));
-        const { content: rc, model: __aiModel3, usage: __aiUsage3 } = await callChatCompletion({
-          models: __seniorChain,
+        // Parallel dual senior review: Claude Sonnet 4.5 + Gemini 2.5 Pro.
+        // Worst verdict wins (VETO > DOWNGRADE > CONFIRM). Either failing is OK
+        // as long as the other returns — only both failing marks the stage failed.
+        const seniorPair = ["bmind/claude-sonnet-4.5", "bmind/gemini-2.5-pro"] as const;
+        const reviewPromises = seniorPair.map((mdl) =>
+          callChatCompletion({
+            models: [mdl],
+            messages: [
+              { role: "system", content: reviewSystem },
+              { role: "user", content: reviewUser },
+            ],
+            jsonMode: true,
+            maxTokens: 220,
+            timeoutMs: 15000,
+            priority: false,
+            retriesPerModel: 1,
+            stage: "senior-review",
+          })
+        );
+        const settled = await Promise.allSettled(reviewPromises);
 
-          messages: [
-            { role: "system", content: reviewSystem },
-            { role: "user", content: reviewUser },
-          ],
-          jsonMode: true,
-          maxTokens: 220,
-          timeoutMs: 12000,
-          priority: true,
-          retriesPerModel: 1,
-          stage: "senior-review",
-
-        });
-        __usedSeniorModel = __aiModel3 ?? null;
-        __totalPromptTokens += __aiUsage3?.promptTokens ?? 0;
-        __totalCompletionTokens += __aiUsage3?.completionTokens ?? 0;
-        import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: __aiModel3, usage: __aiUsage3 })).catch(() => {});
-        const review: any = tryParseJsonLoose(rc) || {};
-        const verdict = String(review.verdict || "").toUpperCase();
-        __seniorReviewStatus = "completed";
-        if (verdict === "VETO") {
-          __seniorReviewStatus = "vetoed";
-          setupGrade = "C";
-          setupScore = Math.min(setupScore, 50);
-          setupChecks.unshift({
-            key: "senior_veto",
-            label: "⛔ Senior trader veto",
-            pass: false,
-            reason: String(review.reasoning || "Veteran review vetoed this setup"),
-          });
-        } else if (verdict === "DOWNGRADE") {
-          __seniorReviewStatus = "downgraded";
-          setupGrade = setupGrade === "A+" ? "A" : "B";
-          setupScore = Math.max(60, setupScore - 15);
-          setupChecks.unshift({
-            key: "senior_downgrade",
-            label: "⚠ Senior review downgrade",
-            pass: false,
-            reason: String(review.reasoning || "Not quite A+ material"),
-          });
-        } else if (verdict === "CONFIRM") {
-          __seniorReviewStatus = "confirmed";
-          setupChecks.unshift({
-            key: "senior_confirm",
-            label: "✓ Senior trader confirms",
-            pass: true,
-            reason: String(review.reasoning || "Institutional-grade setup confirmed"),
-          });
+        const usedModels: string[] = [];
+        const reviews: Array<{ model: string; verdict: string; parsed: any }> = [];
+        for (let i = 0; i < settled.length; i++) {
+          const r = settled[i];
+          const mdl = seniorPair[i];
+          if (r.status === "fulfilled") {
+            usedModels.push(mdl);
+            __totalPromptTokens += r.value.usage?.promptTokens ?? 0;
+            __totalCompletionTokens += r.value.usage?.completionTokens ?? 0;
+            const uCap = r.value.usage;
+            import("@/lib/ai-cost-log.server")
+              .then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: mdl, usage: uCap }))
+              .catch(() => {});
+            const parsed: any = tryParseJsonLoose(r.value.content) || {};
+            const verdict = String(parsed.verdict || "").toUpperCase();
+            reviews.push({ model: mdl, verdict, parsed });
+          }
         }
-        if (review.counter_argument) {
-          setupChecks.push({
-            key: "counter_arg",
-            label: "Counter-argument (know your risk)",
+
+        if (usedModels.length === 0) {
+          __seniorReviewStatus = "failed";
+          const firstReason = settled.find((s) => s.status === "rejected") as PromiseRejectedResult | undefined;
+          __seniorReviewError = String(firstReason?.reason?.message ?? firstReason?.reason ?? "senior review unavailable").slice(0, 240);
+          setupChecks.unshift({
+            key: "senior_review_attempted",
+            label: "⚠ Senior review attempted",
             pass: false,
-            reason: String(review.counter_argument),
+            reason: "Senior review (Claude 4.5 + Gemini 2.5 Pro) was required for this paid-plan signal but both providers were unavailable; billing still records the senior review tier for audit.",
           });
+        } else {
+          __usedSeniorModel = usedModels.join(",");
+          const verdicts = reviews.map((r) => r.verdict);
+          const finalVerdict = verdicts.includes("VETO")
+            ? "VETO"
+            : verdicts.includes("DOWNGRADE")
+              ? "DOWNGRADE"
+              : verdicts.includes("CONFIRM")
+                ? "CONFIRM"
+                : "";
+          __seniorReviewStatus = "completed";
+          const reasoning = reviews.map((r) => `${r.model.split("/").pop()}: ${String(r.parsed.reasoning ?? "").slice(0, 160)}`).join(" | ");
+          if (finalVerdict === "VETO") {
+            __seniorReviewStatus = "vetoed";
+            setupGrade = "C";
+            setupScore = Math.min(setupScore, 50);
+            setupChecks.unshift({
+              key: "senior_veto",
+              label: "⛔ Senior trader veto",
+              pass: false,
+              reason: reasoning || "Veteran review vetoed this setup",
+            });
+          } else if (finalVerdict === "DOWNGRADE") {
+            __seniorReviewStatus = "downgraded";
+            setupGrade = setupGrade === "A+" ? "A" : "B";
+            setupScore = Math.max(60, setupScore - 15);
+            setupChecks.unshift({
+              key: "senior_downgrade",
+              label: "⚠ Senior review downgrade",
+              pass: false,
+              reason: reasoning || "Not quite A+ material",
+            });
+          } else if (finalVerdict === "CONFIRM") {
+            __seniorReviewStatus = "confirmed";
+            setupChecks.unshift({
+              key: "senior_confirm",
+              label: "✓ Senior traders confirm (Claude 4.5 + Gemini 2.5 Pro)",
+              pass: true,
+              reason: reasoning || "Institutional-grade setup confirmed by both reviewers",
+            });
+          }
+          const counter = reviews.map((r) => r.parsed.counter_argument).filter(Boolean).join(" | ");
+          if (counter) {
+            setupChecks.push({
+              key: "counter_arg",
+              label: "Counter-argument (know your risk)",
+              pass: false,
+              reason: String(counter),
+            });
+          }
         }
       } catch (e) {
         __seniorReviewStatus = "failed";
         __seniorReviewError = String((e as Error)?.message ?? e).slice(0, 240);
         setupChecks.unshift({
           key: "senior_review_attempted",
-          label: "⚠ DeepSeek review attempted",
+          label: "⚠ Senior review attempted",
           pass: false,
-          reason: "DeepSeek senior review was required for this paid-plan signal but the provider did not respond in time; billing still records the DeepSeek review tier for audit.",
+          reason: "Senior review was required for this paid-plan signal but did not complete in time; billing still records the senior review tier for audit.",
         });
         console.warn("senior-review failed:", __seniorReviewError);
       }
     }
+
 
     tradeFromAi.confidence = Math.min(95, setupScore);
     if (built.direction !== "WAIT") {
