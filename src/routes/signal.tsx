@@ -1066,7 +1066,7 @@ function SignalPage() {
                 />
               </div>
 
-              <h3 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
+              <h3 className={`text-[12px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
                 ICT Execution Feed
               </h3>
               {!plan && (
