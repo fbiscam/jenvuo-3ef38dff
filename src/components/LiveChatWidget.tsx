@@ -15,9 +15,11 @@ const NAME_KEY = "jenvu_chat_name_v1";
 const POLL_MS = 2500;
 
 export function LiveChatWidget() {
-  const [pathname, setPathname] = useState<string>(() =>
-    typeof window !== "undefined" ? window.location.pathname : ""
-  );
+  const [pathname, setPathname] = useState<string>("");
+  useEffect(() => {
+    if (typeof window !== "undefined") setPathname(window.location.pathname);
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const update = () => setPathname(window.location.pathname);

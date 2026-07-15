@@ -146,7 +146,7 @@ function KillzonesPage() {
   const navigate = useNavigate();
   const currentPlan = useCurrentPlan();
   const isFreePlan = currentPlan === "free";
-  const [now, setNow] = useState<Date>(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<(typeof CATEGORIES)[number]>("All");
   const [ipTZ, setIpTZ] = useState<string | null>(null);
@@ -163,9 +163,11 @@ function KillzonesPage() {
   }, [tz]);
 
   useEffect(() => {
+    setNow(new Date());
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+
 
   // Detect timezone from user IP (free, no key). Falls back to browser TZ on error.
   useEffect(() => {
@@ -211,20 +213,21 @@ function KillzonesPage() {
     return g;
   }, [rows]);
 
-  const utcNow = now.toLocaleTimeString([], {
+  const utcNow = now ? now.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
     timeZone: "UTC",
-  });
-  const localNow = now.toLocaleTimeString([], {
+  }) : "--:--:--";
+  const localNow = now ? now.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
     timeZone: tz,
-  });
+  }) : "--:--:--";
+
 
   return (
     <div className="killzones-root min-h-dvh w-full bg-[#FAFAFA] text-slate-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
@@ -347,8 +350,10 @@ function KillzonesPage() {
 
                 <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2">
                   {items.map(({ profile, meta }) => {
-                    const st = statusFor(profile, now);
-                    const marketOpen = isMarketOpen(now);
+                    const nowRef = now ?? new Date(0);
+                    const st = statusFor(profile, nowRef);
+                    const marketOpen = now ? isMarketOpen(nowRef) : false;
+
                     const locked = isFreePlan && profile.key !== "XAUUSD";
                     return (
                       <button
@@ -413,7 +418,7 @@ function KillzonesPage() {
 
                         <div className="mt-3 space-y-1.5">
                           {profile.killzones.map(kz => {
-                            const active = inZone(kz, now.getUTCHours());
+                            const active = now ? inZone(kz, now.getUTCHours()) : false;
                             return (
                               <div
                                 key={kz.name}
