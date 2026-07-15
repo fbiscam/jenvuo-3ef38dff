@@ -173,12 +173,12 @@ function Billing() {
       </section>
 
       {/* WALLET BALANCE */}
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
+      <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400, textTransform: "none", letterSpacing: "normal" }}>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             
             <div className="mt-2 flex items-baseline gap-2 flex-nowrap whitespace-nowrap">
-              <span className="text-3xl sm:text-4xl font-semibold tabular-nums">${Number(remaining).toFixed(2)}</span>
+              <span className="text-3xl sm:text-4xl tabular-nums" style={{ fontWeight: 400 }}>${Number(remaining).toFixed(2)}</span>
               <span className="text-[11px] sm:text-sm text-zinc-500">/ ${Number(credits.allowance).toFixed(2)} · {plan.toUpperCase()}</span>
             </div>
             {resetsAt && (
