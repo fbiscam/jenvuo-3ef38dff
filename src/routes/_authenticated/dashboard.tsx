@@ -903,20 +903,21 @@ function DashboardLayout() {
                 className="inline-flex flex-wrap items-center gap-1"
                 title="AI models powering your signals"
               >
-                <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1 py-0.5 hover:bg-zinc-50 sm:px-1.5">
-                  <svg viewBox="0 0 24 24" width="11" height="11" fill="#000" aria-hidden="true"><path d="M22.28 9.82a5.98 5.98 0 0 0-.51-4.91 6.05 6.05 0 0 0-6.52-2.9A6 6 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.52 2.9A6 6 0 0 0 19.02 19.8a5.98 5.98 0 0 0 4-2.9 6.05 6.05 0 0 0-.74-7.1zm-9.06 12.67a4.5 4.5 0 0 1-2.88-1.04l.14-.08 4.79-2.77a.78.78 0 0 0 .39-.68v-6.76l2.03 1.17.02.05v5.6a4.5 4.5 0 0 1-4.49 4.51zM3.5 18.55a4.47 4.47 0 0 1-.54-3.03l.14.08 4.79 2.77a.78.78 0 0 0 .79 0l5.85-3.38v2.35l.02.05-4.85 2.8a4.5 4.5 0 0 1-6.2-1.64zM2.24 8.03a4.5 4.5 0 0 1 2.35-1.98v5.7a.77.77 0 0 0 .39.68l5.83 3.36-2.03 1.17a.07.07 0 0 1-.07 0l-4.84-2.8a4.5 4.5 0 0 1-1.63-6.13zm16.63 3.87-5.85-3.4L15.05 7.34a.07.07 0 0 1 .07 0l4.84 2.8a4.5 4.5 0 0 1-.68 8.11v-5.7a.79.79 0 0 0-.4-.65zm2.02-3.04-.14-.09-4.78-2.79a.78.78 0 0 0-.79 0L9.33 9.36V7.01l-.02-.05 4.85-2.8a4.5 4.5 0 0 1 6.68 4.66zM8.22 12.99l-2.03-1.17-.02-.05v-5.6a4.5 4.5 0 0 1 7.38-3.45l-.14.08L8.62 5.57a.78.78 0 0 0-.4.68zm1.1-2.38 2.61-1.5 2.6 1.5v3l-2.6 1.5-2.6-1.5z"/></svg>
-                  <span className="text-[10px] font-medium text-zinc-800 sm:text-[11px]">OpenAI</span>
+                <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2 py-1 hover:bg-zinc-50">
+                  <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" width={14} height={14} className="h-3.5 w-3.5 rounded-sm object-contain" loading="lazy" />
+                  <span className="text-[12px] font-medium text-zinc-800 sm:text-[13px]">OpenAI</span>
+                  {showDeepSeek && (
+                    <>
+                      <span className="text-zinc-300">·</span>
+                      <img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=64" alt="Anthropic" width={14} height={14} className="h-3.5 w-3.5 rounded-sm object-contain" loading="lazy" />
+                      <span className="text-[12px] font-medium text-zinc-800 sm:text-[13px]">Anthropic</span>
+                      <span className="text-zinc-300">·</span>
+                      <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={14} height={14} className="h-3.5 w-3.5 rounded-sm object-contain" loading="lazy" />
+                      <span className="text-[12px] font-medium text-zinc-800 sm:text-[13px]">Google</span>
+                      <span className="ml-1 text-[10px] text-zinc-500 hidden sm:inline">Senior Review</span>
+                    </>
+                  )}
                 </span>
-                {showDeepSeek && (
-                <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1 py-0.5 hover:bg-zinc-50 sm:px-1.5">
-                  <img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=32" alt="" width={11} height={11} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
-                  <span className="text-[10px] font-medium text-zinc-800 sm:text-[11px]">Anthropic</span>
-                  <span className="text-zinc-300">·</span>
-                  <img src="https://www.google.com/s2/favicons?domain=google.com&sz=32" alt="" width={11} height={11} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
-                  <span className="text-[10px] font-medium text-zinc-800 sm:text-[11px]">Google</span>
-                  <span className="ml-0.5 text-[9px] text-zinc-500 hidden sm:inline">Senior Review</span>
-                </span>
-                )}
               </Link>
             </div>
           </div>
