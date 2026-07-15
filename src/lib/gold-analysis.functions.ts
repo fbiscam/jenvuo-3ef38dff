@@ -12,7 +12,7 @@ import {
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
-  MODEL_CHAIN, SENIOR_REVIEW_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
+  MODEL_CHAIN, SENIOR_REVIEW_CHAIN, MACRO_CONTEXT_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
 } from "@/lib/ai-gateway";
 
 async function _spendUserCredits(
@@ -2317,7 +2317,7 @@ ${newsLines}
 IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(imminentHigh.minutesUntil)}m` : "none"}`;
 
         const macroRes = await callChatCompletion({
-          models: [...MODEL_CHAIN.narration],
+          models: [...MACRO_CONTEXT_CHAIN],
           messages: [
             { role: "system", content: macroSystem },
             { role: "user", content: macroUser },

@@ -346,20 +346,41 @@ export const MODEL_CHAIN = {
   intent: ["bmind/gpt-5.2-chat"],
   narration: ["bmind/gpt-5.2-chat"],
   seniorReview: [
-    // Tier 1 — flagship reasoning (best quality when available)
     "bmind/claude-sonnet-4.5",
     "bmind/deepseek-v4-pro",
     "bmind/grok-4.5",
-    // Tier 2 — strong general reasoning
     "bmind/claude-3.7-sonnet",
     "bmind/gpt-5-mini",
-    // Tier 3 — fast reliable fallbacks (rarely throttled)
     "bmind/gpt-4.1-mini",
     "bmind/gpt-4o-mini",
     "bmind/deepseek-v4-flash",
   ],
+  // Macro/news backdrop — lightweight enrichment. Sequential best-available
+  // fallback chain (same pattern as senior review) so whichever Bluesminds
+  // model is currently live handles it. Cheap/fast models first since output
+  // is only 1-2 sentences.
+  macroContext: [
+    "bmind/gpt-5.2-chat",
+    "bmind/gpt-4o-mini",
+    "bmind/gpt-4.1-mini",
+    "bmind/claude-3.7-sonnet",
+    "bmind/deepseek-v4-flash",
+    "bmind/gpt-5-mini",
+    "bmind/grok-4.5",
+  ],
   chat: ["bmind/gpt-5.2-chat"],
 } as const;
+
+// Ordered fallback chain for the macro-context runner (fast/cheap → strong).
+export const MACRO_CONTEXT_CHAIN = [
+  "bmind/gpt-5.2-chat",
+  "bmind/gpt-4o-mini",
+  "bmind/gpt-4.1-mini",
+  "bmind/claude-3.7-sonnet",
+  "bmind/deepseek-v4-flash",
+  "bmind/gpt-5-mini",
+  "bmind/grok-4.5",
+] as const;
 
 // Ordered fallback chain for the senior-review runner (best → most reliable).
 export const SENIOR_REVIEW_CHAIN = [
