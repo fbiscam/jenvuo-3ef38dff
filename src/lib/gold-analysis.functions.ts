@@ -2189,7 +2189,7 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             key: "senior_review_attempted",
             label: "⚠ Senior review attempted",
             pass: false,
-            reason: "Senior review (Claude 4.5 → DeepSeek V4 Pro → GPT-5 Mini) was required for this paid-plan signal but all providers were unavailable; billing still records the senior review tier for audit.",
+            reason: "Senior review (Claude 3.7 Sonnet → GPT-4o Mini → GPT-4.1 Mini → GPT-5 Mini) attempted but all providers throttled; primary narration still applied and signal delivered.",
           });
         } else {
           const mdl = reviewResult.model;
