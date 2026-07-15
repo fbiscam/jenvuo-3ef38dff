@@ -7,6 +7,8 @@ import {
   computeDisplacement, detectRejectionConfirmation, detectZoneConfluence, computeZoneFreshness,
   detectEqualHighsLows, detectTurtleSoup, detectHTFPOIAlignment,
   detectSilverBullet, detectPowerOf3, detectMitigationAtEntry,
+  detectCETap, detectLiquidityVoidAtEntry, detectMomentumDivergence,
+  detectVolumeSpikeOnBreak, detectMidnightOpenBias,
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
