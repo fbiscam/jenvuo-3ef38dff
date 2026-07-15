@@ -914,7 +914,7 @@ function DashboardLayout() {
                       <span className="text-zinc-300">·</span>
                       <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={18} height={18} className="h-[18px] w-[18px] rounded-sm object-contain" loading="lazy" />
                       <span className="text-[11px] font-medium text-zinc-800">Google</span>
-                      <span className="ml-1 text-[9px] text-zinc-500 hidden sm:inline">Senior Review</span>
+                      
                     </>
                   )}
                 </span>
