@@ -2445,9 +2445,9 @@ function TradeManagementLadder({
 
   return (
     <div className="rounded-md border border-zinc-100 bg-zinc-50/60 p-2 space-y-1.5">
-      <div className={`flex items-center justify-between font-['Urbanist',sans-serif] text-[13px] font-semibold tracking-wide text-zinc-900`}>
+      <div className={`flex items-center justify-between gap-3 font-['Urbanist',sans-serif] text-[11px] sm:text-[12px] font-semibold tracking-wide text-zinc-900`}>
         <span>Trade Management</span>
-        <span className="font-['Urbanist',sans-serif] text-[12px] font-medium text-zinc-600">70/30 + Breakeven Runner</span>
+        <span className="font-['Urbanist',sans-serif] text-[10px] sm:text-[11px] font-medium text-zinc-600">70/30 + Breakeven Runner</span>
       </div>
       <ol className="space-y-1">
         {steps.map((s, i) => (
