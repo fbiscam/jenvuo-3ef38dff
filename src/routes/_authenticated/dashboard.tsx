@@ -444,8 +444,8 @@ function DashboardLayout() {
   const localHour = useLocalHour();
   const greetingText = pickGreeting(localHour);
   const currentPlan = useCurrentPlan();
-  const showDeepSeek = currentPlan === "pro" || currentPlan === "elite" || currentPlan === "ultra";
-  const showGrok = currentPlan === "elite" || currentPlan === "ultra";
+  const showDeepSeek = true;
+  const showGrok = true;
 
 
   // Persist sidebar collapsed state
