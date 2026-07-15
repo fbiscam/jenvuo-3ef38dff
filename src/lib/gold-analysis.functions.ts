@@ -2014,7 +2014,36 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       avgScore <= 42 ? "Mild Bearish Alignment" :
       "Mixed / Choppy";
 
-    // 10-factor weighted score with hard-veto gates → only ≥88 is A+
+    // ---- Pro-trader signal layer ----
+    // Displacement on the HTF impulse leg after last BOS/CHoCH
+    const displacement = htfStructureEvents.length
+      ? computeDisplacement(htf, htfStructureEvents)
+      : null;
+    // Rejection wick at the LTF entry zone (in trade direction)
+    const rejection = built.zone
+      ? detectRejectionConfirmation(ltf, { priceLow: built.zone.priceLow, priceHigh: built.zone.priceHigh }, built.direction)
+      : null;
+    // OB + FVG stacked confluence
+    const confluence = detectZoneConfluence(ltfA, built.direction);
+    // Entry zone freshness (age in LTF candles)
+    const freshness = built.zone
+      ? computeZoneFreshness(ltf, (() => {
+          // Find the actual zone we picked and extract its fromTime
+          const dirOb = built.direction === "BUY" ? "demand" : built.direction === "SELL" ? "supply" : null;
+          const dirFvg = built.direction === "BUY" ? "bullish" : built.direction === "SELL" ? "bearish" : null;
+          const pool = [
+            ...ltfA.obs.filter((o) => !o.mitigated && (dirOb ? o.kind === dirOb : true)),
+            ...ltfA.fvgs.filter((f) => !f.mitigated && (dirFvg ? f.kind === dirFvg : true)),
+          ];
+          const match = pool.find((z) =>
+            Math.abs(z.priceLow - (built.zone as any).priceLow) < 1e-6 &&
+            Math.abs(z.priceHigh - (built.zone as any).priceHigh) < 1e-6,
+          );
+          return match ? { fromTime: match.fromTime } : null;
+        })())
+      : null;
+
+    // 10+ factor weighted score with hard-veto gates → only ≥88 is A+
     const scored = scoreSetup({
       trade: built,
       htf: htfA,
@@ -2029,6 +2058,10 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       smtDivergence,
       nativeSession: kz.nativeSession,
       zoneMitigated,
+      displacement,
+      rejection,
+      confluence,
+      freshness,
     });
     let setupScore = scored.score;
     let setupGrade = scored.grade;
