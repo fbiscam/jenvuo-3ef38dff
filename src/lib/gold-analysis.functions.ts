@@ -2324,6 +2324,20 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
       });
     }
 
+    // Confluence pocket (OB + FVG overlap) — mark as premium institutional zone
+    if (confluence?.confluent && built.direction !== "WAIT") {
+      const nowS = Math.floor(Date.now() / 1000);
+      addMark({
+        type: "orderBlock", tf: "ltf",
+        fromTime: nowS - 3600, toTime: nowS,
+        priceLow: +confluence.priceLow.toFixed(dec),
+        priceHigh: +confluence.priceHigh.toFixed(dec),
+        kind: (built.direction === "BUY" ? "demand" : "supply") as any,
+        label: `⭐ Confluence Zone (OB + FVG)`,
+      } as Marking);
+    }
+
+
 
 
     // ============ GUIDED NARRATION ============
