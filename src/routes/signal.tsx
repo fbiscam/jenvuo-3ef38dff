@@ -2191,7 +2191,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
       <div className="p-4 space-y-4">
         {/* Header row: label + score */}
         <div className="flex items-center justify-between">
-          <span className={`text-[11px] ${MONO} tracking-widest uppercase text-zinc-900`}>
+          <span className={`text-[12px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal text-zinc-900`}>
             A+ Setup Score
           </span>
           <span className={`text-base font-bold tabular-nums ${MONO} text-zinc-900`}>
