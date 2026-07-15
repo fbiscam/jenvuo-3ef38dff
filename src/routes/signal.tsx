@@ -1796,7 +1796,7 @@ function ChartSkeleton() {
 
 function LegendDot({ color, label }: { color: string; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1">
+    <span className="inline-flex items-center gap-1 text-[12px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal normal-case">
       <span className={cn("h-1.5 w-1.5 rounded-full", color)} />
       {label}
     </span>
