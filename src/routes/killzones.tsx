@@ -418,7 +418,7 @@ function KillzonesPage() {
 
                         <div className="mt-3 space-y-1.5">
                           {profile.killzones.map(kz => {
-                            const active = inZone(kz, now.getUTCHours());
+                            const active = now ? inZone(kz, now.getUTCHours()) : false;
                             return (
                               <div
                                 key={kz.name}
