@@ -350,8 +350,10 @@ function KillzonesPage() {
 
                 <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2">
                   {items.map(({ profile, meta }) => {
-                    const st = statusFor(profile, now);
-                    const marketOpen = isMarketOpen(now);
+                    const nowRef = now ?? new Date(0);
+                    const st = statusFor(profile, nowRef);
+                    const marketOpen = now ? isMarketOpen(nowRef) : false;
+
                     const locked = isFreePlan && profile.key !== "XAUUSD";
                     return (
                       <button
