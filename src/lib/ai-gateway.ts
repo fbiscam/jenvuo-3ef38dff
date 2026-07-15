@@ -361,6 +361,7 @@ export const MODEL_CHAIN = {
   intent: ["bmind/gpt-5.2-chat"],
   narration: ["bmind/gpt-5.2-chat"],
   seniorReview: [
+    "bmind/gpt-5.6-sol",
     "bmind/claude-sonnet-4.5",
     "bmind/deepseek-v4-pro",
     "bmind/grok-4.5",
@@ -399,6 +400,7 @@ export const MACRO_CONTEXT_CHAIN = [
 
 // Ordered fallback chain for the senior-review runner (best → most reliable).
 export const SENIOR_REVIEW_CHAIN = [
+  "bmind/gpt-5.6-sol",
   "bmind/claude-sonnet-4.5",
   "bmind/deepseek-v4-pro",
   "bmind/grok-4.5",
