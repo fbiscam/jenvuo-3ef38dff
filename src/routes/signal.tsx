@@ -1705,17 +1705,17 @@ function SignalPage() {
           <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-white flex justify-center sm:justify-between items-center gap-3">
             <div className="flex gap-4 sm:gap-6 items-center">
               <div className="flex items-center gap-1.5">
-                <span className={`text-[11px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900`}>STATE</span>
-                <span className={`text-[11px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal tabular-nums text-zinc-900`}>{playing ? "Narrating" : loading ? `Analyzing ${analyzeElapsed}s` : "Ready"}</span>
+                <span className={`text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900`}>STATE</span>
+                <span className={`text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal tabular-nums text-zinc-900`}>{playing ? "Narrating" : loading ? `Analyzing ${analyzeElapsed}s` : "Ready"}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className={`text-[11px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900`}>STEP</span>
-                <span className={`text-[11px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal tabular-nums text-zinc-900`}>
+                <span className={`text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900`}>STEP</span>
+                <span className={`text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal tabular-nums text-zinc-900`}>
                   {plan ? `${Math.max(0, step + 1)}/${plan.narration.length}` : "0/0"}
                 </span>
               </div>
             </div>
-            <span className={`hidden sm:inline text-[11px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900 tracking-normal truncate`}>
+            <span className={`hidden sm:inline text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900 tracking-normal truncate`}>
               Pro Version 2.04.1 · ICT/SMC Engine
             </span>
           </div>
