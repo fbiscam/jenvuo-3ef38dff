@@ -876,7 +876,7 @@ function SignalPage() {
           <div className="flex items-center gap-2 justify-end flex-nowrap overflow-x-auto min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <Link
               to="/killzones"
-              className="hidden sm:inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
+              className="hidden sm:inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[12px] font-normal text-zinc-700 hover:bg-zinc-50 transition"
             >
               Killzones
             </Link>
