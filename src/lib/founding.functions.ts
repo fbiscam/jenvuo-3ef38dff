@@ -643,11 +643,47 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
       patch.documents_rejected_reason = data.rejected_reason ?? null;
     }
     if (data.note !== undefined) patch.documents_note = data.note;
+
+    // Look up prior status + applicant info for email decisioning
+    const { data: priorRow } = await context.supabase
+      .from("founding_applications" as any)
+      .select("email, full_name, requested_plan, document_status")
+      .eq("id", data.id)
+      .maybeSingle();
+    const prior = priorRow as any;
+
     const { error } = await context.supabase
       .from("founding_applications" as any)
       .update(patch)
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+
+    // Fire applicant email only on real transitions to verified/rejected
+    if (prior?.email && prior.document_status !== data.document_status) {
+      const kind: ApplicantEmailKind | null =
+        data.document_status === "verified"
+          ? "documents_approved"
+          : data.document_status === "rejected"
+            ? "documents_rejected"
+            : null;
+      if (kind) {
+        const url = process.env.SUPABASE_URL;
+        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (url && service) {
+          const admin = createClient<Database>(url, service, {
+            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+          });
+          await enqueueApplicantEmail(
+            admin,
+            kind,
+            String(prior.email),
+            String(prior.full_name || "there"),
+            String(prior.requested_plan || "elite"),
+            `${data.id}-${kind}-${now.slice(0, 10)}`,
+          );
+        }
+      }
+    }
     return { ok: true };
   });
 
