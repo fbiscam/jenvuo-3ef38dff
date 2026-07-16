@@ -44,17 +44,6 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
 });
 
-/* ---------- ticker (matches homepage) ---------- */
-type TickerRow = [string, string, string];
-const INITIAL_TICKER: TickerRow[] = [
-  ["XAU/USD", "2,418.30", "+0.42%"],
-  ["XAU/EUR", "2,232.15", "+0.31%"],
-  ["XAU/GBP", "1,907.44", "+0.28%"],
-  ["XAU/JPY", "381,204", "+0.55%"],
-  ["XAU/AUD", "3,672.90", "+0.48%"],
-  ["XAU/CHF", "2,178.60", "+0.19%"],
-  ["DXY", "104.21", "-0.12%"],
-];
 
 const TIERS = [
   {
