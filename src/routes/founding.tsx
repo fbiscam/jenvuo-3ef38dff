@@ -180,8 +180,7 @@ function FoundingPage() {
               <Check className="mx-auto h-8 w-8 text-emerald-600" />
               <div className="mt-3 text-base font-semibold text-emerald-900">Application received</div>
               <p className="mt-1 text-sm text-emerald-800">
-                We'll email you within 48 hours. Meanwhile,{" "}
-                <Link to="/signal" className="underline">explore the platform</Link>.
+                We'll email you within 48 hours.
               </p>
             </div>
           ) : (
