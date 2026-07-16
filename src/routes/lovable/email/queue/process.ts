@@ -35,6 +35,23 @@ function getRetryAfterSeconds(error: unknown): number {
   return 60
 }
 
+function fallbackTextFromHtml(html: unknown): string {
+  if (typeof html !== 'string') return ''
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li|h[1-6]|tr)>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '• ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 async function moveToDlq(
   supabase: SupabaseClient<any, any>,
   queue: string,
@@ -227,6 +244,10 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               failedAttempts > 0 && payload.idempotency_key
                 ? `${payload.idempotency_key}-retry-${failedAttempts}`
                 : payload.idempotency_key
+            const plainText =
+              typeof payload.text === 'string' && payload.text.trim().length > 0
+                ? payload.text
+                : fallbackTextFromHtml(payload.html)
 
             try {
               await sendLovableEmail(
@@ -237,7 +258,7 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   sender_domain: payload.sender_domain,
                   subject: payload.subject,
                   html: payload.html,
-                  text: payload.text,
+                  text: plainText,
                   purpose: payload.purpose,
                   label: payload.label,
                   idempotency_key: retryIdempotencyKey,
