@@ -179,7 +179,7 @@ function Billing() {
             
             <div className="mt-2 flex items-baseline gap-2 flex-nowrap whitespace-nowrap">
               <span className="text-3xl sm:text-4xl tabular-nums" style={{ fontWeight: 400 }}>${Number(remaining).toFixed(2)}</span>
-              <span className="text-[11px] sm:text-sm text-zinc-500">/ ${Number(credits.allowance).toFixed(2)} · {plan.toUpperCase()}</span>
+              <span className="text-[11px] sm:text-sm text-zinc-500">/ ${Number(credits.allowance).toFixed(2)} · {plan.toUpperCase()} /Free credits</span>
             </div>
             {resetsAt && (
               <p className="mt-1 text-xs text-zinc-500">Next billing date: {resetsAt.toLocaleDateString()}</p>
