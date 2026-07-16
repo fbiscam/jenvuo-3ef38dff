@@ -18,6 +18,9 @@ export const Route = createFileRoute("/ops-x9k2-7m4n")({
   component: OpsLogin,
 });
 
+const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+
 function OpsLogin() {
   const router = useRouter();
   const unlock = useServerFn(opsUnlock);
@@ -45,154 +48,115 @@ function OpsLogin() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        background:
-          "radial-gradient(1200px 600px at 20% -10%, #eef2ff 0%, transparent 60%), radial-gradient(900px 500px at 110% 110%, #f5f3ff 0%, transparent 55%), #ffffff",
-        color: "#0a0a0a",
-        fontFamily:
-          "'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif",
-        padding: 24,
-      }}
-    >
-      <form
-        onSubmit={onSubmit}
-        style={{
-          width: "100%",
-          maxWidth: 400,
-          background: "#ffffff",
-          border: "1px solid #e5e7eb",
-          borderRadius: 20,
-          padding: 28,
-          boxShadow:
-            "0 1px 2px rgba(15,23,42,.04), 0 12px 32px -12px rgba(15,23,42,.12)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
-          <img
-            src="/favicon.png"
-            alt="Jenvu"
-            width={32}
-            height={32}
-            style={{ borderRadius: 8, objectFit: "contain" }}
-          />
-          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: "#0a0a0a" }}>Jenvu</span>
-            <span
-              style={{
-                fontSize: 10,
-                letterSpacing: ".2em",
-                textTransform: "uppercase",
-                color: "#64748b",
-                marginTop: 2,
-              }}
-            >
-              Ops Console
+    <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+      <main className="mx-auto flex min-h-dvh max-w-md items-center justify-center px-5 py-16 sm:px-6">
+        <form
+          onSubmit={onSubmit}
+          className="w-full rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.08)]"
+        >
+          {/* Header row: dots + brand + status */}
+          <div className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />
+            <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />
+            <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />
+            <span className={`ml-3 ${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
+              ops · restricted
+            </span>
+            <span className={`ml-auto ${MONO} text-[10px] uppercase tracking-[0.22em] text-emerald-600 flex items-center gap-1.5`}>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              live
             </span>
           </div>
-          <span
-            style={{
-              marginLeft: "auto",
-              fontSize: 10,
-              letterSpacing: ".14em",
-              textTransform: "uppercase",
-              color: "#64748b",
-              background: "#f1f5f9",
-              border: "1px solid #e2e8f0",
-              padding: "4px 8px",
-              borderRadius: 999,
-            }}
-          >
-            Restricted
-          </span>
-        </div>
 
-        <h1 style={{ fontSize: 22, margin: "6px 0 4px", fontWeight: 600, letterSpacing: "-0.01em" }}>
-          Sign in to continue
-        </h1>
-        <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 20px" }}>
-          Internal tools for the Jenvu operations team.
-        </p>
-
-        <label style={labelStyle}>ID</label>
-        <input
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          autoComplete="username"
-          spellCheck={false}
-          style={inputStyle}
-        />
-
-        <label style={{ ...labelStyle, marginTop: 14 }}>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          style={inputStyle}
-        />
-
-        {err && (
-          <div
-            style={{
-              color: "#b91c1c",
-              background: "#fef2f2",
-              border: "1px solid #fecaca",
-              fontSize: 13,
-              marginTop: 14,
-              padding: "8px 12px",
-              borderRadius: 10,
-            }}
-          >
-            {err}
+          {/* Brand */}
+          <div className="mt-6 flex items-center gap-2.5">
+            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
+            <span
+              className="text-[22px] tracking-tight leading-none"
+              style={{
+                color: "#3c4043",
+                fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif",
+                fontWeight: 500,
+              }}
+            >
+              Jenvu
+            </span>
           </div>
-        )}
 
-        <button type="submit" disabled={loading} style={btnStyle}>
-          {loading ? "Verifying…" : "Enter console"}
-        </button>
-        <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 16, textAlign: "center" }}>
-          Authorized personnel only · All access is logged
-        </p>
-      </form>
+          <h1 className="mt-6 text-2xl font-semibold tracking-tight text-zinc-900">
+            Sign in to continue
+          </h1>
+          <p className="mt-2 text-sm text-zinc-600">
+            Internal tools for the Jenvu operations team.
+          </p>
+
+          <div className="mt-6 space-y-5">
+            <div>
+              <label htmlFor="ops-id" className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
+                ID
+              </label>
+              <div className="mt-1.5">
+                <input
+                  id="ops-id"
+                  value={id}
+                  onChange={(e) => setId(e.target.value)}
+                  autoComplete="username"
+                  spellCheck={false}
+                  className={inputCls}
+                  placeholder="operator id"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="ops-pw" className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
+                Password
+              </label>
+              <div className="mt-1.5">
+                <input
+                  id="ops-pw"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  className={inputCls}
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
+            {err && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {err}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loading ? "Verifying…" : "Enter console"}
+              {!loading && (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              )}
+            </button>
+          </div>
+
+          <p className={`${MONO} mt-6 text-center text-[10px] uppercase tracking-[0.22em] text-zinc-400`}>
+            Authorized personnel only · all access is logged
+          </p>
+        </form>
+      </main>
     </div>
   );
 }
 
-const labelStyle: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 500,
-  color: "#334155",
-  display: "block",
-};
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  marginTop: 6,
-  padding: "11px 13px",
-  background: "#ffffff",
-  color: "#0a0a0a",
-  border: "1px solid #e2e8f0",
-  borderRadius: 10,
-  fontSize: 14,
-  outline: "none",
-  boxSizing: "border-box",
-  transition: "border-color .15s ease, box-shadow .15s ease",
-};
-
-const btnStyle: React.CSSProperties = {
-  marginTop: 20,
-  width: "100%",
-  padding: "12px 14px",
-  background: "#0a0a0a",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: 10,
-  fontWeight: 600,
-  fontSize: 14,
-  cursor: "pointer",
-  letterSpacing: "0.01em",
-};
+const inputCls = [
+  "w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400",
+  "outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10",
+  "border-zinc-200",
+].join(" ");
