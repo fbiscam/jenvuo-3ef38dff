@@ -119,7 +119,7 @@ const meterHint = {
 const ghostBtn = {
   display: 'inline-block',
   color: COLORS.ink,
-  fontFamily: 'Urbanist, Arial, sans-serif',
+  fontFamily: "'Google Sans','Google Sans Normal',Arial,sans-serif",
   fontSize: '14px',
   fontWeight: 600 as const,
   borderRadius: '10px',

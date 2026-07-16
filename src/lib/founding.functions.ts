@@ -94,7 +94,9 @@ type ApplicantEmailKind = "received" | "approved" | "rejected" | "waitlisted" | 
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string) {
   const meta = PLAN_META[plan] || PLAN_META.elite;
-  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }) => `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#18181b;padding:24px 12px">
+  const FONT = "'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif";
+  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }) => `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:${FONT};color:#18181b;padding:24px 12px">
+
     <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:20px;overflow:hidden">
       <div style="padding:28px 32px 8px">
         <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#71717a">${escapeHtml(tag)}</div>
@@ -295,7 +297,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
           w: escapeHtml(data.why_joining).replace(/\n/g, "<br/>"),
           m: escapeHtml(data.myfxbook_url || "—"),
         };
-        const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;background:#fff;color:#111;padding:24px">
+        const html = `<!doctype html><html><body style="font-family:'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#fff;color:#111;padding:24px">
           <div style="max-width:600px;margin:0 auto;border:1px solid #e5e7eb;border-radius:12px;padding:24px">
             <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6b7280">New founding application</div>
             <h1 style="font-size:20px;margin:8px 0 16px">${safe.n}</h1>
@@ -441,29 +443,34 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     // Referral reward ($5 each) is now awarded when the referred user upgrades
     // to a paid plan after their trial — handled in public.set_user_plan.
 
+    // Only send emails for actions that were actually fulfilled in this update.
+    // - approved: only when status transitions to "approved"
+    // - funded:   only when status transitions to "active" (account funded/paying)
+    //             OR admin marks first_profit_reached=true
+    // - rejected / waitlisted: on their respective status transitions
+    const kinds: ApplicantEmailKind[] = [];
     if (p?.email && data.status && data.status !== p.status) {
-      const kindMap: Record<string, ApplicantEmailKind[]> = {
-        approved: ["approved", "funded"],
-        active: ["funded"],
-        rejected: ["rejected"],
-        waitlisted: ["waitlisted"],
-        pending: [],
-        graduated: [],
-      };
-      const kinds = kindMap[data.status] ?? [];
-      if (kinds.length > 0) {
-        const url = process.env.SUPABASE_URL;
-        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-        if (url && service) {
-          const admin = createClient<Database>(url, service, {
-            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-          });
-          for (const kind of kinds) {
-            await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`);
-          }
+      if (data.status === "approved") kinds.push("approved");
+      else if (data.status === "active") kinds.push("funded");
+      else if (data.status === "rejected") kinds.push("rejected");
+      else if (data.status === "waitlisted") kinds.push("waitlisted");
+    }
+    if (p?.email && data.first_profit_reached && !kinds.includes("funded")) {
+      kinds.push("funded");
+    }
+    if (kinds.length > 0) {
+      const url = process.env.SUPABASE_URL;
+      const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (url && service) {
+        const admin = createClient<Database>(url, service, {
+          auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+        });
+        for (const kind of kinds) {
+          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`);
         }
       }
     }
+
 
     return { ok: true };
   });

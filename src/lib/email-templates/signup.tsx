@@ -109,7 +109,7 @@ const stepsHeading = {
   margin: '4px 0 10px',
 }
 const step = {
-  fontFamily: 'Urbanist, Arial, sans-serif',
+  fontFamily: "'Google Sans','Google Sans Normal',Arial,sans-serif",
   fontSize: '14px',
   color: '#3f3f46',
   lineHeight: '1.6',
