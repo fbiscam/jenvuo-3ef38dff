@@ -87,69 +87,153 @@ function FoundingPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-4xl px-5 pt-14 pb-10 text-center">
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-zinc-600">
-          <Sparkles className="h-3 w-3" /> Limited · 100 seats / month
-        </div>
-        <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Founding Trader Program
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-zinc-600">
-          We built Jenvu to help traders become consistently profitable — not to sell hope by the month.
-          Get <span className="font-semibold text-zinc-900">Elite plan free for 30 days</span>. Pay only
-          after you make your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>.
-          If you don't profit, you don't pay. Simple.
-        </p>
+      {/* HERO */}
+      <section className="relative overflow-hidden border-b border-zinc-100">
+        {/* subtle grid backdrop */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+            maskImage: "radial-gradient(ellipse at top, black 30%, transparent 75%)",
+            WebkitMaskImage: "radial-gradient(ellipse at top, black 30%, transparent 75%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[720px] -translate-x-1/2 rounded-full blur-3xl"
+          style={{ background: "radial-gradient(closest-side, rgba(24,24,27,0.10), transparent)" }}
+        />
 
-        <div className="mx-auto mt-8 max-w-md rounded-2xl border border-zinc-200 bg-white p-5">
-          <div className="flex items-center justify-between text-xs text-zinc-500">
-            <span>Seats claimed this month</span>
-            <span className="font-medium text-zinc-900">{seats.filled} / {seats.total}</span>
+        <div className="relative mx-auto max-w-4xl px-5 pt-16 pb-14 text-center sm:pt-20">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-600 shadow-sm">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            </span>
+            Cohort open · {remaining} of {seats.total} seats left
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100">
-            <div className="h-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
+
+          <h1 className="mt-6 text-[40px] font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+            Trade with us.
+            <br />
+            <span className="bg-gradient-to-b from-zinc-900 to-zinc-500 bg-clip-text text-transparent">
+              Pay only when it works.
+            </span>
+          </h1>
+
+          <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-zinc-600 sm:text-base">
+            The Founding Trader Program hand-picks <span className="font-semibold text-zinc-900">100 traders each month</span> and
+            gives them <span className="font-semibold text-zinc-900">Elite access free for 30 days</span>. Billing only
+            starts after your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>. Don't profit — don't pay.
+          </p>
+
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a
+              href="#apply"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 hover:shadow-md"
+            >
+              Apply for a seat <ArrowRight className="h-4 w-4" />
+            </a>
+            <Link
+              to="/signal"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 py-3 text-sm font-semibold text-zinc-900 transition-colors hover:border-zinc-400"
+            >
+              See the platform
+            </Link>
           </div>
-          <div className="mt-2 text-[11px] text-zinc-500">{remaining} spots remaining</div>
+
+          {/* Seat meter */}
+          <div className="mx-auto mt-10 max-w-md rounded-2xl border border-zinc-200 bg-white/70 p-5 shadow-sm backdrop-blur">
+            <div className="flex items-center justify-between text-[11px] uppercase tracking-wider text-zinc-500">
+              <span>Seats claimed · this month</span>
+              <span className="font-semibold text-zinc-900">{seats.filled} / {seats.total}</span>
+            </div>
+            <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-zinc-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-zinc-900 to-zinc-600 transition-all"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <div className="mt-2 flex items-center justify-between text-[11px] text-zinc-500">
+              <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> Resets on the 1st</span>
+              <span>{remaining} spots left</span>
+            </div>
+          </div>
+
+          {/* Trust stats */}
+          <div className="mx-auto mt-10 grid max-w-3xl grid-cols-3 gap-3 sm:gap-6">
+            {[
+              { k: "$0", v: "Upfront to join" },
+              { k: "30 days", v: "Elite plan free" },
+              { k: "$100", v: "Profit before billing" },
+            ].map((s) => (
+              <div key={s.v} className="rounded-2xl border border-zinc-200 bg-white p-4 text-left">
+                <div className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">{s.k}</div>
+                <div className="mt-0.5 text-[11px] uppercase tracking-wider text-zinc-500">{s.v}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-5 pb-14">
+      {/* WHY */}
+      <section className="mx-auto max-w-5xl px-5 py-16">
+        <div className="mb-8 max-w-2xl">
+          <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-500">Why we built this</div>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">A program that only wins when you do.</h2>
+        </div>
         <div className="grid gap-3 sm:grid-cols-3">
           {[
             { icon: Users, title: "Curated cohort", body: "Only 100 traders each month. Serious applicants, real capital, no tire-kickers." },
             { icon: DollarSign, title: "Pay after profit", body: "First month Elite is free. Billing activates only after $100 verified profit." },
             { icon: Shield, title: "Aligned incentives", body: "We win when you win. Our job is to make you stable, not to milk subscriptions." },
+            { icon: Target, title: "Institutional edge", body: "ICT / SMC engine, blended AI confidence, killzone-aware alerts across XAU pairs." },
+            { icon: Zap, title: "Realtime alerts", body: "The moment a valid setup fires — email, in-app and voice brief. No lag, no noise." },
+            { icon: Lock, title: "Invite-only access", body: "This program is closed by design. It keeps the cohort small and the quality high." },
           ].map((b) => (
-            <div key={b.title} className="rounded-2xl border border-zinc-200 bg-white p-5">
-              <b.icon className="h-5 w-5 text-zinc-700" />
-              <div className="mt-3 text-sm font-semibold">{b.title}</div>
+            <div key={b.title} className="group rounded-2xl border border-zinc-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-sm">
+              <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 text-white">
+                <b.icon className="h-4.5 w-4.5" />
+              </div>
+              <div className="mt-4 text-sm font-semibold">{b.title}</div>
               <div className="mt-1.5 text-[13px] leading-relaxed text-zinc-600">{b.body}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-5 pb-14">
-        <div className="rounded-3xl border border-zinc-200 bg-white p-7">
-          <h2 className="text-xl font-semibold">How it works</h2>
-          <ol className="mt-5 space-y-4 text-[14px]">
+      {/* HOW */}
+      <section className="mx-auto max-w-4xl px-5 pb-16">
+        <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-b from-zinc-50 to-white p-8 sm:p-10">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-zinc-500" />
+            <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-500">Four steps</div>
+          </div>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight">How it works</h2>
+          <ol className="mt-8 grid gap-5 sm:grid-cols-2">
             {[
-              ["Apply", "Fill the short form below. We review every application manually."],
-              ["Get approved", "If accepted, we activate your Elite plan free for 30 days — full access to signals, alerts, killzones and voice analysis."],
-              ["Trade & prove it", "Connect your broker (MyFxBook or statement upload). You have 90 days to reach $100 in verified profit."],
-              ["Start paying — only if you profit", "Once you cross $100 profit, your monthly plan activates. Cancel anytime. If you don't profit within 90 days, you walk away — no charge."],
+              ["Apply", "Fill the short form below. We review every application manually within 48 hours."],
+              ["Get approved", "If accepted, we activate your Elite plan free for 30 days — full signals, alerts, killzones, voice."],
+              ["Trade & prove it", "Connect your broker (MyFxBook or statement). You have 90 days to reach $100 verified profit."],
+              ["Pay only if you profit", "Cross $100 profit — your plan activates. Cancel anytime. No profit in 90 days? You walk. No charge."],
             ].map(([t, d], i) => (
-              <li key={t} className="flex gap-4">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-xs font-semibold text-white">{i + 1}</div>
+              <li key={t} className="relative flex gap-4 rounded-2xl border border-zinc-200 bg-white p-5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-sm font-semibold text-white">
+                  {String(i + 1).padStart(2, "0")}
+                </div>
                 <div>
-                  <div className="font-semibold text-zinc-900">{t}</div>
-                  <div className="mt-0.5 text-[13px] text-zinc-600">{d}</div>
+                  <div className="text-[15px] font-semibold text-zinc-900">{t}</div>
+                  <div className="mt-1 text-[13px] leading-relaxed text-zinc-600">{d}</div>
                 </div>
               </li>
             ))}
           </ol>
         </div>
       </section>
+
 
       <section id="apply" className="mx-auto max-w-2xl px-5 pb-24">
         <div className="rounded-3xl border border-zinc-200 bg-white p-7">
