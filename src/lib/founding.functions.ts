@@ -296,6 +296,14 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+
+    // Fetch prior row so we only email on real status transitions
+    const { data: prior } = await context.supabase
+      .from("founding_applications" as any)
+      .select("email, full_name, status, requested_plan")
+      .eq("id", data.id)
+      .maybeSingle();
+
     const patch: Record<string, any> = { updated_at: new Date().toISOString() };
     if (data.status) {
       patch.status = data.status;
@@ -308,6 +316,31 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
       .update(patch)
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+
+    // Notify applicant on real status transitions
+    const p = prior as any;
+    if (p?.email && data.status && data.status !== p.status) {
+      const kindMap: Record<string, ApplicantEmailKind | null> = {
+        approved: "approved",
+        active: "approved",
+        rejected: "rejected",
+        waitlisted: "waitlisted",
+        pending: null,
+        graduated: null,
+      };
+      const kind = kindMap[data.status];
+      if (kind) {
+        const url = process.env.SUPABASE_URL;
+        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (url && service) {
+          const admin = createClient<Database>(url, service, {
+            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+          });
+          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"));
+        }
+      }
+    }
+
     return { ok: true };
   });
 
