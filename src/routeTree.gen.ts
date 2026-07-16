@@ -21,6 +21,7 @@ import { Route as LlmRouteImport } from './routes/llm'
 import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as JenvuOpsX9k2RouteImport } from './routes/jenvu-ops-x9k2'
 import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as FoundingRouteImport } from './routes/founding'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as DevelopmentRouteImport } from './routes/development'
@@ -133,6 +134,11 @@ const JenvuOpsX9k2Route = JenvuOpsX9k2RouteImport.update({
 const InsightsRoute = InsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoundingRoute = FoundingRouteImport.update({
+  id: '/founding',
+  path: '/founding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DownloadRoute = DownloadRouteImport.update({
@@ -435,6 +441,7 @@ export interface FileRoutesByFullPath {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
+  '/founding': typeof FoundingRoute
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
@@ -501,6 +508,7 @@ export interface FileRoutesByTo {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
+  '/founding': typeof FoundingRoute
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
@@ -566,6 +574,7 @@ export interface FileRoutesById {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
+  '/founding': typeof FoundingRoute
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
@@ -634,6 +643,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
+    | '/founding'
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/killzones'
@@ -700,6 +710,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
+    | '/founding'
     | '/killzones'
     | '/llm'
     | '/pricing'
@@ -764,6 +775,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
+    | '/founding'
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/killzones'
@@ -832,6 +844,7 @@ export interface RootRouteChildren {
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
   DownloadRoute: typeof DownloadRoute
+  FoundingRoute: typeof FoundingRoute
   InsightsRoute: typeof InsightsRouteWithChildren
   JenvuOpsX9k2Route: typeof JenvuOpsX9k2RouteWithChildren
   KillzonesRoute: typeof KillzonesRoute
@@ -949,6 +962,13 @@ declare module '@tanstack/react-router' {
       path: '/insights'
       fullPath: '/insights'
       preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/founding': {
+      id: '/founding'
+      path: '/founding'
+      fullPath: '/founding'
+      preLoaderRoute: typeof FoundingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/download': {
@@ -1427,6 +1447,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
   DownloadRoute: DownloadRoute,
+  FoundingRoute: FoundingRoute,
   InsightsRoute: InsightsRouteWithChildren,
   JenvuOpsX9k2Route: JenvuOpsX9k2RouteWithChildren,
   KillzonesRoute: KillzonesRoute,
