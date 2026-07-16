@@ -2465,8 +2465,6 @@ Run the full 25-year desk-head review internally through the elite lens above, t
           __seniorReviewStatus = "completed";
           if (verdict === "VETO") {
             __seniorReviewStatus = "vetoed";
-            setupGrade = "C";
-            setupScore = Math.min(setupScore, 50);
             setupChecks.unshift({
               key: "senior_veto",
               label: `⛔ Senior trader veto (${modelShort})`,
@@ -2475,8 +2473,6 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             });
           } else if (verdict === "DOWNGRADE") {
             __seniorReviewStatus = "downgraded";
-            setupGrade = setupGrade === "A+" ? "A" : "B";
-            setupScore = Math.max(60, setupScore - 15);
             setupChecks.unshift({
               key: "senior_downgrade",
               label: `⚠ Senior review downgrade (${modelShort})`,
@@ -2485,10 +2481,6 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             });
           } else if (verdict === "CONFIRM") {
             __seniorReviewStatus = "confirmed";
-            // Confidence boost: institutional AI confirm → +8 score, upgrade grade
-            setupScore = Math.min(95, setupScore + 8);
-            if (setupGrade === "B") setupGrade = "A";
-            else if (setupGrade === "A") setupGrade = "A+";
             setupChecks.unshift({
               key: "senior_confirm",
               label: `✓ Senior trader confirms (${modelShort})`,
@@ -3019,7 +3011,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           model,
           modelLabel: label,
           included: __seniorReviewStatus === "completed" || __seniorReviewStatus === "confirmed" || __seniorReviewStatus === "downgraded" || __seniorReviewStatus === "vetoed",
-          confidenceAdjusted: __seniorReviewStatus === "downgraded" || __seniorReviewStatus === "vetoed",
+          confidenceAdjusted: false,
         };
       })(),
       macroContext: __macroContext,
