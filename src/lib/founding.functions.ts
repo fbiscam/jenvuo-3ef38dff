@@ -297,7 +297,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
           w: escapeHtml(data.why_joining).replace(/\n/g, "<br/>"),
           m: escapeHtml(data.myfxbook_url || "—"),
         };
-        const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;background:#fff;color:#111;padding:24px">
+        const html = `<!doctype html><html><body style="font-family:'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#fff;color:#111;padding:24px">
           <div style="max-width:600px;margin:0 auto;border:1px solid #e5e7eb;border-radius:12px;padding:24px">
             <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6b7280">New founding application</div>
             <h1 style="font-size:20px;margin:8px 0 16px">${safe.n}</h1>
