@@ -90,7 +90,15 @@ const PLAN_META: Record<string, { label: string; wallet: string; blurb: string }
   ultra: { label: "Ultra", wallet: "$100 wallet credit", blurb: "Top-tier access. Every model, every pair, no throttling." },
 };
 
-type ApplicantEmailKind = "received" | "approved" | "rejected" | "waitlisted" | "funded";
+type ApplicantEmailKind =
+  | "received"
+  | "approved"
+  | "rejected"
+  | "waitlisted"
+  | "funded"
+  | "documents_received"
+  | "documents_approved"
+  | "documents_rejected";
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string) {
   const meta = PLAN_META[plan] || PLAN_META.elite;
@@ -184,11 +192,49 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           { label: "Explore the platform", href: `${APP_URL}/signal` },
         ),
       };
+    case "documents_received":
+      return {
+        subject: "We received your documents",
+        html: wrap(
+          `Thanks, ${n} — documents received`,
+          "Documents · Under Review",
+          `<p style="margin:0 0 12px">We received your earning-proof documents and they're now in the review queue.</p>
+           <p style="margin:0 0 12px">Reviews usually complete within <strong>24–48 hours</strong>. You'll get another email as soon as they're approved or if we need something updated.</p>
+           <p style="margin:0">No action needed from your side right now.</p>`,
+          { label: "View submission", href: `${APP_URL}/dashboard/documents` },
+        ),
+      };
+    case "documents_approved":
+      return {
+        subject: "Your documents are verified ✅",
+        html: wrap(
+          `You're verified, ${n}`,
+          "Documents · Approved",
+          `<p style="margin:0 0 12px">Your earning-proof documents have been reviewed and <strong>approved</strong>. Your Founding Trader account is fully verified.</p>
+           <p style="margin:0 0 12px">Billing continues on your <strong>${escapeHtml(meta.label)}</strong> plan as expected. Nothing else is required from your side.</p>
+           <p style="margin:0">Thanks for keeping the program transparent.</p>`,
+          { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
+        ),
+      };
+    case "documents_rejected":
+      return {
+        subject: "Documents need an update",
+        html: wrap(
+          `Documents need an update, ${n}`,
+          "Documents · Action Required",
+          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. Please re-upload updated documents at your earliest convenience.</p>
+           <p style="margin:0 0 12px">If the admin left a reason, you'll see it on your Documents page. Common asks: a clearer screenshot, a fuller statement, or a screen-recording that shows the account name.</p>
+           <p style="margin:0">Reply to this email if you need help.</p>`,
+          { label: "Re-upload documents", href: `${APP_URL}/dashboard/documents` },
+        ),
+      };
   }
 }
 
 async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string, dedupeKey?: string) {
-  const { subject, html } = renderApplicantEmail(kind, name, plan);
+  const rendered = renderApplicantEmail(kind, name, plan);
+  if (!rendered) return;
+  const { subject, html } = rendered;
   const text = htmlToText(html);
   const messageId = crypto.randomUUID();
   const idempotencyKey = dedupeKey ? `founding-${kind}-${dedupeKey}` : `founding-${kind}-${messageId}`;
@@ -597,11 +643,47 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
       patch.documents_rejected_reason = data.rejected_reason ?? null;
     }
     if (data.note !== undefined) patch.documents_note = data.note;
+
+    // Look up prior status + applicant info for email decisioning
+    const { data: priorRow } = await context.supabase
+      .from("founding_applications" as any)
+      .select("email, full_name, requested_plan, document_status")
+      .eq("id", data.id)
+      .maybeSingle();
+    const prior = priorRow as any;
+
     const { error } = await context.supabase
       .from("founding_applications" as any)
       .update(patch)
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+
+    // Fire applicant email only on real transitions to verified/rejected
+    if (prior?.email && prior.document_status !== data.document_status) {
+      const kind: ApplicantEmailKind | null =
+        data.document_status === "verified"
+          ? "documents_approved"
+          : data.document_status === "rejected"
+            ? "documents_rejected"
+            : null;
+      if (kind) {
+        const url = process.env.SUPABASE_URL;
+        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (url && service) {
+          const admin = createClient<Database>(url, service, {
+            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+          });
+          await enqueueApplicantEmail(
+            admin,
+            kind,
+            String(prior.email),
+            String(prior.full_name || "there"),
+            String(prior.requested_plan || "elite"),
+            `${data.id}-${kind}-${now.slice(0, 10)}`,
+          );
+        }
+      }
+    }
     return { ok: true };
   });
 
@@ -694,6 +776,17 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
           updated_at: new Date().toISOString(),
         })
         .eq("id", app.id);
+      // Notify applicant that documents landed (idempotent per application submission window)
+      if (app.email) {
+        await enqueueApplicantEmail(
+          admin,
+          "documents_received",
+          String(app.email),
+          String(app.full_name || "there"),
+          String(app.requested_plan || "elite"),
+          `${app.id}-docs-received-${new Date().toISOString().slice(0, 10)}`,
+        );
+      }
     }
     return { ok: true };
   });
