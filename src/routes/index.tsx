@@ -61,14 +61,15 @@ const SIGNALS = [
 
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
-  ["XAU/USD", "2,418.30", "+0.42%"],
-  ["XAU/EUR", "2,241.05", "+0.31%"],
-  ["XAU/GBP", "1,908.72", "+0.18%"],
-  ["XAU/JPY", "376,410", "+0.55%"],
-  ["XAU/AUD", "3,684.10", "+0.72%"],
-  ["XAU/CHF", "2,132.94", "+0.24%"],
-  ["DXY", "104.21", "-0.12%"],
+  ["XAU/USD", "—", "…"],
+  ["XAU/EUR", "—", "…"],
+  ["XAU/GBP", "—", "…"],
+  ["XAU/JPY", "—", "…"],
+  ["XAU/AUD", "—", "…"],
+  ["XAU/CHF", "—", "…"],
+  ["DXY", "—", "…"],
 ];
+
 
 // Server-fn symbol map — routes through getMarketSnapshot to bypass browser
 // CORS restrictions on Yahoo Finance and return authoritative live prices.
