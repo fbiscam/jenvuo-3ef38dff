@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// Cron endpoint. Generates a ~150-word killzone brief (text-only) via
-// Bluesminds and inserts a row. TTS audio is disabled — Lovable no longer used.
-// Auth: shared `x-cron-secret` header matching CRON_SECRET (same pattern as
-// generate-insight / notify-subscribers).
+// Cron endpoint. Generates a ~150-word killzone brief via Bluesminds/Lovable AI
+// and synthesizes MP3 audio via Lovable AI TTS (openai/gpt-4o-mini-tts).
+// Auth: shared `x-cron-secret` header matching CRON_SECRET.
 
 type KillzoneSession = "london" | "new_york" | "asia";
 
@@ -156,9 +155,45 @@ Return STRICT JSON only, no prose, with this exact shape:
 
         const briefId = crypto.randomUUID();
 
-        // Text-only brief — no TTS. Rough read-time estimate (~150 wpm).
+        // Estimate read-time (~150 wpm) as a fallback if audio fails.
         const wordCount = script.split(/\s+/).filter(Boolean).length;
         const estimatedSeconds = Math.max(30, Math.round((wordCount / 150) * 60));
+
+        // Synthesize audio via Lovable AI TTS.
+        let audioPath: string | null = null;
+        let audioDuration = estimatedSeconds;
+        try {
+          const lovableKey = process.env.LOVABLE_API_KEY;
+          if (!lovableKey) throw new Error("LOVABLE_API_KEY missing");
+          const ttsRes = await fetch("https://ai.gateway.lovable.dev/v1/audio/speech", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${lovableKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "openai/gpt-4o-mini-tts",
+              input: script,
+              voice: "onyx",
+              response_format: "mp3",
+              instructions: "Speak as a measured, senior institutional gold desk analyst. Confident, precise, unhurried. No hype.",
+            }),
+          });
+          if (!ttsRes.ok) {
+            const errBody = await ttsRes.text().catch(() => "");
+            throw new Error(`TTS ${ttsRes.status}: ${errBody.slice(0, 200)}`);
+          }
+          const mp3 = new Uint8Array(await ttsRes.arrayBuffer());
+          const path = `${session}/${briefId}.mp3`;
+          const up = await supabaseAdmin.storage
+            .from("briefs")
+            .upload(path, mp3, { contentType: "audio/mpeg", upsert: true });
+          if (up.error) throw new Error(`upload: ${up.error.message}`);
+          audioPath = path;
+        } catch (err) {
+          console.error("[generate-brief] TTS failed", err);
+          // Keep going with text-only brief.
+        }
 
         const { data: inserted, error: insErr } = await supabaseAdmin
           .from("killzone_briefs")
@@ -169,8 +204,8 @@ Return STRICT JSON only, no prose, with this exact shape:
             summary,
             script,
             transcript: script,
-            audio_path: null,
-            audio_duration_seconds: estimatedSeconds,
+            audio_path: audioPath,
+            audio_duration_seconds: audioDuration,
             is_public: true,
             metadata: {
               session_label: meta.label,
@@ -191,8 +226,8 @@ Return STRICT JSON only, no prose, with this exact shape:
           ok: true,
           id: inserted.id,
           session,
-          audio_path: null,
-          duration: estimatedSeconds,
+          audio_path: audioPath,
+          duration: audioDuration,
         });
       },
     },
