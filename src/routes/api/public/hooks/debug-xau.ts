@@ -22,7 +22,7 @@ export const Route = createFileRoute("/api/public/hooks/debug-xau")({
             rr: plan.trade?.rr,
             selfCritique: plan.selfCritique,
             seniorReview: plan.seniorReview,
-            reason: plan.trade?.reason ?? plan.trade?.summary ?? null,
+            summary: plan.trade?.summary ?? null,
           });
         } catch (e) {
           return Response.json({ ok: false, error: (e as Error).message }, { status: 500 });

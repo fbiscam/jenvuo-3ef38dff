@@ -67,6 +67,7 @@ import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/publ
 import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/api/public/hooks/notify-subscribers'
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
+import { Route as ApiPublicHooksDebugXauRouteImport } from './routes/api/public/hooks/debug-xau'
 import { Route as ApiPublicHooksAutoScanRouteImport } from './routes/api/public/hooks/auto-scan'
 import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/brief-audio.$id'
 import { Route as AuthenticatedDashboardAdminSubscribersRouteImport } from './routes/_authenticated/dashboard.admin.subscribers'
@@ -381,6 +382,11 @@ const ApiPublicHooksGenerateBriefRoute =
     path: '/api/public/hooks/generate-brief',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksDebugXauRoute = ApiPublicHooksDebugXauRouteImport.update({
+  id: '/api/public/hooks/debug-xau',
+  path: '/api/public/hooks/debug-xau',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksAutoScanRoute = ApiPublicHooksAutoScanRouteImport.update({
   id: '/api/public/hooks/auto-scan',
   path: '/api/public/hooks/auto-scan',
@@ -471,6 +477,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
+  '/api/public/hooks/debug-xau': typeof ApiPublicHooksDebugXauRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
@@ -533,6 +540,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
+  '/api/public/hooks/debug-xau': typeof ApiPublicHooksDebugXauRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
@@ -600,6 +608,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
+  '/api/public/hooks/debug-xau': typeof ApiPublicHooksDebugXauRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
@@ -667,6 +676,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/subscribers'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/auto-scan'
+    | '/api/public/hooks/debug-xau'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
@@ -729,6 +739,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/subscribers'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/auto-scan'
+    | '/api/public/hooks/debug-xau'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
@@ -795,6 +806,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/subscribers'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/auto-scan'
+    | '/api/public/hooks/debug-xau'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
@@ -841,6 +853,7 @@ export interface RootRouteChildren {
   HelpCollectionIndexRoute: typeof HelpCollectionIndexRoute
   ApiPublicBriefAudioIdRoute: typeof ApiPublicBriefAudioIdRoute
   ApiPublicHooksAutoScanRoute: typeof ApiPublicHooksAutoScanRoute
+  ApiPublicHooksDebugXauRoute: typeof ApiPublicHooksDebugXauRoute
   ApiPublicHooksGenerateBriefRoute: typeof ApiPublicHooksGenerateBriefRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
   ApiPublicHooksNotifySubscribersRoute: typeof ApiPublicHooksNotifySubscribersRoute
@@ -1260,6 +1273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksGenerateBriefRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/debug-xau': {
+      id: '/api/public/hooks/debug-xau'
+      path: '/api/public/hooks/debug-xau'
+      fullPath: '/api/public/hooks/debug-xau'
+      preLoaderRoute: typeof ApiPublicHooksDebugXauRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/auto-scan': {
       id: '/api/public/hooks/auto-scan'
       path: '/api/public/hooks/auto-scan'
@@ -1428,6 +1448,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpCollectionIndexRoute: HelpCollectionIndexRoute,
   ApiPublicBriefAudioIdRoute: ApiPublicBriefAudioIdRoute,
   ApiPublicHooksAutoScanRoute: ApiPublicHooksAutoScanRoute,
+  ApiPublicHooksDebugXauRoute: ApiPublicHooksDebugXauRoute,
   ApiPublicHooksGenerateBriefRoute: ApiPublicHooksGenerateBriefRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
   ApiPublicHooksNotifySubscribersRoute: ApiPublicHooksNotifySubscribersRoute,
