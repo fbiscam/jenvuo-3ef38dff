@@ -95,19 +95,11 @@ export const Route = createFileRoute("/auth")({
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
-/* ---------- mock data for ticker ---------- */
-type TickerRow = [string, string, string];
-const INITIAL_TICKER: TickerRow[] = [
-  ["XAU/USD", "2,418.30", "+0.42%"],
-  ["XAU/EUR", "2,232.15", "+0.31%"],
-  ["XAU/GBP", "1,907.44", "+0.28%"],
-  ["XAU/JPY", "381,204", "+0.55%"],
-  ["XAU/AUD", "3,672.90", "+0.48%"],
-  ["XAU/CHF", "2,178.60", "+0.19%"],
-  ["DXY", "104.21", "-0.12%"],
-];
+/* ---------- live ticker ---------- */
+import { useLiveTicker } from "@/hooks/useLiveTicker";
 
 function AuthPage() {
+  const tickerRows = useLiveTicker();
   const navigate = useNavigate();
   const sendSignupOtp = useServerFn(requestSignupOtp);
   const verifySignupCode = useServerFn(confirmSignupOtp);
@@ -807,7 +799,7 @@ function AuthPage() {
         {/* ticker strip */}
         <div className="border-t border-zinc-100 overflow-hidden">
           <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap animate-ticker`}>
-            {[...INITIAL_TICKER, ...INITIAL_TICKER].map(([s, p, d], i) => (
+            {[...tickerRows, ...tickerRows].map(([s, p, d], i) => (
               <span key={i} className="flex items-center gap-2">
                 <span className="text-zinc-900 font-medium">{s}</span>
                 <span>{p}</span>

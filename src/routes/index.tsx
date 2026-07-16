@@ -53,7 +53,7 @@ const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]
 
 /* ---------- mock data ---------- */
 const SIGNALS = [
-  { pair: "XAUUSD", t: "14:20:02", tag: "SWEEP", note: "Liquidity grab @ 2,418.30", tone: "ink" },
+  { pair: "XAUUSD", t: "14:20:02", tag: "SWEEP", note: "Liquidity grab on London high", tone: "ink" },
   { pair: "XAUEUR", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
   { pair: "XAUGBP", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
   { pair: "XAUJPY", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
