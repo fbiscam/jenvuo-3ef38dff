@@ -476,9 +476,11 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
 
 export const foundingStats = createServerFn({ method: "GET" }).handler(async () => {
   const url = process.env.SUPABASE_URL;
-  const pub = process.env.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !pub) return { seatsFilled: 0, seatsTotal: 220 };
-  const supa = createClient<Database>(url, pub, {
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !service) return { seatsFilled: 0, seatsTotal: 220 };
+  // Use service role — RLS blocks anon reads on founding_applications.
+  // We only return an aggregate count, never PII.
+  const supa = createClient<Database>(url, service, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
   const now = new Date();
