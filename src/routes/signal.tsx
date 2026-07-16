@@ -2401,8 +2401,10 @@ function TradeTrackerCard({
         </svg>
       )}
 
-      {/* Trade Management Ladder — partial close + trailing SL plan */}
-      <TradeManagementLadder plan={plan} rMultiple={rMultiple} status={status} />
+      {/* Trade Management Ladder — only when a real trade plan is issued (confidence ≥ 59) */}
+      {(plan.trade?.confidence ?? 0) >= 59 && plan.trade?.direction !== "WAIT" && (
+        <TradeManagementLadder plan={plan} rMultiple={rMultiple} status={status} />
+      )}
 
     </motion.div>
   );
