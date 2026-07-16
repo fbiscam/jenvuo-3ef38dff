@@ -321,7 +321,23 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    // Notify applicant on real status transitions
+    // Award referral credit ($5 each) when approved/active
+    if (data.status === "approved" || data.status === "active") {
+      try {
+        const url = process.env.SUPABASE_URL;
+        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (url && service) {
+          const admin = createClient<Database>(url, service, {
+            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+          });
+          await admin.rpc("award_founding_referral" as any, { _application_id: data.id });
+        }
+      } catch (e) {
+        console.error("[founding] referral award failed:", (e as Error)?.message);
+      }
+    }
+
+
     const p = prior as any;
     if (p?.email && data.status && data.status !== p.status) {
       const kindMap: Record<string, ApplicantEmailKind | null> = {
