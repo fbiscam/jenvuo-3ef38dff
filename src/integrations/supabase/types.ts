@@ -670,6 +670,12 @@ export type Database = {
           broker: string | null
           country: string | null
           created_at: string
+          document_status: string
+          documents_note: string | null
+          documents_rejected_at: string | null
+          documents_rejected_reason: string | null
+          documents_submitted_at: string | null
+          documents_verified_at: string | null
           email: string
           experience_years: number | null
           first_profit_at: string | null
@@ -691,6 +697,12 @@ export type Database = {
           broker?: string | null
           country?: string | null
           created_at?: string
+          document_status?: string
+          documents_note?: string | null
+          documents_rejected_at?: string | null
+          documents_rejected_reason?: string | null
+          documents_submitted_at?: string | null
+          documents_verified_at?: string | null
           email: string
           experience_years?: number | null
           first_profit_at?: string | null
@@ -712,6 +724,12 @@ export type Database = {
           broker?: string | null
           country?: string | null
           created_at?: string
+          document_status?: string
+          documents_note?: string | null
+          documents_rejected_at?: string | null
+          documents_rejected_reason?: string | null
+          documents_submitted_at?: string | null
+          documents_verified_at?: string | null
           email?: string
           experience_years?: number | null
           first_profit_at?: string | null
