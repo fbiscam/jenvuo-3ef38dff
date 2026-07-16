@@ -413,10 +413,11 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
             auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
           });
           const planId = String(p.requested_plan || "elite");
-          const { data: users } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-          const matchedUser = users.users.find((u) => u.email?.toLowerCase() === String(p.email).toLowerCase());
+          const { data: userList, error: listUsersError } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+          if (listUsersError) throw listUsersError;
+          const matchedUser = userList?.users?.find((u) => u.email?.toLowerCase() === String(p.email).toLowerCase());
           if (matchedUser) {
-            await admin.rpc("set_user_plan", {
+            await admin.rpc("set_user_plan" as any, {
               _user_id: matchedUser.id,
               _plan_id: planId,
               _billing_interval: "monthly",
