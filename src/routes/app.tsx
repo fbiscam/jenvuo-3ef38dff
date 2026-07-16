@@ -37,60 +37,7 @@ function clearStoredAuthSession() {
 }
 
 /* ---------- ticker (matches homepage) ---------- */
-type TickerRow = [string, string, string];
-const INITIAL_TICKER: TickerRow[] = [
-  ["XAU/USD", "2,418.30", "+0.42%"],
-  ["XAU/EUR", "2,232.15", "+0.31%"],
-  ["XAU/GBP", "1,907.44", "+0.28%"],
-  ["XAU/JPY", "381,204", "+0.55%"],
-  ["XAU/AUD", "3,672.90", "+0.48%"],
-  ["XAU/CHF", "2,178.60", "+0.19%"],
-  ["DXY", "104.21", "-0.12%"],
-];
-
-function fmtPrice(n: number): string {
-  if (n >= 1000) return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  if (n >= 10) return n.toFixed(2);
-  return n.toFixed(4);
-}
-
-function useLiveTicker(): TickerRow[] {
-  const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
-  React.useEffect(() => {
-    let alive = true;
-    const fetchGold = async () => {
-      try {
-        const r = await fetch("https://api.gold-api.com/price/XAU");
-        if (!r.ok) return null;
-        const j = await r.json();
-        const price = Number(j.price);
-        return isFinite(price) ? price : null;
-      } catch { return null; }
-    };
-    const tick = async () => {
-      try {
-        const gold = await fetchGold();
-        if (!alive || !gold) return;
-        setRows((prev) =>
-          prev.map(([label, price, delta]) => {
-            if (label === "XAU/USD") {
-              const prevN = parseFloat(price.replace(/,/g, ""));
-              const pct = isFinite(prevN) && prevN > 0 ? ((gold - prevN) / prevN) * 100 : 0;
-              const sign = pct >= 0 ? "+" : "";
-              const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
-              return [label, fmtPrice(gold), deltaOut];
-            }
-            return [label, price, delta];
-          })
-        );
-      } catch { /* ignore */ }
-    };
-    tick();
-    const id = setInterval(tick, 10_000);
-    return () => { alive = false; clearInterval(id); };
-  }, []);
-  return rows;
-}
+import { useLiveTicker, type TickerRow } from "@/hooks/useLiveTicker";
 
 
 
