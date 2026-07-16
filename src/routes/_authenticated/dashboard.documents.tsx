@@ -57,9 +57,7 @@ function DocumentsPage() {
       <div className="mb-6">
         <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">Founding Trader</div>
         <h1 className="text-2xl font-semibold text-zinc-900 mt-1">Document verification</h1>
-        <p className="text-sm text-zinc-600 mt-2 max-w-xl">
-          Track the status of your KYC documents. Billing activates only after your documents are verified.
-        </p>
+        <p className="text-sm text-zinc-600 mt-2 whitespace-nowrap overflow-hidden text-ellipsis">Track your KYC document status — billing activates only after verification.</p>
       </div>
 
       {isLoading ? (
