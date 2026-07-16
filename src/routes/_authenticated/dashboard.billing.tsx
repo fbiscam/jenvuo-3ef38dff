@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
+import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import xaiLogo from "@/assets/xai-logo.png";
 
 
