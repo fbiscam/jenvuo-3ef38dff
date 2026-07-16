@@ -3,6 +3,7 @@ import * as React from "react";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
+import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 
 import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 import pricingVoice from "@/assets/pricing-voice.jpg";
@@ -151,6 +152,7 @@ const FAQ = [
 
 function PricingPage() {
   const currentPlan = useCurrentPlan();
+  const upgradeLock = useUpgradeLock();
   const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
   const priceOf = (t: { id: string; price: number }) =>
     billing === "annual" && t.price > 0 ? Math.round((t.price * 12 * 0.83) / 10) * 10 : t.price;
@@ -233,7 +235,12 @@ function PricingPage() {
                 ].map((p) => {
                   const isCurrent = currentPlan === p.key;
                   const isLoggedIn = currentPlan !== null;
-                  const cta = isLoggedIn ? "Upgrade" : "Apply now";
+                  const disabled = isLoggedIn && !isCurrent && upgradeLock.locked;
+                  const cta = disabled
+                    ? "Locked in trial"
+                    : isLoggedIn
+                      ? "Upgrade"
+                      : "Apply now";
                   return (
                   <th
                     key={p.name}
@@ -264,6 +271,20 @@ function PricingPage() {
                       <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
                         Active
                       </div>
+                    ) : disabled ? (
+                      <button
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        title={
+                          upgradeLock.reason === "docs_pending"
+                            ? "Upgrades unlock after your earning proof is verified and your 30-day trial ends."
+                            : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your earning proof is verified.`
+                        }
+                        className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center rounded-md border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-500"
+                      >
+                        {cta}
+                      </button>
                     ) : (
                       <Link
                         to={p.to}

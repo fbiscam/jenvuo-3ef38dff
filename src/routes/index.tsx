@@ -5,6 +5,7 @@ import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
+import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 
 import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
@@ -171,6 +172,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function HomePage() {
   const ticker = useLiveTicker();
   const currentPlan = useCurrentPlan();
+  const upgradeLock = useUpgradeLock();
   return (
     <>
     <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
@@ -637,7 +639,14 @@ function HomePage() {
                   ].map((p) => {
                     const isCurrent = currentPlan === p.key;
                     const isLoggedIn = currentPlan !== null;
-                    const cta = isCurrent ? "Active" : isLoggedIn ? "Upgrade" : "Apply now";
+                    const disabled = isLoggedIn && !isCurrent && upgradeLock.locked;
+                    const cta = isCurrent
+                      ? "Active"
+                      : disabled
+                        ? "Locked in trial"
+                        : isLoggedIn
+                          ? "Upgrade"
+                          : "Apply now";
                     return (
                     <th
                       key={p.name}
@@ -668,6 +677,20 @@ function HomePage() {
                         <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
                           Active
                         </div>
+                      ) : disabled ? (
+                        <button
+                          type="button"
+                          disabled
+                          aria-disabled="true"
+                          title={
+                            upgradeLock.reason === "docs_pending"
+                              ? "Upgrades unlock after your earning proof is verified and your 30-day trial ends."
+                              : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your earning proof is verified.`
+                          }
+                          className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center rounded-md border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-500"
+                        >
+                          {cta}
+                        </button>
                       ) : (
                         <Link
                           to="/founding"

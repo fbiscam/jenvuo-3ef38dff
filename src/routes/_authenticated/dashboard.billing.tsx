@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
+import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import xaiLogo from "@/assets/xai-logo.png";
 
 
@@ -109,6 +110,7 @@ const PLAN_KEY_BY_COL: Record<number, string> = { 0: "free", 1: "pro", 2: "elite
 
 function Billing() {
   const currentPlan = useCurrentPlan();
+  const upgradeLock = useUpgradeLock();
   const credits = useCredits();
   const [showAllActivity, setShowAllActivity] = useState(false);
 
@@ -166,9 +168,29 @@ function Billing() {
                 : "Your plan renews automatically. Manage billing via the customer portal."}
             </p>
           </div>
-          <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
-            {plan === "free" ? "Upgrade" : "Manage plan"}
-          </Link>
+          {plan !== "free" ? (
+            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+              Manage plan
+            </Link>
+          ) : upgradeLock.locked ? (
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              title={
+                upgradeLock.reason === "docs_pending"
+                  ? "Upgrades unlock after your earning proof is verified and your 30-day trial ends."
+                  : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your earning proof is verified.`
+              }
+              className="cursor-not-allowed rounded-lg border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-500"
+            >
+              Locked in trial{typeof upgradeLock.daysLeft === "number" ? ` · ${upgradeLock.daysLeft}d left` : ""}
+            </button>
+          ) : (
+            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+              Upgrade
+            </Link>
+          )}
         </div>
       </section>
 
@@ -385,6 +407,20 @@ function Billing() {
                         <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
                           Active plan
                         </div>
+                      ) : upgradeLock.locked ? (
+                        <button
+                          type="button"
+                          disabled
+                          aria-disabled="true"
+                          title={
+                            upgradeLock.reason === "docs_pending"
+                              ? "Upgrades unlock after your earning proof is verified and your 30-day trial ends."
+                              : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your earning proof is verified.`
+                          }
+                          className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center whitespace-nowrap rounded-md border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-500"
+                        >
+                          Locked in trial
+                        </button>
                       ) : (
                         <Link
                           to={p.to}
