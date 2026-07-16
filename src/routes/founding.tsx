@@ -2,7 +2,7 @@ import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, Users, DollarSign, Shield, Sparkles, ArrowRight } from "lucide-react";
+import { Check, Users, DollarSign, Shield, Sparkles, ArrowRight, TrendingUp, Lock, Zap, Target, Clock } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { submitFoundingApplication, foundingStats } from "@/lib/founding.functions";
