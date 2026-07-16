@@ -359,3 +359,106 @@ export const foundingStats = createServerFn({ method: "GET" }).handler(async () 
     .eq("seat_month", monthKey);
   return { seatsFilled: count ?? 0, seatsTotal: 100, monthKey };
 });
+
+/* ---------------- Document submission tracking ---------------- */
+
+export type DocumentStatusRow = {
+  id: string;
+  full_name: string;
+  email: string;
+  status: string;
+  requested_plan: string | null;
+  document_status: "not_submitted" | "received" | "pending" | "verified" | "rejected";
+  documents_submitted_at: string | null;
+  documents_verified_at: string | null;
+  documents_rejected_at: string | null;
+  documents_rejected_reason: string | null;
+  documents_note: string | null;
+  created_at: string;
+};
+
+export const getMyDocumentStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<DocumentStatusRow | null> => {
+    const email = (context.claims as any)?.email as string | undefined;
+    if (!email) return null;
+    const { data, error } = await context.supabase
+      .from("founding_applications" as any)
+      .select(
+        "id, full_name, email, status, requested_plan, document_status, documents_submitted_at, documents_verified_at, documents_rejected_at, documents_rejected_reason, documents_note, created_at",
+      )
+      .ilike("email", email)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return (data as unknown as DocumentStatusRow) ?? null;
+  });
+
+export const markMyDocumentsSubmitted = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ note: z.string().trim().max(1000).optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const email = (context.claims as any)?.email as string | undefined;
+    if (!email) throw new Error("No email on session");
+    const url = process.env.SUPABASE_URL;
+    const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !service) throw new Error("Server not configured");
+    const admin = createClient<Database>(url, service, {
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    });
+    const { data: row } = await admin
+      .from("founding_applications" as any)
+      .select("id, document_status")
+      .ilike("email", email)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (!row) throw new Error("No application found for this account");
+    const r = row as any;
+    if (r.document_status === "verified") return { ok: true, already: true };
+    const { error } = await admin
+      .from("founding_applications" as any)
+      .update({
+        document_status: "received",
+        documents_submitted_at: new Date().toISOString(),
+        documents_note: data.note ?? null,
+        documents_rejected_at: null,
+        documents_rejected_reason: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", r.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({
+      id: z.string().uuid(),
+      document_status: z.enum(["not_submitted", "received", "pending", "verified", "rejected"]),
+      rejected_reason: z.string().max(1000).optional(),
+      note: z.string().max(1000).optional(),
+    }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const now = new Date().toISOString();
+    const patch: Record<string, any> = {
+      document_status: data.document_status,
+      updated_at: now,
+    };
+    if (data.document_status === "verified") patch.documents_verified_at = now;
+    if (data.document_status === "rejected") {
+      patch.documents_rejected_at = now;
+      patch.documents_rejected_reason = data.rejected_reason ?? null;
+    }
+    if (data.note !== undefined) patch.documents_note = data.note;
+    const { error } = await context.supabase
+      .from("founding_applications" as any)
+      .update(patch)
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
