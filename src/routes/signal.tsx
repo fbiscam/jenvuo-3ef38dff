@@ -485,7 +485,7 @@ function SignalPage() {
       const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
       const ok = await credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
       if (!ok) { setLoading(false); return; }
-      const result = await fetchPlan({ data: { symbol: sym, scanId } });
+      const result = await fetchPlan({ data: { symbol: sym, scanId, force: true } });
       if (!result.ok) {
         setPlan(null);
         setAnalysisError(result.error);
