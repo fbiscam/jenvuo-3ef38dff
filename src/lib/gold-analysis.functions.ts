@@ -2601,8 +2601,16 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         if (gap >= 25) { rulesW = 0.45; aiW = 0.55; }
         else if (gap >= 15) { rulesW = 0.5; aiW = 0.5; }
         blended = Math.round(setupScore * rulesW + aiConf * aiW);
+        // Anti-inflation cap: when rules are weak (<55), AI can only lift confidence
+        // by a bounded amount so a C-grade rules setup can't become a B/A confidence.
+        if (setupScore < 55) {
+          blended = Math.min(blended, setupScore + 8);
+        } else if (setupScore < 65) {
+          blended = Math.min(blended, setupScore + 12);
+        }
       }
       tradeFromAi.confidence = Math.min(95, Math.max(setupScore, blended));
+
       // Sync grade with final displayed confidence so user sees consistent quality signal.
       const finalConf = tradeFromAi.confidence;
       const syncedGrade = finalConf >= 90 ? "A+" : finalConf >= 80 ? "A" : finalConf >= 65 ? "B" : "C";
