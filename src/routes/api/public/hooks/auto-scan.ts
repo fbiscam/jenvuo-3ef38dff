@@ -168,6 +168,19 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
 
             const round = (n: number) => Number(n.toFixed(dec));
 
+            // Detect current FX session from UTC hour
+            const utcH = now.getUTCHours();
+            const session =
+              utcH >= 0 && utcH < 7
+                ? "Asia"
+                : utcH >= 7 && utcH < 12
+                  ? "London"
+                  : utcH >= 12 && utcH < 16
+                    ? "London/NY Overlap"
+                    : utcH >= 16 && utcH < 21
+                      ? "New York"
+                      : "After Hours";
+
             // Insert signal_alert
             const { data: inserted, error: insErr } = await supabaseAdmin
               .from("signal_alerts")
@@ -182,7 +195,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 confidence: Math.round(conf),
                 setup_score: setupScore,
                 htf_bias: plan.htfBias ?? null,
-                session: null,
+                session,
                 killzone: plan.killzone ?? null,
                 rationale: `Auto-scan · 2-hit confirmed · ${plan.alignmentLabel ?? ""}`.slice(
                   0,
@@ -216,8 +229,9 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             );
             let notified = 0;
             if (userIds.length > 0) {
-              const title = `${grade} ${dir} · ${pair}`;
-              const body = `Entry ${round(entry)} · SL ${round(sl)} · TP ${round(tp)} · R:R ${rr.toFixed(2)} (auto-scan)`;
+              const kz = plan.killzone ? ` · ${plan.killzone}` : "";
+              const title = `${grade} ${dir} · ${pair} · ${session}${kz}`;
+              const body = `Entry ${round(entry)} · SL ${round(sl)} · TP ${round(tp)} · R:R ${rr.toFixed(2)} · ${Math.round(conf)}% conf`;
               const rows = userIds.map((uid) => ({
                 user_id: uid,
                 type: "signal_alert",
