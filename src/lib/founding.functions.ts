@@ -38,10 +38,132 @@ export type FoundingApplication = {
 const SUPPORT_INBOX = "support@jenvu.net";
 const FROM_ADDRESS = "Jenvu Founding <founding@notify.jenvu.net>";
 const SENDER_DOMAIN = "notify.jenvu.net";
+const APP_URL = "https://jenvu.com";
 
 function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
+
+const PLAN_META: Record<string, { label: string; wallet: string; blurb: string }> = {
+  free: { label: "Free", wallet: "$2 starting credit", blurb: "Try the platform on XAU/USD. Upgrade any time." },
+  pro: { label: "Pro", wallet: "$15 wallet credit", blurb: "Multi-pair scans, realtime alerts, full trade management." },
+  elite: { label: "Elite", wallet: "$50 wallet credit", blurb: "Everything in Pro plus priority AI models & higher scan budget." },
+  ultra: { label: "Ultra", wallet: "$100 wallet credit", blurb: "Top-tier access. Every model, every pair, no throttling." },
+};
+
+type ApplicantEmailKind = "received" | "approved" | "rejected" | "waitlisted";
+
+function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string) {
+  const meta = PLAN_META[plan] || PLAN_META.elite;
+  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }) => `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#18181b;padding:24px 12px">
+    <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:20px;overflow:hidden">
+      <div style="padding:28px 32px 8px">
+        <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#71717a">${escapeHtml(tag)}</div>
+        <h1 style="font-size:24px;line-height:1.2;margin:8px 0 0;color:#09090b">${escapeHtml(title)}</h1>
+      </div>
+      <div style="padding:16px 32px 8px;font-size:15px;line-height:1.6;color:#3f3f46">${body}</div>
+      ${cta ? `<div style="padding:16px 32px 28px"><a href="${cta.href}" style="display:inline-block;background:#09090b;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px">${escapeHtml(cta.label)}</a></div>` : `<div style="height:16px"></div>`}
+      <div style="border-top:1px solid #f4f4f5;padding:16px 32px 24px;font-size:12px;color:#a1a1aa">
+        Jenvu · Institutional-grade XAU intelligence · <a href="${APP_URL}" style="color:#71717a;text-decoration:underline">jenvu.com</a>
+      </div>
+    </div></body></html>`;
+
+  const n = escapeHtml(name);
+  switch (kind) {
+    case "received":
+      return {
+        subject: "We received your Founding Trader application",
+        html: wrap(
+          `Thanks, ${n} — application received`,
+          "Founding Trader Program",
+          `<p style="margin:0 0 12px">We got your application for the <strong>${escapeHtml(meta.label)}</strong> tier. Every application is reviewed manually within <strong>48 hours</strong>.</p>
+           <p style="margin:0 0 12px">If approved, you'll get:</p>
+           <ul style="margin:0 0 12px;padding-left:20px">
+             <li style="margin:4px 0"><strong>${escapeHtml(meta.label)}</strong> plan free for 30 days</li>
+             <li style="margin:4px 0">${escapeHtml(meta.wallet)} on your account</li>
+             <li style="margin:4px 0">Full access — signals, alerts, killzones, voice briefs</li>
+           </ul>
+           <p style="margin:0">You only start paying once you cross <strong>$100 in verified profit</strong>. If you don't profit, you don't pay.</p>`,
+          { label: "Explore the platform", href: `${APP_URL}/signal` },
+        ),
+      };
+    case "approved":
+      return {
+        subject: `You're in — ${meta.label} plan activated 🎉`,
+        html: wrap(
+          `Welcome to Jenvu, ${n}.`,
+          "Approved · Founding Trader",
+          `<p style="margin:0 0 12px">Your application has been approved. Your <strong>${escapeHtml(meta.label)}</strong> plan is now active with <strong>${escapeHtml(meta.wallet)}</strong>.</p>
+           <p style="margin:0 0 12px;color:#52525b"><em>${escapeHtml(meta.blurb)}</em></p>
+           <p style="margin:16px 0 8px"><strong>Onboarding — 4 quick steps</strong></p>
+           <ol style="margin:0 0 12px;padding-left:20px">
+             <li style="margin:6px 0">Sign in with this email and open your dashboard.</li>
+             <li style="margin:6px 0">Run your first XAU/USD scan on the Signal page.</li>
+             <li style="margin:6px 0">Turn on alerts so you catch A/B setups the moment they fire.</li>
+             <li style="margin:6px 0">Connect your broker (MyFxBook or statement) so we can verify profit.</li>
+           </ol>
+           <p style="margin:0">You have 90 days to reach $100 in verified profit — billing only starts after that. If you don't profit, you walk away, no charge.</p>`,
+          { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
+        ),
+      };
+    case "rejected":
+      return {
+        subject: "Founding Trader Program — application update",
+        html: wrap(
+          `Thanks for applying, ${n}`,
+          "Application update",
+          `<p style="margin:0 0 12px">We reviewed your application carefully. This month's cohort is a tight fit and unfortunately we're not able to offer you a founding seat right now.</p>
+           <p style="margin:0 0 12px">This isn't a judgment on you as a trader — the program is capped at 100 seats and prioritizes very specific criteria each intake.</p>
+           <p style="margin:0">You're welcome to sign up on the standard plans at any time, and to re-apply for a future cohort. We appreciate the time you took.</p>`,
+          { label: "See plans", href: `${APP_URL}/pricing` },
+        ),
+      };
+    case "waitlisted":
+      return {
+        subject: "You're on the Founding waitlist",
+        html: wrap(
+          `You're on the waitlist, ${n}`,
+          "Waitlisted · Founding Trader",
+          `<p style="margin:0 0 12px">This month's 100 seats are filled, but your application looks strong — you're on the waitlist for the next cohort.</p>
+           <p style="margin:0 0 12px">As soon as a seat opens (or the next month rolls over on the 1st), we'll email you to activate your <strong>${escapeHtml(meta.label)}</strong> plan.</p>
+           <p style="margin:0">No action needed from your side. Sit tight.</p>`,
+          { label: "Explore the platform", href: `${APP_URL}/signal` },
+        ),
+      };
+  }
+}
+
+async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string) {
+  const { subject, html } = renderApplicantEmail(kind, name, plan);
+  const messageId = crypto.randomUUID();
+  try {
+    await admin.from("email_send_log").insert({
+      message_id: messageId,
+      template_name: `founding-${kind}`,
+      recipient_email: to,
+      status: "pending",
+    });
+    await admin.rpc("enqueue_email", {
+      queue_name: "transactional_emails",
+      payload: {
+        message_id: messageId,
+        to,
+        from: FROM_ADDRESS,
+        sender_domain: SENDER_DOMAIN,
+        subject,
+        html,
+        reply_to: SUPPORT_INBOX,
+        purpose: "transactional",
+        label: `founding-${kind}`,
+        idempotency_key: `founding-${kind}-${messageId}`,
+        queued_at: new Date().toISOString(),
+      },
+    });
+  } catch (e) {
+    console.error(`[founding] applicant email (${kind}) failed:`, (e as Error)?.message);
+  }
+}
+
 
 export const submitFoundingApplication = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => ApplyInput.parse(data))
