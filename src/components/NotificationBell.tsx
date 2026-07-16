@@ -33,6 +33,32 @@ function timeAgo(iso: string): string {
   return `${d}d`;
 }
 
+function beep() {
+  try {
+    const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const t0 = ctx.currentTime;
+    const tones = [880, 1175, 1568];
+    tones.forEach((f, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0 + i * 0.12);
+      g.gain.exponentialRampToValueAtTime(0.18, t0 + i * 0.12 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.12 + 0.18);
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start(t0 + i * 0.12);
+      o.stop(t0 + i * 0.12 + 0.2);
+    });
+    setTimeout(() => ctx.close().catch(() => {}), 800);
+  } catch {
+    /* ignore */
+  }
+}
+
 type Visual = {
   Icon: React.ComponentType<{ className?: string }>;
   wrap: string;
@@ -108,7 +134,10 @@ export default function NotificationBell() {
             table: "user_notifications",
             filter: `user_id=eq.${uid}`,
           },
-          () => {
+          (payload) => {
+            if (payload.eventType === "INSERT") {
+              beep();
+            }
             load();
           },
         )
