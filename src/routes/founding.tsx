@@ -82,7 +82,10 @@ function FoundingPage() {
     <div className="min-h-screen bg-white text-zinc-900" style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif" }}>
       <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
-          <Link to="/" className="text-[15px] font-semibold tracking-tight">Jenvu</Link>
+          <Link to="/" className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight">
+            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
+            Jenvu
+          </Link>
           <HeaderAuthButtons />
         </div>
       </header>
