@@ -2024,7 +2024,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       const ltfAligned = bias !== "neutral" && bias === ltfBias;
       parsed.htfLock = {
         bias,
-        reason: `HTF structure is ${bias} with price in ${inPremium ? "premium" : "discount"} of the ${fmtPx(swingLow)}–${fmtPx(swingHigh)} dealing range (equilibrium ${fmtPx(equilibrium)}). LTF trend is ${ltfBias}${ltfAligned ? " — aligned with HTF" : " — not aligned with HTF"}.`,
+        reason: `HTF structure is ${bias} with price in ${inPremium ? "premium" : "discount"} of the ${_fmtPx(swingLow)}–${_fmtPx(swingHigh)} dealing range (equilibrium ${_fmtPx(equilibrium)}). LTF trend is ${ltfBias}${ltfAligned ? " — aligned with HTF" : " — not aligned with HTF"}.`,
         ltfAligned,
       };
 
@@ -2042,12 +2042,12 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       if (built.direction === "WAIT") risks.push(built.reason || "No A+ setup present right now.");
       if (built.direction === "BUY") {
         invalidationTriggers.push(`15M close below ${built.sl.toFixed(dec)} invalidates the long.`);
-        invalidationTriggers.push(`Loss of ${fmtPx(equilibrium)} equilibrium shifts control back to sellers.`);
+        invalidationTriggers.push(`Loss of ${_fmtPx(equilibrium)} equilibrium shifts control back to sellers.`);
       } else if (built.direction === "SELL") {
         invalidationTriggers.push(`15M close above ${built.sl.toFixed(dec)} invalidates the short.`);
-        invalidationTriggers.push(`Reclaim of ${fmtPx(equilibrium)} equilibrium shifts control back to buyers.`);
+        invalidationTriggers.push(`Reclaim of ${_fmtPx(equilibrium)} equilibrium shifts control back to buyers.`);
       } else {
-        invalidationTriggers.push(`No trigger until price mitigates HTF POI near ${fmtPx(inPremium ? swingHigh : swingLow)}.`);
+        invalidationTriggers.push(`No trigger until price mitigates HTF POI near ${_fmtPx(inPremium ? swingHigh : swingLow)}.`);
       }
       const confSelf = Math.round(((marketRegime.confidence ?? 50) / 10 + (ltfAligned ? 1.5 : 0) + (marketRegime.favorable ? 1 : 0)) * 10) / 10;
       parsed.selfCritique = {
@@ -2063,9 +2063,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       if (bias === "bullish") { bullP = ltfAligned ? 55 : 45; bearP = ltfAligned ? 20 : 25; baseP = 100 - bullP - bearP; }
       else if (bias === "bearish") { bearP = ltfAligned ? 55 : 45; bullP = ltfAligned ? 20 : 25; baseP = 100 - bullP - bearP; }
       parsed.scenarios = {
-        bullish: { probability: bullP, path: `Sweep of ${fmtPx(pdl)} liquidity, reclaim equilibrium, target ${fmtPx(bullTarget)}.`, keyLevel: bullTarget },
-        base:    { probability: baseP, path: `Rotation between ${fmtPx(pdl)} and ${fmtPx(pdh)} around equilibrium ${fmtPx(eqLvl)}.`, keyLevel: eqLvl },
-        bearish: { probability: bearP, path: `Rejection at ${fmtPx(pdh)}, break of equilibrium, target ${fmtPx(bearTarget)}.`, keyLevel: bearTarget },
+        bullish: { probability: bullP, path: `Sweep of ${_fmtPx(pdl)} liquidity, reclaim equilibrium, target ${_fmtPx(bullTarget)}.`, keyLevel: bullTarget },
+        base:    { probability: baseP, path: `Rotation between ${_fmtPx(pdl)} and ${_fmtPx(pdh)} around equilibrium ${_fmtPx(eqLvl)}.`, keyLevel: eqLvl },
+        bearish: { probability: bearP, path: `Rejection at ${_fmtPx(pdh)}, break of equilibrium, target ${_fmtPx(bearTarget)}.`, keyLevel: bearTarget },
       };
     }
 
