@@ -2318,6 +2318,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       setupChecks.unshift({ key: `veto_${v.key}`, label: `⛔ ${v.label}`, pass: false, reason: v.reason });
     }
 
+    const SENIOR_REVIEW_MIN_RULE_SCORE = 59;
+
     // ---- WISDOM: Regime-based downgrade ----
     // If the tape is unfavorable (choppy/ranging/volatile), a textbook A+ is
     // still a lower-probability trade. Downgrade one step + flag it in checks.
@@ -2372,9 +2374,10 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         __planAllowsSenior = sub?.status === "active" && pid !== "free";
       } catch { __planAllowsSenior = false; __planId = "free"; }
     }
-    // Widened gate: borderline setups (score >=52) also get AI senior review so
-    // strong AI agreement can boost them into A/A+, and weak ones get filtered.
-    __requiresSeniorReview = __planAllowsSenior && built.direction !== "WAIT" && (setupGrade === "A+" || setupGrade === "A" || setupScore >= 52);
+    // Senior review only starts after the rules engine reaches the public
+    // trade threshold. This keeps paid account scans aligned with debug scans
+    // instead of letting a borderline 52-58% setup get capped to 50% by review.
+    __requiresSeniorReview = __planAllowsSenior && built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
 
     if (__requiresSeniorReview) {
       try {
