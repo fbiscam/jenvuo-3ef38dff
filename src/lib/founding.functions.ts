@@ -199,10 +199,10 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
     }
 
     if (service) {
+      const admin = createClient<Database>(url, service, {
+        auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+      });
       try {
-        const admin = createClient<Database>(url, service, {
-          auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-        });
         const safe = {
           n: escapeHtml(data.full_name),
           e: escapeHtml(data.email),
