@@ -318,6 +318,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               action: "broadcast",
               alert_id: inserted.id,
               notified,
+              emailed,
               conf,
               dir,
             });
