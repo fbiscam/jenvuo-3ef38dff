@@ -73,7 +73,7 @@ function BriefPage() {
           <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm">
             <Link to="/signal">Signal Engine</Link>
             <Link to="/briefs" className="font-semibold">Briefs</Link>
-            <Link to="/pricing">Pricing</Link>
+            <Link to="/founding">Founding</Link>
             <Link to="/insights">Insights</Link>
           </nav>
           <HeaderAuthButtons />
