@@ -2570,7 +2570,18 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
 
 
 
-    tradeFromAi.confidence = Math.min(95, setupScore);
+    // Blend rules-engine setupScore with AI market-regime confidence so that
+    // when the AI layer is materially more confident (and direction is not
+    // WAIT), the final score reflects both signals instead of the rules
+    // engine alone. Weight 60% rules / 40% AI when AI is higher.
+    {
+      const aiConf = Number(marketRegime?.confidence ?? 0);
+      let blended = setupScore;
+      if (built.direction !== "WAIT" && Number.isFinite(aiConf) && aiConf > setupScore) {
+        blended = Math.round(setupScore * 0.6 + aiConf * 0.4);
+      }
+      tradeFromAi.confidence = Math.min(95, Math.max(setupScore, blended));
+    }
     if (built.direction !== "WAIT") {
       tradeFromAi.summary = `${setupGrade} setup: ${built.direction} ${inst.display} at ${built.entry.toFixed(dec)}, stop ${built.sl.toFixed(dec)}, target ${built.tp.toFixed(dec)} for 1:${built.rr.toFixed(1)} R. ${built.reason}`;
     } else {
