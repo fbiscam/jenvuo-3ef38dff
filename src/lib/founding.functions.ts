@@ -188,6 +188,9 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
       why_joining: data.why_joining,
       myfxbook_url: data.myfxbook_url || null,
       requested_plan: data.requested_plan,
+      referrer_email: data.referrer_email && data.referrer_email.length > 0
+        ? data.referrer_email.toLowerCase()
+        : null,
     });
 
     if (error) {
