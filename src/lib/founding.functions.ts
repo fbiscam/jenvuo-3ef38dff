@@ -13,6 +13,7 @@ const ApplyInput = z.object({
   monthly_volume_usd: z.coerce.number().min(0).max(1_000_000_000).optional(),
   why_joining: z.string().trim().min(10).max(1500),
   myfxbook_url: z.string().trim().max(300).optional().default(""),
+  requested_plan: z.enum(["free", "pro", "elite", "ultra"]).default("elite"),
 });
 
 export type FoundingApplication = {
@@ -62,6 +63,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
       monthly_volume_usd: data.monthly_volume_usd ?? null,
       why_joining: data.why_joining,
       myfxbook_url: data.myfxbook_url || null,
+      requested_plan: data.requested_plan,
     });
 
     if (error) {
