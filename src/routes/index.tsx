@@ -130,7 +130,7 @@ function useLiveTicker(): TickerRow[] {
       }
     };
     fetchPrices();
-    const id = setInterval(fetchPrices, 15_000);
+    const id = setInterval(fetchPrices, 10_000);
     return () => {
       alive = false;
       clearInterval(id);
