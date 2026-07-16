@@ -77,36 +77,19 @@ export const getAutoScanOverview = createServerFn({ method: "GET" })
         supabaseAdmin.from("auto_scan_pool_ledger").select("cost_usd,ai_cost_usd").gte("created_at", weekAgo),
       ]);
 
-    // cron history via raw SQL
+    // cron history — the RPC checks auth.uid() so it must go through the
+    // authenticated user client, not supabaseAdmin (service_role has no auth.uid()).
     let cron: AutoScanCronRow[] = [];
     let lastCronRun: string | null = null;
     try {
-      const { data: cronRows } = await supabaseAdmin.rpc("admin_auto_scan_cron_history" as any).select();
+      const { data: cronRows, error: cronErr } = await context.supabase.rpc(
+        "admin_auto_scan_cron_history" as any,
+      );
+      if (cronErr) throw cronErr;
       if (Array.isArray(cronRows)) cron = cronRows as AutoScanCronRow[];
-    } catch {
+    } catch (e) {
+      console.warn("[auto-scan] cron history RPC failed:", (e as Error)?.message);
       cron = [];
-    }
-    // fallback: read directly using SQL if RPC missing
-    if (cron.length === 0) {
-      try {
-        const url = process.env.SUPABASE_URL!;
-        const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-        const res = await fetch(`${url}/rest/v1/rpc/admin_auto_scan_cron_history`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: key,
-            Authorization: `Bearer ${key}`,
-          },
-          body: "{}",
-        });
-        if (res.ok) {
-          const j = await res.json();
-          if (Array.isArray(j)) cron = j as AutoScanCronRow[];
-        }
-      } catch {
-        // ignore
-      }
     }
     if (cron.length > 0) lastCronRun = cron[0].start_time;
 
