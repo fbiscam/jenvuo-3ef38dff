@@ -152,7 +152,7 @@ export const listFoundingApplications = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) throw new Error(error.message);
-    return (data ?? []) as FoundingApplication[];
+    return (data ?? []) as unknown as FoundingApplication[];
   });
 
 export const updateFoundingApplication = createServerFn({ method: "POST" })
