@@ -273,7 +273,7 @@ function PricingPage() {
                     <div className="mt-2 flex items-baseline gap-1">
                       <span className="text-2xl tracking-tight text-zinc-900 price-font">{p.price}</span>
                       {p.price.startsWith("$") && p.price !== "$0" && (
-                        <span className="text-[11px] text-zinc-500 price-font">{billing === "annual" ? "/year" : "/month"}</span>
+                        <span className="text-[11px] text-zinc-500 price-font">Free credits per month</span>
                       )}
                     </div>
                     <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
