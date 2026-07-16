@@ -105,7 +105,12 @@ function FoundingPage() {
             <span className="font-medium text-zinc-900">{seats.filled} / {seats.total}</span>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100">
-            <div className="h-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
+            <div
+              className="relative h-full rounded-full bg-[#2563eb] transition-all duration-700 ease-out overflow-hidden"
+              style={{ width: `${pct}%` }}
+            >
+              <div className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[shimmer_1.8s_linear_infinite]" />
+            </div>
           </div>
           <div className="mt-2 text-[11px] text-zinc-500">{remaining} spots remaining</div>
         </div>
