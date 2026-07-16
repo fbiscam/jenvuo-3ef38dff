@@ -672,7 +672,7 @@ function HomePage() {
 
               <tbody>
                 {([
-                  { f: "AFTER RAISING $100 IN REVENUE - PRICING", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
+                  { f: "PAY AFTER RAISING $100 IN REVENUE\u00A0", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
                   { f: "Monthly wallet (USD)", a: "$2", b: "$15", c: "$50", d: "$100" },
                   { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
                   { f: "Signal latency", a: "No alerts", b: "Realtime", c: "Realtime", d: "Realtime" },
