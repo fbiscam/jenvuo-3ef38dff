@@ -69,6 +69,7 @@ function FoundingPage() {
           broker: String(fd.get("broker") || ""),
           experience_years: fd.get("experience_years") ? Number(fd.get("experience_years")) : undefined,
           monthly_volume_usd: fd.get("monthly_volume_usd") ? Number(fd.get("monthly_volume_usd")) : undefined,
+          referrer_email: String(fd.get("referrer_email") || ""),
           why_joining: String(fd.get("why_joining") || ""),
           myfxbook_url: String(fd.get("myfxbook_url") || ""),
           requested_plan: plan,
