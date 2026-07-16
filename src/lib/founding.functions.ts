@@ -14,6 +14,7 @@ const ApplyInput = z.object({
   why_joining: z.string().trim().min(10).max(1500),
   myfxbook_url: z.string().trim().max(300).optional().default(""),
   requested_plan: z.enum(["free", "pro", "elite", "ultra"]).default("elite"),
+  referrer_email: z.string().trim().email().max(255).optional().or(z.literal("")),
 });
 
 export type FoundingApplication = {
@@ -187,6 +188,9 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
       why_joining: data.why_joining,
       myfxbook_url: data.myfxbook_url || null,
       requested_plan: data.requested_plan,
+      referrer_email: data.referrer_email && data.referrer_email.length > 0
+        ? data.referrer_email.toLowerCase()
+        : null,
     });
 
     if (error) {
@@ -317,7 +321,23 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    // Notify applicant on real status transitions
+    // Award referral credit ($5 each) when approved/active
+    if (data.status === "approved" || data.status === "active") {
+      try {
+        const url = process.env.SUPABASE_URL;
+        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (url && service) {
+          const admin = createClient<Database>(url, service, {
+            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+          });
+          await admin.rpc("award_founding_referral" as any, { _application_id: data.id });
+        }
+      } catch (e) {
+        console.error("[founding] referral award failed:", (e as Error)?.message);
+      }
+    }
+
+
     const p = prior as any;
     if (p?.email && data.status && data.status !== p.status) {
       const kindMap: Record<string, ApplicantEmailKind | null> = {

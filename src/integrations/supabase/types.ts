@@ -684,6 +684,8 @@ export type Database = {
           ip_address: string | null
           monthly_volume_usd: number | null
           myfxbook_url: string | null
+          referral_rewarded: boolean
+          referrer_email: string | null
           requested_plan: string
           seat_month: string | null
           status: string
@@ -711,6 +713,8 @@ export type Database = {
           ip_address?: string | null
           monthly_volume_usd?: number | null
           myfxbook_url?: string | null
+          referral_rewarded?: boolean
+          referrer_email?: string | null
           requested_plan?: string
           seat_month?: string | null
           status?: string
@@ -738,6 +742,8 @@ export type Database = {
           ip_address?: string | null
           monthly_volume_usd?: number | null
           myfxbook_url?: string | null
+          referral_rewarded?: boolean
+          referrer_email?: string | null
           requested_plan?: string
           seat_month?: string | null
           status?: string
@@ -1604,6 +1610,10 @@ export type Database = {
         }[]
       }
       apply_referral_code: { Args: { _code: string }; Returns: Json }
+      award_founding_referral: {
+        Args: { _application_id: string }
+        Returns: Json
+      }
       close_chat_session: { Args: { _session_id: string }; Returns: undefined }
       convert_referral: { Args: { _user_id: string }; Returns: undefined }
       create_chat_session: {

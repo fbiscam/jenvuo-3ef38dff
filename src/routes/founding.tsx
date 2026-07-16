@@ -46,6 +46,15 @@ function FoundingPage() {
   const pct = Math.min(100, Math.round((seats.filled / seats.total) * 100));
 
   const [plan, setPlan] = React.useState<"free" | "pro" | "elite" | "ultra">("elite");
+  const [refEmail, setRefEmail] = React.useState<string>("");
+
+  React.useEffect(() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      const r = p.get("ref") || p.get("referrer") || "";
+      if (r) setRefEmail(r);
+    } catch {}
+  }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -60,6 +69,7 @@ function FoundingPage() {
           broker: String(fd.get("broker") || ""),
           experience_years: fd.get("experience_years") ? Number(fd.get("experience_years")) : undefined,
           monthly_volume_usd: fd.get("monthly_volume_usd") ? Number(fd.get("monthly_volume_usd")) : undefined,
+          referrer_email: String(fd.get("referrer_email") || ""),
           why_joining: String(fd.get("why_joining") || ""),
           myfxbook_url: String(fd.get("myfxbook_url") || ""),
           requested_plan: plan,
@@ -216,7 +226,13 @@ function FoundingPage() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field name="experience_years" label="Experience (years)" type="number" placeholder="3" />
-                <Field name="monthly_volume_usd" label="Avg. monthly volume ($)" type="number" placeholder="10000" />
+                <Field
+                  name="referrer_email"
+                  label="Referred by (optional)"
+                  type="email"
+                  placeholder="friend@email.com"
+                  defaultValue={refEmail}
+                />
               </div>
               <Field
                 name="myfxbook_url"
@@ -266,6 +282,7 @@ function Field(props: {
   type?: string;
   required?: boolean;
   placeholder?: string;
+  defaultValue?: string;
 }) {
   return (
     <div>
@@ -278,6 +295,7 @@ function Field(props: {
         type={props.type ?? "text"}
         required={props.required}
         placeholder={props.placeholder}
+        defaultValue={props.defaultValue}
         className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-[14px] outline-none placeholder:text-zinc-400 focus:border-zinc-900"
       />
     </div>
