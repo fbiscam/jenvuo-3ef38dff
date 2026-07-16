@@ -753,6 +753,47 @@ export type Database = {
         }
         Relationships: []
       }
+      founding_documents: {
+        Row: {
+          application_id: string
+          created_at: string
+          file_size: number
+          id: string
+          mime_type: string
+          original_name: string | null
+          storage_path: string
+          user_id: string | null
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          file_size?: number
+          id?: string
+          mime_type: string
+          original_name?: string | null
+          storage_path: string
+          user_id?: string | null
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          file_size?: number
+          id?: string
+          mime_type?: string
+          original_name?: string | null
+          storage_path?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "founding_documents_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "founding_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insight_topics: {
         Row: {
           angle: string | null
