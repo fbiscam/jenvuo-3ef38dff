@@ -88,9 +88,6 @@ function FoundingPage() {
       </header>
 
       <section className="mx-auto max-w-4xl px-5 pt-14 pb-10 text-center">
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-zinc-600">
-          <Sparkles className="h-3 w-3" /> Limited · 100 seats / month
-        </div>
         <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">
           Founding Trader Program
         </h1>
