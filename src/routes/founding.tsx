@@ -248,7 +248,7 @@ function FoundingPage() {
               </button>
 
               <p className="text-[11px] leading-relaxed text-zinc-500 whitespace-nowrap overflow-hidden text-ellipsis">
-                By applying you agree to our <Link to="/terms" className="underline">Terms</Link> and <Link to="/disclaimer" className="underline">Risk Disclaimer</Link>. Trading involves risk.
+                By applying you agree to our <Link to="/terms" className="underline">Terms</Link> and <Link to="/disclaimer" className="underline">Risk Disclaimer</Link>. Future trading involves significant risk.
               </p>
             </form>
           )}
