@@ -122,6 +122,62 @@ function hhmmss(d = new Date()): string {
   return d.toTimeString().slice(0, 8);
 }
 
+function withSignalIntelligence(plan: SignalPlan): SignalPlan {
+  const dec = plan.instrument?.decimals ?? 2;
+  const pricePrefix = plan.instrument?.kind === "crypto" ? "" : "$";
+  const fmt = (n: number) => `${pricePrefix}${Number(n || 0).toFixed(dec)}`;
+  const current = Number.isFinite(plan.currentPrice) && plan.currentPrice > 0 ? plan.currentPrice : Math.max(plan.trade.entry, 1);
+  const findLevel = (re: RegExp) => plan.keyLevels.find((k) => re.test(k.label))?.price;
+  const swingHigh = findLevel(/swing high|pdh|high/i) ?? Math.max(current, plan.trade.tp || current) * 1.003;
+  const swingLow = findLevel(/swing low|pdl|low/i) ?? Math.min(current, plan.trade.tp || current) * 0.997;
+  const equilibrium = findLevel(/equilibrium|eq/i) ?? (swingHigh + swingLow) / 2;
+  const inPremium = current >= equilibrium;
+  const ltfBias = plan.multiTf.find((tf) => tf.tf === "15M")?.bias ?? plan.htfBias;
+  const ltfAligned = plan.htfBias !== "neutral" && ltfBias === plan.htfBias;
+
+  const htfLock = plan.htfLock?.reason ? plan.htfLock : {
+    bias: plan.htfBias,
+    reason: `HTF structure is ${plan.htfBias} with price in the ${inPremium ? "premium" : "discount"} side of the ${fmt(swingLow)}–${fmt(swingHigh)} dealing range. LTF bias is ${ltfBias}, so execution must respect equilibrium near ${fmt(equilibrium)}.`,
+    ltfAligned,
+  };
+
+  const failedChecks = plan.setupChecks.filter((c) => c.pass === false).map((c) => c.reason).filter(Boolean);
+  const risks = plan.selfCritique?.risks?.length
+    ? plan.selfCritique.risks
+    : [
+        ...failedChecks,
+        plan.newsRisk.severity !== "low" ? plan.newsRisk.warning : "",
+        plan.trade.direction === "WAIT" ? plan.trade.summary : "Respect live volatility and session quality before entry.",
+      ].filter(Boolean).slice(0, 6);
+  const invalidationTriggers = plan.selfCritique?.invalidationTriggers?.length
+    ? plan.selfCritique.invalidationTriggers
+    : [
+        plan.trade.invalidation,
+        plan.trade.direction === "BUY"
+          ? `15M close below ${fmt(plan.trade.sl)} invalidates the long setup.`
+          : plan.trade.direction === "SELL"
+            ? `15M close above ${fmt(plan.trade.sl)} invalidates the short setup.`
+            : `No trigger until price returns to a valid HTF/LTF POI with confirmation.`,
+      ].filter(Boolean).slice(0, 6);
+  const selfCritique = (risks.length || invalidationTriggers.length) ? {
+    risks,
+    invalidationTriggers,
+    confidenceSelfScore: plan.selfCritique?.confidenceSelfScore && plan.selfCritique.confidenceSelfScore > 0
+      ? plan.selfCritique.confidenceSelfScore
+      : Math.max(0, Math.min(10, Math.round((plan.trade.confidence / 10) * 10) / 10)),
+  } : plan.selfCritique;
+
+  const existingScenarios = plan.scenarios;
+  const hasScenarios = !!(existingScenarios?.bullish?.path || existingScenarios?.base?.path || existingScenarios?.bearish?.path);
+  const scenarios = hasScenarios ? existingScenarios : {
+    bullish: { probability: plan.htfBias === "bullish" ? (ltfAligned ? 55 : 45) : 25, path: `Reclaim and hold above ${fmt(equilibrium)} opens continuation toward ${fmt(swingHigh)}.`, keyLevel: +swingHigh.toFixed(dec) },
+    base: { probability: plan.htfBias === "neutral" ? 50 : 30, path: `Range rotation around equilibrium ${fmt(equilibrium)} while the desk waits for cleaner displacement.`, keyLevel: +equilibrium.toFixed(dec) },
+    bearish: { probability: plan.htfBias === "bearish" ? (ltfAligned ? 55 : 45) : 25, path: `Rejection below ${fmt(equilibrium)} keeps sellers in control toward ${fmt(swingLow)}.`, keyLevel: +swingLow.toFixed(dec) },
+  };
+
+  return { ...plan, htfLock, selfCritique, scenarios };
+}
+
 /* ---------- page ---------- */
 function SignalPage() {
   const navigate = useNavigate();
@@ -436,7 +492,7 @@ function SignalPage() {
         toast.error(result.error);
         return;
       }
-      const p = result.plan;
+      const p = withSignalIntelligence(result.plan);
       setPlan(p);
       // ICT narration is included in the single "signal" charge above — no extra deduction.
       // Free users still don't get the guided narration.
@@ -476,10 +532,10 @@ function SignalPage() {
       if (error) throw error;
       const snap: any = data?.snapshot ?? null;
       if (snap?.plan) {
-        setPlan(snap.plan as SignalPlan);
+        setPlan(withSignalIntelligence(snap.plan as SignalPlan));
         // Redraw persistent entry/sl/tp + context zones without re-charging credits.
         setTimeout(() => {
-          const p = snap.plan as SignalPlan;
+          const p = withSignalIntelligence(snap.plan as SignalPlan);
           htfRef.current?.clear();
           ltfRef.current?.clear();
           const autoTypes = new Set(["premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql"]);

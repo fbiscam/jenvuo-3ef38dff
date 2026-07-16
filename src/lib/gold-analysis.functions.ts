@@ -2831,7 +2831,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         return {
           bias: bias as "bullish" | "bearish" | "neutral",
           reason: reason.slice(0, 300),
-          ltfAligned: h.ltfAligned === true,
+          ltfAligned: typeof h.ltfAligned === "boolean" ? h.ltfAligned : defaultHtfLock.ltfAligned,
         };
       })(),
       selfCritique: (() => {
@@ -2843,7 +2843,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         return {
           risks: risks.length ? risks : defaultSelfCritique.risks,
           invalidationTriggers: invalidationTriggers.length ? invalidationTriggers : defaultSelfCritique.invalidationTriggers,
-          confidenceSelfScore: Number.isFinite(n) ? Math.max(0, Math.min(10, n)) : 0,
+          confidenceSelfScore: Number.isFinite(n) ? Math.max(0, Math.min(10, n)) : defaultSelfCritique.confidenceSelfScore,
         };
       })(),
       scenarios: (() => {
@@ -2853,9 +2853,9 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           const p = Number(o.probability);
           const kl = Number(o.keyLevel);
           return {
-            probability: Number.isFinite(p) ? Math.max(0, Math.min(100, Math.round(p))) : 0,
+            probability: Number.isFinite(p) ? Math.max(0, Math.min(100, Math.round(p))) : fallback.probability,
             path: (String(o.path ?? "").trim() || fallback.path).slice(0, 240),
-            keyLevel: Number.isFinite(kl) ? +kl.toFixed(dec) : null,
+            keyLevel: Number.isFinite(kl) ? +kl.toFixed(dec) : fallback.keyLevel,
           };
         };
         return { bearish: one(s.bearish, defaultScenarios.bearish), base: one(s.base, defaultScenarios.base), bullish: one(s.bullish, defaultScenarios.bullish) };
@@ -2889,6 +2889,20 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       })(),
       macroContext: __macroContext,
     };
+
+    // Final safety net: rules-primary mode must never return a plan without
+    // the Intelligence Dashboard payload, even if an older/partial parsed
+    // object sneaks through a cache or provider response.
+    if (!plan.htfLock?.reason) plan.htfLock = defaultHtfLock;
+    if (!plan.selfCritique?.risks?.length && !plan.selfCritique?.invalidationTriggers?.length) {
+      plan.selfCritique = defaultSelfCritique;
+    }
+    const scenarioHasContent = !!(
+      plan.scenarios?.bullish?.path ||
+      plan.scenarios?.base?.path ||
+      plan.scenarios?.bearish?.path
+    );
+    if (!scenarioHasContent) plan.scenarios = defaultScenarios;
 
     // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
     // WAIT / no-trade returns are free. MUST be awaited — Cloudflare Workers
