@@ -90,7 +90,15 @@ const PLAN_META: Record<string, { label: string; wallet: string; blurb: string }
   ultra: { label: "Ultra", wallet: "$100 wallet credit", blurb: "Top-tier access. Every model, every pair, no throttling." },
 };
 
-type ApplicantEmailKind = "received" | "approved" | "rejected" | "waitlisted" | "funded";
+type ApplicantEmailKind =
+  | "received"
+  | "approved"
+  | "rejected"
+  | "waitlisted"
+  | "funded"
+  | "documents_received"
+  | "documents_approved"
+  | "documents_rejected";
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string) {
   const meta = PLAN_META[plan] || PLAN_META.elite;
