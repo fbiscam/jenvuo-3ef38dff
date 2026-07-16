@@ -37,9 +37,24 @@ function FoundingPage() {
   const [seats, setSeats] = React.useState<{ filled: number; total: number }>({ filled: 0, total: 220 });
 
   React.useEffect(() => {
-    stats()
-      .then((s) => setSeats({ filled: s.seatsFilled, total: s.seatsTotal }))
-      .catch(() => {});
+    let cancelled = false;
+    const refresh = () => {
+      stats()
+        .then((s) => { if (!cancelled) setSeats({ filled: s.seatsFilled, total: s.seatsTotal }); })
+        .catch(() => {});
+    };
+    refresh();
+    const interval = window.setInterval(refresh, 10000);
+    const onFocus = () => refresh();
+    const onVisible = () => { if (document.visibilityState === "visible") refresh(); };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   const remaining = Math.max(0, seats.total - seats.filled);
