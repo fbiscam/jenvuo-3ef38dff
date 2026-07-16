@@ -113,7 +113,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `Thanks for applying, ${n}`,
           "Application update",
           `<p style="margin:0 0 12px">We reviewed your application carefully. This month's cohort is a tight fit and unfortunately we're not able to offer you a founding seat right now.</p>
-           <p style="margin:0 0 12px">This isn't a judgment on you as a trader — the program is capped at 100 seats and prioritizes very specific criteria each intake.</p>
+           <p style="margin:0 0 12px">This isn't a judgment on you as a trader — the program is capped at 220 seats and prioritizes very specific criteria each intake.</p>
            <p style="margin:0">You're welcome to sign up on the standard plans at any time, and to re-apply for a future cohort. We appreciate the time you took.</p>`,
           { label: "See plans", href: `${APP_URL}/pricing` },
         ),
