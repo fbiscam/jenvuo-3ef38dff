@@ -2010,7 +2010,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // ============ DETERMINISTIC INTELLIGENCE PANELS ============
     // Synthesize htfLock / selfCritique / scenarios from the rules engine so
     // the Intelligence Dashboard cards always render, even without AI narration.
-    {
+      const _fmtPx = (n: number) => `${inst.kind === "crypto" ? "" : "$"}${n.toFixed(dec)}`;
+
       const htfTrend = String(htfA.trend || "").toLowerCase();
       const bias: "bullish" | "bearish" | "neutral" =
         htfTrend.includes("bull") ? "bullish" :
