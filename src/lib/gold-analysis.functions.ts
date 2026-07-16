@@ -2007,6 +2007,68 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     const built = buildTrade(htfA, ltfA, pools, last.c, atr, inst.kind as any);
 
+    // ============ DETERMINISTIC INTELLIGENCE PANELS ============
+    // Synthesize htfLock / selfCritique / scenarios from the rules engine so
+    // the Intelligence Dashboard cards always render, even without AI narration.
+    {
+      const htfTrend = String(htfA.trend || "").toLowerCase();
+      const bias: "bullish" | "bearish" | "neutral" =
+        htfTrend.includes("bull") ? "bullish" :
+        htfTrend.includes("bear") ? "bearish" : "neutral";
+      const ltfTrend = String(ltfA.trend || "").toLowerCase();
+      const ltfBias: "bullish" | "bearish" | "neutral" =
+        ltfTrend.includes("bull") ? "bullish" :
+        ltfTrend.includes("bear") ? "bearish" : "neutral";
+      const ltfAligned = bias !== "neutral" && bias === ltfBias;
+      parsed.htfLock = {
+        bias,
+        reason: `HTF structure is ${bias} with price in ${inPremium ? "premium" : "discount"} of the ${fmtPx(swingLow)}–${fmtPx(swingHigh)} dealing range (equilibrium ${fmtPx(equilibrium)}). LTF trend is ${ltfBias}${ltfAligned ? " — aligned with HTF" : " — not aligned with HTF"}.`,
+        ltfAligned,
+      };
+
+      const risks: string[] = [];
+      const invalidationTriggers: string[] = [];
+      if (imminentHigh) {
+        risks.push(`High-impact ${imminentHigh.country} event "${imminentHigh.title}" in ${imminentHigh.minutesUntil}m — expect volatility.`);
+      } else if (upcomingNews.some((n) => n.impact === "High")) {
+        risks.push("High-impact USD news within the next 4 hours.");
+      }
+      if (marketRegime.warning) risks.push(marketRegime.warning);
+      if (marketRegime.volatility >= 70) risks.push(`Elevated volatility (${marketRegime.volatility}%) — wider stops possible.`);
+      if (marketRegime.trendStrength <= 30) risks.push(`Weak trend strength (${marketRegime.trendStrength}%) — chop risk.`);
+      if (!ltfAligned && bias !== "neutral") risks.push("LTF not aligned with HTF bias — counter-trend risk.");
+      if (built.direction === "WAIT") risks.push(built.reason || "No A+ setup present right now.");
+      if (built.direction === "BUY") {
+        invalidationTriggers.push(`15M close below ${built.sl.toFixed(dec)} invalidates the long.`);
+        invalidationTriggers.push(`Loss of ${fmtPx(equilibrium)} equilibrium shifts control back to sellers.`);
+      } else if (built.direction === "SELL") {
+        invalidationTriggers.push(`15M close above ${built.sl.toFixed(dec)} invalidates the short.`);
+        invalidationTriggers.push(`Reclaim of ${fmtPx(equilibrium)} equilibrium shifts control back to buyers.`);
+      } else {
+        invalidationTriggers.push(`No trigger until price mitigates HTF POI near ${fmtPx(inPremium ? swingHigh : swingLow)}.`);
+      }
+      const confSelf = Math.round(((marketRegime.confidence ?? 50) / 10 + (ltfAligned ? 1.5 : 0) + (marketRegime.favorable ? 1 : 0)) * 10) / 10;
+      parsed.selfCritique = {
+        risks: risks.slice(0, 6),
+        invalidationTriggers: invalidationTriggers.slice(0, 6),
+        confidenceSelfScore: Math.max(0, Math.min(10, confSelf)),
+      };
+
+      const bullTarget = +swingHigh.toFixed(dec);
+      const bearTarget = +swingLow.toFixed(dec);
+      const eqLvl = +equilibrium.toFixed(dec);
+      let bullP = 33, baseP = 34, bearP = 33;
+      if (bias === "bullish") { bullP = ltfAligned ? 55 : 45; bearP = ltfAligned ? 20 : 25; baseP = 100 - bullP - bearP; }
+      else if (bias === "bearish") { bearP = ltfAligned ? 55 : 45; bullP = ltfAligned ? 20 : 25; baseP = 100 - bullP - bearP; }
+      parsed.scenarios = {
+        bullish: { probability: bullP, path: `Sweep of ${fmtPx(pdl)} liquidity, reclaim equilibrium, target ${fmtPx(bullTarget)}.`, keyLevel: bullTarget },
+        base:    { probability: baseP, path: `Rotation between ${fmtPx(pdl)} and ${fmtPx(pdh)} around equilibrium ${fmtPx(eqLvl)}.`, keyLevel: eqLvl },
+        bearish: { probability: bearP, path: `Rejection at ${fmtPx(pdh)}, break of equilibrium, target ${fmtPx(bearTarget)}.`, keyLevel: bearTarget },
+      };
+    }
+
+
+
     // buildTrade already filters mitigated OB/FVGs. Do not mark the freshly
     // tapped execution zone as "mitigated" just because the live candle is
     // inside it; that was flattening confidence across instruments.
