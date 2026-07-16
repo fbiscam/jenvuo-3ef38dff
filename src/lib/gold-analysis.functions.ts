@@ -2377,13 +2377,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // Senior review only starts after the rules engine reaches the public
     // trade threshold. This keeps paid account scans aligned with debug scans
     // instead of letting a borderline 52-58% setup get capped to 50% by review.
-    // Trigger senior review when EITHER rules engine OR macro AI shows a
-    // tradeable signal — otherwise 54-rule + 90-AI setups skip review entirely.
-    {
-      const aiConfForGate = Number((marketRegime as any)?.confidence ?? 0);
-      const gateScore = Math.max(setupScore, Number.isFinite(aiConfForGate) ? aiConfForGate : 0);
-      __requiresSeniorReview = __planAllowsSenior && built.direction !== "WAIT" && gateScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
-    }
+    // Senior Review disabled — signals from rules + AI blend are performing best.
+    __requiresSeniorReview = false;
 
     if (__requiresSeniorReview) {
       try {
