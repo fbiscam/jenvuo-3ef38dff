@@ -45,6 +45,8 @@ function FoundingPage() {
   const remaining = Math.max(0, seats.total - seats.filled);
   const pct = Math.min(100, Math.round((seats.filled / seats.total) * 100));
 
+  const [plan, setPlan] = React.useState<"free" | "pro" | "elite" | "ultra">("elite");
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -60,6 +62,7 @@ function FoundingPage() {
           monthly_volume_usd: fd.get("monthly_volume_usd") ? Number(fd.get("monthly_volume_usd")) : undefined,
           why_joining: String(fd.get("why_joining") || ""),
           myfxbook_url: String(fd.get("myfxbook_url") || ""),
+          requested_plan: plan,
         } as any,
       });
       if (res.ok) {
@@ -168,6 +171,38 @@ function FoundingPage() {
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
               <Field name="full_name" label="Full name" required placeholder="Your full name" />
               <Field name="email" label="Email" type="email" required placeholder="you@example.com" />
+
+              <div>
+                <label className="text-[13px] font-medium text-zinc-800">
+                  Which plan do you want? <span className="text-rose-500">*</span>
+                </label>
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {([
+                    { id: "free", label: "Free", desc: "$0 — try it" },
+                    { id: "pro", label: "Pro", desc: "$15 wallet" },
+                    { id: "elite", label: "Elite", desc: "$50 wallet" },
+                    { id: "ultra", label: "Ultra", desc: "$100 wallet" },
+                  ] as const).map((p) => {
+                    const active = plan === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setPlan(p.id)}
+                        className={`rounded-xl border px-3 py-2.5 text-left transition ${
+                          active
+                            ? "border-zinc-900 bg-zinc-900 text-white"
+                            : "border-zinc-200 bg-white text-zinc-900 hover:border-zinc-400"
+                        }`}
+                      >
+                        <div className="text-[13px] font-semibold">{p.label}</div>
+                        <div className={`text-[11px] ${active ? "text-zinc-300" : "text-zinc-500"}`}>{p.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-1.5 text-[11px] text-zinc-500">Approved applicants get this plan free for 30 days.</p>
+              </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field name="country" label="Country" placeholder="Pakistan" />
                 <Field name="broker" label="Broker" placeholder="IC Markets, Exness…" />

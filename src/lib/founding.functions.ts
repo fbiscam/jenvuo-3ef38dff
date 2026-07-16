@@ -13,6 +13,7 @@ const ApplyInput = z.object({
   monthly_volume_usd: z.coerce.number().min(0).max(1_000_000_000).optional(),
   why_joining: z.string().trim().min(10).max(1500),
   myfxbook_url: z.string().trim().max(300).optional().default(""),
+  requested_plan: z.enum(["free", "pro", "elite", "ultra"]).default("elite"),
 });
 
 export type FoundingApplication = {
@@ -31,6 +32,7 @@ export type FoundingApplication = {
   approved_at: string | null;
   first_profit_at: string | null;
   created_at: string;
+  requested_plan?: string | null;
 };
 
 const SUPPORT_INBOX = "support@jenvu.net";
@@ -62,6 +64,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
       monthly_volume_usd: data.monthly_volume_usd ?? null,
       why_joining: data.why_joining,
       myfxbook_url: data.myfxbook_url || null,
+      requested_plan: data.requested_plan,
     });
 
     if (error) {
@@ -94,6 +97,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
             <h1 style="font-size:20px;margin:8px 0 16px">${safe.n}</h1>
             <table style="width:100%;font-size:14px;border-collapse:collapse;margin-bottom:16px">
               <tr><td style="color:#6b7280;padding:4px 0;width:140px">Email</td><td>${safe.e}</td></tr>
+              <tr><td style="color:#6b7280;padding:4px 0">Requested plan</td><td><strong>${escapeHtml(data.requested_plan.toUpperCase())}</strong></td></tr>
               <tr><td style="color:#6b7280;padding:4px 0">Country</td><td>${safe.c}</td></tr>
               <tr><td style="color:#6b7280;padding:4px 0">Broker</td><td>${safe.b}</td></tr>
               <tr><td style="color:#6b7280;padding:4px 0">Experience</td><td>${safe.y} yrs</td></tr>
@@ -103,7 +107,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
             <div style="font-size:14px;line-height:1.6;white-space:pre-wrap;border-top:1px solid #e5e7eb;padding-top:16px">${safe.w}</div>
             <p style="font-size:12px;color:#6b7280;margin-top:24px">Review in the Founding admin panel.</p>
           </div></body></html>`;
-        const text = `New founding application\n\n${data.full_name} <${data.email}>\nCountry: ${data.country || "—"}\nBroker: ${data.broker || "—"}\nExperience: ${data.experience_years ?? "—"} yrs\nMonthly volume: $${data.monthly_volume_usd ?? "—"}\nMyFxBook: ${data.myfxbook_url || "—"}\n\n${data.why_joining}`;
+        const text = `New founding application\n\n${data.full_name} <${data.email}>\nRequested plan: ${data.requested_plan.toUpperCase()}\nCountry: ${data.country || "—"}\nBroker: ${data.broker || "—"}\nExperience: ${data.experience_years ?? "—"} yrs\nMonthly volume: $${data.monthly_volume_usd ?? "—"}\nMyFxBook: ${data.myfxbook_url || "—"}\n\n${data.why_joining}`;
         const messageId = crypto.randomUUID();
         await admin.from("email_send_log").insert({
           message_id: messageId,
@@ -118,7 +122,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
             to: SUPPORT_INBOX,
             from: FROM_ADDRESS,
             sender_domain: SENDER_DOMAIN,
-            subject: `[Founding] ${data.full_name}`,
+            subject: `[Founding] ${data.full_name} — ${data.requested_plan.toUpperCase()}`,
             html,
             text,
             reply_to: data.email,

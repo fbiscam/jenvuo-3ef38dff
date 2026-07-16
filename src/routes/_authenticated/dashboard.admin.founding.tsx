@@ -157,6 +157,11 @@ function AdminFoundingPage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-semibold text-zinc-900">{r.full_name}</span>
+                  {r.requested_plan && (
+                    <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                      Wants: {r.requested_plan}
+                    </span>
+                  )}
                   <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${
                       STATUS_STYLES[r.status] || "bg-zinc-100 text-zinc-600"
