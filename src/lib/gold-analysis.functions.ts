@@ -2576,15 +2576,21 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
 
 
 
-    // Blend rules-engine setupScore with AI market-regime confidence so that
-    // when the AI layer is materially more confident (and direction is not
-    // WAIT), the final score reflects both signals instead of the rules
-    // engine alone. Weight 60% rules / 40% AI when AI is higher.
+    // Adaptive blend: rules-engine setupScore + AI market-regime confidence.
+    // - Base weight: 60% rules / 40% AI when AI is higher.
+    // - Strong AI agreement (AI >= rules + 15): 50/50 (AI gets more voice).
+    // - Very strong AI agreement (AI >= rules + 25): 45/55 (AI leads).
+    // Senior review CONFIRM has already boosted setupScore above, so this
+    // stage layers AI market context on top for final confidence.
     {
       const aiConf = Number(marketRegime?.confidence ?? 0);
       let blended = setupScore;
       if (built.direction !== "WAIT" && Number.isFinite(aiConf) && aiConf > setupScore) {
-        blended = Math.round(setupScore * 0.6 + aiConf * 0.4);
+        const gap = aiConf - setupScore;
+        let rulesW = 0.6, aiW = 0.4;
+        if (gap >= 25) { rulesW = 0.45; aiW = 0.55; }
+        else if (gap >= 15) { rulesW = 0.5; aiW = 0.5; }
+        blended = Math.round(setupScore * rulesW + aiConf * aiW);
       }
       tradeFromAi.confidence = Math.min(95, Math.max(setupScore, blended));
     }
