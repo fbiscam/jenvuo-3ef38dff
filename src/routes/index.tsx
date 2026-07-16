@@ -70,15 +70,16 @@ const INITIAL_TICKER: TickerRow[] = [
   ["DXY", "104.21", "-0.12%"],
 ];
 
-// Yahoo Finance symbol map for each XAU cross-pair on the ticker.
-const YAHOO_MAP: Record<string, string> = {
-  "XAU/USD": "XAUUSD=X",
-  "XAU/EUR": "XAUEUR=X",
-  "XAU/GBP": "XAUGBP=X",
-  "XAU/JPY": "XAUJPY=X",
-  "XAU/AUD": "XAUAUD=X",
-  "XAU/CHF": "XAUCHF=X",
-  "DXY": "DX-Y.NYB",
+// Server-fn symbol map — routes through getMarketSnapshot to bypass browser
+// CORS restrictions on Yahoo Finance and return authoritative live prices.
+const SYMBOL_MAP: Record<string, string> = {
+  "XAU/USD": "XAUUSD",
+  "XAU/EUR": "XAUEUR",
+  "XAU/GBP": "XAUGBP",
+  "XAU/JPY": "XAUJPY",
+  "XAU/AUD": "XAUAUD",
+  "XAU/CHF": "XAUCHF",
+  "DXY": "DXY",
 };
 
 
@@ -91,44 +92,36 @@ function fmtPrice(n: number): string {
 
 function useLiveTicker(): TickerRow[] {
   const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
+  const fetchSnapshot = useServerFn(getMarketSnapshot);
   React.useEffect(() => {
     let alive = true;
-
-    const fetchOne = async (yahooSym: string): Promise<number | null> => {
-      try {
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSym)}?interval=5m&range=1d`;
-        const r = await fetch(url);
-        if (!r.ok) return null;
-        const j: any = await r.json();
-        const meta = j?.chart?.result?.[0]?.meta;
-        const p = Number(meta?.regularMarketPrice);
-        return Number.isFinite(p) ? p : null;
-      } catch {
-        return null;
-      }
-    };
 
     const fetchPrices = async () => {
       try {
         const entries = await Promise.all(
           INITIAL_TICKER.map(async ([label]) => {
-            const sym = YAHOO_MAP[label];
+            const sym = SYMBOL_MAP[label];
             if (!sym) return null;
-            const p = await fetchOne(sym);
-            return p != null ? [label, p] as const : null;
+            try {
+              const snap = await fetchSnapshot({ data: { symbol: sym } });
+              if (!snap || !Number.isFinite(snap.price)) return null;
+              return [label, snap.price, snap.changePct] as const;
+            } catch {
+              return null;
+            }
           }),
         );
         if (!alive) return;
-        const priceByLabel = new Map(entries.filter((e): e is readonly [string, number] => !!e));
+        const dataByLabel = new Map(
+          entries.filter((e): e is readonly [string, number, number | null] => !!e).map((e) => [e[0], { price: e[1], pct: e[2] }]),
+        );
         setRows((prev) =>
           prev.map(([label, price, delta]) => {
-            const p = priceByLabel.get(label);
-            if (p == null) return [label, price, delta];
-            const prevN = parseFloat(price.replace(/,/g, ""));
-            const pct = isFinite(prevN) && prevN > 0 ? ((p - prevN) / prevN) * 100 : 0;
-            const sign = pct >= 0 ? "+" : "";
-            const deltaOut = Math.abs(pct) < 0.005 ? delta : `${sign}${pct.toFixed(2)}%`;
-            return [label, fmtPrice(p), deltaOut];
+            const d = dataByLabel.get(label);
+            if (!d) return [label, price, delta];
+            const sign = (d.pct ?? 0) >= 0 ? "+" : "";
+            const deltaOut = d.pct == null ? delta : `${sign}${d.pct.toFixed(2)}%`;
+            return [label, fmtPrice(d.price), deltaOut];
           }),
         );
       } catch {
@@ -141,6 +134,7 @@ function useLiveTicker(): TickerRow[] {
       alive = false;
       clearInterval(id);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return rows;
 }
