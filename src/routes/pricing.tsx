@@ -226,12 +226,14 @@ function PricingPage() {
                   <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                 </th>
                 {[
-                  { name: "Free", price: "$0", tag: "Curious", to: "/founding" as const, cta: "Apply now", dark: false, key: "free" },
-                  { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", to: "/founding" as const, cta: "Apply now", dark: false, accent: true, key: "pro" },
-                  { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", to: "/founding" as const, cta: "Apply now", dark: true, key: "elite" },
-                  { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", to: "/founding" as const, cta: "Apply now", dark: false, key: "ultra" },
+                  { name: "Free", price: "$0", tag: "Curious", to: "/founding" as const, dark: false, key: "free" },
+                  { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", to: "/founding" as const, dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", to: "/founding" as const, dark: true, key: "elite" },
+                  { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", to: "/founding" as const, dark: false, key: "ultra" },
                 ].map((p) => {
                   const isCurrent = currentPlan === p.key;
+                  const isLoggedIn = currentPlan !== null;
+                  const cta = isLoggedIn ? "Upgrade" : "Apply now";
                   return (
                   <th
                     key={p.name}
@@ -271,7 +273,7 @@ function PricingPage() {
                             : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
                         }`}
                       >
-                        {p.cta}
+                        {cta}
                       </Link>
                     )}
                   </th>
