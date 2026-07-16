@@ -41,13 +41,19 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         }
 
         const cfg = settingsMap.get("auto_scan_config") ?? {};
-        const pairs = (cfg.pairs as string[]) ?? [
+        const rawPairs = (cfg.pairs as string[]) ?? [
           "XAUUSD",
-          "GBPUSD",
-          "EURUSD",
-          "US30",
-          "NAS100",
+          "XAUEUR",
+          "XAUGBP",
+          "XAUJPY",
+          "XAUAUD",
+          "XAUCHF",
         ];
+        // Gold-only: strip any non-XAU symbols even if config has legacy entries
+        const pairs = rawPairs.filter(
+          (p) =>
+            typeof p === "string" && p.toUpperCase().startsWith("XAU"),
+        );
         const minConf = Number(cfg.min_conf ?? 59);
         const confirmWindowMin = Number(cfg.confirm_window_min ?? 45);
         const cooldownMin = Number(cfg.cooldown_min ?? 60);
