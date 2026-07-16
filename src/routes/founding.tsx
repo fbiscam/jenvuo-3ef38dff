@@ -138,7 +138,7 @@ function FoundingPage() {
               ["Start paying — only if you profit", "Cross $100 profit and your plan activates; no profit in 90 days, no charge."],
             ].map(([t, d], i) => (
               <li key={t} className="flex gap-4">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-xs font-semibold text-white">{i + 1}</div>
+                <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${i === 0 ? "bg-green-500 text-zinc-900" : "bg-zinc-900 text-white"}`}>{i + 1}</div>
                 <div>
                   <div className="font-semibold text-zinc-900">{t}</div>
                   <div className="mt-0.5 text-[13px] text-zinc-600">{d}</div>
