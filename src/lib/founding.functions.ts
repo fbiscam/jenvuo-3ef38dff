@@ -299,6 +299,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
           </div></body></html>`;
         const text = `New founding application\n\n${data.full_name} <${data.email}>\nRequested plan: ${data.requested_plan.toUpperCase()}\nCountry: ${data.country || "—"}\nBroker: ${data.broker || "—"}\nExperience: ${data.experience_years ?? "—"} yrs\nMonthly volume: $${data.monthly_volume_usd ?? "—"}\nMyFxBook: ${data.myfxbook_url || "—"}\n\n${data.why_joining}`;
         const messageId = crypto.randomUUID();
+        const adminUnsubToken = await getOrCreateUnsubToken(admin, SUPPORT_INBOX);
         await admin.from("email_send_log").insert({
           message_id: messageId,
           template_name: "founding-application",
@@ -319,6 +320,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
             purpose: "transactional",
             label: "founding-application",
             idempotency_key: `founding-${messageId}`,
+            unsubscribe_token: adminUnsubToken,
             queued_at: new Date().toISOString(),
           },
         });
