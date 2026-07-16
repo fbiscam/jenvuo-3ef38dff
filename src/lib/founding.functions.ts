@@ -94,7 +94,9 @@ type ApplicantEmailKind = "received" | "approved" | "rejected" | "waitlisted" | 
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string) {
   const meta = PLAN_META[plan] || PLAN_META.elite;
-  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }) => `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#18181b;padding:24px 12px">
+  const FONT = "'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif";
+  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }) => `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:${FONT};color:#18181b;padding:24px 12px">
+
     <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:20px;overflow:hidden">
       <div style="padding:28px 32px 8px">
         <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#71717a">${escapeHtml(tag)}</div>
