@@ -1521,6 +1521,7 @@ function SignalPage() {
                       {signalSaved ? "Saved" : "Save Signal"}
                     </button>
                   </div>
+                  )}
                 </div>
               )}
 
