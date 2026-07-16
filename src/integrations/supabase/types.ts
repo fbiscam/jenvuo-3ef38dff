@@ -1004,6 +1004,7 @@ export type Database = {
       profiles: {
         Row: {
           alerts_last_seen_at: string | null
+          avatar_url: string | null
           created_at: string
           full_name: string | null
           id: string
@@ -1015,6 +1016,7 @@ export type Database = {
         }
         Insert: {
           alerts_last_seen_at?: string | null
+          avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id: string
@@ -1026,6 +1028,7 @@ export type Database = {
         }
         Update: {
           alerts_last_seen_at?: string | null
+          avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { deleteMyAccount } from "@/lib/delete-account.functions";
@@ -12,6 +12,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/profile")({
 
 function Profile() {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -21,15 +22,29 @@ function Profile() {
   const [changingEmail, setChangingEmail] = useState(false);
   const [emailPending, setEmailPending] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [avatarPath, setAvatarPath] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const refreshAvatarUrl = async (path: string | null) => {
+    if (!path) { setAvatarUrl(null); return; }
+    const { data } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+    setAvatarUrl(data?.signedUrl ?? null);
+  };
 
   useEffect(() => {
     (async () => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) return;
+      setUserId(user.user.id);
       setEmail(user.user.email ?? "");
-      const { data } = await supabase.from("profiles").select("full_name").eq("id", user.user.id).maybeSingle();
+      const { data } = await supabase.from("profiles").select("full_name, avatar_url").eq("id", user.user.id).maybeSingle();
       if (data?.full_name) setFullName(data.full_name);
+      if (data?.avatar_url) {
+        setAvatarPath(data.avatar_url);
+        await refreshAvatarUrl(data.avatar_url);
+      }
     })();
   }, []);
 
@@ -40,6 +55,54 @@ function Profile() {
     const { error } = await supabase.from("profiles").upsert({ id: user.user.id, full_name: fullName });
     setSaving(false);
     if (error) toast.error("Could not save"); else toast.success("Profile updated");
+  };
+
+  const onAvatarPick = () => fileInputRef.current?.click();
+
+  const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !userId) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please choose an image file"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Max 5MB"); return; }
+    setUploadingAvatar(true);
+    try {
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const path = `${userId}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) throw upErr;
+
+      // Clean up previous avatar object
+      if (avatarPath && avatarPath !== path) {
+        await supabase.storage.from("avatars").remove([avatarPath]).catch(() => {});
+      }
+
+      const { error: profErr } = await supabase.from("profiles").upsert({ id: userId, avatar_url: path });
+      if (profErr) throw profErr;
+      setAvatarPath(path);
+      await refreshAvatarUrl(path);
+      toast.success("Profile photo updated");
+    } catch (err: any) {
+      toast.error(err?.message || "Upload failed");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const removeAvatar = async () => {
+    if (!userId || !avatarPath) return;
+    setUploadingAvatar(true);
+    try {
+      await supabase.storage.from("avatars").remove([avatarPath]).catch(() => {});
+      await supabase.from("profiles").upsert({ id: userId, avatar_url: null });
+      setAvatarPath(null);
+      setAvatarUrl(null);
+      toast.success("Profile photo removed");
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   const changeEmail = async () => {
@@ -89,6 +152,50 @@ function Profile() {
     <div className="max-w-2xl space-y-6">
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <h2 className="text-base font-semibold">Profile</h2>
+
+        {/* Profile photo */}
+        <div className="mt-5 flex items-center gap-5">
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-zinc-200 bg-zinc-100">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-zinc-400">
+                {(fullName || email || "?").trim().charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={onAvatarPick}
+                disabled={uploadingAvatar}
+                className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
+              >
+                {uploadingAvatar ? "Uploading…" : avatarPath ? "Change photo" : "Upload photo"}
+              </button>
+              {avatarPath && (
+                <button
+                  type="button"
+                  onClick={removeAvatar}
+                  disabled={uploadingAvatar}
+                  className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 disabled:opacity-50"
+                >
+                  Remove
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={onAvatarChange}
+              />
+            </div>
+            <p className="text-[11px] text-zinc-500">JPG, PNG or WebP. Max 5MB.</p>
+          </div>
+        </div>
+
         <div className="mt-5 space-y-4">
           <label className="block text-xs font-medium text-zinc-600">
             Full name
