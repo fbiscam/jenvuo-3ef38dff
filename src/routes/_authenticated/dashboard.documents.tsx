@@ -131,8 +131,7 @@ function DocumentsPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-zinc-900 mt-1">Earning proof</h1>
         <p className="text-sm text-zinc-600 mt-2 whitespace-pre-line">
-          Upload screenshots or a short screen-recording of your recent trading earnings&nbsp;
-          billing activates only after our team verifies your proof.
+          {`Upload screenshots or a short screen-recording of your recent trading earnings\u00A0\nbilling activates only after our team verifies your proof.`}
         </p>
       </div>
 
