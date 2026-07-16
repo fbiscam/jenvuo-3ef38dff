@@ -432,21 +432,9 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
       }
     }
 
-    // Award referral credit ($5 each) when approved/active
-    if (data.status === "approved" || data.status === "active") {
-      try {
-        const url = process.env.SUPABASE_URL;
-        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-        if (url && service) {
-          const admin = createClient<Database>(url, service, {
-            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-          });
-          await admin.rpc("award_founding_referral" as any, { _application_id: data.id });
-        }
-      } catch (e) {
-        console.error("[founding] referral award failed:", (e as Error)?.message);
-      }
-    }
+    // Referral reward ($5 each) is now awarded when the referred user upgrades
+    // to a paid plan after their trial — handled in public.set_user_plan.
+
     if (p?.email && data.status && data.status !== p.status) {
       const kindMap: Record<string, ApplicantEmailKind[]> = {
         approved: ["approved", "funded"],

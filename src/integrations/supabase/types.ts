@@ -1614,6 +1614,10 @@ export type Database = {
         Args: { _application_id: string }
         Returns: Json
       }
+      award_founding_referral_by_user: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       close_chat_session: { Args: { _session_id: string }; Returns: undefined }
       convert_referral: { Args: { _user_id: string }; Returns: undefined }
       create_chat_session: {
