@@ -1041,10 +1041,10 @@ function SignalPage() {
                 className={cn(
                   "shrink-0 h-7 px-2.5 rounded-md font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[13px] font-normal tracking-normal transition border inline-flex items-center gap-1",
                   active
-                    ? "bg-zinc-900 text-white border-zinc-900"
+                    ? "bg-zinc-50 text-zinc-900 border-zinc-400 ring-1 ring-zinc-300 shadow-sm font-medium"
                     : locked
-                      ? "bg-zinc-50 text-zinc-400 border-zinc-200 hover:bg-zinc-100 cursor-pointer"
-                      : "bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-50",
+                      ? "bg-white text-zinc-400 border-zinc-200 hover:bg-zinc-50 cursor-pointer"
+                      : "bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-50",
                 )}
                 title={locked ? "Pro feature — upgrade to unlock" : undefined}
               >
