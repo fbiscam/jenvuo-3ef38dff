@@ -101,7 +101,7 @@ const boxLabel = {
   margin: '0 0 6px',
 }
 const boxValue = {
-  fontFamily: 'Urbanist, Arial, sans-serif',
+  fontFamily: "'Google Sans','Google Sans Normal',Arial,sans-serif",
   fontSize: '22px',
   fontWeight: 700 as const,
   color: COLORS.ink,
@@ -124,7 +124,7 @@ const stepsHeading = {
   margin: '4px 0 10px',
 }
 const feat = {
-  fontFamily: 'Urbanist, Arial, sans-serif',
+  fontFamily: "'Google Sans','Google Sans Normal',Arial,sans-serif",
   fontSize: '14px',
   color: '#3f3f46',
   lineHeight: '1.6',

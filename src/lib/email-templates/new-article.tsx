@@ -154,7 +154,7 @@ export const template = {
 const main: React.CSSProperties = {
   backgroundColor: '#ffffff',
   fontFamily:
-    "Urbanist, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif",
   margin: 0,
   padding: '24px 0',
   color: '#18181b',
@@ -184,7 +184,7 @@ const brandWordmark: React.CSSProperties = {
   color: '#09090b',
 }
 const headerMeta: React.CSSProperties = {
-  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 10,
   letterSpacing: '0.22em',
   color: '#71717a',
@@ -201,7 +201,7 @@ const liveDot: React.CSSProperties = {
   color: '#dc2626',
 }
 const liveText: React.CSSProperties = {
-  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 11,
   letterSpacing: '0.2em',
   fontWeight: 700,
@@ -218,7 +218,7 @@ const bodySection: React.CSSProperties = {
   padding: '24px 32px 8px',
 }
 const categoryLabel: React.CSSProperties = {
-  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 10,
   letterSpacing: '0.22em',
   color: '#71717a',
@@ -269,7 +269,7 @@ const footer: React.CSSProperties = {
   textAlign: 'center',
 }
 const footerBrand: React.CSSProperties = {
-  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 10,
   letterSpacing: '0.28em',
   color: '#09090b',
