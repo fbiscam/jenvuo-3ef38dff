@@ -2162,6 +2162,9 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
   const isTop = plan.setupGrade === "A+" || plan.setupGrade === "A";
   const passed = plan.setupChecks.filter((c) => c.pass === true).length;
   const total = plan.setupChecks.length;
+  // Use blended trade-plan confidence (rules + AI) so the score card matches
+  // what the user sees on the trade plan (e.g. 72) instead of rules-only setupScore (49).
+  const displayScore = Math.max(0, Math.min(100, Math.round(Number(plan.trade?.confidence ?? plan.setupScore))));
   // Direction/bias is separate from setup quality — an A+ setup can be short.
   const dir = (plan.trade?.direction ?? "").toString().toLowerCase();
   const bias = (plan.htfBias ?? "").toString().toLowerCase();
@@ -2192,7 +2195,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
             A+ Setup Score
           </span>
           <span className={`text-base font-bold tabular-nums ${MONO} text-zinc-900`}>
-            {plan.setupScore}
+            {displayScore}
             <span className="text-zinc-400 text-[11px] font-medium">/100</span>
           </span>
         </div>
@@ -2226,7 +2229,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
           <div className="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${plan.setupScore}%` }}
+              animate={{ width: `${displayScore}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
               className={cn("h-full", barFill)}
             />
