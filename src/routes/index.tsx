@@ -172,6 +172,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function HomePage() {
   const ticker = useLiveTicker();
   const currentPlan = useCurrentPlan();
+  const upgradeLock = useUpgradeLock();
   return (
     <>
     <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
