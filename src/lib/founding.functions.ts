@@ -347,7 +347,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
 export const foundingStats = createServerFn({ method: "GET" }).handler(async () => {
   const url = process.env.SUPABASE_URL;
   const pub = process.env.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !pub) return { seatsFilled: 0, seatsTotal: 100 };
+  if (!url || !pub) return { seatsFilled: 0, seatsTotal: 220 };
   const supa = createClient<Database>(url, pub, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
@@ -357,7 +357,7 @@ export const foundingStats = createServerFn({ method: "GET" }).handler(async () 
     .select("id", { count: "exact", head: true })
     .in("status", ["approved", "active"])
     .eq("seat_month", monthKey);
-  return { seatsFilled: count ?? 0, seatsTotal: 100, monthKey };
+  return { seatsFilled: count ?? 0, seatsTotal: 220, monthKey };
 });
 
 /* ---------------- Document submission tracking ---------------- */
