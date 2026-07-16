@@ -45,6 +45,44 @@ function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+function htmlToText(html: string) {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|h[1-6]|tr)>/gi, "\n")
+    .replace(/<li[^>]*>/gi, "• ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+async function getOrCreateUnsubToken(admin: any, email: string): Promise<string> {
+  const normalized = email.toLowerCase();
+  const { data: existing } = await admin
+    .from("email_unsubscribe_tokens")
+    .select("token, used_at")
+    .eq("email", normalized)
+    .maybeSingle();
+  if (existing?.token && !existing.used_at) return existing.token as string;
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  const token = Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  await admin
+    .from("email_unsubscribe_tokens")
+    .upsert({ token, email: normalized }, { onConflict: "email", ignoreDuplicates: true });
+  const { data: stored } = await admin
+    .from("email_unsubscribe_tokens")
+    .select("token")
+    .eq("email", normalized)
+    .maybeSingle();
+  return (stored?.token as string) ?? token;
+}
+
 const PLAN_META: Record<string, { label: string; wallet: string; blurb: string }> = {
   free: { label: "Free", wallet: "$2 starting credit", blurb: "Try the platform on XAU/USD. Upgrade any time." },
   pro: { label: "Pro", wallet: "$15 wallet credit", blurb: "Multi-pair scans, realtime alerts, full trade management." },
@@ -136,8 +174,10 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
 
 async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string) {
   const { subject, html } = renderApplicantEmail(kind, name, plan);
+  const text = htmlToText(html);
   const messageId = crypto.randomUUID();
   try {
+    const unsubscribeToken = await getOrCreateUnsubToken(admin, to);
     await admin.from("email_send_log").insert({
       message_id: messageId,
       template_name: `founding-${kind}`,
@@ -153,10 +193,12 @@ async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: s
         sender_domain: SENDER_DOMAIN,
         subject,
         html,
+        text,
         reply_to: SUPPORT_INBOX,
         purpose: "transactional",
         label: `founding-${kind}`,
         idempotency_key: `founding-${kind}-${messageId}`,
+        unsubscribe_token: unsubscribeToken,
         queued_at: new Date().toISOString(),
       },
     });
@@ -257,6 +299,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
           </div></body></html>`;
         const text = `New founding application\n\n${data.full_name} <${data.email}>\nRequested plan: ${data.requested_plan.toUpperCase()}\nCountry: ${data.country || "—"}\nBroker: ${data.broker || "—"}\nExperience: ${data.experience_years ?? "—"} yrs\nMonthly volume: $${data.monthly_volume_usd ?? "—"}\nMyFxBook: ${data.myfxbook_url || "—"}\n\n${data.why_joining}`;
         const messageId = crypto.randomUUID();
+        const adminUnsubToken = await getOrCreateUnsubToken(admin, SUPPORT_INBOX);
         await admin.from("email_send_log").insert({
           message_id: messageId,
           template_name: "founding-application",
@@ -277,6 +320,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
             purpose: "transactional",
             label: "founding-application",
             idempotency_key: `founding-${messageId}`,
+            unsubscribe_token: adminUnsubToken,
             queued_at: new Date().toISOString(),
           },
         });
