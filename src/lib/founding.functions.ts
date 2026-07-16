@@ -113,7 +113,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `Thanks for applying, ${n}`,
           "Application update",
           `<p style="margin:0 0 12px">We reviewed your application carefully. This month's cohort is a tight fit and unfortunately we're not able to offer you a founding seat right now.</p>
-           <p style="margin:0 0 12px">This isn't a judgment on you as a trader — the program is capped at 100 seats and prioritizes very specific criteria each intake.</p>
+           <p style="margin:0 0 12px">This isn't a judgment on you as a trader — the program is capped at 220 seats and prioritizes very specific criteria each intake.</p>
            <p style="margin:0">You're welcome to sign up on the standard plans at any time, and to re-apply for a future cohort. We appreciate the time you took.</p>`,
           { label: "See plans", href: `${APP_URL}/pricing` },
         ),
@@ -124,7 +124,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `You're on the waitlist, ${n}`,
           "Waitlisted · Founding Trader",
-          `<p style="margin:0 0 12px">This month's 100 seats are filled, but your application looks strong — you're on the waitlist for the next cohort.</p>
+          `<p style="margin:0 0 12px">This month's 220 seats are filled, but your application looks strong — you're on the waitlist for the next cohort.</p>
            <p style="margin:0 0 12px">As soon as a seat opens (or the next month rolls over on the 1st), we'll email you to activate your <strong>${escapeHtml(meta.label)}</strong> plan.</p>
            <p style="margin:0">No action needed from your side. Sit tight.</p>`,
           { label: "Explore the platform", href: `${APP_URL}/signal` },
@@ -347,7 +347,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
 export const foundingStats = createServerFn({ method: "GET" }).handler(async () => {
   const url = process.env.SUPABASE_URL;
   const pub = process.env.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !pub) return { seatsFilled: 0, seatsTotal: 100 };
+  if (!url || !pub) return { seatsFilled: 0, seatsTotal: 220 };
   const supa = createClient<Database>(url, pub, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
@@ -357,7 +357,7 @@ export const foundingStats = createServerFn({ method: "GET" }).handler(async () 
     .select("id", { count: "exact", head: true })
     .in("status", ["approved", "active"])
     .eq("seat_month", monthKey);
-  return { seatsFilled: count ?? 0, seatsTotal: 100, monthKey };
+  return { seatsFilled: count ?? 0, seatsTotal: 220, monthKey };
 });
 
 /* ---------------- Document submission tracking ---------------- */
