@@ -784,6 +784,7 @@ function DashboardLayout() {
             { to: "/dashboard/admin/messages", label: "Inbox", icon: "inbox" },
             { to: "/dashboard/admin/subscribers", label: "Subscribers", icon: "group" },
             { to: "/dashboard/admin/founding", label: "Founding", icon: "workspace_premium" },
+            { to: "/dashboard/admin/documents", label: "Documents", icon: "verified_user" },
           ] }] : [])].map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
               {!sidebarCollapsed && group.label && (
