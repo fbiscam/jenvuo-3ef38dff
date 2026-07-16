@@ -385,7 +385,11 @@ function SignalPage() {
             } catch (e) { console.warn("entry focus failed", e); }
           }
           await speakWait(p.trade.summary);
-          toast.success(`Setup ready · ${p.setupGrade}`);
+          const hasLevels =
+            Number.isFinite(p.trade.entry) && Number.isFinite(p.trade.sl) && Number.isFinite(p.trade.tp);
+          if ((p.trade.confidence ?? 0) >= 59 && hasLevels && p.trade.direction !== "WAIT") {
+            toast.success(`Setup ready · ${p.setupGrade}`);
+          }
         }
       } finally {
         setPlaying(false);
