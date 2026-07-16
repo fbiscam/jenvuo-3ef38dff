@@ -2607,7 +2607,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       const syncedGrade = finalConf >= 90 ? "A+" : finalConf >= 80 ? "A" : finalConf >= 65 ? "B" : "C";
       if (built.direction !== "WAIT") {
         setupGrade = syncedGrade;
-        tradeFromAi.setupGrade = syncedGrade;
+        (tradeFromAi as any).setupGrade = syncedGrade;
       }
     }
     if (built.direction !== "WAIT") {
