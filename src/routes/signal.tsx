@@ -651,6 +651,9 @@ function SignalPage() {
     // Skip TP/SL/entry-fill events when market is closed (weekends for FX/metals/indices).
     if (!isMarketOpen(plan.instrument.symbol)) return;
     if (plan.trade.direction === "WAIT") return;
+    // Only track & fire notifications when confidence ≥ 59% AND entry/SL/TP are valid.
+    if ((plan.trade.confidence ?? 0) < 59) return;
+    if (!Number.isFinite(plan.trade.entry) || !Number.isFinite(plan.trade.sl) || !Number.isFinite(plan.trade.tp)) return;
 
     const tr = plan.trade;
     const dir = tr.direction;
