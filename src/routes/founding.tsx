@@ -46,6 +46,15 @@ function FoundingPage() {
   const pct = Math.min(100, Math.round((seats.filled / seats.total) * 100));
 
   const [plan, setPlan] = React.useState<"free" | "pro" | "elite" | "ultra">("elite");
+  const [refEmail, setRefEmail] = React.useState<string>("");
+
+  React.useEffect(() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      const r = p.get("ref") || p.get("referrer") || "";
+      if (r) setRefEmail(r);
+    } catch {}
+  }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
