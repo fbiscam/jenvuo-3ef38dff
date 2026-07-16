@@ -481,13 +481,22 @@ export const foundingStats = createServerFn({ method: "GET" }).handler(async () 
   const supa = createClient<Database>(url, pub, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
-  const monthKey = new Date().toISOString().slice(0, 7);
-  const { count } = await supa
+  const now = new Date();
+  const monthKey = now.toISOString().slice(0, 7);
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+  const monthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
+  // Count approved/active applications for this month, matching either seat_month
+  // or falling back to approved_at / created_at within the current month.
+  const { data: rows } = await supa
     .from("founding_applications" as any)
-    .select("id", { count: "exact", head: true })
-    .in("status", ["approved", "active"])
-    .eq("seat_month", monthKey);
-  return { seatsFilled: count ?? 0, seatsTotal: 220, monthKey };
+    .select("id, seat_month, approved_at, created_at, status")
+    .in("status", ["approved", "active"]);
+  const filled = (rows ?? []).filter((r: any) => {
+    if (r.seat_month === monthKey) return true;
+    const ts = r.approved_at || r.created_at;
+    return ts && ts >= monthStart && ts < monthEnd;
+  }).length;
+  return { seatsFilled: filled, seatsTotal: 220, monthKey };
 });
 
 /* ---------------- Document submission tracking ---------------- */
