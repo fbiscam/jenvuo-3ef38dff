@@ -607,7 +607,62 @@ function HomePage() {
         </div>
       </section>
 
-      {/* PRICING section removed — invite-only via Founding program */}
+      {/* PRICING — invite-only via Founding program */}
+      <section className="border-t border-zinc-100 bg-white">
+        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Invite Only Access</div>
+              <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
+                After raising $100 in revenue — pricing.
+              </h2>
+            </div>
+            <Link to="/founding" className="text-sm font-medium text-zinc-900 underline underline-offset-4">
+              Apply to the Founding Program →
+            </Link>
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { name: "Free", price: "$0", tag: "Curious", bullets: ["$2 wallet", "A+ signals & narration", "Trade journal", "No realtime alerts"] },
+              { name: "Pro", price: "$15", tag: "Active trader", accent: true, bullets: ["$15 wallet", "Realtime A+ alerts", "Full ICT/SMC narration", "Multi-timeframe bias"] },
+              { name: "Elite", price: "$50", tag: "Desk", bullets: ["$50 wallet", "< 30s priority alerts", "Multi-pair scanner", "Custom alert rules"] },
+              { name: "Ultra", price: "$100", tag: "Fund / Desk+", bullets: ["$100 wallet", "Everything in Elite", "Priority desk support", "API & webhooks"] },
+            ].map((p) => (
+              <div
+                key={p.name}
+                className={`flex flex-col rounded-2xl border p-6 ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                  {p.accent && (
+                    <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>
+                  )}
+                </div>
+                <div className="mt-2 flex items-baseline gap-1">
+                  <span className="text-3xl tracking-tight text-zinc-900 price-font">{p.price}</span>
+                  {p.price !== "$0" && <span className="text-[11px] text-zinc-500 price-font">/Free credits</span>}
+                </div>
+                <p className={`${MONO} mt-1 text-[10px] uppercase tracking-wider text-zinc-500`}>{p.tag} · Invite only</p>
+                <ul className="mt-5 space-y-2 text-sm text-zinc-700">
+                  {p.bullets.map((b) => (
+                    <li key={b} className="flex gap-2"><span className="text-zinc-400">·</span><span>{b}</span></li>
+                  ))}
+                </ul>
+                <Link
+                  to="/founding"
+                  className={`mt-6 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-xs font-medium transition ${
+                    p.accent ? "bg-zinc-900 text-white hover:bg-black" : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
+                  }`}
+                >
+                  Apply now
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
 
       {/* TESTIMONIALS */}
       <section className="border-t border-zinc-100 bg-white">
