@@ -347,7 +347,7 @@ function Billing() {
             <thead>
               <tr className="border-b border-zinc-200">
                 <th className="p-6 text-left align-bottom">
-                  <span className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">Plans</span>
+                  <span className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">Invite Only Pricing</span>
                 </th>
                 {[
                   { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false, key: "free" },
