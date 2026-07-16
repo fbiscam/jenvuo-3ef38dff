@@ -678,6 +678,7 @@ export type Database = {
           ip_address: string | null
           monthly_volume_usd: number | null
           myfxbook_url: string | null
+          requested_plan: string
           seat_month: string | null
           status: string
           updated_at: string
@@ -698,6 +699,7 @@ export type Database = {
           ip_address?: string | null
           monthly_volume_usd?: number | null
           myfxbook_url?: string | null
+          requested_plan?: string
           seat_month?: string | null
           status?: string
           updated_at?: string
@@ -718,6 +720,7 @@ export type Database = {
           ip_address?: string | null
           monthly_volume_usd?: number | null
           myfxbook_url?: string | null
+          requested_plan?: string
           seat_month?: string | null
           status?: string
           updated_at?: string
