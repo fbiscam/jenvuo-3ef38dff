@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { deleteMyAccount } from "@/lib/delete-account.functions";
 import { requestEmailChange } from "@/lib/email-change.functions";
+import AvatarAdjuster from "@/components/AvatarAdjuster";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: Profile,
@@ -26,6 +27,7 @@ function Profile() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
   const refreshAvatarUrl = async (path: string | null) => {
     if (!path) { setAvatarUrl(null); return; }
@@ -59,19 +61,24 @@ function Profile() {
 
   const onAvatarPick = () => fileInputRef.current?.click();
 
-  const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file || !userId) return;
     if (!file.type.startsWith("image/")) { toast.error("Please choose an image file"); return; }
-    if (file.size > 5 * 1024 * 1024) { toast.error("Max 5MB"); return; }
+    if (file.size > 10 * 1024 * 1024) { toast.error("Max 10MB"); return; }
+    setPendingFile(file);
+  };
+
+  const uploadAdjustedBlob = async (blob: Blob) => {
+    if (!userId) return;
     setUploadingAvatar(true);
+    setPendingFile(null);
     try {
-      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-      const path = `${userId}/avatar-${Date.now()}.${ext}`;
+      const path = `${userId}/avatar-${Date.now()}.jpg`;
       const { error: upErr } = await supabase.storage
         .from("avatars")
-        .upload(path, file, { upsert: true, contentType: file.type });
+        .upload(path, blob, { upsert: true, contentType: "image/jpeg" });
       if (upErr) throw upErr;
 
       // Clean up previous avatar object
@@ -192,7 +199,7 @@ function Profile() {
                 onChange={onAvatarChange}
               />
             </div>
-            <p className="text-[11px] text-zinc-500">JPG, PNG or WebP. Max 5MB.</p>
+            <p className="text-[11px] text-zinc-500">JPG, PNG or WebP. Max 10MB. You can crop, zoom and reposition after selecting.</p>
           </div>
         </div>
 
@@ -271,6 +278,14 @@ function Profile() {
           </div>
         )}
       </section>
+
+      {pendingFile && (
+        <AvatarAdjuster
+          file={pendingFile}
+          onCancel={() => setPendingFile(null)}
+          onDone={(blob) => { void uploadAdjustedBlob(blob); }}
+        />
+      )}
     </div>
   );
 }
