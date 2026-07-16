@@ -2229,7 +2229,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
           <div className="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${plan.setupScore}%` }}
+              animate={{ width: `${displayScore}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
               className={cn("h-full", barFill)}
             />
