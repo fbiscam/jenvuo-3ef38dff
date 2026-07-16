@@ -248,6 +248,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                   rr: Number(rr.toFixed(2)),
                   confidence: Math.round(conf),
                   setup_score: setupScore,
+                  session,
+                  killzone: plan.killzone ?? null,
                   source: "auto_scan",
                 },
               }));
