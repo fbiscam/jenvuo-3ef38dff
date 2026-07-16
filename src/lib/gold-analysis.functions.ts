@@ -2427,7 +2427,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
               { role: "user", content: reviewUser },
             ],
             jsonMode: true,
-            maxTokens: 220,
+            maxTokens: 320,
             timeoutMs: 20000,
             priority: false,
             retriesPerModel: 2,
