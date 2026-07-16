@@ -178,6 +178,30 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
       auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
     });
 
+    const normalizedReferrer =
+      data.referrer_email && data.referrer_email.length > 0
+        ? data.referrer_email.toLowerCase()
+        : null;
+
+    // Prevent the same referrer email from being reused across multiple applications
+    if (normalizedReferrer) {
+      if (normalizedReferrer === data.email.toLowerCase()) {
+        return { ok: false, error: "You can't refer yourself." };
+      }
+      const { data: existing } = await supabase
+        .from("founding_applications" as any)
+        .select("id")
+        .eq("referrer_email", normalizedReferrer)
+        .limit(1)
+        .maybeSingle();
+      if (existing) {
+        return {
+          ok: false,
+          error: "This referral email has already been used on another application.",
+        };
+      }
+    }
+
     const { error } = await supabase.from("founding_applications" as any).insert({
       full_name: data.full_name,
       email: data.email.toLowerCase(),
@@ -188,9 +212,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
       why_joining: data.why_joining,
       myfxbook_url: data.myfxbook_url || null,
       requested_plan: data.requested_plan,
-      referrer_email: data.referrer_email && data.referrer_email.length > 0
-        ? data.referrer_email.toLowerCase()
-        : null,
+      referrer_email: normalizedReferrer,
     });
 
     if (error) {
