@@ -407,6 +407,20 @@ function Billing() {
                         <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
                           Active plan
                         </div>
+                      ) : upgradeLock.locked ? (
+                        <button
+                          type="button"
+                          disabled
+                          aria-disabled="true"
+                          title={
+                            upgradeLock.reason === "docs_pending"
+                              ? "Upgrades unlock after your earning proof is verified and your 30-day trial ends."
+                              : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your earning proof is verified.`
+                          }
+                          className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center whitespace-nowrap rounded-md border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-500"
+                        >
+                          Locked in trial
+                        </button>
                       ) : (
                         <Link
                           to={p.to}
