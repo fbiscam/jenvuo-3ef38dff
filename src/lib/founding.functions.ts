@@ -14,6 +14,7 @@ const ApplyInput = z.object({
   why_joining: z.string().trim().min(10).max(1500),
   myfxbook_url: z.string().trim().max(300).optional().default(""),
   requested_plan: z.enum(["free", "pro", "elite", "ultra"]).default("elite"),
+  referrer_email: z.string().trim().email().max(255).optional().or(z.literal("")),
 });
 
 export type FoundingApplication = {
