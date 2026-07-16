@@ -79,7 +79,7 @@ function FoundingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900" style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-white text-zinc-900 founding-zoom" style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif" }}>
       <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
           <Link to="/" className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight">
