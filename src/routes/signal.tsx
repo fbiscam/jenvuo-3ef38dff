@@ -2249,67 +2249,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
           </div>
         </div>
 
-        {/* Senior Review Badge — shows whether the senior AI review is included
-            and whether it adjusted the engine's original confidence. */}
-        {plan.seniorReview && (() => {
-          const sr = plan.seniorReview;
-          const s = sr.status;
-          const cfg = (() => {
-            if (s === "not_required") return {
-              tone: "border-zinc-200 bg-zinc-50 text-zinc-700",
-              dot: "bg-zinc-400",
-              title: "Senior Review · Not required",
-              sub: "Confidence below senior-review threshold on this plan.",
-            };
-            if (s === "failed") return {
-              tone: "border-amber-200 bg-amber-50/60 text-amber-800",
-              dot: "bg-amber-500",
-              title: "Senior Review · Unavailable",
-              sub: "Senior AI didn't respond in time — engine confidence shown as-is.",
-            };
-            if (s === "confirmed" || s === "completed") return {
-              tone: "border-emerald-200 bg-emerald-50/60 text-emerald-800",
-              dot: "bg-emerald-500",
-              title: `Senior Review · Confirmed${sr.modelLabel ? " · " + sr.modelLabel : ""}`,
-              sub: "Confidence not adjusted — senior AI agrees with the engine.",
-            };
-            if (s === "downgraded") return {
-              tone: "border-amber-200 bg-amber-50/60 text-amber-800",
-              dot: "bg-amber-500",
-              title: `Senior Review · Downgraded${sr.modelLabel ? " · " + sr.modelLabel : ""}`,
-              sub: "Confidence adjusted down after senior AI review.",
-            };
-            if (s === "vetoed") return {
-              tone: "border-rose-200 bg-rose-50/60 text-rose-800",
-              dot: "bg-rose-500",
-              title: `Senior Review · Vetoed${sr.modelLabel ? " · " + sr.modelLabel : ""}`,
-              sub: "Confidence capped after senior AI flagged the setup.",
-            };
-            return null;
-          })();
-          if (!cfg) return null;
-          return (
-            <div className={cn("mt-2 rounded-xl border px-3 py-2 flex items-start gap-2", cfg.tone)}>
-              <span className={cn("mt-1.5 h-2 w-2 rounded-full shrink-0", cfg.dot)} />
-              <div className="min-w-0 flex-1">
-                <div className="font-['Urbanist',sans-serif] text-[13px] font-semibold leading-tight">
-                  {cfg.title}
-                </div>
-                <div className="font-['Urbanist',sans-serif] text-[12px] font-medium opacity-90 leading-snug mt-0.5">
-                  {cfg.sub}
-                </div>
-              </div>
-              <span className={cn(
-                "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
-                sr.confidenceAdjusted ? "bg-amber-100 text-amber-800 border border-amber-300"
-                  : sr.included ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                  : "bg-zinc-100 text-zinc-600 border border-zinc-300"
-              )}>
-                {sr.confidenceAdjusted ? "Adjusted" : sr.included ? "Unchanged" : "N/A"}
-              </span>
-            </div>
-          );
-        })()}
+        {/* Senior Review UI removed — feature disabled. */}
 
         {/* Market Regime — wisdom layer */}
         {plan.marketRegime && (
