@@ -61,14 +61,15 @@ const SIGNALS = [
 
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
-  ["XAU/USD", "2,418.30", "+0.42%"],
-  ["XAU/EUR", "2,241.05", "+0.31%"],
-  ["XAU/GBP", "1,908.72", "+0.18%"],
-  ["XAU/JPY", "376,410", "+0.55%"],
-  ["XAU/AUD", "3,684.10", "+0.72%"],
-  ["XAU/CHF", "2,132.94", "+0.24%"],
-  ["DXY", "104.21", "-0.12%"],
+  ["XAU/USD", "—", "…"],
+  ["XAU/EUR", "—", "…"],
+  ["XAU/GBP", "—", "…"],
+  ["XAU/JPY", "—", "…"],
+  ["XAU/AUD", "—", "…"],
+  ["XAU/CHF", "—", "…"],
+  ["DXY", "—", "…"],
 ];
+
 
 // Server-fn symbol map — routes through getMarketSnapshot to bypass browser
 // CORS restrictions on Yahoo Finance and return authoritative live prices.
@@ -129,7 +130,7 @@ function useLiveTicker(): TickerRow[] {
       }
     };
     fetchPrices();
-    const id = setInterval(fetchPrices, 15_000);
+    const id = setInterval(fetchPrices, 10_000);
     return () => {
       alive = false;
       clearInterval(id);
@@ -199,7 +200,7 @@ function HomePage() {
               <span key={i} className="flex items-center gap-2">
                 <span className="text-zinc-900 font-medium">{s}</span>
                 <span>{p}</span>
-                <span className={d.startsWith("-") ? "text-red-500" : "text-emerald-600"}>{d}</span>
+                <span className={d === "…" ? "text-zinc-400" : d.startsWith("-") ? "text-red-500" : "text-emerald-600"}>{d}</span>
                 <span className="text-zinc-200">•</span>
               </span>
             ))}
