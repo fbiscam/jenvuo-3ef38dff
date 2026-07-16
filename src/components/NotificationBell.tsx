@@ -134,7 +134,10 @@ export default function NotificationBell() {
             table: "user_notifications",
             filter: `user_id=eq.${uid}`,
           },
-          () => {
+          (payload) => {
+            if (payload.eventType === "INSERT") {
+              beep();
+            }
             load();
           },
         )
