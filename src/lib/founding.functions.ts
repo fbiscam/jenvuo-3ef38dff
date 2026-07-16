@@ -445,23 +445,25 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
       }
     }
     if (p?.email && data.status && data.status !== p.status) {
-      const kindMap: Record<string, ApplicantEmailKind | null> = {
-        approved: "approved",
-        active: "funded",
-        rejected: "rejected",
-        waitlisted: "waitlisted",
-        pending: null,
-        graduated: null,
+      const kindMap: Record<string, ApplicantEmailKind[]> = {
+        approved: ["approved", "funded"],
+        active: ["funded"],
+        rejected: ["rejected"],
+        waitlisted: ["waitlisted"],
+        pending: [],
+        graduated: [],
       };
-      const kind = kindMap[data.status];
-      if (kind) {
+      const kinds = kindMap[data.status] ?? [];
+      if (kinds.length > 0) {
         const url = process.env.SUPABASE_URL;
         const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (url && service) {
           const admin = createClient<Database>(url, service, {
             auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
           });
-          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${data.status}`);
+          for (const kind of kinds) {
+            await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`);
+          }
         }
       }
     }
