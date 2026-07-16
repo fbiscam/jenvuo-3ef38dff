@@ -1435,9 +1435,24 @@ function SignalPage() {
 
                   {/* Trade Management — final recommendation only */}
                   {(isBuy || isSell) && (t.confidence ?? 0) >= 59 && (
-                    <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2.5 font-['Urbanist',sans-serif] text-[13px] font-medium text-emerald-950 leading-relaxed space-y-1.5">
-                      <div className="flex items-center gap-1.5 font-['Urbanist',sans-serif] font-semibold text-emerald-800 uppercase tracking-wide text-[10px] sm:text-[11px] flex-wrap">
-                        <span>◆</span> Trade Management — Final Recommendation
+                    <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2.5 font-['Urbanist',sans-serif] text-[13px] font-medium text-emerald-950 leading-relaxed space-y-2">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 font-['Urbanist',sans-serif] font-semibold text-emerald-800 uppercase tracking-wide text-[10px] sm:text-[11px]">
+                          <span>◆</span> Trade Management — Final Recommendation
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-bold tracking-wide ${
+                            plan.setupGrade === "A+" ? "bg-emerald-600 text-white" :
+                            plan.setupGrade === "A" ? "bg-emerald-500 text-white" :
+                            plan.setupGrade === "B" ? "bg-amber-500 text-white" :
+                            "bg-zinc-400 text-white"
+                          }`}>
+                            {plan.setupGrade} Setup
+                          </span>
+                          <span className="inline-flex items-center rounded-md bg-white border border-emerald-300 px-2 py-0.5 text-[12px] font-bold text-emerald-800 tabular-nums">
+                            {t.confidence}%
+                          </span>
+                        </div>
                       </div>
                       <div className="leading-relaxed">
                         At <b>30% profit</b>, close <b>70%</b> of the position and move SL to <b>breakeven</b>. Let the <b>30% runner</b> ride toward TP2 / 50% profit — exit flat if price returns, lock bonus if it runs.
