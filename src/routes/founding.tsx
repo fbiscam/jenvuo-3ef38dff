@@ -272,6 +272,7 @@ function Field(props: {
   type?: string;
   required?: boolean;
   placeholder?: string;
+  defaultValue?: string;
 }) {
   return (
     <div>
@@ -284,6 +285,7 @@ function Field(props: {
         type={props.type ?? "text"}
         required={props.required}
         placeholder={props.placeholder}
+        defaultValue={props.defaultValue}
         className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-[14px] outline-none placeholder:text-zinc-400 focus:border-zinc-900"
       />
     </div>
