@@ -110,6 +110,7 @@ const PLAN_KEY_BY_COL: Record<number, string> = { 0: "free", 1: "pro", 2: "elite
 
 function Billing() {
   const currentPlan = useCurrentPlan();
+  const upgradeLock = useUpgradeLock();
   const credits = useCredits();
   const [showAllActivity, setShowAllActivity] = useState(false);
 
