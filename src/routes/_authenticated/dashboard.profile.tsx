@@ -27,6 +27,7 @@ function Profile() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
   const refreshAvatarUrl = async (path: string | null) => {
     if (!path) { setAvatarUrl(null); return; }
