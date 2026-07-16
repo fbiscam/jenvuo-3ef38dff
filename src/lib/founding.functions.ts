@@ -151,7 +151,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Account funded, ${n}`,
           "Funded · Founding Trader",
-          `<p style="margin:0 0 12px">We funded your account with <strong>${escapeHtml(meta.wallet)}</strong> and your <strong>${escapeHtml(meta.label)}</strong> plan is active.</p>
+          `<p style="margin:0 0 12px">We funded your account with <strong>$100</strong> and your <strong>${escapeHtml(meta.label)}</strong> plan is active.</p>
            <p style="margin:0 0 12px;color:#52525b"><em>${escapeHtml(meta.blurb)}</em></p>
            <p style="margin:0 0 12px">You can now continue scanning from your dashboard. Billing starts only after your verified-profit checkpoint and document review are complete.</p>
            <p style="margin:0">If anything looks wrong, reply to this email and support will check your account.</p>`,
