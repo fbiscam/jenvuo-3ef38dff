@@ -21,6 +21,7 @@ import { Route as LlmRouteImport } from './routes/llm'
 import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as JenvuOpsX9k2RouteImport } from './routes/jenvu-ops-x9k2'
 import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as FoundingRouteImport } from './routes/founding'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as DevelopmentRouteImport } from './routes/development'
@@ -73,6 +74,7 @@ import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/b
 import { Route as AuthenticatedDashboardAdminSubscribersRouteImport } from './routes/_authenticated/dashboard.admin.subscribers'
 import { Route as AuthenticatedDashboardAdminScanAuditRouteImport } from './routes/_authenticated/dashboard.admin.scan-audit'
 import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './routes/_authenticated/dashboard.admin.messages'
+import { Route as AuthenticatedDashboardAdminFoundingRouteImport } from './routes/_authenticated/dashboard.admin.founding'
 import { Route as AuthenticatedDashboardAdminAutoScanRouteImport } from './routes/_authenticated/dashboard.admin.auto-scan'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
@@ -133,6 +135,11 @@ const JenvuOpsX9k2Route = JenvuOpsX9k2RouteImport.update({
 const InsightsRoute = InsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoundingRoute = FoundingRouteImport.update({
+  id: '/founding',
+  path: '/founding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DownloadRoute = DownloadRouteImport.update({
@@ -415,6 +422,12 @@ const AuthenticatedDashboardAdminMessagesRoute =
     path: '/admin/messages',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardAdminFoundingRoute =
+  AuthenticatedDashboardAdminFoundingRouteImport.update({
+    id: '/admin/founding',
+    path: '/admin/founding',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardAdminAutoScanRoute =
   AuthenticatedDashboardAdminAutoScanRouteImport.update({
     id: '/admin/auto-scan',
@@ -435,6 +448,7 @@ export interface FileRoutesByFullPath {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
+  '/founding': typeof FoundingRoute
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
@@ -472,6 +486,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
+  '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
@@ -501,6 +516,7 @@ export interface FileRoutesByTo {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
+  '/founding': typeof FoundingRoute
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
@@ -535,6 +551,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
   '/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
+  '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
@@ -566,6 +583,7 @@ export interface FileRoutesById {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
+  '/founding': typeof FoundingRoute
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
@@ -603,6 +621,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/_authenticated/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
+  '/_authenticated/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/_authenticated/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/_authenticated/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/_authenticated/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
@@ -634,6 +653,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
+    | '/founding'
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/killzones'
@@ -671,6 +691,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/help/$collection/'
     | '/dashboard/admin/auto-scan'
+    | '/dashboard/admin/founding'
     | '/dashboard/admin/messages'
     | '/dashboard/admin/scan-audit'
     | '/dashboard/admin/subscribers'
@@ -700,6 +721,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
+    | '/founding'
     | '/killzones'
     | '/llm'
     | '/pricing'
@@ -734,6 +756,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/help/$collection'
     | '/dashboard/admin/auto-scan'
+    | '/dashboard/admin/founding'
     | '/dashboard/admin/messages'
     | '/dashboard/admin/scan-audit'
     | '/dashboard/admin/subscribers'
@@ -764,6 +787,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
+    | '/founding'
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/killzones'
@@ -801,6 +825,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
     | '/_authenticated/dashboard/admin/auto-scan'
+    | '/_authenticated/dashboard/admin/founding'
     | '/_authenticated/dashboard/admin/messages'
     | '/_authenticated/dashboard/admin/scan-audit'
     | '/_authenticated/dashboard/admin/subscribers'
@@ -832,6 +857,7 @@ export interface RootRouteChildren {
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
   DownloadRoute: typeof DownloadRoute
+  FoundingRoute: typeof FoundingRoute
   InsightsRoute: typeof InsightsRouteWithChildren
   JenvuOpsX9k2Route: typeof JenvuOpsX9k2RouteWithChildren
   KillzonesRoute: typeof KillzonesRoute
@@ -949,6 +975,13 @@ declare module '@tanstack/react-router' {
       path: '/insights'
       fullPath: '/insights'
       preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/founding': {
+      id: '/founding'
+      path: '/founding'
+      fullPath: '/founding'
+      preLoaderRoute: typeof FoundingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/download': {
@@ -1315,6 +1348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminMessagesRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/admin/founding': {
+      id: '/_authenticated/dashboard/admin/founding'
+      path: '/admin/founding'
+      fullPath: '/dashboard/admin/founding'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminFoundingRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/admin/auto-scan': {
       id: '/_authenticated/dashboard/admin/auto-scan'
       path: '/admin/auto-scan'
@@ -1338,6 +1378,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardWorkspaceRoute: typeof AuthenticatedDashboardWorkspaceRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardAdminAutoScanRoute: typeof AuthenticatedDashboardAdminAutoScanRoute
+  AuthenticatedDashboardAdminFoundingRoute: typeof AuthenticatedDashboardAdminFoundingRoute
   AuthenticatedDashboardAdminMessagesRoute: typeof AuthenticatedDashboardAdminMessagesRoute
   AuthenticatedDashboardAdminScanAuditRoute: typeof AuthenticatedDashboardAdminScanAuditRoute
   AuthenticatedDashboardAdminSubscribersRoute: typeof AuthenticatedDashboardAdminSubscribersRoute
@@ -1359,6 +1400,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
     AuthenticatedDashboardAdminAutoScanRoute:
       AuthenticatedDashboardAdminAutoScanRoute,
+    AuthenticatedDashboardAdminFoundingRoute:
+      AuthenticatedDashboardAdminFoundingRoute,
     AuthenticatedDashboardAdminMessagesRoute:
       AuthenticatedDashboardAdminMessagesRoute,
     AuthenticatedDashboardAdminScanAuditRoute:
@@ -1427,6 +1470,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
   DownloadRoute: DownloadRoute,
+  FoundingRoute: FoundingRoute,
   InsightsRoute: InsightsRouteWithChildren,
   JenvuOpsX9k2Route: JenvuOpsX9k2RouteWithChildren,
   KillzonesRoute: KillzonesRoute,

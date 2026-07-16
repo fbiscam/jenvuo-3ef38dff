@@ -663,6 +663,69 @@ export type Database = {
         }
         Relationships: []
       }
+      founding_applications: {
+        Row: {
+          admin_notes: string | null
+          approved_at: string | null
+          broker: string | null
+          country: string | null
+          created_at: string
+          email: string
+          experience_years: number | null
+          first_profit_at: string | null
+          full_name: string
+          id: string
+          ip_address: string | null
+          monthly_volume_usd: number | null
+          myfxbook_url: string | null
+          seat_month: string | null
+          status: string
+          updated_at: string
+          user_agent: string | null
+          why_joining: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          approved_at?: string | null
+          broker?: string | null
+          country?: string | null
+          created_at?: string
+          email: string
+          experience_years?: number | null
+          first_profit_at?: string | null
+          full_name: string
+          id?: string
+          ip_address?: string | null
+          monthly_volume_usd?: number | null
+          myfxbook_url?: string | null
+          seat_month?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          why_joining?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          approved_at?: string | null
+          broker?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string
+          experience_years?: number | null
+          first_profit_at?: string | null
+          full_name?: string
+          id?: string
+          ip_address?: string | null
+          monthly_volume_usd?: number | null
+          myfxbook_url?: string | null
+          seat_month?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          why_joining?: string | null
+        }
+        Relationships: []
+      }
       insight_topics: {
         Row: {
           angle: string | null

@@ -782,6 +782,7 @@ function DashboardLayout() {
             { to: "/dashboard/admin/auto-scan", label: "Auto-Scan Monitor", icon: "radar" },
             { to: "/dashboard/admin/messages", label: "Inbox", icon: "inbox" },
             { to: "/dashboard/admin/subscribers", label: "Subscribers", icon: "group" },
+            { to: "/dashboard/admin/founding", label: "Founding", icon: "workspace_premium" },
           ] }] : [])].map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
               {!sidebarCollapsed && group.label && (
