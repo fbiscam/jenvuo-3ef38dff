@@ -198,7 +198,189 @@ function PricingPage() {
       </section>
 
 
-      {/* COMPARISON MATRIX removed — invite only */}
+      {/* COMPARISON MATRIX — homepage Beanstalk style */}
+      <section className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
+        <div className="mb-10">
+          
+          <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
+        </div>
+
+        {/* Billing interval toggle */}
+        <div className="mb-8 flex justify-center">
+          <div className="inline-flex items-center rounded-full border border-zinc-200 bg-white p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setBilling("monthly")}
+              className={`rounded-full px-4 py-1.5 font-medium transition ${billing === "monthly" ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"}`}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              onClick={() => setBilling("annual")}
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 font-medium transition ${billing === "annual" ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"}`}
+            >
+              Annual
+              <span className={`rounded-sm px-1 py-0.5 text-[9px] font-bold ${billing === "annual" ? "bg-emerald-400 text-zinc-900" : "bg-emerald-100 text-emerald-700"}`}>
+                −17%
+              </span>
+            </button>
+          </div>
+        </div>
+
+
+        <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+
+          <table className="w-full min-w-[760px] text-sm border-collapse">
+            <colgroup>
+              <col className="w-[28%]" />
+              <col className={`w-[18%] ${currentPlan === "free" ? "bg-emerald-50/50" : ""}`} />
+              <col className={`w-[18%] ${currentPlan === "pro" ? "bg-emerald-50/50" : "bg-amber-50/40"}`} />
+              <col className={`w-[18%] ${currentPlan === "elite" ? "bg-emerald-50/50" : ""}`} />
+              <col className={`w-[18%] ${currentPlan === "ultra" ? "bg-emerald-50/50" : ""}`} />
+            </colgroup>
+
+            <thead>
+              <tr className="border-b border-zinc-200">
+                <th className="p-6 text-left align-bottom">
+                  <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Pricing</span>
+                </th>
+                {[
+                  { name: "Free", price: "$0", tag: "Curious", to: "/auth" as const, cta: "Start free", dark: false, key: "free" },
+                  { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", to: "/contact" as const, cta: "Notify me", dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", to: "/contact" as const, cta: "Talk to sales", dark: true, key: "elite" },
+                  { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", to: "/contact" as const, cta: "Talk to sales", dark: false, key: "ultra" },
+                ].map((p) => {
+                  const isCurrent = currentPlan === p.key;
+                  return (
+                  <th
+                    key={p.name}
+                    className={`p-6 text-left align-top border-l border-zinc-200 ${isCurrent ? "bg-emerald-50/50" : p.accent ? "bg-amber-50/50" : ""}`}
+                  >
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                      {isCurrent && (
+                        <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
+                          Current
+                        </span>
+                      )}
+                      {p.accent && !isCurrent && (
+                        <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                          Popular
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-2 flex items-baseline gap-1">
+                      <span className="text-2xl tracking-tight text-zinc-900 price-font">{p.price}</span>
+                      {p.price.startsWith("$") && p.price !== "$0" && (
+                        <span className="text-[11px] text-zinc-500 price-font">{billing === "annual" ? "/year" : "/month"}</span>
+                      )}
+                    </div>
+                    <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
+                    <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-amber-700 font-semibold`}>Invite Only</p>
+                    {isCurrent ? (
+                      <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
+                        Active
+                      </div>
+                    ) : (
+                      <Link
+                        to={p.to}
+                        className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                          p.accent || p.dark
+                            ? "bg-zinc-900 text-white hover:bg-black"
+                            : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
+                        }`}
+                      >
+                        {p.cta}
+                      </Link>
+                    )}
+                  </th>
+                  );
+                })}
+              </tr>
+            </thead>
+
+            <tbody>
+              {([
+                { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
+                { f: "Monthly wallet (USD)", a: "$2", b: "$15", c: "$50", d: "$100" },
+                
+                { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+
+                { f: "Signal latency", a: "No alerts", b: "Realtime", c: "Realtime", d: "Realtime" },
+                { f: "AI models", a: "__MODELS_PLUS__", b: "__MODELS_PLUS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },
+                { f: "A+ signal access", a: true, b: true, c: true, d: true },
+                { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
+                { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
+                { f: "Trade journal", a: true, b: true, c: true, d: true },
+                { f: "Email + push alerts", a: false, b: true, c: true, d: true },
+                { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
+                
+                { f: "Custom alert rules", a: false, b: false, c: true, d: true },
+                
+                { f: "Priority desk support", a: false, b: false, c: false, d: true },
+              ] as ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }>).map((row, idx) => (
+                <tr
+                  key={row.f}
+                  className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
+                >
+                  <td className="px-6 py-3.5 text-zinc-800">
+                    <div className="flex items-center gap-2">
+                      {"badge" in row && row.badge && (
+                        <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                          {row.badge}
+                        </span>
+                      )}
+                      <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-zinc-500" : ""}>
+                        {row.f}
+                      </span>
+                    </div>
+                  </td>
+                  {[row.a, row.b, row.c, row.d].map((v, i) => {
+                    const colKey = (["free", "pro", "elite", "ultra"] as const)[i];
+                    const isCurrentCol = currentPlan === colKey;
+                    return (
+                    <td
+                      key={i}
+                      className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${isCurrentCol ? "bg-emerald-50/60" : i === 1 ? "bg-amber-50/40" : ""}`}
+                    >
+                      {v === true ? (
+                        <span className={`inline-block h-1.5 w-1.5 rounded-full ${isCurrentCol ? "bg-emerald-600" : "bg-zinc-900"}`} />
+                      ) : v === false ? (
+                        <span className="inline-block h-px w-4 bg-zinc-200" />
+                      ) : v === "__MODELS__" || v === "__GPT_ONLY__" || v === "__MODELS_PLUS__" ? (
+                        <span className="inline-flex flex-col items-center justify-center gap-1">
+                          <span className="inline-flex flex-col sm:flex-row flex-nowrap items-center justify-center gap-1 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
+                              <svg viewBox="0 0 24 24" width="10" height="10" fill="#000" aria-hidden="true"><path d="M22.28 9.82a5.98 5.98 0 0 0-.51-4.91 6.05 6.05 0 0 0-6.52-2.9A6 6 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.52 2.9A6 6 0 0 0 19.02 19.8a5.98 5.98 0 0 0 4-2.9 6.05 6.05 0 0 0-.74-7.1zm-9.06 12.67a4.5 4.5 0 0 1-2.88-1.04l.14-.08 4.79-2.77a.78.78 0 0 0 .39-.68v-6.76l2.03 1.17.02.05v5.6a4.5 4.5 0 0 1-4.49 4.51zM3.5 18.55a4.47 4.47 0 0 1-.54-3.03l.14.08 4.79 2.77a.78.78 0 0 0 .79 0l5.85-3.38v2.35l.02.05-4.85 2.8a4.5 4.5 0 0 1-6.2-1.64zM2.24 8.03a4.5 4.5 0 0 1 2.35-1.98v5.7a.77.77 0 0 0 .39.68l5.83 3.36-2.03 1.17a.07.07 0 0 1-.07 0l-4.84-2.8a4.5 4.5 0 0 1-1.63-6.13zm16.63 3.87-5.85-3.4L15.05 7.34a.07.07 0 0 1 .07 0l4.84 2.8a4.5 4.5 0 0 1-.68 8.11v-5.7a.79.79 0 0 0-.4-.65zm2.02-3.04-.14-.09-4.78-2.79a.78.78 0 0 0-.79 0L9.33 9.36V7.01l-.02-.05 4.85-2.8a4.5 4.5 0 0 1 6.68 4.66zM8.22 12.99l-2.03-1.17-.02-.05v-5.6a4.5 4.5 0 0 1 7.38-3.45l-.14.08L8.62 5.57a.78.78 0 0 0-.4.68zm1.1-2.38 2.61-1.5 2.6 1.5v3l-2.6 1.5-2.6-1.5z"/></svg>
+                              <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">OpenAI</span>
+                            </span>
+                          </span>
+                          {(v === "__MODELS__" || v === "__MODELS_PLUS__") && (
+                            <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
+                              <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
+                              <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">DeepSeek</span>
+                              <span className="text-zinc-300">·</span>
+                              <img src="https://www.google.com/s2/favicons?domain=google.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
+                              <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Google</span>
+                              
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : isCurrentCol ? "text-emerald-700 font-semibold" : "text-zinc-700"}`}>
+                          {v}
+                        </span>
+                      )}
+                    </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       {/* FEATURE CARDS — 6 modules */}
       <section className="border-y border-zinc-100 bg-white">
