@@ -604,3 +604,184 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/* ---------------- Earning proof file uploads ---------------- */
+
+export type FoundingDocFile = {
+  id: string;
+  application_id: string;
+  storage_path: string;
+  mime_type: string;
+  file_size: number;
+  original_name: string | null;
+  created_at: string;
+  signed_url?: string | null;
+};
+
+const BUCKET = "founding-docs";
+
+async function getServiceClient() {
+  const url = process.env.SUPABASE_URL;
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !service) throw new Error("Server not configured");
+  return createClient<Database>(url, service, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
+}
+
+async function signPaths(admin: any, rows: FoundingDocFile[]): Promise<FoundingDocFile[]> {
+  const paths = rows.map((r) => r.storage_path);
+  if (!paths.length) return rows;
+  const { data } = await admin.storage.from(BUCKET).createSignedUrls(paths, 60 * 60);
+  const map = new Map<string, string>();
+  (data || []).forEach((d: any) => {
+    if (d && d.path && d.signedUrl) map.set(d.path, d.signedUrl);
+  });
+  return rows.map((r) => ({ ...r, signed_url: map.get(r.storage_path) ?? null }));
+}
+
+// Returns the founding_applications row bound to the current user's email (creates none).
+async function getMyApplication(context: any) {
+  const email = (context.claims as any)?.email as string | undefined;
+  if (!email) return null;
+  const admin = await getServiceClient();
+  const { data } = await admin
+    .from("founding_applications" as any)
+    .select("id, email, document_status")
+    .ilike("email", email)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data as any;
+}
+
+export const registerDocumentFile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({
+      storage_path: z.string().min(3).max(500),
+      mime_type: z.string().min(3).max(120),
+      file_size: z.number().int().min(1).max(500 * 1024 * 1024),
+      original_name: z.string().max(255).optional(),
+    }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const app = await getMyApplication(context);
+    if (!app) throw new Error("No Founding application found for this account");
+    // Enforce folder ownership on stored path
+    if (!data.storage_path.startsWith(`${context.userId}/`)) {
+      throw new Error("Invalid storage path");
+    }
+    const admin = await getServiceClient();
+    const { error } = await admin.from("founding_documents" as any).insert({
+      application_id: app.id,
+      user_id: context.userId,
+      storage_path: data.storage_path,
+      mime_type: data.mime_type,
+      file_size: data.file_size,
+      original_name: data.original_name ?? null,
+    });
+    if (error) throw new Error(error.message);
+    // Bump application to "received" (unless verified)
+    if (app.document_status !== "verified") {
+      await admin
+        .from("founding_applications" as any)
+        .update({
+          document_status: "received",
+          documents_submitted_at: new Date().toISOString(),
+          documents_rejected_at: null,
+          documents_rejected_reason: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", app.id);
+    }
+    return { ok: true };
+  });
+
+export const listMyDocumentFiles = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<FoundingDocFile[]> => {
+    const app = await getMyApplication(context);
+    if (!app) return [];
+    const admin = await getServiceClient();
+    const { data, error } = await admin
+      .from("founding_documents" as any)
+      .select("id, application_id, storage_path, mime_type, file_size, original_name, created_at")
+      .eq("application_id", app.id)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return await signPaths(admin, (data ?? []) as any);
+  });
+
+export const deleteMyDocumentFile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const admin = await getServiceClient();
+    const { data: row } = await admin
+      .from("founding_documents" as any)
+      .select("id, user_id, storage_path")
+      .eq("id", data.id)
+      .maybeSingle();
+    const r = row as any;
+    if (!r || r.user_id !== context.userId) throw new Error("Not found");
+    await admin.storage.from(BUCKET).remove([r.storage_path]);
+    await admin.from("founding_documents" as any).delete().eq("id", data.id);
+    return { ok: true };
+  });
+
+export type AdminDocSubmission = {
+  application_id: string;
+  email: string;
+  full_name: string;
+  requested_plan: string | null;
+  status: string;
+  document_status: string;
+  documents_submitted_at: string | null;
+  documents_note: string | null;
+  documents_rejected_reason: string | null;
+  files: FoundingDocFile[];
+};
+
+export const adminListDocumentSubmissions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<AdminDocSubmission[]> => {
+    await assertAdmin(context.supabase, context.userId);
+    const admin = await getServiceClient();
+    const { data: apps, error } = await admin
+      .from("founding_applications" as any)
+      .select(
+        "id, email, full_name, requested_plan, status, document_status, documents_submitted_at, documents_note, documents_rejected_reason",
+      )
+      .neq("document_status", "not_submitted")
+      .order("documents_submitted_at", { ascending: false, nullsFirst: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+    const list = (apps ?? []) as any[];
+    if (!list.length) return [];
+    const ids = list.map((a) => a.id);
+    const { data: files } = await admin
+      .from("founding_documents" as any)
+      .select("id, application_id, storage_path, mime_type, file_size, original_name, created_at")
+      .in("application_id", ids)
+      .order("created_at", { ascending: false });
+    const signed = await signPaths(admin, (files ?? []) as any);
+    const byApp = new Map<string, FoundingDocFile[]>();
+    signed.forEach((f) => {
+      const arr = byApp.get(f.application_id) ?? [];
+      arr.push(f);
+      byApp.set(f.application_id, arr);
+    });
+    return list.map((a) => ({
+      application_id: a.id,
+      email: a.email,
+      full_name: a.full_name,
+      requested_plan: a.requested_plan,
+      status: a.status,
+      document_status: a.document_status,
+      documents_submitted_at: a.documents_submitted_at,
+      documents_note: a.documents_note,
+      documents_rejected_reason: a.documents_rejected_reason,
+      files: byApp.get(a.id) ?? [],
+    }));
+  });
