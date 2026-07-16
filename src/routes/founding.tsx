@@ -158,13 +158,7 @@ function FoundingPage() {
             Applications reviewed within 48 hours. Only serious traders — please be honest.
           </p>
 
-              </p>
-            </div>
-            <div className="hidden shrink-0 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-right sm:block">
-              <div className="text-[10px] uppercase tracking-wider text-zinc-500">Seats left</div>
-              <div className="text-lg font-semibold text-zinc-900">{remaining}</div>
-            </div>
-          </div>
+
 
 
           {submitted ? (
