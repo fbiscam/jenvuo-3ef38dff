@@ -95,11 +95,9 @@ function FoundingPage() {
           Founding Trader Program
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-zinc-600">
-          We built Jenvu to help traders become consistently profitable — not to sell hope by the month.
-          Get <span className="font-semibold text-zinc-900">Elite plan free for 30 days</span>. Pay only
-          after you make your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>.
-          If you don't profit, you don't pay. Simple.
+          Get <span className="font-semibold text-zinc-900">Elite free for 30 days</span> — pay only after your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>. No profit, no payment.
         </p>
+
 
         <div className="mx-auto mt-8 max-w-md rounded-2xl border border-zinc-200 bg-white p-5">
           <div className="flex items-center justify-between text-xs text-zinc-500">
