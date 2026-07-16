@@ -95,17 +95,8 @@ export const Route = createFileRoute("/auth")({
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
-/* ---------- mock data for ticker ---------- */
-type TickerRow = [string, string, string];
-const INITIAL_TICKER: TickerRow[] = [
-  ["XAU/USD", "2,418.30", "+0.42%"],
-  ["XAU/EUR", "2,232.15", "+0.31%"],
-  ["XAU/GBP", "1,907.44", "+0.28%"],
-  ["XAU/JPY", "381,204", "+0.55%"],
-  ["XAU/AUD", "3,672.90", "+0.48%"],
-  ["XAU/CHF", "2,178.60", "+0.19%"],
-  ["DXY", "104.21", "-0.12%"],
-];
+/* ---------- live ticker ---------- */
+import { useLiveTicker } from "@/hooks/useLiveTicker";
 
 function AuthPage() {
   const navigate = useNavigate();
