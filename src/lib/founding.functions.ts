@@ -84,13 +84,13 @@ async function getOrCreateUnsubToken(admin: any, email: string): Promise<string>
 }
 
 const PLAN_META: Record<string, { label: string; wallet: string; blurb: string }> = {
-  free: { label: "Free", wallet: "$2 starting credit", blurb: "Try the platform on XAU/USD. Upgrade any time." },
+  free: { label: "Free", wallet: "$1 starting credit", blurb: "Try the platform on XAU/USD. Upgrade any time." },
   pro: { label: "Pro", wallet: "$15 wallet credit", blurb: "Multi-pair scans, realtime alerts, full trade management." },
   elite: { label: "Elite", wallet: "$50 wallet credit", blurb: "Everything in Pro plus priority AI models & higher scan budget." },
   ultra: { label: "Ultra", wallet: "$100 wallet credit", blurb: "Top-tier access. Every model, every pair, no throttling." },
 };
 
-type ApplicantEmailKind = "received" | "approved" | "rejected" | "waitlisted";
+type ApplicantEmailKind = "received" | "approved" | "rejected" | "waitlisted" | "funded";
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string) {
   const meta = PLAN_META[plan] || PLAN_META.elite;
@@ -145,6 +145,19 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
         ),
       };
+    case "funded":
+      return {
+        subject: `Your Jenvu account is funded — ${meta.label} plan active`,
+        html: wrap(
+          `Account funded, ${n}`,
+          "Funded · Founding Trader",
+          `<p style="margin:0 0 12px">We funded your account with <strong>$100</strong> and your <strong>${escapeHtml(meta.label)}</strong> plan is active.</p>
+           <p style="margin:0 0 12px;color:#52525b"><em>${escapeHtml(meta.blurb)}</em></p>
+           <p style="margin:0 0 12px">You can now continue scanning from your dashboard. Billing starts only after your verified-profit checkpoint and document review are complete.</p>
+           <p style="margin:0">If anything looks wrong, reply to this email and support will check your account.</p>`,
+          { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
+        ),
+      };
     case "rejected":
       return {
         subject: "Founding Trader Program — application update",
@@ -172,10 +185,11 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
   }
 }
 
-async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string) {
+async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string, dedupeKey?: string) {
   const { subject, html } = renderApplicantEmail(kind, name, plan);
   const text = htmlToText(html);
   const messageId = crypto.randomUUID();
+  const idempotencyKey = dedupeKey ? `founding-${kind}-${dedupeKey}` : `founding-${kind}-${messageId}`;
   try {
     const unsubscribeToken = await getOrCreateUnsubToken(admin, to);
     await admin.from("email_send_log").insert({
@@ -197,7 +211,7 @@ async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: s
         reply_to: SUPPORT_INBOX,
         purpose: "transactional",
         label: `founding-${kind}`,
-        idempotency_key: `founding-${kind}-${messageId}`,
+        idempotency_key: idempotencyKey,
         unsubscribe_token: unsubscribeToken,
         queued_at: new Date().toISOString(),
       },
@@ -387,6 +401,34 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
 
+    const p = prior as any;
+
+    // Activate/fund the selected plan when the applicant is approved/active and already has an account.
+    if ((data.status === "approved" || data.status === "active") && p?.email) {
+      try {
+        const url = process.env.SUPABASE_URL;
+        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (url && service) {
+          const admin = createClient<Database>(url, service, {
+            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+          });
+          const planId = String(p.requested_plan || "elite");
+          const { data: userList, error: listUsersError } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+          if (listUsersError) throw listUsersError;
+          const matchedUser = userList?.users?.find((u) => u.email?.toLowerCase() === String(p.email).toLowerCase());
+          if (matchedUser) {
+            await admin.rpc("set_user_plan" as any, {
+              _user_id: matchedUser.id,
+              _plan_id: planId,
+              _billing_interval: "monthly",
+            });
+          }
+        }
+      } catch (e) {
+        console.error("[founding] plan activation failed:", (e as Error)?.message);
+      }
+    }
+
     // Award referral credit ($5 each) when approved/active
     if (data.status === "approved" || data.status === "active") {
       try {
@@ -402,27 +444,26 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
         console.error("[founding] referral award failed:", (e as Error)?.message);
       }
     }
-
-
-    const p = prior as any;
     if (p?.email && data.status && data.status !== p.status) {
-      const kindMap: Record<string, ApplicantEmailKind | null> = {
-        approved: "approved",
-        active: "approved",
-        rejected: "rejected",
-        waitlisted: "waitlisted",
-        pending: null,
-        graduated: null,
+      const kindMap: Record<string, ApplicantEmailKind[]> = {
+        approved: ["approved", "funded"],
+        active: ["funded"],
+        rejected: ["rejected"],
+        waitlisted: ["waitlisted"],
+        pending: [],
+        graduated: [],
       };
-      const kind = kindMap[data.status];
-      if (kind) {
+      const kinds = kindMap[data.status] ?? [];
+      if (kinds.length > 0) {
         const url = process.env.SUPABASE_URL;
         const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (url && service) {
           const admin = createClient<Database>(url, service, {
             auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
           });
-          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"));
+          for (const kind of kinds) {
+            await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`);
+          }
         }
       }
     }
