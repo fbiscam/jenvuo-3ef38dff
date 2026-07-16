@@ -168,9 +168,29 @@ function Billing() {
                 : "Your plan renews automatically. Manage billing via the customer portal."}
             </p>
           </div>
-          <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
-            {plan === "free" ? "Upgrade" : "Manage plan"}
-          </Link>
+          {plan !== "free" ? (
+            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+              Manage plan
+            </Link>
+          ) : upgradeLock.locked ? (
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              title={
+                upgradeLock.reason === "docs_pending"
+                  ? "Upgrades unlock after your earning proof is verified and your 30-day trial ends."
+                  : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your earning proof is verified.`
+              }
+              className="cursor-not-allowed rounded-lg border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-500"
+            >
+              Locked in trial{typeof upgradeLock.daysLeft === "number" ? ` · ${upgradeLock.daysLeft}d left` : ""}
+            </button>
+          ) : (
+            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+              Upgrade
+            </Link>
+          )}
         </div>
       </section>
 
