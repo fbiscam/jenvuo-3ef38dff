@@ -2468,6 +2468,10 @@ VETO if a desk trader wouldn't take it OR levels are wrong. DOWNGRADE if fine bu
             });
           } else if (verdict === "CONFIRM") {
             __seniorReviewStatus = "confirmed";
+            // Confidence boost: institutional AI confirm → +8 score, upgrade grade
+            setupScore = Math.min(95, setupScore + 8);
+            if (setupGrade === "B") setupGrade = "A";
+            else if (setupGrade === "A") setupGrade = "A+";
             setupChecks.unshift({
               key: "senior_confirm",
               label: `✓ Senior trader confirms (${modelShort})`,
