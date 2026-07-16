@@ -99,6 +99,7 @@ const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]
 import { useLiveTicker } from "@/hooks/useLiveTicker";
 
 function AuthPage() {
+  const tickerRows = useLiveTicker();
   const navigate = useNavigate();
   const sendSignupOtp = useServerFn(requestSignupOtp);
   const verifySignupCode = useServerFn(confirmSignupOtp);
