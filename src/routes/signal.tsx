@@ -994,7 +994,7 @@ function SignalPage() {
                 ) : "Re-analyze"}
               </button>
             )}
-            {isAdmin && plan && plan.trade.direction !== "WAIT" && (
+            {isAdmin && authUser?.email?.toLowerCase() === "haseeb@jenvu.com" && plan && plan.trade.direction !== "WAIT" && (
               <button
                 onClick={handleBroadcast}
                 disabled={broadcasting}
