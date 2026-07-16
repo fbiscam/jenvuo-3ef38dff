@@ -4,9 +4,11 @@ import { computeSignalPlan } from "@/lib/gold-analysis.functions";
 export const Route = createFileRoute("/api/public/hooks/debug-xau")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
         try {
-          const plan = await computeSignalPlan({ symbol: "XAUUSD" }, null);
+          const url = new URL(request.url);
+          const symbol = (url.searchParams.get("symbol") || "XAUUSD").toUpperCase();
+          const plan = await computeSignalPlan({ symbol }, null);
           return Response.json({
             ok: true,
             direction: plan.trade?.direction,
