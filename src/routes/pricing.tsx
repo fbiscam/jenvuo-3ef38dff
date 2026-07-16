@@ -131,7 +131,7 @@ type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Voice queries / day", free: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
   { feature: "A+ signal access", free: true, pro: true, elite: true },
-  { feature: "AI models", free: "OpenAI", pro: "OpenAI + Anthropic + Google", elite: "OpenAI + Anthropic + Google" },
+  { feature: "AI models", free: "OpenAI", pro: "OpenAI + DeepSeek + Google", elite: "OpenAI + DeepSeek + Google" },
   { feature: "Alert latency", free: "No alerts", pro: "Realtime", elite: "Realtime" },
   { feature: "ICT / SMC narration", free: true, pro: true, elite: true },
   { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
@@ -357,8 +357,8 @@ function PricingPage() {
                           </span>
                           {(v === "__MODELS__" || v === "__MODELS_PLUS__") && (
                             <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
-                              <img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
-                              <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Anthropic</span>
+                              <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
+                              <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">DeepSeek</span>
                               <span className="text-zinc-300">·</span>
                               <img src="https://www.google.com/s2/favicons?domain=google.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
                               <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Google</span>
