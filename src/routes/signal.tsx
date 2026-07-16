@@ -17,7 +17,7 @@ import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { cn } from "@/lib/utils";
 import { useSignalAlerts } from "@/hooks/useSignalAlerts";
 import { appendVoiceTurn } from "@/lib/voice-history";
-import AlertOptInCard from "@/components/AlertOptInCard";
+
 import AlertsHistoryPanel from "@/components/AlertsHistoryPanel";
 import { useCredits } from "@/hooks/useCredits";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -1684,9 +1684,9 @@ function SignalPage() {
 
 
 
-              {/* A+ alert opt-in + recent fired alerts */}
-              <AlertOptInCard />
+              {/* Recent fired alerts (opt-in is now automatic on signup) */}
               <AlertsHistoryPanel alerts={alertHistory} loading={alertsLoading} />
+
 
               <Link
                 to="/app"
