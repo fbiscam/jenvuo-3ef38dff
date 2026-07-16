@@ -385,7 +385,11 @@ function SignalPage() {
             } catch (e) { console.warn("entry focus failed", e); }
           }
           await speakWait(p.trade.summary);
-          toast.success(`Setup ready · ${p.setupGrade}`);
+          const hasLevels =
+            Number.isFinite(p.trade.entry) && Number.isFinite(p.trade.sl) && Number.isFinite(p.trade.tp);
+          if ((p.trade.confidence ?? 0) >= 59 && hasLevels && p.trade.direction !== "WAIT") {
+            toast.success(`Setup ready · ${p.setupGrade}`);
+          }
         }
       } finally {
         setPlaying(false);
@@ -647,6 +651,9 @@ function SignalPage() {
     // Skip TP/SL/entry-fill events when market is closed (weekends for FX/metals/indices).
     if (!isMarketOpen(plan.instrument.symbol)) return;
     if (plan.trade.direction === "WAIT") return;
+    // Only track & fire notifications when confidence ≥ 59% AND entry/SL/TP are valid.
+    if ((plan.trade.confidence ?? 0) < 59) return;
+    if (!Number.isFinite(plan.trade.entry) || !Number.isFinite(plan.trade.sl) || !Number.isFinite(plan.trade.tp)) return;
 
     const tr = plan.trade;
     const dir = tr.direction;
