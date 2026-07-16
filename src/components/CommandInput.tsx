@@ -32,16 +32,18 @@ export function CommandInput({
         onKeyDown={(e) => e.key === "Enter" && submit()}
         placeholder='Try: "Analyze gold 15m" or "Give me A+ setup on 1H"'
         disabled={disabled}
-        className="flex-1 bg-transparent text-sm text-[color:var(--gold)] placeholder:text-[color:var(--gold)]/40 focus:outline-none px-3 font-mono"
+        className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--gold)] placeholder:text-[color:var(--gold)]/40 focus:outline-none px-3 font-mono"
       />
       <button
         onClick={submit}
         disabled={disabled || !text.trim()}
-        className="rounded-lg bg-gradient-to-br from-[color:var(--gold)] to-amber-600 px-4 py-2 text-black font-semibold text-sm disabled:opacity-40 hover:brightness-110 flex items-center gap-1"
+        aria-label="Send"
+        className="shrink-0 rounded-lg bg-gradient-to-br from-[color:var(--gold)] to-amber-600 px-3 sm:px-4 py-2 text-black font-semibold text-sm disabled:opacity-40 hover:brightness-110 flex items-center gap-1"
       >
         <Send className="h-4 w-4" />
-        Execute
+        <span className="hidden sm:inline">Execute</span>
       </button>
+
     </div>
   );
 }
