@@ -2195,7 +2195,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
             A+ Setup Score
           </span>
           <span className={`text-base font-bold tabular-nums ${MONO} text-zinc-900`}>
-            {plan.setupScore}
+            {displayScore}
             <span className="text-zinc-400 text-[11px] font-medium">/100</span>
           </span>
         </div>
