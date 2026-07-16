@@ -37,11 +37,13 @@ export function CommandInput({
       <button
         onClick={submit}
         disabled={disabled || !text.trim()}
-        className="rounded-lg bg-gradient-to-br from-[color:var(--gold)] to-amber-600 px-4 py-2 text-black font-semibold text-sm disabled:opacity-40 hover:brightness-110 flex items-center gap-1"
+        aria-label="Send"
+        className="shrink-0 rounded-lg bg-gradient-to-br from-[color:var(--gold)] to-amber-600 px-3 sm:px-4 py-2 text-black font-semibold text-sm disabled:opacity-40 hover:brightness-110 flex items-center gap-1"
       >
         <Send className="h-4 w-4" />
-        Execute
+        <span className="hidden sm:inline">Execute</span>
       </button>
+
     </div>
   );
 }
