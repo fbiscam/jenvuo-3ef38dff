@@ -124,7 +124,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `You're on the waitlist, ${n}`,
           "Waitlisted · Founding Trader",
-          `<p style="margin:0 0 12px">This month's 100 seats are filled, but your application looks strong — you're on the waitlist for the next cohort.</p>
+          `<p style="margin:0 0 12px">This month's 220 seats are filled, but your application looks strong — you're on the waitlist for the next cohort.</p>
            <p style="margin:0 0 12px">As soon as a seat opens (or the next month rolls over on the 1st), we'll email you to activate your <strong>${escapeHtml(meta.label)}</strong> plan.</p>
            <p style="margin:0">No action needed from your side. Sit tight.</p>`,
           { label: "Explore the platform", href: `${APP_URL}/signal` },
