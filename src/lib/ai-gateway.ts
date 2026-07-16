@@ -357,11 +357,18 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // down / rate-limited / times out, it hops to the next best one that responds.
 // This way the review is always done by the highest-quality Bluesminds model
 // that is currently live, never by a weaker default when a stronger one is up.
+// NOTE: `bmind/gpt-5.6-*` models return 503 "No available channel" on this
+// workspace's Bluesminds plan — they are not allocated. Kept OUT of every
+// chain so we don't burn a retry on a guaranteed failure. Working today:
+// gpt-5.5, gpt-5.2-chat, gpt-5-mini, gpt-4o-mini. Rate-limited-but-live:
+// claude-sonnet-4.5, claude-3.7-sonnet, deepseek-v4-pro/flash, grok-4.5,
+// gpt-4.1-mini — kept as later fallbacks.
 export const MODEL_CHAIN = {
-  intent: ["bmind/gpt-5.2-chat"],
-  narration: ["bmind/gpt-5.2-chat"],
+  intent: ["bmind/gpt-5.2-chat", "bmind/gpt-4o-mini"],
+  narration: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
   seniorReview: [
-    "bmind/gpt-5.6-sol",
+    "bmind/gpt-5.5",
+    "bmind/gpt-5.2-chat",
     "bmind/claude-sonnet-4.5",
     "bmind/deepseek-v4-pro",
     "bmind/grok-4.5",
@@ -371,36 +378,31 @@ export const MODEL_CHAIN = {
     "bmind/gpt-4o-mini",
     "bmind/deepseek-v4-flash",
   ],
-  // Macro/news backdrop — lightweight enrichment. Sequential best-available
-  // fallback chain (same pattern as senior review) so whichever Bluesminds
-  // model is currently live handles it. Cheap/fast models first since output
-  // is only 1-2 sentences.
   macroContext: [
-    "bmind/gpt-5.2-chat",
     "bmind/gpt-4o-mini",
+    "bmind/gpt-5.2-chat",
+    "bmind/gpt-5-mini",
     "bmind/gpt-4.1-mini",
     "bmind/claude-3.7-sonnet",
     "bmind/deepseek-v4-flash",
-    "bmind/gpt-5-mini",
     "bmind/grok-4.5",
   ],
-  chat: ["bmind/gpt-5.2-chat"],
+  chat: ["bmind/gpt-5.2-chat", "bmind/gpt-5.5"],
 } as const;
 
-// Ordered fallback chain for the macro-context runner (fast/cheap → strong).
 export const MACRO_CONTEXT_CHAIN = [
-  "bmind/gpt-5.2-chat",
   "bmind/gpt-4o-mini",
+  "bmind/gpt-5.2-chat",
+  "bmind/gpt-5-mini",
   "bmind/gpt-4.1-mini",
   "bmind/claude-3.7-sonnet",
   "bmind/deepseek-v4-flash",
-  "bmind/gpt-5-mini",
   "bmind/grok-4.5",
 ] as const;
 
-// Ordered fallback chain for the senior-review runner (best → most reliable).
 export const SENIOR_REVIEW_CHAIN = [
-  "bmind/gpt-5.6-sol",
+  "bmind/gpt-5.5",
+  "bmind/gpt-5.2-chat",
   "bmind/claude-sonnet-4.5",
   "bmind/deepseek-v4-pro",
   "bmind/grok-4.5",
