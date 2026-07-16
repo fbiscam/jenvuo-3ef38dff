@@ -740,6 +740,17 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
           updated_at: new Date().toISOString(),
         })
         .eq("id", app.id);
+      // Notify applicant that documents landed (idempotent per application submission window)
+      if (app.email) {
+        await enqueueApplicantEmail(
+          admin,
+          "documents_received",
+          String(app.email),
+          String(app.full_name || "there"),
+          String(app.requested_plan || "elite"),
+          `${app.id}-docs-received-${new Date().toISOString().slice(0, 10)}`,
+        );
+      }
     }
     return { ok: true };
   });
