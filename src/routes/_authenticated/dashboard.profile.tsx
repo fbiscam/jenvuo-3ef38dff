@@ -152,8 +152,50 @@ function Profile() {
     <div className="max-w-2xl space-y-6">
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <h2 className="text-base font-semibold">Profile</h2>
-        <div className="mt-5 space-y-4">
-          <label className="block text-xs font-medium text-zinc-600">
+
+        {/* Profile photo */}
+        <div className="mt-5 flex items-center gap-5">
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-zinc-200 bg-zinc-100">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-zinc-400">
+                {(fullName || email || "?").trim().charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={onAvatarPick}
+                disabled={uploadingAvatar}
+                className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
+              >
+                {uploadingAvatar ? "Uploading…" : avatarPath ? "Change photo" : "Upload photo"}
+              </button>
+              {avatarPath && (
+                <button
+                  type="button"
+                  onClick={removeAvatar}
+                  disabled={uploadingAvatar}
+                  className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 disabled:opacity-50"
+                >
+                  Remove
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={onAvatarChange}
+              />
+            </div>
+            <p className="text-[11px] text-zinc-500">JPG, PNG or WebP. Max 5MB.</p>
+          </div>
+        </div>
+
             Full name
             <input
               value={fullName}
