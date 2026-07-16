@@ -193,12 +193,12 @@ function FoundingPage() {
                         onClick={() => setPlan(p.id)}
                         className={`rounded-xl border px-3 py-2.5 text-left transition ${
                           active
-                            ? "border-zinc-900 bg-zinc-900 text-white"
+                            ? "border-[#2563eb] bg-[#2563eb] text-white"
                             : "border-zinc-200 bg-white text-zinc-900 hover:border-zinc-400"
                         }`}
                       >
                         <div className="text-[13px] font-semibold">{p.label}</div>
-                        <div className={`text-[11px] ${active ? "text-zinc-300" : "text-zinc-500"}`}>{p.desc}</div>
+                        <div className={`text-[11px] ${active ? "text-blue-100" : "text-zinc-500"}`}>{p.desc}</div>
                       </button>
                     );
                   })}
