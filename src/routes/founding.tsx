@@ -216,7 +216,13 @@ function FoundingPage() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field name="experience_years" label="Experience (years)" type="number" placeholder="3" />
-                <Field name="monthly_volume_usd" label="Avg. monthly volume ($)" type="number" placeholder="10000" />
+                <Field
+                  name="referrer_email"
+                  label="Referred by (optional)"
+                  type="email"
+                  placeholder="friend@email.com"
+                  defaultValue={refEmail}
+                />
               </div>
               <Field
                 name="myfxbook_url"
