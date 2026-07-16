@@ -192,11 +192,49 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           { label: "Explore the platform", href: `${APP_URL}/signal` },
         ),
       };
+    case "documents_received":
+      return {
+        subject: "We received your documents",
+        html: wrap(
+          `Thanks, ${n} — documents received`,
+          "Documents · Under Review",
+          `<p style="margin:0 0 12px">We received your earning-proof documents and they're now in the review queue.</p>
+           <p style="margin:0 0 12px">Reviews usually complete within <strong>24–48 hours</strong>. You'll get another email as soon as they're approved or if we need something updated.</p>
+           <p style="margin:0">No action needed from your side right now.</p>`,
+          { label: "View submission", href: `${APP_URL}/dashboard/documents` },
+        ),
+      };
+    case "documents_approved":
+      return {
+        subject: "Your documents are verified ✅",
+        html: wrap(
+          `You're verified, ${n}`,
+          "Documents · Approved",
+          `<p style="margin:0 0 12px">Your earning-proof documents have been reviewed and <strong>approved</strong>. Your Founding Trader account is fully verified.</p>
+           <p style="margin:0 0 12px">Billing continues on your <strong>${escapeHtml(meta.label)}</strong> plan as expected. Nothing else is required from your side.</p>
+           <p style="margin:0">Thanks for keeping the program transparent.</p>`,
+          { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
+        ),
+      };
+    case "documents_rejected":
+      return {
+        subject: "Documents need an update",
+        html: wrap(
+          `Documents need an update, ${n}`,
+          "Documents · Action Required",
+          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. Please re-upload updated documents at your earliest convenience.</p>
+           <p style="margin:0 0 12px">If the admin left a reason, you'll see it on your Documents page. Common asks: a clearer screenshot, a fuller statement, or a screen-recording that shows the account name.</p>
+           <p style="margin:0">Reply to this email if you need help.</p>`,
+          { label: "Re-upload documents", href: `${APP_URL}/dashboard/documents` },
+        ),
+      };
   }
 }
 
 async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string, dedupeKey?: string) {
-  const { subject, html } = renderApplicantEmail(kind, name, plan);
+  const rendered = renderApplicantEmail(kind, name, plan);
+  if (!rendered) return;
+  const { subject, html } = rendered;
   const text = htmlToText(html);
   const messageId = crypto.randomUUID();
   const idempotencyKey = dedupeKey ? `founding-${kind}-${dedupeKey}` : `founding-${kind}-${messageId}`;
