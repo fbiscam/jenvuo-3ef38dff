@@ -1011,6 +1011,101 @@ export type SignalPlanResult =
   | { ok: true; plan: SignalPlan }
   | { ok: false; error: string };
 
+function ensureSignalIntelligencePayload(plan: SignalPlan): SignalPlan {
+  const dec = plan.instrument?.decimals ?? 2;
+  const pricePrefix = plan.instrument?.kind === "crypto" ? "" : "$";
+  const fmt = (n: number) => `${pricePrefix}${Number(n || 0).toFixed(dec)}`;
+  const keyLevels = Array.isArray(plan.keyLevels) ? plan.keyLevels : [];
+  const setupChecks = Array.isArray(plan.setupChecks) ? plan.setupChecks : [];
+  const multiTf = Array.isArray(plan.multiTf) ? plan.multiTf : [];
+  const trade = plan.trade;
+  const current = Number.isFinite(plan.currentPrice) && plan.currentPrice > 0
+    ? plan.currentPrice
+    : Math.max(Number(trade?.entry) || 0, Number(trade?.tp) || 0, 1);
+  const findLevel = (re: RegExp) => keyLevels.find((k) => re.test(String(k.label)))?.price;
+  const swingHigh = findLevel(/swing high|pdh|high/i) ?? Math.max(current, Number(trade?.tp) || current) * 1.003;
+  const swingLow = findLevel(/swing low|pdl|low/i) ?? Math.min(current, Number(trade?.tp) || current) * 0.997;
+  const equilibrium = findLevel(/equilibrium|eq/i) ?? (swingHigh + swingLow) / 2;
+  const htfBias: SignalPlan["htfBias"] = plan.htfBias === "bullish" || plan.htfBias === "bearish" ? plan.htfBias : "neutral";
+  const ltfBias = multiTf.find((tf) => tf.tf === "15M")?.bias ?? htfBias;
+  const ltfAligned = htfBias !== "neutral" && ltfBias === htfBias;
+  const inPremium = current >= equilibrium;
+
+  const htfLock: NonNullable<SignalPlan["htfLock"]> = plan.htfLock?.reason
+    ? {
+        bias: plan.htfLock.bias === "bullish" || plan.htfLock.bias === "bearish" ? plan.htfLock.bias : "neutral",
+        reason: String(plan.htfLock.reason).slice(0, 300),
+        ltfAligned: typeof plan.htfLock.ltfAligned === "boolean" ? plan.htfLock.ltfAligned : ltfAligned,
+      }
+    : {
+        bias: htfBias,
+        reason: `HTF structure is ${htfBias} with price in the ${inPremium ? "premium" : "discount"} side of the ${fmt(swingLow)}–${fmt(swingHigh)} dealing range. LTF bias is ${ltfBias}, so execution must respect equilibrium near ${fmt(equilibrium)}.`,
+        ltfAligned,
+      };
+
+  const existingRisks = Array.isArray(plan.selfCritique?.risks) ? plan.selfCritique.risks.map(String).filter(Boolean) : [];
+  const existingInvalidations = Array.isArray(plan.selfCritique?.invalidationTriggers) ? plan.selfCritique.invalidationTriggers.map(String).filter(Boolean) : [];
+  const fallbackRisks = [
+    ...setupChecks.filter((c) => c?.pass === false).map((c) => c.reason).filter(Boolean),
+    plan.newsRisk?.severity && plan.newsRisk.severity !== "low" ? plan.newsRisk.warning : "",
+    trade?.direction === "WAIT" ? trade.summary : "Respect live volatility, session quality, and structure before entry.",
+  ].map(String).filter(Boolean).slice(0, 6);
+  const fallbackInvalidations = [
+    trade?.invalidation,
+    trade?.direction === "BUY"
+      ? `15M close below ${fmt(trade.sl)} invalidates the long setup.`
+      : trade?.direction === "SELL"
+        ? `15M close above ${fmt(trade.sl)} invalidates the short setup.`
+        : "No trigger until price returns to a valid HTF/LTF POI with confirmation.",
+  ].map(String).filter(Boolean).slice(0, 6);
+  const confidenceSelfScore = Number(plan.selfCritique?.confidenceSelfScore);
+  const selfCritique: NonNullable<SignalPlan["selfCritique"]> = {
+    risks: (existingRisks.length ? existingRisks : fallbackRisks).slice(0, 6),
+    invalidationTriggers: (existingInvalidations.length ? existingInvalidations : fallbackInvalidations).slice(0, 6),
+    confidenceSelfScore: Number.isFinite(confidenceSelfScore)
+      ? Math.max(0, Math.min(10, confidenceSelfScore))
+      : Math.max(0, Math.min(10, Math.round(((trade?.confidence ?? 50) / 10) * 10) / 10)),
+  };
+
+  const existingScenarios = plan.scenarios;
+  const hasScenarios = !!(existingScenarios?.bullish?.path || existingScenarios?.base?.path || existingScenarios?.bearish?.path);
+  let bullishProbability = 33;
+  let baseProbability = 34;
+  let bearishProbability = 33;
+  if (htfBias === "bullish") {
+    bullishProbability = ltfAligned ? 55 : 45;
+    bearishProbability = ltfAligned ? 20 : 25;
+    baseProbability = 100 - bullishProbability - bearishProbability;
+  } else if (htfBias === "bearish") {
+    bearishProbability = ltfAligned ? 55 : 45;
+    bullishProbability = ltfAligned ? 20 : 25;
+    baseProbability = 100 - bullishProbability - bearishProbability;
+  }
+  const fallbackScenarios: NonNullable<SignalPlan["scenarios"]> = {
+    bullish: { probability: bullishProbability, path: `Reclaim and hold above ${fmt(equilibrium)} opens continuation toward ${fmt(swingHigh)}.`, keyLevel: +swingHigh.toFixed(dec) },
+    base: { probability: baseProbability, path: `Range rotation around equilibrium ${fmt(equilibrium)} while the desk waits for cleaner displacement.`, keyLevel: +equilibrium.toFixed(dec) },
+    bearish: { probability: bearishProbability, path: `Rejection below ${fmt(equilibrium)} keeps sellers in control toward ${fmt(swingLow)}.`, keyLevel: +swingLow.toFixed(dec) },
+  };
+  const normalizeScenario = (value: any, fallback: { probability: number; path: string; keyLevel: number | null }) => {
+    const probability = Number(value?.probability);
+    const keyLevel = Number(value?.keyLevel);
+    return {
+      probability: Number.isFinite(probability) ? Math.max(0, Math.min(100, Math.round(probability))) : fallback.probability,
+      path: (String(value?.path ?? "").trim() || fallback.path).slice(0, 240),
+      keyLevel: Number.isFinite(keyLevel) ? +keyLevel.toFixed(dec) : fallback.keyLevel,
+    };
+  };
+  const scenarios: NonNullable<SignalPlan["scenarios"]> = hasScenarios
+    ? {
+        bullish: normalizeScenario(existingScenarios?.bullish, fallbackScenarios.bullish),
+        base: normalizeScenario(existingScenarios?.base, fallbackScenarios.base),
+        bearish: normalizeScenario(existingScenarios?.bearish, fallbackScenarios.bearish),
+      }
+    : fallbackScenarios;
+
+  return { ...plan, htfLock, selfCritique, scenarios };
+}
+
 
 function toDTO(c: Candle): CandleDTO {
   return { time: Math.floor(c.t / 1000), open: c.o, high: c.h, low: c.l, close: c.c };
