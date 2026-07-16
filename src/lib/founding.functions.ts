@@ -408,27 +408,33 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
 
     // Activate/fund the selected plan when the applicant is approved/active and already has an account.
     if ((data.status === "approved" || data.status === "active") && p?.email) {
-      try {
-        const url = process.env.SUPABASE_URL;
-        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-        if (url && service) {
-          const admin = createClient<Database>(url, service, {
-            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-          });
-          const planId = String(p.requested_plan || "elite");
-          const { data: userList, error: listUsersError } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-          if (listUsersError) throw listUsersError;
-          const matchedUser = userList?.users?.find((u) => u.email?.toLowerCase() === String(p.email).toLowerCase());
-          if (matchedUser) {
-            await admin.rpc("set_user_plan" as any, {
-              _user_id: matchedUser.id,
-              _plan_id: planId,
-              _billing_interval: "monthly",
-            });
-          }
+      const url = process.env.SUPABASE_URL;
+      const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (url && service) {
+        const admin = createClient<Database>(url, service, {
+          auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+        });
+        const planId = String(p.requested_plan || "elite");
+        const targetEmail = String(p.email).toLowerCase();
+        let matchedUserId: string | null = null;
+        // Paginate auth.users until we find the applicant (listUsers caps at ~1000/page).
+        for (let page = 1; page <= 20 && !matchedUserId; page++) {
+          const { data: userList, error: listErr } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+          if (listErr) throw new Error(`plan activation: ${listErr.message}`);
+          const found = userList?.users?.find((u) => u.email?.toLowerCase() === targetEmail);
+          if (found) matchedUserId = found.id;
+          if (!userList?.users?.length || (userList.users.length < 1000)) break;
         }
-      } catch (e) {
-        console.error("[founding] plan activation failed:", (e as Error)?.message);
+        if (matchedUserId) {
+          const { error: rpcErr } = await admin.rpc("set_user_plan" as any, {
+            _user_id: matchedUserId,
+            _plan_id: planId,
+            _billing_interval: "monthly",
+          });
+          if (rpcErr) throw new Error(`plan activation: ${rpcErr.message}`);
+        } else {
+          console.warn(`[founding] approved applicant has no account yet: ${targetEmail}`);
+        }
       }
     }
 
