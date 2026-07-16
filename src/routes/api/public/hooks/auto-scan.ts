@@ -261,6 +261,35 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               notified = rows.length;
             }
 
+            // Enqueue emails to opted-in paid subscribers
+            let emailed = 0;
+            try {
+              const { enqueueSignalAlertEmails } = await import(
+                "@/lib/signal-alert-email.server"
+              );
+              const r = await enqueueSignalAlertEmails({
+                alertId: inserted.id,
+                firedAt: inserted.fired_at,
+                pair,
+                grade,
+                direction: dir,
+                entry,
+                sl,
+                tp,
+                rr,
+                confidence: conf,
+                decimals: dec,
+                session,
+                killzone: plan.killzone ?? null,
+                htfBias: plan.htfBias ?? null,
+                rationale: `Auto-scan · ${plan.alignmentLabel ?? ""}`.slice(0, 500),
+              });
+              emailed = r.enqueued;
+            } catch (e) {
+              // Don't fail the scan if email enqueue errors out
+              console.error("auto-scan email enqueue failed", e);
+            }
+
             // Ledger entry ($0.10 system pool cost)
             await supabaseAdmin.from("auto_scan_pool_ledger").insert({
               pair,
