@@ -807,8 +807,8 @@ function HomePage() {
                             </span>
                             {(v === "__MODELS__" || v === "__MODELS_PLUS__") && (
                               <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
-                                <img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
-                                <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Anthropic</span>
+                                <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
+                                <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">DeepSeek</span>
                                 <span className="text-zinc-300">·</span>
                                 <img src="https://www.google.com/s2/favicons?domain=google.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
                                 <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Google</span>

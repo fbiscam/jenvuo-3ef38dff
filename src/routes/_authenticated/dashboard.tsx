@@ -925,8 +925,8 @@ function DashboardLayout() {
                   {showDeepSeek && (
                     <>
                       <span className="leading-none text-zinc-300">·</span>
-                      <img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=64" alt="Anthropic" width={18} height={18} className="h-[18px] w-[18px] shrink-0 rounded-sm object-contain" loading="lazy" />
-                      <span className="text-[11px] font-medium leading-none text-zinc-800">Anthropic</span>
+                      <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="DeepSeek" width={18} height={18} className="h-[18px] w-[18px] shrink-0 rounded-sm object-contain" loading="lazy" />
+                      <span className="text-[11px] font-medium leading-none text-zinc-800">DeepSeek</span>
                       <span className="leading-none text-zinc-300">·</span>
                       <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={18} height={18} className="h-[18px] w-[18px] shrink-0 rounded-sm object-contain" loading="lazy" />
                       <span className="text-[11px] font-medium leading-none text-zinc-800">Google</span>
