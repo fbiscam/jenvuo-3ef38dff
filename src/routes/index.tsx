@@ -654,7 +654,7 @@ function HomePage() {
                         )}
                       </div>
                       <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
-                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-amber-700 font-semibold`}>Invite Only</p>
+                      
                       <Link
                         to="/founding"
                         className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${

@@ -257,7 +257,7 @@ function PricingPage() {
                       )}
                     </div>
                     <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
-                    <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-amber-700 font-semibold`}>Invite Only</p>
+                    
                     {isCurrent ? (
                       <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
                         Active
