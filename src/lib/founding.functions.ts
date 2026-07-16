@@ -391,7 +391,10 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     const patch: Record<string, any> = { updated_at: new Date().toISOString() };
     if (data.status) {
       patch.status = data.status;
-      if (data.status === "approved") patch.approved_at = new Date().toISOString();
+      if (data.status === "approved" || data.status === "active") {
+        patch.approved_at = new Date().toISOString();
+        patch.seat_month = new Date().toISOString().slice(0, 7);
+      }
     }
     if (data.admin_notes !== undefined) patch.admin_notes = data.admin_notes;
     if (data.first_profit_reached) patch.first_profit_at = new Date().toISOString();
@@ -473,18 +476,29 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
 
 export const foundingStats = createServerFn({ method: "GET" }).handler(async () => {
   const url = process.env.SUPABASE_URL;
-  const pub = process.env.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !pub) return { seatsFilled: 0, seatsTotal: 220 };
-  const supa = createClient<Database>(url, pub, {
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !service) return { seatsFilled: 0, seatsTotal: 220 };
+  // Use service role — RLS blocks anon reads on founding_applications.
+  // We only return an aggregate count, never PII.
+  const supa = createClient<Database>(url, service, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
-  const monthKey = new Date().toISOString().slice(0, 7);
-  const { count } = await supa
+  const now = new Date();
+  const monthKey = now.toISOString().slice(0, 7);
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+  const monthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
+  // Count approved/active applications for this month, matching either seat_month
+  // or falling back to approved_at / created_at within the current month.
+  const { data: rows } = await supa
     .from("founding_applications" as any)
-    .select("id", { count: "exact", head: true })
-    .in("status", ["approved", "active"])
-    .eq("seat_month", monthKey);
-  return { seatsFilled: count ?? 0, seatsTotal: 220, monthKey };
+    .select("id, seat_month, approved_at, created_at, status")
+    .in("status", ["approved", "active"]);
+  const filled = (rows ?? []).filter((r: any) => {
+    if (r.seat_month === monthKey) return true;
+    const ts = r.approved_at || r.created_at;
+    return ts && ts >= monthStart && ts < monthEnd;
+  }).length;
+  return { seatsFilled: filled, seatsTotal: 220, monthKey };
 });
 
 /* ---------------- Document submission tracking ---------------- */
