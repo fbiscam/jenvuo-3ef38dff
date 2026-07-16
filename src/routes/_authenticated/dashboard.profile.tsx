@@ -278,6 +278,14 @@ function Profile() {
           </div>
         )}
       </section>
+
+      {pendingFile && (
+        <AvatarAdjuster
+          file={pendingFile}
+          onCancel={() => setPendingFile(null)}
+          onDone={(blob) => { void uploadAdjustedBlob(blob); }}
+        />
+      )}
     </div>
   );
 }
