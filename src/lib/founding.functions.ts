@@ -644,35 +644,35 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
     }
     if (data.note !== undefined) patch.documents_note = data.note;
 
-    // Look up prior status + applicant info for email decisioning
-    const { data: priorRow } = await context.supabase
+    // Use the service client so RLS or session edge cases can't hide the prior row
+    // (email dispatch depends on this read succeeding).
+    const admin = await getServiceClient();
+
+    const { data: priorRow } = await admin
       .from("founding_applications" as any)
       .select("email, full_name, requested_plan, document_status")
       .eq("id", data.id)
       .maybeSingle();
     const prior = priorRow as any;
 
-    const { error } = await context.supabase
+    const { error } = await admin
       .from("founding_applications" as any)
       .update(patch)
       .eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    // Fire applicant email only on real transitions to verified/rejected
+    // Fire applicant email on real transitions. `pending` reuses the "received/under review" template.
     if (prior?.email && prior.document_status !== data.document_status) {
       const kind: ApplicantEmailKind | null =
         data.document_status === "verified"
           ? "documents_approved"
           : data.document_status === "rejected"
             ? "documents_rejected"
-            : null;
+            : data.document_status === "pending" || data.document_status === "received"
+              ? "documents_received"
+              : null;
       if (kind) {
-        const url = process.env.SUPABASE_URL;
-        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-        if (url && service) {
-          const admin = createClient<Database>(url, service, {
-            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-          });
+        try {
           await enqueueApplicantEmail(
             admin,
             kind,
@@ -681,6 +681,8 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
             String(prior.requested_plan || "elite"),
             `${data.id}-${kind}-${now.slice(0, 10)}`,
           );
+        } catch (e) {
+          console.error("[founding] doc-status email enqueue failed:", (e as Error)?.message);
         }
       }
     }
