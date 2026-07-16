@@ -32,7 +32,7 @@ export function CommandInput({
         onKeyDown={(e) => e.key === "Enter" && submit()}
         placeholder='Try: "Analyze gold 15m" or "Give me A+ setup on 1H"'
         disabled={disabled}
-        className="flex-1 bg-transparent text-sm text-[color:var(--gold)] placeholder:text-[color:var(--gold)]/40 focus:outline-none px-3 font-mono"
+        className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--gold)] placeholder:text-[color:var(--gold)]/40 focus:outline-none px-3 font-mono"
       />
       <button
         onClick={submit}
