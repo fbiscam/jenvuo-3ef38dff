@@ -607,58 +607,120 @@ function HomePage() {
         </div>
       </section>
 
-      {/* PRICING — invite-only via Founding program */}
+      {/* PRICING — comparison matrix (old style) */}
       <section className="border-t border-zinc-100 bg-white">
-        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-              <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Invite Only Access</div>
-              <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
-                After raising $100 in revenue — pricing.
-              </h2>
-            </div>
-            <Link to="/founding" className="text-sm font-medium text-zinc-900 underline underline-offset-4">
-              Apply to the Founding Program →
-            </Link>
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
+          <div className="mb-10">
+            <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { name: "Free", price: "$0", tag: "Curious", bullets: ["$2 wallet", "A+ signals & narration", "Trade journal", "No realtime alerts"] },
-              { name: "Pro", price: "$15", tag: "Active trader", accent: true, bullets: ["$15 wallet", "Realtime A+ alerts", "Full ICT/SMC narration", "Multi-timeframe bias"] },
-              { name: "Elite", price: "$50", tag: "Desk", bullets: ["$50 wallet", "< 30s priority alerts", "Multi-pair scanner", "Custom alert rules"] },
-              { name: "Ultra", price: "$100", tag: "Fund / Desk+", bullets: ["$100 wallet", "Everything in Elite", "Priority desk support", "API & webhooks"] },
-            ].map((p) => (
-              <div
-                key={p.name}
-                className={`flex flex-col rounded-2xl border p-6 ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"}`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
-                  {p.accent && (
-                    <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Popular</span>
-                  )}
-                </div>
-                <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-3xl tracking-tight text-zinc-900 price-font">{p.price}</span>
-                  {p.price !== "$0" && <span className="text-[11px] text-zinc-500 price-font">/Free credits</span>}
-                </div>
-                <p className={`${MONO} mt-1 text-[10px] uppercase tracking-wider text-zinc-500`}>{p.tag} · Invite only</p>
-                <ul className="mt-5 space-y-2 text-sm text-zinc-700">
-                  {p.bullets.map((b) => (
-                    <li key={b} className="flex gap-2"><span className="text-zinc-400">·</span><span>{b}</span></li>
+          <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+            <table className="w-full min-w-[760px] text-sm border-collapse">
+              <colgroup>
+                <col className="w-[28%]" />
+                <col className="w-[18%]" />
+                <col className="w-[18%] bg-amber-50/40" />
+                <col className="w-[18%]" />
+                <col className="w-[18%]" />
+              </colgroup>
+
+              <thead>
+                <tr className="border-b border-zinc-200">
+                  <th className="p-6 text-left align-bottom">
+                    <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
+                  </th>
+                  {[
+                    { name: "Free", price: "$0", tag: "Curious" },
+                    { name: "Pro", price: "$15", tag: "Active", accent: true },
+                    { name: "Elite", price: "$50", tag: "Desk", dark: true },
+                    { name: "Ultra", price: "$100", tag: "Fund / Desk+" },
+                  ].map((p) => (
+                    <th
+                      key={p.name}
+                      className={`p-6 text-left align-top border-l border-zinc-200 ${p.accent ? "bg-amber-50/50" : ""}`}
+                    >
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-base font-semibold ${p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                        {p.accent && (
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                            Popular
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-2 flex items-baseline gap-1">
+                        <span className="text-2xl tracking-tight text-zinc-900 price-font">{p.price}</span>
+                        {p.price !== "$0" && (
+                          <span className="text-[11px] text-zinc-500 price-font">/Free credits</span>
+                        )}
+                      </div>
+                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
+                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-amber-700 font-semibold`}>Invite Only</p>
+                      <Link
+                        to="/founding"
+                        className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                          p.accent || p.dark
+                            ? "bg-zinc-900 text-white hover:bg-black"
+                            : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
+                        }`}
+                      >
+                        Apply now
+                      </Link>
+                    </th>
                   ))}
-                </ul>
-                <Link
-                  to="/founding"
-                  className={`mt-6 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-xs font-medium transition ${
-                    p.accent ? "bg-zinc-900 text-white hover:bg-black" : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
-                  }`}
-                >
-                  Apply now
-                </Link>
-              </div>
-            ))}
+                </tr>
+              </thead>
+
+              <tbody>
+                {([
+                  { f: "AFTER RAISING $100 IN REVENUE - PRICING", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
+                  { f: "Monthly wallet (USD)", a: "$2", b: "$15", c: "$50", d: "$100" },
+                  { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+                  { f: "Signal latency", a: "No alerts", b: "Realtime", c: "Realtime", d: "Realtime" },
+                  { f: "A+ signal access", a: true, b: true, c: true, d: true },
+                  { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
+                  { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
+                  { f: "Trade journal", a: true, b: true, c: true, d: true },
+                  { f: "Email + push alerts", a: false, b: true, c: true, d: true },
+                  { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
+                  { f: "Custom alert rules", a: false, b: false, c: true, d: true },
+                  { f: "Priority desk support", a: false, b: false, c: false, d: true },
+                ] as ReadonlyArray<{ f: string; a: string | boolean; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
+                  <tr
+                    key={row.f}
+                    className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
+                  >
+                    <td className="px-6 py-3.5 text-zinc-800">
+                      <div className="flex items-center gap-2">
+                        {row.badge && (
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                            {row.badge}
+                          </span>
+                        )}
+                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-zinc-500" : ""}>
+                          {row.f}
+                        </span>
+                      </div>
+                    </td>
+                    {[row.a, row.b, row.c, row.d].map((v, i) => (
+                      <td
+                        key={i}
+                        className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${i === 1 ? "bg-amber-50/40" : ""}`}
+                      >
+                        {v === true ? (
+                          <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
+                        ) : v === false ? (
+                          <span className="inline-block h-px w-4 bg-zinc-200" />
+                        ) : (
+                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : "text-zinc-700"}`}>
+                            {v}
+                          </span>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
