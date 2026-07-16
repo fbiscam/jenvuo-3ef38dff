@@ -2998,17 +2998,18 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       plan.scenarios?.bearish?.path
     );
     if (!scenarioHasContent) plan.scenarios = defaultScenarios;
+    const enrichedPlan = ensureSignalIntelligencePayload(plan);
 
     // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
     // WAIT / no-trade returns are free. MUST be awaited — Cloudflare Workers
     // cancel post-response async work, so fire-and-forget charges get dropped.
     const __scanId = billing?.scanId ?? ((globalThis as any).crypto?.randomUUID?.() ?? `scan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`);
-    if (plan.trade.direction === "BUY" || plan.trade.direction === "SELL") {
+    if (enrichedPlan.trade.direction === "BUY" || enrichedPlan.trade.direction === "SELL") {
       try {
         const { chargeSignalScan } = await import("@/lib/ai-cost-log.server");
         await chargeSignalScan({
           userId: __userId,
-          direction: plan.trade.direction,
+          direction: enrichedPlan.trade.direction,
           model: __usedNarrationModel ?? MODEL_CHAIN.narration[0],
           seniorModel: __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview.join(",") : null),
           seniorReviewRequired: __requiresSeniorReview,
@@ -3025,7 +3026,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         console.warn("computeSignalPlan: chargeSignalScan failed:", (e as Error)?.message ?? e);
       }
     }
-    return plan;
+    return enrichedPlan;
 
 }
 
@@ -3052,15 +3053,16 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     const cacheKey = `${context.userId}:${data.symbol.toUpperCase()}`;
     if (!data.force) {
       const cached = getCachedPlan<SignalPlan>(cacheKey);
-      if (cached) return { ok: true, plan: cached } satisfies SignalPlanResult;
+      if (cached) return { ok: true, plan: ensureSignalIntelligencePayload(cached) } satisfies SignalPlanResult;
     }
 
     // Billing is handled by the caller (client) via credits.spend("signal") once per scan.
     // Do NOT charge here — otherwise a single scan would be double/triple-billed.
     try {
       const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId, { scanId: data.scanId });
-      setCachedPlan(cacheKey, plan);
-      return { ok: true, plan } satisfies SignalPlanResult;
+      const enrichedPlan = ensureSignalIntelligencePayload(plan);
+      setCachedPlan(cacheKey, enrichedPlan);
+      return { ok: true, plan: enrichedPlan } satisfies SignalPlanResult;
     } catch (e) {
       const raw = (e as Error)?.message || "Server busy — please try again in a moment.";
       const error = /server busy|too many|credits|balance|key rejected|unauthorized|forbidden/i.test(raw)
