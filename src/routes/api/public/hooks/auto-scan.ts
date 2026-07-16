@@ -122,31 +122,21 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               }
             }
 
-            // First hit or side flip
-            const withinWindow =
-              state?.first_seen_at &&
-              (now.getTime() - new Date(state.first_seen_at).getTime()) /
-                60000 <=
-                confirmWindowMin;
-            const sameDirection = state?.direction === dir;
+            // Single-hit mode: broadcast immediately (no 2-hit confirmation)
+            // Still record state for cooldown tracking
+            await supabaseAdmin.from("auto_scan_state").upsert(
+              {
+                pair,
+                direction: dir,
+                first_conf: conf,
+                first_seen_at: now.toISOString(),
+                last_broadcast_at: state?.last_broadcast_at ?? null,
+                updated_at: now.toISOString(),
+              },
+              { onConflict: "pair" },
+            );
 
-            if (!state || !sameDirection || !withinWindow) {
-              await supabaseAdmin.from("auto_scan_state").upsert(
-                {
-                  pair,
-                  direction: dir,
-                  first_conf: conf,
-                  first_seen_at: now.toISOString(),
-                  last_broadcast_at: state?.last_broadcast_at ?? null,
-                  updated_at: now.toISOString(),
-                },
-                { onConflict: "pair" },
-              );
-              results.push({ pair, action: "first_hit", conf, dir });
-              continue;
-            }
-
-            // Second confirmed hit — broadcast
+            // Broadcast on first qualifying hit
             const dec = plan.instrument?.decimals ?? 2;
             const entry = Number(plan.trade?.entry);
             const sl = Number(plan.trade?.sl);
@@ -197,7 +187,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 htf_bias: plan.htfBias ?? null,
                 session,
                 killzone: plan.killzone ?? null,
-                rationale: `Auto-scan · 2-hit confirmed · ${plan.alignmentLabel ?? ""}`.slice(
+                rationale: `Auto-scan · single-hit · ${plan.alignmentLabel ?? ""}`.slice(
                   0,
                   1000,
                 ),
