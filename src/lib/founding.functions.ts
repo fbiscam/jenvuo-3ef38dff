@@ -391,7 +391,10 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     const patch: Record<string, any> = { updated_at: new Date().toISOString() };
     if (data.status) {
       patch.status = data.status;
-      if (data.status === "approved") patch.approved_at = new Date().toISOString();
+      if (data.status === "approved" || data.status === "active") {
+        patch.approved_at = new Date().toISOString();
+        patch.seat_month = new Date().toISOString().slice(0, 7);
+      }
     }
     if (data.admin_notes !== undefined) patch.admin_notes = data.admin_notes;
     if (data.first_profit_reached) patch.first_profit_at = new Date().toISOString();
