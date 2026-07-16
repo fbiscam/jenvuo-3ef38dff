@@ -2602,6 +2602,13 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         blended = Math.round(setupScore * rulesW + aiConf * aiW);
       }
       tradeFromAi.confidence = Math.min(95, Math.max(setupScore, blended));
+      // Sync grade with final displayed confidence so user sees consistent quality signal.
+      const finalConf = tradeFromAi.confidence;
+      const syncedGrade = finalConf >= 90 ? "A+" : finalConf >= 80 ? "A" : finalConf >= 65 ? "B" : "C";
+      if (built.direction !== "WAIT") {
+        setupGrade = syncedGrade;
+        (tradeFromAi as any).setupGrade = syncedGrade;
+      }
     }
     if (built.direction !== "WAIT") {
       tradeFromAi.summary = `${setupGrade} setup: ${built.direction} ${inst.display} at ${built.entry.toFixed(dec)}, stop ${built.sl.toFixed(dec)}, target ${built.tp.toFixed(dec)} for 1:${built.rr.toFixed(1)} R. ${built.reason}`;
