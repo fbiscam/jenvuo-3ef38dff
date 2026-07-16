@@ -152,6 +152,7 @@ const FAQ = [
 
 function PricingPage() {
   const currentPlan = useCurrentPlan();
+  const upgradeLock = useUpgradeLock();
   const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
   const priceOf = (t: { id: string; price: number }) =>
     billing === "annual" && t.price > 0 ? Math.round((t.price * 12 * 0.83) / 10) * 10 : t.price;
