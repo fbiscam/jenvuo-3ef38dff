@@ -174,8 +174,10 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
 
 async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string) {
   const { subject, html } = renderApplicantEmail(kind, name, plan);
+  const text = htmlToText(html);
   const messageId = crypto.randomUUID();
   try {
+    const unsubscribeToken = await getOrCreateUnsubToken(admin, to);
     await admin.from("email_send_log").insert({
       message_id: messageId,
       template_name: `founding-${kind}`,
@@ -191,10 +193,12 @@ async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: s
         sender_domain: SENDER_DOMAIN,
         subject,
         html,
+        text,
         reply_to: SUPPORT_INBOX,
         purpose: "transactional",
         label: `founding-${kind}`,
         idempotency_key: `founding-${kind}-${messageId}`,
+        unsubscribe_token: unsubscribeToken,
         queued_at: new Date().toISOString(),
       },
     });
