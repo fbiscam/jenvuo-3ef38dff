@@ -1636,8 +1636,31 @@ function buildFeedFallbackPlan(args: {
     ltfCandles: ltf.map(toDTO),
     currentPrice: safePrice,
     instrument: { symbol: canonicalSymbol, display: inst.display, kind: inst.kind, decimals: inst.decimals },
+    htfLock: {
+      bias: "neutral",
+      reason: `${inst.display} candle feed is temporarily delayed. Live quote is available at ${priceText}, but HTF/LTF structure cannot be locked until the feed returns.`,
+      ltfAligned: false,
+    },
+    selfCritique: {
+      risks: [
+        reasonText,
+        "Structure, liquidity and OTE cannot be validated on delayed candles.",
+        "Any forced entry here would be blind to HTF context.",
+      ],
+      invalidationTriggers: [
+        "Re-analyze once the candle feed is restored.",
+        `Loss of live quote around ${priceText} would remove the only reference we have.`,
+      ],
+      confidenceSelfScore: 2,
+    },
+    scenarios: {
+      bearish: { probability: 33, path: `Rejection near ${inst.kind === "crypto" ? "" : "$"}${htfHigh.toFixed(dec)} could resume downside once real candles print.`, keyLevel: +htfHigh.toFixed(dec) },
+      base:    { probability: 34, path: `Rotation around ${inst.kind === "crypto" ? "" : "$"}${eq.toFixed(dec)} equilibrium while the feed catches up.`, keyLevel: +eq.toFixed(dec) },
+      bullish: { probability: 33, path: `Reclaim of equilibrium after feed restores may drive back toward ${inst.kind === "crypto" ? "" : "$"}${htfHigh.toFixed(dec)}.`, keyLevel: +htfHigh.toFixed(dec) },
+    },
   };
 }
+
 
 export async function computeSignalPlan(
   data: { symbol: string },
