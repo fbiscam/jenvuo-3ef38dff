@@ -55,7 +55,7 @@ function DocumentsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 font-['Google_Sans',_'Inter',_system-ui,_sans-serif]">
       <div className="mb-6">
-        <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">Founding Trader</div>
+        
         <h1 className="text-2xl font-semibold text-zinc-900 mt-1">Document verification</h1>
         <p className="text-sm text-zinc-600 mt-2 whitespace-nowrap overflow-hidden text-ellipsis">Track your KYC document status — billing activates only after verification.</p>
       </div>
