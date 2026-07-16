@@ -134,8 +134,9 @@ function FoundingPage() {
             {[
               ["Apply", "Fill the short form below. We review every application manually."],
               ["Get approved", "If accepted, we activate your Elite plan free for 30 days — full access to signals, alerts, killzones and voice analysis."],
-              ["Trade & prove it", "Connect your broker (MyFxBook or statement upload). You have 90 days to reach $100 in verified profit."],
-              ["Start paying — only if you profit", "Cross $100 profit and your plan activates; no profit in 90 days, no charge."],
+              ["Reach $100 in 30 days", "You have 30 days to hit $100 in verified profit. After that, billing activates on your account and you pay per scan."],
+              ["Verify & pay to continue scanning", "Once 30 days end, a 'Submit documents' notification appears on your account. Click it, upload your broker statement / MyFxBook, and we verify. After verification, billing goes live — pay, and credits are added to your account so you can keep scanning."],
+
             ].map(([t, d], i) => (
               <li key={t} className="flex gap-4">
                 <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${i === 0 ? "bg-green-500 text-zinc-900" : "bg-zinc-900 text-white"}`}>{i + 1}</div>
