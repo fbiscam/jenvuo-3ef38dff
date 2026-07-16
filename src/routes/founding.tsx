@@ -257,7 +257,7 @@ function FoundingPage() {
               <button
                 type="submit"
                 disabled={submitting || remaining === 0}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#1d4ed8] disabled:opacity-60"
               >
                 {submitting ? "Submitting…" : remaining === 0 ? "This month is full — join waitlist" : "Submit application"}
                 <ArrowRight className="h-4 w-4" />
