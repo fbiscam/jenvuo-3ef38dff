@@ -199,7 +199,7 @@ function Profile() {
                 onChange={onAvatarChange}
               />
             </div>
-            <p className="text-[11px] text-zinc-500">JPG, PNG or WebP. Max 5MB.</p>
+            <p className="text-[11px] text-zinc-500">JPG, PNG or WebP. Max 10MB. You can crop, zoom and reposition after selecting.</p>
           </div>
         </div>
 
