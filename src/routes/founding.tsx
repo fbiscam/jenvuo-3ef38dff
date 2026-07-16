@@ -45,6 +45,8 @@ function FoundingPage() {
   const remaining = Math.max(0, seats.total - seats.filled);
   const pct = Math.min(100, Math.round((seats.filled / seats.total) * 100));
 
+  const [plan, setPlan] = React.useState<"free" | "pro" | "elite" | "ultra">("elite");
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -60,6 +62,7 @@ function FoundingPage() {
           monthly_volume_usd: fd.get("monthly_volume_usd") ? Number(fd.get("monthly_volume_usd")) : undefined,
           why_joining: String(fd.get("why_joining") || ""),
           myfxbook_url: String(fd.get("myfxbook_url") || ""),
+          requested_plan: plan,
         } as any,
       });
       if (res.ok) {
