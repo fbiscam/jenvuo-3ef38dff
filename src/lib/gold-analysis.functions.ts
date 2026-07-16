@@ -2594,6 +2594,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     // stage layers AI market context on top for final confidence.
     {
       const aiConf = Number(marketRegime?.confidence ?? 0);
+      const inKz = /Killzone/i.test(killzone || "") && !/Outside/i.test(killzone || "");
       let blended = setupScore;
       if (built.direction !== "WAIT" && Number.isFinite(aiConf) && aiConf > setupScore) {
         const gap = aiConf - setupScore;
@@ -2601,18 +2602,23 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         if (gap >= 25) { rulesW = 0.45; aiW = 0.55; }
         else if (gap >= 15) { rulesW = 0.5; aiW = 0.5; }
         blended = Math.round(setupScore * rulesW + aiConf * aiW);
-        // Anti-inflation cap: bounded lift so weak rules can't be inflated to A/B,
-        // but allow moderate setups to cross the 59% alert threshold when AI strongly agrees.
-        if (setupScore < 50) {
-          blended = Math.min(blended, setupScore + 10);
-        } else if (setupScore < 60) {
-          blended = Math.min(blended, setupScore + 14);
-        } else if (setupScore < 70) {
-          blended = Math.min(blended, setupScore + 16);
+        // Killzone-aware anti-inflation caps.
+        // Inside a killzone (London / NY AM / NY PM / Asia) volatility & institutional
+        // flow justify a bigger AI-driven lift → confidence can cross the 59% alert
+        // threshold on moderate rules setups. Outside killzone we stay conservative.
+        if (inKz) {
+          if (setupScore < 50) blended = Math.min(blended, setupScore + 12);
+          else if (setupScore < 60) blended = Math.min(blended, setupScore + 20);
+          else if (setupScore < 70) blended = Math.min(blended, setupScore + 22);
+        } else {
+          if (setupScore < 50) blended = Math.min(blended, setupScore + 6);
+          else if (setupScore < 60) blended = Math.min(blended, setupScore + 8);
+          else if (setupScore < 70) blended = Math.min(blended, setupScore + 12);
         }
 
       }
       tradeFromAi.confidence = Math.min(95, Math.max(setupScore, blended));
+
 
       // Sync grade with final displayed confidence so user sees consistent quality signal.
       const finalConf = tradeFromAi.confidence;
