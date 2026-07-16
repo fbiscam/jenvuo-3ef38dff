@@ -2162,6 +2162,9 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
   const isTop = plan.setupGrade === "A+" || plan.setupGrade === "A";
   const passed = plan.setupChecks.filter((c) => c.pass === true).length;
   const total = plan.setupChecks.length;
+  // Use blended trade-plan confidence (rules + AI) so the score card matches
+  // what the user sees on the trade plan (e.g. 72) instead of rules-only setupScore (49).
+  const displayScore = Math.max(0, Math.min(100, Math.round(Number(plan.trade?.confidence ?? plan.setupScore))));
   // Direction/bias is separate from setup quality — an A+ setup can be short.
   const dir = (plan.trade?.direction ?? "").toString().toLowerCase();
   const bias = (plan.htfBias ?? "").toString().toLowerCase();
