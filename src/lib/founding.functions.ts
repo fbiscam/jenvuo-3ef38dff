@@ -257,6 +257,9 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
       } catch (e) {
         console.error("[founding] notify failed:", (e as Error)?.message);
       }
+
+      // Confirmation email to the applicant
+      await enqueueApplicantEmail(admin, "received", data.email.toLowerCase(), data.full_name, data.requested_plan);
     }
 
     return { ok: true };
