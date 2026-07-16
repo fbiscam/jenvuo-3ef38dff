@@ -729,7 +729,7 @@ async function getMyApplication(context: any) {
   const admin = await getServiceClient();
   const { data } = await admin
     .from("founding_applications" as any)
-    .select("id, email, document_status")
+    .select("id, email, full_name, requested_plan, document_status")
     .ilike("email", email)
     .order("created_at", { ascending: false })
     .limit(1)
