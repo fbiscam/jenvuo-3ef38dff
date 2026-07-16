@@ -2372,7 +2372,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         __planAllowsSenior = sub?.status === "active" && pid !== "free";
       } catch { __planAllowsSenior = false; __planId = "free"; }
     }
-    __requiresSeniorReview = __planAllowsSenior && built.direction !== "WAIT" && (setupGrade === "A+" || setupGrade === "A" || setupScore >= 59);
+    // Widened gate: borderline setups (score >=52) also get AI senior review so
+    // strong AI agreement can boost them into A/A+, and weak ones get filtered.
+    __requiresSeniorReview = __planAllowsSenior && built.direction !== "WAIT" && (setupGrade === "A+" || setupGrade === "A" || setupScore >= 52);
 
     if (__requiresSeniorReview) {
       try {
