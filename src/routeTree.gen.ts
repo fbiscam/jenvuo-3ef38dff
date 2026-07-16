@@ -74,6 +74,7 @@ import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/b
 import { Route as AuthenticatedDashboardAdminSubscribersRouteImport } from './routes/_authenticated/dashboard.admin.subscribers'
 import { Route as AuthenticatedDashboardAdminScanAuditRouteImport } from './routes/_authenticated/dashboard.admin.scan-audit'
 import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './routes/_authenticated/dashboard.admin.messages'
+import { Route as AuthenticatedDashboardAdminFoundingRouteImport } from './routes/_authenticated/dashboard.admin.founding'
 import { Route as AuthenticatedDashboardAdminAutoScanRouteImport } from './routes/_authenticated/dashboard.admin.auto-scan'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
@@ -421,6 +422,12 @@ const AuthenticatedDashboardAdminMessagesRoute =
     path: '/admin/messages',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardAdminFoundingRoute =
+  AuthenticatedDashboardAdminFoundingRouteImport.update({
+    id: '/admin/founding',
+    path: '/admin/founding',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardAdminAutoScanRoute =
   AuthenticatedDashboardAdminAutoScanRouteImport.update({
     id: '/admin/auto-scan',
@@ -479,6 +486,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
+  '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
@@ -543,6 +551,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
   '/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
+  '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
@@ -612,6 +621,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/_authenticated/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
+  '/_authenticated/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/_authenticated/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/_authenticated/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/_authenticated/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
@@ -681,6 +691,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/help/$collection/'
     | '/dashboard/admin/auto-scan'
+    | '/dashboard/admin/founding'
     | '/dashboard/admin/messages'
     | '/dashboard/admin/scan-audit'
     | '/dashboard/admin/subscribers'
@@ -745,6 +756,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/help/$collection'
     | '/dashboard/admin/auto-scan'
+    | '/dashboard/admin/founding'
     | '/dashboard/admin/messages'
     | '/dashboard/admin/scan-audit'
     | '/dashboard/admin/subscribers'
@@ -813,6 +825,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
     | '/_authenticated/dashboard/admin/auto-scan'
+    | '/_authenticated/dashboard/admin/founding'
     | '/_authenticated/dashboard/admin/messages'
     | '/_authenticated/dashboard/admin/scan-audit'
     | '/_authenticated/dashboard/admin/subscribers'
@@ -1335,6 +1348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminMessagesRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/admin/founding': {
+      id: '/_authenticated/dashboard/admin/founding'
+      path: '/admin/founding'
+      fullPath: '/dashboard/admin/founding'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminFoundingRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/admin/auto-scan': {
       id: '/_authenticated/dashboard/admin/auto-scan'
       path: '/admin/auto-scan'
@@ -1358,6 +1378,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardWorkspaceRoute: typeof AuthenticatedDashboardWorkspaceRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardAdminAutoScanRoute: typeof AuthenticatedDashboardAdminAutoScanRoute
+  AuthenticatedDashboardAdminFoundingRoute: typeof AuthenticatedDashboardAdminFoundingRoute
   AuthenticatedDashboardAdminMessagesRoute: typeof AuthenticatedDashboardAdminMessagesRoute
   AuthenticatedDashboardAdminScanAuditRoute: typeof AuthenticatedDashboardAdminScanAuditRoute
   AuthenticatedDashboardAdminSubscribersRoute: typeof AuthenticatedDashboardAdminSubscribersRoute
@@ -1379,6 +1400,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
     AuthenticatedDashboardAdminAutoScanRoute:
       AuthenticatedDashboardAdminAutoScanRoute,
+    AuthenticatedDashboardAdminFoundingRoute:
+      AuthenticatedDashboardAdminFoundingRoute,
     AuthenticatedDashboardAdminMessagesRoute:
       AuthenticatedDashboardAdminMessagesRoute,
     AuthenticatedDashboardAdminScanAuditRoute:
