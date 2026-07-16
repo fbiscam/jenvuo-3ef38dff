@@ -799,7 +799,7 @@ function AuthPage() {
         {/* ticker strip */}
         <div className="border-t border-zinc-100 overflow-hidden">
           <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap animate-ticker`}>
-            {[...INITIAL_TICKER, ...INITIAL_TICKER].map(([s, p, d], i) => (
+            {[...tickerRows, ...tickerRows].map(([s, p, d], i) => (
               <span key={i} className="flex items-center gap-2">
                 <span className="text-zinc-900 font-medium">{s}</span>
                 <span>{p}</span>
