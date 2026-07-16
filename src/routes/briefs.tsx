@@ -92,7 +92,7 @@ function BriefsPage() {
             <Link to="/signal">Signal Engine</Link>
             <Link to="/ai-engine">AI Engine</Link>
             <Link to="/briefs" className="font-semibold">Briefs</Link>
-            <Link to="/pricing">Pricing</Link>
+            <Link to="/founding">Founding</Link>
             <Link to="/insights">Insights</Link>
             <Link to="/about">About</Link>
           </nav>
