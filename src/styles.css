@@ -229,6 +229,11 @@
 }
 .animate-terminal-blink { animation: terminal-blink 1s steps(1, end) infinite; }
 
+@keyframes shimmer {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(400%); }
+}
+
 
 
 
