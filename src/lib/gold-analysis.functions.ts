@@ -2727,6 +2727,53 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
 
     const canonicalSymbol = inst.key.includes(":") ? inst.key.split(":")[1] : (inst.raw || inst.key);
 
+    const defaultHtfLock = {
+      bias: htfBiasLocal,
+      reason: `HTF structure is ${htfBiasLocal} with price in the ${inPremium ? "premium" : "discount"} side of the ${fmtPx(swingLow)}–${fmtPx(swingHigh)} dealing range. LTF structure is ${ltfA.trend}, so execution must respect the locked HTF read around equilibrium ${fmtPx(equilibrium)}.`,
+      ltfAligned: htfBiasLocal !== "neutral" && htfBiasLocal === ltfA.trend,
+    } satisfies NonNullable<SignalPlan["htfLock"]>;
+
+    const defaultSelfCritique = {
+      risks: [
+        ...setupChecks.filter((c) => c.pass === false).map((c) => c.reason).filter(Boolean),
+        marketRegime.warning,
+        newsWarning,
+      ].filter(Boolean).map(String).slice(0, 6),
+      invalidationTriggers: [
+        tradeFromAi.invalidation,
+        built.direction === "BUY"
+          ? `15M close below ${fmtPx(tradeFromAi.sl)} invalidates the long setup.`
+          : built.direction === "SELL"
+            ? `15M close above ${fmtPx(tradeFromAi.sl)} invalidates the short setup.`
+            : `No entry trigger until price returns to a valid HTF/LTF POI with confirmation.`,
+      ].filter(Boolean).map(String).slice(0, 6),
+      confidenceSelfScore: Math.max(0, Math.min(10, Math.round((tradeFromAi.confidence / 10) * 10) / 10)),
+    } satisfies NonNullable<SignalPlan["selfCritique"]>;
+
+    if (!defaultSelfCritique.risks.length) {
+      defaultSelfCritique.risks.push("No critical risk flag from the rules engine; continue to respect structure, session quality, and live volatility.");
+    }
+
+    const defaultScenarios = (() => {
+      let bullishProbability = 33;
+      let baseProbability = 34;
+      let bearishProbability = 33;
+      if (htfBiasLocal === "bullish") {
+        bullishProbability = defaultHtfLock.ltfAligned ? 55 : 45;
+        bearishProbability = defaultHtfLock.ltfAligned ? 20 : 25;
+        baseProbability = 100 - bullishProbability - bearishProbability;
+      } else if (htfBiasLocal === "bearish") {
+        bearishProbability = defaultHtfLock.ltfAligned ? 55 : 45;
+        bullishProbability = defaultHtfLock.ltfAligned ? 20 : 25;
+        baseProbability = 100 - bullishProbability - bearishProbability;
+      }
+      return {
+        bearish: { probability: bearishProbability, path: `Rejection below ${fmtPx(pdh)} keeps sellers in control toward ${fmtPx(swingLow)}.`, keyLevel: +swingLow.toFixed(dec) },
+        base: { probability: baseProbability, path: `Range rotation around equilibrium ${fmtPx(equilibrium)} while the desk waits for cleaner displacement.`, keyLevel: +equilibrium.toFixed(dec) },
+        bullish: { probability: bullishProbability, path: `Reclaim and hold above ${fmtPx(equilibrium)} opens continuation toward ${fmtPx(swingHigh)}.`, keyLevel: +swingHigh.toFixed(dec) },
+      } satisfies NonNullable<SignalPlan["scenarios"]>;
+    })();
+
     const plan: SignalPlan = {
       htfBias: htfBiasLocal,
       intro: String(parsed.intro ?? `${inst.display} rules-based ICT/SMC scan is complete at ${fmtPx(last.c)}.`),
@@ -2778,40 +2825,40 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       },
       // ---- Additive AI intelligence layers (never blocks BUY/SELL) ----
       htfLock: (() => {
-        const h = parsed.htfLock;
-        if (!h || typeof h !== "object") return undefined;
+        const h = parsed.htfLock && typeof parsed.htfLock === "object" ? parsed.htfLock : defaultHtfLock;
         const bias = h.bias === "bullish" || h.bias === "bearish" ? h.bias : "neutral";
+        const reason = String(h.reason ?? "").trim() || defaultHtfLock.reason;
         return {
           bias: bias as "bullish" | "bearish" | "neutral",
-          reason: String(h.reason ?? "").slice(0, 300),
+          reason: reason.slice(0, 300),
           ltfAligned: h.ltfAligned === true,
         };
       })(),
       selfCritique: (() => {
-        const s = parsed.selfCritique;
-        if (!s || typeof s !== "object") return undefined;
+        const s = parsed.selfCritique && typeof parsed.selfCritique === "object" ? parsed.selfCritique : defaultSelfCritique;
         const arr = (v: any) => (Array.isArray(v) ? v.map(String).slice(0, 6) : []);
         const n = Number(s.confidenceSelfScore);
+        const risks = arr(s.risks);
+        const invalidationTriggers = arr(s.invalidationTriggers);
         return {
-          risks: arr(s.risks),
-          invalidationTriggers: arr(s.invalidationTriggers),
+          risks: risks.length ? risks : defaultSelfCritique.risks,
+          invalidationTriggers: invalidationTriggers.length ? invalidationTriggers : defaultSelfCritique.invalidationTriggers,
           confidenceSelfScore: Number.isFinite(n) ? Math.max(0, Math.min(10, n)) : 0,
         };
       })(),
       scenarios: (() => {
-        const s = parsed.scenarios;
-        if (!s || typeof s !== "object") return undefined;
-        const one = (o: any) => {
-          if (!o || typeof o !== "object") return { probability: 0, path: "", keyLevel: null };
+        const s = parsed.scenarios && typeof parsed.scenarios === "object" ? parsed.scenarios : defaultScenarios;
+        const one = (o: any, fallback: { probability: number; path: string; keyLevel: number | null }) => {
+          if (!o || typeof o !== "object") return fallback;
           const p = Number(o.probability);
           const kl = Number(o.keyLevel);
           return {
             probability: Number.isFinite(p) ? Math.max(0, Math.min(100, Math.round(p))) : 0,
-            path: String(o.path ?? "").slice(0, 240),
+            path: (String(o.path ?? "").trim() || fallback.path).slice(0, 240),
             keyLevel: Number.isFinite(kl) ? +kl.toFixed(dec) : null,
           };
         };
-        return { bearish: one(s.bearish), base: one(s.base), bullish: one(s.bullish) };
+        return { bearish: one(s.bearish, defaultScenarios.bearish), base: one(s.base, defaultScenarios.base), bullish: one(s.bullish, defaultScenarios.bullish) };
       })(),
       seniorReview: (() => {
         const model = __usedSeniorModel ?? (__requiresSeniorReview ? MODEL_CHAIN.seniorReview.join(",") : null);
