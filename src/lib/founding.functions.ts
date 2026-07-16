@@ -443,29 +443,34 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     // Referral reward ($5 each) is now awarded when the referred user upgrades
     // to a paid plan after their trial — handled in public.set_user_plan.
 
+    // Only send emails for actions that were actually fulfilled in this update.
+    // - approved: only when status transitions to "approved"
+    // - funded:   only when status transitions to "active" (account funded/paying)
+    //             OR admin marks first_profit_reached=true
+    // - rejected / waitlisted: on their respective status transitions
+    const kinds: ApplicantEmailKind[] = [];
     if (p?.email && data.status && data.status !== p.status) {
-      const kindMap: Record<string, ApplicantEmailKind[]> = {
-        approved: ["approved", "funded"],
-        active: ["funded"],
-        rejected: ["rejected"],
-        waitlisted: ["waitlisted"],
-        pending: [],
-        graduated: [],
-      };
-      const kinds = kindMap[data.status] ?? [];
-      if (kinds.length > 0) {
-        const url = process.env.SUPABASE_URL;
-        const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-        if (url && service) {
-          const admin = createClient<Database>(url, service, {
-            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-          });
-          for (const kind of kinds) {
-            await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`);
-          }
+      if (data.status === "approved") kinds.push("approved");
+      else if (data.status === "active") kinds.push("funded");
+      else if (data.status === "rejected") kinds.push("rejected");
+      else if (data.status === "waitlisted") kinds.push("waitlisted");
+    }
+    if (p?.email && data.first_profit_reached && !kinds.includes("funded")) {
+      kinds.push("funded");
+    }
+    if (kinds.length > 0) {
+      const url = process.env.SUPABASE_URL;
+      const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (url && service) {
+        const admin = createClient<Database>(url, service, {
+          auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+        });
+        for (const kind of kinds) {
+          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`);
         }
       }
     }
+
 
     return { ok: true };
   });
