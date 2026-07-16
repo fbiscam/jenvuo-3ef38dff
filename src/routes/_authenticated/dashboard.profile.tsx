@@ -196,6 +196,8 @@ function Profile() {
           </div>
         </div>
 
+        <div className="mt-5 space-y-4">
+          <label className="block text-xs font-medium text-zinc-600">
             Full name
             <input
               value={fullName}
