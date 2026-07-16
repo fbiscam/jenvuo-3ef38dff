@@ -45,6 +45,44 @@ function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+function htmlToText(html: string) {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|h[1-6]|tr)>/gi, "\n")
+    .replace(/<li[^>]*>/gi, "• ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+async function getOrCreateUnsubToken(admin: any, email: string): Promise<string> {
+  const normalized = email.toLowerCase();
+  const { data: existing } = await admin
+    .from("email_unsubscribe_tokens")
+    .select("token, used_at")
+    .eq("email", normalized)
+    .maybeSingle();
+  if (existing?.token && !existing.used_at) return existing.token as string;
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  const token = Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  await admin
+    .from("email_unsubscribe_tokens")
+    .upsert({ token, email: normalized }, { onConflict: "email", ignoreDuplicates: true });
+  const { data: stored } = await admin
+    .from("email_unsubscribe_tokens")
+    .select("token")
+    .eq("email", normalized)
+    .maybeSingle();
+  return (stored?.token as string) ?? token;
+}
+
 const PLAN_META: Record<string, { label: string; wallet: string; blurb: string }> = {
   free: { label: "Free", wallet: "$2 starting credit", blurb: "Try the platform on XAU/USD. Upgrade any time." },
   pro: { label: "Pro", wallet: "$15 wallet credit", blurb: "Multi-pair scans, realtime alerts, full trade management." },
