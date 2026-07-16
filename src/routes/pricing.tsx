@@ -3,6 +3,7 @@ import * as React from "react";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
+import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 
 import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 import pricingVoice from "@/assets/pricing-voice.jpg";
