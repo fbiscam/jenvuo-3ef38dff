@@ -93,20 +93,36 @@ function DocumentsPage() {
     onError: (e: any) => toast.error(e?.message || "Could not remove"),
   });
 
-  async function handleFiles(list: FileList | null) {
-    if (!list || !list.length || !row) return;
+  function handleFiles(list: FileList | null) {
+    if (!list || !list.length) return;
+    const accepted: File[] = [];
+    for (const file of Array.from(list)) {
+      if (file.size > MAX_BYTES) {
+        toast.error(`${file.name} exceeds 100 MB`);
+        continue;
+      }
+      accepted.push(file);
+    }
+    if (accepted.length) {
+      setPending((prev) => [...prev, ...accepted]);
+    }
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  function removePending(idx: number) {
+    setPending((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  async function submitPending() {
+    if (!pending.length || !row) return;
     setUploading(true);
     try {
       const { data: session } = await supabase.auth.getUser();
       const uid = session?.user?.id;
       if (!uid) throw new Error("Not signed in");
       let done = 0;
-      for (const file of Array.from(list)) {
-        if (file.size > MAX_BYTES) {
-          toast.error(`${file.name} exceeds 100 MB`);
-          continue;
-        }
-        setProgress(`Uploading ${++done}/${list.length}: ${file.name}`);
+      for (const file of pending) {
+        setProgress(`Uploading ${++done}/${pending.length}: ${file.name}`);
         const safe = file.name.replace(/[^\w.\-]+/g, "_").slice(-80);
         const path = `${uid}/${row.id}/${Date.now()}-${safe}`;
         const { error: upErr } = await supabase.storage
@@ -125,7 +141,8 @@ function DocumentsPage() {
           },
         } as any);
       }
-      toast.success("Upload complete");
+      toast.success("Submitted for review");
+      setPending([]);
       qc.invalidateQueries({ queryKey: ["my-document-files"] });
       qc.invalidateQueries({ queryKey: ["my-document-status"] });
     } catch (e: any) {
@@ -133,7 +150,6 @@ function DocumentsPage() {
     } finally {
       setUploading(false);
       setProgress("");
-      if (inputRef.current) inputRef.current.value = "";
     }
   }
 
