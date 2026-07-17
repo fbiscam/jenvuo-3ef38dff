@@ -158,8 +158,9 @@ function FoundingPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-5 pb-14">
-        <div className="rounded-3xl border border-zinc-200 bg-white p-7">
+      <section className="mx-auto max-w-4xl px-5 pb-10 sm:pb-14">
+        <div className="rounded-3xl border border-zinc-200 bg-white p-5 sm:p-7">
+
           <h2 className="text-xl font-semibold">How it works</h2>
           <ol className="mt-5 space-y-4 text-[14px]">
             {[
