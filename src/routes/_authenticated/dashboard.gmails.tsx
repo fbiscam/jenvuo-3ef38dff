@@ -637,11 +637,17 @@ function MailPage() {
                           )}
                           <div className="relative shrink-0">
                             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 text-white flex items-center justify-center text-xs font-semibold overflow-hidden ring-1 ring-gray-200/60">
-                              {m.sender_avatar ? (
-                                <img src={m.sender_avatar} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                initials(m.sender_name, m.sender_address)
-                              )}
+                              {(() => {
+                                const isSent = folder === "sent";
+                                const avatar = isSent ? m.recipient_avatar : m.sender_avatar;
+                                const name = isSent ? m.recipient_name : m.sender_name;
+                                const addr = isSent ? m.recipient_address : m.sender_address;
+                                return avatar ? (
+                                  <img src={avatar} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  initials(name, addr)
+                                );
+                              })()}
                             </div>
                             {!m.is_read && folder === "inbox" && (
                               <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-blue-600 ring-2 ring-white" />
@@ -718,11 +724,17 @@ function MailPage() {
                 <div className="p-6">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-11 h-11 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold overflow-hidden">
-                      {selected.sender_avatar ? (
-                        <img src={selected.sender_avatar} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        initials(selected.sender_name, selected.sender_address)
-                      )}
+                      {(() => {
+                        const isSent = selected.folder === "sent";
+                        const avatar = isSent ? selected.recipient_avatar : selected.sender_avatar;
+                        const name = isSent ? selected.recipient_name : selected.sender_name;
+                        const addr = isSent ? selected.recipient_address : selected.sender_address;
+                        return avatar ? (
+                          <img src={avatar} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          initials(name, addr)
+                        );
+                      })()}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
