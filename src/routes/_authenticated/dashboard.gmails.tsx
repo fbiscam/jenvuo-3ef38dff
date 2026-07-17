@@ -611,7 +611,7 @@ function MailPage() {
                               )}
                             />
                           </button>
-                        </button>
+                        </div>
                       </li>
                     );
                   })}
