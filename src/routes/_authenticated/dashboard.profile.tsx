@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { deleteMyAccount } from "@/lib/delete-account.functions";
 import { requestEmailChange } from "@/lib/email-change.functions";
+import { getMyMailAddress } from "@/lib/mail.functions";
 import AvatarAdjuster from "@/components/AvatarAdjuster";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
