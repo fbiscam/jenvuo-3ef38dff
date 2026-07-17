@@ -1041,7 +1041,23 @@ function DashboardLayout() {
                 <button
                   type="button"
                   aria-label="Account menu"
-                  className="relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-white text-[14px] font-medium text-zinc-700 shadow-sm hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                  className="relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-zinc-200 text-[15px] font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                  style={avatarUrl ? undefined : (() => {
+                    const seed = (fullName || email || "U").trim().toLowerCase();
+                    const palette = [
+                      "linear-gradient(135deg,#2563eb,#1d4ed8)",
+                      "linear-gradient(135deg,#059669,#047857)",
+                      "linear-gradient(135deg,#db2777,#be185d)",
+                      "linear-gradient(135deg,#ea580c,#c2410c)",
+                      "linear-gradient(135deg,#7c3aed,#5b21b6)",
+                      "linear-gradient(135deg,#0891b2,#0e7490)",
+                      "linear-gradient(135deg,#dc2626,#991b1b)",
+                      "linear-gradient(135deg,#0d9488,#115e59)",
+                    ];
+                    let h = 0;
+                    for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+                    return { backgroundImage: palette[h % palette.length] };
+                  })()}
                 >
                   <span className="absolute inset-0 flex items-center justify-center">
                     {(fullName || email || "U").trim().charAt(0).toUpperCase()}
