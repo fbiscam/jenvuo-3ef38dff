@@ -530,7 +530,14 @@ function DashboardLayout() {
       const u = authUser;
       if (!cancelled) {
         setEmail(u.email ?? "");
-        setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
+        // Only seed from user_metadata when we have no cached name yet.
+        // user_metadata.full_name can be stale after a rename, so profiles
+        // (fetched below) is the source of truth and must win — writing the
+        // stale metadata value here caused the "old name" flash on refresh.
+        setFullName((prev) => {
+          if (prev && prev.trim()) return prev;
+          return (u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? "");
+        });
       }
       // Prefer name from profiles table (source of truth updated from Profile page)
       supabase.from("profiles").select("full_name").eq("id", u.id).maybeSingle().then(({ data }) => {
