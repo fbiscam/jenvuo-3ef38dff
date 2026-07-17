@@ -39,12 +39,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/founding")
 });
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/30",
-  approved: "bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/30",
-  active: "bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/30",
-  rejected: "bg-rose-500/10 text-rose-300 ring-1 ring-rose-500/30",
-  waitlisted: "bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/30",
-  graduated: "bg-violet-500/10 text-violet-300 ring-1 ring-violet-500/30",
+  pending: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+  approved: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
+  active: "bg-sky-50 text-sky-700 ring-1 ring-sky-200",
+  rejected: "bg-rose-50 text-rose-700 ring-1 ring-rose-200",
+  waitlisted: "bg-zinc-100 text-zinc-700 ring-1 ring-zinc-200",
+  graduated: "bg-violet-50 text-violet-700 ring-1 ring-violet-200",
 };
 
 type SortKey = "newest" | "oldest" | "name";
