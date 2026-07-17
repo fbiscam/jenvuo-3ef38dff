@@ -423,6 +423,10 @@ function MailPage() {
                               >
                                 {who}
                               </span>
+                              <VerifiedBadge
+                                tier={badges[(folder === "sent" ? m.recipient_address : m.sender_address)?.toLowerCase?.() ?? ""]}
+                                size={13}
+                              />
                               <span className="ml-auto text-[11px] text-gray-400 shrink-0">
                                 {timeAgo(m.created_at)}
                               </span>
