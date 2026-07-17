@@ -572,6 +572,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
       else if (data.status === "active") kinds.push("funded");
       else if (data.status === "rejected") kinds.push("rejected");
       else if (data.status === "waitlisted") kinds.push("waitlisted");
+      else if (data.status === "pending") kinds.push("pending");
     }
     if (p?.email && data.first_profit_reached && !kinds.includes("funded")) {
       kinds.push("funded");
