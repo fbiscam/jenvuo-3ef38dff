@@ -448,6 +448,17 @@ function DashboardLayout() {
   const [refreshTick, setRefreshTick] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  // Embed mode: hide sidebar/chrome when rendered inside the Ops Hub iframe.
+  const embedMode = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const inIframe = window.self !== window.top;
+      const hasFlag = new URLSearchParams(window.location.search).get("embed") === "1";
+      return inIframe || hasFlag;
+    } catch {
+      return true; // cross-origin iframe access throws — assume embed
+    }
+  }, []);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [isAdminUser, setIsAdminUser] = useState(false);
   const credits = useCredits();
