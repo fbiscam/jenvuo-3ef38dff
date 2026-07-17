@@ -119,7 +119,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         <h1 style="font-size:24px;line-height:1.2;margin:8px 0 0;color:#09090b">${escapeHtml(title)}</h1>
       </div>
       <div style="padding:16px 32px 8px;font-size:15px;line-height:1.6;color:#3f3f46">${body}</div>
-      ${cta ? `<div style="padding:16px 32px 28px"><a href="${cta.href}" style="display:inline-block;background:#09090b;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px">${escapeHtml(cta.label)}</a></div>` : `<div style="height:16px"></div>`}
+      ${cta ? `<div style="padding:16px 32px ${cta2 ? '8px' : '28px'}"><a href="${cta.href}" style="display:inline-block;background:#09090b;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px">${escapeHtml(cta.label)}</a>${cta2 ? `&nbsp;&nbsp;<a href="${cta2.href}" style="display:inline-block;background:#ffffff;color:#09090b;text-decoration:none;padding:11px 19px;border-radius:12px;font-weight:600;font-size:14px;border:1px solid #e4e4e7">${escapeHtml(cta2.label)}</a>` : ''}</div>${cta2 ? '<div style="height:12px"></div>' : ''}` : `<div style="height:16px"></div>`}
       <div style="border-top:1px solid #f4f4f5;padding:16px 32px 24px;font-size:12px;color:#a1a1aa">
         Jenvu · Institutional-grade XAU intelligence · <a href="${APP_URL}" style="color:#71717a;text-decoration:underline">jenvu.com</a>
       </div>
