@@ -14,9 +14,10 @@ import {
   ArrowLeft,
   RefreshCcw,
   Mail,
-  MailOpen,
   X,
   AtSign,
+  MoreVertical,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -41,11 +42,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/gmails")({
   component: MailPage,
 });
 
-const FOLDERS: { key: MailFolder; label: string; icon: any }[] = [
+type ViewKey = "inbox" | "starred" | "sent" | "archive";
+const FOLDERS: { key: ViewKey; label: string; icon: any }[] = [
   { key: "inbox", label: "Inbox", icon: InboxIcon },
+  { key: "starred", label: "Starred", icon: Star },
   { key: "sent", label: "Sent", icon: Send },
-  { key: "archive", label: "Archive", icon: Archive },
-  { key: "trash", label: "Trash", icon: Trash2 },
+  { key: "archive", label: "Archived", icon: Archive },
 ];
 
 function timeAgo(iso: string) {
@@ -79,7 +81,8 @@ function MailPage() {
   const [claiming, setClaiming] = useState(false);
   const [claimVal, setClaimVal] = useState("");
   const [claimStatus, setClaimStatus] = useState<"" | "ok" | "taken" | "invalid" | "checking">("");
-  const [folder, setFolder] = useState<MailFolder>("inbox");
+  const [view, setView] = useState<ViewKey>("inbox");
+  const folder: MailFolder = view === "starred" ? "inbox" : (view as MailFolder);
   const [messages, setMessages] = useState<MailListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -130,9 +133,11 @@ function MailPage() {
   }, [load]);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return messages;
+    let list = messages;
+    if (view === "starred") list = list.filter((m) => m.is_starred);
+    if (!query.trim()) return list;
     const q = query.toLowerCase();
-    return messages.filter(
+    return list.filter(
       (m) =>
         m.subject.toLowerCase().includes(q) ||
         m.body.toLowerCase().includes(q) ||
@@ -140,7 +145,7 @@ function MailPage() {
         m.recipient_address.toLowerCase().includes(q) ||
         (m.sender_name ?? "").toLowerCase().includes(q),
     );
-  }, [messages, query]);
+  }, [messages, query, view]);
 
   const unreadCount = messages.filter((m) => !m.is_read && m.folder === "inbox").length;
 
@@ -273,35 +278,32 @@ function MailPage() {
         <aside className="lg:w-56 shrink-0 lg:sticky lg:top-4 lg:self-start px-3 py-4 lg:p-0">
           <button
             onClick={() => setComposeOpen(true)}
-            className="w-full flex items-center gap-2 justify-center bg-white text-black border border-gray-200 rounded-xl py-2.5 text-sm font-medium hover:bg-gray-50 transition mb-4"
+            className="w-full flex items-center gap-2 justify-center bg-white text-gray-900 border border-gray-200 shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-full py-3 text-sm font-medium hover:shadow-md hover:bg-gray-50 transition mb-6"
           >
-            <Pencil className="w-4 h-4" /> Compose
+            <Pencil className="w-4 h-4 text-gray-700" /> Compose
           </button>
-          <nav className="space-y-1">
+          <nav className="space-y-1.5">
             {FOLDERS.map((f) => {
               const Icon = f.icon;
-              const active = folder === f.key;
+              const active = view === f.key;
               return (
                 <button
                   key={f.key}
                   onClick={() => {
-                    setFolder(f.key);
+                    setView(f.key);
                     setSelected(null);
                   }}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition",
-                    active ? "bg-[#f5efe4] text-black" : "text-gray-700 hover:bg-[#faf6ee]",
+                    "w-full flex items-center gap-3 px-4 py-2.5 rounded-full text-sm transition",
+                    active
+                      ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-gray-100 text-gray-900 font-semibold"
+                      : "text-gray-600 hover:bg-gray-50",
                   )}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className={cn("w-[18px] h-[18px]", active ? "text-blue-600" : "text-gray-500")} strokeWidth={active ? 2.2 : 1.8} />
                   <span className="flex-1 text-left">{f.label}</span>
                   {f.key === "inbox" && unreadCount > 0 && (
-                    <span
-                      className={cn(
-                        "text-[11px] px-1.5 py-0.5 rounded-full font-medium",
-                        active ? "bg-red-500 text-white" : "bg-red-500 text-white",
-                      )}
-                    >
+                    <span className="text-[11px] px-1.5 py-0.5 rounded-full font-medium bg-red-500 text-white">
                       {unreadCount}
                     </span>
                   )}
@@ -320,28 +322,37 @@ function MailPage() {
         {/* Main */}
         <section className="flex-1 min-w-0 border-x-0 lg:border lg:border-gray-200 lg:rounded-2xl overflow-hidden bg-white">
           {/* Header */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
-            {selected && (
-              <button onClick={() => setSelected(null)} className="lg:hidden p-1.5 hover:bg-gray-100 rounded">
-                <ArrowLeft className="w-4 h-4" />
+          <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+            <div className="flex items-center gap-1 mb-3">
+              {selected && (
+                <button onClick={() => setSelected(null)} className="lg:hidden p-1.5 hover:bg-gray-100 rounded">
+                  <ArrowLeft className="w-4 h-4" />
+                </button>
+              )}
+              <button className="flex items-center gap-1 p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
+                <span className="w-4 h-4 rounded-full border-2 border-gray-300 inline-block" />
+                <ChevronDown className="w-3.5 h-3.5" />
               </button>
-            )}
-            <div className="relative flex-1 max-w-md">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <button
+                onClick={() => load()}
+                className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
+                title="Refresh"
+              >
+                <RefreshCcw className="w-4 h-4" />
+              </button>
+              <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
+                <MoreVertical className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search mail"
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-100 focus:bg-white focus:ring-1 focus:ring-black outline-none border border-transparent focus:border-gray-300"
+                className="w-full pl-11 pr-4 py-2.5 text-sm rounded-full bg-gray-100 focus:bg-white focus:ring-1 focus:ring-gray-300 outline-none border border-transparent transition"
               />
             </div>
-            <button
-              onClick={() => load()}
-              className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
-              title="Refresh"
-            >
-              <RefreshCcw className="w-4 h-4" />
-            </button>
           </div>
 
           {/* Split view */}
@@ -435,9 +446,12 @@ function MailPage() {
             {/* Detail */}
             <div className={cn("bg-white", !selected ? "hidden lg:block" : "block")}>
               {!selected ? (
-                <div className="h-full flex flex-col items-center justify-center p-12 text-center">
-                  <MailOpen className="w-12 h-12 text-gray-200 mb-3" />
-                  <div className="text-sm text-gray-400">Select a message to read</div>
+                <div className="h-full min-h-[400px] flex flex-col items-center justify-center p-12 text-center">
+                  <div className="w-20 h-20 rounded-full border border-gray-200 flex items-center justify-center mb-4">
+                    <InboxIcon className="w-8 h-8 text-blue-600" strokeWidth={2} />
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900 mb-1">No conversation selected</div>
+                  <div className="text-sm text-gray-500">Pick a message from the list to read it here.</div>
                 </div>
               ) : (
                 <div className="p-6">
