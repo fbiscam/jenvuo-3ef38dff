@@ -514,6 +514,14 @@ function DashboardLayout() {
         setEmail(u.email ?? "");
         setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
       }
+      // Load avatar (best-effort, non-blocking)
+      supabase.from("profiles").select("avatar_url").eq("id", u.id).maybeSingle().then(async ({ data }) => {
+        if (cancelled) return;
+        const path = (data as { avatar_url?: string | null } | null)?.avatar_url;
+        if (!path) { setAvatarUrl(null); return; }
+        const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+        if (!cancelled) setAvatarUrl(signed?.signedUrl ?? null);
+      });
       const days = RANGE_DAYS[range];
       const since = days != null ? new Date(Date.now() - days * 24 * 3600 * 1000).toISOString() : null;
 
