@@ -289,17 +289,17 @@ function NotificationsPage() {
                 key={f.key}
                 onClick={() => setFilter(f.key)}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition",
+                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition",
                   active
-                    ? "bg-zinc-900 text-white"
-                    : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200",
+                    ? "border-zinc-900 bg-white text-zinc-900"
+                    : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50",
                 )}
               >
                 {f.label}
                 {count > 0 && (
                   <span className={cn(
                     "rounded-full px-1.5 text-[10px]",
-                    active ? "bg-white/20 text-white" : "bg-white text-zinc-500",
+                    active ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600",
                   )}>{count}</span>
                 )}
               </button>
