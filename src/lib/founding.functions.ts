@@ -98,7 +98,8 @@ type ApplicantEmailKind =
   | "funded"
   | "documents_received"
   | "documents_approved"
-  | "documents_rejected";
+  | "documents_rejected"
+  | "documents_needs_info";
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string) {
   const meta = PLAN_META[plan] || PLAN_META.elite;
