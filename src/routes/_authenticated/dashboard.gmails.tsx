@@ -130,7 +130,7 @@ function MailPage() {
       setLoading(false);
       setReady(true);
     }
-  }, [folder, _getAddr, _listAddrs, _list]);
+  }, [folder, view, _getAddr, _listAddrs, _list]);
 
   useEffect(() => {
     load();
