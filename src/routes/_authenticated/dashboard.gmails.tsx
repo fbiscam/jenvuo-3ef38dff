@@ -79,6 +79,7 @@ function MailPage() {
   const _send = useServerFn(sendMail);
   const _setState = useServerFn(setMailState);
   const _search = useServerFn(searchMailDirectory);
+  const _badges = useServerFn(getMailBadges);
 
   const [myAddress, setMyAddress] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
@@ -92,6 +93,7 @@ function MailPage() {
   const [selected, setSelected] = useState<MailListItem | null>(null);
   const [composeOpen, setComposeOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [badges, setBadges] = useState<Record<string, MailBadgeTier>>({});
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
