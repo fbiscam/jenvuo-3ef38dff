@@ -200,6 +200,7 @@ function AlertPrefs() {
         for (const a of alerts) {
           if (set.has(key(a.pair, a.entry, a.sl, a.tp))) next.add(a.id);
         }
+        persistLogged(next);
         return next;
       });
     })();
