@@ -1,9 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
+import { useServerFn } from "@tanstack/react-start";
+import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
+import { Bell, BellOff, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/alerts")({
