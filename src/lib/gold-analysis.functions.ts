@@ -1615,6 +1615,56 @@ export const getMarketSnapshot = createServerFn({ method: "POST" })
   });
 
 
+export const getMarketSnapshotsBatch = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { symbols?: unknown };
+    const arr = Array.isArray(obj.symbols) ? obj.symbols : [];
+    const symbols = arr
+      .filter((s): s is string => typeof s === "string" && s.trim().length > 0)
+      .slice(0, 20);
+    return { symbols: symbols.length ? symbols : ["XAUUSD"] };
+  })
+  .handler(async ({ data }) => {
+    const results = await Promise.all(
+      data.symbols.map(async (symbol) => {
+        try {
+          const inst = resolveInstrument(symbol);
+          const [quote, daily] = await Promise.all([
+            resolveLiveTick(inst).catch(() => null),
+            fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]),
+          ]);
+          let price: number | null = null;
+          let prevClose: number | null = null;
+          if (daily.length >= 2) {
+            price = daily[daily.length - 1].c;
+            prevClose = daily[daily.length - 2].c;
+          } else if (daily.length === 1) {
+            price = daily[0].c;
+            prevClose = daily[0].o;
+          }
+          if (quote?.price && isFinite(quote.price)) price = quote.price;
+          if (price == null) return { symbol, snapshot: null };
+          return {
+            symbol,
+            snapshot: {
+              price,
+              prevClose,
+              changePct: prevClose ? ((price - prevClose) / prevClose) * 100 : null,
+              decimals: inst.decimals,
+              display: inst.display,
+              kind: inst.kind,
+              t: Date.now(),
+            },
+          };
+        } catch {
+          return { symbol, snapshot: null };
+        }
+      }),
+    );
+    return { results };
+  });
+
+
 export const getNewsRisk = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {
     const obj = (d ?? {}) as { symbol?: string };
