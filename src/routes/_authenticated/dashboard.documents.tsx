@@ -245,9 +245,7 @@ function DocumentsPage() {
                 </div>
               )}
               <div className="text-xs mt-3 font-medium text-red-800">
-                {rejectedResubmitOpen
-                  ? `You can re-submit within the next ${rejectedHoursLeft} hour${rejectedHoursLeft === 1 ? "" : "s"}.`
-                  : "The 24-hour re-submission window has closed. Please contact support to try again."}
+                You can re-submit right away — just upload updated proof below.
               </div>
             </div>
           )}
