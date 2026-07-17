@@ -526,6 +526,26 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           if (found) existingUserId = found.id;
           if (!userList?.users?.length || (userList.users.length < 1000)) break;
         }
+        // Fresh account on approval: wipe ALL user-scoped data so the new
+        // founding trader starts clean — no old alerts, notifications,
+        // trades, credits, referrals, devices, etc.
+        if (existingUserId) {
+          const uid = existingUserId;
+          const tables = [
+            "user_notifications", "signal_alert_subscribers", "alert_preferences",
+            "credit_ledger", "credit_lots", "credit_balances", "credit_charge_audit",
+            "ai_cost_log", "trade_journal", "trade_setup_links", "trade_setups",
+            "saved_signals", "voice_history", "trusted_devices", "account_devices",
+            "email_change_requests", "email_change_audit", "user_subscriptions",
+            "referral_codes", "mail_message_state",
+          ];
+          for (const t of tables) {
+            const { error: wErr } = await admin.from(t as any).delete().eq("user_id", uid);
+            if (wErr) console.error(`[founding] fresh-wipe ${t} failed:`, wErr.message);
+          }
+          const { error: refErr } = await admin.from("referrals" as any).delete().or(`referrer_id.eq.${uid},referred_user_id.eq.${uid}`);
+          if (refErr) console.error("[founding] fresh-wipe referrals failed:", refErr.message);
+        }
         try {
           const linkType = existingUserId ? "recovery" : "invite";
           const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
