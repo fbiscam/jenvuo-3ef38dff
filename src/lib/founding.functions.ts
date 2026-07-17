@@ -569,12 +569,14 @@ export type DocumentStatusRow = {
   email: string;
   status: string;
   requested_plan: string | null;
-  document_status: "not_submitted" | "received" | "pending" | "verified" | "rejected";
+  document_status: "not_submitted" | "received" | "pending" | "verified" | "rejected" | "needs_info";
   documents_submitted_at: string | null;
   documents_verified_at: string | null;
   documents_rejected_at: string | null;
   documents_rejected_reason: string | null;
   documents_note: string | null;
+  documents_info_request: string | null;
+  documents_info_requested_at: string | null;
   created_at: string;
 };
 
@@ -586,7 +588,7 @@ export const getMyDocumentStatus = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("founding_applications" as any)
       .select(
-        "id, full_name, email, status, requested_plan, document_status, documents_submitted_at, documents_verified_at, documents_rejected_at, documents_rejected_reason, documents_note, created_at",
+        "id, full_name, email, status, requested_plan, document_status, documents_submitted_at, documents_verified_at, documents_rejected_at, documents_rejected_reason, documents_note, documents_info_request, documents_info_requested_at, created_at",
       )
       .ilike("email", email)
       .order("created_at", { ascending: false })
