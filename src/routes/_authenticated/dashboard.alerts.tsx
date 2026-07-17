@@ -212,9 +212,11 @@ function AlertPrefs() {
               <tbody className="divide-y divide-zinc-100">
                 {alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter).slice(0, visibleCount).map((a) => {
                   const isBuy = a.direction === "BUY";
-                  const ago = relativeTime(new Date(a.fired_at));
+                  const firedAt = new Date(a.fired_at);
+                  const ago = relativeTime(firedAt);
                   const logged = loggedIds.has(a.id);
                   const busy = loggingId === a.id;
+                  const withinHour = Date.now() - firedAt.getTime() < 60 * 60 * 1000;
                   return (
                     <tr key={a.id} className="text-center hover:bg-zinc-50/60">
                       <td className="px-3 py-2.5">
