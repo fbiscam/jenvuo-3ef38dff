@@ -525,16 +525,29 @@ function DashboardLayout() {
       // Prefer name from profiles table (source of truth updated from Profile page)
       supabase.from("profiles").select("full_name").eq("id", u.id).maybeSingle().then(({ data }) => {
         const n = (data as { full_name?: string | null } | null)?.full_name;
-        if (!cancelled && n && n.trim()) setFullName(n.trim());
+        if (!cancelled && n && n.trim()) {
+          setFullName(n.trim());
+          try { localStorage.setItem("jenvu:profile:fullName", n.trim()); } catch {}
+        }
       });
       // Load avatar (best-effort, non-blocking)
       supabase.from("profiles").select("avatar_url").eq("id", u.id).maybeSingle().then(async ({ data }) => {
         if (cancelled) return;
         const path = (data as { avatar_url?: string | null } | null)?.avatar_url;
-        if (!path) { setAvatarUrl(null); return; }
+        if (!path) {
+          setAvatarUrl(null);
+          try { localStorage.removeItem("jenvu:profile:avatarUrl"); } catch {}
+          return;
+        }
         const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
-        if (!cancelled) setAvatarUrl(signed?.signedUrl ?? null);
+        if (!cancelled) {
+          setAvatarUrl(signed?.signedUrl ?? null);
+          try {
+            if (signed?.signedUrl) localStorage.setItem("jenvu:profile:avatarUrl", signed.signedUrl);
+          } catch {}
+        }
       });
+
       const days = RANGE_DAYS[range];
       const since = days != null ? new Date(Date.now() - days * 24 * 3600 * 1000).toISOString() : null;
 
