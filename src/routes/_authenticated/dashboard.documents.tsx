@@ -184,21 +184,27 @@ function DocumentsPage() {
               {STEPS.map((step, i) => {
                 const done = i < currentIdx || (i === currentIdx && row?.document_status === "verified");
                 const active = i === currentIdx && !rejected && !needsInfo && row?.document_status !== "verified";
+                const isLast = i === STEPS.length - 1;
                 return (
                   <li key={step.key} className="flex items-start gap-3">
-                    <div
-                      className={[
-                        "mt-0.5 h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold",
-                        done
-                          ? "bg-blue-600 text-white"
-                          : active
-                          ? "bg-blue-600 text-white"
-                          : "bg-blue-600 text-white",
-                      ].join(" ")}
-                    >
-                      {done ? "✓" : i + 1}
+                    <div className="flex flex-col items-center self-stretch">
+                      <div
+                        className={[
+                          "mt-0.5 h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold",
+                          done
+                            ? "bg-blue-600 text-white"
+                            : active
+                            ? "bg-blue-600 text-white"
+                            : "bg-blue-600 text-white",
+                        ].join(" ")}
+                      >
+                        {done ? "✓" : i + 1}
+                      </div>
+                      {!isLast && (
+                        <div className={["w-px flex-1 mt-1", done ? "bg-blue-600" : "bg-blue-200"].join(" ")} />
+                      )}
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 pb-4">
                       <div className="text-sm font-semibold text-zinc-900">{step.label}</div>
                       <div className="text-xs text-zinc-600">{step.desc}</div>
                       {active && step.key === "received" && row.documents_submitted_at && (
