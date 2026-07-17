@@ -166,7 +166,7 @@ function DocumentsPage() {
             <ol className="space-y-4">
               {STEPS.map((step, i) => {
                 const done = i < currentIdx || (i === currentIdx && row?.document_status === "verified");
-                const active = i === currentIdx && !rejected && row?.document_status !== "verified";
+                const active = i === currentIdx && !rejected && !needsInfo && row?.document_status !== "verified";
                 return (
                   <li key={step.key} className="flex items-start gap-3">
                     <div
