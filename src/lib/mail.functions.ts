@@ -159,23 +159,26 @@ export const getUnreadMailCount = createServerFn({ method: "GET" })
 
 export const sendMail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { to: string; subject: string; body: string }) => {
+  .inputValidator((data: { to: string; subject: string; body: string; from?: string }) => {
     const to = String(data?.to ?? "").toLowerCase().trim();
     const subject = String(data?.subject ?? "").slice(0, 300);
     const body = String(data?.body ?? "").slice(0, 50000);
+    const from = data?.from ? String(data.from).toLowerCase().trim() : undefined;
     if (!to.endsWith("@jenvu.email")) throw new Error("Recipient must be a @jenvu.email address");
     if (!body.trim() && !subject.trim()) throw new Error("Message is empty");
-    return { to, subject, body };
+    return { to, subject, body, from };
   })
   .handler(async ({ context, data }) => {
     const { data: id, error } = await context.supabase.rpc("mail_send", {
       _to_address: data.to,
       _subject: data.subject,
       _body: data.body,
+      _from_address: data.from ?? null,
     });
     if (error) throw new Error(error.message);
     return { id: id as string };
   });
+
 
 export const setMailState = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
