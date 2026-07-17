@@ -291,8 +291,8 @@ function NotificationsPage() {
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition",
                   active
-                    ? "border-zinc-900 bg-white text-zinc-900"
-                    : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50",
+                    ? "border-black bg-white text-zinc-900"
+                    : "border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-50",
                 )}
               >
                 {f.label}
