@@ -422,18 +422,18 @@ function AdminFoundingPage() {
                 </div>
 
                 {isOpen && (
-                  <div className="mt-4 grid gap-4 border-t border-white/5 pt-4 md:grid-cols-2">
+                  <div className="mt-4 grid gap-4 border-t border-zinc-100 pt-4 md:grid-cols-2">
                     <div>
                       <div className="text-[11px] uppercase tracking-widest text-zinc-500">Why joining</div>
-                      <p className="mt-1 whitespace-pre-wrap text-[13px] text-zinc-200">
-                        {r.why_joining || <span className="text-zinc-600">—</span>}
+                      <p className="mt-1 whitespace-pre-wrap text-[13px] text-zinc-800">
+                        {r.why_joining || <span className="text-zinc-400">—</span>}
                       </p>
                       {r.myfxbook_url && (
                         <a
                           href={r.myfxbook_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="mt-3 inline-flex items-center gap-1 text-[12px] text-amber-300 hover:underline"
+                          className="mt-3 inline-flex items-center gap-1 text-[12px] text-amber-700 hover:underline"
                         >
                           <ExternalLink className="h-3 w-3" /> Track record
                         </a>
@@ -448,13 +448,13 @@ function AdminFoundingPage() {
                         onChange={(e) => setNotes((s) => ({ ...s, [r.id]: e.target.value }))}
                         rows={4}
                         placeholder="Private notes about this applicant…"
-                        className="mt-1 w-full resize-y rounded-lg border border-white/10 bg-zinc-950/60 p-2 text-[13px] text-zinc-100 placeholder:text-zinc-600 focus:border-amber-500/40 focus:outline-none"
+                        className="mt-1 w-full resize-y rounded-lg border border-zinc-200 bg-white p-2 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:border-amber-400 focus:outline-none"
                       />
                       <div className="mt-2 flex justify-end">
                         <button
                           onClick={() => saveNote(r.id)}
                           disabled={savingNote === r.id}
-                          className="rounded-lg bg-white/10 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-white/15 disabled:opacity-50"
+                          className="rounded-lg bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
                         >
                           {savingNote === r.id ? "Saving…" : "Save note"}
                         </button>
