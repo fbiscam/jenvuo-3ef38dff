@@ -24,47 +24,31 @@ export interface EnqueueAlertEmailsArgs {
 }
 
 export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promise<{ enqueued: number }> {
-  // 1. Resolve opt-in subscribers
-  const { data: subs } = await supabaseAdmin
-    .from('signal_alert_subscribers')
-    .select('email')
-    .eq('status', 'active')
-  const allSubEmails = Array.from(
-    new Set(
-      (subs ?? [])
-        .map((s: { email: string | null }) => (s.email ?? '').toLowerCase().trim())
-        .filter((e) => !!e && /.+@.+\..+/.test(e)),
-    ),
-  )
-  if (allSubEmails.length === 0) return { enqueued: 0 }
-
-  // 2. Intersect with paid users
-  const { data: matchedUsers } = (await supabaseAdmin
-    .schema('auth' as never)
-    .from('users' as never)
-    .select('id, email')
-    .in('email', allSubEmails)) as unknown as {
-    data: Array<{ id: string; email: string }> | null
-  }
-  const emailByUserId = new Map<string, string>()
-  for (const u of matchedUsers ?? []) {
-    if (u?.id && u?.email) emailByUserId.set(u.id, u.email.toLowerCase().trim())
-  }
-  if (emailByUserId.size === 0) return { enqueued: 0 }
-
+  // Recipients = every active paid-plan user's email (no opt-in required).
   const { data: paidRows } = await supabaseAdmin
     .from('user_subscriptions')
     .select('user_id')
     .eq('status', 'active')
     .neq('plan_id', 'free')
-    .in('user_id', Array.from(emailByUserId.keys()))
-  const paidEmailSet = new Set(
-    (paidRows ?? [])
-      .map((r: { user_id: string }) => emailByUserId.get(r.user_id))
-      .filter((e): e is string => !!e),
+  const paidIds = Array.from(new Set((paidRows ?? []).map((r: { user_id: string }) => r.user_id)))
+  if (paidIds.length === 0) return { enqueued: 0 }
+
+  const { data: users } = (await supabaseAdmin
+    .schema('auth' as never)
+    .from('users' as never)
+    .select('id, email')
+    .in('id', paidIds)) as unknown as {
+    data: Array<{ id: string; email: string | null }> | null
+  }
+  const recipients = Array.from(
+    new Set(
+      (users ?? [])
+        .map((u) => (u?.email ?? '').toLowerCase().trim())
+        .filter((e) => !!e && /.+@.+\..+/.test(e)),
+    ),
   )
-  const recipients = allSubEmails.filter((e) => paidEmailSet.has(e))
   if (recipients.length === 0) return { enqueued: 0 }
+
 
   // 3. Render template
   const { default: React } = await import('react')
