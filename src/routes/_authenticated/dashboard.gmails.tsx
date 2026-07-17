@@ -17,11 +17,6 @@ import {
   MailOpen,
   X,
   AtSign,
-  CheckCheck,
-  Sparkles,
-  Copy,
-  Check,
-  Reply,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -53,8 +48,6 @@ const FOLDERS: { key: MailFolder; label: string; icon: any }[] = [
   { key: "trash", label: "Trash", icon: Trash2 },
 ];
 
-type ViewFilter = "all" | "unread" | "starred";
-
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const s = Math.floor(diff / 1000);
@@ -71,23 +64,6 @@ function timeAgo(iso: string) {
 function initials(name?: string | null, address?: string) {
   const s = (name || address || "?").trim();
   return s.slice(0, 2).toUpperCase();
-}
-
-// Deterministic soft gradient for sender avatar background
-function avatarGradient(seed: string) {
-  const palettes = [
-    "from-indigo-500 to-purple-500",
-    "from-sky-500 to-cyan-500",
-    "from-emerald-500 to-teal-500",
-    "from-amber-500 to-orange-500",
-    "from-pink-500 to-rose-500",
-    "from-violet-500 to-fuchsia-500",
-    "from-blue-500 to-indigo-500",
-    "from-lime-500 to-emerald-500",
-  ];
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return palettes[h % palettes.length];
 }
 
 function MailPage() {
@@ -110,17 +86,6 @@ function MailPage() {
   const [selected, setSelected] = useState<MailListItem | null>(null);
   const [composeOpen, setComposeOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [view, setView] = useState<ViewFilter>("all");
-  const [selection, setSelection] = useState<Set<string>>(new Set());
-  const [copied, setCopied] = useState(false);
-
-  // per-folder unread counts (inbox is the meaningful one; others shown for consistency)
-  const [folderCounts, setFolderCounts] = useState<Record<MailFolder, { total: number; unread: number }>>({
-    inbox: { total: 0, unread: 0 },
-    sent: { total: 0, unread: 0 },
-    archive: { total: 0, unread: 0 },
-    trash: { total: 0, unread: 0 },
-  });
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -130,22 +95,17 @@ function MailPage() {
         _list({ data: { folder } }).catch(() => []),
       ]);
       setMyAddress((addr as any)?.address ?? null);
-      const list = rows as MailListItem[];
-      setMessages(list);
-      setFolderCounts((prev) => ({
-        ...prev,
-        [folder]: {
-          total: list.length,
-          unread: list.filter((m) => !m.is_read && folder === "inbox").length,
-        },
-      }));
+      setMessages(rows as MailListItem[]);
     } finally {
       setLoading(false);
       setReady(true);
     }
   }, [folder, _getAddr, _list]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
+
 
   // realtime: refresh on inbox changes
   useEffect(() => {
@@ -169,29 +129,20 @@ function MailPage() {
     };
   }, [load]);
 
-  // reset selection when folder changes
-  useEffect(() => { setSelection(new Set()); setSelected(null); }, [folder]);
-
   const filtered = useMemo(() => {
-    let list = messages;
-    if (view === "unread") list = list.filter((m) => !m.is_read);
-    else if (view === "starred") list = list.filter((m) => m.is_starred);
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      list = list.filter(
-        (m) =>
-          m.subject.toLowerCase().includes(q) ||
-          m.body.toLowerCase().includes(q) ||
-          m.sender_address.toLowerCase().includes(q) ||
-          m.recipient_address.toLowerCase().includes(q) ||
-          (m.sender_name ?? "").toLowerCase().includes(q),
-      );
-    }
-    return list;
-  }, [messages, query, view]);
+    if (!query.trim()) return messages;
+    const q = query.toLowerCase();
+    return messages.filter(
+      (m) =>
+        m.subject.toLowerCase().includes(q) ||
+        m.body.toLowerCase().includes(q) ||
+        m.sender_address.toLowerCase().includes(q) ||
+        m.recipient_address.toLowerCase().includes(q) ||
+        (m.sender_name ?? "").toLowerCase().includes(q),
+    );
+  }, [messages, query]);
 
-  const unreadCount = messages.filter((m) => !m.is_read && folder === "inbox").length;
-  const starredCount = messages.filter((m) => m.is_starred).length;
+  const unreadCount = messages.filter((m) => !m.is_read && m.folder === "inbox").length;
 
   const openMessage = async (m: MailListItem) => {
     setSelected(m);
@@ -223,71 +174,20 @@ function MailPage() {
     } catch {}
   };
 
-  const toggleSelect = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelection((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const bulkAction = async (action: "read" | "archive" | "trash") => {
-    const ids = Array.from(selection);
-    if (ids.length === 0) return;
-    try {
-      await Promise.all(
-        ids.map((id) => {
-          if (action === "read") return _setState({ data: { message_id: id, is_read: true } });
-          if (action === "archive") return _setState({ data: { message_id: id, folder: "archive" } });
-          return _setState({ data: { message_id: id, folder: "trash" } });
-        }),
-      );
-      if (action === "read") {
-        setMessages((prev) => prev.map((x) => (ids.includes(x.message_id) ? { ...x, is_read: true } : x)));
-      } else {
-        setMessages((prev) => prev.filter((x) => !ids.includes(x.message_id)));
-      }
-      setSelection(new Set());
-      toast.success(
-        action === "read" ? `Marked ${ids.length} as read` : `Moved ${ids.length} to ${action}`,
-      );
-    } catch (e: any) {
-      toast.error(e?.message || "Bulk action failed");
-    }
-  };
-
-  const markAllRead = async () => {
-    const ids = messages.filter((m) => !m.is_read).map((m) => m.message_id);
-    if (ids.length === 0) return;
-    try {
-      await Promise.all(ids.map((id) => _setState({ data: { message_id: id, is_read: true } })));
-      setMessages((prev) => prev.map((x) => ({ ...x, is_read: true })));
-      toast.success(`Marked ${ids.length} as read`);
-    } catch (e: any) {
-      toast.error(e?.message || "Failed");
-    }
-  };
-
-  const copyAddress = async () => {
-    if (!myAddress) return;
-    try {
-      await navigator.clipboard.writeText(myAddress);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1400);
-    } catch {}
-  };
-
   // debounced username check
   useEffect(() => {
-    if (!claimVal) { setClaimStatus(""); return; }
+    if (!claimVal) {
+      setClaimStatus("");
+      return;
+    }
     setClaimStatus("checking");
     const t = setTimeout(async () => {
       try {
         const r = await _check({ data: { local_part: claimVal } });
         setClaimStatus(r.reason === "ok" ? "ok" : r.reason);
-      } catch { setClaimStatus("invalid"); }
+      } catch {
+        setClaimStatus("invalid");
+      }
     }, 350);
     return () => clearTimeout(t);
   }, [claimVal, _check]);
@@ -300,19 +200,24 @@ function MailPage() {
       toast.success(`Your address is ${r.address}`);
     } catch (e: any) {
       toast.error(e?.message || "Failed to claim");
-    } finally { setClaiming(false); }
+    } finally {
+      setClaiming(false);
+    }
   };
 
-  // ---------- Initial stable shell ----------
-  if (!ready) return <div className="min-h-[calc(100vh-4rem)] bg-white" />;
+  // ------------ Initial load: stable white shell to prevent flicker ------------
+  if (!ready) {
+    return <div className="min-h-[calc(100vh-4rem)] bg-white" />;
+  }
 
-  // ---------- Claim screen ----------
+  // ------------ Claim address screen ------------
   if (!myAddress) {
+
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-white flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/20">
+            <div className="w-14 h-14 rounded-2xl bg-white border border-gray-200 text-black flex items-center justify-center mx-auto mb-4 shadow-sm">
               <AtSign className="w-7 h-7" />
             </div>
             <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 whitespace-nowrap">Claim your JENVU address</h1>
@@ -353,248 +258,122 @@ function MailPage() {
             <p className="text-[10px] sm:text-[11px] text-gray-400 mt-3 text-center whitespace-nowrap">
               Cannot be changed later. Only JENVU members can email you.
             </p>
+
           </div>
         </div>
       </div>
     );
   }
 
-  const anySelected = selection.size > 0;
-
-  // ---------- Mail UI ----------
+  // ------------ Mail UI ------------
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-gray-50/60 via-white to-white">
-      <div className="max-w-[1500px] mx-auto flex flex-col lg:flex-row gap-0 lg:gap-5 lg:p-5">
+    <div className="min-h-[calc(100vh-4rem)] bg-white">
+      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-0 lg:gap-4 lg:p-4">
         {/* Sidebar */}
-        <aside className="lg:w-60 shrink-0 lg:sticky lg:top-4 lg:self-start px-3 py-4 lg:p-0">
-          {/* Compose */}
+        <aside className="lg:w-56 shrink-0 lg:sticky lg:top-4 lg:self-start px-3 py-4 lg:p-0">
           <button
             onClick={() => setComposeOpen(true)}
-            className="w-full flex items-center gap-2 justify-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl py-3 text-sm font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99] transition mb-4"
+            className="w-full flex items-center gap-2 justify-center bg-black text-white rounded-xl py-2.5 text-sm font-medium hover:bg-gray-800 transition mb-4"
           >
             <Pencil className="w-4 h-4" /> Compose
           </button>
-
-          {/* Folders */}
           <nav className="space-y-1">
             {FOLDERS.map((f) => {
               const Icon = f.icon;
               const active = folder === f.key;
-              const badge = f.key === "inbox" ? unreadCount : 0;
               return (
                 <button
                   key={f.key}
-                  onClick={() => setFolder(f.key)}
+                  onClick={() => {
+                    setFolder(f.key);
+                    setSelected(null);
+                  }}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition",
-                    active
-                      ? "bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-sm"
-                      : "text-gray-700 hover:bg-gray-100",
+                    "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition",
+                    active ? "bg-gray-900 text-white" : "text-gray-700 hover:bg-gray-100",
                   )}
                 >
-                  <Icon className={cn("w-4 h-4", active ? "text-white" : "text-gray-500")} />
-                  <span className="flex-1 text-left font-medium">{f.label}</span>
-                  {badge > 0 && (
+                  <Icon className="w-4 h-4" />
+                  <span className="flex-1 text-left">{f.label}</span>
+                  {f.key === "inbox" && unreadCount > 0 && (
                     <span
                       className={cn(
-                        "text-[11px] px-1.5 py-0.5 rounded-full font-semibold",
-                        active ? "bg-white text-gray-900" : "bg-red-500 text-white",
+                        "text-[11px] px-1.5 py-0.5 rounded-full font-medium",
+                        active ? "bg-white text-black" : "bg-red-500 text-white",
                       )}
                     >
-                      {badge}
+                      {unreadCount}
                     </span>
                   )}
                 </button>
               );
             })}
           </nav>
-
-          {/* Address card */}
-          <div className="mt-5 rounded-2xl bg-white border border-gray-200 p-4 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                <Sparkles className="w-3 h-3 text-white" />
-              </div>
-              <div className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Your address</div>
+          {myAddress && (
+            <div className="mt-6 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
+              <div className="text-[10px] uppercase tracking-wide text-gray-400">Your address</div>
+              <div className="text-xs font-medium text-gray-900 truncate">{myAddress}</div>
             </div>
-            <div className="text-xs font-semibold text-gray-900 truncate">{myAddress}</div>
+          )}
+        </aside>
+
+        {/* Main */}
+        <section className="flex-1 min-w-0 border-x-0 lg:border lg:border-gray-200 lg:rounded-2xl overflow-hidden bg-white">
+          {/* Header */}
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
+            {selected && (
+              <button onClick={() => setSelected(null)} className="lg:hidden p-1.5 hover:bg-gray-100 rounded">
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+            )}
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search mail"
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-100 focus:bg-white focus:ring-1 focus:ring-black outline-none border border-transparent focus:border-gray-300"
+              />
+            </div>
             <button
-              onClick={copyAddress}
-              className="mt-2 w-full flex items-center justify-center gap-1.5 text-[11px] font-medium text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-lg py-1.5 transition"
+              onClick={() => load()}
+              className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
+              title="Refresh"
             >
-              {copied ? <><Check className="w-3 h-3 text-green-600" /> Copied</> : <><Copy className="w-3 h-3" /> Copy</>}
+              <RefreshCcw className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Tips */}
-          <div className="mt-3 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 p-3">
-            <div className="text-[10px] uppercase tracking-wider text-indigo-700 font-semibold mb-1">Shortcut</div>
-            <div className="text-[11px] text-indigo-900/80 leading-relaxed">
-              Press <kbd className="px-1 py-0.5 rounded bg-white border border-indigo-200 text-[10px] font-semibold">⌘</kbd> + <kbd className="px-1 py-0.5 rounded bg-white border border-indigo-200 text-[10px] font-semibold">↵</kbd> to send fast.
-            </div>
-          </div>
-        </aside>
-
-        {/* Main panel */}
-        <section className="flex-1 min-w-0 border-x-0 lg:border lg:border-gray-200 lg:rounded-3xl overflow-hidden bg-white shadow-sm">
-          {/* Header */}
-          <div className="border-b border-gray-200">
-            <div className="flex items-center gap-2 px-4 py-3">
-              {selected && (
-                <button onClick={() => setSelected(null)} className="lg:hidden p-1.5 hover:bg-gray-100 rounded">
-                  <ArrowLeft className="w-4 h-4" />
-                </button>
-              )}
-              <div className="relative flex-1 max-w-md">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search mail"
-                  className="w-full pl-9 pr-3 py-2 text-sm rounded-xl bg-gray-100 focus:bg-white focus:ring-2 focus:ring-indigo-500/30 outline-none border border-transparent focus:border-indigo-400 transition"
-                />
-              </div>
-              {folder === "inbox" && unreadCount > 0 && (
-                <button
-                  onClick={markAllRead}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
-                  title="Mark all as read"
-                >
-                  <CheckCheck className="w-4 h-4" /> Mark all read
-                </button>
-              )}
-              <button
-                onClick={() => load()}
-                className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
-                title="Refresh"
-              >
-                <RefreshCcw className={cn("w-4 h-4", loading && "animate-spin")} />
-              </button>
-            </div>
-
-            {/* Filter tabs */}
-            <div className="flex items-center gap-1 px-4 pb-2">
-              {([
-                { key: "all", label: "All", count: messages.length },
-                { key: "unread", label: "Unread", count: messages.filter((m) => !m.is_read).length },
-                { key: "starred", label: "Starred", count: starredCount },
-              ] as { key: ViewFilter; label: string; count: number }[]).map((t) => {
-                const active = view === t.key;
-                return (
-                  <button
-                    key={t.key}
-                    onClick={() => setView(t.key)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-full text-xs font-medium transition flex items-center gap-1.5",
-                      active
-                        ? "bg-gray-900 text-white"
-                        : "text-gray-600 hover:bg-gray-100",
-                    )}
-                  >
-                    <span>{t.label}</span>
-                    <span className={cn("text-[10px] px-1 rounded", active ? "bg-white/20" : "text-gray-400")}>
-                      {t.count}
-                    </span>
-                  </button>
-                );
-              })}
-              {anySelected && (
-                <div className="ml-auto flex items-center gap-1">
-                  <span className="text-xs text-gray-500 mr-1">{selection.size} selected</span>
-                  <button
-                    onClick={() => bulkAction("read")}
-                    className="px-2.5 py-1.5 text-xs rounded-lg hover:bg-gray-100 text-gray-700 flex items-center gap-1"
-                    title="Mark read"
-                  >
-                    <CheckCheck className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => bulkAction("archive")}
-                    className="px-2.5 py-1.5 text-xs rounded-lg hover:bg-gray-100 text-gray-700 flex items-center gap-1"
-                    title="Archive"
-                  >
-                    <Archive className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => bulkAction("trash")}
-                    className="px-2.5 py-1.5 text-xs rounded-lg hover:bg-red-50 text-red-600 flex items-center gap-1"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
           {/* Split view */}
-          <div className="grid lg:grid-cols-[400px_1fr] min-h-[560px]">
+          <div className="grid lg:grid-cols-[380px_1fr] min-h-[500px]">
             {/* List */}
             <div className={cn("border-r border-gray-200", selected ? "hidden lg:block" : "block")}>
               {loading ? (
-                <div className="p-8 space-y-3">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="flex gap-3 animate-pulse">
-                      <div className="w-9 h-9 rounded-full bg-gray-100" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-3 bg-gray-100 rounded w-1/3" />
-                        <div className="h-3 bg-gray-100 rounded w-2/3" />
-                        <div className="h-2 bg-gray-100 rounded w-full" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <div className="p-8 text-center text-sm text-gray-400">Loading…</div>
               ) : filtered.length === 0 ? (
                 <div className="p-12 text-center">
-                  <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mb-3">
-                    <Mail className="w-6 h-6 text-gray-400" />
-                  </div>
-                  <div className="text-sm font-medium text-gray-700">
-                    {view === "unread" ? "No unread messages" : view === "starred" ? "No starred messages" : "Nothing here yet"}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    {folder === "inbox" ? "Messages from JENVU members will land here." : `Your ${folder} folder is empty.`}
-                  </div>
+                  <Mail className="w-10 h-10 mx-auto text-gray-300 mb-2" />
+                  <div className="text-sm text-gray-500">Nothing here</div>
                 </div>
               ) : (
                 <ul>
                   {filtered.map((m) => {
                     const active = selected?.message_id === m.message_id;
-                    const isSel = selection.has(m.message_id);
-                    const who = folder === "sent" ? m.recipient_address : m.sender_name || m.sender_address;
-                    const grad = avatarGradient(m.sender_address || m.recipient_address || "x");
+                    const who =
+                      folder === "sent"
+                        ? m.recipient_address
+                        : m.sender_name || m.sender_address;
                     return (
                       <li key={m.message_id}>
                         <button
                           onClick={() => openMessage(m)}
                           className={cn(
-                            "w-full text-left px-4 py-3 border-b border-gray-100 flex gap-3 items-start hover:bg-gray-50 transition group relative",
-                            active && "bg-indigo-50/50",
-                            !m.is_read && folder === "inbox" && !active && "bg-blue-50/30",
-                            isSel && "bg-indigo-50/70",
+                            "w-full text-left px-4 py-3 border-b border-gray-100 flex gap-3 items-start hover:bg-gray-50 transition",
+                            active && "bg-gray-100",
+                            !m.is_read && folder === "inbox" && "bg-blue-50/40",
                           )}
                         >
-                          {!m.is_read && folder === "inbox" && (
-                            <span className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 to-purple-500" />
-                          )}
-                          {/* checkbox */}
-                          <span
-                            onClick={(e) => toggleSelect(m.message_id, e)}
-                            className={cn(
-                              "w-4 h-4 mt-2 rounded border-2 flex items-center justify-center shrink-0 transition",
-                              isSel
-                                ? "bg-indigo-600 border-indigo-600"
-                                : "border-gray-300 group-hover:border-gray-400",
-                            )}
-                          >
-                            {isSel && <Check className="w-3 h-3 text-white" />}
-                          </span>
-                          <div
-                            className={cn(
-                              "w-9 h-9 rounded-full text-white flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden bg-gradient-to-br",
-                              grad,
-                            )}
-                          >
+                          <div className="w-9 h-9 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden">
                             {m.sender_avatar ? (
                               <img src={m.sender_avatar} alt="" className="w-full h-full object-cover" />
                             ) : (
@@ -632,13 +411,16 @@ function MailPage() {
                             </div>
                           </div>
                           <button
-                            onClick={(e) => { e.stopPropagation(); toggleStar(m); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleStar(m);
+                            }}
                             className="shrink-0 p-1"
                           >
                             <Star
                               className={cn(
-                                "w-4 h-4 transition",
-                                m.is_starred ? "fill-yellow-400 text-yellow-400" : "text-gray-300 hover:text-yellow-400",
+                                "w-4 h-4",
+                                m.is_starred ? "fill-yellow-400 text-yellow-400" : "text-gray-300",
                               )}
                             />
                           </button>
@@ -654,21 +436,13 @@ function MailPage() {
             <div className={cn("bg-white", !selected ? "hidden lg:block" : "block")}>
               {!selected ? (
                 <div className="h-full flex flex-col items-center justify-center p-12 text-center">
-                  <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center mb-3">
-                    <MailOpen className="w-8 h-8 text-indigo-400" />
-                  </div>
-                  <div className="text-sm font-medium text-gray-600">Select a message to read</div>
-                  <div className="text-xs text-gray-400 mt-1">Your conversations appear here.</div>
+                  <MailOpen className="w-12 h-12 text-gray-200 mb-3" />
+                  <div className="text-sm text-gray-400">Select a message to read</div>
                 </div>
               ) : (
                 <div className="p-6">
-                  <div className="flex items-start gap-3 mb-5">
-                    <div
-                      className={cn(
-                        "w-11 h-11 rounded-full text-white flex items-center justify-center text-sm font-semibold overflow-hidden bg-gradient-to-br",
-                        avatarGradient(selected.sender_address),
-                      )}
-                    >
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-11 h-11 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold overflow-hidden">
                       {selected.sender_avatar ? (
                         <img src={selected.sender_avatar} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -679,26 +453,14 @@ function MailPage() {
                       <div className="text-sm font-semibold text-gray-900">
                         {selected.sender_name || selected.sender_address}
                       </div>
-                      <div className="text-xs text-gray-500 truncate">
-                        {selected.sender_address} <span className="text-gray-300">→</span> {selected.recipient_address}
+                      <div className="text-xs text-gray-500">
+                        {selected.sender_address} → {selected.recipient_address}
                       </div>
                       <div className="text-xs text-gray-400 mt-0.5">
                         {new Date(selected.created_at).toLocaleString()}
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => toggleStar(selected)}
-                        className="p-2 hover:bg-gray-100 rounded-lg"
-                        title={selected.is_starred ? "Unstar" : "Star"}
-                      >
-                        <Star
-                          className={cn(
-                            "w-4 h-4",
-                            selected.is_starred ? "fill-yellow-400 text-yellow-400" : "text-gray-400",
-                          )}
-                        />
-                      </button>
                       {selected.folder !== "archive" && (
                         <button
                           onClick={() => moveTo(selected, "archive")}
@@ -711,7 +473,7 @@ function MailPage() {
                       {selected.folder !== "trash" && (
                         <button
                           onClick={() => moveTo(selected, "trash")}
-                          className="p-2 hover:bg-red-50 hover:text-red-600 rounded-lg text-gray-500"
+                          className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -719,21 +481,20 @@ function MailPage() {
                       )}
                     </div>
                   </div>
-                  <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 leading-snug">
+                  <h1 className="text-xl font-semibold text-gray-900 mb-4">
                     {selected.subject || "(no subject)"}
                   </h1>
                   <div className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
                     {selected.body}
                   </div>
                   {selected.sender_address !== myAddress && (
-                    <div className="mt-6 pt-4 border-t border-gray-200 flex items-center gap-2">
+                    <div className="mt-6 pt-4 border-t border-gray-200">
                       <button
                         onClick={() => setComposeOpen(true)}
-                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium hover:shadow-lg hover:shadow-indigo-500/25 transition flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg bg-black text-white text-sm hover:bg-gray-800"
                       >
-                        <Reply className="w-4 h-4" /> Reply
+                        Reply
                       </button>
-                      <div className="text-[11px] text-gray-400">Only members of JENVU can be reached.</div>
                     </div>
                   )}
                 </div>
@@ -787,50 +548,42 @@ function ComposeModal(props: {
     setShowSug(true);
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
-      if (v.trim().length < 1) { setSuggest([]); return; }
-      try { const r = await searchDirectory(v.trim()); setSuggest(r); } catch {}
+      if (v.trim().length < 1) {
+        setSuggest([]);
+        return;
+      }
+      try {
+        const r = await searchDirectory(v.trim());
+        setSuggest(r);
+      } catch {}
     }, 250);
   };
 
-  const submit = useCallback(async () => {
+  const submit = async () => {
     if (!to.trim().endsWith("@jenvu.email")) {
       toast.error("Recipient must end with @jenvu.email");
       return;
     }
-    if (!body.trim()) { toast.error("Write a message first"); return; }
     setSending(true);
-    try { await onSend({ to: to.trim().toLowerCase(), subject, body }); }
-    catch (e: any) { toast.error(e?.message || "Failed to send"); }
-    finally { setSending(false); }
-  }, [to, subject, body, onSend]);
-
-  // ⌘/Ctrl + Enter to send, Esc to close
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); submit(); }
-      else if (e.key === "Escape") { onClose(); }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [submit, onClose]);
-
-  const wordCount = body.trim() ? body.trim().split(/\s+/).length : 0;
+    try {
+      await onSend({ to: to.trim().toLowerCase(), subject, body });
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to send");
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="bg-white w-full sm:max-w-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200 bg-gradient-to-r from-indigo-50/60 to-purple-50/60">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-              <Pencil className="w-3.5 h-3.5 text-white" />
-            </div>
-            <div className="text-sm font-semibold text-gray-900">New message</div>
-          </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-white/70 rounded-lg">
+    <div className="fixed inset-0 z-50 bg-black/30 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="bg-white w-full sm:max-w-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[92vh]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <div className="text-sm font-semibold text-gray-900">New message</div>
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded">
             <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="px-5 py-4 space-y-3 flex-1 overflow-auto">
+        <div className="px-4 py-3 space-y-3 flex-1 overflow-auto">
           <div className="text-xs text-gray-500">
             From: <span className="font-medium text-gray-800">{myAddress}</span>
           </div>
@@ -847,7 +600,7 @@ function ComposeModal(props: {
               />
             </div>
             {showSug && suggest.length > 0 && (
-              <div className="absolute left-14 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-56 overflow-auto">
+              <div className="absolute left-14 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-56 overflow-auto">
                 {suggest.map((s) => (
                   <button
                     key={s.address}
@@ -856,7 +609,7 @@ function ComposeModal(props: {
                       setTo(s.address);
                       setShowSug(false);
                     }}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex justify-between"
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 flex justify-between"
                   >
                     <span>{s.full_name || s.address}</span>
                     <span className="text-xs text-gray-400">{s.address}</span>
@@ -883,16 +636,12 @@ function ComposeModal(props: {
             className="w-full text-sm outline-none resize-none min-h-[240px]"
           />
         </div>
-        <div className="flex items-center justify-between px-5 py-3 border-t border-gray-200 bg-gray-50/50">
-          <div className="text-[11px] text-gray-500 flex items-center gap-2">
-            <span>{wordCount} words · {body.length} chars</span>
-            <span className="text-gray-300">·</span>
-            <span>Internal only</span>
-          </div>
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+          <div className="text-[11px] text-gray-400">Internal only — JENVU members</div>
           <button
             onClick={submit}
             disabled={sending || !to.trim() || !body.trim()}
-            className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold disabled:opacity-40 hover:shadow-lg hover:shadow-indigo-500/25 transition flex items-center gap-2"
+            className="px-5 py-2 rounded-lg bg-black text-white text-sm font-medium disabled:opacity-40 hover:bg-gray-800 flex items-center gap-2"
           >
             <Send className="w-4 h-4" /> {sending ? "Sending…" : "Send"}
           </button>
