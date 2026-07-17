@@ -669,9 +669,6 @@ function MailPage() {
                                 tier={badges[(folder === "sent" ? m.recipient_address : m.sender_address)?.toLowerCase?.() ?? ""]}
                                 size={13}
                               />
-                              <span className="ml-auto text-[11px] text-gray-400 shrink-0 tabular-nums">
-                                {timeAgo(m.created_at)}
-                              </span>
                             </div>
                             <div
                               className={cn(
