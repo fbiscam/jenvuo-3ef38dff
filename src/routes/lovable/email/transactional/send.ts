@@ -59,6 +59,11 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        // Templates that authenticated end-users are allowed to trigger for themselves.
+        // Any other template can only be sent from trusted server-side code paths that
+        // call enqueue_email directly (never through this HTTP relay).
+        const CLIENT_CALLABLE_TEMPLATES = new Set<string>(['welcome'])
+
         // Parse request body
         let templateName: string
         let recipientEmail: string
@@ -88,22 +93,31 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           )
         }
 
+        // Enforce client allowlist — this endpoint is not a general email relay.
+        if (!CLIENT_CALLABLE_TEMPLATES.has(templateName)) {
+          console.warn('Blocked client send of non-allowlisted template', {
+            templateName,
+            user_id: user.id,
+          })
+          return Response.json(
+            { error: 'Template not permitted' },
+            { status: 403 }
+          )
+        }
+
         // 1. Look up template from registry (early — needed to resolve recipient)
         const template = TEMPLATES[templateName]
 
         if (!template) {
           console.error('Template not found in registry', { templateName })
           return Response.json(
-            {
-              error: `Template '${templateName}' not found. Available: ${Object.keys(TEMPLATES).join(', ')}`,
-            },
+            { error: `Template '${templateName}' not found` },
             { status: 404 }
           )
         }
 
         // Resolve effective recipient: template-level `to` takes precedence over
-        // the caller-provided recipientEmail. This allows notification templates
-        // to always send to a fixed address (e.g., site owner from env var).
+        // the caller-provided recipientEmail.
         const effectiveRecipient = template.to || recipientEmail
 
         if (!effectiveRecipient) {
@@ -114,6 +128,39 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             { status: 400 }
           )
         }
+
+        // Prevent open-relay abuse: authenticated users can only trigger sends to
+        // their own verified email address. Templates with a fixed `to` bypass
+        // this (they route to a hard-coded address, not the caller's choice).
+        if (!template.to) {
+          const callerEmail = (user.email || '').toLowerCase()
+          if (!callerEmail || callerEmail !== effectiveRecipient.toLowerCase()) {
+            console.warn('Blocked send to third-party recipient', {
+              templateName,
+              user_id: user.id,
+            })
+            return Response.json(
+              { error: 'Recipient must match your account email' },
+              { status: 403 }
+            )
+          }
+        }
+
+        // Cap templateData size to prevent oversized payloads.
+        try {
+          if (JSON.stringify(templateData).length > 4000) {
+            return Response.json(
+              { error: 'templateData too large' },
+              { status: 413 }
+            )
+          }
+        } catch {
+          return Response.json(
+            { error: 'Invalid templateData' },
+            { status: 400 }
+          )
+        }
+
 
         // 2. Check suppression list (fail-closed: if we can't verify, don't send)
         const { data: suppressed, error: suppressionError } = await supabase
