@@ -81,6 +81,7 @@ import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './route
 import { Route as AuthenticatedDashboardAdminFoundingRouteImport } from './routes/_authenticated/dashboard.admin.founding'
 import { Route as AuthenticatedDashboardAdminDocumentsRouteImport } from './routes/_authenticated/dashboard.admin.documents'
 import { Route as AuthenticatedDashboardAdminAutoScanRouteImport } from './routes/_authenticated/dashboard.admin.auto-scan'
+import { Route as AuthenticatedDashboardCommunityUHandleRouteImport } from './routes/_authenticated/dashboard.community.u.$handle'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -467,6 +468,12 @@ const AuthenticatedDashboardAdminAutoScanRoute =
     path: '/admin/auto-scan',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardCommunityUHandleRoute =
+  AuthenticatedDashboardCommunityUHandleRouteImport.update({
+    id: '/u/$handle',
+    path: '/u/$handle',
+    getParentRoute: () => AuthenticatedDashboardCommunityRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -508,7 +515,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/dashboard/community': typeof AuthenticatedDashboardCommunityRoute
+  '/dashboard/community': typeof AuthenticatedDashboardCommunityRouteWithChildren
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/gmails': typeof AuthenticatedDashboardGmailsRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
@@ -540,6 +547,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/dashboard/community/u/$handle': typeof AuthenticatedDashboardCommunityUHandleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -578,7 +586,7 @@ export interface FileRoutesByTo {
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/dashboard/community': typeof AuthenticatedDashboardCommunityRoute
+  '/dashboard/community': typeof AuthenticatedDashboardCommunityRouteWithChildren
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/gmails': typeof AuthenticatedDashboardGmailsRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
@@ -610,6 +618,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/dashboard/community/u/$handle': typeof AuthenticatedDashboardCommunityUHandleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -653,7 +662,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/_authenticated/dashboard/community': typeof AuthenticatedDashboardCommunityRoute
+  '/_authenticated/dashboard/community': typeof AuthenticatedDashboardCommunityRouteWithChildren
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/gmails': typeof AuthenticatedDashboardGmailsRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
@@ -685,6 +694,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/_authenticated/dashboard/community/u/$handle': typeof AuthenticatedDashboardCommunityUHandleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -760,6 +770,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/dashboard/community/u/$handle'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -830,6 +841,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/dashboard/community/u/$handle'
   id:
     | '__root__'
     | '/'
@@ -904,6 +916,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/_authenticated/dashboard/community/u/$handle'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1461,14 +1474,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminAutoScanRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/community/u/$handle': {
+      id: '/_authenticated/dashboard/community/u/$handle'
+      path: '/u/$handle'
+      fullPath: '/dashboard/community/u/$handle'
+      preLoaderRoute: typeof AuthenticatedDashboardCommunityUHandleRouteImport
+      parentRoute: typeof AuthenticatedDashboardCommunityRoute
+    }
   }
 }
+
+interface AuthenticatedDashboardCommunityRouteChildren {
+  AuthenticatedDashboardCommunityUHandleRoute: typeof AuthenticatedDashboardCommunityUHandleRoute
+}
+
+const AuthenticatedDashboardCommunityRouteChildren: AuthenticatedDashboardCommunityRouteChildren =
+  {
+    AuthenticatedDashboardCommunityUHandleRoute:
+      AuthenticatedDashboardCommunityUHandleRoute,
+  }
+
+const AuthenticatedDashboardCommunityRouteWithChildren =
+  AuthenticatedDashboardCommunityRoute._addFileChildren(
+    AuthenticatedDashboardCommunityRouteChildren,
+  )
 
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAlertsRoute: typeof AuthenticatedDashboardAlertsRoute
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
-  AuthenticatedDashboardCommunityRoute: typeof AuthenticatedDashboardCommunityRoute
+  AuthenticatedDashboardCommunityRoute: typeof AuthenticatedDashboardCommunityRouteWithChildren
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardGmailsRoute: typeof AuthenticatedDashboardGmailsRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
@@ -1491,7 +1526,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAlertsRoute: AuthenticatedDashboardAlertsRoute,
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
-    AuthenticatedDashboardCommunityRoute: AuthenticatedDashboardCommunityRoute,
+    AuthenticatedDashboardCommunityRoute:
+      AuthenticatedDashboardCommunityRouteWithChildren,
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
     AuthenticatedDashboardGmailsRoute: AuthenticatedDashboardGmailsRoute,
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
