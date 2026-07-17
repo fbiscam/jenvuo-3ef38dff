@@ -531,33 +531,20 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
         // trades, credits, referrals, devices, etc.
         if (existingUserId) {
           const uid = existingUserId;
-          const wipes = [
-            admin.from("user_notifications" as any).delete().eq("user_id", uid).then(),
-            admin.from("signal_alert_subscribers" as any).delete().eq("user_id", uid),
-            admin.from("alert_preferences" as any).delete().eq("user_id", uid),
-            admin.from("credit_ledger" as any).delete().eq("user_id", uid),
-            admin.from("credit_lots" as any).delete().eq("user_id", uid),
-            admin.from("credit_balances" as any).delete().eq("user_id", uid),
-            admin.from("credit_charge_audit" as any).delete().eq("user_id", uid),
-            admin.from("ai_cost_log" as any).delete().eq("user_id", uid),
-            admin.from("trade_journal" as any).delete().eq("user_id", uid),
-            admin.from("trade_setup_links" as any).delete().eq("user_id", uid),
-            admin.from("trade_setups" as any).delete().eq("user_id", uid),
-            admin.from("saved_signals" as any).delete().eq("user_id", uid),
-            admin.from("voice_history" as any).delete().eq("user_id", uid),
-            admin.from("trusted_devices" as any).delete().eq("user_id", uid),
-            admin.from("account_devices" as any).delete().eq("user_id", uid),
-            admin.from("email_change_requests" as any).delete().eq("user_id", uid),
-            admin.from("email_change_audit" as any).delete().eq("user_id", uid),
-            admin.from("user_subscriptions" as any).delete().eq("user_id", uid),
-            admin.from("referrals" as any).delete().or(`referrer_id.eq.${uid},referred_user_id.eq.${uid}`),
-            admin.from("referral_codes" as any).delete().eq("user_id", uid),
-            admin.from("mail_message_state" as any).delete().eq("user_id", uid),
+          const tables = [
+            "user_notifications", "signal_alert_subscribers", "alert_preferences",
+            "credit_ledger", "credit_lots", "credit_balances", "credit_charge_audit",
+            "ai_cost_log", "trade_journal", "trade_setup_links", "trade_setups",
+            "saved_signals", "voice_history", "trusted_devices", "account_devices",
+            "email_change_requests", "email_change_audit", "user_subscriptions",
+            "referral_codes", "mail_message_state",
           ];
-          const results = await Promise.allSettled(wipes);
-          results.forEach((r, i) => {
-            if (r.status === "rejected") console.error(`[founding] fresh-wipe[${i}] failed:`, r.reason);
-          });
+          for (const t of tables) {
+            const { error: wErr } = await admin.from(t as any).delete().eq("user_id", uid);
+            if (wErr) console.error(`[founding] fresh-wipe ${t} failed:`, wErr.message);
+          }
+          const { error: refErr } = await admin.from("referrals" as any).delete().or(`referrer_id.eq.${uid},referred_user_id.eq.${uid}`);
+          if (refErr) console.error("[founding] fresh-wipe referrals failed:", refErr.message);
         }
         try {
           const linkType = existingUserId ? "recovery" : "invite";
