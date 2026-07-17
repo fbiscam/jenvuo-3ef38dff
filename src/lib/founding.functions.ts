@@ -95,6 +95,7 @@ type ApplicantEmailKind =
   | "approved"
   | "rejected"
   | "waitlisted"
+  | "pending"
   | "funded"
   | "documents_received"
   | "documents_approved"
