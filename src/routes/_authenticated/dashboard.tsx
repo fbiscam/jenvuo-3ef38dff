@@ -869,7 +869,7 @@ function DashboardLayout() {
                   const iconName = t.icon;
                   const iconColor = t.iconColor;
                   const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
-                  const isNotifs = t.to === "/dashboard/gmails";
+                  const isNotifs = t.to === "/dashboard/notifications";
                   const hasUnread = isNotifs && unreadNotifs > 0 && !active;
                   return (
                     <Link
