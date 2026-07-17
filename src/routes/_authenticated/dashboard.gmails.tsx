@@ -273,7 +273,7 @@ function MailPage() {
         <aside className="lg:w-56 shrink-0 lg:sticky lg:top-4 lg:self-start px-3 py-4 lg:p-0">
           <button
             onClick={() => setComposeOpen(true)}
-            className="w-full flex items-center gap-2 justify-center bg-black text-white rounded-xl py-2.5 text-sm font-medium hover:bg-gray-800 transition mb-4"
+            className="w-full flex items-center gap-2 justify-center bg-white text-black border border-gray-200 rounded-xl py-2.5 text-sm font-medium hover:bg-gray-50 transition mb-4"
           >
             <Pencil className="w-4 h-4" /> Compose
           </button>
