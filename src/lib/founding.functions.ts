@@ -202,10 +202,9 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           "Application update",
           `<p style="margin:0 0 12px">We reviewed your application carefully. This month's cohort is a tight fit and unfortunately we're not able to offer you a founding seat right now.</p>
            <p style="margin:0 0 12px">This isn't a judgment on you as a trader — the program is capped at 220 seats and prioritizes very specific criteria each intake.</p>
-           <p style="margin:0 0 12px">You're welcome to sign up on the standard plans at any time, and to re-apply for a future cohort. We appreciate the time you took.</p>
+           <p style="margin:0 0 12px">You're welcome to re-apply for a future cohort — we'd love to see your updated application.</p>
            <p style="margin:16px 0 0;color:#52525b">If you'd like to share more context about your trading or ask us to reconsider, just hit reply — a real person on our team will read it.</p>`,
-          { label: "Reply to us", href: `mailto:founding@jenvu.net?subject=${encodeURIComponent("Re: Founding Trader Program — application update")}&body=${encodeURIComponent(`Hi Jenvu team,\n\nI'd like to follow up on my Founding Trader application.\n\n— ${n}`)}` },
-          { label: "See plans", href: `${APP_URL}/pricing` },
+          { label: "Reapply to Founding", href: `${APP_URL}/founding` },
         ),
       };
     case "waitlisted":
