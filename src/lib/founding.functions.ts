@@ -241,15 +241,27 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           { label: "Explore the platform", href: `${APP_URL}/` },
         ),
       };
+    case "documents_submitted":
+      return {
+        subject: "We received your documents ✅",
+        html: wrap(
+          `Got it, ${n} — documents received`,
+          "Documents · Submitted",
+          `<p style="margin:0 0 12px">Thanks for sending over your earning proof. Your document(s) have safely landed in our review queue.</p>
+           <p style="margin:0 0 12px">A real person on our team will look through everything and update your status here — usually within <strong>48 hours</strong>.</p>
+           <p style="margin:0">No action needed from your side right now. We'll email you the moment there's a decision.</p>`,
+          { label: "Open Documents page", href: `${APP_URL}/dashboard/documents` },
+        ),
+      };
     case "documents_received":
       return {
-        subject: "We're reviewing your documents — up to 48 hours",
+        subject: "Your documents are now under review 🔍",
         html: wrap(
-          `Thanks, ${n} — we're on it`,
-          "Documents · Reviewing",
-          `<p style="margin:0 0 12px">We are reviewing your document. It can take up to <strong>48 hours</strong> to verify.</p>
-           <p style="margin:0 0 12px">The status will be shown on this page.</p>
-           <p style="margin:0">Thanks for your understanding.</p>`,
+          `We're reviewing your documents, ${n}`,
+          "Documents · Under Review",
+          `<p style="margin:0 0 12px">Quick update — your submission has been moved into <strong>active review</strong> by our verification team.</p>
+           <p style="margin:0 0 12px">Verification can take up to <strong>48 hours</strong> from this point. You'll get a follow-up email as soon as the outcome is decided.</p>
+           <p style="margin:0">You can track the live status any time on your Documents page. Thanks for your patience.</p>`,
           { label: "Open Documents page", href: `${APP_URL}/dashboard/documents` },
         ),
       };
