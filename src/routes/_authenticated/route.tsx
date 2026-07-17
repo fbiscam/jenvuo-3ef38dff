@@ -32,6 +32,7 @@ async function hasValidTrustedDevice(uid: string): Promise<boolean> {
 
 function AuthenticatedLayout() {
   useAutoCloseTrades();
+  useGlobalNotificationToasts();
   return <Outlet />;
 }
 
