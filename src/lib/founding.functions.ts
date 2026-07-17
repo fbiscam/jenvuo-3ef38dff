@@ -906,7 +906,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
             if (data.info_request) bodyLines.push("", `Requested: ${data.info_request}`);
             bodyLines.push("", "Please open your Documents page and submit the requested update.");
           } else {
-            bodyLines.push("We are reviewing your document. It can take up to 48 hours to verify.", "", "The status will be shown on your Documents page. Thanks for your understanding.");
+            bodyLines.push("Quick update — your submission has been moved into active review by our verification team.", "", "Verification can take up to 48 hours from this point. You'll get a follow-up email as soon as the outcome is decided.", "", "You can track the live status any time on your Documents page.");
           }
           bodyLines.push("", "— Jenvu Notifications");
           await sendSystemMailByEmail({
