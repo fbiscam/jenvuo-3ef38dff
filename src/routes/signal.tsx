@@ -9,6 +9,8 @@ import { getBacktestStats, type BacktestStats } from "@/lib/backtest.functions";
 import { runHistoricalBacktest, type HistoricalBacktestResult } from "@/lib/backtest-historical.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
 import { broadcastCurrentSignal } from "@/lib/broadcast-alert.functions";
+import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
+import { Bell, BellOff } from "lucide-react";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 
 import { stopAllBrowserSpeech, useSpeech } from "@/hooks/useSpeech";
