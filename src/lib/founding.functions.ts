@@ -866,6 +866,9 @@ export type AdminDocSubmission = {
   documents_submitted_at: string | null;
   documents_note: string | null;
   documents_rejected_reason: string | null;
+  documents_rejected_at: string | null;
+  documents_info_request: string | null;
+  documents_info_requested_at: string | null;
   files: FoundingDocFile[];
 };
 
@@ -877,7 +880,7 @@ export const adminListDocumentSubmissions = createServerFn({ method: "GET" })
     const { data: apps, error } = await admin
       .from("founding_applications" as any)
       .select(
-        "id, email, full_name, requested_plan, status, document_status, documents_submitted_at, documents_note, documents_rejected_reason",
+        "id, email, full_name, requested_plan, status, document_status, documents_submitted_at, documents_note, documents_rejected_reason, documents_rejected_at, documents_info_request, documents_info_requested_at",
       )
       .neq("document_status", "not_submitted")
       .order("documents_submitted_at", { ascending: false, nullsFirst: false })
@@ -908,6 +911,9 @@ export const adminListDocumentSubmissions = createServerFn({ method: "GET" })
       documents_submitted_at: a.documents_submitted_at,
       documents_note: a.documents_note,
       documents_rejected_reason: a.documents_rejected_reason,
+      documents_rejected_at: a.documents_rejected_at,
+      documents_info_request: a.documents_info_request,
+      documents_info_requested_at: a.documents_info_requested_at,
       files: byApp.get(a.id) ?? [],
     }));
   });
