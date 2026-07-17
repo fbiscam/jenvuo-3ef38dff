@@ -830,9 +830,8 @@ function DashboardLayout() {
         />
       )}
 
-      {embedMode ? null : (
-
-      {/* Sidebar (Firebase-style) */}
+      {!embedMode && (
+      /* Sidebar (Firebase-style) */
       <aside
         className={`dashboard-sidebar-root max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
           ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"}
