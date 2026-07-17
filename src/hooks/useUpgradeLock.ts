@@ -60,14 +60,10 @@ export function useUpgradeLock(): UpgradeLock {
       const trialActive = !!trialEnd && now < trialEnd;
       const docsVerified = docStatus === "verified";
 
-      // Locked while the user is inside the founding funnel and either the trial
-      // hasn't ended OR their earning proof isn't verified yet.
-      const locked = trialActive || !docsVerified;
-      const reason: UpgradeLock["reason"] = !docsVerified
-        ? "docs_pending"
-        : trialActive
-          ? "trial_active"
-          : null;
+      // Unlocks as soon as earning proof is verified — no need to wait
+      // for the full 30-day trial to elapse.
+      const locked = !docsVerified;
+      const reason: UpgradeLock["reason"] = !docsVerified ? "docs_pending" : null;
 
       const daysLeft = trialEnd
         ? Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / 86_400_000))
