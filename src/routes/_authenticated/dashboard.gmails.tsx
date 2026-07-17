@@ -14,10 +14,12 @@ import {
   ArrowLeft,
   RefreshCcw,
   Mail,
+  MailOpen,
   X,
   AtSign,
   MoreVertical,
   ChevronDown,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
