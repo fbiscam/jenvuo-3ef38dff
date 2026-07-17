@@ -82,12 +82,13 @@ function MailPage() {
   const [folder, setFolder] = useState<MailFolder>("inbox");
   const [messages, setMessages] = useState<MailListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
   const [selected, setSelected] = useState<MailListItem | null>(null);
   const [composeOpen, setComposeOpen] = useState(false);
   const [query, setQuery] = useState("");
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const [addr, rows] = await Promise.all([
         _getAddr({}),
@@ -97,12 +98,14 @@ function MailPage() {
       setMessages(rows as MailListItem[]);
     } finally {
       setLoading(false);
+      setReady(true);
     }
   }, [folder, _getAddr, _list]);
 
   useEffect(() => {
     load();
   }, [load]);
+
 
   // realtime: refresh on inbox changes
   useEffect(() => {
