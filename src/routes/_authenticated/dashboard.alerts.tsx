@@ -261,18 +261,15 @@ function AlertPrefs() {
             <p className="mt-1 text-sm text-zinc-500">Live A+ setups across all pairs & coins. Updates in realtime.</p>
           </div>
           <div className="flex items-center gap-2 self-start sm:self-auto">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> LIVE
-            </span>
             {alertsOn !== null && (
               <button
                 onClick={toggleAlerts}
                 disabled={alertsSaving}
                 className={cn(
-                  "shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-[12px] font-medium border transition disabled:opacity-50",
+                  "shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-[12px] font-medium border bg-transparent transition disabled:opacity-50",
                   alertsOn
-                    ? "bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
-                    : "bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100",
+                    ? "border-emerald-200 text-emerald-800 hover:bg-emerald-50"
+                    : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
                 )}
                 title={alertsOn
                   ? "Alerts ON · $0.20 charged per signal. Click to turn off."
@@ -288,6 +285,10 @@ function AlertPrefs() {
                 {alertsOn ? "Alerts ON" : "Alerts OFF"}
               </button>
             )}
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> LIVE
+            </span>
+
 
             <select
               value={pairFilter}
