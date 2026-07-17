@@ -267,9 +267,9 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
       };
     case "documents_approved":
       return {
-        subject: "Your documents are verified ✅",
+        subject: "Congratulations 🎉 Your documents are verified",
         html: wrap(
-          `You're verified, ${n}`,
+          `Congratulations, ${n} 🎉`,
           "Documents · Approved",
           `<p style="margin:0 0 12px">Your earning-proof documents have been reviewed and <strong>approved</strong>. Your Founding Trader account is fully verified.</p>
            <p style="margin:0 0 12px">Billing continues on your <strong>${escapeHtml(meta.label)}</strong> plan as expected. Nothing else is required from your side.</p>
