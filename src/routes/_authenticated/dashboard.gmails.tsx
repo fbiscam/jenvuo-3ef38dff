@@ -669,9 +669,6 @@ function MailPage() {
                                 tier={badges[(folder === "sent" ? m.recipient_address : m.sender_address)?.toLowerCase?.() ?? ""]}
                                 size={13}
                               />
-                              <span className="ml-auto text-[11px] text-gray-400 shrink-0 tabular-nums">
-                                {timeAgo(m.created_at)}
-                              </span>
                             </div>
                             <div
                               className={cn(
@@ -687,7 +684,11 @@ function MailPage() {
                               {m.body.slice(0, 100)}
                             </div>
                           </div>
-                          <button
+                          <div className="flex items-center gap-1 shrink-0 ml-auto self-start">
+                            <span className="text-[11px] text-gray-400 tabular-nums">
+                              {timeAgo(m.created_at)}
+                            </span>
+                            <button
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleStar(m);
@@ -702,6 +703,7 @@ function MailPage() {
                               )}
                             />
                           </button>
+                          </div>
                         </div>
                       </li>
                     );
