@@ -667,7 +667,7 @@ function MailPage() {
                               </span>
                               <VerifiedBadge
                                 tier={badges[(folder === "sent" ? m.recipient_address : m.sender_address)?.toLowerCase?.() ?? ""]}
-                                size={13}
+                                size={17}
                               />
                             </div>
                             <div
