@@ -290,7 +290,7 @@ function NotificationsPage() {
                 key={f.key}
                 onClick={() => setFilter(f.key)}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border border-black bg-white px-3 py-1.5 text-xs font-medium transition",
+                  "inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-medium transition",
                   active ? "text-zinc-900" : "text-zinc-600 hover:bg-zinc-50",
                 )}
               >
