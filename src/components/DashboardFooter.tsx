@@ -4,7 +4,7 @@ const LINKS: { label: string; to: string }[] = [
   { label: "About Us", to: "/about" },
   { label: "Contact Us", to: "/contact" },
   { label: "Privacy Policy", to: "/privacy" },
-  { label: "Terms Conditions", to: "/terms" },
+  { label: "Broadcasts", to: "/broadcasts" },
   { label: "Help Center", to: "/help" },
 ];
 

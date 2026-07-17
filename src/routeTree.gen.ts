@@ -29,6 +29,7 @@ import { Route as DevelopmentRouteImport } from './routes/development'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ConfirmEmailChangeRouteImport } from './routes/confirm-email-change'
 import { Route as CancellationRouteImport } from './routes/cancellation'
+import { Route as BroadcastsRouteImport } from './routes/broadcasts'
 import { Route as BriefsRouteImport } from './routes/briefs'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
@@ -180,6 +181,11 @@ const ConfirmEmailChangeRoute = ConfirmEmailChangeRouteImport.update({
 const CancellationRoute = CancellationRouteImport.update({
   id: '/cancellation',
   path: '/cancellation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BroadcastsRoute = BroadcastsRouteImport.update({
+  id: '/broadcasts',
+  path: '/broadcasts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BriefsRoute = BriefsRouteImport.update({
@@ -474,6 +480,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/briefs': typeof BriefsRoute
+  '/broadcasts': typeof BroadcastsRoute
   '/cancellation': typeof CancellationRoute
   '/confirm-email-change': typeof ConfirmEmailChangeRoute
   '/contact': typeof ContactRoute
@@ -547,6 +554,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/briefs': typeof BriefsRoute
+  '/broadcasts': typeof BroadcastsRoute
   '/cancellation': typeof CancellationRoute
   '/confirm-email-change': typeof ConfirmEmailChangeRoute
   '/contact': typeof ContactRoute
@@ -618,6 +626,7 @@ export interface FileRoutesById {
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/briefs': typeof BriefsRoute
+  '/broadcasts': typeof BroadcastsRoute
   '/cancellation': typeof CancellationRoute
   '/confirm-email-change': typeof ConfirmEmailChangeRoute
   '/contact': typeof ContactRoute
@@ -693,6 +702,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/briefs'
+    | '/broadcasts'
     | '/cancellation'
     | '/confirm-email-change'
     | '/contact'
@@ -766,6 +776,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/briefs'
+    | '/broadcasts'
     | '/cancellation'
     | '/confirm-email-change'
     | '/contact'
@@ -836,6 +847,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/briefs'
+    | '/broadcasts'
     | '/cancellation'
     | '/confirm-email-change'
     | '/contact'
@@ -911,6 +923,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
   BriefsRoute: typeof BriefsRoute
+  BroadcastsRoute: typeof BroadcastsRoute
   CancellationRoute: typeof CancellationRoute
   ConfirmEmailChangeRoute: typeof ConfirmEmailChangeRoute
   ContactRoute: typeof ContactRoute
@@ -1092,6 +1105,13 @@ declare module '@tanstack/react-router' {
       path: '/cancellation'
       fullPath: '/cancellation'
       preLoaderRoute: typeof CancellationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/broadcasts': {
+      id: '/broadcasts'
+      path: '/broadcasts'
+      fullPath: '/broadcasts'
+      preLoaderRoute: typeof BroadcastsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/briefs': {
@@ -1579,6 +1599,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
   BriefsRoute: BriefsRoute,
+  BroadcastsRoute: BroadcastsRoute,
   CancellationRoute: CancellationRoute,
   ConfirmEmailChangeRoute: ConfirmEmailChangeRoute,
   ContactRoute: ContactRoute,
