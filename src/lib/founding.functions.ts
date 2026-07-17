@@ -98,6 +98,7 @@ type ApplicantEmailKind =
   | "pending"
   | "funded"
   | "password_set"
+  | "documents_submitted"
   | "documents_received"
   | "documents_approved"
   | "documents_rejected"
@@ -240,15 +241,27 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           { label: "Explore the platform", href: `${APP_URL}/` },
         ),
       };
+    case "documents_submitted":
+      return {
+        subject: "We received your documents ✅",
+        html: wrap(
+          `Got it, ${n} — documents received`,
+          "Documents · Submitted",
+          `<p style="margin:0 0 12px">Thanks for sending over your earning proof. Your document(s) have safely landed in our review queue.</p>
+           <p style="margin:0 0 12px">A real person on our team will look through everything and update your status here — usually within <strong>48 hours</strong>.</p>
+           <p style="margin:0">No action needed from your side right now. We'll email you the moment there's a decision.</p>`,
+          { label: "Open Documents page", href: `${APP_URL}/dashboard/documents` },
+        ),
+      };
     case "documents_received":
       return {
-        subject: "We're reviewing your documents — up to 48 hours",
+        subject: "Your documents are now under review 🔍",
         html: wrap(
-          `Thanks, ${n} — we're on it`,
-          "Documents · Reviewing",
-          `<p style="margin:0 0 12px">We are reviewing your document. It can take up to <strong>48 hours</strong> to verify.</p>
-           <p style="margin:0 0 12px">The status will be shown on this page.</p>
-           <p style="margin:0">Thanks for your understanding.</p>`,
+          `We're reviewing your documents, ${n}`,
+          "Documents · Under Review",
+          `<p style="margin:0 0 12px">Quick update — your submission has been moved into <strong>active review</strong> by our verification team.</p>
+           <p style="margin:0 0 12px">Verification can take up to <strong>48 hours</strong> from this point. You'll get a follow-up email as soon as the outcome is decided.</p>
+           <p style="margin:0">You can track the live status any time on your Documents page. Thanks for your patience.</p>`,
           { label: "Open Documents page", href: `${APP_URL}/dashboard/documents` },
         ),
       };
@@ -879,7 +892,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
                 ? "Action required: documents rejected"
                 : kind === "documents_needs_info"
                   ? "We need a bit more information"
-                  : "We're reviewing your documents — up to 48 hours";
+                  : "Your documents are now under review 🔍";
           const bodyLines: string[] = [`Hi ${name},`, ``];
           if (kind === "documents_approved") {
             bodyLines.push("Great news — your submitted documents have been approved.");
@@ -893,7 +906,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
             if (data.info_request) bodyLines.push("", `Requested: ${data.info_request}`);
             bodyLines.push("", "Please open your Documents page and submit the requested update.");
           } else {
-            bodyLines.push("We are reviewing your document. It can take up to 48 hours to verify.", "", "The status will be shown on your Documents page. Thanks for your understanding.");
+            bodyLines.push("Quick update — your submission has been moved into active review by our verification team.", "", "Verification can take up to 48 hours from this point. You'll get a follow-up email as soon as the outcome is decided.", "", "You can track the live status any time on your Documents page.");
           }
           bodyLines.push("", "— Jenvu Notifications");
           await sendSystemMailByEmail({
@@ -1006,11 +1019,11 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
       if (app.email) {
         await enqueueApplicantEmail(
           admin,
-          "documents_received",
+          "documents_submitted",
           String(app.email),
           String(app.full_name || "there"),
           String(app.requested_plan || "elite"),
-          `${app.id}-docs-received-${Date.now()}`,
+          `${app.id}-docs-submitted-${Date.now()}`,
         );
         try {
           const { sendSystemMail } = await import("@/lib/system-mail.server");
@@ -1018,19 +1031,19 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
           await sendSystemMail({
             from: "notifications@jenvu.email",
             toUserId: context.userId,
-            subject: "Documents received — under review",
+            subject: "We received your documents ✅",
             body: [
               `Hi ${name},`,
               ``,
-              `We received your submitted document(s). Our team will review shortly and update you here.`,
+              `Thanks for sending over your earning proof — your document(s) are safely in our review queue.`,
               ``,
-              `You can track the status any time on your Documents page.`,
+              `A real person on our team will review and update your status here, usually within 48 hours.`,
               ``,
               `— Jenvu Notifications`,
             ].join("\n"),
           });
         } catch (e) {
-          console.error("[founding] system-mail docs-received failed:", (e as Error)?.message);
+          console.error("[founding] system-mail docs-submitted failed:", (e as Error)?.message);
         }
       }
     }
