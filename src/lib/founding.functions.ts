@@ -892,7 +892,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
                 ? "Action required: documents rejected"
                 : kind === "documents_needs_info"
                   ? "We need a bit more information"
-                  : "We're reviewing your documents — up to 48 hours";
+                  : "Your documents are now under review 🔍";
           const bodyLines: string[] = [`Hi ${name},`, ``];
           if (kind === "documents_approved") {
             bodyLines.push("Great news — your submitted documents have been approved.");
