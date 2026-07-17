@@ -446,9 +446,12 @@ function MailPage() {
             {/* Detail */}
             <div className={cn("bg-white", !selected ? "hidden lg:block" : "block")}>
               {!selected ? (
-                <div className="h-full flex flex-col items-center justify-center p-12 text-center">
-                  <MailOpen className="w-12 h-12 text-gray-200 mb-3" />
-                  <div className="text-sm text-gray-400">Select a message to read</div>
+                <div className="h-full min-h-[400px] flex flex-col items-center justify-center p-12 text-center">
+                  <div className="w-20 h-20 rounded-full border border-gray-200 flex items-center justify-center mb-4">
+                    <InboxIcon className="w-8 h-8 text-blue-600" strokeWidth={2} />
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900 mb-1">No conversation selected</div>
+                  <div className="text-sm text-gray-500">Pick a message from the list to read it here.</div>
                 </div>
               ) : (
                 <div className="p-6">
