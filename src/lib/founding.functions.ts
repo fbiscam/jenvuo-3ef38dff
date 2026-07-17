@@ -493,6 +493,28 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
             _billing_interval: "monthly",
           });
           if (rpcErr) throw new Error(`plan activation: ${rpcErr.message}`);
+          // Billing notice from billing@
+          try {
+            const { sendSystemMail } = await import("@/lib/system-mail.server");
+            const name = String(p.full_name || "there").split(/\s+/)[0];
+            await sendSystemMail({
+              from: "billing@jenvu.email",
+              toUserId: matchedUserId,
+              subject: `Your ${planId.toUpperCase()} plan is active 🎉`,
+              body: [
+                `Hi ${name},`,
+                ``,
+                `Your ${planId.toUpperCase()} plan has been activated on your Jenvu account.`,
+                `Your wallet has been funded per your plan and you can start scanning right away.`,
+                ``,
+                `View details on the Billing page.`,
+                ``,
+                `— Jenvu Billing`,
+              ].join("\n"),
+            });
+          } catch (e) {
+            console.error("[founding] system-mail plan-activated failed:", (e as Error)?.message);
+          }
         } else {
           console.warn(`[founding] approved applicant has no account yet: ${targetEmail}`);
         }
