@@ -78,6 +78,7 @@ function initials(name?: string | null, address?: string) {
 
 function MailPage() {
   const _getAddr = useServerFn(getMyMailAddress);
+  const _listAddrs = useServerFn(listMyMailAddresses);
   const _claim = useServerFn(claimMailAddress);
   const _check = useServerFn(checkUsernameAvailable);
   const _list = useServerFn(listMail);
@@ -87,6 +88,12 @@ function MailPage() {
   const _badges = useServerFn(getMailBadges);
 
   const [myAddress, setMyAddress] = useState<string | null>(null);
+  const [myAddresses, setMyAddresses] = useState<MailAddress[]>([]);
+  const [activeAddress, setActiveAddress] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return window.localStorage.getItem("mail:active_address");
+  });
+  const [addrSwitchOpen, setAddrSwitchOpen] = useState(false);
   const [claiming, setClaiming] = useState(false);
   const [claimVal, setClaimVal] = useState("");
   const [claimStatus, setClaimStatus] = useState<"" | "ok" | "taken" | "invalid" | "checking">("");
@@ -106,21 +113,35 @@ function MailPage() {
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const [addr, rows] = await Promise.all([
+      const [addr, addrs, rows] = await Promise.all([
         _getAddr({}),
+        _listAddrs({}).catch(() => [] as MailAddress[]),
         _list({ data: { folder } }).catch(() => []),
       ]);
-      setMyAddress((addr as any)?.address ?? null);
+      const primary = (addr as any)?.address ?? null;
+      setMyAddress(primary);
+      setMyAddresses(addrs as MailAddress[]);
+      setActiveAddress((prev) => {
+        if (prev && (addrs as MailAddress[]).some((a) => a.address === prev)) return prev;
+        return primary;
+      });
       setMessages(rows as MailListItem[]);
     } finally {
       setLoading(false);
       setReady(true);
     }
-  }, [folder, _getAddr, _list]);
+  }, [folder, _getAddr, _listAddrs, _list]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (activeAddress && typeof window !== "undefined") {
+      window.localStorage.setItem("mail:active_address", activeAddress);
+    }
+  }, [activeAddress]);
+
 
   // Fetch verification badges for every address currently on screen
   useEffect(() => {
