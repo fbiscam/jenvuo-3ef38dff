@@ -617,22 +617,24 @@ function MailPage() {
                             selectedIds.has(m.message_id) && "bg-blue-50 hover:bg-blue-50",
                           )}
                         >
-                          <span
-                            role="checkbox"
-                            aria-checked={selectedIds.has(m.message_id)}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleSelectOne(m.message_id);
-                            }}
-                            className={cn(
-                              "mt-1.5 w-4 h-4 rounded border-2 inline-flex items-center justify-center shrink-0 cursor-pointer transition",
-                              selectedIds.has(m.message_id)
-                                ? "bg-blue-600 border-blue-600 text-white"
-                                : "border-gray-300 hover:border-gray-500 bg-white",
-                            )}
-                          >
-                            {selectedIds.has(m.message_id) && <Check className="w-3 h-3" strokeWidth={3} />}
-                          </span>
+                          {selectedIds.size > 0 && (
+                            <span
+                              role="checkbox"
+                              aria-checked={selectedIds.has(m.message_id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleSelectOne(m.message_id);
+                              }}
+                              className={cn(
+                                "mt-1.5 w-4 h-4 rounded border-2 inline-flex items-center justify-center shrink-0 cursor-pointer transition",
+                                selectedIds.has(m.message_id)
+                                  ? "bg-blue-600 border-blue-600 text-white"
+                                  : "border-gray-300 hover:border-gray-500 bg-white",
+                              )}
+                            >
+                              {selectedIds.has(m.message_id) && <Check className="w-3 h-3" strokeWidth={3} />}
+                            </span>
+                          )}
                           <div className="relative shrink-0">
                             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 text-white flex items-center justify-center text-xs font-semibold overflow-hidden ring-1 ring-gray-200/60">
                               {m.sender_avatar ? (
