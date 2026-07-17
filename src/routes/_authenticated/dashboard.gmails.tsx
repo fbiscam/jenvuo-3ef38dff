@@ -530,16 +530,32 @@ function MailPage() {
                       folder === "sent"
                         ? m.recipient_address
                         : m.sender_name || m.sender_address;
-                    return (
-                      <li key={m.message_id}>
-                        <button
+                      <li key={m.message_id} className={cn(selectedIds.has(m.message_id) && "bg-blue-50")}>
+                        <div
                           onClick={() => openMessage(m)}
                           className={cn(
-                            "w-full text-left px-4 py-3 border-b border-gray-100 flex gap-3 items-start hover:bg-gray-50 transition",
+                            "w-full text-left px-4 py-3 border-b border-gray-100 flex gap-3 items-start hover:bg-gray-50 transition cursor-pointer",
                             active && "bg-gray-100",
-                            !m.is_read && folder === "inbox" && "bg-blue-50/40",
+                            !m.is_read && folder === "inbox" && !selectedIds.has(m.message_id) && "bg-blue-50/40",
+                            selectedIds.has(m.message_id) && "bg-blue-50 hover:bg-blue-50",
                           )}
                         >
+                          <span
+                            role="checkbox"
+                            aria-checked={selectedIds.has(m.message_id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSelectOne(m.message_id);
+                            }}
+                            className={cn(
+                              "mt-1 w-4 h-4 rounded border-2 inline-flex items-center justify-center shrink-0 cursor-pointer",
+                              selectedIds.has(m.message_id)
+                                ? "bg-blue-600 border-blue-600 text-white"
+                                : "border-gray-300 hover:border-gray-500 bg-white",
+                            )}
+                          >
+                            {selectedIds.has(m.message_id) && <Check className="w-3 h-3" strokeWidth={3} />}
+                          </span>
                           <div className="w-9 h-9 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden">
                             {m.sender_avatar ? (
                               <img src={m.sender_avatar} alt="" className="w-full h-full object-cover" />
