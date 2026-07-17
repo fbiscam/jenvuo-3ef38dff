@@ -654,6 +654,10 @@ function AuthPage() {
         dedupeKey: `welcome-${email.toLowerCase()}`,
       },
     });
+    // Deliver welcome message to the user's internal @jenvu.email inbox from support@
+    void import("@/lib/system-mail.functions").then((m) =>
+      m.sendWelcomeSystemMail({ data: { fullName } }).catch(() => {}),
+    );
   };
 
 
