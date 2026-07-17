@@ -266,10 +266,10 @@ function AlertPrefs() {
                 onClick={toggleAlerts}
                 disabled={alertsSaving}
                 className={cn(
-                  "shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-[12px] font-medium border bg-transparent transition disabled:opacity-50",
+                  "shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-[12px] font-medium border-0 bg-transparent transition disabled:opacity-50",
                   alertsOn
-                    ? "border-emerald-200 text-emerald-800 hover:bg-emerald-50"
-                    : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                    ? "text-emerald-800 hover:bg-emerald-50"
+                    : "text-zinc-600 hover:bg-zinc-50",
                 )}
                 title={alertsOn
                   ? "Alerts ON · $0.20 charged per signal. Click to turn off."
