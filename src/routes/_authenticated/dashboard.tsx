@@ -74,7 +74,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/app", label: "Launch AI", icon: "auto_awesome" },
       { to: "/dashboard/workspace", label: "Saved Signals", icon: "bookmarks" },
       { to: "/dashboard/alerts", label: "Signal Alerts", icon: "notifications_active", countKey: "alerts7d" },
-      { to: "/dashboard/notifications", label: "Inbox", icon: "inbox" },
+      { to: "/dashboard/gmails", label: "Emails", icon: "inbox" },
     ],
   },
   {
@@ -498,7 +498,7 @@ function DashboardLayout() {
 
   // Clear red indicator when user visits the notifications page
   useEffect(() => {
-    if (pathname.startsWith("/dashboard/notifications")) setUnreadNotifs(0);
+    if (pathname.startsWith("/dashboard/gmails")) setUnreadNotifs(0);
   }, [pathname]);
 
   useEffect(() => {
@@ -814,7 +814,7 @@ function DashboardLayout() {
                   const iconName = t.icon;
                   const iconColor = t.iconColor;
                   const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
-                  const isNotifs = t.to === "/dashboard/notifications";
+                  const isNotifs = t.to === "/dashboard/gmails";
                   const hasUnread = isNotifs && unreadNotifs > 0 && !active;
                   return (
                     <Link

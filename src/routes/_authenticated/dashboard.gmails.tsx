@@ -31,7 +31,7 @@ import {
   type MailListItem,
 } from "@/lib/mail.functions";
 
-export const Route = createFileRoute("/_authenticated/dashboard/notifications")({
+export const Route = createFileRoute("/_authenticated/dashboard/gmails")({
   head: () => ({
     meta: [
       { title: "Inbox — JENVU AI" },
