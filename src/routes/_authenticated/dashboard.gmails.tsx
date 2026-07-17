@@ -747,7 +747,7 @@ function MailPage() {
                   <div className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
                     {selected.body}
                   </div>
-                  {selected.sender_address !== myAddress && (
+                  {!myAddresses.some((a) => a.address === selected.sender_address) && (
                     <div className="mt-6 pt-4 border-t border-gray-200">
                       <button
                         onClick={() => setComposeOpen(true)}
@@ -767,10 +767,10 @@ function MailPage() {
       {composeOpen && (
         <ComposeModal
           onClose={() => setComposeOpen(false)}
-          myAddress={myAddress}
-          replyTo={selected && selected.sender_address !== myAddress ? selected : null}
+          myAddress={activeAddress ?? myAddress}
+          replyTo={selected && !myAddresses.some((a) => a.address === selected.sender_address) ? selected : null}
           onSend={async ({ to, subject, body }) => {
-            await _send({ data: { to, subject, body } });
+            await _send({ data: { to, subject, body, from: activeAddress ?? undefined } });
             setComposeOpen(false);
             toast.success("Message sent");
             if (folder === "sent") load();
@@ -781,6 +781,7 @@ function MailPage() {
           }}
         />
       )}
+
     </div>
   );
 }
