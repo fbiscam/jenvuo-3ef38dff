@@ -144,36 +144,54 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           { label: "Explore the platform", href: `${APP_URL}/` },
         ),
       };
-    case "approved":
+    case "approved": {
+      const resetUrl = extras.resetUrl || `${APP_URL}/auth`;
       return {
-        subject: `You're in — ${meta.label} plan activated 🎉`,
+        subject: "Your application has been approved 🎉",
         html: wrap(
-          `Welcome to Jenvu, ${n}.`,
+          `Congratulations, ${n} — you're approved.`,
           "Approved · Founding Trader",
-          `<p style="margin:0 0 12px">Your application has been approved. Your <strong>${escapeHtml(meta.label)}</strong> plan is now active with <strong>${escapeHtml(meta.wallet)}</strong>.</p>
-           <p style="margin:0 0 12px;color:#52525b"><em>${escapeHtml(meta.blurb)}</em></p>
-           <p style="margin:16px 0 8px"><strong>Onboarding — 4 quick steps</strong></p>
-           <ol style="margin:0 0 12px;padding-left:20px">
-             <li style="margin:6px 0">Sign in with this email and open your dashboard.</li>
-             <li style="margin:6px 0">Run your first XAU/USD scan on the Signal page.</li>
-             <li style="margin:6px 0">Turn on alerts so you catch A/B setups the moment they fire.</li>
-             <li style="margin:6px 0">Connect your broker (MyFxBook or statement) so we can verify profit.</li>
-           </ol>
-           <p style="margin:0">You have 90 days to reach $100 in verified profit — billing only starts after that. If you don't profit, you walk away, no charge.</p>`,
+          `<p style="margin:0 0 12px">Your Founding Trader application has been <strong>approved</strong>. Welcome to Jenvu — a very small, hand-picked cohort of traders.</p>
+           <p style="margin:0 0 12px">Your seat is reserved on the <strong>${escapeHtml(meta.label)}</strong> plan (${escapeHtml(meta.wallet)}). ${escapeHtml(meta.blurb)}</p>
+           <p style="margin:16px 0 8px"><strong>What you'll get inside Jenvu:</strong></p>
+           <ul style="margin:0 0 12px;padding-left:20px">
+             <li style="margin:4px 0"><strong>Institutional XAU/USD signal engine</strong> — ICT/SMC rules blended with senior-desk AI review.</li>
+             <li style="margin:4px 0"><strong>Live killzones & session alerts</strong> — you never miss London or NY opens.</li>
+             <li style="margin:4px 0"><strong>Trade journal & analytics</strong> — auto win/lose tracking on every setup you take.</li>
+             <li style="margin:4px 0"><strong>Voice briefs & macro context</strong> — news, narrative and sentiment layered onto every scan.</li>
+           </ul>
+           <p style="margin:16px 0 8px"><strong>Next step — set your password</strong></p>
+           <p style="margin:0 0 12px">Use the secure link below to set your password. It's a one-time link tied to your email; once you set it, you can sign in from anywhere.</p>`,
+          { label: "Set my password", href: resetUrl },
+        ),
+      };
+    }
+    case "password_set": {
+      const hours = extras.activateHours ?? 4;
+      return {
+        subject: `You're in — your ${meta.label} plan activates in ${hours} hours`,
+        html: wrap(
+          `You're in, ${n}.`,
+          "Account Ready · Founding Trader",
+          `<p style="margin:0 0 12px">Your password is set and your Jenvu account is live. ✅</p>
+           <p style="margin:0 0 12px">Your <strong>${escapeHtml(meta.label)}</strong> plan will be activated on this account within the next <strong>${hours} hours</strong>. Once it's live, you'll see the wallet credit and full plan features on your Billing page.</p>
+           <p style="margin:0 0 12px">In the meantime, feel free to explore the dashboard — the signal page, journal and killzones are already open to you.</p>
+           <p style="margin:0;color:#52525b"><em>You'll get a separate "account funded" email the moment your wallet is credited.</em></p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
         ),
       };
+    }
     case "funded":
       return {
-        subject: `Your Jenvu account is funded — ${meta.label} plan active`,
+        subject: "Your account has been funded ✅",
         html: wrap(
-          `Account funded, ${n}`,
+          `Account funded, ${n}.`,
           "Funded · Founding Trader",
-          `<p style="margin:0 0 12px">We funded your account with <strong>$100</strong> and your <strong>${escapeHtml(meta.label)}</strong> plan is active.</p>
-           <p style="margin:0 0 12px;color:#52525b"><em>${escapeHtml(meta.blurb)}</em></p>
-           <p style="margin:0 0 12px">You can now continue scanning from your dashboard. Billing starts only after your verified-profit checkpoint and document review are complete.</p>
-           <p style="margin:0">If anything looks wrong, reply to this email and support will check your account.</p>`,
+          `<p style="margin:0 0 12px">Great news — your Jenvu account has been funded with <strong>$100</strong> on the <strong>${escapeHtml(meta.label)}</strong> plan.</p>
+           <p style="margin:0 0 12px">The credit is available in your wallet right now. You can start scanning, use trade management and enable alerts straight from the dashboard.</p>
+           <p style="margin:0;color:#52525b"><em>Full transaction history is on your Billing page.</em></p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
+          { label: "View billing", href: `${APP_URL}/dashboard/billing` },
         ),
       };
     case "rejected":
