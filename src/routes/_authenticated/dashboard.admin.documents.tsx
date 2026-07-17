@@ -119,7 +119,10 @@ function AdminDocumentsPage() {
       setInfoMsg("");
       qc.invalidateQueries({ queryKey: ["admin-doc-submissions"] });
     },
-    onError: (e: any) => toast.error(e?.message || "Failed"),
+    onError: (e: any) => {
+      console.error("[admin-docs] update failed", e);
+      toast.error(e?.message || "Failed to update — check console");
+    },
   });
 
   const filtered = filter === "all" ? rows : rows.filter((r) => r.document_status === filter);
