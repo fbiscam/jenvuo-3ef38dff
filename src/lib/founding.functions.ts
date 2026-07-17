@@ -753,7 +753,7 @@ async function getMyApplication(context: any) {
   const admin = await getServiceClient();
   const { data } = await admin
     .from("founding_applications" as any)
-    .select("id, email, full_name, requested_plan, document_status")
+    .select("id, email, full_name, requested_plan, document_status, documents_rejected_at")
     .ilike("email", email)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -778,6 +778,13 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
     if (!data.storage_path.startsWith(`${context.userId}/`)) {
       throw new Error("Invalid storage path");
     }
+    // 24-hour resubmission window after rejection
+    if (app.document_status === "rejected" && app.documents_rejected_at) {
+      const rejectedAt = new Date(app.documents_rejected_at).getTime();
+      if (Date.now() - rejectedAt > 24 * 60 * 60 * 1000) {
+        throw new Error("The 24-hour resubmission window has expired. Please contact support.");
+      }
+    }
     const admin = await getServiceClient();
     const { error } = await admin.from("founding_documents" as any).insert({
       application_id: app.id,
@@ -797,6 +804,8 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
           documents_submitted_at: new Date().toISOString(),
           documents_rejected_at: null,
           documents_rejected_reason: null,
+          documents_info_request: null,
+          documents_info_requested_at: null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", app.id);
