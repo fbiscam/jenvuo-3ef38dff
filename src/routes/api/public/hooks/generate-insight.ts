@@ -45,10 +45,6 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
         if (provided !== cronSecret) {
           return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
         }
-        const bmindKey = process.env.BLUESMINDS_API_KEY;
-        if (!bmindKey) {
-          return new Response(JSON.stringify({ error: "BLUESMINDS_API_KEY missing" }), { status: 500 });
-        }
 
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
