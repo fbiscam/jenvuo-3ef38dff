@@ -194,6 +194,18 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           { label: "Explore the platform", href: `${APP_URL}/` },
         ),
       };
+    case "pending":
+      return {
+        subject: "Your Founding Trader application is under review",
+        html: wrap(
+          `Your application is pending, ${n}`,
+          "Pending · Founding Trader",
+          `<p style="margin:0 0 12px">Your application has been moved into our review queue and is currently <strong>pending</strong>.</p>
+           <p style="margin:0 0 12px">Our team manually reviews every application. This usually takes up to <strong>48 hours</strong> — you'll get another email as soon as there's a decision.</p>
+           <p style="margin:0">No action needed from your side right now. Thanks for your patience.</p>`,
+          { label: "Explore the platform", href: `${APP_URL}/` },
+        ),
+      };
     case "documents_received":
       return {
         subject: "We received your documents",
