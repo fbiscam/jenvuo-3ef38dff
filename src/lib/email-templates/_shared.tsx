@@ -86,10 +86,10 @@ const logoWrap = {
 
 const logoWord = {
   margin: 0,
-  fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: '"Google Sans", "Product Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
   fontSize: '22px',
-  fontWeight: 700 as const,
-  letterSpacing: '-0.01em',
+  fontWeight: 400 as const,
+  letterSpacing: '-0.005em',
   color: COLORS.ink,
   lineHeight: '1',
 }
