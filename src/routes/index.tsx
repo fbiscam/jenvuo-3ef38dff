@@ -619,11 +619,10 @@ function HomePage() {
           <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
-                <col className="w-[28%]" />
-                <col className="w-[18%]" />
-                <col className="w-[18%] bg-amber-50/40" />
-                <col className="w-[18%]" />
-                <col className="w-[18%]" />
+                <col className="w-[34%]" />
+                <col className="w-[22%] bg-amber-50/40" />
+                <col className="w-[22%]" />
+                <col className="w-[22%]" />
               </colgroup>
 
               <thead>
@@ -632,7 +631,6 @@ function HomePage() {
                     <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                   </th>
                   {[
-                    { name: "Free", price: "$0", tag: "Curious", key: "free" },
                     { name: "Pro", price: "$15", tag: "Active", accent: true, key: "pro" },
                     { name: "Elite", price: "$50", tag: "Desk", dark: true, key: "elite" },
                     { name: "Ultra", price: "$100", tag: "Fund / Desk+", key: "ultra" },
