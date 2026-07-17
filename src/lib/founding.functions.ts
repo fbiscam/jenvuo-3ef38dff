@@ -706,6 +706,43 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
         } catch (e) {
           console.error("[founding] doc-status email enqueue failed:", (e as Error)?.message);
         }
+        // Also deliver an in-app @jenvu.email message from notifications@
+        try {
+          const { sendSystemMailByEmail } = await import("@/lib/system-mail.server");
+          const name = String(prior.full_name || "there").split(/\s+/)[0];
+          const subj =
+            kind === "documents_approved"
+              ? "Your documents were approved ✅"
+              : kind === "documents_rejected"
+                ? "Action required: documents rejected"
+                : kind === "documents_needs_info"
+                  ? "We need a bit more information"
+                  : "Documents received — under review";
+          const bodyLines: string[] = [`Hi ${name},`, ``];
+          if (kind === "documents_approved") {
+            bodyLines.push("Great news — your submitted documents have been approved.");
+            bodyLines.push("Your Founding program access is now fully active.");
+          } else if (kind === "documents_rejected") {
+            bodyLines.push("Unfortunately your documents were not approved.");
+            if (data.rejected_reason) bodyLines.push("", `Reason: ${data.rejected_reason}`);
+            bodyLines.push("", "You can resubmit within 24 hours from the Documents page.");
+          } else if (kind === "documents_needs_info") {
+            bodyLines.push("Our review team needs a bit more information before we can approve.");
+            if (data.info_request) bodyLines.push("", `Requested: ${data.info_request}`);
+            bodyLines.push("", "Please open your Documents page and submit the requested update.");
+          } else {
+            bodyLines.push("We received your documents. Our team will review shortly.");
+          }
+          bodyLines.push("", "— Jenvu Notifications");
+          await sendSystemMailByEmail({
+            from: "notifications@jenvu.email",
+            toEmail: String(prior.email),
+            subject: subj,
+            body: bodyLines.join("\n"),
+          });
+        } catch (e) {
+          console.error("[founding] system-mail doc-status failed:", (e as Error)?.message);
+        }
       }
     }
     return { ok: true };
