@@ -200,7 +200,7 @@ function NotificationsPage() {
             <span className="shrink-0 text-[11px] text-zinc-400">{timeAgo(n.created_at)}</span>
           </div>
         </div>
-        <div className="flex items-start gap-1 opacity-0 transition group-hover:opacity-100">
+        <div className="-mt-1 flex items-start gap-1 self-start opacity-0 transition group-hover:opacity-100">
           {unread && (
             <button
               onClick={async (e) => {
