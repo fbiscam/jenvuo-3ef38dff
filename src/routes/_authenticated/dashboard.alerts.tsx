@@ -265,20 +265,20 @@ function AlertPrefs() {
               <button
                 onClick={toggleAlerts}
                 disabled={alertsSaving}
-                className="shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-[12px] font-medium border-0 bg-transparent text-zinc-900 hover:bg-zinc-50 transition disabled:opacity-50"
+                className="shrink-0 h-8 w-8 inline-flex items-center justify-center rounded-lg border-0 bg-transparent hover:bg-zinc-50 transition disabled:opacity-50"
                 title={alertsOn
                   ? "Alerts ON · $0.20 charged per signal. Click to turn off."
                   : "Alerts OFF · no notifications, no charges. Click to turn on."}
               >
                 {alertsSaving ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : alertsOn ? (
-                  <Bell className="h-3.5 w-3.5 text-emerald-600" />
+                  <Bell className="h-4 w-4 text-emerald-600" />
                 ) : (
-                  <BellOff className="h-3.5 w-3.5 text-rose-600" />
+                  <BellOff className="h-4 w-4 text-rose-600" />
                 )}
-                {alertsOn ? "Alerts ON" : "Alerts OFF"}
               </button>
+
             )}
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> LIVE
