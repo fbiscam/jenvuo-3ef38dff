@@ -183,13 +183,13 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
     }
     case "funded":
       return {
-        subject: "Your account has been funded ✅",
+        subject: `Your account has been funded 🎉`,
         html: wrap(
-          `Account funded, ${n}.`,
+          `Congratulations, ${n} — you're funded.`,
           "Funded · Founding Trader",
-          `<p style="margin:0 0 12px">Great news — your Jenvu account has been funded with <strong>$100</strong> on the <strong>${escapeHtml(meta.label)}</strong> plan.</p>
-           <p style="margin:0 0 12px">The credit is available in your wallet right now. You can start scanning, use trade management and enable alerts straight from the dashboard.</p>
-           <p style="margin:0;color:#52525b"><em>Full transaction history is on your Billing page.</em></p>`,
+          `<p style="margin:0 0 14px;line-height:1.6">Great news — your Jenvu account has just been funded with <strong>${escapeHtml(meta.amount)}</strong> of wallet credit on the <strong>${escapeHtml(meta.label)}</strong> plan.</p>
+           <p style="margin:0 0 14px;line-height:1.6">The credit is live in your wallet right now. You can start scanning XAU/USD, use full trade management and enable realtime alerts straight from the dashboard.</p>
+           <p style="margin:0 0 4px;line-height:1.6;color:#52525b"><em>Your full transaction history is always available on the Billing page.</em></p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
           { label: "View billing", href: `${APP_URL}/dashboard/billing` },
         ),
