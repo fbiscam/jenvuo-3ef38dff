@@ -452,11 +452,9 @@ function DashboardLayout() {
   const embedMode = useMemo(() => {
     if (typeof window === "undefined") return false;
     try {
-      const inIframe = window.self !== window.top;
-      const hasFlag = new URLSearchParams(window.location.search).get("embed") === "1";
-      return inIframe || hasFlag;
+      return new URLSearchParams(window.location.search).get("embed") === "1";
     } catch {
-      return true; // cross-origin iframe access throws — assume embed
+      return false;
     }
   }, []);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
