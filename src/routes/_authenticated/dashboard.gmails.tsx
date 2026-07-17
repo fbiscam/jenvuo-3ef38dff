@@ -384,8 +384,9 @@ function MailPage() {
 
   // ------------ Mail UI ------------
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-white lg:h-[calc(100vh-7rem)] lg:min-h-0 lg:overflow-hidden">
-      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-0 lg:gap-4 lg:p-4 lg:h-full">
+    <div className="h-[calc(100vh-4rem)] lg:h-[calc(100vh-7rem)] bg-white overflow-hidden">
+      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-0 lg:gap-4 lg:p-4 h-full min-h-0">
+
         {/* Sidebar */}
         <aside className="lg:w-56 shrink-0 lg:sticky lg:top-0 lg:self-start lg:h-full lg:max-h-none lg:overflow-y-auto px-3 py-4 lg:p-0 z-10">
           <button
