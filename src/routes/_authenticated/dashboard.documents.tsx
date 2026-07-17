@@ -343,7 +343,7 @@ function DocumentsPage() {
           )}
 
           {/* Uploaded files list */}
-          {files.length > 0 && (
+          {canUpload && files.length > 0 && (
             <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6">
               <div className="text-sm font-semibold text-zinc-900 mb-3">
                 Uploaded files ({files.length})
