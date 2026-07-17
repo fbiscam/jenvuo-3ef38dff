@@ -680,9 +680,6 @@ function MailPage() {
                             >
                               {m.subject || "(no subject)"}
                             </div>
-                            <div className="text-xs text-gray-400 truncate mt-0.5 leading-relaxed">
-                              {m.body.slice(0, 100)}
-                            </div>
                           </div>
                           <div className="flex items-center gap-1 shrink-0 ml-auto self-start">
                             <span className="text-[11px] text-gray-400 tabular-nums">
