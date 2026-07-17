@@ -192,16 +192,16 @@ function DocumentsPage() {
                         className={[
                           "mt-0.5 h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold",
                           done
-                            ? "bg-blue-600 text-white"
+                            ? "bg-emerald-500 text-white"
                             : active
                             ? "bg-blue-600 text-white"
-                            : "bg-blue-600 text-white",
+                            : "bg-zinc-900 text-white",
                         ].join(" ")}
                       >
                         {done ? "✓" : i + 1}
                       </div>
                       {!isLast && (
-                        <div className={["w-px flex-1 mt-1", done ? "bg-blue-600" : "bg-blue-200"].join(" ")} />
+                        <div className={["w-px flex-1 mt-1", done ? "bg-emerald-500" : "bg-zinc-300"].join(" ")} />
                       )}
                     </div>
                     <div className="flex-1 pb-4">
