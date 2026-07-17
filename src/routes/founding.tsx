@@ -238,7 +238,7 @@ function FoundingPage() {
                 <label className="text-[13px] font-medium text-zinc-800">
                   Which plan do you want? <span className="text-rose-500">*</span>
                 </label>
-                <div className="mt-2 grid grid-cols-3 gap-2">
+                <div className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2">
                   {([
                     { id: "pro", label: "Pro", desc: "$15 wallet" },
                     { id: "elite", label: "Elite", desc: "$50 wallet" },
