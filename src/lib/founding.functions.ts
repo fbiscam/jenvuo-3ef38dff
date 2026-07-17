@@ -98,6 +98,7 @@ type ApplicantEmailKind =
   | "pending"
   | "funded"
   | "password_set"
+  | "documents_submitted"
   | "documents_received"
   | "documents_approved"
   | "documents_rejected"
