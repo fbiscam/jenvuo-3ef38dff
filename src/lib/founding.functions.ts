@@ -526,6 +526,39 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           if (found) existingUserId = found.id;
           if (!userList?.users?.length || (userList.users.length < 1000)) break;
         }
+        // Fresh account on approval: wipe ALL user-scoped data so the new
+        // founding trader starts clean — no old alerts, notifications,
+        // trades, credits, referrals, devices, etc.
+        if (existingUserId) {
+          const uid = existingUserId;
+          const wipes: Array<Promise<any>> = [
+            admin.from("user_notifications" as any).delete().eq("user_id", uid),
+            admin.from("signal_alert_subscribers" as any).delete().eq("user_id", uid),
+            admin.from("alert_preferences" as any).delete().eq("user_id", uid),
+            admin.from("credit_ledger" as any).delete().eq("user_id", uid),
+            admin.from("credit_lots" as any).delete().eq("user_id", uid),
+            admin.from("credit_balances" as any).delete().eq("user_id", uid),
+            admin.from("credit_charge_audit" as any).delete().eq("user_id", uid),
+            admin.from("ai_cost_log" as any).delete().eq("user_id", uid),
+            admin.from("trade_journal" as any).delete().eq("user_id", uid),
+            admin.from("trade_setup_links" as any).delete().eq("user_id", uid),
+            admin.from("trade_setups" as any).delete().eq("user_id", uid),
+            admin.from("saved_signals" as any).delete().eq("user_id", uid),
+            admin.from("voice_history" as any).delete().eq("user_id", uid),
+            admin.from("trusted_devices" as any).delete().eq("user_id", uid),
+            admin.from("account_devices" as any).delete().eq("user_id", uid),
+            admin.from("email_change_requests" as any).delete().eq("user_id", uid),
+            admin.from("email_change_audit" as any).delete().eq("user_id", uid),
+            admin.from("user_subscriptions" as any).delete().eq("user_id", uid),
+            admin.from("referrals" as any).delete().or(`referrer_id.eq.${uid},referred_user_id.eq.${uid}`),
+            admin.from("referral_codes" as any).delete().eq("user_id", uid),
+            admin.from("mail_message_state" as any).delete().eq("user_id", uid),
+          ];
+          const results = await Promise.allSettled(wipes);
+          results.forEach((r, i) => {
+            if (r.status === "rejected") console.error(`[founding] fresh-wipe[${i}] failed:`, r.reason);
+          });
+        }
         try {
           const linkType = existingUserId ? "recovery" : "invite";
           const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
