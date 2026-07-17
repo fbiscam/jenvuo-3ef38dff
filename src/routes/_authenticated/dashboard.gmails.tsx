@@ -203,7 +203,54 @@ function MailPage() {
     } catch {}
   };
 
-  // debounced username check
+  const toggleSelectOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+  const clearSelection = () => setSelectedIds(new Set());
+  const selectAllVisible = () => setSelectedIds(new Set(filtered.map((m) => m.message_id)));
+  const selectByPredicate = (pred: (m: MailListItem) => boolean) =>
+    setSelectedIds(new Set(filtered.filter(pred).map((m) => m.message_id)));
+
+  const allVisibleSelected =
+    filtered.length > 0 && filtered.every((m) => selectedIds.has(m.message_id));
+  const someSelected = selectedIds.size > 0;
+
+  const bulkMarkRead = async () => {
+    const ids = Array.from(selectedIds);
+    try {
+      await Promise.all(
+        ids.map((id) => _setState({ data: { message_id: id, is_read: true } })),
+      );
+      setMessages((prev) =>
+        prev.map((x) => (selectedIds.has(x.message_id) ? { ...x, is_read: true } : x)),
+      );
+      toast.success(`Marked ${ids.length} as read`);
+      clearSelection();
+    } catch (e: any) {
+      toast.error(e?.message || "Failed");
+    }
+  };
+
+  const bulkMove = async (target: MailFolder) => {
+    const ids = Array.from(selectedIds);
+    try {
+      await Promise.all(
+        ids.map((id) => _setState({ data: { message_id: id, folder: target } })),
+      );
+      setMessages((prev) => prev.filter((x) => !selectedIds.has(x.message_id)));
+      if (selected && selectedIds.has(selected.message_id)) setSelected(null);
+      toast.success(`${ids.length} ${target === "trash" ? "deleted" : "moved to " + target}`);
+      clearSelection();
+    } catch (e: any) {
+      toast.error(e?.message || "Failed");
+    }
+  };
+
   useEffect(() => {
     if (!claimVal) {
       setClaimStatus("");
