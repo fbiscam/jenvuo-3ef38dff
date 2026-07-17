@@ -6,7 +6,7 @@ import { computeSignalPlan } from '@/lib/gold-analysis.functions'
 // fires A+/A alerts (dedup'd) to opted-in subscribers.
 
 const SENDER_DOMAIN = 'notify.jenvu.net'
-const FROM = 'Jenvu Signal Desk <signals@jenvu.net>'
+const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.net>'
 const DEDUPE_WINDOW_MS = 90 * 60 * 1000 // 90 minutes
 
 const XAU_PAIRS = ['XAUUSD', 'XAUEUR', 'XAUGBP']

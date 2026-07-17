@@ -3,7 +3,7 @@
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
 
 const SENDER_DOMAIN = 'notify.jenvu.net'
-const FROM = 'Jenvu Signal Desk <signals@jenvu.net>'
+const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.net>'
 
 export interface EnqueueAlertEmailsArgs {
   alertId: string
