@@ -68,9 +68,19 @@ function DocumentsPage() {
   });
 
   const rejected = row?.document_status === "rejected";
-  const currentIdx = rejected ? 0 : statusIndex(row?.document_status);
+  const needsInfo = row?.document_status === "needs_info";
+  const rejectedAtMs = row?.documents_rejected_at ? new Date(row.documents_rejected_at).getTime() : 0;
+  const rejectedResubmitOpen =
+    rejected && rejectedAtMs > 0 && Date.now() - rejectedAtMs <= 24 * 60 * 60 * 1000;
+  const rejectedHoursLeft = rejectedResubmitOpen
+    ? Math.max(0, Math.ceil((24 * 60 * 60 * 1000 - (Date.now() - rejectedAtMs)) / (60 * 60 * 1000)))
+    : 0;
+  const currentIdx = rejected || needsInfo ? 0 : statusIndex(row?.document_status);
   const canUpload =
-    !!row && row.document_status !== "verified" && row.document_status !== "pending";
+    !!row &&
+    row.document_status !== "verified" &&
+    row.document_status !== "pending" &&
+    (!rejected || rejectedResubmitOpen);
 
   const removeMut = useMutation({
     mutationFn: (id: string) => remove({ data: { id } } as any),
