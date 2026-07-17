@@ -1270,7 +1270,7 @@ function DashboardLayout() {
         )}
 
         </main>
-        {!embedMode && <DashboardFooter sidebarCollapsed={sidebarCollapsed} />}
+        
        </div>
 
     </div>
