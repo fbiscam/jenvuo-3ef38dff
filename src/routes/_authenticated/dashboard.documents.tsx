@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { UploadCloud, Trash2, FileVideo, FileImage, FileText } from "lucide-react";
+import { UploadCloud, Trash2, FileVideo, FileImage, FileText, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   getMyDocumentStatus,
