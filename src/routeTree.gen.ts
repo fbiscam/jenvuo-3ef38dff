@@ -82,6 +82,7 @@ import { Route as AuthenticatedDashboardAdminFoundingRouteImport } from './route
 import { Route as AuthenticatedDashboardAdminDocumentsRouteImport } from './routes/_authenticated/dashboard.admin.documents'
 import { Route as AuthenticatedDashboardAdminAutoScanRouteImport } from './routes/_authenticated/dashboard.admin.auto-scan'
 import { Route as AuthenticatedDashboardCommunityUHandleRouteImport } from './routes/_authenticated/dashboard.community.u.$handle'
+import { Route as AuthenticatedDashboardCommunityPostIdRouteImport } from './routes/_authenticated/dashboard.community.post.$id'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -474,6 +475,12 @@ const AuthenticatedDashboardCommunityUHandleRoute =
     path: '/u/$handle',
     getParentRoute: () => AuthenticatedDashboardCommunityRoute,
   } as any)
+const AuthenticatedDashboardCommunityPostIdRoute =
+  AuthenticatedDashboardCommunityPostIdRouteImport.update({
+    id: '/post/$id',
+    path: '/post/$id',
+    getParentRoute: () => AuthenticatedDashboardCommunityRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -547,6 +554,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/dashboard/community/post/$id': typeof AuthenticatedDashboardCommunityPostIdRoute
   '/dashboard/community/u/$handle': typeof AuthenticatedDashboardCommunityUHandleRoute
 }
 export interface FileRoutesByTo {
@@ -618,6 +626,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/dashboard/community/post/$id': typeof AuthenticatedDashboardCommunityPostIdRoute
   '/dashboard/community/u/$handle': typeof AuthenticatedDashboardCommunityUHandleRoute
 }
 export interface FileRoutesById {
@@ -694,6 +703,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/_authenticated/dashboard/community/post/$id': typeof AuthenticatedDashboardCommunityPostIdRoute
   '/_authenticated/dashboard/community/u/$handle': typeof AuthenticatedDashboardCommunityUHandleRoute
 }
 export interface FileRouteTypes {
@@ -770,6 +780,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/dashboard/community/post/$id'
     | '/dashboard/community/u/$handle'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -841,6 +852,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/dashboard/community/post/$id'
     | '/dashboard/community/u/$handle'
   id:
     | '__root__'
@@ -916,6 +928,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/_authenticated/dashboard/community/post/$id'
     | '/_authenticated/dashboard/community/u/$handle'
   fileRoutesById: FileRoutesById
 }
@@ -1481,15 +1494,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCommunityUHandleRouteImport
       parentRoute: typeof AuthenticatedDashboardCommunityRoute
     }
+    '/_authenticated/dashboard/community/post/$id': {
+      id: '/_authenticated/dashboard/community/post/$id'
+      path: '/post/$id'
+      fullPath: '/dashboard/community/post/$id'
+      preLoaderRoute: typeof AuthenticatedDashboardCommunityPostIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardCommunityRoute
+    }
   }
 }
 
 interface AuthenticatedDashboardCommunityRouteChildren {
+  AuthenticatedDashboardCommunityPostIdRoute: typeof AuthenticatedDashboardCommunityPostIdRoute
   AuthenticatedDashboardCommunityUHandleRoute: typeof AuthenticatedDashboardCommunityUHandleRoute
 }
 
 const AuthenticatedDashboardCommunityRouteChildren: AuthenticatedDashboardCommunityRouteChildren =
   {
+    AuthenticatedDashboardCommunityPostIdRoute:
+      AuthenticatedDashboardCommunityPostIdRoute,
     AuthenticatedDashboardCommunityUHandleRoute:
       AuthenticatedDashboardCommunityUHandleRoute,
   }
