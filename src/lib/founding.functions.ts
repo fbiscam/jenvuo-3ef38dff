@@ -589,10 +589,14 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     //             OR admin marks first_profit_reached=true
     // - rejected / waitlisted / pending: on their respective status transitions
     const kinds: ApplicantEmailKind[] = [];
-    if (p?.email && data.status && data.status !== p.status) {
-      if (data.status === "approved") kinds.push("approved");
-      else if (data.status === "active") kinds.push("funded");
-      else if (data.status === "rejected") kinds.push("rejected");
+    if (p?.email && data.status) {
+      const changed = data.status !== p.status;
+      if (data.status === "approved" && changed) kinds.push("approved");
+      else if (data.status === "active" && changed) kinds.push("funded");
+      else if (data.status === "rejected" && changed) kinds.push("rejected");
+      // Waitlisted / pending: email EVERY time admin sets this status,
+      // even when re-applying the same status. Admin re-triggers the email
+      // by re-saving the status.
       else if (data.status === "waitlisted") kinds.push("waitlisted");
       else if (data.status === "pending") kinds.push("pending");
     }
@@ -608,10 +612,15 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
         });
         for (const kind of kinds) {
           const extras: ApplicantEmailExtras = kind === "approved" && approvedResetUrl ? { resetUrl: approvedResetUrl } : {};
-          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`, extras);
+          // For repeatable kinds (waitlisted/pending) include a timestamp in
+          // the dedupe key so each admin action produces a new email.
+          const repeatable = kind === "waitlisted" || kind === "pending";
+          const dedupe = repeatable ? `${data.id}-${kind}-${Date.now()}` : `${data.id}-${kind}`;
+          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), dedupe, extras);
         }
       }
     }
+
 
 
 
