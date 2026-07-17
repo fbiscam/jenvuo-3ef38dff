@@ -45,10 +45,6 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
         if (provided !== cronSecret) {
           return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
         }
-        const bmindKey = process.env.BLUESMINDS_API_KEY;
-        if (!bmindKey) {
-          return new Response(JSON.stringify({ error: "BLUESMINDS_API_KEY missing" }), { status: 500 });
-        }
 
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -59,7 +55,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
           .from("insights")
           .select("id", { count: "exact", head: true })
           .gte("created_at", since);
-        if ((recentCount ?? 0) >= 2) {
+        if ((recentCount ?? 0) >= 1) {
           return Response.json({ skipped: "daily-cap-reached", recentCount });
         }
 
@@ -94,21 +90,43 @@ Return STRICT JSON only, no prose, with this exact shape:
   "content": "<full markdown article 900-1300 words with ## H2 sections, lists, and a final ## FAQ section. Use internal links to /signal, /app, /insights, /download where natural>"
 }`;
 
-        const aiRes = await fetch("https://api.bluesminds.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${bmindKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "gpt-5.5",
-            messages: [
-              { role: "system", content: sys },
-              { role: "user", content: userPrompt },
-            ],
-          }),
-        });
+        const lovableKey = process.env.LOVABLE_API_KEY;
+        if (!lovableKey) {
+          return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), { status: 500 });
+        }
 
+        async function callAI(model: string, timeoutMs: number) {
+          const ctrl = new AbortController();
+          const t = setTimeout(() => ctrl.abort(), timeoutMs);
+          try {
+            return await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Lovable-API-Key": lovableKey!,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model,
+                messages: [
+                  { role: "system", content: sys },
+                  { role: "user", content: userPrompt },
+                ],
+                response_format: { type: "json_object" },
+              }),
+              signal: ctrl.signal,
+            });
+          } finally {
+            clearTimeout(t);
+          }
+        }
+
+        // Primary: Lovable AI gpt-5.5. Fallback: BluesMinds if provided.
+        let aiRes: Response;
+        try {
+          aiRes = await callAI("openai/gpt-5.5", 90_000);
+        } catch (e) {
+          return new Response(JSON.stringify({ error: "ai-timeout", detail: String(e) }), { status: 504 });
+        }
 
         if (!aiRes.ok) {
           const txt = await aiRes.text();
