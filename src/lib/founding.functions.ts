@@ -531,8 +531,8 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
         // trades, credits, referrals, devices, etc.
         if (existingUserId) {
           const uid = existingUserId;
-          const wipes: Array<Promise<any>> = [
-            admin.from("user_notifications" as any).delete().eq("user_id", uid),
+          const wipes = [
+            admin.from("user_notifications" as any).delete().eq("user_id", uid).then(),
             admin.from("signal_alert_subscribers" as any).delete().eq("user_id", uid),
             admin.from("alert_preferences" as any).delete().eq("user_id", uid),
             admin.from("credit_ledger" as any).delete().eq("user_id", uid),
