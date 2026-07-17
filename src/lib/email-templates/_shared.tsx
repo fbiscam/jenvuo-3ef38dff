@@ -86,7 +86,7 @@ const logoWrap = {
 
 const logoWord = {
   margin: 0,
-  fontFamily: '"Google Sans", "Product Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: '"Google Sans","Google Sans Normal",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif',
   fontSize: '22px',
   fontWeight: 400 as const,
   letterSpacing: '-0.005em',
