@@ -74,7 +74,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/app", label: "Launch AI", icon: "auto_awesome" },
       { to: "/dashboard/workspace", label: "Saved Signals", icon: "bookmarks" },
       { to: "/dashboard/alerts", label: "Signal Alerts", icon: "notifications_active", countKey: "alerts7d" },
-      { to: "/dashboard/notifications", label: "Notifications", icon: "mark_email_unread" },
+      { to: "/dashboard/notifications", label: "Inbox", icon: "inbox" },
     ],
   },
   {
