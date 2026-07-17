@@ -1042,22 +1042,7 @@ function DashboardLayout() {
                   type="button"
                   aria-label="Account menu"
                   className="relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-zinc-200 text-[15px] font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
-                  style={avatarUrl ? undefined : (() => {
-                    const seed = (fullName || email || "U").trim().toLowerCase();
-                    const palette = [
-                      "linear-gradient(135deg,#0f172a,#1e293b)",
-                      "linear-gradient(135deg,#111827,#1f2937)",
-                      "linear-gradient(135deg,#0c1e3d,#1e3a8a)",
-                      "linear-gradient(135deg,#14532d,#166534)",
-                      "linear-gradient(135deg,#3b0764,#581c87)",
-                      "linear-gradient(135deg,#450a0a,#7f1d1d)",
-                      "linear-gradient(135deg,#0f2027,#134e4a)",
-                      "linear-gradient(135deg,#1c1917,#292524)",
-                    ];
-                    let h = 0;
-                    for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-                    return { backgroundImage: palette[h % palette.length] };
-                  })()}
+                  style={avatarUrl ? undefined : { backgroundImage: "linear-gradient(135deg,#0f172a,#1e293b)" }}
                 >
                   <span className="absolute inset-0 flex items-center justify-center">
                     {(fullName || email || "U").trim().charAt(0).toUpperCase()}
