@@ -115,13 +115,14 @@ function FoundingPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-4xl px-5 pt-14 pb-10 text-center">
-        <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">
+      <section className="mx-auto max-w-4xl px-5 pt-10 pb-8 text-center sm:pt-14 sm:pb-10">
+        <h1 className="mt-2 text-[28px] leading-tight font-semibold tracking-tight sm:mt-5 sm:text-5xl">
           Founding Trader Program
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-zinc-600">
-          Get <span className="font-semibold text-zinc-900">Elite free for 30 days</span> — pay only after your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>. No profit, no payment Built for traders who want institutional grade signals without upfront risk or long term commitment
+        <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-zinc-600 sm:text-[15px]">
+          Get <span className="font-semibold text-zinc-900">Elite free for 30 days</span> — pay only after your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>. No profit, no payment. Built for traders who want institutional grade signals without upfront risk or long term commitment.
         </p>
+
 
 
         <div className="mx-auto mt-8 max-w-md rounded-2xl border border-zinc-200 bg-white p-5">
