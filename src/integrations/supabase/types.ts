@@ -1832,6 +1832,13 @@ export type Database = {
           full_name: string
         }[]
       }
+      mail_get_badges: {
+        Args: { _addresses: string[] }
+        Returns: {
+          address: string
+          tier: string
+        }[]
+      }
       mail_send: {
         Args: { _body: string; _subject: string; _to_address: string }
         Returns: string
