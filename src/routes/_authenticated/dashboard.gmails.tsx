@@ -446,7 +446,9 @@ function MailPage() {
                 </>
               ) : (
                 <>
+                  <div className="w-px h-5 bg-gray-200 mx-1" />
                   <button
+
                     onClick={() => load()}
                     className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
                     title="Refresh"
