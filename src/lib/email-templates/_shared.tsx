@@ -47,27 +47,28 @@ export const EmailFonts = () => (
 )
 
 
-/** Simple, clean header — favicon + Jenvu wordmark on a hairline-divided band. */
+/** Centered logo + Jenvu wordmark, Replit-style masthead. */
 export const LogoHeader = (_props: { tagline?: string } = {}) => (
   <Section style={logoWrap}>
     <table
       cellPadding={0}
       cellSpacing={0}
       role="presentation"
-      style={{ borderCollapse: 'collapse' as const }}
+      align="center"
+      style={{ borderCollapse: 'collapse' as const, margin: '0 auto' }}
     >
       <tbody>
         <tr>
           <td style={{ verticalAlign: 'middle' }}>
             <Img
               src={LOGO_URL}
-              width="28"
-              height="28"
+              width="32"
+              height="32"
               alt="Jenvu"
-              style={{ display: 'block', borderRadius: '6px' }}
+              style={{ display: 'block', borderRadius: '7px' }}
             />
           </td>
-          <td style={{ paddingLeft: '10px', verticalAlign: 'middle' }}>
+          <td style={{ paddingLeft: '12px', verticalAlign: 'middle' }}>
             <Text style={logoWord}>Jenvu</Text>
           </td>
         </tr>
@@ -77,19 +78,18 @@ export const LogoHeader = (_props: { tagline?: string } = {}) => (
 )
 
 const logoWrap = {
-  padding: '22px 28px 18px',
+  padding: '26px 28px 22px',
   borderBottom: `1px solid ${COLORS.hairline}`,
   backgroundColor: '#ffffff',
+  textAlign: 'center' as const,
 }
 
 const logoWord = {
   margin: 0,
-  // Use a web-safe font stack for the wordmark so lowercase "v" doesn't
-  // get mistaken for "u"/"o" in email clients that fall back from Google Sans.
   fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-  fontSize: '19px',
+  fontSize: '22px',
   fontWeight: 700 as const,
-  letterSpacing: '0.01em',
+  letterSpacing: '-0.01em',
   color: COLORS.ink,
   lineHeight: '1',
 }
