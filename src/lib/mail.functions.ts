@@ -121,8 +121,9 @@ export const listMail = createServerFn({ method: "POST" })
       ),
     );
     let profileMap = new Map<string, { full_name: string | null; avatar_url: string | null }>();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (userIds.length) {
-      const { data: profiles } = await context.supabase
+      const { data: profiles } = await supabaseAdmin
         .from("profiles")
         .select("id, full_name, avatar_url")
         .in("id", userIds);
@@ -133,7 +134,7 @@ export const listMail = createServerFn({ method: "POST" })
     // fallback: resolve avatar by mail address (for system mailboxes or when sender_id is null)
     const addrToUser = new Map<string, string>();
     if (addresses.length) {
-      const { data: addrRows } = await context.supabase
+      const { data: addrRows } = await supabaseAdmin
         .from("mail_addresses")
         .select("address, user_id")
         .in("address", addresses);
@@ -142,7 +143,7 @@ export const listMail = createServerFn({ method: "POST" })
       }
       const extraIds = Array.from(new Set(Array.from(addrToUser.values()).filter((id) => !profileMap.has(id))));
       if (extraIds.length) {
-        const { data: extra } = await context.supabase
+        const { data: extra } = await supabaseAdmin
           .from("profiles")
           .select("id, full_name, avatar_url")
           .in("id", extraIds);
