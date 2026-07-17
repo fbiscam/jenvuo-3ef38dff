@@ -57,6 +57,35 @@ function AlertPrefs() {
   const [visibleCount, setVisibleCount] = useState<number>(10);
   const [loggedIds, setLoggedIds] = useState<Set<string>>(new Set());
   const [loggingId, setLoggingId] = useState<string | null>(null);
+  const getAlertsEnabledFn = useServerFn(getAlertsEnabled);
+  const setAlertsEnabledFn = useServerFn(setAlertsEnabled);
+  const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
+  const [alertsSaving, setAlertsSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await getAlertsEnabledFn({});
+        setAlertsOn(!!r.enabled);
+      } catch { setAlertsOn(true); }
+    })();
+  }, [getAlertsEnabledFn]);
+
+  const toggleAlerts = useCallback(async () => {
+    if (alertsOn === null || alertsSaving) return;
+    const next = !alertsOn;
+    setAlertsSaving(true);
+    try {
+      await setAlertsEnabledFn({ data: { enabled: next } });
+      setAlertsOn(next);
+      toast.success(next ? "Alerts enabled · $0.20 will be charged per signal" : "Alerts disabled · no charges, no notifications");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not update alerts");
+    } finally {
+      setAlertsSaving(false);
+    }
+  }, [alertsOn, alertsSaving, setAlertsEnabledFn]);
+
 
   const takeTrade = async (a: FiredAlert) => {
     if (loggedIds.has(a.id) || loggingId) return;
