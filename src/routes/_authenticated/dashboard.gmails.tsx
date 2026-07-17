@@ -388,7 +388,7 @@ function MailPage() {
       <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-0 lg:gap-4 lg:p-4 h-full min-h-0">
 
         {/* Sidebar */}
-        <aside className="lg:w-56 shrink-0 lg:sticky lg:top-0 lg:self-start lg:h-full lg:max-h-none lg:overflow-y-auto px-3 py-4 lg:p-0 z-10">
+        <aside className="lg:w-56 shrink-0 lg:sticky lg:top-0 lg:self-start h-auto lg:h-full lg:max-h-none overflow-y-auto px-3 py-4 lg:p-0 z-10 shrink-0">
           <button
             onClick={() => setComposeOpen(true)}
             className="w-full flex items-center gap-2 justify-center bg-white text-gray-900 border border-gray-200 shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-full py-3 text-sm font-medium hover:shadow-md hover:bg-gray-50 transition mb-6"
