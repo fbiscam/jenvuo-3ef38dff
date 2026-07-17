@@ -14,9 +14,10 @@ import {
   ArrowLeft,
   RefreshCcw,
   Mail,
-  MailOpen,
   X,
   AtSign,
+  MoreVertical,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -41,11 +42,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/gmails")({
   component: MailPage,
 });
 
-const FOLDERS: { key: MailFolder; label: string; icon: any }[] = [
+type ViewKey = "inbox" | "starred" | "sent" | "archive";
+const FOLDERS: { key: ViewKey; label: string; icon: any }[] = [
   { key: "inbox", label: "Inbox", icon: InboxIcon },
+  { key: "starred", label: "Starred", icon: Star },
   { key: "sent", label: "Sent", icon: Send },
-  { key: "archive", label: "Archive", icon: Archive },
-  { key: "trash", label: "Trash", icon: Trash2 },
+  { key: "archive", label: "Archived", icon: Archive },
 ];
 
 function timeAgo(iso: string) {
