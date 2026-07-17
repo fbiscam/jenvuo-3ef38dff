@@ -248,6 +248,31 @@ function AlertPrefs() {
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> LIVE
             </span>
+            {alertsOn !== null && (
+              <button
+                onClick={toggleAlerts}
+                disabled={alertsSaving}
+                className={cn(
+                  "shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-[12px] font-medium border transition disabled:opacity-50",
+                  alertsOn
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
+                    : "bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100",
+                )}
+                title={alertsOn
+                  ? "Alerts ON · $0.20 charged per signal. Click to turn off."
+                  : "Alerts OFF · no notifications, no charges. Click to turn on."}
+              >
+                {alertsSaving ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : alertsOn ? (
+                  <Bell className="h-3.5 w-3.5" />
+                ) : (
+                  <BellOff className="h-3.5 w-3.5" />
+                )}
+                {alertsOn ? "Alerts ON" : "Alerts OFF"}
+              </button>
+            )}
+
             <select
               value={pairFilter}
               onChange={(e) => setPairFilter(e.target.value)}
