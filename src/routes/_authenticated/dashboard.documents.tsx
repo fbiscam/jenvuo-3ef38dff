@@ -55,6 +55,7 @@ function DocumentsPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<string>("");
+  const [pending, setPending] = useState<File[]>([]);
 
   const { data: row, isLoading } = useQuery<DocumentStatusRow | null>({
     queryKey: ["my-document-status"],
