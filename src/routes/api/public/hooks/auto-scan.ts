@@ -147,14 +147,18 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               continue;
             }
             const setupScore = Math.round(plan.setupScore ?? conf);
+            // Grade must reflect the displayed blended confidence, not the raw
+            // setup score — otherwise a 71% signal shows as grade "C".
+            const gradeBasis = Math.round(conf);
             const grade =
-              setupScore >= 90
+              gradeBasis >= 90
                 ? "A+"
-                : setupScore >= 80
+                : gradeBasis >= 80
                   ? "A"
-                  : setupScore >= 65
+                  : gradeBasis >= 65
                     ? "B"
                     : "C";
+
 
             const round = (n: number) => Number(n.toFixed(dec));
 
