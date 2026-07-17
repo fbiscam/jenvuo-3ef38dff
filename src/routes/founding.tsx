@@ -182,8 +182,9 @@ function FoundingPage() {
         </div>
       </section>
 
-      <section id="apply" className="mx-auto max-w-2xl px-5 pb-24">
-        <div className="rounded-3xl border border-zinc-200 bg-white p-7">
+      <section id="apply" className="mx-auto max-w-2xl px-5 pb-16 sm:pb-24">
+        <div className="rounded-3xl border border-zinc-200 bg-white p-5 sm:p-7">
+
           <h2 className="text-xl font-semibold">Apply for a founding seat</h2>
           <p className="mt-1.5 text-[13px] text-zinc-500">
             Applications reviewed within 48 hours. Only serious traders — please be honest.
