@@ -15,6 +15,7 @@ function sessionConfig() {
       httpOnly: true,
       secure: true,
       sameSite: "none" as const,
+      partitioned: true,
       path: "/",
     },
   };
