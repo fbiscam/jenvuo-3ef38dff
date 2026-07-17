@@ -190,7 +190,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `<p style="margin:0 0 12px">This month's 220 seats are filled, but your application looks strong — you're on the waitlist for the next cohort.</p>
            <p style="margin:0 0 12px">As soon as a seat opens (or the next month rolls over on the 1st), we'll email you to activate your <strong>${escapeHtml(meta.label)}</strong> plan.</p>
            <p style="margin:0">No action needed from your side. Sit tight.</p>`,
-          { label: "Explore the platform", href: `${APP_URL}/signal` },
+          { label: "Explore the platform", href: `${APP_URL}/explore` },
         ),
       };
     case "documents_received":
