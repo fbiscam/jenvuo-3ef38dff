@@ -50,6 +50,46 @@ function AlertPrefs() {
   const [alertsLoading, setAlertsLoading] = useState(true);
   const [pairFilter, setPairFilter] = useState<string>("ALL");
   const [visibleCount, setVisibleCount] = useState<number>(10);
+  const [loggedIds, setLoggedIds] = useState<Set<string>>(new Set());
+  const [loggingId, setLoggingId] = useState<string | null>(null);
+
+  const takeTrade = async (a: FiredAlert) => {
+    if (loggedIds.has(a.id) || loggingId) return;
+    setLoggingId(a.id);
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) {
+      toast.error("Sign in to log trades");
+      setLoggingId(null);
+      return;
+    }
+    const { error } = await supabase.from("trade_journal").insert({
+      user_id: u.user.id,
+      pair: a.pair,
+      direction: a.direction === "BUY" ? "long" : "short",
+      entry: a.entry,
+      stop_loss: a.sl,
+      take_profit: a.tp,
+      outcome: "pending",
+      notes: `Auto-logged from ${a.grade} alert · Conf ${a.confidence}%${a.session ? " · " + a.session : ""}`,
+    } as never);
+    setLoggingId(null);
+    if (error) {
+      const msg = String(error.message ?? "");
+      const code = String((error as { code?: string }).code ?? "");
+      const isPerm = code === "42501" || /row-level security|permission denied|policy/i.test(msg);
+      if (isPerm) {
+        toast.error("Trade Journal is a paid feature", {
+          description: "Upgrade to Pro or Elite to log and auto-track trades.",
+          action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+        });
+      } else {
+        toast.error("Could not log trade", { description: msg || "Please try again." });
+      }
+      return;
+    }
+    setLoggedIds((prev) => new Set(prev).add(a.id));
+    toast.success("Trade logged · auto-tracking win/loss");
+  };
 
   useEffect(() => {
     (async () => {
