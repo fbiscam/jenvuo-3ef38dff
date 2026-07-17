@@ -393,7 +393,7 @@ function AdminFoundingPage() {
                         onClick={() => markProfit(r.id)}
                         className="inline-flex items-center gap-1 rounded-lg bg-amber-500 px-2.5 py-1.5 text-[12px] font-medium text-white hover:bg-amber-600 disabled:opacity-50"
                       >
-                        Mark $100 profit → Active
+                        Fund {PLAN_AMOUNT[(r.requested_plan || "elite").toLowerCase()] || "$50"} ({(r.requested_plan || "elite").toUpperCase()}) → Active
                       </button>
                     )}
                     {r.status === "rejected" && (
