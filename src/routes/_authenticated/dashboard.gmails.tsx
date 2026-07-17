@@ -446,7 +446,6 @@ function MailPage() {
                 </>
               ) : (
                 <>
-                  <div className="w-px h-5 bg-gray-200 mx-1" />
                   <button
 
                     onClick={() => load()}
