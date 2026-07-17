@@ -299,7 +299,7 @@ function MailPage() {
                     <span
                       className={cn(
                         "text-[11px] px-1.5 py-0.5 rounded-full font-medium",
-                        active ? "bg-white text-black" : "bg-red-500 text-white",
+                        active ? "bg-red-500 text-white" : "bg-red-500 text-white",
                       )}
                     >
                       {unreadCount}
