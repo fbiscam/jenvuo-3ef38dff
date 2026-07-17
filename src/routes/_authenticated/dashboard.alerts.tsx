@@ -126,6 +126,38 @@ function AlertPrefs() {
     return () => { cancelled = true; supabase.removeChannel(channel); };
   }, []);
 
+  // Persist "Trade Done" state by cross-checking existing trade_journal rows
+  useEffect(() => {
+    if (alerts.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
+      const { data } = await supabase
+        .from("trade_journal")
+        .select("pair, entry, stop_loss, take_profit")
+        .eq("user_id", u.user.id)
+        .limit(500);
+      if (cancelled || !data) return;
+      const key = (p: string, e: number, s: number, t: number) =>
+        `${p}|${Number(e).toFixed(5)}|${Number(s).toFixed(5)}|${Number(t).toFixed(5)}`;
+      const set = new Set<string>(
+        (data as Array<{ pair: string; entry: number; stop_loss: number; take_profit: number }>).map((r) =>
+          key(r.pair, r.entry, r.stop_loss, r.take_profit),
+        ),
+      );
+      setLoggedIds((prev) => {
+        const next = new Set(prev);
+        for (const a of alerts) {
+          if (set.has(key(a.pair, a.entry, a.sl, a.tp))) next.add(a.id);
+        }
+        return next;
+      });
+    })();
+    return () => { cancelled = true; };
+  }, [alerts]);
+
+
 
   const save = async () => {
     setSaving(true);
