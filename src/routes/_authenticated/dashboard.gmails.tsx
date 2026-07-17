@@ -488,8 +488,9 @@ function MailPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {selected.sender_name || selected.sender_address}
+                      <div className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                        <span className="truncate">{selected.sender_name || selected.sender_address}</span>
+                        <VerifiedBadge tier={badges[selected.sender_address?.toLowerCase() ?? ""]} size={15} />
                       </div>
                       <div className="text-xs text-gray-500">
                         {selected.sender_address} → {selected.recipient_address}
