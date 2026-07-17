@@ -161,11 +161,11 @@ function AlertPrefs() {
           ) : alerts.length === 0 ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">No alerts have fired yet. Sit tight — the scanner runs every 15 minutes.</div>
           ) : (
-            <table className="w-full min-w-[720px] sm:min-w-0 text-sm">
+            <table className="w-full min-w-[780px] sm:min-w-0 text-sm">
               <thead className="bg-zinc-50 text-center font-mono text-[10px] uppercase tracking-wider text-zinc-500">
                 <tr>
-                  {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Time"].map((h) => (
-                    <th key={h} className="px-3 py-2 font-medium">{h}</th>
+                  {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Time", ""].map((h, i) => (
+                    <th key={i} className="px-3 py-2 font-medium">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -173,6 +173,8 @@ function AlertPrefs() {
                 {alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter).slice(0, visibleCount).map((a) => {
                   const isBuy = a.direction === "BUY";
                   const ago = relativeTime(new Date(a.fired_at));
+                  const logged = loggedIds.has(a.id);
+                  const busy = loggingId === a.id;
                   return (
                     <tr key={a.id} className="text-center hover:bg-zinc-50/60">
                       <td className="px-3 py-2.5">
@@ -193,6 +195,22 @@ function AlertPrefs() {
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-700">{a.rr}</td>
                       <td className="px-3 py-2.5 text-[11px] font-medium text-zinc-700">{a.confidence}%</td>
                       <td className="px-3 py-2.5 text-[10px] text-zinc-400 whitespace-nowrap">{ago}</td>
+                      <td className="px-3 py-2.5">
+                        <button
+                          type="button"
+                          disabled={logged || busy}
+                          onClick={() => takeTrade(a)}
+                          className={`inline-flex items-center justify-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-medium transition ${
+                            logged
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default"
+                              : isBuy
+                                ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                                : "bg-rose-600 text-white hover:bg-rose-700"
+                          } ${busy ? "opacity-70" : ""}`}
+                        >
+                          {logged ? "Logged" : busy ? "…" : "Trade Done"}
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -200,6 +218,7 @@ function AlertPrefs() {
             </table>
           )}
         </div>
+
         {(() => {
           const filtered = alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter);
           if (filtered.length <= visibleCount) return null;
