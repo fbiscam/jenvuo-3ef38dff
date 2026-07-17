@@ -132,7 +132,7 @@ function AdminDocumentsPage() {
           <p className="text-sm text-zinc-600 mt-1">Review uploads and approve or reject users' earning proof.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {["all", "received", "pending", "verified", "rejected"].map((s) => (
+          {["all", "received", "pending", "needs_info", "verified", "rejected"].map((s) => (
             <button
               key={s}
               onClick={() => setFilter(s)}
@@ -143,7 +143,7 @@ function AdminDocumentsPage() {
                   : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50",
               ].join(" ")}
             >
-              {s}
+              {s.replace("_", " ")}
             </button>
           ))}
         </div>
