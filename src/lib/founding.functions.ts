@@ -598,7 +598,7 @@ export const foundingStats = createServerFn({ method: "GET" }).handler(async () 
   const { data: rows } = await supa
     .from("founding_applications" as any)
     .select("id, seat_month, approved_at, created_at, status")
-    .in("status", ["approved", "active"]);
+    .in("status", ["approved", "active", "graduated", "verified"]);
   const filled = (rows ?? []).filter((r: any) => {
     if (r.seat_month === monthKey) return true;
     const ts = r.approved_at || r.created_at;
