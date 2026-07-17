@@ -132,7 +132,11 @@ function AlertPrefs() {
       }
       return;
     }
-    setLoggedIds((prev) => new Set(prev).add(a.id));
+    setLoggedIds((prev) => {
+      const next = new Set(prev).add(a.id);
+      persistLogged(next);
+      return next;
+    });
     toast.success("Trade logged · auto-tracking win/loss");
   };
 
