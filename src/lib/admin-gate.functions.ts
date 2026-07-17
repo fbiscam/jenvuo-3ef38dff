@@ -58,10 +58,10 @@ export const adminLogout = createServerFn({ method: "POST" }).handler(async () =
 });
 
 export const adminMe = createServerFn({ method: "GET" }).handler(async () => {
-  const session = await useSession<AdminSession>(sessionConfig());
+  // Login requirement disabled — always report unlocked.
   return {
-    unlocked: !!session.data.unlocked,
-    username: session.data.username ?? null,
+    unlocked: true,
+    username: "admin",
   };
 });
 
