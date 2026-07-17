@@ -98,7 +98,8 @@ type ApplicantEmailKind =
   | "funded"
   | "documents_received"
   | "documents_approved"
-  | "documents_rejected";
+  | "documents_rejected"
+  | "documents_needs_info";
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string) {
   const meta = PLAN_META[plan] || PLAN_META.elite;
@@ -222,10 +223,22 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Documents need an update, ${n}`,
           "Documents · Action Required",
-          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. Please re-upload updated documents at your earliest convenience.</p>
+          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. You can re-upload updated documents within the next <strong>24 hours</strong>.</p>
            <p style="margin:0 0 12px">If the admin left a reason, you'll see it on your Documents page. Common asks: a clearer screenshot, a fuller statement, or a screen-recording that shows the account name.</p>
            <p style="margin:0">Reply to this email if you need help.</p>`,
           { label: "Re-upload documents", href: `${APP_URL}/dashboard/documents` },
+        ),
+      };
+    case "documents_needs_info":
+      return {
+        subject: "We need a bit more info on your documents",
+        html: wrap(
+          `Quick follow-up, ${n}`,
+          "Documents · More Info Needed",
+          `<p style="margin:0 0 12px">Our reviewer looked at your earning-proof submission and needs a small update before it can be approved.</p>
+           <p style="margin:0 0 12px">Head to your Documents page — you'll see the exact note from the reviewer and can upload the missing piece there. No need to redo everything, just address the ask.</p>
+           <p style="margin:0">Reply to this email if anything is unclear.</p>`,
+          { label: "View reviewer note", href: `${APP_URL}/dashboard/documents` },
         ),
       };
   }
@@ -556,12 +569,14 @@ export type DocumentStatusRow = {
   email: string;
   status: string;
   requested_plan: string | null;
-  document_status: "not_submitted" | "received" | "pending" | "verified" | "rejected";
+  document_status: "not_submitted" | "received" | "pending" | "verified" | "rejected" | "needs_info";
   documents_submitted_at: string | null;
   documents_verified_at: string | null;
   documents_rejected_at: string | null;
   documents_rejected_reason: string | null;
   documents_note: string | null;
+  documents_info_request: string | null;
+  documents_info_requested_at: string | null;
   created_at: string;
 };
 
@@ -573,7 +588,7 @@ export const getMyDocumentStatus = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("founding_applications" as any)
       .select(
-        "id, full_name, email, status, requested_plan, document_status, documents_submitted_at, documents_verified_at, documents_rejected_at, documents_rejected_reason, documents_note, created_at",
+        "id, full_name, email, status, requested_plan, document_status, documents_submitted_at, documents_verified_at, documents_rejected_at, documents_rejected_reason, documents_note, documents_info_request, documents_info_requested_at, created_at",
       )
       .ilike("email", email)
       .order("created_at", { ascending: false })
@@ -625,8 +640,9 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z.object({
       id: z.string().uuid(),
-      document_status: z.enum(["not_submitted", "received", "pending", "verified", "rejected"]),
+      document_status: z.enum(["not_submitted", "received", "pending", "verified", "rejected", "needs_info"]),
       rejected_reason: z.string().max(1000).optional(),
+      info_request: z.string().max(1000).optional(),
       note: z.string().max(1000).optional(),
     }).parse(d),
   )
@@ -641,6 +657,10 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
     if (data.document_status === "rejected") {
       patch.documents_rejected_at = now;
       patch.documents_rejected_reason = data.rejected_reason ?? null;
+    }
+    if (data.document_status === "needs_info") {
+      patch.documents_info_request = data.info_request ?? null;
+      patch.documents_info_requested_at = now;
     }
     if (data.note !== undefined) patch.documents_note = data.note;
 
@@ -668,9 +688,11 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
           ? "documents_approved"
           : data.document_status === "rejected"
             ? "documents_rejected"
-            : data.document_status === "pending" || data.document_status === "received"
-              ? "documents_received"
-              : null;
+            : data.document_status === "needs_info"
+              ? "documents_needs_info"
+              : data.document_status === "pending" || data.document_status === "received"
+                ? "documents_received"
+                : null;
       if (kind) {
         try {
           await enqueueApplicantEmail(
@@ -731,7 +753,7 @@ async function getMyApplication(context: any) {
   const admin = await getServiceClient();
   const { data } = await admin
     .from("founding_applications" as any)
-    .select("id, email, full_name, requested_plan, document_status")
+    .select("id, email, full_name, requested_plan, document_status, documents_rejected_at")
     .ilike("email", email)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -756,6 +778,13 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
     if (!data.storage_path.startsWith(`${context.userId}/`)) {
       throw new Error("Invalid storage path");
     }
+    // 24-hour resubmission window after rejection
+    if (app.document_status === "rejected" && app.documents_rejected_at) {
+      const rejectedAt = new Date(app.documents_rejected_at).getTime();
+      if (Date.now() - rejectedAt > 24 * 60 * 60 * 1000) {
+        throw new Error("The 24-hour resubmission window has expired. Please contact support.");
+      }
+    }
     const admin = await getServiceClient();
     const { error } = await admin.from("founding_documents" as any).insert({
       application_id: app.id,
@@ -775,6 +804,8 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
           documents_submitted_at: new Date().toISOString(),
           documents_rejected_at: null,
           documents_rejected_reason: null,
+          documents_info_request: null,
+          documents_info_requested_at: null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", app.id);
@@ -835,6 +866,9 @@ export type AdminDocSubmission = {
   documents_submitted_at: string | null;
   documents_note: string | null;
   documents_rejected_reason: string | null;
+  documents_rejected_at: string | null;
+  documents_info_request: string | null;
+  documents_info_requested_at: string | null;
   files: FoundingDocFile[];
 };
 
@@ -846,7 +880,7 @@ export const adminListDocumentSubmissions = createServerFn({ method: "GET" })
     const { data: apps, error } = await admin
       .from("founding_applications" as any)
       .select(
-        "id, email, full_name, requested_plan, status, document_status, documents_submitted_at, documents_note, documents_rejected_reason",
+        "id, email, full_name, requested_plan, status, document_status, documents_submitted_at, documents_note, documents_rejected_reason, documents_rejected_at, documents_info_request, documents_info_requested_at",
       )
       .neq("document_status", "not_submitted")
       .order("documents_submitted_at", { ascending: false, nullsFirst: false })
@@ -877,6 +911,9 @@ export const adminListDocumentSubmissions = createServerFn({ method: "GET" })
       documents_submitted_at: a.documents_submitted_at,
       documents_note: a.documents_note,
       documents_rejected_reason: a.documents_rejected_reason,
+      documents_rejected_at: a.documents_rejected_at,
+      documents_info_request: a.documents_info_request,
+      documents_info_requested_at: a.documents_info_requested_at,
       files: byApp.get(a.id) ?? [],
     }));
   });

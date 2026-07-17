@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Check, X, Clock, FileImage, FileVideo, FileText } from "lucide-react";
+import { Check, X, Clock, FileImage, FileVideo, FileText, HelpCircle } from "lucide-react";
 import {
   adminListDocumentSubmissions,
   adminUpdateDocumentStatus,
@@ -23,6 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/documents"
 const STATUS_BADGES: Record<string, string> = {
   received: "bg-blue-50 text-blue-700 border-blue-200",
   pending: "bg-amber-50 text-amber-700 border-amber-200",
+  needs_info: "bg-violet-50 text-violet-700 border-violet-200",
   verified: "bg-emerald-50 text-emerald-700 border-emerald-200",
   rejected: "bg-rose-50 text-rose-700 border-rose-200",
 };
@@ -78,6 +79,8 @@ function AdminDocumentsPage() {
   const [filter, setFilter] = useState<string>("all");
   const [rejectFor, setRejectFor] = useState<string | null>(null);
   const [reason, setReason] = useState("");
+  const [infoFor, setInfoFor] = useState<string | null>(null);
+  const [infoMsg, setInfoMsg] = useState("");
 
   const { data: rows = [], isLoading, error } = useQuery<AdminDocSubmission[]>({
     queryKey: ["admin-doc-submissions"],
@@ -86,12 +89,18 @@ function AdminDocumentsPage() {
   });
 
   const mut = useMutation({
-    mutationFn: (input: { id: string; status: "verified" | "pending" | "rejected"; reason?: string }) =>
+    mutationFn: (input: {
+      id: string;
+      status: "verified" | "pending" | "rejected" | "needs_info";
+      reason?: string;
+      info?: string;
+    }) =>
       update({
         data: {
           id: input.id,
           document_status: input.status,
           rejected_reason: input.reason,
+          info_request: input.info,
         },
       } as any),
     onSuccess: (_r, vars) => {
@@ -100,10 +109,14 @@ function AdminDocumentsPage() {
           ? "Approved — user is now verified"
           : vars.status === "rejected"
           ? "Rejected"
+          : vars.status === "needs_info"
+          ? "Info request sent to user"
           : "Marked as under review",
       );
       setRejectFor(null);
       setReason("");
+      setInfoFor(null);
+      setInfoMsg("");
       qc.invalidateQueries({ queryKey: ["admin-doc-submissions"] });
     },
     onError: (e: any) => toast.error(e?.message || "Failed"),
@@ -119,7 +132,7 @@ function AdminDocumentsPage() {
           <p className="text-sm text-zinc-600 mt-1">Review uploads and approve or reject users' earning proof.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {["all", "received", "pending", "verified", "rejected"].map((s) => (
+          {["all", "received", "pending", "needs_info", "verified", "rejected"].map((s) => (
             <button
               key={s}
               onClick={() => setFilter(s)}
@@ -130,7 +143,7 @@ function AdminDocumentsPage() {
                   : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50",
               ].join(" ")}
             >
-              {s}
+              {s.replace("_", " ")}
             </button>
           ))}
         </div>
@@ -184,6 +197,12 @@ function AdminDocumentsPage() {
                   {row.documents_rejected_reason}
                 </div>
               )}
+              {row.document_status === "needs_info" && row.documents_info_request && (
+                <div className="mt-3 text-xs text-violet-700 bg-violet-50 rounded-lg p-3">
+                  <span className="font-semibold">Info requested: </span>
+                  {row.documents_info_request}
+                </div>
+              )}
 
               {row.files.length === 0 ? (
                 <div className="mt-4 text-xs text-zinc-500 italic">No files uploaded.</div>
@@ -212,6 +231,9 @@ function AdminDocumentsPage() {
                     placeholder="e.g. Screenshot is blurry — please re-upload a clearer version."
                     className="w-full rounded-lg border border-rose-200 bg-white p-2 text-sm outline-none min-h-[70px]"
                   />
+                  <div className="text-[11px] text-rose-700 mt-1">
+                    User will have 24 hours to re-upload after rejection.
+                  </div>
                   <div className="mt-2 flex gap-2">
                     <button
                       onClick={() =>
@@ -226,6 +248,41 @@ function AdminDocumentsPage() {
                       onClick={() => {
                         setRejectFor(null);
                         setReason("");
+                      }}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-700"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : infoFor === row.application_id ? (
+                <div className="mt-4 rounded-xl border border-violet-200 bg-violet-50 p-3">
+                  <div className="text-xs font-semibold text-violet-800 mb-2">
+                    What info do you need from the user? (shown to them)
+                  </div>
+                  <textarea
+                    value={infoMsg}
+                    onChange={(e) => setInfoMsg(e.target.value)}
+                    placeholder="e.g. Please share a screen recording that also shows the account name on your broker terminal."
+                    className="w-full rounded-lg border border-violet-200 bg-white p-2 text-sm outline-none min-h-[70px]"
+                  />
+                  <div className="text-[11px] text-violet-700 mt-1">
+                    User can respond and re-upload right away — status resets to Received on their next upload.
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      onClick={() =>
+                        mut.mutate({ id: row.application_id, status: "needs_info", info: infoMsg.trim() })
+                      }
+                      disabled={mut.isPending || !infoMsg.trim()}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
+                    >
+                      Send request
+                    </button>
+                    <button
+                      onClick={() => {
+                        setInfoFor(null);
+                        setInfoMsg("");
                       }}
                       className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-700"
                     >
@@ -248,6 +305,16 @@ function AdminDocumentsPage() {
                     className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50 inline-flex items-center gap-1"
                   >
                     <Clock className="h-3.5 w-3.5" /> Mark reviewing
+                  </button>
+                  <button
+                    onClick={() => {
+                      setInfoFor(row.application_id);
+                      setInfoMsg(row.documents_info_request || "");
+                    }}
+                    disabled={mut.isPending}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-violet-200 text-violet-700 hover:bg-violet-50 inline-flex items-center gap-1"
+                  >
+                    <HelpCircle className="h-3.5 w-3.5" /> Need info
                   </button>
                   <button
                     onClick={() => setRejectFor(row.application_id)}
