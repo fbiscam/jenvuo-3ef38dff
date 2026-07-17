@@ -640,8 +640,9 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z.object({
       id: z.string().uuid(),
-      document_status: z.enum(["not_submitted", "received", "pending", "verified", "rejected"]),
+      document_status: z.enum(["not_submitted", "received", "pending", "verified", "rejected", "needs_info"]),
       rejected_reason: z.string().max(1000).optional(),
+      info_request: z.string().max(1000).optional(),
       note: z.string().max(1000).optional(),
     }).parse(d),
   )
@@ -656,6 +657,10 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
     if (data.document_status === "rejected") {
       patch.documents_rejected_at = now;
       patch.documents_rejected_reason = data.rejected_reason ?? null;
+    }
+    if (data.document_status === "needs_info") {
+      patch.documents_info_request = data.info_request ?? null;
+      patch.documents_info_requested_at = now;
     }
     if (data.note !== undefined) patch.documents_note = data.note;
 
@@ -683,9 +688,11 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
           ? "documents_approved"
           : data.document_status === "rejected"
             ? "documents_rejected"
-            : data.document_status === "pending" || data.document_status === "received"
-              ? "documents_received"
-              : null;
+            : data.document_status === "needs_info"
+              ? "documents_needs_info"
+              : data.document_status === "pending" || data.document_status === "received"
+                ? "documents_received"
+                : null;
       if (kind) {
         try {
           await enqueueApplicantEmail(
