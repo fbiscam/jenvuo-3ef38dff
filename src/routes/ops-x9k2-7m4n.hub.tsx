@@ -165,33 +165,52 @@ function OpsHub() {
             ))}
           </div>
         ) : (
-          /* Embedded section */
-          <div className="mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_24px_60px_-24px_rgba(0,0,0,0.08)]">
-            <div className="flex items-center gap-2 border-b border-zinc-100 px-4 py-2">
-              <span className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-400`}>
-                embedded · {active.to}
-              </span>
-              <a
-                href={active.to}
-                target="_blank"
-                rel="noreferrer"
-                className={`${MONO} ml-auto text-[10px] uppercase tracking-[0.22em] text-zinc-500 hover:text-zinc-900`}
+          /* Fullscreen embedded section */
+          <div className="fixed inset-0 z-50 flex flex-col bg-white">
+            <div className="flex items-center gap-3 border-b border-zinc-200 bg-white px-4 py-2.5">
+              <button
+                onClick={() => setActive(null)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50"
               >
-                open in new tab ↗
-              </a>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+                Back
+              </button>
+              <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded-md object-contain" />
+              <div className="flex flex-col leading-tight">
+                <span className="text-[13px] font-semibold text-zinc-900">{active.title}</span>
+                <span className={`${MONO} text-[9px] uppercase tracking-[0.22em] text-zinc-400`}>{active.to}</span>
+              </div>
+              <div className="ml-auto flex items-center gap-2">
+                <a
+                  href={active.to}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500 hover:text-zinc-900`}
+                >
+                  open in new tab ↗
+                </a>
+                <button
+                  onClick={onLock}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50"
+                >
+                  Lock
+                </button>
+              </div>
             </div>
             <iframe
               key={active.key}
               src={active.to}
               title={active.title}
-              className="h-[calc(100dvh-260px)] min-h-[560px] w-full bg-white"
+              className="h-full w-full flex-1 bg-white"
             />
           </div>
         )}
 
         {!active && (
           <p className={`${MONO} mt-8 text-center text-[10px] uppercase tracking-[0.22em] text-zinc-400`}>
-            Sections open embedded inside the hub · admin session still required
+            Sections open fullscreen inside the hub
           </p>
         )}
       </main>
