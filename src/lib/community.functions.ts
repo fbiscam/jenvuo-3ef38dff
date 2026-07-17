@@ -33,6 +33,7 @@ export type CommunityPostRow = {
   like_count: number;
   reply_count: number;
   repost_count: number;
+  bookmark_count: number;
   view_count: number;
   liked_by_me: boolean;
   reposted_by_me: boolean;
