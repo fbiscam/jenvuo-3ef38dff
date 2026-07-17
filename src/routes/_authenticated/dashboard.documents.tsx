@@ -55,6 +55,7 @@ function DocumentsPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<string>("");
+  const [pending, setPending] = useState<File[]>([]);
 
   const { data: row, isLoading } = useQuery<DocumentStatusRow | null>({
     queryKey: ["my-document-status"],
@@ -92,20 +93,36 @@ function DocumentsPage() {
     onError: (e: any) => toast.error(e?.message || "Could not remove"),
   });
 
-  async function handleFiles(list: FileList | null) {
-    if (!list || !list.length || !row) return;
+  function handleFiles(list: FileList | null) {
+    if (!list || !list.length) return;
+    const accepted: File[] = [];
+    for (const file of Array.from(list)) {
+      if (file.size > MAX_BYTES) {
+        toast.error(`${file.name} exceeds 100 MB`);
+        continue;
+      }
+      accepted.push(file);
+    }
+    if (accepted.length) {
+      setPending((prev) => [...prev, ...accepted]);
+    }
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  function removePending(idx: number) {
+    setPending((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  async function submitPending() {
+    if (!pending.length || !row) return;
     setUploading(true);
     try {
       const { data: session } = await supabase.auth.getUser();
       const uid = session?.user?.id;
       if (!uid) throw new Error("Not signed in");
       let done = 0;
-      for (const file of Array.from(list)) {
-        if (file.size > MAX_BYTES) {
-          toast.error(`${file.name} exceeds 100 MB`);
-          continue;
-        }
-        setProgress(`Uploading ${++done}/${list.length}: ${file.name}`);
+      for (const file of pending) {
+        setProgress(`Uploading ${++done}/${pending.length}: ${file.name}`);
         const safe = file.name.replace(/[^\w.\-]+/g, "_").slice(-80);
         const path = `${uid}/${row.id}/${Date.now()}-${safe}`;
         const { error: upErr } = await supabase.storage
@@ -124,7 +141,8 @@ function DocumentsPage() {
           },
         } as any);
       }
-      toast.success("Upload complete");
+      toast.success("Submitted for review");
+      setPending([]);
       qc.invalidateQueries({ queryKey: ["my-document-files"] });
       qc.invalidateQueries({ queryKey: ["my-document-status"] });
     } catch (e: any) {
@@ -132,7 +150,6 @@ function DocumentsPage() {
     } finally {
       setUploading(false);
       setProgress("");
-      if (inputRef.current) inputRef.current.value = "";
     }
   }
 
@@ -275,6 +292,46 @@ function DocumentsPage() {
                   onChange={(e) => handleFiles(e.target.files)}
                   className="hidden"
                 />
+              </div>
+
+              {pending.length > 0 && (
+                <div className="mt-4 rounded-xl border border-zinc-200 bg-white">
+                  <div className="px-4 py-2 text-xs font-semibold text-zinc-700 border-b border-zinc-100">
+                    Ready to submit ({pending.length})
+                  </div>
+                  <ul className="divide-y divide-zinc-100">
+                    {pending.map((f, i) => (
+                      <li key={`${f.name}-${i}`} className="flex items-center gap-3 px-4 py-2 text-sm">
+                        <FileIcon mime={f.type || ""} />
+                        <div className="flex-1 min-w-0">
+                          <div className="truncate text-zinc-900">{f.name}</div>
+                          <div className="text-xs text-zinc-500">{fmtSize(f.size)}</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removePending(i)}
+                          disabled={uploading}
+                          className="text-zinc-400 hover:text-red-600 disabled:opacity-40"
+                          aria-label="Remove"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="mt-4 flex items-center justify-end gap-3">
+                {uploading && <div className="text-xs text-zinc-500">{progress}</div>}
+                <button
+                  type="button"
+                  onClick={submitPending}
+                  disabled={pending.length === 0 || uploading}
+                  className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {uploading ? "Submitting…" : `Submit${pending.length ? ` (${pending.length})` : ""}`}
+                </button>
               </div>
             </div>
           )}
