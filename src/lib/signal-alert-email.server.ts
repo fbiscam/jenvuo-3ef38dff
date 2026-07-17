@@ -30,7 +30,12 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
     .select('user_id')
     .eq('status', 'active')
     .neq('plan_id', 'free')
-  const paidIds = Array.from(new Set((paidRows ?? []).map((r: { user_id: string }) => r.user_id)))
+  let paidIds = Array.from(new Set((paidRows ?? []).map((r: { user_id: string }) => r.user_id)))
+  if (paidIds.length === 0) return { enqueued: 0 }
+
+  // Exclude users who turned alerts off on the signal page.
+  const { filterAlertsEnabledUserIds } = await import('@/lib/alert-pref-filter.server')
+  paidIds = await filterAlertsEnabledUserIds(paidIds)
   if (paidIds.length === 0) return { enqueued: 0 }
 
   const { data: users } = (await supabaseAdmin
