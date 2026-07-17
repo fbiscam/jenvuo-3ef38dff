@@ -75,6 +75,12 @@ function ResetPasswordPage() {
       setError(upErr.message);
       return;
     }
+    // Fire the "You're in — plan activates in 4 hours" email for founding users.
+    // Best-effort: don't block the flow on failure.
+    try {
+      const { notifyFoundingPasswordSet } = await import("@/lib/founding.functions");
+      await notifyFoundingPasswordSet();
+    } catch {}
     // Sign out from every device (including this one) so the user re-logs in with
     // the new password everywhere.
     await supabase.auth.signOut({ scope: "global" }).catch(() => {});
