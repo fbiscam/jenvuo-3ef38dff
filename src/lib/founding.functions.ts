@@ -223,10 +223,22 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Documents need an update, ${n}`,
           "Documents · Action Required",
-          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. Please re-upload updated documents at your earliest convenience.</p>
+          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. You can re-upload updated documents within the next <strong>24 hours</strong>.</p>
            <p style="margin:0 0 12px">If the admin left a reason, you'll see it on your Documents page. Common asks: a clearer screenshot, a fuller statement, or a screen-recording that shows the account name.</p>
            <p style="margin:0">Reply to this email if you need help.</p>`,
           { label: "Re-upload documents", href: `${APP_URL}/dashboard/documents` },
+        ),
+      };
+    case "documents_needs_info":
+      return {
+        subject: "We need a bit more info on your documents",
+        html: wrap(
+          `Quick follow-up, ${n}`,
+          "Documents · More Info Needed",
+          `<p style="margin:0 0 12px">Our reviewer looked at your earning-proof submission and needs a small update before it can be approved.</p>
+           <p style="margin:0 0 12px">Head to your Documents page — you'll see the exact note from the reviewer and can upload the missing piece there. No need to redo everything, just address the ask.</p>
+           <p style="margin:0">Reply to this email if anything is unclear.</p>`,
+          { label: "View reviewer note", href: `${APP_URL}/dashboard/documents` },
         ),
       };
   }
