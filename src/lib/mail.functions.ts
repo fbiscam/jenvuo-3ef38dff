@@ -19,17 +19,41 @@ export type MailListItem = {
   sender_avatar: string | null;
 };
 
+export type MailAddress = {
+  address: string;
+  local_part: string;
+  is_primary: boolean;
+  created_at: string;
+};
+
 export const getMyMailAddress = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("mail_addresses")
-      .select("address, local_part, created_at")
+      .select("address, local_part, created_at, is_primary")
       .eq("user_id", context.userId)
-      .maybeSingle();
+      .order("is_primary", { ascending: false })
+      .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
-    return data;
+    const rows = (data ?? []) as MailAddress[];
+    const primary = rows.find((r) => r.is_primary) ?? rows[0] ?? null;
+    return primary ? { ...primary, all: rows } : null;
   });
+
+export const listMyMailAddresses = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<MailAddress[]> => {
+    const { data, error } = await context.supabase
+      .from("mail_addresses")
+      .select("address, local_part, created_at, is_primary")
+      .eq("user_id", context.userId)
+      .order("is_primary", { ascending: false })
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    return (data ?? []) as MailAddress[];
+  });
+
 
 export const claimMailAddress = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
