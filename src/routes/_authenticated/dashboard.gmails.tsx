@@ -570,7 +570,7 @@ function MailPage() {
                 </>
               )}
             </div>
-            <div className="relative">
+            <div className="relative lg:w-[360px] lg:border-r lg:border-gray-200 lg:pr-4">
               <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 value={query}
