@@ -27,6 +27,7 @@ import {
   claimMailAddress,
   checkUsernameAvailable,
   listMail,
+  listMyMailAddresses,
   sendMail,
   setMailState,
   searchMailDirectory,
@@ -34,8 +35,10 @@ import {
   type MailFolder,
   type MailListItem,
   type MailBadgeTier,
+  type MailAddress,
 } from "@/lib/mail.functions";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/gmails")({
   head: () => ({
@@ -75,6 +78,7 @@ function initials(name?: string | null, address?: string) {
 
 function MailPage() {
   const _getAddr = useServerFn(getMyMailAddress);
+  const _listAddrs = useServerFn(listMyMailAddresses);
   const _claim = useServerFn(claimMailAddress);
   const _check = useServerFn(checkUsernameAvailable);
   const _list = useServerFn(listMail);
@@ -84,6 +88,12 @@ function MailPage() {
   const _badges = useServerFn(getMailBadges);
 
   const [myAddress, setMyAddress] = useState<string | null>(null);
+  const [myAddresses, setMyAddresses] = useState<MailAddress[]>([]);
+  const [activeAddress, setActiveAddress] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return window.localStorage.getItem("mail:active_address");
+  });
+  const [addrSwitchOpen, setAddrSwitchOpen] = useState(false);
   const [claiming, setClaiming] = useState(false);
   const [claimVal, setClaimVal] = useState("");
   const [claimStatus, setClaimStatus] = useState<"" | "ok" | "taken" | "invalid" | "checking">("");
@@ -103,21 +113,35 @@ function MailPage() {
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const [addr, rows] = await Promise.all([
+      const [addr, addrs, rows] = await Promise.all([
         _getAddr({}),
+        _listAddrs({}).catch(() => [] as MailAddress[]),
         _list({ data: { folder } }).catch(() => []),
       ]);
-      setMyAddress((addr as any)?.address ?? null);
+      const primary = (addr as any)?.address ?? null;
+      setMyAddress(primary);
+      setMyAddresses(addrs as MailAddress[]);
+      setActiveAddress((prev) => {
+        if (prev && (addrs as MailAddress[]).some((a) => a.address === prev)) return prev;
+        return primary;
+      });
       setMessages(rows as MailListItem[]);
     } finally {
       setLoading(false);
       setReady(true);
     }
-  }, [folder, _getAddr, _list]);
+  }, [folder, _getAddr, _listAddrs, _list]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (activeAddress && typeof window !== "undefined") {
+      window.localStorage.setItem("mail:active_address", activeAddress);
+    }
+  }, [activeAddress]);
+
 
   // Fetch verification badges for every address currently on screen
   useEffect(() => {
@@ -159,6 +183,15 @@ function MailPage() {
 
   const filtered = useMemo(() => {
     let list = messages;
+    // Scope to the selected mailbox when the user owns more than one
+    if (activeAddress && myAddresses.length > 1) {
+      const a = activeAddress.toLowerCase();
+      list = list.filter((m) =>
+        folder === "sent"
+          ? m.sender_address?.toLowerCase() === a
+          : m.recipient_address?.toLowerCase() === a,
+      );
+    }
     if (view === "starred") list = list.filter((m) => m.is_starred);
     if (!query.trim()) return list;
     const q = query.toLowerCase();
@@ -170,9 +203,16 @@ function MailPage() {
         m.recipient_address.toLowerCase().includes(q) ||
         (m.sender_name ?? "").toLowerCase().includes(q),
     );
-  }, [messages, query, view]);
+  }, [messages, query, view, activeAddress, myAddresses, folder]);
 
-  const unreadCount = messages.filter((m) => !m.is_read && m.folder === "inbox").length;
+  const unreadCount = messages.filter((m) => {
+    if (m.is_read || m.folder !== "inbox") return false;
+    if (activeAddress && myAddresses.length > 1) {
+      return m.recipient_address?.toLowerCase() === activeAddress.toLowerCase();
+    }
+    return true;
+  }).length;
+
 
   const openMessage = async (m: MailListItem) => {
     setSelected(m);
@@ -354,6 +394,36 @@ function MailPage() {
           >
             <Pencil className="w-4 h-4 text-gray-700" /> Compose
           </button>
+
+          {myAddresses.length > 1 && (
+            <div className="relative mb-4">
+              <button
+                onClick={() => setAddrSwitchOpen((v) => !v)}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-left"
+              >
+                <div className="min-w-0">
+                  <div className="text-[10px] uppercase tracking-wide text-gray-400">Mailbox</div>
+                  <div className="text-sm text-gray-900 truncate">{activeAddress}</div>
+                </div>
+                <svg className={`w-4 h-4 text-gray-500 transition ${addrSwitchOpen ? "rotate-180" : ""}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd"/></svg>
+              </button>
+              {addrSwitchOpen && (
+                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                  {myAddresses.map((a) => (
+                    <button
+                      key={a.address}
+                      onClick={() => { setActiveAddress(a.address); setAddrSwitchOpen(false); setSelected(null); }}
+                      className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between hover:bg-gray-50 ${activeAddress === a.address ? "bg-gray-50" : ""}`}
+                    >
+                      <span className="truncate">{a.address}</span>
+                      {a.is_primary && <span className="text-[10px] text-gray-400 ml-2">primary</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <nav className="space-y-1.5">
             {FOLDERS.map((f) => {
               const Icon = f.icon;
@@ -677,7 +747,7 @@ function MailPage() {
                   <div className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
                     {selected.body}
                   </div>
-                  {selected.sender_address !== myAddress && (
+                  {!myAddresses.some((a) => a.address === selected.sender_address) && (
                     <div className="mt-6 pt-4 border-t border-gray-200">
                       <button
                         onClick={() => setComposeOpen(true)}
@@ -697,10 +767,10 @@ function MailPage() {
       {composeOpen && (
         <ComposeModal
           onClose={() => setComposeOpen(false)}
-          myAddress={myAddress}
-          replyTo={selected && selected.sender_address !== myAddress ? selected : null}
+          myAddress={activeAddress ?? myAddress}
+          replyTo={selected && !myAddresses.some((a) => a.address === selected.sender_address) ? selected : null}
           onSend={async ({ to, subject, body }) => {
-            await _send({ data: { to, subject, body } });
+            await _send({ data: { to, subject, body, from: activeAddress ?? undefined } });
             setComposeOpen(false);
             toast.success("Message sent");
             if (folder === "sent") load();
@@ -711,6 +781,7 @@ function MailPage() {
           }}
         />
       )}
+
     </div>
   );
 }
