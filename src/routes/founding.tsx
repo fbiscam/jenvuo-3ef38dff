@@ -60,7 +60,7 @@ function FoundingPage() {
   const remaining = Math.max(0, seats.total - seats.filled);
   const pct = Math.min(100, Math.round((seats.filled / seats.total) * 100));
 
-  const [plan, setPlan] = React.useState<"free" | "pro" | "elite" | "ultra">("elite");
+  const [plan, setPlan] = React.useState<"pro" | "elite" | "ultra">("elite");
   const [refEmail, setRefEmail] = React.useState<string>("");
 
   React.useEffect(() => {
