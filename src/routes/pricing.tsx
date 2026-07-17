@@ -193,10 +193,9 @@ function PricingPage() {
           <table className="w-full min-w-[760px] text-sm border-collapse">
             <colgroup>
               <col className="w-[28%]" />
-              <col className={`w-[18%] ${currentPlan === "free" ? "bg-emerald-50/50" : ""}`} />
-              <col className={`w-[18%] ${currentPlan === "pro" ? "bg-emerald-50/50" : "bg-amber-50/40"}`} />
-              <col className={`w-[18%] ${currentPlan === "elite" ? "bg-emerald-50/50" : ""}`} />
-              <col className={`w-[18%] ${currentPlan === "ultra" ? "bg-emerald-50/50" : ""}`} />
+              <col className={`w-[24%] ${currentPlan === "pro" ? "bg-emerald-50/50" : "bg-amber-50/40"}`} />
+              <col className={`w-[24%] ${currentPlan === "elite" ? "bg-emerald-50/50" : ""}`} />
+              <col className={`w-[24%] ${currentPlan === "ultra" ? "bg-emerald-50/50" : ""}`} />
             </colgroup>
 
             <thead>
@@ -205,7 +204,6 @@ function PricingPage() {
                   <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                 </th>
                 {[
-                  { name: "Free", price: "$0", tag: "Curious", to: "/founding" as const, dark: false, key: "free" },
                   { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", to: "/founding" as const, dark: false, accent: true, key: "pro" },
                   { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", to: "/founding" as const, dark: true, key: "elite" },
                   { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", to: "/founding" as const, dark: false, key: "ultra" },
@@ -282,24 +280,24 @@ function PricingPage() {
 
             <tbody>
               {([
-                { f: "AFTER RAISING $100 IN REVENUE - PRICING", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
-                { f: "Monthly wallet (USD)", a: "$2", b: "$15", c: "$50", d: "$100" },
-                
-                { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+                { f: "AFTER RAISING $100 IN REVENUE - PRICING", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
+                { f: "Monthly wallet (USD)", b: "$15", c: "$50", d: "$100" },
 
-                { f: "Signal latency", a: "No alerts", b: "Realtime", c: "Realtime", d: "Realtime" },
-                { f: "AI models", a: "__MODELS_PLUS__", b: "__MODELS_PLUS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },
-                { f: "A+ signal access", a: true, b: true, c: true, d: true },
-                { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
-                { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
-                { f: "Trade journal", a: true, b: true, c: true, d: true },
-                { f: "Email + push alerts", a: false, b: true, c: true, d: true },
-                { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
-                
-                { f: "Custom alert rules", a: false, b: false, c: true, d: true },
-                
-                { f: "Priority desk support", a: false, b: false, c: false, d: true },
-              ] as ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }>).map((row, idx) => (
+                { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+
+                { f: "Signal latency", b: "Realtime", c: "Realtime", d: "Realtime" },
+                { f: "AI models", b: "__MODELS_PLUS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },
+                { f: "A+ signal access", b: true, c: true, d: true },
+                { f: "ICT / SMC narration", b: true, c: true, d: true },
+                { f: "Multi-timeframe bias", b: true, c: true, d: true },
+                { f: "Trade journal", b: true, c: true, d: true },
+                { f: "Email + push alerts", b: true, c: true, d: true },
+                { f: "Multi-pair scanner", b: false, c: true, d: true, badge: "new" },
+
+                { f: "Custom alert rules", b: false, c: true, d: true },
+
+                { f: "Priority desk support", b: false, c: false, d: true },
+              ] as ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }>).map((row, idx) => (
                 <tr
                   key={row.f}
                   className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
@@ -316,13 +314,13 @@ function PricingPage() {
                       </span>
                     </div>
                   </td>
-                  {[row.a, row.b, row.c, row.d].map((v, i) => {
-                    const colKey = (["free", "pro", "elite", "ultra"] as const)[i];
+                  {[row.b, row.c, row.d].map((v, i) => {
+                    const colKey = (["pro", "elite", "ultra"] as const)[i];
                     const isCurrentCol = currentPlan === colKey;
                     return (
                     <td
                       key={i}
-                      className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${isCurrentCol ? "bg-emerald-50/60" : i === 1 ? "bg-amber-50/40" : ""}`}
+                      className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${isCurrentCol ? "bg-emerald-50/60" : i === 0 ? "bg-amber-50/40" : ""}`}
                     >
                       {v === true ? (
                         <span className={`inline-block h-1.5 w-1.5 rounded-full ${isCurrentCol ? "bg-emerald-600" : "bg-zinc-900"}`} />
