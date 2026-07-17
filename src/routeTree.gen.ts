@@ -36,6 +36,7 @@ import { Route as AiEngineRouteImport } from './routes/ai-engine'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.index'
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
@@ -214,6 +215,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const OpsX9k27m4nIndexRoute = OpsX9k27m4nIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
 const JenvuOpsX9k2IndexRoute = JenvuOpsX9k2IndexRouteImport.update({
   id: '/',
@@ -498,6 +504,7 @@ export interface FileRoutesByFullPath {
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
+  '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -549,7 +556,6 @@ export interface FileRoutesByTo {
   '/founding': typeof FoundingRoute
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
-  '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
@@ -567,6 +573,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
+  '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -641,6 +648,7 @@ export interface FileRoutesById {
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
+  '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -715,6 +723,7 @@ export interface FileRouteTypes {
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
+    | '/ops-x9k2-7m4n/'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -766,7 +775,6 @@ export interface FileRouteTypes {
     | '/founding'
     | '/killzones'
     | '/llm'
-    | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
     | '/refund'
@@ -784,6 +792,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
+    | '/ops-x9k2-7m4n'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -857,6 +866,7 @@ export interface FileRouteTypes {
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
+    | '/ops-x9k2-7m4n/'
     | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
@@ -1132,6 +1142,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/ops-x9k2-7m4n/': {
+      id: '/ops-x9k2-7m4n/'
+      path: '/'
+      fullPath: '/ops-x9k2-7m4n/'
+      preLoaderRoute: typeof OpsX9k27m4nIndexRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
     }
     '/jenvu-ops-x9k2/': {
       id: '/jenvu-ops-x9k2/'
@@ -1542,10 +1559,12 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
 
 interface OpsX9k27m4nRouteChildren {
   OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
+  OpsX9k27m4nIndexRoute: typeof OpsX9k27m4nIndexRoute
 }
 
 const OpsX9k27m4nRouteChildren: OpsX9k27m4nRouteChildren = {
   OpsX9k27m4nHubRoute: OpsX9k27m4nHubRoute,
+  OpsX9k27m4nIndexRoute: OpsX9k27m4nIndexRoute,
 }
 
 const OpsX9k27m4nRouteWithChildren = OpsX9k27m4nRoute._addFileChildren(
