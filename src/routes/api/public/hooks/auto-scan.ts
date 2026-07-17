@@ -141,11 +141,16 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const entry = Number(plan.trade?.entry);
             const sl = Number(plan.trade?.sl);
             const tp = Number(plan.trade?.tp1 ?? plan.trade?.tp);
-            const rr = Number(plan.trade?.rr ?? 0);
             if (!isFinite(entry) || !isFinite(sl) || !isFinite(tp)) {
               results.push({ pair, action: "invalid_levels" });
               continue;
             }
+            // Always compute R:R from actual entry/SL/TP distances — never trust
+            // upstream `plan.trade.rr`, which has produced inflated values
+            // (e.g. reporting 3.0 when SL/TP are symmetric ~1:1).
+            const riskDist = Math.abs(entry - sl);
+            const rewardDist = Math.abs(tp - entry);
+            const rr = riskDist > 0 ? rewardDist / riskDist : 0;
             const setupScore = Math.round(plan.setupScore ?? conf);
             // Grade must reflect the displayed blended confidence, not the raw
             // setup score — otherwise a 71% signal shows as grade "C".
