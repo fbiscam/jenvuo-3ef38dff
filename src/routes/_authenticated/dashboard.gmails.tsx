@@ -120,7 +120,7 @@ function MailPage() {
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "mail_message_state", filter: `user_id=eq.${uid}` },
-          () => load(),
+          () => load(true),
         )
         .subscribe();
     })();
