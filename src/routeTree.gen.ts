@@ -56,6 +56,7 @@ import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardSecurityRouteImport } from './routes/_authenticated/dashboard.security'
 import { Route as AuthenticatedDashboardReferralsRouteImport } from './routes/_authenticated/dashboard.referrals'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
+import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
 import { Route as AuthenticatedDashboardCommunityRouteImport } from './routes/_authenticated/dashboard.community'
@@ -323,6 +324,12 @@ const AuthenticatedDashboardProfileRoute =
     path: '/profile',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardNotificationsRoute =
+  AuthenticatedDashboardNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardJournalRoute =
   AuthenticatedDashboardJournalRouteImport.update({
     id: '/journal',
@@ -518,6 +525,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/community': typeof AuthenticatedDashboardCommunityRouteWithChildren
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
@@ -589,6 +597,7 @@ export interface FileRoutesByTo {
   '/dashboard/community': typeof AuthenticatedDashboardCommunityRouteWithChildren
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
@@ -665,6 +674,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/community': typeof AuthenticatedDashboardCommunityRouteWithChildren
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/_authenticated/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
@@ -741,6 +751,7 @@ export interface FileRouteTypes {
     | '/dashboard/community'
     | '/dashboard/documents'
     | '/dashboard/journal'
+    | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/referrals'
     | '/dashboard/security'
@@ -812,6 +823,7 @@ export interface FileRouteTypes {
     | '/dashboard/community'
     | '/dashboard/documents'
     | '/dashboard/journal'
+    | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/referrals'
     | '/dashboard/security'
@@ -887,6 +899,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/community'
     | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/journal'
+    | '/_authenticated/dashboard/notifications'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/referrals'
     | '/_authenticated/dashboard/security'
@@ -1299,6 +1312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardProfileRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/notifications': {
+      id: '/_authenticated/dashboard/notifications'
+      path: '/notifications'
+      fullPath: '/dashboard/notifications'
+      preLoaderRoute: typeof AuthenticatedDashboardNotificationsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/journal': {
       id: '/_authenticated/dashboard/journal'
       path: '/journal'
@@ -1509,6 +1529,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardCommunityRoute: typeof AuthenticatedDashboardCommunityRouteWithChildren
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
+  AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
   AuthenticatedDashboardSecurityRoute: typeof AuthenticatedDashboardSecurityRoute
@@ -1532,6 +1553,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardCommunityRouteWithChildren,
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
+    AuthenticatedDashboardNotificationsRoute:
+      AuthenticatedDashboardNotificationsRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
     AuthenticatedDashboardReferralsRoute: AuthenticatedDashboardReferralsRoute,
     AuthenticatedDashboardSecurityRoute: AuthenticatedDashboardSecurityRoute,
