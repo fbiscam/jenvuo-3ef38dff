@@ -267,7 +267,7 @@ export function TwoFactorSettings() {
   return (
     <div className="mt-5 rounded-xl border border-zinc-200 bg-white p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-        <Shield className="h-5 w-5 shrink-0 text-zinc-500 sm:mt-0.5" />
+        
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-zinc-900">Two-factor authentication</p>
           <p className="mt-1 text-xs text-zinc-500">Require a 6-digit code from an authenticator app on every sign-in.</p>
