@@ -50,6 +50,46 @@ function AlertPrefs() {
   const [alertsLoading, setAlertsLoading] = useState(true);
   const [pairFilter, setPairFilter] = useState<string>("ALL");
   const [visibleCount, setVisibleCount] = useState<number>(10);
+  const [loggedIds, setLoggedIds] = useState<Set<string>>(new Set());
+  const [loggingId, setLoggingId] = useState<string | null>(null);
+
+  const takeTrade = async (a: FiredAlert) => {
+    if (loggedIds.has(a.id) || loggingId) return;
+    setLoggingId(a.id);
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) {
+      toast.error("Sign in to log trades");
+      setLoggingId(null);
+      return;
+    }
+    const { error } = await supabase.from("trade_journal").insert({
+      user_id: u.user.id,
+      pair: a.pair,
+      direction: a.direction === "BUY" ? "long" : "short",
+      entry: a.entry,
+      stop_loss: a.sl,
+      take_profit: a.tp,
+      outcome: "pending",
+      notes: `Auto-logged from ${a.grade} alert · Conf ${a.confidence}%${a.session ? " · " + a.session : ""}`,
+    } as never);
+    setLoggingId(null);
+    if (error) {
+      const msg = String(error.message ?? "");
+      const code = String((error as { code?: string }).code ?? "");
+      const isPerm = code === "42501" || /row-level security|permission denied|policy/i.test(msg);
+      if (isPerm) {
+        toast.error("Trade Journal is a paid feature", {
+          description: "Upgrade to Pro or Elite to log and auto-track trades.",
+          action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+        });
+      } else {
+        toast.error("Could not log trade", { description: msg || "Please try again." });
+      }
+      return;
+    }
+    setLoggedIds((prev) => new Set(prev).add(a.id));
+    toast.success("Trade logged · auto-tracking win/loss");
+  };
 
   useEffect(() => {
     (async () => {
@@ -161,11 +201,11 @@ function AlertPrefs() {
           ) : alerts.length === 0 ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">No alerts have fired yet. Sit tight — the scanner runs every 15 minutes.</div>
           ) : (
-            <table className="w-full min-w-[720px] sm:min-w-0 text-sm">
+            <table className="w-full min-w-[780px] sm:min-w-0 text-sm">
               <thead className="bg-zinc-50 text-center font-mono text-[10px] uppercase tracking-wider text-zinc-500">
                 <tr>
-                  {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Time"].map((h) => (
-                    <th key={h} className="px-3 py-2 font-medium">{h}</th>
+                  {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Time", ""].map((h, i) => (
+                    <th key={i} className="px-3 py-2 font-medium">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -173,6 +213,8 @@ function AlertPrefs() {
                 {alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter).slice(0, visibleCount).map((a) => {
                   const isBuy = a.direction === "BUY";
                   const ago = relativeTime(new Date(a.fired_at));
+                  const logged = loggedIds.has(a.id);
+                  const busy = loggingId === a.id;
                   return (
                     <tr key={a.id} className="text-center hover:bg-zinc-50/60">
                       <td className="px-3 py-2.5">
@@ -193,6 +235,22 @@ function AlertPrefs() {
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-700">{a.rr}</td>
                       <td className="px-3 py-2.5 text-[11px] font-medium text-zinc-700">{a.confidence}%</td>
                       <td className="px-3 py-2.5 text-[10px] text-zinc-400 whitespace-nowrap">{ago}</td>
+                      <td className="px-3 py-2.5">
+                        <button
+                          type="button"
+                          disabled={logged || busy}
+                          onClick={() => takeTrade(a)}
+                          className={`inline-flex items-center justify-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-medium transition ${
+                            logged
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default"
+                              : isBuy
+                                ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                                : "bg-rose-600 text-white hover:bg-rose-700"
+                          } ${busy ? "opacity-70" : ""}`}
+                        >
+                          {logged ? "Logged" : busy ? "…" : "Trade Done"}
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -200,6 +258,7 @@ function AlertPrefs() {
             </table>
           )}
         </div>
+
         {(() => {
           const filtered = alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter);
           if (filtered.length <= visibleCount) return null;
