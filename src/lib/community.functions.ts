@@ -119,7 +119,6 @@ async function hydratePosts(admin: any, rows: any[], viewerId: string): Promise<
       repost_count: r.repost_count,
       bookmark_count: r.bookmark_count,
       view_count: r.view_count,
-      view_count: r.view_count,
       liked_by_me: likedSet.has(r.id),
       reposted_by_me: rpSet.has(r.id),
       bookmarked_by_me: bmSet.has(r.id),
