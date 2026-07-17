@@ -98,6 +98,7 @@ function MailPage() {
   const [badges, setBadges] = useState<Record<string, MailBadgeTier>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectMenuOpen, setSelectMenuOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
