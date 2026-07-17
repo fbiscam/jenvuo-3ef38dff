@@ -97,15 +97,21 @@ type ApplicantEmailKind =
   | "waitlisted"
   | "pending"
   | "funded"
+  | "password_set"
   | "documents_received"
   | "documents_approved"
   | "documents_rejected"
   | "documents_needs_info";
 
-function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string) {
+type ApplicantEmailExtras = {
+  resetUrl?: string;
+  activateHours?: number;
+};
+
+function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string, extras: ApplicantEmailExtras = {}) {
   const meta = PLAN_META[plan] || PLAN_META.elite;
   const FONT = "'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif";
-  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }) => `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:${FONT};color:#18181b;padding:24px 12px">
+  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }, cta2?: { label: string; href: string }) => `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:${FONT};color:#18181b;padding:24px 12px">
 
     <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:20px;overflow:hidden">
       <div style="padding:28px 32px 8px">
@@ -113,7 +119,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         <h1 style="font-size:24px;line-height:1.2;margin:8px 0 0;color:#09090b">${escapeHtml(title)}</h1>
       </div>
       <div style="padding:16px 32px 8px;font-size:15px;line-height:1.6;color:#3f3f46">${body}</div>
-      ${cta ? `<div style="padding:16px 32px 28px"><a href="${cta.href}" style="display:inline-block;background:#09090b;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px">${escapeHtml(cta.label)}</a></div>` : `<div style="height:16px"></div>`}
+      ${cta ? `<div style="padding:16px 32px ${cta2 ? '8px' : '28px'}"><a href="${cta.href}" style="display:inline-block;background:#09090b;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px">${escapeHtml(cta.label)}</a>${cta2 ? `&nbsp;&nbsp;<a href="${cta2.href}" style="display:inline-block;background:#ffffff;color:#09090b;text-decoration:none;padding:11px 19px;border-radius:12px;font-weight:600;font-size:14px;border:1px solid #e4e4e7">${escapeHtml(cta2.label)}</a>` : ''}</div>${cta2 ? '<div style="height:12px"></div>' : ''}` : `<div style="height:16px"></div>`}
       <div style="border-top:1px solid #f4f4f5;padding:16px 32px 24px;font-size:12px;color:#a1a1aa">
         Jenvu · Institutional-grade XAU intelligence · <a href="${APP_URL}" style="color:#71717a;text-decoration:underline">jenvu.com</a>
       </div>
@@ -138,36 +144,54 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           { label: "Explore the platform", href: `${APP_URL}/` },
         ),
       };
-    case "approved":
+    case "approved": {
+      const resetUrl = extras.resetUrl || `${APP_URL}/auth`;
       return {
-        subject: `You're in — ${meta.label} plan activated 🎉`,
+        subject: "Your application has been approved 🎉",
         html: wrap(
-          `Welcome to Jenvu, ${n}.`,
+          `Congratulations, ${n} — you're approved.`,
           "Approved · Founding Trader",
-          `<p style="margin:0 0 12px">Your application has been approved. Your <strong>${escapeHtml(meta.label)}</strong> plan is now active with <strong>${escapeHtml(meta.wallet)}</strong>.</p>
-           <p style="margin:0 0 12px;color:#52525b"><em>${escapeHtml(meta.blurb)}</em></p>
-           <p style="margin:16px 0 8px"><strong>Onboarding — 4 quick steps</strong></p>
-           <ol style="margin:0 0 12px;padding-left:20px">
-             <li style="margin:6px 0">Sign in with this email and open your dashboard.</li>
-             <li style="margin:6px 0">Run your first XAU/USD scan on the Signal page.</li>
-             <li style="margin:6px 0">Turn on alerts so you catch A/B setups the moment they fire.</li>
-             <li style="margin:6px 0">Connect your broker (MyFxBook or statement) so we can verify profit.</li>
-           </ol>
-           <p style="margin:0">You have 90 days to reach $100 in verified profit — billing only starts after that. If you don't profit, you walk away, no charge.</p>`,
+          `<p style="margin:0 0 12px">Your Founding Trader application has been <strong>approved</strong>. Welcome to Jenvu — a very small, hand-picked cohort of traders.</p>
+           <p style="margin:0 0 12px">Your seat is reserved on the <strong>${escapeHtml(meta.label)}</strong> plan (${escapeHtml(meta.wallet)}). ${escapeHtml(meta.blurb)}</p>
+           <p style="margin:16px 0 8px"><strong>What you'll get inside Jenvu:</strong></p>
+           <ul style="margin:0 0 12px;padding-left:20px">
+             <li style="margin:4px 0"><strong>Institutional XAU/USD signal engine</strong> — ICT/SMC rules blended with senior-desk AI review.</li>
+             <li style="margin:4px 0"><strong>Live killzones & session alerts</strong> — you never miss London or NY opens.</li>
+             <li style="margin:4px 0"><strong>Trade journal & analytics</strong> — auto win/lose tracking on every setup you take.</li>
+             <li style="margin:4px 0"><strong>Voice briefs & macro context</strong> — news, narrative and sentiment layered onto every scan.</li>
+           </ul>
+           <p style="margin:16px 0 8px"><strong>Next step — set your password</strong></p>
+           <p style="margin:0 0 12px">Use the secure link below to set your password. It's a one-time link tied to your email; once you set it, you can sign in from anywhere.</p>`,
+          { label: "Set my password", href: resetUrl },
+        ),
+      };
+    }
+    case "password_set": {
+      const hours = extras.activateHours ?? 4;
+      return {
+        subject: `You're in — your ${meta.label} plan activates in ${hours} hours`,
+        html: wrap(
+          `You're in, ${n}.`,
+          "Account Ready · Founding Trader",
+          `<p style="margin:0 0 12px">Your password is set and your Jenvu account is live. ✅</p>
+           <p style="margin:0 0 12px">Your <strong>${escapeHtml(meta.label)}</strong> plan will be activated on this account within the next <strong>${hours} hours</strong>. Once it's live, you'll see the wallet credit and full plan features on your Billing page.</p>
+           <p style="margin:0 0 12px">In the meantime, feel free to explore the dashboard — the signal page, journal and killzones are already open to you.</p>
+           <p style="margin:0;color:#52525b"><em>You'll get a separate "account funded" email the moment your wallet is credited.</em></p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
         ),
       };
+    }
     case "funded":
       return {
-        subject: `Your Jenvu account is funded — ${meta.label} plan active`,
+        subject: "Your account has been funded ✅",
         html: wrap(
-          `Account funded, ${n}`,
+          `Account funded, ${n}.`,
           "Funded · Founding Trader",
-          `<p style="margin:0 0 12px">We funded your account with <strong>$100</strong> and your <strong>${escapeHtml(meta.label)}</strong> plan is active.</p>
-           <p style="margin:0 0 12px;color:#52525b"><em>${escapeHtml(meta.blurb)}</em></p>
-           <p style="margin:0 0 12px">You can now continue scanning from your dashboard. Billing starts only after your verified-profit checkpoint and document review are complete.</p>
-           <p style="margin:0">If anything looks wrong, reply to this email and support will check your account.</p>`,
+          `<p style="margin:0 0 12px">Great news — your Jenvu account has been funded with <strong>$100</strong> on the <strong>${escapeHtml(meta.label)}</strong> plan.</p>
+           <p style="margin:0 0 12px">The credit is available in your wallet right now. You can start scanning, use trade management and enable alerts straight from the dashboard.</p>
+           <p style="margin:0;color:#52525b"><em>Full transaction history is on your Billing page.</em></p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
+          { label: "View billing", href: `${APP_URL}/dashboard/billing` },
         ),
       };
     case "rejected":
@@ -257,8 +281,8 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
   }
 }
 
-async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string, dedupeKey?: string) {
-  const rendered = renderApplicantEmail(kind, name, plan);
+async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string, dedupeKey?: string, extras: ApplicantEmailExtras = {}) {
+  const rendered = renderApplicantEmail(kind, name, plan, extras);
   if (!rendered) return;
   const { subject, html } = rendered;
   const text = htmlToText(html);
@@ -480,8 +504,53 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
 
     const p = prior as any;
 
-    // Activate/fund the selected plan when the applicant is approved/active and already has an account.
-    if ((data.status === "approved" || data.status === "active") && p?.email) {
+    // On APPROVED: don't activate the plan yet — just generate a secure
+    // set-password link so the user can sign in. Plan activation happens
+    // separately when the admin marks the application "active" (funded).
+    let approvedResetUrl: string | null = null;
+    if (data.status === "approved" && data.status !== p?.status && p?.email) {
+      const url = process.env.SUPABASE_URL;
+      const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (url && service) {
+        const admin = createClient<Database>(url, service, {
+          auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+        });
+        const targetEmail = String(p.email).toLowerCase();
+        const planId = String(p.requested_plan || "elite");
+        // Check if the user already has an account
+        let existingUserId: string | null = null;
+        for (let page = 1; page <= 20 && !existingUserId; page++) {
+          const { data: userList } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+          const found = userList?.users?.find((u) => u.email?.toLowerCase() === targetEmail);
+          if (found) existingUserId = found.id;
+          if (!userList?.users?.length || (userList.users.length < 1000)) break;
+        }
+        try {
+          const linkType = existingUserId ? "recovery" : "invite";
+          const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+            type: linkType as any,
+            email: targetEmail,
+            options: {
+              redirectTo: `${APP_URL}/reset-password`,
+              data: existingUserId
+                ? undefined
+                : { full_name: p.full_name || null, founding_application_id: data.id, requested_plan: planId },
+            },
+          });
+          if (linkErr) {
+            console.error(`[founding] generateLink(${linkType}) failed:`, linkErr.message);
+          }
+          approvedResetUrl = (linkData as any)?.properties?.action_link || null;
+        } catch (e) {
+          console.error("[founding] generateLink threw:", (e as Error)?.message);
+        }
+      }
+    }
+
+    // On ACTIVE (admin marked account funded / $100): activate the plan and
+    // send the "account funded" email. This is the point where the wallet
+    // actually gets credited.
+    if (data.status === "active" && data.status !== p?.status && p?.email) {
       const url = process.env.SUPABASE_URL;
       const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
       if (url && service) {
@@ -491,7 +560,6 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
         const planId = String(p.requested_plan || "elite");
         const targetEmail = String(p.email).toLowerCase();
         let matchedUserId: string | null = null;
-        // Paginate auth.users until we find the applicant (listUsers caps at ~1000/page).
         for (let page = 1; page <= 20 && !matchedUserId; page++) {
           const { data: userList, error: listErr } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
           if (listErr) throw new Error(`plan activation: ${listErr.message}`);
@@ -506,55 +574,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
             _billing_interval: "monthly",
           });
           if (rpcErr) throw new Error(`plan activation: ${rpcErr.message}`);
-          // Billing notice from billing@
-          try {
-            const { sendSystemMail } = await import("@/lib/system-mail.server");
-            const name = String(p.full_name || "there").split(/\s+/)[0];
-            await sendSystemMail({
-              from: "billing@jenvu.email",
-              toUserId: matchedUserId,
-              subject: `Your ${planId.toUpperCase()} plan is active 🎉`,
-              body: [
-                `Hi ${name},`,
-                ``,
-                `Your ${planId.toUpperCase()} plan has been activated on your Jenvu account.`,
-                `Your wallet has been funded per your plan and you can start scanning right away.`,
-                ``,
-                `View details on the Billing page.`,
-                ``,
-                `— Jenvu Billing`,
-              ].join("\n"),
-            });
-          } catch (e) {
-            console.error("[founding] system-mail plan-activated failed:", (e as Error)?.message);
-          }
-        } else {
-          // Applicant has no account yet — send a Supabase invite so they can
-          // set their own password and sign in. Plan activation happens the
-          // next time this approval is saved after the account exists.
-          try {
-            const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(targetEmail, {
-              redirectTo: `${APP_URL}/reset-password`,
-              data: {
-                full_name: p.full_name || null,
-                founding_application_id: data.id,
-                requested_plan: planId,
-              },
-            });
-            if (inviteErr) {
-              // Ignore "already registered" races — the user exists now, they can sign in.
-              const msg = (inviteErr.message || "").toLowerCase();
-              if (!msg.includes("already") && !msg.includes("registered")) {
-                console.error(`[founding] invite failed for ${targetEmail}:`, inviteErr.message);
-              }
-            } else {
-              console.log(`[founding] invite sent to ${targetEmail}`);
-            }
-          } catch (e) {
-            console.error(`[founding] invite threw for ${targetEmail}:`, (e as Error)?.message);
-          }
         }
-
       }
     }
 
@@ -562,10 +582,10 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     // to a paid plan after their trial — handled in public.set_user_plan.
 
     // Only send emails for actions that were actually fulfilled in this update.
-    // - approved: only when status transitions to "approved"
-    // - funded:   only when status transitions to "active" (account funded/paying)
+    // - approved: password-reset link email
+    // - funded:   only when status transitions to "active" (account funded)
     //             OR admin marks first_profit_reached=true
-    // - rejected / waitlisted: on their respective status transitions
+    // - rejected / waitlisted / pending: on their respective status transitions
     const kinds: ApplicantEmailKind[] = [];
     if (p?.email && data.status && data.status !== p.status) {
       if (data.status === "approved") kinds.push("approved");
@@ -585,14 +605,55 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
         });
         for (const kind of kinds) {
-          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`);
+          const extras: ApplicantEmailExtras = kind === "approved" && approvedResetUrl ? { resetUrl: approvedResetUrl } : {};
+          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`, extras);
         }
       }
     }
 
 
+
+
     return { ok: true };
   });
+
+// Called from /reset-password after the user successfully sets a new
+// password. Sends the "You're in — plan activates in 4 hours" email once.
+// Uses the founding_applications row keyed by the caller's email so we
+// only email users tied to a real approved application.
+export const notifyFoundingPasswordSet = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ ok: true; sent: boolean }> => {
+    const email = (context.claims as any)?.email as string | undefined;
+    if (!email) return { ok: true, sent: false };
+    const url = process.env.SUPABASE_URL;
+    const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !service) return { ok: true, sent: false };
+    const admin = createClient<Database>(url, service, {
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    });
+    const { data: app } = await admin
+      .from("founding_applications" as any)
+      .select("id, full_name, email, requested_plan, status")
+      .ilike("email", email)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const a = app as any;
+    if (!a || (a.status !== "approved" && a.status !== "active")) return { ok: true, sent: false };
+    await enqueueApplicantEmail(
+      admin,
+      "password_set",
+      String(a.email),
+      String(a.full_name || "there"),
+      String(a.requested_plan || "elite"),
+      `${a.id}-password-set`,
+      { activateHours: 4 },
+    );
+    return { ok: true, sent: true };
+  });
+
+
 
 export const foundingStats = createServerFn({ method: "GET" }).handler(async () => {
   const url = process.env.SUPABASE_URL;
