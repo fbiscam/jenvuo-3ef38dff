@@ -114,6 +114,21 @@ function MailPage() {
     load();
   }, [load]);
 
+  // Fetch verification badges for every address currently on screen
+  useEffect(() => {
+    const addrs = new Set<string>();
+    for (const m of messages) {
+      if (m.sender_address) addrs.add(m.sender_address.toLowerCase());
+      if (m.recipient_address) addrs.add(m.recipient_address.toLowerCase());
+    }
+    if (myAddress) addrs.add(myAddress.toLowerCase());
+    const list = Array.from(addrs).filter((a) => !(a in badges));
+    if (!list.length) return;
+    _badges({ data: { addresses: list } })
+      .then((m) => setBadges((prev) => ({ ...prev, ...m })))
+      .catch(() => {});
+  }, [messages, myAddress, _badges, badges]);
+
 
   // realtime: refresh on inbox changes
   useEffect(() => {
