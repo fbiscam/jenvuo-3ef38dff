@@ -484,30 +484,29 @@ function DashboardLayout() {
     return () => { cancelled = true; };
   }, [authLoading, authUser]);
 
-  // Unread inbox mail count (for red label indicator)
+  // Unread notifications count (for red label indicator on the Notifications tab)
   useEffect(() => {
     if (authLoading || !authUser) { setUnreadNotifs(0); return; }
     let cancelled = false;
     const load = async () => {
       const { count } = await supabase
-        .from("mail_message_state")
-        .select("message_id", { count: "exact", head: true })
+        .from("user_notifications")
+        .select("id", { count: "exact", head: true })
         .eq("user_id", authUser.id)
-        .eq("folder", "inbox")
-        .eq("is_read", false);
+        .is("read_at", null);
       if (!cancelled) setUnreadNotifs(count ?? 0);
     };
     load();
     const ch = supabase
-      .channel(`mail-nav:${authUser.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "mail_message_state", filter: `user_id=eq.${authUser.id}` }, load)
+      .channel(`notif-nav:${authUser.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_notifications", filter: `user_id=eq.${authUser.id}` }, load)
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [authUser?.id, authLoading]);
 
   // Clear red indicator when user visits the notifications page
   useEffect(() => {
-    if (pathname.startsWith("/dashboard/gmails")) setUnreadNotifs(0);
+    if (pathname.startsWith("/dashboard/notifications")) setUnreadNotifs(0);
   }, [pathname]);
 
   useEffect(() => {
