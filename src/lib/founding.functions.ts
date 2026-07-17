@@ -242,14 +242,14 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
       };
     case "documents_received":
       return {
-        subject: "We received your documents",
+        subject: "We're reviewing your documents — up to 48 hours",
         html: wrap(
-          `Thanks, ${n} — documents received`,
-          "Documents · Under Review",
-          `<p style="margin:0 0 12px">We received your earning-proof documents and they're now in the review queue.</p>
-           <p style="margin:0 0 12px">Reviews usually complete within <strong>24–48 hours</strong>. You'll get another email as soon as they're approved or if we need something updated.</p>
-           <p style="margin:0">No action needed from your side right now.</p>`,
-          { label: "View submission", href: `${APP_URL}/dashboard/documents` },
+          `Thanks, ${n} — we're on it`,
+          "Documents · Reviewing",
+          `<p style="margin:0 0 12px">We are reviewing your document. It can take up to <strong>48 hours</strong> to verify.</p>
+           <p style="margin:0 0 12px">The status will be shown on this page.</p>
+           <p style="margin:0">Thanks for your understanding.</p>`,
+          { label: "Open Documents page", href: `${APP_URL}/dashboard/documents` },
         ),
       };
     case "documents_approved":
@@ -841,9 +841,9 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    // Fire applicant email on real transitions. `pending` reuses the "received/under review" template.
-    // For rejected / needs_info the admin may re-send the same status intentionally — always email.
-    const alwaysEmail = data.document_status === "rejected" || data.document_status === "needs_info";
+    // Fire applicant email on every admin action — even if status is unchanged,
+    // the admin may intentionally re-notify the user (mark reviewing, reject, etc.).
+    const alwaysEmail = true;
     if (prior?.email && (alwaysEmail || prior.document_status !== data.document_status)) {
       const kind: ApplicantEmailKind | null =
         data.document_status === "verified"
@@ -879,7 +879,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
                 ? "Action required: documents rejected"
                 : kind === "documents_needs_info"
                   ? "We need a bit more information"
-                  : "Documents received — under review";
+                  : "We're reviewing your documents — up to 48 hours";
           const bodyLines: string[] = [`Hi ${name},`, ``];
           if (kind === "documents_approved") {
             bodyLines.push("Great news — your submitted documents have been approved.");
@@ -893,7 +893,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
             if (data.info_request) bodyLines.push("", `Requested: ${data.info_request}`);
             bodyLines.push("", "Please open your Documents page and submit the requested update.");
           } else {
-            bodyLines.push("We received your documents. Our team will review shortly.");
+            bodyLines.push("We are reviewing your document. It can take up to 48 hours to verify.", "", "The status will be shown on your Documents page. Thanks for your understanding.");
           }
           bodyLines.push("", "— Jenvu Notifications");
           await sendSystemMailByEmail({
