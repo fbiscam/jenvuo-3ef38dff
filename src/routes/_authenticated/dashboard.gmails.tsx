@@ -278,9 +278,9 @@ function MailPage() {
         <aside className="lg:w-56 shrink-0 lg:sticky lg:top-4 lg:self-start px-3 py-4 lg:p-0">
           <button
             onClick={() => setComposeOpen(true)}
-            className="w-full flex items-center gap-2 justify-center bg-white text-black border border-gray-200 rounded-xl py-2.5 text-sm font-medium hover:bg-gray-50 transition mb-4"
+            className="w-full flex items-center gap-2 justify-center bg-white text-gray-900 border border-gray-200 shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-full py-3 text-sm font-medium hover:shadow-md hover:bg-gray-50 transition mb-6"
           >
-            <Pencil className="w-4 h-4" /> Compose
+            <Pencil className="w-4 h-4 text-gray-700" /> Compose
           </button>
           <nav className="space-y-1.5">
             {FOLDERS.map((f) => {
