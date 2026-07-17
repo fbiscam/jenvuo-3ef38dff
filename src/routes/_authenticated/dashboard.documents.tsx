@@ -244,7 +244,7 @@ function DocumentsPage() {
                   {new Date(row.documents_rejected_at).toLocaleString()}
                 </div>
               )}
-              <div className="text-xs mt-3 font-medium text-red-800">
+              <div className="text-xs mt-3 font-medium text-black">
                 You can re-submit right away — just upload updated proof below.
               </div>
             </div>
