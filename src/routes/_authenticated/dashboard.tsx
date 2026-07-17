@@ -498,7 +498,7 @@ function DashboardLayout() {
     };
     load();
     const ch = supabase
-      .channel(`notif-nav:${authUser.id}`)
+      .channel(`notif-nav:${authUser.id}:${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "user_notifications", filter: `user_id=eq.${authUser.id}` }, load)
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };

@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAutoCloseTrades } from "@/hooks/useAutoCloseTrades";
+import { useGlobalNotificationToasts } from "@/hooks/useGlobalNotificationToasts";
 import { verifyTrustedDevice } from "@/lib/trusted-devices.functions";
 
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
@@ -31,6 +32,7 @@ async function hasValidTrustedDevice(uid: string): Promise<boolean> {
 
 function AuthenticatedLayout() {
   useAutoCloseTrades();
+  useGlobalNotificationToasts();
   return <Outlet />;
 }
 
