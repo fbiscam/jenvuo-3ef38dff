@@ -97,10 +97,16 @@ type ApplicantEmailKind =
   | "waitlisted"
   | "pending"
   | "funded"
+  | "password_set"
   | "documents_received"
   | "documents_approved"
   | "documents_rejected"
   | "documents_needs_info";
+
+type ApplicantEmailExtras = {
+  resetUrl?: string;
+  activateHours?: number;
+};
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string) {
   const meta = PLAN_META[plan] || PLAN_META.elite;
