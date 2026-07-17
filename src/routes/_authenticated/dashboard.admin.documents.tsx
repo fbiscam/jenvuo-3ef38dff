@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Check, X, Clock, FileImage, FileVideo, FileText } from "lucide-react";
+import { Check, X, Clock, FileImage, FileVideo, FileText, HelpCircle } from "lucide-react";
 import {
   adminListDocumentSubmissions,
   adminUpdateDocumentStatus,
@@ -23,6 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/documents"
 const STATUS_BADGES: Record<string, string> = {
   received: "bg-blue-50 text-blue-700 border-blue-200",
   pending: "bg-amber-50 text-amber-700 border-amber-200",
+  needs_info: "bg-violet-50 text-violet-700 border-violet-200",
   verified: "bg-emerald-50 text-emerald-700 border-emerald-200",
   rejected: "bg-rose-50 text-rose-700 border-rose-200",
 };
