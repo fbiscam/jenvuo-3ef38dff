@@ -255,9 +255,10 @@ function MailPage() {
             >
               {claiming ? "Claiming…" : "Claim address"}
             </button>
-            <p className="text-[11px] text-gray-400 mt-3 text-center">
+            <p className="text-[10px] sm:text-[11px] text-gray-400 mt-3 text-center whitespace-nowrap">
               Cannot be changed later. Only JENVU members can email you.
             </p>
+
           </div>
         </div>
       </div>
