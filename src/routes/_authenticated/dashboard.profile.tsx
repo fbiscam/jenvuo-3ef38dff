@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { deleteMyAccount } from "@/lib/delete-account.functions";
 import { requestEmailChange } from "@/lib/email-change.functions";
+import { getMyMailAddress } from "@/lib/mail.functions";
 import AvatarAdjuster from "@/components/AvatarAdjuster";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
@@ -28,6 +29,7 @@ function Profile() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [mailAddress, setMailAddress] = useState<string | null>(null);
 
   const refreshAvatarUrl = async (path: string | null) => {
     if (!path) { setAvatarUrl(null); return; }
@@ -47,6 +49,10 @@ function Profile() {
         setAvatarPath(data.avatar_url);
         await refreshAvatarUrl(data.avatar_url);
       }
+      try {
+        const addr = await getMyMailAddress();
+        if (addr?.address) setMailAddress(addr.address);
+      } catch {}
     })();
   }, []);
 
@@ -221,6 +227,16 @@ function Profile() {
               className="mt-1 block w-full cursor-not-allowed rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500"
             />
           </label>
+          {mailAddress && (
+            <label className="block text-xs font-medium text-zinc-600">
+              Jenvu mail address
+              <input
+                value={mailAddress}
+                disabled
+                className="mt-1 block w-full cursor-not-allowed rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500"
+              />
+            </label>
+          )}
           <button onClick={saveProfile} disabled={saving} className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50">
             {saving ? "Saving…" : "Save changes"}
           </button>
