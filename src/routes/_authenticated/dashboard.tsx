@@ -1042,20 +1042,21 @@ function DashboardLayout() {
                 <button
                   type="button"
                   aria-label="Account menu"
-                  className="relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-zinc-200 text-[15px] font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
-                  style={avatarUrl ? undefined : { backgroundImage: "linear-gradient(135deg,#0f172a,#1e293b)" }}
+                  className="relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-zinc-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
                 >
-                  <span className="absolute inset-0 flex items-center justify-center">
-                    {(fullName || email || "U").trim().charAt(0).toUpperCase()}
-                  </span>
-                  {avatarUrl && (
-                    <img
-                      src={avatarUrl}
-                      alt="Profile"
-                      className="relative h-full w-full object-cover"
-                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                    />
-                  )}
+                  <img
+                    src={avatarUrl || getDefaultAvatar(email || fullName)}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    width={48}
+                    height={48}
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement;
+                      const fallback = getDefaultAvatar(email || fullName);
+                      if (img.src !== fallback) img.src = fallback;
+                    }}
+                  />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" sideOffset={8} className="w-56 bg-white">
