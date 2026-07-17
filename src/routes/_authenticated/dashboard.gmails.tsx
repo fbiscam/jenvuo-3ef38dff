@@ -458,7 +458,7 @@ function MailPage() {
         </aside>
 
         {/* Main */}
-        <section className="flex-1 min-w-0 min-h-0 border-x-0 lg:border lg:border-gray-200 lg:rounded-2xl overflow-hidden bg-white h-full flex flex-col">
+        <section className="flex-1 min-w-0 min-h-0 overflow-hidden bg-white h-full flex flex-col">
           {/* Header */}
           <div className="px-4 pt-4 pb-3 border-b border-gray-100 lg:shrink-0">
             <div className="flex items-center gap-1 mb-3">
