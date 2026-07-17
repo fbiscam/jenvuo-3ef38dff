@@ -514,6 +514,13 @@ function DashboardLayout() {
         setEmail(u.email ?? "");
         setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
       }
+      // Prefer name from profiles table (source of truth updated from Profile page)
+      supabase.from("profiles").select("full_name").eq("id", u.id).maybeSingle().then(({ data }) => {
+        const n = (data as { full_name?: string | null } | null)?.full_name;
+        if (!cancelled && n && n.trim()) setFullName(n.trim());
+      });
+      if (false) {
+      }
       // Load avatar (best-effort, non-blocking)
       supabase.from("profiles").select("avatar_url").eq("id", u.id).maybeSingle().then(async ({ data }) => {
         if (cancelled) return;
