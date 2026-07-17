@@ -863,7 +863,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
             String(prior.email),
             String(prior.full_name || "there"),
             String(prior.requested_plan || "elite"),
-            `${data.id}-${kind}-${now.slice(0, 10)}`,
+            `${data.id}-${kind}-${Date.now()}`,
           );
         } catch (e) {
           console.error("[founding] doc-status email enqueue failed:", (e as Error)?.message);
