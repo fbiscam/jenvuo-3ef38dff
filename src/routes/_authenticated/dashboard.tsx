@@ -75,7 +75,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/dashboard/workspace", label: "Saved Signals", icon: "bookmarks" },
       { to: "/dashboard/alerts", label: "Signal Alerts", icon: "notifications_active", countKey: "alerts7d" },
       { to: "/dashboard/community", label: "Community", icon: "forum" },
-      { to: "/dashboard/gmails", label: "Emails", icon: "inbox" },
+      { to: "/dashboard/notifications", label: "Notifications", icon: "notifications" },
     ],
   },
   {
@@ -469,20 +469,7 @@ function DashboardLayout() {
     if (typeof window === "undefined") return;
     window.localStorage.setItem("jenvu:dash:sidebar-collapsed", sidebarCollapsed ? "1" : "0");
   }, [sidebarCollapsed]);
-  // Auto-collapse sidebar when entering the Emails page; restore prior state on leave
-  const prevSidebarRef = useRef<boolean | null>(null);
-  useEffect(() => {
-    const onMail = pathname.startsWith("/dashboard/gmails");
-    if (onMail) {
-      if (prevSidebarRef.current === null) prevSidebarRef.current = sidebarCollapsed;
-      if (!sidebarCollapsed) setSidebarCollapsed(true);
-    } else if (prevSidebarRef.current !== null) {
-      const prev = prevSidebarRef.current;
-      prevSidebarRef.current = null;
-      setSidebarCollapsed(prev);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  // (removed emails auto-collapse — page no longer exists)
   // Close mobile drawer on route change
   useEffect(() => { setMobileNavOpen(false); }, [pathname]);
 
@@ -497,30 +484,29 @@ function DashboardLayout() {
     return () => { cancelled = true; };
   }, [authLoading, authUser]);
 
-  // Unread inbox mail count (for red label indicator)
+  // Unread notifications count (for red label indicator on the Notifications tab)
   useEffect(() => {
     if (authLoading || !authUser) { setUnreadNotifs(0); return; }
     let cancelled = false;
     const load = async () => {
       const { count } = await supabase
-        .from("mail_message_state")
-        .select("message_id", { count: "exact", head: true })
+        .from("user_notifications")
+        .select("id", { count: "exact", head: true })
         .eq("user_id", authUser.id)
-        .eq("folder", "inbox")
-        .eq("is_read", false);
+        .is("read_at", null);
       if (!cancelled) setUnreadNotifs(count ?? 0);
     };
     load();
     const ch = supabase
-      .channel(`mail-nav:${authUser.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "mail_message_state", filter: `user_id=eq.${authUser.id}` }, load)
+      .channel(`notif-nav:${authUser.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_notifications", filter: `user_id=eq.${authUser.id}` }, load)
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [authUser?.id, authLoading]);
 
   // Clear red indicator when user visits the notifications page
   useEffect(() => {
-    if (pathname.startsWith("/dashboard/gmails")) setUnreadNotifs(0);
+    if (pathname.startsWith("/dashboard/notifications")) setUnreadNotifs(0);
   }, [pathname]);
 
   useEffect(() => {
@@ -883,7 +869,7 @@ function DashboardLayout() {
                   const iconName = t.icon;
                   const iconColor = t.iconColor;
                   const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
-                  const isNotifs = t.to === "/dashboard/gmails";
+                  const isNotifs = t.to === "/dashboard/notifications";
                   const hasUnread = isNotifs && unreadNotifs > 0 && !active;
                   return (
                     <Link
@@ -985,7 +971,7 @@ function DashboardLayout() {
 
 
 
-      <main className={pathname.startsWith("/dashboard/gmails") ? "w-full flex-1 min-h-0 overflow-hidden" : "mx-auto w-full max-w-7xl flex-1 px-5 pt-14 pb-7 sm:px-8 sm:pt-7"}>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
 
 
         {pathname === "/dashboard" ? (

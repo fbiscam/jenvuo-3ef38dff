@@ -213,7 +213,7 @@ export default function NotificationBell() {
             </div>
             {items.length > 0 && (
               <Link
-                to="/dashboard/gmails"
+                to="/dashboard/notifications"
                 onClick={() => setOpen(false)}
                 className="text-[11px] font-medium text-zinc-500 hover:text-zinc-900"
               >
