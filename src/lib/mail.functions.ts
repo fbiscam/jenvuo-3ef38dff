@@ -110,25 +110,59 @@ export const listMail = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     const rows = (states ?? []) as any[];
-    const senderIds = Array.from(
-      new Set(rows.map((r) => r.mail_messages?.sender_id).filter(Boolean)),
+    const userIds = Array.from(
+      new Set(
+        rows.flatMap((r) => [r.mail_messages?.sender_id, r.mail_messages?.recipient_id]).filter(Boolean),
+      ),
+    );
+    const addresses = Array.from(
+      new Set(
+        rows.flatMap((r) => [r.mail_messages?.sender_address, r.mail_messages?.recipient_address]).filter(Boolean),
+      ),
     );
     let profileMap = new Map<string, { full_name: string | null; avatar_url: string | null }>();
-    if (senderIds.length) {
+    if (userIds.length) {
       const { data: profiles } = await context.supabase
         .from("profiles")
         .select("id, full_name, avatar_url")
-        .in("id", senderIds);
+        .in("id", userIds);
       profileMap = new Map(
         (profiles ?? []).map((p: any) => [p.id, { full_name: p.full_name, avatar_url: p.avatar_url }]),
       );
     }
+    // fallback: resolve avatar by mail address (for system mailboxes or when sender_id is null)
+    const addrToUser = new Map<string, string>();
+    if (addresses.length) {
+      const { data: addrRows } = await context.supabase
+        .from("mail_addresses")
+        .select("address, user_id")
+        .in("address", addresses);
+      for (const a of (addrRows ?? []) as any[]) {
+        if (a.address && a.user_id) addrToUser.set(a.address, a.user_id);
+      }
+      const extraIds = Array.from(new Set(Array.from(addrToUser.values()).filter((id) => !profileMap.has(id))));
+      if (extraIds.length) {
+        const { data: extra } = await context.supabase
+          .from("profiles")
+          .select("id, full_name, avatar_url")
+          .in("id", extraIds);
+        for (const p of (extra ?? []) as any[]) {
+          profileMap.set(p.id, { full_name: p.full_name, avatar_url: p.avatar_url });
+        }
+      }
+    }
+    const resolve = (id: string | null, addr: string | null) => {
+      const uid = id ?? (addr ? addrToUser.get(addr) ?? null : null);
+      const p = uid ? profileMap.get(uid) : null;
+      return { name: p?.full_name ?? null, avatar: p?.avatar_url ?? null };
+    };
 
     return rows
       .filter((r) => r.mail_messages)
       .map((r) => {
         const m = r.mail_messages;
-        const p = m.sender_id ? profileMap.get(m.sender_id) : null;
+        const s = resolve(m.sender_id, m.sender_address);
+        const rc = resolve(m.recipient_id, m.recipient_address);
         return {
           message_id: r.message_id,
           folder: r.folder,
@@ -141,8 +175,10 @@ export const listMail = createServerFn({ method: "POST" })
           sender_id: m.sender_id,
           recipient_id: m.recipient_id,
           created_at: m.created_at,
-          sender_name: p?.full_name ?? null,
-          sender_avatar: p?.avatar_url ?? null,
+          sender_name: s.name,
+          sender_avatar: s.avatar,
+          recipient_name: rc.name,
+          recipient_avatar: rc.avatar,
         };
       });
   });
