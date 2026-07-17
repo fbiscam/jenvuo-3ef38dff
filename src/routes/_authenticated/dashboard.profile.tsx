@@ -49,6 +49,10 @@ function Profile() {
         setAvatarPath(data.avatar_url);
         await refreshAvatarUrl(data.avatar_url);
       }
+      try {
+        const addr = await getMyMailAddress();
+        if (addr?.address) setMailAddress(addr.address);
+      } catch {}
     })();
   }, []);
 
