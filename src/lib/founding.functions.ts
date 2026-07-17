@@ -270,7 +270,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Documents need an update, ${n}`,
           "Documents · Action Required",
-          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. You can re-upload updated documents within the next <strong>24 hours</strong>.</p>
+          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. You can re-upload updated documents right away from your Documents page — there's no waiting period.</p>
            <p style="margin:0 0 12px">If the admin left a reason, you'll see it on your Documents page. Common asks: a clearer screenshot, a fuller statement, or a screen-recording that shows the account name.</p>
            <p style="margin:0">Reply to this email if you need help.</p>`,
           { label: "Re-upload documents", href: `${APP_URL}/dashboard/documents` },
