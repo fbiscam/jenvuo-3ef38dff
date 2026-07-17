@@ -150,6 +150,40 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       for (let i = 0; i < rows.length; i += 500) {
         await supabaseAdmin.from('user_notifications').insert(rows.slice(i, i + 500))
       }
+
+      // Also deliver an in-app @jenvu.email message from alerts@ to every paid user
+      try {
+        const { sendSystemMail } = await import('@/lib/system-mail.server')
+        const mailBody = [
+          `New ${grade} ${data.direction} setup on ${pair}`,
+          ``,
+          `Entry: ${round(data.entry)}`,
+          `Stop Loss: ${round(data.sl)}`,
+          `Take Profit: ${round(data.tp)}`,
+          `R:R: ${data.rr.toFixed(2)}`,
+          `Confidence: ${Math.round(data.confidence)}%`,
+          rationale ? `\nContext: ${rationale}` : '',
+          ``,
+          `— Jenvu Alerts`,
+        ].join('\n')
+        // Fire in parallel batches to avoid stampeding
+        const batchSize = 25
+        for (let i = 0; i < notifyUserIds.length; i += batchSize) {
+          const batch = notifyUserIds.slice(i, i + batchSize)
+          await Promise.all(
+            batch.map((uid) =>
+              sendSystemMail({
+                from: 'alerts@jenvu.email',
+                toUserId: uid,
+                subject: title,
+                body: mailBody,
+              }).catch(() => {}),
+            ),
+          )
+        }
+      } catch (e) {
+        console.error('[broadcast] system-mail alerts failed:', (e as Error)?.message)
+      }
     }
 
     // 4. Queue emails
