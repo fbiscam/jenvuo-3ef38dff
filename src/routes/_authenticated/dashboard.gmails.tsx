@@ -133,9 +133,11 @@ function MailPage() {
   }, [load]);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return messages;
+    let list = messages;
+    if (view === "starred") list = list.filter((m) => m.is_starred);
+    if (!query.trim()) return list;
     const q = query.toLowerCase();
-    return messages.filter(
+    return list.filter(
       (m) =>
         m.subject.toLowerCase().includes(q) ||
         m.body.toLowerCase().includes(q) ||
@@ -143,7 +145,7 @@ function MailPage() {
         m.recipient_address.toLowerCase().includes(q) ||
         (m.sender_name ?? "").toLowerCase().includes(q),
     );
-  }, [messages, query]);
+  }, [messages, query, view]);
 
   const unreadCount = messages.filter((m) => !m.is_read && m.folder === "inbox").length;
 
