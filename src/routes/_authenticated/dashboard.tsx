@@ -431,6 +431,7 @@ function DashboardLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [email, setEmail] = useState<string>("");
   const [fullName, setFullName] = useState<string>("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0, closedWins: 0, closedDecided: 0, openTrades: [] });
   const [newCounts, setNewCounts] = useState<{ saved: number; alerts7d: number; journalTotal: number }>({ saved: 0, alerts7d: 0, journalTotal: 0 });
 
@@ -513,6 +514,14 @@ function DashboardLayout() {
         setEmail(u.email ?? "");
         setFullName((u.user_metadata?.full_name as string) ?? (u.email?.split("@")[0] ?? ""));
       }
+      // Load avatar (best-effort, non-blocking)
+      supabase.from("profiles").select("avatar_url").eq("id", u.id).maybeSingle().then(async ({ data }) => {
+        if (cancelled) return;
+        const path = (data as { avatar_url?: string | null } | null)?.avatar_url;
+        if (!path) { setAvatarUrl(null); return; }
+        const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+        if (!cancelled) setAvatarUrl(signed?.signedUrl ?? null);
+      });
       const days = RANGE_DAYS[range];
       const since = days != null ? new Date(Date.now() - days * 24 * 3600 * 1000).toISOString() : null;
 
@@ -889,15 +898,54 @@ function DashboardLayout() {
       {/* Right column */}
       <div className={`dashboard-right-col flex min-h-screen min-w-0 flex-1 flex-col ${sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
-      {/* Mobile menu toggle (floating) */}
-      <button
-        type="button"
-        aria-label="Open menu"
-        onClick={() => setMobileNavOpen(true)}
-        className="fixed top-3 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
-      >
-        <Menu className="h-4 w-4" />
-      </button>
+      {/* Top-right profile menu (floating) */}
+      <div className="fixed top-3 right-3 z-30 flex items-center gap-2">
+        <button
+          type="button"
+          aria-label="Open menu"
+          onClick={() => setMobileNavOpen(true)}
+          className="inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
+        >
+          <Menu className="h-4 w-4" />
+        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              aria-label="Account menu"
+              className="inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-white text-[12px] font-medium text-zinc-700 shadow-sm hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+              ) : (
+                <span>{(fullName || email || "U").trim().charAt(0).toUpperCase()}</span>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" sideOffset={8} className="w-56 bg-white">
+            <DropdownMenuLabel className="truncate text-[12px] font-normal text-zinc-500">
+              {email || fullName || "Account"}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/dashboard/profile" className="flex items-center gap-2">
+                <User className="h-4 w-4" /> Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/dashboard/billing" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" /> Billing
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/dashboard/security" className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4" /> Security
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
 
