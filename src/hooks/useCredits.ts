@@ -58,7 +58,12 @@ export function useCredits() {
     try {
       const res: any = await spendFn({ data: { action, metadata } });
       if (res && res.ok === false) {
-        if (res.error === "INSUFFICIENT_CREDITS") {
+        if (res.error === "DOCUMENTS_REQUIRED") {
+          toast.error("Documents required", {
+            description: "Please submit your document to continue using the features.",
+            action: { label: "Submit documents", onClick: () => (window.location.href = "/dashboard/documents") },
+          });
+        } else if (res.error === "INSUFFICIENT_CREDITS") {
           toast.error("Low balance", {
             description: `You need at least $${(res.minRequired ?? 0.2).toFixed(2)} to run a signal scan. Add funds to continue.`,
             action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
