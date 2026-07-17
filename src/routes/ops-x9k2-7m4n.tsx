@@ -1,6 +1,6 @@
-import { createFileRoute, useRouter, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useLocation, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { opsUnlock, opsStatus } from "@/lib/ops-gate.functions";
 
 export const Route = createFileRoute("/ops-x9k2-7m4n")({
@@ -10,11 +10,6 @@ export const Route = createFileRoute("/ops-x9k2-7m4n")({
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
-  loader: async () => {
-    const s = await opsStatus();
-    if (s.unlocked) throw redirect({ to: "/ops-x9k2-7m4n/hub" });
-    return null;
-  },
   component: OpsLogin,
 });
 
@@ -23,11 +18,28 @@ const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]
 
 function OpsLogin() {
   const router = useRouter();
+  const location = useLocation();
   const unlock = useServerFn(opsUnlock);
+  const status = useServerFn(opsStatus);
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname !== "/ops-x9k2-7m4n") return;
+    let alive = true;
+    status({}).then((s) => {
+      if (alive && s.unlocked) router.navigate({ to: "/ops-x9k2-7m4n/hub", replace: true });
+    }).catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [location.pathname, router, status]);
+
+  if (location.pathname !== "/ops-x9k2-7m4n") {
+    return <Outlet />;
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
