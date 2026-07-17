@@ -79,9 +79,9 @@ function DocumentsPage() {
   const currentIdx = rejected || needsInfo ? 0 : statusIndex(row?.document_status);
   const canUpload =
     !!row &&
-    row.document_status !== "verified" &&
-    row.document_status !== "pending" &&
-    (!rejected || rejectedResubmitOpen);
+    (row.document_status === "not_submitted" ||
+      needsInfo ||
+      (rejected && rejectedResubmitOpen));
 
   const removeMut = useMutation({
     mutationFn: (id: string) => remove({ data: { id } } as any),
