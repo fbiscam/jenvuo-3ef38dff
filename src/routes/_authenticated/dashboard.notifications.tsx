@@ -208,7 +208,7 @@ function MailPage() {
       <div className="min-h-[calc(100vh-4rem)] bg-white flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-black text-white flex items-center justify-center mx-auto mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-white border border-gray-200 text-black flex items-center justify-center mx-auto mb-4 shadow-sm">
               <AtSign className="w-7 h-7" />
             </div>
             <h1 className="text-2xl font-semibold text-gray-900">Claim your JENVU address</h1>
