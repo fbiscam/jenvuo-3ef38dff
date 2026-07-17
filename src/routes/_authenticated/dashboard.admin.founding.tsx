@@ -136,7 +136,7 @@ function AdminFoundingPage() {
       setRows((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status: "active", first_profit_at: new Date().toISOString() } : r)),
       );
-      toast.success("Marked $100 profit reached → active");
+      toast.success("Account funded → plan activated");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Update failed");
     } finally {
