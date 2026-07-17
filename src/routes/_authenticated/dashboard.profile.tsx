@@ -29,6 +29,7 @@ function Profile() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [mailAddress, setMailAddress] = useState<string | null>(null);
 
   const refreshAvatarUrl = async (path: string | null) => {
     if (!path) { setAvatarUrl(null); return; }
