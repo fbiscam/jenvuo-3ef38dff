@@ -95,6 +95,7 @@ type ApplicantEmailKind =
   | "approved"
   | "rejected"
   | "waitlisted"
+  | "pending"
   | "funded"
   | "documents_received"
   | "documents_approved"
@@ -190,6 +191,18 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `<p style="margin:0 0 12px">This month's 220 seats are filled, but your application looks strong — you're on the waitlist for the next cohort.</p>
            <p style="margin:0 0 12px">As soon as a seat opens (or the next month rolls over on the 1st), we'll email you to activate your <strong>${escapeHtml(meta.label)}</strong> plan.</p>
            <p style="margin:0">No action needed from your side. Sit tight.</p>`,
+          { label: "Explore the platform", href: `${APP_URL}/` },
+        ),
+      };
+    case "pending":
+      return {
+        subject: "Your Founding Trader application is under review",
+        html: wrap(
+          `Your application is pending, ${n}`,
+          "Pending · Founding Trader",
+          `<p style="margin:0 0 12px">Your application has been moved into our review queue and is currently <strong>pending</strong>.</p>
+           <p style="margin:0 0 12px">Our team manually reviews every application. This usually takes up to <strong>48 hours</strong> — you'll get another email as soon as there's a decision.</p>
+           <p style="margin:0">No action needed from your side right now. Thanks for your patience.</p>`,
           { label: "Explore the platform", href: `${APP_URL}/` },
         ),
       };
@@ -559,6 +572,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
       else if (data.status === "active") kinds.push("funded");
       else if (data.status === "rejected") kinds.push("rejected");
       else if (data.status === "waitlisted") kinds.push("waitlisted");
+      else if (data.status === "pending") kinds.push("pending");
     }
     if (p?.email && data.first_profit_reached && !kinds.includes("funded")) {
       kinds.push("funded");
