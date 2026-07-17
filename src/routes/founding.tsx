@@ -169,10 +169,15 @@ function FoundingPage() {
               ["Reach $100 in 30 days", "You have 30 days to hit $100 in verified profit. After that, billing activates on your account and you pay per scan."],
               ["Verify & pay to continue scanning", "Once 30 days end, a 'Submit documents' notification appears on your account. Click it, upload your broker statement / MyFxBook, and we verify. After verification, billing goes live — pay, and credits are added to your account so you can keep scanning."],
 
-            ].map(([t, d], i) => (
+            ].map(([t, d], i, arr) => (
               <li key={t} className="flex gap-4">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold bg-[#2563eb] text-white">{i + 1}</div>
-                <div>
+                <div className="flex flex-col items-center shrink-0">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold bg-[#2563eb] text-white">{i + 1}</div>
+                  {i < arr.length - 1 && (
+                    <div className="mt-1 w-px flex-1 bg-[#2563eb]/30" />
+                  )}
+                </div>
+                <div className="pb-2">
                   <div className="font-semibold text-zinc-900">{t}</div>
                   <div className="mt-0.5 text-[13px] text-zinc-600">{d}</div>
                 </div>
