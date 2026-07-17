@@ -667,7 +667,7 @@ function MailPage() {
                               </span>
                               <VerifiedBadge
                                 tier={badges[(folder === "sent" ? m.recipient_address : m.sender_address)?.toLowerCase?.() ?? ""]}
-                                size={13}
+                                size={17}
                               />
                             </div>
                             <div
@@ -738,7 +738,7 @@ function MailPage() {
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
                         <span className="truncate">{selected.sender_name || selected.sender_address}</span>
-                        <VerifiedBadge tier={badges[selected.sender_address?.toLowerCase() ?? ""]} size={15} />
+                        <VerifiedBadge tier={badges[selected.sender_address?.toLowerCase() ?? ""]} size={20} />
                       </div>
                       <div className="text-xs text-gray-500">
                         {selected.sender_address} → {selected.recipient_address}
