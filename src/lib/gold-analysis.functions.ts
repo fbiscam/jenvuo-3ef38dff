@@ -2318,7 +2318,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       setupChecks.unshift({ key: `veto_${v.key}`, label: `⛔ ${v.label}`, pass: false, reason: v.reason });
     }
 
-    const SENIOR_REVIEW_MIN_RULE_SCORE = 59;
+    const SENIOR_REVIEW_MIN_RULE_SCORE = 62;
 
     // ---- WISDOM: Regime-based downgrade ----
     // If the tape is unfavorable (choppy/ranging/volatile), a textbook A+ is
@@ -2602,7 +2602,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         else if (gap >= 15) { rulesW = 0.5; aiW = 0.5; }
         blended = Math.round(setupScore * rulesW + aiConf * aiW);
         // Anti-inflation cap: bounded lift so weak rules can't be inflated to A/B,
-        // but allow moderate setups to cross the 59% alert threshold when AI strongly agrees.
+        // but allow moderate setups to cross the 62% alert threshold when AI strongly agrees.
         if (setupScore < 50) {
           blended = Math.min(blended, setupScore + 10);
         } else if (setupScore < 60) {
