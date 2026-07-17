@@ -322,28 +322,37 @@ function MailPage() {
         {/* Main */}
         <section className="flex-1 min-w-0 border-x-0 lg:border lg:border-gray-200 lg:rounded-2xl overflow-hidden bg-white">
           {/* Header */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
-            {selected && (
-              <button onClick={() => setSelected(null)} className="lg:hidden p-1.5 hover:bg-gray-100 rounded">
-                <ArrowLeft className="w-4 h-4" />
+          <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+            <div className="flex items-center gap-1 mb-3">
+              {selected && (
+                <button onClick={() => setSelected(null)} className="lg:hidden p-1.5 hover:bg-gray-100 rounded">
+                  <ArrowLeft className="w-4 h-4" />
+                </button>
+              )}
+              <button className="flex items-center gap-1 p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
+                <span className="w-4 h-4 rounded-full border-2 border-gray-300 inline-block" />
+                <ChevronDown className="w-3.5 h-3.5" />
               </button>
-            )}
-            <div className="relative flex-1 max-w-md">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <button
+                onClick={() => load()}
+                className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
+                title="Refresh"
+              >
+                <RefreshCcw className="w-4 h-4" />
+              </button>
+              <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
+                <MoreVertical className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search mail"
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-100 focus:bg-white focus:ring-1 focus:ring-black outline-none border border-transparent focus:border-gray-300"
+                className="w-full pl-11 pr-4 py-2.5 text-sm rounded-full bg-gray-100 focus:bg-white focus:ring-1 focus:ring-gray-300 outline-none border border-transparent transition"
               />
             </div>
-            <button
-              onClick={() => load()}
-              className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
-              title="Refresh"
-            >
-              <RefreshCcw className="w-4 h-4" />
-            </button>
           </div>
 
           {/* Split view */}
