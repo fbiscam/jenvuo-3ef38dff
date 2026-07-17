@@ -229,14 +229,14 @@ function HomePage() {
             </p>
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
-                to="/app"
+                to={isAuthed ? "/app" : "/auth"}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
               >
                 Launch Voice Agent
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
               <Link
-                to="/signal"
+                to={isAuthed ? "/signal" : "/auth"}
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
               >
                 See Signal Engine
