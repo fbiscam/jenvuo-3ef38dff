@@ -55,7 +55,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
           .from("insights")
           .select("id", { count: "exact", head: true })
           .gte("created_at", since);
-        if ((recentCount ?? 0) >= 2) {
+        if ((recentCount ?? 0) >= 1) {
           return Response.json({ skipped: "daily-cap-reached", recentCount });
         }
 
