@@ -241,6 +241,7 @@ function FoundingPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field name="experience_years" label="Experience (years)" type="number" placeholder="3" />
                 <Field
+                  key={`ref-${refEmail}`}
                   name="referrer_email"
                   label="Referred by (optional)"
                   type="email"
