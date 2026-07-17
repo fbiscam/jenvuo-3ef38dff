@@ -67,8 +67,10 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       throw new Error(insertErr?.message ?? 'Failed to record alert')
     }
 
-    // 2. Recipients = every active paid-plan user's email (no opt-in required).
+    // 2. Recipients = every active paid-plan user's email whose alerts_enabled is true.
+    const { filterAlertsEnabledUserIds } = await import('@/lib/alert-pref-filter.server')
     let recipientEmails: string[] = []
+    let notifyUserIds: string[] = []
     {
       const { data: paidRows } = await supabaseAdmin
         .from('user_subscriptions')
@@ -78,12 +80,13 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       const paidIds = Array.from(
         new Set((paidRows ?? []).map((r: { user_id: string }) => r.user_id)),
       )
-      if (paidIds.length > 0) {
+      notifyUserIds = await filterAlertsEnabledUserIds(paidIds)
+      if (notifyUserIds.length > 0) {
         const { data: users } = (await supabaseAdmin
           .schema('auth' as never)
           .from('users' as never)
           .select('id, email')
-          .in('id', paidIds)) as unknown as {
+          .in('id', notifyUserIds)) as unknown as {
           data: Array<{ id: string; email: string | null }> | null
         }
         recipientEmails = Array.from(
@@ -98,15 +101,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
     const recipients: Array<{ email: string }> = recipientEmails.map((email) => ({ email }))
 
 
-    // 3. Insert in-app notifications for all paid users (even non-subscribers)
-    const { data: allPaid } = await supabaseAdmin
-      .from('user_subscriptions')
-      .select('user_id')
-      .eq('status', 'active')
-      .neq('plan_id', 'free')
-
-      
-    const notifyUserIds = Array.from(new Set((allPaid ?? []).map((r: { user_id: string }) => r.user_id)))
+    // 3. Insert in-app notifications for allow-listed users only
 
     if (notifyUserIds.length > 0) {
       const rationale = (data.rationale ?? '').slice(0, 500)
