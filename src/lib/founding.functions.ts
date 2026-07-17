@@ -134,7 +134,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
              <li style="margin:4px 0">Full access — signals, alerts, killzones, voice briefs</li>
            </ul>
            <p style="margin:0">You only start paying once you cross <strong>$100 in verified profit</strong>. If you don't profit, you don't pay.</p>`,
-          { label: "Explore the platform", href: `${APP_URL}/signal` },
+          { label: "Explore the platform", href: `${APP_URL}/explore` },
         ),
       };
     case "approved":
