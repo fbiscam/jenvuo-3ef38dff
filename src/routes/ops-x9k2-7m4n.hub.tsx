@@ -153,10 +153,7 @@ function OpsHub() {
                 onClick={() => setActive(t)}
                 className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-5 text-left shadow-[0_12px_30px_-20px_rgba(0,0,0,0.08)] transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_24px_60px_-24px_rgba(0,0,0,0.14)]"
               >
-                <div className="flex items-center justify-between">
-                  <span className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-400`}>
-                    tile
-                  </span>
+                <div className="flex items-center justify-end">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400 transition group-hover:translate-x-0.5 group-hover:text-zinc-900">
                     <line x1="5" y1="12" x2="19" y2="12" />
                     <polyline points="12 5 19 12 12 19" />
