@@ -504,8 +504,53 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
 
     const p = prior as any;
 
-    // Activate/fund the selected plan when the applicant is approved/active and already has an account.
-    if ((data.status === "approved" || data.status === "active") && p?.email) {
+    // On APPROVED: don't activate the plan yet — just generate a secure
+    // set-password link so the user can sign in. Plan activation happens
+    // separately when the admin marks the application "active" (funded).
+    let approvedResetUrl: string | null = null;
+    if (data.status === "approved" && data.status !== p?.status && p?.email) {
+      const url = process.env.SUPABASE_URL;
+      const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (url && service) {
+        const admin = createClient<Database>(url, service, {
+          auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+        });
+        const targetEmail = String(p.email).toLowerCase();
+        const planId = String(p.requested_plan || "elite");
+        // Check if the user already has an account
+        let existingUserId: string | null = null;
+        for (let page = 1; page <= 20 && !existingUserId; page++) {
+          const { data: userList } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+          const found = userList?.users?.find((u) => u.email?.toLowerCase() === targetEmail);
+          if (found) existingUserId = found.id;
+          if (!userList?.users?.length || (userList.users.length < 1000)) break;
+        }
+        try {
+          const linkType = existingUserId ? "recovery" : "invite";
+          const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+            type: linkType as any,
+            email: targetEmail,
+            options: {
+              redirectTo: `${APP_URL}/reset-password`,
+              data: existingUserId
+                ? undefined
+                : { full_name: p.full_name || null, founding_application_id: data.id, requested_plan: planId },
+            },
+          });
+          if (linkErr) {
+            console.error(`[founding] generateLink(${linkType}) failed:`, linkErr.message);
+          }
+          approvedResetUrl = (linkData as any)?.properties?.action_link || null;
+        } catch (e) {
+          console.error("[founding] generateLink threw:", (e as Error)?.message);
+        }
+      }
+    }
+
+    // On ACTIVE (admin marked account funded / $100): activate the plan and
+    // send the "account funded" email. This is the point where the wallet
+    // actually gets credited.
+    if (data.status === "active" && data.status !== p?.status && p?.email) {
       const url = process.env.SUPABASE_URL;
       const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
       if (url && service) {
@@ -515,7 +560,6 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
         const planId = String(p.requested_plan || "elite");
         const targetEmail = String(p.email).toLowerCase();
         let matchedUserId: string | null = null;
-        // Paginate auth.users until we find the applicant (listUsers caps at ~1000/page).
         for (let page = 1; page <= 20 && !matchedUserId; page++) {
           const { data: userList, error: listErr } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
           if (listErr) throw new Error(`plan activation: ${listErr.message}`);
@@ -530,55 +574,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
             _billing_interval: "monthly",
           });
           if (rpcErr) throw new Error(`plan activation: ${rpcErr.message}`);
-          // Billing notice from billing@
-          try {
-            const { sendSystemMail } = await import("@/lib/system-mail.server");
-            const name = String(p.full_name || "there").split(/\s+/)[0];
-            await sendSystemMail({
-              from: "billing@jenvu.email",
-              toUserId: matchedUserId,
-              subject: `Your ${planId.toUpperCase()} plan is active 🎉`,
-              body: [
-                `Hi ${name},`,
-                ``,
-                `Your ${planId.toUpperCase()} plan has been activated on your Jenvu account.`,
-                `Your wallet has been funded per your plan and you can start scanning right away.`,
-                ``,
-                `View details on the Billing page.`,
-                ``,
-                `— Jenvu Billing`,
-              ].join("\n"),
-            });
-          } catch (e) {
-            console.error("[founding] system-mail plan-activated failed:", (e as Error)?.message);
-          }
-        } else {
-          // Applicant has no account yet — send a Supabase invite so they can
-          // set their own password and sign in. Plan activation happens the
-          // next time this approval is saved after the account exists.
-          try {
-            const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(targetEmail, {
-              redirectTo: `${APP_URL}/reset-password`,
-              data: {
-                full_name: p.full_name || null,
-                founding_application_id: data.id,
-                requested_plan: planId,
-              },
-            });
-            if (inviteErr) {
-              // Ignore "already registered" races — the user exists now, they can sign in.
-              const msg = (inviteErr.message || "").toLowerCase();
-              if (!msg.includes("already") && !msg.includes("registered")) {
-                console.error(`[founding] invite failed for ${targetEmail}:`, inviteErr.message);
-              }
-            } else {
-              console.log(`[founding] invite sent to ${targetEmail}`);
-            }
-          } catch (e) {
-            console.error(`[founding] invite threw for ${targetEmail}:`, (e as Error)?.message);
-          }
         }
-
       }
     }
 
@@ -586,10 +582,10 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     // to a paid plan after their trial — handled in public.set_user_plan.
 
     // Only send emails for actions that were actually fulfilled in this update.
-    // - approved: only when status transitions to "approved"
-    // - funded:   only when status transitions to "active" (account funded/paying)
+    // - approved: password-reset link email
+    // - funded:   only when status transitions to "active" (account funded)
     //             OR admin marks first_profit_reached=true
-    // - rejected / waitlisted: on their respective status transitions
+    // - rejected / waitlisted / pending: on their respective status transitions
     const kinds: ApplicantEmailKind[] = [];
     if (p?.email && data.status && data.status !== p.status) {
       if (data.status === "approved") kinds.push("approved");
@@ -609,10 +605,13 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
         });
         for (const kind of kinds) {
-          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`);
+          const extras: ApplicantEmailExtras = kind === "approved" && approvedResetUrl ? { resetUrl: approvedResetUrl } : {};
+          await enqueueApplicantEmail(admin, kind, String(p.email), String(p.full_name || "there"), String(p.requested_plan || "elite"), `${data.id}-${kind}`, extras);
         }
       }
     }
+
+
 
 
     return { ok: true };
