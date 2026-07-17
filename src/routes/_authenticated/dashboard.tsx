@@ -952,7 +952,7 @@ function DashboardLayout() {
               </Link>
             </div>
           </div>
-          <div className="flex items-center gap-2 lg:self-start lg:mt-1">
+          <div className="flex items-center gap-2 lg:self-end lg:mt-6 lg:mb-0">
             <button
               type="button"
               aria-label="Open menu"
@@ -966,7 +966,7 @@ function DashboardLayout() {
                 <button
                   type="button"
                   aria-label="Account menu"
-                  className="inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-white text-[12px] font-medium text-zinc-700 shadow-sm hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                  className="inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-white text-[14px] font-medium text-zinc-700 shadow-sm hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300"
                 >
                   {avatarUrl ? (
                     <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
