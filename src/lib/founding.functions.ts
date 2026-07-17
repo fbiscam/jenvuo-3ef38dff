@@ -151,17 +151,17 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Congratulations, ${n} — you're approved.`,
           "Approved · Founding Trader",
-          `<p style="margin:0 0 12px">Your Founding Trader application has been <strong>approved</strong>. Welcome to Jenvu — a very small, hand-picked cohort of traders.</p>
-           <p style="margin:0 0 12px">Your seat is reserved on the <strong>${escapeHtml(meta.label)}</strong> plan (${escapeHtml(meta.wallet)}). ${escapeHtml(meta.blurb)}</p>
-           <p style="margin:16px 0 8px"><strong>What you'll get inside Jenvu:</strong></p>
-           <ul style="margin:0 0 12px;padding-left:20px">
-             <li style="margin:4px 0"><strong>Institutional XAU/USD signal engine</strong> — ICT/SMC rules blended with senior-desk AI review.</li>
-             <li style="margin:4px 0"><strong>Live killzones & session alerts</strong> — you never miss London or NY opens.</li>
-             <li style="margin:4px 0"><strong>Trade journal & analytics</strong> — auto win/lose tracking on every setup you take.</li>
-             <li style="margin:4px 0"><strong>Voice briefs & macro context</strong> — news, narrative and sentiment layered onto every scan.</li>
+          `<p style="margin:0 0 14px;line-height:1.6">Your Founding Trader application has been <strong>approved</strong>. Welcome to Jenvu — a small, hand-picked cohort of traders.</p>
+           <p style="margin:0 0 18px;line-height:1.6">Your seat is reserved on the <strong>${escapeHtml(meta.label)}</strong> plan (${escapeHtml(meta.wallet)}).</p>
+           <p style="margin:0 0 10px;font-weight:600">What you get inside Jenvu</p>
+           <ul style="margin:0 0 18px;padding-left:20px;line-height:1.5">
+             <li style="margin:6px 0">Institutional XAU/USD signal engine</li>
+             <li style="margin:6px 0">Live killzones & session alerts</li>
+             <li style="margin:6px 0">Trade journal with auto win/lose tracking</li>
+             <li style="margin:6px 0">Voice briefs & macro context on every scan</li>
            </ul>
-           <p style="margin:16px 0 8px"><strong>Next step — set your password</strong></p>
-           <p style="margin:0 0 12px">Use the secure link below to set your password. It's a one-time link tied to your email; once you set it, you can sign in from anywhere.</p>`,
+           <p style="margin:0 0 8px;font-weight:600">Next step — set your password</p>
+           <p style="margin:0 0 4px;line-height:1.6">Use the secure link below. It's a one-time link tied to your email.</p>`,
           { label: "Set my password", href: resetUrl },
         ),
       };
