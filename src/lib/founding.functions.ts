@@ -117,7 +117,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
       <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;border-collapse:collapse">
         <tr>
           <td style="vertical-align:middle"><img src="${APP_URL}/favicon.png" width="32" height="32" alt="Jenvu" style="display:block;border-radius:7px" /></td>
-          <td style="vertical-align:middle;padding-left:12px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.01em;color:#09090b;line-height:1">Jenvu</td>
+          <td style="vertical-align:middle;padding-left:12px;font-family:'Google Sans','Product Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:400;letter-spacing:-0.005em;color:#09090b;line-height:1">Jenvu</td>
         </tr>
       </table>
     </div>
