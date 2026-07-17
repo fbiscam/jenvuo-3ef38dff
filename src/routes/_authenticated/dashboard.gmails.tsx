@@ -282,31 +282,28 @@ function MailPage() {
           >
             <Pencil className="w-4 h-4" /> Compose
           </button>
-          <nav className="space-y-1">
+          <nav className="space-y-1.5">
             {FOLDERS.map((f) => {
               const Icon = f.icon;
-              const active = folder === f.key;
+              const active = view === f.key;
               return (
                 <button
                   key={f.key}
                   onClick={() => {
-                    setFolder(f.key);
+                    setView(f.key);
                     setSelected(null);
                   }}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition",
-                    active ? "bg-[#f5efe4] text-black" : "text-gray-700 hover:bg-[#faf6ee]",
+                    "w-full flex items-center gap-3 px-4 py-2.5 rounded-full text-sm transition",
+                    active
+                      ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-gray-100 text-gray-900 font-semibold"
+                      : "text-gray-600 hover:bg-gray-50",
                   )}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className={cn("w-[18px] h-[18px]", active ? "text-blue-600" : "text-gray-500")} strokeWidth={active ? 2.2 : 1.8} />
                   <span className="flex-1 text-left">{f.label}</span>
                   {f.key === "inbox" && unreadCount > 0 && (
-                    <span
-                      className={cn(
-                        "text-[11px] px-1.5 py-0.5 rounded-full font-medium",
-                        active ? "bg-red-500 text-white" : "bg-red-500 text-white",
-                      )}
-                    >
+                    <span className="text-[11px] px-1.5 py-0.5 rounded-full font-medium bg-red-500 text-white">
                       {unreadCount}
                     </span>
                   )}
