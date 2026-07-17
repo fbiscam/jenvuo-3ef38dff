@@ -394,6 +394,36 @@ function MailPage() {
           >
             <Pencil className="w-4 h-4 text-gray-700" /> Compose
           </button>
+
+          {myAddresses.length > 1 && (
+            <div className="relative mb-4">
+              <button
+                onClick={() => setAddrSwitchOpen((v) => !v)}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-left"
+              >
+                <div className="min-w-0">
+                  <div className="text-[10px] uppercase tracking-wide text-gray-400">Mailbox</div>
+                  <div className="text-sm text-gray-900 truncate">{activeAddress}</div>
+                </div>
+                <svg className={`w-4 h-4 text-gray-500 transition ${addrSwitchOpen ? "rotate-180" : ""}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd"/></svg>
+              </button>
+              {addrSwitchOpen && (
+                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                  {myAddresses.map((a) => (
+                    <button
+                      key={a.address}
+                      onClick={() => { setActiveAddress(a.address); setAddrSwitchOpen(false); setSelected(null); }}
+                      className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between hover:bg-gray-50 ${activeAddress === a.address ? "bg-gray-50" : ""}`}
+                    >
+                      <span className="truncate">{a.address}</span>
+                      {a.is_primary && <span className="text-[10px] text-gray-400 ml-2">primary</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <nav className="space-y-1.5">
             {FOLDERS.map((f) => {
               const Icon = f.icon;
