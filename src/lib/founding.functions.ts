@@ -243,7 +243,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
       };
     case "documents_submitted":
       return {
-        subject: "We received your documents ✅",
+        subject: "We received your documents",
         html: wrap(
           `Got it, ${n} — documents received`,
           "Documents · Submitted",
@@ -1031,7 +1031,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
           await sendSystemMail({
             from: "notifications@jenvu.email",
             toUserId: context.userId,
-            subject: "We received your documents ✅",
+            subject: "We received your documents",
             body: [
               `Hi ${name},`,
               ``,
