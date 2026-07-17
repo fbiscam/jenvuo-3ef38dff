@@ -469,20 +469,7 @@ function DashboardLayout() {
     if (typeof window === "undefined") return;
     window.localStorage.setItem("jenvu:dash:sidebar-collapsed", sidebarCollapsed ? "1" : "0");
   }, [sidebarCollapsed]);
-  // Auto-collapse sidebar when entering the Emails page; restore prior state on leave
-  const prevSidebarRef = useRef<boolean | null>(null);
-  useEffect(() => {
-    const onMail = pathname.startsWith("/dashboard/gmails");
-    if (onMail) {
-      if (prevSidebarRef.current === null) prevSidebarRef.current = sidebarCollapsed;
-      if (!sidebarCollapsed) setSidebarCollapsed(true);
-    } else if (prevSidebarRef.current !== null) {
-      const prev = prevSidebarRef.current;
-      prevSidebarRef.current = null;
-      setSidebarCollapsed(prev);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  // (removed emails auto-collapse — page no longer exists)
   // Close mobile drawer on route change
   useEffect(() => { setMobileNavOpen(false); }, [pathname]);
 
