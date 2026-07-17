@@ -459,15 +459,8 @@ function SignalPage() {
   const load = useCallback(async () => {
     const sym = symbol || "XAUUSD";
     if (activeScanRef.current === sym) return;
-    // FREE plan: only XAU/USD scans allowed. Force-redirect to XAUUSD.
-    if (!credits.isLoading && credits.plan?.id === "free" && sym.toUpperCase().replace(/[^A-Z]/g, "") !== "XAUUSD") {
-      toast.info("Multi-pair analysis is a Pro feature", {
-        description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
-        action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
-      });
-      navigate({ to: "/signal", search: { symbol: "XAUUSD" }, replace: true });
-      return;
-    }
+    // Free plan removed — all authenticated users are on a paid plan and can scan any XAU pair.
+
     // Pre-flight: block the scan if wallet is below the flat $0.20 per-signal charge.
     if (!credits.isLoading && credits.balance < 0.20) {
       toast.error("Balance too low to run analysis", {

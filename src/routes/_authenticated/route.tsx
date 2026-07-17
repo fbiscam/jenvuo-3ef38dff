@@ -11,6 +11,7 @@ const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 // beforeLoad awaited the network).
 let verifiedUserId: string | null = null;
 let trustedDeviceVerified: string | null = null;
+let planCheckedUserId: string | null = null;
 
 async function hasValidTrustedDevice(uid: string): Promise<boolean> {
   if (typeof window === "undefined") return false;
@@ -71,6 +72,19 @@ export const Route = createFileRoute("/_authenticated")({
     }
 
     verifiedUserId = user.id;
+
+    // Force plan selection: users without an active subscription are sent to /pricing.
+    if (planCheckedUserId !== user.id) {
+      const { data: sub } = await supabase
+        .from("user_subscriptions")
+        .select("plan_id, status")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!sub || sub.status !== "active") {
+        throw redirect({ to: "/pricing" });
+      }
+      planCheckedUserId = user.id;
+    }
   },
   component: AuthenticatedLayout,
 });

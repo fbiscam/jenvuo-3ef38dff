@@ -18,7 +18,7 @@ export function useCurrentPlan() {
         .maybeSingle();
       if (!mounted) return;
       if (data && data.status === "active") setPlan(data.plan_id);
-      else setPlan("free");
+      else setPlan(null);
     };
     load();
     const { data: sub } = supabase.auth.onAuthStateChange(() => load());

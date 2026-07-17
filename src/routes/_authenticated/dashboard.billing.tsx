@@ -136,7 +136,7 @@ function Billing() {
   }
 
   const plan = currentPlan;
-  const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+  const planLabel = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "No plan";
   const remaining = credits.balance;
   const pctBase = Math.max(credits.balance, credits.allowance);
   const pct = pctBase > 0 ? Math.min(100, Math.round((remaining / pctBase) * 100)) : 0;
@@ -152,44 +152,29 @@ function Billing() {
           <div>
             <div className="mt-2 flex items-center gap-3">
               <h2 className="text-2xl font-semibold">{planLabel}</h2>
-              {plan === "free" && (
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-800">
-                  Limited
-                </span>
-              )}
-              {plan !== "free" && (
+              {plan ? (
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-800">
                   Active
+                </span>
+              ) : (
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-800">
+                  No plan
                 </span>
               )}
             </div>
             <p className="mt-2 max-w-xl text-[12px] leading-snug sm:text-sm sm:leading-normal text-zinc-500">
-              {plan === "free"
-                ? "Upgrade for a bigger monthly wallet, priority alerts, and multi-pair scanning."
-                : "Your plan renews automatically. Manage billing via the customer portal."}
+              {plan
+                ? "Your plan renews automatically. Manage billing via the customer portal."
+                : "Choose a plan to activate your wallet and unlock signals."}
             </p>
           </div>
-          {plan !== "free" ? (
+          {plan ? (
             <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
               Manage plan
             </Link>
-          ) : upgradeLock.locked ? (
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title={
-                upgradeLock.reason === "docs_pending"
-                  ? "Upgrades unlock after your earning proof is verified and your 30-day trial ends."
-                  : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your earning proof is verified.`
-              }
-              className="cursor-not-allowed rounded-lg border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-500"
-            >
-              Locked in trial{typeof upgradeLock.daysLeft === "number" ? ` · ${upgradeLock.daysLeft}d left` : ""}
-            </button>
           ) : (
             <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
-              Upgrade
+              Choose plan
             </Link>
           )}
         </div>
