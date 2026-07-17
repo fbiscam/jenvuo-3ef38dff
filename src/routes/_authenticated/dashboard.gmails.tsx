@@ -605,13 +605,15 @@ function MailPage() {
                         ? m.recipient_address
                         : m.sender_name || m.sender_address;
                     return (
-                      <li key={m.message_id} className={cn(selectedIds.has(m.message_id) && "bg-blue-50")}>
+                      <li key={m.message_id} className={cn("relative", selectedIds.has(m.message_id) && "bg-blue-50")}>
+                        {active && <span className="absolute left-0 top-0 bottom-0 w-[3px] bg-blue-600 rounded-r" />}
                         <div
                           onClick={() => openMessage(m)}
                           className={cn(
-                            "w-full text-left px-4 py-3 border-b border-gray-100 flex gap-3 items-start hover:bg-gray-50 transition cursor-pointer",
-                            active && "bg-gray-100",
-                            !m.is_read && folder === "inbox" && !selectedIds.has(m.message_id) && "bg-blue-50/40",
+                            "w-full text-left pl-4 pr-3 py-3 border-b border-gray-100 flex gap-3 items-start transition cursor-pointer",
+                            "hover:bg-gray-50/80",
+                            active && "bg-blue-50/70 hover:bg-blue-50/70",
+                            !m.is_read && folder === "inbox" && !active && !selectedIds.has(m.message_id) && "bg-white",
                             selectedIds.has(m.message_id) && "bg-blue-50 hover:bg-blue-50",
                           )}
                         >
@@ -623,7 +625,7 @@ function MailPage() {
                               toggleSelectOne(m.message_id);
                             }}
                             className={cn(
-                              "mt-1 w-4 h-4 rounded border-2 inline-flex items-center justify-center shrink-0 cursor-pointer",
+                              "mt-1.5 w-4 h-4 rounded border-2 inline-flex items-center justify-center shrink-0 cursor-pointer transition",
                               selectedIds.has(m.message_id)
                                 ? "bg-blue-600 border-blue-600 text-white"
                                 : "border-gray-300 hover:border-gray-500 bg-white",
@@ -631,21 +633,26 @@ function MailPage() {
                           >
                             {selectedIds.has(m.message_id) && <Check className="w-3 h-3" strokeWidth={3} />}
                           </span>
-                          <div className="w-9 h-9 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden">
-                            {m.sender_avatar ? (
-                              <img src={m.sender_avatar} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              initials(m.sender_name, m.sender_address)
+                          <div className="relative shrink-0">
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 text-white flex items-center justify-center text-xs font-semibold overflow-hidden ring-1 ring-gray-200/60">
+                              {m.sender_avatar ? (
+                                <img src={m.sender_avatar} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                initials(m.sender_name, m.sender_address)
+                              )}
+                            </div>
+                            {!m.is_read && folder === "inbox" && (
+                              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-blue-600 ring-2 ring-white" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5">
                               <span
                                 className={cn(
                                   "text-sm truncate",
                                   !m.is_read && folder === "inbox"
                                     ? "font-semibold text-gray-900"
-                                    : "text-gray-700",
+                                    : "text-gray-800",
                                 )}
                               >
                                 {who}
@@ -654,13 +661,13 @@ function MailPage() {
                                 tier={badges[(folder === "sent" ? m.recipient_address : m.sender_address)?.toLowerCase?.() ?? ""]}
                                 size={13}
                               />
-                              <span className="ml-auto text-[11px] text-gray-400 shrink-0">
+                              <span className="ml-auto text-[11px] text-gray-400 shrink-0 tabular-nums">
                                 {timeAgo(m.created_at)}
                               </span>
                             </div>
                             <div
                               className={cn(
-                                "text-sm truncate",
+                                "text-sm truncate mt-0.5",
                                 !m.is_read && folder === "inbox"
                                   ? "text-gray-900 font-medium"
                                   : "text-gray-600",
@@ -668,7 +675,7 @@ function MailPage() {
                             >
                               {m.subject || "(no subject)"}
                             </div>
-                            <div className="text-xs text-gray-400 truncate">
+                            <div className="text-xs text-gray-400 truncate mt-0.5 leading-relaxed">
                               {m.body.slice(0, 100)}
                             </div>
                           </div>
@@ -677,12 +684,13 @@ function MailPage() {
                               e.stopPropagation();
                               toggleStar(m);
                             }}
-                            className="shrink-0 p-1"
+                            className="shrink-0 p-1 rounded hover:bg-gray-100 transition"
+                            title={m.is_starred ? "Unstar" : "Star"}
                           >
                             <Star
                               className={cn(
-                                "w-4 h-4",
-                                m.is_starred ? "fill-yellow-400 text-yellow-400" : "text-gray-300",
+                                "w-4 h-4 transition",
+                                m.is_starred ? "fill-yellow-400 text-yellow-400" : "text-gray-300 hover:text-gray-400",
                               )}
                             />
                           </button>
