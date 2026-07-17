@@ -190,10 +190,10 @@ function DocumentsPage() {
                       className={[
                         "mt-0.5 h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold",
                         done
-                          ? "bg-emerald-500 text-white"
+                          ? "bg-blue-600 text-white"
                           : active
-                          ? "bg-zinc-900 text-white"
-                          : "bg-zinc-100 text-zinc-500",
+                          ? "bg-blue-600 text-white"
+                          : "bg-blue-600 text-white",
                       ].join(" ")}
                     >
                       {done ? "✓" : i + 1}
