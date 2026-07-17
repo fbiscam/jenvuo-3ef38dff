@@ -887,7 +887,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
           } else if (kind === "documents_rejected") {
             bodyLines.push("Unfortunately your documents were not approved.");
             if (data.rejected_reason) bodyLines.push("", `Reason: ${data.rejected_reason}`);
-            bodyLines.push("", "You can resubmit within 24 hours from the Documents page.");
+            bodyLines.push("", "You can resubmit right away from your Documents page.");
           } else if (kind === "documents_needs_info") {
             bodyLines.push("Our review team needs a bit more information before we can approve.");
             if (data.info_request) bodyLines.push("", `Requested: ${data.info_request}`);
