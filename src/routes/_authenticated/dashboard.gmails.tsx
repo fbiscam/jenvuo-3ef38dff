@@ -290,7 +290,7 @@ function MailPage() {
                   }}
                   className={cn(
                     "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition",
-                    active ? "bg-gray-900 text-white" : "text-gray-700 hover:bg-gray-100",
+                    active ? "bg-[#f5efe4] text-black" : "text-gray-700 hover:bg-[#faf6ee]",
                   )}
                 >
                   <Icon className="w-4 h-4" />
