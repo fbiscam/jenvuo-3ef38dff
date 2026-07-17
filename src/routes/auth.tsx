@@ -1053,10 +1053,13 @@ function AuthPage() {
                     ) : (
                       <form onSubmit={signUp} className="mt-4 space-y-3">
                         <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-[12px] leading-snug text-amber-900">
-                          This program is invite only — please submit your form here:{" "}
-                          <a href="/founding" className="font-semibold underline hover:text-amber-950">
-                            /founding
-                          </a>
+                          <div className="font-semibold text-amber-950">Jenvu Founding Program — Invite Only</div>
+                          <p className="mt-1">
+                            Access to Jenvu is currently limited to founding members. Read the program details and submit your application to receive access:{" "}
+                            <a href="/founding" className="font-semibold underline hover:text-amber-950">
+                              Read more & apply →
+                            </a>
+                          </p>
                         </div>
                         <div>
                           <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
