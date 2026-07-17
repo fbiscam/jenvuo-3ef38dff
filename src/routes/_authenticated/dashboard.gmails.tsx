@@ -344,10 +344,10 @@ function MailPage() {
 
   // ------------ Mail UI ------------
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-white">
-      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-0 lg:gap-4 lg:p-4">
+    <div className="min-h-[calc(100vh-4rem)] bg-white lg:h-[calc(100vh-7rem)] lg:min-h-0 lg:overflow-hidden">
+      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-0 lg:gap-4 lg:p-4 lg:h-full">
         {/* Sidebar */}
-        <aside className="lg:w-56 shrink-0 lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto px-3 py-4 lg:p-0 z-10">
+        <aside className="lg:w-56 shrink-0 lg:sticky lg:top-0 lg:self-start lg:h-full lg:max-h-none lg:overflow-y-auto px-3 py-4 lg:p-0 z-10">
           <button
             onClick={() => setComposeOpen(true)}
             className="w-full flex items-center gap-2 justify-center bg-white text-gray-900 border border-gray-200 shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-full py-3 text-sm font-medium hover:shadow-md hover:bg-gray-50 transition mb-6"
@@ -386,9 +386,9 @@ function MailPage() {
         </aside>
 
         {/* Main */}
-        <section className="flex-1 min-w-0 border-x-0 lg:border lg:border-gray-200 lg:rounded-2xl overflow-hidden bg-white">
+        <section className="flex-1 min-w-0 border-x-0 lg:border lg:border-gray-200 lg:rounded-2xl overflow-hidden bg-white lg:h-full lg:flex lg:flex-col">
           {/* Header */}
-          <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+          <div className="px-4 pt-4 pb-3 border-b border-gray-100 lg:shrink-0">
             <div className="flex items-center gap-1 mb-3">
               {selected && (
                 <button onClick={() => setSelected(null)} className="lg:hidden p-1.5 hover:bg-gray-100 rounded">
@@ -510,9 +510,9 @@ function MailPage() {
           </div>
 
           {/* Split view */}
-          <div className="grid lg:grid-cols-[380px_1fr] min-h-[500px]">
+          <div className="grid lg:grid-cols-[380px_1fr] min-h-[500px] lg:min-h-0 lg:flex-1 lg:overflow-hidden">
             {/* List */}
-            <div className={cn("border-r border-gray-200", selected ? "hidden lg:block" : "block")}>
+            <div className={cn("border-r border-gray-200 lg:overflow-y-auto", selected ? "hidden lg:block" : "block")}>
               {loading ? (
                 <div className="p-8 text-center text-sm text-gray-400">Loading…</div>
               ) : filtered.length === 0 ? (
@@ -619,7 +619,7 @@ function MailPage() {
             </div>
 
             {/* Detail */}
-            <div className={cn("bg-white", !selected ? "hidden lg:block" : "block")}>
+            <div className={cn("bg-white lg:overflow-y-auto", !selected ? "hidden lg:block" : "block")}>
               {!selected ? (
                 <div className="h-full min-h-[400px] flex flex-col items-center justify-center p-12 text-center">
                   <div className="w-20 h-20 rounded-full border border-gray-200 flex items-center justify-center mb-4">
