@@ -28,9 +28,12 @@ import {
   sendMail,
   setMailState,
   searchMailDirectory,
+  getMailBadges,
   type MailFolder,
   type MailListItem,
+  type MailBadgeTier,
 } from "@/lib/mail.functions";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 
 export const Route = createFileRoute("/_authenticated/dashboard/gmails")({
   head: () => ({
@@ -76,6 +79,7 @@ function MailPage() {
   const _send = useServerFn(sendMail);
   const _setState = useServerFn(setMailState);
   const _search = useServerFn(searchMailDirectory);
+  const _badges = useServerFn(getMailBadges);
 
   const [myAddress, setMyAddress] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
@@ -89,6 +93,7 @@ function MailPage() {
   const [selected, setSelected] = useState<MailListItem | null>(null);
   const [composeOpen, setComposeOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [badges, setBadges] = useState<Record<string, MailBadgeTier>>({});
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -108,6 +113,21 @@ function MailPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // Fetch verification badges for every address currently on screen
+  useEffect(() => {
+    const addrs = new Set<string>();
+    for (const m of messages) {
+      if (m.sender_address) addrs.add(m.sender_address.toLowerCase());
+      if (m.recipient_address) addrs.add(m.recipient_address.toLowerCase());
+    }
+    if (myAddress) addrs.add(myAddress.toLowerCase());
+    const list = Array.from(addrs).filter((a) => !(a in badges));
+    if (!list.length) return;
+    _badges({ data: { addresses: list } })
+      .then((m) => setBadges((prev) => ({ ...prev, ...m })))
+      .catch(() => {});
+  }, [messages, myAddress, _badges, badges]);
 
 
   // realtime: refresh on inbox changes
@@ -403,6 +423,10 @@ function MailPage() {
                               >
                                 {who}
                               </span>
+                              <VerifiedBadge
+                                tier={badges[(folder === "sent" ? m.recipient_address : m.sender_address)?.toLowerCase?.() ?? ""]}
+                                size={13}
+                              />
                               <span className="ml-auto text-[11px] text-gray-400 shrink-0">
                                 {timeAgo(m.created_at)}
                               </span>
@@ -464,8 +488,9 @@ function MailPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {selected.sender_name || selected.sender_address}
+                      <div className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                        <span className="truncate">{selected.sender_name || selected.sender_address}</span>
+                        <VerifiedBadge tier={badges[selected.sender_address?.toLowerCase() ?? ""]} size={15} />
                       </div>
                       <div className="text-xs text-gray-500">
                         {selected.sender_address} → {selected.recipient_address}
