@@ -134,7 +134,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
              <li style="margin:4px 0">Full access — signals, alerts, killzones, voice briefs</li>
            </ul>
            <p style="margin:0">You only start paying once you cross <strong>$100 in verified profit</strong>. If you don't profit, you don't pay.</p>`,
-          { label: "Explore the platform", href: `${APP_URL}/signal` },
+          { label: "Explore the platform", href: `${APP_URL}/explore` },
         ),
       };
     case "approved":
@@ -190,7 +190,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `<p style="margin:0 0 12px">This month's 220 seats are filled, but your application looks strong — you're on the waitlist for the next cohort.</p>
            <p style="margin:0 0 12px">As soon as a seat opens (or the next month rolls over on the 1st), we'll email you to activate your <strong>${escapeHtml(meta.label)}</strong> plan.</p>
            <p style="margin:0">No action needed from your side. Sit tight.</p>`,
-          { label: "Explore the platform", href: `${APP_URL}/signal` },
+          { label: "Explore the platform", href: `${APP_URL}/explore` },
         ),
       };
     case "documents_received":
