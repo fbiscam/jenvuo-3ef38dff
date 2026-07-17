@@ -281,8 +281,8 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
   }
 }
 
-async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string, dedupeKey?: string) {
-  const rendered = renderApplicantEmail(kind, name, plan);
+async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: string, name: string, plan: string, dedupeKey?: string, extras: ApplicantEmailExtras = {}) {
+  const rendered = renderApplicantEmail(kind, name, plan, extras);
   if (!rendered) return;
   const { subject, html } = rendered;
   const text = htmlToText(html);
