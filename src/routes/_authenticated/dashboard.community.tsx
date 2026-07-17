@@ -136,10 +136,6 @@ function ClaimHandleGate({ onClaimed }: { onClaimed: () => void }) {
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-md px-4 py-16">
-        <div className="mb-2 flex items-center gap-2 text-blue-600">
-          <Sparkles className="h-5 w-5" />
-          <span className="text-xs font-semibold uppercase tracking-widest">Jenvu Community</span>
-        </div>
         <h1 className="mb-2 text-3xl font-semibold tracking-tight text-zinc-900">Claim your handle</h1>
         <p className="mb-6 text-sm text-zinc-500">Pick a unique @handle. This is permanent — you cannot change it later.</p>
         <label className="mb-1 block text-xs font-medium text-zinc-600">Handle</label>
