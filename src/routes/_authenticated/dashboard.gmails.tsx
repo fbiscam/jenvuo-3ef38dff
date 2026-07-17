@@ -471,7 +471,7 @@ function MailPage() {
                   if (allVisibleSelected || someSelected) clearSelection();
                   else selectAllVisible();
                 }}
-                className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
+                className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500 mt-1"
                 title="Select all"
               >
                 <span
