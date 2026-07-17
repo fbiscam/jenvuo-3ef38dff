@@ -1581,37 +1581,43 @@ export const getMarketSnapshot = createServerFn({ method: "POST" })
     return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
   })
   .handler(async ({ data }) => {
-    const inst = resolveInstrument(data.symbol);
-    const quote = await resolveLiveTick(inst).catch(() => null);
-    // Use daily candles for a stable 24h reference price.
-    const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
-    let price: number | null = null;
-    let prevClose: number | null = null;
-    if (daily.length >= 2) {
-      price = daily[daily.length - 1].c;
-      prevClose = daily[daily.length - 2].c;
-    } else if (daily.length === 1) {
-      price = daily[0].c;
-      prevClose = daily[0].o;
+    try {
+      const inst = resolveInstrument(data.symbol);
+      const quote = await resolveLiveTick(inst).catch(() => null);
+      // Use daily candles for a stable 24h reference price.
+      const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
+      let price: number | null = null;
+      let prevClose: number | null = null;
+      if (daily.length >= 2) {
+        price = daily[daily.length - 1].c;
+        prevClose = daily[daily.length - 2].c;
+      } else if (daily.length === 1) {
+        price = daily[0].c;
+        prevClose = daily[0].o;
+      }
+      // Overlay intraday last price when available — keeps the figure fresh
+      // while % change stays anchored to yesterday's close.
+      for (const tf of ["1m", "5m", "15m", "1h"]) {
+        const intraday = await fetchInstrumentCandles(inst, tf).catch(() => [] as Candle[]);
+        const last = intraday[intraday.length - 1];
+        if (last) { price = last.c; break; }
+      }
+      if (quote?.price && isFinite(quote.price)) price = quote.price;
+      if (price == null) return null;
+      return {
+        price,
+        prevClose,
+        changePct: prevClose ? ((price - prevClose) / prevClose) * 100 : null,
+        decimals: inst.decimals,
+        display: inst.display,
+        kind: inst.kind,
+        t: Date.now(),
+      };
+    } catch {
+      // Never let upstream fetch aborts/timeouts bubble as a 500 —
+      // clients treat null as "keep last snapshot".
+      return null;
     }
-    // Overlay intraday last price when available — keeps the figure fresh
-    // while % change stays anchored to yesterday's close.
-    for (const tf of ["1m", "5m", "15m", "1h"]) {
-      const intraday = await fetchInstrumentCandles(inst, tf).catch(() => [] as Candle[]);
-      const last = intraday[intraday.length - 1];
-      if (last) { price = last.c; break; }
-    }
-    if (quote?.price && isFinite(quote.price)) price = quote.price;
-    if (price == null) return null;
-    return {
-      price,
-      prevClose,
-      changePct: prevClose ? ((price - prevClose) / prevClose) * 100 : null,
-      decimals: inst.decimals,
-      display: inst.display,
-      kind: inst.kind,
-      t: Date.now(),
-    };
   });
 
 
