@@ -39,12 +39,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/founding")
 });
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/30",
-  approved: "bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/30",
-  active: "bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/30",
-  rejected: "bg-rose-500/10 text-rose-300 ring-1 ring-rose-500/30",
-  waitlisted: "bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/30",
-  graduated: "bg-violet-500/10 text-violet-300 ring-1 ring-violet-500/30",
+  pending: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+  approved: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
+  active: "bg-sky-50 text-sky-700 ring-1 ring-sky-200",
+  rejected: "bg-rose-50 text-rose-700 ring-1 ring-rose-200",
+  waitlisted: "bg-zinc-100 text-zinc-700 ring-1 ring-zinc-200",
+  graduated: "bg-violet-50 text-violet-700 ring-1 ring-violet-200",
 };
 
 type SortKey = "newest" | "oldest" | "name";
@@ -201,32 +201,32 @@ function AdminFoundingPage() {
   }
 
   const stat = (label: string, value: number, Icon: any, tone: string) => (
-    <div className="rounded-2xl border border-white/5 bg-zinc-900/60 p-4 backdrop-blur">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-4">
       <div className="flex items-center justify-between">
         <span className="text-[11px] uppercase tracking-widest text-zinc-500">{label}</span>
         <Icon className={`h-4 w-4 ${tone}`} />
       </div>
-      <div className="mt-2 text-2xl font-semibold text-white tabular-nums">{value}</div>
+      <div className="mt-2 text-2xl font-semibold text-zinc-900 tabular-nums">{value}</div>
     </div>
   );
 
   return (
-    <div className="-m-6 min-h-[calc(100vh-4rem)] bg-gradient-to-b from-zinc-950 via-zinc-950 to-black p-6 text-zinc-100">
+    <div className="-m-6 min-h-[calc(100vh-4rem)] bg-white p-6 text-zinc-900">
       {/* Header */}
       <div className="mx-auto max-w-6xl">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-3 py-1 text-[11px] uppercase tracking-widest text-amber-300">
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] uppercase tracking-widest text-amber-700">
               <Crown className="h-3.5 w-3.5" /> Founding program · Admin
             </div>
-            <h1 className="mt-3 text-2xl font-semibold text-white">Founding applications</h1>
-            <p className="mt-1 text-sm text-zinc-400">
+            <h1 className="mt-3 text-2xl font-semibold text-zinc-900">Founding applications</h1>
+            <p className="mt-1 text-sm text-zinc-500">
               Review, approve, waitlist, or reject candidates. Approving activates their plan and sends an invite.
             </p>
           </div>
           <button
             onClick={exportCsv}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[13px] font-medium text-zinc-200 hover:bg-white/10"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium text-zinc-700 hover:bg-zinc-50"
           >
             <Download className="h-4 w-4" /> Export CSV
           </button>
@@ -234,29 +234,29 @@ function AdminFoundingPage() {
 
         {/* Stats */}
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {stat("Total", rows.length, Users, "text-zinc-400")}
-          {stat("Pending", counts.pending || 0, Hourglass, "text-amber-400")}
-          {stat("Approved", counts.approved || 0, CheckCircle2, "text-emerald-400")}
-          {stat("Active", counts.active || 0, TrendingUp, "text-sky-400")}
-          {stat("Waitlist", counts.waitlisted || 0, ListChecks, "text-zinc-400")}
-          {stat("Rejected", counts.rejected || 0, XCircle, "text-rose-400")}
+          {stat("Total", rows.length, Users, "text-zinc-500")}
+          {stat("Pending", counts.pending || 0, Hourglass, "text-amber-500")}
+          {stat("Approved", counts.approved || 0, CheckCircle2, "text-emerald-500")}
+          {stat("Active", counts.active || 0, TrendingUp, "text-sky-500")}
+          {stat("Waitlist", counts.waitlisted || 0, ListChecks, "text-zinc-500")}
+          {stat("Rejected", counts.rejected || 0, XCircle, "text-rose-500")}
         </div>
 
         {/* Filters */}
         <div className="mt-5 flex flex-wrap items-center gap-2">
           <div className="relative flex-1 min-w-[220px]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search name, email, country, broker…"
-              className="w-full rounded-lg border border-white/10 bg-zinc-900/60 pl-9 pr-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500/40 focus:outline-none"
+              className="w-full rounded-lg border border-zinc-200 bg-white pl-9 pr-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-amber-400 focus:outline-none"
             />
           </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-lg border border-white/10 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100"
+            className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
           >
             <option value="all">All statuses</option>
             <option value="pending">Pending</option>
@@ -269,7 +269,7 @@ function AdminFoundingPage() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="rounded-lg border border-white/10 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100"
+            className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
@@ -285,8 +285,8 @@ function AdminFoundingPage() {
               onClick={() => setStatusFilter(s)}
               className={`rounded-full px-3 py-1 text-[11px] font-medium uppercase tracking-wide transition ${
                 statusFilter === s
-                  ? "bg-amber-500/20 text-amber-200 ring-1 ring-amber-500/40"
-                  : "bg-white/5 text-zinc-400 hover:bg-white/10"
+                  ? "bg-amber-100 text-amber-800 ring-1 ring-amber-200"
+                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
               }`}
             >
               {s} {s !== "all" && counts[s] ? `· ${counts[s]}` : ""}
@@ -297,7 +297,7 @@ function AdminFoundingPage() {
         {/* List */}
         <div className="mt-5 space-y-3">
           {filtered.length === 0 && (
-            <div className="rounded-2xl border border-white/5 bg-zinc-900/40 p-10 text-center text-sm text-zinc-500">
+            <div className="rounded-2xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
               No applications match your filters.
             </div>
           )}
@@ -306,32 +306,32 @@ function AdminFoundingPage() {
             return (
               <div
                 key={r.id}
-                className="rounded-2xl border border-white/5 bg-zinc-900/60 p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition hover:border-white/10"
+                className="rounded-2xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-300"
               >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-white">{r.full_name}</span>
+                      <span className="font-semibold text-zinc-900">{r.full_name}</span>
                       {r.requested_plan && (
-                        <span className="inline-flex rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300 ring-1 ring-amber-500/30">
+                        <span className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200">
                           Wants: {r.requested_plan}
                         </span>
                       )}
                       <span
                         className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${
-                          STATUS_STYLES[r.status] || "bg-zinc-500/10 text-zinc-300"
+                          STATUS_STYLES[r.status] || "bg-zinc-100 text-zinc-700"
                         }`}
                       >
                         {r.status}
                       </span>
                     </div>
-                    <div className="mt-1 flex items-center gap-2 text-[13px] text-zinc-400">
-                      <a href={`mailto:${r.email}`} className="text-zinc-300 hover:text-amber-300 hover:underline">
+                    <div className="mt-1 flex items-center gap-2 text-[13px] text-zinc-600">
+                      <a href={`mailto:${r.email}`} className="text-zinc-700 hover:text-amber-700 hover:underline">
                         {r.email}
                       </a>
                       <button
                         onClick={() => copyEmail(r.email)}
-                        className="rounded p-0.5 text-zinc-500 hover:text-zinc-200"
+                        className="rounded p-0.5 text-zinc-400 hover:text-zinc-700"
                         title="Copy email"
                       >
                         <Copy className="h-3 w-3" />
@@ -354,7 +354,7 @@ function AdminFoundingPage() {
                         <button
                           disabled={busy === r.id + "approved"}
                           onClick={() => changeStatus(r.id, "approved")}
-                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-500 px-2.5 py-1.5 text-[12px] font-medium text-white hover:bg-emerald-400 disabled:opacity-50"
+                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1.5 text-[12px] font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
                         >
                           <Check className="h-3.5 w-3.5" /> Approve
                         </button>
@@ -362,7 +362,7 @@ function AdminFoundingPage() {
                           <button
                             disabled={busy === r.id + "waitlisted"}
                             onClick={() => changeStatus(r.id, "waitlisted")}
-                            className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-[12px] font-medium text-zinc-200 hover:bg-white/10 disabled:opacity-50"
+                            className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
                           >
                             Waitlist
                           </button>
@@ -370,7 +370,7 @@ function AdminFoundingPage() {
                           <button
                             disabled={busy === r.id + "pending"}
                             onClick={() => changeStatus(r.id, "pending")}
-                            className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-[12px] font-medium text-zinc-200 hover:bg-white/10 disabled:opacity-50"
+                            className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
                           >
                             Back to pending
                           </button>
@@ -378,7 +378,7 @@ function AdminFoundingPage() {
                         <button
                           disabled={busy === r.id + "rejected"}
                           onClick={() => changeStatus(r.id, "rejected")}
-                          className="inline-flex items-center gap-1 rounded-lg border border-rose-500/30 bg-rose-500/10 px-2.5 py-1.5 text-[12px] font-medium text-rose-300 hover:bg-rose-500/20 disabled:opacity-50"
+                          className="inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[12px] font-medium text-rose-700 hover:bg-rose-100 disabled:opacity-50"
                         >
                           <X className="h-3.5 w-3.5" /> Reject
                         </button>
@@ -388,7 +388,7 @@ function AdminFoundingPage() {
                       <button
                         disabled={busy === r.id + "profit"}
                         onClick={() => markProfit(r.id)}
-                        className="inline-flex items-center gap-1 rounded-lg bg-amber-500 px-2.5 py-1.5 text-[12px] font-medium text-zinc-900 hover:bg-amber-400 disabled:opacity-50"
+                        className="inline-flex items-center gap-1 rounded-lg bg-amber-500 px-2.5 py-1.5 text-[12px] font-medium text-white hover:bg-amber-600 disabled:opacity-50"
                       >
                         Mark $100 profit → Active
                       </button>
@@ -397,7 +397,7 @@ function AdminFoundingPage() {
                       <button
                         disabled={busy === r.id + "pending"}
                         onClick={() => changeStatus(r.id, "pending")}
-                        className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-[12px] font-medium text-zinc-200 hover:bg-white/10 disabled:opacity-50"
+                        className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
                       >
                         Reopen
                       </button>
@@ -406,14 +406,14 @@ function AdminFoundingPage() {
                       <button
                         disabled={busy === r.id + "graduated"}
                         onClick={() => changeStatus(r.id, "graduated")}
-                        className="inline-flex items-center gap-1 rounded-lg border border-violet-500/30 bg-violet-500/10 px-2.5 py-1.5 text-[12px] font-medium text-violet-200 hover:bg-violet-500/20 disabled:opacity-50"
+                        className="inline-flex items-center gap-1 rounded-lg border border-violet-200 bg-violet-50 px-2.5 py-1.5 text-[12px] font-medium text-violet-700 hover:bg-violet-100 disabled:opacity-50"
                       >
                         Graduate
                       </button>
                     )}
                     <button
                       onClick={() => setExpanded((s) => ({ ...s, [r.id]: !s[r.id] }))}
-                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-[12px] font-medium text-zinc-200 hover:bg-white/10"
+                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50"
                     >
                       {isOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                       {isOpen ? "Hide" : "Details"}
@@ -422,18 +422,18 @@ function AdminFoundingPage() {
                 </div>
 
                 {isOpen && (
-                  <div className="mt-4 grid gap-4 border-t border-white/5 pt-4 md:grid-cols-2">
+                  <div className="mt-4 grid gap-4 border-t border-zinc-100 pt-4 md:grid-cols-2">
                     <div>
                       <div className="text-[11px] uppercase tracking-widest text-zinc-500">Why joining</div>
-                      <p className="mt-1 whitespace-pre-wrap text-[13px] text-zinc-200">
-                        {r.why_joining || <span className="text-zinc-600">—</span>}
+                      <p className="mt-1 whitespace-pre-wrap text-[13px] text-zinc-800">
+                        {r.why_joining || <span className="text-zinc-400">—</span>}
                       </p>
                       {r.myfxbook_url && (
                         <a
                           href={r.myfxbook_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="mt-3 inline-flex items-center gap-1 text-[12px] text-amber-300 hover:underline"
+                          className="mt-3 inline-flex items-center gap-1 text-[12px] text-amber-700 hover:underline"
                         >
                           <ExternalLink className="h-3 w-3" /> Track record
                         </a>
@@ -448,13 +448,13 @@ function AdminFoundingPage() {
                         onChange={(e) => setNotes((s) => ({ ...s, [r.id]: e.target.value }))}
                         rows={4}
                         placeholder="Private notes about this applicant…"
-                        className="mt-1 w-full resize-y rounded-lg border border-white/10 bg-zinc-950/60 p-2 text-[13px] text-zinc-100 placeholder:text-zinc-600 focus:border-amber-500/40 focus:outline-none"
+                        className="mt-1 w-full resize-y rounded-lg border border-zinc-200 bg-white p-2 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:border-amber-400 focus:outline-none"
                       />
                       <div className="mt-2 flex justify-end">
                         <button
                           onClick={() => saveNote(r.id)}
                           disabled={savingNote === r.id}
-                          className="rounded-lg bg-white/10 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-white/15 disabled:opacity-50"
+                          className="rounded-lg bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
                         >
                           {savingNote === r.id ? "Saving…" : "Save note"}
                         </button>
