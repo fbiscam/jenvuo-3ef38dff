@@ -475,22 +475,23 @@ function DashboardLayout() {
     return () => { cancelled = true; };
   }, [authLoading, authUser]);
 
-  // Unread notifications count (for red label indicator)
+  // Unread inbox mail count (for red label indicator)
   useEffect(() => {
     if (authLoading || !authUser) { setUnreadNotifs(0); return; }
     let cancelled = false;
     const load = async () => {
       const { count } = await supabase
-        .from("user_notifications")
-        .select("id", { count: "exact", head: true })
+        .from("mail_message_state")
+        .select("message_id", { count: "exact", head: true })
         .eq("user_id", authUser.id)
-        .is("read_at", null);
+        .eq("folder", "inbox")
+        .eq("is_read", false);
       if (!cancelled) setUnreadNotifs(count ?? 0);
     };
     load();
     const ch = supabase
-      .channel(`notifs-nav:${authUser.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "user_notifications", filter: `user_id=eq.${authUser.id}` }, load)
+      .channel(`mail-nav:${authUser.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "mail_message_state", filter: `user_id=eq.${authUser.id}` }, load)
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [authUser?.id, authLoading]);
