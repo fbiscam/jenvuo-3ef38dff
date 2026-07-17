@@ -164,7 +164,12 @@ export const setMailState = createServerFn({ method: "POST" })
     }) => data,
   )
   .handler(async ({ context, data }) => {
-    const patch: Record<string, any> = { updated_at: new Date().toISOString() };
+    const patch: {
+      updated_at: string;
+      folder?: MailFolder;
+      is_read?: boolean;
+      is_starred?: boolean;
+    } = { updated_at: new Date().toISOString() };
     if (data.folder) patch.folder = data.folder;
     if (typeof data.is_read === "boolean") patch.is_read = data.is_read;
     if (typeof data.is_starred === "boolean") patch.is_starred = data.is_starred;
