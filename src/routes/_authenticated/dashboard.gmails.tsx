@@ -495,9 +495,46 @@ function MailPage() {
                   >
                     <RefreshCcw className="w-4 h-4" />
                   </button>
-                  <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
-                    <MoreVertical className="w-4 h-4" />
-                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => setMoreMenuOpen((v) => !v)}
+                      className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
+                      title="More"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                    {moreMenuOpen && (
+                      <>
+                        <div className="fixed inset-0 z-10" onClick={() => setMoreMenuOpen(false)} />
+                        <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[180px] text-sm">
+                          {[
+                            {
+                              label: "Mark all as read",
+                              fn: async () => {
+                                const ids = filtered.filter((m) => !m.is_read).map((m) => m.message_id);
+                                if (!ids.length) { toast.info("Nothing to mark"); return; }
+                                try {
+                                  await Promise.all(ids.map((id) => _setState({ data: { message_id: id, is_read: true } })));
+                                  setMessages((prev) => prev.map((x) => ids.includes(x.message_id) ? { ...x, is_read: true } : x));
+                                  toast.success(`Marked ${ids.length} as read`);
+                                } catch (e: any) { toast.error(e?.message || "Failed"); }
+                              },
+                            },
+                            { label: "Select all", fn: () => selectAllVisible() },
+                            { label: "Refresh", fn: () => load() },
+                          ].map((o) => (
+                            <button
+                              key={o.label}
+                              onClick={() => { o.fn(); setMoreMenuOpen(false); }}
+                              className="w-full text-left px-3 py-1.5 hover:bg-gray-50 text-gray-700"
+                            >
+                              {o.label}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </>
               )}
             </div>
