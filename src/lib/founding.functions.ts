@@ -842,7 +842,9 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // Fire applicant email on real transitions. `pending` reuses the "received/under review" template.
-    if (prior?.email && prior.document_status !== data.document_status) {
+    // For rejected / needs_info the admin may re-send the same status intentionally — always email.
+    const alwaysEmail = data.document_status === "rejected" || data.document_status === "needs_info";
+    if (prior?.email && (alwaysEmail || prior.document_status !== data.document_status)) {
       const kind: ApplicantEmailKind | null =
         data.document_status === "verified"
           ? "documents_approved"
