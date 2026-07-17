@@ -691,7 +691,7 @@ function MailPage() {
             </div>
 
             {/* Detail */}
-            <div className={cn("bg-white lg:overflow-y-auto", !selected ? "hidden lg:block" : "block")}>
+            <div className={cn("bg-white overflow-y-auto min-h-0", !selected ? "hidden lg:block" : "block")}>
               {!selected ? (
                 <div className="h-full min-h-[400px] flex flex-col items-center justify-center p-12 text-center">
                   <div className="w-20 h-20 rounded-full border border-gray-200 flex items-center justify-center mb-4">
