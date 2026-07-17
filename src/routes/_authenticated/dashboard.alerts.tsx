@@ -331,7 +331,7 @@ function AlertPrefs() {
                       </td>
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-900">{a.pair}</td>
                       <td className="px-3 py-2.5">
-                        <span className="rounded-md bg-zinc-900 px-1.5 py-0.5 text-[10px] font-bold text-white">{a.grade}</span>
+                        <span className="rounded-md bg-transparent px-1.5 py-0.5 text-[10px] font-bold text-zinc-900">{a.grade}</span>
                       </td>
                       <td className="px-3 py-2.5 text-[11px] text-zinc-500">{a.session ?? "—"}</td>
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-700">{a.entry}</td>
