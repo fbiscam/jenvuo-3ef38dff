@@ -400,20 +400,106 @@ function MailPage() {
                   <ArrowLeft className="w-4 h-4" />
                 </button>
               )}
-              <button className="flex items-center gap-1 p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
-                <span className="w-4 h-4 rounded-full border-2 border-gray-300 inline-block" />
-                <ChevronDown className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => load()}
-                className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
-                title="Refresh"
-              >
-                <RefreshCcw className="w-4 h-4" />
-              </button>
-              <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
-                <MoreVertical className="w-4 h-4" />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    if (allVisibleSelected || someSelected) clearSelection();
+                    else selectAllVisible();
+                  }}
+                  className="flex items-center gap-1 p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
+                  title="Select"
+                >
+                  <span
+                    className={cn(
+                      "w-4 h-4 rounded border-2 inline-flex items-center justify-center",
+                      someSelected ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300",
+                    )}
+                  >
+                    {allVisibleSelected ? (
+                      <Check className="w-3 h-3" strokeWidth={3} />
+                    ) : someSelected ? (
+                      <span className="w-2 h-0.5 bg-white rounded" />
+                    ) : null}
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectMenuOpen((v) => !v);
+                    }}
+                    className="p-0.5"
+                  >
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </button>
+                </button>
+                {selectMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setSelectMenuOpen(false)} />
+                    <div className="absolute left-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px] text-sm">
+                      {[
+                        { label: "All", fn: () => selectAllVisible() },
+                        { label: "None", fn: () => clearSelection() },
+                        { label: "Read", fn: () => selectByPredicate((m) => !!m.is_read) },
+                        { label: "Unread", fn: () => selectByPredicate((m) => !m.is_read) },
+                        { label: "Starred", fn: () => selectByPredicate((m) => !!m.is_starred) },
+                        { label: "Unstarred", fn: () => selectByPredicate((m) => !m.is_starred) },
+                      ].map((o) => (
+                        <button
+                          key={o.label}
+                          onClick={() => {
+                            o.fn();
+                            setSelectMenuOpen(false);
+                          }}
+                          className="w-full text-left px-3 py-1.5 hover:bg-gray-50 text-gray-700"
+                        >
+                          {o.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              {someSelected ? (
+                <>
+                  <div className="w-px h-5 bg-gray-200 mx-1" />
+                  <button
+                    onClick={() => bulkMove("trash")}
+                    className="p-1.5 hover:bg-gray-100 rounded-md text-gray-600"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={bulkMarkRead}
+                    className="p-1.5 hover:bg-gray-100 rounded-md text-gray-600"
+                    title="Mark as read"
+                  >
+                    <MailOpen className="w-4 h-4" />
+                  </button>
+                  {folder !== "archive" && (
+                    <button
+                      onClick={() => bulkMove("archive")}
+                      className="p-1.5 hover:bg-gray-100 rounded-md text-gray-600"
+                      title="Archive"
+                    >
+                      <Archive className="w-4 h-4" />
+                    </button>
+                  )}
+                  <span className="ml-2 text-xs text-gray-500">{selectedIds.size} selected</span>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => load()}
+                    className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
+                    title="Refresh"
+                  >
+                    <RefreshCcw className="w-4 h-4" />
+                  </button>
+                  <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+                </>
+              )}
             </div>
             <div className="relative">
               <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
