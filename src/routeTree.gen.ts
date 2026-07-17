@@ -17,7 +17,6 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
-import { Route as OpsX9k27m4nRouteImport } from './routes/ops-x9k2-7m4n'
 import { Route as LlmRouteImport } from './routes/llm'
 import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as JenvuOpsX9k2RouteImport } from './routes/jenvu-ops-x9k2'
@@ -119,11 +118,6 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OpsX9k27m4nRoute = OpsX9k27m4nRouteImport.update({
-  id: '/ops-x9k2-7m4n',
-  path: '/ops-x9k2-7m4n',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LlmRoute = LlmRouteImport.update({
@@ -231,9 +225,9 @@ const HelpIndexRoute = HelpIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
-  id: '/hub',
-  path: '/hub',
-  getParentRoute: () => OpsX9k27m4nRoute,
+  id: '/ops-x9k2-7m4n/hub',
+  path: '/ops-x9k2-7m4n/hub',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const JenvuOpsX9k2InboxRoute = JenvuOpsX9k2InboxRouteImport.update({
   id: '/inbox',
@@ -479,7 +473,6 @@ export interface FileRoutesByFullPath {
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
-  '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
@@ -549,7 +542,6 @@ export interface FileRoutesByTo {
   '/founding': typeof FoundingRoute
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
-  '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
@@ -622,7 +614,6 @@ export interface FileRoutesById {
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
-  '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
@@ -696,7 +687,6 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2'
     | '/killzones'
     | '/llm'
-    | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
     | '/refund'
@@ -766,7 +756,6 @@ export interface FileRouteTypes {
     | '/founding'
     | '/killzones'
     | '/llm'
-    | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
     | '/refund'
@@ -838,7 +827,6 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2'
     | '/killzones'
     | '/llm'
-    | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
     | '/refund'
@@ -912,7 +900,6 @@ export interface RootRouteChildren {
   JenvuOpsX9k2Route: typeof JenvuOpsX9k2RouteWithChildren
   KillzonesRoute: typeof KillzonesRoute
   LlmRoute: typeof LlmRoute
-  OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
@@ -923,6 +910,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   BriefIdRoute: typeof BriefIdRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
   HelpIndexRoute: typeof HelpIndexRoute
   ApiPublicPodcastDotxmlRoute: typeof ApiPublicPodcastDotxmlRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
@@ -998,13 +986,6 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ops-x9k2-7m4n': {
-      id: '/ops-x9k2-7m4n'
-      path: '/ops-x9k2-7m4n'
-      fullPath: '/ops-x9k2-7m4n'
-      preLoaderRoute: typeof OpsX9k27m4nRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/llm': {
@@ -1156,10 +1137,10 @@ declare module '@tanstack/react-router' {
     }
     '/ops-x9k2-7m4n/hub': {
       id: '/ops-x9k2-7m4n/hub'
-      path: '/hub'
+      path: '/ops-x9k2-7m4n/hub'
       fullPath: '/ops-x9k2-7m4n/hub'
       preLoaderRoute: typeof OpsX9k27m4nHubRouteImport
-      parentRoute: typeof OpsX9k27m4nRoute
+      parentRoute: typeof rootRouteImport
     }
     '/jenvu-ops-x9k2/inbox': {
       id: '/jenvu-ops-x9k2/inbox'
@@ -1540,18 +1521,6 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
   JenvuOpsX9k2RouteChildren,
 )
 
-interface OpsX9k27m4nRouteChildren {
-  OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
-}
-
-const OpsX9k27m4nRouteChildren: OpsX9k27m4nRouteChildren = {
-  OpsX9k27m4nHubRoute: OpsX9k27m4nHubRoute,
-}
-
-const OpsX9k27m4nRouteWithChildren = OpsX9k27m4nRoute._addFileChildren(
-  OpsX9k27m4nRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -1571,7 +1540,6 @@ const rootRouteChildren: RootRouteChildren = {
   JenvuOpsX9k2Route: JenvuOpsX9k2RouteWithChildren,
   KillzonesRoute: KillzonesRoute,
   LlmRoute: LlmRoute,
-  OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
@@ -1582,6 +1550,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   BriefIdRoute: BriefIdRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  OpsX9k27m4nHubRoute: OpsX9k27m4nHubRoute,
   HelpIndexRoute: HelpIndexRoute,
   ApiPublicPodcastDotxmlRoute: ApiPublicPodcastDotxmlRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
