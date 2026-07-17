@@ -191,3 +191,22 @@ export const searchMailDirectory = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return (rows ?? []) as { address: string; full_name: string | null }[];
   });
+
+export type MailBadgeTier = "gold" | "blue" | null;
+
+export const getMailBadges = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { addresses: string[] }) => ({
+    addresses: Array.from(new Set((data?.addresses ?? []).map((a) => String(a).toLowerCase().trim()).filter(Boolean))).slice(0, 200),
+  }))
+  .handler(async ({ context, data }) => {
+    if (!data.addresses.length) return {} as Record<string, MailBadgeTier>;
+    const { data: rows, error } = await context.supabase.rpc("mail_get_badges", { _addresses: data.addresses });
+    if (error) throw new Error(error.message);
+    const map: Record<string, MailBadgeTier> = {};
+    for (const r of (rows ?? []) as { address: string; tier: MailBadgeTier }[]) {
+      map[r.address] = r.tier;
+    }
+    return map;
+  });
+
