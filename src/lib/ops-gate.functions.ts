@@ -38,6 +38,49 @@ async function equalsCT(input: string, expected: string): Promise<boolean> {
   return diff === 0;
 }
 
+function toBase64Url(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function fromBase64Url(value: string): Uint8Array {
+  const padded = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+  const binary = atob(padded);
+  return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+}
+
+async function signOpsPayload(payload: string, secret: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
+  return toBase64Url(new Uint8Array(sig));
+}
+
+async function issueOpsToken(who: string, secret: string): Promise<string> {
+  const payload = toBase64Url(new TextEncoder().encode(JSON.stringify({ who, exp: Date.now() + 1000 * 60 * 60 * 8 })));
+  return `${payload}.${await signOpsPayload(payload, secret)}`;
+}
+
+async function verifyOpsToken(token: string | undefined, secret: string | undefined): Promise<boolean> {
+  if (!token || !secret || !token.includes(".")) return false;
+  const [payload, sig] = token.split(".");
+  const expectedSig = await signOpsPayload(payload, secret);
+  const sigOk = await equalsCT(sig, expectedSig);
+  if (!sigOk) return false;
+  try {
+    const data = JSON.parse(new TextDecoder().decode(fromBase64Url(payload))) as { exp?: number };
+    return typeof data.exp === "number" && data.exp > Date.now();
+  } catch {
+    return false;
+  }
+}
+
 export const opsUnlock = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string; password: string }) => data)
   .handler(async ({ data }) => {
@@ -55,7 +98,7 @@ export const opsUnlock = createServerFn({ method: "POST" })
       }
       const session = await useSession<OpsSession>(sessionConfig());
       await session.update({ unlocked: true, who: expectedId });
-      return { ok: true as const };
+      return { ok: true as const, token: await issueOpsToken(expectedId, secret) };
     } catch (e) {
       return {
         ok: false as const,
@@ -71,9 +114,12 @@ export const opsLock = createServerFn({ method: "POST" }).handler(async () => {
   return { ok: true as const };
 });
 
-export const opsStatus = createServerFn({ method: "GET" }).handler(async () => {
+export const opsStatus = createServerFn({ method: "POST" })
+  .inputValidator((data?: { token?: string }) => data ?? {})
+  .handler(async ({ data }) => {
   const session = await useSession<OpsSession>(sessionConfig());
-  return { unlocked: !!session.data.unlocked };
+  const tokenUnlocked = await verifyOpsToken(data.token, process.env.OPS_CONSOLE_SESSION_SECRET);
+  return { unlocked: !!session.data.unlocked || tokenUnlocked };
 });
 
 // Loader-side gate. Throws a redirect to the unlock page if not unlocked.

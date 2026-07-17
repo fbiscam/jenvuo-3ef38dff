@@ -27,7 +27,8 @@ function OpsLogin() {
 
   useEffect(() => {
     let alive = true;
-    status({})
+    const token = window.sessionStorage.getItem("jenvu_ops_token") ?? undefined;
+    status({ data: { token } })
       .then((s) => {
         if (alive && s.unlocked) router.navigate({ to: "/ops-x9k2-7m4n/hub", replace: true });
       })
@@ -44,6 +45,7 @@ function OpsLogin() {
     try {
       const res = await unlock({ data: { id: id.trim(), password } });
       if (res.ok) {
+        window.sessionStorage.setItem("jenvu_ops_token", res.token);
         await router.navigate({ to: "/ops-x9k2-7m4n/hub" });
       } else {
         setErr("Invalid credentials");

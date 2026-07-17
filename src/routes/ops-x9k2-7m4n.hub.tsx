@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { opsLock, requireOpsUnlocked } from "@/lib/ops-gate.functions";
+import { useEffect, useState } from "react";
+import { opsLock, opsStatus } from "@/lib/ops-gate.functions";
 
 export const Route = createFileRoute("/ops-x9k2-7m4n/hub")({
   head: () => ({
@@ -9,7 +10,6 @@ export const Route = createFileRoute("/ops-x9k2-7m4n/hub")({
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
-  loader: () => requireOpsUnlocked(),
   component: OpsHub,
 });
 
@@ -20,7 +20,7 @@ type Tile = {
 };
 
 const TILES: Tile[] = [
-  { title: "Support Inbox", desc: "Contact & live-chat messages", to: "/jenvu-ops-x9k2.inbox" },
+  { title: "Support Inbox", desc: "Contact & live-chat messages", to: "/jenvu-ops-x9k2/inbox" },
   { title: "Contact Messages", desc: "Legacy contact form entries", to: "/dashboard/admin/messages" },
   { title: "Newsletter Subscribers", desc: "Email list & signal opt-ins", to: "/dashboard/admin/subscribers" },
   { title: "Founding Applications", desc: "Review & approve applicants", to: "/dashboard/admin/founding" },
@@ -32,10 +32,34 @@ const TILES: Tile[] = [
 function OpsHub() {
   const router = useRouter();
   const lock = useServerFn(opsLock);
+  const status = useServerFn(opsStatus);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    const token = window.sessionStorage.getItem("jenvu_ops_token") ?? undefined;
+    status({ data: { token } })
+      .then((s) => {
+        if (!alive) return;
+        if (s.unlocked) setReady(true);
+        else router.navigate({ to: "/ops-x9k2-7m4n", replace: true });
+      })
+      .catch(() => {
+        if (alive) router.navigate({ to: "/ops-x9k2-7m4n", replace: true });
+      });
+    return () => {
+      alive = false;
+    };
+  }, [router, status]);
 
   async function onLock() {
+    window.sessionStorage.removeItem("jenvu_ops_token");
     await lock({});
     await router.navigate({ to: "/ops-x9k2-7m4n" });
+  }
+
+  if (!ready) {
+    return <div style={{ minHeight: "100vh", background: "#0a0a0a" }} />;
   }
 
   return (
