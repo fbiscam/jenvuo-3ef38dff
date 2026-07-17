@@ -405,9 +405,10 @@ function MailPage() {
               >
                 <span
                   className={cn(
-                    "w-4 h-4 rounded border-2 inline-flex items-center justify-center",
+                    "w-4 h-4 rounded border-2 inline-flex items-center justify-center mt-0.5",
                     someSelected ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300",
                   )}
+
                 >
                   {allVisibleSelected ? (
                     <Check className="w-3 h-3" strokeWidth={3} />
