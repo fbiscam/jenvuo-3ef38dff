@@ -120,7 +120,7 @@ function FoundingPage() {
           Founding Trader Program
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-zinc-600 sm:text-[15px]">
-          Get <span className="font-semibold text-zinc-900">Elite free for 30 days</span> — pay only after your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>. No profit, no payment. Built for traders who want institutional grade signals without upfront risk or long term commitment.
+          Get <span className="font-semibold text-zinc-900">Elite free for 30 days</span> — pay only after your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>. No profit, no payment. Built for traders who want institutional grade signals without upfront risk commitment.
         </p>
 
 
