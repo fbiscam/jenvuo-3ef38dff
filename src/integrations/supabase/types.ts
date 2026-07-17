@@ -923,6 +923,95 @@ export type Database = {
         }
         Relationships: []
       }
+      mail_addresses: {
+        Row: {
+          address: string
+          created_at: string
+          local_part: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          local_part: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          local_part?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mail_message_state: {
+        Row: {
+          folder: string
+          is_read: boolean
+          is_starred: boolean
+          message_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          folder?: string
+          is_read?: boolean
+          is_starred?: boolean
+          message_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          folder?: string
+          is_read?: boolean
+          is_starred?: boolean
+          message_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mail_message_state_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "mail_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mail_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          recipient_address: string
+          recipient_id: string | null
+          sender_address: string
+          sender_id: string | null
+          subject: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          recipient_address: string
+          recipient_id?: string | null
+          sender_address: string
+          sender_id?: string | null
+          subject?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          recipient_address?: string
+          recipient_id?: string | null
+          sender_address?: string
+          sender_id?: string | null
+          subject?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -1733,6 +1822,18 @@ export type Database = {
           _user_agent: string
           _user_id: string
         }
+        Returns: string
+      }
+      mail_claim_address: { Args: { _local_part: string }; Returns: string }
+      mail_directory_search: {
+        Args: { _q: string }
+        Returns: {
+          address: string
+          full_name: string
+        }[]
+      }
+      mail_send: {
+        Args: { _body: string; _subject: string; _to_address: string }
         Returns: string
       }
       mark_chat_read: { Args: { _session_id: string }; Returns: undefined }
