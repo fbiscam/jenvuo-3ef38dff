@@ -212,9 +212,11 @@ function AlertPrefs() {
               <tbody className="divide-y divide-zinc-100">
                 {alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter).slice(0, visibleCount).map((a) => {
                   const isBuy = a.direction === "BUY";
-                  const ago = relativeTime(new Date(a.fired_at));
+                  const firedAt = new Date(a.fired_at);
+                  const ago = relativeTime(firedAt);
                   const logged = loggedIds.has(a.id);
                   const busy = loggingId === a.id;
+                  const withinHour = Date.now() - firedAt.getTime() < 60 * 60 * 1000;
                   return (
                     <tr key={a.id} className="text-center hover:bg-zinc-50/60">
                       <td className="px-3 py-2.5">
@@ -235,21 +237,25 @@ function AlertPrefs() {
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-700">{a.rr}</td>
                       <td className="px-3 py-2.5 text-[11px] font-medium text-zinc-700">{a.confidence}%</td>
                       <td className="px-3 py-2.5 text-[10px] text-zinc-400 whitespace-nowrap">{ago}</td>
-                      <td className="px-3 py-2.5">
-                        <button
-                          type="button"
-                          disabled={logged || busy}
-                          onClick={() => takeTrade(a)}
-                          className={`inline-flex items-center justify-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-medium transition ${
-                            logged
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default"
-                              : isBuy
-                                ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                                : "bg-rose-600 text-white hover:bg-rose-700"
-                          } ${busy ? "opacity-70" : ""}`}
-                        >
-                          {logged ? "Logged" : busy ? "…" : "Trade Done"}
-                        </button>
+                      <td className="px-3 py-2.5 whitespace-nowrap">
+                        {withinHour ? (
+                          <button
+                            type="button"
+                            disabled={logged || busy}
+                            onClick={() => takeTrade(a)}
+                            className={`inline-flex items-center justify-center gap-1 rounded-md px-3 py-1.5 text-[11px] font-semibold whitespace-nowrap transition ${
+                              logged
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default"
+                                : isBuy
+                                  ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                                  : "bg-rose-600 text-white hover:bg-rose-700"
+                            } ${busy ? "opacity-70" : ""}`}
+                          >
+                            {logged ? "Logged" : busy ? "…" : "Trade Done"}
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-zinc-300">—</span>
+                        )}
                       </td>
                     </tr>
                   );
