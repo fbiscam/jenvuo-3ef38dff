@@ -255,7 +255,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
       };
     case "documents_received":
       return {
-        subject: "Your documents are now under review 🔍",
+        subject: "Your documents are now under review",
         html: wrap(
           `We're reviewing your documents, ${n}`,
           "Documents · Under Review",
@@ -892,7 +892,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
                 ? "Action required: documents rejected"
                 : kind === "documents_needs_info"
                   ? "We need a bit more information"
-                  : "Your documents are now under review 🔍";
+                  : "Your documents are now under review";
           const bodyLines: string[] = [`Hi ${name},`, ``];
           if (kind === "documents_approved") {
             bodyLines.push("Great news — your submitted documents have been approved.");
