@@ -60,7 +60,7 @@ function FoundingPage() {
   const remaining = Math.max(0, seats.total - seats.filled);
   const pct = Math.min(100, Math.round((seats.filled / seats.total) * 100));
 
-  const [plan, setPlan] = React.useState<"free" | "pro" | "elite" | "ultra">("elite");
+  const [plan, setPlan] = React.useState<"pro" | "elite" | "ultra">("elite");
   const [refEmail, setRefEmail] = React.useState<string>("");
 
   React.useEffect(() => {
@@ -207,9 +207,8 @@ function FoundingPage() {
                 <label className="text-[13px] font-medium text-zinc-800">
                   Which plan do you want? <span className="text-rose-500">*</span>
                 </label>
-                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <div className="mt-2 grid grid-cols-3 gap-2">
                   {([
-                    { id: "free", label: "Free", desc: "$0 — try it" },
                     { id: "pro", label: "Pro", desc: "$15 wallet" },
                     { id: "elite", label: "Elite", desc: "$50 wallet" },
                     { id: "ultra", label: "Ultra", desc: "$100 wallet" },

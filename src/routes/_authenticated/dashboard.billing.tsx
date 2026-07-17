@@ -88,25 +88,25 @@ function formatModelLabel(rawModel: string | null | undefined): string {
 
 type Mark = boolean | string;
 
-const MATRIX_ROWS: ReadonlyArray<{ f: string; a: Mark; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }> = [
-  { f: "Price", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
-  { f: "Wallet balance", a: "$1.00", b: "$15", c: "$50", d: "$100" },
-  { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
-  { f: "Signal latency", a: "No alerts", b: "Realtime", c: "Realtime", d: "Realtime" },
-  { f: "AI models", a: "__MODELS_PLUS__", b: "__MODELS_PLUS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },
-  { f: "A+ signal access", a: true, b: true, c: true, d: true },
-  { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
-  { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
-  { f: "Trade journal", a: true, b: true, c: true, d: true },
-  { f: "Email + push alerts", a: false, b: true, c: true, d: true },
-  { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
+const MATRIX_ROWS: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }> = [
+  { f: "Price", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
+  { f: "Wallet balance", b: "$15", c: "$50", d: "$100" },
+  { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+  { f: "Signal latency", b: "Realtime", c: "Realtime", d: "Realtime" },
+  { f: "AI models", b: "__MODELS_PLUS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },
+  { f: "A+ signal access", b: true, c: true, d: true },
+  { f: "ICT / SMC narration", b: true, c: true, d: true },
+  { f: "Multi-timeframe bias", b: true, c: true, d: true },
+  { f: "Trade journal", b: true, c: true, d: true },
+  { f: "Email + push alerts", b: true, c: true, d: true },
+  { f: "Multi-pair scanner", b: false, c: true, d: true, badge: "new" },
 
-  { f: "Custom alert rules", a: false, b: false, c: true, d: true },
+  { f: "Custom alert rules", b: false, c: true, d: true },
 
-  { f: "Priority desk support", a: false, b: false, c: false, d: true },
+  { f: "Priority desk support", b: false, c: false, d: true },
 ];
 
-const PLAN_KEY_BY_COL: Record<number, string> = { 0: "free", 1: "pro", 2: "elite", 3: "ultra" };
+const PLAN_KEY_BY_COL: Record<number, string> = { 0: "pro", 1: "elite", 2: "ultra" };
 
 function Billing() {
   const currentPlan = useCurrentPlan();
@@ -345,11 +345,10 @@ function Billing() {
         <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
           <table className="w-full min-w-[760px] text-sm border-collapse">
             <colgroup>
-              <col className="w-[28%]" />
-              <col className="w-[18%]" />
-              <col className="w-[18%] bg-amber-50/40" />
-              <col className="w-[18%]" />
-              <col className="w-[18%]" />
+              <col className="w-[34%]" />
+              <col className="w-[22%] bg-amber-50/40" />
+              <col className="w-[22%]" />
+              <col className="w-[22%]" />
             </colgroup>
 
             <thead>
@@ -358,7 +357,6 @@ function Billing() {
                   <span className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">Invite Only Pricing</span>
                 </th>
                 {[
-                  { name: "Free", price: "$0", tag: "Curious", to: "/founding" as const, cta: "Upgrade now", dark: false, key: "free" },
                   { name: "Pro", price: "$15", tag: "Active", to: "/founding" as const, cta: "Upgrade now", dark: false, accent: true, key: "pro" },
                   { name: "Elite", price: "$50", tag: "Desk", to: "/founding" as const, cta: "Upgrade now", dark: true, key: "elite" },
                   { name: "Ultra", price: "$100", tag: "Fund / Desk+", to: "/founding" as const, cta: "Upgrade now", dark: false, key: "ultra" },
@@ -443,7 +441,7 @@ function Billing() {
                       </span>
                     </div>
                   </td>
-                  {[row.a, row.b, row.c, row.d].map((v, i) => {
+                  {[row.b, row.c, row.d].map((v, i) => {
                     const isCurrentCol = plan === PLAN_KEY_BY_COL[i];
                     return (
                       <td

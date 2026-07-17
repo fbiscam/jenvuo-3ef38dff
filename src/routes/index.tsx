@@ -619,11 +619,10 @@ function HomePage() {
           <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
-                <col className="w-[28%]" />
-                <col className="w-[18%]" />
-                <col className="w-[18%] bg-amber-50/40" />
-                <col className="w-[18%]" />
-                <col className="w-[18%]" />
+                <col className="w-[34%]" />
+                <col className="w-[22%] bg-amber-50/40" />
+                <col className="w-[22%]" />
+                <col className="w-[22%]" />
               </colgroup>
 
               <thead>
@@ -632,7 +631,6 @@ function HomePage() {
                     <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                   </th>
                   {[
-                    { name: "Free", price: "$0", tag: "Curious", key: "free" },
                     { name: "Pro", price: "$15", tag: "Active", accent: true, key: "pro" },
                     { name: "Elite", price: "$50", tag: "Desk", dark: true, key: "elite" },
                     { name: "Ultra", price: "$100", tag: "Fund / Desk+", key: "ultra" },
@@ -668,7 +666,7 @@ function HomePage() {
                       <div className="mt-2 flex items-baseline gap-1">
                         <span className="text-2xl tracking-tight text-zinc-900 price-font">{p.price}</span>
                         {p.price !== "$0" && (
-                          <span className="text-[11px] text-zinc-500 price-font">/Free credits</span>
+                          <span className="text-[11px] text-zinc-500 price-font">/credits</span>
                         )}
                       </div>
                       <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
@@ -711,19 +709,19 @@ function HomePage() {
 
               <tbody>
                 {([
-                  { f: "PAY AFTER RAISING $100 IN REVENUE\u00A0", a: "Free", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
-                  { f: "Monthly wallet (USD)", a: "$2", b: "$15", c: "$50", d: "$100" },
-                  { f: "Voice queries / day", a: "Unlimited", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
-                  { f: "Signal latency", a: "No alerts", b: "Realtime", c: "Realtime", d: "Realtime" },
-                  { f: "A+ signal access", a: true, b: true, c: true, d: true },
-                  { f: "ICT / SMC narration", a: true, b: true, c: true, d: true },
-                  { f: "Multi-timeframe bias", a: true, b: true, c: true, d: true },
-                  { f: "Trade journal", a: true, b: true, c: true, d: true },
-                  { f: "Email + push alerts", a: false, b: true, c: true, d: true },
-                  { f: "Multi-pair scanner", a: false, b: false, c: true, d: true, badge: "new" },
-                  { f: "Custom alert rules", a: false, b: false, c: true, d: true },
-                  { f: "Priority desk support", a: false, b: false, c: false, d: true },
-                ] as ReadonlyArray<{ f: string; a: string | boolean; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
+                  { f: "PAY AFTER RAISING $100 IN REVENUE\u00A0", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
+                  { f: "Monthly wallet (USD)", b: "$15", c: "$50", d: "$100" },
+                  { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+                  { f: "Signal latency", b: "Realtime", c: "Realtime", d: "Realtime" },
+                  { f: "A+ signal access", b: true, c: true, d: true },
+                  { f: "ICT / SMC narration", b: true, c: true, d: true },
+                  { f: "Multi-timeframe bias", b: true, c: true, d: true },
+                  { f: "Trade journal", b: true, c: true, d: true },
+                  { f: "Email + push alerts", b: true, c: true, d: true },
+                  { f: "Multi-pair scanner", b: false, c: true, d: true, badge: "new" },
+                  { f: "Custom alert rules", b: false, c: true, d: true },
+                  { f: "Priority desk support", b: false, c: false, d: true },
+                ] as ReadonlyArray<{ f: string; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
                   <tr
                     key={row.f}
                     className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
@@ -740,10 +738,10 @@ function HomePage() {
                         </span>
                       </div>
                     </td>
-                    {[row.a, row.b, row.c, row.d].map((v, i) => (
+                    {[row.b, row.c, row.d].map((v, i) => (
                       <td
                         key={i}
-                        className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${i === 1 ? "bg-amber-50/40" : ""}`}
+                        className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${i === 0 ? "bg-amber-50/40" : ""}`}
                       >
                         {v === true ? (
                           <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
