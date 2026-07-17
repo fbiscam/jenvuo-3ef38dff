@@ -81,7 +81,8 @@ function MailPage() {
   const [claiming, setClaiming] = useState(false);
   const [claimVal, setClaimVal] = useState("");
   const [claimStatus, setClaimStatus] = useState<"" | "ok" | "taken" | "invalid" | "checking">("");
-  const [folder, setFolder] = useState<MailFolder>("inbox");
+  const [view, setView] = useState<ViewKey>("inbox");
+  const folder: MailFolder = view === "starred" ? "inbox" : (view as MailFolder);
   const [messages, setMessages] = useState<MailListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
