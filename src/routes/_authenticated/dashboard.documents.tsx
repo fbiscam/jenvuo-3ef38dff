@@ -240,7 +240,7 @@ function DocumentsPage() {
                 {row.documents_rejected_reason || "Please re-upload clearer or more recent proof."}
               </div>
               {row.documents_rejected_at && (
-                <div className="text-[11px] text-red-600 mt-2">
+                <div className="text-[11px] text-black mt-2">
                   {new Date(row.documents_rejected_at).toLocaleString()}
                 </div>
               )}
