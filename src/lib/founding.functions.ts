@@ -516,8 +516,32 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
             console.error("[founding] system-mail plan-activated failed:", (e as Error)?.message);
           }
         } else {
-          console.warn(`[founding] approved applicant has no account yet: ${targetEmail}`);
+          // Applicant has no account yet — send a Supabase invite so they can
+          // set their own password and sign in. Plan activation happens the
+          // next time this approval is saved after the account exists.
+          try {
+            const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(targetEmail, {
+              redirectTo: `${APP_URL}/reset-password`,
+              data: {
+                full_name: p.full_name || null,
+                founding_application_id: data.id,
+                requested_plan: planId,
+              },
+            });
+            if (inviteErr) {
+              // Ignore "already registered" races — the user exists now, they can sign in.
+              const msg = (inviteErr.message || "").toLowerCase();
+              if (!msg.includes("already") && !msg.includes("registered")) {
+                console.error(`[founding] invite failed for ${targetEmail}:`, inviteErr.message);
+              }
+            } else {
+              console.log(`[founding] invite sent to ${targetEmail}`);
+            }
+          } catch (e) {
+            console.error(`[founding] invite threw for ${targetEmail}:`, (e as Error)?.message);
+          }
         }
+
       }
     }
 
