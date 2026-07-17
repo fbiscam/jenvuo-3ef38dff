@@ -1019,11 +1019,11 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
       if (app.email) {
         await enqueueApplicantEmail(
           admin,
-          "documents_received",
+          "documents_submitted",
           String(app.email),
           String(app.full_name || "there"),
           String(app.requested_plan || "elite"),
-          `${app.id}-docs-received-${Date.now()}`,
+          `${app.id}-docs-submitted-${Date.now()}`,
         );
         try {
           const { sendSystemMail } = await import("@/lib/system-mail.server");
@@ -1031,19 +1031,19 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
           await sendSystemMail({
             from: "notifications@jenvu.email",
             toUserId: context.userId,
-            subject: "Documents received — under review",
+            subject: "We received your documents ✅",
             body: [
               `Hi ${name},`,
               ``,
-              `We received your submitted document(s). Our team will review shortly and update you here.`,
+              `Thanks for sending over your earning proof — your document(s) are safely in our review queue.`,
               ``,
-              `You can track the status any time on your Documents page.`,
+              `A real person on our team will review and update your status here, usually within 48 hours.`,
               ``,
               `— Jenvu Notifications`,
             ].join("\n"),
           });
         } catch (e) {
-          console.error("[founding] system-mail docs-received failed:", (e as Error)?.message);
+          console.error("[founding] system-mail docs-submitted failed:", (e as Error)?.message);
         }
       }
     }
