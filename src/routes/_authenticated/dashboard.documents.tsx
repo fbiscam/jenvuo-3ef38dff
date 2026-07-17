@@ -236,7 +236,7 @@ function DocumentsPage() {
           {rejected && (
             <div className="mt-4 rounded-2xl border border-red-200 bg-white p-5">
               <div className="text-sm font-semibold text-red-800">Earning proof rejected</div>
-              <div className="text-sm text-red-700 mt-1">
+              <div className="text-sm text-yellow-600 mt-1">
                 {row.documents_rejected_reason || "Please re-upload clearer or more recent proof."}
               </div>
               {row.documents_rejected_at && (
