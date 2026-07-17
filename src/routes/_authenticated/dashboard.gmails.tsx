@@ -18,7 +18,6 @@ import {
   X,
   AtSign,
   CheckCheck,
-  Filter,
   Sparkles,
   Copy,
   Check,
