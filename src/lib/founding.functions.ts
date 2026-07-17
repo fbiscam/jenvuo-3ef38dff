@@ -206,6 +206,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
            <p style="margin:16px 0 0;color:#52525b">If you'd like to share more context about your trading or ask us to reconsider, just hit reply — a real person on our team will read it.</p>`,
           { label: "Reply to us", href: `mailto:founding@jenvu.net?subject=${encodeURIComponent("Re: Founding Trader Program — application update")}&body=${encodeURIComponent(`Hi Jenvu team,\n\nI'd like to follow up on my Founding Trader application.\n\n— ${n}`)}` },
           { label: "See plans", href: `${APP_URL}/pricing` },
+        ),
       };
     case "waitlisted":
       return {
