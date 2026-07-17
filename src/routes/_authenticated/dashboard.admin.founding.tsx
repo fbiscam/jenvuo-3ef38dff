@@ -21,6 +21,9 @@ import {
   ExternalLink,
   Download,
 } from "lucide-react";
+
+const PLAN_AMOUNT: Record<string, string> = { pro: "$15", elite: "$50", ultra: "$100", free: "$1" };
+
 import { isAdmin } from "@/lib/admin-messages.functions";
 import {
   listFoundingApplications,
@@ -133,7 +136,7 @@ function AdminFoundingPage() {
       setRows((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status: "active", first_profit_at: new Date().toISOString() } : r)),
       );
-      toast.success("Marked $100 profit reached → active");
+      toast.success("Account funded → plan activated");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Update failed");
     } finally {
@@ -390,7 +393,7 @@ function AdminFoundingPage() {
                         onClick={() => markProfit(r.id)}
                         className="inline-flex items-center gap-1 rounded-lg bg-amber-500 px-2.5 py-1.5 text-[12px] font-medium text-white hover:bg-amber-600 disabled:opacity-50"
                       >
-                        Mark $100 profit → Active
+                        Fund {PLAN_AMOUNT[(r.requested_plan || "elite").toLowerCase()] || "$50"} ({(r.requested_plan || "elite").toUpperCase()}) → Active
                       </button>
                     )}
                     {r.status === "rejected" && (

@@ -83,11 +83,11 @@ async function getOrCreateUnsubToken(admin: any, email: string): Promise<string>
   return (stored?.token as string) ?? token;
 }
 
-const PLAN_META: Record<string, { label: string; wallet: string; blurb: string }> = {
-  free: { label: "Free", wallet: "$1 starting credit", blurb: "Try the platform on XAU/USD. Upgrade any time." },
-  pro: { label: "Pro", wallet: "$15 wallet credit", blurb: "Multi-pair scans, realtime alerts, full trade management." },
-  elite: { label: "Elite", wallet: "$50 wallet credit", blurb: "Everything in Pro plus priority AI models & higher scan budget." },
-  ultra: { label: "Ultra", wallet: "$100 wallet credit", blurb: "Top-tier access. Every model, every pair, no throttling." },
+const PLAN_META: Record<string, { label: string; wallet: string; amount: string; blurb: string }> = {
+  free: { label: "Free", wallet: "$1 starting credit", amount: "$1", blurb: "Try the platform on XAU/USD. Upgrade any time." },
+  pro: { label: "Pro", wallet: "$15 wallet credit", amount: "$15", blurb: "Multi-pair scans, realtime alerts, full trade management." },
+  elite: { label: "Elite", wallet: "$50 wallet credit", amount: "$50", blurb: "Everything in Pro plus priority AI models & higher scan budget." },
+  ultra: { label: "Ultra", wallet: "$100 wallet credit", amount: "$100", blurb: "Top-tier access. Every model, every pair, no throttling." },
 };
 
 type ApplicantEmailKind =
@@ -183,13 +183,13 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
     }
     case "funded":
       return {
-        subject: "Your account has been funded ✅",
+        subject: `Your account has been funded 🎉`,
         html: wrap(
-          `Account funded, ${n}.`,
+          `Congratulations, ${n} — you're funded.`,
           "Funded · Founding Trader",
-          `<p style="margin:0 0 12px">Great news — your Jenvu account has been funded with <strong>$100</strong> on the <strong>${escapeHtml(meta.label)}</strong> plan.</p>
-           <p style="margin:0 0 12px">The credit is available in your wallet right now. You can start scanning, use trade management and enable alerts straight from the dashboard.</p>
-           <p style="margin:0;color:#52525b"><em>Full transaction history is on your Billing page.</em></p>`,
+          `<p style="margin:0 0 14px;line-height:1.6">Great news — your Jenvu account has just been funded with <strong>${escapeHtml(meta.amount)}</strong> of wallet credit on the <strong>${escapeHtml(meta.label)}</strong> plan.</p>
+           <p style="margin:0 0 14px;line-height:1.6">The credit is live in your wallet right now. You can start scanning XAU/USD, use full trade management and enable realtime alerts straight from the dashboard.</p>
+           <p style="margin:0 0 4px;line-height:1.6;color:#52525b"><em>Your full transaction history is always available on the Billing page.</em></p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
           { label: "View billing", href: `${APP_URL}/dashboard/billing` },
         ),
