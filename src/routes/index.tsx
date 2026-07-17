@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
@@ -173,6 +174,8 @@ function HomePage() {
   const ticker = useLiveTicker();
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
+  const { user: authUser } = useAuthUser();
+  const isAuthed = !!authUser;
   return (
     <>
     <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
@@ -226,14 +229,14 @@ function HomePage() {
             </p>
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
-                to="/app"
+                to={isAuthed ? "/app" : "/auth"}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
               >
                 Launch Voice Agent
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
               <Link
-                to="/signal"
+                to={isAuthed ? "/signal" : "/auth"}
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
               >
                 See Signal Engine
