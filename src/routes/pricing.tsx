@@ -48,29 +48,6 @@ export const Route = createFileRoute("/pricing")({
 
 const TIERS = [
   {
-    id: "free",
-    name: "Free",
-    price: 0,
-    icon: Sparkles,
-    bestFor: "Curious",
-    tagline: "Full platform. No alerts.",
-    cta: "Start free",
-    ctaTo: "/auth",
-    credits: 5,
-    features: [
-      "$2 wallet / month",
-      "Unlimited voice queries",
-      "A+ / A institutional signals",
-      "Powered by OpenAI",
-      "Full ICT / SMC narration",
-      "Trade journal & analytics",
-      "Multi-timeframe bias engine",
-      "No realtime alerts",
-    ],
-
-    highlight: false,
-  },
-  {
     id: "pro",
     name: "Pro",
     price: 15,
@@ -81,7 +58,7 @@ const TIERS = [
     ctaTo: "/contact",
     credits: 35,
     features: [
-      
+
       "Voice queries free",
       "A+ / A institutional signals",
       "Institutional-grade signal engine",
@@ -104,7 +81,7 @@ const TIERS = [
     ctaTo: "/contact",
     credits: 85,
     features: [
-      
+
       "Voice queries free",
       "Everything in Pro",
       "Institutional-grade signal engine",
