@@ -174,7 +174,8 @@ function NotificationsPage() {
   const renderItem = (n: NotificationRow) => {
     const { Icon, tone } = iconFor(n);
     const unread = !n.read_at;
-    const url = typeof n.data?.url === "string" ? n.data.url : undefined;
+    const explicit = typeof n.data?.url === "string" ? n.data.url : undefined;
+    const url = explicit ?? (n.type === "signal_alert" || categoryOf(n) === "signals" ? "/dashboard/alerts" : undefined);
     const inner = (
       <div className={cn(
         "group relative flex gap-3 rounded-2xl border px-4 py-3.5 transition",
