@@ -617,6 +617,44 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// Called from /reset-password after the user successfully sets a new
+// password. Sends the "You're in — plan activates in 4 hours" email once.
+// Uses the founding_applications row keyed by the caller's email so we
+// only email users tied to a real approved application.
+export const notifyFoundingPasswordSet = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ ok: true; sent: boolean }> => {
+    const email = (context.claims as any)?.email as string | undefined;
+    if (!email) return { ok: true, sent: false };
+    const url = process.env.SUPABASE_URL;
+    const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !service) return { ok: true, sent: false };
+    const admin = createClient<Database>(url, service, {
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    });
+    const { data: app } = await admin
+      .from("founding_applications" as any)
+      .select("id, full_name, email, requested_plan, status")
+      .ilike("email", email)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const a = app as any;
+    if (!a || (a.status !== "approved" && a.status !== "active")) return { ok: true, sent: false };
+    await enqueueApplicantEmail(
+      admin,
+      "password_set",
+      String(a.email),
+      String(a.full_name || "there"),
+      String(a.requested_plan || "elite"),
+      `${a.id}-password-set`,
+      { activateHours: 4 },
+    );
+    return { ok: true, sent: true };
+  });
+
+
+
 export const foundingStats = createServerFn({ method: "GET" }).handler(async () => {
   const url = process.env.SUPABASE_URL;
   const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
