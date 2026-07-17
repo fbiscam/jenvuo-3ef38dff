@@ -95,35 +95,29 @@ function fmtPrice(n: number): string {
 
 function useLiveTicker(): TickerRow[] {
   const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
-  const fetchSnapshot = useServerFn(getMarketSnapshot);
+  const fetchBatch = useServerFn(getMarketSnapshotsBatch);
   React.useEffect(() => {
     let alive = true;
+    const symbols = INITIAL_TICKER
+      .map(([label]) => SYMBOL_MAP[label])
+      .filter((s): s is string => !!s);
 
     const fetchPrices = async () => {
       try {
-        const entries = await Promise.all(
-          INITIAL_TICKER.map(async ([label]) => {
-            const sym = SYMBOL_MAP[label];
-            if (!sym) return null;
-            try {
-              const snap = await fetchSnapshot({ data: { symbol: sym } });
-              if (!snap || !Number.isFinite(snap.price)) return null;
-              return [label, snap.price, snap.changePct] as const;
-            } catch {
-              return null;
-            }
-          }),
-        );
-        if (!alive) return;
-        const dataByLabel = new Map(
-          entries.filter((e): e is readonly [string, number, number | null] => !!e).map((e) => [e[0], { price: e[1], pct: e[2] }]),
+        const res = await fetchBatch({ data: { symbols } });
+        if (!alive || !res?.results) return;
+        const dataBySym = new Map(
+          res.results
+            .filter((r) => r.snapshot && Number.isFinite(r.snapshot.price))
+            .map((r) => [r.symbol, r.snapshot!]),
         );
         setRows((prev) =>
           prev.map(([label, price, delta]) => {
-            const d = dataByLabel.get(label);
+            const sym = SYMBOL_MAP[label];
+            const d = sym ? dataBySym.get(sym) : undefined;
             if (!d) return [label, price, delta];
-            const sign = (d.pct ?? 0) >= 0 ? "+" : "";
-            const deltaOut = d.pct == null ? delta : `${sign}${d.pct.toFixed(2)}%`;
+            const sign = (d.changePct ?? 0) >= 0 ? "+" : "";
+            const deltaOut = d.changePct == null ? delta : `${sign}${d.changePct.toFixed(2)}%`;
             return [label, fmtPrice(d.price), deltaOut];
           }),
         );
@@ -132,7 +126,7 @@ function useLiveTicker(): TickerRow[] {
       }
     };
     fetchPrices();
-    const id = setInterval(fetchPrices, 10_000);
+    const id = setInterval(fetchPrices, 5_000);
     return () => {
       alive = false;
       clearInterval(id);
