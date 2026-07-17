@@ -201,6 +201,23 @@ function DocumentsPage() {
             </ol>
           </div>
 
+          {needsInfo && (
+            <div className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 p-5">
+              <div className="text-sm font-semibold text-violet-900">Reviewer needs more info</div>
+              <div className="text-sm text-violet-800 mt-1 whitespace-pre-line">
+                {row.documents_info_request || "Our team asked for a small update. Please upload the missing item below."}
+              </div>
+              {row.documents_info_requested_at && (
+                <div className="text-[11px] text-violet-700 mt-2">
+                  Requested {new Date(row.documents_info_requested_at).toLocaleString()}
+                </div>
+              )}
+              <div className="text-xs text-violet-800 mt-3">
+                Upload the requested file below — your submission will go straight back to review.
+              </div>
+            </div>
+          )}
+
           {rejected && (
             <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-5">
               <div className="text-sm font-semibold text-red-800">Earning proof rejected</div>
@@ -212,6 +229,11 @@ function DocumentsPage() {
                   {new Date(row.documents_rejected_at).toLocaleString()}
                 </div>
               )}
+              <div className="text-xs mt-3 font-medium text-red-800">
+                {rejectedResubmitOpen
+                  ? `You can re-submit within the next ${rejectedHoursLeft} hour${rejectedHoursLeft === 1 ? "" : "s"}.`
+                  : "The 24-hour re-submission window has closed. Please contact support to try again."}
+              </div>
             </div>
           )}
 
