@@ -147,6 +147,34 @@ export const spendCredits = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => spendSchema.parse(data))
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
+
+    // Document gate: after 30 days from approval, unverified users must
+    // submit earning-proof documents before running any scan.
+    const { data: authData } = await supabase.auth.getUser();
+    const email = authData?.user?.email ?? null;
+    if (email) {
+      const { data: app } = await supabase
+        .from("founding_applications")
+        .select("status, document_status, approved_at")
+        .ilike("email", email)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (app?.approved_at && app.document_status !== "verified") {
+        const approvedMs = new Date(app.approved_at as string).getTime();
+        const daysSince = (Date.now() - approvedMs) / 86_400_000;
+        if (daysSince > 30) {
+          return {
+            balance: 0,
+            spent: 0,
+            ok: false as const,
+            error: "DOCUMENTS_REQUIRED" as const,
+            daysSinceApproval: Math.floor(daysSince),
+          };
+        }
+      }
+    }
+
     const { data: bal } = await supabase
       .from("credit_balances").select("balance").eq("user_id", userId).maybeSingle();
     const balance = Number(bal?.balance ?? 0);
