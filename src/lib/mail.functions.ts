@@ -17,6 +17,8 @@ export type MailListItem = {
   created_at: string;
   sender_name: string | null;
   sender_avatar: string | null;
+  recipient_name: string | null;
+  recipient_avatar: string | null;
 };
 
 export type MailAddress = {
