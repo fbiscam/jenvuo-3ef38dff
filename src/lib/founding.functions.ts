@@ -975,13 +975,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
     if (!data.storage_path.startsWith(`${context.userId}/`)) {
       throw new Error("Invalid storage path");
     }
-    // 24-hour resubmission window after rejection
-    if (app.document_status === "rejected" && app.documents_rejected_at) {
-      const rejectedAt = new Date(app.documents_rejected_at).getTime();
-      if (Date.now() - rejectedAt > 24 * 60 * 60 * 1000) {
-        throw new Error("The 24-hour resubmission window has expired. Please contact support.");
-      }
-    }
+    // Users can resubmit at any time after rejection or needs_info — no waiting window.
     const admin = await getServiceClient();
     const { error } = await admin.from("founding_documents" as any).insert({
       application_id: app.id,
