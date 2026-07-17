@@ -1018,6 +1018,30 @@ function SignalPage() {
                 ) : "Re-analyze"}
               </button>
             )}
+            {alertsOn !== null && (
+              <button
+                onClick={toggleAlerts}
+                disabled={alertsSaving}
+                className={cn(
+                  "shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-[12px] font-medium border transition disabled:opacity-50",
+                  alertsOn
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
+                    : "bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100",
+                )}
+                title={alertsOn
+                  ? "Alerts ON · $0.20 charged per signal. Click to turn off."
+                  : "Alerts OFF · no notifications, no charges. Click to turn on."}
+              >
+                {alertsSaving ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : alertsOn ? (
+                  <Bell className="h-3.5 w-3.5" />
+                ) : (
+                  <BellOff className="h-3.5 w-3.5" />
+                )}
+                {alertsOn ? "Alerts ON" : "Alerts OFF"}
+              </button>
+            )}
             {isAdmin && authUser?.email?.toLowerCase() === "haseeb@jenvu.com" && plan && plan.trade.direction !== "WAIT" && (
               <button
                 onClick={handleBroadcast}
