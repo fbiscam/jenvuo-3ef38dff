@@ -9,6 +9,8 @@ import { getBacktestStats, type BacktestStats } from "@/lib/backtest.functions";
 import { runHistoricalBacktest, type HistoricalBacktestResult } from "@/lib/backtest-historical.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
 import { broadcastCurrentSignal } from "@/lib/broadcast-alert.functions";
+import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
+import { Bell, BellOff } from "lucide-react";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 
 import { stopAllBrowserSpeech, useSpeech } from "@/hooks/useSpeech";
@@ -220,6 +222,35 @@ function SignalPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [broadcasting, setBroadcasting] = useState(false);
   const broadcastFn = useServerFn(broadcastCurrentSignal);
+  const getAlertsEnabledFn = useServerFn(getAlertsEnabled);
+  const setAlertsEnabledFn = useServerFn(setAlertsEnabled);
+  const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
+  const [alertsSaving, setAlertsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!authUser) return;
+    (async () => {
+      try {
+        const r = await getAlertsEnabledFn({});
+        setAlertsOn(!!r.enabled);
+      } catch { setAlertsOn(true); }
+    })();
+  }, [authUser, getAlertsEnabledFn]);
+
+  const toggleAlerts = useCallback(async () => {
+    if (alertsOn === null || alertsSaving) return;
+    const next = !alertsOn;
+    setAlertsSaving(true);
+    try {
+      await setAlertsEnabledFn({ data: { enabled: next } });
+      setAlertsOn(next);
+      toast.success(next ? "Alerts enabled · $0.20 will be charged per signal" : "Alerts disabled · no charges, no notifications");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not update alerts");
+    } finally {
+      setAlertsSaving(false);
+    }
+  }, [alertsOn, alertsSaving, setAlertsEnabledFn]);
 
   type BroadcastedAlert = {
     id: string;
@@ -985,6 +1016,30 @@ function SignalPage() {
                     Analyzing… {analyzeElapsed}s
                   </span>
                 ) : "Re-analyze"}
+              </button>
+            )}
+            {alertsOn !== null && (
+              <button
+                onClick={toggleAlerts}
+                disabled={alertsSaving}
+                className={cn(
+                  "shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-[12px] font-medium border transition disabled:opacity-50",
+                  alertsOn
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
+                    : "bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100",
+                )}
+                title={alertsOn
+                  ? "Alerts ON · $0.20 charged per signal. Click to turn off."
+                  : "Alerts OFF · no notifications, no charges. Click to turn on."}
+              >
+                {alertsSaving ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : alertsOn ? (
+                  <Bell className="h-3.5 w-3.5" />
+                ) : (
+                  <BellOff className="h-3.5 w-3.5" />
+                )}
+                {alertsOn ? "Alerts ON" : "Alerts OFF"}
               </button>
             )}
             {isAdmin && authUser?.email?.toLowerCase() === "haseeb@jenvu.com" && plan && plan.trade.direction !== "WAIT" && (

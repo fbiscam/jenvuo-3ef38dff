@@ -210,13 +210,17 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               .select("user_id")
               .eq("status", "active")
               .neq("plan_id", "free");
-            const userIds = Array.from(
+            const allPaidIds = Array.from(
               new Set(
                 (paidUsers ?? []).map(
                   (r: { user_id: string }) => r.user_id,
                 ),
               ),
             );
+            const { filterAlertsEnabledUserIds } = await import(
+              "@/lib/alert-pref-filter.server"
+            );
+            const userIds = await filterAlertsEnabledUserIds(allPaidIds);
             let notified = 0;
             if (userIds.length > 0) {
               const kz = plan.killzone ? ` · ${plan.killzone}` : "";

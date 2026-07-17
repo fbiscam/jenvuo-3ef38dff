@@ -82,6 +82,7 @@ export type Database = {
       }
       alert_preferences: {
         Row: {
+          alerts_enabled: boolean
           browser_enabled: boolean
           email_enabled: boolean
           min_grade: string
@@ -91,6 +92,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          alerts_enabled?: boolean
           browser_enabled?: boolean
           email_enabled?: boolean
           min_grade?: string
@@ -100,6 +102,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          alerts_enabled?: boolean
           browser_enabled?: boolean
           email_enabled?: boolean
           min_grade?: string
