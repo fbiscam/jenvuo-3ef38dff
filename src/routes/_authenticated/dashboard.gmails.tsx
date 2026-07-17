@@ -682,7 +682,7 @@ function MailPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-1 shrink-0 ml-auto self-start">
-                            <span className="text-[11px] text-gray-400 tabular-nums">
+                            <span className="text-[11px] text-gray-400 tabular-nums mt-0.5">
                               {timeAgo(m.created_at)}
                             </span>
                             <button
