@@ -225,9 +225,9 @@ function MailPage() {
                 onChange={(e) => setClaimVal(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""))}
                 placeholder="your.name"
                 maxLength={32}
-                className="flex-1 px-3 py-2.5 text-sm outline-none bg-white"
+                className="flex-1 min-w-0 px-3 py-2.5 text-sm outline-none bg-white"
               />
-              <span className="px-3 py-2.5 text-sm text-gray-500 bg-gray-50 border-l border-gray-200 flex items-center">
+              <span className="shrink-0 px-2 sm:px-3 py-2.5 text-xs sm:text-sm text-gray-500 bg-gray-50 border-l border-gray-200 flex items-center">
                 @jenvu.email
               </span>
             </div>
