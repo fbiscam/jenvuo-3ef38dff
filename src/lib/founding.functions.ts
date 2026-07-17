@@ -242,14 +242,14 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
       };
     case "documents_received":
       return {
-        subject: "We received your documents",
+        subject: "We're reviewing your documents — up to 48 hours",
         html: wrap(
-          `Thanks, ${n} — documents received`,
-          "Documents · Under Review",
-          `<p style="margin:0 0 12px">We received your earning-proof documents and they're now in the review queue.</p>
-           <p style="margin:0 0 12px">Reviews usually complete within <strong>24–48 hours</strong>. You'll get another email as soon as they're approved or if we need something updated.</p>
-           <p style="margin:0">No action needed from your side right now.</p>`,
-          { label: "View submission", href: `${APP_URL}/dashboard/documents` },
+          `Thanks, ${n} — we're on it`,
+          "Documents · Reviewing",
+          `<p style="margin:0 0 12px">We are reviewing your document. It can take up to <strong>48 hours</strong> to verify.</p>
+           <p style="margin:0 0 12px">The status will be shown on this page.</p>
+           <p style="margin:0">Thanks for your understanding.</p>`,
+          { label: "Open Documents page", href: `${APP_URL}/dashboard/documents` },
         ),
       };
     case "documents_approved":
