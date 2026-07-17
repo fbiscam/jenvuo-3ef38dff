@@ -14,10 +14,12 @@ import {
   ArrowLeft,
   RefreshCcw,
   Mail,
+  MailOpen,
   X,
   AtSign,
   MoreVertical,
   ChevronDown,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -94,6 +96,8 @@ function MailPage() {
   const [composeOpen, setComposeOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [badges, setBadges] = useState<Record<string, MailBadgeTier>>({});
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectMenuOpen, setSelectMenuOpen] = useState(false);
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -199,7 +203,54 @@ function MailPage() {
     } catch {}
   };
 
-  // debounced username check
+  const toggleSelectOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+  const clearSelection = () => setSelectedIds(new Set());
+  const selectAllVisible = () => setSelectedIds(new Set(filtered.map((m) => m.message_id)));
+  const selectByPredicate = (pred: (m: MailListItem) => boolean) =>
+    setSelectedIds(new Set(filtered.filter(pred).map((m) => m.message_id)));
+
+  const allVisibleSelected =
+    filtered.length > 0 && filtered.every((m) => selectedIds.has(m.message_id));
+  const someSelected = selectedIds.size > 0;
+
+  const bulkMarkRead = async () => {
+    const ids = Array.from(selectedIds);
+    try {
+      await Promise.all(
+        ids.map((id) => _setState({ data: { message_id: id, is_read: true } })),
+      );
+      setMessages((prev) =>
+        prev.map((x) => (selectedIds.has(x.message_id) ? { ...x, is_read: true } : x)),
+      );
+      toast.success(`Marked ${ids.length} as read`);
+      clearSelection();
+    } catch (e: any) {
+      toast.error(e?.message || "Failed");
+    }
+  };
+
+  const bulkMove = async (target: MailFolder) => {
+    const ids = Array.from(selectedIds);
+    try {
+      await Promise.all(
+        ids.map((id) => _setState({ data: { message_id: id, folder: target } })),
+      );
+      setMessages((prev) => prev.filter((x) => !selectedIds.has(x.message_id)));
+      if (selected && selectedIds.has(selected.message_id)) setSelected(null);
+      toast.success(`${ids.length} ${target === "trash" ? "deleted" : "moved to " + target}`);
+      clearSelection();
+    } catch (e: any) {
+      toast.error(e?.message || "Failed");
+    }
+  };
+
   useEffect(() => {
     if (!claimVal) {
       setClaimStatus("");
@@ -349,20 +400,105 @@ function MailPage() {
                   <ArrowLeft className="w-4 h-4" />
                 </button>
               )}
-              <button className="flex items-center gap-1 p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
-                <span className="w-4 h-4 rounded-full border-2 border-gray-300 inline-block" />
-                <ChevronDown className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => load()}
-                className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
-                title="Refresh"
-              >
-                <RefreshCcw className="w-4 h-4" />
-              </button>
-              <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
-                <MoreVertical className="w-4 h-4" />
-              </button>
+              <div className="relative">
+                <div className="flex items-center rounded-md hover:bg-gray-100 text-gray-500">
+                  <button
+                    onClick={() => {
+                      if (allVisibleSelected || someSelected) clearSelection();
+                      else selectAllVisible();
+                    }}
+                    className="p-1.5 pr-1"
+                    title="Select"
+                  >
+                    <span
+                      className={cn(
+                        "w-4 h-4 rounded border-2 inline-flex items-center justify-center",
+                        someSelected ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300",
+                      )}
+                    >
+                      {allVisibleSelected ? (
+                        <Check className="w-3 h-3" strokeWidth={3} />
+                      ) : someSelected ? (
+                        <span className="w-2 h-0.5 bg-white rounded" />
+                      ) : null}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setSelectMenuOpen((v) => !v)}
+                    className="p-1.5 pl-0"
+                  >
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                {selectMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setSelectMenuOpen(false)} />
+                    <div className="absolute left-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px] text-sm">
+                      {[
+                        { label: "All", fn: () => selectAllVisible() },
+                        { label: "None", fn: () => clearSelection() },
+                        { label: "Read", fn: () => selectByPredicate((m) => !!m.is_read) },
+                        { label: "Unread", fn: () => selectByPredicate((m) => !m.is_read) },
+                        { label: "Starred", fn: () => selectByPredicate((m) => !!m.is_starred) },
+                        { label: "Unstarred", fn: () => selectByPredicate((m) => !m.is_starred) },
+                      ].map((o) => (
+                        <button
+                          key={o.label}
+                          onClick={() => {
+                            o.fn();
+                            setSelectMenuOpen(false);
+                          }}
+                          className="w-full text-left px-3 py-1.5 hover:bg-gray-50 text-gray-700"
+                        >
+                          {o.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              {someSelected ? (
+                <>
+                  <div className="w-px h-5 bg-gray-200 mx-1" />
+                  <button
+                    onClick={() => bulkMove("trash")}
+                    className="p-1.5 hover:bg-gray-100 rounded-md text-gray-600"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={bulkMarkRead}
+                    className="p-1.5 hover:bg-gray-100 rounded-md text-gray-600"
+                    title="Mark as read"
+                  >
+                    <MailOpen className="w-4 h-4" />
+                  </button>
+                  {folder !== "archive" && (
+                    <button
+                      onClick={() => bulkMove("archive")}
+                      className="p-1.5 hover:bg-gray-100 rounded-md text-gray-600"
+                      title="Archive"
+                    >
+                      <Archive className="w-4 h-4" />
+                    </button>
+                  )}
+                  <span className="ml-2 text-xs text-gray-500">{selectedIds.size} selected</span>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => load()}
+                    className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
+                    title="Refresh"
+                  >
+                    <RefreshCcw className="w-4 h-4" />
+                  </button>
+                  <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500">
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+                </>
+              )}
             </div>
             <div className="relative">
               <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -395,15 +531,32 @@ function MailPage() {
                         ? m.recipient_address
                         : m.sender_name || m.sender_address;
                     return (
-                      <li key={m.message_id}>
-                        <button
+                      <li key={m.message_id} className={cn(selectedIds.has(m.message_id) && "bg-blue-50")}>
+                        <div
                           onClick={() => openMessage(m)}
                           className={cn(
-                            "w-full text-left px-4 py-3 border-b border-gray-100 flex gap-3 items-start hover:bg-gray-50 transition",
+                            "w-full text-left px-4 py-3 border-b border-gray-100 flex gap-3 items-start hover:bg-gray-50 transition cursor-pointer",
                             active && "bg-gray-100",
-                            !m.is_read && folder === "inbox" && "bg-blue-50/40",
+                            !m.is_read && folder === "inbox" && !selectedIds.has(m.message_id) && "bg-blue-50/40",
+                            selectedIds.has(m.message_id) && "bg-blue-50 hover:bg-blue-50",
                           )}
                         >
+                          <span
+                            role="checkbox"
+                            aria-checked={selectedIds.has(m.message_id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSelectOne(m.message_id);
+                            }}
+                            className={cn(
+                              "mt-1 w-4 h-4 rounded border-2 inline-flex items-center justify-center shrink-0 cursor-pointer",
+                              selectedIds.has(m.message_id)
+                                ? "bg-blue-600 border-blue-600 text-white"
+                                : "border-gray-300 hover:border-gray-500 bg-white",
+                            )}
+                          >
+                            {selectedIds.has(m.message_id) && <Check className="w-3 h-3" strokeWidth={3} />}
+                          </span>
                           <div className="w-9 h-9 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden">
                             {m.sender_avatar ? (
                               <img src={m.sender_avatar} alt="" className="w-full h-full object-cover" />
@@ -459,7 +612,7 @@ function MailPage() {
                               )}
                             />
                           </button>
-                        </button>
+                        </div>
                       </li>
                     );
                   })}
