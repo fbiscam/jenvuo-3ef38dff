@@ -430,8 +430,15 @@ function useLocalHour(): number {
 function DashboardLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [email, setEmail] = useState<string>("");
-  const [fullName, setFullName] = useState<string>("");
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [fullName, setFullName] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("jenvu:profile:fullName") ?? "";
+  });
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("jenvu:profile:avatarUrl");
+  });
+
   const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0, closedWins: 0, closedDecided: 0, openTrades: [] });
   const [newCounts, setNewCounts] = useState<{ saved: number; alerts7d: number; journalTotal: number }>({ saved: 0, alerts7d: 0, journalTotal: 0 });
 
@@ -518,16 +525,29 @@ function DashboardLayout() {
       // Prefer name from profiles table (source of truth updated from Profile page)
       supabase.from("profiles").select("full_name").eq("id", u.id).maybeSingle().then(({ data }) => {
         const n = (data as { full_name?: string | null } | null)?.full_name;
-        if (!cancelled && n && n.trim()) setFullName(n.trim());
+        if (!cancelled && n && n.trim()) {
+          setFullName(n.trim());
+          try { localStorage.setItem("jenvu:profile:fullName", n.trim()); } catch {}
+        }
       });
       // Load avatar (best-effort, non-blocking)
       supabase.from("profiles").select("avatar_url").eq("id", u.id).maybeSingle().then(async ({ data }) => {
         if (cancelled) return;
         const path = (data as { avatar_url?: string | null } | null)?.avatar_url;
-        if (!path) { setAvatarUrl(null); return; }
+        if (!path) {
+          setAvatarUrl(null);
+          try { localStorage.removeItem("jenvu:profile:avatarUrl"); } catch {}
+          return;
+        }
         const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
-        if (!cancelled) setAvatarUrl(signed?.signedUrl ?? null);
+        if (!cancelled) {
+          setAvatarUrl(signed?.signedUrl ?? null);
+          try {
+            if (signed?.signedUrl) localStorage.setItem("jenvu:profile:avatarUrl", signed.signedUrl);
+          } catch {}
+        }
       });
+
       const days = RANGE_DAYS[range];
       const since = days != null ? new Date(Date.now() - days * 24 * 3600 * 1000).toISOString() : null;
 
@@ -559,6 +579,40 @@ function DashboardLayout() {
     })();
     return () => { cancelled = true; };
   }, [range, refreshTick, authUser?.id, authLoading]);
+
+  // Realtime: refresh name/avatar as soon as Profile page saves changes
+  useEffect(() => {
+    if (!authUser?.id) return;
+    const uid = authUser.id;
+    const ch = supabase
+      .channel(`profile-nav:${uid}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${uid}` },
+        async (payload) => {
+          const row = payload.new as { full_name?: string | null; avatar_url?: string | null };
+          const n = (row.full_name ?? "").trim();
+          if (n) {
+            setFullName(n);
+            try { localStorage.setItem("jenvu:profile:fullName", n); } catch {}
+          }
+          const path = row.avatar_url;
+          if (!path) {
+            setAvatarUrl(null);
+            try { localStorage.removeItem("jenvu:profile:avatarUrl"); } catch {}
+          } else {
+            const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+            if (signed?.signedUrl) {
+              setAvatarUrl(signed.signedUrl);
+              try { localStorage.setItem("jenvu:profile:avatarUrl", signed.signedUrl); } catch {}
+            }
+          }
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [authUser?.id]);
+
 
   // ---------- Unread badge counts (per tab, cleared when user opens tab) ----------
   // Persist lastSeen to profiles (DB) so badges stay cleared across
