@@ -530,6 +530,7 @@ function MailPage() {
                       folder === "sent"
                         ? m.recipient_address
                         : m.sender_name || m.sender_address;
+                    return (
                       <li key={m.message_id} className={cn(selectedIds.has(m.message_id) && "bg-blue-50")}>
                         <div
                           onClick={() => openMessage(m)}
