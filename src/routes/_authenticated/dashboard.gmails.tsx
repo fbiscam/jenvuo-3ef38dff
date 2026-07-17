@@ -383,12 +383,6 @@ function MailPage() {
               );
             })}
           </nav>
-          {myAddress && (
-            <div className="mt-6 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
-              <div className="text-[10px] uppercase tracking-wide text-gray-400">Your address</div>
-              <div className="text-xs font-medium text-gray-900 truncate">{myAddress}</div>
-            </div>
-          )}
         </aside>
 
         {/* Main */}
