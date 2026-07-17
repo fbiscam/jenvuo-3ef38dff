@@ -121,6 +121,7 @@ export const listMail = createServerFn({ method: "POST" })
       ),
     );
     let profileMap = new Map<string, { full_name: string | null; avatar_url: string | null }>();
+    const avatarUrlMap = new Map<string, string>();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (userIds.length) {
       const { data: profiles } = await supabaseAdmin
@@ -152,10 +153,32 @@ export const listMail = createServerFn({ method: "POST" })
         }
       }
     }
+    const avatarPaths = Array.from(
+      new Set(
+        Array.from(profileMap.values())
+          .map((p) => p.avatar_url)
+          .filter((path): path is string => Boolean(path)),
+      ),
+    );
+    const privateAvatarPaths = avatarPaths.filter((path) => !/^https?:\/\//i.test(path));
+    for (const url of avatarPaths.filter((path) => /^https?:\/\//i.test(path))) {
+      avatarUrlMap.set(url, url);
+    }
+    if (privateAvatarPaths.length) {
+      const { data: signedAvatars } = await supabaseAdmin.storage
+        .from("avatars")
+        .createSignedUrls(privateAvatarPaths, 60 * 60);
+      for (const item of signedAvatars ?? []) {
+        if (item.path && item.signedUrl) avatarUrlMap.set(item.path, item.signedUrl);
+      }
+    }
     const resolve = (id: string | null, addr: string | null) => {
       const uid = id ?? (addr ? addrToUser.get(addr) ?? null : null);
       const p = uid ? profileMap.get(uid) : null;
-      return { name: p?.full_name ?? null, avatar: p?.avatar_url ?? null };
+      return {
+        name: p?.full_name ?? null,
+        avatar: p?.avatar_url ? avatarUrlMap.get(p.avatar_url) ?? null : null,
+      };
     };
 
     return rows
