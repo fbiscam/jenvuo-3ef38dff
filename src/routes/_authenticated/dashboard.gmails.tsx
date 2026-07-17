@@ -401,36 +401,35 @@ function MailPage() {
                 </button>
               )}
               <div className="relative">
-                <button
-                  onClick={() => {
-                    if (allVisibleSelected || someSelected) clearSelection();
-                    else selectAllVisible();
-                  }}
-                  className="flex items-center gap-1 p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
-                  title="Select"
-                >
-                  <span
-                    className={cn(
-                      "w-4 h-4 rounded border-2 inline-flex items-center justify-center",
-                      someSelected ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300",
-                    )}
-                  >
-                    {allVisibleSelected ? (
-                      <Check className="w-3 h-3" strokeWidth={3} />
-                    ) : someSelected ? (
-                      <span className="w-2 h-0.5 bg-white rounded" />
-                    ) : null}
-                  </span>
+                <div className="flex items-center rounded-md hover:bg-gray-100 text-gray-500">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectMenuOpen((v) => !v);
+                    onClick={() => {
+                      if (allVisibleSelected || someSelected) clearSelection();
+                      else selectAllVisible();
                     }}
-                    className="p-0.5"
+                    className="p-1.5 pr-1"
+                    title="Select"
+                  >
+                    <span
+                      className={cn(
+                        "w-4 h-4 rounded border-2 inline-flex items-center justify-center",
+                        someSelected ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300",
+                      )}
+                    >
+                      {allVisibleSelected ? (
+                        <Check className="w-3 h-3" strokeWidth={3} />
+                      ) : someSelected ? (
+                        <span className="w-2 h-0.5 bg-white rounded" />
+                      ) : null}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setSelectMenuOpen((v) => !v)}
+                    className="p-1.5 pl-0"
                   >
                     <ChevronDown className="w-3.5 h-3.5" />
                   </button>
-                </button>
+                </div>
                 {selectMenuOpen && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setSelectMenuOpen(false)} />
