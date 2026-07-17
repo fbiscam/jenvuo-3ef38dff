@@ -671,6 +671,8 @@ export type Database = {
           country: string | null
           created_at: string
           document_status: string
+          documents_info_request: string | null
+          documents_info_requested_at: string | null
           documents_note: string | null
           documents_rejected_at: string | null
           documents_rejected_reason: string | null
@@ -700,6 +702,8 @@ export type Database = {
           country?: string | null
           created_at?: string
           document_status?: string
+          documents_info_request?: string | null
+          documents_info_requested_at?: string | null
           documents_note?: string | null
           documents_rejected_at?: string | null
           documents_rejected_reason?: string | null
@@ -729,6 +733,8 @@ export type Database = {
           country?: string | null
           created_at?: string
           document_status?: string
+          documents_info_request?: string | null
+          documents_info_requested_at?: string | null
           documents_note?: string | null
           documents_rejected_at?: string | null
           documents_rejected_reason?: string | null
