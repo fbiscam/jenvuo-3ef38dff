@@ -290,7 +290,7 @@ function MailPage() {
                   }}
                   className={cn(
                     "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition",
-                    active ? "bg-gray-900 text-white" : "text-gray-700 hover:bg-gray-100",
+                    active ? "bg-[#f5efe4] text-black" : "text-gray-700 hover:bg-[#faf6ee]",
                   )}
                 >
                   <Icon className="w-4 h-4" />
@@ -299,7 +299,7 @@ function MailPage() {
                     <span
                       className={cn(
                         "text-[11px] px-1.5 py-0.5 rounded-full font-medium",
-                        active ? "bg-white text-black" : "bg-red-500 text-white",
+                        active ? "bg-red-500 text-white" : "bg-red-500 text-white",
                       )}
                     >
                       {unreadCount}
