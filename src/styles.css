@@ -298,6 +298,12 @@
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
 @media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
 
+/* Founding page: no zoom on mobile/tablet; progressive zoom on desktop */
+@media (min-width: 1024px) { .founding-zoom { zoom: 1.15; } }
+@media (min-width: 1280px) { .founding-zoom { zoom: 1.28; } }
+@media (min-width: 1500px) { .founding-zoom { zoom: 1.44; } }
+
+
 @utility no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;

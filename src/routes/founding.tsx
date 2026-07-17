@@ -104,7 +104,7 @@ function FoundingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900" style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif", zoom: 1.44 }}>
+    <div className="min-h-screen bg-white text-zinc-900 founding-zoom" style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif" }}>
       <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
           <Link to="/" className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight">
@@ -115,13 +115,14 @@ function FoundingPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-4xl px-5 pt-14 pb-10 text-center">
-        <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">
+      <section className="mx-auto max-w-4xl px-5 pt-10 pb-8 text-center sm:pt-14 sm:pb-10">
+        <h1 className="mt-2 text-[28px] leading-tight font-semibold tracking-tight sm:mt-5 sm:text-5xl">
           Founding Trader Program
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-zinc-600">
-          Get <span className="font-semibold text-zinc-900">Elite free for 30 days</span> — pay only after your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>. No profit, no payment Built for traders who want institutional grade signals without upfront risk or long term commitment
+        <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-zinc-600 sm:text-[15px]">
+          Get <span className="font-semibold text-zinc-900">Elite free for 30 days</span> — pay only after your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>. No profit, no payment. Built for traders who want institutional grade signals without upfront risk or long term commitment.
         </p>
+
 
 
         <div className="mx-auto mt-8 max-w-md rounded-2xl border border-zinc-200 bg-white p-5">
@@ -157,8 +158,9 @@ function FoundingPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-5 pb-14">
-        <div className="rounded-3xl border border-zinc-200 bg-white p-7">
+      <section className="mx-auto max-w-4xl px-5 pb-10 sm:pb-14">
+        <div className="rounded-3xl border border-zinc-200 bg-white p-5 sm:p-7">
+
           <h2 className="text-xl font-semibold">How it works</h2>
           <ol className="mt-5 space-y-4 text-[14px]">
             {[
@@ -180,8 +182,9 @@ function FoundingPage() {
         </div>
       </section>
 
-      <section id="apply" className="mx-auto max-w-2xl px-5 pb-24">
-        <div className="rounded-3xl border border-zinc-200 bg-white p-7">
+      <section id="apply" className="mx-auto max-w-2xl px-5 pb-16 sm:pb-24">
+        <div className="rounded-3xl border border-zinc-200 bg-white p-5 sm:p-7">
+
           <h2 className="text-xl font-semibold">Apply for a founding seat</h2>
           <p className="mt-1.5 text-[13px] text-zinc-500">
             Applications reviewed within 48 hours. Only serious traders — please be honest.
@@ -235,7 +238,7 @@ function FoundingPage() {
                 <label className="text-[13px] font-medium text-zinc-800">
                   Which plan do you want? <span className="text-rose-500">*</span>
                 </label>
-                <div className="mt-2 grid grid-cols-3 gap-2">
+                <div className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2">
                   {([
                     { id: "pro", label: "Pro", desc: "$15 wallet" },
                     { id: "elite", label: "Elite", desc: "$50 wallet" },
@@ -305,9 +308,10 @@ function FoundingPage() {
                 <ArrowRight className="h-4 w-4" />
               </button>
 
-              <p className="text-[11px] leading-relaxed text-zinc-500 whitespace-nowrap overflow-hidden text-ellipsis">
+              <p className="text-[11px] leading-relaxed text-zinc-500">
                 By applying you agree to our <Link to="/terms" className="underline">Terms</Link> and <Link to="/disclaimer" className="underline">Risk Disclaimer</Link>. Future trading involves significant risk.
               </p>
+
             </form>
           )}
         </div>
