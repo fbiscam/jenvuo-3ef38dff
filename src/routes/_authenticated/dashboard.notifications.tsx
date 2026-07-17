@@ -212,7 +212,7 @@ function MailPage() {
               <AtSign className="w-7 h-7" />
             </div>
             <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 whitespace-nowrap">Claim your JENVU address</h1>
-            <p className="text-sm text-gray-500 mt-2 max-w-md mx-auto sm:whitespace-nowrap">
+            <p className="text-xs sm:text-sm text-gray-500 mt-2 whitespace-nowrap">
               Your private inbox — message any JENVU member.
             </p>
           </div>
