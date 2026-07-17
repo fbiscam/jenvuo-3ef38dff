@@ -580,6 +580,40 @@ function DashboardLayout() {
     return () => { cancelled = true; };
   }, [range, refreshTick, authUser?.id, authLoading]);
 
+  // Realtime: refresh name/avatar as soon as Profile page saves changes
+  useEffect(() => {
+    if (!authUser?.id) return;
+    const uid = authUser.id;
+    const ch = supabase
+      .channel(`profile-nav:${uid}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${uid}` },
+        async (payload) => {
+          const row = payload.new as { full_name?: string | null; avatar_url?: string | null };
+          const n = (row.full_name ?? "").trim();
+          if (n) {
+            setFullName(n);
+            try { localStorage.setItem("jenvu:profile:fullName", n); } catch {}
+          }
+          const path = row.avatar_url;
+          if (!path) {
+            setAvatarUrl(null);
+            try { localStorage.removeItem("jenvu:profile:avatarUrl"); } catch {}
+          } else {
+            const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+            if (signed?.signedUrl) {
+              setAvatarUrl(signed.signedUrl);
+              try { localStorage.setItem("jenvu:profile:avatarUrl", signed.signedUrl); } catch {}
+            }
+          }
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [authUser?.id]);
+
+
   // ---------- Unread badge counts (per tab, cleared when user opens tab) ----------
   // Persist lastSeen to profiles (DB) so badges stay cleared across
   // sign-ins, browsers, and devices — not just this browser.
