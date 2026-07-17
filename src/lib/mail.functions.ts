@@ -93,20 +93,24 @@ export const checkUsernameAvailable = createServerFn({ method: "POST" })
 
 export const listMail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { folder?: MailFolder }) => ({
+  .inputValidator((data: { folder?: MailFolder; starred?: boolean }) => ({
     folder: (data?.folder ?? "inbox") as MailFolder,
+    starred: Boolean(data?.starred),
   }))
   .handler(async ({ context, data }): Promise<MailListItem[]> => {
-    const { data: states, error } = await context.supabase
+    let q = context.supabase
       .from("mail_message_state")
       .select(
         `message_id, folder, is_read, is_starred,
          mail_messages:message_id ( id, sender_id, sender_address, recipient_id, recipient_address, subject, body, created_at )`,
       )
-      .eq("user_id", context.userId)
-      .eq("folder", data.folder)
-      .order("updated_at", { ascending: false })
-      .limit(200);
+      .eq("user_id", context.userId);
+    if (data.starred) {
+      q = q.eq("is_starred", true).neq("folder", "trash");
+    } else {
+      q = q.eq("folder", data.folder);
+    }
+    const { data: states, error } = await q.order("updated_at", { ascending: false }).limit(200);
     if (error) throw new Error(error.message);
 
     const rows = (states ?? []) as any[];
