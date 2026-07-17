@@ -1008,7 +1008,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
           String(app.email),
           String(app.full_name || "there"),
           String(app.requested_plan || "elite"),
-          `${app.id}-docs-received-${new Date().toISOString().slice(0, 10)}`,
+          `${app.id}-docs-received-${Date.now()}`,
         );
         try {
           const { sendSystemMail } = await import("@/lib/system-mail.server");
