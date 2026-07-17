@@ -82,12 +82,13 @@ function MailPage() {
   const [folder, setFolder] = useState<MailFolder>("inbox");
   const [messages, setMessages] = useState<MailListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
   const [selected, setSelected] = useState<MailListItem | null>(null);
   const [composeOpen, setComposeOpen] = useState(false);
   const [query, setQuery] = useState("");
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const [addr, rows] = await Promise.all([
         _getAddr({}),
@@ -97,12 +98,14 @@ function MailPage() {
       setMessages(rows as MailListItem[]);
     } finally {
       setLoading(false);
+      setReady(true);
     }
   }, [folder, _getAddr, _list]);
 
   useEffect(() => {
     load();
   }, [load]);
+
 
   // realtime: refresh on inbox changes
   useEffect(() => {
@@ -117,7 +120,7 @@ function MailPage() {
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "mail_message_state", filter: `user_id=eq.${uid}` },
-          () => load(),
+          () => load(true),
         )
         .subscribe();
     })();
@@ -202,8 +205,14 @@ function MailPage() {
     }
   };
 
+  // ------------ Initial load: stable white shell to prevent flicker ------------
+  if (!ready) {
+    return <div className="min-h-[calc(100vh-4rem)] bg-white" />;
+  }
+
   // ------------ Claim address screen ------------
-  if (!myAddress && !loading) {
+  if (!myAddress) {
+
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-white flex items-center justify-center p-6">
         <div className="w-full max-w-md">
@@ -326,7 +335,7 @@ function MailPage() {
               />
             </div>
             <button
-              onClick={load}
+              onClick={() => load()}
               className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
               title="Refresh"
             >
