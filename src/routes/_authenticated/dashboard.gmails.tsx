@@ -183,6 +183,15 @@ function MailPage() {
 
   const filtered = useMemo(() => {
     let list = messages;
+    // Scope to the selected mailbox when the user owns more than one
+    if (activeAddress && myAddresses.length > 1) {
+      const a = activeAddress.toLowerCase();
+      list = list.filter((m) =>
+        folder === "sent"
+          ? m.sender_address?.toLowerCase() === a
+          : m.recipient_address?.toLowerCase() === a,
+      );
+    }
     if (view === "starred") list = list.filter((m) => m.is_starred);
     if (!query.trim()) return list;
     const q = query.toLowerCase();
@@ -194,9 +203,16 @@ function MailPage() {
         m.recipient_address.toLowerCase().includes(q) ||
         (m.sender_name ?? "").toLowerCase().includes(q),
     );
-  }, [messages, query, view]);
+  }, [messages, query, view, activeAddress, myAddresses, folder]);
 
-  const unreadCount = messages.filter((m) => !m.is_read && m.folder === "inbox").length;
+  const unreadCount = messages.filter((m) => {
+    if (m.is_read || m.folder !== "inbox") return false;
+    if (activeAddress && myAddresses.length > 1) {
+      return m.recipient_address?.toLowerCase() === activeAddress.toLowerCase();
+    }
+    return true;
+  }).length;
+
 
   const openMessage = async (m: MailListItem) => {
     setSelected(m);
