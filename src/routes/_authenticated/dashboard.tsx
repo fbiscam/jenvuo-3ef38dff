@@ -821,7 +821,7 @@ function DashboardLayout() {
     <div className="min-h-dvh flex bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
 
       {/* Mobile overlay */}
-      {mobileNavOpen && (
+      {mobileNavOpen && !embedMode && (
         <button
           type="button"
           aria-label="Close menu"
@@ -829,6 +829,8 @@ function DashboardLayout() {
           className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] lg:hidden"
         />
       )}
+
+      {embedMode ? null : (
 
       {/* Sidebar (Firebase-style) */}
       <aside
