@@ -927,18 +927,24 @@ export type Database = {
         Row: {
           address: string
           created_at: string
+          id: string
+          is_primary: boolean
           local_part: string
           user_id: string
         }
         Insert: {
           address: string
           created_at?: string
+          id?: string
+          is_primary?: boolean
           local_part: string
           user_id: string
         }
         Update: {
           address?: string
           created_at?: string
+          id?: string
+          is_primary?: boolean
           local_part?: string
           user_id?: string
         }
@@ -1839,10 +1845,29 @@ export type Database = {
           tier: string
         }[]
       }
-      mail_send: {
-        Args: { _body: string; _subject: string; _to_address: string }
-        Returns: string
+      mail_list_my_addresses: {
+        Args: never
+        Returns: {
+          address: string
+          created_at: string
+          is_primary: boolean
+          local_part: string
+        }[]
       }
+      mail_send:
+        | {
+            Args: { _body: string; _subject: string; _to_address: string }
+            Returns: string
+          }
+        | {
+            Args: {
+              _body: string
+              _from_address?: string
+              _subject: string
+              _to_address: string
+            }
+            Returns: string
+          }
       mark_chat_read: { Args: { _session_id: string }; Returns: undefined }
       move_to_dlq: {
         Args: {
