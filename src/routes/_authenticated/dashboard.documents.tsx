@@ -79,9 +79,9 @@ function DocumentsPage() {
   const currentIdx = rejected || needsInfo ? 0 : statusIndex(row?.document_status);
   const canUpload =
     !!row &&
-    row.document_status !== "verified" &&
-    row.document_status !== "pending" &&
-    (!rejected || rejectedResubmitOpen);
+    (row.document_status === "not_submitted" ||
+      needsInfo ||
+      (rejected && rejectedResubmitOpen));
 
   const removeMut = useMutation({
     mutationFn: (id: string) => remove({ data: { id } } as any),
@@ -343,7 +343,7 @@ function DocumentsPage() {
           )}
 
           {/* Uploaded files list */}
-          {files.length > 0 && (
+          {canUpload && files.length > 0 && (
             <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6">
               <div className="text-sm font-semibold text-zinc-900 mb-3">
                 Uploaded files ({files.length})
