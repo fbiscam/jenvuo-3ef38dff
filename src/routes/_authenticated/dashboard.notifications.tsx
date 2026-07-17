@@ -299,7 +299,7 @@ function NotificationsPage() {
                 {count > 0 && (
                   <span className={cn(
                     "rounded-full px-1.5 text-[10px]",
-                    active ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600",
+                    active ? "text-zinc-900" : "text-zinc-500",
                   )}>{count}</span>
                 )}
               </button>
