@@ -1868,6 +1868,15 @@ export type Database = {
             }
             Returns: string
           }
+      mail_system_send: {
+        Args: {
+          _body: string
+          _from_address: string
+          _subject: string
+          _to_user_id: string
+        }
+        Returns: string
+      }
       mark_chat_read: { Args: { _session_id: string }; Returns: undefined }
       move_to_dlq: {
         Args: {
