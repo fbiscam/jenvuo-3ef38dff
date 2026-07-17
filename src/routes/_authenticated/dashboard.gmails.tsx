@@ -205,8 +205,14 @@ function MailPage() {
     }
   };
 
+  // ------------ Initial load: stable white shell to prevent flicker ------------
+  if (!ready) {
+    return <div className="min-h-[calc(100vh-4rem)] bg-white" />;
+  }
+
   // ------------ Claim address screen ------------
-  if (!myAddress && !loading) {
+  if (!myAddress) {
+
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-white flex items-center justify-center p-6">
         <div className="w-full max-w-md">
