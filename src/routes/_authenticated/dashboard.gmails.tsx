@@ -581,9 +581,10 @@ function MailPage() {
           </div>
 
           {/* Split view */}
-          <div className="grid lg:grid-cols-[380px_1fr] min-h-[500px] lg:min-h-0 lg:flex-1 lg:overflow-hidden">
+          <div className="grid lg:grid-cols-[380px_1fr] flex-1 min-h-0 overflow-hidden">
             {/* List */}
-            <div className={cn("border-r border-gray-200 lg:overflow-y-auto", selected ? "hidden lg:block" : "block")}>
+            <div className={cn("border-r border-gray-200 overflow-y-auto min-h-0", selected ? "hidden lg:block" : "block")}>
+
               {loading ? (
                 <div className="p-8 text-center text-sm text-gray-400">Loading…</div>
               ) : filtered.length === 0 ? (
