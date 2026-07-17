@@ -20,17 +20,10 @@ import {
   Copy,
   ExternalLink,
   Download,
-  DollarSign,
 } from "lucide-react";
-// (unused DollarSign kept as visual marker)
 
 const PLAN_AMOUNT: Record<string, string> = { pro: "$15", elite: "$50", ultra: "$100", free: "$1" };
 
-  StickyNote,
-  Copy,
-  ExternalLink,
-  Download,
-} from "lucide-react";
 import { isAdmin } from "@/lib/admin-messages.functions";
 import {
   listFoundingApplications,
