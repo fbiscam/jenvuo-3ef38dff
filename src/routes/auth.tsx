@@ -1040,6 +1040,10 @@ function AuthPage() {
                             ) : (
                               "Resend code"
                             )}
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
                       <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3.5 text-[13px] leading-snug text-amber-900">
                         <div className="font-semibold text-amber-950">Jenvu Founding Program — Invite Only</div>
                         <p className="mt-1.5">
