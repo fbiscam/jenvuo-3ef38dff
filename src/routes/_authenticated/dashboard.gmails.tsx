@@ -464,7 +464,7 @@ function MailPage() {
                     {moreMenuOpen && (
                       <>
                         <div className="fixed inset-0 z-10" onClick={() => setMoreMenuOpen(false)} />
-                        <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[180px] text-sm">
+                        <div className="absolute left-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[180px] text-sm">
                           {[
                             {
                               label: "Mark all as read",
