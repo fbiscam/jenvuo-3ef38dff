@@ -191,13 +191,41 @@ function FoundingPage() {
 
 
           {submitted ? (
-            <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center">
-              <Check className="mx-auto h-8 w-8 text-emerald-600" />
-              <div className="mt-3 text-base font-semibold text-emerald-900">Application received</div>
-              <p className="mt-1 text-sm text-emerald-800">
-                We'll email you within 48 hours.
-              </p>
-            </div>
+            <>
+              <div
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-5 animate-in fade-in duration-200"
+                role="dialog"
+                aria-modal="true"
+              >
+                <div className="relative w-full max-w-md rounded-3xl border border-zinc-200 bg-white p-8 text-center shadow-2xl animate-in zoom-in-95 duration-300">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+                    <Check className="h-7 w-7 text-emerald-600" />
+                  </div>
+                  <h3 className="mt-5 text-2xl font-semibold tracking-tight text-zinc-900">
+                    Application received
+                  </h3>
+                  <p className="mt-3 text-[15px] leading-relaxed text-zinc-600">
+                    Thank you — we've got your application. Our team will personally review it and email you a decision within <strong className="text-zinc-900">48 hours</strong>.
+                  </p>
+                  <p className="mt-2 text-[13px] text-zinc-500">
+                    Please keep an eye on your inbox (and spam folder).
+                  </p>
+                  <Link
+                    to="/"
+                    className="mt-6 inline-flex items-center justify-center rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
+                  >
+                    Back to home
+                  </Link>
+                </div>
+              </div>
+              <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center">
+                <Check className="mx-auto h-8 w-8 text-emerald-600" />
+                <div className="mt-3 text-base font-semibold text-emerald-900">Application received</div>
+                <p className="mt-1 text-sm text-emerald-800">
+                  We'll email you within 48 hours.
+                </p>
+              </div>
+            </>
           ) : (
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
               <Field name="full_name" label="Full name" required placeholder="Your full name" />
