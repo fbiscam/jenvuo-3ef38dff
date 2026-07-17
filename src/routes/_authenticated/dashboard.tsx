@@ -448,6 +448,17 @@ function DashboardLayout() {
   const [refreshTick, setRefreshTick] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  // Embed mode: hide sidebar/chrome when rendered inside the Ops Hub iframe.
+  const embedMode = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const inIframe = window.self !== window.top;
+      const hasFlag = new URLSearchParams(window.location.search).get("embed") === "1";
+      return inIframe || hasFlag;
+    } catch {
+      return true; // cross-origin iframe access throws — assume embed
+    }
+  }, []);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [isAdminUser, setIsAdminUser] = useState(false);
   const credits = useCredits();
@@ -810,7 +821,7 @@ function DashboardLayout() {
     <div className="min-h-dvh flex bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
 
       {/* Mobile overlay */}
-      {mobileNavOpen && (
+      {mobileNavOpen && !embedMode && (
         <button
           type="button"
           aria-label="Close menu"
@@ -819,7 +830,8 @@ function DashboardLayout() {
         />
       )}
 
-      {/* Sidebar (Firebase-style) */}
+      {!embedMode && (
+      /* Sidebar (Firebase-style) */
       <aside
         className={`dashboard-sidebar-root max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
           ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"}
@@ -954,12 +966,14 @@ function DashboardLayout() {
 
 
       </aside>
+      )}
 
 
       {/* Right column */}
-      <div className={`dashboard-right-col flex min-h-screen min-w-0 flex-1 flex-col ${sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
+      <div className={`dashboard-right-col flex min-h-screen min-w-0 flex-1 flex-col ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
       {/* Mobile menu toggle (floating) */}
+      {!embedMode && (
       <button
         type="button"
         aria-label="Open menu"
@@ -968,6 +982,7 @@ function DashboardLayout() {
       >
         <Menu className="h-4 w-4" />
       </button>
+      )}
 
 
 

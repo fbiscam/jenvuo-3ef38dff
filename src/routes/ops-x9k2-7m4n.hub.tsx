@@ -201,7 +201,7 @@ function OpsHub() {
             </div>
             <iframe
               key={active.key}
-              src={active.to}
+              src={`${active.to}${active.to.includes("?") ? "&" : "?"}embed=1`}
               title={active.title}
               className="h-full w-full flex-1 bg-white"
             />
