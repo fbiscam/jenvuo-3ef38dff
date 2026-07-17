@@ -856,6 +856,26 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
           String(app.requested_plan || "elite"),
           `${app.id}-docs-received-${new Date().toISOString().slice(0, 10)}`,
         );
+        try {
+          const { sendSystemMail } = await import("@/lib/system-mail.server");
+          const name = String(app.full_name || "there").split(/\s+/)[0];
+          await sendSystemMail({
+            from: "notifications@jenvu.email",
+            toUserId: context.userId,
+            subject: "Documents received — under review",
+            body: [
+              `Hi ${name},`,
+              ``,
+              `We received your submitted document(s). Our team will review shortly and update you here.`,
+              ``,
+              `You can track the status any time on your Documents page.`,
+              ``,
+              `— Jenvu Notifications`,
+            ].join("\n"),
+          });
+        } catch (e) {
+          console.error("[founding] system-mail docs-received failed:", (e as Error)?.message);
+        }
       }
     }
     return { ok: true };
