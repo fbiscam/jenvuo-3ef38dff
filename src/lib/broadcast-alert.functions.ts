@@ -67,52 +67,36 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       throw new Error(insertErr?.message ?? 'Failed to record alert')
     }
 
-    // 2. Resolve active email subscribers from the signal page opt-in.
-    //    Only paid-plan users receive the email (match by auth.users.email → user_subscriptions).
-    const { data: subs } = await supabaseAdmin
-      .from('signal_alert_subscribers')
-      .select('email')
-      .eq('status', 'active')
-    const allSubEmails = Array.from(
-      new Set(
-        (subs ?? [])
-          .map((s: { email: string | null }) => (s.email ?? '').toLowerCase().trim())
-          .filter((e) => !!e && /.+@.+\..+/.test(e)),
-      ),
-    )
-
+    // 2. Recipients = every active paid-plan user's email (no opt-in required).
     let recipientEmails: string[] = []
-    if (allSubEmails.length > 0) {
-      // Resolve user_ids for the opt-in emails in one auth.users query,
-      // then intersect with active paid subscriptions. This is bounded by
-      // the actual opted-in list, not the full paid user base.
-      const { data: matchedUsers } = await supabaseAdmin
-        .schema('auth' as never)
-        .from('users' as never)
-        .select('id, email')
-        .in('email', allSubEmails) as unknown as {
-          data: Array<{ id: string; email: string }> | null
+    {
+      const { data: paidRows } = await supabaseAdmin
+        .from('user_subscriptions')
+        .select('user_id')
+        .eq('status', 'active')
+        .neq('plan_id', 'free')
+      const paidIds = Array.from(
+        new Set((paidRows ?? []).map((r: { user_id: string }) => r.user_id)),
+      )
+      if (paidIds.length > 0) {
+        const { data: users } = (await supabaseAdmin
+          .schema('auth' as never)
+          .from('users' as never)
+          .select('id, email')
+          .in('id', paidIds)) as unknown as {
+          data: Array<{ id: string; email: string | null }> | null
         }
-      const emailByUserId = new Map<string, string>()
-      for (const u of matchedUsers ?? []) {
-        if (u?.id && u?.email) emailByUserId.set(u.id, u.email.toLowerCase().trim())
-      }
-      if (emailByUserId.size > 0) {
-        const { data: paidRows } = await supabaseAdmin
-          .from('user_subscriptions')
-          .select('user_id')
-          .eq('status', 'active')
-          .neq('plan_id', 'free')
-          .in('user_id', Array.from(emailByUserId.keys()))
-        const paidEmailSet = new Set(
-          (paidRows ?? [])
-            .map((r: { user_id: string }) => emailByUserId.get(r.user_id))
-            .filter((e): e is string => !!e),
+        recipientEmails = Array.from(
+          new Set(
+            (users ?? [])
+              .map((u) => (u?.email ?? '').toLowerCase().trim())
+              .filter((e) => !!e && /.+@.+\..+/.test(e)),
+          ),
         )
-        recipientEmails = allSubEmails.filter((e) => paidEmailSet.has(e))
       }
     }
     const recipients: Array<{ email: string }> = recipientEmails.map((email) => ({ email }))
+
 
     // 3. Insert in-app notifications for all paid users (even non-subscribers)
     const { data: allPaid } = await supabaseAdmin
