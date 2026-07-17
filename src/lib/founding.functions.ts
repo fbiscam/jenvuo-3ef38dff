@@ -270,7 +270,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Documents need an update, ${n}`,
           "Documents · Action Required",
-          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. You can re-upload updated documents within the next <strong>24 hours</strong>.</p>
+          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. You can re-upload updated documents right away from your Documents page — there's no waiting period.</p>
            <p style="margin:0 0 12px">If the admin left a reason, you'll see it on your Documents page. Common asks: a clearer screenshot, a fuller statement, or a screen-recording that shows the account name.</p>
            <p style="margin:0">Reply to this email if you need help.</p>`,
           { label: "Re-upload documents", href: `${APP_URL}/dashboard/documents` },
@@ -842,7 +842,9 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // Fire applicant email on real transitions. `pending` reuses the "received/under review" template.
-    if (prior?.email && prior.document_status !== data.document_status) {
+    // For rejected / needs_info the admin may re-send the same status intentionally — always email.
+    const alwaysEmail = data.document_status === "rejected" || data.document_status === "needs_info";
+    if (prior?.email && (alwaysEmail || prior.document_status !== data.document_status)) {
       const kind: ApplicantEmailKind | null =
         data.document_status === "verified"
           ? "documents_approved"
@@ -861,7 +863,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
             String(prior.email),
             String(prior.full_name || "there"),
             String(prior.requested_plan || "elite"),
-            `${data.id}-${kind}-${now.slice(0, 10)}`,
+            `${data.id}-${kind}-${Date.now()}`,
           );
         } catch (e) {
           console.error("[founding] doc-status email enqueue failed:", (e as Error)?.message);
@@ -885,7 +887,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
           } else if (kind === "documents_rejected") {
             bodyLines.push("Unfortunately your documents were not approved.");
             if (data.rejected_reason) bodyLines.push("", `Reason: ${data.rejected_reason}`);
-            bodyLines.push("", "You can resubmit within 24 hours from the Documents page.");
+            bodyLines.push("", "You can resubmit right away from your Documents page.");
           } else if (kind === "documents_needs_info") {
             bodyLines.push("Our review team needs a bit more information before we can approve.");
             if (data.info_request) bodyLines.push("", `Requested: ${data.info_request}`);
@@ -975,13 +977,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
     if (!data.storage_path.startsWith(`${context.userId}/`)) {
       throw new Error("Invalid storage path");
     }
-    // 24-hour resubmission window after rejection
-    if (app.document_status === "rejected" && app.documents_rejected_at) {
-      const rejectedAt = new Date(app.documents_rejected_at).getTime();
-      if (Date.now() - rejectedAt > 24 * 60 * 60 * 1000) {
-        throw new Error("The 24-hour resubmission window has expired. Please contact support.");
-      }
-    }
+    // Users can resubmit at any time after rejection or needs_info — no waiting window.
     const admin = await getServiceClient();
     const { error } = await admin.from("founding_documents" as any).insert({
       application_id: app.id,
@@ -1014,7 +1010,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
           String(app.email),
           String(app.full_name || "there"),
           String(app.requested_plan || "elite"),
-          `${app.id}-docs-received-${new Date().toISOString().slice(0, 10)}`,
+          `${app.id}-docs-received-${Date.now()}`,
         );
         try {
           const { sendSystemMail } = await import("@/lib/system-mail.server");

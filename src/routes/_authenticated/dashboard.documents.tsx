@@ -70,18 +70,10 @@ function DocumentsPage() {
 
   const rejected = row?.document_status === "rejected";
   const needsInfo = row?.document_status === "needs_info";
-  const rejectedAtMs = row?.documents_rejected_at ? new Date(row.documents_rejected_at).getTime() : 0;
-  const rejectedResubmitOpen =
-    rejected && rejectedAtMs > 0 && Date.now() - rejectedAtMs <= 24 * 60 * 60 * 1000;
-  const rejectedHoursLeft = rejectedResubmitOpen
-    ? Math.max(0, Math.ceil((24 * 60 * 60 * 1000 - (Date.now() - rejectedAtMs)) / (60 * 60 * 1000)))
-    : 0;
   const currentIdx = rejected || needsInfo ? 0 : statusIndex(row?.document_status);
   const canUpload =
     !!row &&
-    (row.document_status === "not_submitted" ||
-      needsInfo ||
-      (rejected && rejectedResubmitOpen));
+    (row.document_status === "not_submitted" || needsInfo || rejected);
 
   const removeMut = useMutation({
     mutationFn: (id: string) => remove({ data: { id } } as any),
@@ -253,9 +245,7 @@ function DocumentsPage() {
                 </div>
               )}
               <div className="text-xs mt-3 font-medium text-red-800">
-                {rejectedResubmitOpen
-                  ? `You can re-submit within the next ${rejectedHoursLeft} hour${rejectedHoursLeft === 1 ? "" : "s"}.`
-                  : "The 24-hour re-submission window has closed. Please contact support to try again."}
+                You can re-submit right away — just upload updated proof below.
               </div>
             </div>
           )}
