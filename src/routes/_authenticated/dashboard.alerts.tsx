@@ -55,7 +55,18 @@ function AlertPrefs() {
   const [alertsLoading, setAlertsLoading] = useState(true);
   const [pairFilter, setPairFilter] = useState<string>("ALL");
   const [visibleCount, setVisibleCount] = useState<number>(10);
-  const [loggedIds, setLoggedIds] = useState<Set<string>>(new Set());
+  const LOGGED_KEY = "jenvu:alerts:logged_ids";
+  const [loggedIds, setLoggedIds] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      const raw = window.localStorage.getItem(LOGGED_KEY);
+      const arr = raw ? (JSON.parse(raw) as string[]) : [];
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch { return new Set(); }
+  });
+  const persistLogged = useCallback((next: Set<string>) => {
+    try { window.localStorage.setItem(LOGGED_KEY, JSON.stringify(Array.from(next))); } catch { /* ignore */ }
+  }, []);
   const [loggingId, setLoggingId] = useState<string | null>(null);
   const getAlertsEnabledFn = useServerFn(getAlertsEnabled);
   const setAlertsEnabledFn = useServerFn(setAlertsEnabled);
@@ -121,7 +132,11 @@ function AlertPrefs() {
       }
       return;
     }
-    setLoggedIds((prev) => new Set(prev).add(a.id));
+    setLoggedIds((prev) => {
+      const next = new Set(prev).add(a.id);
+      persistLogged(next);
+      return next;
+    });
     toast.success("Trade logged · auto-tracking win/loss");
   };
 
@@ -185,6 +200,7 @@ function AlertPrefs() {
         for (const a of alerts) {
           if (set.has(key(a.pair, a.entry, a.sl, a.tp))) next.add(a.id);
         }
+        persistLogged(next);
         return next;
       });
     })();
