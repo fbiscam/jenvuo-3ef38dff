@@ -971,7 +971,7 @@ function DashboardLayout() {
 
 
 
-      <main className={pathname.startsWith("/dashboard/gmails") ? "w-full flex-1 min-h-0 overflow-hidden" : "mx-auto w-full max-w-7xl flex-1 px-5 pt-14 pb-7 sm:px-8 sm:pt-7"}>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
 
 
         {pathname === "/dashboard" ? (
