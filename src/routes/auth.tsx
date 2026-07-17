@@ -890,6 +890,13 @@ function AuthPage() {
                       >
                         Sign in
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
+                        className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
+                      >
+                        Sign up
+                      </button>
                     </div>
                   )}
 
