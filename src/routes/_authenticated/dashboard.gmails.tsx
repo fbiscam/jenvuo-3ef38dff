@@ -27,6 +27,7 @@ import {
   claimMailAddress,
   checkUsernameAvailable,
   listMail,
+  listMyMailAddresses,
   sendMail,
   setMailState,
   searchMailDirectory,
@@ -34,8 +35,10 @@ import {
   type MailFolder,
   type MailListItem,
   type MailBadgeTier,
+  type MailAddress,
 } from "@/lib/mail.functions";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/gmails")({
   head: () => ({
