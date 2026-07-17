@@ -170,7 +170,7 @@ function AlertPrefs() {
       title="Realtime Alerts are Pro"
       description="Get A+ setups delivered the moment they form. Upgrade to Pro or Elite to enable realtime alerts."
     >
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-6xl space-y-6">
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
