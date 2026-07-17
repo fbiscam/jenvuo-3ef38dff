@@ -222,6 +222,35 @@ function SignalPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [broadcasting, setBroadcasting] = useState(false);
   const broadcastFn = useServerFn(broadcastCurrentSignal);
+  const getAlertsEnabledFn = useServerFn(getAlertsEnabled);
+  const setAlertsEnabledFn = useServerFn(setAlertsEnabled);
+  const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
+  const [alertsSaving, setAlertsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!authUser) return;
+    (async () => {
+      try {
+        const r = await getAlertsEnabledFn({});
+        setAlertsOn(!!r.enabled);
+      } catch { setAlertsOn(true); }
+    })();
+  }, [authUser, getAlertsEnabledFn]);
+
+  const toggleAlerts = useCallback(async () => {
+    if (alertsOn === null || alertsSaving) return;
+    const next = !alertsOn;
+    setAlertsSaving(true);
+    try {
+      await setAlertsEnabledFn({ data: { enabled: next } });
+      setAlertsOn(next);
+      toast.success(next ? "Alerts enabled · $0.20 will be charged per signal" : "Alerts disabled · no charges, no notifications");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not update alerts");
+    } finally {
+      setAlertsSaving(false);
+    }
+  }, [alertsOn, alertsSaving, setAlertsEnabledFn]);
 
   type BroadcastedAlert = {
     id: string;
