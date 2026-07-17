@@ -724,11 +724,17 @@ function MailPage() {
                 <div className="p-6">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-11 h-11 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold overflow-hidden">
-                      {selected.sender_avatar ? (
-                        <img src={selected.sender_avatar} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        initials(selected.sender_name, selected.sender_address)
-                      )}
+                      {(() => {
+                        const isSent = selected.folder === "sent";
+                        const avatar = isSent ? selected.recipient_avatar : selected.sender_avatar;
+                        const name = isSent ? selected.recipient_name : selected.sender_name;
+                        const addr = isSent ? selected.recipient_address : selected.sender_address;
+                        return avatar ? (
+                          <img src={avatar} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          initials(name, addr)
+                        );
+                      })()}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
