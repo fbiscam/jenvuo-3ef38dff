@@ -703,6 +703,7 @@ function MailPage() {
                               )}
                             />
                           </button>
+                          </div>
                         </div>
                       </li>
                     );
