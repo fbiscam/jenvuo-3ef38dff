@@ -613,7 +613,9 @@ function MailPage() {
                             "w-full text-left pl-4 pr-3 py-3 border-b border-gray-100 flex gap-3 items-start transition cursor-pointer",
                             "hover:bg-gray-50/80",
                             active && "bg-blue-50/70 hover:bg-blue-50/70",
-                            !m.is_read && folder === "inbox" && !active && !selectedIds.has(m.message_id) && "bg-white",
+                            !m.is_read && folder === "inbox" && !active && !selectedIds.has(m.message_id) &&
+                              "bg-gradient-to-r from-blue-50/70 via-white to-white shadow-[inset_3px_0_0_0_rgb(37,99,235)] hover:from-blue-50",
+                            m.is_read && folder === "inbox" && !active && !selectedIds.has(m.message_id) && "bg-white opacity-70",
                             selectedIds.has(m.message_id) && "bg-blue-50 hover:bg-blue-50",
                           )}
                         >
