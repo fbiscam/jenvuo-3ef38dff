@@ -201,12 +201,12 @@ function AdminFoundingPage() {
   }
 
   const stat = (label: string, value: number, Icon: any, tone: string) => (
-    <div className="rounded-2xl border border-white/5 bg-zinc-900/60 p-4 backdrop-blur">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-4">
       <div className="flex items-center justify-between">
         <span className="text-[11px] uppercase tracking-widest text-zinc-500">{label}</span>
         <Icon className={`h-4 w-4 ${tone}`} />
       </div>
-      <div className="mt-2 text-2xl font-semibold text-white tabular-nums">{value}</div>
+      <div className="mt-2 text-2xl font-semibold text-zinc-900 tabular-nums">{value}</div>
     </div>
   );
 
