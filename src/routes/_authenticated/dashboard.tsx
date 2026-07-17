@@ -430,8 +430,15 @@ function useLocalHour(): number {
 function DashboardLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [email, setEmail] = useState<string>("");
-  const [fullName, setFullName] = useState<string>("");
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [fullName, setFullName] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("jenvu:profile:fullName") ?? "";
+  });
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("jenvu:profile:avatarUrl");
+  });
+
   const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0, closedWins: 0, closedDecided: 0, openTrades: [] });
   const [newCounts, setNewCounts] = useState<{ saved: number; alerts7d: number; journalTotal: number }>({ saved: 0, alerts7d: 0, journalTotal: 0 });
 
