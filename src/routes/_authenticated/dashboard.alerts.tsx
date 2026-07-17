@@ -1,9 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
+import { useServerFn } from "@tanstack/react-start";
+import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
+import { Bell, BellOff, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/alerts")({
@@ -52,6 +57,35 @@ function AlertPrefs() {
   const [visibleCount, setVisibleCount] = useState<number>(10);
   const [loggedIds, setLoggedIds] = useState<Set<string>>(new Set());
   const [loggingId, setLoggingId] = useState<string | null>(null);
+  const getAlertsEnabledFn = useServerFn(getAlertsEnabled);
+  const setAlertsEnabledFn = useServerFn(setAlertsEnabled);
+  const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
+  const [alertsSaving, setAlertsSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await getAlertsEnabledFn({});
+        setAlertsOn(!!r.enabled);
+      } catch { setAlertsOn(true); }
+    })();
+  }, [getAlertsEnabledFn]);
+
+  const toggleAlerts = useCallback(async () => {
+    if (alertsOn === null || alertsSaving) return;
+    const next = !alertsOn;
+    setAlertsSaving(true);
+    try {
+      await setAlertsEnabledFn({ data: { enabled: next } });
+      setAlertsOn(next);
+      toast.success(next ? "Alerts enabled · $0.20 will be charged per signal" : "Alerts disabled · no charges, no notifications");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not update alerts");
+    } finally {
+      setAlertsSaving(false);
+    }
+  }, [alertsOn, alertsSaving, setAlertsEnabledFn]);
+
 
   const takeTrade = async (a: FiredAlert) => {
     if (loggedIds.has(a.id) || loggingId) return;
@@ -214,6 +248,31 @@ function AlertPrefs() {
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> LIVE
             </span>
+            {alertsOn !== null && (
+              <button
+                onClick={toggleAlerts}
+                disabled={alertsSaving}
+                className={cn(
+                  "shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-[12px] font-medium border transition disabled:opacity-50",
+                  alertsOn
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
+                    : "bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100",
+                )}
+                title={alertsOn
+                  ? "Alerts ON · $0.20 charged per signal. Click to turn off."
+                  : "Alerts OFF · no notifications, no charges. Click to turn on."}
+              >
+                {alertsSaving ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : alertsOn ? (
+                  <Bell className="h-3.5 w-3.5" />
+                ) : (
+                  <BellOff className="h-3.5 w-3.5" />
+                )}
+                {alertsOn ? "Alerts ON" : "Alerts OFF"}
+              </button>
+            )}
+
             <select
               value={pairFilter}
               onChange={(e) => setPairFilter(e.target.value)}
