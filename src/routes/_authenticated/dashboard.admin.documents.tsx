@@ -79,6 +79,8 @@ function AdminDocumentsPage() {
   const [filter, setFilter] = useState<string>("all");
   const [rejectFor, setRejectFor] = useState<string | null>(null);
   const [reason, setReason] = useState("");
+  const [infoFor, setInfoFor] = useState<string | null>(null);
+  const [infoMsg, setInfoMsg] = useState("");
 
   const { data: rows = [], isLoading, error } = useQuery<AdminDocSubmission[]>({
     queryKey: ["admin-doc-submissions"],
@@ -87,12 +89,18 @@ function AdminDocumentsPage() {
   });
 
   const mut = useMutation({
-    mutationFn: (input: { id: string; status: "verified" | "pending" | "rejected"; reason?: string }) =>
+    mutationFn: (input: {
+      id: string;
+      status: "verified" | "pending" | "rejected" | "needs_info";
+      reason?: string;
+      info?: string;
+    }) =>
       update({
         data: {
           id: input.id,
           document_status: input.status,
           rejected_reason: input.reason,
+          info_request: input.info,
         },
       } as any),
     onSuccess: (_r, vars) => {
@@ -101,10 +109,14 @@ function AdminDocumentsPage() {
           ? "Approved — user is now verified"
           : vars.status === "rejected"
           ? "Rejected"
+          : vars.status === "needs_info"
+          ? "Info request sent to user"
           : "Marked as under review",
       );
       setRejectFor(null);
       setReason("");
+      setInfoFor(null);
+      setInfoMsg("");
       qc.invalidateQueries({ queryKey: ["admin-doc-submissions"] });
     },
     onError: (e: any) => toast.error(e?.message || "Failed"),
