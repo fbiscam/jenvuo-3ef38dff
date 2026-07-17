@@ -174,6 +174,8 @@ function HomePage() {
   const ticker = useLiveTicker();
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
+  const { user: authUser } = useAuthUser();
+  const isAuthed = !!authUser;
   return (
     <>
     <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
