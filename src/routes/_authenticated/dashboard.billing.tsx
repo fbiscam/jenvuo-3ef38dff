@@ -441,7 +441,7 @@ function Billing() {
                       </span>
                     </div>
                   </td>
-                  {[row.a, row.b, row.c, row.d].map((v, i) => {
+                  {[row.b, row.c, row.d].map((v, i) => {
                     const isCurrentCol = plan === PLAN_KEY_BY_COL[i];
                     return (
                       <td
