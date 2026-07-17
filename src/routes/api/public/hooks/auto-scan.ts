@@ -280,15 +280,39 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               console.error("auto-scan email enqueue failed", e);
             }
 
-            // Ledger entry ($0.10 system pool cost)
+            // Ledger entry (system pool cost per broadcast)
             await supabaseAdmin.from("auto_scan_pool_ledger").insert({
               pair,
               direction: dir,
               confidence: Math.round(conf),
               alert_id: inserted.id,
               broadcast_count: notified,
-              cost_usd: 0.1,
+              cost_usd: 0.2,
             });
+
+            // Per-user $0.20 auto-scan charge — mirrors manual scan billing so
+            // the deduction shows up in every recipient's billing history.
+            try {
+              const { chargeSignalScan } = await import(
+                "@/lib/ai-cost-log.server"
+              );
+              await Promise.all(
+                userIds.map((uid) =>
+                  chargeSignalScan({
+                    userId: uid,
+                    direction: dir,
+                    model: "rules-engine/ict-smc",
+                    symbol: pair,
+                    scanId: `auto_${inserted.id}_${uid}`,
+                    grade,
+                    score: setupScore,
+                  }),
+                ),
+              );
+            } catch (e) {
+              console.warn("auto-scan chargeSignalScan failed", e);
+            }
+
 
             // Update state: mark broadcast, clear first-hit
             await supabaseAdmin.from("auto_scan_state").upsert(
