@@ -116,7 +116,7 @@ function MailPage() {
       const [addr, addrs, rows] = await Promise.all([
         _getAddr({}),
         _listAddrs({}).catch(() => [] as MailAddress[]),
-        _list({ data: { folder } }).catch(() => []),
+        _list({ data: { folder, starred: view === "starred" } }).catch(() => []),
       ]);
       const primary = (addr as any)?.address ?? null;
       setMyAddress(primary);
@@ -130,7 +130,7 @@ function MailPage() {
       setLoading(false);
       setReady(true);
     }
-  }, [folder, _getAddr, _listAddrs, _list]);
+  }, [folder, view, _getAddr, _listAddrs, _list]);
 
   useEffect(() => {
     load();
