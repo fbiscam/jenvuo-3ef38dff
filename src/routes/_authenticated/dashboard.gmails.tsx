@@ -395,63 +395,27 @@ function MailPage() {
                   <ArrowLeft className="w-4 h-4" />
                 </button>
               )}
-              <div className="relative">
-                <div className="flex items-center rounded-md hover:bg-gray-100 text-gray-500">
-                  <button
-                    onClick={() => {
-                      if (allVisibleSelected || someSelected) clearSelection();
-                      else selectAllVisible();
-                    }}
-                    className="p-1.5 pr-1"
-                    title="Select"
-                  >
-                    <span
-                      className={cn(
-                        "w-4 h-4 rounded border-2 inline-flex items-center justify-center",
-                        someSelected ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300",
-                      )}
-                    >
-                      {allVisibleSelected ? (
-                        <Check className="w-3 h-3" strokeWidth={3} />
-                      ) : someSelected ? (
-                        <span className="w-2 h-0.5 bg-white rounded" />
-                      ) : null}
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => setSelectMenuOpen((v) => !v)}
-                    className="p-1.5 pl-0"
-                  >
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                {selectMenuOpen && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setSelectMenuOpen(false)} />
-                    <div className="absolute left-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px] text-sm">
-                      {[
-                        { label: "All", fn: () => selectAllVisible() },
-                        { label: "None", fn: () => clearSelection() },
-                        { label: "Read", fn: () => selectByPredicate((m) => !!m.is_read) },
-                        { label: "Unread", fn: () => selectByPredicate((m) => !m.is_read) },
-                        { label: "Starred", fn: () => selectByPredicate((m) => !!m.is_starred) },
-                        { label: "Unstarred", fn: () => selectByPredicate((m) => !m.is_starred) },
-                      ].map((o) => (
-                        <button
-                          key={o.label}
-                          onClick={() => {
-                            o.fn();
-                            setSelectMenuOpen(false);
-                          }}
-                          className="w-full text-left px-3 py-1.5 hover:bg-gray-50 text-gray-700"
-                        >
-                          {o.label}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
+              <button
+                onClick={() => {
+                  if (allVisibleSelected || someSelected) clearSelection();
+                  else selectAllVisible();
+                }}
+                className="p-1.5 hover:bg-gray-100 rounded-md text-gray-500"
+                title="Select all"
+              >
+                <span
+                  className={cn(
+                    "w-4 h-4 rounded border-2 inline-flex items-center justify-center",
+                    someSelected ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300",
+                  )}
+                >
+                  {allVisibleSelected ? (
+                    <Check className="w-3 h-3" strokeWidth={3} />
+                  ) : someSelected ? (
+                    <span className="w-2 h-0.5 bg-white rounded" />
+                  ) : null}
+                </span>
+              </button>
               {someSelected ? (
                 <>
                   <div className="w-px h-5 bg-gray-200 mx-1" />
