@@ -43,11 +43,6 @@ type Candle = { x: number; o: number; h: number; l: number; c: number }
 
 
 
-const YAHOO_SYMBOL: Record<string, string> = {
-  XAUUSD: 'XAUUSD=X', XAUEUR: 'XAUEUR=X', XAUGBP: 'XAUGBP=X',
-  XAUJPY: 'XAUJPY=X', XAUAUD: 'XAUAUD=X', XAUCHF: 'XAUCHF=X',
-}
-
 // Base gold in USD from COMEX futures (Yahoo cross-pair symbols like XAUCHF=X return 404).
 // For non-USD quote pairs, multiply by USD/QUOTE (or divide by QUOTE/USD).
 type CrossFx = { symbol: string; invert: boolean } | null
