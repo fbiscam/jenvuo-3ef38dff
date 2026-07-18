@@ -494,16 +494,21 @@ function DashboardLayout() {
     return () => { cancelled = true; };
   }, [authLoading, authUser]);
 
-  // Unread notifications count (for red label indicator on the Notifications tab)
+  // Unread notifications count — only counts notifications newer than the last
+  // time the user opened the notifications page (localStorage timestamp).
+  // This prevents old already-seen notifications from re-appearing after sign-in.
   useEffect(() => {
     if (authLoading || !authUser) { setUnreadNotifs(0); return; }
     let cancelled = false;
+    const lastSeenKey = `jenvu:notifs:last-seen:${authUser.id}`;
     const load = async () => {
+      const lastSeen = (typeof window !== "undefined" && window.localStorage.getItem(lastSeenKey)) || new Date(0).toISOString();
       const { count } = await supabase
         .from("user_notifications")
         .select("id", { count: "exact", head: true })
         .eq("user_id", authUser.id)
-        .is("read_at", null);
+        .is("read_at", null)
+        .gt("created_at", lastSeen);
       if (!cancelled) setUnreadNotifs(count ?? 0);
     };
     load();
@@ -514,10 +519,16 @@ function DashboardLayout() {
     return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [authUser?.id, authLoading]);
 
-  // Clear red indicator when user visits the notifications page
+  // Clear red indicator when user visits the notifications page and persist
+  // the "last seen" timestamp so old notifications never count again.
   useEffect(() => {
-    if (pathname.startsWith("/dashboard/notifications")) setUnreadNotifs(0);
-  }, [pathname]);
+    if (!pathname.startsWith("/dashboard/notifications")) return;
+    setUnreadNotifs(0);
+    if (typeof window !== "undefined" && authUser?.id) {
+      window.localStorage.setItem(`jenvu:notifs:last-seen:${authUser.id}`, new Date().toISOString());
+    }
+  }, [pathname, authUser?.id]);
+
 
   useEffect(() => {
     // Wait until Supabase has restored the session; otherwise RLS-gated
