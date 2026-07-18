@@ -559,7 +559,7 @@ function AlertPrefs() {
                     ? `Connected to chat ${telegramChatId || "—"}`
                     : "Open @Jenvu_Bot on Telegram and tap Start, then paste your numeric chat ID below."}
                 </div>
-                {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {new Date(telegramVerifiedAt).toLocaleString()}</div>}
+                {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {formatVerifiedAt(telegramVerifiedAt)}</div>}
               </div>
               <div className="flex items-center gap-2 sm:flex-shrink-0">
                 <a
