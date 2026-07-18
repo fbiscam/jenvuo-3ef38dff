@@ -496,39 +496,38 @@ function AlertPrefs() {
                 </div>
                 {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {new Date(telegramVerifiedAt).toLocaleString()}</div>}
               </div>
-              {telegramLinked && (
-                <button
-                  type="button"
-                  onClick={() => toggleTelegram(!telegramEnabled)}
-                  className={cn(
-                    "rounded-full px-3 py-1.5 text-xs font-semibold transition",
-                    telegramEnabled ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700",
-                  )}
+              <div className="flex items-center gap-2 sm:flex-shrink-0">
+                <a
+                  href="https://t.me/Jenvu_Bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
                 >
-                  {telegramEnabled ? "ON" : "OFF"}
-                </button>
-              )}
-            </div>
-
-            <div className="mt-3 flex sm:justify-end">
-              <a
-                href="https://t.me/Jenvu_Bot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
-              >
-                <svg viewBox="0 0 240 240" className="h-4 w-4" aria-hidden="true">
-                  <defs>
-                    <linearGradient id="tg-grad" x1="120" y1="0" x2="120" y2="240" gradientUnits="userSpaceOnUse">
-                      <stop offset="0" stopColor="#2AABEE" />
-                      <stop offset="1" stopColor="#229ED9" />
-                    </linearGradient>
-                  </defs>
-                  <circle cx="120" cy="120" r="120" fill="url(#tg-grad)" />
-                  <path fill="#fff" d="M53.6 116.7c34.9-15.2 58.2-25.2 69.9-30.1 33.3-13.8 40.2-16.2 44.7-16.3 1 0 3.2.2 4.7 1.4 1.2 1 1.5 2.3 1.7 3.3.2 1 .4 3.2.2 4.9-1.8 19.4-9.9 66.5-14 88.2-1.7 9.2-5.1 12.3-8.4 12.6-7.2.7-12.6-4.7-19.5-9.2-10.8-7.1-16.9-11.5-27.4-18.4-12.1-8-4.3-12.4 2.7-19.6 1.8-1.9 33.6-30.8 34.2-33.4.1-.3.1-1.5-.6-2.1-.7-.6-1.7-.4-2.5-.2-1.1.2-18.5 11.8-52.4 34.6-5 3.4-9.5 5.1-13.5 5-4.4-.1-13-2.5-19.3-4.6-7.8-2.5-14-3.9-13.5-8.2.3-2.3 3.4-4.6 9-6.9z" />
-                </svg>
-                Open Telegram
-              </a>
+                  <svg viewBox="0 0 240 240" className="h-4 w-4" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="tg-grad" x1="120" y1="0" x2="120" y2="240" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stopColor="#2AABEE" />
+                        <stop offset="1" stopColor="#229ED9" />
+                      </linearGradient>
+                    </defs>
+                    <circle cx="120" cy="120" r="120" fill="url(#tg-grad)" />
+                    <path fill="#fff" d="M53.6 116.7c34.9-15.2 58.2-25.2 69.9-30.1 33.3-13.8 40.2-16.2 44.7-16.3 1 0 3.2.2 4.7 1.4 1.2 1 1.5 2.3 1.7 3.3.2 1 .4 3.2.2 4.9-1.8 19.4-9.9 66.5-14 88.2-1.7 9.2-5.1 12.3-8.4 12.6-7.2.7-12.6-4.7-19.5-9.2-10.8-7.1-16.9-11.5-27.4-18.4-12.1-8-4.3-12.4 2.7-19.6 1.8-1.9 33.6-30.8 34.2-33.4.1-.3.1-1.5-.6-2.1-.7-.6-1.7-.4-2.5-.2-1.1.2-18.5 11.8-52.4 34.6-5 3.4-9.5 5.1-13.5 5-4.4-.1-13-2.5-19.3-4.6-7.8-2.5-14-3.9-13.5-8.2.3-2.3 3.4-4.6 9-6.9z" />
+                  </svg>
+                  Open Telegram
+                </a>
+                {telegramLinked && (
+                  <button
+                    type="button"
+                    onClick={() => toggleTelegram(!telegramEnabled)}
+                    className={cn(
+                      "rounded-full px-3 py-1.5 text-xs font-semibold transition",
+                      telegramEnabled ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700",
+                    )}
+                  >
+                    {telegramEnabled ? "ON" : "OFF"}
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
