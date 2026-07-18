@@ -93,7 +93,11 @@ async function handleCommand(opts: {
 
   const userId = link.user_id as string;
 
-  // Fetch profile in parallel for the requested command
+  // Get user's email (needed for founding_applications lookup)
+  const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+  const userEmail = authUser?.user?.email ?? "";
+
+  // Fetch data in parallel
   const [balanceRes, subRes, docsAppRes, tradesRes, profileRes] = await Promise.all([
     supabaseAdmin
       .from("credit_balances")
@@ -105,13 +109,15 @@ async function handleCommand(opts: {
       .select("plan_id, status, current_period_end, billing_interval")
       .eq("user_id", userId)
       .maybeSingle(),
-    supabaseAdmin
-      .from("founding_applications")
-      .select("status, document_status, documents_verified_at, documents_rejected_reason, documents_info_request")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+    userEmail
+      ? supabaseAdmin
+          .from("founding_applications")
+          .select("status, document_status, documents_verified_at, documents_rejected_reason, documents_info_request")
+          .ilike("email", userEmail)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
     supabaseAdmin
       .from("trade_journal")
       .select("pair, direction, outcome, pnl, opened_at, closed_at")
@@ -120,7 +126,7 @@ async function handleCommand(opts: {
       .limit(50),
     supabaseAdmin
       .from("profiles")
-      .select("display_name, email")
+      .select("full_name, plan")
       .eq("id", userId)
       .maybeSingle(),
   ]);
