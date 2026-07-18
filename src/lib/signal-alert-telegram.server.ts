@@ -226,12 +226,13 @@ async function buildChartUrl(a: EnqueueAlertEmailsArgs): Promise<string> {
 
 function buildCaption(a: EnqueueAlertEmailsArgs, reason: string): string {
   const round = (n: number) => Number(n.toFixed(a.decimals)).toFixed(a.decimals)
-  const title = `${a.grade} ${a.direction} · ${a.pair}`
+  const title = `${a.direction} · ${a.pair}`
   const lines = [
     `<b>${escapeHtml(title)}</b>`,
     ``,
-
+    `Grade: <b>${escapeHtml(a.grade)}</b>`,
     `Entry: <b>${round(a.entry)}</b>`,
+
     `SL: <b>${round(a.sl)}</b>`,
     `TP: <b>${round(a.tp)}</b>`,
     `R:R: <b>1:${a.rr.toFixed(2)}</b>`,
