@@ -41,6 +41,8 @@ function buildReason(a: EnqueueAlertEmailsArgs): string {
 
 type Candle = { x: number; o: number; h: number; l: number; c: number }
 
+
+
 const YAHOO_SYMBOL: Record<string, string> = {
   XAUUSD: 'XAUUSD=X', XAUEUR: 'XAUEUR=X', XAUGBP: 'XAUGBP=X',
   XAUJPY: 'XAUJPY=X', XAUAUD: 'XAUAUD=X', XAUCHF: 'XAUCHF=X',
