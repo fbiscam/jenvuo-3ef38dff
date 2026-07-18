@@ -15,12 +15,21 @@ export const Route = createFileRoute("/_authenticated/dashboard/alerts")({
   component: AlertPrefs,
 });
 
+type Grade = "A+" | "A" | "B";
+type Direction = "BUY" | "SELL";
+const ALL_PAIRS = ["XAUUSD","XAUEUR","XAUGBP","XAUJPY","XAUAUD","XAUCHF"] as const;
+const ALL_GRADES: Grade[] = ["A+", "A", "B"];
+const ALL_DIRECTIONS: Direction[] = ["BUY", "SELL"];
+
 type Prefs = {
   email_enabled: boolean;
   browser_enabled: boolean;
   min_grade: "A+" | "A";
   quiet_start: string | null;
   quiet_end: string | null;
+  email_grades: Grade[];
+  email_pairs: string[];
+  email_directions: Direction[];
 };
 
 const DEFAULTS: Prefs = {
@@ -29,7 +38,11 @@ const DEFAULTS: Prefs = {
   min_grade: "A+",
   quiet_start: null,
   quiet_end: null,
+  email_grades: [...ALL_GRADES],
+  email_pairs: [...ALL_PAIRS],
+  email_directions: [...ALL_DIRECTIONS],
 };
+
 
 type FiredAlert = {
   id: string;
