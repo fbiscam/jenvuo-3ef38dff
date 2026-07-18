@@ -845,14 +845,8 @@ function AlertPrefs() {
         </div>
       </section>
 
-      <div className="flex justify-end">
-        <button
-          onClick={save}
-          disabled={saving}
-          className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
-        >
-          {saving ? "Saving…" : "Save preferences"}
-        </button>
+      <div className="flex justify-end text-xs text-zinc-400">
+        {saving ? "Saving…" : "Changes are saved automatically"}
       </div>
 
       <AlertDialog open={disconnectConfirmOpen} onOpenChange={setDisconnectConfirmOpen}>
