@@ -78,7 +78,7 @@ export function useSignalAlerts(pair: string = 'XAUUSD') {
   // Fetch current alerts_enabled preference and cache it
   useEffect(() => {
     let cancelled = false
-    alertsEnabledFn({ data: undefined as never })
+    alertsEnabledFn()
       .then((r) => {
         if (cancelled) return
         enabledRef.current = r.enabled !== false
