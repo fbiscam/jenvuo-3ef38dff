@@ -1032,15 +1032,15 @@ function DashboardLayout() {
                 title="AI models powering your signals"
               >
                 <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-1 leading-none hover:bg-zinc-50">
-                  <img src="https://logo.clearbit.com/openai.com" alt="OpenAI" width={16} height={16} className="h-[16px] w-[16px] shrink-0 rounded object-contain" loading="lazy" />
+                  <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" width={16} height={16} className="h-[16px] w-[16px] shrink-0 rounded object-contain" loading="lazy" />
                   <span className="text-[11px] font-medium leading-none text-zinc-800">OpenAI</span>
                   {showDeepSeek && (
                     <>
                       <span className="leading-none text-zinc-300">·</span>
-                      <img src="https://logo.clearbit.com/deepseek.com" alt="DeepSeek" width={16} height={16} className="h-[16px] w-[16px] shrink-0 rounded object-contain" loading="lazy" />
+                      <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="DeepSeek" width={16} height={16} className="h-[16px] w-[16px] shrink-0 rounded object-contain" loading="lazy" />
                       <span className="text-[11px] font-medium leading-none text-zinc-800">DeepSeek</span>
                       <span className="leading-none text-zinc-300">·</span>
-                      <img src="https://logo.clearbit.com/google.com" alt="Google" width={16} height={16} className="h-[16px] w-[16px] shrink-0 rounded object-contain" loading="lazy" />
+                      <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={16} height={16} className="h-[16px] w-[16px] shrink-0 rounded object-contain" loading="lazy" />
                       <span className="text-[11px] font-medium leading-none text-zinc-800">Google</span>
                     </>
                   )}
