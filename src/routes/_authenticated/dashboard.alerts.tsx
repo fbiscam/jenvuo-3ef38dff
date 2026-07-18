@@ -353,11 +353,11 @@ function AlertPrefs() {
 
 
   const save = async () => {
-    setSaving(true);
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) return;
     let timezone: string | null = null;
     try { timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch { timezone = null; }
+    setSaving(true);
     const { error } = await supabase.from("alert_preferences").upsert({
       user_id: user.user.id,
       ...prefs,
@@ -365,8 +365,16 @@ function AlertPrefs() {
     });
     setSaving(false);
     if (error) toast.error("Could not save preferences");
-    else toast.success("Preferences saved");
   };
+
+  // Auto-save preferences whenever they change (debounced)
+  useEffect(() => {
+    if (loading) return;
+    const t = setTimeout(() => { save(); }, 500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefs, loading]);
+
 
   const requestBrowser = async () => {
     if (typeof Notification === "undefined") return toast.error("Notifications not supported in this browser");
@@ -845,14 +853,8 @@ function AlertPrefs() {
         </div>
       </section>
 
-      <div className="flex justify-end">
-        <button
-          onClick={save}
-          disabled={saving}
-          className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
-        >
-          {saving ? "Saving…" : "Save preferences"}
-        </button>
+      <div className="flex justify-end text-xs text-zinc-400">
+        {saving ? "Saving…" : "Changes are saved automatically"}
       </div>
 
       <AlertDialog open={disconnectConfirmOpen} onOpenChange={setDisconnectConfirmOpen}>
