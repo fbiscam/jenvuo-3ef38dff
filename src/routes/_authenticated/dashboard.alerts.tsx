@@ -111,6 +111,35 @@ function AlertPrefs() {
   const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
   const canConnectTelegram = chatIdValid && !telegramSaving;
 
+  const [ipTimezone, setIpTimezone] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return window.localStorage.getItem("jenvu:ipTimezone");
+  });
+  useEffect(() => {
+    let cancelled = false;
+    fetch("https://ipapi.co/json/")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (cancelled || !d?.timezone) return;
+        setIpTimezone(d.timezone);
+        try { window.localStorage.setItem("jenvu:ipTimezone", d.timezone); } catch { /* ignore */ }
+      })
+      .catch(() => { /* fall back to device tz */ });
+    return () => { cancelled = true; };
+  }, []);
+  const formatVerifiedAt = useCallback((iso: string) => {
+    try {
+      return new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: ipTimezone || undefined,
+      }).format(new Date(iso));
+    } catch {
+      return new Date(iso).toLocaleString();
+    }
+  }, [ipTimezone]);
+
+
   useEffect(() => {
     (async () => {
       try {
@@ -530,7 +559,7 @@ function AlertPrefs() {
                     ? `Connected to chat ${telegramChatId || "—"}`
                     : "Open @Jenvu_Bot on Telegram and tap Start, then paste your numeric chat ID below."}
                 </div>
-                {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {new Date(telegramVerifiedAt).toLocaleString()}</div>}
+                {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {formatVerifiedAt(telegramVerifiedAt)}</div>}
               </div>
               <div className="flex items-center gap-2 sm:flex-shrink-0">
                 <a
