@@ -7,22 +7,6 @@ const TelegramLinkSchema = z.object({
   chatId: z.string().trim().regex(/^-?\d{5,20}$/, 'Invalid Telegram chat ID'),
 })
 
-async function callTelegram<T>(botToken: string, method: string, body: Record<string, unknown>): Promise<T> {
-  const res = await fetch(`https://api.telegram.org/bot${botToken}/${method}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-  const text = await res.text()
-  let json: any = null
-  try { json = text ? JSON.parse(text) : null } catch { /* provider returned non-json */ }
-  if (!res.ok || json?.ok === false) {
-    const description = json?.description || `Telegram returned ${res.status}`
-    throw new Error(description)
-  }
-  return json as T
-}
-
 export const getTelegramAlertLink = createServerFn({ method: 'GET' })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -45,6 +29,21 @@ export const connectTelegramAlertLink = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => TelegramLinkSchema.parse(input))
   .handler(async ({ data, context }) => {
+    const callTelegram = async (method: string, body: Record<string, unknown>) => {
+      const res = await fetch(`https://api.telegram.org/bot${data.botToken}/${method}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const text = await res.text()
+      let json: any = null
+      try { json = text ? JSON.parse(text) : null } catch { /* provider returned non-json */ }
+      if (!res.ok || json?.ok === false) {
+        const description = json?.description || `Telegram returned ${res.status}`
+        throw new Error(description)
+      }
+    }
+
     await callTelegram(data.botToken, 'getMe', {})
     await callTelegram(data.botToken, 'sendMessage', {
       chat_id: data.chatId,
