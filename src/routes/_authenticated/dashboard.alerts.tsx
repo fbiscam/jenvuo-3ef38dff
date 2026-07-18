@@ -672,7 +672,7 @@ function AlertPrefs() {
                       ...p,
                       email_grades: on ? p.email_grades.filter((x) => x !== g) : [...p.email_grades, g],
                     }))}
-                    className={`rounded-md px-3 py-1.5 text-xs font-semibold transition border ${on ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50"}`}
+                    className={`rounded-md px-3 py-1.5 text-xs font-semibold transition border ${on ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50"}`}
                   >
                     {g}
                   </button>
