@@ -303,28 +303,12 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               cost_usd: 0.2,
             });
 
-            // Per-user $0.20 auto-scan charge — mirrors manual scan billing so
-            // the deduction shows up in every recipient's billing history.
-            try {
-              const { chargeSignalScan } = await import(
-                "@/lib/ai-cost-log.server"
-              );
-              await Promise.all(
-                userIds.map((uid) =>
-                  chargeSignalScan({
-                    userId: uid,
-                    direction: dir,
-                    model: "rules-engine/ict-smc",
-                    symbol: pair,
-                    scanId: `auto_${inserted.id}_${uid}`,
-                    grade,
-                    score: setupScore,
-                  }),
-                ),
-              );
-            } catch (e) {
-              console.warn("auto-scan chargeSignalScan failed", e);
-            }
+            // NOTE: Auto-broadcast alerts are NOT billed to recipient wallets.
+            // The scan cost is absorbed by the system pool ledger row above
+            // (auto_scan_pool_ledger). Charging each subscriber $0.20 for a
+            // signal they didn't request would silently drain a paid plan's
+            // monthly wallet (up to max_broadcasts_per_day × $0.20 / day).
+            // Per-user billing only applies to user-initiated manual scans.
 
 
             // Update state: mark broadcast, clear first-hit
