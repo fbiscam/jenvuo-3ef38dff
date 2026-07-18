@@ -133,6 +133,17 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 });
                 continue;
               }
+              // Dedup: if we've already broadcast this same direction for this
+              // pair, don't re-broadcast until direction flips or state clears
+              // (state auto-clears when dir drops to hold or below threshold).
+              if (state.direction === dir) {
+                results.push({
+                  pair,
+                  action: "already_broadcast_same_dir",
+                  dir,
+                });
+                continue;
+              }
             }
 
             // Single-hit mode: broadcast immediately (no 2-hit confirmation)
