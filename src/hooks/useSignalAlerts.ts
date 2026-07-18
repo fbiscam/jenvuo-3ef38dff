@@ -2,8 +2,10 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useServerFn } from '@tanstack/react-start'
 import { supabase } from '@/integrations/supabase/client'
 import { listSignalAlerts, type SignalAlertRow } from '@/lib/signal-alerts.functions'
+import { getAlertsEnabled } from '@/lib/alert-toggle.functions'
 
 const SEEN_KEY = 'jenvu_seen_alert_id'
+const ALERTS_ENABLED_CACHE_KEY = 'jenvu_alerts_enabled'
 
 function beep() {
   try {
