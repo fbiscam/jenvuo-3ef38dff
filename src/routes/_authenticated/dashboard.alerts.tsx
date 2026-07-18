@@ -664,24 +664,35 @@ function AlertPrefs() {
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
         <h2 className="text-base font-semibold">Conviction filter</h2>
-        <p className="mt-1 text-sm text-zinc-500">Only fire when grade meets this threshold.</p>
-        <div className="mt-4 inline-flex rounded-lg border border-zinc-200 p-1">
+        <p className="mt-1 text-sm text-zinc-500">Only fire when confidence meets this threshold.</p>
+        <div className="mt-4 inline-flex flex-wrap gap-1 rounded-lg border border-zinc-200 p-1">
           {([
-            { key: "A+", label: "A+ only" },
-            { key: "A", label: "A & A+" },
-          ] as const).map((opt) => (
-            <button
-              key={opt.key}
-              onClick={() => setPrefs((p) => ({ ...p, min_grade: opt.key }))}
-              className={`px-4 py-1.5 text-sm font-medium rounded-md transition ${
-                prefs.min_grade === opt.key ? "bg-emerald-600 text-white" : "bg-white text-zinc-600 hover:text-zinc-900"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
+            { key: 0, label: "ALL" },
+            { key: 62, label: "62%" },
+            { key: 70, label: "70%" },
+            { key: 75, label: "75%" },
+            { key: 85, label: "85%" },
+          ] as const).map((opt) => {
+            const active = (prefs.min_grade === "A+" ? 75 : 0) === opt.key
+              ? false
+              : false;
+            const current = prefs.min_grade === "A+" ? 75 : 0;
+            const isActive = current === opt.key || (opt.key === 0 && current === 0 && prefs.min_grade !== "A+");
+            void active;
+            return (
+              <button
+                key={opt.key}
+                onClick={() => setPrefs((p) => ({ ...p, min_grade: opt.key >= 75 ? "A+" : "A" }))}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition ${
+                  isActive ? "bg-emerald-600 text-white" : "bg-white text-zinc-600 hover:text-zinc-900"
+                }`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
-        <p className="mt-2 text-[11px] text-zinc-400">Tip: "A &amp; A+" enables both grades so you never miss a solid setup.</p>
+        <p className="mt-2 text-[11px] text-zinc-400">Higher threshold = fewer, higher-conviction alerts.</p>
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
