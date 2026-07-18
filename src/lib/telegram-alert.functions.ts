@@ -44,8 +44,8 @@ export const connectTelegramAlertLink = createServerFn({ method: 'POST' })
       }
     }
 
-    await callTelegram(data.botToken, 'getMe', {})
-    await callTelegram(data.botToken, 'sendMessage', {
+    await callTelegram('getMe', {})
+    await callTelegram('sendMessage', {
       chat_id: data.chatId,
       text: '✅ Jenvu Telegram alerts connected. You will receive signal alerts here.',
       disable_web_page_preview: true,
