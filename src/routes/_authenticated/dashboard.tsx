@@ -932,21 +932,19 @@ function DashboardLayout() {
                       </span>
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
-                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white tabular-nums ring-2 ring-white aspect-square" style={{ height: 16, width: 16, minWidth: 16, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 600, letterSpacing: 0, padding: 0 }}>
-                          {count}
+                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
+                          New
                         </span>
                       )}
                       {!sidebarCollapsed && hasUnread && (
-                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white tabular-nums ring-2 ring-white aspect-square" style={{ height: 16, width: 16, minWidth: 16, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 600, letterSpacing: 0, padding: 0 }}>
-                          {unreadNotifs}
+                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
+                          New
                         </span>
                       )}
                       {sidebarCollapsed && ((typeof count === "number" && count > 0 && !active) || hasUnread) && (
-                        <span className="absolute -right-0.5 -top-0.5 inline-flex items-center justify-center rounded-full bg-rose-600 text-[9px] font-semibold text-white tabular-nums" style={{ height: 18, width: 18, lineHeight: '18px', textAlign: 'center' }}>
-                          {hasUnread ? unreadNotifs : count}
+                        <span className="absolute -right-1 -top-1 inline-flex items-center justify-center rounded-full bg-rose-600 text-white" style={{ height: 14, paddingLeft: 5, paddingRight: 5, fontSize: 8, fontWeight: 700, letterSpacing: 0.3 }}>
+                          New
                         </span>
-
-
                       )}
 
 
