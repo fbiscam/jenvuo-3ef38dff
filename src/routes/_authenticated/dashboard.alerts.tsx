@@ -669,15 +669,15 @@ function AlertPrefs() {
                 const on = prefs.email_grades.includes(g);
                 const styles: Record<string, { on: string; off: string }> = {
                   "A+": {
-                    on: "bg-emerald-500 text-white border-emerald-500 shadow-sm shadow-emerald-500/30",
+                    on: "bg-white text-emerald-700 border-emerald-500 shadow-sm shadow-emerald-500/20",
                     off: "bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-50",
                   },
                   "A": {
-                    on: "bg-sky-500 text-white border-sky-500 shadow-sm shadow-sky-500/30",
+                    on: "bg-white text-sky-700 border-sky-500 shadow-sm shadow-sky-500/20",
                     off: "bg-white text-sky-700 border-sky-300 hover:bg-sky-50",
                   },
                   "B": {
-                    on: "bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/30",
+                    on: "bg-white text-amber-700 border-amber-500 shadow-sm shadow-amber-500/20",
                     off: "bg-white text-amber-700 border-amber-300 hover:bg-amber-50",
                   },
                 };
