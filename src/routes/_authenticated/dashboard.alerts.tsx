@@ -598,10 +598,10 @@ function AlertPrefs() {
                 onClick={connectTelegram}
                 disabled={!canConnectTelegram}
                 className={cn(
-                  "inline-flex items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold transition",
+                  "inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-semibold transition",
                   canConnectTelegram
-                    ? "bg-zinc-900 text-white hover:bg-zinc-800"
-                    : "cursor-not-allowed bg-zinc-100 text-zinc-400",
+                    ? "border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+                    : "cursor-not-allowed border-zinc-200 bg-white text-zinc-400",
                 )}
               >
                 {telegramSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
