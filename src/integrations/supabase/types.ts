@@ -1734,6 +1734,39 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_alert_links: {
+        Row: {
+          bot_token: string | null
+          chat_id: string
+          created_at: string
+          last_error: string | null
+          telegram_enabled: boolean
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          bot_token?: string | null
+          chat_id: string
+          created_at?: string
+          last_error?: string | null
+          telegram_enabled?: boolean
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          bot_token?: string | null
+          chat_id?: string
+          created_at?: string
+          last_error?: string | null
+          telegram_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       topup_packs: {
         Row: {
           credits: number
