@@ -267,11 +267,18 @@ function NotificationsPage() {
               onClick={async () => {
                 await markAll();
                 setItems((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() })));
+                try {
+                  const { data } = await supabase.auth.getUser();
+                  if (data.user?.id) {
+                    window.localStorage.setItem(`jenvu:notifs:last-seen:${data.user.id}`, new Date().toISOString());
+                  }
+                } catch {}
               }}
               className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm hover:bg-zinc-50"
             >
-              <CheckCheck className="h-3.5 w-3.5" /> Mark all read
+              <CheckCheck className="h-3.5 w-3.5" /> Mark all as read
             </button>
+
           )}
         </header>
 
