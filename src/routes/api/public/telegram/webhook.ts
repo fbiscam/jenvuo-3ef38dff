@@ -162,7 +162,7 @@ async function handleCommand(opts: {
   const winRate = closed.length ? Math.round((wins / closed.length) * 100) : 0;
   const totalPnl = closed.reduce((sum, t) => sum + Number(t.pnl ?? 0), 0);
 
-  const name = (profileRes.data?.display_name as string) || (profileRes.data?.email as string) || "Trader";
+  const name = (profileRes.data?.full_name as string) || userEmail || "Trader";
 
   if (cmd === "/balance") {
     const reset = balanceRes.data?.period_resets_at
