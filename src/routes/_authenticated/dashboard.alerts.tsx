@@ -686,22 +686,40 @@ function AlertPrefs() {
             <div className="mt-2 flex flex-wrap gap-2">
               {ALL_PAIRS.map((pair) => {
                 const on = prefs.email_pairs.includes(pair);
+                const quote = pair.slice(3).toLowerCase();
+                const flagCode = quote === "eur" ? "eu" : quote === "usd" ? "us" : quote === "gbp" ? "gb" : quote === "jpy" ? "jp" : quote === "aud" ? "au" : quote === "chf" ? "ch" : "us";
                 return (
                   <button
                     key={pair}
                     type="button"
+                    title={pair}
                     onClick={() => setPrefs((p) => ({
                       ...p,
                       email_pairs: on ? p.email_pairs.filter((x) => x !== pair) : [...p.email_pairs, pair],
                     }))}
-                    className={`rounded-lg px-3.5 py-2 font-mono text-[13px] font-semibold tracking-wide transition border shadow-sm ${on ? "bg-zinc-900 text-white border-zinc-900 shadow-zinc-900/20" : "bg-white text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"}`}
+                    className={`group inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-semibold tracking-wide transition border shadow-sm ${on ? "bg-zinc-900 text-white border-zinc-900 shadow-zinc-900/20" : "bg-white text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"}`}
                   >
-                    {pair}
+                    <span className="relative inline-flex items-center">
+                      <span
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-full ring-2 ring-white text-[9px] font-bold text-amber-900"
+                        style={{ background: "radial-gradient(circle at 30% 30%, #FEF3C7, #F59E0B 60%, #B45309)" }}
+                      >
+                        Au
+                      </span>
+                      <img
+                        src={`https://flagcdn.com/w40/${flagCode}.png`}
+                        alt={quote.toUpperCase()}
+                        className="-ml-2 h-6 w-6 rounded-full object-cover ring-2 ring-white"
+                        loading="lazy"
+                      />
+                    </span>
+                    <span className="font-mono text-[11px]">{pair}</span>
                   </button>
                 );
               })}
             </div>
           </div>
+
 
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Direction</div>
