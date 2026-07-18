@@ -641,7 +641,7 @@ function AlertPrefs() {
               key={opt.key}
               onClick={() => setPrefs((p) => ({ ...p, min_grade: opt.key }))}
               className={`px-4 py-1.5 text-sm font-medium rounded-md transition ${
-                prefs.min_grade === opt.key ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"
+                prefs.min_grade === opt.key ? "bg-green-400 text-white" : "bg-white text-zinc-600 hover:text-zinc-900"
               }`}
             >
               {opt.label}
