@@ -588,7 +588,7 @@ function AlertPrefs() {
                   type="button"
                   onClick={() => setDisconnectConfirmOpen(true)}
                   disabled={telegramSaving}
-                  className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 disabled:opacity-50"
+                  className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50"
                 >
                   Disconnect
                 </button>
