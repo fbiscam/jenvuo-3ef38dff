@@ -107,6 +107,7 @@ function AlertPrefs() {
   const [telegramVerifiedAt, setTelegramVerifiedAt] = useState<string | null>(null);
   const [telegramError, setTelegramError] = useState<string | null>(null);
   const [telegramSaving, setTelegramSaving] = useState(false);
+  const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false);
   const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
   const canConnectTelegram = chatIdValid && !telegramSaving;
 
