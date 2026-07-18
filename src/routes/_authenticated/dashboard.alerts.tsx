@@ -567,6 +567,7 @@ function AlertPrefs() {
                 {telegramLinked ? "Reconnect" : "Connect"}
               </button>
             </div>
+            {!telegramLinked && (
             <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-3" style={{ fontFamily: '"Google Sans", "Product Sans", system-ui, sans-serif' }}>
               <div className="text-xs font-semibold text-zinc-900">Where do I get my Chat ID?</div>
               <ol className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-zinc-700">
