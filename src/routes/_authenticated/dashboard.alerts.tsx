@@ -159,13 +159,23 @@ function AlertPrefs() {
       if (!user.user) return;
       const { data } = await supabase
         .from("alert_preferences")
-        .select("email_enabled, browser_enabled, min_grade, quiet_start, quiet_end")
+        .select("email_enabled, browser_enabled, min_grade, quiet_start, quiet_end, email_grades, email_pairs, email_directions")
         .eq("user_id", user.user.id)
         .maybeSingle();
-      if (data) setPrefs(data as Prefs);
+      if (data) {
+        const d = data as Partial<Prefs>;
+        setPrefs({
+          ...DEFAULTS,
+          ...d,
+          email_grades: (d.email_grades && d.email_grades.length ? d.email_grades : DEFAULTS.email_grades) as Grade[],
+          email_pairs: d.email_pairs && d.email_pairs.length ? d.email_pairs : DEFAULTS.email_pairs,
+          email_directions: (d.email_directions && d.email_directions.length ? d.email_directions : DEFAULTS.email_directions) as Direction[],
+        });
+      }
       setLoading(false);
     })();
   }, []);
+
 
   useEffect(() => {
     let cancelled = false;
