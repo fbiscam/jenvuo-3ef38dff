@@ -694,7 +694,7 @@ function AlertPrefs() {
                       ...p,
                       email_pairs: on ? p.email_pairs.filter((x) => x !== pair) : [...p.email_pairs, pair],
                     }))}
-                    className={`rounded-md px-3 py-1.5 font-mono text-[11px] transition ${on ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"}`}
+                    className={`rounded-md px-3 py-1.5 font-mono text-[11px] transition border ${on ? "bg-green-400 text-white border-green-400" : "bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50"}`}
                   >
                     {pair}
                   </button>
