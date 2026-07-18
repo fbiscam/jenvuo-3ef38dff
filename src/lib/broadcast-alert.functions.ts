@@ -82,17 +82,21 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       )
       notifyUserIds = await filterAlertsEnabledUserIds(paidIds)
       if (notifyUserIds.length > 0) {
-        const { data: users } = (await supabaseAdmin
-          .schema('auth' as never)
-          .from('users' as never)
-          .select('id, email')
-          .in('id', notifyUserIds)) as unknown as {
-          data: Array<{ id: string; email: string | null }> | null
+        // PostgREST does not expose the auth schema; use the Auth Admin API.
+        const collected: Array<{ id: string; email: string | null }> = []
+        for (const uid of notifyUserIds) {
+          try {
+            const { data: u, error } = await supabaseAdmin.auth.admin.getUserById(uid)
+            if (error) continue
+            collected.push({ id: uid, email: u.user?.email ?? null })
+          } catch {
+            // ignore individual failures
+          }
         }
         recipientEmails = Array.from(
           new Set(
-            (users ?? [])
-              .map((u) => (u?.email ?? '').toLowerCase().trim())
+            collected
+              .map((u) => (u.email ?? '').toLowerCase().trim())
               .filter((e) => !!e && /.+@.+\..+/.test(e)),
           ),
         )
