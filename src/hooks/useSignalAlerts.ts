@@ -49,8 +49,14 @@ function notify(a: SignalAlertRow) {
 
 export function useSignalAlerts(pair: string = 'XAUUSD') {
   const fetcher = useServerFn(listSignalAlerts)
+  const alertsEnabledFn = useServerFn(getAlertsEnabled)
   const [alerts, setAlerts] = useState<SignalAlertRow[]>([])
   const [loading, setLoading] = useState(true)
+  const enabledRef = useRef<boolean>(
+    typeof window !== 'undefined'
+      ? window.localStorage.getItem(ALERTS_ENABLED_CACHE_KEY) !== '0'
+      : true,
+  )
   const seenRef = useRef<string | null>(
     typeof window !== 'undefined' ? window.localStorage.getItem(SEEN_KEY) : null,
   )
