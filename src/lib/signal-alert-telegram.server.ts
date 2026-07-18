@@ -224,7 +224,7 @@ function buildCaption(a: EnqueueAlertEmailsArgs, reason: string): string {
 }
 
 async function sendOne(botToken: string, chatId: string, a: EnqueueAlertEmailsArgs, reason: string): Promise<void> {
-  const photo = buildChartUrl(a)
+  const photo = await buildChartUrl(a)
   const caption = buildCaption(a, reason)
   try {
     await tgApi(botToken, 'sendPhoto', {
