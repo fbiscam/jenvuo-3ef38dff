@@ -88,6 +88,7 @@ function AlertPrefs() {
   const getTelegramLinkFn = useServerFn(getTelegramAlertLink);
   const connectTelegramFn = useServerFn(connectTelegramAlertLink);
   const setTelegramEnabledFn = useServerFn(setTelegramAlertEnabled);
+  const disconnectTelegramFn = useServerFn(disconnectTelegramAlertLink);
   const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
   const [alertsSaving, setAlertsSaving] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState("");
