@@ -697,7 +697,7 @@ function AlertPrefs() {
                       ...p,
                       email_pairs: on ? p.email_pairs.filter((x) => x !== pair) : [...p.email_pairs, pair],
                     }))}
-                    className={`group inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-semibold tracking-wide transition border shadow-sm ${on ? "bg-zinc-900 text-white border-zinc-900 shadow-zinc-900/20" : "bg-white text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"}`}
+                    className={`group inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-semibold tracking-wide transition border shadow-sm bg-white ${on ? "text-zinc-900 border-zinc-900" : "text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"}`}
                   >
                     <span className="relative inline-flex items-center">
                       <span
