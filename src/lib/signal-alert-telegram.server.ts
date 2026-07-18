@@ -39,92 +39,189 @@ function buildReason(a: EnqueueAlertEmailsArgs): string {
   return bits.join(' ').slice(0, 700)
 }
 
-function buildChartUrl(a: EnqueueAlertEmailsArgs): string {
+type Candle = { x: number; o: number; h: number; l: number; c: number }
+
+
+
+// Base gold in USD from COMEX futures (Yahoo cross-pair symbols like XAUCHF=X return 404).
+// For non-USD quote pairs, multiply by USD/QUOTE (or divide by QUOTE/USD).
+type CrossFx = { symbol: string; invert: boolean } | null
+const PAIR_FX: Record<string, CrossFx> = {
+  XAUUSD: null,
+  XAUEUR: { symbol: 'EURUSD=X', invert: true },   // divide by EURUSD
+  XAUGBP: { symbol: 'GBPUSD=X', invert: true },   // divide by GBPUSD
+  XAUJPY: { symbol: 'USDJPY=X', invert: false },  // multiply by USDJPY
+  XAUAUD: { symbol: 'AUDUSD=X', invert: true },   // divide by AUDUSD
+  XAUCHF: { symbol: 'USDCHF=X', invert: false },  // multiply by USDCHF
+}
+
+async function yahooFetch(sym: string, tf: string): Promise<{ candles: Candle[]; last: number } | null> {
+  for (const host of ['query1.finance.yahoo.com', 'query2.finance.yahoo.com']) {
+    try {
+      const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${tf}&range=2d`
+      const controller = new AbortController()
+      const t = setTimeout(() => controller.abort(), 4000)
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36',
+          Accept: 'application/json',
+        },
+      })
+      clearTimeout(t)
+      if (!res.ok) continue
+      const j: { chart?: { result?: Array<{ meta?: { regularMarketPrice?: number }; timestamp?: number[]; indicators?: { quote?: Array<{ open?: number[]; high?: number[]; low?: number[]; close?: number[] }> } }> } } = await res.json()
+      const result = j?.chart?.result?.[0]
+      if (!result) continue
+      const ts: number[] = result.timestamp ?? []
+      const q = result.indicators?.quote?.[0] ?? {}
+      const out: Candle[] = []
+      for (let i = 0; i < ts.length; i++) {
+        const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i]
+        if (o == null || h == null || l == null || c == null) continue
+        out.push({ x: ts[i] * 1000, o, h, l, c })
+      }
+      if (out.length >= 15) return { candles: out, last: result.meta?.regularMarketPrice ?? out.at(-1)!.c }
+    } catch { /* try next host */ }
+  }
+  return null
+}
+
+async function fetchCandles(pair: string, tf = '15m'): Promise<Candle[]> {
+  const key = pair.toUpperCase()
+  const base = await yahooFetch('GC=F', tf)
+  if (!base) return []
+  const fx = PAIR_FX[key]
+  let scale = 1
+  if (fx) {
+    const fxData = await yahooFetch(fx.symbol, tf)
+    if (fxData) {
+      scale = fx.invert ? 1 / fxData.last : fxData.last
+    } else {
+      return []
+    }
+  }
+  return base.candles.slice(-80).map((k) => ({
+    x: k.x,
+    o: k.o * scale, h: k.h * scale, l: k.l * scale, c: k.c * scale,
+  }))
+}
+
+function buildChartConfig(a: EnqueueAlertEmailsArgs, candles: Candle[]): object {
   const { entry, sl, tp, direction, pair, decimals } = a
   const round = (n: number) => Number(n.toFixed(decimals)).toFixed(decimals)
-  const min = Math.min(entry, sl, tp)
-  const max = Math.max(entry, sl, tp)
-  const pad = (max - min) * 0.35 || Math.abs(entry) * 0.001
-  const yMin = min - pad
-  const yMax = max + pad
   const isBuy = direction === 'BUY'
   const entryColor = '#2563eb'
   const slColor = '#dc2626'
-  const tpColor = '#059669'
+  const tpColor = '#16a34a'
 
-  // Simple line "path": entry point in the middle, projecting to TP on the right.
-  const priceLine = [entry, entry, entry, entry, isBuy ? (entry + tp) / 2 : (entry + tp) / 2, tp]
+  // Compute Y range from candles + entry/sl/tp
+  const values: number[] = [entry, sl, tp]
+  candles.forEach((k) => { values.push(k.h, k.l) })
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const pad = (max - min) * 0.08 || Math.abs(entry) * 0.001
+  const yMin = min - pad
+  const yMax = max + pad
 
-  const config = {
+  const title = `${pair}  ·  ${direction}  ·  ${a.grade}  ·  ${Math.round(a.confidence)}%   (15m)`
+
+  const annotations: Record<string, unknown> = {
+    slZone: {
+      type: 'box',
+      yMin: isBuy ? sl : entry,
+      yMax: isBuy ? entry : sl,
+      backgroundColor: 'rgba(220,38,38,0.10)',
+      borderWidth: 0,
+    },
+    tpZone: {
+      type: 'box',
+      yMin: isBuy ? entry : tp,
+      yMax: isBuy ? tp : entry,
+      backgroundColor: 'rgba(22,163,74,0.12)',
+      borderWidth: 0,
+    },
+    entry: {
+      type: 'line', yMin: entry, yMax: entry,
+      borderColor: entryColor, borderWidth: 2, borderDash: [6, 4],
+      label: { display: true, content: `ENTRY  ${round(entry)}`, position: 'end', backgroundColor: entryColor, color: '#fff', font: { weight: 'bold', size: 12 }, padding: 5 },
+    },
+    sl: {
+      type: 'line', yMin: sl, yMax: sl,
+      borderColor: slColor, borderWidth: 2,
+      label: { display: true, content: `SL  ${round(sl)}`, position: 'end', backgroundColor: slColor, color: '#fff', font: { weight: 'bold', size: 12 }, padding: 5 },
+    },
+    tp: {
+      type: 'line', yMin: tp, yMax: tp,
+      borderColor: tpColor, borderWidth: 2,
+      label: { display: true, content: `TP  ${round(tp)}  ·  1:${a.rr.toFixed(2)}R`, position: 'end', backgroundColor: tpColor, color: '#fff', font: { weight: 'bold', size: 12 }, padding: 5 },
+    },
+  }
+
+  if (candles.length > 0) {
+    return {
+      type: 'candlestick',
+      data: {
+        datasets: [{
+          label: pair,
+          data: candles,
+          color: { up: '#16a34a', down: '#dc2626', unchanged: '#64748b' },
+          borderColor: { up: '#15803d', down: '#b91c1c', unchanged: '#475569' },
+        }],
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: title, font: { size: 18, weight: 'bold' }, color: '#0f172a' },
+          annotation: { annotations },
+        },
+        scales: {
+          x: { type: 'time', time: { unit: 'hour', displayFormats: { hour: 'MMM d HH:mm' } }, ticks: { color: '#64748b', maxTicksLimit: 8 }, grid: { color: 'rgba(0,0,0,0.04)' } },
+          y: { min: yMin, max: yMax, position: 'right', ticks: { color: '#334155' }, grid: { color: 'rgba(0,0,0,0.06)' } },
+        },
+      },
+    }
+  }
+
+  // Fallback: schematic line if candles unavailable
+  const priceLine = [entry, entry, entry, entry, (entry + tp) / 2, tp]
+  return {
     type: 'line',
     data: {
       labels: ['', '', '', 'Now', '', 'Target'],
-      datasets: [
-        {
-          label: pair,
-          data: priceLine,
-          borderColor: '#0f172a',
-          backgroundColor: 'rgba(15,23,42,0.08)',
-          borderWidth: 2,
-          pointRadius: [0, 0, 0, 5, 0, 5],
-          pointBackgroundColor: ['', '', '', entryColor, '', tpColor],
-          tension: 0.25,
-          fill: false,
-        },
-      ],
+      datasets: [{ label: pair, data: priceLine, borderColor: '#0f172a', borderWidth: 2, pointRadius: [0,0,0,5,0,5], pointBackgroundColor: ['','','',entryColor,'',tpColor], tension: 0.25, fill: false }],
     },
     options: {
       plugins: {
         legend: { display: false },
-        title: {
-          display: true,
-          text: `${pair}  ·  ${direction}  ·  ${a.grade}  ·  ${Math.round(a.confidence)}%`,
-          font: { size: 18, weight: 'bold' },
-          color: '#0f172a',
-        },
-        annotation: {
-          annotations: {
-            entry: {
-              type: 'line', yMin: entry, yMax: entry,
-              borderColor: entryColor, borderWidth: 2, borderDash: [6, 4],
-              label: { display: true, content: `ENTRY  ${round(entry)}`, position: 'start', backgroundColor: entryColor, color: '#fff', font: { weight: 'bold', size: 12 }, padding: 4 },
-            },
-            sl: {
-              type: 'line', yMin: sl, yMax: sl,
-              borderColor: slColor, borderWidth: 2,
-              label: { display: true, content: `SL  ${round(sl)}`, position: 'start', backgroundColor: slColor, color: '#fff', font: { weight: 'bold', size: 12 }, padding: 4 },
-            },
-            tp: {
-              type: 'line', yMin: tp, yMax: tp,
-              borderColor: tpColor, borderWidth: 2,
-              label: { display: true, content: `TP  ${round(tp)}  ·  1:${a.rr.toFixed(2)}R`, position: 'start', backgroundColor: tpColor, color: '#fff', font: { weight: 'bold', size: 12 }, padding: 4 },
-            },
-            slZone: {
-              type: 'box',
-              yMin: isBuy ? sl : entry,
-              yMax: isBuy ? entry : sl,
-              backgroundColor: 'rgba(220,38,38,0.08)',
-              borderWidth: 0,
-            },
-            tpZone: {
-              type: 'box',
-              yMin: isBuy ? entry : tp,
-              yMax: isBuy ? tp : entry,
-              backgroundColor: 'rgba(5,150,105,0.10)',
-              borderWidth: 0,
-            },
-          },
-        },
+        title: { display: true, text: title, font: { size: 18, weight: 'bold' }, color: '#0f172a' },
+        annotation: { annotations },
       },
       scales: {
-        y: { min: yMin, max: yMax, grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: '#334155' } },
+        y: { min: yMin, max: yMax, position: 'right', grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: '#334155' } },
         x: { grid: { display: false }, ticks: { color: '#64748b' } },
       },
     },
   }
+}
 
+async function buildChartUrl(a: EnqueueAlertEmailsArgs): Promise<string> {
+  const candles = await fetchCandles(a.pair).catch(() => [] as Candle[])
+  const config = buildChartConfig(a, candles)
+  // Use POST /chart/create for a short URL (Telegram-friendly).
+  try {
+    const r = await fetch('https://quickchart.io/chart/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chart: config, width: 1000, height: 560, backgroundColor: 'white', version: '4' }),
+    })
+    if (r.ok) {
+      const j: { success?: boolean; url?: string } = await r.json()
+      if (j?.url) return j.url
+    }
+  } catch { /* fall through to GET */ }
   const encoded = encodeURIComponent(JSON.stringify(config))
-  return `https://quickchart.io/chart?bkg=white&w=900&h=500&c=${encoded}`
+  return `https://quickchart.io/chart?bkg=white&w=1000&h=560&v=4&c=${encoded}`
 }
 
 function buildCaption(a: EnqueueAlertEmailsArgs, reason: string): string {
@@ -155,7 +252,7 @@ function buildCaption(a: EnqueueAlertEmailsArgs, reason: string): string {
 }
 
 async function sendOne(botToken: string, chatId: string, a: EnqueueAlertEmailsArgs, reason: string): Promise<void> {
-  const photo = buildChartUrl(a)
+  const photo = await buildChartUrl(a)
   const caption = buildCaption(a, reason)
   try {
     await tgApi(botToken, 'sendPhoto', {
