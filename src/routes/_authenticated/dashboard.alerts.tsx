@@ -560,24 +560,34 @@ function AlertPrefs() {
               </div>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+            <div className="mt-4 flex flex-wrap items-center gap-2">
               <input
                 type="text"
                 inputMode="numeric"
                 value={telegramChatId}
                 onChange={(e) => setTelegramChatId(e.target.value.replace(/[^\d-]/g, ""))}
-                placeholder="Your Telegram chat ID (e.g. 123456789)"
+                placeholder="Chat ID (e.g. 123456789)"
                 className={cn(
-                  "min-w-0 rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-200",
+                  "min-w-0 flex-1 sm:flex-none sm:w-56 rounded-lg border px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200",
                   telegramChatId && !chatIdValid ? "border-rose-200 bg-rose-50" : "border-zinc-200 bg-white",
                 )}
               />
+              {telegramLinked && (
+                <button
+                  type="button"
+                  onClick={disconnectTelegram}
+                  disabled={telegramSaving}
+                  className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 disabled:opacity-50"
+                >
+                  Disconnect
+                </button>
+              )}
               <button
                 type="button"
                 onClick={connectTelegram}
                 disabled={!canConnectTelegram}
                 className={cn(
-                  "inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition",
+                  "inline-flex items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold transition",
                   canConnectTelegram
                     ? "bg-zinc-900 text-white hover:bg-zinc-800"
                     : "cursor-not-allowed bg-zinc-100 text-zinc-400",
