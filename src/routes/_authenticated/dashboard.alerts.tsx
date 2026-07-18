@@ -558,15 +558,15 @@ function AlertPrefs() {
                 {telegramLinked ? "Reconnect" : "Connect"}
               </button>
             </div>
-            <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-3">
-              <div className="text-xs font-semibold text-zinc-900">Chat ID kahan se laayein?</div>
+            <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-3" style={{ fontFamily: '"Google Sans", "Product Sans", system-ui, sans-serif' }}>
+              <div className="text-xs font-semibold text-zinc-900">Where do I get my Chat ID?</div>
               <ol className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-zinc-700">
-                <li><span className="font-semibold">1.</span> Pehle upar wala neela button dabakar <span className="font-mono text-zinc-900">@Jenvu_Bot</span> kholein aur <span className="font-semibold">Start</span> dabayein (zaroori — warna bot aapko message nahi bhej payega).</li>
-                <li><span className="font-semibold">2.</span> Ab Telegram mein search karein <span className="font-mono text-zinc-900">@userinfobot</span> aur us chat mein bhi <span className="font-semibold">Start</span> dabayein.</li>
-                <li><span className="font-semibold">3.</span> Wo bot turant aapki <span className="font-mono text-zinc-900">Id</span> bhej dega — sirf numbers, jaise <span className="font-mono">123456789</span>.</li>
-                <li><span className="font-semibold">4.</span> Wo number copy karke upar wale field mein paste karein aur <span className="font-semibold">Connect</span> dabayein — test message turant aa jayega.</li>
+                <li><span className="font-semibold">1.</span> Tap the blue button above to open <span className="font-mono text-zinc-900">@Jenvu_Bot</span> and press <span className="font-semibold">Start</span> (required — otherwise the bot cannot message you).</li>
+                <li><span className="font-semibold">2.</span> In Telegram, search for <span className="font-mono text-zinc-900">@userinfobot</span> and press <span className="font-semibold">Start</span> in that chat as well.</li>
+                <li><span className="font-semibold">3.</span> It will instantly send you your <span className="font-mono text-zinc-900">Id</span> — a numeric value like <span className="font-mono">123456789</span>.</li>
+                <li><span className="font-semibold">4.</span> Copy that number, paste it into the field above and press <span className="font-semibold">Connect</span> — a test message will arrive right away.</li>
               </ol>
-              <div className="mt-2 text-[11px] text-zinc-500">Note: Chat ID sirf numbers ka hota hai. Username jaisa <span className="font-mono">@haseeb</span> yahan kaam nahi karega.</div>
+              <div className="mt-2 text-[11px] text-zinc-500">Note: The Chat ID is numbers only. A username like <span className="font-mono">@haseeb</span> will not work here.</div>
             </div>
             {telegramError && <div className="mt-2 text-[11px] text-rose-600">{telegramError}</div>}
 
