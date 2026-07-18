@@ -40,6 +40,19 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           return Response.json({ ok: true, skipped: "disabled" });
         }
 
+        // Gold market hours check — XAU trades ~ Sunday 22:00 UTC → Friday 21:00 UTC.
+        // Skip scans when market is closed (weekend).
+        const nowCheck = new Date();
+        const dow = nowCheck.getUTCDay(); // 0=Sun, 6=Sat
+        const utcHour = nowCheck.getUTCHours();
+        const marketClosed =
+          dow === 6 || // Saturday all day
+          (dow === 5 && utcHour >= 21) || // Friday after 21:00 UTC
+          (dow === 0 && utcHour < 22); // Sunday before 22:00 UTC
+        if (marketClosed) {
+          return Response.json({ ok: true, skipped: "market_closed" });
+        }
+
         const cfg = settingsMap.get("auto_scan_config") ?? {};
         const rawPairs = (cfg.pairs as string[]) ?? [
           "XAUUSD",
