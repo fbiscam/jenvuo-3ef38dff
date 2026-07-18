@@ -228,9 +228,9 @@ function buildCaption(a: EnqueueAlertEmailsArgs, reason: string): string {
   const round = (n: number) => Number(n.toFixed(a.decimals)).toFixed(a.decimals)
   const title = `${a.grade} ${a.direction} · ${a.pair}`
   const lines = [
-    `<b>🔔 Jenvu Signal Alert</b>`,
     `<b>${escapeHtml(title)}</b>`,
     ``,
+
     `Entry: <b>${round(a.entry)}</b>`,
     `SL: <b>${round(a.sl)}</b>`,
     `TP: <b>${round(a.tp)}</b>`,
