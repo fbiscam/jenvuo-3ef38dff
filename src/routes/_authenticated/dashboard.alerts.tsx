@@ -6,7 +6,8 @@ import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
 import { useServerFn } from "@tanstack/react-start";
 import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
-import { Bell, BellOff, Loader2 } from "lucide-react";
+import { Bell, BellOff, Loader2, Send } from "lucide-react";
+import { connectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
 import { cn } from "@/lib/utils";
 
 
@@ -83,8 +84,21 @@ function AlertPrefs() {
   const [loggingId, setLoggingId] = useState<string | null>(null);
   const getAlertsEnabledFn = useServerFn(getAlertsEnabled);
   const setAlertsEnabledFn = useServerFn(setAlertsEnabled);
+  const getTelegramLinkFn = useServerFn(getTelegramAlertLink);
+  const connectTelegramFn = useServerFn(connectTelegramAlertLink);
+  const setTelegramEnabledFn = useServerFn(setTelegramAlertEnabled);
   const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
   const [alertsSaving, setAlertsSaving] = useState(false);
+  const [telegramBotToken, setTelegramBotToken] = useState("");
+  const [telegramChatId, setTelegramChatId] = useState("");
+  const [telegramLinked, setTelegramLinked] = useState(false);
+  const [telegramEnabled, setTelegramEnabled] = useState(true);
+  const [telegramVerifiedAt, setTelegramVerifiedAt] = useState<string | null>(null);
+  const [telegramError, setTelegramError] = useState<string | null>(null);
+  const [telegramSaving, setTelegramSaving] = useState(false);
+  const tokenValid = /^\d{6,12}:[A-Za-z0-9_-]{35,}$/.test(telegramBotToken.trim());
+  const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
+  const canConnectTelegram = tokenValid && chatIdValid && !telegramSaving;
 
   useEffect(() => {
     (async () => {
@@ -94,6 +108,21 @@ function AlertPrefs() {
       } catch { setAlertsOn(true); }
     })();
   }, [getAlertsEnabledFn]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await getTelegramLinkFn({});
+        setTelegramLinked(!!r.linked);
+        setTelegramChatId(r.chatId ?? "");
+        setTelegramEnabled(r.enabled !== false);
+        setTelegramVerifiedAt(r.verifiedAt ?? null);
+        setTelegramError(r.lastError ?? null);
+      } catch {
+        setTelegramError("Could not load Telegram settings");
+      }
+    })();
+  }, [getTelegramLinkFn]);
 
   const toggleAlerts = useCallback(async () => {
     if (alertsOn === null || alertsSaving) return;
@@ -109,6 +138,38 @@ function AlertPrefs() {
       setAlertsSaving(false);
     }
   }, [alertsOn, alertsSaving, setAlertsEnabledFn]);
+
+  const connectTelegram = useCallback(async () => {
+    if (!canConnectTelegram) return;
+    setTelegramSaving(true);
+    setTelegramError(null);
+    try {
+      const r = await connectTelegramFn({ data: { botToken: telegramBotToken.trim(), chatId: telegramChatId.trim() } });
+      setTelegramLinked(true);
+      setTelegramEnabled(true);
+      setTelegramVerifiedAt(new Date().toISOString());
+      setTelegramChatId(r.chatId);
+      setTelegramBotToken("");
+      toast.success("Telegram connected", { description: "A test message was sent to your chat." });
+    } catch (e: any) {
+      const message = e?.message ?? "Could not connect Telegram";
+      setTelegramError(message);
+      toast.error("Telegram connect failed", { description: message });
+    } finally {
+      setTelegramSaving(false);
+    }
+  }, [canConnectTelegram, connectTelegramFn, telegramBotToken, telegramChatId]);
+
+  const toggleTelegram = useCallback(async (enabled: boolean) => {
+    setTelegramEnabled(enabled);
+    try {
+      await setTelegramEnabledFn({ data: { enabled } });
+      toast.success(enabled ? "Telegram alerts enabled" : "Telegram alerts disabled");
+    } catch (e: any) {
+      setTelegramEnabled(!enabled);
+      toast.error(e?.message ?? "Could not update Telegram");
+    }
+  }, [setTelegramEnabledFn]);
 
 
   const takeTrade = async (a: FiredAlert) => {
@@ -427,6 +488,74 @@ function AlertPrefs() {
             checked={prefs.browser_enabled}
             onChange={(v) => setPrefs((p) => ({ ...p, browser_enabled: v }))}
           />
+          <div className="rounded-xl border border-zinc-100 p-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <div className="text-sm font-medium text-zinc-900">Telegram alerts</div>
+                <div className="text-xs text-zinc-500">
+                  {telegramLinked
+                    ? `Connected to chat ${telegramChatId || "—"}`
+                    : "Paste your bot token and chat ID. Button enables automatically when both are valid."}
+                </div>
+                {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {new Date(telegramVerifiedAt).toLocaleString()}</div>}
+              </div>
+              {telegramLinked && (
+                <button
+                  type="button"
+                  onClick={() => toggleTelegram(!telegramEnabled)}
+                  className={cn(
+                    "rounded-full px-3 py-1.5 text-xs font-semibold transition",
+                    telegramEnabled ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700",
+                  )}
+                >
+                  {telegramEnabled ? "ON" : "OFF"}
+                </button>
+              )}
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_160px_auto]">
+              <input
+                type="password"
+                value={telegramBotToken}
+                onChange={(e) => setTelegramBotToken(e.target.value)}
+                placeholder={telegramLinked ? "New bot token to reconnect" : "Bot token from BotFather"}
+                autoComplete="off"
+                className={cn(
+                  "min-w-0 rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-200",
+                  telegramBotToken && !tokenValid ? "border-rose-200 bg-rose-50" : "border-zinc-200 bg-white",
+                )}
+              />
+              <input
+                type="text"
+                inputMode="numeric"
+                value={telegramChatId}
+                onChange={(e) => setTelegramChatId(e.target.value.replace(/[^\d-]/g, ""))}
+                placeholder="Chat ID"
+                className={cn(
+                  "min-w-0 rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-200",
+                  telegramChatId && !chatIdValid ? "border-rose-200 bg-rose-50" : "border-zinc-200 bg-white",
+                )}
+              />
+              <button
+                type="button"
+                onClick={connectTelegram}
+                disabled={!canConnectTelegram}
+                className={cn(
+                  "inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition",
+                  canConnectTelegram
+                    ? "bg-zinc-900 text-white hover:bg-zinc-800"
+                    : "cursor-not-allowed bg-zinc-100 text-zinc-400",
+                )}
+              >
+                {telegramSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {telegramLinked ? "Reconnect" : "Connect"}
+              </button>
+            </div>
+            <div className="mt-2 text-[11px] text-zinc-400">
+              Start your bot first, then paste numeric chat ID. Token format: 123456789:ABC...
+            </div>
+            {telegramError && <div className="mt-2 text-[11px] text-rose-600">{telegramError}</div>}
+          </div>
           <button onClick={requestBrowser} className="text-xs font-medium text-zinc-700 underline-offset-2 hover:underline">
             Request browser permission →
           </button>

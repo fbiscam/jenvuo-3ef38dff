@@ -171,6 +171,30 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
 
     // 4. Queue emails
     let enqueued = 0
+    let telegramSent = 0
+    try {
+      const { sendSignalAlertTelegrams } = await import('@/lib/signal-alert-telegram.server')
+      const r = await sendSignalAlertTelegrams({
+        alertId: inserted.id,
+        firedAt: inserted.fired_at,
+        pair,
+        grade,
+        direction: data.direction,
+        entry: round(data.entry),
+        sl: round(data.sl),
+        tp: round(data.tp),
+        rr: Number(data.rr.toFixed(2)),
+        confidence: Math.round(data.confidence),
+        decimals: data.decimals,
+        session: data.session ?? null,
+        killzone: data.killzone ?? null,
+        htfBias: data.htfBias ?? null,
+        rationale: data.rationale ?? null,
+      })
+      telegramSent = r.sent
+    } catch (e) {
+      console.error('[broadcast] telegram alerts failed:', (e as Error)?.message)
+    }
     if (recipients.length > 0) {
       const { default: React } = await import('react')
       const { render } = await import('@react-email/render')
@@ -270,6 +294,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       alert_id: inserted.id,
       recipients: recipients.length,
       enqueued,
+      telegram_sent: telegramSent,
       notified_in_app: notifyUserIds.length,
     }
   })
