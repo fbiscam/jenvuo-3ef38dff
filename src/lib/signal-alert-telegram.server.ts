@@ -46,10 +46,20 @@ const YAHOO_SYMBOL: Record<string, string> = {
   XAUJPY: 'XAUJPY=X', XAUAUD: 'XAUAUD=X', XAUCHF: 'XAUCHF=X',
 }
 
-async function fetchCandles(pair: string, tf = '15m'): Promise<Candle[]> {
-  const sym = YAHOO_SYMBOL[pair.toUpperCase()] ?? `${pair.toUpperCase()}=X`
-  const hosts = ['query1.finance.yahoo.com', 'query2.finance.yahoo.com']
-  for (const host of hosts) {
+// Base gold in USD from COMEX futures (Yahoo cross-pair symbols like XAUCHF=X return 404).
+// For non-USD quote pairs, multiply by USD/QUOTE (or divide by QUOTE/USD).
+type CrossFx = { symbol: string; invert: boolean } | null
+const PAIR_FX: Record<string, CrossFx> = {
+  XAUUSD: null,
+  XAUEUR: { symbol: 'EURUSD=X', invert: true },   // divide by EURUSD
+  XAUGBP: { symbol: 'GBPUSD=X', invert: true },   // divide by GBPUSD
+  XAUJPY: { symbol: 'USDJPY=X', invert: false },  // multiply by USDJPY
+  XAUAUD: { symbol: 'AUDUSD=X', invert: true },   // divide by AUDUSD
+  XAUCHF: { symbol: 'USDCHF=X', invert: false },  // multiply by USDCHF
+}
+
+async function yahooFetch(sym: string, tf: string): Promise<{ candles: Candle[]; last: number } | null> {
+  for (const host of ['query1.finance.yahoo.com', 'query2.finance.yahoo.com']) {
     try {
       const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${tf}&range=2d`
       const controller = new AbortController()
@@ -63,20 +73,41 @@ async function fetchCandles(pair: string, tf = '15m'): Promise<Candle[]> {
       })
       clearTimeout(t)
       if (!res.ok) continue
-      const j: { chart?: { result?: Array<{ timestamp?: number[]; indicators?: { quote?: Array<{ open?: number[]; high?: number[]; low?: number[]; close?: number[] }> } }> } } = await res.json()
+      const j: { chart?: { result?: Array<{ meta?: { regularMarketPrice?: number }; timestamp?: number[]; indicators?: { quote?: Array<{ open?: number[]; high?: number[]; low?: number[]; close?: number[] }> } }> } } = await res.json()
       const result = j?.chart?.result?.[0]
-      const ts: number[] = result?.timestamp ?? []
-      const q = result?.indicators?.quote?.[0] ?? {}
+      if (!result) continue
+      const ts: number[] = result.timestamp ?? []
+      const q = result.indicators?.quote?.[0] ?? {}
       const out: Candle[] = []
       for (let i = 0; i < ts.length; i++) {
         const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i]
         if (o == null || h == null || l == null || c == null) continue
         out.push({ x: ts[i] * 1000, o, h, l, c })
       }
-      if (out.length >= 15) return out.slice(-80)
+      if (out.length >= 15) return { candles: out, last: result.meta?.regularMarketPrice ?? out.at(-1)!.c }
     } catch { /* try next host */ }
   }
-  return []
+  return null
+}
+
+async function fetchCandles(pair: string, tf = '15m'): Promise<Candle[]> {
+  const key = pair.toUpperCase()
+  const base = await yahooFetch('GC=F', tf)
+  if (!base) return []
+  const fx = PAIR_FX[key]
+  let scale = 1
+  if (fx) {
+    const fxData = await yahooFetch(fx.symbol, tf)
+    if (fxData) {
+      scale = fx.invert ? 1 / fxData.last : fxData.last
+    } else {
+      return []
+    }
+  }
+  return base.candles.slice(-80).map((k) => ({
+    x: k.x,
+    o: k.o * scale, h: k.h * scale, l: k.l * scale, c: k.c * scale,
+  }))
 }
 
 function buildChartConfig(a: EnqueueAlertEmailsArgs, candles: Candle[]): object {
