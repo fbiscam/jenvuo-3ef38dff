@@ -578,6 +578,7 @@ function AlertPrefs() {
               </ol>
               <div className="mt-2 text-[11px] text-zinc-500">Note: The Chat ID is numbers only. A username like <span className="font-mono">@haseeb</span> will not work here.</div>
             </div>
+            )}
             {telegramError && <div className="mt-2 text-[11px] text-rose-600">{telegramError}</div>}
 
           </div>
