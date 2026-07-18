@@ -536,7 +536,7 @@ function AlertPrefs() {
                   className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
                 >
                   <img src={userinfobotLogo.url} alt="Userinfobot" className="h-4 w-4 rounded-full object-cover" />
-                  Open Userinfobot
+                  Open @userinfobot
                 </a>
                 <a
                   href="https://t.me/Jenvu_Bot"
