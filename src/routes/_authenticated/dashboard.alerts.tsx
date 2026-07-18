@@ -9,6 +9,7 @@ import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions
 import { Bell, BellOff, Loader2, Send } from "lucide-react";
 import { connectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
 import { cn } from "@/lib/utils";
+import userinfobotLogo from "@/assets/userinfobot.jpg.asset.json";
 
 
 
