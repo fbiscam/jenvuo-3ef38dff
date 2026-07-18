@@ -664,6 +664,21 @@ function AlertPrefs() {
             <div className="mt-2 flex flex-wrap gap-2">
               {ALL_GRADES.map((g) => {
                 const on = prefs.email_grades.includes(g);
+                const styles: Record<string, { on: string; off: string }> = {
+                  "A+": {
+                    on: "bg-emerald-500 text-white border-emerald-500 shadow-sm shadow-emerald-500/30",
+                    off: "bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-50",
+                  },
+                  "A": {
+                    on: "bg-sky-500 text-white border-sky-500 shadow-sm shadow-sky-500/30",
+                    off: "bg-white text-sky-700 border-sky-300 hover:bg-sky-50",
+                  },
+                  "B": {
+                    on: "bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/30",
+                    off: "bg-white text-amber-700 border-amber-300 hover:bg-amber-50",
+                  },
+                };
+                const s = styles[g] ?? styles["B"];
                 return (
                   <button
                     key={g}
@@ -672,7 +687,7 @@ function AlertPrefs() {
                       ...p,
                       email_grades: on ? p.email_grades.filter((x) => x !== g) : [...p.email_grades, g],
                     }))}
-                    className={`rounded-md px-3 py-1.5 text-xs font-semibold transition border ${on ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50"}`}
+                    className={`rounded-md px-3 py-1.5 text-xs font-semibold transition border ${on ? s.on : s.off}`}
                   >
                     {g}
                   </button>
