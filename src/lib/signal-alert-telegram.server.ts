@@ -47,6 +47,9 @@ function buildMessage(a: EnqueueAlertEmailsArgs): string {
 }
 
 export async function sendSignalAlertTelegrams(a: EnqueueAlertEmailsArgs): Promise<{ sent: number }> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN
+  if (!botToken) return { sent: 0 }
+
   const { data: paidRows } = await supabaseAdmin
     .from('user_subscriptions')
     .select('user_id')
@@ -58,20 +61,19 @@ export async function sendSignalAlertTelegrams(a: EnqueueAlertEmailsArgs): Promi
 
   const { data: links } = await supabaseAdmin
     .from('telegram_alert_links')
-    .select('user_id, chat_id, bot_token')
+    .select('user_id, chat_id')
     .in('user_id', paidIds)
     .eq('telegram_enabled', true)
     .not('verified_at', 'is', null)
-    .not('bot_token', 'is', null)
 
-  const rows = (links ?? []) as Array<{ user_id: string; chat_id: string; bot_token: string | null }>
+  const rows = (links ?? []) as Array<{ user_id: string; chat_id: string }>
   if (rows.length === 0) return { sent: 0 }
 
   const text = buildMessage(a)
   let sent = 0
   for (const row of rows) {
     try {
-      await sendTelegram(row.bot_token!, row.chat_id, text)
+      await sendTelegram(botToken, row.chat_id, text)
       sent++
       await supabaseAdmin
         .from('telegram_alert_links')
