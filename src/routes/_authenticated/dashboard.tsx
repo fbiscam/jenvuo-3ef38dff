@@ -910,19 +910,20 @@ function DashboardLayout() {
                       </span>
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
-                        <span className="ml-auto inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-rose-600 text-white tabular-nums ring-2 ring-white" style={{ fontSize: 10, lineHeight: 1, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 600, letterSpacing: "-0.02em", paddingBottom: 1 }}>
-                          {count > 9 ? "9+" : count}
+                        <span className="ml-auto inline-flex h-[18px] min-w-[18px] shrink-0 items-center justify-center rounded-full bg-rose-600 px-1 text-white tabular-nums ring-2 ring-white" style={{ fontSize: 10, lineHeight: 1, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 600, letterSpacing: "-0.02em", paddingBottom: 1 }}>
+                          {count}
                         </span>
                       )}
                       {!sidebarCollapsed && hasUnread && (
-                        <span className="ml-auto inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-rose-600 text-white tabular-nums ring-2 ring-white" style={{ fontSize: 10, lineHeight: 1, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 600, letterSpacing: "-0.02em", paddingBottom: 1 }}>
-                          {unreadNotifs > 9 ? "9+" : unreadNotifs}
+                        <span className="ml-auto inline-flex h-[18px] min-w-[18px] shrink-0 items-center justify-center rounded-full bg-rose-600 px-1 text-white tabular-nums ring-2 ring-white" style={{ fontSize: 10, lineHeight: 1, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 600, letterSpacing: "-0.02em", paddingBottom: 1 }}>
+                          {unreadNotifs}
                         </span>
                       )}
                       {sidebarCollapsed && ((typeof count === "number" && count > 0 && !active) || hasUnread) && (
                         <span className="absolute -right-0.5 -top-0.5 inline-flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-rose-600 px-1 text-[9px] font-semibold leading-none text-white tabular-nums text-center">
-                          {hasUnread ? (unreadNotifs > 9 ? "9+" : unreadNotifs) : count}
+                          {hasUnread ? unreadNotifs : count}
                         </span>
+
                       )}
 
 
