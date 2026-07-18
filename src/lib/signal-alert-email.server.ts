@@ -38,17 +38,21 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
   paidIds = await filterAlertsEnabledUserIds(paidIds)
   if (paidIds.length === 0) return { enqueued: 0 }
 
-  const { data: users } = (await supabaseAdmin
-    .schema('auth' as never)
-    .from('users' as never)
-    .select('id, email')
-    .in('id', paidIds)) as unknown as {
-    data: Array<{ id: string; email: string | null }> | null
+  // Fetch emails via Auth Admin API (PostgREST doesn't expose the auth schema).
+  const emailsById: Array<{ id: string; email: string | null }> = []
+  for (const uid of paidIds) {
+    try {
+      const { data, error } = await supabaseAdmin.auth.admin.getUserById(uid)
+      if (error) continue
+      emailsById.push({ id: uid, email: data.user?.email ?? null })
+    } catch {
+      // swallow — one bad lookup shouldn't kill the whole broadcast
+    }
   }
   const recipients = Array.from(
     new Set(
-      (users ?? [])
-        .map((u) => (u?.email ?? '').toLowerCase().trim())
+      emailsById
+        .map((u) => (u.email ?? '').toLowerCase().trim())
         .filter((e) => !!e && /.+@.+\..+/.test(e)),
     ),
   )
