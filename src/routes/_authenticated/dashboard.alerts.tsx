@@ -353,11 +353,11 @@ function AlertPrefs() {
 
 
   const save = async () => {
-    setSaving(true);
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) return;
     let timezone: string | null = null;
     try { timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch { timezone = null; }
+    setSaving(true);
     const { error } = await supabase.from("alert_preferences").upsert({
       user_id: user.user.id,
       ...prefs,
@@ -365,8 +365,16 @@ function AlertPrefs() {
     });
     setSaving(false);
     if (error) toast.error("Could not save preferences");
-    else toast.success("Preferences saved");
   };
+
+  // Auto-save preferences whenever they change (debounced)
+  useEffect(() => {
+    if (loading) return;
+    const t = setTimeout(() => { save(); }, 500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefs, loading]);
+
 
   const requestBrowser = async () => {
     if (typeof Notification === "undefined") return toast.error("Notifications not supported in this browser");
