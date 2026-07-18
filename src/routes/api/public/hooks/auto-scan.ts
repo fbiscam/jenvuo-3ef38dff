@@ -253,7 +253,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const { filterAlertsEnabledUserIds } = await import(
               "@/lib/alert-pref-filter.server"
             );
-            const userIds = await filterAlertsEnabledUserIds(allPaidIds);
+            const userIds = await filterAlertsEnabledUserIds(allPaidIds, { grade, pair, direction: dir });
             let notified = 0;
             if (userIds.length > 0) {
               const kz = plan.killzone ? ` · ${plan.killzone}` : "";
