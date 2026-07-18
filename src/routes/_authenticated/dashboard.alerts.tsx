@@ -89,16 +89,14 @@ function AlertPrefs() {
   const setTelegramEnabledFn = useServerFn(setTelegramAlertEnabled);
   const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
   const [alertsSaving, setAlertsSaving] = useState(false);
-  const [telegramBotToken, setTelegramBotToken] = useState("");
   const [telegramChatId, setTelegramChatId] = useState("");
   const [telegramLinked, setTelegramLinked] = useState(false);
   const [telegramEnabled, setTelegramEnabled] = useState(true);
   const [telegramVerifiedAt, setTelegramVerifiedAt] = useState<string | null>(null);
   const [telegramError, setTelegramError] = useState<string | null>(null);
   const [telegramSaving, setTelegramSaving] = useState(false);
-  const tokenValid = /^\d{6,12}:[A-Za-z0-9_-]{35,}$/.test(telegramBotToken.trim());
   const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
-  const canConnectTelegram = tokenValid && chatIdValid && !telegramSaving;
+  const canConnectTelegram = chatIdValid && !telegramSaving;
 
   useEffect(() => {
     (async () => {
@@ -144,12 +142,11 @@ function AlertPrefs() {
     setTelegramSaving(true);
     setTelegramError(null);
     try {
-      const r = await connectTelegramFn({ data: { botToken: telegramBotToken.trim(), chatId: telegramChatId.trim() } });
+      const r = await connectTelegramFn({ data: { chatId: telegramChatId.trim() } });
       setTelegramLinked(true);
       setTelegramEnabled(true);
       setTelegramVerifiedAt(new Date().toISOString());
       setTelegramChatId(r.chatId);
-      setTelegramBotToken("");
       toast.success("Telegram connected", { description: "A test message was sent to your chat." });
     } catch (e: any) {
       const message = e?.message ?? "Could not connect Telegram";
@@ -158,7 +155,7 @@ function AlertPrefs() {
     } finally {
       setTelegramSaving(false);
     }
-  }, [canConnectTelegram, connectTelegramFn, telegramBotToken, telegramChatId]);
+  }, [canConnectTelegram, connectTelegramFn, telegramChatId]);
 
   const toggleTelegram = useCallback(async (enabled: boolean) => {
     setTelegramEnabled(enabled);
@@ -495,7 +492,7 @@ function AlertPrefs() {
                 <div className="text-xs text-zinc-500">
                   {telegramLinked
                     ? `Connected to chat ${telegramChatId || "—"}`
-                    : "Paste your bot token and chat ID. Button enables automatically when both are valid."}
+                    : "Message @JenvuBot on Telegram, then paste your numeric chat ID below."}
                 </div>
                 {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {new Date(telegramVerifiedAt).toLocaleString()}</div>}
               </div>
@@ -513,24 +510,13 @@ function AlertPrefs() {
               )}
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_160px_auto]">
-              <input
-                type="password"
-                value={telegramBotToken}
-                onChange={(e) => setTelegramBotToken(e.target.value)}
-                placeholder={telegramLinked ? "New bot token to reconnect" : "Bot token from BotFather"}
-                autoComplete="off"
-                className={cn(
-                  "min-w-0 rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-200",
-                  telegramBotToken && !tokenValid ? "border-rose-200 bg-rose-50" : "border-zinc-200 bg-white",
-                )}
-              />
+            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
               <input
                 type="text"
                 inputMode="numeric"
                 value={telegramChatId}
                 onChange={(e) => setTelegramChatId(e.target.value.replace(/[^\d-]/g, ""))}
-                placeholder="Chat ID"
+                placeholder="Your Telegram chat ID (e.g. 123456789)"
                 className={cn(
                   "min-w-0 rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-200",
                   telegramChatId && !chatIdValid ? "border-rose-200 bg-rose-50" : "border-zinc-200 bg-white",
@@ -552,7 +538,7 @@ function AlertPrefs() {
               </button>
             </div>
             <div className="mt-2 text-[11px] text-zinc-400">
-              Start your bot first, then paste numeric chat ID. Token format: 123456789:ABC...
+              Tip: open Telegram, message <span className="font-mono">@userinfobot</span> to get your chat ID, then paste it here.
             </div>
             {telegramError && <div className="mt-2 text-[11px] text-rose-600">{telegramError}</div>}
           </div>

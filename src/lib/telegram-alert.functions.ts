@@ -3,7 +3,6 @@ import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
 import { z } from 'zod'
 
 const TelegramLinkSchema = z.object({
-  botToken: z.string().trim().regex(/^\d{6,12}:[A-Za-z0-9_-]{35,}$/, 'Invalid Telegram bot token'),
   chatId: z.string().trim().regex(/^-?\d{5,20}$/, 'Invalid Telegram chat ID'),
 })
 
@@ -29,8 +28,11 @@ export const connectTelegramAlertLink = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => TelegramLinkSchema.parse(input))
   .handler(async ({ data, context }) => {
+    const botToken = process.env.TELEGRAM_BOT_TOKEN
+    if (!botToken) throw new Error('Telegram bot is not configured yet. Please try again shortly.')
+
     const callTelegram = async (method: string, body: Record<string, unknown>) => {
-      const res = await fetch(`https://api.telegram.org/bot${data.botToken}/${method}`, {
+      const res = await fetch(`https://api.telegram.org/bot${botToken}/${method}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -42,9 +44,10 @@ export const connectTelegramAlertLink = createServerFn({ method: 'POST' })
         const description = json?.description || `Telegram returned ${res.status}`
         throw new Error(description)
       }
+      return json
     }
 
-    await callTelegram('getMe', {})
+    const me = await callTelegram('getMe', {})
     await callTelegram('sendMessage', {
       chat_id: data.chatId,
       text: '✅ Jenvu Telegram alerts connected. You will receive signal alerts here.',
@@ -56,13 +59,12 @@ export const connectTelegramAlertLink = createServerFn({ method: 'POST' })
       .upsert({
         user_id: context.userId,
         chat_id: data.chatId,
-        bot_token: data.botToken,
         telegram_enabled: true,
         verified_at: new Date().toISOString(),
         last_error: null,
       }, { onConflict: 'user_id' })
     if (error) throw new Error(error.message)
-    return { ok: true, chatId: data.chatId }
+    return { ok: true, chatId: data.chatId, botUsername: me?.result?.username ?? null }
   })
 
 export const setTelegramAlertEnabled = createServerFn({ method: 'POST' })
