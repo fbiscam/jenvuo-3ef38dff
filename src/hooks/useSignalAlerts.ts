@@ -2,8 +2,10 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useServerFn } from '@tanstack/react-start'
 import { supabase } from '@/integrations/supabase/client'
 import { listSignalAlerts, type SignalAlertRow } from '@/lib/signal-alerts.functions'
+import { getAlertsEnabled } from '@/lib/alert-toggle.functions'
 
 const SEEN_KEY = 'jenvu_seen_alert_id'
+const ALERTS_ENABLED_CACHE_KEY = 'jenvu_alerts_enabled'
 
 function beep() {
   try {
@@ -47,8 +49,14 @@ function notify(a: SignalAlertRow) {
 
 export function useSignalAlerts(pair: string = 'XAUUSD') {
   const fetcher = useServerFn(listSignalAlerts)
+  const alertsEnabledFn = useServerFn(getAlertsEnabled)
   const [alerts, setAlerts] = useState<SignalAlertRow[]>([])
   const [loading, setLoading] = useState(true)
+  const enabledRef = useRef<boolean>(
+    typeof window !== 'undefined'
+      ? window.localStorage.getItem(ALERTS_ENABLED_CACHE_KEY) !== '0'
+      : true,
+  )
   const seenRef = useRef<string | null>(
     typeof window !== 'undefined' ? window.localStorage.getItem(SEEN_KEY) : null,
   )
@@ -62,9 +70,29 @@ export function useSignalAlerts(pair: string = 'XAUUSD') {
     } catch {
       /* ignore */
     }
+    if (!enabledRef.current) return
     beep()
     notify(row)
   }, [])
+
+  // Fetch current alerts_enabled preference and cache it
+  useEffect(() => {
+    let cancelled = false
+    alertsEnabledFn()
+      .then((r) => {
+        if (cancelled) return
+        enabledRef.current = r.enabled !== false
+        try {
+          window.localStorage.setItem(ALERTS_ENABLED_CACHE_KEY, r.enabled ? '1' : '0')
+        } catch {
+          /* ignore */
+        }
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [alertsEnabledFn])
 
   // Initial fetch
   useEffect(() => {

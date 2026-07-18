@@ -142,6 +142,7 @@ function AlertPrefs() {
     try {
       await setAlertsEnabledFn({ data: { enabled: next } });
       setAlertsOn(next);
+      try { window.localStorage.setItem('jenvu_alerts_enabled', next ? '1' : '0'); } catch { /* ignore */ }
       toast.success(next ? "Alerts enabled · $0.20 will be charged per signal" : "Alerts disabled · no charges, no notifications");
     } catch (e: any) {
       toast.error(e?.message ?? "Could not update alerts");
