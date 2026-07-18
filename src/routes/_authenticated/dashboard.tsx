@@ -516,7 +516,18 @@ function DashboardLayout() {
       .channel(`notif-nav:${authUser.id}:${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "user_notifications", filter: `user_id=eq.${authUser.id}` }, load)
       .subscribe();
-    return () => { cancelled = true; supabase.removeChannel(ch); };
+    // Polling fallback (20s) in case realtime drops, plus refresh on tab focus.
+    const iv = window.setInterval(load, 20000);
+    const onVis = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", load);
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(ch);
+      window.clearInterval(iv);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", load);
+    };
   }, [authUser?.id, authLoading]);
 
   // Clear red indicator when user visits the notifications page and persist
