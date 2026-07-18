@@ -70,9 +70,29 @@ export function useSignalAlerts(pair: string = 'XAUUSD') {
     } catch {
       /* ignore */
     }
+    if (!enabledRef.current) return
     beep()
     notify(row)
   }, [])
+
+  // Fetch current alerts_enabled preference and cache it
+  useEffect(() => {
+    let cancelled = false
+    alertsEnabledFn({ data: undefined as never })
+      .then((r) => {
+        if (cancelled) return
+        enabledRef.current = r.enabled !== false
+        try {
+          window.localStorage.setItem(ALERTS_ENABLED_CACHE_KEY, r.enabled ? '1' : '0')
+        } catch {
+          /* ignore */
+        }
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [alertsEnabledFn])
 
   // Initial fetch
   useEffect(() => {
