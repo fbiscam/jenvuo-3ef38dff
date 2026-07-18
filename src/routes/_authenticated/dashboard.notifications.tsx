@@ -135,23 +135,31 @@ function NotificationsPage() {
 
   useEffect(() => {
     let uid: string | null = null;
+    let ch: ReturnType<typeof supabase.channel> | null = null;
     (async () => {
       const { data } = await supabase.auth.getUser();
       uid = data.user?.id ?? null;
       if (!uid) return;
-      const ch = supabase
-        .channel(`notifs:${uid}`)
+      ch = supabase
+        .channel(`notifs:${uid}:${Math.random().toString(36).slice(2)}`)
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "user_notifications", filter: `user_id=eq.${uid}` },
           () => { refresh(); },
         )
         .subscribe();
-      (window as any).__notifCh = ch;
     })();
+    // Polling fallback (15s) + refresh on tab focus so new notifications
+    // appear even if the realtime socket drops.
+    const iv = window.setInterval(() => { refresh(); }, 15000);
+    const onVis = () => { if (document.visibilityState === "visible") refresh(); };
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", refresh);
     return () => {
-      const ch = (window as any).__notifCh;
       if (ch) supabase.removeChannel(ch);
+      window.clearInterval(iv);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", refresh);
     };
   }, []);
 
