@@ -10,6 +10,16 @@ import { Bell, BellOff, Loader2, Send } from "lucide-react";
 import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
 import { cn } from "@/lib/utils";
 import userinfobotLogo from "@/assets/userinfobot.jpg.asset.json";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 
 
@@ -97,6 +107,7 @@ function AlertPrefs() {
   const [telegramVerifiedAt, setTelegramVerifiedAt] = useState<string | null>(null);
   const [telegramError, setTelegramError] = useState<string | null>(null);
   const [telegramSaving, setTelegramSaving] = useState(false);
+  const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false);
   const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
   const canConnectTelegram = chatIdValid && !telegramSaving;
 
@@ -575,7 +586,7 @@ function AlertPrefs() {
               {telegramLinked && (
                 <button
                   type="button"
-                  onClick={disconnectTelegram}
+                  onClick={() => setDisconnectConfirmOpen(true)}
                   disabled={telegramSaving}
                   className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 disabled:opacity-50"
                 >
@@ -761,6 +772,31 @@ function AlertPrefs() {
           {saving ? "Saving…" : "Save preferences"}
         </button>
       </div>
+
+      <AlertDialog open={disconnectConfirmOpen} onOpenChange={setDisconnectConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Disconnect Telegram alerts?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You'll stop receiving signal alerts and confirmations on Telegram. You can reconnect anytime by pasting your Chat ID again.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={telegramSaving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={telegramSaving}
+              onClick={async (e) => {
+                e.preventDefault();
+                await disconnectTelegram();
+                setDisconnectConfirmOpen(false);
+              }}
+              className="bg-rose-600 text-white hover:bg-rose-700"
+            >
+              {telegramSaving ? "Disconnecting…" : "Disconnect"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
     </UpgradeOverlay>
   );
