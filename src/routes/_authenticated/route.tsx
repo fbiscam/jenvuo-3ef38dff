@@ -73,16 +73,14 @@ export const Route = createFileRoute("/_authenticated")({
 
     verifiedUserId = user.id;
 
-    // Force plan selection: users without an active subscription are sent to /pricing.
+    // Access model: signups are invite-only via founding approvals.
+    // Approved founding applicants sign in BEFORE their plan is activated
+    // (plan activation happens when the admin marks the account "active" /
+    // funded). Blocking the dashboard on user_subscriptions.status = "active"
+    // strands approved users on /pricing with no way in. Let any signed-in
+    // + email-confirmed + MFA-verified user reach the dashboard; plan-gated
+    // features (alerts, scans) enforce their own paid-plan checks.
     if (planCheckedUserId !== user.id) {
-      const { data: sub } = await supabase
-        .from("user_subscriptions")
-        .select("plan_id, status")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (!sub || sub.status !== "active") {
-        throw redirect({ to: "/pricing" });
-      }
       planCheckedUserId = user.id;
     }
   },
