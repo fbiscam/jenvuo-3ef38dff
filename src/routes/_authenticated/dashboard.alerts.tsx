@@ -326,9 +326,12 @@ function AlertPrefs() {
     setSaving(true);
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) return;
+    let timezone: string | null = null;
+    try { timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch { timezone = null; }
     const { error } = await supabase.from("alert_preferences").upsert({
       user_id: user.user.id,
       ...prefs,
+      timezone,
     });
     setSaving(false);
     if (error) toast.error("Could not save preferences");

@@ -91,6 +91,7 @@ export type Database = {
           min_grade: string
           quiet_end: string | null
           quiet_start: string | null
+          timezone: string | null
           updated_at: string
           user_id: string
         }
@@ -104,6 +105,7 @@ export type Database = {
           min_grade?: string
           quiet_end?: string | null
           quiet_start?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -117,6 +119,7 @@ export type Database = {
           min_grade?: string
           quiet_end?: string | null
           quiet_start?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
