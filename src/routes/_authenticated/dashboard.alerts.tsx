@@ -492,7 +492,7 @@ function AlertPrefs() {
                 <div className="text-xs text-zinc-500">
                   {telegramLinked
                     ? `Connected to chat ${telegramChatId || "—"}`
-                    : "Message @JenvuBot on Telegram, then paste your numeric chat ID below."}
+                    : "Open @Jenvu_Bot on Telegram and tap Start, then paste your numeric chat ID below."}
                 </div>
                 {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {new Date(telegramVerifiedAt).toLocaleString()}</div>}
               </div>
@@ -509,6 +509,16 @@ function AlertPrefs() {
                 </button>
               )}
             </div>
+
+            <a
+              href="https://t.me/Jenvu_Bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#229ED9] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1c8bc0]"
+            >
+              <Send className="h-3.5 w-3.5" />
+              Open @Jenvu_Bot on Telegram
+            </a>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
               <input
@@ -538,9 +548,10 @@ function AlertPrefs() {
               </button>
             </div>
             <div className="mt-2 text-[11px] text-zinc-400">
-              Tip: open Telegram, message <span className="font-mono">@userinfobot</span> to get your chat ID, then paste it here.
+              Tip: after tapping Start on <span className="font-mono">@Jenvu_Bot</span>, message <span className="font-mono">@userinfobot</span> to get your numeric chat ID, then paste it above.
             </div>
             {telegramError && <div className="mt-2 text-[11px] text-rose-600">{telegramError}</div>}
+
           </div>
           <button onClick={requestBrowser} className="text-xs font-medium text-zinc-700 underline-offset-2 hover:underline">
             Request browser permission →
