@@ -78,3 +78,35 @@ export const setTelegramAlertEnabled = createServerFn({ method: 'POST' })
     if (error) throw new Error(error.message)
     return { enabled: data.enabled }
   })
+
+export const disconnectTelegramAlertLink = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: existing } = await context.supabase
+      .from('telegram_alert_links')
+      .select('chat_id')
+      .eq('user_id', context.userId)
+      .maybeSingle()
+
+    const botToken = process.env.TELEGRAM_BOT_TOKEN
+    if (botToken && existing?.chat_id) {
+      try {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: existing.chat_id,
+            text: '🔌 Jenvu Telegram alerts disconnected. You will no longer receive alerts or confirmations here.',
+            disable_web_page_preview: true,
+          }),
+        })
+      } catch { /* best effort */ }
+    }
+
+    const { error } = await context.supabase
+      .from('telegram_alert_links')
+      .delete()
+      .eq('user_id', context.userId)
+    if (error) throw new Error(error.message)
+    return { ok: true }
+  })
