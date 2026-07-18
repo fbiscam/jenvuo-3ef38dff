@@ -84,7 +84,10 @@ export type Database = {
         Row: {
           alerts_enabled: boolean
           browser_enabled: boolean
+          email_directions: string[]
           email_enabled: boolean
+          email_grades: string[]
+          email_pairs: string[]
           min_grade: string
           quiet_end: string | null
           quiet_start: string | null
@@ -94,7 +97,10 @@ export type Database = {
         Insert: {
           alerts_enabled?: boolean
           browser_enabled?: boolean
+          email_directions?: string[]
           email_enabled?: boolean
+          email_grades?: string[]
+          email_pairs?: string[]
           min_grade?: string
           quiet_end?: string | null
           quiet_start?: string | null
@@ -104,7 +110,10 @@ export type Database = {
         Update: {
           alerts_enabled?: boolean
           browser_enabled?: boolean
+          email_directions?: string[]
           email_enabled?: boolean
+          email_grades?: string[]
+          email_pairs?: string[]
           min_grade?: string
           quiet_end?: string | null
           quiet_start?: string | null

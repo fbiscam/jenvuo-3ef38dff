@@ -15,12 +15,21 @@ export const Route = createFileRoute("/_authenticated/dashboard/alerts")({
   component: AlertPrefs,
 });
 
+type Grade = "A+" | "A" | "B";
+type Direction = "BUY" | "SELL";
+const ALL_PAIRS = ["XAUUSD","XAUEUR","XAUGBP","XAUJPY","XAUAUD","XAUCHF"] as const;
+const ALL_GRADES: Grade[] = ["A+", "A", "B"];
+const ALL_DIRECTIONS: Direction[] = ["BUY", "SELL"];
+
 type Prefs = {
   email_enabled: boolean;
   browser_enabled: boolean;
   min_grade: "A+" | "A";
   quiet_start: string | null;
   quiet_end: string | null;
+  email_grades: Grade[];
+  email_pairs: string[];
+  email_directions: Direction[];
 };
 
 const DEFAULTS: Prefs = {
@@ -29,7 +38,11 @@ const DEFAULTS: Prefs = {
   min_grade: "A+",
   quiet_start: null,
   quiet_end: null,
+  email_grades: [...ALL_GRADES],
+  email_pairs: [...ALL_PAIRS],
+  email_directions: [...ALL_DIRECTIONS],
 };
+
 
 type FiredAlert = {
   id: string;
@@ -146,13 +159,23 @@ function AlertPrefs() {
       if (!user.user) return;
       const { data } = await supabase
         .from("alert_preferences")
-        .select("email_enabled, browser_enabled, min_grade, quiet_start, quiet_end")
+        .select("email_enabled, browser_enabled, min_grade, quiet_start, quiet_end, email_grades, email_pairs, email_directions")
         .eq("user_id", user.user.id)
         .maybeSingle();
-      if (data) setPrefs(data as Prefs);
+      if (data) {
+        const d = data as Partial<Prefs>;
+        setPrefs({
+          ...DEFAULTS,
+          ...d,
+          email_grades: (d.email_grades && d.email_grades.length ? d.email_grades : DEFAULTS.email_grades) as Grade[],
+          email_pairs: d.email_pairs && d.email_pairs.length ? d.email_pairs : DEFAULTS.email_pairs,
+          email_directions: (d.email_directions && d.email_directions.length ? d.email_directions : DEFAULTS.email_directions) as Direction[],
+        });
+      }
       setLoading(false);
     })();
   }, []);
+
 
   useEffect(() => {
     let cancelled = false;
@@ -431,6 +454,92 @@ function AlertPrefs() {
         </div>
         <p className="mt-2 text-[11px] text-zinc-400">Tip: "A &amp; A+" enables both grades so you never miss a solid setup.</p>
       </section>
+
+      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+        <h2 className="text-base font-semibold">Email filters</h2>
+        <p className="mt-1 text-sm text-zinc-500">
+          Emails are sent to <span className="font-medium text-zinc-800">your account email</span> only.
+          Choose which signals qualify — grade, pair, and direction all must match.
+        </p>
+
+        <div className="mt-5 space-y-5">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Grades</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {ALL_GRADES.map((g) => {
+                const on = prefs.email_grades.includes(g);
+                return (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setPrefs((p) => ({
+                      ...p,
+                      email_grades: on ? p.email_grades.filter((x) => x !== g) : [...p.email_grades, g],
+                    }))}
+                    className={`rounded-md px-3 py-1.5 text-xs font-semibold transition ${on ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"}`}
+                  >
+                    {g}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Pairs</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {ALL_PAIRS.map((pair) => {
+                const on = prefs.email_pairs.includes(pair);
+                return (
+                  <button
+                    key={pair}
+                    type="button"
+                    onClick={() => setPrefs((p) => ({
+                      ...p,
+                      email_pairs: on ? p.email_pairs.filter((x) => x !== pair) : [...p.email_pairs, pair],
+                    }))}
+                    className={`rounded-md px-3 py-1.5 font-mono text-[11px] transition ${on ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"}`}
+                  >
+                    {pair}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Direction</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {ALL_DIRECTIONS.map((d) => {
+                const on = prefs.email_directions.includes(d);
+                const isBuy = d === "BUY";
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setPrefs((p) => ({
+                      ...p,
+                      email_directions: on ? p.email_directions.filter((x) => x !== d) : [...p.email_directions, d],
+                    }))}
+                    className={`rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                      on
+                        ? isBuy ? "bg-emerald-600 text-white" : "bg-rose-600 text-white"
+                        : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+                    }`}
+                  >
+                    {d}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        <p className="mt-4 text-[11px] text-zinc-400">
+          Leaving a group empty is the same as selecting all — you'll receive every signal that matches your other filters.
+        </p>
+      </section>
+
+
 
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
