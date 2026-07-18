@@ -772,6 +772,31 @@ function AlertPrefs() {
           {saving ? "Saving…" : "Save preferences"}
         </button>
       </div>
+
+      <AlertDialog open={disconnectConfirmOpen} onOpenChange={setDisconnectConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Disconnect Telegram alerts?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You'll stop receiving signal alerts and confirmations on Telegram. You can reconnect anytime by pasting your Chat ID again.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={telegramSaving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={telegramSaving}
+              onClick={async (e) => {
+                e.preventDefault();
+                await disconnectTelegram();
+                setDisconnectConfirmOpen(false);
+              }}
+              className="bg-rose-600 text-white hover:bg-rose-700"
+            >
+              {telegramSaving ? "Disconnecting…" : "Disconnect"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
     </UpgradeOverlay>
   );
