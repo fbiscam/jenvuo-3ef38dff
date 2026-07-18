@@ -1,6 +1,14 @@
-// Server-only helper: filter user ids down to those who want an email for a
-// specific signal (alerts_enabled + email_enabled + per-user grade/pair/direction filters).
+// Server-only helper: filter user ids down to those who want an alert for a
+// specific signal (alerts_enabled + quiet hours + per-user grade/pair/direction filters).
+// The per-user filter columns are stored under email_grades/email_pairs/email_directions
+// for historical reasons, but now apply to ALL alert channels (browser, telegram, email).
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
+
+export interface SignalFilter {
+  grade: string
+  pair: string
+  direction: 'BUY' | 'SELL'
+}
 
 // Returns true if the current time (in the user's timezone) falls within
 // [quiet_start, quiet_end). Handles overnight windows (e.g. 22:00 → 07:00).
@@ -24,18 +32,28 @@ function isInQuietHours(quietStart: string | null, quietEnd: string | null, tz: 
     const endMin = eH * 60 + (eM || 0)
     if (startMin === endMin) return false
     if (startMin < endMin) return nowMin >= startMin && nowMin < endMin
-    // overnight window
     return nowMin >= startMin || nowMin < endMin
   } catch {
     return false
   }
 }
 
-export async function filterAlertsEnabledUserIds(userIds: string[]): Promise<string[]> {
+/**
+ * Given user ids (and optionally a specific signal), return those whose alert
+ * preferences allow this alert on ANY channel. Applies:
+ *   - alerts_enabled master switch
+ *   - quiet hours (user's local timezone)
+ *   - grade/pair/direction filters (when a signal is provided)
+ * Users without a preferences row are treated as opt-in.
+ */
+export async function filterAlertsEnabledUserIds(
+  userIds: string[],
+  signal?: SignalFilter,
+): Promise<string[]> {
   if (!userIds || userIds.length === 0) return []
   const { data } = await supabaseAdmin
     .from('alert_preferences')
-    .select('user_id, alerts_enabled, quiet_start, quiet_end, timezone')
+    .select('user_id, alerts_enabled, quiet_start, quiet_end, timezone, email_grades, email_pairs, email_directions')
     .in('user_id', userIds)
   type Row = {
     user_id: string
@@ -43,62 +61,48 @@ export async function filterAlertsEnabledUserIds(userIds: string[]): Promise<str
     quiet_start: string | null
     quiet_end: string | null
     timezone: string | null
+    email_grades: string[] | null
+    email_pairs: string[] | null
+    email_directions: string[] | null
   }
   const byId = new Map<string, Row>()
   for (const r of (data ?? []) as Row[]) byId.set(r.user_id, r)
+  const pair = signal?.pair.toUpperCase()
   return userIds.filter((id) => {
     const r = byId.get(id)
     if (!r) return true
     if (r.alerts_enabled === false) return false
     if (isInQuietHours(r.quiet_start, r.quiet_end, r.timezone)) return false
+    if (signal) {
+      if (r.email_grades && r.email_grades.length > 0 && !r.email_grades.includes(signal.grade)) return false
+      if (r.email_pairs && r.email_pairs.length > 0 && pair && !r.email_pairs.includes(pair)) return false
+      if (r.email_directions && r.email_directions.length > 0 && !r.email_directions.includes(signal.direction)) return false
+    }
     return true
   })
 }
 
-export interface EmailAlertFilter {
-  grade: string
-  pair: string
-  direction: 'BUY' | 'SELL'
-}
+export type EmailAlertFilter = SignalFilter
 
 /**
- * Given a list of paid user ids and a specific signal, return the subset who
- * want the email based on their per-user filters (email_enabled, grade, pair,
- * direction, quiet hours). Defaults to opt-in when a preference row doesn't exist yet.
+ * Given user ids and a specific signal, return the subset who want the EMAIL
+ * channel — same rules as filterAlertsEnabledUserIds plus email_enabled.
  */
 export async function filterEmailRecipientIds(
   userIds: string[],
   s: EmailAlertFilter,
 ): Promise<string[]> {
   if (!userIds || userIds.length === 0) return []
+  const allowed = await filterAlertsEnabledUserIds(userIds, s)
+  if (allowed.length === 0) return []
   const { data } = await supabaseAdmin
     .from('alert_preferences')
-    .select('user_id, alerts_enabled, email_enabled, email_grades, email_pairs, email_directions, quiet_start, quiet_end, timezone')
-    .in('user_id', userIds)
-  type Row = {
-    user_id: string
-    alerts_enabled: boolean
-    email_enabled: boolean
-    email_grades: string[] | null
-    email_pairs: string[] | null
-    email_directions: string[] | null
-    quiet_start: string | null
-    quiet_end: string | null
-    timezone: string | null
-  }
-  const byId = new Map<string, Row>()
-  for (const r of (data ?? []) as Row[]) byId.set(r.user_id, r)
-
-  const pair = s.pair.toUpperCase()
-  return userIds.filter((id) => {
-    const r = byId.get(id)
-    if (!r) return true // no prefs row yet → default opt-in
-    if (r.alerts_enabled === false) return false
-    if (r.email_enabled === false) return false
-    if (isInQuietHours(r.quiet_start, r.quiet_end, r.timezone)) return false
-    if (r.email_grades && r.email_grades.length > 0 && !r.email_grades.includes(s.grade)) return false
-    if (r.email_pairs && r.email_pairs.length > 0 && !r.email_pairs.includes(pair)) return false
-    if (r.email_directions && r.email_directions.length > 0 && !r.email_directions.includes(s.direction)) return false
-    return true
-  })
+    .select('user_id, email_enabled')
+    .in('user_id', allowed)
+  const disabled = new Set(
+    ((data ?? []) as Array<{ user_id: string; email_enabled: boolean }>)
+      .filter((r) => r.email_enabled === false)
+      .map((r) => r.user_id),
+  )
+  return allowed.filter((id) => !disabled.has(id))
 }

@@ -56,7 +56,7 @@ export async function sendSignalAlertTelegrams(a: EnqueueAlertEmailsArgs): Promi
     .eq('status', 'active')
     .neq('plan_id', 'free')
   let paidIds = Array.from(new Set((paidRows ?? []).map((r: { user_id: string }) => r.user_id)))
-  paidIds = await filterAlertsEnabledUserIds(paidIds)
+  paidIds = await filterAlertsEnabledUserIds(paidIds, { grade: a.grade, pair: a.pair, direction: a.direction })
   if (paidIds.length === 0) return { sent: 0 }
 
   const { data: links } = await supabaseAdmin

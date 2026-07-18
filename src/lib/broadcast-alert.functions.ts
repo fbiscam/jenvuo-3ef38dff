@@ -80,7 +80,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       const paidIds = Array.from(
         new Set((paidRows ?? []).map((r: { user_id: string }) => r.user_id)),
       )
-      notifyUserIds = await filterAlertsEnabledUserIds(paidIds)
+      notifyUserIds = await filterAlertsEnabledUserIds(paidIds, { grade, pair, direction: data.direction })
       if (notifyUserIds.length > 0) {
         // PostgREST does not expose the auth schema; use the Auth Admin API.
         const collected: Array<{ id: string; email: string | null }> = []
