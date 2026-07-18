@@ -673,16 +673,21 @@ function AlertPrefs() {
             { key: 75, label: "75%" },
             { key: 85, label: "85%" },
           ] as const).map((opt) => {
-            const active = (prefs.min_grade === "A+" ? 75 : 0) === opt.key
-              ? false
-              : false;
-            const current = prefs.min_grade === "A+" ? 75 : 0;
-            const isActive = current === opt.key || (opt.key === 0 && current === 0 && prefs.min_grade !== "A+");
-            void active;
+            const currentThreshold = (() => {
+              if (typeof window !== "undefined") {
+                const v = Number(window.localStorage.getItem("jenvu:minConfidence"));
+                if (!Number.isNaN(v)) return v;
+              }
+              return prefs.min_grade === "A+" ? 75 : 0;
+            })();
+            const isActive = currentThreshold === opt.key;
             return (
               <button
                 key={opt.key}
-                onClick={() => setPrefs((p) => ({ ...p, min_grade: opt.key >= 75 ? "A+" : "A" }))}
+                onClick={() => {
+                  try { window.localStorage.setItem("jenvu:minConfidence", String(opt.key)); } catch { /* ignore */ }
+                  setPrefs((p) => ({ ...p, min_grade: opt.key >= 75 ? "A+" : "A" }));
+                }}
                 className={`px-4 py-1.5 text-sm font-medium rounded-md transition ${
                   isActive ? "bg-emerald-600 text-white" : "bg-white text-zinc-600 hover:text-zinc-900"
                 }`}
