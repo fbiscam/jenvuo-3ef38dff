@@ -170,6 +170,25 @@ function AlertPrefs() {
     }
   }, [setTelegramEnabledFn]);
 
+  const disconnectTelegram = useCallback(async () => {
+    setTelegramSaving(true);
+    setTelegramError(null);
+    try {
+      await disconnectTelegramFn({});
+      setTelegramLinked(false);
+      setTelegramEnabled(true);
+      setTelegramVerifiedAt(null);
+      setTelegramChatId("");
+      toast.success("Telegram disconnected", { description: "You will no longer receive alerts on Telegram." });
+    } catch (e: any) {
+      const message = e?.message ?? "Could not disconnect Telegram";
+      setTelegramError(message);
+      toast.error("Telegram disconnect failed", { description: message });
+    } finally {
+      setTelegramSaving(false);
+    }
+  }, [disconnectTelegramFn]);
+
 
   const takeTrade = async (a: FiredAlert) => {
     if (loggedIds.has(a.id) || loggingId) return;
