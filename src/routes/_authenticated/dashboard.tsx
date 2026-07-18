@@ -932,12 +932,12 @@ function DashboardLayout() {
                       </span>
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
-                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white tabular-nums ring-2 ring-white" style={{ height: 16, width: 16, minWidth: 16, fontSize: 9, lineHeight: '16px', fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 600, letterSpacing: "-0.02em", textAlign: 'center' }}>
+                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white tabular-nums ring-2 ring-white aspect-square" style={{ height: 16, width: 16, minWidth: 16, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 600, letterSpacing: 0, padding: 0 }}>
                           {count}
                         </span>
                       )}
                       {!sidebarCollapsed && hasUnread && (
-                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white tabular-nums ring-2 ring-white" style={{ height: 16, width: 16, minWidth: 16, fontSize: 9, lineHeight: '16px', fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 600, letterSpacing: "-0.02em", textAlign: 'center' }}>
+                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white tabular-nums ring-2 ring-white aspect-square" style={{ height: 16, width: 16, minWidth: 16, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 600, letterSpacing: 0, padding: 0 }}>
                           {unreadNotifs}
                         </span>
                       )}
