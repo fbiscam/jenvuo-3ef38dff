@@ -1060,7 +1060,6 @@ function DashboardLayout() {
               <Menu className="h-4 w-4" />
             </button>
             <DropdownMenu>
-              <div className="hidden md:contents">
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
