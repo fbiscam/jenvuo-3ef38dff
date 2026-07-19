@@ -533,7 +533,7 @@ function Home() {
               placeholder="Type"
               disabled={loading}
               className={cn(
-                "flex-1 bg-transparent text-[15px] focus:outline-none px-1 py-1",
+                "flex-1 min-w-0 bg-transparent text-[15px] focus:outline-none px-1 py-1",
                 dark ? "text-neutral-100 placeholder:text-neutral-500" : "text-neutral-900 placeholder:text-neutral-500",
               )}
             />
