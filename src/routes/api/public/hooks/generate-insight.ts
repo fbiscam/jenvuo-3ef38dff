@@ -120,12 +120,21 @@ Return STRICT JSON only, no prose, with this exact shape:
           }
         }
 
-        // Primary: Lovable AI gpt-5.5. Fallback: BluesMinds if provided.
+        // Primary: gemini-2.5-pro (reliable + high quality). Fallback: gemini-2.5-flash.
         let aiRes: Response;
         try {
-          aiRes = await callAI("openai/gpt-5.5", 90_000);
+          aiRes = await callAI("google/gemini-2.5-pro", 90_000);
+          if (!aiRes.ok) {
+            const errTxt = await aiRes.text().catch(() => "");
+            console.warn("[generate-insight] primary failed", aiRes.status, errTxt.slice(0, 200));
+            aiRes = await callAI("google/gemini-2.5-flash", 90_000);
+          }
         } catch (e) {
-          return new Response(JSON.stringify({ error: "ai-timeout", detail: String(e) }), { status: 504 });
+          try {
+            aiRes = await callAI("google/gemini-2.5-flash", 90_000);
+          } catch (e2) {
+            return new Response(JSON.stringify({ error: "ai-timeout", detail: String(e2) }), { status: 504 });
+          }
         }
 
         if (!aiRes.ok) {
