@@ -1162,6 +1162,8 @@ export type Database = {
           excerpt: string
           id: string
           image_url: string | null
+          index_status: Json | null
+          indexed_at: string | null
           is_breaking: boolean | null
           notified_at: string | null
           published_at: string
@@ -1176,6 +1178,8 @@ export type Database = {
           excerpt: string
           id?: string
           image_url?: string | null
+          index_status?: Json | null
+          indexed_at?: string | null
           is_breaking?: boolean | null
           notified_at?: string | null
           published_at?: string
@@ -1190,6 +1194,8 @@ export type Database = {
           excerpt?: string
           id?: string
           image_url?: string | null
+          index_status?: Json | null
+          indexed_at?: string | null
           is_breaking?: boolean | null
           notified_at?: string | null
           published_at?: string
