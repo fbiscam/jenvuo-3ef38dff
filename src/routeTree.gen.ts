@@ -71,6 +71,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
+import { Route as ApiPublicHooksReindexInsightsRouteImport } from './routes/api/public/hooks/reindex-insights'
 import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/api/public/hooks/notify-subscribers'
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
@@ -409,6 +410,12 @@ const ApiPublicHooksScanSignalsRoute =
     path: '/api/public/hooks/scan-signals',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksReindexInsightsRoute =
+  ApiPublicHooksReindexInsightsRouteImport.update({
+    id: '/api/public/hooks/reindex-insights',
+    path: '/api/public/hooks/reindex-insights',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksNotifySubscribersRoute =
   ApiPublicHooksNotifySubscribersRouteImport.update({
     id: '/api/public/hooks/notify-subscribers',
@@ -540,6 +547,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -610,6 +618,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -686,6 +695,7 @@ export interface FileRoutesById {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -762,6 +772,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/telegram/webhook'
     | '/lovable/email/auth/preview'
@@ -832,6 +843,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/telegram/webhook'
     | '/lovable/email/auth/preview'
@@ -907,6 +919,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/telegram/webhook'
     | '/lovable/email/auth/preview'
@@ -957,6 +970,7 @@ export interface RootRouteChildren {
   ApiPublicHooksGenerateBriefRoute: typeof ApiPublicHooksGenerateBriefRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
   ApiPublicHooksNotifySubscribersRoute: typeof ApiPublicHooksNotifySubscribersRoute
+  ApiPublicHooksReindexInsightsRoute: typeof ApiPublicHooksReindexInsightsRoute
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -1402,6 +1416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksScanSignalsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/reindex-insights': {
+      id: '/api/public/hooks/reindex-insights'
+      path: '/api/public/hooks/reindex-insights'
+      fullPath: '/api/public/hooks/reindex-insights'
+      preLoaderRoute: typeof ApiPublicHooksReindexInsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/notify-subscribers': {
       id: '/api/public/hooks/notify-subscribers'
       path: '/api/public/hooks/notify-subscribers'
@@ -1633,6 +1654,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksGenerateBriefRoute: ApiPublicHooksGenerateBriefRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
   ApiPublicHooksNotifySubscribersRoute: ApiPublicHooksNotifySubscribersRoute,
+  ApiPublicHooksReindexInsightsRoute: ApiPublicHooksReindexInsightsRoute,
   ApiPublicHooksScanSignalsRoute: ApiPublicHooksScanSignalsRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
