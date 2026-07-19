@@ -1028,7 +1028,7 @@ function DashboardLayout() {
               </span>
               <Link
                 to="/dashboard/billing"
-                className="inline-flex flex-wrap items-center gap-1"
+                className="-ml-1.5 sm:ml-0 inline-flex flex-wrap items-center gap-1"
                 title="AI models powering your signals"
               >
                 <span className="inline-flex items-center gap-1.5 rounded-md bg-transparent px-1.5 py-1 leading-none">
