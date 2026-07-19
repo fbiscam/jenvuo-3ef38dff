@@ -1059,7 +1059,52 @@ function DashboardLayout() {
             >
               <Menu className="h-4 w-4" />
             </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Account menu"
+                  className="relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-zinc-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                >
+                  <img
+                    src={avatarUrl || getDefaultAvatar(email || fullName)}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    width={48}
+                    height={48}
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement;
+                      const fallback = getDefaultAvatar(email || fullName);
+                      if (img.src !== fallback) img.src = fallback;
+                    }}
+                  />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" sideOffset={8} className="w-56 bg-white">
+                <DropdownMenuLabel className="truncate text-[12px] font-normal text-zinc-500">
+                  {email || fullName || "Account"}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/profile" className="flex items-center gap-2">
+                    <User className="h-4 w-4" /> Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/billing" className="flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" /> Billing
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/security" className="flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4" /> Security
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
+
 
 
 
