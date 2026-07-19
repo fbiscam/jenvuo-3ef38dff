@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 const BASE_URL = "https://jenvu.com";
+const INDEXNOW_KEY = "31f95befb924351f7ab6c1f5ce4bc15b";
 
 function slugify(s: string) {
   return s
@@ -10,7 +11,7 @@ function slugify(s: string) {
     .slice(0, 90);
 }
 
-async function submitToGoogle(url: string) {
+export async function submitToGoogle(url: string) {
   const lovableKey = process.env.LOVABLE_API_KEY;
   const gscKey = process.env.GOOGLE_SEARCH_CONSOLE_API_KEY;
   if (!lovableKey || !gscKey) return { ok: false, skipped: true };
@@ -27,6 +28,25 @@ async function submitToGoogle(url: string) {
         body: JSON.stringify({ url, type: "URL_UPDATED" }),
       },
     );
+    return { ok: res.ok, status: res.status };
+  } catch (e) {
+    return { ok: false, error: String(e) };
+  }
+}
+
+export async function submitToIndexNow(urls: string[]) {
+  if (!urls.length) return { ok: false, skipped: true };
+  try {
+    const res = await fetch("https://api.indexnow.org/IndexNow", {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        host: "jenvu.com",
+        key: INDEXNOW_KEY,
+        keyLocation: `${BASE_URL}/${INDEXNOW_KEY}.txt`,
+        urlList: urls,
+      }),
+    });
     return { ok: res.ok, status: res.status };
   } catch (e) {
     return { ok: false, error: String(e) };
