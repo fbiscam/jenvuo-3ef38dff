@@ -58,6 +58,14 @@ export const Route = createFileRoute("/api/public/brief-audio/$id")({
             if (!ttsRes.ok) {
               const errBody = await ttsRes.text().catch(() => "");
               console.error("[brief-audio] TTS failed", ttsRes.status, errBody.slice(0, 200));
+              // Surface billing/rate-limit failures so callers (podcast clients,
+              // browsers) back off instead of hammering. 402/429 → 503 + Retry-After.
+              if (ttsRes.status === 402 || ttsRes.status === 429) {
+                return new Response("tts unavailable", {
+                  status: 503,
+                  headers: { "Retry-After": "3600", "Cache-Control": "no-store" },
+                });
+              }
               return new Response("tts failed", { status: 502 });
             }
             const mp3 = new Uint8Array(await ttsRes.arrayBuffer());

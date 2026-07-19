@@ -45,8 +45,9 @@ export const Route = createFileRoute("/api/public/podcast.xml")({
         );
         const { data: rows } = await supabase
           .from("killzone_briefs")
-          .select("id, session, headline, summary, transcript, audio_duration_seconds, published_at")
+          .select("id, session, headline, summary, transcript, audio_duration_seconds, audio_path, published_at")
           .eq("is_public", true)
+          .not("audio_path", "is", null)
           .order("published_at", { ascending: false })
           .limit(50);
 
