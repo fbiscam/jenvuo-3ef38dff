@@ -158,6 +158,25 @@ Return STRICT JSON only, no prose, with this exact shape:
           return new Response(JSON.stringify({ error: "all-providers-failed", detail: lastErr }), { status: 502 });
         }
 
+        const ai = await aiRes.json();
+        let raw: string = ai?.choices?.[0]?.message?.content ?? "{}";
+        // Some providers wrap JSON in ```json fences — strip them.
+        raw = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+        let parsed: { title?: string; slug?: string; excerpt?: string; content?: string };
+        try {
+          parsed = JSON.parse(raw);
+        } catch {
+          // Try to extract the first {...} block
+          const m = raw.match(/\{[\s\S]*\}/);
+          if (!m) {
+            return new Response(JSON.stringify({ error: "ai-bad-json", raw: raw.slice(0, 400) }), { status: 502 });
+          }
+          try { parsed = JSON.parse(m[0]); } catch {
+            return new Response(JSON.stringify({ error: "ai-bad-json", raw: raw.slice(0, 400) }), { status: 502 });
+          }
+        }
+
+
 
         const title = (parsed.title || topic.keyword).slice(0, 120);
         const slug = slugify(parsed.slug || title);
