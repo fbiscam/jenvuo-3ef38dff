@@ -1050,12 +1050,12 @@ function DashboardLayout() {
               </Link>
             </div>
           </div>
-          <div className="flex items-center gap-2 lg:self-start lg:mt-6 lg:mb-0">
+          <div className="flex flex-col items-end gap-2 md:flex-row md:items-center lg:self-start lg:mt-6 lg:mb-0">
             <button
               type="button"
               aria-label="Open menu"
               onClick={() => setMobileNavOpen(true)}
-              className="hidden md:inline-flex lg:hidden items-center justify-center rounded-md border border-zinc-200 bg-white p-2 text-zinc-700 shadow-sm hover:bg-zinc-50"
+              className="inline-flex lg:hidden items-center justify-center rounded-md border border-zinc-200 bg-white p-2 text-zinc-700 shadow-sm hover:bg-zinc-50"
             >
               <Menu className="h-4 w-4" />
             </button>
