@@ -75,8 +75,8 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
         }
         const topic = topics[0];
 
-        // Call Lovable AI for a structured article
-        const sys = `You are a senior institutional trading analyst writing for Jenvu — an AI gold trading terminal. Write a comprehensive, factually accurate, SEO-optimized markdown article. Style: precise, professional, no fluff, no hype, no emojis. Use ICT/SMC concepts correctly. Include H2/H3 headings, bullet lists where useful, a short FAQ section at the end with 3 Q&A pairs. 900-1300 words.`;
+        // Article prompt — Europe-focused SEO to grow EU organic traffic
+        const sys = `You are a senior institutional trading analyst writing for Jenvu — an AI gold trading terminal. Write a comprehensive, factually accurate, SEO-optimized markdown article targeted at European retail and prop-firm traders (UK, Germany, France, Italy, Spain, Netherlands, Poland, Switzerland). Naturally weave in high-intent European search terms (London killzone, Frankfurt open, XAU/EUR, XAU/GBP, London session gold, prop firm challenge, MT5 gold signals, ICT concepts, smart money concepts) without keyword stuffing. Style: precise, professional, no fluff, no hype, no emojis. Use ICT/SMC concepts correctly. Include H2/H3 headings, bullet lists where useful, and a final ## FAQ section with 3 Q&A pairs answering long-tail European queries. 900-1300 words. Use British English spelling.`;
 
         const userPrompt = `Write a complete article on: "${topic.keyword}"
 Angle: ${topic.angle || "comprehensive guide"}
@@ -84,35 +84,42 @@ Category: ${topic.category}
 
 Return STRICT JSON only, no prose, with this exact shape:
 {
-  "title": "<60-char SEO title with the primary keyword>",
+  "title": "<60-char SEO title with the primary keyword, optimized for Google Europe SERPs>",
   "slug": "<url-safe-slug>",
-  "excerpt": "<150-160 char meta description with primary keyword>",
+  "excerpt": "<150-160 char meta description with primary keyword and a European trading hook>",
   "content": "<full markdown article 900-1300 words with ## H2 sections, lists, and a final ## FAQ section. Use internal links to /signal, /app, /insights, /download where natural>"
 }`;
 
+        const bmindKey = process.env.BLUESMINDS_API_KEY;
         const lovableKey = process.env.LOVABLE_API_KEY;
-        if (!lovableKey) {
-          return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), { status: 500 });
+        if (!bmindKey && !lovableKey) {
+          return new Response(JSON.stringify({ error: "no-ai-provider-configured" }), { status: 500 });
         }
 
-        async function callAI(model: string, timeoutMs: number) {
+        async function callProvider(provider: "bmind" | "lovable", model: string, timeoutMs: number) {
           const ctrl = new AbortController();
           const t = setTimeout(() => ctrl.abort(), timeoutMs);
+          const isBmind = provider === "bmind";
+          const endpoint = isBmind
+            ? "https://api.bluesminds.com/v1/chat/completions"
+            : "https://ai.gateway.lovable.dev/v1/chat/completions";
+          const headers: Record<string, string> = { "Content-Type": "application/json" };
+          if (isBmind) headers["Authorization"] = `Bearer ${bmindKey!}`;
+          else headers["Lovable-API-Key"] = lovableKey!;
+          const body: Record<string, unknown> = {
+            model,
+            messages: [
+              { role: "system", content: sys },
+              { role: "user", content: userPrompt },
+            ],
+          };
+          // Force JSON only on Lovable gateway; Bluesminds relies on system prompt.
+          if (!isBmind) body.response_format = { type: "json_object" };
           try {
-            return await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            return await fetch(endpoint, {
               method: "POST",
-              headers: {
-                "Lovable-API-Key": lovableKey!,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                model,
-                messages: [
-                  { role: "system", content: sys },
-                  { role: "user", content: userPrompt },
-                ],
-                response_format: { type: "json_object" },
-              }),
+              headers,
+              body: JSON.stringify(body),
               signal: ctrl.signal,
             });
           } finally {
@@ -120,36 +127,56 @@ Return STRICT JSON only, no prose, with this exact shape:
           }
         }
 
-        // Primary: gemini-2.5-pro (reliable + high quality). Fallback: gemini-2.5-flash.
-        let aiRes: Response;
-        try {
-          aiRes = await callAI("google/gemini-2.5-pro", 90_000);
-          if (!aiRes.ok) {
-            const errTxt = await aiRes.text().catch(() => "");
-            console.warn("[generate-insight] primary failed", aiRes.status, errTxt.slice(0, 200));
-            aiRes = await callAI("google/gemini-2.5-flash", 90_000);
-          }
-        } catch (e) {
+        // Provider chain: Bluesminds first (has credit), then Lovable Gemini as fallback.
+        const chain: Array<{ provider: "bmind" | "lovable"; model: string }> = [];
+        if (bmindKey) {
+          chain.push({ provider: "bmind", model: "gpt-5.5" });
+          chain.push({ provider: "bmind", model: "gpt-5.2-chat" });
+          chain.push({ provider: "bmind", model: "deepseek-v4-pro" });
+        }
+        if (lovableKey) {
+          chain.push({ provider: "lovable", model: "google/gemini-2.5-pro" });
+          chain.push({ provider: "lovable", model: "google/gemini-2.5-flash" });
+        }
+
+        let aiRes: Response | null = null;
+        let lastErr = "";
+        for (const step of chain) {
           try {
-            aiRes = await callAI("google/gemini-2.5-flash", 90_000);
-          } catch (e2) {
-            return new Response(JSON.stringify({ error: "ai-timeout", detail: String(e2) }), { status: 504 });
+            const r = await callProvider(step.provider, step.model, 90_000);
+            if (r.ok) { aiRes = r; break; }
+            lastErr = `${step.provider}:${step.model} ${r.status}`;
+            const txt = await r.text().catch(() => "");
+            console.warn("[generate-insight] provider failed", lastErr, txt.slice(0, 200));
+          } catch (e) {
+            lastErr = `${step.provider}:${step.model} ${String(e)}`;
+            console.warn("[generate-insight] provider threw", lastErr);
           }
         }
 
-        if (!aiRes.ok) {
-          const txt = await aiRes.text();
-          return new Response(JSON.stringify({ error: "ai-failed", status: aiRes.status, body: txt.slice(0, 400) }), { status: 502 });
+        if (!aiRes) {
+          return new Response(JSON.stringify({ error: "all-providers-failed", detail: lastErr }), { status: 502 });
         }
 
         const ai = await aiRes.json();
-        const raw = ai?.choices?.[0]?.message?.content ?? "{}";
+        let raw: string = ai?.choices?.[0]?.message?.content ?? "{}";
+        // Some providers wrap JSON in ```json fences — strip them.
+        raw = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
         let parsed: { title?: string; slug?: string; excerpt?: string; content?: string };
         try {
           parsed = JSON.parse(raw);
         } catch {
-          return new Response(JSON.stringify({ error: "ai-bad-json", raw: raw.slice(0, 400) }), { status: 502 });
+          // Try to extract the first {...} block
+          const m = raw.match(/\{[\s\S]*\}/);
+          if (!m) {
+            return new Response(JSON.stringify({ error: "ai-bad-json", raw: raw.slice(0, 400) }), { status: 502 });
+          }
+          try { parsed = JSON.parse(m[0]); } catch {
+            return new Response(JSON.stringify({ error: "ai-bad-json", raw: raw.slice(0, 400) }), { status: 502 });
+          }
         }
+
+
 
         const title = (parsed.title || topic.keyword).slice(0, 120);
         const slug = slugify(parsed.slug || title);
