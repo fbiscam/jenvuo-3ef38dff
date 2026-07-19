@@ -1064,7 +1064,7 @@ function DashboardLayout() {
                 <button
                   type="button"
                   aria-label="Account menu"
-                  className="relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-zinc-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                  className="relative hidden md:inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-zinc-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
                 >
                   <img
                     src={avatarUrl || getDefaultAvatar(email || fullName)}
