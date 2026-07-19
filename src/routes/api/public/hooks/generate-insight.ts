@@ -248,11 +248,19 @@ Return STRICT JSON only, no prose, with this exact shape:
 
         await supabaseAdmin.from("insight_topics").update({ last_used_at: new Date().toISOString() }).eq("id", topic.id);
 
-        // Submit to Google indexing (best-effort, non-blocking on failure)
+        // Submit to search engines (Google indexing API + IndexNow → Bing/Yandex)
         const url = `${BASE_URL}/insights/${slug}`;
-        const index = await submitToGoogle(url);
+        const [google, indexnow] = await Promise.all([
+          submitToGoogle(url),
+          submitToIndexNow([url, `${BASE_URL}/insights`, `${BASE_URL}/sitemap.xml`]),
+        ]);
 
-        return Response.json({ ok: true, slug, url, index });
+        await supabaseAdmin
+          .from("insights")
+          .update({ indexed_at: new Date().toISOString(), index_status: { google, indexnow } })
+          .eq("id", inserted!.id);
+
+        return Response.json({ ok: true, slug, url, google, indexnow });
       },
     },
   },
