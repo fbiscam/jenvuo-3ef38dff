@@ -14,7 +14,7 @@ export const Route = createFileRoute("/founding")({
       {
         name: "description",
         content:
-          "220 traders per month get free Elite access. Pay only after your first $100 profit. Institutional-grade XAU intelligence, aligned incentives.",
+          "50 traders per month get free Elite access. Pay only after your first $100 profit. Institutional-grade XAU intelligence, aligned incentives.",
       },
       { property: "og:title", content: "Founding Trader Program" },
       {
@@ -34,7 +34,7 @@ function FoundingPage() {
   const stats = useServerFn(foundingStats);
   const [submitting, setSubmitting] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
-  const [seats, setSeats] = React.useState<{ filled: number; total: number }>({ filled: 0, total: 220 });
+  const [seats, setSeats] = React.useState<{ filled: number; total: number }>({ filled: 0, total: 50 });
 
   React.useEffect(() => {
     let cancelled = false;
@@ -145,7 +145,7 @@ function FoundingPage() {
       <section className="mx-auto max-w-5xl px-5 pb-14">
         <div className="grid gap-3 sm:grid-cols-3">
           {[
-            { icon: Users, title: "Curated cohort", body: "Only 220 traders each month. Serious applicants, real capital, no tire-kickers." },
+            { icon: Users, title: "Curated cohort", body: "Only 50 traders each month. Serious applicants, real capital, no tire-kickers." },
             { icon: DollarSign, title: "Pay after profit", body: "First month Elite is free. Billing activates only after $100 verified profit." },
             { icon: Shield, title: "Aligned incentives", body: "We win when you win. Our job is to make you stable, not to milk subscriptions." },
           ].map((b) => (

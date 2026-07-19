@@ -211,7 +211,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `Thanks for applying, ${n}`,
           "Application update",
           `<p style="margin:0 0 12px">We reviewed your application carefully. This month's cohort is a tight fit and unfortunately we're not able to offer you a founding seat right now.</p>
-           <p style="margin:0 0 12px">This isn't a judgment on you as a trader — the program is capped at 220 seats and prioritizes very specific criteria each intake.</p>
+           <p style="margin:0 0 12px">This isn't a judgment on you as a trader — the program is capped at 50 seats and prioritizes very specific criteria each intake.</p>
            <p style="margin:0 0 12px">You're welcome to re-apply for a future cohort — we'd love to see your updated application.</p>
            <p style="margin:16px 0 0;color:#52525b">If you'd like to share more context about your trading or ask us to reconsider, just hit reply — a real person on our team will read it.</p>`,
           { label: "Reapply to Founding", href: `${APP_URL}/founding` },
@@ -223,7 +223,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `You're on the waitlist, ${n}`,
           "Waitlisted · Founding Trader",
-          `<p style="margin:0 0 12px">This month's 220 seats are filled, but your application looks strong — you're on the waitlist for the next cohort.</p>
+          `<p style="margin:0 0 12px">This month's 50 seats are filled, but your application looks strong — you're on the waitlist for the next cohort.</p>
            <p style="margin:0 0 12px">As soon as a seat opens (or the next month rolls over on the 1st), we'll email you to activate your <strong>${escapeHtml(meta.label)}</strong> plan.</p>
            <p style="margin:0">No action needed from your side. Sit tight.</p>`,
           { label: "Explore the platform", href: `${APP_URL}/` },
@@ -710,7 +710,7 @@ export const notifyFoundingPasswordSet = createServerFn({ method: "POST" })
 export const foundingStats = createServerFn({ method: "GET" }).handler(async () => {
   const url = process.env.SUPABASE_URL;
   const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !service) return { seatsFilled: 0, seatsTotal: 220 };
+  if (!url || !service) return { seatsFilled: 0, seatsTotal: 50 };
   // Use service role — RLS blocks anon reads on founding_applications.
   // We only return an aggregate count, never PII.
   const supa = createClient<Database>(url, service, {
@@ -731,7 +731,7 @@ export const foundingStats = createServerFn({ method: "GET" }).handler(async () 
     const ts = r.approved_at || r.created_at;
     return ts && ts >= monthStart && ts < monthEnd;
   }).length;
-  return { seatsFilled: filled, seatsTotal: 220, monthKey };
+  return { seatsFilled: filled, seatsTotal: 50, monthKey };
 });
 
 /* ---------------- Document submission tracking ---------------- */
