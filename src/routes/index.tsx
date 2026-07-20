@@ -260,9 +260,12 @@ function HomePage() {
         </div>
       </section>
 
+      {/* LIVE SIGNAL TICKER — last 48h broadcasted signals */}
+      <SignalTicker />
 
       {/* TERMINAL WORKSTATION */}
-      <section className="mx-auto max-w-6xl px-5 -mt-8 pb-14 sm:px-6 sm:-mt-12 sm:pb-20">
+      <section className="mx-auto max-w-6xl px-5 mt-8 pb-14 sm:px-6 sm:mt-10 sm:pb-20">
+
         <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
           {/* terminal header */}
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
