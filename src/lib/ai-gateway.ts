@@ -62,7 +62,23 @@ function providerConfigured(model: string): boolean {
   return Boolean(process.env.LOVABLE_API_KEY);
 }
 
+// -------- Per-worker model health cache -----------------------------------
+// When a model returns "model_not_found" (503/404) or a hard upstream error
+// (500 "do_request_failed", ngrok offline), we mark it unhealthy for a TTL
+// so the next chain-walk skips it instead of paying its full timeout.
+const modelUnhealthyUntil = new Map<string, number>();
+export function markModelUnhealthy(model: string, ttlMs: number): void {
+  modelUnhealthyUntil.set(model, Date.now() + ttlMs);
+}
+export function isModelUnhealthy(model: string): boolean {
+  const until = modelUnhealthyUntil.get(model);
+  if (!until) return false;
+  if (until < Date.now()) { modelUnhealthyUntil.delete(model); return false; }
+  return true;
+}
+
 export type UsageInfo = { promptTokens: number; completionTokens: number; totalTokens: number };
+
 
 async function singleAttempt(
   model: string,
@@ -195,8 +211,21 @@ async function singleAttempt(
     const raMs = ra ? (Number.isFinite(+ra) ? +ra * 1000 : Math.max(0, Date.parse(ra) - Date.now())) : 0;
     const e = new AiGatewayError(msg, res.status, terminal);
     (e as any).retryAfterMs = Number.isFinite(raMs) && raMs > 0 ? Math.min(raMs, 8000) : 0;
+    // Mark model unhealthy for TTL when it looks structurally dead
+    // (not just busy). This lets the runner skip it on the next call
+    // instead of burning retries + timeout on a known-dead upstream.
+    const bodyLower = txt.toLowerCase();
+    const modelNotFound = bodyLower.includes("model_not_found") || bodyLower.includes("no available channel");
+    const upstreamDead = bodyLower.includes("upstream error") || bodyLower.includes("do_request_failed") || bodyLower.includes("endpoint") && bodyLower.includes("offline") || bodyLower.includes("err_ngrok");
+    if (res.status === 404 || modelNotFound) {
+      markModelUnhealthy(model, 15 * 60 * 1000); // 15 min — model not provisioned
+    } else if (res.status >= 500 && upstreamDead) {
+      markModelUnhealthy(model, 5 * 60 * 1000);  // 5 min — upstream flaky
+    }
     throw e;
   }
+
+
 
   const json: any = await res.json();
   const content = json?.choices?.[0]?.message?.content;
@@ -235,8 +264,14 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
 
   const timeoutMs = opts.timeoutMs ?? 25000;
   const retriesPerModel = Math.max(1, opts.retriesPerModel ?? 3);
-  const models = opts.models.filter(Boolean).filter(providerConfigured);
-  if (!models.length) throw new AiGatewayError(`No configured AI provider for ${opts.stage ?? "AI call"}`, 0, true);
+  const configured = opts.models.filter(Boolean).filter(providerConfigured);
+  if (!configured.length) throw new AiGatewayError(`No configured AI provider for ${opts.stage ?? "AI call"}`, 0, true);
+  // Skip models that recently returned model_not_found or hard upstream errors.
+  // If every candidate is cooling, fall back to the original list so we still
+  // attempt (in case the outage cleared).
+  const healthy = configured.filter((m) => !isModelUnhealthy(m));
+  const models = healthy.length ? healthy : configured;
+
 
   let lastErr: AiGatewayError | null = null;
 
@@ -355,14 +390,18 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // Senior review = SEQUENTIAL "best-available" chain.
 // Ordered strongest → weakest. The runner tries #1 first; if that model is
 // down / rate-limited / times out, it hops to the next best one that responds.
-// This way the review is always done by the highest-quality Bluesminds model
-// that is currently live, never by a weaker default when a stronger one is up.
+// Health cache: markModelUnhealthy() is called automatically on 404 /
+// model_not_found / "upstream do_request_failed" / ngrok-offline, so the next
+// chain-walk skips a known-dead endpoint instead of paying its timeout.
+// TTLs: 15 min for "model_not_found" (not provisioned), 5 min for flaky
+// upstream. If every candidate is cooling, we still try the whole chain.
 // NOTE: `bmind/gpt-5.6-*` models return 503 "No available channel" on this
-// workspace's Bluesminds plan — they are not allocated. Kept OUT of every
-// chain so we don't burn a retry on a guaranteed failure. Working today:
-// gpt-5.5, gpt-5.2-chat, gpt-5-mini, gpt-4o-mini. Rate-limited-but-live:
-// claude-sonnet-4.5, claude-3.7-sonnet, deepseek-v4-pro/flash, grok-4.5,
-// gpt-4.1-mini — kept as later fallbacks.
+// workspace's Bluesminds plan — not allocated. Kept OUT so we don't waste
+// the first attempt marking them unhealthy. Working today: gpt-5-mini,
+// gpt-4o-mini. Intermittent: gpt-5.5 (upstream 500), gpt-5.2-chat (proxy
+// 404). Rate-limited-but-live premium: claude-sonnet-4.5, claude-3.7-sonnet,
+// deepseek-v4-pro/flash, grok-4.5, gpt-4.1-mini — kept as final fallbacks.
+
 export const MODEL_CHAIN = {
   intent: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-4o-mini"],
   narration: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
