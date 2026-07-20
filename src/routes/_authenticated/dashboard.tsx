@@ -104,6 +104,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/dashboard/documents", label: "Documents", icon: "verified_user" },
       { to: "/dashboard/profile", label: "Profile", icon: "person_pin" },
       { to: "/dashboard/security", label: "Security", icon: "encrypted" },
+      { to: "/dashboard/risk", label: "Risk", icon: "shield" },
       { to: "/help", label: "Help Center", icon: "lightbulb" },
     ],
   },
