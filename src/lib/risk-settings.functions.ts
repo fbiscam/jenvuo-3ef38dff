@@ -83,8 +83,8 @@ export const getRiskContext = createServerFn({ method: "POST" })
       .maybeSingle();
     const settings: RiskSettings = s
       ? {
-          account_balance_usd: Number(s.account_balance_usd ?? 1000),
-          risk_pct: Number(s.risk_pct ?? 1),
+          account_balance_usd: Number(s.account_balance_usd ?? DEFAULTS.account_balance_usd),
+          risk_pct: Number(s.risk_pct ?? DEFAULTS.risk_pct),
           daily_loss_limit_usd:
             s.daily_loss_limit_usd == null ? null : Number(s.daily_loss_limit_usd),
           kill_switch_enabled: Boolean(s.kill_switch_enabled),
