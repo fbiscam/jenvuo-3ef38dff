@@ -18,6 +18,9 @@ export type WeightConfigRow = {
   retired_at: string | null;
   created_at: string;
   weights: FactorWeightsByAsset;
+  validated: boolean;
+  validated_at: string | null;
+  validation_summary: Record<string, unknown> | null;
 };
 
 export const listWeightConfigs = createServerFn({ method: "GET" })
