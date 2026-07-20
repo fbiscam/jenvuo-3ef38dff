@@ -241,7 +241,7 @@ function InsightsPage() {
                 return (
                   <button
                     key={f.id}
-                    onClick={() => setFilter(f.id)}
+                    onClick={() => onFilterChange(f.id)}
                     className={`px-4 py-1.5 rounded-full transition-colors ${
                       active
                         ? "bg-zinc-900 text-white shadow-sm"
