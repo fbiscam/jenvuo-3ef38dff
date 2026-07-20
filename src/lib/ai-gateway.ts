@@ -364,7 +364,7 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // claude-sonnet-4.5, claude-3.7-sonnet, deepseek-v4-pro/flash, grok-4.5,
 // gpt-4.1-mini — kept as later fallbacks.
 export const MODEL_CHAIN = {
-  intent: ["bmind/gpt-5.2-chat", "bmind/gpt-4o-mini"],
+  intent: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-4o-mini"],
   narration: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
   seniorReview: [
     "bmind/gpt-5.5",
@@ -379,26 +379,29 @@ export const MODEL_CHAIN = {
     "bmind/deepseek-v4-flash",
   ],
   macroContext: [
-    "bmind/gpt-4o-mini",
+    "bmind/gpt-5.5",
     "bmind/gpt-5.2-chat",
+    "bmind/gpt-4o-mini",
     "bmind/gpt-5-mini",
     "bmind/gpt-4.1-mini",
     "bmind/claude-3.7-sonnet",
     "bmind/deepseek-v4-flash",
     "bmind/grok-4.5",
   ],
-  chat: ["bmind/gpt-5.2-chat", "bmind/gpt-5.5"],
+  chat: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat"],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = [
-  "bmind/gpt-4o-mini",
+  "bmind/gpt-5.5",
   "bmind/gpt-5.2-chat",
+  "bmind/gpt-4o-mini",
   "bmind/gpt-5-mini",
   "bmind/gpt-4.1-mini",
   "bmind/claude-3.7-sonnet",
   "bmind/deepseek-v4-flash",
   "bmind/grok-4.5",
 ] as const;
+
 
 export const SENIOR_REVIEW_CHAIN = [
   "bmind/gpt-5.5",
