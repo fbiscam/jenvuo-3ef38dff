@@ -264,8 +264,14 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
 
   const timeoutMs = opts.timeoutMs ?? 25000;
   const retriesPerModel = Math.max(1, opts.retriesPerModel ?? 3);
-  const models = opts.models.filter(Boolean).filter(providerConfigured);
-  if (!models.length) throw new AiGatewayError(`No configured AI provider for ${opts.stage ?? "AI call"}`, 0, true);
+  const configured = opts.models.filter(Boolean).filter(providerConfigured);
+  if (!configured.length) throw new AiGatewayError(`No configured AI provider for ${opts.stage ?? "AI call"}`, 0, true);
+  // Skip models that recently returned model_not_found or hard upstream errors.
+  // If every candidate is cooling, fall back to the original list so we still
+  // attempt (in case the outage cleared).
+  const healthy = configured.filter((m) => !isModelUnhealthy(m));
+  const models = healthy.length ? healthy : configured;
+
 
   let lastErr: AiGatewayError | null = null;
 
