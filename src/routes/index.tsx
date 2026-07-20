@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
-import { SignalTicker } from "@/components/SignalTicker";
+
 import { DeskStatsStrip } from "@/components/DeskStatsStrip";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
@@ -261,8 +261,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* LIVE SIGNAL TICKER — last 48h broadcasted signals */}
-      <SignalTicker />
 
       {/* DESK STATS — live social proof */}
       <DeskStatsStrip />
