@@ -5,7 +5,7 @@ import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 
-import { DeskStatsStrip } from "@/components/DeskStatsStrip";
+
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
@@ -258,8 +258,6 @@ function HomePage() {
       </section>
 
 
-      {/* DESK STATS — live social proof */}
-      <DeskStatsStrip />
 
       {/* TERMINAL WORKSTATION */}
       <section className="mx-auto max-w-6xl px-5 mt-8 pb-14 sm:px-6 sm:mt-10 sm:pb-20">
