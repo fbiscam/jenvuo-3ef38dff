@@ -303,6 +303,46 @@ function InsightsPage() {
             ))}
           </div>
 
+          {remaining.length === 0 && !featured && (
+            <div className="text-center py-16 text-sm text-zinc-500">
+              No briefings in this category yet.
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <nav aria-label="Insights pagination" className="mt-14 flex items-center justify-center gap-2">
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                ← Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <button
+                  key={n}
+                  onClick={() => goToPage(n)}
+                  aria-current={n === currentPage ? "page" : undefined}
+                  className={`min-w-[36px] rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                    n === currentPage
+                      ? "bg-zinc-900 text-white"
+                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Next →
+              </button>
+            </nav>
+          )}
+
+
           {/* LOAD MORE / NEWSLETTER */}
           <div className="mt-20 rounded-3xl bg-zinc-50 border border-zinc-200 p-8 sm:p-12 text-center text-zinc-900 relative overflow-hidden">
             <div className="absolute inset-0 opacity-[0.07]" style={{
