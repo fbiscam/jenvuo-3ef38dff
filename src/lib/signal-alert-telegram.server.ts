@@ -248,7 +248,7 @@ async function buildChartUrl(a: EnqueueAlertEmailsArgs): Promise<string> {
   return `https://quickchart.io/chart?bkg=white&w=1000&h=560&v=4&c=${encoded}`
 }
 
-function buildCaption(a: EnqueueAlertEmailsArgs, reason: string): string {
+function buildCaption(a: EnqueueAlertEmailsArgs, reason: string, sizeLine?: string): string {
   const round = (n: number) => Number(n.toFixed(a.decimals)).toFixed(a.decimals)
   const title = `${a.direction} · ${a.pair}`
   const lines = [
@@ -264,6 +264,7 @@ function buildCaption(a: EnqueueAlertEmailsArgs, reason: string): string {
     a.session ? `Session: <b>${escapeHtml(a.session)}</b>` : '',
     a.killzone ? `Killzone: <b>${escapeHtml(a.killzone)}</b>` : '',
     a.htfBias ? `HTF bias: <b>${escapeHtml(a.htfBias)}</b>` : '',
+    sizeLine ? `Suggested size: <b>${escapeHtml(sizeLine)}</b>` : '',
     ``,
     `<b>Why this ${a.direction.toLowerCase()}:</b>`,
     escapeHtml(reason),
@@ -276,9 +277,9 @@ function buildCaption(a: EnqueueAlertEmailsArgs, reason: string): string {
   return caption
 }
 
-async function sendOne(botToken: string, chatId: string, a: EnqueueAlertEmailsArgs, reason: string): Promise<void> {
+async function sendOne(botToken: string, chatId: string, a: EnqueueAlertEmailsArgs, reason: string, sizeLine?: string): Promise<void> {
   const photo = await buildChartUrl(a)
-  const caption = buildCaption(a, reason)
+  const caption = buildCaption(a, reason, sizeLine)
   try {
     await tgApi(botToken, 'sendPhoto', {
       chat_id: chatId,
