@@ -72,7 +72,7 @@ export function OnboardingTour() {
         className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-[0_24px_60px_-20px_rgba(24,24,27,0.25)] animate-scale-in"
       >
         <div className="mb-4 flex items-start justify-between">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900 text-white">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-900">
             <Icon className="h-5 w-5" />
           </div>
           <button
