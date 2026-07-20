@@ -3,9 +3,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { FactorWeightsByAsset } from "@/lib/analysis/engine";
 
 async function requireAdmin(supabase: any, userId: string) {
-  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error("Forbidden");
+  const { isAdminOrOpsUnlocked } = await import("@/lib/admin-guard.server");
+  const ok = await isAdminOrOpsUnlocked(supabase, userId);
+  if (!ok) throw new Error("Forbidden");
 }
 
 export type WeightConfigRow = {
