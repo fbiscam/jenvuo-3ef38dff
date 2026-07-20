@@ -390,14 +390,18 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // Senior review = SEQUENTIAL "best-available" chain.
 // Ordered strongest → weakest. The runner tries #1 first; if that model is
 // down / rate-limited / times out, it hops to the next best one that responds.
-// This way the review is always done by the highest-quality Bluesminds model
-// that is currently live, never by a weaker default when a stronger one is up.
+// Health cache: markModelUnhealthy() is called automatically on 404 /
+// model_not_found / "upstream do_request_failed" / ngrok-offline, so the next
+// chain-walk skips a known-dead endpoint instead of paying its timeout.
+// TTLs: 15 min for "model_not_found" (not provisioned), 5 min for flaky
+// upstream. If every candidate is cooling, we still try the whole chain.
 // NOTE: `bmind/gpt-5.6-*` models return 503 "No available channel" on this
-// workspace's Bluesminds plan — they are not allocated. Kept OUT of every
-// chain so we don't burn a retry on a guaranteed failure. Working today:
-// gpt-5.5, gpt-5.2-chat, gpt-5-mini, gpt-4o-mini. Rate-limited-but-live:
-// claude-sonnet-4.5, claude-3.7-sonnet, deepseek-v4-pro/flash, grok-4.5,
-// gpt-4.1-mini — kept as later fallbacks.
+// workspace's Bluesminds plan — not allocated. Kept OUT so we don't waste
+// the first attempt marking them unhealthy. Working today: gpt-5-mini,
+// gpt-4o-mini. Intermittent: gpt-5.5 (upstream 500), gpt-5.2-chat (proxy
+// 404). Rate-limited-but-live premium: claude-sonnet-4.5, claude-3.7-sonnet,
+// deepseek-v4-pro/flash, grok-4.5, gpt-4.1-mini — kept as final fallbacks.
+
 export const MODEL_CHAIN = {
   intent: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-4o-mini"],
   narration: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
