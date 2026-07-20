@@ -292,46 +292,142 @@ function TuningPage() {
           <table className="min-w-full text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500">
               <tr>
+                <th className="px-3 py-2 text-left"></th>
                 <th className="px-3 py-2 text-left">Version</th>
                 <th className="px-3 py-2 text-left">Source</th>
                 <th className="px-3 py-2 text-left">Status</th>
+                <th className="px-3 py-2 text-left">Validation</th>
                 <th className="px-3 py-2 text-left">Notes</th>
                 <th className="px-3 py-2 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {configs.map((c) => (
-                <tr key={c.id} className="border-t border-slate-100 align-top">
-                  <td className="px-3 py-2 font-medium text-slate-900">v{c.version}</td>
-                  <td className="px-3 py-2 text-slate-700">{c.created_by}</td>
-                  <td className="px-3 py-2">
-                    {c.status === "active" ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                        <CheckCircle2 className="h-3 w-3" /> Active
-                      </span>
-                    ) : c.status === "candidate" ? (
-                      <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
-                        Candidate
-                      </span>
-                    ) : (
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                        Retired
-                      </span>
+              {configs.map((c) => {
+                const s = (c.validation_summary ?? {}) as any;
+                const isOpen = expanded === c.id;
+                const folds = foldsByConfig[c.id] ?? [];
+                return (
+                  <>
+                    <tr key={c.id} className="border-t border-slate-100 align-top">
+                      <td className="px-3 py-2">
+                        <button onClick={() => toggleFolds(c.id)} className="text-slate-400 hover:text-slate-700">
+                          {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                        </button>
+                      </td>
+                      <td className="px-3 py-2 font-medium text-slate-900">v{c.version}</td>
+                      <td className="px-3 py-2 text-slate-700">{c.created_by}</td>
+                      <td className="px-3 py-2">
+                        {c.status === "active" ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                            <CheckCircle2 className="h-3 w-3" /> Active
+                          </span>
+                        ) : c.status === "candidate" ? (
+                          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+                            Candidate
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                            Retired
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-xs">
+                        {c.validated ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700">
+                            <ShieldCheck className="h-3 w-3" /> Passed
+                            {s.foldWinsForCandidate != null ? ` ${s.foldWinsForCandidate}/${s.folds ?? 5}` : ""}
+                          </span>
+                        ) : c.validation_summary ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 font-medium text-rose-700">
+                            <ShieldAlert className="h-3 w-3" /> Failed
+                            {s.foldWinsForCandidate != null ? ` ${s.foldWinsForCandidate}/${s.folds ?? 5}` : ""}
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-500">
+                            Not run
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-slate-600">{c.notes ?? "—"}</td>
+                      <td className="px-3 py-2 text-right">
+                        <div className="flex justify-end gap-1">
+                          {c.status !== "active" && c.status !== "retired" && (
+                            <button
+                              onClick={() => doValidate(c.id, c.version)}
+                              disabled={validatingId === c.id}
+                              className="rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                            >
+                              {validatingId === c.id ? "Validating…" : "Validate"}
+                            </button>
+                          )}
+                          {c.status !== "active" && (
+                            <button
+                              onClick={() => doActivate(c.id, c.version, c.validated)}
+                              className={
+                                c.validated
+                                  ? "rounded-lg bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
+                                  : "rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs text-rose-700 hover:bg-rose-50"
+                              }
+                            >
+                              {c.validated ? "Activate" : "Force activate"}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    {isOpen && (
+                      <tr className="border-t border-slate-100 bg-slate-50/60">
+                        <td colSpan={7} className="px-4 py-3">
+                          {folds.length === 0 ? (
+                            <div className="text-xs text-slate-500">No walk-forward folds recorded for this config yet.</div>
+                          ) : (
+                            <table className="min-w-full text-xs">
+                              <thead className="text-slate-500">
+                                <tr>
+                                  <th className="px-2 py-1 text-left">Fold</th>
+                                  <th className="px-2 py-1 text-left">OOS window</th>
+                                  <th className="px-2 py-1 text-right">Cand win %</th>
+                                  <th className="px-2 py-1 text-right">Cand avg R</th>
+                                  <th className="px-2 py-1 text-right">Sample</th>
+                                  <th className="px-2 py-1 text-right">Base win %</th>
+                                  <th className="px-2 py-1 text-right">Base avg R</th>
+                                  <th className="px-2 py-1 text-left">Beats baseline</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {folds.map((f) => {
+                                  const cm = (f.metrics ?? {}) as any;
+                                  const b = cm.baseline ?? {};
+                                  return (
+                                    <tr key={f.id} className="border-t border-slate-200/70">
+                                      <td className="px-2 py-1 text-slate-700">#{f.fold_index}</td>
+                                      <td className="px-2 py-1 text-slate-600">
+                                        {new Date(f.oos_start).toLocaleDateString()} → {new Date(f.oos_end).toLocaleDateString()}
+                                      </td>
+                                      <td className="px-2 py-1 text-right text-slate-700">{pct(f.win_rate)}</td>
+                                      <td className="px-2 py-1 text-right text-slate-700">{num(f.expectancy_r)}</td>
+                                      <td className="px-2 py-1 text-right text-slate-700">{f.sample_size}</td>
+                                      <td className="px-2 py-1 text-right text-slate-500">{pct(b.winRate)}</td>
+                                      <td className="px-2 py-1 text-right text-slate-500">{num(b.avgR)}</td>
+                                      <td className="px-2 py-1">
+                                        {f.passed ? (
+                                          <span className="text-emerald-700">✓</span>
+                                        ) : (
+                                          <span className="text-rose-700">✗</span>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          )}
+                        </td>
+                      </tr>
                     )}
-                  </td>
-                  <td className="px-3 py-2 text-slate-600">{c.notes ?? "—"}</td>
-                  <td className="px-3 py-2 text-right">
-                    {c.status !== "active" && (
-                      <button
-                        onClick={() => doActivate(c.id, c.version)}
-                        className="rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700 hover:bg-slate-50"
-                      >
-                        Activate
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                  </>
+                );
+              })}
             </tbody>
           </table>
         </div>
