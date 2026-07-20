@@ -2,13 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { RefreshCw, Play, CheckCircle2, RotateCcw } from "lucide-react";
+import { RefreshCw, Play, CheckCircle2, RotateCcw, ShieldCheck, ShieldAlert, ChevronDown, ChevronRight } from "lucide-react";
 import { isAdmin } from "@/lib/admin-messages.functions";
 import {
   listWeightConfigs, listTuningRuns, activateWeightConfig, rollbackWeightConfig,
-  type WeightConfigRow, type TuningRunRow,
+  listFoldResultsForConfig,
+  type WeightConfigRow, type TuningRunRow, type FoldResultRow,
 } from "@/lib/tuning/weights-admin.functions";
 import { runGridSearchTuning } from "@/lib/tuning/grid-search.functions";
+import { runWalkForwardValidation } from "@/lib/tuning/walk-forward.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/tuning")({
   head: () => ({
