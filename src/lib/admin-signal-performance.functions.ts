@@ -43,9 +43,9 @@ type Candle = { t: number; o: number; h: number; l: number; c: number };
 
 async function ensureAdmin(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin.rpc("has_role", { _user_id: userId, _role: "admin" as any });
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error("Forbidden");
+  const { isAdminOrOpsUnlocked } = await import("@/lib/admin-guard.server");
+  const ok = await isAdminOrOpsUnlocked(supabaseAdmin as any, userId);
+  if (!ok) throw new Error("Forbidden");
 }
 
 const YAHOO_MAP: Record<string, string> = {
