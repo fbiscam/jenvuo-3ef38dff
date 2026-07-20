@@ -237,7 +237,7 @@ async function buildChartUrl(a: EnqueueAlertEmailsArgs): Promise<string> {
     const r = await fetch('https://quickchart.io/chart/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chart: config, width: 1000, height: 560, backgroundColor: 'white', version: '4' }),
+      body: JSON.stringify({ chart: config, width: 1200, height: 680, backgroundColor: 'white', version: '4', devicePixelRatio: 2 }),
     })
     if (r.ok) {
       const j: { success?: boolean; url?: string } = await r.json()
