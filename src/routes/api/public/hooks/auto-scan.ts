@@ -428,30 +428,49 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             }
             let notified = 0;
             if (userIds.length > 0) {
+              const { getPersonalRiskMap } = await import(
+                "@/lib/personal-risk.server"
+              );
+              const riskMap = await getPersonalRiskMap(userIds, { entry, sl });
               const kz = plan.killzone ? ` · ${plan.killzone}` : "";
               const title = `${grade} ${dir} · ${pair} · ${session}${kz}`;
-              const body = `Entry ${round(entry)} · SL ${round(sl)} · TP ${round(tp)} · R:R ${rr.toFixed(2)} · ${Math.round(conf)}% conf`;
-              const rows = userIds.map((uid) => ({
-                user_id: uid,
-                type: "signal_alert",
-                title,
-                body,
-                data: {
-                  alert_id: inserted.id,
-                  pair,
-                  grade,
-                  direction: dir,
-                  entry: round(entry),
-                  sl: round(sl),
-                  tp: round(tp),
-                  rr: Number(rr.toFixed(2)),
-                  confidence: Math.round(conf),
-                  setup_score: setupScore,
-                  session,
-                  killzone: plan.killzone ?? null,
-                  source: "auto_scan",
-                },
-              }));
+              const rows = userIds.map((uid) => {
+                const personal = riskMap.get(uid);
+                const sizeNote = personal?.size?.note ?? "";
+                const body =
+                  `Entry ${round(entry)} · SL ${round(sl)} · TP ${round(tp)} · R:R ${rr.toFixed(2)} · ${Math.round(conf)}% conf` +
+                  (sizeNote ? ` · ${sizeNote}` : "");
+                return {
+                  user_id: uid,
+                  type: "signal_alert",
+                  title,
+                  body,
+                  data: {
+                    alert_id: inserted.id,
+                    pair,
+                    grade,
+                    direction: dir,
+                    entry: round(entry),
+                    sl: round(sl),
+                    tp: round(tp),
+                    rr: Number(rr.toFixed(2)),
+                    confidence: Math.round(conf),
+                    setup_score: setupScore,
+                    session,
+                    killzone: plan.killzone ?? null,
+                    source: "auto_scan",
+                    personal_risk: personal?.size
+                      ? {
+                          lots: personal.size.lots,
+                          units: personal.size.units,
+                          risk_usd: personal.size.riskUsd,
+                          balance_usd: personal.balance,
+                          risk_pct: personal.riskPct,
+                        }
+                      : null,
+                  },
+                };
+              });
               for (let i = 0; i < rows.length; i += 500) {
                 await supabaseAdmin
                   .from("user_notifications")
@@ -459,6 +478,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               }
               notified = rows.length;
             }
+
 
             // Enqueue emails to opted-in paid subscribers
             let emailed = 0;

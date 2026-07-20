@@ -71,6 +71,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
     const { filterAlertsEnabledUserIds } = await import('@/lib/alert-pref-filter.server')
     let recipientEmails: string[] = []
     let notifyUserIds: string[] = []
+    const emailToUserId = new Map<string, string>()
     {
       const { data: paidRows } = await supabaseAdmin
         .from('user_subscriptions')
@@ -93,46 +94,67 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
             // ignore individual failures
           }
         }
-        recipientEmails = Array.from(
-          new Set(
-            collected
-              .map((u) => (u.email ?? '').toLowerCase().trim())
-              .filter((e) => !!e && /.+@.+\..+/.test(e)),
-          ),
-        )
+        for (const c of collected) {
+          const em = (c.email ?? '').toLowerCase().trim()
+          if (em && /.+@.+\..+/.test(em)) emailToUserId.set(em, c.id)
+        }
+        recipientEmails = Array.from(new Set(Array.from(emailToUserId.keys())))
       }
     }
     const recipients: Array<{ email: string }> = recipientEmails.map((email) => ({ email }))
 
 
+
     // 3. Insert in-app notifications for allow-listed users only
 
     if (notifyUserIds.length > 0) {
+      const { getPersonalRiskMap } = await import('@/lib/personal-risk.server')
+      const riskMap = await getPersonalRiskMap(notifyUserIds, {
+        entry: data.entry,
+        sl: data.sl,
+      })
       const rationale = (data.rationale ?? '').slice(0, 500)
       const title = `${grade} ${data.direction} · ${pair}`
-      const body = `Entry ${round(data.entry)} · SL ${round(data.sl)} · TP ${round(data.tp)} · R:R ${data.rr.toFixed(2)}${rationale ? ` — ${rationale}` : ''}`
-      const rows = notifyUserIds.map((uid) => ({
-        user_id: uid,
-        type: 'signal_alert',
-        title,
-        body,
-        data: {
-          alert_id: inserted.id,
-          pair,
-          grade,
-          direction: data.direction,
-          entry: round(data.entry),
-          sl: round(data.sl),
-          tp: round(data.tp),
-          rr: Number(data.rr.toFixed(2)),
-          confidence: Math.round(data.confidence),
-          setup_score: scoreForGrade,
-        },
-      }))
+      const rows = notifyUserIds.map((uid) => {
+        const personal = riskMap.get(uid)
+        const sizeNote = personal?.size?.note ?? ''
+        const body =
+          `Entry ${round(data.entry)} · SL ${round(data.sl)} · TP ${round(data.tp)} · R:R ${data.rr.toFixed(2)}` +
+          (sizeNote ? ` · ${sizeNote}` : '') +
+          (rationale ? ` — ${rationale}` : '')
+        return {
+          user_id: uid,
+          type: 'signal_alert',
+          title,
+          body,
+          data: {
+            alert_id: inserted.id,
+            pair,
+            grade,
+            direction: data.direction,
+            entry: round(data.entry),
+            sl: round(data.sl),
+            tp: round(data.tp),
+            rr: Number(data.rr.toFixed(2)),
+            confidence: Math.round(data.confidence),
+            setup_score: scoreForGrade,
+            personal_risk: personal?.size
+              ? {
+                  lots: personal.size.lots,
+                  units: personal.size.units,
+                  risk_usd: personal.size.riskUsd,
+                  balance_usd: personal.balance,
+                  risk_pct: personal.riskPct,
+                }
+              : null,
+          },
+        }
+      })
       // Chunk to avoid oversize inserts
       for (let i = 0; i < rows.length; i += 500) {
         await supabaseAdmin.from('user_notifications').insert(rows.slice(i, i + 500))
       }
+
 
       // Also deliver an in-app @jenvu.email message from alerts@ to every paid user
       try {
@@ -199,8 +221,14 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       const { default: React } = await import('react')
       const { render } = await import('@react-email/render')
       const { template } = await import('@/lib/email-templates/signal-alert')
+      const { getPersonalRiskMap } = await import('@/lib/personal-risk.server')
 
-      const templateData = {
+      const riskMap = await getPersonalRiskMap(
+        Array.from(new Set(emailToUserId.values())),
+        { entry: data.entry, sl: data.sl },
+      )
+
+      const baseData = {
         pair,
         grade,
         direction: data.direction,
@@ -216,11 +244,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
         firedAt: inserted.fired_at,
         signalUrl: 'https://jenvu.com/signal',
       }
-      const element = React.createElement(template.component, templateData)
-      const html = await render(element)
-      const text = await render(element, { plainText: true })
-      const subject =
-        typeof template.subject === 'function' ? template.subject(templateData) : template.subject
+
 
       for (const { email } of recipients) {
         const normalized = email.toLowerCase()
@@ -258,6 +282,24 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
           continue
         }
 
+        // Personalize this recipient's email with their risk-manager sizing
+        const uid = emailToUserId.get(normalized)
+        const personal = uid ? riskMap.get(uid) : undefined
+        const size = personal?.size ?? null
+        const templateData = {
+          ...baseData,
+          sizeLots: size ? size.lots.toFixed(2) : undefined,
+          sizeUnits: size ? String(size.units) : undefined,
+          sizeRiskUsd: size ? size.riskUsd.toFixed(2) : undefined,
+          sizeBalance: personal ? personal.balance.toFixed(2) : undefined,
+          sizeRiskPct: personal ? personal.riskPct.toFixed(2) : undefined,
+        }
+        const element = React.createElement(template.component, templateData)
+        const html = await render(element)
+        const text = await render(element, { plainText: true })
+        const subject =
+          typeof template.subject === 'function' ? template.subject(templateData) : template.subject
+
         const messageId = crypto.randomUUID()
         const idempotencyKey = `alert-${inserted.id}-${normalized}`
 
@@ -267,6 +309,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
           recipient_email: normalized,
           status: 'pending',
         })
+
 
         const { error: enqErr } = await supabaseAdmin.rpc('enqueue_email', {
           queue_name: 'transactional_emails',

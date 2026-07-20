@@ -6,6 +6,8 @@ import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
 import { useServerFn } from "@tanstack/react-start";
 import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
+import { getRiskSettings } from "@/lib/risk-settings.functions";
+import { computePositionSize } from "@/lib/risk-manager";
 import { Bell, BellOff, Loader2, Send } from "lucide-react";
 import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
 import { cn } from "@/lib/utils";
@@ -99,6 +101,7 @@ function AlertPrefs() {
   const connectTelegramFn = useServerFn(connectTelegramAlertLink);
   const setTelegramEnabledFn = useServerFn(setTelegramAlertEnabled);
   const disconnectTelegramFn = useServerFn(disconnectTelegramAlertLink);
+  const getRisk = useServerFn(getRiskSettings);
   const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
   const [alertsSaving, setAlertsSaving] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState("");
@@ -110,6 +113,19 @@ function AlertPrefs() {
   const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false);
   const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
   const canConnectTelegram = chatIdValid && !telegramSaving;
+
+  const [risk, setRisk] = useState<{ balance: number; pct: number } | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getRisk()
+      .then((r) => {
+        if (cancelled) return;
+        setRisk({ balance: r.account_balance_usd, pct: r.risk_pct });
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [getRisk]);
+
 
   const [ipTimezone, setIpTimezone] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
@@ -462,7 +478,7 @@ function AlertPrefs() {
             <table className="w-full min-w-[780px] sm:min-w-0 text-sm">
               <thead className="bg-zinc-50 text-center font-mono text-[10px] uppercase tracking-wider text-zinc-500">
                 <tr>
-                  {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Time", ""].map((h, i) => (
+                  {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Your Size", "Time", ""].map((h, i) => (
                     <th key={i} className="px-3 py-2 font-medium">{h}</th>
                   ))}
                 </tr>
@@ -494,6 +510,21 @@ function AlertPrefs() {
                       <td className="px-3 py-2.5 font-mono text-xs text-emerald-600">{a.tp}</td>
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-700">{a.rr}</td>
                       <td className="px-3 py-2.5 text-[11px] font-medium text-zinc-700">{a.confidence}%</td>
+                      <td className="px-3 py-2.5 font-mono text-[11px] text-zinc-800 whitespace-nowrap">
+                        {(() => {
+                          if (!risk) return <span className="text-zinc-300">—</span>;
+                          const entryN = Number(a.entry);
+                          const slN = Number(a.sl);
+                          if (!Number.isFinite(entryN) || !Number.isFinite(slN)) return <span className="text-zinc-300">—</span>;
+                          const sz = computePositionSize({ balanceUsd: risk.balance, riskPct: risk.pct, entry: entryN, sl: slN });
+                          if (!sz) return <span className="text-zinc-300">—</span>;
+                          return (
+                            <span title={`Balance $${risk.balance.toFixed(2)} · Risk ${risk.pct}% ($${sz.riskUsd.toFixed(2)})`}>
+                              {sz.lots.toFixed(2)} lot
+                            </span>
+                          );
+                        })()}
+                      </td>
                       <td className="px-3 py-2.5 text-[10px] text-zinc-400 whitespace-nowrap">{ago}</td>
                       <td className="px-3 py-2.5 whitespace-nowrap">
                         {withinHour ? (

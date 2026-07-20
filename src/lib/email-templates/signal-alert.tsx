@@ -29,6 +29,12 @@ interface Props {
   rationale?: string
   firedAt?: string
   signalUrl?: string
+  // Personalized position sizing (from user's /dashboard/risk settings)
+  sizeLots?: string
+  sizeUnits?: string
+  sizeRiskUsd?: string
+  sizeBalance?: string
+  sizeRiskPct?: string
 }
 
 const SITE = 'https://jenvu.com'
@@ -57,8 +63,14 @@ const Email = ({
   rationale = 'High-confluence institutional setup detected.',
   firedAt,
   signalUrl = `${SITE}/signal`,
+  sizeLots,
+  sizeUnits,
+  sizeRiskUsd,
+  sizeBalance,
+  sizeRiskPct,
 }: Props) => {
   const dirColor = direction === 'BUY' ? '#059669' : '#dc2626'
+  const hasSize = !!sizeLots
   return (
     <Html lang="en" dir="ltr">
       <Head><EmailFonts /></Head>
@@ -133,11 +145,43 @@ const Email = ({
               </table>
             </Section>
 
+            {hasSize ? (
+              <Section style={sizeBox}>
+                <Text style={sizeHeader}>YOUR SUGGESTED POSITION</Text>
+                <table width="100%" cellPadding={0} cellSpacing={0} border={0}>
+                  <tbody>
+                    <tr>
+                      <td style={sizeCell}>
+                        <div style={tradeLabel}>LOT SIZE</div>
+                        <div style={tradeValue}>{sizeLots}</div>
+                      </td>
+                      <td style={sizeCell}>
+                        <div style={tradeLabel}>UNITS (OZ)</div>
+                        <div style={tradeValue}>{sizeUnits}</div>
+                      </td>
+                      <td style={sizeCellLast}>
+                        <div style={tradeLabel}>RISK</div>
+                        <div style={tradeValue}>${sizeRiskUsd}</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3} style={tradeFooter}>
+                        Based on balance <strong style={{ color: '#09090b' }}>${sizeBalance}</strong>
+                        &nbsp;·&nbsp; risk <strong style={{ color: '#09090b' }}>{sizeRiskPct}%</strong>
+                        &nbsp;·&nbsp; from your Risk Manager
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </Section>
+            ) : null}
+
             <Section style={{ padding: '8px 0 0' }}>
               <Link href={signalUrl} style={cta}>
                 Open signal desk →
               </Link>
             </Section>
+
 
             <Text style={fineprint}>
               Trade at your own risk. This is institutional analysis, not financial advice.
@@ -275,6 +319,30 @@ const tradeCell: React.CSSProperties = {
   width: '33.33%',
 }
 const tradeCellLast: React.CSSProperties = { ...tradeCell, borderRight: 'none' }
+const sizeBox: React.CSSProperties = {
+  border: '1px solid #e4e4e7',
+  borderRadius: 12,
+  overflow: 'hidden',
+  margin: '14px 0 0 0',
+  backgroundColor: '#fafafa',
+}
+const sizeHeader: React.CSSProperties = {
+  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
+  fontSize: 10,
+  letterSpacing: '0.22em',
+  color: '#71717a',
+  padding: '10px 12px 4px',
+  margin: 0,
+  fontWeight: 700,
+}
+const sizeCell: React.CSSProperties = {
+  padding: '12px 12px',
+  borderRight: '1px solid #e4e4e7',
+  textAlign: 'center',
+  backgroundColor: '#ffffff',
+  width: '33.33%',
+}
+const sizeCellLast: React.CSSProperties = { ...sizeCell, borderRight: 'none' }
 const tradeLabel: React.CSSProperties = {
   fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 9,
