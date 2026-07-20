@@ -10,7 +10,7 @@ import { submitFoundingApplication, foundingStats } from "@/lib/founding.functio
 export const Route = createFileRoute("/founding")({
   head: () => ({
     meta: [
-      { title: "Founding Trader Program" },
+      { title: "Founding Trader Program — Jenvu" },
       {
         name: "description",
         content:
