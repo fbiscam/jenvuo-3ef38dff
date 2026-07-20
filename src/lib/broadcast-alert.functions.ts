@@ -282,6 +282,24 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
           continue
         }
 
+        // Personalize this recipient's email with their risk-manager sizing
+        const uid = emailToUserId.get(normalized)
+        const personal = uid ? riskMap.get(uid) : undefined
+        const size = personal?.size ?? null
+        const templateData = {
+          ...baseData,
+          sizeLots: size ? size.lots.toFixed(2) : undefined,
+          sizeUnits: size ? String(size.units) : undefined,
+          sizeRiskUsd: size ? size.riskUsd.toFixed(2) : undefined,
+          sizeBalance: personal ? personal.balance.toFixed(2) : undefined,
+          sizeRiskPct: personal ? personal.riskPct.toFixed(2) : undefined,
+        }
+        const element = React.createElement(template.component, templateData)
+        const html = await render(element)
+        const text = await render(element, { plainText: true })
+        const subject =
+          typeof template.subject === 'function' ? template.subject(templateData) : template.subject
+
         const messageId = crypto.randomUUID()
         const idempotencyKey = `alert-${inserted.id}-${normalized}`
 
@@ -291,6 +309,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
           recipient_email: normalized,
           status: 'pending',
         })
+
 
         const { error: enqErr } = await supabaseAdmin.rpc('enqueue_email', {
           queue_name: 'transactional_emails',
