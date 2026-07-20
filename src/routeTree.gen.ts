@@ -87,6 +87,7 @@ import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './route
 import { Route as AuthenticatedDashboardAdminFoundingRouteImport } from './routes/_authenticated/dashboard.admin.founding'
 import { Route as AuthenticatedDashboardAdminDocumentsRouteImport } from './routes/_authenticated/dashboard.admin.documents'
 import { Route as AuthenticatedDashboardAdminAutoScanRouteImport } from './routes/_authenticated/dashboard.admin.auto-scan'
+import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './routes/_authenticated/dashboard.admin.accuracy'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -508,6 +509,12 @@ const AuthenticatedDashboardAdminAutoScanRoute =
     path: '/admin/auto-scan',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardAdminAccuracyRoute =
+  AuthenticatedDashboardAdminAccuracyRouteImport.update({
+    id: '/admin/accuracy',
+    path: '/admin/accuracy',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -565,6 +572,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
+  '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
   '/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
   '/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
   '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
@@ -640,6 +648,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
+  '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
   '/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
   '/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
   '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
@@ -721,6 +730,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
+  '/_authenticated/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
   '/_authenticated/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
   '/_authenticated/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
   '/_authenticated/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
@@ -802,6 +812,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/dashboard/'
     | '/help/$collection/'
+    | '/dashboard/admin/accuracy'
     | '/dashboard/admin/auto-scan'
     | '/dashboard/admin/documents'
     | '/dashboard/admin/founding'
@@ -877,6 +888,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/dashboard'
     | '/help/$collection'
+    | '/dashboard/admin/accuracy'
     | '/dashboard/admin/auto-scan'
     | '/dashboard/admin/documents'
     | '/dashboard/admin/founding'
@@ -957,6 +969,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
+    | '/_authenticated/dashboard/admin/accuracy'
     | '/_authenticated/dashboard/admin/auto-scan'
     | '/_authenticated/dashboard/admin/documents'
     | '/_authenticated/dashboard/admin/founding'
@@ -1581,6 +1594,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminAutoScanRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/admin/accuracy': {
+      id: '/_authenticated/dashboard/admin/accuracy'
+      path: '/admin/accuracy'
+      fullPath: '/dashboard/admin/accuracy'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminAccuracyRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
   }
 }
 
@@ -1598,6 +1618,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardUsageRoute: typeof AuthenticatedDashboardUsageRoute
   AuthenticatedDashboardWorkspaceRoute: typeof AuthenticatedDashboardWorkspaceRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardAdminAccuracyRoute: typeof AuthenticatedDashboardAdminAccuracyRoute
   AuthenticatedDashboardAdminAutoScanRoute: typeof AuthenticatedDashboardAdminAutoScanRoute
   AuthenticatedDashboardAdminDocumentsRoute: typeof AuthenticatedDashboardAdminDocumentsRoute
   AuthenticatedDashboardAdminFoundingRoute: typeof AuthenticatedDashboardAdminFoundingRoute
@@ -1624,6 +1645,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardUsageRoute: AuthenticatedDashboardUsageRoute,
     AuthenticatedDashboardWorkspaceRoute: AuthenticatedDashboardWorkspaceRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+    AuthenticatedDashboardAdminAccuracyRoute:
+      AuthenticatedDashboardAdminAccuracyRoute,
     AuthenticatedDashboardAdminAutoScanRoute:
       AuthenticatedDashboardAdminAutoScanRoute,
     AuthenticatedDashboardAdminDocumentsRoute:
