@@ -73,6 +73,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
 import { Route as ApiPublicHooksReindexInsightsRouteImport } from './routes/api/public/hooks/reindex-insights'
+import { Route as ApiPublicHooksPaperTradeResolverRouteImport } from './routes/api/public/hooks/paper-trade-resolver'
 import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/api/public/hooks/notify-subscribers'
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
@@ -425,6 +426,12 @@ const ApiPublicHooksReindexInsightsRoute =
     path: '/api/public/hooks/reindex-insights',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksPaperTradeResolverRoute =
+  ApiPublicHooksPaperTradeResolverRouteImport.update({
+    id: '/api/public/hooks/paper-trade-resolver',
+    path: '/api/public/hooks/paper-trade-resolver',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksNotifySubscribersRoute =
   ApiPublicHooksNotifySubscribersRouteImport.update({
     id: '/api/public/hooks/notify-subscribers',
@@ -571,6 +578,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -645,6 +653,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -725,6 +734,7 @@ export interface FileRoutesById {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -805,6 +815,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/telegram/webhook'
@@ -879,6 +890,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/telegram/webhook'
@@ -958,6 +970,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/telegram/webhook'
@@ -1009,6 +1022,7 @@ export interface RootRouteChildren {
   ApiPublicHooksGenerateBriefRoute: typeof ApiPublicHooksGenerateBriefRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
   ApiPublicHooksNotifySubscribersRoute: typeof ApiPublicHooksNotifySubscribersRoute
+  ApiPublicHooksPaperTradeResolverRoute: typeof ApiPublicHooksPaperTradeResolverRoute
   ApiPublicHooksReindexInsightsRoute: typeof ApiPublicHooksReindexInsightsRoute
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
@@ -1469,6 +1483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksReindexInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/paper-trade-resolver': {
+      id: '/api/public/hooks/paper-trade-resolver'
+      path: '/api/public/hooks/paper-trade-resolver'
+      fullPath: '/api/public/hooks/paper-trade-resolver'
+      preLoaderRoute: typeof ApiPublicHooksPaperTradeResolverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/notify-subscribers': {
       id: '/api/public/hooks/notify-subscribers'
       path: '/api/public/hooks/notify-subscribers'
@@ -1722,6 +1743,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksGenerateBriefRoute: ApiPublicHooksGenerateBriefRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
   ApiPublicHooksNotifySubscribersRoute: ApiPublicHooksNotifySubscribersRoute,
+  ApiPublicHooksPaperTradeResolverRoute: ApiPublicHooksPaperTradeResolverRoute,
   ApiPublicHooksReindexInsightsRoute: ApiPublicHooksReindexInsightsRoute,
   ApiPublicHooksScanSignalsRoute: ApiPublicHooksScanSignalsRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
