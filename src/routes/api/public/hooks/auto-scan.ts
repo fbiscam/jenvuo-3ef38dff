@@ -389,9 +389,11 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               alert_id: inserted.id,
               notified,
               emailed,
+              charged,
               conf,
               dir,
             });
+
           } catch (err) {
             results.push({
               pair,
