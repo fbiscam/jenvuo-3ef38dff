@@ -110,6 +110,20 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               continue;
             }
 
+            // Killzone gate — only fire during London / NY AM / NY PM / Asia
+            // killzones. Outside-killzone tape is thin and produces low-quality
+            // signals (documented losers), so skip broadcasting entirely.
+            const kz = String(plan.killzone ?? "");
+            const inKillzone = /Killzone/i.test(kz) && !/Outside/i.test(kz);
+            if (!inKillzone) {
+              await supabaseAdmin
+                .from("auto_scan_state")
+                .delete()
+                .eq("pair", pair);
+              results.push({ pair, action: "outside_killzone", conf, killzone: kz });
+              continue;
+            }
+
             // Check existing state
             const { data: state } = await supabaseAdmin
               .from("auto_scan_state")
