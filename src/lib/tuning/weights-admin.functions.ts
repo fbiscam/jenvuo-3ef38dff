@@ -40,7 +40,7 @@ export type TuningRunRow = {
   range_end: string;
   combinations_tested: number;
   best_config_id: string | null;
-  metrics: Record<string, unknown>;
+  metrics: Record<string, unknown> | null;
   status: "running" | "completed" | "failed";
   started_at: string;
   finished_at: string | null;
