@@ -77,6 +77,7 @@ import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
 import { Route as ApiPublicHooksAutoScanRouteImport } from './routes/api/public/hooks/auto-scan'
 import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/brief-audio.$id'
+import { Route as AuthenticatedDashboardAdminTvMismatchRouteImport } from './routes/_authenticated/dashboard.admin.tv-mismatch'
 import { Route as AuthenticatedDashboardAdminSubscribersRouteImport } from './routes/_authenticated/dashboard.admin.subscribers'
 import { Route as AuthenticatedDashboardAdminScanAuditRouteImport } from './routes/_authenticated/dashboard.admin.scan-audit'
 import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './routes/_authenticated/dashboard.admin.messages'
@@ -444,6 +445,12 @@ const ApiPublicBriefAudioIdRoute = ApiPublicBriefAudioIdRouteImport.update({
   path: '/api/public/brief-audio/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardAdminTvMismatchRoute =
+  AuthenticatedDashboardAdminTvMismatchRouteImport.update({
+    id: '/admin/tv-mismatch',
+    path: '/admin/tv-mismatch',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardAdminSubscribersRoute =
   AuthenticatedDashboardAdminSubscribersRouteImport.update({
     id: '/admin/subscribers',
@@ -542,6 +549,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
+  '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
@@ -613,6 +621,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
+  '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
@@ -690,6 +699,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
   '/_authenticated/dashboard/admin/scan-audit': typeof AuthenticatedDashboardAdminScanAuditRoute
   '/_authenticated/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
+  '/_authenticated/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
@@ -767,6 +777,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/messages'
     | '/dashboard/admin/scan-audit'
     | '/dashboard/admin/subscribers'
+    | '/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/generate-brief'
@@ -838,6 +849,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/messages'
     | '/dashboard/admin/scan-audit'
     | '/dashboard/admin/subscribers'
+    | '/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/generate-brief'
@@ -914,6 +926,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/messages'
     | '/_authenticated/dashboard/admin/scan-audit'
     | '/_authenticated/dashboard/admin/subscribers'
+    | '/_authenticated/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/generate-brief'
@@ -1458,6 +1471,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBriefAudioIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/admin/tv-mismatch': {
+      id: '/_authenticated/dashboard/admin/tv-mismatch'
+      path: '/admin/tv-mismatch'
+      fullPath: '/dashboard/admin/tv-mismatch'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminTvMismatchRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/admin/subscribers': {
       id: '/_authenticated/dashboard/admin/subscribers'
       path: '/admin/subscribers'
@@ -1522,6 +1542,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAdminMessagesRoute: typeof AuthenticatedDashboardAdminMessagesRoute
   AuthenticatedDashboardAdminScanAuditRoute: typeof AuthenticatedDashboardAdminScanAuditRoute
   AuthenticatedDashboardAdminSubscribersRoute: typeof AuthenticatedDashboardAdminSubscribersRoute
+  AuthenticatedDashboardAdminTvMismatchRoute: typeof AuthenticatedDashboardAdminTvMismatchRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -1551,6 +1572,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardAdminScanAuditRoute,
     AuthenticatedDashboardAdminSubscribersRoute:
       AuthenticatedDashboardAdminSubscribersRoute,
+    AuthenticatedDashboardAdminTvMismatchRoute:
+      AuthenticatedDashboardAdminTvMismatchRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =
