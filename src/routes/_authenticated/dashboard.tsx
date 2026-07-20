@@ -84,6 +84,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     items: [
       { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
       { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats" },
+      { to: "/dashboard/risk", label: "Risk", icon: "shield" },
       { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3" },
     ],
   },
@@ -104,7 +105,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/dashboard/documents", label: "Documents", icon: "verified_user" },
       { to: "/dashboard/profile", label: "Profile", icon: "person_pin" },
       { to: "/dashboard/security", label: "Security", icon: "encrypted" },
-      { to: "/dashboard/risk", label: "Risk", icon: "shield" },
       { to: "/help", label: "Help Center", icon: "lightbulb" },
     ],
   },
