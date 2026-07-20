@@ -12,6 +12,7 @@ import { Bell, BellOff, Loader2, Send } from "lucide-react";
 import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
 import { cn } from "@/lib/utils";
 import userinfobotLogo from "@/assets/userinfobot.jpg.asset.json";
+import xauLogo from "@/assets/xau-gold.png.asset.json";
 import {
   AlertDialog,
   AlertDialogAction,
