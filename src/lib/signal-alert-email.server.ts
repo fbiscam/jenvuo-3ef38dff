@@ -51,16 +51,21 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
 
 
   // Fetch emails via Auth Admin API (PostgREST doesn't expose the auth schema).
-  const emailsById: Array<{ id: string; email: string | null }> = []
-  for (const uid of paidIds) {
-    try {
-      const { data, error } = await supabaseAdmin.auth.admin.getUserById(uid)
-      if (error) continue
-      emailsById.push({ id: uid, email: data.user?.email ?? null })
-    } catch {
-      // swallow — one bad lookup shouldn't kill the whole broadcast
-    }
-  }
+  // Run lookups in parallel so a large paid-user list doesn't serialize into a
+  // multi-second stall that starves the enqueue budget mid-broadcast.
+  const emailsById: Array<{ id: string; email: string | null }> = (
+    await Promise.all(
+      paidIds.map(async (uid) => {
+        try {
+          const { data, error } = await supabaseAdmin.auth.admin.getUserById(uid)
+          if (error) return null
+          return { id: uid, email: data.user?.email ?? null }
+        } catch {
+          return null
+        }
+      }),
+    )
+  ).filter((r): r is { id: string; email: string | null } => r !== null)
   const recipients = Array.from(
     new Set(
       emailsById
