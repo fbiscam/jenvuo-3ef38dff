@@ -78,7 +78,7 @@ export const Route = createFileRoute("/insights/")({
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 9;
 
 function InsightsPage() {
   const { data: insights } = useSuspenseQuery(insightsQueryOptions);
