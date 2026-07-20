@@ -27,13 +27,13 @@ export async function getPersonalRiskMap(
   const byUser = new Map<string, { balance: number; riskPct: number }>()
   for (const r of data ?? []) {
     byUser.set(r.user_id, {
-      balance: Number(r.account_balance_usd ?? 1000),
+      balance: Number(r.account_balance_usd ?? 10),
       riskPct: Number(r.risk_pct ?? 1),
     })
   }
 
   for (const uid of userIds) {
-    const s = byUser.get(uid) ?? { balance: 1000, riskPct: 1 }
+    const s = byUser.get(uid) ?? { balance: 10, riskPct: 1 }
     const size = computePositionSize({
       balanceUsd: s.balance,
       riskPct: s.riskPct,

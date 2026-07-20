@@ -330,7 +330,7 @@ export async function sendSignalAlertTelegrams(a: EnqueueAlertEmailsArgs): Promi
   const riskByUser = new Map<string, { balance: number; pct: number }>()
   for (const r of riskRows ?? []) {
     riskByUser.set(r.user_id, {
-      balance: Number(r.account_balance_usd ?? 1000),
+      balance: Number(r.account_balance_usd ?? 10),
       pct: Number(r.risk_pct ?? 1),
     })
   }
@@ -339,7 +339,7 @@ export async function sendSignalAlertTelegrams(a: EnqueueAlertEmailsArgs): Promi
   let sent = 0
   for (const row of rows) {
     try {
-      const risk = riskByUser.get(row.user_id) ?? { balance: 1000, pct: 1 }
+      const risk = riskByUser.get(row.user_id) ?? { balance: 10, pct: 1 }
       const size = computePositionSize({
         balanceUsd: risk.balance,
         riskPct: risk.pct,
