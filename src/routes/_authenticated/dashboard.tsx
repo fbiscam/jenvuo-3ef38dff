@@ -15,6 +15,7 @@ import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
 import { getDefaultAvatar } from "@/lib/default-avatar";
+import OnboardingTour from "@/components/OnboardingTour";
 
 import {
   Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Power, Mic, Plus,
