@@ -45,6 +45,8 @@ function TuningPage() {
   const loadConfigs = useServerFn(listWeightConfigs);
   const loadRuns = useServerFn(listTuningRuns);
   const runGrid = useServerFn(runGridSearchTuning);
+  const runValidate = useServerFn(runWalkForwardValidation);
+  const loadFolds = useServerFn(listFoldResultsForConfig);
   const activate = useServerFn(activateWeightConfig);
   const rollback = useServerFn(rollbackWeightConfig);
 
@@ -54,6 +56,9 @@ function TuningPage() {
   const [configs, setConfigs] = useState<WeightConfigRow[]>([]);
   const [runs, setRuns] = useState<TuningRunRow[]>([]);
   const [symbol, setSymbol] = useState("XAUUSD");
+  const [validatingId, setValidatingId] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [foldsByConfig, setFoldsByConfig] = useState<Record<string, FoldResultRow[]>>({});
 
   const reload = async () => {
     setLoading(true);
@@ -134,12 +139,6 @@ function TuningPage() {
       toast.error(e?.message ?? "Rollback failed");
     }
   };
-
-  const runValidate = useServerFn(runWalkForwardValidation);
-  const loadFolds = useServerFn(listFoldResultsForConfig);
-  const [validatingId, setValidatingId] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [foldsByConfig, setFoldsByConfig] = useState<Record<string, FoldResultRow[]>>({});
 
   const doValidate = async (id: string, version: number) => {
     if (validatingId) return;
