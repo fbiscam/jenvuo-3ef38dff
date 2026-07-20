@@ -34,7 +34,7 @@ export async function isOpsUnlocked(): Promise<boolean> {
  * Use inside any admin-gated server function to allow ops-console access.
  */
 export async function isAdminOrOpsUnlocked(
-  supabase: { rpc: (fn: string, args: any) => Promise<{ data: any; error: any }> },
+  supabase: any,
   userId: string,
 ): Promise<boolean> {
   try {
