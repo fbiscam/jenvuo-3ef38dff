@@ -108,31 +108,53 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
     // 3. Insert in-app notifications for allow-listed users only
 
     if (notifyUserIds.length > 0) {
+      const { getPersonalRiskMap } = await import('@/lib/personal-risk.server')
+      const riskMap = await getPersonalRiskMap(notifyUserIds, {
+        entry: data.entry,
+        sl: data.sl,
+      })
       const rationale = (data.rationale ?? '').slice(0, 500)
       const title = `${grade} ${data.direction} · ${pair}`
-      const body = `Entry ${round(data.entry)} · SL ${round(data.sl)} · TP ${round(data.tp)} · R:R ${data.rr.toFixed(2)}${rationale ? ` — ${rationale}` : ''}`
-      const rows = notifyUserIds.map((uid) => ({
-        user_id: uid,
-        type: 'signal_alert',
-        title,
-        body,
-        data: {
-          alert_id: inserted.id,
-          pair,
-          grade,
-          direction: data.direction,
-          entry: round(data.entry),
-          sl: round(data.sl),
-          tp: round(data.tp),
-          rr: Number(data.rr.toFixed(2)),
-          confidence: Math.round(data.confidence),
-          setup_score: scoreForGrade,
-        },
-      }))
+      const rows = notifyUserIds.map((uid) => {
+        const personal = riskMap.get(uid)
+        const sizeNote = personal?.size?.note ?? ''
+        const body =
+          `Entry ${round(data.entry)} · SL ${round(data.sl)} · TP ${round(data.tp)} · R:R ${data.rr.toFixed(2)}` +
+          (sizeNote ? ` · ${sizeNote}` : '') +
+          (rationale ? ` — ${rationale}` : '')
+        return {
+          user_id: uid,
+          type: 'signal_alert',
+          title,
+          body,
+          data: {
+            alert_id: inserted.id,
+            pair,
+            grade,
+            direction: data.direction,
+            entry: round(data.entry),
+            sl: round(data.sl),
+            tp: round(data.tp),
+            rr: Number(data.rr.toFixed(2)),
+            confidence: Math.round(data.confidence),
+            setup_score: scoreForGrade,
+            personal_risk: personal?.size
+              ? {
+                  lots: personal.size.lots,
+                  units: personal.size.units,
+                  risk_usd: personal.size.riskUsd,
+                  balance_usd: personal.balance,
+                  risk_pct: personal.riskPct,
+                }
+              : null,
+          },
+        }
+      })
       // Chunk to avoid oversize inserts
       for (let i = 0; i < rows.length; i += 500) {
         await supabaseAdmin.from('user_notifications').insert(rows.slice(i, i + 500))
       }
+
 
       // Also deliver an in-app @jenvu.email message from alerts@ to every paid user
       try {
