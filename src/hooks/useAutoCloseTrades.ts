@@ -55,10 +55,11 @@ export function useAutoCloseTrades() {
       if (t.outcome !== "pending" || t.entry == null) return false;
       const px = livePrices[t.pair.toUpperCase()];
       if (px == null) return false;
+      // Fill only when live price is within a tight tolerance of entry.
+      // Direction-based inequalities were misfiring for stop entries and
+      // for trades whose price had already moved past entry.
       const tol = Math.max(t.entry * 0.0005, 0.01);
-      return Math.abs(px - t.entry) <= tol
-        || (t.direction === "long" && px <= t.entry)
-        || (t.direction === "short" && px >= t.entry);
+      return Math.abs(px - t.entry) <= tol;
     });
     if (!filling.length) return;
     (async () => {
