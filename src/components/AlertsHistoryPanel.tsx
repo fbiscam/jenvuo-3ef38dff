@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import type { SignalAlertRow } from '@/lib/signal-alerts.functions'
 import { cn } from '@/lib/utils'
+import { MiniPairChart } from '@/components/MiniPairChart'
+
 
 const MONO = 'font-mono'
 
@@ -21,6 +24,7 @@ export default function AlertsHistoryPanel({
   alerts: SignalAlertRow[]
   loading: boolean
 }) {
+  const [openId, setOpenId] = useState<string | null>(null)
   return (
     <div className="rounded-lg border border-zinc-200 bg-white">
       <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-100">
@@ -40,9 +44,10 @@ export default function AlertsHistoryPanel({
           The scanner is watching every 15 min.
         </div>
       ) : (
-        <ul className="max-h-[280px] overflow-y-auto divide-y divide-zinc-100">
+        <ul className="max-h-[420px] overflow-y-auto divide-y divide-zinc-100">
           {alerts.map((a) => {
             const isBuy = a.direction === 'BUY'
+            const open = openId === a.id
             return (
               <li key={a.id} className="px-3 py-2.5">
                 <div className="flex items-center justify-between gap-2">
@@ -67,9 +72,18 @@ export default function AlertsHistoryPanel({
                     </span>
                     <span className={`text-[10px] ${MONO} text-zinc-500`}>{a.pair}</span>
                   </div>
-                  <span className={`text-[9px] ${MONO} text-zinc-400 tabular-nums`}>
-                    {timeAgo(a.fired_at)}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setOpenId(open ? null : a.id)}
+                      className="rounded-full border border-zinc-200 bg-white px-2 py-0.5 text-[9px] font-medium text-zinc-600 shadow-sm transition hover:bg-zinc-50"
+                    >
+                      {open ? 'Hide chart' : 'Chart'}
+                    </button>
+                    <span className={`text-[9px] ${MONO} text-zinc-400 tabular-nums`}>
+                      {timeAgo(a.fired_at)}
+                    </span>
+                  </div>
                 </div>
                 <div className="mt-1.5 grid grid-cols-3 gap-1 text-[10px] tabular-nums">
                   <div>
@@ -90,6 +104,11 @@ export default function AlertsHistoryPanel({
                     {a.rationale}
                   </p>
                 )}
+                {open && (
+                  <div className="mt-2 animate-fade-in">
+                    <MiniPairChart symbol={a.pair} height={120} />
+                  </div>
+                )}
               </li>
             )
           })}
@@ -98,3 +117,4 @@ export default function AlertsHistoryPanel({
     </div>
   )
 }
+
