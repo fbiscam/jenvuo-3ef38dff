@@ -195,8 +195,21 @@ async function singleAttempt(
     const raMs = ra ? (Number.isFinite(+ra) ? +ra * 1000 : Math.max(0, Date.parse(ra) - Date.now())) : 0;
     const e = new AiGatewayError(msg, res.status, terminal);
     (e as any).retryAfterMs = Number.isFinite(raMs) && raMs > 0 ? Math.min(raMs, 8000) : 0;
+    // Mark model unhealthy for TTL when it looks structurally dead
+    // (not just busy). This lets the runner skip it on the next call
+    // instead of burning retries + timeout on a known-dead upstream.
+    const bodyLower = txt.toLowerCase();
+    const modelNotFound = bodyLower.includes("model_not_found") || bodyLower.includes("no available channel");
+    const upstreamDead = bodyLower.includes("upstream error") || bodyLower.includes("do_request_failed") || bodyLower.includes("endpoint") && bodyLower.includes("offline") || bodyLower.includes("err_ngrok");
+    if (res.status === 404 || modelNotFound) {
+      markModelUnhealthy(model, 15 * 60 * 1000); // 15 min — model not provisioned
+    } else if (res.status >= 500 && upstreamDead) {
+      markModelUnhealthy(model, 5 * 60 * 1000);  // 5 min — upstream flaky
+    }
     throw e;
   }
+
+
 
   const json: any = await res.json();
   const content = json?.choices?.[0]?.message?.content;
