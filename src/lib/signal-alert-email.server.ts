@@ -106,90 +106,99 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
     signalUrl: 'https://jenvu.com/signal',
   }
 
-  // 5. Enqueue one-by-one with suppression + unsubscribe tokens
-  let enqueued = 0
-  for (const email of recipients) {
-    const normalized = email.toLowerCase()
-    const { data: suppressed } = await supabaseAdmin
-      .from('suppressed_emails')
-      .select('id')
-      .eq('email', normalized)
-      .maybeSingle()
-    if (suppressed) continue
-
-    let token: string | null = null
-    const { data: existing } = await supabaseAdmin
-      .from('email_unsubscribe_tokens')
-      .select('token, used_at')
-      .eq('email', normalized)
-      .maybeSingle()
-    if (existing && !existing.used_at) {
-      token = existing.token
-    } else if (!existing) {
-      const bytes = new Uint8Array(32)
-      crypto.getRandomValues(bytes)
-      token = Array.from(bytes)
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('')
-      await supabaseAdmin
-        .from('email_unsubscribe_tokens')
-        .upsert({ token, email: normalized }, { onConflict: 'email', ignoreDuplicates: true })
-      const { data: stored } = await supabaseAdmin
-        .from('email_unsubscribe_tokens')
-        .select('token')
+  // 5. Enqueue in parallel (recipient loop was previously serial → mid-broadcast
+  //    timeouts left most paid users un-emailed for a given signal). Each
+  //    per-recipient step is wrapped so one failure never aborts the batch.
+  const perRecipient = async (email: string): Promise<boolean> => {
+    try {
+      const normalized = email.toLowerCase()
+      const { data: suppressed } = await supabaseAdmin
+        .from('suppressed_emails')
+        .select('id')
         .eq('email', normalized)
         .maybeSingle()
-      token = stored?.token ?? token
-    } else {
-      continue
-    }
+      if (suppressed) return false
 
-    // Personalize with this user's risk-manager settings
-    const personal = riskByEmail.get(normalized)
-    const size = personal?.size ?? null
-    const templateData = {
-      ...baseData,
-      sizeLots: size ? size.lots.toFixed(2) : undefined,
-      sizeUnits: size ? String(size.units) : undefined,
-      sizeRiskUsd: size ? size.riskUsd.toFixed(2) : undefined,
-      sizeBalance: personal ? personal.balance.toFixed(2) : undefined,
-      sizeRiskPct: personal ? personal.riskPct.toFixed(2) : undefined,
-    }
-    const element = React.createElement(template.component, templateData)
-    const html = await render(element)
-    const text = await render(element, { plainText: true })
-    const subject =
-      typeof template.subject === 'function' ? template.subject(templateData) : template.subject
+      let token: string | null = null
+      const { data: existing } = await supabaseAdmin
+        .from('email_unsubscribe_tokens')
+        .select('token, used_at')
+        .eq('email', normalized)
+        .maybeSingle()
+      if (existing && !existing.used_at) {
+        token = existing.token
+      } else if (!existing) {
+        const bytes = new Uint8Array(32)
+        crypto.getRandomValues(bytes)
+        token = Array.from(bytes)
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join('')
+        await supabaseAdmin
+          .from('email_unsubscribe_tokens')
+          .upsert({ token, email: normalized }, { onConflict: 'email', ignoreDuplicates: true })
+        const { data: stored } = await supabaseAdmin
+          .from('email_unsubscribe_tokens')
+          .select('token')
+          .eq('email', normalized)
+          .maybeSingle()
+        token = stored?.token ?? token
+      } else {
+        // Token exists but was used (user unsubscribed) → skip.
+        return false
+      }
 
-    const messageId = crypto.randomUUID()
-    const idempotencyKey = `alert-${a.alertId}-${normalized}`
+      const personal = riskByEmail.get(normalized)
+      const size = personal?.size ?? null
+      const templateData = {
+        ...baseData,
+        sizeLots: size ? size.lots.toFixed(2) : undefined,
+        sizeUnits: size ? String(size.units) : undefined,
+        sizeRiskUsd: size ? size.riskUsd.toFixed(2) : undefined,
+        sizeBalance: personal ? personal.balance.toFixed(2) : undefined,
+        sizeRiskPct: personal ? personal.riskPct.toFixed(2) : undefined,
+      }
+      const element = React.createElement(template.component, templateData)
+      const html = await render(element)
+      const text = await render(element, { plainText: true })
+      const subject =
+        typeof template.subject === 'function' ? template.subject(templateData) : template.subject
 
-    await supabaseAdmin.from('email_send_log').insert({
-      message_id: messageId,
-      template_name: 'signal-alert',
-      recipient_email: normalized,
-      status: 'pending',
-    })
+      const messageId = crypto.randomUUID()
+      const idempotencyKey = `alert-${a.alertId}-${normalized}`
 
-    const { error: enqErr } = await supabaseAdmin.rpc('enqueue_email', {
-      queue_name: 'transactional_emails',
-      payload: {
+      await supabaseAdmin.from('email_send_log').insert({
         message_id: messageId,
-        to: normalized,
-        from: FROM,
-        sender_domain: SENDER_DOMAIN,
-        subject,
-        html,
-        text,
-        purpose: 'transactional',
-        label: 'signal-alert',
-        idempotency_key: idempotencyKey,
-        unsubscribe_token: token,
-        queued_at: new Date().toISOString(),
-      },
-    })
-    if (!enqErr) enqueued++
+        template_name: 'signal-alert',
+        recipient_email: normalized,
+        status: 'pending',
+      })
+
+      const { error: enqErr } = await supabaseAdmin.rpc('enqueue_email', {
+        queue_name: 'transactional_emails',
+        payload: {
+          message_id: messageId,
+          to: normalized,
+          from: FROM,
+          sender_domain: SENDER_DOMAIN,
+          subject,
+          html,
+          text,
+          purpose: 'transactional',
+          label: 'signal-alert',
+          idempotency_key: idempotencyKey,
+          unsubscribe_token: token,
+          queued_at: new Date().toISOString(),
+        },
+      })
+      return !enqErr
+    } catch (err) {
+      console.error('signal-alert enqueue failed for', email, (err as Error)?.message)
+      return false
+    }
   }
+
+  const settled = await Promise.all(recipients.map(perRecipient))
+  const enqueued = settled.filter(Boolean).length
 
   return { enqueued }
 }
