@@ -55,7 +55,7 @@ export async function computeTodayRealizedLoss(
     from: (t: string) => {
       select: (cols: string) => {
         eq: (c: string, v: string) => {
-          gte: (c: string, v: string) => Promise<{ data: Array<{ pnl_usd: number | null }> | null }>;
+          gte: (c: string, v: string) => Promise<{ data: Array<{ pnl: number | null }> | null }>;
         };
       };
     };
@@ -66,13 +66,13 @@ export async function computeTodayRealizedLoss(
   dayStart.setUTCHours(0, 0, 0, 0);
   const { data } = await supabase
     .from("trade_journal")
-    .select("pnl_usd")
+    .select("pnl")
     .eq("user_id", userId)
     .gte("closed_at", dayStart.toISOString());
   if (!data) return 0;
   let loss = 0;
   for (const r of data) {
-    const p = Number(r.pnl_usd ?? 0);
+    const p = Number(r.pnl ?? 0);
     if (p < 0) loss += Math.abs(p);
   }
   return Math.round(loss * 100) / 100;

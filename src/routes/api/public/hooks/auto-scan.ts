@@ -375,12 +375,12 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 dayStart.setUTCHours(0, 0, 0, 0);
                 const { data: journalRows } = await supabaseAdmin
                   .from("trade_journal")
-                  .select("user_id, pnl_usd")
+                  .select("user_id, pnl")
                   .in("user_id", guarded.map((g) => g.user_id))
                   .gte("closed_at", dayStart.toISOString());
                 const lossByUser = new Map<string, number>();
                 for (const r of journalRows ?? []) {
-                  const p = Number(r.pnl_usd ?? 0);
+                  const p = Number(r.pnl ?? 0);
                   if (p < 0) {
                     lossByUser.set(
                       r.user_id,
