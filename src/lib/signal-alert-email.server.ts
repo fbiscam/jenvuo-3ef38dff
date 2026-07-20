@@ -71,13 +71,25 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
   if (recipients.length === 0) return { enqueued: 0 }
 
 
-  // 3. Render template
+  // 3. Fetch per-user risk settings → personalized lot size
+  const { getPersonalRiskMap } = await import('@/lib/personal-risk.server')
+  const riskMap = await getPersonalRiskMap(
+    emailsById.map((u) => u.id),
+    { entry: a.entry, sl: a.sl },
+  )
+  const riskByEmail = new Map<string, ReturnType<typeof riskMap.get>>()
+  for (const u of emailsById) {
+    const em = (u.email ?? '').toLowerCase().trim()
+    if (em) riskByEmail.set(em, riskMap.get(u.id))
+  }
+
+  // 4. Render template (per-recipient to inject personalized size)
   const { default: React } = await import('react')
   const { render } = await import('@react-email/render')
   const { template } = await import('@/lib/email-templates/signal-alert')
 
   const round = (n: number) => Number(n.toFixed(a.decimals))
-  const templateData = {
+  const baseData = {
     pair: a.pair,
     grade: a.grade,
     direction: a.direction,
@@ -93,13 +105,8 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
     firedAt: a.firedAt,
     signalUrl: 'https://jenvu.com/signal',
   }
-  const element = React.createElement(template.component, templateData)
-  const html = await render(element)
-  const text = await render(element, { plainText: true })
-  const subject =
-    typeof template.subject === 'function' ? template.subject(templateData) : template.subject
 
-  // 4. Enqueue one-by-one with suppression + unsubscribe tokens
+  // 5. Enqueue one-by-one with suppression + unsubscribe tokens
   let enqueued = 0
   for (const email of recipients) {
     const normalized = email.toLowerCase()
@@ -136,6 +143,23 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
     } else {
       continue
     }
+
+    // Personalize with this user's risk-manager settings
+    const personal = riskByEmail.get(normalized)
+    const size = personal?.size ?? null
+    const templateData = {
+      ...baseData,
+      sizeLots: size ? size.lots.toFixed(2) : undefined,
+      sizeUnits: size ? String(size.units) : undefined,
+      sizeRiskUsd: size ? size.riskUsd.toFixed(2) : undefined,
+      sizeBalance: personal ? personal.balance.toFixed(2) : undefined,
+      sizeRiskPct: personal ? personal.riskPct.toFixed(2) : undefined,
+    }
+    const element = React.createElement(template.component, templateData)
+    const html = await render(element)
+    const text = await render(element, { plainText: true })
+    const subject =
+      typeof template.subject === 'function' ? template.subject(templateData) : template.subject
 
     const messageId = crypto.randomUUID()
     const idempotencyKey = `alert-${a.alertId}-${normalized}`
