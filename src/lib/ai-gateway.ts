@@ -62,7 +62,23 @@ function providerConfigured(model: string): boolean {
   return Boolean(process.env.LOVABLE_API_KEY);
 }
 
+// -------- Per-worker model health cache -----------------------------------
+// When a model returns "model_not_found" (503/404) or a hard upstream error
+// (500 "do_request_failed", ngrok offline), we mark it unhealthy for a TTL
+// so the next chain-walk skips it instead of paying its full timeout.
+const modelUnhealthyUntil = new Map<string, number>();
+export function markModelUnhealthy(model: string, ttlMs: number): void {
+  modelUnhealthyUntil.set(model, Date.now() + ttlMs);
+}
+export function isModelUnhealthy(model: string): boolean {
+  const until = modelUnhealthyUntil.get(model);
+  if (!until) return false;
+  if (until < Date.now()) { modelUnhealthyUntil.delete(model); return false; }
+  return true;
+}
+
 export type UsageInfo = { promptTokens: number; completionTokens: number; totalTokens: number };
+
 
 async function singleAttempt(
   model: string,
