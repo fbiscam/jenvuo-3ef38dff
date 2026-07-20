@@ -18,6 +18,9 @@ export type WeightConfigRow = {
   retired_at: string | null;
   created_at: string;
   weights: FactorWeightsByAsset;
+  validated: boolean;
+  validated_at: string | null;
+  validation_summary: Record<string, any> | null;
 };
 
 export const listWeightConfigs = createServerFn({ method: "GET" })
@@ -79,8 +82,13 @@ export const activateWeightConfig = createServerFn({ method: "POST" })
     if (!target) throw new Error("Config not found");
     if (target.status === "active") return { ok: true, message: "Already active" };
 
-    // In Phase 1 we allow manual activation with a confirm. Phase 2 will add
-    // the walk-forward guardrail; manual override remains for admins.
+    // Phase 2 guardrail: candidates must pass walk-forward validation before
+    // activation, unless an admin explicitly overrides.
+    if (!data.forceManualOverride && !target.validated) {
+      throw new Error(
+        "Config has not passed walk-forward validation. Run validation first, or activate with manual override.",
+      );
+    }
     // Retire current active
     await supabaseAdmin
       .from("signal_weight_configs")
@@ -127,4 +135,31 @@ export const rollbackWeightConfig = createServerFn({ method: "POST" })
     const { invalidateActiveWeightsCache } = await import("@/lib/tuning/weights.server");
     invalidateActiveWeightsCache();
     return { ok: true, rolledBackTo: previous.version };
+  });
+
+export type FoldResultRow = {
+  id: string;
+  run_id: string;
+  fold_index: number;
+  oos_start: string;
+  oos_end: string;
+  win_rate: number | null;
+  expectancy_r: number | null;
+  sample_size: number;
+  passed: boolean;
+  metrics: Record<string, any> | null;
+};
+
+export const listFoldResultsForConfig = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { configId: string }) => ({ configId: String(input.configId) }))
+  .handler(async ({ context, data }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { data: rows, error } = await context.supabase
+      .from("signal_weight_window_results")
+      .select("id, run_id, fold_index, oos_start, oos_end, win_rate, expectancy_r, sample_size, passed, metrics")
+      .eq("config_id", data.configId)
+      .order("fold_index", { ascending: true });
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as FoldResultRow[];
   });

@@ -1690,6 +1690,9 @@ export type Database = {
           retired_at: string | null
           status: string
           updated_at: string
+          validated: boolean
+          validated_at: string | null
+          validation_summary: Json | null
           version: number
           weights: Json
         }
@@ -1702,6 +1705,9 @@ export type Database = {
           retired_at?: string | null
           status?: string
           updated_at?: string
+          validated?: boolean
+          validated_at?: string | null
+          validation_summary?: Json | null
           version: number
           weights: Json
         }
@@ -1714,6 +1720,9 @@ export type Database = {
           retired_at?: string | null
           status?: string
           updated_at?: string
+          validated?: boolean
+          validated_at?: string | null
+          validation_summary?: Json | null
           version?: number
           weights?: Json
         }
