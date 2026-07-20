@@ -67,7 +67,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           (p) =>
             typeof p === "string" && p.toUpperCase().startsWith("XAU"),
         );
-        const minConf = Number(cfg.min_conf ?? 62);
+        const minConf = Number(cfg.min_conf ?? 64);
         const confirmWindowMin = Number(cfg.confirm_window_min ?? 45);
         const cooldownMin = Number(cfg.cooldown_min ?? 60);
         const maxPerDay = Number(cfg.max_broadcasts_per_day ?? 8);
@@ -107,6 +107,20 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 .delete()
                 .eq("pair", pair);
               results.push({ pair, action: "below_threshold", conf });
+              continue;
+            }
+
+            // Killzone gate — only fire during London / NY AM / NY PM / Asia
+            // killzones. Outside-killzone tape is thin and produces low-quality
+            // signals (documented losers), so skip broadcasting entirely.
+            const kz = String(plan.killzone ?? "");
+            const inKillzone = /Killzone/i.test(kz) && !/Outside/i.test(kz);
+            if (!inKillzone) {
+              await supabaseAdmin
+                .from("auto_scan_state")
+                .delete()
+                .eq("pair", pair);
+              results.push({ pair, action: "outside_killzone", conf, killzone: kz });
               continue;
             }
 
