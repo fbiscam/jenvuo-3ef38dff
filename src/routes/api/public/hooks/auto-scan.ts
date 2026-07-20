@@ -84,6 +84,46 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           return Response.json({ ok: true, skipped: "daily_cap" });
         }
 
+        // News hard-pause: skip broadcasts if a high-impact USD/XAU red-folder
+        // event lands within ±30 minutes of now. Volatility around NFP, CPI,
+        // FOMC etc. invalidates ICT/SMC setups — better to sit out than to
+        // fire on stop-runs.
+        const newsPauseMin = Number(cfg.news_pause_min ?? 30);
+        let newsPaused: { title: string; minutes: number } | null = null;
+        try {
+          const res = await fetch(
+            "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+            { headers: { "User-Agent": "Mozilla/5.0" } },
+          );
+          if (res.ok) {
+            const raw = (await res.json()) as Array<{
+              title: string;
+              country: string;
+              date: string;
+              impact: string;
+            }>;
+            const now = Date.now();
+            for (const e of raw) {
+              if (e.country !== "USD" && e.country !== "XAU") continue;
+              if (!/High/i.test(e.impact)) continue;
+              const mins = Math.abs((new Date(e.date).getTime() - now) / 60000);
+              if (mins <= newsPauseMin) {
+                newsPaused = { title: e.title, minutes: Math.round(mins) };
+                break;
+              }
+            }
+          }
+        } catch {
+          // Fail open — don't block scans if news feed is down.
+        }
+        if (newsPaused) {
+          return Response.json({
+            ok: true,
+            skipped: "news_pause",
+            event: newsPaused,
+          });
+        }
+
         const results: Array<Record<string, unknown>> = [];
 
         for (const pair of pairs) {
@@ -315,7 +355,49 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const { filterAlertsEnabledUserIds } = await import(
               "@/lib/alert-pref-filter.server"
             );
-            const userIds = await filterAlertsEnabledUserIds(allPaidIds, { grade, pair, direction: dir });
+            let userIds = await filterAlertsEnabledUserIds(allPaidIds, { grade, pair, direction: dir });
+
+            // Per-user daily-loss kill-switch: users who enabled the guard and
+            // whose realized losses today already crossed their limit get
+            // filtered out of this broadcast — no notification, no email, no
+            // charge. They can still see history on their dashboard.
+            if (userIds.length > 0) {
+              const { data: killRows } = await supabaseAdmin
+                .from("user_risk_settings")
+                .select("user_id, daily_loss_limit_usd, kill_switch_enabled")
+                .in("user_id", userIds)
+                .eq("kill_switch_enabled", true);
+              const guarded = (killRows ?? []).filter(
+                (r) => r.daily_loss_limit_usd && Number(r.daily_loss_limit_usd) > 0,
+              );
+              if (guarded.length > 0) {
+                const dayStart = new Date();
+                dayStart.setUTCHours(0, 0, 0, 0);
+                const { data: journalRows } = await supabaseAdmin
+                  .from("trade_journal")
+                  .select("user_id, pnl")
+                  .in("user_id", guarded.map((g) => g.user_id))
+                  .gte("closed_at", dayStart.toISOString());
+                const lossByUser = new Map<string, number>();
+                for (const r of journalRows ?? []) {
+                  const p = Number(r.pnl ?? 0);
+                  if (p < 0) {
+                    lossByUser.set(
+                      r.user_id,
+                      (lossByUser.get(r.user_id) ?? 0) + Math.abs(p),
+                    );
+                  }
+                }
+                const blocked = new Set<string>();
+                for (const g of guarded) {
+                  const loss = lossByUser.get(g.user_id) ?? 0;
+                  if (loss >= Number(g.daily_loss_limit_usd)) blocked.add(g.user_id);
+                }
+                if (blocked.size > 0) {
+                  userIds = userIds.filter((u) => !blocked.has(u));
+                }
+              }
+            }
             let notified = 0;
             if (userIds.length > 0) {
               const kz = plan.killzone ? ` · ${plan.killzone}` : "";
