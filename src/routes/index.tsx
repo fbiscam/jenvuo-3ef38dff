@@ -264,6 +264,9 @@ function HomePage() {
       {/* LIVE SIGNAL TICKER — last 48h broadcasted signals */}
       <SignalTicker />
 
+      {/* DESK STATS — live social proof */}
+      <DeskStatsStrip />
+
       {/* TERMINAL WORKSTATION */}
       <section className="mx-auto max-w-6xl px-5 mt-8 pb-14 sm:px-6 sm:mt-10 sm:pb-20">
 
