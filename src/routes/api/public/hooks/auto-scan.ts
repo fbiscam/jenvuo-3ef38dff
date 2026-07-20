@@ -355,7 +355,49 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const { filterAlertsEnabledUserIds } = await import(
               "@/lib/alert-pref-filter.server"
             );
-            const userIds = await filterAlertsEnabledUserIds(allPaidIds, { grade, pair, direction: dir });
+            let userIds = await filterAlertsEnabledUserIds(allPaidIds, { grade, pair, direction: dir });
+
+            // Per-user daily-loss kill-switch: users who enabled the guard and
+            // whose realized losses today already crossed their limit get
+            // filtered out of this broadcast — no notification, no email, no
+            // charge. They can still see history on their dashboard.
+            if (userIds.length > 0) {
+              const { data: killRows } = await supabaseAdmin
+                .from("user_risk_settings")
+                .select("user_id, daily_loss_limit_usd, kill_switch_enabled")
+                .in("user_id", userIds)
+                .eq("kill_switch_enabled", true);
+              const guarded = (killRows ?? []).filter(
+                (r) => r.daily_loss_limit_usd && Number(r.daily_loss_limit_usd) > 0,
+              );
+              if (guarded.length > 0) {
+                const dayStart = new Date();
+                dayStart.setUTCHours(0, 0, 0, 0);
+                const { data: journalRows } = await supabaseAdmin
+                  .from("trade_journal")
+                  .select("user_id, pnl_usd")
+                  .in("user_id", guarded.map((g) => g.user_id))
+                  .gte("closed_at", dayStart.toISOString());
+                const lossByUser = new Map<string, number>();
+                for (const r of journalRows ?? []) {
+                  const p = Number(r.pnl_usd ?? 0);
+                  if (p < 0) {
+                    lossByUser.set(
+                      r.user_id,
+                      (lossByUser.get(r.user_id) ?? 0) + Math.abs(p),
+                    );
+                  }
+                }
+                const blocked = new Set<string>();
+                for (const g of guarded) {
+                  const loss = lossByUser.get(g.user_id) ?? 0;
+                  if (loss >= Number(g.daily_loss_limit_usd)) blocked.add(g.user_id);
+                }
+                if (blocked.size > 0) {
+                  userIds = userIds.filter((u) => !blocked.has(u));
+                }
+              }
+            }
             let notified = 0;
             if (userIds.length > 0) {
               const kz = plan.killzone ? ` · ${plan.killzone}` : "";
