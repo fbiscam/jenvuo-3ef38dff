@@ -63,7 +63,7 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
         // same-direction alerts and bypassed the stricter killzone gate.
         return Response.json({ ok: true, skipped: 'legacy_hook_disabled_use_auto_scan' })
 
-        const admin = createClient(supabaseUrl, serviceKey, {
+        const admin = createClient(supabaseUrl, serviceKey!, {
           auth: { persistSession: false, autoRefreshToken: false },
         })
 
