@@ -437,14 +437,18 @@ export type VetoResult = { key: string; label: string; reason: string };
 
 // Per-asset factor weights. Factors that don't apply to a class get weight 0
 // and are dropped from the score (the remaining weights are re-normalised to 100).
-// New factors: structure (BOS/CHoCH quality), smt (correlation divergence), session_align (native session for this pair).
-const FACTOR_WEIGHTS: Record<AssetKind, Record<string, number>> = {
+// These are the SEED defaults — the live active set is loaded from
+// public.signal_weight_configs and can be tuned via /dashboard/admin/tuning.
+export const DEFAULT_FACTOR_WEIGHTS: Record<AssetKind, Record<string, number>> = {
   metal:  { bias: 12, sweep: 9, zone: 8, pd: 4, killzone: 6, dxy: 6, rr: 5, structure: 5, smt: 3, session_align: 3, displacement: 6, rejection: 5, confluence: 3, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 3, power3: 3, mitigation: 3, ce: 4, liq_void: 4, momentum_div: 4, vol_spike: 3, midnight: 3 },
   forex:  { bias: 12, sweep: 9, zone: 8, pd: 4, killzone: 7, dxy: 4, rr: 5, structure: 5, smt: 4, session_align: 3, displacement: 6, rejection: 5, confluence: 3, freshness: 2, eqhl: 4, turtle: 3, htf_poi: 5, silver_bullet: 3, power3: 4, mitigation: 3, ce: 4, liq_void: 4, momentum_div: 4, vol_spike: 2, midnight: 3 },
   index:  { bias: 14, sweep: 9, zone: 8, pd: 4, killzone: 7, dxy: 0, rr: 5, structure: 6, smt: 4, session_align: 4, displacement: 8, rejection: 5, confluence: 2, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 4, power3: 3, mitigation: 3, ce: 4, liq_void: 5, momentum_div: 4, vol_spike: 5, midnight: 3 },
   crypto: { bias: 16, sweep: 12, zone: 9, pd: 4, killzone: 0, dxy: 0, rr: 7, structure: 7, smt: 3, session_align: 2, displacement: 9, rejection: 5, confluence: 2, freshness: 0, eqhl: 4, turtle: 4, htf_poi: 5, silver_bullet: 0, power3: 0, mitigation: 3, ce: 4, liq_void: 6, momentum_div: 4, vol_spike: 6, midnight: 0 },
   stock:  { bias: 14, sweep: 9, zone: 8, pd: 4, killzone: 7, dxy: 0, rr: 5, structure: 6, smt: 4, session_align: 4, displacement: 8, rejection: 5, confluence: 2, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 4, power3: 3, mitigation: 3, ce: 4, liq_void: 5, momentum_div: 4, vol_spike: 5, midnight: 3 },
 };
+const FACTOR_WEIGHTS = DEFAULT_FACTOR_WEIGHTS;
+export type FactorWeightsByAsset = Record<AssetKind, Record<string, number>>;
+
 
 export function scoreSetup(args: {
   trade: BuiltTrade;
