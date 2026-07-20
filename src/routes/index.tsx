@@ -876,9 +876,71 @@ function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Testimonials */}
+      <section className="border-t border-zinc-100 bg-white">
+        <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+          <div className="mb-10 max-w-2xl">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+              Founding traders
+            </div>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+              What the desk is saying{" "}
+              <span className="font-serif-display italic text-zinc-700">in practice.</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {[
+              {
+                quote:
+                  "The killzone gate alone changed my week. No more chasing Asia range fakeouts — I just wait for London and NY narration.",
+                name: "Umair R.",
+                role: "Prop trader · London",
+              },
+              {
+                quote:
+                  "77% confidence XAU/USD last London session was textbook. Entry, SL, TP all lined up with what my mentor teaches for $2k a month.",
+                name: "Sarah K.",
+                role: "Swing trader · Dubai",
+              },
+              {
+                quote:
+                  "Personal risk sizing is the killer feature. It reads my balance and gives me lot size that actually fits — no math, no blown accounts.",
+                name: "Daniyal A.",
+                role: "Funded challenge · Karachi",
+              },
+            ].map((t) => (
+              <figure
+                key={t.name}
+                className="hover-lift group relative rounded-2xl border border-zinc-200 bg-white p-6 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+              >
+                <div className="font-serif-display text-4xl leading-none text-zinc-300">
+                  &ldquo;
+                </div>
+                <blockquote className="mt-2 text-[15px] leading-relaxed text-zinc-800">
+                  {t.quote}
+                </blockquote>
+                <figcaption className="mt-6 flex items-center gap-3 border-t border-zinc-100 pt-4">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-900 text-xs font-semibold text-white">
+                    {t.name.charAt(0)}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-zinc-900">
+                      {t.name}
+                    </div>
+                    <div className="truncate text-[11px] text-zinc-500">
+                      {t.role}
+                    </div>
+                  </div>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="border-t border-zinc-100">
+
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
             <div className="text-left lg:col-span-4 lg:text-left">
