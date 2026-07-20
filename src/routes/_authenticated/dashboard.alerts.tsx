@@ -510,6 +510,21 @@ function AlertPrefs() {
                       <td className="px-3 py-2.5 font-mono text-xs text-emerald-600">{a.tp}</td>
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-700">{a.rr}</td>
                       <td className="px-3 py-2.5 text-[11px] font-medium text-zinc-700">{a.confidence}%</td>
+                      <td className="px-3 py-2.5 font-mono text-[11px] text-zinc-800 whitespace-nowrap">
+                        {(() => {
+                          if (!risk) return <span className="text-zinc-300">—</span>;
+                          const entryN = Number(a.entry);
+                          const slN = Number(a.sl);
+                          if (!Number.isFinite(entryN) || !Number.isFinite(slN)) return <span className="text-zinc-300">—</span>;
+                          const sz = computePositionSize({ balanceUsd: risk.balance, riskPct: risk.pct, entry: entryN, sl: slN });
+                          if (!sz) return <span className="text-zinc-300">—</span>;
+                          return (
+                            <span title={`Balance $${risk.balance.toFixed(2)} · Risk ${risk.pct}% ($${sz.riskUsd.toFixed(2)})`}>
+                              {sz.lots.toFixed(2)} lot
+                            </span>
+                          );
+                        })()}
+                      </td>
                       <td className="px-3 py-2.5 text-[10px] text-zinc-400 whitespace-nowrap">{ago}</td>
                       <td className="px-3 py-2.5 whitespace-nowrap">
                         {withinHour ? (
