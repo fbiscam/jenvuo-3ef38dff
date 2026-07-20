@@ -29,7 +29,7 @@ export const listWeightConfigs = createServerFn({ method: "GET" })
       .select("*")
       .order("version", { ascending: false });
     if (error) throw new Error(error.message);
-    return (data ?? []) as WeightConfigRow[];
+    return (data ?? []) as unknown as WeightConfigRow[];
   });
 
 export type TuningRunRow = {
