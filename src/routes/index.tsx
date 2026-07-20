@@ -954,10 +954,12 @@ function HomePage() {
           </div>
         </div>
       </section>
+      </main>
 
       <SiteFooter />
     </div>
     </>
+
   );
 }
 
