@@ -28,6 +28,9 @@ const TILES: Tile[] = [
   { key: "docs", title: "Document Submissions", desc: "Earning-proof review", to: "/dashboard/admin/documents" },
   { key: "autoscan", title: "Auto-Scan Monitor", desc: "Auto-scanner state & history", to: "/dashboard/admin/auto-scan" },
   { key: "audit", title: "Scan Audit", desc: "AI cost & scan ledger", to: "/dashboard/admin/scan-audit" },
+  { key: "accuracy", title: "Accuracy Dashboard", desc: "Paper-trade win rate & drift", to: "/dashboard/admin/accuracy" },
+  { key: "tuning", title: "Weight Tuning", desc: "Grid search & walk-forward configs", to: "/dashboard/admin/tuning" },
+  { key: "tvmm", title: "TV Mismatch Checker", desc: "Telegram chart price drift audit", to: "/dashboard/admin/tv-mismatch" },
 ];
 
 function OpsHub() {
