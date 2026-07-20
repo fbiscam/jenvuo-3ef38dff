@@ -70,6 +70,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         const minConf = Number(cfg.min_conf ?? 64);
         const confirmWindowMin = Number(cfg.confirm_window_min ?? 45);
         const cooldownMin = Number(cfg.cooldown_min ?? 60);
+        const sameDirectionLockMin = Number(cfg.same_direction_lock_min ?? 240);
         const maxPerDay = Number(cfg.max_broadcasts_per_day ?? 8);
 
         // Global daily rate limit
@@ -160,19 +161,66 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               }
             }
 
-            // Single-hit mode: broadcast immediately (no 2-hit confirmation)
-            // Still record state for cooldown tracking
-            await supabaseAdmin.from("auto_scan_state").upsert(
-              {
+            // Cross-hook duplicate lock: a legacy/manual scanner may have already
+            // inserted this pair+direction. Do not alert the same idea again for
+            // several hours even if confidence temporarily dips and returns.
+            const duplicateSince = new Date(
+              now.getTime() - sameDirectionLockMin * 60_000,
+            ).toISOString();
+            const { data: recentSameDirection } = await supabaseAdmin
+              .from("signal_alerts")
+              .select("id, fired_at, confidence")
+              .eq("pair", pair)
+              .eq("direction", dir)
+              .gte("fired_at", duplicateSince)
+              .order("fired_at", { ascending: false })
+              .limit(1);
+            if (recentSameDirection?.length) {
+              results.push({
                 pair,
-                direction: dir,
-                first_conf: conf,
-                first_seen_at: now.toISOString(),
-                last_broadcast_at: state?.last_broadcast_at ?? null,
-                updated_at: now.toISOString(),
-              },
-              { onConflict: "pair" },
-            );
+                action: "duplicate_same_direction_lock",
+                dir,
+                recent_alert_id: recentSameDirection[0].id,
+              });
+              continue;
+            }
+
+            // Two-hit confirmation: first qualifying scan only arms the signal.
+            // Broadcast only if the same direction is still valid on the next
+            // scan inside the confirmation window. This filters one-candle
+            // spikes and AI confidence drift (e.g. 74% now, 57% later).
+            const firstSeenAt =
+              state?.direction === dir && state.first_seen_at
+                ? new Date(state.first_seen_at)
+                : null;
+            const firstAgeMin = firstSeenAt
+              ? (now.getTime() - firstSeenAt.getTime()) / 60000
+              : Number.POSITIVE_INFINITY;
+            const hasConfirmedHit =
+              state?.direction === dir && firstAgeMin <= confirmWindowMin;
+
+            if (!hasConfirmedHit) {
+              await supabaseAdmin.from("auto_scan_state").upsert(
+                {
+                  pair,
+                  direction: dir,
+                  first_conf: conf,
+                  first_seen_at: now.toISOString(),
+                  last_broadcast_at:
+                    state?.direction === dir ? state?.last_broadcast_at ?? null : null,
+                  updated_at: now.toISOString(),
+                },
+                { onConflict: "pair" },
+              );
+              results.push({
+                pair,
+                action: "first_hit_waiting_confirmation",
+                conf,
+                dir,
+                killzone: plan.killzone ?? null,
+              });
+              continue;
+            }
 
             // Broadcast on first qualifying hit
             const dec = plan.instrument?.decimals ?? 2;
@@ -198,7 +246,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 ? "A+"
                 : gradeBasis >= 80
                   ? "A"
-                  : gradeBasis >= 65
+                  : gradeBasis >= 64
                     ? "B"
                     : "C";
 
