@@ -1,32 +1,13 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { playAlertSound } from "@/lib/alert-sound";
 
 function beep() {
-  try {
-    const Ctx = (window as unknown as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext }).AudioContext
-      || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    const t0 = ctx.currentTime;
-    [880, 1175, 1568].forEach((f, i) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = "sine";
-      o.frequency.value = f;
-      g.gain.setValueAtTime(0.0001, t0 + i * 0.12);
-      g.gain.exponentialRampToValueAtTime(0.18, t0 + i * 0.12 + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.12 + 0.18);
-      o.connect(g);
-      g.connect(ctx.destination);
-      o.start(t0 + i * 0.12);
-      o.stop(t0 + i * 0.12 + 0.2);
-    });
-    setTimeout(() => ctx.close().catch(() => { /* ignore */ }), 800);
-  } catch {
-    /* ignore */
-  }
+  playAlertSound();
 }
+
+
 
 /**
  * Subscribes to the current user's `user_notifications` table via realtime and
