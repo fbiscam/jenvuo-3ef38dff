@@ -779,7 +779,7 @@ function HomePage() {
                     <div className="font-medium text-zinc-900">{n}</div>
                     <div className="text-zinc-500">{r}</div>
                   </div>
-                  <span className="text-zinc-400">↗</span>
+                  <span className="text-zinc-600" aria-hidden="true">↗</span>
                 </figcaption>
               </figure>
             ))}
