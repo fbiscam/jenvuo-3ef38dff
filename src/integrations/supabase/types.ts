@@ -1680,6 +1680,78 @@ export type Database = {
         }
         Relationships: []
       }
+      signal_paper_trades: {
+        Row: {
+          broadcast_alert_id: string | null
+          confidence: number
+          created_at: string
+          direction: string
+          entry: number
+          fired_at: string
+          gates: Json
+          grade: string | null
+          htf_bias: string | null
+          id: string
+          killzone: string | null
+          notes: string | null
+          outcome: string | null
+          pair: string
+          realized_r: number | null
+          resolved_at: string | null
+          rr: number | null
+          session: string | null
+          setup_score: number | null
+          sl: number
+          tp: number
+        }
+        Insert: {
+          broadcast_alert_id?: string | null
+          confidence: number
+          created_at?: string
+          direction: string
+          entry: number
+          fired_at?: string
+          gates?: Json
+          grade?: string | null
+          htf_bias?: string | null
+          id?: string
+          killzone?: string | null
+          notes?: string | null
+          outcome?: string | null
+          pair: string
+          realized_r?: number | null
+          resolved_at?: string | null
+          rr?: number | null
+          session?: string | null
+          setup_score?: number | null
+          sl: number
+          tp: number
+        }
+        Update: {
+          broadcast_alert_id?: string | null
+          confidence?: number
+          created_at?: string
+          direction?: string
+          entry?: number
+          fired_at?: string
+          gates?: Json
+          grade?: string | null
+          htf_bias?: string | null
+          id?: string
+          killzone?: string | null
+          notes?: string | null
+          outcome?: string | null
+          pair?: string
+          realized_r?: number | null
+          resolved_at?: string | null
+          rr?: number | null
+          session?: string | null
+          setup_score?: number | null
+          sl?: number
+          tp?: number
+        }
+        Relationships: []
+      }
       signal_weight_configs: {
         Row: {
           activated_at: string | null
