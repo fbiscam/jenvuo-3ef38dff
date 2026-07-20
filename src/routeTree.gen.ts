@@ -73,6 +73,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
 import { Route as ApiPublicHooksReindexInsightsRouteImport } from './routes/api/public/hooks/reindex-insights'
+import { Route as ApiPublicHooksPaperTradeResolverRouteImport } from './routes/api/public/hooks/paper-trade-resolver'
 import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/api/public/hooks/notify-subscribers'
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
@@ -86,6 +87,7 @@ import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './route
 import { Route as AuthenticatedDashboardAdminFoundingRouteImport } from './routes/_authenticated/dashboard.admin.founding'
 import { Route as AuthenticatedDashboardAdminDocumentsRouteImport } from './routes/_authenticated/dashboard.admin.documents'
 import { Route as AuthenticatedDashboardAdminAutoScanRouteImport } from './routes/_authenticated/dashboard.admin.auto-scan'
+import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './routes/_authenticated/dashboard.admin.accuracy'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -425,6 +427,12 @@ const ApiPublicHooksReindexInsightsRoute =
     path: '/api/public/hooks/reindex-insights',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksPaperTradeResolverRoute =
+  ApiPublicHooksPaperTradeResolverRouteImport.update({
+    id: '/api/public/hooks/paper-trade-resolver',
+    path: '/api/public/hooks/paper-trade-resolver',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksNotifySubscribersRoute =
   ApiPublicHooksNotifySubscribersRouteImport.update({
     id: '/api/public/hooks/notify-subscribers',
@@ -501,6 +509,12 @@ const AuthenticatedDashboardAdminAutoScanRoute =
     path: '/admin/auto-scan',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardAdminAccuracyRoute =
+  AuthenticatedDashboardAdminAccuracyRouteImport.update({
+    id: '/admin/accuracy',
+    path: '/admin/accuracy',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -558,6 +572,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
+  '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
   '/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
   '/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
   '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
@@ -571,6 +586,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -632,6 +648,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
+  '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
   '/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
   '/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
   '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
@@ -645,6 +662,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -712,6 +730,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
+  '/_authenticated/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
   '/_authenticated/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
   '/_authenticated/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
   '/_authenticated/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
@@ -725,6 +744,7 @@ export interface FileRoutesById {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
+  '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -792,6 +812,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/dashboard/'
     | '/help/$collection/'
+    | '/dashboard/admin/accuracy'
     | '/dashboard/admin/auto-scan'
     | '/dashboard/admin/documents'
     | '/dashboard/admin/founding'
@@ -805,6 +826,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/telegram/webhook'
@@ -866,6 +888,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/dashboard'
     | '/help/$collection'
+    | '/dashboard/admin/accuracy'
     | '/dashboard/admin/auto-scan'
     | '/dashboard/admin/documents'
     | '/dashboard/admin/founding'
@@ -879,6 +902,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/telegram/webhook'
@@ -945,6 +969,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
+    | '/_authenticated/dashboard/admin/accuracy'
     | '/_authenticated/dashboard/admin/auto-scan'
     | '/_authenticated/dashboard/admin/documents'
     | '/_authenticated/dashboard/admin/founding'
@@ -958,6 +983,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/notify-subscribers'
+    | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/telegram/webhook'
@@ -1009,6 +1035,7 @@ export interface RootRouteChildren {
   ApiPublicHooksGenerateBriefRoute: typeof ApiPublicHooksGenerateBriefRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
   ApiPublicHooksNotifySubscribersRoute: typeof ApiPublicHooksNotifySubscribersRoute
+  ApiPublicHooksPaperTradeResolverRoute: typeof ApiPublicHooksPaperTradeResolverRoute
   ApiPublicHooksReindexInsightsRoute: typeof ApiPublicHooksReindexInsightsRoute
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
@@ -1469,6 +1496,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksReindexInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/paper-trade-resolver': {
+      id: '/api/public/hooks/paper-trade-resolver'
+      path: '/api/public/hooks/paper-trade-resolver'
+      fullPath: '/api/public/hooks/paper-trade-resolver'
+      preLoaderRoute: typeof ApiPublicHooksPaperTradeResolverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/notify-subscribers': {
       id: '/api/public/hooks/notify-subscribers'
       path: '/api/public/hooks/notify-subscribers'
@@ -1560,6 +1594,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminAutoScanRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/admin/accuracy': {
+      id: '/_authenticated/dashboard/admin/accuracy'
+      path: '/admin/accuracy'
+      fullPath: '/dashboard/admin/accuracy'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminAccuracyRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
   }
 }
 
@@ -1577,6 +1618,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardUsageRoute: typeof AuthenticatedDashboardUsageRoute
   AuthenticatedDashboardWorkspaceRoute: typeof AuthenticatedDashboardWorkspaceRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardAdminAccuracyRoute: typeof AuthenticatedDashboardAdminAccuracyRoute
   AuthenticatedDashboardAdminAutoScanRoute: typeof AuthenticatedDashboardAdminAutoScanRoute
   AuthenticatedDashboardAdminDocumentsRoute: typeof AuthenticatedDashboardAdminDocumentsRoute
   AuthenticatedDashboardAdminFoundingRoute: typeof AuthenticatedDashboardAdminFoundingRoute
@@ -1603,6 +1645,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardUsageRoute: AuthenticatedDashboardUsageRoute,
     AuthenticatedDashboardWorkspaceRoute: AuthenticatedDashboardWorkspaceRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+    AuthenticatedDashboardAdminAccuracyRoute:
+      AuthenticatedDashboardAdminAccuracyRoute,
     AuthenticatedDashboardAdminAutoScanRoute:
       AuthenticatedDashboardAdminAutoScanRoute,
     AuthenticatedDashboardAdminDocumentsRoute:
@@ -1722,6 +1766,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksGenerateBriefRoute: ApiPublicHooksGenerateBriefRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
   ApiPublicHooksNotifySubscribersRoute: ApiPublicHooksNotifySubscribersRoute,
+  ApiPublicHooksPaperTradeResolverRoute: ApiPublicHooksPaperTradeResolverRoute,
   ApiPublicHooksReindexInsightsRoute: ApiPublicHooksReindexInsightsRoute,
   ApiPublicHooksScanSignalsRoute: ApiPublicHooksScanSignalsRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
