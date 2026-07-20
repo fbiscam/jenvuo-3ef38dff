@@ -141,35 +141,41 @@ function buildChartConfig(a: EnqueueAlertEmailsArgs, candles: Candle[]): object 
 
   const title = `${pair}  ·  ${direction}  ·  ${a.grade}  ·  ${Math.round(a.confidence)}%   (15m)`
 
+  // TradingView-style palette
+  const upBg = '#26a69a', upBorder = '#00897b'
+  const dnBg = '#ef5350', dnBorder = '#c62828'
+
+  const labelBase = { display: true, position: 'end', color: '#fff', font: { weight: 'bold', size: 13 }, padding: 6, borderRadius: 4 } as const
+
   const annotations: Record<string, unknown> = {
     slZone: {
       type: 'box',
       yMin: isBuy ? sl : entry,
       yMax: isBuy ? entry : sl,
-      backgroundColor: 'rgba(220,38,38,0.10)',
+      backgroundColor: 'rgba(239,83,80,0.08)',
       borderWidth: 0,
     },
     tpZone: {
       type: 'box',
       yMin: isBuy ? entry : tp,
       yMax: isBuy ? tp : entry,
-      backgroundColor: 'rgba(22,163,74,0.12)',
+      backgroundColor: 'rgba(38,166,154,0.10)',
       borderWidth: 0,
     },
     entry: {
       type: 'line', yMin: entry, yMax: entry,
-      borderColor: entryColor, borderWidth: 2, borderDash: [6, 4],
-      label: { display: true, content: `ENTRY  ${round(entry)}`, position: 'end', backgroundColor: entryColor, color: '#fff', font: { weight: 'bold', size: 12 }, padding: 5 },
+      borderColor: entryColor, borderWidth: 2, borderDash: [8, 4],
+      label: { ...labelBase, content: `ENTRY  ${round(entry)}`, backgroundColor: entryColor },
     },
     sl: {
       type: 'line', yMin: sl, yMax: sl,
       borderColor: slColor, borderWidth: 2,
-      label: { display: true, content: `SL  ${round(sl)}`, position: 'end', backgroundColor: slColor, color: '#fff', font: { weight: 'bold', size: 12 }, padding: 5 },
+      label: { ...labelBase, content: `SL  ${round(sl)}`, backgroundColor: slColor },
     },
     tp: {
       type: 'line', yMin: tp, yMax: tp,
       borderColor: tpColor, borderWidth: 2,
-      label: { display: true, content: `TP  ${round(tp)}  ·  1:${a.rr.toFixed(2)}R`, position: 'end', backgroundColor: tpColor, color: '#fff', font: { weight: 'bold', size: 12 }, padding: 5 },
+      label: { ...labelBase, content: `TP  ${round(tp)}  ·  1:${a.rr.toFixed(2)}R`, backgroundColor: tpColor },
     },
   }
 
@@ -180,19 +186,21 @@ function buildChartConfig(a: EnqueueAlertEmailsArgs, candles: Candle[]): object 
         datasets: [{
           label: pair,
           data: candles,
-          color: { up: '#16a34a', down: '#dc2626', unchanged: '#64748b' },
-          borderColor: { up: '#15803d', down: '#b91c1c', unchanged: '#475569' },
+          color: { up: upBg, down: dnBg, unchanged: '#90a4ae' },
+          borderColor: { up: upBorder, down: dnBorder, unchanged: '#607d8b' },
+          borderWidth: 1,
         }],
       },
       options: {
+        layout: { padding: { left: 8, right: 90, top: 20, bottom: 8 } },
         plugins: {
           legend: { display: false },
-          title: { display: true, text: title, font: { size: 18, weight: 'bold' }, color: '#0f172a' },
+          title: { display: true, text: title, font: { size: 18, weight: 'bold' }, color: '#131722', padding: { top: 6, bottom: 12 } },
           annotation: { annotations },
         },
         scales: {
-          x: { type: 'time', time: { unit: 'hour', displayFormats: { hour: 'MMM d HH:mm' } }, ticks: { color: '#64748b', maxTicksLimit: 8 }, grid: { color: 'rgba(0,0,0,0.04)' } },
-          y: { min: yMin, max: yMax, position: 'right', ticks: { color: '#334155' }, grid: { color: 'rgba(0,0,0,0.06)' } },
+          x: { type: 'time', time: { unit: 'hour', displayFormats: { hour: 'MMM d HH:mm' } }, ticks: { color: '#787b86', maxTicksLimit: 8, font: { size: 11 } }, grid: { color: 'rgba(42,46,57,0.06)' } },
+          y: { min: yMin, max: yMax, position: 'right', ticks: { color: '#131722', font: { size: 12 } }, grid: { color: 'rgba(42,46,57,0.06)' } },
         },
       },
     }
@@ -204,17 +212,18 @@ function buildChartConfig(a: EnqueueAlertEmailsArgs, candles: Candle[]): object 
     type: 'line',
     data: {
       labels: ['', '', '', 'Now', '', 'Target'],
-      datasets: [{ label: pair, data: priceLine, borderColor: '#0f172a', borderWidth: 2, pointRadius: [0,0,0,5,0,5], pointBackgroundColor: ['','','',entryColor,'',tpColor], tension: 0.25, fill: false }],
+      datasets: [{ label: pair, data: priceLine, borderColor: '#131722', borderWidth: 2, pointRadius: [0,0,0,5,0,5], pointBackgroundColor: ['','','',entryColor,'',tpColor], tension: 0.25, fill: false }],
     },
     options: {
+      layout: { padding: { left: 8, right: 90, top: 20, bottom: 8 } },
       plugins: {
         legend: { display: false },
-        title: { display: true, text: title, font: { size: 18, weight: 'bold' }, color: '#0f172a' },
+        title: { display: true, text: title, font: { size: 18, weight: 'bold' }, color: '#131722' },
         annotation: { annotations },
       },
       scales: {
-        y: { min: yMin, max: yMax, position: 'right', grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: '#334155' } },
-        x: { grid: { display: false }, ticks: { color: '#64748b' } },
+        y: { min: yMin, max: yMax, position: 'right', grid: { color: 'rgba(42,46,57,0.06)' }, ticks: { color: '#131722' } },
+        x: { grid: { display: false }, ticks: { color: '#787b86' } },
       },
     },
   }
