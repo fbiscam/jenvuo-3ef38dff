@@ -39,14 +39,20 @@ export function computePositionSize(input: {
   // Enforce broker minimum 0.01 lot so small accounts ($10) can still trade.
   const lots = Math.max(0.01, Math.round(rawLots * 100) / 100);
   const units = Math.round(lots * contract);
+  // Actual $ at risk given the (possibly clamped) lot size.
+  const actualRiskUsd = Math.round(lots * contract * stopDist * 100) / 100;
+  const clamped = actualRiskUsd > riskUsd + 0.01;
 
   return {
     lots,
     units,
     riskUsd: Math.round(riskUsd * 100) / 100,
     stopDistance: stopDist,
-    note: `${lots.toFixed(2)} lot · ${units} oz · risking $${riskUsd.toFixed(2)} (${riskPct}%)`,
+    note: clamped
+      ? `${lots.toFixed(2)} lot · ${units} oz · min-lot risk $${actualRiskUsd.toFixed(2)} (target ${riskPct}% = $${riskUsd.toFixed(2)})`
+      : `${lots.toFixed(2)} lot · ${units} oz · risking $${riskUsd.toFixed(2)} (${riskPct}%)`,
   };
+
 
 
 }
