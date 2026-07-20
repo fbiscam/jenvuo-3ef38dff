@@ -12,6 +12,7 @@ import { Bell, BellOff, Loader2, Send } from "lucide-react";
 import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
 import { cn } from "@/lib/utils";
 import userinfobotLogo from "@/assets/userinfobot.jpg.asset.json";
+import xauLogo from "@/assets/xau-gold.png.asset.json";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -804,12 +805,12 @@ function AlertPrefs() {
                     className={`group inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-semibold tracking-wide transition border shadow-sm bg-white ${on ? "text-zinc-900 border-zinc-900" : "text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"}`}
                   >
                     <span className="relative inline-flex items-center">
-                      <span
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-full ring-2 ring-white text-[9px] font-bold text-amber-900"
-                        style={{ background: "radial-gradient(circle at 30% 30%, #FEF3C7, #F59E0B 60%, #B45309)" }}
-                      >
-                        Au
-                      </span>
+                      <img
+                        src={xauLogo.url}
+                        alt="XAU"
+                        className="h-6 w-6 rounded-full object-cover ring-2 ring-white bg-white"
+                        loading="lazy"
+                      />
                       <img
                         src={`https://flagcdn.com/w40/${flagCode}.png`}
                         alt={quote.toUpperCase()}
