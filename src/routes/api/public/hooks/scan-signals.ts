@@ -57,6 +57,12 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
           return Response.json({ ok: true, skipped: 'market_closed' })
         }
 
+        // Legacy hook disabled: the canonical /auto-scan worker owns signals,
+        // billing, Telegram, email, 64% confidence, killzone-only gating and
+        // two-hit confirmation. Keeping this route as a scanner caused duplicate
+        // same-direction alerts and bypassed the stricter killzone gate.
+        return Response.json({ ok: true, skipped: 'legacy_hook_disabled_use_auto_scan' })
+
         const admin = createClient(supabaseUrl, serviceKey, {
           auth: { persistSession: false, autoRefreshToken: false },
         })
