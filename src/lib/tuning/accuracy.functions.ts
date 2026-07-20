@@ -122,20 +122,22 @@ export const getAccuracyReport = createServerFn({ method: "GET" })
     const recent = all.filter((r) => new Date(r.fired_at).getTime() >= cutoff30);
     const recentAgg = agg(recent);
 
-    // Baseline: aggregate from active tuning config if present, else historic
-    // average of the full window.
+    // Baseline: use the active tuning config's validation summary if
+    // available, otherwise fall back to the full window's average.
     let baseline_win_rate: number | null = null;
     try {
       const { data: cfg } = await supabaseAdmin
         .from("signal_weight_configs")
-        .select("baseline_win_rate")
-        .eq("is_active", true)
+        .select("validation_summary")
+        .eq("status", "active")
         .maybeSingle();
-      if (cfg && cfg.baseline_win_rate != null) {
-        baseline_win_rate = Number(cfg.baseline_win_rate);
-      }
+      const vs = (cfg?.validation_summary ?? null) as
+        | { baseline_win_rate?: number; win_rate?: number }
+        | null;
+      const b = vs?.baseline_win_rate ?? vs?.win_rate;
+      if (typeof b === "number") baseline_win_rate = b;
     } catch {
-      // column may not exist in older configs
+      // best-effort baseline
     }
     if (baseline_win_rate == null && overall.win_rate > 0) {
       baseline_win_rate = overall.win_rate;
