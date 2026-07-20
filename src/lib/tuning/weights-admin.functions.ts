@@ -136,3 +136,30 @@ export const rollbackWeightConfig = createServerFn({ method: "POST" })
     invalidateActiveWeightsCache();
     return { ok: true, rolledBackTo: previous.version };
   });
+
+export type FoldResultRow = {
+  id: string;
+  run_id: string;
+  fold_index: number;
+  oos_start: string;
+  oos_end: string;
+  win_rate: number | null;
+  expectancy_r: number | null;
+  sample_size: number;
+  passed: boolean;
+  metrics: Record<string, any> | null;
+};
+
+export const listFoldResultsForConfig = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { configId: string }) => ({ configId: String(input.configId) }))
+  .handler(async ({ context, data }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { data: rows, error } = await context.supabase
+      .from("signal_weight_window_results")
+      .select("id, run_id, fold_index, oos_start, oos_end, win_rate, expectancy_r, sample_size, passed, metrics")
+      .eq("config_id", data.configId)
+      .order("fold_index", { ascending: true });
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as FoldResultRow[];
+  });
