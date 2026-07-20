@@ -3,6 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   analyzeTF, buildLiquidityPools, buildTrade, scoreSetup, computeATR,
   computeStructureQuality,
+  type FactorWeightsByAsset,
 } from "@/lib/analysis/engine";
 import { fetchInstrumentCandles, resolveInstrument } from "@/lib/gold-analysis.functions";
 
