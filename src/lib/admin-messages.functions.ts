@@ -13,12 +13,9 @@ export type ContactMessage = {
 };
 
 async function assertAdmin(supabase: any, userId: string) {
-  const { data, error } = await supabase.rpc("has_role", {
-    _user_id: userId,
-    _role: "admin",
-  });
-  if (error) throw new Error("Failed to verify admin role");
-  if (!data) throw new Error("Forbidden: admin access required");
+  const { isAdminOrOpsUnlocked } = await import("@/lib/admin-guard.server");
+  const ok = await isAdminOrOpsUnlocked(supabase, userId);
+  if (!ok) throw new Error("Forbidden: admin access required");
 }
 
 export const isAdmin = createServerFn({ method: "GET" })

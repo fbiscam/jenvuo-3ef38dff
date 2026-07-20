@@ -38,12 +38,10 @@ export const getAccuracyReport = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { days?: number } | undefined) => d ?? {})
   .handler(async ({ data, context }): Promise<AccuracyResult> => {
-    // Admin gate
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    // Admin gate (ops-console session also allowed)
+    const { isAdminOrOpsUnlocked } = await import("@/lib/admin-guard.server");
+    const ok = await isAdminOrOpsUnlocked(context.supabase, context.userId);
+    if (!ok) throw new Error("Forbidden");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const days = Math.max(1, Math.min(180, Number(data.days ?? 90)));

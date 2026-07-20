@@ -97,11 +97,9 @@ function computeReference(pair: string, spot: number, rates: Record<string, numb
 export const runTvMismatchCheck = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<MismatchReport> => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden: admin access required");
+    const { isAdminOrOpsUnlocked } = await import("@/lib/admin-guard.server");
+    const ok = await isAdminOrOpsUnlocked(context.supabase, context.userId);
+    if (!ok) throw new Error("Forbidden: admin access required");
 
     const [base, spot, rates] = await Promise.all([
       yahooFetch("GC=F", "15m"),
