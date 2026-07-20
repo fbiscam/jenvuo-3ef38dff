@@ -63,8 +63,14 @@ const Email = ({
   rationale = 'High-confluence institutional setup detected.',
   firedAt,
   signalUrl = `${SITE}/signal`,
+  sizeLots,
+  sizeUnits,
+  sizeRiskUsd,
+  sizeBalance,
+  sizeRiskPct,
 }: Props) => {
   const dirColor = direction === 'BUY' ? '#059669' : '#dc2626'
+  const hasSize = !!sizeLots
   return (
     <Html lang="en" dir="ltr">
       <Head><EmailFonts /></Head>
