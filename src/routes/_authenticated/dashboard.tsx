@@ -1249,8 +1249,11 @@ function DashboardLayout() {
        </div>
 
     </div>
+      {!embedMode && <OnboardingTour />}
+    </>
   );
 }
+
 
 // Real ICT/SMC Killzones — times in UTC (converted from NY EST reference).
 // Standard institutional trading windows used by prop firms & smart-money traders.
