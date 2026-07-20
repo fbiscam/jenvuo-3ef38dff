@@ -22,7 +22,7 @@ export type RiskSettings = {
 };
 
 const DEFAULTS: RiskSettings = {
-  account_balance_usd: 1000,
+  account_balance_usd: 10,
   risk_pct: 1,
   daily_loss_limit_usd: null,
   kill_switch_enabled: false,
@@ -38,8 +38,8 @@ export const getRiskSettings = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!data) return DEFAULTS;
     return {
-      account_balance_usd: Number(data.account_balance_usd ?? 1000),
-      risk_pct: Number(data.risk_pct ?? 1),
+      account_balance_usd: Number(data.account_balance_usd ?? DEFAULTS.account_balance_usd),
+      risk_pct: Number(data.risk_pct ?? DEFAULTS.risk_pct),
       daily_loss_limit_usd:
         data.daily_loss_limit_usd == null ? null : Number(data.daily_loss_limit_usd),
       kill_switch_enabled: Boolean(data.kill_switch_enabled),
