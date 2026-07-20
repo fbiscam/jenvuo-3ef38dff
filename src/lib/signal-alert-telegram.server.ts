@@ -321,11 +321,32 @@ export async function sendSignalAlertTelegrams(a: EnqueueAlertEmailsArgs): Promi
   const rows = (links ?? []) as Array<{ user_id: string; chat_id: string }>
   if (rows.length === 0) return { sent: 0 }
 
+  // Per-user risk settings → suggested lot size
+  const { computePositionSize } = await import('@/lib/risk-manager')
+  const { data: riskRows } = await supabaseAdmin
+    .from('user_risk_settings')
+    .select('user_id, account_balance_usd, risk_pct')
+    .in('user_id', rows.map((r) => r.user_id))
+  const riskByUser = new Map<string, { balance: number; pct: number }>()
+  for (const r of riskRows ?? []) {
+    riskByUser.set(r.user_id, {
+      balance: Number(r.account_balance_usd ?? 1000),
+      pct: Number(r.risk_pct ?? 1),
+    })
+  }
+
   const reason = buildReason(a)
   let sent = 0
   for (const row of rows) {
     try {
-      await sendOne(botToken, row.chat_id, a, reason)
+      const risk = riskByUser.get(row.user_id) ?? { balance: 1000, pct: 1 }
+      const size = computePositionSize({
+        balanceUsd: risk.balance,
+        riskPct: risk.pct,
+        entry: a.entry,
+        sl: a.sl,
+      })
+      await sendOne(botToken, row.chat_id, a, reason, size?.note)
       sent++
       await supabaseAdmin
         .from('telegram_alert_links')
