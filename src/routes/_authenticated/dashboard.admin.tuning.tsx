@@ -110,10 +110,14 @@ function TuningPage() {
     }
   };
 
-  const doActivate = async (id: string, version: number) => {
-    if (!confirm(`Activate weight config v${version}? Manual activation bypasses walk-forward validation (Phase 2). Continue?`)) return;
+  const doActivate = async (id: string, version: number, validated: boolean) => {
+    const force = !validated;
+    const msg = force
+      ? `⚠️ v${version} has NOT passed walk-forward validation. Manual override will activate it anyway. Continue?`
+      : `Activate weight config v${version}?`;
+    if (!confirm(msg)) return;
     try {
-      await activate({ data: { configId: id, forceManualOverride: true } });
+      await activate({ data: { configId: id, forceManualOverride: force } });
       toast.success(`v${version} is now active`);
       await reload();
     } catch (e: any) {
@@ -128,6 +132,50 @@ function TuningPage() {
       await reload();
     } catch (e: any) {
       toast.error(e?.message ?? "Rollback failed");
+    }
+  };
+
+  const runValidate = useServerFn(runWalkForwardValidation);
+  const loadFolds = useServerFn(listFoldResultsForConfig);
+  const [validatingId, setValidatingId] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [foldsByConfig, setFoldsByConfig] = useState<Record<string, FoldResultRow[]>>({});
+
+  const doValidate = async (id: string, version: number) => {
+    if (validatingId) return;
+    setValidatingId(id);
+    const tid = toast.loading(`Walk-forward validating v${version} — 5 folds…`);
+    try {
+      const res = await runValidate({ data: { configId: id, symbol, threshold: 62 } });
+      const s = res.summary as any;
+      if (res.passed) {
+        toast.success(`v${version} PASSED · ${s.foldWinsForCandidate}/${s.folds} folds · winRate=${pct(s.aggWinRate)} · avgR=${num(s.aggAvgR)}`, { id: tid });
+      } else {
+        toast.error(`v${version} FAILED · ${s.foldWinsForCandidate}/${s.folds} folds · winRate=${pct(s.aggWinRate)} · avgR=${num(s.aggAvgR)}`, { id: tid });
+      }
+      await reload();
+      // refresh folds inline if expanded
+      if (expanded === id) {
+        const folds = await loadFolds({ data: { configId: id } });
+        setFoldsByConfig((m) => ({ ...m, [id]: folds }));
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Validation failed", { id: tid });
+    } finally {
+      setValidatingId(null);
+    }
+  };
+
+  const toggleFolds = async (id: string) => {
+    if (expanded === id) { setExpanded(null); return; }
+    setExpanded(id);
+    if (!foldsByConfig[id]) {
+      try {
+        const folds = await loadFolds({ data: { configId: id } });
+        setFoldsByConfig((m) => ({ ...m, [id]: folds }));
+      } catch (e: any) {
+        toast.error(e?.message ?? "Failed to load folds");
+      }
     }
   };
 
