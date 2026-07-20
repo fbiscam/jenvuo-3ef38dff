@@ -25,59 +25,6 @@ import {
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  ALERT_SOUND_OPTIONS,
-  getAlertSoundPref,
-  setAlertSoundPref,
-  playAlertSound,
-  type AlertSoundKey,
-} from "@/lib/alert-sound";
-import { Volume2 } from "lucide-react";
-
-function SoundPicker() {
-  const [choice, setChoice] = useState<AlertSoundKey>("chime");
-  useEffect(() => { setChoice(getAlertSoundPref()); }, []);
-  function pick(k: AlertSoundKey) {
-    setChoice(k);
-    setAlertSoundPref(k);
-    playAlertSound(k);
-  }
-  return (
-    <div className="mb-6 rounded-2xl border border-zinc-200 bg-white p-4">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 text-white">
-          <Volume2 className="h-4 w-4" />
-        </span>
-        <div>
-          <div className="text-sm font-semibold text-zinc-900">Alert sound</div>
-          <div className="text-[11px] text-zinc-500">
-            Plays when a new signal or notification lands. Saved to this browser.
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-wrap gap-1.5">
-        {ALERT_SOUND_OPTIONS.map((o) => {
-          const active = choice === o.key;
-          return (
-            <button
-              key={o.key}
-              onClick={() => pick(o.key)}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition",
-                active
-                  ? "border-zinc-300 bg-zinc-50 text-zinc-900"
-                  : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50",
-              )}
-              title={o.description}
-            >
-              {o.label}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/notifications")({
@@ -377,12 +324,8 @@ function NotificationsPage() {
           })}
         </div>
 
-        {/* Alert sound picker */}
-        <SoundPicker />
-
-
-
         {/* Body */}
+
         {loading ? (
           <div className="flex items-center justify-center py-20 text-zinc-400">
             <Loader2 className="h-5 w-5 animate-spin" />
