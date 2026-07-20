@@ -221,8 +221,14 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       const { default: React } = await import('react')
       const { render } = await import('@react-email/render')
       const { template } = await import('@/lib/email-templates/signal-alert')
+      const { getPersonalRiskMap } = await import('@/lib/personal-risk.server')
 
-      const templateData = {
+      const riskMap = await getPersonalRiskMap(
+        Array.from(new Set(emailToUserId.values())),
+        { entry: data.entry, sl: data.sl },
+      )
+
+      const baseData = {
         pair,
         grade,
         direction: data.direction,
@@ -238,11 +244,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
         firedAt: inserted.fired_at,
         signalUrl: 'https://jenvu.com/signal',
       }
-      const element = React.createElement(template.component, templateData)
-      const html = await render(element)
-      const text = await render(element, { plainText: true })
-      const subject =
-        typeof template.subject === 'function' ? template.subject(templateData) : template.subject
+
 
       for (const { email } of recipients) {
         const normalized = email.toLowerCase()
