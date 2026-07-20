@@ -7,9 +7,10 @@ import { computeSignalPlan } from '@/lib/gold-analysis.functions'
 
 const SENDER_DOMAIN = 'notify.jenvu.net'
 const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.net>'
-const DEDUPE_WINDOW_MS = 90 * 60 * 1000 // 90 minutes
+const MIN_SIGNAL_CONFIDENCE = 64
+const DEDUPE_WINDOW_MS = 4 * 60 * 60 * 1000 // 4 hours per pair+direction
 
-const XAU_PAIRS = ['XAUUSD', 'XAUEUR', 'XAUGBP']
+const XAU_PAIRS = ['XAUUSD', 'XAUEUR', 'XAUGBP', 'XAUJPY', 'XAUAUD', 'XAUCHF']
 
 export const Route = createFileRoute('/api/public/hooks/scan-signals')({
   server: {
@@ -84,27 +85,49 @@ async function scanOnePair(
     return { error: 'analyzer_failed', message: String(e) }
   }
 
-  const grade = plan.setupGrade
   const direction = plan.trade.direction
-  const acceptableGrades = ['A+', 'A']
-  if (!acceptableGrades.includes(grade) || (direction !== 'BUY' && direction !== 'SELL') || plan.setupScore < 72) {
-    return { skipped: 'below_threshold', grade, direction, score: plan.setupScore }
+  const confidence = Math.round(Number(plan.trade.confidence ?? 0))
+  const killzone = String(plan.killzone ?? '')
+  const inKillzone = /Killzone/i.test(killzone) && !/Outside/i.test(killzone)
+  if (direction !== 'BUY' && direction !== 'SELL') {
+    return { skipped: 'wait', direction, confidence }
   }
+  if (confidence < MIN_SIGNAL_CONFIDENCE) {
+    return { skipped: 'below_confidence', direction, confidence, min: MIN_SIGNAL_CONFIDENCE }
+  }
+  if (!inKillzone) {
+    return { skipped: 'outside_killzone', direction, confidence, killzone }
+  }
+
+  const dec = plan.instrument.decimals
+  const round = (n: number) => Number(n.toFixed(dec))
+  const entry = Number(plan.trade.entry)
+  const sl = Number(plan.trade.sl)
+  const tp = Number(plan.trade.tp1 ?? plan.trade.tp)
+  if (!Number.isFinite(entry) || !Number.isFinite(sl) || !Number.isFinite(tp)) {
+    return { skipped: 'invalid_levels', direction, confidence }
+  }
+  const riskDist = Math.abs(entry - sl)
+  const rewardDist = Math.abs(tp - entry)
+  const rr = riskDist > 0 ? rewardDist / riskDist : 0
+  if (rr < 1.5) {
+    return { skipped: 'rr_too_low', direction, confidence, rr: Number(rr.toFixed(2)) }
+  }
+  const grade = confidence >= 90 ? 'A+' : confidence >= 80 ? 'A' : confidence >= 64 ? 'B' : 'C'
 
   const since = new Date(Date.now() - DEDUPE_WINDOW_MS).toISOString()
   const { data: recent } = await admin
     .from('signal_alerts')
     .select('id, direction, fired_at')
     .eq('pair', pair)
+    .eq('direction', direction)
     .gte('fired_at', since)
     .order('fired_at', { ascending: false })
     .limit(1)
-  if (recent && recent.length && recent[0].direction === direction) {
-    return { skipped: 'duplicate' }
+  if (recent && recent.length) {
+    return { skipped: 'duplicate_same_direction', recent_alert_id: recent[0].id }
   }
 
-  const dec = plan.instrument.decimals
-  const round = (n: number) => Number(n.toFixed(dec))
   const rationale =
     plan.trade.summary ||
     plan.confluences.slice(0, 3).join(' · ') ||
@@ -118,13 +141,13 @@ async function scanOnePair(
       direction,
       entry: round(plan.trade.entry),
       sl: round(plan.trade.sl),
-      tp: round(plan.trade.tp),
-      rr: Number(plan.trade.rr.toFixed(2)),
-      confidence: Math.round(plan.trade.confidence),
+      tp: round(tp),
+      rr: Number(rr.toFixed(2)),
+      confidence,
       setup_score: Math.round(plan.setupScore),
       htf_bias: plan.htfBias,
       session: plan.session,
-      killzone: plan.killzone,
+      killzone,
       rationale: rationale.slice(0, 1000),
     })
     .select()
@@ -179,15 +202,15 @@ async function scanOnePair(
 
     const templateData = {
       pair,
-      grade: grade as 'A+' | 'A',
+      grade: grade as 'A+' | 'A' | 'B' | 'C',
       direction,
       entry: round(plan.trade.entry).toFixed(dec),
       sl: round(plan.trade.sl).toFixed(dec),
-      tp: round(plan.trade.tp).toFixed(dec),
-      rr: plan.trade.rr.toFixed(2),
-      confidence: Math.round(plan.trade.confidence),
+      tp: round(tp).toFixed(dec),
+      rr: rr.toFixed(2),
+      confidence,
       session: plan.session,
-      killzone: plan.killzone,
+      killzone,
       htfBias: plan.htfBias,
       rationale,
       firedAt: inserted.fired_at,
