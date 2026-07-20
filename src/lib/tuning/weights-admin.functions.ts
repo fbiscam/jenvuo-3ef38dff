@@ -20,7 +20,7 @@ export type WeightConfigRow = {
   weights: FactorWeightsByAsset;
   validated: boolean;
   validated_at: string | null;
-  validation_summary: Record<string, unknown> | null;
+  validation_summary: Record<string, any> | null;
 };
 
 export const listWeightConfigs = createServerFn({ method: "GET" })
