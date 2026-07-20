@@ -1214,17 +1214,17 @@ function DashboardLayout() {
 
         {/* Row 3 — Quick Actions + Pro Tip + Referral */}
         <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card className="flex flex-col">
+          <Card className="hover-lift flex flex-col">
             <CardHeader icon={LayoutGrid} title="Quick Actions" />
             <QuickActions />
           </Card>
 
-          <Card className="flex flex-col">
+          <Card className="hover-lift flex flex-col">
             <CardHeader icon={Lightbulb} title="Pro Tip" />
             <DailyTip />
           </Card>
 
-          <Card className="flex flex-col">
+          <Card className="hover-lift flex flex-col">
             <CardHeader
               icon={Gift}
               title="Invite & Earn"
@@ -1237,6 +1237,7 @@ function DashboardLayout() {
             <ReferralSnapshot />
           </Card>
         </section>
+
 
         <div className="h-12" />
         </>
