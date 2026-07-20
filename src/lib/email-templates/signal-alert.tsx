@@ -145,11 +145,43 @@ const Email = ({
               </table>
             </Section>
 
+            {hasSize ? (
+              <Section style={sizeBox}>
+                <Text style={sizeHeader}>YOUR SUGGESTED POSITION</Text>
+                <table width="100%" cellPadding={0} cellSpacing={0} border={0}>
+                  <tbody>
+                    <tr>
+                      <td style={sizeCell}>
+                        <div style={tradeLabel}>LOT SIZE</div>
+                        <div style={tradeValue}>{sizeLots}</div>
+                      </td>
+                      <td style={sizeCell}>
+                        <div style={tradeLabel}>UNITS (OZ)</div>
+                        <div style={tradeValue}>{sizeUnits}</div>
+                      </td>
+                      <td style={sizeCellLast}>
+                        <div style={tradeLabel}>RISK</div>
+                        <div style={tradeValue}>${sizeRiskUsd}</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3} style={tradeFooter}>
+                        Based on balance <strong style={{ color: '#09090b' }}>${sizeBalance}</strong>
+                        &nbsp;·&nbsp; risk <strong style={{ color: '#09090b' }}>{sizeRiskPct}%</strong>
+                        &nbsp;·&nbsp; from your Risk Manager
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </Section>
+            ) : null}
+
             <Section style={{ padding: '8px 0 0' }}>
               <Link href={signalUrl} style={cta}>
                 Open signal desk →
               </Link>
             </Section>
+
 
             <Text style={fineprint}>
               Trade at your own risk. This is institutional analysis, not financial advice.
