@@ -319,6 +319,30 @@ const tradeCell: React.CSSProperties = {
   width: '33.33%',
 }
 const tradeCellLast: React.CSSProperties = { ...tradeCell, borderRight: 'none' }
+const sizeBox: React.CSSProperties = {
+  border: '1px solid #e4e4e7',
+  borderRadius: 12,
+  overflow: 'hidden',
+  margin: '14px 0 0 0',
+  backgroundColor: '#fafafa',
+}
+const sizeHeader: React.CSSProperties = {
+  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
+  fontSize: 10,
+  letterSpacing: '0.22em',
+  color: '#71717a',
+  padding: '10px 12px 4px',
+  margin: 0,
+  fontWeight: 700,
+}
+const sizeCell: React.CSSProperties = {
+  padding: '12px 12px',
+  borderRight: '1px solid #e4e4e7',
+  textAlign: 'center',
+  backgroundColor: '#ffffff',
+  width: '33.33%',
+}
+const sizeCellLast: React.CSSProperties = { ...sizeCell, borderRight: 'none' }
 const tradeLabel: React.CSSProperties = {
   fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 9,
