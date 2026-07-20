@@ -1248,11 +1248,11 @@ function DashboardLayout() {
         
        </div>
 
-    </div>
       {!embedMode && <OnboardingTour />}
-    </>
+    </div>
   );
 }
+
 
 
 // Real ICT/SMC Killzones — times in UTC (converted from NY EST reference).
