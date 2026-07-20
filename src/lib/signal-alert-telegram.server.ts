@@ -92,19 +92,34 @@ async function fetchCandles(pair: string, tf = '15m'): Promise<Candle[]> {
   const base = await yahooFetch('GC=F', tf)
   if (!base) return []
   const fx = PAIR_FX[key]
-  let scale = 1
-  if (fx) {
-    const fxData = await yahooFetch(fx.symbol, tf)
-    if (fxData) {
-      scale = fx.invert ? 1 / fxData.last : fxData.last
-    } else {
-      return []
+  if (!fx) return base.candles.slice(-60)
+
+  // Per-candle FX join — align each gold candle with the closest FX candle
+  // (within 30 min) and scale OHLC individually. Matches TradingView cross
+  // pricing far more closely than last-price scaling.
+  const fxData = await yahooFetch(fx.symbol, tf)
+  if (!fxData) return []
+  const fxByTime = new Map<number, Candle>()
+  for (const k of fxData.candles) fxByTime.set(k.x, k)
+  const fxTimes = [...fxByTime.keys()]
+  const nearestFx = (t: number): Candle | null => {
+    if (fxByTime.has(t)) return fxByTime.get(t)!
+    let best: number | null = null
+    let bestDiff = Infinity
+    for (const ft of fxTimes) {
+      const d = Math.abs(ft - t)
+      if (d < bestDiff) { bestDiff = d; best = ft }
     }
+    return best != null && bestDiff <= 30 * 60 * 1000 ? fxByTime.get(best)! : null
   }
-  return base.candles.slice(-80).map((k) => ({
-    x: k.x,
-    o: k.o * scale, h: k.h * scale, l: k.l * scale, c: k.c * scale,
-  }))
+  const out: Candle[] = []
+  for (const k of base.candles.slice(-60)) {
+    const f = nearestFx(k.x)
+    if (!f) continue
+    const s = fx.invert ? 1 / f.c : f.c
+    out.push({ x: k.x, o: k.o * s, h: k.h * s, l: k.l * s, c: k.c * s })
+  }
+  return out
 }
 
 function buildChartConfig(a: EnqueueAlertEmailsArgs, candles: Candle[]): object {
