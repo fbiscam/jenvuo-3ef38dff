@@ -1995,6 +1995,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_risk_settings: {
+        Row: {
+          account_balance_usd: number
+          created_at: string
+          daily_loss_limit_usd: number | null
+          kill_switch_enabled: boolean
+          risk_pct: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_balance_usd?: number
+          created_at?: string
+          daily_loss_limit_usd?: number | null
+          kill_switch_enabled?: boolean
+          risk_pct?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_balance_usd?: number
+          created_at?: string
+          daily_loss_limit_usd?: number | null
+          kill_switch_enabled?: boolean
+          risk_pct?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
