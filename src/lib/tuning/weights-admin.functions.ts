@@ -82,8 +82,13 @@ export const activateWeightConfig = createServerFn({ method: "POST" })
     if (!target) throw new Error("Config not found");
     if (target.status === "active") return { ok: true, message: "Already active" };
 
-    // In Phase 1 we allow manual activation with a confirm. Phase 2 will add
-    // the walk-forward guardrail; manual override remains for admins.
+    // Phase 2 guardrail: candidates must pass walk-forward validation before
+    // activation, unless an admin explicitly overrides.
+    if (!data.forceManualOverride && !target.validated) {
+      throw new Error(
+        "Config has not passed walk-forward validation. Run validation first, or activate with manual override.",
+      );
+    }
     // Retire current active
     await supabaseAdmin
       .from("signal_weight_configs")
