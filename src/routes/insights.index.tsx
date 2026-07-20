@@ -78,9 +78,11 @@ export const Route = createFileRoute("/insights/")({
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
+const PAGE_SIZE = 10;
+
 function InsightsPage() {
   const { data: insights } = useSuspenseQuery(insightsQueryOptions);
-  
+
   // Ticker: any breaking + most recent items (outsourced top-bar feed)
   const tickerItems = (() => {
     const breaking = insights.filter((i) => i.is_breaking);
@@ -92,22 +94,40 @@ function InsightsPage() {
       return true;
     }).slice(0, 10);
   })();
-  const featured = insights[0];
-  const allRemaining = insights.slice(1);
 
   const [filter, setFilter] = useState<"latest" | "gold" | "macro">("latest");
+  const [page, setPage] = useState(1);
   const filters: { id: typeof filter; label: string }[] = [
     { id: "latest", label: "Latest" },
     { id: "gold", label: "Gold" },
     { id: "macro", label: "Macro" },
   ];
-  const remaining = useMemo(() => {
-    if (filter === "latest") return allRemaining;
+
+  const filtered = useMemo(() => {
+    if (filter === "latest") return insights;
     const goldCats = ["gold", "analysis", "ict", "smc", "strategy", "institutional"];
     const macroCats = ["market news", "education", "ai"];
     const match = filter === "gold" ? goldCats : macroCats;
-    return allRemaining.filter((i) => match.includes((i.category || "").toLowerCase()));
-  }, [allRemaining, filter]);
+    return insights.filter((i) => match.includes((i.category || "").toLowerCase()));
+  }, [insights, filter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+  // On page 1 use the first item as the featured hero; grid shows the rest of the page.
+  const featured = currentPage === 1 ? pageItems[0] : undefined;
+  const remaining = currentPage === 1 ? pageItems.slice(1) : pageItems;
+
+  const goToPage = (n: number) => {
+    setPage(Math.min(Math.max(1, n), totalPages));
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const onFilterChange = (id: typeof filter) => {
+    setFilter(id);
+    setPage(1);
+  };
 
   return (
     <>
@@ -221,7 +241,7 @@ function InsightsPage() {
                 return (
                   <button
                     key={f.id}
-                    onClick={() => setFilter(f.id)}
+                    onClick={() => onFilterChange(f.id)}
                     className={`px-4 py-1.5 rounded-full transition-colors ${
                       active
                         ? "bg-zinc-900 text-white shadow-sm"
@@ -282,6 +302,46 @@ function InsightsPage() {
               </article>
             ))}
           </div>
+
+          {remaining.length === 0 && !featured && (
+            <div className="text-center py-16 text-sm text-zinc-500">
+              No briefings in this category yet.
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <nav aria-label="Insights pagination" className="mt-14 flex items-center justify-center gap-2">
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                ← Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <button
+                  key={n}
+                  onClick={() => goToPage(n)}
+                  aria-current={n === currentPage ? "page" : undefined}
+                  className={`min-w-[36px] rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                    n === currentPage
+                      ? "bg-zinc-900 text-white"
+                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Next →
+              </button>
+            </nav>
+          )}
+
 
           {/* LOAD MORE / NEWSLETTER */}
           <div className="mt-20 rounded-3xl bg-zinc-50 border border-zinc-200 p-8 sm:p-12 text-center text-zinc-900 relative overflow-hidden">
