@@ -71,6 +71,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
     const { filterAlertsEnabledUserIds } = await import('@/lib/alert-pref-filter.server')
     let recipientEmails: string[] = []
     let notifyUserIds: string[] = []
+    const emailToUserId = new Map<string, string>()
     {
       const { data: paidRows } = await supabaseAdmin
         .from('user_subscriptions')
@@ -93,16 +94,15 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
             // ignore individual failures
           }
         }
-        recipientEmails = Array.from(
-          new Set(
-            collected
-              .map((u) => (u.email ?? '').toLowerCase().trim())
-              .filter((e) => !!e && /.+@.+\..+/.test(e)),
-          ),
-        )
+        for (const c of collected) {
+          const em = (c.email ?? '').toLowerCase().trim()
+          if (em && /.+@.+\..+/.test(em)) emailToUserId.set(em, c.id)
+        }
+        recipientEmails = Array.from(new Set(Array.from(emailToUserId.keys())))
       }
     }
     const recipients: Array<{ email: string }> = recipientEmails.map((email) => ({ email }))
+
 
 
     // 3. Insert in-app notifications for allow-listed users only
