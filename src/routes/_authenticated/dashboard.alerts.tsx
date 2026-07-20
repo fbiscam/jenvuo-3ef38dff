@@ -101,6 +101,7 @@ function AlertPrefs() {
   const connectTelegramFn = useServerFn(connectTelegramAlertLink);
   const setTelegramEnabledFn = useServerFn(setTelegramAlertEnabled);
   const disconnectTelegramFn = useServerFn(disconnectTelegramAlertLink);
+  const getRisk = useServerFn(getRiskSettings);
   const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
   const [alertsSaving, setAlertsSaving] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState("");
@@ -112,6 +113,19 @@ function AlertPrefs() {
   const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false);
   const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
   const canConnectTelegram = chatIdValid && !telegramSaving;
+
+  const [risk, setRisk] = useState<{ balance: number; pct: number } | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getRisk()
+      .then((r) => {
+        if (cancelled) return;
+        setRisk({ balance: r.account_balance_usd, pct: r.risk_pct });
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [getRisk]);
+
 
   const [ipTimezone, setIpTimezone] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
