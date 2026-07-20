@@ -29,6 +29,12 @@ interface Props {
   rationale?: string
   firedAt?: string
   signalUrl?: string
+  // Personalized position sizing (from user's /dashboard/risk settings)
+  sizeLots?: string
+  sizeUnits?: string
+  sizeRiskUsd?: string
+  sizeBalance?: string
+  sizeRiskPct?: string
 }
 
 const SITE = 'https://jenvu.com'
