@@ -1680,6 +1680,173 @@ export type Database = {
         }
         Relationships: []
       }
+      signal_weight_configs: {
+        Row: {
+          activated_at: string | null
+          created_at: string
+          created_by: string
+          id: string
+          notes: string | null
+          retired_at: string | null
+          status: string
+          updated_at: string
+          version: number
+          weights: Json
+        }
+        Insert: {
+          activated_at?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          notes?: string | null
+          retired_at?: string | null
+          status?: string
+          updated_at?: string
+          version: number
+          weights: Json
+        }
+        Update: {
+          activated_at?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          retired_at?: string | null
+          status?: string
+          updated_at?: string
+          version?: number
+          weights?: Json
+        }
+        Relationships: []
+      }
+      signal_weight_tuning_runs: {
+        Row: {
+          best_config_id: string | null
+          combinations_tested: number
+          created_at: string
+          created_by: string | null
+          finished_at: string | null
+          id: string
+          metrics: Json
+          mode: string
+          range_end: string
+          range_start: string
+          started_at: string
+          status: string
+          symbol: string
+        }
+        Insert: {
+          best_config_id?: string | null
+          combinations_tested?: number
+          created_at?: string
+          created_by?: string | null
+          finished_at?: string | null
+          id?: string
+          metrics?: Json
+          mode: string
+          range_end: string
+          range_start: string
+          started_at?: string
+          status?: string
+          symbol: string
+        }
+        Update: {
+          best_config_id?: string | null
+          combinations_tested?: number
+          created_at?: string
+          created_by?: string | null
+          finished_at?: string | null
+          id?: string
+          metrics?: Json
+          mode?: string
+          range_end?: string
+          range_start?: string
+          started_at?: string
+          status?: string
+          symbol?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signal_weight_tuning_runs_best_config_id_fkey"
+            columns: ["best_config_id"]
+            isOneToOne: false
+            referencedRelation: "signal_weight_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      signal_weight_window_results: {
+        Row: {
+          config_id: string | null
+          created_at: string
+          expectancy_r: number | null
+          fold_index: number
+          id: string
+          in_sample_end: string
+          in_sample_start: string
+          in_sample_win_rate: number | null
+          max_drawdown_r: number | null
+          metrics: Json
+          oos_end: string
+          oos_start: string
+          passed: boolean
+          run_id: string
+          sample_size: number
+          win_rate: number | null
+        }
+        Insert: {
+          config_id?: string | null
+          created_at?: string
+          expectancy_r?: number | null
+          fold_index: number
+          id?: string
+          in_sample_end: string
+          in_sample_start: string
+          in_sample_win_rate?: number | null
+          max_drawdown_r?: number | null
+          metrics?: Json
+          oos_end: string
+          oos_start: string
+          passed?: boolean
+          run_id: string
+          sample_size?: number
+          win_rate?: number | null
+        }
+        Update: {
+          config_id?: string | null
+          created_at?: string
+          expectancy_r?: number | null
+          fold_index?: number
+          id?: string
+          in_sample_end?: string
+          in_sample_start?: string
+          in_sample_win_rate?: number | null
+          max_drawdown_r?: number | null
+          metrics?: Json
+          oos_end?: string
+          oos_start?: string
+          passed?: boolean
+          run_id?: string
+          sample_size?: number
+          win_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signal_weight_window_results_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "signal_weight_configs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signal_weight_window_results_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "signal_weight_tuning_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signup_attempts: {
         Row: {
           created_at: string
