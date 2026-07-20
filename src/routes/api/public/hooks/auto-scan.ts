@@ -327,12 +327,47 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               cost_usd: 0.2,
             });
 
-            // NOTE: Auto-broadcast alerts are NOT billed to recipient wallets.
-            // The scan cost is absorbed by the system pool ledger row above
-            // (auto_scan_pool_ledger). Charging each subscriber $0.20 for a
-            // signal they didn't request would silently drain a paid plan's
-            // monthly wallet (up to max_broadcasts_per_day × $0.20 / day).
-            // Per-user billing only applies to user-initiated manual scans.
+            // Per-recipient billing: charge $0.20 to every paid user who
+            // opted in via alerts_enabled (already filtered above in
+            // `userIds`). Users who disabled alerts are not in `userIds`
+            // and are not charged. Idempotent via unique per-user scanId.
+            let charged = 0;
+            if (userIds.length > 0) {
+              try {
+                const { chargeSignalScan } = await import(
+                  "@/lib/ai-cost-log.server"
+                );
+                const model = "auto-scan/ict-smc";
+                await Promise.all(
+                  userIds.map(async (uid) => {
+                    try {
+                      await chargeSignalScan({
+                        userId: uid,
+                        direction: dir,
+                        model,
+                        symbol: pair,
+                        scanId: `auto_${inserted.id}_${uid}`,
+                        grade,
+                        score: setupScore,
+                      });
+                      charged += 1;
+                    } catch (err) {
+                      console.warn(
+                        "auto-scan chargeSignalScan failed for",
+                        uid,
+                        (err as Error)?.message,
+                      );
+                    }
+                  }),
+                );
+              } catch (e) {
+                console.warn(
+                  "auto-scan chargeSignalScan module import failed",
+                  (e as Error)?.message,
+                );
+              }
+            }
+
 
 
             // Update state: mark broadcast, clear first-hit
