@@ -84,6 +84,46 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           return Response.json({ ok: true, skipped: "daily_cap" });
         }
 
+        // News hard-pause: skip broadcasts if a high-impact USD/XAU red-folder
+        // event lands within ±30 minutes of now. Volatility around NFP, CPI,
+        // FOMC etc. invalidates ICT/SMC setups — better to sit out than to
+        // fire on stop-runs.
+        const newsPauseMin = Number(cfg.news_pause_min ?? 30);
+        let newsPaused: { title: string; minutes: number } | null = null;
+        try {
+          const res = await fetch(
+            "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+            { headers: { "User-Agent": "Mozilla/5.0" } },
+          );
+          if (res.ok) {
+            const raw = (await res.json()) as Array<{
+              title: string;
+              country: string;
+              date: string;
+              impact: string;
+            }>;
+            const now = Date.now();
+            for (const e of raw) {
+              if (e.country !== "USD" && e.country !== "XAU") continue;
+              if (!/High/i.test(e.impact)) continue;
+              const mins = Math.abs((new Date(e.date).getTime() - now) / 60000);
+              if (mins <= newsPauseMin) {
+                newsPaused = { title: e.title, minutes: Math.round(mins) };
+                break;
+              }
+            }
+          }
+        } catch {
+          // Fail open — don't block scans if news feed is down.
+        }
+        if (newsPaused) {
+          return Response.json({
+            ok: true,
+            skipped: "news_pause",
+            event: newsPaused,
+          });
+        }
+
         const results: Array<Record<string, unknown>> = [];
 
         for (const pair of pairs) {
