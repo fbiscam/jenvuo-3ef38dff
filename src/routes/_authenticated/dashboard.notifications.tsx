@@ -323,6 +323,11 @@ function NotificationsPage() {
           })}
         </div>
 
+        {/* Alert sound picker */}
+        <SoundPicker />
+
+
+
         {/* Body */}
         {loading ? (
           <div className="flex items-center justify-center py-20 text-zinc-400">
