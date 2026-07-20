@@ -210,43 +210,46 @@ function HomePage() {
 
       <main>
       {/* HERO */}
-      <section className="mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
+      <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
+        <div className="hero-mesh" aria-hidden="true" />
 
-        <div className="grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
+        <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
           <div className="text-left lg:col-span-7 lg:text-left">
-            
-            <h1 className="mt-5 max-w-3xl text-[26px] font-semibold tracking-tight leading-[1.15] sm:text-4xl md:text-5xl lg:mx-0">
-              <span className="inline-block leading-[1.1] text-zinc-900">Institutional intelligence</span><br />
-              <span className="text-zinc-900">vocalized in real time.</span>
+
+            <h1 className="mt-5 max-w-3xl text-[28px] font-semibold tracking-tight leading-[1.1] sm:text-[42px] md:text-[56px] lg:mx-0">
+              <span className="inline-block text-zinc-900">Institutional</span>{" "}
+              <span className="font-serif-display italic text-zinc-900 tracking-tight">intelligence</span><br />
+              <span className="text-zinc-900">vocalized in </span>
+              <span className="font-serif-display italic text-zinc-900 tracking-tight">real time.</span>
             </h1>
-            <p className="mt-5 max-w-3xl text-[13px] leading-relaxed text-zinc-900 sm:text-base md:text-lg lg:mx-0">
+            <p className="mt-5 max-w-3xl text-[13px] leading-relaxed text-zinc-700 sm:text-base md:text-lg lg:mx-0">
               <span className="sm:hidden">Voice native gold desk narrating live A+ ICT/SMC setups every XAU pair with institutional precision.</span>
               <span className="hidden sm:inline">Voice native gold terminal narrating live A+ ICT/SMC setups<br />across every XAU pair in real time with institutional precision.</span>
             </p>
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
                 to={isAuthed ? "/app" : "/auth"}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
               >
                 Launch Voice Agent
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
               <Link
                 to={isAuthed ? "/signal" : "/auth"}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
+                className="hover-glow inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
               >
                 See Signal Engine
               </Link>
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)]">
               {[
                 ["Markets", "XAU"],
                 ["Frameworks", "ICT, SMC"],
                 ["Avg. R:R", "1 : 3.2"],
               ].map(([k, v]) => (
-                <div key={k} className="bg-white p-5 text-left text-zinc-900 sm:text-left">
+                <div key={k} className="bg-white p-5 text-left text-zinc-900 sm:text-left transition-colors hover:bg-zinc-50/60">
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>{k}</div>
                   <div className="mt-2 text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">{v}</div>
                 </div>
@@ -255,6 +258,7 @@ function HomePage() {
           </div>
         </div>
       </section>
+
 
       {/* TERMINAL WORKSTATION */}
       <section className="mx-auto max-w-6xl px-5 -mt-8 pb-14 sm:px-6 sm:-mt-12 sm:pb-20">
