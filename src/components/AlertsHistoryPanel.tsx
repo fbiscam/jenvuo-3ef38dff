@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import type { SignalAlertRow } from '@/lib/signal-alerts.functions'
 import { cn } from '@/lib/utils'
+import { MiniPairChart } from '@/components/MiniPairChart'
+
 
 const MONO = 'font-mono'
 
