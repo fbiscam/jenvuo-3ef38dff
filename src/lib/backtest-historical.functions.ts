@@ -73,104 +73,115 @@ export const runHistoricalBacktest = createServerFn({ method: "POST" })
       return emptyResult(inst.display, threshold, "Not enough historical candles for a meaningful backtest", Math.max(ltf.length, htf.length));
     }
 
-    const trades: BacktestTrade[] = [];
-    const START = Math.min(200, Math.max(60, Math.floor(ltf.length * 0.25))); // need lookback for HTF context
-    const LOOKAHEAD = Math.min(96, Math.max(32, Math.floor(ltf.length * 0.12))); // up to 24h on 15m
-    const HTF_WINDOW = Math.min(300, htf.length);
-    const LTF_WINDOW = Math.min(200, Math.max(80, START));
-    
-
-    // Track last simulated trade bar so we don't stack overlapping setups.
-    let cooldownUntil = -1;
-
-    for (let i = START; i < ltf.length - LOOKAHEAD - 1; i++) {
-      if (i < cooldownUntil) continue;
-
-      const ltfSlice = ltf.slice(Math.max(0, i - LTF_WINDOW), i + 1);
-      const ltfLast = ltfSlice[ltfSlice.length - 1];
-      // Align HTF slice to LTF time
-      const htfEndIdx = findHtfIndex(htf, ltfLast.t);
-      if (htfEndIdx < 50) continue;
-      const htfSlice = htf.slice(Math.max(0, htfEndIdx - HTF_WINDOW), htfEndIdx + 1);
-
-      const htfA = analyzeTF(htfSlice);
-      const ltfA = analyzeTF(ltfSlice);
-      const pools = buildLiquidityPools(htfSlice, ltfSlice);
-      const atr = computeATR(ltfSlice, 14);
-      const last = ltfLast.c;
-
-      const built = buildTrade(htfA, ltfA, pools, last, atr, inst.kind as any);
-      if (built.direction === "WAIT") continue;
-
-      const htfStructureEvents = htfA.lastStructure ? [htfA.lastStructure] : [];
-      const structureQuality = htfStructureEvents.length
-        ? computeStructureQuality(htfSlice, htfStructureEvents)
-        : null;
-      const scored = scoreSetup({
-        trade: built,
-        htf: htfA,
-        ltf: ltfA,
-        pools,
-        inKillzone: true,
-        imminentHighNews: false,
-        dxyConfirms: null,
-        lastPrice: last,
-        kind: inst.kind as any,
-        structureQuality,
-        smtDivergence: null,
-        nativeSession: null,
-        zoneMitigated: false,
-      });
-
-      if (scored.score < threshold) continue;
-      if (!Number.isFinite(built.entry) || !Number.isFinite(built.sl) || !Number.isFinite(built.tp)) continue;
-
-      // Walk forward to determine outcome
-      const outcome = walkForward(ltf, i, built.direction, built.entry, built.sl, built.tp, LOOKAHEAD);
-
-      trades.push({
-        barIndex: i,
-        time: ltfLast.t,
-        direction: built.direction as "BUY" | "SELL",
-        entry: +built.entry.toFixed(inst.decimals),
-        sl: +built.sl.toFixed(inst.decimals),
-        tp: +built.tp.toFixed(inst.decimals),
-        score: Math.round(scored.score),
-        outcome: outcome.outcome,
-        rMultiple: +outcome.rMultiple.toFixed(2),
-      });
-
-      // 8-bar cooldown so we don't compound the same setup
-      cooldownUntil = i + 8;
-    }
-
-    const wins = trades.filter((t) => t.outcome === "win").length;
-    const losses = trades.filter((t) => t.outcome === "loss").length;
-    const expired = trades.filter((t) => t.outcome === "expired").length;
-    const decided = wins + losses;
-    const winRate = decided > 0 ? (wins / decided) * 100 : null;
-    const rs = trades.map((t) => t.rMultiple);
-    const avgR = rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : null;
-    const bestR = rs.length ? Math.max(...rs) : null;
-    const worstR = rs.length ? Math.min(...rs) : null;
+    const sim = simulateOnCandles({
+      ltf, htf, kind: inst.kind as any, threshold,
+      decimals: inst.decimals,
+    });
 
     return {
       symbol: inst.display,
       bars: ltf.length,
-      simulated: trades.length,
-      wins,
-      losses,
-      expired,
-      winRate,
-      avgR,
-      bestR,
-      worstR,
-      trades: trades.slice(-30).reverse(),   // return the most recent 30
+      simulated: sim.trades.length,
+      wins: sim.wins,
+      losses: sim.losses,
+      expired: sim.expired,
+      winRate: sim.winRate,
+      avgR: sim.avgR,
+      bestR: sim.bestR,
+      worstR: sim.worstR,
+      trades: sim.trades.slice(-30).reverse(),
       threshold,
       disclaimer:
         "Deterministic SMC engine only — no AI-review layer, no news filter. Live signals apply an additional dual-AI review that may filter or refine these further. Past results ≠ future results.",
     };
   });
+
+/**
+ * Pure simulation on pre-fetched candles. Exposed so the weight-tuning
+ * grid search can score many candidate weight sets against the same
+ * historical window without re-fetching data each time.
+ */
+export function simulateOnCandles(args: {
+  ltf: Candle[];
+  htf: Candle[];
+  kind: "crypto" | "metal" | "forex" | "index" | "stock";
+  threshold: number;
+  decimals: number;
+  weightsOverride?: FactorWeightsByAsset | null;
+  timeFilter?: (t: number) => boolean;
+}) {
+  const { ltf, htf, kind, threshold, decimals, weightsOverride, timeFilter } = args;
+  const trades: BacktestTrade[] = [];
+  const START = Math.min(200, Math.max(60, Math.floor(ltf.length * 0.25)));
+  const LOOKAHEAD = Math.min(96, Math.max(32, Math.floor(ltf.length * 0.12)));
+  const HTF_WINDOW = Math.min(300, htf.length);
+  const LTF_WINDOW = Math.min(200, Math.max(80, START));
+  let cooldownUntil = -1;
+
+  for (let i = START; i < ltf.length - LOOKAHEAD - 1; i++) {
+    if (i < cooldownUntil) continue;
+    const ltfSlice = ltf.slice(Math.max(0, i - LTF_WINDOW), i + 1);
+    const ltfLast = ltfSlice[ltfSlice.length - 1];
+    if (timeFilter && !timeFilter(ltfLast.t)) continue;
+    const htfEndIdx = findHtfIndex(htf, ltfLast.t);
+    if (htfEndIdx < 50) continue;
+    const htfSlice = htf.slice(Math.max(0, htfEndIdx - HTF_WINDOW), htfEndIdx + 1);
+    const htfA = analyzeTF(htfSlice);
+    const ltfA = analyzeTF(ltfSlice);
+    const pools = buildLiquidityPools(htfSlice, ltfSlice);
+    const atr = computeATR(ltfSlice, 14);
+    const last = ltfLast.c;
+    const built = buildTrade(htfA, ltfA, pools, last, atr, kind);
+    if (built.direction === "WAIT") continue;
+    const htfStructureEvents = htfA.lastStructure ? [htfA.lastStructure] : [];
+    const structureQuality = htfStructureEvents.length
+      ? computeStructureQuality(htfSlice, htfStructureEvents)
+      : null;
+    const scored = scoreSetup({
+      trade: built, htf: htfA, ltf: ltfA, pools,
+      inKillzone: true, imminentHighNews: false, dxyConfirms: null,
+      lastPrice: last, kind,
+      structureQuality, smtDivergence: null, nativeSession: null, zoneMitigated: false,
+      weightsOverride: weightsOverride ?? null,
+    });
+    if (scored.score < threshold) continue;
+    if (!Number.isFinite(built.entry) || !Number.isFinite(built.sl) || !Number.isFinite(built.tp)) continue;
+    const outcome = walkForward(ltf, i, built.direction, built.entry, built.sl, built.tp, LOOKAHEAD);
+    trades.push({
+      barIndex: i, time: ltfLast.t,
+      direction: built.direction as "BUY" | "SELL",
+      entry: +built.entry.toFixed(decimals),
+      sl: +built.sl.toFixed(decimals),
+      tp: +built.tp.toFixed(decimals),
+      score: Math.round(scored.score),
+      outcome: outcome.outcome,
+      rMultiple: +outcome.rMultiple.toFixed(2),
+    });
+    cooldownUntil = i + 8;
+  }
+
+  const wins = trades.filter((t) => t.outcome === "win").length;
+  const losses = trades.filter((t) => t.outcome === "loss").length;
+  const expired = trades.filter((t) => t.outcome === "expired").length;
+  const decided = wins + losses;
+  const winRate = decided > 0 ? (wins / decided) * 100 : null;
+  const rs = trades.map((t) => t.rMultiple);
+  const avgR = rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : null;
+  const bestR = rs.length ? Math.max(...rs) : null;
+  const worstR = rs.length ? Math.min(...rs) : null;
+  return { trades, wins, losses, expired, winRate, avgR, bestR, worstR };
+}
+
+/** Fetch pre-normalized candle series for the tuning module. */
+export async function fetchBacktestSeries(symbol: string) {
+  const inst = resolveInstrument(symbol);
+  const [ltf, htf] = await Promise.all([
+    fetchBacktestCandles(inst, "15m", 900),
+    fetchBacktestCandles(inst, "1h", 600),
+  ]);
+  return { inst, ltf, htf };
+}
+
 
 // ------------- helpers -------------
 
