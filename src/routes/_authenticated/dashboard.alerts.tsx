@@ -247,7 +247,8 @@ function AlertPrefs() {
       entry: a.entry,
       stop_loss: a.sl,
       take_profit: a.tp,
-      outcome: "pending",
+      outcome: "open",
+      opened_at: new Date().toISOString(),
       notes: `Auto-logged from ${a.grade} alert · Conf ${a.confidence}%${a.session ? " · " + a.session : ""}`,
     } as never);
     setLoggingId(null);
