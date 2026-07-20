@@ -754,21 +754,10 @@ function AlertPrefs() {
             <div className="mt-2 flex flex-wrap gap-2">
               {ALL_GRADES.map((g) => {
                 const on = prefs.email_grades.includes(g);
-                const styles: Record<string, { on: string; off: string }> = {
-                  "A+": {
-                    on: "bg-white text-emerald-700 border-emerald-500 shadow-sm shadow-emerald-500/20",
-                    off: "bg-white text-emerald-700 border-white hover:border-emerald-300",
-                  },
-                  "A": {
-                    on: "bg-white text-sky-700 border-sky-500 shadow-sm shadow-sky-500/20",
-                    off: "bg-white text-sky-700 border-white hover:border-sky-300",
-                  },
-                  "B": {
-                    on: "bg-white text-amber-700 border-amber-500 shadow-sm shadow-amber-500/20",
-                    off: "bg-white text-amber-700 border-white hover:border-amber-300",
-                  },
+                const s = {
+                  on: "bg-zinc-900 text-white border-zinc-900",
+                  off: "bg-white text-zinc-900 border-zinc-200 hover:border-zinc-400",
                 };
-                const s = styles[g] ?? styles["B"];
                 return (
                   <button
                     key={g}
