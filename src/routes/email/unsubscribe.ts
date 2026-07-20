@@ -19,9 +19,19 @@ export const Route = createFileRoute("/email/unsubscribe")({
           return Response.json({ error: 'Server configuration error' }, { status: 500 })
         }
 
-        // Extract token from query params
         const url = new URL(request.url)
         const token = url.searchParams.get('token')
+
+        // Browser click (Gmail "Unsubscribe" button, etc.) → redirect to the
+        // friendly /unsubscribe page. In-app fetch() calls set
+        // Accept: application/json and continue to the JSON API below.
+        const accept = request.headers.get('accept') ?? ''
+        const wantsJson = accept.includes('application/json') && !accept.includes('text/html')
+        if (!wantsJson) {
+          const dest = new URL('/unsubscribe', url.origin)
+          if (token) dest.searchParams.set('token', token)
+          return Response.redirect(dest.toString(), 302)
+        }
 
         if (!token) {
           return Response.json({ error: 'Token is required' }, { status: 400 })
