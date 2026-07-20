@@ -213,16 +213,12 @@ function HomePage() {
       <main>
       {/* HERO */}
       <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
-        <div className="hero-mesh" aria-hidden="true" />
-
         <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
           <div className="text-left lg:col-span-7 lg:text-left">
 
-            <h1 className="mt-5 max-w-3xl text-[28px] font-semibold tracking-tight leading-[1.1] sm:text-[42px] md:text-[56px] lg:mx-0">
-              <span className="inline-block text-zinc-900">Institutional</span>{" "}
-              <span className="font-serif-display italic text-zinc-900 tracking-tight">intelligence</span><br />
-              <span className="text-zinc-900">vocalized in </span>
-              <span className="font-serif-display italic text-zinc-900 tracking-tight">real time.</span>
+            <h1 className="mt-5 max-w-3xl text-[28px] font-semibold tracking-tight leading-[1.1] sm:text-[42px] md:text-[56px] lg:mx-0 text-zinc-900">
+              Institutional intelligence<br />
+              vocalized in real time.
             </h1>
             <p className="mt-5 max-w-3xl text-[13px] leading-relaxed text-zinc-700 sm:text-base md:text-lg lg:mx-0">
               <span className="sm:hidden">Voice native gold desk narrating live A+ ICT/SMC setups every XAU pair with institutional precision.</span>
