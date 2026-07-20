@@ -483,6 +483,8 @@ export function scoreSetup(args: {
   momentumDivergence?: { present: boolean; detail: string } | null;
   volumeSpike?: { spike: boolean; detail: string } | null;
   midnightOpen?: { aligned: boolean; detail: string } | null;
+  // ---- tuning override: swap in a candidate weight set without changing the module default ----
+  weightsOverride?: FactorWeightsByAsset | null;
 }): {
   score: number;
   grade: "A+" | "A" | "B" | "C";
@@ -495,8 +497,11 @@ export function scoreSetup(args: {
     displacement, rejection, confluence, freshness,
     equalHL, turtleSoup, htfPOI, silverBullet, powerOf3, mitigationBlock,
     ceTap, liquidityVoid, momentumDivergence, volumeSpike, midnightOpen,
+    weightsOverride,
   } = args;
-  const w = FACTOR_WEIGHTS[kind] ?? FACTOR_WEIGHTS.metal;
+  const table = weightsOverride ?? FACTOR_WEIGHTS;
+  const w = table[kind] ?? table.metal ?? FACTOR_WEIGHTS.metal;
+
   const f: ScoreFactor[] = [];
   const vetos: VetoResult[] = [];
   const dir = trade.direction;
