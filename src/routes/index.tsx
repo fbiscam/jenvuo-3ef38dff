@@ -199,7 +199,7 @@ function HomePage() {
               <span key={i} className="flex items-center gap-2">
                 <span className="text-zinc-900 font-medium">{s}</span>
                 <span>{p}</span>
-                <span className={d === "…" ? "text-zinc-400" : d.startsWith("-") ? "text-red-500" : "text-emerald-600"}>{d}</span>
+                <span className={d === "…" ? "text-zinc-500" : d.startsWith("-") ? "text-red-600" : "text-emerald-700"}>{d}</span>
                 <span className="text-zinc-200">•</span>
               </span>
             ))}
@@ -208,8 +208,10 @@ function HomePage() {
 
       </header>
 
+      <main>
       {/* HERO */}
       <section className="mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
+
         <div className="grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
           <div className="text-left lg:col-span-7 lg:text-left">
             
@@ -777,7 +779,7 @@ function HomePage() {
                     <div className="font-medium text-zinc-900">{n}</div>
                     <div className="text-zinc-500">{r}</div>
                   </div>
-                  <span className="text-zinc-400">↗</span>
+                  <span className="text-zinc-600" aria-hidden="true">↗</span>
                 </figcaption>
               </figure>
             ))}
@@ -952,10 +954,12 @@ function HomePage() {
           </div>
         </div>
       </section>
+      </main>
 
       <SiteFooter />
     </div>
     </>
+
   );
 }
 

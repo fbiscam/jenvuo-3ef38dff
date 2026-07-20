@@ -40,7 +40,7 @@ function NewsletterSubscribe() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@example.com"
         maxLength={255}
-        className="flex-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-900 placeholder:text-zinc-400 outline-none"
+        className="flex-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-900 placeholder:text-zinc-500 outline-none"
       />
       <button
         type="submit"
