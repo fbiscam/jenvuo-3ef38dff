@@ -56,6 +56,7 @@ import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/
 import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_authenticated/dashboard.workspace'
 import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authenticated/dashboard.usage'
 import { Route as AuthenticatedDashboardSecurityRouteImport } from './routes/_authenticated/dashboard.security'
+import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
 import { Route as AuthenticatedDashboardReferralsRouteImport } from './routes/_authenticated/dashboard.referrals'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
@@ -323,6 +324,12 @@ const AuthenticatedDashboardSecurityRoute =
     path: '/security',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardRiskRoute =
+  AuthenticatedDashboardRiskRouteImport.update({
+    id: '/risk',
+    path: '/risk',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardReferralsRoute =
   AuthenticatedDashboardReferralsRouteImport.update({
     id: '/referrals',
@@ -535,6 +542,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
+  '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
@@ -607,6 +615,7 @@ export interface FileRoutesByTo {
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
+  '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
@@ -685,6 +694,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
+  '/_authenticated/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/_authenticated/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/_authenticated/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
@@ -763,6 +773,7 @@ export interface FileRouteTypes {
     | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/referrals'
+    | '/dashboard/risk'
     | '/dashboard/security'
     | '/dashboard/usage'
     | '/dashboard/workspace'
@@ -835,6 +846,7 @@ export interface FileRouteTypes {
     | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/referrals'
+    | '/dashboard/risk'
     | '/dashboard/security'
     | '/dashboard/usage'
     | '/dashboard/workspace'
@@ -912,6 +924,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/notifications'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/referrals'
+    | '/_authenticated/dashboard/risk'
     | '/_authenticated/dashboard/security'
     | '/_authenticated/dashboard/usage'
     | '/_authenticated/dashboard/workspace'
@@ -1324,6 +1337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSecurityRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/risk': {
+      id: '/_authenticated/dashboard/risk'
+      path: '/risk'
+      fullPath: '/dashboard/risk'
+      preLoaderRoute: typeof AuthenticatedDashboardRiskRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/referrals': {
       id: '/_authenticated/dashboard/referrals'
       path: '/referrals'
@@ -1532,6 +1552,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
+  AuthenticatedDashboardRiskRoute: typeof AuthenticatedDashboardRiskRoute
   AuthenticatedDashboardSecurityRoute: typeof AuthenticatedDashboardSecurityRoute
   AuthenticatedDashboardUsageRoute: typeof AuthenticatedDashboardUsageRoute
   AuthenticatedDashboardWorkspaceRoute: typeof AuthenticatedDashboardWorkspaceRoute
@@ -1556,6 +1577,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardNotificationsRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
     AuthenticatedDashboardReferralsRoute: AuthenticatedDashboardReferralsRoute,
+    AuthenticatedDashboardRiskRoute: AuthenticatedDashboardRiskRoute,
     AuthenticatedDashboardSecurityRoute: AuthenticatedDashboardSecurityRoute,
     AuthenticatedDashboardUsageRoute: AuthenticatedDashboardUsageRoute,
     AuthenticatedDashboardWorkspaceRoute: AuthenticatedDashboardWorkspaceRoute,
