@@ -339,6 +339,34 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               continue;
             }
 
+            // Paper-trading log: record every broadcasted signal for
+            // objective outcome tracking (win/loss/timeout) resolved later
+            // by the paper-trade-resolver hook. Independent of user
+            // "Trade Done" self-reporting.
+            await supabaseAdmin.from("signal_paper_trades").insert({
+              pair,
+              direction: dir,
+              entry: round(entry),
+              sl: round(sl),
+              tp: round(tp),
+              rr: Number(rr.toFixed(2)),
+              confidence: Math.round(conf),
+              setup_score: setupScore,
+              grade,
+              htf_bias: plan.htfBias ?? null,
+              killzone: plan.killzone ?? null,
+              session,
+              gates: {
+                min_conf: minConf,
+                confirmed_hit: true,
+                killzone_passed: true,
+                cooldown_passed: true,
+              },
+              broadcast_alert_id: inserted.id,
+              outcome: "pending",
+            });
+
+
             // In-app notifications to all paid users
             const { data: paidUsers } = await supabaseAdmin
               .from("user_subscriptions")
