@@ -36,16 +36,23 @@ export function computePositionSize(input: {
   const riskUsd = (balanceUsd * riskPct) / 100;
   const dollarPerLotPerUnit = contract; // 100 oz per lot
   const rawLots = riskUsd / (stopDist * dollarPerLotPerUnit);
-  const lots = Math.max(0.01, Math.round(rawLots * 100) / 100);
-  const units = Math.round(lots * contract);
+  // Do NOT clamp to a minimum broker lot — small accounts must see honest
+  // sizing (e.g. $10 balance @ 1% on XAU cannot afford 0.01 lot). Round to
+  // 3dp so micro-lots (0.001) are visible.
+  const lots = Math.max(0, Math.round(rawLots * 1000) / 1000);
+  const units = Math.round(lots * contract * 100) / 100;
+  const belowMin = lots > 0 && lots < 0.01;
 
   return {
     lots,
     units,
     riskUsd: Math.round(riskUsd * 100) / 100,
     stopDistance: stopDist,
-    note: `${lots.toFixed(2)} lot · ${units} oz · risking $${riskUsd.toFixed(2)} (${riskPct}%)`,
+    note: belowMin
+      ? `${lots.toFixed(3)} lot · risking $${riskUsd.toFixed(2)} (${riskPct}%) — below 0.01 broker min; increase balance or skip`
+      : `${lots.toFixed(2)} lot · ${units.toFixed(0)} oz · risking $${riskUsd.toFixed(2)} (${riskPct}%)`,
   };
+
 }
 
 // Sum realized losses (negative pnl) for today from trade_journal.
