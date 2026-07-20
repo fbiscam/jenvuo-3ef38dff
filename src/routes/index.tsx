@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import { SignalTicker } from "@/components/SignalTicker";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
