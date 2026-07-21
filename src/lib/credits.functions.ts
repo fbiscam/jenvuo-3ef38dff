@@ -52,7 +52,7 @@ export const getCreditState = createServerFn({ method: "GET" })
     const [{ data: sub }, { data: bal }, { data: ledger }] = await Promise.all([
       supabase
         .from("user_subscriptions")
-        .select("plan_id, plans:plan_id ( id, name, price_usd, wallet_usd, monthly_credits, feature_journal, feature_realtime_alerts, feature_full_ict, feature_scanner )")
+        .select("plan_id, status")
         .eq("user_id", userId)
         .maybeSingle(),
       supabase.from("credit_balances").select("balance, monthly_allowance, period_resets_at").eq("user_id", userId).maybeSingle(),
@@ -60,6 +60,15 @@ export const getCreditState = createServerFn({ method: "GET" })
         .select("id, delta, reason, balance_after, created_at, model, stage, prompt_tokens, completion_tokens, raw_cost_usd, metadata")
         .eq("user_id", userId).order("created_at", { ascending: false }).limit(60),
     ]);
+
+    // Fetch plan row separately to avoid PostgREST embed edge-cases
+    // (array vs object, null on join). Falls back to Free defaults.
+    const planId = (sub?.plan_id as string | null) ?? "free";
+    const { data: planRow } = await supabase
+      .from("plans")
+      .select("id, name, price_usd, wallet_usd, monthly_credits, feature_journal, feature_realtime_alerts, feature_full_ict, feature_scanner")
+      .eq("id", planId)
+      .maybeSingle();
 
     const ledgerRows = ledger ?? [];
     let actualModelMatches = new Map<string, MatchedAiModels>();
@@ -79,7 +88,7 @@ export const getCreditState = createServerFn({ method: "GET" })
       }
     }
 
-    const plan = (sub?.plans as any) ?? { id: "free", name: "Free", price_usd: 0, wallet_usd: 1.00, feature_journal: false, feature_realtime_alerts: false, feature_full_ict: false, feature_scanner: false };
+    const plan = (planRow as any) ?? { id: "free", name: "Free", price_usd: 0, wallet_usd: 1.00, feature_journal: false, feature_realtime_alerts: false, feature_full_ict: false, feature_scanner: false };
     const walletUsd = Number(plan.wallet_usd ?? 0);
 
     return {
