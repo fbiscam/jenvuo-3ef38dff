@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Jenvu</title>
+<style>
+  body { width: 320px; margin: 0; padding: 14px; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #fff; color: #111827; }
+  h1 { font-size: 15px; margin: 0 0 6px; }
+  p { font-size: 11px; color: #6b7280; margin: 0 0 10px; }
+  label { font-size: 11px; color: #374151; display: block; margin-top: 8px; }
+  input, select { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 12px; margin-top: 4px; }
+  button { margin-top: 10px; width: 100%; padding: 9px; border: 0; border-radius: 8px; background: #111827; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+  button.secondary { background: #f3f4f6; color: #111827; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  .status { margin-top: 10px; padding: 8px 10px; font-size: 11px; border-radius: 8px; background: #f9fafb; color: #374151; }
+  .status.ok { background: #ecfdf5; color: #065f46; }
+  .status.err { background: #fef2f2; color: #991b1b; }
+  .sig { margin-top: 10px; padding: 10px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 12px; }
+  .sig b { font-weight: 600; }
+  .sig .row2 { display: flex; justify-content: space-between; margin-top: 2px; }
+  .muted { color: #6b7280; font-size: 10px; }
+  a { color: #2563eb; text-decoration: none; font-size: 11px; }
+</style>
+</head>
+<body>
+  <h1>Jenvu · TradingView</h1>
+  <p>Auto-draw signals on your chart.</p>
+
+  <label>API endpoint
+    <select id="endpoint">
+      <option value="https://jenvu.com">jenvu.com (production)</option>
+      <option value="https://jenvuo.lovable.app">jenvuo.lovable.app</option>
+      <option value="custom">Custom…</option>
+    </select>
+  </label>
+  <input id="customEndpoint" placeholder="https://your-domain.com" style="display:none">
+
+  <label>Access token
+    <input id="token" type="password" placeholder="jext_..." />
+  </label>
+
+  <div class="row">
+    <button id="save">Connect</button>
+    <button id="test" class="secondary">Test</button>
+  </div>
+
+  <div id="status" class="status">Not connected.</div>
+  <div id="signal" class="sig" style="display:none"></div>
+
+  <p style="margin-top:12px" class="muted">
+    Get your token from <a href="https://jenvu.com/dashboard/extension" target="_blank">jenvu.com/dashboard/extension</a>.
+  </p>
+
+  <script src="popup.js"></script>
+</body>
+</html>

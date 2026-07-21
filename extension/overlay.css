@@ -1,0 +1,16 @@
+#jenvu-card {
+  position: fixed; top: 90px; right: 20px; width: 240px;
+  background: #ffffff; color: #111827; border: 1px solid #e5e7eb; border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 10px 12px; font: 12px/1.35 'Google Sans', system-ui, sans-serif;
+  z-index: 2147483647;
+}
+#jenvu-card .jv-head { display:flex; justify-content:space-between; align-items:center; padding-left:8px; margin:-2px -4px 6px -4px; }
+#jenvu-card .jv-pair { font-weight:600; font-size: 13px; }
+#jenvu-card .jv-close { background:transparent; border:0; font-size:18px; color:#6b7280; cursor:pointer; padding:0 4px; }
+#jenvu-card .jv-row { display:flex; justify-content:space-between; padding:2px 0; }
+#jenvu-card .jv-row b { font-weight:600; }
+#jenvu-card .jv-meta { margin-top:6px; padding-top:6px; border-top:1px dashed #e5e7eb; color:#6b7280; font-size:11px; }
+#jenvu-card .jv-actions { display:flex; gap:6px; margin-top:8px; }
+#jenvu-card .jv-btn { flex:1; padding:6px; border:1px solid #e5e7eb; background:#f9fafb; border-radius:6px; font-size:11px; cursor:pointer; }
+#jenvu-card .jv-btn:hover { background:#f3f4f6; }
