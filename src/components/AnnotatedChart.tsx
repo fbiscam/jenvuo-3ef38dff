@@ -138,8 +138,7 @@ export default function AnnotatedChart({ data, visible }: Props) {
           }));
           // lightweight-charts v5 exposes markers via createSeriesMarkers primitive
           try {
-            // @ts-expect-error — createSeriesMarkers is a runtime export in v5.
-            const { createSeriesMarkers } = mod;
+            const createSeriesMarkers = (mod as unknown as { createSeriesMarkers?: (s: unknown, m: Marker[]) => unknown }).createSeriesMarkers;
             if (typeof createSeriesMarkers === "function") {
               createSeriesMarkers(series, markers);
             }
