@@ -234,7 +234,7 @@ export const getChartData = createServerFn({ method: "POST" })
 
       return {
         ok: true,
-        pair: inst.symbol,
+        pair: data.pair,
         display: inst.display,
         decimals: inst.decimals,
         timeframe: ltfTf,
@@ -257,7 +257,7 @@ export const getChartData = createServerFn({ method: "POST" })
       return {
         ok: false,
         error: msg,
-        pair: inst.symbol,
+        pair: data.pair,
         display: inst.display,
         decimals: inst.decimals,
         timeframe: ltfTf,
