@@ -229,8 +229,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               .eq("pair", pair)
               .maybeSingle();
 
-            // Cooldown check
-            if (state?.last_broadcast_at) {
+            // Cooldown check — bypassed in manual mode (user is explicitly asking).
+            if (!manualMode && state?.last_broadcast_at) {
               const since =
                 (now.getTime() -
                   new Date(state.last_broadcast_at).getTime()) /
