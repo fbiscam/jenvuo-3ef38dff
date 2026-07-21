@@ -40,7 +40,7 @@ export const runManualScanBroadcast = createServerFn({ method: 'POST' })
         }),
       })
       const body = await res.json().catch(() => ({}))
-      return { ok: res.ok as const, status: res.status, body }
+      return { ok: res.ok, status: res.status, body }
     } catch (e) {
       return { ok: false as const, error: (e as Error).message }
     }
