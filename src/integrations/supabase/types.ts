@@ -1628,12 +1628,16 @@ export type Database = {
           htf_bias: string | null
           id: string
           killzone: string | null
+          markings: Json | null
+          narration: Json | null
           pair: string
           rationale: string | null
           rr: number | null
           session: string | null
           setup_score: number | null
           sl: number
+          structure: Json | null
+          swings: Json | null
           tp: number
         }
         Insert: {
@@ -1646,12 +1650,16 @@ export type Database = {
           htf_bias?: string | null
           id?: string
           killzone?: string | null
+          markings?: Json | null
+          narration?: Json | null
           pair?: string
           rationale?: string | null
           rr?: number | null
           session?: string | null
           setup_score?: number | null
           sl: number
+          structure?: Json | null
+          swings?: Json | null
           tp: number
         }
         Update: {
@@ -1664,12 +1672,16 @@ export type Database = {
           htf_bias?: string | null
           id?: string
           killzone?: string | null
+          markings?: Json | null
+          narration?: Json | null
           pair?: string
           rationale?: string | null
           rr?: number | null
           session?: string | null
           setup_score?: number | null
           sl?: number
+          structure?: Json | null
+          swings?: Json | null
           tp?: number
         }
         Relationships: []

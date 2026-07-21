@@ -70,7 +70,9 @@ export const Route = createFileRoute("/api/public/extension/latest-signal")({
         const cutoff = new Date(Date.now() - 30 * 60 * 1000).toISOString();
         const { data: sig } = await supabaseAdmin
           .from("signal_alerts")
-          .select("id, pair, direction, entry, sl, tp, rr, confidence, grade, killzone, session, htf_bias, created_at")
+          .select(
+            "id, pair, direction, entry, sl, tp, rr, confidence, grade, killzone, session, htf_bias, markings, narration, structure, swings, created_at",
+          )
           .gte("created_at", cutoff)
           .order("created_at", { ascending: false })
           .limit(1)
@@ -87,6 +89,7 @@ export const Route = createFileRoute("/api/public/extension/latest-signal")({
           }),
           { status: 200, headers: { ...CORS, "content-type": "application/json" } },
         );
+
       },
     },
   },

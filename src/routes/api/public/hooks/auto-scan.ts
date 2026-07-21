@@ -387,6 +387,26 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                       ? "New York"
                       : "After Hours";
 
+            // Package SMC markings + narration from the SAME engine output so
+            // the Chrome extension can redraw them on TradingView charts
+            // (BOS/CHoCH, FVG, order blocks, liquidity, entry/SL/TP) with a
+            // Claude-style step-by-step reveal, instead of just 3 price lines.
+            const bpAny = broadcastPlan as any;
+            const markingsPayload = Array.isArray(bpAny.markings)
+              ? bpAny.markings.slice(0, 40)
+              : null;
+            const narrationPayload = Array.isArray(bpAny.narration)
+              ? bpAny.narration.slice(0, 12)
+              : null;
+            const structurePayload = {
+              htfBias: bpAny.htfBias ?? null,
+              ltfBias: bpAny.ltfBias ?? null,
+              killzone: bpAny.killzone ?? null,
+              alignmentLabel: bpAny.alignmentLabel ?? null,
+              rr: Number(rr.toFixed(2)),
+            };
+            const swingsPayload = bpAny.swings ?? bpAny.dealingRange ?? null;
+
             // Insert signal_alert
             const { data: inserted, error: insErr } = await supabaseAdmin
               .from("signal_alerts")
@@ -407,9 +427,14 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                   0,
                   1000,
                 ),
+                markings: markingsPayload,
+                narration: narrationPayload,
+                structure: structurePayload,
+                swings: swingsPayload,
               })
               .select("id, fired_at")
               .single();
+
 
             if (insErr || !inserted) {
               results.push({
