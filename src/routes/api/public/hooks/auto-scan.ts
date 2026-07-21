@@ -278,11 +278,46 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               continue;
             }
 
+            // Re-quote at broadcast: recompute entry/SL/TP from the latest
+            // candle right before firing. The initial `plan` above was used
+            // to check gates (direction, conf, killzone, HTF bias); by the
+            // time we reach the broadcast step, state lookups and cooldown
+            // checks have added latency — refresh so the levels users see
+            // reflect the freshest market snapshot, not the top-of-loop one.
+            let broadcastPlan = plan;
+            try {
+              const fresh = await computeSignalPlan({ symbol: pair }, null);
+              const freshDir = fresh.trade?.direction;
+              const freshConf = Number(fresh.trade?.confidence ?? 0);
+              // Only accept the requote if direction still matches and
+              // confidence hasn't collapsed below threshold. Otherwise the
+              // setup has invalidated between checks — skip instead of
+              // broadcasting a mixed signal.
+              if (freshDir === dir && freshConf >= minConf) {
+                broadcastPlan = fresh;
+              } else {
+                await supabaseAdmin
+                  .from("auto_scan_state")
+                  .delete()
+                  .eq("pair", pair);
+                results.push({
+                  pair,
+                  action: "requote_invalidated",
+                  original_dir: dir,
+                  requote_dir: freshDir,
+                  requote_conf: freshConf,
+                });
+                continue;
+              }
+            } catch {
+              // Requote failed (transient upstream) — fall back to original plan.
+            }
+
             // Broadcast on first qualifying hit
-            const dec = plan.instrument?.decimals ?? 2;
-            const entry = Number(plan.trade?.entry);
-            const sl = Number(plan.trade?.sl);
-            const tp = Number(plan.trade?.tp1 ?? plan.trade?.tp);
+            const dec = broadcastPlan.instrument?.decimals ?? 2;
+            const entry = Number(broadcastPlan.trade?.entry);
+            const sl = Number(broadcastPlan.trade?.sl);
+            const tp = Number(broadcastPlan.trade?.tp1 ?? broadcastPlan.trade?.tp);
             if (!isFinite(entry) || !isFinite(sl) || !isFinite(tp)) {
               results.push({ pair, action: "invalid_levels" });
               continue;
