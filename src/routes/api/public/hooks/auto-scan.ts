@@ -293,6 +293,36 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const riskDist = Math.abs(entry - sl);
             const rewardDist = Math.abs(tp - entry);
             const rr = riskDist > 0 ? rewardDist / riskDist : 0;
+
+            // Freshness gate: refuse to broadcast if live price has already
+            // drifted more than 40% of the risk distance toward SL (stale
+            // entry) or already blown past TP. This prevents "SELL @ 4051
+            // while live is 4072" (entry already at SL) situations caused by
+            // 15-min two-hit confirmation lag on fast-moving markets.
+            try {
+              const live = await getLiveTick({ data: { symbol: pair } });
+              const lp = Number(live?.price);
+              if (isFinite(lp) && lp > 0 && riskDist > 0) {
+                const towardSL = dir === "BUY" ? entry - lp : lp - entry;
+                const towardTP = dir === "BUY" ? lp - entry : entry - lp;
+                const staleSL = towardSL > 0.4 * riskDist;
+                const pastTP = towardTP > 0.6 * rewardDist;
+                if (staleSL || pastTP) {
+                  results.push({
+                    pair,
+                    action: "skipped_stale_entry",
+                    entry,
+                    live: lp,
+                    reason: staleSL ? "drifted_toward_sl" : "already_past_tp",
+                  });
+                  continue;
+                }
+              }
+            } catch {
+              // If live price lookup fails, fall through — better to broadcast
+              // than to silently drop every signal on a transient upstream error.
+            }
+
             const setupScore = Math.round(plan.setupScore ?? conf);
             // Grade must reflect the displayed blended confidence, not the raw
             // setup score — otherwise a 71% signal shows as grade "C".
