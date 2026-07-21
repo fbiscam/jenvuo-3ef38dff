@@ -70,7 +70,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         }
         const enabled =
           (settingsMap.get("auto_scan_enabled")?.enabled as boolean) ?? false;
-        if (!enabled) {
+        if (!enabled && !manualMode) {
           return Response.json({ ok: true, skipped: "disabled" });
         }
 
@@ -88,14 +88,16 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         }
 
         const cfg = settingsMap.get("auto_scan_config") ?? {};
-        const rawPairs = (cfg.pairs as string[]) ?? [
-          "XAUUSD",
-          "XAUEUR",
-          "XAUGBP",
-          "XAUJPY",
-          "XAUAUD",
-          "XAUCHF",
-        ];
+        const rawPairs = manualMode && manualPair
+          ? [manualPair]
+          : ((cfg.pairs as string[]) ?? [
+              "XAUUSD",
+              "XAUEUR",
+              "XAUGBP",
+              "XAUJPY",
+              "XAUAUD",
+              "XAUCHF",
+            ]);
         // Gold-only: strip any non-XAU symbols even if config has legacy entries
         const pairs = rawPairs.filter(
           (p) =>
@@ -107,15 +109,18 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         const sameDirectionLockMin = Number(cfg.same_direction_lock_min ?? 240);
         const maxPerDay = Number(cfg.max_broadcasts_per_day ?? 8);
 
-        // Global daily rate limit
+        // Global daily rate limit — manual scans bypass so the user's
+        // deliberate analyze still fires when the pool cap is hit.
         const dayStart = new Date();
         dayStart.setUTCHours(0, 0, 0, 0);
-        const { count: todayCount } = await supabaseAdmin
-          .from("auto_scan_pool_ledger")
-          .select("id", { count: "exact", head: true })
-          .gte("created_at", dayStart.toISOString());
-        if ((todayCount ?? 0) >= maxPerDay) {
-          return Response.json({ ok: true, skipped: "daily_cap" });
+        if (!manualMode) {
+          const { count: todayCount } = await supabaseAdmin
+            .from("auto_scan_pool_ledger")
+            .select("id", { count: "exact", head: true })
+            .gte("created_at", dayStart.toISOString());
+          if ((todayCount ?? 0) >= maxPerDay) {
+            return Response.json({ ok: true, skipped: "daily_cap" });
+          }
         }
 
         // News hard-pause: skip broadcasts if a high-impact USD/XAU red-folder
