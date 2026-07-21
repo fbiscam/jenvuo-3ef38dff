@@ -530,6 +530,11 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               "@/lib/alert-pref-filter.server"
             );
             let userIds = await filterAlertsEnabledUserIds(allPaidIds, { grade, pair, direction: dir });
+            // Manual mode: the caller already paid $0.20 to run this scan and
+            // sees the plan on-screen. Skip broadcasting back to them.
+            if (manualMode && manualExcludeUserId) {
+              userIds = userIds.filter((u) => u !== manualExcludeUserId);
+            }
 
             // Per-user daily-loss kill-switch: users who enabled the guard and
             // whose realized losses today already crossed their limit get
