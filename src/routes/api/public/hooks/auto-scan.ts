@@ -653,6 +653,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 killzone: plan.killzone ?? null,
                 htfBias: plan.htfBias ?? null,
                 rationale: `${manualMode ? "Manual scan" : "Auto-scan"} · ${plan.alignmentLabel ?? ""}`.slice(0, 500),
+                excludeUserId: manualMode ? manualExcludeUserId : null,
               });
               emailed = r.enqueued;
             } catch (e) {
