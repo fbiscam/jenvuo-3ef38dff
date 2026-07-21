@@ -609,7 +609,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                     setup_score: setupScore,
                     session,
                     killzone: plan.killzone ?? null,
-                    source: "auto_scan",
+                    source: manualMode ? "manual_scan" : "auto_scan",
                     personal_risk: personal?.size
                       ? {
                           lots: personal.size.lots,
