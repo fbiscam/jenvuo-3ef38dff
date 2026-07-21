@@ -17,6 +17,40 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           return new Response("Unauthorized", { status: 401 });
         }
 
+        // Manual mode: triggered from the signal page after a user runs a
+        // manual analyze. Server-side callers (from `runManualScanBroadcast`)
+        // sign the request with the service role key. Skips two-hit, cooldown,
+        // daily-cap, and the `enabled` gate — but keeps every safety gate
+        // (news pause, killzone, HTF align, min conf, dedup, freshness, re-quote).
+        let manualMode = false;
+        let manualPair: string | null = null;
+        let manualExcludeUserId: string | null = null;
+        try {
+          const raw = await request.clone().text();
+          if (raw) {
+            const body = JSON.parse(raw) as {
+              manual?: boolean;
+              pair?: string;
+              manual_token?: string;
+              exclude_user_id?: string;
+            };
+            const svcKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+            if (
+              body?.manual === true &&
+              typeof body.pair === "string" &&
+              body.manual_token &&
+              svcKey &&
+              body.manual_token === svcKey
+            ) {
+              manualMode = true;
+              manualPair = body.pair.toUpperCase().replace(/[^A-Z]/g, "");
+              manualExcludeUserId = body.exclude_user_id ?? null;
+            }
+          }
+        } catch {
+          // ignore body parse errors — fall through to scheduled auto-scan
+        }
+
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"
         );
@@ -36,7 +70,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         }
         const enabled =
           (settingsMap.get("auto_scan_enabled")?.enabled as boolean) ?? false;
-        if (!enabled) {
+        if (!enabled && !manualMode) {
           return Response.json({ ok: true, skipped: "disabled" });
         }
 
@@ -54,14 +88,16 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         }
 
         const cfg = settingsMap.get("auto_scan_config") ?? {};
-        const rawPairs = (cfg.pairs as string[]) ?? [
-          "XAUUSD",
-          "XAUEUR",
-          "XAUGBP",
-          "XAUJPY",
-          "XAUAUD",
-          "XAUCHF",
-        ];
+        const rawPairs = manualMode && manualPair
+          ? [manualPair]
+          : ((cfg.pairs as string[]) ?? [
+              "XAUUSD",
+              "XAUEUR",
+              "XAUGBP",
+              "XAUJPY",
+              "XAUAUD",
+              "XAUCHF",
+            ]);
         // Gold-only: strip any non-XAU symbols even if config has legacy entries
         const pairs = rawPairs.filter(
           (p) =>
@@ -73,15 +109,18 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         const sameDirectionLockMin = Number(cfg.same_direction_lock_min ?? 240);
         const maxPerDay = Number(cfg.max_broadcasts_per_day ?? 8);
 
-        // Global daily rate limit
+        // Global daily rate limit — manual scans bypass so the user's
+        // deliberate analyze still fires when the pool cap is hit.
         const dayStart = new Date();
         dayStart.setUTCHours(0, 0, 0, 0);
-        const { count: todayCount } = await supabaseAdmin
-          .from("auto_scan_pool_ledger")
-          .select("id", { count: "exact", head: true })
-          .gte("created_at", dayStart.toISOString());
-        if ((todayCount ?? 0) >= maxPerDay) {
-          return Response.json({ ok: true, skipped: "daily_cap" });
+        if (!manualMode) {
+          const { count: todayCount } = await supabaseAdmin
+            .from("auto_scan_pool_ledger")
+            .select("id", { count: "exact", head: true })
+            .gte("created_at", dayStart.toISOString());
+          if ((todayCount ?? 0) >= maxPerDay) {
+            return Response.json({ ok: true, skipped: "daily_cap" });
+          }
         }
 
         // News hard-pause: skip broadcasts if a high-impact USD/XAU red-folder
@@ -190,8 +229,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               .eq("pair", pair)
               .maybeSingle();
 
-            // Cooldown check
-            if (state?.last_broadcast_at) {
+            // Cooldown check — bypassed in manual mode (user is explicitly asking).
+            if (!manualMode && state?.last_broadcast_at) {
               const since =
                 (now.getTime() -
                   new Date(state.last_broadcast_at).getTime()) /
@@ -253,7 +292,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               ? (now.getTime() - firstSeenAt.getTime()) / 60000
               : Number.POSITIVE_INFINITY;
             const hasConfirmedHit =
-              state?.direction === dir && firstAgeMin <= confirmWindowMin;
+              manualMode ||
+              (state?.direction === dir && firstAgeMin <= confirmWindowMin);
 
             if (!hasConfirmedHit) {
               await supabaseAdmin.from("auto_scan_state").upsert(
@@ -423,7 +463,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 htf_bias: plan.htfBias ?? null,
                 session,
                 killzone: plan.killzone ?? null,
-                rationale: `Auto-scan · single-hit · ${plan.alignmentLabel ?? ""}`.slice(
+                rationale: `${manualMode ? "Manual scan" : "Auto-scan · single-hit"} · ${plan.alignmentLabel ?? ""}`.slice(
                   0,
                   1000,
                 ),
@@ -490,6 +530,11 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               "@/lib/alert-pref-filter.server"
             );
             let userIds = await filterAlertsEnabledUserIds(allPaidIds, { grade, pair, direction: dir });
+            // Manual mode: the caller already paid $0.20 to run this scan and
+            // sees the plan on-screen. Skip broadcasting back to them.
+            if (manualMode && manualExcludeUserId) {
+              userIds = userIds.filter((u) => u !== manualExcludeUserId);
+            }
 
             // Per-user daily-loss kill-switch: users who enabled the guard and
             // whose realized losses today already crossed their limit get
@@ -564,7 +609,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                     setup_score: setupScore,
                     session,
                     killzone: plan.killzone ?? null,
-                    source: "auto_scan",
+                    source: manualMode ? "manual_scan" : "auto_scan",
                     personal_risk: personal?.size
                       ? {
                           lots: personal.size.lots,
@@ -607,7 +652,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 session,
                 killzone: plan.killzone ?? null,
                 htfBias: plan.htfBias ?? null,
-                rationale: `Auto-scan · ${plan.alignmentLabel ?? ""}`.slice(0, 500),
+                rationale: `${manualMode ? "Manual scan" : "Auto-scan"} · ${plan.alignmentLabel ?? ""}`.slice(0, 500),
+                excludeUserId: manualMode ? manualExcludeUserId : null,
               });
               emailed = r.enqueued;
             } catch (e) {

@@ -9,6 +9,7 @@ import { getBacktestStats, type BacktestStats } from "@/lib/backtest.functions";
 import { runHistoricalBacktest, type HistoricalBacktestResult } from "@/lib/backtest-historical.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
 import { broadcastCurrentSignal } from "@/lib/broadcast-alert.functions";
+import { runManualScanBroadcast } from "@/lib/manual-scan-broadcast.functions";
 import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
 import { Bell, BellOff } from "lucide-react";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
@@ -185,6 +186,7 @@ function SignalPage() {
   const navigate = useNavigate();
   const { symbol, savedId, alertId } = Route.useSearch();
   const fetchPlan = useServerFn(getSignalPlan);
+  const triggerManualBroadcast = useServerFn(runManualScanBroadcast);
   const speech = useSpeech();
   const credits = useCredits();
 
@@ -518,6 +520,12 @@ function SignalPage() {
       }
       const p = withSignalIntelligence(result.plan);
       setPlan(p);
+      // Fire the shared auto-scan broadcast pipeline (fan-out to paid subscribers,
+      // Telegram, email, in-app) using the same gates as scheduled scans.
+      // Runs in the background — never blocks the on-screen result.
+      void triggerManualBroadcast({ data: { pair: sym.toUpperCase() } }).catch(
+        (e) => console.error("manual broadcast failed", e),
+      );
       // ICT narration is included in the single "signal" charge above — no extra deduction.
       // Free users still don't get the guided narration.
       if (credits.features.full_ict) {
