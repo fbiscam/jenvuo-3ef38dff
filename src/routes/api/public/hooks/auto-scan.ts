@@ -17,6 +17,40 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           return new Response("Unauthorized", { status: 401 });
         }
 
+        // Manual mode: triggered from the signal page after a user runs a
+        // manual analyze. Server-side callers (from `runManualScanBroadcast`)
+        // sign the request with the service role key. Skips two-hit, cooldown,
+        // daily-cap, and the `enabled` gate — but keeps every safety gate
+        // (news pause, killzone, HTF align, min conf, dedup, freshness, re-quote).
+        let manualMode = false;
+        let manualPair: string | null = null;
+        let manualExcludeUserId: string | null = null;
+        try {
+          const raw = await request.clone().text();
+          if (raw) {
+            const body = JSON.parse(raw) as {
+              manual?: boolean;
+              pair?: string;
+              manual_token?: string;
+              exclude_user_id?: string;
+            };
+            const svcKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+            if (
+              body?.manual === true &&
+              typeof body.pair === "string" &&
+              body.manual_token &&
+              svcKey &&
+              body.manual_token === svcKey
+            ) {
+              manualMode = true;
+              manualPair = body.pair.toUpperCase().replace(/[^A-Z]/g, "");
+              manualExcludeUserId = body.exclude_user_id ?? null;
+            }
+          }
+        } catch {
+          // ignore body parse errors — fall through to scheduled auto-scan
+        }
+
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"
         );
