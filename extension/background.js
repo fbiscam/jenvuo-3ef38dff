@@ -114,8 +114,8 @@ async function openAndDraw(sig) {
   }
   const send = (attempt = 0) => {
     chrome.tabs.sendMessage(tab.id, { type: "jenvu-draw", signal: sig }).catch(() => {
-      if (attempt < 6) setTimeout(() => send(attempt + 1), 1500);
+      if (attempt < 14) setTimeout(() => send(attempt + 1), 2000);
     });
   };
-  setTimeout(() => send(0), 4500);
+  setTimeout(() => send(0), 3500);
 }
