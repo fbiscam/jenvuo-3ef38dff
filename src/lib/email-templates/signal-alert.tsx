@@ -35,6 +35,7 @@ interface Props {
   sizeRiskUsd?: string
   sizeBalance?: string
   sizeRiskPct?: string
+  unsubscribe_token?: string
 }
 
 const SITE = 'https://jenvu.com'
@@ -68,7 +69,11 @@ const Email = ({
   sizeRiskUsd,
   sizeBalance,
   sizeRiskPct,
+  unsubscribe_token,
 }: Props) => {
+  const unsubUrl = unsubscribe_token
+    ? `${SITE}/unsubscribe?token=${encodeURIComponent(unsubscribe_token)}`
+    : `${SITE}/unsubscribe`
   const dirColor = direction === 'BUY' ? '#059669' : '#dc2626'
   const hasSize = !!sizeLots
   return (
@@ -199,6 +204,11 @@ const Email = ({
             <Text style={footerBrand}>JENVU AI · SIGNAL ALERTS</Text>
             <Text style={footerMeta}>
               You're receiving this because you subscribed to A+ setup alerts at jenvu.com/signal.
+            </Text>
+            <Text style={footerMeta}>
+              <Link href={unsubUrl} style={unsubLink}>Unsubscribe</Link>
+              {' · '}
+              <Link href={`${SITE}/dashboard/notifications`} style={unsubLink}>Manage alerts</Link>
             </Text>
           </Section>
         </Container>
@@ -345,16 +355,21 @@ const sizeCell: React.CSSProperties = {
 const sizeCellLast: React.CSSProperties = { ...sizeCell, borderRight: 'none' }
 const tradeLabel: React.CSSProperties = {
   fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
-  fontSize: 9,
+  fontSize: 10,
   letterSpacing: '0.22em',
-  color: '#71717a',
+  color: '#000000',
+  fontWeight: 700,
   marginBottom: 6,
 }
 const tradeValue: React.CSSProperties = {
-  fontSize: 18,
-  fontWeight: 700,
-  color: '#09090b',
+  fontSize: 20,
+  fontWeight: 800,
+  color: '#000000',
   fontFeatureSettings: '"tnum"',
+}
+const unsubLink: React.CSSProperties = {
+  color: '#52525b',
+  textDecoration: 'underline',
 }
 const tradeFooter: React.CSSProperties = {
   padding: '10px 12px',

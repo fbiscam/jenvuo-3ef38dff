@@ -161,6 +161,7 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
         sizeRiskUsd: size ? size.riskUsd.toFixed(2) : undefined,
         sizeBalance: personal ? personal.balance.toFixed(2) : undefined,
         sizeRiskPct: personal ? personal.riskPct.toFixed(2) : undefined,
+        unsubscribe_token: token,
       }
       const element = React.createElement(template.component, templateData)
       const html = await render(element)
