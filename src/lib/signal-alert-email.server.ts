@@ -39,6 +39,7 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
     .eq('status', 'active')
     .neq('plan_id', 'free')
   let paidIds = Array.from(new Set((paidRows ?? []).map((r: { user_id: string }) => r.user_id)))
+  if (a.excludeUserId) paidIds = paidIds.filter((id) => id !== a.excludeUserId)
   if (paidIds.length === 0) return { enqueued: 0 }
 
   // Apply per-user email filters (alerts_enabled, email_enabled, grade/pair/direction).
