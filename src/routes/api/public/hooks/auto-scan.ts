@@ -165,6 +165,22 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               continue;
             }
 
+            // HTF bias alignment gate — never fire against higher-timeframe trend.
+            // Today's losses were SELLs into a bullish macro rally; this guard
+            // blocks counter-trend trades even when the LTF setup looks clean.
+            const htfBias = String((plan as { htfBias?: string }).htfBias ?? "neutral");
+            const aligned =
+              (dir === "BUY" && htfBias === "bullish") ||
+              (dir === "SELL" && htfBias === "bearish");
+            if (!aligned) {
+              await supabaseAdmin
+                .from("auto_scan_state")
+                .delete()
+                .eq("pair", pair);
+              results.push({ pair, action: "htf_bias_conflict", conf, dir, htfBias });
+              continue;
+            }
+
             // Check existing state
             const { data: state } = await supabaseAdmin
               .from("auto_scan_state")
