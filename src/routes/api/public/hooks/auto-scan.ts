@@ -151,17 +151,17 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               continue;
             }
 
-            // Killzone gate — only fire during London / NY AM / NY PM / Asia
-            // killzones. Outside-killzone tape is thin and produces low-quality
-            // signals (documented losers), so skip broadcasting entirely.
+            // Killzone gate — only fire during London / NY AM / NY PM killzones.
+            // Asia killzone excluded: thin liquidity, historically produces losers.
             const kz = String(plan.killzone ?? "");
             const inKillzone = /Killzone/i.test(kz) && !/Outside/i.test(kz);
-            if (!inKillzone) {
+            const isAsia = /asia/i.test(kz);
+            if (!inKillzone || isAsia) {
               await supabaseAdmin
                 .from("auto_scan_state")
                 .delete()
                 .eq("pair", pair);
-              results.push({ pair, action: "outside_killzone", conf, killzone: kz });
+              results.push({ pair, action: isAsia ? "asia_skipped" : "outside_killzone", conf, killzone: kz });
               continue;
             }
 
