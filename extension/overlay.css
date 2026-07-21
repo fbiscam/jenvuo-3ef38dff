@@ -1,83 +1,153 @@
-/* Jenvu overlay: floating SMC card + full-chart SVG canvas + narration bar */
+/* Jenvu TradingView overlay — themed, Google Sans, step-by-step SMC walkthrough */
+
+.jenvu-card, .jenvu-narr, .jenvu-svg text {
+  font-family: "Google Sans", "Product Sans", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
 .jenvu-card {
   position: fixed;
   top: 84px;
   right: 20px;
   z-index: 2147483000;
-  width: 300px;
-  background: rgba(17, 24, 39, 0.96);
-  color: #f9fafb;
-  border-radius: 12px;
-  padding: 12px 14px;
-  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  width: 308px;
+  background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(11,18,32,0.98));
+  color: #f1f5f9;
+  border-radius: 14px;
+  padding: 14px 14px 12px;
   font-size: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
 }
-.jenvu-card h3 { margin: 0 0 4px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-.jenvu-card .tag { font-size: 10px; padding: 2px 6px; border-radius: 999px; background: rgba(255,255,255,0.1); }
-.jenvu-card .row { display: flex; justify-content: space-between; margin-top: 3px; }
-.jenvu-card .row b { font-weight: 600; }
-.jenvu-card .buy { color: #34d399; }
-.jenvu-card .sell { color: #f87171; }
-.jenvu-card .muted { color: #9ca3af; font-size: 10px; margin-top: 6px; }
-.jenvu-card .btns { display: flex; gap: 6px; margin-top: 10px; }
+.jenvu-card h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.jenvu-card .tag {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(16,185,129,0.2), rgba(5,150,105,0.2));
+  color: #6ee7b7;
+  border: 1px solid rgba(16,185,129,0.3);
+  font-weight: 500;
+}
+.jenvu-card .row { display: flex; justify-content: space-between; margin-top: 4px; color: #cbd5e1; }
+.jenvu-card .row b { font-weight: 600; color: #f9fafb; font-variant-numeric: tabular-nums; }
+.jenvu-card .buy { color: #34d399; font-weight: 600; }
+.jenvu-card .sell { color: #f87171; font-weight: 600; }
+.jenvu-card .muted { color: #94a3b8; font-size: 10px; margin-top: 8px; line-height: 1.4; }
+.jenvu-card .btns { display: flex; gap: 6px; margin-top: 12px; }
 .jenvu-card button {
-  flex: 1; padding: 6px; font-size: 11px; border: 0; border-radius: 6px;
-  background: rgba(255,255,255,0.08); color: #f9fafb; cursor: pointer;
+  flex: 1;
+  padding: 7px 10px;
+  font-size: 11px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(148,163,184,0.15);
+  color: #f1f5f9;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: filter .15s;
 }
-.jenvu-card button.primary { background: #2563eb; color: #fff; }
-.jenvu-card .close { position:absolute; top:8px; right:10px; background:transparent; color:#9ca3af; border:0; cursor:pointer; font-size:14px; }
+.jenvu-card button:hover { filter: brightness(1.15); }
+.jenvu-card button.primary {
+  background: linear-gradient(180deg, #10b981, #059669);
+  color: #fff;
+  font-weight: 600;
+}
+.jenvu-card .close {
+  position: absolute; top: 10px; right: 12px;
+  background: transparent; color: #94a3b8; border: 0;
+  cursor: pointer; font-size: 16px; padding: 0; width: auto; flex: 0;
+}
+.jenvu-card .close:hover { color: #f87171; }
 
-/* Full-viewport SVG overlay for guided drawing */
+/* Full-viewport SVG overlay for step-by-step drawing */
 .jenvu-svg {
   position: fixed;
   inset: 0;
   z-index: 2147482900;
   pointer-events: none;
 }
-.jenvu-svg .line { stroke-width: 1.5; fill: none; opacity: 0; transition: opacity 400ms ease; }
+.jenvu-svg .line {
+  stroke-width: 1.6; fill: none;
+  opacity: 0;
+  transition: opacity 500ms ease, stroke-width 200ms ease;
+  filter: drop-shadow(0 0 3px rgba(0,0,0,0.3));
+}
 .jenvu-svg .line.show { opacity: 1; }
-.jenvu-svg .zone { opacity: 0; transition: opacity 500ms ease; }
-.jenvu-svg .zone.show { opacity: 0.18; }
+.jenvu-svg .line.emphasis { stroke-width: 2.2; }
+.jenvu-svg .zone {
+  opacity: 0;
+  transition: opacity 550ms ease;
+}
+.jenvu-svg .zone.show { opacity: 0.22; }
+.jenvu-svg .zone.emphasis.show { opacity: 0.32; }
 .jenvu-svg .label {
-  font: 600 10px -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
   fill: #f9fafb;
   paint-order: stroke;
-  stroke: rgba(17,24,39,0.85);
-  stroke-width: 3;
+  stroke: rgba(11,18,32,0.9);
+  stroke-width: 3.5;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  font-family: "Google Sans", "Product Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.jenvu-svg .label.show { opacity: 1; }
+.jenvu-svg .tag-pill {
   opacity: 0;
   transition: opacity 300ms ease;
 }
-.jenvu-svg .label.show { opacity: 1; }
+.jenvu-svg .tag-pill.show { opacity: 1; }
 
-/* Narration bar at bottom-center */
+/* Bottom-center narration bar — Jenvu themed */
 .jenvu-narr {
   position: fixed;
   bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2147483000;
-  max-width: 640px;
-  min-width: 300px;
-  background: rgba(17, 24, 39, 0.96);
-  color: #f9fafb;
-  padding: 10px 16px;
+  max-width: 680px;
+  min-width: 320px;
+  background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(11,18,32,0.98));
+  color: #f1f5f9;
+  padding: 11px 18px;
   border-radius: 999px;
-  font: 500 12px/1.4 -apple-system, "Segoe UI", Roboto, sans-serif;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255,255,255,0.06);
-  display: flex; align-items: center; gap: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  box-shadow: 0 20px 40px -8px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+  display: flex; align-items: center; gap: 12px;
+  backdrop-filter: blur(10px);
 }
 .jenvu-narr .dot {
-  width: 8px; height: 8px; border-radius: 50%; background: #34d399;
-  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.15);
-  animation: jenvuPulse 1.4s ease-in-out infinite;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 0 4px rgba(52,211,153,0.18), 0 0 12px rgba(52,211,153,0.6);
+  animation: jenvuPulse 1.6s ease-in-out infinite;
   flex: 0 0 auto;
 }
 @keyframes jenvuPulse {
-  0%,100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.25); opacity: 0.7; }
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.65; }
 }
-.jenvu-narr .step { flex: 0 0 auto; color: #9ca3af; font-variant-numeric: tabular-nums; }
+.jenvu-narr .step {
+  flex: 0 0 auto;
+  color: #6ee7b7;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 11px;
+  padding: 3px 9px;
+  background: rgba(16,185,129,0.15);
+  border-radius: 999px;
+  border: 1px solid rgba(16,185,129,0.28);
+}
 .jenvu-narr .say { flex: 1 1 auto; }
