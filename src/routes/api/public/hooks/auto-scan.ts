@@ -292,7 +292,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               ? (now.getTime() - firstSeenAt.getTime()) / 60000
               : Number.POSITIVE_INFINITY;
             const hasConfirmedHit =
-              state?.direction === dir && firstAgeMin <= confirmWindowMin;
+              manualMode ||
+              (state?.direction === dir && firstAgeMin <= confirmWindowMin);
 
             if (!hasConfirmedHit) {
               await supabaseAdmin.from("auto_scan_state").upsert(
