@@ -631,6 +631,52 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             }
 
 
+            // Per-recipient billing: charge $0.20 to every paid user who
+            // opted in via alerts_enabled (already filtered above in
+            // `userIds`). Users who disabled alerts are not in `userIds`
+            // and are not charged. Idempotent via unique per-user scanId.
+            //
+            // Charges MUST run before the slower email/telegram fan-out —
+            // otherwise the Worker can hit its CPU/wall budget mid-scan
+            // (the Auth Admin API call per recipient dominates the tail)
+            // and users get the alert without being billed.
+            let charged = 0;
+            if (userIds.length > 0) {
+              try {
+                const { chargeSignalScan } = await import(
+                  "@/lib/ai-cost-log.server"
+                );
+                const model = "auto-scan/ict-smc";
+                await Promise.all(
+                  userIds.map(async (uid) => {
+                    try {
+                      await chargeSignalScan({
+                        userId: uid,
+                        direction: dir,
+                        model,
+                        symbol: pair,
+                        scanId: `auto_${inserted.id}_${uid}`,
+                        grade,
+                        score: setupScore,
+                      });
+                      charged += 1;
+                    } catch (err) {
+                      console.warn(
+                        "auto-scan chargeSignalScan failed for",
+                        uid,
+                        (err as Error)?.message,
+                      );
+                    }
+                  }),
+                );
+              } catch (e) {
+                console.warn(
+                  "auto-scan chargeSignalScan module import failed",
+                  (e as Error)?.message,
+                );
+              }
+            }
+
             // Enqueue emails to opted-in paid subscribers
             let emailed = 0;
             try {
@@ -671,46 +717,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               cost_usd: 0.2,
             });
 
-            // Per-recipient billing: charge $0.20 to every paid user who
-            // opted in via alerts_enabled (already filtered above in
-            // `userIds`). Users who disabled alerts are not in `userIds`
-            // and are not charged. Idempotent via unique per-user scanId.
-            let charged = 0;
-            if (userIds.length > 0) {
-              try {
-                const { chargeSignalScan } = await import(
-                  "@/lib/ai-cost-log.server"
-                );
-                const model = "auto-scan/ict-smc";
-                await Promise.all(
-                  userIds.map(async (uid) => {
-                    try {
-                      await chargeSignalScan({
-                        userId: uid,
-                        direction: dir,
-                        model,
-                        symbol: pair,
-                        scanId: `auto_${inserted.id}_${uid}`,
-                        grade,
-                        score: setupScore,
-                      });
-                      charged += 1;
-                    } catch (err) {
-                      console.warn(
-                        "auto-scan chargeSignalScan failed for",
-                        uid,
-                        (err as Error)?.message,
-                      );
-                    }
-                  }),
-                );
-              } catch (e) {
-                console.warn(
-                  "auto-scan chargeSignalScan module import failed",
-                  (e as Error)?.message,
-                );
-              }
-            }
+
 
 
 
