@@ -4,13 +4,16 @@
 <meta charset="utf-8">
 <title>Jenvu</title>
 <style>
-  body { width: 320px; margin: 0; padding: 14px; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #fff; color: #111827; }
-  h1 { font-size: 15px; margin: 0 0 6px; }
+  body { width: 340px; margin: 0; padding: 14px; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #fff; color: #111827; }
+  h1 { font-size: 15px; margin: 0 0 6px; display: flex; align-items: center; gap: 6px; }
+  h1 .v { font-size: 10px; font-weight: 500; color: #6b7280; background: #f3f4f6; padding: 2px 6px; border-radius: 999px; }
   p { font-size: 11px; color: #6b7280; margin: 0 0 10px; }
   label { font-size: 11px; color: #374151; display: block; margin-top: 8px; }
   input, select { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 12px; margin-top: 4px; }
   button { margin-top: 10px; width: 100%; padding: 9px; border: 0; border-radius: 8px; background: #111827; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
   button.secondary { background: #f3f4f6; color: #111827; }
+  button.primary-blue { background: #2563eb; }
   .row { display: flex; gap: 8px; }
   .row > * { flex: 1; }
   .status { margin-top: 10px; padding: 8px 10px; font-size: 11px; border-radius: 8px; background: #f9fafb; color: #374151; }
@@ -21,11 +24,14 @@
   .sig .row2 { display: flex; justify-content: space-between; margin-top: 2px; }
   .muted { color: #6b7280; font-size: 10px; }
   a { color: #2563eb; text-decoration: none; font-size: 11px; }
+  hr { border: 0; border-top: 1px solid #f3f4f6; margin: 12px 0 6px; }
+  .toggle { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 11px; color: #374151; }
+  .toggle input { width: auto; margin: 0; }
 </style>
 </head>
 <body>
-  <h1>Jenvu · TradingView</h1>
-  <p>Auto-draw signals on your chart.</p>
+  <h1>Jenvu · TradingView <span class="v">v1.1</span></h1>
+  <p>Auto-draws ICT/SMC markings & guided narration on your chart.</p>
 
   <label>API endpoint
     <select id="endpoint">
@@ -44,6 +50,25 @@
     <button id="save">Connect</button>
     <button id="test" class="secondary">Test</button>
   </div>
+
+  <div class="toggle">
+    <span>Auto-open TradingView on new signal</span>
+    <input id="autoOpen" type="checkbox" />
+  </div>
+
+  <hr />
+
+  <label>Analyze pair now ($0.20)
+    <select id="pair">
+      <option value="XAUUSD">XAU/USD</option>
+      <option value="XAUEUR">XAU/EUR</option>
+      <option value="XAUGBP">XAU/GBP</option>
+      <option value="XAUJPY">XAU/JPY</option>
+      <option value="XAUAUD">XAU/AUD</option>
+      <option value="XAUCHF">XAU/CHF</option>
+    </select>
+  </label>
+  <button id="analyze" class="primary-blue">Analyze on TradingView</button>
 
   <div id="status" class="status">Not connected.</div>
   <div id="signal" class="sig" style="display:none"></div>

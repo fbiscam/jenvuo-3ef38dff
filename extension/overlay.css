@@ -1,16 +1,83 @@
-#jenvu-card {
-  position: fixed; top: 90px; right: 20px; width: 240px;
-  background: #ffffff; color: #111827; border: 1px solid #e5e7eb; border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  padding: 10px 12px; font: 12px/1.35 'Google Sans', system-ui, sans-serif;
-  z-index: 2147483647;
+/* Jenvu overlay: floating SMC card + full-chart SVG canvas + narration bar */
+.jenvu-card {
+  position: fixed;
+  top: 84px;
+  right: 20px;
+  z-index: 2147483000;
+  width: 300px;
+  background: rgba(17, 24, 39, 0.96);
+  color: #f9fafb;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-size: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255,255,255,0.06);
 }
-#jenvu-card .jv-head { display:flex; justify-content:space-between; align-items:center; padding-left:8px; margin:-2px -4px 6px -4px; }
-#jenvu-card .jv-pair { font-weight:600; font-size: 13px; }
-#jenvu-card .jv-close { background:transparent; border:0; font-size:18px; color:#6b7280; cursor:pointer; padding:0 4px; }
-#jenvu-card .jv-row { display:flex; justify-content:space-between; padding:2px 0; }
-#jenvu-card .jv-row b { font-weight:600; }
-#jenvu-card .jv-meta { margin-top:6px; padding-top:6px; border-top:1px dashed #e5e7eb; color:#6b7280; font-size:11px; }
-#jenvu-card .jv-actions { display:flex; gap:6px; margin-top:8px; }
-#jenvu-card .jv-btn { flex:1; padding:6px; border:1px solid #e5e7eb; background:#f9fafb; border-radius:6px; font-size:11px; cursor:pointer; }
-#jenvu-card .jv-btn:hover { background:#f3f4f6; }
+.jenvu-card h3 { margin: 0 0 4px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+.jenvu-card .tag { font-size: 10px; padding: 2px 6px; border-radius: 999px; background: rgba(255,255,255,0.1); }
+.jenvu-card .row { display: flex; justify-content: space-between; margin-top: 3px; }
+.jenvu-card .row b { font-weight: 600; }
+.jenvu-card .buy { color: #34d399; }
+.jenvu-card .sell { color: #f87171; }
+.jenvu-card .muted { color: #9ca3af; font-size: 10px; margin-top: 6px; }
+.jenvu-card .btns { display: flex; gap: 6px; margin-top: 10px; }
+.jenvu-card button {
+  flex: 1; padding: 6px; font-size: 11px; border: 0; border-radius: 6px;
+  background: rgba(255,255,255,0.08); color: #f9fafb; cursor: pointer;
+}
+.jenvu-card button.primary { background: #2563eb; color: #fff; }
+.jenvu-card .close { position:absolute; top:8px; right:10px; background:transparent; color:#9ca3af; border:0; cursor:pointer; font-size:14px; }
+
+/* Full-viewport SVG overlay for guided drawing */
+.jenvu-svg {
+  position: fixed;
+  inset: 0;
+  z-index: 2147482900;
+  pointer-events: none;
+}
+.jenvu-svg .line { stroke-width: 1.5; fill: none; opacity: 0; transition: opacity 400ms ease; }
+.jenvu-svg .line.show { opacity: 1; }
+.jenvu-svg .zone { opacity: 0; transition: opacity 500ms ease; }
+.jenvu-svg .zone.show { opacity: 0.18; }
+.jenvu-svg .label {
+  font: 600 10px -apple-system, "Segoe UI", Roboto, sans-serif;
+  fill: #f9fafb;
+  paint-order: stroke;
+  stroke: rgba(17,24,39,0.85);
+  stroke-width: 3;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.jenvu-svg .label.show { opacity: 1; }
+
+/* Narration bar at bottom-center */
+.jenvu-narr {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483000;
+  max-width: 640px;
+  min-width: 300px;
+  background: rgba(17, 24, 39, 0.96);
+  color: #f9fafb;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font: 500 12px/1.4 -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 10px;
+}
+.jenvu-narr .dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #34d399;
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.15);
+  animation: jenvuPulse 1.4s ease-in-out infinite;
+  flex: 0 0 auto;
+}
+@keyframes jenvuPulse {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.7; }
+}
+.jenvu-narr .step { flex: 0 0 auto; color: #9ca3af; font-variant-numeric: tabular-nums; }
+.jenvu-narr .say { flex: 1 1 auto; }
