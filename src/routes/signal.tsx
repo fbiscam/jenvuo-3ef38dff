@@ -186,6 +186,7 @@ function SignalPage() {
   const navigate = useNavigate();
   const { symbol, savedId, alertId } = Route.useSearch();
   const fetchPlan = useServerFn(getSignalPlan);
+  const triggerManualBroadcast = useServerFn(runManualScanBroadcast);
   const speech = useSpeech();
   const credits = useCredits();
 
