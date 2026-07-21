@@ -21,6 +21,7 @@ export interface EnqueueAlertEmailsArgs {
   killzone?: string | null
   htfBias?: string | null
   rationale?: string | null
+  excludeUserId?: string | null
 }
 
 export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promise<{ enqueued: number }> {
