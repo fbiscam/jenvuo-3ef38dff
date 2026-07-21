@@ -189,6 +189,30 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       } catch (e) {
         console.error('[broadcast] system-mail alerts failed:', (e as Error)?.message)
       }
+
+      // Per-recipient billing: charge $0.20 to every paid user who received
+      // this broadcast (mirrors auto-scan billing). Idempotent via unique
+      // per-user scanId so retries never double-charge.
+      try {
+        const { chargeSignalScan } = await import('@/lib/ai-cost-log.server')
+        await Promise.all(
+          notifyUserIds.map((uid) =>
+            chargeSignalScan({
+              userId: uid,
+              direction: data.direction,
+              model: 'manual-broadcast/ict-smc',
+              symbol: pair,
+              scanId: `broadcast_${inserted.id}_${uid}`,
+              grade,
+              score: scoreForGrade,
+            }).catch((err) =>
+              console.warn('[broadcast] chargeSignalScan failed for', uid, (err as Error)?.message),
+            ),
+          ),
+        )
+      } catch (e) {
+        console.warn('[broadcast] chargeSignalScan import failed:', (e as Error)?.message)
+      }
     }
 
     // 4. Queue emails
