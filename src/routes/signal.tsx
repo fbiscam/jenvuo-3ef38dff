@@ -520,6 +520,12 @@ function SignalPage() {
       }
       const p = withSignalIntelligence(result.plan);
       setPlan(p);
+      // Fire the shared auto-scan broadcast pipeline (fan-out to paid subscribers,
+      // Telegram, email, in-app) using the same gates as scheduled scans.
+      // Runs in the background — never blocks the on-screen result.
+      void triggerManualBroadcast({ data: { pair: sym.toUpperCase() } }).catch(
+        (e) => console.error("manual broadcast failed", e),
+      );
       // ICT narration is included in the single "signal" charge above — no extra deduction.
       // Free users still don't get the guided narration.
       if (credits.features.full_ict) {
