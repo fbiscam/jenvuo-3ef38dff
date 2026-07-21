@@ -49,17 +49,29 @@ export function useAutoCloseTrades() {
   );
   const livePrices = useLivePrices(symbols);
 
-  // Auto-fill pending → open when price crosses entry
+  // Auto-fill pending → open only when live price is *at* entry AND hasn't
+  // already blown past the SL/TP. Prevents instant fake losses when the
+  // market has already moved far from the alert's entry by the time the
+  // user logs it as a trade.
   useEffect(() => {
     const filling = openTrades.filter((t) => {
       if (t.outcome !== "pending" || t.entry == null) return false;
       const px = livePrices[t.pair.toUpperCase()];
       if (px == null) return false;
-      // Fill only when live price is within a tight tolerance of entry.
-      // Direction-based inequalities were misfiring for stop entries and
-      // for trades whose price had already moved past entry.
-      const tol = Math.max(t.entry * 0.0005, 0.01);
-      return Math.abs(px - t.entry) <= tol;
+      // Tight tolerance: 0.02% of entry (≈132 pts on XAUJPY @ 661k, ≈0.8 on XAUUSD @ 4000).
+      const tol = Math.max(t.entry * 0.0002, 0.01);
+      if (Math.abs(px - t.entry) > tol) return false;
+      // Refuse to fill if price has already crossed SL or TP —
+      // that trade never actually filled in the real market.
+      if (t.stop_loss != null) {
+        if (t.direction === "long" && px <= t.stop_loss) return false;
+        if (t.direction === "short" && px >= t.stop_loss) return false;
+      }
+      if (t.take_profit != null) {
+        if (t.direction === "long" && px >= t.take_profit) return false;
+        if (t.direction === "short" && px <= t.take_profit) return false;
+      }
+      return true;
     });
     if (!filling.length) return;
     (async () => {
