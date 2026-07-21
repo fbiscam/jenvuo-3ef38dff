@@ -45,16 +45,11 @@ export const listNotifications = createServerFn({ method: 'GET' })
         const alert = byId.get(String(n.data?.alert_id ?? ''))
         if (!alert) return n
 
-        const score = Number(alert.setup_score ?? alert.confidence)
-        const derivedGrade = Number.isFinite(score)
-          ? score >= 90
-            ? 'A+'
-            : score >= 80
-              ? 'A'
-              : score >= 65
-                ? 'B'
-                : 'C'
-          : alert.grade
+        // Use the grade stored on the alert — it's derived from the blended
+        // confidence at broadcast time. Re-deriving from raw setup_score here
+        // downgraded every notification to "C" because setup_score often
+        // sits below 65 while the displayed confidence is 65–75%+.
+        const derivedGrade = alert.grade ?? 'C'
 
         return {
           ...n,
