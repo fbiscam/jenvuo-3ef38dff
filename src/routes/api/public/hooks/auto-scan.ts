@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { computeSignalPlan } from "@/lib/gold-analysis.functions";
+import { computeSignalPlan, getLiveTick } from "@/lib/gold-analysis.functions";
 
 // Auto-scan broadcast worker. Called every 15 min by pg_cron.
 // Auth: apikey header (Supabase anon).
