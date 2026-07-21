@@ -84,6 +84,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "Trades & Insights",
     items: [
       { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
+      { to: "/dashboard/chart", label: "Annotated Chart", icon: "insights" },
       { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats" },
       { to: "/dashboard/risk", label: "Risk Manager", icon: "balance" },
       { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3" },
