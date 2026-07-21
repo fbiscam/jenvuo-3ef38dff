@@ -79,6 +79,7 @@ import { Route as ApiPublicHooksMonthlyRetuneRouteImport } from './routes/api/pu
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
 import { Route as ApiPublicHooksAutoScanRouteImport } from './routes/api/public/hooks/auto-scan'
+import { Route as ApiPublicExtensionLatestSignalRouteImport } from './routes/api/public/extension/latest-signal'
 import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/brief-audio.$id'
 import { Route as AuthenticatedDashboardAdminTvMismatchRouteImport } from './routes/_authenticated/dashboard.admin.tv-mismatch'
 import { Route as AuthenticatedDashboardAdminTuningRouteImport } from './routes/_authenticated/dashboard.admin.tuning'
@@ -463,6 +464,12 @@ const ApiPublicHooksAutoScanRoute = ApiPublicHooksAutoScanRouteImport.update({
   path: '/api/public/hooks/auto-scan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicExtensionLatestSignalRoute =
+  ApiPublicExtensionLatestSignalRouteImport.update({
+    id: '/api/public/extension/latest-signal',
+    path: '/api/public/extension/latest-signal',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicBriefAudioIdRoute = ApiPublicBriefAudioIdRouteImport.update({
   id: '/api/public/brief-audio/$id',
   path: '/api/public/brief-audio/$id',
@@ -589,6 +596,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
+  '/api/public/extension/latest-signal': typeof ApiPublicExtensionLatestSignalRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
@@ -666,6 +674,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
+  '/api/public/extension/latest-signal': typeof ApiPublicExtensionLatestSignalRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
@@ -749,6 +758,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/_authenticated/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
+  '/api/public/extension/latest-signal': typeof ApiPublicExtensionLatestSignalRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
@@ -832,6 +842,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/tuning'
     | '/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
+    | '/api/public/extension/latest-signal'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
@@ -909,6 +920,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/tuning'
     | '/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
+    | '/api/public/extension/latest-signal'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
@@ -991,6 +1003,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/tuning'
     | '/_authenticated/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
+    | '/api/public/extension/latest-signal'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
@@ -1044,6 +1057,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   HelpCollectionIndexRoute: typeof HelpCollectionIndexRoute
   ApiPublicBriefAudioIdRoute: typeof ApiPublicBriefAudioIdRoute
+  ApiPublicExtensionLatestSignalRoute: typeof ApiPublicExtensionLatestSignalRoute
   ApiPublicHooksAutoScanRoute: typeof ApiPublicHooksAutoScanRoute
   ApiPublicHooksGenerateBriefRoute: typeof ApiPublicHooksGenerateBriefRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
@@ -1552,6 +1566,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksAutoScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/extension/latest-signal': {
+      id: '/api/public/extension/latest-signal'
+      path: '/api/public/extension/latest-signal'
+      fullPath: '/api/public/extension/latest-signal'
+      preLoaderRoute: typeof ApiPublicExtensionLatestSignalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/brief-audio/$id': {
       id: '/api/public/brief-audio/$id'
       path: '/api/public/brief-audio/$id'
@@ -1783,6 +1804,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   HelpCollectionIndexRoute: HelpCollectionIndexRoute,
   ApiPublicBriefAudioIdRoute: ApiPublicBriefAudioIdRoute,
+  ApiPublicExtensionLatestSignalRoute: ApiPublicExtensionLatestSignalRoute,
   ApiPublicHooksAutoScanRoute: ApiPublicHooksAutoScanRoute,
   ApiPublicHooksGenerateBriefRoute: ApiPublicHooksGenerateBriefRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
