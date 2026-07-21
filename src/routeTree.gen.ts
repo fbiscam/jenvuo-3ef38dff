@@ -62,7 +62,6 @@ import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
-import { Route as AuthenticatedDashboardChartRouteImport } from './routes/_authenticated/dashboard.chart'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAlertsRouteImport } from './routes/_authenticated/dashboard.alerts'
@@ -365,12 +364,6 @@ const AuthenticatedDashboardDocumentsRoute =
     path: '/documents',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardChartRoute =
-  AuthenticatedDashboardChartRouteImport.update({
-    id: '/chart',
-    path: '/chart',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
 const AuthenticatedDashboardBillingRoute =
   AuthenticatedDashboardBillingRouteImport.update({
     id: '/billing',
@@ -572,7 +565,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/dashboard/chart': typeof AuthenticatedDashboardChartRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
@@ -650,7 +642,6 @@ export interface FileRoutesByTo {
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/dashboard/chart': typeof AuthenticatedDashboardChartRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
@@ -734,7 +725,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/_authenticated/dashboard/chart': typeof AuthenticatedDashboardChartRoute
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
@@ -818,7 +808,6 @@ export interface FileRouteTypes {
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
-    | '/dashboard/chart'
     | '/dashboard/documents'
     | '/dashboard/journal'
     | '/dashboard/notifications'
@@ -896,7 +885,6 @@ export interface FileRouteTypes {
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
-    | '/dashboard/chart'
     | '/dashboard/documents'
     | '/dashboard/journal'
     | '/dashboard/notifications'
@@ -979,7 +967,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
-    | '/_authenticated/dashboard/chart'
     | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/journal'
     | '/_authenticated/dashboard/notifications'
@@ -1446,13 +1433,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardDocumentsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/chart': {
-      id: '/_authenticated/dashboard/chart'
-      path: '/chart'
-      fullPath: '/dashboard/chart'
-      preLoaderRoute: typeof AuthenticatedDashboardChartRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
     '/_authenticated/dashboard/billing': {
       id: '/_authenticated/dashboard/billing'
       path: '/billing'
@@ -1649,7 +1629,6 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAlertsRoute: typeof AuthenticatedDashboardAlertsRoute
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
-  AuthenticatedDashboardChartRoute: typeof AuthenticatedDashboardChartRoute
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
@@ -1676,7 +1655,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAlertsRoute: AuthenticatedDashboardAlertsRoute,
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
-    AuthenticatedDashboardChartRoute: AuthenticatedDashboardChartRoute,
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
     AuthenticatedDashboardNotificationsRoute:
