@@ -116,25 +116,25 @@ function FeedBody() {
     <>
       {/* HERO */}
       <section className="border-b border-zinc-100 bg-white">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-10 sm:py-14">
-          <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-7 sm:py-14">
+          <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
             <div className="min-w-0">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 sm:text-[11px]">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Live · Public
               </div>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
+              <h1 className="mt-3 text-[22px] font-semibold tracking-tight leading-[1.15] sm:text-4xl md:text-5xl">
                 Every signal. Every outcome. <span className="text-zinc-500">Nothing hidden.</span>
               </h1>
-              <p className="mt-4 max-w-2xl text-base text-zinc-600 leading-relaxed sm:text-lg">
-                Real-time log of every gold signal broadcast by Jenvu AI — with the actual win/loss and R multiple auto-resolved from live price. No login, no filters, no cherry-picking.
+              <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-zinc-600 sm:mt-4 sm:text-lg">
+                Real-time log of every gold signal broadcast by Jenvu AI — actual win/loss and R multiple auto-resolved from live price. No login, no cherry-picking.
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
               {([7, 30, 90] as const).map((d) => (
                 <button
                   key={d}
                   onClick={() => setDays(d)}
-                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${days === d ? "bg-zinc-900 text-white" : "border border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400"}`}
+                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${days === d ? "bg-zinc-900 text-white" : "border border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400"}`}
                 >
                   {d}D
                 </button>
@@ -142,7 +142,7 @@ function FeedBody() {
               <button
                 onClick={() => refetch()}
                 disabled={isFetching}
-                className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 hover:border-zinc-400 disabled:opacity-50"
+                className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 hover:border-zinc-400 disabled:opacity-50"
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} /> Refresh
               </button>
@@ -152,7 +152,7 @@ function FeedBody() {
       </section>
 
       {/* STATS */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-6 py-8">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
         <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
           <StatCard
             icon={<Trophy className="h-4 w-4" />}
@@ -215,39 +215,39 @@ function FeedBody() {
       </section>
 
       {/* FILTERS */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-6">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-2.5 sm:p-4">
+          <div className="-mx-0.5 flex items-center gap-2 overflow-x-auto pb-0.5 sm:flex-wrap sm:overflow-visible">
+            <div className="shrink-0 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 sm:text-[11px]">
               <Filter className="h-3.5 w-3.5" /> Filters
             </div>
-            <select value={pairFilter} onChange={(e) => setPairFilter(e.target.value)} className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-700">
+            <select value={pairFilter} onChange={(e) => setPairFilter(e.target.value)} className="shrink-0 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-700">
               <option value="ALL">All pairs</option>
               {pairs.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
-            <div className="inline-flex rounded-lg border border-zinc-200 p-0.5">
+            <div className="shrink-0 inline-flex rounded-lg border border-zinc-200 p-0.5">
               {(["all", "BUY", "SELL"] as const).map((d) => (
                 <button key={d} onClick={() => setDirFilter(d)} className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${dirFilter === d ? (d === "BUY" ? "bg-emerald-600 text-white" : d === "SELL" ? "bg-rose-600 text-white" : "bg-zinc-900 text-white") : "text-zinc-600 hover:text-zinc-900"}`}>
                   {d === "all" ? "Both" : d}
                 </button>
               ))}
             </div>
-            <div className="inline-flex rounded-lg border border-zinc-200 p-0.5">
+            <div className="shrink-0 inline-flex rounded-lg border border-zinc-200 p-0.5">
               {(["all", "win", "loss", "pending"] as const).map((o) => (
                 <button key={o} onClick={() => setOutcomeFilter(o)} className={`rounded-md px-2.5 py-1 text-[11px] font-semibold capitalize ${outcomeFilter === o ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"}`}>
                   {o}
                 </button>
               ))}
             </div>
-            <div className="ml-auto text-[11px] text-zinc-500">
-              Showing <span className="font-mono text-zinc-900">{filtered.length}</span> of {signals.length}
+            <div className="ml-auto shrink-0 text-[11px] text-zinc-500">
+              <span className="font-mono text-zinc-900">{filtered.length}</span>/{signals.length}
             </div>
           </div>
         </div>
       </section>
 
       {/* SIGNAL LIST */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-6 py-6">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-6">
         {filtered.length === 0 ? (
           <div className="rounded-2xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
             No signals match these filters.
@@ -264,7 +264,7 @@ function FeedBody() {
 
       {/* CTA */}
       <section className="border-t border-zinc-100 bg-white">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 text-center">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 text-center">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Want these signals the moment they fire?</h2>
           <p className="mt-2 text-sm text-zinc-600">Sign in to Jenvu, upgrade a plan, and get alerts via email, browser, and Telegram.</p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
