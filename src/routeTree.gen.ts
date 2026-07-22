@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignalsLiveRouteImport } from './routes/signals-live'
 import { Route as SignalRouteImport } from './routes/signal'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundRouteImport } from './routes/refund'
@@ -104,6 +105,11 @@ const TermsRoute = TermsRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignalsLiveRoute = SignalsLiveRouteImport.update({
+  id: '/signals-live',
+  path: '/signals-live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignalRoute = SignalRouteImport.update({
@@ -554,6 +560,7 @@ export interface FileRoutesByFullPath {
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signal': typeof SignalRoute
+  '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -633,6 +640,7 @@ export interface FileRoutesByTo {
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signal': typeof SignalRoute
+  '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -716,6 +724,7 @@ export interface FileRoutesById {
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signal': typeof SignalRoute
+  '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -800,6 +809,7 @@ export interface FileRouteTypes {
     | '/refund'
     | '/reset-password'
     | '/signal'
+    | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
@@ -879,6 +889,7 @@ export interface FileRouteTypes {
     | '/refund'
     | '/reset-password'
     | '/signal'
+    | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
@@ -961,6 +972,7 @@ export interface FileRouteTypes {
     | '/refund'
     | '/reset-password'
     | '/signal'
+    | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
@@ -1045,6 +1057,7 @@ export interface RootRouteChildren {
   RefundRoute: typeof RefundRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignalRoute: typeof SignalRoute
+  SignalsLiveRoute: typeof SignalsLiveRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -1094,6 +1107,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signals-live': {
+      id: '/signals-live'
+      path: '/signals-live'
+      fullPath: '/signals-live'
+      preLoaderRoute: typeof SignalsLiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signal': {
@@ -1792,6 +1812,7 @@ const rootRouteChildren: RootRouteChildren = {
   RefundRoute: RefundRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignalRoute: SignalRoute,
+  SignalsLiveRoute: SignalsLiveRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
