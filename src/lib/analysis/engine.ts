@@ -663,7 +663,7 @@ export function scoreSetup(args: {
   const totalWeight = f.reduce((s, x) => s + x.weight, 0) || 1;
   const earned = f.reduce((s, x) => s + (x.pass ? x.weight : 0), 0);
   let score = Math.round((earned / totalWeight) * 100);
-  if (imminentHighNews) score = Math.min(score, 60);
+  if (imminentHighNews) score = Math.min(score, 55); // hard-block: below 75% broadcast threshold
 
   // Vetoes: single = soft (-8), multi (2+) = harsh (-15 each). Prevents a lone
   // false-positive gate from killing an otherwise strong setup.
