@@ -264,12 +264,48 @@ function FeedBody() {
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-6">
         {filtered.length === 0 ? (
           <div className="rounded-2xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
-            No signals match these filters.
+            No signals yet. New signals will appear here as they fire.
           </div>
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {filtered.map((s) => <SignalCard key={s.id} s={s} />)}
-          </ul>
+          <>
+            <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {pageItems.map((s) => <SignalCard key={s.id} s={s} />)}
+            </ul>
+            {totalPages > 1 && (
+              <nav className="mt-6 flex flex-wrap items-center justify-center gap-1.5" aria-label="Pagination">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Prev
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setPage(n)}
+                    className={`min-w-[32px] rounded-full px-3 py-1.5 text-xs font-medium ${
+                      n === currentPage
+                        ? "bg-zinc-900 text-white"
+                        : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+                <span className="ml-2 text-[11px] text-zinc-500">
+                  Page {currentPage} of {totalPages} · {filtered.length} signals
+                </span>
+              </nav>
+            )}
+          </>
         )}
         <p className="mt-6 text-center text-[11px] text-zinc-400">
           Auto-updated every 60s · Generated {new Date(data.generated_at).toLocaleString()} · Educational data only, not financial advice.
