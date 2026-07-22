@@ -81,7 +81,7 @@ export function SavedSignalsList() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {rows.map((r) => {
         const snap = r.snapshot ?? null;
         const a = r.signal_alerts;
@@ -97,34 +97,34 @@ export function SavedSignalsList() {
 
         if (!snap && !a) return null;
         return (
-          <article key={r.id} className="group rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)] transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
-            <header className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold tracking-wider text-white ${grade === "A+" ? "bg-gradient-to-r from-amber-500 to-amber-600 shadow-sm shadow-amber-500/30" : "bg-zinc-900"}`}>{grade}</span>
-                <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium tracking-wider ${isLong ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+          <article key={r.id} className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)] transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
+            <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+              <div className="min-w-0 flex flex-wrap items-center gap-1.5">
+                <span className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold tracking-wider text-white ${grade === "A+" ? "bg-gradient-to-r from-amber-500 to-amber-600 shadow-sm shadow-amber-500/30" : "bg-zinc-900"}`}>{grade}</span>
+                <span className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium tracking-wider ${isLong ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
                   {direction.toUpperCase()}
                 </span>
-                {snap?.pair && <span className="font-mono text-[11px] text-zinc-500">{pair}</span>}
+                {snap?.pair && <span className="shrink-0 font-mono text-[11px] text-zinc-500">{pair}</span>}
               </div>
-              <button onClick={() => remove(r.id)} className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-rose-600">
+              <button onClick={() => remove(r.id)} className="shrink-0 rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-rose-600">
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </header>
-            <p className="mt-3 text-sm text-zinc-700 line-clamp-3">{summary}</p>
-            <dl className="mt-4 grid grid-cols-4 gap-2 text-[11px]">
+            <p className="mt-3 text-sm text-zinc-700 line-clamp-3 break-words">{summary}</p>
+            <dl className="mt-4 grid grid-cols-2 gap-2 text-[11px] xs:grid-cols-4 min-[380px]:grid-cols-4">
               {([
                 ["Entry", entry],
                 ["SL", sl],
                 ["TP", tp],
                 ["R:R", rr ? `${Number(rr).toFixed(1)}` : "—"],
               ] as const).map(([k, v]) => (
-                <div key={k} className="rounded-md bg-zinc-50 px-2 py-1.5 ring-1 ring-inset ring-zinc-200/70">
+                <div key={k} className="min-w-0 rounded-md bg-zinc-50 px-2 py-1.5 ring-1 ring-inset ring-zinc-200/70">
                   <dt className="font-mono uppercase tracking-wider text-zinc-500">{k}</dt>
-                  <dd className="mt-0.5 font-mono text-zinc-900">{v ?? "—"}</dd>
+                  <dd className="mt-0.5 font-mono text-zinc-900 truncate">{v ?? "—"}</dd>
                 </div>
               ))}
             </dl>
-            <footer className="mt-4 flex items-center justify-between text-[11px] text-zinc-400">
+            <footer className="mt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-400">
               <span className="font-mono uppercase tracking-wider">Saved {new Date(r.created_at).toLocaleDateString()}</span>
               {snap && <Link to="/signal" search={{ symbol: pair, savedId: r.id }} className="text-zinc-600 hover:text-zinc-900">Re-open →</Link>}
             </footer>
