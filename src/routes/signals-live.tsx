@@ -40,16 +40,18 @@ type FeedResponse = {
 const feedQuery = (days: number) => queryOptions({
   queryKey: ["public-signals-feed", days],
   queryFn: async (): Promise<FeedResponse> => {
-    let base = "";
     if (typeof window === "undefined") {
-      try {
-        const { getRequestHost, getRequestProtocol } = await import("@tanstack/react-start/server");
-        base = `${getRequestProtocol()}://${getRequestHost()}`;
-      } catch {
-        base = "http://localhost:8080";
-      }
+      // Skip during SSR — client will fetch immediately after hydration.
+      return {
+        generated_at: new Date().toISOString(),
+        window_days: days,
+        signals: [],
+        by_pair: [],
+        by_session: [],
+        totals: { wins: 0, losses: 0, pending: 0, total: 0, win_rate: 0, total_r: 0, best_streak: 0, current_streak: 0 },
+      } as FeedResponse;
     }
-    const res = await fetch(`${base}/api/public/signals-feed?days=${days}&limit=200`);
+    const res = await fetch(`/api/public/signals-feed?days=${days}&limit=200`);
     if (!res.ok) throw new Error("feed_failed");
     return res.json();
   },
