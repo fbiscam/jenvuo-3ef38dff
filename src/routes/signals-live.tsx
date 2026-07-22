@@ -130,7 +130,7 @@ function FeedBody() {
     <>
       {/* HERO */}
       <section className="border-b border-zinc-100 bg-white">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-7 sm:py-14">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-7 sm:py-14">
           <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
             <div className="min-w-0">
               <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 sm:text-[11px]">
@@ -166,7 +166,7 @@ function FeedBody() {
       </section>
 
       {/* STATS */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
+      <section className="mx-auto max-w-6xl px-5 sm:px-6 py-8">
         <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
           <StatCard
             icon={<Trophy className="h-4 w-4" />}
@@ -229,7 +229,7 @@ function FeedBody() {
       </section>
 
       {/* FILTERS */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6">
+      <section className="mx-auto max-w-6xl px-5 sm:px-6">
         <div className="rounded-2xl border border-zinc-200 bg-white p-2.5 sm:p-4">
           <div className="-mx-0.5 flex items-center gap-2 overflow-x-auto pb-0.5 sm:flex-wrap sm:overflow-visible">
             <div className="shrink-0 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 sm:text-[11px]">
@@ -261,7 +261,7 @@ function FeedBody() {
       </section>
 
       {/* SIGNAL LIST */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-6">
+      <section className="mx-auto max-w-6xl px-5 sm:px-6 py-6">
         {filtered.length === 0 ? (
           <div className="rounded-2xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
             No signals yet. New signals will appear here as they fire.
@@ -314,7 +314,7 @@ function FeedBody() {
 
       {/* CTA */}
       <section className="border-t border-zinc-100 bg-white">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 text-center">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 text-center">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Want these signals the moment they fire?</h2>
           <p className="mt-2 text-sm text-zinc-600">Sign in to Jenvu, upgrade a plan, and get alerts via email, browser, and Telegram.</p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
