@@ -42,7 +42,24 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    // Also log to our error_log table.
+    (async () => {
+      try {
+        const { logError } = await import("../lib/error-log.functions");
+        await logError({
+          data: {
+            message: error.message || String(error),
+            stack: error.stack ?? null,
+            route: typeof window !== "undefined" ? window.location.pathname : null,
+            mechanism: "react_error_boundary",
+            severity: "error",
+            source: "client",
+          },
+        });
+      } catch { /* ignore */ }
+    })();
   }, [error]);
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
