@@ -40,7 +40,15 @@ type FeedResponse = {
 const feedQuery = (days: number) => queryOptions({
   queryKey: ["public-signals-feed", days],
   queryFn: async (): Promise<FeedResponse> => {
-    const base = typeof window === "undefined" ? "http://localhost:8080" : "";
+    let base = "";
+    if (typeof window === "undefined") {
+      try {
+        const { getRequestHost, getRequestProtocol } = await import("@tanstack/react-start/server");
+        base = `${getRequestProtocol()}://${getRequestHost()}`;
+      } catch {
+        base = "http://localhost:8080";
+      }
+    }
     const res = await fetch(`${base}/api/public/signals-feed?days=${days}&limit=200`);
     if (!res.ok) throw new Error("feed_failed");
     return res.json();
