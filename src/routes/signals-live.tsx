@@ -41,15 +41,14 @@ const feedQuery = (days: number) => queryOptions({
   queryKey: ["public-signals-feed", days],
   queryFn: async (): Promise<FeedResponse> => {
     if (typeof window === "undefined") {
-      // Skip during SSR — client will fetch immediately after hydration.
       return {
+        days,
         generated_at: new Date().toISOString(),
-        window_days: days,
         signals: [],
+        stats: { total: 0, resolved: 0, pending: 0, wins: 0, losses: 0, win_rate: 0, avg_r: 0, total_r: 0, streak: 0, streak_kind: null },
         by_pair: [],
         by_session: [],
-        totals: { wins: 0, losses: 0, pending: 0, total: 0, win_rate: 0, total_r: 0, best_streak: 0, current_streak: 0 },
-      } as FeedResponse;
+      };
     }
     const res = await fetch(`/api/public/signals-feed?days=${days}&limit=200`);
     if (!res.ok) throw new Error("feed_failed");
