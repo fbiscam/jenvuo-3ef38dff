@@ -1120,7 +1120,7 @@ function detectKillzone(d: Date): { session: string; killzone: string } {
   else if (h >= 17 && h < 21) session = "New York PM";
   let killzone = "Outside Killzone";
   if (h >= 7 && h < 10) killzone = "London Killzone";
-  else if (h >= 12 && h < 15) killzone = "NY AM Killzone";
+  else if (h >= 12 && h < 16) killzone = "NY AM Killzone";
   else if (h >= 17 && h < 20) killzone = "NY PM Killzone";
   else if (h >= 0 && h < 4) killzone = "Asia Killzone";
   return { session, killzone };

@@ -257,24 +257,31 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             }
 
             // Cross-hook duplicate lock: a legacy/manual scanner may have already
-            // inserted this pair+direction. Do not alert the same idea again for
-            // several hours even if confidence temporarily dips and returns.
+            // inserted this pair+direction. Do not alert the same idea again in
+            // the SAME killzone — but a new killzone (London → NY AM → NY PM)
+            // is a fresh liquidity regime, so an aligned setup there should
+            // fire even if bias hasn't flipped since the previous session.
+            const currentKz = String(plan.killzone ?? "");
             const duplicateSince = new Date(
               now.getTime() - sameDirectionLockMin * 60_000,
             ).toISOString();
             const { data: recentSameDirection } = await supabaseAdmin
               .from("signal_alerts")
-              .select("id, fired_at, confidence")
+              .select("id, fired_at, confidence, killzone")
               .eq("pair", pair)
               .eq("direction", dir)
               .gte("fired_at", duplicateSince)
               .order("fired_at", { ascending: false })
               .limit(1);
-            if (recentSameDirection?.length) {
+            const lastKz = String(recentSameDirection?.[0]?.killzone ?? "");
+            const sameKillzone =
+              !!lastKz && !!currentKz && lastKz === currentKz;
+            if (recentSameDirection?.length && sameKillzone) {
               results.push({
                 pair,
                 action: "duplicate_same_direction_lock",
                 dir,
+                killzone: currentKz,
                 recent_alert_id: recentSameDirection[0].id,
               });
               continue;
