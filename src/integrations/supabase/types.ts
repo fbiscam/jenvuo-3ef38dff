@@ -987,6 +987,117 @@ export type Database = {
         }
         Relationships: []
       }
+      error_group: {
+        Row: {
+          ai_analyzed_at: string | null
+          ai_model: string | null
+          ai_root_cause: string | null
+          ai_suggested_fix: string | null
+          fingerprint: string
+          first_seen: string
+          last_seen: string
+          occurrences: number
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          sample_message: string
+          sample_route: string | null
+          sample_stack: string | null
+          severity: string
+          status: string
+          telegram_notified_at: string | null
+        }
+        Insert: {
+          ai_analyzed_at?: string | null
+          ai_model?: string | null
+          ai_root_cause?: string | null
+          ai_suggested_fix?: string | null
+          fingerprint: string
+          first_seen?: string
+          last_seen?: string
+          occurrences?: number
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          sample_message: string
+          sample_route?: string | null
+          sample_stack?: string | null
+          severity?: string
+          status?: string
+          telegram_notified_at?: string | null
+        }
+        Update: {
+          ai_analyzed_at?: string | null
+          ai_model?: string | null
+          ai_root_cause?: string | null
+          ai_suggested_fix?: string | null
+          fingerprint?: string
+          first_seen?: string
+          last_seen?: string
+          occurrences?: number
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          sample_message?: string
+          sample_route?: string | null
+          sample_stack?: string | null
+          severity?: string
+          status?: string
+          telegram_notified_at?: string | null
+        }
+        Relationships: []
+      }
+      error_log: {
+        Row: {
+          created_at: string
+          fingerprint: string
+          id: string
+          mechanism: string | null
+          message: string
+          metadata: Json
+          request_ip: string | null
+          route: string | null
+          severity: string
+          source: string
+          stack: string | null
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          fingerprint: string
+          id?: string
+          mechanism?: string | null
+          message: string
+          metadata?: Json
+          request_ip?: string | null
+          route?: string | null
+          severity?: string
+          source?: string
+          stack?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          fingerprint?: string
+          id?: string
+          mechanism?: string | null
+          message?: string
+          metadata?: Json
+          request_ip?: string | null
+          route?: string | null
+          severity?: string
+          source?: string
+          stack?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       extension_tokens: {
         Row: {
           created_at: string
@@ -2502,6 +2613,10 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      error_fingerprint: {
+        Args: { _message: string; _stack: string }
+        Returns: string
+      }
       expire_credits: { Args: never; Returns: number }
       get_guest_messages: {
         Args: { _token: string }
@@ -2548,6 +2663,19 @@ export type Database = {
           _symbol: string
           _user_agent: string
           _user_id: string
+        }
+        Returns: string
+      }
+      log_error: {
+        Args: {
+          _mechanism?: string
+          _message: string
+          _metadata?: Json
+          _route?: string
+          _severity?: string
+          _source?: string
+          _stack?: string
+          _user_agent?: string
         }
         Returns: string
       }
