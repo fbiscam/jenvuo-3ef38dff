@@ -36,16 +36,17 @@ export const logError = createServerFn({ method: 'POST' })
       const ua = getRequestHeader('user-agent') ?? null
       const { error } = await supabaseAdmin.rpc('log_error', {
         _message: data.message,
-        _stack: data.stack,
-        _route: data.route,
+        _stack: data.stack ?? undefined,
+        _route: data.route ?? undefined,
         _source: data.source,
-        _mechanism: data.mechanism,
+        _mechanism: data.mechanism ?? undefined,
         _severity: data.severity,
-        _user_agent: ua,
-        _metadata: data.metadata,
+        _user_agent: ua ?? undefined,
+        _metadata: (data.metadata ?? {}) as never,
       })
       if (error) return { ok: false as const, error: error.message }
       return { ok: true as const }
+
     } catch (e) {
       // Never let error logging cause its own error loop.
       return { ok: false as const, error: e instanceof Error ? e.message : String(e) }
