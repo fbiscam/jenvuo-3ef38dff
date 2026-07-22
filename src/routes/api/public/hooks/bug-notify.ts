@@ -60,9 +60,8 @@ export const Route = createFileRoute('/api/public/hooks/bug-notify')({
         const { fingerprint, kind = 'new', occurrences = 1 } = payload
         if (!fingerprint) return new Response('fingerprint required', { status: 400 })
 
-        const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-
         // Fetch bug details
+
         const { data: group, error: gerr } = await supabaseAdmin
           .from('error_group')
           .select('fingerprint, sample_message, sample_route, occurrences, first_seen, last_seen, status')
