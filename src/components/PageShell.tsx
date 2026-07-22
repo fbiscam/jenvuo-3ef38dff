@@ -30,6 +30,7 @@ export function PageShell({
             </Link>
             <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900">
               <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
+              <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
               <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
               <Link to="/briefs" className="hover:text-zinc-900">Briefs</Link>
               <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
