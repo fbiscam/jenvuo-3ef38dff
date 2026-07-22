@@ -11,7 +11,7 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 
-import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Minus, Menu, X } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 
 export const Route = createFileRoute("/")({
@@ -172,6 +172,14 @@ function HomePage() {
   const upgradeLock = useUpgradeLock();
   const { user: authUser } = useAuthUser();
   const isAuthed = !!authUser;
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (mobileMenuOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [mobileMenuOpen]);
   return (
     <>
     <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
@@ -192,7 +200,21 @@ function HomePage() {
             
             <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
           </nav>
-          <HeaderAuthButtons />
+          <div className="flex items-center gap-2 justify-self-end">
+            {!isAuthed && (
+              <button
+                type="button"
+                aria-label="Open menu"
+                aria-expanded={mobileMenuOpen}
+                onClick={() => setMobileMenuOpen(true)}
+                className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+              >
+                <Menu className="h-4 w-4" />
+              </button>
+            )}
+            <HeaderAuthButtons />
+          </div>
+
 
         </div>
         {/* ticker strip */}
@@ -210,6 +232,65 @@ function HomePage() {
         </div>
 
       </header>
+
+      {/* Mobile menu (signed-out users) */}
+      {!isAuthed && mobileMenuOpen && (
+        <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-zinc-900/40" onClick={() => setMobileMenuOpen(false)} />
+          <div className="absolute inset-x-0 top-0 bg-white border-b border-zinc-100 shadow-lg">
+            <div className="flex items-center justify-between px-5 py-3">
+              <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5">
+                <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
+                <span className="text-[20px] tracking-tight" style={{ color: "#3c4043", fontFamily: "\"Google Sans\",\"Product Sans\",\"DM Sans\",system-ui,sans-serif", fontWeight: 500 }}>Jenvu</span>
+              </Link>
+              <button
+                type="button"
+                aria-label="Close menu"
+                onClick={() => setMobileMenuOpen(false)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-zinc-900">
+              {[
+                { to: "/signal", label: "Signal Engine" },
+                { to: "/signals-live", label: "Signals Live" },
+                { to: "/ai-engine", label: "AI Engine" },
+                { to: "/founding", label: "Founding" },
+                { to: "/about", label: "About" },
+                { to: "/contact", label: "Contact" },
+              ].map((it) => (
+                <Link
+                  key={it.to}
+                  to={it.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-lg px-3 py-3 hover:bg-zinc-50"
+                >
+                  {it.label}
+                </Link>
+              ))}
+              <div className="mt-2 grid grid-cols-2 gap-2 px-3">
+                <Link
+                  to="/auth"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 hover:bg-zinc-50"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/founding"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                >
+                  Apply Now
+                </Link>
+              </div>
+            </nav>
+          </div>
+        </div>
+      )}
+
 
       <main>
       {/* HERO */}
