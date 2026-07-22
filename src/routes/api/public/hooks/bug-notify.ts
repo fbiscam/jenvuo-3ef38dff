@@ -1,15 +1,12 @@
 // Public endpoint called by the error_group trigger to push Telegram alerts
 // to the admin when a NEW bug appears or an existing one SPIKES.
-// Security: shared secret derived from TELEGRAM_BOT_TOKEN via SHA-256.
+// Security: shared secret BUG_NOTIFY_SECRET (also stored in DB vault).
 
 import { createFileRoute } from '@tanstack/react-router'
-import { createHash, timingSafeEqual } from 'crypto'
+import { timingSafeEqual } from 'crypto'
 
 const ADMIN_EMAIL = 'haseebinvestigator@gmail.com'
 
-function deriveSecret(botToken: string): string {
-  return createHash('sha256').update(`bug-notify:${botToken}`).digest('hex')
-}
 
 function safeEq(a: string, b: string): boolean {
   const A = Buffer.from(a); const B = Buffer.from(b)
