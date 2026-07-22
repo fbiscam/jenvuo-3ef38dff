@@ -148,15 +148,19 @@ export const updateBugStatus = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }) => {
     await assertAdmin(context)
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-    const patch: Record<string, unknown> = { status: data.status, resolution_note: data.note || null }
-    if (data.status === 'resolved') {
-      patch.resolved_at = new Date().toISOString()
-      patch.resolved_by = context.userId
-    } else {
-      patch.resolved_at = null
-      patch.resolved_by = null
+    const patch: {
+      status: 'open' | 'investigating' | 'resolved' | 'ignored'
+      resolution_note: string | null
+      resolved_at: string | null
+      resolved_by: string | null
+    } = {
+      status: data.status,
+      resolution_note: data.note || null,
+      resolved_at: data.status === 'resolved' ? new Date().toISOString() : null,
+      resolved_by: data.status === 'resolved' ? context.userId : null,
     }
     const { error } = await supabaseAdmin.from('error_group').update(patch).eq('fingerprint', data.fingerprint)
     if (error) throw new Error(error.message)
     return { ok: true as const }
+
   })
