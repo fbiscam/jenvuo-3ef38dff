@@ -38,12 +38,21 @@ export const Route = createFileRoute('/api/public/hooks/bug-notify')({
     handlers: {
       POST: async ({ request }) => {
         const botToken = process.env.TELEGRAM_BOT_TOKEN
-        const expected = process.env.BUG_NOTIFY_SECRET
         if (!botToken) return new Response('bot not configured', { status: 500 })
+
+        const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+        const { data: secretRow } = await supabaseAdmin
+          .schema('vault' as never)
+          .from('decrypted_secrets' as never)
+          .select('decrypted_secret')
+          .eq('name', 'bug_notify_secret')
+          .maybeSingle() as { data: { decrypted_secret: string } | null }
+        const expected = secretRow?.decrypted_secret ?? ''
         if (!expected) return new Response('secret not configured', { status: 500 })
 
         const provided = request.headers.get('x-bug-notify-secret') ?? ''
         if (!safeEq(provided, expected)) return new Response('unauthorized', { status: 401 })
+
 
 
         let payload: { fingerprint?: string; kind?: 'new' | 'spike'; occurrences?: number } = {}
