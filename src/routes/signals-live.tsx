@@ -232,35 +232,36 @@ function FeedBody() {
         </div>
       </section>
 
-      {/* STATS */}
+      {/* STATS — only show once at least 1 signal exists */}
+      {signals.length > 0 && (
       <section className="mx-auto max-w-6xl px-5 sm:px-6 py-8">
         <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
           <StatCard
             icon={<Trophy className="h-4 w-4" />}
             label="Win rate"
-            value={`${data.stats.win_rate.toFixed(1)}%`}
-            hint={`${data.stats.wins}W / ${data.stats.losses}L`}
+            value={`${liveStats.win_rate.toFixed(1)}%`}
+            hint={`${liveStats.wins}W / ${liveStats.losses}L`}
             accent="emerald"
           />
           <StatCard
             icon={<Sparkles className="h-4 w-4" />}
             label="Total R"
-            value={`${data.stats.total_r >= 0 ? "+" : ""}${data.stats.total_r.toFixed(2)}R`}
-            hint={`avg ${data.stats.avg_r >= 0 ? "+" : ""}${data.stats.avg_r.toFixed(2)}R / trade`}
-            accent={data.stats.total_r >= 0 ? "emerald" : "rose"}
+            value={`${liveStats.total_r >= 0 ? "+" : ""}${liveStats.total_r.toFixed(2)}R`}
+            hint={`avg ${liveStats.avg_r >= 0 ? "+" : ""}${liveStats.avg_r.toFixed(2)}R / trade`}
+            accent={liveStats.total_r >= 0 ? "emerald" : "rose"}
           />
           <StatCard
             icon={<Flame className="h-4 w-4" />}
             label="Current streak"
-            value={data.stats.streak_kind ? `${data.stats.streak} ${data.stats.streak_kind === "win" ? "wins" : "losses"}` : "—"}
-            hint={data.stats.streak_kind === "win" ? "In the green" : data.stats.streak_kind === "loss" ? "In drawdown" : "Awaiting"}
-            accent={data.stats.streak_kind === "win" ? "emerald" : data.stats.streak_kind === "loss" ? "rose" : "zinc"}
+            value={liveStats.streak_kind ? `${liveStats.streak} ${liveStats.streak_kind === "win" ? "wins" : "losses"}` : "—"}
+            hint={liveStats.streak_kind === "win" ? "In the green" : liveStats.streak_kind === "loss" ? "In drawdown" : "Awaiting"}
+            accent={liveStats.streak_kind === "win" ? "emerald" : liveStats.streak_kind === "loss" ? "rose" : "zinc"}
           />
           <StatCard
             icon={<Clock className="h-4 w-4" />}
             label="Signals fired"
-            value={String(data.stats.total)}
-            hint={`${data.stats.resolved} resolved · ${data.stats.pending} live`}
+            value={String(liveStats.total)}
+            hint={`${liveStats.resolved} resolved · ${liveStats.pending} live`}
             accent="zinc"
           />
         </div>
@@ -294,6 +295,7 @@ function FeedBody() {
           )}
         </div>
       </section>
+      )}
 
       {/* FILTERS */}
       <section className="mx-auto max-w-6xl px-5 sm:px-6">
