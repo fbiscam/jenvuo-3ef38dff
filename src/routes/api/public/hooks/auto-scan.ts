@@ -460,6 +460,17 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             };
             const swingsPayload = bpAny.swings ?? bpAny.dealingRange ?? null;
 
+            // Capture which AI models participated in this scan so users can
+            // see it in the alerts history ("which model called this signal").
+            const modelsUsed: string[] = [];
+            const srLabel = bpAny.seniorReview?.modelLabel ?? bpAny.seniorReview?.model;
+            const mcLabel = bpAny.macroContext?.modelLabel ?? bpAny.macroContext?.model;
+            if (typeof srLabel === "string" && srLabel) modelsUsed.push(srLabel);
+            if (typeof mcLabel === "string" && mcLabel) modelsUsed.push(mcLabel);
+            // Deterministic SMC/ICT engine is always the primary signal source.
+            modelsUsed.unshift("Deterministic SMC/ICT Engine");
+            const dedupedModels = Array.from(new Set(modelsUsed));
+
             // Insert signal_alert
             const { data: inserted, error: insErr } = await supabaseAdmin
               .from("signal_alerts")
@@ -484,6 +495,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 narration: narrationPayload,
                 structure: structurePayload,
                 swings: swingsPayload,
+                models_used: dedupedModels,
               })
               .select("id, fired_at")
               .single();
