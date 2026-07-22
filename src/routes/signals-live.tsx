@@ -92,14 +92,21 @@ function SignalsLivePage() {
   );
 }
 
+const SIGNALS_START_AT = new Date("2026-07-23T00:00:00Z").getTime();
+const PAGE_SIZE = 10;
+
 function FeedBody() {
   const [days, setDays] = useState(30);
   const { data, refetch, isFetching } = useSuspenseQuery(feedQuery(days));
   const [pairFilter, setPairFilter] = useState<string>("ALL");
   const [outcomeFilter, setOutcomeFilter] = useState<"all" | "win" | "loss" | "pending">("all");
   const [dirFilter, setDirFilter] = useState<"all" | "BUY" | "SELL">("all");
+  const [page, setPage] = useState(1);
 
-  const signals = data.signals;
+  const signals = useMemo(
+    () => data.signals.filter((s) => new Date(s.fired_at).getTime() >= SIGNALS_START_AT),
+    [data.signals],
+  );
   const pairs = useMemo(() => Array.from(new Set(signals.map((s) => s.pair))).sort(), [signals]);
 
   const filtered = useMemo(() => signals.filter((s) => {
@@ -108,6 +115,13 @@ function FeedBody() {
     if (dirFilter !== "all" && s.direction !== dirFilter) return false;
     return true;
   }), [signals, pairFilter, outcomeFilter, dirFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filtered.slice(pageStart, pageStart + PAGE_SIZE);
+  // Reset to page 1 whenever filters shrink the list below current page
+  if (page !== currentPage) setTimeout(() => setPage(currentPage), 0);
 
   const bestPair = data.by_pair.find((p) => p.wins + p.losses >= 3) ?? data.by_pair[0];
   const bestSession = data.by_session.find((s) => s.wins + s.losses >= 3) ?? data.by_session[0];
