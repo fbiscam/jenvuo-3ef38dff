@@ -94,8 +94,11 @@ function SignalsLivePage() {
       </header>
 
       <Suspense fallback={<div className="mx-auto max-w-6xl px-5 py-16 text-sm text-zinc-500">Loading live feed…</div>}>
-        <FeedBody />
+        <ClientGate fallback={<div className="mx-auto max-w-6xl px-5 py-16 text-sm text-zinc-500">Loading live feed…</div>}>
+          <FeedBody />
+        </ClientGate>
       </Suspense>
+
 
       <SiteFooter />
     </div>
