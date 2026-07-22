@@ -40,7 +40,8 @@ type FeedResponse = {
 const feedQuery = (days: number) => queryOptions({
   queryKey: ["public-signals-feed", days],
   queryFn: async (): Promise<FeedResponse> => {
-    const res = await fetch(`/api/public/signals-feed?days=${days}&limit=200`);
+    const base = typeof window === "undefined" ? "http://localhost:8080" : "";
+    const res = await fetch(`${base}/api/public/signals-feed?days=${days}&limit=200`);
     if (!res.ok) throw new Error("feed_failed");
     return res.json();
   },
@@ -49,7 +50,6 @@ const feedQuery = (days: number) => queryOptions({
 });
 
 export const Route = createFileRoute("/signals-live")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(feedQuery(30)),
   head: () => ({
     meta: [
       { title: "Live Signals Feed — Real Trades, Real Results | Jenvu" },
