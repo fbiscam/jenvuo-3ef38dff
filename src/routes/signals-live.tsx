@@ -215,32 +215,32 @@ function FeedBody() {
       </section>
 
       {/* FILTERS */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-6">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-2.5 sm:p-4">
+          <div className="-mx-0.5 flex items-center gap-2 overflow-x-auto pb-0.5 sm:flex-wrap sm:overflow-visible">
+            <div className="shrink-0 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 sm:text-[11px]">
               <Filter className="h-3.5 w-3.5" /> Filters
             </div>
-            <select value={pairFilter} onChange={(e) => setPairFilter(e.target.value)} className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-700">
+            <select value={pairFilter} onChange={(e) => setPairFilter(e.target.value)} className="shrink-0 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-700">
               <option value="ALL">All pairs</option>
               {pairs.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
-            <div className="inline-flex rounded-lg border border-zinc-200 p-0.5">
+            <div className="shrink-0 inline-flex rounded-lg border border-zinc-200 p-0.5">
               {(["all", "BUY", "SELL"] as const).map((d) => (
                 <button key={d} onClick={() => setDirFilter(d)} className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${dirFilter === d ? (d === "BUY" ? "bg-emerald-600 text-white" : d === "SELL" ? "bg-rose-600 text-white" : "bg-zinc-900 text-white") : "text-zinc-600 hover:text-zinc-900"}`}>
                   {d === "all" ? "Both" : d}
                 </button>
               ))}
             </div>
-            <div className="inline-flex rounded-lg border border-zinc-200 p-0.5">
+            <div className="shrink-0 inline-flex rounded-lg border border-zinc-200 p-0.5">
               {(["all", "win", "loss", "pending"] as const).map((o) => (
                 <button key={o} onClick={() => setOutcomeFilter(o)} className={`rounded-md px-2.5 py-1 text-[11px] font-semibold capitalize ${outcomeFilter === o ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"}`}>
                   {o}
                 </button>
               ))}
             </div>
-            <div className="ml-auto text-[11px] text-zinc-500">
-              Showing <span className="font-mono text-zinc-900">{filtered.length}</span> of {signals.length}
+            <div className="ml-auto shrink-0 text-[11px] text-zinc-500">
+              <span className="font-mono text-zinc-900">{filtered.length}</span>/{signals.length}
             </div>
           </div>
         </div>
