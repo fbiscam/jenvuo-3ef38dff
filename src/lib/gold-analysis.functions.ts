@@ -2668,9 +2668,52 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         }
 
       }
-      tradeFromAi.confidence = Math.min(95, Math.max(setupScore, blended));
+      let rawConf = Math.min(95, Math.max(setupScore, blended));
 
+      // Confidence smoothing memory — prevents a fresh scan from swinging
+      // wildly (e.g. 75% now, 55% five minutes later) when structure hasn't
+      // materially changed. We keep a short-lived per-(pair,direction) memory
+      // and EMA-blend the new raw value with the recent one, and cap any
+      // drop within a 15-minute window. Fail-open on any DB error.
+      if (built.direction !== "WAIT") {
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const pairKey = String(inst.display);
+          const dirKey = String(built.direction);
+          const { data: mem } = await supabaseAdmin
+            .from("signal_confidence_memory")
+            .select("smoothed_conf, updated_at")
+            .eq("pair", pairKey)
+            .eq("direction", dirKey)
+            .maybeSingle();
+          let smoothed = rawConf;
+          if (mem && mem.updated_at) {
+            const ageMin = (Date.now() - new Date(mem.updated_at as string).getTime()) / 60000;
+            const prev = Number(mem.smoothed_conf);
+            if (Number.isFinite(prev) && ageMin <= 15) {
+              // EMA: weight previous higher to damp jitter
+              smoothed = Math.round(prev * 0.55 + rawConf * 0.45);
+              // Cap drop to 8 points within the window
+              if (smoothed < prev - 8) smoothed = prev - 8;
+              // Cap rise to 10 points so pops also settle in
+              if (smoothed > prev + 10) smoothed = prev + 10;
+              smoothed = Math.min(95, Math.max(0, smoothed));
+            }
+          }
+          await supabaseAdmin
+            .from("signal_confidence_memory")
+            .upsert({
+              pair: pairKey,
+              direction: dirKey,
+              smoothed_conf: smoothed,
+              raw_conf: rawConf,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: "pair,direction" });
+          rawConf = smoothed;
+        } catch { /* fail-open: use unsmoothed */ }
+      }
 
+      tradeFromAi.confidence = rawConf;
 
       // Sync grade with final displayed confidence so user sees consistent quality signal.
       const finalConf = tradeFromAi.confidence;
