@@ -201,7 +201,9 @@ function HomePage() {
             <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
           </nav>
           <div className="flex items-center gap-2">
-            <HeaderAuthButtons />
+            <div className={isAuthed ? "" : "hidden md:block"}>
+              <HeaderAuthButtons />
+            </div>
             {!isAuthed && (
               <button
                 type="button"
