@@ -103,7 +103,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           (p) =>
             typeof p === "string" && p.toUpperCase().startsWith("XAU"),
         );
-        const minConf = Number(cfg.min_conf ?? 64);
+        const minConf = Number(cfg.min_conf ?? 75);
         const confirmWindowMin = Number(cfg.confirm_window_min ?? 45);
         const cooldownMin = Number(cfg.cooldown_min ?? 60);
         const sameDirectionLockMin = Number(cfg.same_direction_lock_min ?? 240);
@@ -207,10 +207,16 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // HTF bias alignment gate — never fire against higher-timeframe trend.
             // Today's losses were SELLs into a bullish macro rally; this guard
             // blocks counter-trend trades even when the LTF setup looks clean.
+            // NY-AM relaxed gate: during 12–16 UTC (London/NY overlap) neutral
+            // HTF bias is allowed through — this window regularly produces the
+            // day's cleanest setups and a rigid bias gate was silencing them.
             const htfBias = String((plan as { htfBias?: string }).htfBias ?? "neutral");
+            const utcHourNow = now.getUTCHours();
+            const isNyAmWindow = utcHourNow >= 12 && utcHourNow < 16;
             const aligned =
               (dir === "BUY" && htfBias === "bullish") ||
-              (dir === "SELL" && htfBias === "bearish");
+              (dir === "SELL" && htfBias === "bearish") ||
+              (isNyAmWindow && htfBias === "neutral");
             if (!aligned) {
               await supabaseAdmin
                 .from("auto_scan_state")
@@ -412,9 +418,9 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const grade =
               gradeBasis >= 90
                 ? "A+"
-                : gradeBasis >= 80
+                : gradeBasis >= 82
                   ? "A"
-                  : gradeBasis >= 64
+                  : gradeBasis >= 75
                     ? "B"
                     : "C";
 
