@@ -476,7 +476,7 @@ function SignalPage() {
           await speakWait(p.trade.summary);
           const hasLevels =
             Number.isFinite(p.trade.entry) && Number.isFinite(p.trade.sl) && Number.isFinite(p.trade.tp);
-          if ((p.trade.confidence ?? 0) >= 62 && hasLevels && p.trade.direction !== "WAIT") {
+          if ((p.trade.confidence ?? 0) >= 75 && hasLevels && p.trade.direction !== "WAIT") {
             toast.success(`Setup ready · ${p.setupGrade}`);
           }
         }
@@ -740,7 +740,7 @@ function SignalPage() {
     if (!isMarketOpen(plan.instrument.symbol)) return;
     if (plan.trade.direction === "WAIT") return;
     // Only track & fire notifications when confidence ≥ 62% AND entry/SL/TP are valid.
-    if ((plan.trade.confidence ?? 0) < 62) return;
+    if ((plan.trade.confidence ?? 0) < 75) return;
     if (!Number.isFinite(plan.trade.entry) || !Number.isFinite(plan.trade.sl) || !Number.isFinite(plan.trade.tp)) return;
 
     const tr = plan.trade;
@@ -1382,7 +1382,7 @@ function SignalPage() {
                   <div className="flex items-end justify-between">
                     <div className="flex items-center gap-2">
                       <span className={`font-['Urbanist',sans-serif] text-[12px] font-semibold tracking-wide uppercase text-zinc-900`}>Trade Plan</span>
-                      {(t.confidence ?? 0) >= 62 && (
+                      {(t.confidence ?? 0) >= 75 && (
                         <>
                           <span className={cn(
                             `text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded`,
@@ -1485,12 +1485,12 @@ function SignalPage() {
                   </div>
 
                   {/* Position sizing calculator */}
-                  {(isBuy || isSell) && (t.confidence ?? 0) >= 62 && (
+                  {(isBuy || isSell) && (t.confidence ?? 0) >= 75 && (
                     <PositionSizer plan={plan} />
                   )}
 
                   {/* Trade Management — final recommendation only */}
-                  {(isBuy || isSell) && (t.confidence ?? 0) >= 62 && (
+                  {(isBuy || isSell) && (t.confidence ?? 0) >= 75 && (
                     <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2.5 font-['Urbanist',sans-serif] text-[13px] font-medium text-emerald-950 leading-relaxed space-y-2">
                       <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex items-center gap-1.5 font-['Urbanist',sans-serif] font-semibold text-emerald-800 uppercase tracking-wide text-[10px] sm:text-[11px]">
@@ -1538,7 +1538,7 @@ function SignalPage() {
 
 
                   {/* Take Trade / Save Signal — only when valid trade plan (conf ≥ 62, entry/SL/TP present) */}
-                  {(isBuy || isSell) && t.confidence >= 62 && Number.isFinite(t.entry) && Number.isFinite(t.sl) && Number.isFinite(t.tp) && t.entry > 0 && t.sl > 0 && t.tp > 0 && (
+                  {(isBuy || isSell) && t.confidence >= 75 && Number.isFinite(t.entry) && Number.isFinite(t.sl) && Number.isFinite(t.tp) && t.entry > 0 && t.sl > 0 && t.tp > 0 && (
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       type="button"
@@ -2458,7 +2458,7 @@ function TradeTrackerCard({
       )}
 
       {/* Trade Management Ladder — only when a real trade plan is issued (confidence ≥ 62) */}
-      {(plan.trade?.confidence ?? 0) >= 62 && plan.trade?.direction !== "WAIT" && (
+      {(plan.trade?.confidence ?? 0) >= 75 && plan.trade?.direction !== "WAIT" && (
         <TradeManagementLadder plan={plan} rMultiple={rMultiple} status={status} />
       )}
 
