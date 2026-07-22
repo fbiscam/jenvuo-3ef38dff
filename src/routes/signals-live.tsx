@@ -207,7 +207,7 @@ function FeedBody() {
                 Every signal. Every outcome.
               </h1>
               <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-zinc-600 sm:mt-4 sm:text-lg">
-                <span className="sm:hidden">Live log of every Jenvu AI gold signal — auto-resolved wins & losses.</span>
+                <span className="sm:hidden">Every gold signal, transparently logged.</span>
                 <span className="hidden sm:inline">Real-time log of every gold signal broadcast by Jenvu AI — actual win/loss and R multiple auto-resolved from live price. No login, no cherry-picking.</span>
               </p>
             </div>
