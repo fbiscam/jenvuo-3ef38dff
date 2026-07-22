@@ -75,24 +75,29 @@ export function useSignalAlerts(pair: string = 'XAUUSD') {
     notify(row)
   }, [])
 
-  // Fetch current alerts_enabled preference and cache it
+  // Fetch current alerts_enabled preference and cache it (only when signed in)
   useEffect(() => {
     let cancelled = false
-    alertsEnabledFn()
-      .then((r) => {
-        if (cancelled) return
-        enabledRef.current = r.enabled !== false
-        try {
-          window.localStorage.setItem(ALERTS_ENABLED_CACHE_KEY, r.enabled ? '1' : '0')
-        } catch {
-          /* ignore */
-        }
-      })
-      .catch(() => {})
+    ;(async () => {
+      const { data } = await supabase.auth.getSession()
+      if (cancelled || !data.session) return
+      alertsEnabledFn()
+        .then((r) => {
+          if (cancelled) return
+          enabledRef.current = r.enabled !== false
+          try {
+            window.localStorage.setItem(ALERTS_ENABLED_CACHE_KEY, r.enabled ? '1' : '0')
+          } catch {
+            /* ignore */
+          }
+        })
+        .catch(() => {})
+    })()
     return () => {
       cancelled = true
     }
   }, [alertsEnabledFn])
+
 
   // Initial fetch
   useEffect(() => {
