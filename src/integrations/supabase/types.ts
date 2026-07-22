@@ -2590,6 +2590,10 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      bug_notify_dispatch: {
+        Args: { _fingerprint: string; _kind: string; _occurrences: number }
+        Returns: undefined
+      }
       close_chat_session: { Args: { _session_id: string }; Returns: undefined }
       community_bump_counter: {
         Args: { _col: string; _delta: number; _post_id: string }
