@@ -739,7 +739,7 @@ function SignalPage() {
     // Skip TP/SL/entry-fill events when market is closed (weekends for FX/metals/indices).
     if (!isMarketOpen(plan.instrument.symbol)) return;
     if (plan.trade.direction === "WAIT") return;
-    // Only track & fire notifications when confidence ≥ 62% AND entry/SL/TP are valid.
+    // Only track & fire notifications when confidence ≥ 75% AND entry/SL/TP are valid.
     if ((plan.trade.confidence ?? 0) < 75) return;
     if (!Number.isFinite(plan.trade.entry) || !Number.isFinite(plan.trade.sl) || !Number.isFinite(plan.trade.tp)) return;
 
@@ -1412,7 +1412,7 @@ function SignalPage() {
                   <NewsCountdownChip plan={plan} />
 
                   {(() => {
-                    const LOW_CONF = 62;
+                    const LOW_CONF = 75;
                     const isLowConf = (t.confidence ?? 0) < LOW_CONF;
                     const dec = plan.instrument.decimals;
                     const riskAbs = Math.abs(t.entry - t.sl);
@@ -1537,7 +1537,7 @@ function SignalPage() {
 
 
 
-                  {/* Take Trade / Save Signal — only when valid trade plan (conf ≥ 62, entry/SL/TP present) */}
+                  {/* Take Trade / Save Signal — only when valid trade plan (conf ≥ 75, entry/SL/TP present) */}
                   {(isBuy || isSell) && t.confidence >= 75 && Number.isFinite(t.entry) && Number.isFinite(t.sl) && Number.isFinite(t.tp) && t.entry > 0 && t.sl > 0 && t.tp > 0 && (
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
@@ -2457,7 +2457,7 @@ function TradeTrackerCard({
         </svg>
       )}
 
-      {/* Trade Management Ladder — only when a real trade plan is issued (confidence ≥ 62) */}
+      {/* Trade Management Ladder — only when a real trade plan is issued (confidence ≥ 75) */}
       {(plan.trade?.confidence ?? 0) >= 75 && plan.trade?.direction !== "WAIT" && (
         <TradeManagementLadder plan={plan} rMultiple={rMultiple} status={status} />
       )}
