@@ -293,6 +293,36 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               continue;
             }
 
+            // Cross-pair XAU correlation dedupe: all XAU pairs (USD, EUR, GBP,
+            // JPY, AUD, CHF) share the same gold-side driver. If any XAU pair
+            // was already alerted in the same direction inside the last 60 min,
+            // suppress correlated duplicates — one gold call per session, not six.
+            if (pair.startsWith("XAU")) {
+              const xauLookback = new Date(
+                now.getTime() - 60 * 60_000,
+              ).toISOString();
+              const { data: recentXau } = await supabaseAdmin
+                .from("signal_alerts")
+                .select("id, pair, fired_at, direction")
+                .like("pair", "XAU%")
+                .eq("direction", dir)
+                .neq("pair", pair)
+                .gte("fired_at", xauLookback)
+                .order("fired_at", { ascending: false })
+                .limit(1);
+              if (recentXau?.length) {
+                results.push({
+                  pair,
+                  action: "xau_correlation_dedup",
+                  dir,
+                  duplicate_of: recentXau[0].pair,
+                  recent_alert_id: recentXau[0].id,
+                });
+                continue;
+              }
+            }
+
+
             // Two-hit confirmation: first qualifying scan only arms the signal.
             // Broadcast only if the same direction is still valid on the next
             // scan inside the confirmation window. This filters one-candle
