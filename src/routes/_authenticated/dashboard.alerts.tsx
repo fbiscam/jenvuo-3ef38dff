@@ -471,13 +471,85 @@ function AlertPrefs() {
           </div>
         </div>
 
-        <div className="mt-4 overflow-x-auto sm:overflow-x-hidden rounded-xl border border-zinc-100">
+        <div className="mt-4 rounded-xl border border-zinc-100 overflow-hidden">
           {alertsLoading ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">Loading alerts…</div>
           ) : alerts.length === 0 ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">No alerts have fired yet. Sit tight — the scanner runs every 15 minutes.</div>
           ) : (
-            <table className="w-full min-w-[780px] sm:min-w-0 text-sm">
+            <>
+            {/* Mobile card list */}
+            <ul className="divide-y divide-zinc-100 sm:hidden">
+              {alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter).slice(0, visibleCount).map((a) => {
+                const isBuy = a.direction === "BUY";
+                const firedAt = new Date(a.fired_at);
+                const ago = relativeTime(firedAt);
+                const logged = loggedIds.has(a.id);
+                const busy = loggingId === a.id;
+                const withinHour = Date.now() - firedAt.getTime() < 60 * 60 * 1000;
+                const entryN = Number(a.entry);
+                const slN = Number(a.sl);
+                const sz = risk && Number.isFinite(entryN) && Number.isFinite(slN)
+                  ? computePositionSize({ balanceUsd: risk.balance, riskPct: risk.pct, entry: entryN, sl: slN })
+                  : null;
+                return (
+                  <li key={a.id} className="p-3">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+                      <div className="min-w-0 flex flex-wrap items-center gap-1.5">
+                        <span className={`shrink-0 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${isBuy ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+                          {isBuy ? "BUY" : "SELL"}
+                        </span>
+                        <span className="shrink-0 font-mono text-xs font-semibold text-zinc-900">{a.pair}</span>
+                        <span className="shrink-0 rounded-md bg-zinc-100 px-1.5 py-0.5 text-[10px] font-bold text-zinc-900">{a.grade}</span>
+                        <span className="shrink-0 text-[10px] text-zinc-500">{a.confidence}%</span>
+                        {a.session && <span className="shrink-0 text-[10px] text-zinc-400">· {a.session}</span>}
+                      </div>
+                      <span className="shrink-0 font-mono text-[10px] text-zinc-400 whitespace-nowrap">{ago}</span>
+                    </div>
+                    <dl className="mt-2 grid grid-cols-4 gap-1.5 text-center">
+                      {([
+                        ["Entry", a.entry, "text-zinc-800"],
+                        ["SL", a.sl, "text-rose-600"],
+                        ["TP", a.tp, "text-emerald-600"],
+                        ["RR", a.rr, "text-zinc-800"],
+                      ] as const).map(([k, v, c]) => (
+                        <div key={k} className="rounded-md bg-zinc-50 px-1 py-1 ring-1 ring-inset ring-zinc-200/70 min-w-0">
+                          <dt className="font-mono text-[9px] uppercase tracking-wider text-zinc-500">{k}</dt>
+                          <dd className={`mt-0.5 font-mono text-[11px] truncate ${c}`}>{v ?? "—"}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <div className="min-w-0 text-[10px] text-zinc-500 truncate">
+                        {sz ? <span title={`Balance $${risk!.balance.toFixed(2)} · Risk ${risk!.pct}%`}>Size: <span className="font-mono text-zinc-800">{sz.lots.toFixed(2)} lot</span></span> : (
+                          a.models_used && a.models_used.length > 0 ? <span className="truncate">{a.models_used.map((m) => m.split("/").pop()).join(" · ")}</span> : <span className="text-zinc-300">—</span>
+                        )}
+                      </div>
+                      {withinHour ? (
+                        <button
+                          type="button"
+                          disabled={logged || busy}
+                          onClick={() => takeTrade(a)}
+                          className={`shrink-0 inline-flex items-center justify-center rounded-md px-3 py-1.5 text-[11px] font-semibold whitespace-nowrap transition ${
+                            logged
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default"
+                              : isBuy
+                                ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                                : "bg-rose-600 text-white hover:bg-rose-700"
+                          } ${busy ? "opacity-70" : ""}`}
+                        >
+                          {logged ? "Logged" : busy ? "…" : "Trade Done"}
+                        </button>
+                      ) : null}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+            <table className="w-full text-sm">
               <thead className="bg-zinc-50 text-center font-mono text-[10px] uppercase tracking-wider text-zinc-500">
                 <tr>
                   {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Models", "Your Size", "Time", ""].map((h, i) => (
@@ -562,6 +634,8 @@ function AlertPrefs() {
                 })}
               </tbody>
             </table>
+            </div>
+            </>
           )}
         </div>
 
