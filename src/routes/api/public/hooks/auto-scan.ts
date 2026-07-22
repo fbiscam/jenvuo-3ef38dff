@@ -535,6 +535,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               },
               broadcast_alert_id: inserted.id,
               outcome: "pending",
+              models_used: dedupedModels,
             });
 
 
