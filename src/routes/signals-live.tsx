@@ -143,8 +143,55 @@ function FeedBody() {
   // Reset to page 1 whenever filters shrink the list below current page
   if (page !== currentPage) setTimeout(() => setPage(currentPage), 0);
 
-  const bestPair = data.by_pair.find((p) => p.wins + p.losses >= 3) ?? data.by_pair[0];
-  const bestSession = data.by_session.find((s) => s.wins + s.losses >= 3) ?? data.by_session[0];
+  // Recompute stats from the SIGNALS_START_AT-filtered signals so nothing is shown before real signals exist
+  const liveStats = useMemo(() => {
+    const total = signals.length;
+    const resolved = signals.filter((s) => s.outcome === "win" || s.outcome === "loss");
+    const wins = resolved.filter((s) => s.outcome === "win").length;
+    const losses = resolved.filter((s) => s.outcome === "loss").length;
+    const pending = total - resolved.length;
+    const rSum = resolved.reduce((sum, s) => sum + (s.realized_r ?? 0), 0);
+    const win_rate = resolved.length ? (wins / resolved.length) * 100 : 0;
+    const avg_r = resolved.length ? rSum / resolved.length : 0;
+    // streak from most recent resolved
+    const sortedResolved = [...resolved].sort((a, b) => new Date(b.resolved_at ?? b.fired_at).getTime() - new Date(a.resolved_at ?? a.fired_at).getTime());
+    let streak = 0;
+    let streak_kind: "win" | "loss" | null = null;
+    for (const s of sortedResolved) {
+      if (streak_kind === null) { streak_kind = s.outcome as "win" | "loss"; streak = 1; continue; }
+      if (s.outcome === streak_kind) streak++; else break;
+    }
+    // by pair
+    const pairMap = new Map<string, { pair: string; total: number; wins: number; losses: number; r: number }>();
+    for (const s of signals) {
+      const p = pairMap.get(s.pair) ?? { pair: s.pair, total: 0, wins: 0, losses: 0, r: 0 };
+      p.total++;
+      if (s.outcome === "win") p.wins++;
+      if (s.outcome === "loss") p.losses++;
+      p.r += s.realized_r ?? 0;
+      pairMap.set(s.pair, p);
+    }
+    const by_pair = Array.from(pairMap.values())
+      .map((p) => ({ ...p, win_rate: p.wins + p.losses ? (p.wins / (p.wins + p.losses)) * 100 : 0 }))
+      .sort((a, b) => b.r - a.r);
+    // by session
+    const sesMap = new Map<string, { session: string; total: number; wins: number; losses: number }>();
+    for (const s of signals) {
+      const key = s.session ?? "—";
+      const v = sesMap.get(key) ?? { session: key, total: 0, wins: 0, losses: 0 };
+      v.total++;
+      if (s.outcome === "win") v.wins++;
+      if (s.outcome === "loss") v.losses++;
+      sesMap.set(key, v);
+    }
+    const by_session = Array.from(sesMap.values())
+      .map((v) => ({ ...v, win_rate: v.wins + v.losses ? (v.wins / (v.wins + v.losses)) * 100 : 0 }))
+      .sort((a, b) => b.win_rate - a.win_rate);
+    return { total, resolved: resolved.length, pending, wins, losses, win_rate, avg_r, total_r: rSum, streak, streak_kind, by_pair, by_session };
+  }, [signals]);
+
+  const bestPair = liveStats.by_pair.find((p) => p.wins + p.losses >= 3) ?? liveStats.by_pair[0];
+  const bestSession = liveStats.by_session.find((s) => s.wins + s.losses >= 3) ?? liveStats.by_session[0];
 
   return (
     <>
