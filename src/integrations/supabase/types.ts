@@ -1689,6 +1689,30 @@ export type Database = {
         }
         Relationships: []
       }
+      signal_confidence_memory: {
+        Row: {
+          direction: string
+          pair: string
+          raw_conf: number
+          smoothed_conf: number
+          updated_at: string
+        }
+        Insert: {
+          direction: string
+          pair: string
+          raw_conf: number
+          smoothed_conf: number
+          updated_at?: string
+        }
+        Update: {
+          direction?: string
+          pair?: string
+          raw_conf?: number
+          smoothed_conf?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       signal_locks: {
         Row: {
           created_at: string
