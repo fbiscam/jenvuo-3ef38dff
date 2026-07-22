@@ -521,6 +521,11 @@ export function scoreSetup(args: {
     if (imminentHighNews) {
       vetos.push({ key: "news", label: "High-impact news imminent", reason: "News event within 60m — stand aside" });
     }
+    // 3b. DXY contradiction on metals — Gold vs DXY inverse correlation is the
+    // single strongest bias filter for XAU; ignore only when DXY data missing.
+    if (kind === "metal" && dxyConfirms === false) {
+      vetos.push({ key: "dxy_contra", label: "DXY contradicts trade direction", reason: "DXY not confirming inverse move — high failure risk on metals" });
+    }
     // 4. R:R < 1.5
     if (trade.rr < 1.5) {
       vetos.push({ key: "rr_low", label: "R:R below 1.5", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
