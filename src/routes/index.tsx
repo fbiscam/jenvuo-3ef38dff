@@ -172,6 +172,14 @@ function HomePage() {
   const upgradeLock = useUpgradeLock();
   const { user: authUser } = useAuthUser();
   const isAuthed = !!authUser;
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (mobileMenuOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [mobileMenuOpen]);
   return (
     <>
     <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
