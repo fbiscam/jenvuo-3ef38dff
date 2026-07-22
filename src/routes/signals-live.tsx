@@ -92,14 +92,21 @@ function SignalsLivePage() {
   );
 }
 
+const SIGNALS_START_AT = new Date("2026-07-23T00:00:00Z").getTime();
+const PAGE_SIZE = 10;
+
 function FeedBody() {
   const [days, setDays] = useState(30);
   const { data, refetch, isFetching } = useSuspenseQuery(feedQuery(days));
   const [pairFilter, setPairFilter] = useState<string>("ALL");
   const [outcomeFilter, setOutcomeFilter] = useState<"all" | "win" | "loss" | "pending">("all");
   const [dirFilter, setDirFilter] = useState<"all" | "BUY" | "SELL">("all");
+  const [page, setPage] = useState(1);
 
-  const signals = data.signals;
+  const signals = useMemo(
+    () => data.signals.filter((s) => new Date(s.fired_at).getTime() >= SIGNALS_START_AT),
+    [data.signals],
+  );
   const pairs = useMemo(() => Array.from(new Set(signals.map((s) => s.pair))).sort(), [signals]);
 
   const filtered = useMemo(() => signals.filter((s) => {
@@ -108,6 +115,13 @@ function FeedBody() {
     if (dirFilter !== "all" && s.direction !== dirFilter) return false;
     return true;
   }), [signals, pairFilter, outcomeFilter, dirFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filtered.slice(pageStart, pageStart + PAGE_SIZE);
+  // Reset to page 1 whenever filters shrink the list below current page
+  if (page !== currentPage) setTimeout(() => setPage(currentPage), 0);
 
   const bestPair = data.by_pair.find((p) => p.wins + p.losses >= 3) ?? data.by_pair[0];
   const bestSession = data.by_session.find((s) => s.wins + s.losses >= 3) ?? data.by_session[0];
@@ -250,12 +264,48 @@ function FeedBody() {
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-6">
         {filtered.length === 0 ? (
           <div className="rounded-2xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
-            No signals match these filters.
+            No signals yet. New signals will appear here as they fire.
           </div>
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {filtered.map((s) => <SignalCard key={s.id} s={s} />)}
-          </ul>
+          <>
+            <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {pageItems.map((s) => <SignalCard key={s.id} s={s} />)}
+            </ul>
+            {totalPages > 1 && (
+              <nav className="mt-6 flex flex-wrap items-center justify-center gap-1.5" aria-label="Pagination">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Prev
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setPage(n)}
+                    className={`min-w-[32px] rounded-full px-3 py-1.5 text-xs font-medium ${
+                      n === currentPage
+                        ? "bg-zinc-900 text-white"
+                        : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+                <span className="ml-2 text-[11px] text-zinc-500">
+                  Page {currentPage} of {totalPages} · {filtered.length} signals
+                </span>
+              </nav>
+            )}
+          </>
         )}
         <p className="mt-6 text-center text-[11px] text-zinc-400">
           Auto-updated every 60s · Generated {new Date(data.generated_at).toLocaleString()} · Educational data only, not financial advice.
