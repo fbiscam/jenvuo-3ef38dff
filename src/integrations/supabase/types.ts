@@ -1629,6 +1629,7 @@ export type Database = {
           id: string
           killzone: string | null
           markings: Json | null
+          models_used: string[] | null
           narration: Json | null
           pair: string
           rationale: string | null
@@ -1651,6 +1652,7 @@ export type Database = {
           id?: string
           killzone?: string | null
           markings?: Json | null
+          models_used?: string[] | null
           narration?: Json | null
           pair?: string
           rationale?: string | null
@@ -1673,6 +1675,7 @@ export type Database = {
           id?: string
           killzone?: string | null
           markings?: Json | null
+          models_used?: string[] | null
           narration?: Json | null
           pair?: string
           rationale?: string | null
@@ -1738,6 +1741,7 @@ export type Database = {
           htf_bias: string | null
           id: string
           killzone: string | null
+          models_used: string[] | null
           notes: string | null
           outcome: string | null
           pair: string
@@ -1761,6 +1765,7 @@ export type Database = {
           htf_bias?: string | null
           id?: string
           killzone?: string | null
+          models_used?: string[] | null
           notes?: string | null
           outcome?: string | null
           pair: string
@@ -1784,6 +1789,7 @@ export type Database = {
           htf_bias?: string | null
           id?: string
           killzone?: string | null
+          models_used?: string[] | null
           notes?: string | null
           outcome?: string | null
           pair?: string
