@@ -35,23 +35,6 @@ function getRetryAfterSeconds(error: unknown): number {
   return 60
 }
 
-function fallbackTextFromHtml(html: unknown): string {
-  if (typeof html !== 'string') return ''
-  return html
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/(p|div|li|h[1-6]|tr)>/gi, '\n')
-    .replace(/<li[^>]*>/gi, '• ')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
-}
-
 async function moveToDlq(
   supabase: SupabaseClient<any, any>,
   queue: string,
@@ -237,35 +220,6 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               }
             }
 
-            // Regenerate idempotency_key on every retry so a previously-failed
-            // send at Lovable's API doesn't reject subsequent attempts with
-            // 409 "run_failed / send again with a new idempotency key".
-            const retryIdempotencyKey =
-              failedAttempts > 0 && payload.idempotency_key
-                ? `${payload.idempotency_key}-retry-${failedAttempts}`
-                : payload.idempotency_key
-            const plainText =
-              typeof payload.text === 'string' && payload.text.trim().length > 0
-                ? payload.text
-                : fallbackTextFromHtml(payload.html)
-
-            // Non-retryable validation error: empty text body would be rejected
-            // by the email provider with 400 missing_parameter=text. Move
-            // straight to DLQ so a bad payload doesn't burn the retry budget
-            // and stall other queued messages.
-            if (!plainText || plainText.trim().length === 0) {
-              console.error('Email payload has empty text/html body — moving to DLQ', {
-                queue,
-                msg_id: msg.msg_id,
-                message_id: payload.message_id,
-                label: payload.label,
-              })
-              await moveToDlq(supabase, queue, msg, 'Empty text/html body (missing_parameter=text)')
-              continue
-            }
-
-
-
             try {
               await sendLovableEmail(
                 {
@@ -275,10 +229,10 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   sender_domain: payload.sender_domain,
                   subject: payload.subject,
                   html: payload.html,
-                  text: plainText,
+                  text: payload.text,
                   purpose: payload.purpose,
                   label: payload.label,
-                  idempotency_key: retryIdempotencyKey,
+                  idempotency_key: payload.idempotency_key,
                   unsubscribe_token: payload.unsubscribe_token,
                   message_id: payload.message_id,
                 },
