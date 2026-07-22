@@ -80,6 +80,7 @@ import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/ap
 import { Route as ApiPublicHooksMonthlyRetuneRouteImport } from './routes/api/public/hooks/monthly-retune'
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
+import { Route as ApiPublicHooksBugNotifyRouteImport } from './routes/api/public/hooks/bug-notify'
 import { Route as ApiPublicHooksAutoScanRouteImport } from './routes/api/public/hooks/auto-scan'
 import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/brief-audio.$id'
 import { Route as AuthenticatedDashboardAdminTvMismatchRouteImport } from './routes/_authenticated/dashboard.admin.tv-mismatch'
@@ -471,6 +472,11 @@ const ApiPublicHooksGenerateBriefRoute =
     path: '/api/public/hooks/generate-brief',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksBugNotifyRoute = ApiPublicHooksBugNotifyRouteImport.update({
+  id: '/api/public/hooks/bug-notify',
+  path: '/api/public/hooks/bug-notify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksAutoScanRoute = ApiPublicHooksAutoScanRouteImport.update({
   id: '/api/public/hooks/auto-scan',
   path: '/api/public/hooks/auto-scan',
@@ -612,6 +618,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
+  '/api/public/hooks/bug-notify': typeof ApiPublicHooksBugNotifyRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/monthly-retune': typeof ApiPublicHooksMonthlyRetuneRoute
@@ -692,6 +699,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
+  '/api/public/hooks/bug-notify': typeof ApiPublicHooksBugNotifyRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/monthly-retune': typeof ApiPublicHooksMonthlyRetuneRoute
@@ -778,6 +786,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
+  '/api/public/hooks/bug-notify': typeof ApiPublicHooksBugNotifyRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/monthly-retune': typeof ApiPublicHooksMonthlyRetuneRoute
@@ -864,6 +873,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/auto-scan'
+    | '/api/public/hooks/bug-notify'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/monthly-retune'
@@ -944,6 +954,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/auto-scan'
+    | '/api/public/hooks/bug-notify'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/monthly-retune'
@@ -1029,6 +1040,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
     | '/api/public/hooks/auto-scan'
+    | '/api/public/hooks/bug-notify'
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/monthly-retune'
@@ -1084,6 +1096,7 @@ export interface RootRouteChildren {
   HelpCollectionIndexRoute: typeof HelpCollectionIndexRoute
   ApiPublicBriefAudioIdRoute: typeof ApiPublicBriefAudioIdRoute
   ApiPublicHooksAutoScanRoute: typeof ApiPublicHooksAutoScanRoute
+  ApiPublicHooksBugNotifyRoute: typeof ApiPublicHooksBugNotifyRoute
   ApiPublicHooksGenerateBriefRoute: typeof ApiPublicHooksGenerateBriefRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
   ApiPublicHooksMonthlyRetuneRoute: typeof ApiPublicHooksMonthlyRetuneRoute
@@ -1598,6 +1611,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksGenerateBriefRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/bug-notify': {
+      id: '/api/public/hooks/bug-notify'
+      path: '/api/public/hooks/bug-notify'
+      fullPath: '/api/public/hooks/bug-notify'
+      preLoaderRoute: typeof ApiPublicHooksBugNotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/auto-scan': {
       id: '/api/public/hooks/auto-scan'
       path: '/api/public/hooks/auto-scan'
@@ -1848,6 +1868,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpCollectionIndexRoute: HelpCollectionIndexRoute,
   ApiPublicBriefAudioIdRoute: ApiPublicBriefAudioIdRoute,
   ApiPublicHooksAutoScanRoute: ApiPublicHooksAutoScanRoute,
+  ApiPublicHooksBugNotifyRoute: ApiPublicHooksBugNotifyRoute,
   ApiPublicHooksGenerateBriefRoute: ApiPublicHooksGenerateBriefRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
   ApiPublicHooksMonthlyRetuneRoute: ApiPublicHooksMonthlyRetuneRoute,
