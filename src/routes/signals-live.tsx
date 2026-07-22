@@ -108,6 +108,13 @@ function SignalsLivePage() {
 const SIGNALS_START_AT = new Date("2026-07-23T00:00:00Z").getTime();
 const PAGE_SIZE = 10;
 
+function ClientGate({ children, fallback }: { children: React.ReactNode; fallback: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  return <>{mounted ? children : fallback}</>;
+}
+
+
 function FeedBody() {
   const [days, setDays] = useState(30);
   const { data, refetch, isFetching } = useSuspenseQuery(feedQuery(days));
