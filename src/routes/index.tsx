@@ -11,7 +11,7 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 
-import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Minus, Menu, X } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 
 export const Route = createFileRoute("/")({
