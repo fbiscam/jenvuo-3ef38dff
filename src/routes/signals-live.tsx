@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
+
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { TrendingUp, TrendingDown, Trophy, Flame, Clock, Filter, RefreshCw, Sparkles, CheckCircle2, XCircle, Circle } from "lucide-react";
@@ -93,8 +94,11 @@ function SignalsLivePage() {
       </header>
 
       <Suspense fallback={<div className="mx-auto max-w-6xl px-5 py-16 text-sm text-zinc-500">Loading live feed…</div>}>
-        <FeedBody />
+        <ClientGate fallback={<div className="mx-auto max-w-6xl px-5 py-16 text-sm text-zinc-500">Loading live feed…</div>}>
+          <FeedBody />
+        </ClientGate>
       </Suspense>
+
 
       <SiteFooter />
     </div>
@@ -103,6 +107,13 @@ function SignalsLivePage() {
 
 const SIGNALS_START_AT = new Date("2026-07-23T00:00:00Z").getTime();
 const PAGE_SIZE = 10;
+
+function ClientGate({ children, fallback }: { children: React.ReactNode; fallback: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  return <>{mounted ? children : fallback}</>;
+}
+
 
 function FeedBody() {
   const [days, setDays] = useState(30);
