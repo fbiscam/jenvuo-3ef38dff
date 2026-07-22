@@ -186,13 +186,7 @@ function HomePage() {
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
-          {/* Mobile: Apply Now on left (signed-out). Desktop: logo. */}
-          {!isAuthed && (
-            <div className="md:hidden">
-              <HeaderAuthButtons />
-            </div>
-          )}
-          <Link to="/" className="hidden md:flex min-w-0 items-center gap-2.5">
+          <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
@@ -207,17 +201,7 @@ function HomePage() {
             <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
           </nav>
           <div className="flex items-center gap-2">
-            {/* Desktop: auth buttons on right */}
-            <div className="hidden md:block">
-              <HeaderAuthButtons />
-            </div>
-            {/* Signed-in users on mobile keep auth buttons visible */}
-            {isAuthed && (
-              <div className="md:hidden">
-                <HeaderAuthButtons />
-              </div>
-            )}
-            {/* Mobile: menu button on far right (signed-out) */}
+            <HeaderAuthButtons />
             {!isAuthed && (
               <button
                 type="button"
