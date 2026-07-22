@@ -89,6 +89,7 @@ import { Route as AuthenticatedDashboardAdminScanAuditRouteImport } from './rout
 import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './routes/_authenticated/dashboard.admin.messages'
 import { Route as AuthenticatedDashboardAdminFoundingRouteImport } from './routes/_authenticated/dashboard.admin.founding'
 import { Route as AuthenticatedDashboardAdminDocumentsRouteImport } from './routes/_authenticated/dashboard.admin.documents'
+import { Route as AuthenticatedDashboardAdminBugsRouteImport } from './routes/_authenticated/dashboard.admin.bugs'
 import { Route as AuthenticatedDashboardAdminAutoScanRouteImport } from './routes/_authenticated/dashboard.admin.auto-scan'
 import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './routes/_authenticated/dashboard.admin.accuracy'
 
@@ -522,6 +523,12 @@ const AuthenticatedDashboardAdminDocumentsRoute =
     path: '/admin/documents',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardAdminBugsRoute =
+  AuthenticatedDashboardAdminBugsRouteImport.update({
+    id: '/admin/bugs',
+    path: '/admin/bugs',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardAdminAutoScanRoute =
   AuthenticatedDashboardAdminAutoScanRouteImport.update({
     id: '/admin/auto-scan',
@@ -595,6 +602,7 @@ export interface FileRoutesByFullPath {
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
   '/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
+  '/dashboard/admin/bugs': typeof AuthenticatedDashboardAdminBugsRoute
   '/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
   '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
@@ -674,6 +682,7 @@ export interface FileRoutesByTo {
   '/help/$collection': typeof HelpCollectionIndexRoute
   '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
   '/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
+  '/dashboard/admin/bugs': typeof AuthenticatedDashboardAdminBugsRoute
   '/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
   '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
@@ -759,6 +768,7 @@ export interface FileRoutesById {
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/_authenticated/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
   '/_authenticated/dashboard/admin/auto-scan': typeof AuthenticatedDashboardAdminAutoScanRoute
+  '/_authenticated/dashboard/admin/bugs': typeof AuthenticatedDashboardAdminBugsRoute
   '/_authenticated/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
   '/_authenticated/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/_authenticated/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
@@ -844,6 +854,7 @@ export interface FileRouteTypes {
     | '/help/$collection/'
     | '/dashboard/admin/accuracy'
     | '/dashboard/admin/auto-scan'
+    | '/dashboard/admin/bugs'
     | '/dashboard/admin/documents'
     | '/dashboard/admin/founding'
     | '/dashboard/admin/messages'
@@ -923,6 +934,7 @@ export interface FileRouteTypes {
     | '/help/$collection'
     | '/dashboard/admin/accuracy'
     | '/dashboard/admin/auto-scan'
+    | '/dashboard/admin/bugs'
     | '/dashboard/admin/documents'
     | '/dashboard/admin/founding'
     | '/dashboard/admin/messages'
@@ -1007,6 +1019,7 @@ export interface FileRouteTypes {
     | '/help/$collection/'
     | '/_authenticated/dashboard/admin/accuracy'
     | '/_authenticated/dashboard/admin/auto-scan'
+    | '/_authenticated/dashboard/admin/bugs'
     | '/_authenticated/dashboard/admin/documents'
     | '/_authenticated/dashboard/admin/founding'
     | '/_authenticated/dashboard/admin/messages'
@@ -1648,6 +1661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminDocumentsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/admin/bugs': {
+      id: '/_authenticated/dashboard/admin/bugs'
+      path: '/admin/bugs'
+      fullPath: '/dashboard/admin/bugs'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminBugsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/admin/auto-scan': {
       id: '/_authenticated/dashboard/admin/auto-scan'
       path: '/admin/auto-scan'
@@ -1681,6 +1701,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardAdminAccuracyRoute: typeof AuthenticatedDashboardAdminAccuracyRoute
   AuthenticatedDashboardAdminAutoScanRoute: typeof AuthenticatedDashboardAdminAutoScanRoute
+  AuthenticatedDashboardAdminBugsRoute: typeof AuthenticatedDashboardAdminBugsRoute
   AuthenticatedDashboardAdminDocumentsRoute: typeof AuthenticatedDashboardAdminDocumentsRoute
   AuthenticatedDashboardAdminFoundingRoute: typeof AuthenticatedDashboardAdminFoundingRoute
   AuthenticatedDashboardAdminMessagesRoute: typeof AuthenticatedDashboardAdminMessagesRoute
@@ -1710,6 +1731,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardAdminAccuracyRoute,
     AuthenticatedDashboardAdminAutoScanRoute:
       AuthenticatedDashboardAdminAutoScanRoute,
+    AuthenticatedDashboardAdminBugsRoute: AuthenticatedDashboardAdminBugsRoute,
     AuthenticatedDashboardAdminDocumentsRoute:
       AuthenticatedDashboardAdminDocumentsRoute,
     AuthenticatedDashboardAdminFoundingRoute:
