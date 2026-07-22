@@ -191,6 +191,63 @@ function RootComponent() {
       .catch(() => {});
   }, []);
 
+  // Global runtime error capture → error_log table.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let recent = new Map<string, number>();
+    const report = async (
+      message: string,
+      stack: string | undefined,
+      mechanism: "onerror" | "unhandledrejection",
+    ) => {
+      try {
+        // Dedupe identical errors within 5s to avoid spamming the log.
+        const key = mechanism + "|" + message.slice(0, 200);
+        const now = Date.now();
+        const last = recent.get(key) ?? 0;
+        if (now - last < 5000) return;
+        recent.set(key, now);
+        if (recent.size > 50) recent = new Map(Array.from(recent.entries()).slice(-25));
+
+        // Skip noise: extension errors, resize observers, network aborts.
+        if (/ResizeObserver|Non-Error promise rejection|AbortError|Load failed/i.test(message)) return;
+
+        const { logError } = await import("../lib/error-log.functions");
+        await logError({
+          data: {
+            message,
+            stack: stack ?? null,
+            route: window.location.pathname + window.location.search,
+            mechanism,
+            severity: "error",
+            source: "client",
+          },
+        });
+      } catch {
+        /* never let logging fail */
+      }
+    };
+
+    const onErr = (e: ErrorEvent) => {
+      const msg = e.message || String(e.error || "unknown");
+      const stack = e.error instanceof Error ? e.error.stack : undefined;
+      void report(msg, stack, "onerror");
+    };
+    const onRej = (e: PromiseRejectionEvent) => {
+      const reason: any = e.reason;
+      const msg = reason instanceof Error ? reason.message : String(reason ?? "unhandled rejection");
+      const stack = reason instanceof Error ? reason.stack : undefined;
+      void report(msg, stack, "unhandledrejection");
+    };
+    window.addEventListener("error", onErr);
+    window.addEventListener("unhandledrejection", onRej);
+    return () => {
+      window.removeEventListener("error", onErr);
+      window.removeEventListener("unhandledrejection", onRej);
+    };
+  }, []);
+
+
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 640px)");
     const update = () => setIsMobile(mq.matches);
