@@ -208,6 +208,11 @@ function SignalPage() {
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [broadcastStatus, setBroadcastStatus] = useState<
+    | { kind: "sent"; pair: string; conf: number; at: number }
+    | { kind: "blocked"; pair: string; reason: string; at: number }
+    | null
+  >(null);
   const activeScanRef = useRef<string | null>(null);
   const [analyzeElapsed, setAnalyzeElapsed] = useState(0);
   useEffect(() => {
