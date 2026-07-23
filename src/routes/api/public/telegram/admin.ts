@@ -73,7 +73,7 @@ export const Route = createFileRoute("/api/public/telegram/admin")({
         }
 
         try {
-          const { runTelegramScan } = await import("./_scan-runner");
+          const { runTelegramScan } = await import("@/lib/telegram-scan.server");
           await runTelegramScan({
             botToken,
             chatId: body.chatId,
