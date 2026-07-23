@@ -552,7 +552,7 @@ function AlertPrefs() {
             <table className="w-full text-sm">
               <thead className="bg-zinc-50 text-center font-mono text-[10px] uppercase tracking-wider text-zinc-500">
                 <tr>
-                  {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Models", "Your Size", "Time", ""].map((h, i) => (
+                  {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Your Size", "Time", ""].map((h, i) => (
                     <th key={i} className="px-3 py-2 font-medium">{h}</th>
                   ))}
                 </tr>
@@ -584,15 +584,6 @@ function AlertPrefs() {
                       <td className="px-3 py-2.5 font-mono text-xs text-emerald-600">{a.tp}</td>
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-700">{a.rr}</td>
                       <td className="px-3 py-2.5 text-[11px] font-medium text-zinc-700">{a.confidence}%</td>
-                      <td className="px-3 py-2.5 text-[10px] text-zinc-600 max-w-[160px]">
-                        {a.models_used && a.models_used.length > 0 ? (
-                          <span title={a.models_used.join(" · ")} className="line-clamp-2">
-                            {a.models_used.map((m) => m.split("/").pop()).join(" · ")}
-                          </span>
-                        ) : (
-                          <span className="text-zinc-300">—</span>
-                        )}
-                      </td>
                       <td className="px-3 py-2.5 font-mono text-[11px] text-zinc-800 whitespace-nowrap">
                         {(() => {
                           if (!risk) return <span className="text-zinc-300">—</span>;
