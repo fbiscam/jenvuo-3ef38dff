@@ -28,9 +28,13 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 async function requireUnlocked() {
-  // Login requirement disabled for support inbox access.
-  return null;
+  const session = await useSession<AdminSession>(sessionConfig());
+  if (!session.data?.unlocked) {
+    throw new Error("Unauthorized");
+  }
+  return session.data;
 }
+
 
 
 export const adminLogin = createServerFn({ method: "POST" })
