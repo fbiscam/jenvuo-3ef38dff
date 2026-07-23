@@ -2391,7 +2391,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       }
       // Keep grade in sync with the (possibly reduced) score so the UI
       // never shows e.g. 59% + grade C (59 is within the B band).
-      setupGrade = setupScore >= 90 ? "A+" : setupScore >= 80 ? "A" : setupScore >= 65 ? "B" : "C";
+      setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
       setupChecks.unshift({
         key: "regime_warn",
         label: `⚠ Market regime: ${marketRegime.regime}`,
@@ -2541,7 +2541,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             // Soft-reduce: shave ~10 points off score so borderline setups
             // fall below the 70% broadcast gate but strong ones still fire.
             setupScore = Math.max(50, setupScore - 10);
-            setupGrade = setupScore >= 90 ? "A+" : setupScore >= 80 ? "A" : setupScore >= 65 ? "B" : "C";
+            setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
             setupChecks.unshift({
               key: "senior_downgrade",
               label: `⚠ Senior review downgrade (${modelShort})`,
@@ -2729,7 +2729,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
 
       // Sync grade with final displayed confidence so user sees consistent quality signal.
       const finalConf = tradeFromAi.confidence;
-      const syncedGrade = finalConf >= 90 ? "A+" : finalConf >= 80 ? "A" : finalConf >= 65 ? "B" : "C";
+      const syncedGrade = finalConf >= 88 ? "A+" : finalConf >= 75 ? "A" : finalConf >= 65 ? "B" : "C";
       if (built.direction !== "WAIT") {
         setupGrade = syncedGrade;
         (tradeFromAi as any).setupGrade = syncedGrade;
