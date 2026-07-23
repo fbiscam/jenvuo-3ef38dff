@@ -691,7 +691,7 @@ function AlertPrefs() {
                   href="https://t.me/Jenvu_Bot"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
+                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
                 >
                   <svg viewBox="0 0 240 240" className="h-4 w-4" aria-hidden="true">
                     <defs>
