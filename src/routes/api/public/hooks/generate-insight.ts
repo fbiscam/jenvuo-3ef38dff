@@ -153,7 +153,7 @@ Return STRICT JSON only, no prose, with this exact shape:
         let lastErr = "";
         for (const step of chain) {
           try {
-            const r = await callProvider(step.provider, step.model, 90_000);
+            const r = await callBmind(step.model, 90_000);
             if (r.ok) { aiRes = r; break; }
             lastErr = `${step.provider}:${step.model} ${r.status}`;
             const txt = await r.text().catch(() => "");
