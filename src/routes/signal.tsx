@@ -519,13 +519,51 @@ function SignalPage() {
         return;
       }
       const p = withSignalIntelligence(result.plan);
+
+      // Mirror the auto-scan pipeline gates so a manual scan never surfaces a
+      // setup the shared broadcaster would reject (below threshold, wrong
+      // killzone, HTF-bias conflict, or no directional bias). This keeps
+      // manual + auto results consistent — "qalt signal" ab manual ma nahi aya.
+      const AUTO_MIN_CONF = 70;
+      const dir = p.trade?.direction;
+      const conf = Number(p.trade?.confidence ?? 0);
+      const kz = String(p.killzone ?? "");
+      const inKillzone = /Killzone/i.test(kz) && !/Outside/i.test(kz);
+      const isAsia = /asia/i.test(kz);
+      const htfBias = String((p as unknown as { htfBias?: string }).htfBias ?? "neutral");
+      const utcH = new Date().getUTCHours();
+      const isNyAm = utcH >= 12 && utcH < 16;
+      const aligned =
+        (dir === "BUY" && htfBias === "bullish") ||
+        (dir === "SELL" && htfBias === "bearish") ||
+        (isNyAm && htfBias === "neutral");
+
+      let gateBlock: string | null = null;
+      if (dir !== "BUY" && dir !== "SELL") {
+        gateBlock = "No directional setup right now — market is in HOLD. Auto-scan pipeline would skip this too.";
+      } else if (conf < AUTO_MIN_CONF) {
+        gateBlock = `Confidence ${Math.round(conf)}% is below the ${AUTO_MIN_CONF}% minimum. No trade this scan — wait for the next qualifying setup.`;
+      } else if (!inKillzone || isAsia) {
+        gateBlock = `Outside a valid killzone (${kz || "n/a"}). Auto-scan only fires in London / NY AM / NY PM — Asia and off-hours are skipped.`;
+      } else if (!aligned) {
+        gateBlock = `${dir} conflicts with HTF bias (${htfBias}). Pipeline rejects counter-trend setups — waiting for alignment.`;
+      }
+
+      // Always show the panel + intelligence so the user can still inspect
+      // structure/context, but suppress the broadcast when any gate fails.
       setPlan(p);
-      // Fire the shared auto-scan broadcast pipeline (fan-out to paid subscribers,
-      // Telegram, email, in-app) using the same gates as scheduled scans.
-      // Runs in the background — never blocks the on-screen result.
-      void triggerManualBroadcast({ data: { pair: sym.toUpperCase() } }).catch(
-        (e) => console.error("manual broadcast failed", e),
-      );
+      if (gateBlock) {
+        setAnalysisError(gateBlock);
+        toast.error("Signal rejected by pipeline gates", { description: gateBlock });
+      } else {
+        // Fire the shared auto-scan broadcast pipeline (fan-out to paid subscribers,
+        // Telegram, email, in-app) using the same gates as scheduled scans.
+        // Runs in the background — never blocks the on-screen result.
+        void triggerManualBroadcast({ data: { pair: sym.toUpperCase() } }).catch(
+          (e) => console.error("manual broadcast failed", e),
+        );
+      }
+
       // ICT narration is included in the single "signal" charge above — no extra deduction.
       // Free users still don't get the guided narration.
       if (credits.features.full_ict) {
