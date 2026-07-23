@@ -677,12 +677,12 @@ function AlertPrefs() {
                 </div>
                 {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {formatVerifiedAt(telegramVerifiedAt)}</div>}
               </div>
-              <div className="flex items-center gap-2 sm:flex-shrink-0">
+              <div className="flex flex-wrap items-center gap-2 sm:flex-shrink-0">
                 <a
                   href="https://t.me/userinfobot"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
+                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
                 >
                   <img src={userinfobotLogo.url} alt="Userinfobot" className="h-4 w-4 rounded-full object-cover" />
                   Open @userinfobot
@@ -691,7 +691,7 @@ function AlertPrefs() {
                   href="https://t.me/Jenvu_Bot"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
+                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
                 >
                   <svg viewBox="0 0 240 240" className="h-4 w-4" aria-hidden="true">
                     <defs>
