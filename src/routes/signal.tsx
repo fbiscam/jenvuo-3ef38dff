@@ -1218,6 +1218,44 @@ function SignalPage() {
                 />
               </div>
 
+              {broadcastStatus && (
+                <div
+                  className={`rounded-xl border p-3 text-xs font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] ${
+                    broadcastStatus.kind === "sent"
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                      : "border-amber-200 bg-amber-50 text-amber-900"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-2">
+                      {broadcastStatus.kind === "sent" ? (
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                      ) : (
+                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                      )}
+                      <div>
+                        <div className="font-semibold">
+                          {broadcastStatus.kind === "sent"
+                            ? `Broadcast sent · ${broadcastStatus.pair} · ${broadcastStatus.conf}%`
+                            : `Broadcast blocked · ${broadcastStatus.pair}`}
+                        </div>
+                        <div className="mt-0.5 opacity-90">
+                          {broadcastStatus.kind === "sent"
+                            ? "Alert fanned out to paid subscribers, Telegram, email, and in-app."
+                            : broadcastStatus.reason}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setBroadcastStatus(null)}
+                      className="text-[11px] opacity-60 hover:opacity-100"
+                      aria-label="Dismiss"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
               <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case text-center pl-2">
                 ICT&nbsp; & SMC Execution Feed
               </h3>
