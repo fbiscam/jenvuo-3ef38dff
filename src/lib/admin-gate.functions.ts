@@ -28,9 +28,13 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 async function requireUnlocked() {
-  // Login requirement disabled for support inbox access.
-  return null;
+  const session = await useSession<AdminSession>(sessionConfig());
+  if (!session.data?.unlocked) {
+    throw new Error("Unauthorized");
+  }
+  return session.data;
 }
+
 
 
 export const adminLogin = createServerFn({ method: "POST" })
@@ -58,10 +62,13 @@ export const adminLogout = createServerFn({ method: "POST" }).handler(async () =
 });
 
 export const adminMe = createServerFn({ method: "GET" }).handler(async () => {
-  // Login requirement disabled — always report unlocked.
+  const session = await useSession<AdminSession>(sessionConfig());
+  if (!session.data?.unlocked) {
+    return { unlocked: false as const };
+  }
   return {
-    unlocked: true,
-    username: "admin",
+    unlocked: true as const,
+    username: session.data.username ?? "admin",
   };
 });
 

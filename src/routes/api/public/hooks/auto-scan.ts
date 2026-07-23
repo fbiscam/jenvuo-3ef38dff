@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { computeSignalPlan, getLiveTick } from "@/lib/gold-analysis.functions";
 
 // Auto-scan broadcast worker. Called every 5 min by pg_cron.
-// Auth: apikey header (app-internal callers) or x-cron-secret (database cron).
+// Auth: x-cron-secret (private CRON_SECRET) for cron + app-internal callers,
+// or a service-role signed manual-mode body for user-triggered manual scans.
+// The public anon apikey is NOT accepted — it ships in every browser bundle.
 // Flow:
 //   1. Read system_settings (enabled, config)
 //   2. For each pair: compute plan, run 2-hit state machine
@@ -11,19 +13,20 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apikey = request.headers.get("apikey") ?? "";
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
         const cronSecret = process.env.CRON_SECRET ?? "";
         const providedCronSecret = request.headers.get("x-cron-secret") ?? "";
-        const hasValidApiKey = !!apikey && !!expected && apikey === expected;
         const hasValidCronSecret =
           !!providedCronSecret &&
           !!cronSecret &&
           providedCronSecret.length === cronSecret.length &&
           providedCronSecret === cronSecret;
-        if (!hasValidApiKey && !hasValidCronSecret) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+
+        // Manual mode below can also self-authenticate via the service-role
+        // key in the body (checked further down). Reject only after both
+        // paths have had a chance to authorize.
+        const rejectUnauthorized = () =>
+          new Response("Unauthorized", { status: 401 });
+
 
         // Manual mode: triggered from the signal page after a user runs a
         // manual analyze. Server-side callers (from `runManualScanBroadcast`)
@@ -58,6 +61,14 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         } catch {
           // ignore body parse errors — fall through to scheduled auto-scan
         }
+
+        // Reject requests that neither present a valid cron secret nor a
+        // service-role-signed manual body.
+        if (!hasValidCronSecret && !manualMode) {
+          return rejectUnauthorized();
+        }
+
+
 
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"

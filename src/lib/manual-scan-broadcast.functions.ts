@@ -18,9 +18,8 @@ export const runManualScanBroadcast = createServerFn({ method: 'POST' })
     if (!pair || !pair.startsWith('XAU')) {
       return { ok: false as const, error: 'unsupported_pair' }
     }
-    const publishable = process.env.SUPABASE_PUBLISHABLE_KEY ?? ''
     const svc = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
-    if (!publishable || !svc) return { ok: false as const, error: 'missing_env' }
+    if (!svc) return { ok: false as const, error: 'missing_env' }
 
     // Cloudflare Workers `fetch` requires an absolute URL — a bare path
     // throws and the manual broadcast silently never leaves the server.
@@ -29,12 +28,11 @@ export const runManualScanBroadcast = createServerFn({ method: 'POST' })
       process.env.PUBLIC_APP_URL ||
       'https://project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app'
     try {
+      // Auth: service-role-signed manual body (the hook accepts it in place
+      // of the x-cron-secret header when `manual: true`).
       const res = await fetch(`${base}/api/public/hooks/auto-scan`, {
         method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          apikey: publishable,
-        },
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           manual: true,
           pair,
