@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Jenvu TradingView Marker",
-  "version": "0.1.0",
-  "description": "Auto-mark Jenvu ICT/SMC signals on TradingView charts. Voice + one-click open.",
+  "version": "0.2.0",
+  "description": "Auto-mark Jenvu ICT/SMC signals on TradingView charts with Entry/SL/TP + OB/FVG zones.",
   "permissions": ["storage", "tabs", "activeTab"],
   "host_permissions": ["https://*.tradingview.com/*", "https://jenvu.com/*", "https://*.lovable.app/*"],
   "action": {
