@@ -392,11 +392,19 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
                   text: "🔒 This chat isn't linked to a Jenvu account yet. Type /help to link.",
                 });
               } else {
-                await runTelegramScan({
-                  botToken,
+                // Send immediate ack so the user sees progress,
+                // then kick off the scan in a separate request so
+                // this webhook returns 200 within Telegram's timeout.
+                await tg(botToken, "sendMessage", {
+                  chat_id: cbChatId,
+                  text: `⚙️ Scanning <b>${escapeHtml(pair)}</b> — running analysis, results in ~15s…`,
+                  parse_mode: "HTML",
+                });
+                await triggerScanAsync({
                   chatId: cbChatId,
                   userId: link.user_id as string,
                   pair,
+                  originUrl: new URL(request.url),
                 });
               }
             } catch (err) {
@@ -407,6 +415,7 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
               });
             }
           }
+
           return Response.json({ ok: true });
         }
 
