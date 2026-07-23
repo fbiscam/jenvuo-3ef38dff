@@ -1450,7 +1450,7 @@ function SignalPage() {
                   <NewsCountdownChip plan={plan} />
 
                   {(() => {
-                    const LOW_CONF = 75;
+                    const LOW_CONF = 70;
                     const isLowConf = (t.confidence ?? 0) < LOW_CONF;
                     const dec = plan.instrument.decimals;
                     const riskAbs = Math.abs(t.entry - t.sl);
