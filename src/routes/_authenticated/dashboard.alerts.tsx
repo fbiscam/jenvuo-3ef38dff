@@ -677,7 +677,7 @@ function AlertPrefs() {
                 </div>
                 {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {formatVerifiedAt(telegramVerifiedAt)}</div>}
               </div>
-              <div className="flex items-center gap-2 sm:flex-shrink-0">
+              <div className="flex flex-wrap items-center gap-2 sm:flex-shrink-0">
                 <a
                   href="https://t.me/userinfobot"
                   target="_blank"
