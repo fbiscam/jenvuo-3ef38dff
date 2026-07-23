@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as TvExtensionRouteImport } from './routes/tv-extension'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalsLiveRouteImport } from './routes/signals-live'
@@ -99,6 +100,11 @@ import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './route
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TvExtensionRoute = TvExtensionRouteImport.update({
+  id: '/tv-extension',
+  path: '/tv-extension',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -589,6 +595,7 @@ export interface FileRoutesByFullPath {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tv-extension': typeof TvExtensionRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
@@ -673,6 +680,7 @@ export interface FileRoutesByTo {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tv-extension': typeof TvExtensionRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
@@ -761,6 +769,7 @@ export interface FileRoutesById {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tv-extension': typeof TvExtensionRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
@@ -850,6 +859,7 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
+    | '/tv-extension'
     | '/unsubscribe'
     | '/dashboard'
     | '/inbox'
@@ -934,6 +944,7 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
+    | '/tv-extension'
     | '/unsubscribe'
     | '/inbox'
     | '/brief/$id'
@@ -1021,6 +1032,7 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
+    | '/tv-extension'
     | '/unsubscribe'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
@@ -1110,6 +1122,7 @@ export interface RootRouteChildren {
   SignalsLiveRoute: typeof SignalsLiveRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  TvExtensionRoute: typeof TvExtensionRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   BriefIdRoute: typeof BriefIdRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -1146,6 +1159,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tv-extension': {
+      id: '/tv-extension'
+      path: '/tv-extension'
+      fullPath: '/tv-extension'
+      preLoaderRoute: typeof TvExtensionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -1898,6 +1918,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignalsLiveRoute: SignalsLiveRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  TvExtensionRoute: TvExtensionRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   BriefIdRoute: BriefIdRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
