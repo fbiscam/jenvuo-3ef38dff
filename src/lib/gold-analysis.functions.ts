@@ -2729,7 +2729,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
 
       // Sync grade with final displayed confidence so user sees consistent quality signal.
       const finalConf = tradeFromAi.confidence;
-      const syncedGrade = finalConf >= 90 ? "A+" : finalConf >= 80 ? "A" : finalConf >= 65 ? "B" : "C";
+      const syncedGrade = finalConf >= 88 ? "A+" : finalConf >= 75 ? "A" : finalConf >= 65 ? "B" : "C";
       if (built.direction !== "WAIT") {
         setupGrade = syncedGrade;
         (tradeFromAi as any).setupGrade = syncedGrade;
