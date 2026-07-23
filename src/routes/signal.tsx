@@ -1022,13 +1022,6 @@ function SignalPage() {
             >
               Killzones
             </Link>
-            <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[11px] font-normal normal-case tracking-normal`}>
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="relative rounded-full bg-emerald-500 h-1.5 w-1.5" />
-              </span>
-              SIGNAL_DESK // ONLINE
-            </div>
             {voiceBlocked && (
               <button
                 onClick={() => {
