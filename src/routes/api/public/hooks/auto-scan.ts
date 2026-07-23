@@ -125,6 +125,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           const { count: todayCount } = await supabaseAdmin
             .from("auto_scan_pool_ledger")
             .select("id", { count: "exact", head: true })
+            .not("alert_id", "is", null)
             .gte("created_at", dayStart.toISOString());
           if ((todayCount ?? 0) >= maxPerDay) {
             return Response.json({ ok: true, skipped: "daily_cap" });

@@ -71,10 +71,11 @@ export const getAutoScanOverview = createServerFn({ method: "GET" })
         supabaseAdmin
           .from("auto_scan_pool_ledger")
           .select("*")
+          .not("alert_id", "is", null)
           .order("created_at", { ascending: false })
           .limit(50),
-        supabaseAdmin.from("auto_scan_pool_ledger").select("cost_usd,ai_cost_usd").gte("created_at", dayAgo),
-        supabaseAdmin.from("auto_scan_pool_ledger").select("cost_usd,ai_cost_usd").gte("created_at", weekAgo),
+        supabaseAdmin.from("auto_scan_pool_ledger").select("cost_usd,ai_cost_usd").not("alert_id", "is", null).gte("created_at", dayAgo),
+        supabaseAdmin.from("auto_scan_pool_ledger").select("cost_usd,ai_cost_usd").not("alert_id", "is", null).gte("created_at", weekAgo),
       ]);
 
     // cron history — the RPC checks auth.uid() so it must go through the
@@ -106,10 +107,10 @@ export const getAutoScanOverview = createServerFn({ method: "GET" })
     const s24 = sum(broadcasts24);
     const s7 = sum(broadcasts7);
 
-    // Next cron ETA — cron is */15, so compute mins to next quarter
+    // Next cron ETA — cron is */5, so compute mins to next five-minute mark
     const d = new Date();
     const minutes = d.getUTCMinutes();
-    const nextQuarter = Math.ceil((minutes + 0.001) / 15) * 15;
+    const nextQuarter = Math.ceil((minutes + 0.001) / 5) * 5;
     const nextEta =
       (nextQuarter - minutes) * 60 - d.getUTCSeconds();
 
