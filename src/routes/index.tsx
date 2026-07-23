@@ -17,11 +17,11 @@ import xaiLogo from "@/assets/xai-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Jenvu AI — Voice-Powered Gold Trading Intelligence" },
+      { title: "Voice Powered Gold Trading Intelligence" },
       {
         name: "description",
         content:
-          "Jenvu AI is a voice-native gold trading desk for XAU/USD, EUR, GBP, JPY, AUD & CHF — live ICT/SMC analysis, A+ setups and spoken execution.",
+          "Jenvu AI is a voice-native gold trading desk for gold pairs delivering precision entries, stops and targets across every major XAU cross-pair in real time — live ICT/SMC analysis, A+ setups and spoken execution.",
       },
       { property: "og:title", content: "Voice-Native Gold Trading Intelligence — Jenvu" },
       {
