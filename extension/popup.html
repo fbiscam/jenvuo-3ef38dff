@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Jenvu Marker</title>
+    <style>
+      body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 14px; width: 300px; background: #fff; color: #111; }
+      h1 { font-size: 15px; margin: 0 0 10px; }
+      .row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+      button { flex: 1 1 30%; padding: 8px 6px; border: 1px solid #ddd; background: #f7f7f7; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+      button:hover { background: #eee; }
+      .sig { border: 1px solid #eee; border-radius: 8px; padding: 10px; font-size: 12px; line-height: 1.5; }
+      .buy { color: #0a7d0a; font-weight: 700; }
+      .sell { color: #c31a1a; font-weight: 700; }
+      .muted { color: #666; font-size: 11px; }
+      .lbl { color: #555; }
+      .val { font-weight: 600; float: right; }
+      .empty { color: #888; text-align: center; padding: 12px 0; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>Jenvu TradingView Marker</h1>
+    <div class="row">
+      <button data-pair="XAUUSD">XAU/USD</button>
+      <button data-pair="XAUEUR">XAU/EUR</button>
+      <button data-pair="XAUGBP">XAU/GBP</button>
+      <button data-pair="XAUJPY">XAU/JPY</button>
+      <button data-pair="XAUAUD">XAU/AUD</button>
+      <button data-pair="XAUCHF">XAU/CHF</button>
+    </div>
+    <div id="signal" class="sig"><div class="empty">Loading latest signal…</div></div>
+    <p class="muted" style="margin-top:10px">Click a pair to open TradingView. Signal levels auto-mark on the chart.</p>
+    <script src="popup.js"></script>
+  </body>
+</html>
