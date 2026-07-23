@@ -458,6 +458,47 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
           return Response.json({ ok: true, ignored: "invalid-json" });
         }
 
+        // --- Inline-keyboard callback (pair picker for /scan) ---
+        const cbq = update?.callback_query;
+        if (cbq?.data && cbq?.message?.chat?.id) {
+          const cbChatId = cbq.message.chat.id;
+          const cbData = String(cbq.data);
+          // Ack the button press so Telegram removes the loading spinner
+          await tg(botToken, "answerCallbackQuery", { callback_query_id: cbq.id });
+
+          if (cbData.startsWith("scan:")) {
+            const pair = cbData.slice(5).toUpperCase();
+            try {
+              const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+              const { data: link } = await supabaseAdmin
+                .from("telegram_alert_links")
+                .select("user_id")
+                .eq("chat_id", String(cbChatId))
+                .maybeSingle();
+              if (!link?.user_id) {
+                await tg(botToken, "sendMessage", {
+                  chat_id: cbChatId,
+                  text: "🔒 This chat isn't linked to a Jenvu account yet. Type /help to link.",
+                });
+              } else {
+                await runTelegramScan({
+                  botToken,
+                  chatId: cbChatId,
+                  userId: link.user_id as string,
+                  pair,
+                });
+              }
+            } catch (err) {
+              console.error("[telegram-webhook] scan callback error", err);
+              await tg(botToken, "sendMessage", {
+                chat_id: cbChatId,
+                text: "⚠️ Scan failed to start. Try again in a moment.",
+              });
+            }
+          }
+          return Response.json({ ok: true });
+        }
+
         const message = update?.message ?? update?.edited_message;
         const chatId = message?.chat?.id;
         const text: string = message?.text ?? "";
