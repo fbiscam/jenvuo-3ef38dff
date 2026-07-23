@@ -2391,7 +2391,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       }
       // Keep grade in sync with the (possibly reduced) score so the UI
       // never shows e.g. 59% + grade C (59 is within the B band).
-      setupGrade = setupScore >= 90 ? "A+" : setupScore >= 80 ? "A" : setupScore >= 65 ? "B" : "C";
+      setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
       setupChecks.unshift({
         key: "regime_warn",
         label: `⚠ Market regime: ${marketRegime.regime}`,
