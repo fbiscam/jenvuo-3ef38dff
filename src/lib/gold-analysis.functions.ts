@@ -2541,7 +2541,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             // Soft-reduce: shave ~10 points off score so borderline setups
             // fall below the 70% broadcast gate but strong ones still fire.
             setupScore = Math.max(50, setupScore - 10);
-            setupGrade = setupScore >= 90 ? "A+" : setupScore >= 80 ? "A" : setupScore >= 65 ? "B" : "C";
+            setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
             setupChecks.unshift({
               key: "senior_downgrade",
               label: `⚠ Senior review downgrade (${modelShort})`,
