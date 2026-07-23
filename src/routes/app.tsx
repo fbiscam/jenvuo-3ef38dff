@@ -14,6 +14,7 @@ import { analyzeGold, getSignalPlan, normalizeQuery, type GoldSignal, type Signa
 import { getGoldNews } from "@/lib/news.functions";
 import { useCredits } from "@/hooks/useCredits";
 import { appendVoiceTurn } from "@/lib/voice-history";
+import { voiceQuickReply } from "@/lib/voice-quick-reply.functions";
 import PageLoading from "@/components/PageLoading";
 import { CloudOrb as SharedCloudOrb } from "@/components/CloudOrb";
 import { useAuthUser } from "@/hooks/useAuthUser";
