@@ -2523,6 +2523,11 @@ Run the full 25-year desk-head review internally through the elite lens above, t
           __seniorReviewStatus = "completed";
           if (verdict === "VETO") {
             __seniorReviewStatus = "vetoed";
+            // Hard-kill the signal: flip to WAIT and cap confidence below the
+            // broadcast threshold so auto-scan + manual scan gates both reject it.
+            built.direction = "WAIT" as typeof built.direction;
+            setupScore = Math.min(setupScore, 49);
+            setupGrade = "C";
             setupChecks.unshift({
               key: "senior_veto",
               label: `⛔ Senior trader veto (${modelShort})`,
@@ -2531,6 +2536,10 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             });
           } else if (verdict === "DOWNGRADE") {
             __seniorReviewStatus = "downgraded";
+            // Soft-reduce: shave ~10 points off score so borderline setups
+            // fall below the 70% broadcast gate but strong ones still fire.
+            setupScore = Math.max(50, setupScore - 10);
+            setupGrade = setupScore >= 90 ? "A+" : setupScore >= 80 ? "A" : setupScore >= 65 ? "B" : "C";
             setupChecks.unshift({
               key: "senior_downgrade",
               label: `⚠ Senior review downgrade (${modelShort})`,
