@@ -1333,7 +1333,7 @@ function computeSetupScore(args: {
   const counted = checks.filter((c) => c.pass !== null);
   const passed = counted.filter((c) => c.pass).length;
   const score = counted.length ? Math.round((passed / counted.length) * 100) : 0;
-  const grade: SignalPlan["setupGrade"] = score >= 90 ? "A+" : score >= 80 ? "A" : score >= 65 ? "B" : "C";
+  const grade: SignalPlan["setupGrade"] = score >= 88 ? "A+" : score >= 75 ? "A" : score >= 65 ? "B" : "C";
   return { score, grade, checks };
 }
 
