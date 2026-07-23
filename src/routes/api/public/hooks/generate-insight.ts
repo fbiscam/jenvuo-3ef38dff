@@ -111,35 +111,27 @@ Return STRICT JSON only, no prose, with this exact shape:
 }`;
 
         const bmindKey = process.env.BLUESMINDS_API_KEY;
-        const lovableKey = process.env.LOVABLE_API_KEY;
-        if (!bmindKey && !lovableKey) {
-          return new Response(JSON.stringify({ error: "no-ai-provider-configured" }), { status: 500 });
+        if (!bmindKey) {
+          return new Response(JSON.stringify({ error: "bluesminds-api-key-missing" }), { status: 500 });
         }
 
-        async function callProvider(provider: "bmind" | "lovable", model: string, timeoutMs: number) {
+        async function callBmind(model: string, timeoutMs: number) {
           const ctrl = new AbortController();
           const t = setTimeout(() => ctrl.abort(), timeoutMs);
-          const isBmind = provider === "bmind";
-          const endpoint = isBmind
-            ? "https://api.bluesminds.com/v1/chat/completions"
-            : "https://ai.gateway.lovable.dev/v1/chat/completions";
-          const headers: Record<string, string> = { "Content-Type": "application/json" };
-          if (isBmind) headers["Authorization"] = `Bearer ${bmindKey!}`;
-          else headers["Lovable-API-Key"] = lovableKey!;
-          const body: Record<string, unknown> = {
-            model,
-            messages: [
-              { role: "system", content: sys },
-              { role: "user", content: userPrompt },
-            ],
-          };
-          // Force JSON only on Lovable gateway; Bluesminds relies on system prompt.
-          if (!isBmind) body.response_format = { type: "json_object" };
           try {
-            return await fetch(endpoint, {
+            return await fetch("https://api.bluesminds.com/v1/chat/completions", {
               method: "POST",
-              headers,
-              body: JSON.stringify(body),
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${bmindKey!}`,
+              },
+              body: JSON.stringify({
+                model,
+                messages: [
+                  { role: "system", content: sys },
+                  { role: "user", content: userPrompt },
+                ],
+              }),
               signal: ctrl.signal,
             });
           } finally {
@@ -147,23 +139,21 @@ Return STRICT JSON only, no prose, with this exact shape:
           }
         }
 
-        // Provider chain: Bluesminds first (has credit), then Lovable Gemini as fallback.
-        const chain: Array<{ provider: "bmind" | "lovable"; model: string }> = [];
-        if (bmindKey) {
-          chain.push({ provider: "bmind", model: "gpt-5.5" });
-          chain.push({ provider: "bmind", model: "gpt-5.2-chat" });
-          chain.push({ provider: "bmind", model: "deepseek-v4-pro" });
-        }
-        if (lovableKey) {
-          chain.push({ provider: "lovable", model: "google/gemini-2.5-pro" });
-          chain.push({ provider: "lovable", model: "google/gemini-2.5-flash" });
-        }
+        // Bluesminds-only chain — layer through available models until one succeeds.
+        const chain: Array<{ provider: "bmind"; model: string }> = [
+          { provider: "bmind", model: "gpt-5.5" },
+          { provider: "bmind", model: "gpt-5.2-chat" },
+          { provider: "bmind", model: "deepseek-v4-pro" },
+          { provider: "bmind", model: "grok-4.5" },
+          { provider: "bmind", model: "claude-4.5-sonnet" },
+        ];
+
 
         let aiRes: Response | null = null;
         let lastErr = "";
         for (const step of chain) {
           try {
-            const r = await callProvider(step.provider, step.model, 90_000);
+            const r = await callBmind(step.model, 90_000);
             if (r.ok) { aiRes = r; break; }
             lastErr = `${step.provider}:${step.model} ${r.status}`;
             const txt = await r.text().catch(() => "");
