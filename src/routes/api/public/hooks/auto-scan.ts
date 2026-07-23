@@ -215,21 +215,17 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             }
             const pool = rescored.length > 0 ? rescored : candidates;
             pool.sort((a, b) => (b.conf - a.conf) || (b.rr - a.rr));
-            const winner = pool[0];
-            for (const loser of pool.slice(1)) {
-              results.push({
-                pair: loser.pair,
-                action: "outranked_by_stronger",
-                winner: winner.pair,
-                winner_conf: Math.round(winner.conf),
-                conf: Math.round(loser.conf),
-                dir: loser.dir,
-              });
-            }
-            // Only the winning pair runs the full broadcast pipeline this scan.
-            workingPairs = [winner.pair];
+            // Order candidates strongest-first, but keep the runner-ups in
+            // the working set. Previously we silenced them here — that meant
+            // if the winner hit cooldown / duplicate lock / xau-correlation
+            // dedupe downstream, NO alert fired at all. Now the main loop
+            // walks the list in order; once one pair broadcasts, the fresh
+            // signal_alerts row makes `xau_correlation_dedup` naturally
+            // suppress the others in this same run.
+            workingPairs = pool.map((c) => c.pair);
           }
         }
+
 
         for (const pair of workingPairs) {
           try {
