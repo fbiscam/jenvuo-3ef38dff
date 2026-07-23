@@ -1057,30 +1057,6 @@ function SignalPage() {
                 ) : "Re-analyze"}
               </button>
             )}
-            {alertsOn !== null && (
-              <button
-                onClick={toggleAlerts}
-                disabled={alertsSaving}
-                className={cn(
-                  "shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-[12px] font-medium border transition disabled:opacity-50",
-                  alertsOn
-                    ? "bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
-                    : "bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100",
-                )}
-                title={alertsOn
-                  ? "Alerts ON · $0.20 charged per signal. Click to turn off."
-                  : "Alerts OFF · no notifications, no charges. Click to turn on."}
-              >
-                {alertsSaving ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : alertsOn ? (
-                  <Bell className="h-3.5 w-3.5" />
-                ) : (
-                  <BellOff className="h-3.5 w-3.5" />
-                )}
-                {alertsOn ? "Alerts ON" : "Alerts OFF"}
-              </button>
-            )}
             {isAdmin && authUser?.email?.toLowerCase() === "haseeb@jenvu.com" && plan && plan.trade.direction !== "WAIT" && (
               <button
                 onClick={handleBroadcast}
@@ -1411,7 +1387,7 @@ function SignalPage() {
               {t && plan && !marketClosed && (
                 <div className="space-y-3">
                   <div className="flex items-end justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className={`font-['Urbanist',sans-serif] text-[12px] font-semibold tracking-wide uppercase text-zinc-900`}>Trade Plan</span>
                       {(t.confidence ?? 0) >= 70 && (
                         <>
@@ -1434,9 +1410,35 @@ function SignalPage() {
                         </>
                       )}
                     </div>
-                    <span className="text-[11px] text-zinc-500">
-                      Conf <span className="font-bold text-zinc-900">{t.confidence}%</span>
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {alertsOn !== null && (
+                        <button
+                          onClick={toggleAlerts}
+                          disabled={alertsSaving}
+                          className={cn(
+                            "shrink-0 h-7 inline-flex items-center gap-1.5 px-2.5 rounded-md text-[11px] font-medium border transition disabled:opacity-50",
+                            alertsOn
+                              ? "bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
+                              : "bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100",
+                          )}
+                          title={alertsOn
+                            ? "Alerts ON · $0.20 charged per signal. Click to turn off."
+                            : "Alerts OFF · no notifications, no charges. Click to turn on."}
+                        >
+                          {alertsSaving ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : alertsOn ? (
+                            <Bell className="h-3 w-3" />
+                          ) : (
+                            <BellOff className="h-3 w-3" />
+                          )}
+                          {alertsOn ? "Alerts ON" : "Alerts OFF"}
+                        </button>
+                      )}
+                      <span className="text-[11px] text-zinc-500">
+                        Conf <span className="font-bold text-zinc-900">{t.confidence}%</span>
+                      </span>
+                    </div>
                   </div>
 
                   {/* Imminent-news countdown chip */}
