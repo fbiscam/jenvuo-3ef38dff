@@ -329,37 +329,42 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // the SAME killzone — but a new killzone (London → NY AM → NY PM)
             // is a fresh liquidity regime, so an aligned setup there should
             // fire even if bias hasn't flipped since the previous session.
-            const currentKz = String(plan.killzone ?? "");
-            const duplicateSince = new Date(
-              now.getTime() - sameDirectionLockMin * 60_000,
-            ).toISOString();
-            const { data: recentSameDirection } = await supabaseAdmin
-              .from("signal_alerts")
-              .select("id, fired_at, confidence, killzone")
-              .eq("pair", pair)
-              .eq("direction", dir)
-              .gte("fired_at", duplicateSince)
-              .order("fired_at", { ascending: false })
-              .limit(1);
-            const lastKz = String(recentSameDirection?.[0]?.killzone ?? "");
-            const sameKillzone =
-              !!lastKz && !!currentKz && lastKz === currentKz;
-            if (recentSameDirection?.length && sameKillzone) {
-              results.push({
-                pair,
-                action: "duplicate_same_direction_lock",
-                dir,
-                killzone: currentKz,
-                recent_alert_id: recentSameDirection[0].id,
-              });
-              continue;
+            // Manual mode bypasses this — the user explicitly asked to scan
+            // this pair; silencing it defeats the point of the button.
+            if (!manualMode) {
+              const currentKz = String(plan.killzone ?? "");
+              const duplicateSince = new Date(
+                now.getTime() - sameDirectionLockMin * 60_000,
+              ).toISOString();
+              const { data: recentSameDirection } = await supabaseAdmin
+                .from("signal_alerts")
+                .select("id, fired_at, confidence, killzone")
+                .eq("pair", pair)
+                .eq("direction", dir)
+                .gte("fired_at", duplicateSince)
+                .order("fired_at", { ascending: false })
+                .limit(1);
+              const lastKz = String(recentSameDirection?.[0]?.killzone ?? "");
+              const sameKillzone =
+                !!lastKz && !!currentKz && lastKz === currentKz;
+              if (recentSameDirection?.length && sameKillzone) {
+                results.push({
+                  pair,
+                  action: "duplicate_same_direction_lock",
+                  dir,
+                  killzone: currentKz,
+                  recent_alert_id: recentSameDirection[0].id,
+                });
+                continue;
+              }
             }
 
             // Cross-pair XAU correlation dedupe: all XAU pairs (USD, EUR, GBP,
             // JPY, AUD, CHF) share the same gold-side driver. If any XAU pair
             // was already alerted in the same direction inside the last 60 min,
             // suppress correlated duplicates — one gold call per session, not six.
-            if (pair.startsWith("XAU")) {
+            // Manual mode bypasses this too — user picked this specific pair.
+            if (!manualMode && pair.startsWith("XAU")) {
               const xauLookback = new Date(
                 now.getTime() - 60 * 60_000,
               ).toISOString();
@@ -383,6 +388,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 continue;
               }
             }
+
 
 
             // Two-hit confirmation: first qualifying scan only arms the signal.
