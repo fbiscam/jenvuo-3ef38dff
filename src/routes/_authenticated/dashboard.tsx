@@ -97,7 +97,9 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/ai-engine", label: "AI Engine", icon: "neurology" },
       { to: "/insights", label: "Insights", icon: "menu_book" },
       { to: "/pricing", label: "Pricing", icon: "local_offer" },
+      { to: "/tv-extension", label: "TV Extension", icon: "extension" },
     ],
+
   },
   {
     label: "Account & Billing",
