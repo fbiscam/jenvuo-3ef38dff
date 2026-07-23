@@ -188,31 +188,6 @@ async function runTelegramScan(opts: {
     parse_mode: "HTML",
     disable_web_page_preview: true,
   });
-
-  // 5. Fire the shared broadcast pipeline (fan-out to paid subscribers,
-  //    email, Telegram, in-app) — caller excluded. Fire-and-forget so the
-  //    Telegram reply isn't held up by fan-out latency.
-  try {
-    const publishable = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
-    const svc = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
-    const base =
-      process.env.PUBLIC_APP_URL ||
-      "https://project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app";
-    if (publishable && svc) {
-      void fetch(`${base}/api/public/hooks/auto-scan`, {
-        method: "POST",
-        headers: { "content-type": "application/json", apikey: publishable },
-        body: JSON.stringify({
-          manual: true,
-          pair,
-          manual_token: svc,
-          exclude_user_id: userId,
-        }),
-      }).catch((e) => console.warn("[telegram scan] broadcast fire-and-forget failed", e));
-    }
-  } catch (e) {
-    console.warn("[telegram scan] broadcast dispatch error", e);
-  }
 }
 
 async function handleCommand(opts: {
