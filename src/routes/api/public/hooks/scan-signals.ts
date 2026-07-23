@@ -1,9 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-// Deprecated public cron route kept for backward compatibility only.
-// The canonical /api/public/hooks/auto-scan worker owns signal generation,
-// billing, Telegram/email delivery, 64% confidence gating, killzone-only
-// filtering and two-hit confirmation. This route must not create alerts.
+// Backward-compatible cron route. It proxies old pg_cron jobs to the canonical
+// /api/public/hooks/auto-scan worker so legacy schedules cannot silently skip
+// eligible alerts.
 
 export const Route = createFileRoute('/api/public/hooks/scan-signals')({
   server: {
@@ -25,9 +24,23 @@ export const Route = createFileRoute('/api/public/hooks/scan-signals')({
           return Response.json({ error: 'unauthorized' }, { status: 401 })
         }
 
+        const base =
+          process.env.PUBLIC_APP_URL ||
+          'https://project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app'
+        const res = await fetch(`${base}/api/public/hooks/auto-scan`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-cron-secret': cronSecret,
+          },
+          body: '{}',
+        })
+        const body = await res.json().catch(() => ({}))
         return Response.json({
-          ok: true,
-          skipped: 'legacy_hook_disabled_use_auto_scan',
+          ok: res.ok,
+          proxied: 'auto-scan',
+          status: res.status,
+          body,
         })
       },
       GET: async () => new Response('Method not allowed', { status: 405 }),

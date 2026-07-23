@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { computeSignalPlan, getLiveTick } from "@/lib/gold-analysis.functions";
 
-// Auto-scan broadcast worker. Called every 15 min by pg_cron.
-// Auth: apikey header (Supabase anon).
+// Auto-scan broadcast worker. Called every 5 min by pg_cron.
+// Auth: apikey header (app-internal callers) or x-cron-secret (database cron).
 // Flow:
 //   1. Read system_settings (enabled, config)
 //   2. For each pair: compute plan, run 2-hit state machine
@@ -13,7 +13,15 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
       POST: async ({ request }) => {
         const apikey = request.headers.get("apikey") ?? "";
         const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
-        if (!apikey || apikey !== expected) {
+        const cronSecret = process.env.CRON_SECRET ?? "";
+        const providedCronSecret = request.headers.get("x-cron-secret") ?? "";
+        const hasValidApiKey = !!apikey && !!expected && apikey === expected;
+        const hasValidCronSecret =
+          !!providedCronSecret &&
+          !!cronSecret &&
+          providedCronSecret.length === cronSecret.length &&
+          providedCronSecret === cronSecret;
+        if (!hasValidApiKey && !hasValidCronSecret) {
           return new Response("Unauthorized", { status: 401 });
         }
 
@@ -117,6 +125,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           const { count: todayCount } = await supabaseAdmin
             .from("auto_scan_pool_ledger")
             .select("id", { count: "exact", head: true })
+            .not("alert_id", "is", null)
             .gte("created_at", dayStart.toISOString());
           if ((todayCount ?? 0) >= maxPerDay) {
             return Response.json({ ok: true, skipped: "daily_cap" });
@@ -164,6 +173,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         }
 
         const results: Array<Record<string, unknown>> = [];
+        const runStartedAt = new Date().toISOString();
 
         // Multi-candidate arbitration: if 2+ pairs qualify simultaneously in
         // this scan run, re-scan the candidates and only broadcast the
@@ -878,7 +888,48 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           }
         }
 
-        return Response.json({ ok: true, results });
+        const broadcasted = results.some((r) => r.action === "broadcast");
+        const qualifiedButBlocked = results.filter((r) =>
+          [
+            "first_hit_waiting_confirmation",
+            "cooldown",
+            "already_broadcast_same_dir",
+            "duplicate_same_direction_lock",
+            "xau_correlation_dedup",
+            "requote_invalidated",
+            "skipped_stale_entry",
+            "insert_failed",
+            "invalid_levels",
+            "error",
+          ].includes(String(r.action)),
+        );
+
+        if (!manualMode) {
+          try {
+            await supabaseAdmin.from("auto_scan_pool_ledger").insert({
+              pair: broadcasted ? "__HEARTBEAT_BROADCAST__" : "__HEARTBEAT_SCAN__",
+              direction: broadcasted ? "BROADCAST" : "SCAN",
+              confidence: 0,
+              alert_id: null,
+              broadcast_count: 0,
+              cost_usd: 0,
+              ai_cost_usd: 0,
+            });
+          } catch {
+            // Heartbeat is diagnostic only; never fail the scan because of it.
+          }
+        }
+
+        return Response.json({
+          ok: true,
+          mode: manualMode ? "manual" : "auto",
+          started_at: runStartedAt,
+          min_conf: minConf,
+          pairs_checked: workingPairs,
+          broadcasted,
+          blocked_after_qualification: qualifiedButBlocked,
+          results,
+        });
       },
       GET: async () => {
         return new Response("Method not allowed", { status: 405 });
