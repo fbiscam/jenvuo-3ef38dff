@@ -1181,7 +1181,7 @@ function SignalPage() {
               <span className={`text-[11px] ${MONO} tabular-nums text-zinc-900`}>{priceStr}</span>
               <div className="hidden sm:block h-4 w-px bg-zinc-200" />
               {plan && (
-                <span className="hidden sm:inline text-[12px] tracking-wide uppercase px-2.5 py-1 rounded bg-zinc-900 text-white" style={{ fontFamily: '"Google Sans", "Product Sans", system-ui, sans-serif', fontWeight: 400 }}>
+                <span className="hidden sm:inline text-[12px] tracking-wide uppercase px-2.5 py-1 rounded bg-white text-zinc-900 border border-zinc-200" style={{ fontFamily: '"Google Sans", "Product Sans", system-ui, sans-serif', fontWeight: 400 }}>
                   {plan.killzone}
                 </span>
               )}
