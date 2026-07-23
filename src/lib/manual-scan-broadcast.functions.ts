@@ -18,15 +18,18 @@ export const runManualScanBroadcast = createServerFn({ method: 'POST' })
     if (!pair || !pair.startsWith('XAU')) {
       return { ok: false as const, error: 'unsupported_pair' }
     }
-    const url = process.env.SUPABASE_URL // used only to derive our own origin? No — call our own route.
     const publishable = process.env.SUPABASE_PUBLISHABLE_KEY ?? ''
     const svc = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
     if (!publishable || !svc) return { ok: false as const, error: 'missing_env' }
 
-    // Same-origin call to the public auto-scan hook. The runtime resolves
-    // relative URLs against the incoming request, so a bare path works.
+    // Cloudflare Workers `fetch` requires an absolute URL — a bare path
+    // throws and the manual broadcast silently never leaves the server.
+    // Resolve against PUBLIC_APP_URL (falls back to the stable project URL).
+    const base =
+      process.env.PUBLIC_APP_URL ||
+      'https://project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app'
     try {
-      const res = await fetch('/api/public/hooks/auto-scan', {
+      const res = await fetch(`${base}/api/public/hooks/auto-scan`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -44,5 +47,4 @@ export const runManualScanBroadcast = createServerFn({ method: 'POST' })
     } catch (e) {
       return { ok: false as const, error: (e as Error).message }
     }
-    void url
   })
