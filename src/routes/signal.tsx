@@ -1218,7 +1218,7 @@ function SignalPage() {
                 />
               </div>
 
-              {broadcastStatus && (
+              {broadcastStatus && broadcastStatus.kind === "sent" && (
                 <div
                   className={`rounded-xl border p-3 text-xs font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] ${
                     broadcastStatus.kind === "sent"
@@ -1228,21 +1228,13 @@ function SignalPage() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-start gap-2">
-                      {broadcastStatus.kind === "sent" ? (
-                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                      ) : (
-                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                      )}
+                      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                       <div>
                         <div className="font-semibold">
-                          {broadcastStatus.kind === "sent"
-                            ? `Broadcast sent · ${broadcastStatus.pair} · ${broadcastStatus.conf}%`
-                            : `Broadcast blocked · ${broadcastStatus.pair}`}
+                          {`Broadcast sent · ${broadcastStatus.pair} · ${broadcastStatus.conf}%`}
                         </div>
                         <div className="mt-0.5 opacity-90">
-                          {broadcastStatus.kind === "sent"
-                            ? "Alert fanned out to paid subscribers, Telegram, email, and in-app."
-                            : broadcastStatus.reason}
+                          Alert fanned out to paid subscribers, Telegram, email, and in-app.
                         </div>
                       </div>
                     </div>
