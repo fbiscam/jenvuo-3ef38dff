@@ -10,8 +10,6 @@ const FAST_MODELS = [
   "bmind/gpt-5.2-chat",
   "bmind/gpt-4o-mini",
   "bmind/gpt-5.5",
-  "openai/gpt-5-nano",
-  "openai/gpt-5-mini",
 ];
 
 const SYSTEM = `You are Jenvu — a friendly voice trading assistant.
