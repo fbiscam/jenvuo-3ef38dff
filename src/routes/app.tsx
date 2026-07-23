@@ -365,7 +365,7 @@ function Home() {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [analyze, fetchSignalPlan, speech, timeframe, navigate, credits]);
+  }, [analyze, fetchSignalPlan, quickReply, speech, timeframe, navigate, credits]);
 
   // Accumulate final transcripts into a buffer while listening (do NOT send yet)
   useEffect(() => {
