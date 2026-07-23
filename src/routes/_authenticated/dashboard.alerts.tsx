@@ -552,7 +552,7 @@ function AlertPrefs() {
             <table className="w-full text-sm">
               <thead className="bg-zinc-50 text-center font-mono text-[10px] uppercase tracking-wider text-zinc-500">
                 <tr>
-                  {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Models", "Your Size", "Time", ""].map((h, i) => (
+                  {["Dir", "Pair", "Grade", "Session", "Entry", "SL", "TP", "RR", "Conf", "Your Size", "Time", ""].map((h, i) => (
                     <th key={i} className="px-3 py-2 font-medium">{h}</th>
                   ))}
                 </tr>
