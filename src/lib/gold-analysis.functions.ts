@@ -2430,11 +2430,12 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         __planAllowsSenior = sub?.status === "active" && pid !== "free";
       } catch { __planAllowsSenior = false; __planId = "free"; }
     }
-    // Senior review only starts after the rules engine reaches the public
-    // trade threshold. This keeps paid account scans aligned with debug scans
-    // instead of letting a borderline 52-58% setup get capped to 50% by review.
-    // Senior Review disabled — signals from rules + AI blend are performing best.
-    __requiresSeniorReview = false;
+    // Senior review re-enabled: acts as a 25-year veteran veto/downgrade layer.
+    // Runs whenever the rules engine produces a live BUY/SELL and the score
+    // is above SENIOR_REVIEW_MIN_RULE_SCORE (62). Failure soft-fails — the
+    // rules result still stands so a throttled AI provider never drops a signal.
+    __requiresSeniorReview =
+      built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
 
     if (__requiresSeniorReview) {
       try {
@@ -2522,6 +2523,11 @@ Run the full 25-year desk-head review internally through the elite lens above, t
           __seniorReviewStatus = "completed";
           if (verdict === "VETO") {
             __seniorReviewStatus = "vetoed";
+            // Hard-kill the signal: flip to WAIT and cap confidence below the
+            // broadcast threshold so auto-scan + manual scan gates both reject it.
+            built.direction = "WAIT" as typeof built.direction;
+            setupScore = Math.min(setupScore, 49);
+            setupGrade = "C";
             setupChecks.unshift({
               key: "senior_veto",
               label: `⛔ Senior trader veto (${modelShort})`,
@@ -2530,6 +2536,10 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             });
           } else if (verdict === "DOWNGRADE") {
             __seniorReviewStatus = "downgraded";
+            // Soft-reduce: shave ~10 points off score so borderline setups
+            // fall below the 70% broadcast gate but strong ones still fire.
+            setupScore = Math.max(50, setupScore - 10);
+            setupGrade = setupScore >= 90 ? "A+" : setupScore >= 80 ? "A" : setupScore >= 65 ? "B" : "C";
             setupChecks.unshift({
               key: "senior_downgrade",
               label: `⚠ Senior review downgrade (${modelShort})`,
