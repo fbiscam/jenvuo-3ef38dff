@@ -2430,11 +2430,12 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         __planAllowsSenior = sub?.status === "active" && pid !== "free";
       } catch { __planAllowsSenior = false; __planId = "free"; }
     }
-    // Senior review only starts after the rules engine reaches the public
-    // trade threshold. This keeps paid account scans aligned with debug scans
-    // instead of letting a borderline 52-58% setup get capped to 50% by review.
-    // Senior Review disabled — signals from rules + AI blend are performing best.
-    __requiresSeniorReview = false;
+    // Senior review re-enabled: acts as a 25-year veteran veto/downgrade layer.
+    // Runs whenever the rules engine produces a live BUY/SELL and the score
+    // is above SENIOR_REVIEW_MIN_RULE_SCORE (62). Failure soft-fails — the
+    // rules result still stands so a throttled AI provider never drops a signal.
+    __requiresSeniorReview =
+      built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
 
     if (__requiresSeniorReview) {
       try {
