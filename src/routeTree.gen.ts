@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
-import { Route as TvExtensionRouteImport } from './routes/tv-extension'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalsLiveRouteImport } from './routes/signals-live'
@@ -56,7 +55,6 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
 import { Route as ApiPublicSignalsFeedRouteImport } from './routes/api/public/signals-feed'
 import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
-import { Route as ApiPublicLatestSignalRouteImport } from './routes/api/public/latest-signal'
 import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_authenticated/dashboard.workspace'
 import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authenticated/dashboard.usage'
 import { Route as AuthenticatedDashboardSecurityRouteImport } from './routes/_authenticated/dashboard.security'
@@ -100,11 +98,6 @@ import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './route
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TvExtensionRoute = TvExtensionRouteImport.update({
-  id: '/tv-extension',
-  path: '/tv-extension',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -330,11 +323,6 @@ const ApiPublicSignalsFeedRoute = ApiPublicSignalsFeedRouteImport.update({
 const ApiPublicPodcastDotxmlRoute = ApiPublicPodcastDotxmlRouteImport.update({
   id: '/api/public/podcast.xml',
   path: '/api/public/podcast.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicLatestSignalRoute = ApiPublicLatestSignalRouteImport.update({
-  id: '/api/public/latest-signal',
-  path: '/api/public/latest-signal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardWorkspaceRoute =
@@ -595,7 +583,6 @@ export interface FileRoutesByFullPath {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
-  '/tv-extension': typeof TvExtensionRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
@@ -620,7 +607,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
-  '/api/public/latest-signal': typeof ApiPublicLatestSignalRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -680,7 +666,6 @@ export interface FileRoutesByTo {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
-  '/tv-extension': typeof TvExtensionRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
@@ -704,7 +689,6 @@ export interface FileRoutesByTo {
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
-  '/api/public/latest-signal': typeof ApiPublicLatestSignalRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -769,7 +753,6 @@ export interface FileRoutesById {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
-  '/tv-extension': typeof TvExtensionRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
@@ -794,7 +777,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/_authenticated/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
-  '/api/public/latest-signal': typeof ApiPublicLatestSignalRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -859,7 +841,6 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
-    | '/tv-extension'
     | '/unsubscribe'
     | '/dashboard'
     | '/inbox'
@@ -884,7 +865,6 @@ export interface FileRouteTypes {
     | '/dashboard/security'
     | '/dashboard/usage'
     | '/dashboard/workspace'
-    | '/api/public/latest-signal'
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
@@ -944,7 +924,6 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
-    | '/tv-extension'
     | '/unsubscribe'
     | '/inbox'
     | '/brief/$id'
@@ -968,7 +947,6 @@ export interface FileRouteTypes {
     | '/dashboard/security'
     | '/dashboard/usage'
     | '/dashboard/workspace'
-    | '/api/public/latest-signal'
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
@@ -1032,7 +1010,6 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
-    | '/tv-extension'
     | '/unsubscribe'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
@@ -1057,7 +1034,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/security'
     | '/_authenticated/dashboard/usage'
     | '/_authenticated/dashboard/workspace'
-    | '/api/public/latest-signal'
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
@@ -1122,12 +1098,10 @@ export interface RootRouteChildren {
   SignalsLiveRoute: typeof SignalsLiveRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
-  TvExtensionRoute: typeof TvExtensionRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   BriefIdRoute: typeof BriefIdRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   HelpIndexRoute: typeof HelpIndexRoute
-  ApiPublicLatestSignalRoute: typeof ApiPublicLatestSignalRoute
   ApiPublicPodcastDotxmlRoute: typeof ApiPublicPodcastDotxmlRoute
   ApiPublicSignalsFeedRoute: typeof ApiPublicSignalsFeedRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
@@ -1159,13 +1133,6 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tv-extension': {
-      id: '/tv-extension'
-      path: '/tv-extension'
-      fullPath: '/tv-extension'
-      preLoaderRoute: typeof TvExtensionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -1481,13 +1448,6 @@ declare module '@tanstack/react-router' {
       path: '/api/public/podcast.xml'
       fullPath: '/api/public/podcast.xml'
       preLoaderRoute: typeof ApiPublicPodcastDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/latest-signal': {
-      id: '/api/public/latest-signal'
-      path: '/api/public/latest-signal'
-      fullPath: '/api/public/latest-signal'
-      preLoaderRoute: typeof ApiPublicLatestSignalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/workspace': {
@@ -1918,12 +1878,10 @@ const rootRouteChildren: RootRouteChildren = {
   SignalsLiveRoute: SignalsLiveRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
-  TvExtensionRoute: TvExtensionRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   BriefIdRoute: BriefIdRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   HelpIndexRoute: HelpIndexRoute,
-  ApiPublicLatestSignalRoute: ApiPublicLatestSignalRoute,
   ApiPublicPodcastDotxmlRoute: ApiPublicPodcastDotxmlRoute,
   ApiPublicSignalsFeedRoute: ApiPublicSignalsFeedRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
