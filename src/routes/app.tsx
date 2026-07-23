@@ -207,6 +207,7 @@ function Home() {
 
   const analyze = useServerFn(analyzeGold);
   const fetchSignalPlan = useServerFn(getSignalPlan);
+  const quickReply = useServerFn(voiceQuickReply);
   const credits = useCredits();
 
   const fetchNews = useServerFn(getGoldNews);
