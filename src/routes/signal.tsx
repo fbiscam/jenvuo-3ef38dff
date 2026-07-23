@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
@@ -208,6 +208,11 @@ function SignalPage() {
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [broadcastStatus, setBroadcastStatus] = useState<
+    | { kind: "sent"; pair: string; conf: number; at: number }
+    | { kind: "blocked"; pair: string; reason: string; at: number }
+    | null
+  >(null);
   const activeScanRef = useRef<string | null>(null);
   const [analyzeElapsed, setAnalyzeElapsed] = useState(0);
   useEffect(() => {
@@ -554,8 +559,10 @@ function SignalPage() {
       setPlan(p);
       if (gateBlock) {
         setAnalysisError(gateBlock);
+        setBroadcastStatus({ kind: "blocked", pair: sym.toUpperCase(), reason: gateBlock, at: Date.now() });
         toast.error("Signal rejected by pipeline gates", { description: gateBlock });
       } else {
+        setBroadcastStatus({ kind: "sent", pair: sym.toUpperCase(), conf: Math.round(conf), at: Date.now() });
         // Fire the shared auto-scan broadcast pipeline (fan-out to paid subscribers,
         // Telegram, email, in-app) using the same gates as scheduled scans.
         // Runs in the background — never blocks the on-screen result.
@@ -1211,6 +1218,44 @@ function SignalPage() {
                 />
               </div>
 
+              {broadcastStatus && (
+                <div
+                  className={`rounded-xl border p-3 text-xs font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] ${
+                    broadcastStatus.kind === "sent"
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                      : "border-amber-200 bg-amber-50 text-amber-900"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-2">
+                      {broadcastStatus.kind === "sent" ? (
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                      ) : (
+                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                      )}
+                      <div>
+                        <div className="font-semibold">
+                          {broadcastStatus.kind === "sent"
+                            ? `Broadcast sent · ${broadcastStatus.pair} · ${broadcastStatus.conf}%`
+                            : `Broadcast blocked · ${broadcastStatus.pair}`}
+                        </div>
+                        <div className="mt-0.5 opacity-90">
+                          {broadcastStatus.kind === "sent"
+                            ? "Alert fanned out to paid subscribers, Telegram, email, and in-app."
+                            : broadcastStatus.reason}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setBroadcastStatus(null)}
+                      className="text-[11px] opacity-60 hover:opacity-100"
+                      aria-label="Dismiss"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
               <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case text-center pl-2">
                 ICT&nbsp; & SMC Execution Feed
               </h3>
