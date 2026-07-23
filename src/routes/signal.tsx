@@ -1816,7 +1816,7 @@ function SignalPage() {
 
               <Link
                 to="/app"
-                className="w-full inline-flex items-center justify-center py-3 bg-zinc-900 text-white text-[14px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal rounded-lg hover:bg-zinc-800 transition-colors normal-case"
+                className="w-full inline-flex items-center justify-center py-3 bg-white text-zinc-900 text-[14px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal rounded-lg border border-zinc-200 hover:bg-zinc-50 transition-colors normal-case"
               >
                 Execute Voice Trade
               </Link>
