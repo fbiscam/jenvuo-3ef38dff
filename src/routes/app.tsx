@@ -14,6 +14,7 @@ import { analyzeGold, getSignalPlan, normalizeQuery, type GoldSignal, type Signa
 import { getGoldNews } from "@/lib/news.functions";
 import { useCredits } from "@/hooks/useCredits";
 import { appendVoiceTurn } from "@/lib/voice-history";
+import { voiceQuickReply } from "@/lib/voice-quick-reply.functions";
 import PageLoading from "@/components/PageLoading";
 import { CloudOrb as SharedCloudOrb } from "@/components/CloudOrb";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -207,6 +208,7 @@ function Home() {
 
   const analyze = useServerFn(analyzeGold);
   const fetchSignalPlan = useServerFn(getSignalPlan);
+  const quickReply = useServerFn(voiceQuickReply);
   const credits = useCredits();
 
   const fetchNews = useServerFn(getGoldNews);
@@ -345,10 +347,10 @@ function Home() {
           speech.resumeIfWanted();
           return;
         }
-        const result = await analyze({ data: { timeframe: tf, query } });
-        setSignal(result);
-        appendVoiceTurn({ query, reply: result.spokenSummary });
-        speech.speak(result.spokenSummary, () => {
+        const result = await quickReply({ data: { query } });
+        const reply = result.reply;
+        appendVoiceTurn({ query, reply });
+        speech.speak(reply, () => {
           speech.resumeIfWanted();
           armSleep();
         });
@@ -363,7 +365,7 @@ function Home() {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [analyze, fetchSignalPlan, speech, timeframe, navigate, credits]);
+  }, [analyze, fetchSignalPlan, quickReply, speech, timeframe, navigate, credits]);
 
   // Accumulate final transcripts into a buffer while listening (do NOT send yet)
   useEffect(() => {
