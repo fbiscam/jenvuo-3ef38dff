@@ -103,7 +103,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           (p) =>
             typeof p === "string" && p.toUpperCase().startsWith("XAU"),
         );
-        const minConf = Number(cfg.min_conf ?? 75);
+        const minConf = Number(cfg.min_conf ?? 70);
         const confirmWindowMin = Number(cfg.confirm_window_min ?? 45);
         const cooldownMin = Number(cfg.cooldown_min ?? 60);
         const sameDirectionLockMin = Number(cfg.same_direction_lock_min ?? 240);
