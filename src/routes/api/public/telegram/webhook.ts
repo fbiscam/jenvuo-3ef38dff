@@ -42,6 +42,7 @@ function escapeHtml(s: string): string {
 const HELP_TEXT = [
   "<b>Jenvu Bot — commands</b>",
   "",
+  "/scan — run a manual signal scan (pick a pair)",
   "/me — account summary (plan, balance, stats)",
   "/balance — current wallet balance",
   "/plan — active plan & renewal",
@@ -50,6 +51,169 @@ const HELP_TEXT = [
   "/documents — document verification status",
   "/help — show this menu",
 ].join("\n");
+
+const SCAN_PAIRS: Array<{ code: string; label: string }> = [
+  { code: "XAUUSD", label: "XAU/USD" },
+  { code: "XAUEUR", label: "XAU/EUR" },
+  { code: "XAUGBP", label: "XAU/GBP" },
+  { code: "XAUJPY", label: "XAU/JPY" },
+  { code: "XAUAUD", label: "XAU/AUD" },
+  { code: "XAUCHF", label: "XAU/CHF" },
+];
+
+function scanKeyboard() {
+  return {
+    inline_keyboard: [
+      SCAN_PAIRS.slice(0, 3).map((p) => ({ text: p.label, callback_data: `scan:${p.code}` })),
+      SCAN_PAIRS.slice(3, 6).map((p) => ({ text: p.label, callback_data: `scan:${p.code}` })),
+    ],
+  };
+}
+
+// ---------------------------------------------------------------
+// Manual scan via Telegram — mirrors the /signal page pipeline:
+// balance check → computeSignalPlan → same gates (killzone, HTF,
+// min conf) → broadcast fan-out via internal auto-scan hook. The
+// caller is excluded from the fan-out (they get the Telegram reply).
+// ---------------------------------------------------------------
+async function runTelegramScan(opts: {
+  botToken: string;
+  chatId: number | string;
+  userId: string;
+  pair: string;
+}) {
+  const { botToken, chatId, userId } = opts;
+  const pair = String(opts.pair || "").toUpperCase().replace(/[^A-Z]/g, "");
+  const AUTO_MIN_CONF = 65;
+
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  // 1. Balance pre-flight ($0.20 flat per-signal charge)
+  const { data: bal } = await supabaseAdmin
+    .from("credit_balances")
+    .select("balance")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const balance = Number(bal?.balance ?? 0);
+  if (balance < 0.2) {
+    await tg(botToken, "sendMessage", {
+      chat_id: chatId,
+      text: `⚠️ <b>Balance too low</b>\n\nYou need at least <b>$0.20</b> per signal scan. Current balance: <b>${fmtMoney(balance)}</b>.\n\nAdd funds in the dashboard → Billing to continue.`,
+      parse_mode: "HTML",
+    });
+    return;
+  }
+
+  // 2. Ack "scanning" message so user sees progress (analysis ~10–15s)
+  await tg(botToken, "sendMessage", {
+    chat_id: chatId,
+    text: `⚙️ Scanning <b>${escapeHtml(pair)}</b> — running multi-model analysis…`,
+    parse_mode: "HTML",
+  });
+
+  // 3. Run the exact same server-side compute path /signal uses
+  let plan: any = null;
+  try {
+    const scanId =
+      (globalThis as any).crypto?.randomUUID?.() ??
+      `tg_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+    const { computeSignalPlan } = await import("@/lib/gold-analysis.functions");
+    plan = await computeSignalPlan({ symbol: pair }, userId, { scanId });
+  } catch (err) {
+    console.error("[telegram scan] compute failed", err);
+    await tg(botToken, "sendMessage", {
+      chat_id: chatId,
+      text: `❌ Analysis failed for <b>${escapeHtml(pair)}</b>. Try again in a moment.`,
+      parse_mode: "HTML",
+    });
+    return;
+  }
+
+  const trade = plan?.trade ?? {};
+  const dir = String(trade.direction ?? "WAIT").toUpperCase();
+  const conf = Number(trade.confidence ?? 0);
+  const kz = String(plan?.killzone ?? "");
+  const inKillzone = /Killzone/i.test(kz) && !/Outside/i.test(kz);
+  const isAsia = /asia/i.test(kz);
+  const htfBias = String(plan?.htfBias ?? "neutral");
+  const utcH = new Date().getUTCHours();
+  const isNyAm = utcH >= 12 && utcH < 16;
+  const aligned =
+    (dir === "BUY" && htfBias === "bullish") ||
+    (dir === "SELL" && htfBias === "bearish") ||
+    (isNyAm && htfBias === "neutral");
+
+  // 4. Same gates as /signal — reject reasons match the app UI exactly
+  let gateBlock: string | null = null;
+  if (dir !== "BUY" && dir !== "SELL") {
+    gateBlock = "No directional setup right now — market is in HOLD.";
+  } else if (conf < AUTO_MIN_CONF) {
+    gateBlock = `Confidence <b>${Math.round(conf)}%</b> is below the ${AUTO_MIN_CONF}% minimum.`;
+  } else if (!inKillzone || isAsia) {
+    gateBlock = `Outside a valid killzone (${escapeHtml(kz || "n/a")}). Fires only in London / NY AM / NY PM.`;
+  } else if (!aligned) {
+    gateBlock = `${dir} conflicts with HTF bias (${escapeHtml(htfBias)}).`;
+  }
+
+  const header = `📈 <b>${escapeHtml(pair)}</b> · ${escapeHtml(kz || "n/a")}`;
+  const meta = `Grade <b>${escapeHtml(String(plan?.setupGrade ?? "-"))}</b> · HTF ${escapeHtml(htfBias)} · Conf <b>${Math.round(conf)}%</b>`;
+
+  if (gateBlock) {
+    await tg(botToken, "sendMessage", {
+      chat_id: chatId,
+      text: [header, meta, "", `🚫 <b>No trade this scan</b>`, gateBlock].join("\n"),
+      parse_mode: "HTML",
+    });
+    return;
+  }
+
+  const arrow = dir === "BUY" ? "🟢" : "🔴";
+  const lines = [
+    header,
+    meta,
+    "",
+    `${arrow} <b>${dir} ${escapeHtml(pair)}</b>`,
+    `Entry: <b>${escapeHtml(String(trade.entry ?? "-"))}</b>`,
+    `SL: <b>${escapeHtml(String(trade.sl ?? "-"))}</b>`,
+    `TP1: <b>${escapeHtml(String(trade.tp1 ?? trade.tp ?? "-"))}</b>`,
+  ];
+  if (trade.tp2) lines.push(`TP2: <b>${escapeHtml(String(trade.tp2))}</b>`);
+  if (trade.tp3) lines.push(`TP3: <b>${escapeHtml(String(trade.tp3))}</b>`);
+  lines.push(`R:R: <b>${escapeHtml(String(trade.rr ?? "-"))}</b>`);
+  if (trade.summary) lines.push("", escapeHtml(String(trade.summary)).slice(0, 400));
+
+  await tg(botToken, "sendMessage", {
+    chat_id: chatId,
+    text: lines.join("\n"),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  });
+
+  // 5. Fire the shared broadcast pipeline (fan-out to paid subscribers,
+  //    email, Telegram, in-app) — caller excluded. Fire-and-forget so the
+  //    Telegram reply isn't held up by fan-out latency.
+  try {
+    const publishable = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
+    const svc = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+    const base =
+      process.env.PUBLIC_APP_URL ||
+      "https://project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app";
+    if (publishable && svc) {
+      void fetch(`${base}/api/public/hooks/auto-scan`, {
+        method: "POST",
+        headers: { "content-type": "application/json", apikey: publishable },
+        body: JSON.stringify({
+          manual: true,
+          pair,
+          manual_token: svc,
+          exclude_user_id: userId,
+        }),
+      }).catch((e) => console.warn("[telegram scan] broadcast fire-and-forget failed", e));
+    }
+  } catch (e) {
+    console.warn("[telegram scan] broadcast dispatch error", e);
+  }
+}
 
 async function handleCommand(opts: {
   botToken: string;
