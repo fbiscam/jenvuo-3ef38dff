@@ -62,6 +62,14 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           // ignore body parse errors — fall through to scheduled auto-scan
         }
 
+        // Reject requests that neither present a valid cron secret nor a
+        // service-role-signed manual body.
+        if (!hasValidCronSecret && !manualMode) {
+          return rejectUnauthorized();
+        }
+
+
+
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"
         );
