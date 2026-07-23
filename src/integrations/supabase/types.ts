@@ -1882,6 +1882,7 @@ export type Database = {
           pair: string
           realized_r: number | null
           resolved_at: string | null
+          reversal_notified_at: string | null
           rr: number | null
           session: string | null
           setup_score: number | null
@@ -1906,6 +1907,7 @@ export type Database = {
           pair: string
           realized_r?: number | null
           resolved_at?: string | null
+          reversal_notified_at?: string | null
           rr?: number | null
           session?: string | null
           setup_score?: number | null
@@ -1930,6 +1932,7 @@ export type Database = {
           pair?: string
           realized_r?: number | null
           resolved_at?: string | null
+          reversal_notified_at?: string | null
           rr?: number | null
           session?: string | null
           setup_score?: number | null
