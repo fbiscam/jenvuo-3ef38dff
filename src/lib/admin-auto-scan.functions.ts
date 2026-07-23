@@ -150,13 +150,14 @@ export const triggerAutoScanNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await ensureAdmin(context.userId);
-    const apikey = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const cronSecret = process.env.CRON_SECRET;
+    if (!cronSecret) throw new Error("CRON_SECRET is not configured");
     const base =
       process.env.PUBLIC_APP_URL ||
       "https://project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app";
     const res = await fetch(`${base}/api/public/hooks/auto-scan`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", apikey },
+      headers: { "Content-Type": "application/json", "x-cron-secret": cronSecret },
       body: "{}",
     });
     const text = await res.text();
