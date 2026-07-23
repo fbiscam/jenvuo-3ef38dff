@@ -165,7 +165,73 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
 
         const results: Array<Record<string, unknown>> = [];
 
-        for (const pair of pairs) {
+        // Multi-candidate arbitration: if 2+ pairs qualify simultaneously in
+        // this scan run, re-scan the candidates and only broadcast the
+        // strongest (highest confidence, R:R tiebreak). Prevents firing
+        // correlated XAU signals when the market gives multiple 70%+ setups
+        // in the same tick. Skipped in manual mode (user picks the pair).
+        let workingPairs = pairs.slice();
+        if (!manualMode && workingPairs.length > 1) {
+          type Cand = { pair: string; conf: number; rr: number; dir: "BUY" | "SELL" };
+          const candidates: Cand[] = [];
+          for (const p of workingPairs) {
+            try {
+              const pre = await computeSignalPlan({ symbol: p }, null);
+              const d = pre.trade?.direction;
+              const c = Number(pre.trade?.confidence ?? 0);
+              if ((d !== "BUY" && d !== "SELL") || c < minConf) continue;
+              const kzc = String(pre.killzone ?? "");
+              const inKz = /Killzone/i.test(kzc) && !/Outside/i.test(kzc) && !/asia/i.test(kzc);
+              if (!inKz) continue;
+              const e = Number(pre.trade?.entry);
+              const s = Number(pre.trade?.sl);
+              const t = Number(pre.trade?.tp1 ?? pre.trade?.tp);
+              const rd = Math.abs(e - s);
+              const rw = Math.abs(t - e);
+              const rr = rd > 0 ? rw / rd : 0;
+              candidates.push({ pair: p, conf: c, rr, dir: d });
+            } catch {
+              // ignore — pair will be re-evaluated in main loop where errors are logged
+            }
+          }
+          if (candidates.length > 1) {
+            // Re-scan qualifying candidates to confirm strength before picking winner.
+            const rescored: Cand[] = [];
+            for (const cand of candidates) {
+              try {
+                const re = await computeSignalPlan({ symbol: cand.pair }, null);
+                const d = re.trade?.direction;
+                const c = Number(re.trade?.confidence ?? 0);
+                if (d !== cand.dir || c < minConf) continue;
+                const e = Number(re.trade?.entry);
+                const s = Number(re.trade?.sl);
+                const t = Number(re.trade?.tp1 ?? re.trade?.tp);
+                const rd = Math.abs(e - s);
+                const rw = Math.abs(t - e);
+                rescored.push({ pair: cand.pair, conf: c, rr: rd > 0 ? rw / rd : 0, dir: cand.dir });
+              } catch {
+                // skip on re-scan error
+              }
+            }
+            const pool = rescored.length > 0 ? rescored : candidates;
+            pool.sort((a, b) => (b.conf - a.conf) || (b.rr - a.rr));
+            const winner = pool[0];
+            for (const loser of pool.slice(1)) {
+              results.push({
+                pair: loser.pair,
+                action: "outranked_by_stronger",
+                winner: winner.pair,
+                winner_conf: Math.round(winner.conf),
+                conf: Math.round(loser.conf),
+                dir: loser.dir,
+              });
+            }
+            // Only the winning pair runs the full broadcast pipeline this scan.
+            workingPairs = [winner.pair];
+          }
+        }
+
+        for (const pair of workingPairs) {
           try {
             const plan = await computeSignalPlan({ symbol: pair }, null);
             const dir = plan.trade?.direction;
