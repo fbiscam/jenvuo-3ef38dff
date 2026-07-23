@@ -529,7 +529,7 @@ function SignalPage() {
       // setup the shared broadcaster would reject (below threshold, wrong
       // killzone, HTF-bias conflict, or no directional bias). This keeps
       // manual + auto results consistent — "qalt signal" ab manual ma nahi aya.
-      const AUTO_MIN_CONF = 70;
+      const AUTO_MIN_CONF = 65;
       const dir = p.trade?.direction;
       const conf = Number(p.trade?.confidence ?? 0);
       const kz = String(p.killzone ?? "");
