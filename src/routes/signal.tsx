@@ -1218,7 +1218,7 @@ function SignalPage() {
                 />
               </div>
 
-              {broadcastStatus && (
+              {broadcastStatus && broadcastStatus.kind === "sent" && (
                 <div
                   className={`rounded-xl border p-3 text-xs font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] ${
                     broadcastStatus.kind === "sent"
