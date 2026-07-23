@@ -347,10 +347,10 @@ function Home() {
           speech.resumeIfWanted();
           return;
         }
-        const result = await analyze({ data: { timeframe: tf, query } });
-        setSignal(result);
-        appendVoiceTurn({ query, reply: result.spokenSummary });
-        speech.speak(result.spokenSummary, () => {
+        const result = await quickReply({ data: { query } });
+        const reply = result.reply;
+        appendVoiceTurn({ query, reply });
+        speech.speak(reply, () => {
           speech.resumeIfWanted();
           armSleep();
         });
