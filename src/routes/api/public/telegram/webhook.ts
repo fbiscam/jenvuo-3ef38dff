@@ -421,6 +421,16 @@ async function handleCommand(opts: {
     return;
   }
 
+  if (cmd === "/scan") {
+    await tg(botToken, "sendMessage", {
+      chat_id: chatId,
+      text: "🎯 <b>Pick a pair to scan</b>\n\nFlat charge: <b>$0.20</b> per signal (only if a valid setup fires).",
+      parse_mode: "HTML",
+      reply_markup: scanKeyboard(),
+    });
+    return;
+  }
+
   // Unknown
   await tg(botToken, "sendMessage", {
     chat_id: chatId,
