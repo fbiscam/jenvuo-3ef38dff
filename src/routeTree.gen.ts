@@ -55,6 +55,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
 import { Route as ApiPublicSignalsFeedRouteImport } from './routes/api/public/signals-feed'
 import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
+import { Route as ApiPublicLatestSignalRouteImport } from './routes/api/public/latest-signal'
 import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_authenticated/dashboard.workspace'
 import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authenticated/dashboard.usage'
 import { Route as AuthenticatedDashboardSecurityRouteImport } from './routes/_authenticated/dashboard.security'
@@ -323,6 +324,11 @@ const ApiPublicSignalsFeedRoute = ApiPublicSignalsFeedRouteImport.update({
 const ApiPublicPodcastDotxmlRoute = ApiPublicPodcastDotxmlRouteImport.update({
   id: '/api/public/podcast.xml',
   path: '/api/public/podcast.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicLatestSignalRoute = ApiPublicLatestSignalRouteImport.update({
+  id: '/api/public/latest-signal',
+  path: '/api/public/latest-signal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardWorkspaceRoute =
@@ -607,6 +613,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
+  '/api/public/latest-signal': typeof ApiPublicLatestSignalRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -689,6 +696,7 @@ export interface FileRoutesByTo {
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
+  '/api/public/latest-signal': typeof ApiPublicLatestSignalRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -777,6 +785,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/_authenticated/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
+  '/api/public/latest-signal': typeof ApiPublicLatestSignalRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -865,6 +874,7 @@ export interface FileRouteTypes {
     | '/dashboard/security'
     | '/dashboard/usage'
     | '/dashboard/workspace'
+    | '/api/public/latest-signal'
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
@@ -947,6 +957,7 @@ export interface FileRouteTypes {
     | '/dashboard/security'
     | '/dashboard/usage'
     | '/dashboard/workspace'
+    | '/api/public/latest-signal'
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
@@ -1034,6 +1045,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/security'
     | '/_authenticated/dashboard/usage'
     | '/_authenticated/dashboard/workspace'
+    | '/api/public/latest-signal'
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
@@ -1102,6 +1114,7 @@ export interface RootRouteChildren {
   BriefIdRoute: typeof BriefIdRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   HelpIndexRoute: typeof HelpIndexRoute
+  ApiPublicLatestSignalRoute: typeof ApiPublicLatestSignalRoute
   ApiPublicPodcastDotxmlRoute: typeof ApiPublicPodcastDotxmlRoute
   ApiPublicSignalsFeedRoute: typeof ApiPublicSignalsFeedRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
@@ -1448,6 +1461,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/podcast.xml'
       fullPath: '/api/public/podcast.xml'
       preLoaderRoute: typeof ApiPublicPodcastDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/latest-signal': {
+      id: '/api/public/latest-signal'
+      path: '/api/public/latest-signal'
+      fullPath: '/api/public/latest-signal'
+      preLoaderRoute: typeof ApiPublicLatestSignalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/workspace': {
@@ -1882,6 +1902,7 @@ const rootRouteChildren: RootRouteChildren = {
   BriefIdRoute: BriefIdRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   HelpIndexRoute: HelpIndexRoute,
+  ApiPublicLatestSignalRoute: ApiPublicLatestSignalRoute,
   ApiPublicPodcastDotxmlRoute: ApiPublicPodcastDotxmlRoute,
   ApiPublicSignalsFeedRoute: ApiPublicSignalsFeedRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
