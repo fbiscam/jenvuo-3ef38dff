@@ -73,6 +73,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
+import { Route as ApiPublicTelegramAdminRouteImport } from './routes/api/public/telegram/admin'
 import { Route as ApiPublicHooksSignalReversalMonitorRouteImport } from './routes/api/public/hooks/signal-reversal-monitor'
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
 import { Route as ApiPublicHooksReindexInsightsRouteImport } from './routes/api/public/hooks/reindex-insights'
@@ -431,6 +432,11 @@ const ApiPublicTelegramWebhookRoute =
     path: '/api/public/telegram/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicTelegramAdminRoute = ApiPublicTelegramAdminRouteImport.update({
+  id: '/api/public/telegram/admin',
+  path: '/api/public/telegram/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksSignalReversalMonitorRoute =
   ApiPublicHooksSignalReversalMonitorRouteImport.update({
     id: '/api/public/hooks/signal-reversal-monitor',
@@ -634,6 +640,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
+  '/api/public/telegram/admin': typeof ApiPublicTelegramAdminRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -716,6 +723,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
+  '/api/public/telegram/admin': typeof ApiPublicTelegramAdminRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -804,6 +812,7 @@ export interface FileRoutesById {
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
+  '/api/public/telegram/admin': typeof ApiPublicTelegramAdminRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -892,6 +901,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
+    | '/api/public/telegram/admin'
     | '/api/public/telegram/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -974,6 +984,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
+    | '/api/public/telegram/admin'
     | '/api/public/telegram/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1061,6 +1072,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
+    | '/api/public/telegram/admin'
     | '/api/public/telegram/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1118,6 +1130,7 @@ export interface RootRouteChildren {
   ApiPublicHooksReindexInsightsRoute: typeof ApiPublicHooksReindexInsightsRoute
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   ApiPublicHooksSignalReversalMonitorRoute: typeof ApiPublicHooksSignalReversalMonitorRoute
+  ApiPublicTelegramAdminRoute: typeof ApiPublicTelegramAdminRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -1576,6 +1589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/telegram/admin': {
+      id: '/api/public/telegram/admin'
+      path: '/api/public/telegram/admin'
+      fullPath: '/api/public/telegram/admin'
+      preLoaderRoute: typeof ApiPublicTelegramAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/signal-reversal-monitor': {
       id: '/api/public/hooks/signal-reversal-monitor'
       path: '/api/public/hooks/signal-reversal-monitor'
@@ -1899,6 +1919,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksScanSignalsRoute: ApiPublicHooksScanSignalsRoute,
   ApiPublicHooksSignalReversalMonitorRoute:
     ApiPublicHooksSignalReversalMonitorRoute,
+  ApiPublicTelegramAdminRoute: ApiPublicTelegramAdminRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
