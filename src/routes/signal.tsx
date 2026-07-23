@@ -559,8 +559,10 @@ function SignalPage() {
       setPlan(p);
       if (gateBlock) {
         setAnalysisError(gateBlock);
+        setBroadcastStatus({ kind: "blocked", pair: sym.toUpperCase(), reason: gateBlock, at: Date.now() });
         toast.error("Signal rejected by pipeline gates", { description: gateBlock });
       } else {
+        setBroadcastStatus({ kind: "sent", pair: sym.toUpperCase(), conf: Math.round(conf), at: Date.now() });
         // Fire the shared auto-scan broadcast pipeline (fan-out to paid subscribers,
         // Telegram, email, in-app) using the same gates as scheduled scans.
         // Runs in the background — never blocks the on-screen result.
