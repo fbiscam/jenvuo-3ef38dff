@@ -299,91 +299,118 @@ function HomePage() {
       <main>
       {/* HERO */}
       <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28 overflow-hidden">
-        {/* trading background animation — desktop + tablet only */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block">
-          {/* pulsing green glow */}
+        {/* aurora market pulse background — desktop + tablet only */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block overflow-hidden">
+          {/* aurora gradient waves */}
           <div
-            className="absolute -left-24 top-1/3 h-[420px] w-[420px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(16,185,129,0.28), transparent 70%)", animation: "hero-pulse 6s ease-in-out infinite" }}
+            className="absolute -inset-[20%] opacity-70"
+            style={{
+              background:
+                "conic-gradient(from 180deg at 50% 50%, rgba(16,185,129,0.18), rgba(5,150,105,0.05), rgba(16,185,129,0.22), rgba(4,120,87,0.04), rgba(16,185,129,0.18))",
+              filter: "blur(60px)",
+              animation: "hero-aurora 24s linear infinite",
+            }}
+          />
+          {/* deep glow orbs */}
+          <div
+            className="absolute left-[8%] top-[45%] h-[380px] w-[380px] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(16,185,129,0.32), transparent 70%)", animation: "hero-drift 14s ease-in-out infinite" }}
           />
           <div
-            className="absolute right-0 top-10 h-[360px] w-[360px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(239,68,68,0.18), transparent 70%)", animation: "hero-pulse 8s ease-in-out infinite 1.5s" }}
+            className="absolute right-[6%] top-[8%] h-[300px] w-[300px] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(52,211,153,0.16), transparent 70%)", animation: "hero-drift 18s ease-in-out infinite -6s" }}
           />
-          {/* scrolling grid */}
+
+          {/* perspective grid floor */}
           <div
-            className="absolute inset-0 opacity-[0.2]"
+            className="absolute inset-x-0 bottom-0 h-[60%] opacity-[0.18]"
             style={{
               backgroundImage:
-                "linear-gradient(to right, rgba(255,255,255,0.09) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.09) 1px, transparent 1px)",
-              backgroundSize: "48px 48px",
-              maskImage: "radial-gradient(ellipse at center, black 55%, transparent 90%)",
-              WebkitMaskImage: "radial-gradient(ellipse at center, black 55%, transparent 90%)",
-              animation: "hero-grid 12s linear infinite",
+                "linear-gradient(to right, rgba(16,185,129,0.35) 1px, transparent 1px), linear-gradient(to bottom, rgba(16,185,129,0.35) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+              transform: "perspective(600px) rotateX(60deg)",
+              transformOrigin: "center bottom",
+              maskImage: "linear-gradient(to top, black 20%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to top, black 20%, transparent 100%)",
+              animation: "hero-floor 8s linear infinite",
             }}
           />
-          {/* sweeping beam */}
-          <div
-            className="absolute inset-y-0 -left-1/3 w-1/3"
-            style={{
-              background: "linear-gradient(90deg, transparent, rgba(16,185,129,0.12), transparent)",
-              animation: "hero-sweep 7s linear infinite",
-            }}
-          />
-          {/* candlesticks + price line */}
-          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1200 500" preserveAspectRatio="none">
+
+          {/* orbital rings + radar sweep */}
+          <svg className="absolute right-[-120px] top-1/2 -translate-y-1/2 h-[720px] w-[720px] opacity-60" viewBox="0 0 400 400">
             <defs>
-              <linearGradient id="lineGrad" x1="0" x2="1" y1="0" y2="0">
+              <radialGradient id="radar" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0.35" />
+                <stop offset="70%" stopColor="#10b981" stopOpacity="0" />
+              </radialGradient>
+              <linearGradient id="sweep" x1="0" x2="1" y1="0" y2="0">
                 <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
-                <stop offset="50%" stopColor="#10b981" stopOpacity="0.65" />
-                <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                <stop offset="100%" stopColor="#10b981" stopOpacity="0.8" />
               </linearGradient>
-              <linearGradient id="areaGrad" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="#10b981" stopOpacity="0.28" />
+            </defs>
+            <circle cx="200" cy="200" r="80" fill="none" stroke="rgba(16,185,129,0.28)" strokeWidth="0.8" />
+            <circle cx="200" cy="200" r="130" fill="none" stroke="rgba(16,185,129,0.22)" strokeWidth="0.8" strokeDasharray="2 6" />
+            <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(16,185,129,0.18)" strokeWidth="0.8" />
+            <circle cx="200" cy="200" r="180" fill="url(#radar)" />
+            {/* radar sweep arm */}
+            <g style={{ transformOrigin: "200px 200px", animation: "hero-spin 6s linear infinite" }}>
+              <path d="M200 200 L200 20 A180 180 0 0 1 355 130 Z" fill="url(#sweep)" opacity="0.35" />
+              <line x1="200" y1="200" x2="200" y2="20" stroke="#10b981" strokeWidth="1" />
+            </g>
+            {/* orbiting nodes */}
+            <g style={{ transformOrigin: "200px 200px", animation: "hero-spin 20s linear infinite" }}>
+              <circle cx="200" cy="20" r="3.5" fill="#10b981" />
+              <circle cx="200" cy="20" r="7" fill="#10b981" opacity="0.25" />
+            </g>
+            <g style={{ transformOrigin: "200px 200px", animation: "hero-spin-rev 14s linear infinite" }}>
+              <circle cx="330" cy="200" r="2.5" fill="#34d399" />
+            </g>
+            <g style={{ transformOrigin: "200px 200px", animation: "hero-spin 28s linear infinite" }}>
+              <circle cx="20" cy="200" r="2" fill="#6ee7b7" opacity="0.7" />
+            </g>
+          </svg>
+
+          {/* heartbeat / EKG price line */}
+          <svg className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[260px] w-full opacity-70" viewBox="0 0 1200 200" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="ekgGrad" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
+                <stop offset="20%" stopColor="#10b981" stopOpacity="0.7" />
+                <stop offset="80%" stopColor="#34d399" stopOpacity="0.7" />
                 <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
               </linearGradient>
             </defs>
-            {/* scrolling price area + line */}
-            <g style={{ animation: "hero-scroll 22s linear infinite" }}>
-              <polygon
-                fill="url(#areaGrad)"
-                points="0,500 0,320 60,300 120,340 180,280 240,310 300,240 360,270 420,220 480,260 540,200 600,230 660,180 720,220 780,170 840,200 900,150 960,190 1020,140 1080,170 1140,120 1200,150 1260,110 1320,140 1380,90 1440,120 1500,70 1560,100 1620,50 1680,80 1740,30 1800,60 1860,20 1920,50 1980,10 2040,40 2100,0 2160,30 2220,-10 2280,20 2280,500"
-              />
-              <polyline
-                fill="none"
-                stroke="url(#lineGrad)"
-                strokeWidth="1.6"
-                points="0,320 60,300 120,340 180,280 240,310 300,240 360,270 420,220 480,260 540,200 600,230 660,180 720,220 780,170 840,200 900,150 960,190 1020,140 1080,170 1140,120 1200,150 1260,110 1320,140 1380,90 1440,120 1500,70 1560,100 1620,50 1680,80 1740,30 1800,60 1860,20 1920,50 1980,10 2040,40 2100,0 2160,30 2220,-10 2280,20"
-              />
-              {/* pulsing tracer dot on the line */}
-              <circle r="4" fill="#10b981" style={{ animation: "hero-tracer 22s linear infinite, hero-blink 1.2s ease-in-out infinite" }} />
-            </g>
-            {/* candles */}
-            {Array.from({ length: 26 }).map((_, i) => {
-              const x = i * 48 + 20;
-              const isUp = i % 3 !== 0;
-              const color = isUp ? "#10b981" : "#ef4444";
-              const bodyH = 18 + ((i * 13) % 40);
-              const wickTop = 30 + ((i * 7) % 60);
-              const bodyY = 220 + ((i * 17) % 90);
-              return (
-                <g
-                  key={i}
-                  opacity="0.35"
-                  style={{
-                    animation: `hero-candle 4s ease-in-out ${i * 0.15}s infinite`,
-                    transformOrigin: `${x + 6}px ${bodyY + bodyH / 2}px`,
-                  }}
-                >
-                  <line x1={x + 6} x2={x + 6} y1={bodyY - wickTop} y2={bodyY + bodyH + wickTop / 2} stroke={color} strokeWidth="1" />
-                  <rect x={x} y={bodyY} width="12" height={bodyH} fill={color} />
-                </g>
-              );
-            })}
-            {/* floating particles */}
-            {Array.from({ length: 14 }).map((_, i) => {
-              const cx = (i * 89) % 1200;
-              const cy = (i * 53) % 460 + 20;
+            <path
+              d="M0 100 L180 100 L200 100 L210 60 L220 140 L235 40 L250 160 L265 100 L420 100 L440 100 L455 70 L470 130 L485 100 L640 100 L660 100 L675 50 L690 150 L705 100 L860 100 L880 100 L895 80 L910 120 L925 100 L1200 100"
+              fill="none"
+              stroke="url(#ekgGrad)"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeDasharray="2400"
+              strokeDashoffset="2400"
+              style={{ animation: "hero-draw 6s ease-in-out infinite" }}
+            />
+          </svg>
+
+          {/* ticker tape numbers */}
+          <div
+            className="absolute left-0 right-0 top-6 flex gap-8 whitespace-nowrap text-[10px] font-mono tracking-widest text-emerald-400/40"
+            style={{ animation: "hero-ticker 40s linear infinite" }}
+          >
+            {Array.from({ length: 2 }).map((_, r) => (
+              <div key={r} className="flex gap-8">
+                <span>XAU/USD 2648.32 ▲</span><span>DXY 106.14 ▼</span><span>XAU/EUR 2510.88 ▲</span>
+                <span>US10Y 4.28% ▲</span><span>XAU/GBP 2098.44 ▼</span><span>VIX 14.62 ▼</span>
+                <span>XAU/JPY 411820 ▲</span><span>SPX 6041.7 ▲</span><span>XAU/AUD 4082.11 ▲</span>
+              </div>
+            ))}
+          </div>
+
+          {/* floating particles */}
+          <svg className="absolute inset-0 h-full w-full">
+            {Array.from({ length: 18 }).map((_, i) => {
+              const cx = (i * 73) % 1200;
+              const cy = (i * 47) % 500 + 30;
               return (
                 <circle
                   key={`p-${i}`}
@@ -397,23 +424,24 @@ function HomePage() {
               );
             })}
           </svg>
+
           {/* soft vignette to keep text readable */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(ellipse at 30% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.9) 60%, #000 100%)",
+                "radial-gradient(ellipse at 25% 45%, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.92) 55%, #000 100%)",
             }}
           />
         </div>
         <style>{`
-          @keyframes hero-scroll { from { transform: translateX(0); } to { transform: translateX(-1080px); } }
-          @keyframes hero-candle { 0%,100% { transform: scaleY(1); opacity: 0.3; } 50% { transform: scaleY(1.2); opacity: 0.6; } }
-          @keyframes hero-pulse { 0%,100% { transform: scale(1); opacity: 0.75; } 50% { transform: scale(1.15); opacity: 1; } }
-          @keyframes hero-grid { from { background-position: 0 0; } to { background-position: 48px 48px; } }
-          @keyframes hero-sweep { 0% { transform: translateX(0); } 100% { transform: translateX(500%); } }
-          @keyframes hero-tracer { 0% { transform: translate(0,0); } 100% { transform: translate(1080px,-170px); } }
-          @keyframes hero-blink { 0%,100% { opacity: 0.4; r: 3; } 50% { opacity: 1; r: 5; } }
+          @keyframes hero-aurora { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+          @keyframes hero-drift { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px,-20px) scale(1.1); } }
+          @keyframes hero-floor { from { background-position: 0 0; } to { background-position: 0 60px; } }
+          @keyframes hero-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+          @keyframes hero-spin-rev { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+          @keyframes hero-draw { 0% { stroke-dashoffset: 2400; } 60% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -2400; } }
+          @keyframes hero-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
           @keyframes hero-float { 0%,100% { transform: translateY(0); opacity: 0.35; } 50% { transform: translateY(-14px); opacity: 0.75; } }
         `}</style>
 
