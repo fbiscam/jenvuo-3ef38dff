@@ -454,7 +454,7 @@ function HomePage() {
                     <span className={`text-[10px] ${MONO} text-zinc-900 uppercase`}>DXY Index</span>
                     <span className="text-xs font-semibold">104.22</span>
                   </div>
-                  <div className="h-16 w-full bg-white rounded border border-zinc-100 flex items-end p-2 gap-0.5">
+                  <div className="h-16 w-full bg-black rounded border border-zinc-200 flex items-end p-2 gap-0.5">
                     {[50, 66, 75, 33, 50, 66, 50, 80, 40].map((h, i) => (
                       <div
                         key={i}
