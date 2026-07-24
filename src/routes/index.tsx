@@ -829,7 +829,7 @@ function HomePage() {
                         {v === true ? (
                           <span className="inline-block h-1.5 w-1.5 rounded-full bg-white" />
                         ) : v === false ? (
-                          <span className="inline-block h-px w-4 bg-white/30" />
+                          <span className="inline-block h-px w-4 bg-white" />
                         ) : (
                           <span className={`${MONO} text-[11px] tracking-wider text-white ${row.isHeading ? "font-semibold" : ""}`}>
                             {v}
