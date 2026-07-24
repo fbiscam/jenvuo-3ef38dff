@@ -701,19 +701,19 @@ function HomePage() {
             <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+          <div className="overflow-x-auto rounded-2xl border border-white/15 bg-black">
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
                 <col className="w-[34%]" />
-                <col className="w-[22%] bg-amber-50/40" />
+                <col className="w-[22%] bg-amber-500/10" />
                 <col className="w-[22%]" />
                 <col className="w-[22%]" />
               </colgroup>
 
               <thead>
-                <tr className="border-b border-zinc-200">
+                <tr className="border-b border-white/10">
                   <th className="p-6 text-left align-bottom">
-                    <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
+                    <span className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Invite Only Access</span>
                   </th>
                   {[
                     { name: "Pro", price: "$15", tag: "Active", accent: true, key: "pro" },
@@ -733,28 +733,28 @@ function HomePage() {
                     return (
                     <th
                       key={p.name}
-                      className={`p-6 text-left align-top border-l border-zinc-200 ${isCurrent ? "bg-emerald-50/50" : p.accent ? "bg-amber-50/50" : ""}`}
+                      className={`p-6 text-left align-top border-l border-white/10 ${isCurrent ? "bg-emerald-500/10" : p.accent ? "bg-amber-500/10" : ""}`}
                     >
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                        <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-white"}`}>{p.name}</span>
                         {isCurrent && (
                           <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
                             Current
                           </span>
                         )}
                         {p.accent && !isCurrent && (
-                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-white font-bold`}>
                             Popular
                           </span>
                         )}
                       </div>
                       <div className="mt-2 flex items-baseline gap-1">
-                        <span className="text-2xl tracking-tight text-zinc-900 price-font">{p.price}</span>
+                        <span className="text-2xl tracking-tight text-white price-font">{p.price}</span>
                         {p.price !== "$0" && (
-                          <span className="text-[11px] text-zinc-500 price-font">/credits</span>
+                          <span className="text-[11px] text-white/60 price-font">/credits</span>
                         )}
                       </div>
-                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
+                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-white/60`}>{p.tag}</p>
 
                       {isCurrent ? (
                         <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
@@ -770,7 +770,7 @@ function HomePage() {
                               ? "Upgrades unlock after your earning proof is verified and your 30-day trial ends."
                               : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your earning proof is verified.`
                           }
-                          className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center rounded-md border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-500"
+                          className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center rounded-md border border-white/10 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-white/60"
                         >
                           {cta}
                         </button>
@@ -779,8 +779,8 @@ function HomePage() {
                           to="/founding"
                           className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
                             p.accent || p.dark
-                              ? "bg-zinc-900 text-white hover:bg-black"
-                              : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
+                              ? "bg-white text-black hover:bg-white/90"
+                              : "border border-white/20 bg-white text-white hover:bg-zinc-50"
                           }`}
                         >
                           {cta}
@@ -809,16 +809,16 @@ function HomePage() {
                 ] as ReadonlyArray<{ f: string; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
                   <tr
                     key={row.f}
-                    className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
+                    className={`border-t border-white/10 ${idx % 2 === 1 ? "bg-white/5" : ""} hover:bg-white/5 transition`}
                   >
-                    <td className="px-6 py-3.5 text-zinc-800">
+                    <td className="px-6 py-3.5 text-white/90">
                       <div className="flex items-center gap-2">
                         {row.badge && (
-                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-white font-bold`}>
                             {row.badge}
                           </span>
                         )}
-                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-zinc-500" : ""}>
+                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-white/60" : ""}>
                           {row.f}
                         </span>
                       </div>
@@ -826,14 +826,14 @@ function HomePage() {
                     {[row.b, row.c, row.d].map((v, i) => (
                       <td
                         key={i}
-                        className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${i === 0 ? "bg-amber-50/40" : ""}`}
+                        className={`px-2 py-3.5 text-center border-l border-white/10 min-w-[120px] ${i === 0 ? "bg-amber-500/10" : ""}`}
                       >
                         {v === true ? (
-                          <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
+                          <span className="inline-block h-1.5 w-1.5 rounded-full bg-white" />
                         ) : v === false ? (
-                          <span className="inline-block h-px w-4 bg-zinc-200" />
+                          <span className="inline-block h-px w-4 bg-white/30" />
                         ) : (
-                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : "text-zinc-700"}`}>
+                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-white font-semibold" : "text-white/80"}`}>
                             {v}
                           </span>
                         )}
