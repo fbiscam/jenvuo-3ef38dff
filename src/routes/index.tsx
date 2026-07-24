@@ -147,7 +147,7 @@ function TagPill({ tag, tone }: { tag: string; tone: "ink" | "green" | "muted" }
     tone === "green"
       ? "bg-emerald-500 text-white"
       : tone === "muted"
-      ? "bg-zinc-200 text-zinc-900"
+      ? "bg-zinc-700 text-white"
       : "bg-zinc-900 text-white";
   return (
     <span className={`text-[10px] px-1.5 py-0.5 rounded ${MONO} uppercase tracking-wider ${cls}`}>
