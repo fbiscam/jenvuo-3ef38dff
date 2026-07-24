@@ -296,8 +296,8 @@ function HomePage() {
 
       <main>
       {/* HERO */}
-      <section className="relative pt-10 pb-20 sm:pt-16 sm:pb-28 overflow-hidden">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 relative"><div className="hidden">{/* wrapper reset */}</div></div>
+      <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28 overflow-hidden">
+        {/* full-bleed trading floor background — desktop + tablet only */}
         {/* aurora market pulse background — desktop + tablet only */}
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block overflow-hidden">
           {/* base gradient wash */}
