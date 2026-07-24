@@ -455,7 +455,7 @@ function HomePage() {
                       <div
                         key={i}
                         className="flex-1 rounded-t-sm"
-                        style={{ height: `${h}%`, backgroundColor: "#ffffff", opacity: 0.4 + (h / 100) * 0.6 }}
+                        style={{ height: `${h}%`, backgroundColor: "#10b981", opacity: 0.4 + (h / 100) * 0.6 }}
                       />
                     ))}
                   </div>
