@@ -71,33 +71,32 @@ function scanKeyboard() {
 }
 
 // ---------------------------------------------------------------
-// Fire the actual scan work in a separate request so this webhook
-// can respond to Telegram within its ~10s timeout. Otherwise the
-// 14s compute path blocks the webhook and Telegram drops the reply.
+// Run the scan inline. Cloudflare Workers cancel unawaited fetches
+// as soon as the outer handler returns, so fire-and-forget to a
+// sibling endpoint silently drops the scan. Telegram waits ~60s
+// for the webhook response — plenty for the ~15s scan pipeline.
 // ---------------------------------------------------------------
-async function triggerScanAsync(opts: {
+async function runScanInline(opts: {
+  botToken: string;
   chatId: number | string;
   userId: string;
   pair: string;
-  originUrl: URL;
 }) {
-  const token = process.env.TG_SELFTEST_TOKEN ?? "";
-  const base = `${opts.originUrl.protocol}//${opts.originUrl.host}`;
-  const url = `${base}/api/public/telegram/admin`;
-  // Fire-and-forget POST — do NOT await. Errors are logged inside the runner.
-  fetch(url, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-tg-admin-token": token,
-    },
-    body: JSON.stringify({
-      action: "run-scan",
+  try {
+    const { runTelegramScan } = await import("@/lib/telegram-scan.server");
+    await runTelegramScan({
+      botToken: opts.botToken,
       chatId: opts.chatId,
       userId: opts.userId,
       pair: opts.pair,
-    }),
-  }).catch((err) => console.error("[telegram-webhook] scan trigger failed", err));
+    });
+  } catch (err) {
+    console.error("[telegram-webhook] inline scan failed", err);
+    await tg(opts.botToken, "sendMessage", {
+      chat_id: opts.chatId,
+      text: "⚠️ Scan failed. Please try again in a moment.",
+    });
+  }
 }
 
 
