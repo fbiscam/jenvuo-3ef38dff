@@ -573,7 +573,7 @@ function HomePage() {
       </section>
 
       {/* COVERAGE */}
-      <section className="border-t border-zinc-100 bg-white/40">
+      <section className="border-t border-white/10 bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
             <div className="text-left lg:col-span-4 lg:text-left">
@@ -605,7 +605,7 @@ function HomePage() {
       </section>
 
       {/* CHANGELOG */}
-      <section className="border-t border-zinc-100 bg-white/40">
+      <section className="border-t border-white/10 bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="mb-8 flex flex-col items-start justify-start gap-2 text-left sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:text-left">
             <div>
@@ -673,7 +673,7 @@ function HomePage() {
       </section>
 
       {/* DESK LOGIC */}
-      <section className="border-t border-zinc-100 bg-white/40">
+      <section className="border-t border-white/10 bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 text-left sm:px-6 sm:py-14 md:text-left">
           <h2 className="max-w-2xl text-xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl">
             The frameworks JENVU thinks in.
@@ -699,7 +699,7 @@ function HomePage() {
       </section>
 
       {/* PRICING — comparison matrix (old style) */}
-      <section className="border-t border-zinc-100 bg-white">
+      <section className="border-t border-white/10 bg-black">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
           <div className="mb-10">
             <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
@@ -853,7 +853,7 @@ function HomePage() {
 
 
       {/* TESTIMONIALS */}
-      <section className="border-t border-zinc-100 bg-white">
+      <section className="border-t border-white/10 bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <h2 className="mb-10 text-xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Trusted by traders.</h2>
           <div className="grid gap-6 md:grid-cols-3">
@@ -879,7 +879,7 @@ function HomePage() {
 
 
       {/* COMPARISON */}
-      <section className="border-t border-zinc-100 bg-white/40">
+      <section className="border-t border-white/10 bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <h2 className="text-left text-xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
             Why traders move to JENVU.
@@ -936,7 +936,7 @@ function HomePage() {
 
 
       {/* INTEGRATIONS */}
-      <section className="border-t border-zinc-100 bg-white/40">
+      <section className="border-t border-white/10 bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
           <div className="flex flex-col md:flex-row items-start justify-between gap-6">
             <div className="text-left md:text-left">
