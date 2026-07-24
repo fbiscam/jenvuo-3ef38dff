@@ -184,7 +184,7 @@ function HomePage() {
     <>
     <div className={`jenvu-zoom min-h-dvh w-full bg-black text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-black/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 bg-black/85 backdrop-blur-md">
         <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
