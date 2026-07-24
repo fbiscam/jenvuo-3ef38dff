@@ -807,7 +807,7 @@ function HomePage() {
                 ] as ReadonlyArray<{ f: string; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
                   <tr
                     key={row.f}
-                    className={`border-t border-white/10 ${idx % 2 === 1 ? "bg-white/5" : ""} hover:bg-white/5 transition`}
+                    className="border-t border-white/10 bg-black hover:bg-white/5 transition"
                   >
                     <td className="px-6 py-3.5 text-white/90">
                       <div className="flex items-center gap-2">
