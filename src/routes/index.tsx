@@ -328,15 +328,15 @@ function HomePage() {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-white/10 rounded-xl overflow-hidden border border-white/10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 rounded-xl overflow-hidden">
               {[
                 ["Markets", "XAU"],
                 ["Frameworks", "ICT, SMC"],
                 ["Avg. R:R", "1 : 3.2"],
               ].map(([k, v]) => (
-                <div key={k} style={{ backgroundColor: "#2a2a2a" }} className="p-5 text-left sm:text-left border-l-2" >
-                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-white/70`}>{k}</div>
-                  <div className="mt-2 text-lg font-semibold tracking-tight sm:text-xl" style={{ color: "#10b981" }}>{v}</div>
+                <div key={k} style={{ backgroundColor: "#2a2a2a" }} className="p-5 text-left rounded-lg">
+                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-white`}>{k}</div>
+                  <div className="mt-2 text-lg font-semibold tracking-tight sm:text-xl text-white">{v}</div>
                 </div>
               ))}
             </div>
