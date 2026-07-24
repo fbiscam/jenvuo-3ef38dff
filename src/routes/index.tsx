@@ -334,7 +334,7 @@ function HomePage() {
                 ["Avg. R:R", "1 : 3.2"],
               ].map(([k, v]) => (
                 <div key={k} style={{ backgroundColor: "#000000" }} className="p-5 text-left sm:text-left">
-                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-white/60`}>{k}</div>
+                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-white`}>{k}</div>
                   <div className="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">{v}</div>
                 </div>
               ))}
