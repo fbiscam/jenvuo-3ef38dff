@@ -891,7 +891,7 @@ function DashboardLayout() {
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
             <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             {!sidebarCollapsed && (
-              <span className="brand-wordmark font-serif-display truncate text-[20px] leading-none tracking-tight text-white">JENVU</span>
+              <span className="brand-wordmark truncate text-[15px] font-semibold tracking-tight text-white">JENVU</span>
             )}
           </Link>
           <button
