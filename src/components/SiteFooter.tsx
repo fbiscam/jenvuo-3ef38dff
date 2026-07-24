@@ -102,7 +102,7 @@ const columns = [
 export default function SiteFooter() {
   const year = new Date().getFullYear();
   return (
-    <footer className="relative bg-[#FAFAFA]">
+    <footer className="relative bg-black text-white">
       {/* Subtle divider */}
       <div className="h-px w-full bg-transparent" />
 
