@@ -462,7 +462,7 @@ function HomePage() {
 
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 p-3 rounded-lg" style={{ backgroundColor: "#2a2a2a" }}>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-zinc-900">Institutional Sentiment</span>
                     <span className="text-xs font-medium text-emerald-600">Bullish</span>
