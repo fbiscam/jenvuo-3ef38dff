@@ -118,11 +118,11 @@ export default function SiteFooter() {
                 alt="JENVU AI"
                 className="h-7 w-7 rounded object-contain"
               />
-              <span className="text-zinc-900 font-semibold tracking-tight text-lg">
+              <span className="text-white font-semibold tracking-tight text-lg">
                 JENVU AI
               </span>
             </Link>
-            <p className="text-sm text-zinc-600 leading-relaxed max-w-sm whitespace-pre-line">
+            <p className="text-sm text-white/70 leading-relaxed max-w-sm whitespace-pre-line">
               Institutional grade voice intelligence for gold{"\n"}traders using ICT & SMC to make analysis.
             </p>
 
