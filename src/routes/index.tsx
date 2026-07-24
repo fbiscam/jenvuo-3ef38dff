@@ -447,6 +447,11 @@ function HomePage() {
           @keyframes hero-draw { 0% { stroke-dashoffset: 2400; } 60% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -2400; } }
           @keyframes hero-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
           @keyframes hero-float { 0%,100% { transform: translateY(0); opacity: 0.35; } 50% { transform: translateY(-14px); opacity: 0.75; } }
+          @keyframes hero-float-up { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(-22px); opacity: 0.9; } }
+          @keyframes hero-float-down { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(22px); opacity: 0.9; } }
+          @keyframes hero-hue { 0%,100% { filter: blur(60px) hue-rotate(0deg); } 50% { filter: blur(60px) hue-rotate(40deg); } }
+          @keyframes hero-pulse-up { 0%,100% { opacity: 0.5; transform: translateY(0) scale(1); } 50% { opacity: 1; transform: translateY(-18px) scale(1.08); } }
+          @keyframes hero-pulse-down { 0%,100% { opacity: 0.5; transform: translateY(0) scale(1); } 50% { opacity: 1; transform: translateY(18px) scale(1.08); } }
         `}</style>
 
         <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
