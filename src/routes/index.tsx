@@ -385,14 +385,10 @@ function HomePage() {
                 {SIGNALS.map((s) => (
                   <div
                     key={s.pair + s.t}
-                    className={`p-3 rounded-lg border ${
-                      s.tone === "green"
-                        ? "border-emerald-100/70 bg-emerald-50/30"
-                        : "border-zinc-100 bg-white"
-                    } space-y-2`}
+                    className={`p-3 rounded-lg border border-zinc-200 bg-white text-zinc-900 space-y-2`}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs font-semibold">{s.pair}</span>
+                      <span className="text-xs font-semibold text-zinc-900">{s.pair}</span>
                       <span className={`text-[10px] ${MONO} text-zinc-900`}>{s.t}</span>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
