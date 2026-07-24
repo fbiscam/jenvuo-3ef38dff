@@ -448,8 +448,8 @@ html, body { background-color: #000 !important; color: #fff; }
   --dd-surface: #000000;
   --dd-surface-2: #000000;
   --dd-surface-3: #050505;
-  --dd-border: #ffffff;
-  --dd-border-strong: #ffffff;
+  --dd-border: rgba(255, 255, 255, 0.25);
+  --dd-border-strong: rgba(255, 255, 255, 0.35);
   --dd-fg: #ffffff;
   --dd-fg-strong: #ffffff;
   --dd-fg-muted: #ffffff;
