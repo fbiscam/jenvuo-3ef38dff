@@ -454,8 +454,8 @@ function HomePage() {
                     {[50, 66, 75, 33, 50, 66, 50, 80, 40].map((h, i) => (
                       <div
                         key={i}
-                        className="flex-1 rounded-t-sm bg-white"
-                        style={{ height: `${h}%`, opacity: 0.3 + (h / 100) * 0.7 }}
+                        className="flex-1 rounded-t-sm"
+                        style={{ height: `${h}%`, backgroundColor: "#2a2a2a", opacity: 0.4 + (h / 100) * 0.6 }}
                       />
                     ))}
                   </div>
