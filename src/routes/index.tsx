@@ -604,7 +604,7 @@ function HomePage() {
             <span className="sm:hidden">Built like a trading desk<br />spoken just like a real partner</span>
             <span className="hidden sm:inline">Built like a trading desk, spoken like a partner.</span>
           </h2>
-          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
+          <div className="mt-12 grid gap-px bg-emerald-500 border border-emerald-500 rounded-2xl overflow-hidden md:grid-cols-3">
             {[
               {
                 k: "01",
@@ -664,7 +664,7 @@ function HomePage() {
                 Jenvu routes liquidity, structure and news context across every XAU pair&nbsp;
               </p>
             </div>
-            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
+            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-emerald-500 border border-emerald-500 rounded-xl overflow-hidden">
               {[
                 ["XAU / USD", "Primary bullion benchmark"],
                 ["XAU / EUR", "European gold demand"],
@@ -731,7 +731,7 @@ function HomePage() {
 
           </div>
 
-          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
+          <div className="mt-12 grid gap-px bg-emerald-500 border border-emerald-500 rounded-2xl overflow-hidden md:grid-cols-4">
             {[
               { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English anything." },
               { k: "02", t: "Reason", d: "JENVU pulls structure, ICT/SMC, DXY and news." },
@@ -757,7 +757,7 @@ function HomePage() {
           <h2 className="max-w-2xl text-xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl">
             The frameworks JENVU thinks in.
           </h2>
-          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-px bg-emerald-500 border border-emerald-500 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
             {[
               ["ICT", "Killzones, judas swings and silver bullet entries."],
               ["SMC", "Structure shifts, mitigations and premium discount zones."],
