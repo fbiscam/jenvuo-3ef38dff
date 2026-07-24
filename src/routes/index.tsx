@@ -388,7 +388,7 @@ function HomePage() {
                     className={`p-3 rounded-lg border ${
                       s.tone === "green"
                         ? "border-emerald-100/70 bg-emerald-50/30"
-                        : "border-zinc-100 bg-white/40"
+                        : "border-zinc-100 bg-white"
                     } space-y-2`}
                   >
                     <div className="flex items-center justify-between gap-3">
