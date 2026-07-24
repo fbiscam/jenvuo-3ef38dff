@@ -659,7 +659,7 @@ function HomePage() {
       </section>
 
       {/* CAPABILITIES */}
-      <section className="border-t border-zinc-100">
+      <section>
         <div className="mx-auto max-w-6xl px-5 py-10 text-left sm:px-6 sm:py-14 md:text-left">
           
           <h2 className="mt-4 max-w-3xl text-xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl md:whitespace-nowrap">
@@ -714,7 +714,7 @@ function HomePage() {
       </section>
 
       {/* COVERAGE */}
-      <section className="border-t border-white/10 bg-black">
+      <section className="bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
             <div className="text-left lg:col-span-4 lg:text-left">
@@ -746,7 +746,7 @@ function HomePage() {
       </section>
 
       {/* CHANGELOG */}
-      <section className="border-t border-white/10 bg-black">
+      <section className="bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="mb-8 flex flex-col items-start justify-start gap-2 text-left sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:text-left">
             <div>
@@ -778,7 +778,7 @@ function HomePage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="border-t border-zinc-100">
+      <section>
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="flex flex-col items-start gap-4 text-left md:flex-row md:items-end md:justify-between md:text-left">
             <div>
@@ -814,7 +814,7 @@ function HomePage() {
       </section>
 
       {/* DESK LOGIC */}
-      <section className="border-t border-white/10 bg-black">
+      <section className="bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 text-left sm:px-6 sm:py-14 md:text-left">
           <h2 className="max-w-2xl text-xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl">
             The frameworks JENVU thinks in.
@@ -840,7 +840,7 @@ function HomePage() {
       </section>
 
       {/* PRICING — comparison matrix (old style) */}
-      <section className="border-t border-white/10 bg-black">
+      <section className="bg-black">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
           <div className="mb-10">
             <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
@@ -994,7 +994,7 @@ function HomePage() {
 
 
       {/* TESTIMONIALS */}
-      <section className="border-t border-white/10 bg-black">
+      <section className="bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <h2 className="mb-10 text-xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Trusted by traders.</h2>
           <div className="grid gap-6 md:grid-cols-3">
@@ -1020,7 +1020,7 @@ function HomePage() {
 
 
       {/* COMPARISON */}
-      <section className="border-t border-white/10 bg-black">
+      <section className="bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <h2 className="text-left text-xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
             Why traders move to JENVU.
@@ -1077,7 +1077,7 @@ function HomePage() {
 
 
       {/* INTEGRATIONS */}
-      <section className="border-t border-white/10 bg-black">
+      <section className="bg-black">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
           <div className="flex flex-col md:flex-row items-start justify-between gap-6">
             <div className="text-left md:text-left">
@@ -1103,7 +1103,7 @@ function HomePage() {
 
 
       {/* FAQ */}
-      <section className="border-t border-zinc-100">
+      <section>
 
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
@@ -1152,7 +1152,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="border-t border-zinc-100 overflow-hidden">
+      <section className="overflow-hidden">
 
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
           <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
