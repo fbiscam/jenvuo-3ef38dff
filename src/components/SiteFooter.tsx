@@ -201,7 +201,7 @@ export default function SiteFooter() {
                   <li key={l.to}>
                     <Link
                       to={l.to}
-                      className="text-sm text-white/70 hover:text-white transition-colors whitespace-nowrap"
+                      className="text-sm text-white hover:text-white/80 transition-colors whitespace-nowrap"
                     >
                       {l.label}
                     </Link>
