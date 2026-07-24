@@ -461,9 +461,11 @@ html, body { background-color: #000 !important; color: #fff; }
 .dash-dark { background-color: var(--dd-bg) !important; color: var(--dd-fg) !important; }
 .dash-dark .bg-white,
 .dash-dark [class*="bg-white/"],
-.dash-dark [class*="bg-\\[\\#F8F8F8\\]"],
-.dash-dark [class*="bg-\\[\\#FAFAFA\\]"],
-.dash-dark [class*="bg-\\[\\#FFFFFF\\]"] { background-color: var(--dd-surface) !important; }
+.dash-dark [class*="bg-[#F8F8F8]"],
+.dash-dark [class*="bg-[#FAFAFA]"],
+.dash-dark [class*="bg-[#FFFFFF]"],
+.dash-dark [class*="bg-[#fafafa]"],
+.dash-dark [class*="bg-[#ffffff]"] { background-color: var(--dd-surface) !important; }
 
 /* Translucent white headers / navs → dark translucent */
 .dash-dark header[class*="bg-white/"],
