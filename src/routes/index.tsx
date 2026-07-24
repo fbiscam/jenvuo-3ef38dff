@@ -299,24 +299,28 @@ function HomePage() {
       <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28 overflow-hidden">
         {/* aurora market pulse background — desktop + tablet only */}
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block overflow-hidden">
-          {/* aurora gradient waves */}
+          {/* aurora gradient waves — bull/bear reflection */}
           <div
-            className="absolute -inset-[20%] opacity-70"
+            className="absolute -inset-[20%] opacity-80"
             style={{
               background:
-                "conic-gradient(from 180deg at 50% 50%, rgba(16,185,129,0.18), rgba(5,150,105,0.05), rgba(16,185,129,0.22), rgba(4,120,87,0.04), rgba(16,185,129,0.18))",
+                "conic-gradient(from 180deg at 50% 50%, rgba(16,185,129,0.28), rgba(244,63,94,0.10), rgba(16,185,129,0.05), rgba(234,88,12,0.14), rgba(16,185,129,0.28), rgba(244,63,94,0.10), rgba(16,185,129,0.28))",
               filter: "blur(60px)",
-              animation: "hero-aurora 24s linear infinite",
+              animation: "hero-aurora 24s linear infinite, hero-hue 12s ease-in-out infinite",
             }}
           />
-          {/* deep glow orbs */}
+          {/* deep glow orbs — green up, red down */}
           <div
-            className="absolute left-[8%] top-[45%] h-[380px] w-[380px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(16,185,129,0.32), transparent 70%)", animation: "hero-drift 14s ease-in-out infinite" }}
+            className="absolute left-[8%] top-[60%] h-[380px] w-[380px] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(16,185,129,0.42), transparent 70%)", animation: "hero-drift 14s ease-in-out infinite, hero-pulse-up 6s ease-in-out infinite" }}
           />
           <div
-            className="absolute right-[6%] top-[8%] h-[300px] w-[300px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(52,211,153,0.16), transparent 70%)", animation: "hero-drift 18s ease-in-out infinite -6s" }}
+            className="absolute right-[10%] top-[15%] h-[340px] w-[340px] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(244,63,94,0.34), transparent 70%)", animation: "hero-drift 18s ease-in-out infinite -6s, hero-pulse-down 6s ease-in-out infinite -3s" }}
+          />
+          <div
+            className="absolute left-[55%] top-[5%] h-[260px] w-[260px] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(234,179,8,0.22), transparent 70%)", animation: "hero-drift 22s ease-in-out infinite -10s" }}
           />
 
           {/* perspective grid floor */}
@@ -373,9 +377,10 @@ function HomePage() {
             <defs>
               <linearGradient id="ekgGrad" x1="0" x2="1" y1="0" y2="0">
                 <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
-                <stop offset="20%" stopColor="#10b981" stopOpacity="0.7" />
-                <stop offset="80%" stopColor="#34d399" stopOpacity="0.7" />
-                <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                <stop offset="20%" stopColor="#10b981" stopOpacity="0.85" />
+                <stop offset="50%" stopColor="#eab308" stopOpacity="0.8" />
+                <stop offset="80%" stopColor="#f43f5e" stopOpacity="0.85" />
+                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
               </linearGradient>
             </defs>
             <path
@@ -406,18 +411,19 @@ function HomePage() {
 
           {/* floating particles */}
           <svg className="absolute inset-0 h-full w-full">
-            {Array.from({ length: 18 }).map((_, i) => {
+            {Array.from({ length: 22 }).map((_, i) => {
               const cx = (i * 73) % 1200;
               const cy = (i * 47) % 500 + 30;
+              const up = i % 2 === 0;
               return (
                 <circle
                   key={`p-${i}`}
                   cx={cx}
                   cy={cy}
-                  r={1.4}
-                  fill="#10b981"
-                  opacity="0.5"
-                  style={{ animation: `hero-float ${5 + (i % 5)}s ease-in-out ${i * 0.3}s infinite` }}
+                  r={1.6}
+                  fill={up ? "#10b981" : "#f43f5e"}
+                  opacity="0.6"
+                  style={{ animation: `${up ? "hero-float-up" : "hero-float-down"} ${5 + (i % 5)}s ease-in-out ${i * 0.3}s infinite` }}
                 />
               );
             })}
@@ -441,6 +447,11 @@ function HomePage() {
           @keyframes hero-draw { 0% { stroke-dashoffset: 2400; } 60% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -2400; } }
           @keyframes hero-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
           @keyframes hero-float { 0%,100% { transform: translateY(0); opacity: 0.35; } 50% { transform: translateY(-14px); opacity: 0.75; } }
+          @keyframes hero-float-up { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(-22px); opacity: 0.9; } }
+          @keyframes hero-float-down { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(22px); opacity: 0.9; } }
+          @keyframes hero-hue { 0%,100% { filter: blur(60px) hue-rotate(0deg); } 50% { filter: blur(60px) hue-rotate(40deg); } }
+          @keyframes hero-pulse-up { 0%,100% { opacity: 0.5; transform: translateY(0) scale(1); } 50% { opacity: 1; transform: translateY(-18px) scale(1.08); } }
+          @keyframes hero-pulse-down { 0%,100% { opacity: 0.5; transform: translateY(0) scale(1); } 50% { opacity: 1; transform: translateY(18px) scale(1.08); } }
         `}</style>
 
         <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
