@@ -1088,9 +1088,10 @@ function DashboardLayout() {
               disabled={refreshing}
               aria-label="Refresh analytics"
               title="Refresh analytics"
-              className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border border-white/10 bg-black p-0 leading-none text-white transition-all duration-150 hover:bg-zinc-900 active:scale-90 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border p-0 leading-none transition-all duration-150 active:scale-90 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-white/20"
+              style={{ backgroundColor: "#000", color: "#fff", borderColor: "rgba(255,255,255,0.15)" }}
             >
-              <RefreshCw className={`h-3.5 w-3.5 shrink-0 text-white transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
+              <RefreshCw className={`h-3.5 w-3.5 shrink-0 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} style={{ color: "#fff" }} />
             </button>
             <DropdownMenu>
             <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
