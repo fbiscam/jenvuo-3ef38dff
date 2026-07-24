@@ -313,8 +313,10 @@ function HomePage() {
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
                 to={isAuthed ? "/app" : "/auth"}
-                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium text-white shadow-[0_8px_24px_-8px_rgba(16,185,129,0.55)]"
+                style={{ backgroundColor: "#10b981" }}
               >
+                <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
                 Launch Voice Agent
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
