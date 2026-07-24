@@ -470,7 +470,7 @@ function HomePage() {
               <Link
                 to={isAuthed ? "/app" : "/auth"}
                 className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium"
-                style={{ backgroundColor: "#ffffff", color: "#000000" }}
+                style={{ backgroundColor: "#10b981", color: "#ffffff" }}
               >
                 Launch Voice Agent
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
