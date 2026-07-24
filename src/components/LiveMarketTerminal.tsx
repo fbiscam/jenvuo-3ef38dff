@@ -294,28 +294,6 @@ export function LiveMarketTerminal() {
             </div>
           </div>
 
-          {/* Bottom Ticker Tape */}
-          <div className="bg-zinc-900/60 border-t border-zinc-800 p-2 overflow-hidden whitespace-nowrap">
-            <div className="flex gap-12 jv-ticker will-change-transform">
-              {[0, 1].map((dup) => (
-                <div key={dup} className="flex gap-8 shrink-0">
-                  {[
-                    ["XAU/USD", livePrice != null ? `$${fmtPrice(livePrice)}` : "—", usdDelta, usdUp],
-                    ...rightRows.map((r) => [r[0], r[1], r[2], r[2].trim().startsWith("+")] as const),
-                    ["DXY", dxyRow?.[1] ?? "—", dxyRow?.[2] ?? "…", (dxyRow?.[2] ?? "").trim().startsWith("+")],
-                  ].map((row, i) => {
-                    const [sym, px, chg, up] = row as [string, string, string, boolean];
-                    return (
-                      <span key={`${dup}-${i}`} className={`${MONO} text-[10px] text-zinc-400 tabular-nums`}>
-                        <span className="text-zinc-600">{sym}:</span> {px}{" "}
-                        <span className={up ? "text-emerald-500" : "text-rose-500"}>{chg}</span>
-                      </span>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </section>
