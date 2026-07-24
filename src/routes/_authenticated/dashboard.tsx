@@ -1462,13 +1462,13 @@ function VoiceAgentHistory() {
 }
 
 function QuickActions() {
-  const actions: { label: string; to: string; icon: typeof Activity; tone: string }[] = [
-    { label: "New Scan",   to: "/signal",                 icon: Activity,    tone: "bg-blue-50 text-blue-700 border-blue-100" },
-    { label: "Journal",    to: "/dashboard/journal",       icon: BookOpen,    tone: "bg-emerald-50 text-emerald-700 border-emerald-100" },
-    { label: "Killzones",  to: "/killzones",              icon: Calendar,    tone: "bg-amber-50 text-amber-700 border-amber-100" },
-    { label: "Insights",   to: "/insights",               icon: LineChart,   tone: "bg-violet-50 text-violet-700 border-violet-100" },
-    { label: "Saved",      to: "/dashboard/workspace",    icon: Bookmark,    tone: "bg-rose-50 text-rose-700 border-rose-100" },
-    { label: "Billing",    to: "/dashboard/billing",      icon: CreditCard,  tone: "bg-zinc-50 text-zinc-700 border-zinc-200" },
+  const actions: { label: string; to: string; icon: typeof Activity; color: string }[] = [
+    { label: "New Scan",   to: "/signal",                 icon: Activity,    color: "text-blue-600" },
+    { label: "Journal",    to: "/dashboard/journal",       icon: BookOpen,    color: "text-emerald-600" },
+    { label: "Killzones",  to: "/killzones",              icon: Calendar,    color: "text-amber-600" },
+    { label: "Insights",   to: "/insights",               icon: LineChart,   color: "text-violet-600" },
+    { label: "Saved",      to: "/dashboard/workspace",    icon: Bookmark,    color: "text-rose-600" },
+    { label: "Billing",    to: "/dashboard/billing",      icon: CreditCard,  color: "text-zinc-900" },
   ];
   return (
     <div className="grid flex-1 grid-cols-3 gap-2 px-5 py-5">
@@ -1480,8 +1480,8 @@ function QuickActions() {
             to={a.to as "/signal"}
             className="group flex flex-col items-center justify-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2 py-3 text-center transition hover:border-zinc-300 hover:bg-zinc-50"
           >
-            <span className={`inline-flex h-8 w-8 items-center justify-center rounded-md border ${a.tone}`}>
-              <Icon className="h-4 w-4" />
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-200 bg-white">
+              <Icon className={`h-4 w-4 ${a.color}`} />
             </span>
             <span className="text-[11.5px] font-medium text-zinc-800">{a.label}</span>
           </Link>
