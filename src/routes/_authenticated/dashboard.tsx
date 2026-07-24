@@ -1052,15 +1052,16 @@ function DashboardLayout() {
                 title="AI models powering your signals"
               >
                 <span className="inline-flex items-center gap-1.5 rounded-md bg-transparent px-1.5 py-1 leading-none">
-                  <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" width={16} height={16} className="h-[16px] w-[16px] shrink-0 object-contain bg-transparent" loading="lazy" />
+                  <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" width={16} height={16} className="h-[16px] w-[16px] shrink-0 object-contain bg-transparent rounded-full" loading="lazy" />
                   <span className="text-[11px] font-medium leading-none text-white">OpenAI</span>
                   {showDeepSeek && (
                     <>
                       <span className="leading-none text-white/40">·</span>
-                      <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="DeepSeek" width={16} height={16} className="h-[16px] w-[16px] shrink-0 object-contain bg-transparent" loading="lazy" />
+                      <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="DeepSeek" width={16} height={16} className="h-[16px] w-[16px] shrink-0 object-contain bg-transparent rounded-full" loading="lazy" />
                       <span className="text-[11px] font-medium leading-none text-white">DeepSeek</span>
                       <span className="leading-none text-white/40">·</span>
-                      <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={16} height={16} className="h-[16px] w-[16px] shrink-0 object-contain bg-transparent" loading="lazy" />
+                      <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={16} height={16} className="h-[16px] w-[16px] shrink-0 object-contain bg-transparent rounded-full" loading="lazy" />
+
                       <span className="text-[11px] font-medium leading-none text-white">Google</span>
                     </>
                   )}
