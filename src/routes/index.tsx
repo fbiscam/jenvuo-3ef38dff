@@ -454,9 +454,7 @@ function HomePage() {
                     {[50, 66, 75, 33, 50, 66, 50, 80, 40].map((h, i) => (
                       <div
                         key={i}
-                        className={`flex-1 rounded-t-sm ${
-                          h > 70 ? "bg-white" : h > 50 ? "bg-white/70" : "bg-white/40"
-                        }`}
+                        className="flex-1 rounded-t-sm bg-white"
                         style={{ height: `${h}%` }}
                       />
                     ))}
