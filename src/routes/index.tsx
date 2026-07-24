@@ -300,136 +300,157 @@ function HomePage() {
         {/* full-bleed trading floor background — desktop + tablet only */}
         {/* aurora market pulse background — desktop + tablet only */}
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block overflow-hidden">
-          {/* base gradient wash */}
+          {/* deep ambient wash */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(ellipse 80% 60% at 80% 20%, rgba(16,185,129,0.18), transparent 60%), radial-gradient(ellipse 70% 60% at 15% 80%, rgba(244,63,94,0.14), transparent 60%), #000",
+                "radial-gradient(ellipse 60% 50% at 85% 15%, rgba(16,185,129,0.22), transparent 65%), radial-gradient(ellipse 60% 50% at 10% 90%, rgba(244,63,94,0.16), transparent 65%), linear-gradient(180deg, #000 0%, #050807 100%)",
             }}
           />
 
-          {/* trading grid floor */}
+          {/* full-height animated grid */}
           <div
-            className="absolute inset-0 opacity-[0.18]"
+            className="absolute inset-0 opacity-[0.22]"
             style={{
               backgroundImage:
-                "linear-gradient(to right, rgba(16,185,129,0.28) 1px, transparent 1px), linear-gradient(to bottom, rgba(16,185,129,0.18) 1px, transparent 1px)",
-              backgroundSize: "80px 40px",
-              maskImage: "linear-gradient(to bottom, black 0%, transparent 90%)",
-              WebkitMaskImage: "linear-gradient(to bottom, black 0%, transparent 90%)",
-              animation: "hero-grid-scroll 12s linear infinite",
+                "linear-gradient(to right, rgba(52,211,153,0.22) 1px, transparent 1px), linear-gradient(to bottom, rgba(52,211,153,0.14) 1px, transparent 1px)",
+              backgroundSize: "90px 45px",
+              maskImage: "radial-gradient(ellipse 90% 80% at 50% 50%, black 50%, transparent 100%)",
+              WebkitMaskImage: "radial-gradient(ellipse 90% 80% at 50% 50%, black 50%, transparent 100%)",
+              animation: "hero-grid-scroll 14s linear infinite",
             }}
           />
 
-          {/* horizontal price levels (support/resistance) */}
-          <div className="absolute inset-x-0 top-[22%] h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
-          <div className="absolute inset-x-0 top-[48%] h-px bg-gradient-to-r from-transparent via-yellow-400/30 to-transparent" style={{ animation: "hero-level 4s ease-in-out infinite" }} />
-          <div className="absolute inset-x-0 top-[72%] h-px bg-gradient-to-r from-transparent via-rose-400/40 to-transparent" />
+          {/* background area trend fill (parallax back layer) */}
+          <svg className="absolute inset-0 h-full w-full opacity-40" viewBox="0 0 1600 900" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="areaFill" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient id="areaLine" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0.9" />
+                <stop offset="60%" stopColor="#34d399" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#eab308" stopOpacity="0.9" />
+              </linearGradient>
+            </defs>
+            <g style={{ animation: "hero-pan 24s linear infinite" }}>
+              <path
+                d="M0 600 C 200 500, 300 700, 500 550 S 800 350, 1000 500 S 1300 250, 1600 400 L 1600 900 L 0 900 Z"
+                fill="url(#areaFill)"
+              />
+              <path
+                d="M0 600 C 200 500, 300 700, 500 550 S 800 350, 1000 500 S 1300 250, 1600 400"
+                fill="none"
+                stroke="url(#areaLine)"
+                strokeWidth="2"
+              />
+            </g>
+          </svg>
 
-          {/* scrolling candlesticks */}
+          {/* horizontal S/R levels spanning full width */}
+          <div className="absolute inset-x-0 top-[18%] h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent" />
+          <div className="absolute inset-x-0 top-[42%] h-px bg-gradient-to-r from-transparent via-yellow-400/40 to-transparent" style={{ animation: "hero-level 4s ease-in-out infinite" }} />
+          <div className="absolute inset-x-0 top-[68%] h-px bg-gradient-to-r from-transparent via-rose-400/50 to-transparent" />
+          <div className="absolute inset-x-0 top-[88%] h-px bg-gradient-to-r from-transparent via-emerald-400/25 to-transparent" />
+
+          {/* foreground scrolling candlesticks — spans full height band */}
           <div
-            className="absolute left-0 top-[28%] flex h-[45%] items-end gap-[6px] whitespace-nowrap will-change-transform"
-            style={{ animation: "hero-candles 40s linear infinite", width: "200%" }}
+            className="absolute left-0 top-[20%] flex h-[60%] items-center gap-[10px] whitespace-nowrap will-change-transform"
+            style={{ animation: "hero-candles 55s linear infinite", width: "220%" }}
           >
-            {Array.from({ length: 120 }).map((_, i) => {
-              // deterministic pseudo-random candle shape
-              const seed = Math.sin(i * 12.9898) * 43758.5453;
+            {Array.from({ length: 180 }).map((_, i) => {
+              const seed = Math.sin(i * 12.9898 + 7.13) * 43758.5453;
               const rand = seed - Math.floor(seed);
-              const bull = rand > 0.45;
-              const bodyH = 12 + Math.floor(rand * 60);
-              const wickH = bodyH + 10 + Math.floor(rand * 30);
-              const offsetY = Math.floor((rand - 0.5) * 60);
+              const seed2 = Math.sin(i * 78.233) * 43758.5453;
+              const rand2 = seed2 - Math.floor(seed2);
+              const bull = rand > 0.42;
+              const bodyH = 18 + Math.floor(rand * 110);
+              const wickTop = 8 + Math.floor(rand2 * 40);
+              const wickBot = 8 + Math.floor(rand * 40);
+              const offsetY = Math.floor((rand2 - 0.5) * 140);
               const color = bull ? "#10b981" : "#f43f5e";
               return (
                 <div
                   key={`c-${i}`}
-                  className="relative flex flex-col items-center justify-end"
-                  style={{ transform: `translateY(${offsetY}px)`, opacity: 0.65 }}
+                  className="relative flex flex-col items-center justify-center"
+                  style={{ transform: `translateY(${offsetY}px)`, opacity: 0.75 }}
                 >
-                  <div style={{ width: 1, height: wickH, background: color, opacity: 0.55 }} />
+                  <div style={{ width: 1, height: wickTop, background: color, opacity: 0.6 }} />
                   <div
-                    className="absolute bottom-0"
-                    style={{ width: 6, height: bodyH, background: color, boxShadow: `0 0 8px ${color}55` }}
+                    style={{
+                      width: 8,
+                      height: bodyH,
+                      background: color,
+                      boxShadow: `0 0 10px ${color}66`,
+                      borderRadius: 1,
+                    }}
                   />
+                  <div style={{ width: 1, height: wickBot, background: color, opacity: 0.6 }} />
                 </div>
               );
             })}
           </div>
 
-          {/* moving average line overlay */}
-          <svg className="absolute inset-x-0 top-[28%] h-[45%] w-full opacity-70" viewBox="0 0 1200 200" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="maGrad" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
-                <stop offset="30%" stopColor="#10b981" stopOpacity="0.9" />
-                <stop offset="70%" stopColor="#eab308" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M0 120 C 120 60, 240 140, 360 100 S 600 40, 720 110 S 960 170, 1200 90"
-              fill="none"
-              stroke="url(#maGrad)"
-              strokeWidth="1.6"
-              strokeDasharray="2400"
-              strokeDashoffset="2400"
-              style={{ animation: "hero-draw 8s ease-in-out infinite" }}
-            />
-          </svg>
-
-          {/* order book depth — left (bids) */}
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 flex w-[180px] flex-col gap-[3px] px-3">
-            {Array.from({ length: 14 }).map((_, i) => (
-              <div
-                key={`bid-${i}`}
-                className="h-[6px] rounded-r-sm bg-gradient-to-r from-emerald-500/50 to-emerald-500/0"
-                style={{ width: `${30 + ((i * 37) % 60)}%`, animation: `hero-book 3s ease-in-out ${i * 0.15}s infinite` }}
-              />
-            ))}
-          </div>
-          {/* order book depth — right (asks) */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex w-[180px] flex-col items-end gap-[3px] px-3">
-            {Array.from({ length: 14 }).map((_, i) => (
-              <div
-                key={`ask-${i}`}
-                className="h-[6px] rounded-l-sm bg-gradient-to-l from-rose-500/50 to-rose-500/0"
-                style={{ width: `${30 + ((i * 53) % 60)}%`, animation: `hero-book 3s ease-in-out ${i * 0.18}s infinite` }}
-              />
-            ))}
-          </div>
-
-          {/* scrolling ticker tape */}
+          {/* volume bars along the very bottom */}
           <div
-            className="absolute left-0 right-0 top-4 flex gap-8 whitespace-nowrap text-[10px] font-mono tracking-widest text-emerald-400/40"
-            style={{ animation: "hero-ticker 40s linear infinite" }}
+            className="absolute inset-x-0 bottom-0 flex h-[80px] items-end gap-[6px] whitespace-nowrap opacity-60 will-change-transform"
+            style={{ animation: "hero-candles 55s linear infinite", width: "220%" }}
+          >
+            {Array.from({ length: 180 }).map((_, i) => {
+              const seed = Math.sin(i * 45.11) * 43758.5453;
+              const rand = seed - Math.floor(seed);
+              const bull = rand > 0.5;
+              const h = 6 + Math.floor(rand * 60);
+              const color = bull ? "rgba(16,185,129,0.55)" : "rgba(244,63,94,0.55)";
+              return <div key={`v-${i}`} style={{ width: 8, height: h, background: color }} />;
+            })}
+          </div>
+
+          {/* diagonal scan beam sweeping across */}
+          <div
+            className="absolute inset-y-0 w-[40%]"
+            style={{
+              background:
+                "linear-gradient(100deg, transparent 0%, rgba(16,185,129,0.12) 45%, rgba(52,211,153,0.22) 50%, rgba(16,185,129,0.12) 55%, transparent 100%)",
+              filter: "blur(20px)",
+              animation: "hero-scan 9s ease-in-out infinite",
+            }}
+          />
+
+          {/* scrolling ticker tape top */}
+          <div
+            className="absolute left-0 right-0 top-4 flex gap-8 whitespace-nowrap text-[10px] font-mono tracking-widest text-emerald-400/45"
+            style={{ animation: "hero-ticker 45s linear infinite" }}
           >
             {Array.from({ length: 2 }).map((_, r) => (
               <div key={r} className="flex gap-8">
-                <span>XAU/USD 2648.32 ▲</span><span className="text-rose-400/40">DXY 106.14 ▼</span><span>XAU/EUR 2510.88 ▲</span>
-                <span>US10Y 4.28% ▲</span><span className="text-rose-400/40">XAU/GBP 2098.44 ▼</span><span className="text-rose-400/40">VIX 14.62 ▼</span>
+                <span>XAU/USD 2648.32 ▲</span><span className="text-rose-400/45">DXY 106.14 ▼</span><span>XAU/EUR 2510.88 ▲</span>
+                <span>US10Y 4.28% ▲</span><span className="text-rose-400/45">XAU/GBP 2098.44 ▼</span><span className="text-rose-400/45">VIX 14.62 ▼</span>
                 <span>XAU/JPY 4118.20 ▲</span><span>SPX 6041.7 ▲</span><span>XAU/AUD 4082.11 ▲</span>
               </div>
             ))}
           </div>
 
-          {/* vignette for readability */}
+          {/* vignette for text readability */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(ellipse at 25% 45%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 60%, #000 100%)",
+                "radial-gradient(ellipse at 22% 45%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.8) 55%, rgba(0,0,0,0.92) 100%)",
             }}
           />
         </div>
         <style>{`
           @keyframes hero-candles { from { transform: translateX(0); } to { transform: translateX(-50%); } }
           @keyframes hero-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-          @keyframes hero-grid-scroll { from { background-position: 0 0; } to { background-position: 0 40px; } }
-          @keyframes hero-draw { 0% { stroke-dashoffset: 2400; } 60% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -2400; } }
+          @keyframes hero-grid-scroll { from { background-position: 0 0; } to { background-position: 90px 45px; } }
+          @keyframes hero-pan { 0% { transform: translateX(0); } 100% { transform: translateX(-8%); } }
           @keyframes hero-level { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
-          @keyframes hero-book { 0%,100% { opacity: 0.4; transform: scaleX(1); } 50% { opacity: 1; transform: scaleX(1.08); } }
+          @keyframes hero-scan { 0% { transform: translateX(-40%); } 100% { transform: translateX(260%); } }
         `}</style>
+
 
 
         <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
