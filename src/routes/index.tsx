@@ -145,10 +145,10 @@ function useLiveTicker(): TickerRow[] {
 function TagPill({ tag, tone }: { tag: string; tone: "ink" | "green" | "muted" }) {
   const cls =
     tone === "green"
-      ? "bg-emerald-500 text-white"
+      ? "bg-white text-black"
       : tone === "muted"
-      ? "bg-zinc-700 text-white"
-      : "bg-zinc-900 text-white";
+      ? "bg-white text-black"
+      : "bg-white text-black";
   return (
     <span className={`text-[10px] px-1.5 py-0.5 rounded ${MONO} uppercase tracking-wider ${cls}`}>
       {tag}
