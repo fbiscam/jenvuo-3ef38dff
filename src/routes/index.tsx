@@ -411,18 +411,19 @@ function HomePage() {
 
           {/* floating particles */}
           <svg className="absolute inset-0 h-full w-full">
-            {Array.from({ length: 18 }).map((_, i) => {
+            {Array.from({ length: 22 }).map((_, i) => {
               const cx = (i * 73) % 1200;
               const cy = (i * 47) % 500 + 30;
+              const up = i % 2 === 0;
               return (
                 <circle
                   key={`p-${i}`}
                   cx={cx}
                   cy={cy}
-                  r={1.4}
-                  fill="#10b981"
-                  opacity="0.5"
-                  style={{ animation: `hero-float ${5 + (i % 5)}s ease-in-out ${i * 0.3}s infinite` }}
+                  r={1.6}
+                  fill={up ? "#10b981" : "#f43f5e"}
+                  opacity="0.6"
+                  style={{ animation: `${up ? "hero-float-up" : "hero-float-down"} ${5 + (i % 5)}s ease-in-out ${i * 0.3}s infinite` }}
                 />
               );
             })}
