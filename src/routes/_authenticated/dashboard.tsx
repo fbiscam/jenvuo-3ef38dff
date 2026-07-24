@@ -978,14 +978,14 @@ function DashboardLayout() {
 
 
         {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
-        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-white py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}>
+        <div className={`mt-auto shrink-0 flex items-center border-t border-white/10 bg-black py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}>
           {!sidebarCollapsed && (
             <button
               type="button"
               onClick={signOut}
               title="Sign out"
               aria-label="Sign out"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900 hover:bg-red-50 hover:text-red-600"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-white hover:bg-red-500/20 hover:text-red-400"
             >
               <Power className="h-3.5 w-3.5" strokeWidth={2.25} />
             </button>
@@ -996,7 +996,7 @@ function DashboardLayout() {
               onClick={() => setSidebarCollapsed((v) => !v)}
               title={sidebarCollapsed ? "Expand" : "Collapse"}
               aria-label={sidebarCollapsed ? "Expand" : "Collapse"}
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-white/70 hover:bg-white/10 hover:text-white"
             >
               {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <ChevronsLeft className="h-3.5 w-3.5" />}
             </button>
