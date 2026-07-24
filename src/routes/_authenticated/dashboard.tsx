@@ -1042,7 +1042,7 @@ function DashboardLayout() {
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-white/70" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span className="inline-flex items-center gap-2">
-                <span className="bg-gradient-to-b from-white via-zinc-100 to-zinc-300 bg-clip-text [-webkit-text-fill-color:transparent] drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]">{greetingText}, {fullName || "Trader"}</span>
+                <span className="text-white">{greetingText}, {fullName || "Trader"}</span>
                 <span className="hidden sm:inline text-zinc-300">·</span>
               </span>
               <Link
