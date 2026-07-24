@@ -218,7 +218,7 @@ function HomePage() {
 
         </div>
         {/* ticker strip */}
-        <div className="border-t border-white/10 overflow-hidden bg-black">
+        <div className="overflow-hidden bg-black">
           <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-white whitespace-nowrap animate-ticker`}>
 
             {[...ticker, ...ticker].map(([s, p, d], i) => (
