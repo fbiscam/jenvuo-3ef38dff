@@ -83,10 +83,10 @@ export function KillzoneClockSection() {
 
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-10">
           <div>
-            <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-emerald-500 mb-2`}>Session Intelligence · UTC</div>
             <h2 className="text-xl font-semibold tracking-tight sm:text-3xl md:text-4xl text-white">
               The killzone clock JENVU trades to.
             </h2>
+
           </div>
           <p className="max-w-md text-sm text-zinc-400 leading-relaxed">
             Every A+ setup is anchored to a killzone. This is the same 24-hour window the desk scans in real time.
