@@ -441,10 +441,10 @@
    near-black dashboard look.
    ============================================================ */
 .dash-dark {
-  --dd-bg: #0b0d12;
-  --dd-surface: #12151d;
-  --dd-surface-2: #171b25;
-  --dd-surface-3: #1d2230;
+  --dd-bg: #000000;
+  --dd-surface: #0a0a0a;
+  --dd-surface-2: #101010;
+  --dd-surface-3: #171717;
   --dd-border: rgba(255, 255, 255, 0.08);
   --dd-border-strong: rgba(255, 255, 255, 0.14);
   --dd-fg: #e7e9f0;
