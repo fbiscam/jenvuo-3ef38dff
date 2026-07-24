@@ -703,7 +703,7 @@ function HomePage() {
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
                 <col className="w-[34%]" />
-                <col className="w-[22%] bg-amber-500/10" />
+                <col className="w-[22%]" />
                 <col className="w-[22%]" />
                 <col className="w-[22%]" />
               </colgroup>
