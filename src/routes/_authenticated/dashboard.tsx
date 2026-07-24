@@ -368,19 +368,19 @@ function TickerRow({ label, symbol, decimals = 2 }: { label: string; symbol: str
   const up = (change ?? 0) >= 0;
 
   return (
-    <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-2.5 last:border-b-0">
+    <div className="flex items-center justify-between border-b border-white/10 px-4 py-2.5 last:border-b-0">
       <div className="flex items-center gap-2">
-        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-        <span className="text-[13px] font-medium text-zinc-800">{label}</span>
+        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+        <span className="text-[13px] font-medium text-white">{label}</span>
       </div>
       <div className="flex items-center gap-3">
-        <span className="font-mono text-[12px] text-zinc-600">{price != null ? price.toFixed(decimals) : "—"}</span>
+        <span className="font-mono text-[12px] text-white">{price != null ? price.toFixed(decimals) : "—"}</span>
         {change != null ? (
-          <span className={`font-mono text-[11px] ${up ? "text-emerald-600" : "text-rose-600"}`}>
+          <span className={`font-mono text-[11px] ${up ? "text-emerald-400" : "text-rose-400"}`}>
             {up ? "+" : ""}{change.toFixed(2)}%
           </span>
         ) : (
-          <span className="font-mono text-[11px] text-zinc-400">—</span>
+          <span className="font-mono text-[11px] text-white/50">—</span>
         )}
       </div>
     </div>
