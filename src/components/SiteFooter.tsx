@@ -189,7 +189,7 @@ export default function SiteFooter() {
           {columns.map((col) => (
             <div key={col.label} className="space-y-3">
               <div
-                className={`${MONO} text-sm font-black uppercase tracking-[0.25em] text-black`}
+                className={`${MONO} text-sm font-black uppercase tracking-[0.25em] text-white`}
               >
 
 
