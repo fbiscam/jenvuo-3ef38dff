@@ -541,15 +541,15 @@ function HomePage() {
                 {SIGNALS.map((s) => (
                   <div
                     key={s.pair + s.t}
-                    className={`light-card p-3 rounded-lg border border-zinc-200 bg-white text-zinc-900 space-y-2`}
+                    className={`light-card p-3 rounded-lg border border-white/10 bg-black text-white space-y-2`}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs font-semibold text-zinc-900">{s.pair}</span>
-                      <span className={`text-[10px] ${MONO} text-zinc-900`}>{s.t}</span>
+                      <span className="text-xs font-semibold text-white">{s.pair}</span>
+                      <span className={`text-[10px] ${MONO} text-white`}>{s.t}</span>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <TagPill tag={s.tag} tone={s.tone} />
-                      <span className={`text-xs ${s.tone === "green" ? "text-zinc-900" : "text-zinc-900"}`}>
+                      <span className="text-xs text-white">
                         {s.note}
                       </span>
                     </div>
