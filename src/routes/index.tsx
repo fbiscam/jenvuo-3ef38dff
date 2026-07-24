@@ -942,10 +942,12 @@ function HomePage() {
               {["OANDA XAU feeds", "Yahoo Finance", "LBMA fix", "TradingView", "COMEX / COT", "DXY"].map((n) => (
                 <span
                   key={n}
-                  className={`rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider text-zinc-900`}
+                  style={{ backgroundColor: "#ffffff", color: "#000000", borderColor: "#ffffff" }}
+                  className={`rounded-full border px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider`}
                 >
                   {n}
                 </span>
+
               ))}
             </div>
           </div>
