@@ -3,6 +3,9 @@
 @import "tw-animate-css";
 @import "@fontsource-variable/inter";
 
+/* Site-wide dark base — dashboard dark theme is now the default across all routes. */
+html, body { background-color: #000 !important; color: #fff; }
+
 @utility price-font {
   font-family: "Inter Variable", "Inter", system-ui, sans-serif;
   font-weight: 700;
