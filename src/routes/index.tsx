@@ -301,34 +301,62 @@ function HomePage() {
       <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28 overflow-hidden">
         {/* trading background animation — desktop + tablet only */}
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block">
-          {/* grid */}
+          {/* pulsing green glow */}
           <div
-            className="absolute inset-0 opacity-[0.18]"
+            className="absolute -left-24 top-1/3 h-[420px] w-[420px] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(16,185,129,0.28), transparent 70%)", animation: "hero-pulse 6s ease-in-out infinite" }}
+          />
+          <div
+            className="absolute right-0 top-10 h-[360px] w-[360px] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(239,68,68,0.18), transparent 70%)", animation: "hero-pulse 8s ease-in-out infinite 1.5s" }}
+          />
+          {/* scrolling grid */}
+          <div
+            className="absolute inset-0 opacity-[0.2]"
             style={{
               backgroundImage:
-                "linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px)",
+                "linear-gradient(to right, rgba(255,255,255,0.09) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.09) 1px, transparent 1px)",
               backgroundSize: "48px 48px",
               maskImage: "radial-gradient(ellipse at center, black 55%, transparent 90%)",
               WebkitMaskImage: "radial-gradient(ellipse at center, black 55%, transparent 90%)",
+              animation: "hero-grid 12s linear infinite",
             }}
           />
-          {/* candlesticks */}
+          {/* sweeping beam */}
+          <div
+            className="absolute inset-y-0 -left-1/3 w-1/3"
+            style={{
+              background: "linear-gradient(90deg, transparent, rgba(16,185,129,0.12), transparent)",
+              animation: "hero-sweep 7s linear infinite",
+            }}
+          />
+          {/* candlesticks + price line */}
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1200 500" preserveAspectRatio="none">
             <defs>
               <linearGradient id="lineGrad" x1="0" x2="1" y1="0" y2="0">
                 <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
-                <stop offset="50%" stopColor="#10b981" stopOpacity="0.55" />
+                <stop offset="50%" stopColor="#10b981" stopOpacity="0.65" />
+                <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient id="areaGrad" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0.28" />
                 <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
               </linearGradient>
             </defs>
-            {/* scrolling price line */}
+            {/* scrolling price area + line */}
             <g style={{ animation: "hero-scroll 22s linear infinite" }}>
+              <polygon
+                fill="url(#areaGrad)"
+                points="0,500 0,320 60,300 120,340 180,280 240,310 300,240 360,270 420,220 480,260 540,200 600,230 660,180 720,220 780,170 840,200 900,150 960,190 1020,140 1080,170 1140,120 1200,150 1260,110 1320,140 1380,90 1440,120 1500,70 1560,100 1620,50 1680,80 1740,30 1800,60 1860,20 1920,50 1980,10 2040,40 2100,0 2160,30 2220,-10 2280,20 2280,500"
+              />
               <polyline
                 fill="none"
                 stroke="url(#lineGrad)"
-                strokeWidth="1.5"
+                strokeWidth="1.6"
                 points="0,320 60,300 120,340 180,280 240,310 300,240 360,270 420,220 480,260 540,200 600,230 660,180 720,220 780,170 840,200 900,150 960,190 1020,140 1080,170 1140,120 1200,150 1260,110 1320,140 1380,90 1440,120 1500,70 1560,100 1620,50 1680,80 1740,30 1800,60 1860,20 1920,50 1980,10 2040,40 2100,0 2160,30 2220,-10 2280,20"
               />
+              {/* pulsing tracer dot on the line */}
+              <circle r="4" fill="#10b981" style={{ animation: "hero-tracer 22s linear infinite, hero-blink 1.2s ease-in-out infinite" }} />
             </g>
             {/* candles */}
             {Array.from({ length: 26 }).map((_, i) => {
@@ -352,6 +380,22 @@ function HomePage() {
                 </g>
               );
             })}
+            {/* floating particles */}
+            {Array.from({ length: 14 }).map((_, i) => {
+              const cx = (i * 89) % 1200;
+              const cy = (i * 53) % 460 + 20;
+              return (
+                <circle
+                  key={`p-${i}`}
+                  cx={cx}
+                  cy={cy}
+                  r={1.4}
+                  fill="#10b981"
+                  opacity="0.5"
+                  style={{ animation: `hero-float ${5 + (i % 5)}s ease-in-out ${i * 0.3}s infinite` }}
+                />
+              );
+            })}
           </svg>
           {/* soft vignette to keep text readable */}
           <div
@@ -364,8 +408,15 @@ function HomePage() {
         </div>
         <style>{`
           @keyframes hero-scroll { from { transform: translateX(0); } to { transform: translateX(-1080px); } }
-          @keyframes hero-candle { 0%,100% { transform: scaleY(1); opacity: 0.3; } 50% { transform: scaleY(1.15); opacity: 0.55; } }
+          @keyframes hero-candle { 0%,100% { transform: scaleY(1); opacity: 0.3; } 50% { transform: scaleY(1.2); opacity: 0.6; } }
+          @keyframes hero-pulse { 0%,100% { transform: scale(1); opacity: 0.75; } 50% { transform: scale(1.15); opacity: 1; } }
+          @keyframes hero-grid { from { background-position: 0 0; } to { background-position: 48px 48px; } }
+          @keyframes hero-sweep { 0% { transform: translateX(0); } 100% { transform: translateX(500%); } }
+          @keyframes hero-tracer { 0% { transform: translate(0,0); } 100% { transform: translate(1080px,-170px); } }
+          @keyframes hero-blink { 0%,100% { opacity: 0.4; r: 3; } 50% { opacity: 1; r: 5; } }
+          @keyframes hero-float { 0%,100% { transform: translateY(0); opacity: 0.35; } 50% { transform: translateY(-14px); opacity: 0.75; } }
         `}</style>
+
         <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
 
           <div className="text-left lg:col-span-7 lg:text-left">
