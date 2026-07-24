@@ -664,7 +664,7 @@ function HomePage() {
                 Jenvu routes liquidity, structure and news context across every XAU pair&nbsp;
               </p>
             </div>
-            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
+            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-emerald-500 border border-emerald-500 rounded-xl overflow-hidden">
               {[
                 ["XAU / USD", "Primary bullion benchmark"],
                 ["XAU / EUR", "European gold demand"],
