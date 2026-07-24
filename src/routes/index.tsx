@@ -673,7 +673,7 @@ function HomePage() {
                 ["XAU / AUD", "Asia-Pacific miners"],
                 ["XAU / CHF", "Swiss safe-haven flows"],
               ].map(([k, v]) => (
-                <div key={k} className="bg-emerald-50 p-5 text-left sm:text-left">
+                <div key={k} className="bg-black p-5 text-left sm:text-left">
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
                   <div className="mt-2 text-sm font-medium tracking-tight whitespace-nowrap">{v}</div>
                 </div>
