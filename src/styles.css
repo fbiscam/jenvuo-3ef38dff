@@ -445,9 +445,9 @@ html, body { background-color: #000 !important; color: #fff; }
    ============================================================ */
 .dash-dark {
   --dd-bg: #000000;
-  --dd-surface: #0a0a0a;
-  --dd-surface-2: #101010;
-  --dd-surface-3: #171717;
+  --dd-surface: #000000;
+  --dd-surface-2: #000000;
+  --dd-surface-3: #050505;
   --dd-border: rgba(255, 255, 255, 0.08);
   --dd-border-strong: rgba(255, 255, 255, 0.14);
   --dd-fg: #ffffff;
