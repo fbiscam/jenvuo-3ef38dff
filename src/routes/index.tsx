@@ -459,7 +459,7 @@ function HomePage() {
                       <div
                         key={i}
                         className={`flex-1 rounded-t-sm ${
-                          h > 70 ? "bg-zinc-900" : h > 50 ? "bg-zinc-400" : "bg-zinc-200"
+                          h > 70 ? "bg-white" : h > 50 ? "bg-white/70" : "bg-white/40"
                         }`}
                         style={{ height: `${h}%` }}
                       />
