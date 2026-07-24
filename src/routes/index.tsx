@@ -184,21 +184,21 @@ function HomePage() {
     <>
     <div className={`jenvu-zoom min-h-dvh w-full bg-black text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
-      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-black/85 backdrop-blur-md">
         <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+            <span className="truncate text-[22px] tracking-tight leading-none text-white" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
 
-          <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
-            <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
-            <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
-            <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
-            <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
-            <Link to="/about" className="hover:text-zinc-900">About</Link>
+          <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-white`}>
+            <Link to="/signal" className="hover:text-white/80">Signal Engine</Link>
+            <Link to="/signals-live" className="hover:text-white/80">Signals Live</Link>
+            <Link to="/ai-engine" className="hover:text-white/80">AI Engine</Link>
+            <Link to="/founding" className="hover:text-white/80">Founding</Link>
+            <Link to="/about" className="hover:text-white/80">About</Link>
 
-            <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
+            <Link to="/contact" className="hover:text-white/80">Contact</Link>
           </nav>
           <div className="flex items-center gap-2">
             <div className={isAuthed ? "" : "hidden md:block"}>
@@ -210,7 +210,7 @@ function HomePage() {
                 aria-label="Open menu"
                 aria-expanded={mobileMenuOpen}
                 onClick={() => setMobileMenuOpen(true)}
-                className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+                className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black text-white hover:bg-white/10"
               >
                 <Menu className="h-4 w-4" />
               </button>
@@ -220,20 +220,21 @@ function HomePage() {
 
         </div>
         {/* ticker strip */}
-        <div className="border-t border-zinc-100 overflow-hidden">
-          <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap animate-ticker`}>
+        <div className="border-t border-white/10 overflow-hidden">
+          <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-white whitespace-nowrap animate-ticker`}>
             {[...ticker, ...ticker].map(([s, p, d], i) => (
               <span key={i} className="flex items-center gap-2">
-                <span className="text-zinc-900 font-medium">{s}</span>
+                <span className="text-white font-medium">{s}</span>
                 <span>{p}</span>
-                <span className={d === "…" ? "text-zinc-500" : d.startsWith("-") ? "text-red-600" : "text-emerald-700"}>{d}</span>
-                <span className="text-zinc-200">•</span>
+                <span className={d === "…" ? "text-white/50" : d.startsWith("-") ? "text-red-400" : "text-emerald-400"}>{d}</span>
+                <span className="text-white/20">•</span>
               </span>
             ))}
           </div>
         </div>
 
       </header>
+
 
       {/* Mobile menu (signed-out users) */}
       {!isAuthed && mobileMenuOpen && (
