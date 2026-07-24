@@ -547,3 +547,58 @@
 
 /* Backdrop softener for mobile overlay */
 .dash-dark .bg-black\/30 { background-color: rgba(0,0,0,0.55) !important; }
+
+/* Buttons: force primary/dark buttons to white bg + black text */
+.dash-dark button.bg-black,
+.dash-dark a.bg-black,
+.dash-dark button.bg-zinc-900,
+.dash-dark a.bg-zinc-900,
+.dash-dark button.bg-zinc-950,
+.dash-dark a.bg-zinc-950,
+.dash-dark button.bg-neutral-900,
+.dash-dark a.bg-neutral-900,
+.dash-dark button.bg-gray-900,
+.dash-dark a.bg-gray-900,
+.dash-dark button.bg-slate-900,
+.dash-dark a.bg-slate-900,
+.dash-dark .btn-primary,
+.dash-dark button[class*="bg-primary"],
+.dash-dark a[class*="bg-primary"] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+.dash-dark button.bg-black:hover,
+.dash-dark a.bg-black:hover,
+.dash-dark button.bg-zinc-900:hover,
+.dash-dark a.bg-zinc-900:hover,
+.dash-dark button.bg-zinc-950:hover,
+.dash-dark a.bg-zinc-950:hover,
+.dash-dark button.bg-neutral-900:hover,
+.dash-dark a.bg-neutral-900:hover,
+.dash-dark button.bg-gray-900:hover,
+.dash-dark a.bg-gray-900:hover,
+.dash-dark button.bg-slate-900:hover,
+.dash-dark a.bg-slate-900:hover,
+.dash-dark .btn-primary:hover,
+.dash-dark button[class*="bg-primary"]:hover,
+.dash-dark a[class*="bg-primary"]:hover {
+  background-color: rgba(255,255,255,0.9) !important;
+  color: #000000 !important;
+}
+/* Nested text/icon color inside white buttons */
+.dash-dark button.bg-black *,
+.dash-dark a.bg-black *,
+.dash-dark button.bg-zinc-900 *,
+.dash-dark a.bg-zinc-900 *,
+.dash-dark button.bg-neutral-900 *,
+.dash-dark a.bg-neutral-900 *,
+.dash-dark button.bg-gray-900 *,
+.dash-dark a.bg-gray-900 *,
+.dash-dark button.bg-slate-900 *,
+.dash-dark a.bg-slate-900 *,
+.dash-dark button[class*="bg-primary"] *,
+.dash-dark a[class*="bg-primary"] * {
+  color: #000000 !important;
+}
+
