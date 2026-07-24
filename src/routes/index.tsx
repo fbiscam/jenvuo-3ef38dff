@@ -824,14 +824,14 @@ function HomePage() {
                     {[row.b, row.c, row.d].map((v, i) => (
                       <td
                         key={i}
-                        className={`px-2 py-3.5 text-center border-l border-white/10 min-w-[120px] ${i === 0 ? "bg-amber-500/10" : ""}`}
+                        className="px-2 py-3.5 text-center border-l border-white/10 min-w-[120px] bg-black"
                       >
                         {v === true ? (
                           <span className="inline-block h-1.5 w-1.5 rounded-full bg-white" />
                         ) : v === false ? (
                           <span className="inline-block h-px w-4 bg-white/30" />
                         ) : (
-                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-white font-semibold" : "text-white/80"}`}>
+                          <span className={`${MONO} text-[11px] tracking-wider text-white ${row.isHeading ? "font-semibold" : ""}`}>
                             {v}
                           </span>
                         )}
