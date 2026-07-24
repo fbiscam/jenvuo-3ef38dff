@@ -703,7 +703,7 @@ function HomePage() {
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
                 <col className="w-[34%]" />
-                <col className="w-[22%] bg-amber-500/10" />
+                <col className="w-[22%]" />
                 <col className="w-[22%]" />
                 <col className="w-[22%]" />
               </colgroup>
@@ -731,10 +731,10 @@ function HomePage() {
                     return (
                     <th
                       key={p.name}
-                      className={`p-6 text-left align-top border-l border-white/10 ${isCurrent ? "bg-emerald-500/10" : p.accent ? "bg-amber-500/10" : ""}`}
+                      className="p-6 text-left align-top border-l border-white/10 bg-black"
                     >
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-white"}`}>{p.name}</span>
+                        <span className="text-base font-semibold text-white">{p.name}</span>
                         {isCurrent && (
                           <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
                             Current
@@ -755,7 +755,7 @@ function HomePage() {
                       <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-white/60`}>{p.tag}</p>
 
                       {isCurrent ? (
-                        <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
+                        <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-white/20 bg-black px-3 py-1.5 text-xs font-medium text-white">
                           Active
                         </div>
                       ) : disabled ? (
@@ -807,16 +807,16 @@ function HomePage() {
                 ] as ReadonlyArray<{ f: string; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
                   <tr
                     key={row.f}
-                    className={`border-t border-white/10 ${idx % 2 === 1 ? "bg-white/5" : ""} hover:bg-white/5 transition`}
+                    className="border-t border-white/10 bg-black hover:bg-white/5 transition"
                   >
-                    <td className="px-6 py-3.5 text-white/90">
+                    <td className="px-6 py-3.5 text-white">
                       <div className="flex items-center gap-2">
                         {row.badge && (
-                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-white font-bold`}>
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-white text-black font-bold`}>
                             {row.badge}
                           </span>
                         )}
-                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-white/60" : ""}>
+                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-white" : "text-white"}>
                           {row.f}
                         </span>
                       </div>
@@ -824,14 +824,14 @@ function HomePage() {
                     {[row.b, row.c, row.d].map((v, i) => (
                       <td
                         key={i}
-                        className={`px-2 py-3.5 text-center border-l border-white/10 min-w-[120px] ${i === 0 ? "bg-amber-500/10" : ""}`}
+                        className="px-2 py-3.5 text-center border-l border-white/10 min-w-[120px] bg-black"
                       >
                         {v === true ? (
                           <span className="inline-block h-1.5 w-1.5 rounded-full bg-white" />
                         ) : v === false ? (
                           <span className="inline-block h-px w-4 bg-white/30" />
                         ) : (
-                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-white font-semibold" : "text-white/80"}`}>
+                          <span className={`${MONO} text-[11px] tracking-wider text-white ${row.isHeading ? "font-semibold" : ""}`}>
                             {v}
                           </span>
                         )}
