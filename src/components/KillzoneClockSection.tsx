@@ -95,7 +95,7 @@ export function KillzoneClockSection() {
 
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           {/* CLOCK */}
-          <div className="relative rounded-2xl border border-zinc-800 bg-[#050505] p-6 overflow-hidden">
+          <div className="relative rounded-2xl bg-[#050505] p-6 overflow-hidden">
             {/* Ambient */}
             <div className="pointer-events-none absolute inset-0 opacity-40" style={{
               background: "radial-gradient(circle at 50% 50%, rgba(16,185,129,0.08), transparent 60%)"
