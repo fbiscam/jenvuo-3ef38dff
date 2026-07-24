@@ -313,8 +313,10 @@ function HomePage() {
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
                 to={isAuthed ? "/app" : "/auth"}
-                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium text-white shadow-[0_8px_24px_-8px_rgba(16,185,129,0.55)]"
+                style={{ backgroundColor: "#10b981" }}
               >
+                <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
                 Launch Voice Agent
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
@@ -333,9 +335,9 @@ function HomePage() {
                 ["Frameworks", "ICT, SMC"],
                 ["Avg. R:R", "1 : 3.2"],
               ].map(([k, v]) => (
-                <div key={k} style={{ backgroundColor: "#2a2a2a" }} className="p-5 text-left sm:text-left">
-                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-white`}>{k}</div>
-                  <div className="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">{v}</div>
+                <div key={k} style={{ backgroundColor: "#2a2a2a" }} className="p-5 text-left sm:text-left border-l-2" >
+                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-white/70`}>{k}</div>
+                  <div className="mt-2 text-lg font-semibold tracking-tight sm:text-xl" style={{ color: "#10b981" }}>{v}</div>
                 </div>
               ))}
             </div>
@@ -353,9 +355,9 @@ function HomePage() {
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="flex gap-1.5 shrink-0">
-                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#ffffff" }} />
-                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#ffffff" }} />
-                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#ffffff" }} />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#ef4444" }} />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#f59e0b" }} />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#10b981" }} />
               </div>
               <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
                 Jenvu // SYSTEM_ACTIVE
