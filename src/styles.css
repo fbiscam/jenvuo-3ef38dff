@@ -608,11 +608,11 @@ html, body { background-color: #000 !important; color: #fff; }
 /* Escape hatch: force a white card with black text inside dash-dark */
 .dash-dark .light-card,
 .dash-dark .light-card.bg-white { background-color: #ffffff !important; color: #000000 !important; border-color: #e4e4e7 !important; }
-.dash-dark .light-card *,
 .dash-dark .light-card .text-zinc-900,
 .dash-dark .light-card .text-zinc-800,
 .dash-dark .light-card .text-zinc-700,
 .dash-dark .light-card .text-zinc-600,
 .dash-dark .light-card .text-black { color: #000000 !important; }
+.dash-dark .light-card .text-white { color: #ffffff !important; }
 
 
