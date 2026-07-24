@@ -432,9 +432,9 @@ function HomePage() {
       {/* TERMINAL WORKSTATION */}
       <section className="mx-auto max-w-6xl px-5 mt-8 pb-14 sm:px-6 sm:mt-10 sm:pb-20">
 
-        <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+        <div className="rounded-2xl border border-emerald-500 bg-white overflow-hidden">
           {/* terminal header */}
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-emerald-500 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="flex gap-1.5 shrink-0">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#ef4444" }} />
@@ -459,7 +459,7 @@ function HomePage() {
           </div>
 
           {/* body */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-emerald-500">
             {/* LEFT — ICT feed */}
             <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-5 sm:gap-6">
               <h2 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
@@ -524,7 +524,7 @@ function HomePage() {
             </div>
 
             {/* RIGHT — intelligence */}
-            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100">
+            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-emerald-500">
               <h2 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase mb-4`}>
                 Intelligence Dashboard
               </h2>
@@ -578,7 +578,7 @@ function HomePage() {
           </div>
 
           {/* status bar */}
-          <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-white flex justify-start sm:justify-between items-center gap-3">
+          <div className="px-4 sm:px-6 py-2 border-t border-emerald-500 bg-white flex justify-start sm:justify-between items-center gap-3">
             <div className="flex gap-4 sm:gap-6 items-center">
               <div className="flex items-center gap-1.5">
                 <span className={`text-[10px] ${MONO} text-zinc-900`}>CPU</span>
