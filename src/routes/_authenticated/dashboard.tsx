@@ -851,7 +851,8 @@ function DashboardLayout() {
   }, [displayRemaining, credits.isLoading, credits.allowance]);
 
   return (
-    <div className="dash-dark flex bg-black text-zinc-100 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
+    <div className="dash-dark flex min-h-screen bg-black text-zinc-100 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
+      <style>{`html, body { background-color: #000 !important; }`}</style>
 
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
