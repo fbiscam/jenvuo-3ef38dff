@@ -871,26 +871,15 @@ function DashboardLayout() {
         style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
       >
         <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }
-        /* Shiny white overrides */
+        /* Black sidebar with plain white text & icons */
         .dashboard-sidebar-root, .dashboard-sidebar-root nav, .dashboard-sidebar-root aside { background: #000 !important; }
         .dashboard-sidebar-root { border-color: rgba(255,255,255,0.08) !important; }
         .dashboard-sidebar-root [class*="border-zinc-200"], .dashboard-sidebar-root [class*="border-t"], .dashboard-sidebar-root [class*="border-b"] { border-color: rgba(255,255,255,0.1) !important; }
-        .dashboard-sidebar-root [class*="bg-white"], .dashboard-sidebar-root [class*="bg-zinc-50"], .dashboard-sidebar-root [class*="bg-zinc-100"] { background-color: rgba(255,255,255,0.06) !important; }
-        .dashboard-sidebar-root a, .dashboard-sidebar-root span, .dashboard-sidebar-root button, .dashboard-sidebar-root div {
-          color: #ffffff !important;
-        }
-        .dashboard-sidebar-root a span:not(.material-symbols-rounded), .dashboard-sidebar-root .brand-text {
-          background: linear-gradient(180deg, #ffffff 0%, #f4f4f5 45%, #d4d4d8 100%);
-          -webkit-background-clip: text; background-clip: text;
-          -webkit-text-fill-color: transparent; color: transparent !important;
-          text-shadow: 0 1px 1px rgba(255,255,255,0.15);
-        }
-        .dashboard-sidebar-root .material-symbols-rounded {
-          color: #ffffff !important;
-          filter: drop-shadow(0 0 4px rgba(255,255,255,0.55));
-        }
+        .dashboard-sidebar-root [class*="bg-white"], .dashboard-sidebar-root [class*="bg-zinc-50"], .dashboard-sidebar-root [class*="bg-zinc-100"] { background-color: rgba(255,255,255,0.08) !important; }
+        .dashboard-sidebar-root a, .dashboard-sidebar-root span, .dashboard-sidebar-root button, .dashboard-sidebar-root div { color: #ffffff !important; }
+        .dashboard-sidebar-root .material-symbols-rounded { color: #ffffff !important; }
         .dashboard-sidebar-root svg { color: #ffffff !important; }
-        .dashboard-sidebar-root img { filter: brightness(0) invert(1) drop-shadow(0 0 6px rgba(255,255,255,0.5)); }
+        .dashboard-sidebar-root .brand-logo { filter: brightness(0) invert(1); }
         `}</style>
         {/* Brand */}
         <div className={`flex h-11 shrink-0 items-center gap-2.5 ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
