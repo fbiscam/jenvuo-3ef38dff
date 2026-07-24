@@ -701,7 +701,7 @@ function HomePage() {
             <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+          <div className="overflow-x-auto rounded-2xl border border-white/15 bg-black">
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
                 <col className="w-[34%]" />
