@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
-import { LiveMarketTerminal } from "@/components/LiveMarketTerminal";
 
 
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -146,19 +145,15 @@ function useLiveTicker(): TickerRow[] {
 function TagPill({ tag, tone }: { tag: string; tone: "ink" | "green" | "muted" }) {
   const cls =
     tone === "green"
-      ? "bg-white text-black"
+      ? "bg-emerald-500 text-white"
       : tone === "muted"
-      ? "bg-white text-black"
-      : "bg-white text-black";
+      ? "bg-zinc-200 text-zinc-900"
+      : "bg-zinc-900 text-white";
   return (
-    <span
-      className={`text-[10px] px-1.5 py-0.5 rounded ${MONO} uppercase tracking-wider ${cls}`}
-      style={{ backgroundColor: "#ffffff", color: "#000000" }}
-    >
+    <span className={`text-[10px] px-1.5 py-0.5 rounded ${MONO} uppercase tracking-wider ${cls}`}>
       {tag}
     </span>
   );
-
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -187,21 +182,23 @@ function HomePage() {
   }, [mobileMenuOpen]);
   return (
     <>
-    <div className={`jenvu-zoom min-h-dvh w-full bg-black text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+    <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
-      <header className="sticky top-0 z-50 bg-black/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[22px] tracking-tight leading-none text-white" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+            <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
 
-          <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-white`}>
-            <Link to="/signal" className="hover:text-white/80">Signal Engine</Link>
-            <Link to="/signals-live" className="hover:text-white/80">Signals Live</Link>
-            <Link to="/ai-engine" className="hover:text-white/80">AI Engine</Link>
-            <Link to="/founding" className="hover:text-white/80">Founding</Link>
-            <Link to="/contact" className="hover:text-white/80">Contact</Link>
+          <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
+            <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
+            <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
+            <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
+            <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
+            <Link to="/about" className="hover:text-zinc-900">About</Link>
+
+            <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
           </nav>
           <div className="flex items-center gap-2">
             <div className={isAuthed ? "" : "hidden md:block"}>
@@ -213,7 +210,7 @@ function HomePage() {
                 aria-label="Open menu"
                 aria-expanded={mobileMenuOpen}
                 onClick={() => setMobileMenuOpen(true)}
-                className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black text-white hover:bg-white/10"
+                className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
               >
                 <Menu className="h-4 w-4" />
               </button>
@@ -223,22 +220,20 @@ function HomePage() {
 
         </div>
         {/* ticker strip */}
-        <div className="overflow-hidden bg-black">
-          <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-white whitespace-nowrap animate-ticker`}>
-
+        <div className="border-t border-zinc-100 overflow-hidden">
+          <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap animate-ticker`}>
             {[...ticker, ...ticker].map(([s, p, d], i) => (
               <span key={i} className="flex items-center gap-2">
-                <span className="text-white font-medium">{s}</span>
+                <span className="text-zinc-900 font-medium">{s}</span>
                 <span>{p}</span>
-                <span className={d === "…" ? "text-white/50" : d.startsWith("-") ? "text-red-400" : "text-emerald-400"}>{d}</span>
-                <span className="text-white/20">•</span>
+                <span className={d === "…" ? "text-zinc-500" : d.startsWith("-") ? "text-red-600" : "text-emerald-700"}>{d}</span>
+                <span className="text-zinc-200">•</span>
               </span>
             ))}
           </div>
         </div>
 
       </header>
-
 
       {/* Mobile menu (signed-out users) */}
       {!isAuthed && mobileMenuOpen && (
@@ -301,89 +296,8 @@ function HomePage() {
 
       <main>
       {/* HERO */}
-      <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28 overflow-hidden">
-        {/* original hero background — desktop + tablet only */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block overflow-hidden">
-          {/* base wash */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(ellipse 55% 45% at 80% 20%, rgba(16,185,129,0.18), transparent 65%), radial-gradient(ellipse 55% 45% at 15% 85%, rgba(244,63,94,0.12), transparent 65%), #000",
-            }}
-          />
-
-          {/* subtle grid */}
-          <div
-            className="absolute inset-0 opacity-[0.18]"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)",
-              backgroundSize: "80px 40px",
-              maskImage: "radial-gradient(ellipse 85% 75% at 50% 50%, black 55%, transparent 100%)",
-              WebkitMaskImage: "radial-gradient(ellipse 85% 75% at 50% 50%, black 55%, transparent 100%)",
-            }}
-          />
-
-          {/* animated price line */}
-          <svg className="absolute inset-0 h-full w-full opacity-70" viewBox="0 0 1600 600" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="priceLine" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0%" stopColor="#10b981" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#34d399" stopOpacity="0.9" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M0 400 C 150 320, 280 460, 440 380 S 720 240, 900 340 S 1200 200, 1400 300 L 1600 260"
-              fill="none"
-              stroke="url(#priceLine)"
-              strokeWidth="2"
-              strokeDasharray="2400"
-              strokeDashoffset="2400"
-              style={{ animation: "hero-draw 6s ease-out forwards" }}
-            />
-          </svg>
-
-          {/* scrolling candlesticks */}
-          <div
-            className="absolute left-0 top-[35%] flex h-[30%] items-center gap-[10px] whitespace-nowrap will-change-transform"
-            style={{ animation: "hero-candles 60s linear infinite", width: "200%" }}
-          >
-            {Array.from({ length: 120 }).map((_, i) => {
-              const seed = Math.sin(i * 12.9898 + 7.13) * 43758.5453;
-              const rand = seed - Math.floor(seed);
-              const bull = rand > 0.45;
-              const bodyH = 14 + Math.floor(rand * 70);
-              const color = bull ? "#10b981" : "#f43f5e";
-              return (
-                <div key={`c-${i}`} className="flex flex-col items-center" style={{ opacity: 0.55 }}>
-                  <div style={{ width: 1, height: 12, background: color, opacity: 0.6 }} />
-                  <div style={{ width: 6, height: bodyH, background: color, borderRadius: 1 }} />
-                  <div style={{ width: 1, height: 12, background: color, opacity: 0.6 }} />
-                </div>
-              );
-            })}
-          </div>
-
-          {/* vignette */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(ellipse at 25% 45%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.8) 55%, rgba(0,0,0,0.92) 100%)",
-            }}
-          />
-        </div>
-        <style>{`
-          @keyframes hero-candles { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-          @keyframes hero-draw { to { stroke-dashoffset: 0; } }
-        `}</style>
-
-
-
-
+      <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
         <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
-
           <div className="text-left lg:col-span-7 lg:text-left">
 
             <h1 className="mt-5 max-w-3xl text-[28px] font-semibold tracking-tight leading-[1.1] sm:text-[42px] md:text-[56px] lg:mx-0 text-zinc-900">
@@ -397,8 +311,7 @@ function HomePage() {
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
                 to={isAuthed ? "/app" : "/auth"}
-                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium"
-                style={{ backgroundColor: "#10b981", color: "#000000" }}
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
               >
                 Launch Voice Agent
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
@@ -412,15 +325,15 @@ function HomePage() {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="grid grid-cols-1 sm:grid-cols-3 rounded-xl border border-white/10 overflow-hidden divide-y divide-white/10 sm:divide-y-0 sm:divide-x sm:divide-white/10" style={{ backgroundColor: "#000000" }}>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)]">
               {[
                 ["Markets", "XAU"],
                 ["Frameworks", "ICT, SMC"],
                 ["Avg. R:R", "1 : 3.2"],
               ].map(([k, v]) => (
-                <div key={k} className="p-5 text-left">
-                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-white`}>{k}</div>
-                  <div className="mt-2 text-lg font-semibold tracking-tight sm:text-xl text-white">{v}</div>
+                <div key={k} className="bg-white p-5 text-left text-zinc-900 sm:text-left transition-colors hover:bg-zinc-50/60">
+                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>{k}</div>
+                  <div className="mt-2 text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">{v}</div>
                 </div>
               ))}
             </div>
@@ -438,9 +351,9 @@ function HomePage() {
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="flex gap-1.5 shrink-0">
-                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#ef4444" }} />
-                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#f59e0b" }} />
-                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#10b981" }} />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
               </div>
               <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
                 Jenvu // SYSTEM_ACTIVE
@@ -470,15 +383,19 @@ function HomePage() {
                 {SIGNALS.map((s) => (
                   <div
                     key={s.pair + s.t}
-                    className={`p-3 rounded-lg border border-white/10 bg-black text-white space-y-2`}
+                    className={`p-3 rounded-lg border ${
+                      s.tone === "green"
+                        ? "border-emerald-100/70 bg-emerald-50/30"
+                        : "border-zinc-100 bg-white/40"
+                    } space-y-2`}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs font-semibold text-white">{s.pair}</span>
-                      <span className={`text-[10px] ${MONO} text-white`}>{s.t}</span>
+                      <span className="text-xs font-semibold">{s.pair}</span>
+                      <span className={`text-[10px] ${MONO} text-zinc-900`}>{s.t}</span>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <TagPill tag={s.tag} tone={s.tone} />
-                      <span className="text-xs text-white">
+                      <span className={`text-xs ${s.tone === "green" ? "text-zinc-900" : "text-zinc-900"}`}>
                         {s.note}
                       </span>
                     </div>
@@ -535,19 +452,20 @@ function HomePage() {
                     <span className={`text-[10px] ${MONO} text-zinc-900 uppercase`}>DXY Index</span>
                     <span className="text-xs font-semibold">104.22</span>
                   </div>
-                  <div className="h-16 w-full bg-black rounded border border-zinc-200 flex items-end p-2 gap-0.5">
+                  <div className="h-16 w-full bg-white rounded border border-zinc-100 flex items-end p-2 gap-0.5">
                     {[50, 66, 75, 33, 50, 66, 50, 80, 40].map((h, i) => (
                       <div
                         key={i}
-                        className="flex-1 rounded-t-sm"
-                        style={{ height: `${h}%`, backgroundColor: "#10b981", opacity: 0.4 + (h / 100) * 0.6 }}
+                        className={`flex-1 rounded-t-sm ${
+                          h > 70 ? "bg-zinc-900" : h > 50 ? "bg-zinc-400" : "bg-zinc-200"
+                        }`}
+                        style={{ height: `${h}%` }}
                       />
                     ))}
                   </div>
-
                 </div>
 
-                <div className="space-y-3 p-3 rounded-lg" style={{ backgroundColor: "#2a2a2a" }}>
+                <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-zinc-900">Institutional Sentiment</span>
                     <span className="text-xs font-medium text-emerald-600">Bullish</span>
@@ -598,14 +516,14 @@ function HomePage() {
       </section>
 
       {/* CAPABILITIES */}
-      <section>
+      <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-5 py-10 text-left sm:px-6 sm:py-14 md:text-left">
           
           <h2 className="mt-4 max-w-3xl text-xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl md:whitespace-nowrap">
             <span className="sm:hidden">Built like a trading desk<br />spoken just like a real partner</span>
             <span className="hidden sm:inline">Built like a trading desk, spoken like a partner.</span>
           </h2>
-          <div className="mt-12 grid gap-px bg-emerald-500 border border-emerald-500 rounded-2xl overflow-hidden md:grid-cols-3">
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
             {[
               {
                 k: "01",
@@ -653,7 +571,7 @@ function HomePage() {
       </section>
 
       {/* COVERAGE */}
-      <section className="bg-black">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
             <div className="text-left lg:col-span-4 lg:text-left">
@@ -665,7 +583,7 @@ function HomePage() {
                 Jenvu routes liquidity, structure and news context across every XAU pair&nbsp;
               </p>
             </div>
-            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-emerald-500 border border-emerald-500 rounded-xl overflow-hidden">
+            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
               {[
                 ["XAU / USD", "Primary bullion benchmark"],
                 ["XAU / EUR", "European gold demand"],
@@ -674,7 +592,7 @@ function HomePage() {
                 ["XAU / AUD", "Asia-Pacific miners"],
                 ["XAU / CHF", "Swiss safe-haven flows"],
               ].map(([k, v]) => (
-                <div key={k} className="bg-black p-5 text-left sm:text-left">
+                <div key={k} className="bg-white p-5 text-left sm:text-left">
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
                   <div className="mt-2 text-sm font-medium tracking-tight whitespace-nowrap">{v}</div>
                 </div>
@@ -684,11 +602,40 @@ function HomePage() {
         </div>
       </section>
 
-      {/* LIVE XAU MARKET TERMINAL */}
-      <LiveMarketTerminal />
+      {/* CHANGELOG */}
+      <section className="border-t border-zinc-100 bg-white/40">
+        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
+          <div className="mb-8 flex flex-col items-start justify-start gap-2 text-left sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:text-left">
+            <div>
+              <h2 className="text-xl font-semibold tracking-tight sm:text-3xl">Recent shipments</h2>
+            </div>
+            <span className={`${MONO} text-[11px] text-zinc-900`}>v2.04.1 · stable</span>
+          </div>
+          <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+            {[
+              ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions."],
+              ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts."],
+              ["2026.05.30", "v2.02", "Red-folder USD, EUR, GBP, JPY, AUD & CHF news injected per XAU cross."],
+              ["2026.05.12", "v2.01", "Push-to-talk replaces always-on; cleaner mic control."],
+              ["2026.04.28", "v2.00", "Voice-native rewrite. New orb. New signal engine."],
+            ].map(([d, v, n], i) => (
+              <div
+                key={v}
+                className={`grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-1 px-5 py-4 sm:grid-cols-12 sm:items-center sm:gap-y-0 sm:px-6 ${
+                  i !== 0 ? "border-t border-zinc-100" : ""
+                }`}
+              >
+                <span className={`min-w-0 sm:col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
+                <span className={`shrink-0 sm:col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900 text-right sm:text-left`}>{v}</span>
+                <span className="col-span-2 text-sm text-zinc-900 sm:col-span-7">{n}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* HOW IT WORKS */}
-      <section>
+      <section className="border-t border-zinc-100">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="flex flex-col items-start gap-4 text-left md:flex-row md:items-end md:justify-between md:text-left">
             <div>
@@ -703,7 +650,7 @@ function HomePage() {
 
           </div>
 
-          <div className="mt-12 grid gap-px bg-emerald-500 border border-emerald-500 rounded-2xl overflow-hidden md:grid-cols-4">
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
             {[
               { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English anything." },
               { k: "02", t: "Reason", d: "JENVU pulls structure, ICT/SMC, DXY and news." },
@@ -723,26 +670,52 @@ function HomePage() {
         </div>
       </section>
 
+      {/* DESK LOGIC */}
+      <section className="border-t border-zinc-100 bg-white/40">
+        <div className="mx-auto max-w-6xl px-5 py-10 text-left sm:px-6 sm:py-14 md:text-left">
+          <h2 className="max-w-2xl text-xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl">
+            The frameworks JENVU thinks in.
+          </h2>
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["ICT", "Killzones, judas swings and silver bullet entries."],
+              ["SMC", "Structure shifts, mitigations and premium discount zones."],
+              ["Liquidity", "EQH, EQL sweeps and engineered stop hunts."],
+              ["Order Flow", "Displacement, imbalance and institutional candle absorption."],
+              ["Risk", "Fixed-R sizing with daily kill-switch breakers."],
+              ["Confluence", "Multi-timeframe alignment scored A, A+, A++."],
+              ["Macro", "DXY, yields and red-folder news overlay."],
+              ["Sessions", "Asia, London and New York killzone bias."],
+            ].map(([k, v]) => (
+              <div key={k} className="bg-white p-6 text-left">
+                <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
+                <p className="mt-3 text-sm text-zinc-900 leading-relaxed line-clamp-2 min-h-[2.75rem]">{v}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* PRICING — comparison matrix (old style) */}
-      <section className="bg-black">
+      <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
           <div className="mb-10">
             <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-emerald-500 bg-black">
+          <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
                 <col className="w-[34%]" />
-                <col className="w-[22%]" />
+                <col className="w-[22%] bg-amber-50/40" />
                 <col className="w-[22%]" />
                 <col className="w-[22%]" />
               </colgroup>
 
               <thead>
-                <tr className="border-b border-emerald-500">
+                <tr className="border-b border-zinc-200">
                   <th className="p-6 text-left align-bottom">
-                    <span className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Invite Only Access</span>
+                    <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                   </th>
                   {[
                     { name: "Pro", price: "$15", tag: "Active", accent: true, key: "pro" },
@@ -762,31 +735,31 @@ function HomePage() {
                     return (
                     <th
                       key={p.name}
-                      className="p-6 text-left align-top border-l border-emerald-500 bg-black"
+                      className={`p-6 text-left align-top border-l border-zinc-200 ${isCurrent ? "bg-emerald-50/50" : p.accent ? "bg-amber-50/50" : ""}`}
                     >
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-base font-semibold text-white">{p.name}</span>
+                        <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
                         {isCurrent && (
                           <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
                             Current
                           </span>
                         )}
                         {p.accent && !isCurrent && (
-                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-white font-bold`}>
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
                             Popular
                           </span>
                         )}
                       </div>
                       <div className="mt-2 flex items-baseline gap-1">
-                        <span className="text-2xl tracking-tight text-white price-font">{p.price}</span>
+                        <span className="text-2xl tracking-tight text-zinc-900 price-font">{p.price}</span>
                         {p.price !== "$0" && (
-                          <span className="text-[11px] text-white/60 price-font">/credits</span>
+                          <span className="text-[11px] text-zinc-500 price-font">/credits</span>
                         )}
                       </div>
-                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-white/60`}>{p.tag}</p>
+                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
 
                       {isCurrent ? (
-                        <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-white/20 bg-black px-3 py-1.5 text-xs font-medium text-white">
+                        <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
                           Active
                         </div>
                       ) : disabled ? (
@@ -799,7 +772,7 @@ function HomePage() {
                               ? "Upgrades unlock after your earning proof is verified and your 30-day trial ends."
                               : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your earning proof is verified.`
                           }
-                          className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center rounded-md border border-white/10 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-white/60"
+                          className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center rounded-md border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-500"
                         >
                           {cta}
                         </button>
@@ -808,8 +781,8 @@ function HomePage() {
                           to="/founding"
                           className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
                             p.accent || p.dark
-                              ? "bg-white text-black hover:bg-white/90"
-                              : "border border-white/20 bg-white text-black hover:bg-white/90"
+                              ? "bg-zinc-900 text-white hover:bg-black"
+                              : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
                           }`}
                         >
                           {cta}
@@ -838,16 +811,16 @@ function HomePage() {
                 ] as ReadonlyArray<{ f: string; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
                   <tr
                     key={row.f}
-                    className="border-t border-emerald-500 bg-black hover:bg-white/5 transition"
+                    className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
                   >
-                    <td className="px-6 py-3.5 text-white">
+                    <td className="px-6 py-3.5 text-zinc-800">
                       <div className="flex items-center gap-2">
                         {row.badge && (
-                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-white text-black font-bold`}>
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
                             {row.badge}
                           </span>
                         )}
-                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-white" : "text-white"}>
+                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-zinc-500" : ""}>
                           {row.f}
                         </span>
                       </div>
@@ -855,14 +828,14 @@ function HomePage() {
                     {[row.b, row.c, row.d].map((v, i) => (
                       <td
                         key={i}
-                        className="px-2 py-3.5 text-center border-l border-white/10 min-w-[120px] bg-black"
+                        className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${i === 0 ? "bg-amber-50/40" : ""}`}
                       >
                         {v === true ? (
-                          <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: "#ffffff" }} />
+                          <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
                         ) : v === false ? (
-                          <span className="inline-block h-px w-4" style={{ backgroundColor: "#ffffff" }} />
+                          <span className="inline-block h-px w-4 bg-zinc-200" />
                         ) : (
-                          <span className={`${MONO} text-[11px] tracking-wider text-white ${row.isHeading ? "font-semibold" : ""}`}>
+                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : "text-zinc-700"}`}>
                             {v}
                           </span>
                         )}
@@ -878,7 +851,7 @@ function HomePage() {
 
 
       {/* TESTIMONIALS */}
-      <section className="bg-black">
+      <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <h2 className="mb-10 text-xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Trusted by traders.</h2>
           <div className="grid gap-6 md:grid-cols-3">
@@ -887,7 +860,7 @@ function HomePage() {
               ["ICT setups marked live on the chart, with voice — I stopped second-guessing my entries.", "M. Chen", "Independent · Singapore"],
               ["Gold execution is on another level. The killzone + sweep logic is exactly how I trade.", "S. Patel", "Family Office · London"],
             ].map(([q, n, r]) => (
-              <figure key={n} className="rounded-2xl border border-emerald-500 bg-white p-6">
+              <figure key={n} className="rounded-2xl border border-zinc-200 bg-white p-6">
                 <blockquote className="text-sm leading-relaxed text-zinc-700">"{q}"</blockquote>
                 <figcaption className="mt-4 flex items-center justify-between text-xs">
                   <div>
@@ -904,13 +877,13 @@ function HomePage() {
 
 
       {/* COMPARISON */}
-      <section className="bg-black">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <h2 className="text-left text-xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
             Why traders move to JENVU.
           </h2>
-          <div className="mt-10 rounded-2xl border border-emerald-500 bg-white overflow-hidden">
-            <div className={`hidden md:grid grid-cols-4 px-6 py-4 border-b border-emerald-500 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
+          <div className="mt-10 rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+            <div className={`hidden md:grid grid-cols-4 px-6 py-4 border-b border-zinc-200 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
               <span>Capability</span>
               <span className="text-center">Generic AI</span>
               <span className="text-center">Signal Group</span>
@@ -926,7 +899,7 @@ function HomePage() {
             ].map(([cap, a, b, c], i) => (
               <div
                 key={String(cap)}
-                className={`px-5 sm:px-6 py-4 text-sm ${i !== 0 ? "border-t border-emerald-500/30" : ""}`}
+                className={`px-5 sm:px-6 py-4 text-sm ${i !== 0 ? "border-t border-zinc-100" : ""}`}
               >
                 {/* desktop row */}
                 <div className="hidden md:grid grid-cols-4 items-center">
@@ -961,7 +934,7 @@ function HomePage() {
 
 
       {/* INTEGRATIONS */}
-      <section className="bg-black">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
           <div className="flex flex-col md:flex-row items-start justify-between gap-6">
             <div className="text-left md:text-left">
@@ -973,12 +946,10 @@ function HomePage() {
               {["OANDA XAU feeds", "Yahoo Finance", "LBMA fix", "TradingView", "COMEX / COT", "DXY"].map((n) => (
                 <span
                   key={n}
-                  style={{ backgroundColor: "#ffffff", color: "#000000", borderColor: "#ffffff" }}
-                  className={`rounded-full border px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider`}
+                  className={`rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider text-zinc-900`}
                 >
                   {n}
                 </span>
-
               ))}
             </div>
           </div>
@@ -987,7 +958,7 @@ function HomePage() {
 
 
       {/* FAQ */}
-      <section>
+      <section className="border-t border-zinc-100">
 
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
@@ -995,7 +966,7 @@ function HomePage() {
               <h2 className="text-xl font-semibold tracking-tight sm:text-3xl">Asked often.</h2>
               <p className="mt-3 text-zinc-900">Everything else lives in the docs&nbsp;</p>
             </div>
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
               {[
                 {
                   q: "Which pairs does JENVU cover?",
@@ -1036,10 +1007,10 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="overflow-hidden">
+      <section className="border-t border-zinc-100 overflow-hidden">
 
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
-          <div className="rounded-2xl border border-emerald-500 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
             <div className="max-w-xl text-left md:text-left">
               <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal.&nbsp;<br />

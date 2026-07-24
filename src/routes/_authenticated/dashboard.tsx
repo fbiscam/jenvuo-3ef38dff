@@ -1,6 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import xaiLogo from "@/assets/xai-logo.png";
-import jenvuWordmark from "@/assets/jenvu-wordmark.png";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -213,9 +212,9 @@ function Metric({
 
 function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof ShieldCheck; title: string; right?: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex items-center justify-between rounded-t-xl border-b border-white/10 bg-black px-4 py-2.5 ${className}`}>
-      <div className="flex items-center gap-2 text-[13px] font-medium text-white">
-        <Icon className="h-4 w-4 text-white" />
+    <div className={`flex items-center justify-between rounded-t-xl border-b border-zinc-200 bg-[#F8F8F8] px-4 py-2.5 ${className}`}>
+      <div className="flex items-center gap-2 text-[13px] font-medium text-zinc-700">
+        <Icon className="h-4 w-4 text-zinc-500" />
         {title}
       </div>
       {right}
@@ -282,7 +281,7 @@ function SignalDeskHistory() {
   }
 
   return (
-    <div className="flex-1 divide-y divide-white/10 overflow-y-auto scrollbar-auto-hide max-h-[260px]">
+    <div className="flex-1 divide-y divide-zinc-100 overflow-y-auto scrollbar-auto-hide max-h-[260px]">
       {alerts.map((a) => {
         const isBuy = a.direction?.toLowerCase().includes("long") || a.direction?.toLowerCase().includes("buy");
         const when = new Date(a.fired_at);
@@ -368,19 +367,19 @@ function TickerRow({ label, symbol, decimals = 2 }: { label: string; symbol: str
   const up = (change ?? 0) >= 0;
 
   return (
-    <div className="flex items-center justify-between border-b border-white/10 px-4 py-2.5 last:border-b-0">
+    <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-2.5 last:border-b-0">
       <div className="flex items-center gap-2">
-        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-        <span className="text-[13px] font-medium text-white">{label}</span>
+        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+        <span className="text-[13px] font-medium text-zinc-800">{label}</span>
       </div>
       <div className="flex items-center gap-3">
-        <span className="font-mono text-[12px] text-white">{price != null ? price.toFixed(decimals) : "—"}</span>
+        <span className="font-mono text-[12px] text-zinc-600">{price != null ? price.toFixed(decimals) : "—"}</span>
         {change != null ? (
-          <span className={`font-mono text-[11px] ${up ? "text-emerald-400" : "text-rose-400"}`}>
+          <span className={`font-mono text-[11px] ${up ? "text-emerald-600" : "text-rose-600"}`}>
             {up ? "+" : ""}{change.toFixed(2)}%
           </span>
         ) : (
-          <span className="font-mono text-[11px] text-white/50">—</span>
+          <span className="font-mono text-[11px] text-zinc-400">—</span>
         )}
       </div>
     </div>
@@ -851,8 +850,7 @@ function DashboardLayout() {
   }, [displayRemaining, credits.isLoading, credits.allowance]);
 
   return (
-    <div className="dash-dark flex min-h-screen bg-black text-zinc-100 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
-      <style>{`html, body { background-color: #000 !important; }`}</style>
+    <div className="dash-dark flex bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard">
 
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -872,27 +870,13 @@ function DashboardLayout() {
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
         style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
       >
-        <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }
-        /* Black sidebar with plain white text & icons */
-        .dashboard-sidebar-root, .dashboard-sidebar-root nav, .dashboard-sidebar-root aside { background: #000 !important; }
-        .dashboard-sidebar-root { border-color: rgba(255,255,255,0.08) !important; }
-        .dashboard-sidebar-root [class*="border-zinc-200"], .dashboard-sidebar-root [class*="border-t"], .dashboard-sidebar-root [class*="border-b"] { border-color: rgba(255,255,255,0.1) !important; }
-        .dashboard-sidebar-root [class*="bg-white"], .dashboard-sidebar-root [class*="bg-zinc-50"], .dashboard-sidebar-root [class*="bg-zinc-100"] { background-color: rgba(255,255,255,0.08) !important; }
-        .dashboard-sidebar-root a, .dashboard-sidebar-root span, .dashboard-sidebar-root button, .dashboard-sidebar-root div { color: #ffffff !important; }
-        .dashboard-sidebar-root .material-symbols-rounded { color: #ffffff !important; }
-        .dashboard-sidebar-root svg { color: #ffffff !important; }
-        .dashboard-sidebar-root .brand-logo { filter: brightness(0) invert(1); }
-        /* Active nav item: distinct white pill on black sidebar */
-        .dashboard-sidebar-root a.sidebar-nav-active { background: #ffffff !important; }
-        .dashboard-sidebar-root a.sidebar-nav-active, .dashboard-sidebar-root a.sidebar-nav-active span, .dashboard-sidebar-root a.sidebar-nav-active .material-symbols-rounded, .dashboard-sidebar-root a.sidebar-nav-active svg { color: #000000 !important; }
-        .dashboard-sidebar-root a:not(.sidebar-nav-active):hover { background: rgba(255,255,255,0.08) !important; }
-        `}</style>
+        <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
         {/* Brand */}
         <div className={`flex h-11 shrink-0 items-center gap-2.5 ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
             <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             {!sidebarCollapsed && (
-              <span className="brand-wordmark truncate text-[22px] font-normal tracking-tight text-white" style={{ fontFamily: '"Google Sans", "Product Sans", ui-sans-serif, system-ui, sans-serif' }}>Jenvu</span>
+              <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: '"Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif', fontWeight: 500 }}>Jenvu</span>
             )}
           </Link>
           <button
@@ -912,7 +896,7 @@ function DashboardLayout() {
           {[...NAV_GROUPS].map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
               {!sidebarCollapsed && group.label && (
-                <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-white/60">
+                <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
                   {group.label}
                 </div>
               )}
@@ -935,8 +919,8 @@ function DashboardLayout() {
                       className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition
                         ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}
                         ${active
-                          ? "sidebar-nav-active font-semibold"
-                          : "text-[#5E5E5E]"}`}
+                          ? "bg-zinc-100 text-zinc-900 font-semibold"
+                          : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
                       <span
                         className="material-symbols-rounded shrink-0"
@@ -952,17 +936,17 @@ function DashboardLayout() {
                       </span>
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
-                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-white text-black" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
+                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
                           New
                         </span>
                       )}
                       {!sidebarCollapsed && hasUnread && (
-                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-white text-black" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
+                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
                           New
                         </span>
                       )}
                       {sidebarCollapsed && ((typeof count === "number" && count > 0 && !active) || hasUnread) && (
-                        <span className="absolute -right-1 -top-1 inline-flex items-center justify-center rounded-full bg-white text-black" style={{ height: 14, paddingLeft: 5, paddingRight: 5, fontSize: 8, fontWeight: 700, letterSpacing: 0.3 }}>
+                        <span className="absolute -right-1 -top-1 inline-flex items-center justify-center rounded-full bg-rose-600 text-white" style={{ height: 14, paddingLeft: 5, paddingRight: 5, fontSize: 8, fontWeight: 700, letterSpacing: 0.3 }}>
                           New
                         </span>
                       )}
@@ -979,14 +963,14 @@ function DashboardLayout() {
 
 
         {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
-        <div className={`mt-auto shrink-0 flex items-center border-t border-white/10 bg-black py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}>
+        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-white py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}>
           {!sidebarCollapsed && (
             <button
               type="button"
               onClick={signOut}
               title="Sign out"
               aria-label="Sign out"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-white hover:bg-red-500/20 hover:text-red-400"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900 hover:bg-red-50 hover:text-red-600"
             >
               <Power className="h-3.5 w-3.5" strokeWidth={2.25} />
             </button>
@@ -997,7 +981,7 @@ function DashboardLayout() {
               onClick={() => setSidebarCollapsed((v) => !v)}
               title={sidebarCollapsed ? "Expand" : "Collapse"}
               aria-label={sidebarCollapsed ? "Expand" : "Collapse"}
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-white/70 hover:bg-white/10 hover:text-white"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
             >
               {sidebarCollapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <ChevronsLeft className="h-3.5 w-3.5" />}
             </button>
@@ -1037,13 +1021,13 @@ function DashboardLayout() {
 
         <div className="flex flex-wrap items-start justify-between gap-4 lg:items-end" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
           <div className="min-w-0">
-            <div className="text-[12px] text-white" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>Account home</div>
+            <div className="text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>Account home</div>
             <h1 className="mt-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span>{email || fullName}</span><span>'s Account</span>
             </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-white/70" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span className="inline-flex items-center gap-2">
-                <span className="text-white">{greetingText}, {fullName || "Trader"}</span>
+                <span>{greetingText}, {fullName || "Trader"}</span>
                 <span className="hidden sm:inline text-zinc-300">·</span>
               </span>
               <Link
@@ -1053,17 +1037,16 @@ function DashboardLayout() {
                 title="AI models powering your signals"
               >
                 <span className="inline-flex items-center gap-1.5 rounded-md bg-transparent px-1.5 py-1 leading-none">
-                  <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" width={16} height={16} className="h-[16px] w-[16px] shrink-0 object-contain bg-transparent rounded-full" loading="lazy" />
-                  <span className="text-[11px] font-medium leading-none text-white">OpenAI</span>
+                  <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" width={20} height={20} className="h-[20px] w-[20px] shrink-0 rounded object-contain" loading="lazy" />
+                  <span className="text-[11px] font-medium leading-none text-zinc-800">OpenAI</span>
                   {showDeepSeek && (
                     <>
-                      <span className="leading-none text-white/40">·</span>
-                      <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="DeepSeek" width={16} height={16} className="h-[16px] w-[16px] shrink-0 object-contain bg-transparent rounded-full" loading="lazy" />
-                      <span className="text-[11px] font-medium leading-none text-white">DeepSeek</span>
-                      <span className="leading-none text-white/40">·</span>
-                      <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={16} height={16} className="h-[16px] w-[16px] shrink-0 object-contain bg-transparent rounded-full" loading="lazy" />
-
-                      <span className="text-[11px] font-medium leading-none text-white">Google</span>
+                      <span className="leading-none text-zinc-300">·</span>
+                      <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="DeepSeek" width={20} height={20} className="h-[20px] w-[20px] shrink-0 rounded object-contain" loading="lazy" />
+                      <span className="text-[11px] font-medium leading-none text-zinc-800">DeepSeek</span>
+                      <span className="leading-none text-zinc-300">·</span>
+                      <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={20} height={20} className="h-[20px] w-[20px] shrink-0 rounded object-contain" loading="lazy" />
+                      <span className="text-[11px] font-medium leading-none text-zinc-800">Google</span>
                     </>
                   )}
                 </span>
@@ -1088,10 +1071,9 @@ function DashboardLayout() {
               disabled={refreshing}
               aria-label="Refresh analytics"
               title="Refresh analytics"
-              className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border p-0 leading-none transition-all duration-150 active:scale-90 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-white/20"
-              style={{ backgroundColor: "#000", color: "#fff", borderColor: "rgba(255,255,255,0.15)" }}
+              className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border border-zinc-200 bg-white p-0 leading-none text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 active:bg-zinc-100 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
             >
-              <RefreshCw className={`h-3.5 w-3.5 shrink-0 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} style={{ color: "#fff" }} />
+              <RefreshCw className={`h-3.5 w-3.5 shrink-0 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
             </button>
             <DropdownMenu>
             <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
@@ -1465,13 +1447,13 @@ function VoiceAgentHistory() {
 }
 
 function QuickActions() {
-  const actions: { label: string; to: string; icon: typeof Activity; color: string }[] = [
-    { label: "New Scan",   to: "/signal",                 icon: Activity,    color: "text-blue-600" },
-    { label: "Journal",    to: "/dashboard/journal",       icon: BookOpen,    color: "text-emerald-600" },
-    { label: "Killzones",  to: "/killzones",              icon: Calendar,    color: "text-amber-600" },
-    { label: "Insights",   to: "/insights",               icon: LineChart,   color: "text-violet-600" },
-    { label: "Saved",      to: "/dashboard/workspace",    icon: Bookmark,    color: "text-rose-600" },
-    { label: "Billing",    to: "/dashboard/billing",      icon: CreditCard,  color: "text-zinc-900" },
+  const actions: { label: string; to: string; icon: typeof Activity; tone: string }[] = [
+    { label: "New Scan",   to: "/signal",                 icon: Activity,    tone: "bg-blue-50 text-blue-700 border-blue-100" },
+    { label: "Journal",    to: "/dashboard/journal",       icon: BookOpen,    tone: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+    { label: "Killzones",  to: "/killzones",              icon: Calendar,    tone: "bg-amber-50 text-amber-700 border-amber-100" },
+    { label: "Insights",   to: "/insights",               icon: LineChart,   tone: "bg-violet-50 text-violet-700 border-violet-100" },
+    { label: "Saved",      to: "/dashboard/workspace",    icon: Bookmark,    tone: "bg-rose-50 text-rose-700 border-rose-100" },
+    { label: "Billing",    to: "/dashboard/billing",      icon: CreditCard,  tone: "bg-zinc-50 text-zinc-700 border-zinc-200" },
   ];
   return (
     <div className="grid flex-1 grid-cols-3 gap-2 px-5 py-5">
@@ -1483,8 +1465,8 @@ function QuickActions() {
             to={a.to as "/signal"}
             className="group flex flex-col items-center justify-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2 py-3 text-center transition hover:border-zinc-300 hover:bg-zinc-50"
           >
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-200 bg-white">
-              <Icon className={`h-4 w-4 ${a.color}`} />
+            <span className={`inline-flex h-8 w-8 items-center justify-center rounded-md border ${a.tone}`}>
+              <Icon className="h-4 w-4" />
             </span>
             <span className="text-[11.5px] font-medium text-zinc-800">{a.label}</span>
           </Link>

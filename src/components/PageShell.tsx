@@ -26,13 +26,16 @@ export function PageShell({
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-              <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#ffffff", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+              <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
             </Link>
             <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900">
               <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
               <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
               <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
+              <Link to="/briefs" className="hover:text-zinc-900">Briefs</Link>
               <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
+              <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
+              <Link to="/about" className="hover:text-zinc-900">About</Link>
               <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
             </nav>
             <HeaderAuthButtons />

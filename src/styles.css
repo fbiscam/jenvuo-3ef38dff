@@ -3,9 +3,6 @@
 @import "tw-animate-css";
 @import "@fontsource-variable/inter";
 
-/* Site-wide dark base — dashboard dark theme is now the default across all routes. */
-html, body { background-color: #000 !important; color: #fff; }
-
 @utility price-font {
   font-family: "Inter Variable", "Inter", system-ui, sans-serif;
   font-weight: 700;
@@ -444,51 +441,25 @@ html, body { background-color: #000 !important; color: #fff; }
    near-black dashboard look.
    ============================================================ */
 .dash-dark {
-  --dd-bg: #000000;
-  --dd-surface: #000000;
-  --dd-surface-2: #000000;
-  --dd-surface-3: #050505;
-  --dd-border: rgba(255, 255, 255, 0.25);
-  --dd-border-strong: rgba(255, 255, 255, 0.35);
-  --dd-fg: #ffffff;
-  --dd-fg-strong: #ffffff;
-  --dd-fg-muted: #ffffff;
-  --dd-fg-dim: rgba(255,255,255,0.75);
+  --dd-bg: #0b0d12;
+  --dd-surface: #12151d;
+  --dd-surface-2: #171b25;
+  --dd-surface-3: #1d2230;
+  --dd-border: rgba(255, 255, 255, 0.08);
+  --dd-border-strong: rgba(255, 255, 255, 0.14);
+  --dd-fg: #e7e9f0;
+  --dd-fg-strong: #f5f6fa;
+  --dd-fg-muted: #a2a8b8;
+  --dd-fg-dim: #7a8093;
   color-scheme: dark;
 }
 
 /* Base surfaces */
 .dash-dark { background-color: var(--dd-bg) !important; color: var(--dd-fg) !important; }
 .dash-dark .bg-white,
-.dash-dark [class*="bg-white/"],
-.dash-dark [class*="bg-[#F8F8F8]"],
-.dash-dark [class*="bg-[#FAFAFA]"],
-.dash-dark [class*="bg-[#FFFFFF]"],
-.dash-dark [class*="bg-[#fafafa]"],
-.dash-dark [class*="bg-[#ffffff]"] { background-color: var(--dd-surface) !important; }
-
-/* Translucent white headers / navs → dark translucent */
-.dash-dark header[class*="bg-white/"],
-.dash-dark nav[class*="bg-white/"] { background-color: rgba(0,0,0,0.75) !important; }
-
-/* Disable hover color changes on header/nav links site-wide */
-header a:hover, header nav a:hover, nav a:hover { color: inherit !important; opacity: 1 !important; }
-
-/* Keep buttons & links pinned to pure white + black text (site-wide CTA style) */
-.dash-dark button.bg-white,
-.dash-dark a.bg-white,
-.dash-dark [role="button"].bg-white,
-.dash-dark input[type="submit"].bg-white,
-.dash-dark input[type="button"].bg-white { background-color: #ffffff !important; color: #000000 !important; }
-
-.dash-dark button.bg-white .text-black,
-.dash-dark a.bg-white .text-black,
-.dash-dark button.bg-white,
-.dash-dark a.bg-white { color: #000000 !important; }
-
-.dash-dark button.bg-white:hover,
-.dash-dark a.bg-white:hover { background-color: rgba(255,255,255,0.9) !important; }
-
+.dash-dark [class*="bg-\\[\\#F8F8F8\\]"],
+.dash-dark [class*="bg-\\[\\#FAFAFA\\]"],
+.dash-dark [class*="bg-\\[\\#FFFFFF\\]"] { background-color: var(--dd-surface) !important; }
 
 .dash-dark .bg-zinc-50 { background-color: var(--dd-surface-2) !important; }
 .dash-dark .bg-zinc-100 { background-color: var(--dd-surface-3) !important; }
@@ -576,69 +547,3 @@ header a:hover, header nav a:hover, nav a:hover { color: inherit !important; opa
 
 /* Backdrop softener for mobile overlay */
 .dash-dark .bg-black\/30 { background-color: rgba(0,0,0,0.55) !important; }
-
-/* Buttons: force primary/dark buttons to white bg + black text */
-.dash-dark button.bg-black,
-.dash-dark a.bg-black,
-.dash-dark button.bg-zinc-900,
-.dash-dark a.bg-zinc-900,
-.dash-dark button.bg-zinc-950,
-.dash-dark a.bg-zinc-950,
-.dash-dark button.bg-neutral-900,
-.dash-dark a.bg-neutral-900,
-.dash-dark button.bg-gray-900,
-.dash-dark a.bg-gray-900,
-.dash-dark button.bg-slate-900,
-.dash-dark a.bg-slate-900,
-.dash-dark .btn-primary,
-.dash-dark button[class*="bg-primary"],
-.dash-dark a[class*="bg-primary"] {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border-color: #ffffff !important;
-}
-.dash-dark button.bg-black:hover,
-.dash-dark a.bg-black:hover,
-.dash-dark button.bg-zinc-900:hover,
-.dash-dark a.bg-zinc-900:hover,
-.dash-dark button.bg-zinc-950:hover,
-.dash-dark a.bg-zinc-950:hover,
-.dash-dark button.bg-neutral-900:hover,
-.dash-dark a.bg-neutral-900:hover,
-.dash-dark button.bg-gray-900:hover,
-.dash-dark a.bg-gray-900:hover,
-.dash-dark button.bg-slate-900:hover,
-.dash-dark a.bg-slate-900:hover,
-.dash-dark .btn-primary:hover,
-.dash-dark button[class*="bg-primary"]:hover,
-.dash-dark a[class*="bg-primary"]:hover {
-  background-color: rgba(255,255,255,0.9) !important;
-  color: #000000 !important;
-}
-/* Nested text/icon color inside white buttons */
-.dash-dark button.bg-black *,
-.dash-dark a.bg-black *,
-.dash-dark button.bg-zinc-900 *,
-.dash-dark a.bg-zinc-900 *,
-.dash-dark button.bg-neutral-900 *,
-.dash-dark a.bg-neutral-900 *,
-.dash-dark button.bg-gray-900 *,
-.dash-dark a.bg-gray-900 *,
-.dash-dark button.bg-slate-900 *,
-.dash-dark a.bg-slate-900 *,
-.dash-dark button[class*="bg-primary"] *,
-.dash-dark a[class*="bg-primary"] * {
-  color: #000000 !important;
-}
-
-/* Escape hatch: force a white card with black text inside dash-dark */
-.dash-dark .light-card,
-.dash-dark .light-card.bg-white { background-color: #ffffff !important; color: #000000 !important; border-color: #e4e4e7 !important; }
-.dash-dark .light-card .text-zinc-900,
-.dash-dark .light-card .text-zinc-800,
-.dash-dark .light-card .text-zinc-700,
-.dash-dark .light-card .text-zinc-600,
-.dash-dark .light-card .text-black { color: #000000 !important; }
-.dash-dark .light-card .text-white { color: #ffffff !important; }
-
-

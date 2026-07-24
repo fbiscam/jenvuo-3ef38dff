@@ -40,7 +40,7 @@ function NewsletterSubscribe() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@example.com"
         maxLength={255}
-        className="flex-1 rounded-md border border-white/20 bg-transparent px-2.5 py-1.5 text-xs text-white placeholder:text-white/50 outline-none"
+        className="flex-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-900 placeholder:text-zinc-500 outline-none"
       />
       <button
         type="submit"
@@ -102,7 +102,7 @@ const columns = [
 export default function SiteFooter() {
   const year = new Date().getFullYear();
   return (
-    <footer className="relative bg-black text-white">
+    <footer className="relative bg-[#FAFAFA]">
       {/* Subtle divider */}
       <div className="h-px w-full bg-transparent" />
 
@@ -118,11 +118,11 @@ export default function SiteFooter() {
                 alt="JENVU AI"
                 className="h-7 w-7 rounded object-contain"
               />
-              <span className="text-white font-semibold tracking-tight text-lg">
+              <span className="text-zinc-900 font-semibold tracking-tight text-lg">
                 JENVU AI
               </span>
             </Link>
-            <p className="text-sm text-white leading-relaxed max-w-sm whitespace-pre-line">
+            <p className="text-sm text-zinc-600 leading-relaxed max-w-sm whitespace-pre-line">
               Institutional grade voice intelligence for gold{"\n"}traders using ICT & SMC to make analysis.
             </p>
 
@@ -173,7 +173,7 @@ export default function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition-all hover:scale-110 hover:border-white/40 hover:bg-white/10"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-900 transition-all hover:scale-110 hover:border-zinc-300 hover:shadow-sm"
                 >
                   {s.icon}
                 </a>
@@ -189,7 +189,7 @@ export default function SiteFooter() {
           {columns.map((col) => (
             <div key={col.label} className="space-y-3">
               <div
-                className={`${MONO} text-sm font-black uppercase tracking-[0.25em] text-white`}
+                className={`${MONO} text-sm font-black uppercase tracking-[0.25em] text-black`}
               >
 
 
@@ -201,7 +201,7 @@ export default function SiteFooter() {
                   <li key={l.to}>
                     <Link
                       to={l.to}
-                      className="text-sm text-white hover:text-white/80 transition-colors whitespace-nowrap"
+                      className="text-sm text-zinc-800 hover:text-black transition-colors whitespace-nowrap"
                     >
                       {l.label}
                     </Link>
@@ -213,10 +213,10 @@ export default function SiteFooter() {
         </div>
 
         {/* Divider + sub bar */}
-        <div className="mt-8 pt-4 pb-4 border-t border-white/10 flex flex-col md:flex-row items-start justify-between gap-3 md:translate-y-2">
+        <div className="mt-8 pt-4 pb-4 border-t border-zinc-100 flex flex-col md:flex-row items-start justify-between gap-3 md:translate-y-2">
           <div
-            className="whitespace-nowrap text-[12px] sm:text-[14px] tracking-tight text-white"
-            style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 500 }}
+            className="whitespace-nowrap text-[12px] sm:text-[14px] tracking-tight"
+            style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 500, color: "#3c4043" }}
           >
             © {year} Jenvu AI. All rights reserved
           </div>
