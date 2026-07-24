@@ -731,7 +731,7 @@ function HomePage() {
 
           </div>
 
-          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
+          <div className="mt-12 grid gap-px bg-emerald-500 border border-emerald-500 rounded-2xl overflow-hidden md:grid-cols-4">
             {[
               { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English anything." },
               { k: "02", t: "Reason", d: "JENVU pulls structure, ICT/SMC, DXY and news." },
