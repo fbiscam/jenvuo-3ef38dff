@@ -377,9 +377,10 @@ function HomePage() {
             <defs>
               <linearGradient id="ekgGrad" x1="0" x2="1" y1="0" y2="0">
                 <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
-                <stop offset="20%" stopColor="#10b981" stopOpacity="0.7" />
-                <stop offset="80%" stopColor="#34d399" stopOpacity="0.7" />
-                <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                <stop offset="20%" stopColor="#10b981" stopOpacity="0.85" />
+                <stop offset="50%" stopColor="#eab308" stopOpacity="0.8" />
+                <stop offset="80%" stopColor="#f43f5e" stopOpacity="0.85" />
+                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
               </linearGradient>
             </defs>
             <path
