@@ -150,10 +150,14 @@ function TagPill({ tag, tone }: { tag: string; tone: "ink" | "green" | "muted" }
       ? "bg-white text-black"
       : "bg-white text-black";
   return (
-    <span className={`text-[10px] px-1.5 py-0.5 rounded ${MONO} uppercase tracking-wider ${cls}`}>
+    <span
+      className={`text-[10px] px-1.5 py-0.5 rounded ${MONO} uppercase tracking-wider ${cls}`}
+      style={{ backgroundColor: "#ffffff", color: "#000000" }}
+    >
       {tag}
     </span>
   );
+
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
