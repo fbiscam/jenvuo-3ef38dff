@@ -173,7 +173,7 @@ export default function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-900 transition-all hover:scale-110 hover:border-zinc-300 hover:shadow-sm"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition-all hover:scale-110 hover:border-white/40 hover:bg-white/10"
                 >
                   {s.icon}
                 </a>
