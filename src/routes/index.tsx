@@ -809,14 +809,14 @@ function HomePage() {
                     key={row.f}
                     className="border-t border-white/10 bg-black hover:bg-white/5 transition"
                   >
-                    <td className="px-6 py-3.5 text-white/90">
+                    <td className="px-6 py-3.5 text-white">
                       <div className="flex items-center gap-2">
                         {row.badge && (
-                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-white font-bold`}>
+                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-white text-black font-bold`}>
                             {row.badge}
                           </span>
                         )}
-                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-white/60" : ""}>
+                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-white" : "text-white"}>
                           {row.f}
                         </span>
                       </div>
