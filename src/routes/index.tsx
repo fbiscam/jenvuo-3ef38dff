@@ -784,7 +784,7 @@ function HomePage() {
             <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-white/15 bg-black">
+          <div className="overflow-x-auto rounded-2xl border border-emerald-500 bg-black">
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
                 <col className="w-[34%]" />
@@ -794,7 +794,7 @@ function HomePage() {
               </colgroup>
 
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-emerald-500">
                   <th className="p-6 text-left align-bottom">
                     <span className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Invite Only Access</span>
                   </th>
@@ -816,7 +816,7 @@ function HomePage() {
                     return (
                     <th
                       key={p.name}
-                      className="p-6 text-left align-top border-l border-white/10 bg-black"
+                      className="p-6 text-left align-top border-l border-emerald-500 bg-black"
                     >
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-base font-semibold text-white">{p.name}</span>
@@ -892,7 +892,7 @@ function HomePage() {
                 ] as ReadonlyArray<{ f: string; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
                   <tr
                     key={row.f}
-                    className="border-t border-white/10 bg-black hover:bg-white/5 transition"
+                    className="border-t border-emerald-500 bg-black hover:bg-white/5 transition"
                   >
                     <td className="px-6 py-3.5 text-white">
                       <div className="flex items-center gap-2">
