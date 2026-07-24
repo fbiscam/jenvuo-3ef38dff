@@ -212,7 +212,7 @@ function Metric({
 
 function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof ShieldCheck; title: string; right?: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex items-center justify-between rounded-t-xl border-b border-zinc-200 bg-[#F8F8F8] px-4 py-2.5 ${className}`}>
+    <div className={`flex items-center justify-between rounded-t-xl border-b border-white/10 bg-black px-4 py-2.5 ${className}`}>
       <div className="flex items-center gap-2 text-[13px] font-medium text-white [text-shadow:0_1px_2px_rgba(255,255,255,0.6)] bg-gradient-to-b from-white via-zinc-100 to-zinc-300 bg-clip-text [-webkit-text-fill-color:transparent] drop-shadow-[0_1px_1px_rgba(0,0,0,0.15)]">
         <Icon className="h-4 w-4 text-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
         {title}
