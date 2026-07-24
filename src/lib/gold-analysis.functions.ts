@@ -1563,18 +1563,24 @@ export const getLiveTick = createServerFn({ method: "POST" })
     return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
   })
   .handler(async ({ data }) => {
-    const inst = resolveInstrument(data.symbol);
-    // 1) Try real-time quote endpoints (asset-specific spot → cross-provider fallback).
-    const q = await resolveLiveTick(inst);
-    if (q) return q;
-    // 2) Fallback to last candle close if both quote feeds fail / market closed.
-    for (const tf of ["1m", "5m", "15m", "1h", "1d"]) {
-      const candles = await fetchInstrumentCandles(inst, tf).catch(() => [] as Candle[]);
-      const last = candles[candles.length - 1];
-      if (last) return { price: last.c, t: last.t } as LiveTick;
+    try {
+      const inst = resolveInstrument(data.symbol);
+      // 1) Try real-time quote endpoints (asset-specific spot → cross-provider fallback).
+      const q = await resolveLiveTick(inst);
+      if (q) return q;
+      // 2) Fallback to last candle close if both quote feeds fail / market closed.
+      for (const tf of ["1m", "5m", "15m", "1h", "1d"]) {
+        const candles = await fetchInstrumentCandles(inst, tf).catch(() => [] as Candle[]);
+        const last = candles[candles.length - 1];
+        if (last) return { price: last.c, t: last.t } as LiveTick;
+      }
+      return null as LiveTick | null;
+    } catch (err) {
+      console.error("[getLiveTick] failed", err);
+      return null as LiveTick | null;
     }
-    return null as LiveTick | null;
   });
+
 
 
 export const getMarketSnapshot = createServerFn({ method: "POST" })
