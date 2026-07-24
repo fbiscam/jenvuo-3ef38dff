@@ -220,8 +220,9 @@ function HomePage() {
 
         </div>
         {/* ticker strip */}
-        <div className="border-t border-white/10 overflow-hidden">
+        <div className="border-t border-white/10 overflow-hidden bg-black">
           <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-white whitespace-nowrap animate-ticker`}>
+
             {[...ticker, ...ticker].map(([s, p, d], i) => (
               <span key={i} className="flex items-center gap-2">
                 <span className="text-white font-medium">{s}</span>
