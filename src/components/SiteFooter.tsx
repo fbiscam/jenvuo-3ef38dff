@@ -213,10 +213,10 @@ export default function SiteFooter() {
         </div>
 
         {/* Divider + sub bar */}
-        <div className="mt-8 pt-4 pb-4 border-t border-zinc-100 flex flex-col md:flex-row items-start justify-between gap-3 md:translate-y-2">
+        <div className="mt-8 pt-4 pb-4 border-t border-white/10 flex flex-col md:flex-row items-start justify-between gap-3 md:translate-y-2">
           <div
-            className="whitespace-nowrap text-[12px] sm:text-[14px] tracking-tight"
-            style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 500, color: "#3c4043" }}
+            className="whitespace-nowrap text-[12px] sm:text-[14px] tracking-tight text-white/70"
+            style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 500 }}
           >
             © {year} Jenvu AI. All rights reserved
           </div>
