@@ -447,10 +447,10 @@
   --dd-surface-3: #171717;
   --dd-border: rgba(255, 255, 255, 0.08);
   --dd-border-strong: rgba(255, 255, 255, 0.14);
-  --dd-fg: #e7e9f0;
-  --dd-fg-strong: #f5f6fa;
-  --dd-fg-muted: #a2a8b8;
-  --dd-fg-dim: #7a8093;
+  --dd-fg: #ffffff;
+  --dd-fg-strong: #ffffff;
+  --dd-fg-muted: #ffffff;
+  --dd-fg-dim: rgba(255,255,255,0.75);
   color-scheme: dark;
 }
 
