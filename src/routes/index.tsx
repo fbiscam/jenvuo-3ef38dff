@@ -685,137 +685,151 @@ function HomePage() {
 
       {/* LIVE XAU MARKET TERMINAL */}
       <section className="bg-black">
-        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <div className="mb-8 flex flex-col items-start justify-start gap-2 text-left sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                </span>
-                <span className={`${MONO} text-[10px] font-bold tracking-[0.2em] text-emerald-500 uppercase`}>Live Intelligence</span>
-              </div>
-              <h2 className="text-xl font-semibold tracking-tight sm:text-3xl text-white">XAU Market Terminal</h2>
-            </div>
-            <div className="flex gap-3 text-[10px] font-mono text-white/40 uppercase tracking-widest">
-              <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Bulls</div>
-              <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Bears</div>
-            </div>
-          </div>
-
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
           <style>{`
-            @keyframes drawLine { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
-            @keyframes tickerScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-            @keyframes flashGreen { 0%, 100% { background-color: rgba(16,185,129,0); } 50% { background-color: rgba(16,185,129,0.15); } }
-            @keyframes flashRed { 0%, 100% { background-color: rgba(239,68,68,0); } 50% { background-color: rgba(239,68,68,0.15); } }
-            @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-            .spark-path { stroke-dasharray: 400; animation: drawLine 2.4s ease-out forwards; }
-            .flash-up { animation: flashGreen 3s ease-in-out infinite; }
-            .flash-down { animation: flashRed 4s ease-in-out infinite; }
-            .ticker-track { animation: tickerScroll 40s linear infinite; }
-            .bar-grow { transform-origin: bottom; animation: barGrow 1.2s cubic-bezier(0.22,1,0.36,1) forwards; }
+            @keyframes jvTicker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+            @keyframes jvPricePulse { 0%,100% { color:#ffffff; } 50% { color:#10b981; } }
+            @keyframes jvDrawLine { from { stroke-dashoffset: 1200; } to { stroke-dashoffset: 0; } }
+            .jv-ticker { animation: jvTicker 40s linear infinite; }
+            .jv-price-pulse { animation: jvPricePulse 2.4s cubic-bezier(0.4,0,0.6,1) infinite; }
+            .jv-spark { stroke-dasharray: 1200; animation: jvDrawLine 2.6s ease-out forwards; }
           `}</style>
 
-          {/* scrolling ticker strip */}
-          <div className="mb-4 overflow-hidden rounded-lg border border-white/10 bg-black/60 py-2">
-            <div className="ticker-track flex gap-8 whitespace-nowrap will-change-transform">
-              {[...Array(2)].map((_, dup) => (
-                <div key={dup} className="flex gap-8 shrink-0">
+          <div className="w-full bg-[#050505] border border-zinc-800 rounded-lg overflow-hidden shadow-[0_0_50px_rgba(16,185,129,0.05)]">
+            {/* Terminal Header Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-zinc-800 bg-zinc-900/40">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse" />
+                  <span className={`${MONO} text-[10px] font-bold tracking-[0.2em] text-zinc-400 uppercase`}>XAU Market Terminal v2.4</span>
+                </div>
+                <div className="hidden sm:block h-4 w-px bg-zinc-800" />
+                <span className={`${MONO} hidden sm:inline text-[10px] text-zinc-500 uppercase tracking-tighter`}>Status: Connected · New York Node</span>
+              </div>
+              <div className={`${MONO} text-[10px] text-zinc-500 uppercase`}>
+                <span className="text-zinc-600">Server Time:</span> 14:22:04 UTC
+              </div>
+            </div>
+
+            {/* Main Data Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3">
+              {/* Left: Large Ticker & Chart */}
+              <div className="lg:col-span-2 p-6 sm:p-8 border-b lg:border-b-0 lg:border-r border-zinc-800">
+                <div className="flex flex-wrap justify-between items-start gap-4 mb-8">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`${MONO} px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-bold`}>SPOT</span>
+                      <h2 className="text-zinc-400 text-xs font-semibold tracking-widest uppercase">XAU / USD · Gold Spot</h2>
+                    </div>
+                    <div className="flex items-baseline gap-4 sm:gap-5 flex-wrap">
+                      <span className="text-5xl sm:text-6xl font-bold text-white tabular-nums tracking-tighter jv-price-pulse">2,342.18</span>
+                      <div className="flex flex-col">
+                        <span className={`${MONO} text-emerald-500 text-base sm:text-lg font-medium tracking-tight`}>+33.24 (+1.42%)</span>
+                        <span className={`${MONO} text-[10px] text-zinc-600 uppercase tracking-widest`}>High: 2,352.10</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <div className={`${MONO} text-[10px] text-zinc-500 mb-1 uppercase tracking-widest`}>24h Market Vol</div>
+                    <div className="text-xl font-medium text-zinc-200 tabular-nums">$4.28B</div>
+                  </div>
+                </div>
+
+                {/* Chart */}
+                <div className="h-48 sm:h-56 w-full relative">
+                  <div className="absolute inset-0 grid grid-cols-8 gap-px opacity-10 pointer-events-none">
+                    {Array.from({ length: 7 }).map((_, i) => (
+                      <div key={i} className="border-r border-zinc-700" />
+                    ))}
+                  </div>
+                  <svg className="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 1000 200">
+                    <defs>
+                      <linearGradient id="jv-emerald-fade" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.18" />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      d="M0 160 Q 50 150, 100 170 T 200 140 T 300 155 T 400 100 T 500 120 T 600 80 T 700 95 T 800 40 T 900 60 T 1000 30 V 200 H 0 Z"
+                      fill="url(#jv-emerald-fade)"
+                    />
+                    <path
+                      className="jv-spark"
+                      d="M0 160 Q 50 150, 100 170 T 200 140 T 300 155 T 400 100 T 500 120 T 600 80 T 700 95 T 800 40 T 900 60 T 1000 30"
+                      stroke="#10b981"
+                      strokeWidth="2.5"
+                      fill="none"
+                      style={{ filter: "drop-shadow(0 0 8px rgba(16,185,129,0.4))" }}
+                    />
+                    <circle cx="1000" cy="30" r="4" fill="#10b981" className="animate-pulse" />
+                  </svg>
+                  <div className="absolute top-3 right-3 sm:top-4 sm:right-10 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded backdrop-blur-sm">
+                    <span className={`${MONO} text-[10px] text-emerald-400`}>Current Resistance: 2,348.50</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Watchlist / Pairs */}
+              <div className="bg-[#080808] flex flex-col">
+                <div className="px-5 py-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/20">
+                  <span className={`${MONO} text-[10px] font-bold text-zinc-400 uppercase tracking-[0.15em]`}>Global Index Pairs</span>
+                  <svg className="w-3 h-3 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </div>
+                <div className="divide-y divide-zinc-900 flex-1">
                   {[
-                    ["XAUUSD", "2,342.18", "+1.42%", true],
-                    ["XAUEUR", "2,164.55", "-0.28%", false],
-                    ["XAUGBP", "1,812.90", "+0.82%", true],
-                    ["XAUJPY", "356,842", "+2.11%", true],
-                    ["XAUAUD", "3,548.20", "-0.34%", false],
-                    ["XAUCHF", "2,088.44", "+0.61%", true],
-                    ["DXY", "104.22", "-0.18%", false],
-                    ["US10Y", "4.284", "+0.03", true],
-                  ].map(([sym, px, chg, up], i) => (
-                    <div key={`${dup}-${i}`} className="flex items-center gap-2 text-[11px]">
-                      <span className={`${MONO} font-bold text-white`}>{sym}</span>
-                      <span className={`${MONO} text-white/70`}>{px}</span>
-                      <span className={`${MONO} ${up ? "text-emerald-400" : "text-red-400"}`}>{chg}</span>
+                    { pair: "XAU / EUR", desc: "European Spot", price: "2,164.55", chg: "-0.28%", up: false },
+                    { pair: "XAU / GBP", desc: "British Spot", price: "1,812.90", chg: "+0.82%", up: true },
+                    { pair: "XAU / JPY", desc: "Japanese Spot", price: "356,842", chg: "+2.11%", up: true },
+                    { pair: "XAU / AUD", desc: "Australian Spot", price: "3,548.20", chg: "-0.34%", up: false },
+                    { pair: "XAU / CHF", desc: "Swiss Spot", price: "2,088.44", chg: "+0.61%", up: true },
+                  ].map((r) => (
+                    <div key={r.pair} className="px-5 py-4 flex justify-between items-center hover:bg-emerald-500/[0.03] transition-colors cursor-pointer">
+                      <div>
+                        <div className="text-[13px] font-bold text-white">{r.pair}</div>
+                        <div className="text-[10px] text-zinc-600 font-medium tracking-wide uppercase">{r.desc}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className={`${MONO} text-[13px] text-zinc-200`}>{r.price}</div>
+                        <div className={`${MONO} text-[10px] tracking-tighter ${r.up ? "text-emerald-500" : "text-rose-500"}`}>{r.chg}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-black overflow-hidden">
-            {/* header */}
-            <div className="grid grid-cols-[2fr_1.2fr_0.9fr_2fr_1fr] items-center px-6 py-3 border-b border-white/10 bg-white/[0.02]">
-              {["Symbol", "Last Price", "24h", "1D Chart", "Sentiment"].map((h) => (
-                <span key={h} className={`${MONO} text-[10px] font-bold text-white/40 uppercase tracking-widest`}>{h}</span>
-              ))}
-            </div>
-
-            {/* rows */}
-            {[
-              { pair: "XAU / USD", desc: "Gold / US Dollar", tag: "AU", price: "2,342.18", chg: "+1.42%", up: true, sentiment: 84, spark: "M0,30 L25,26 L50,28 L75,20 L100,22 L125,15 L150,18 L175,12 L200,14 L225,9 L250,11 L275,6 L300,8 L325,4 L350,7 L375,3 L400,5" },
-              { pair: "XAU / EUR", desc: "Gold / Euro", tag: "EU", price: "2,164.55", chg: "-0.28%", up: false, sentiment: 42, spark: "M0,10 L25,14 L50,12 L75,18 L100,16 L125,22 L150,20 L175,26 L200,23 L225,28 L250,25 L275,30 L300,27 L325,32 L350,29 L375,34 L400,31" },
-              { pair: "XAU / GBP", desc: "Gold / Pound", tag: "GB", price: "1,812.90", chg: "+0.82%", up: true, sentiment: 72, spark: "M0,25 L25,22 L50,24 L75,18 L100,20 L125,15 L150,17 L175,12 L200,16 L225,10 L250,13 L275,8 L300,11 L325,6 L350,9 L375,7 L400,5" },
-              { pair: "XAU / JPY", desc: "Gold / Yen", tag: "JP", price: "356,842", chg: "+2.11%", up: true, sentiment: 94, spark: "M0,32 L25,28 L50,30 L75,22 L100,24 L125,16 L150,19 L175,12 L200,15 L225,8 L250,10 L275,6 L300,7 L325,4 L350,5 L375,3 L400,2" },
-              { pair: "XAU / AUD", desc: "Gold / Aussie", tag: "AU", price: "3,548.20", chg: "-0.34%", up: false, sentiment: 38, spark: "M0,8 L25,12 L50,10 L75,15 L100,13 L125,18 L150,16 L175,22 L200,20 L225,25 L250,23 L275,28 L300,26 L325,30 L350,27 L375,32 L400,29" },
-              { pair: "XAU / CHF", desc: "Gold / Swiss Franc", tag: "CH", price: "2,088.44", chg: "+0.61%", up: true, sentiment: 66, spark: "M0,22 L25,20 L50,23 L75,17 L100,20 L125,14 L150,17 L175,11 L200,15 L225,9 L250,12 L275,8 L300,11 L325,6 L350,10 L375,7 L400,9" },
-            ].map((r, idx) => (
-              <div
-                key={r.pair}
-                className={`grid grid-cols-[2fr_1.2fr_0.9fr_2fr_1fr] items-center px-6 py-4 border-t border-white/5 hover:bg-white/[0.03] transition-colors ${r.up ? "flash-up" : "flash-down"}`}
-                style={{ animationDelay: `${idx * 0.4}s` }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center border ${r.up ? "bg-emerald-500/10 border-emerald-500/20" : "bg-red-500/10 border-red-500/20"}`}>
-                    <span className={`${MONO} text-[10px] font-bold ${r.up ? "text-emerald-500" : "text-red-500"}`}>{r.tag}</span>
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-white tracking-tight">{r.pair}</div>
-                    <div className="text-[10px] text-white/40">{r.desc}</div>
-                  </div>
-                </div>
-                <div className={`${MONO} text-sm font-medium ${r.up ? "text-emerald-400" : "text-red-400"}`}>{r.price}</div>
-                <div>
-                  <span className={`${MONO} inline-flex px-2 py-0.5 rounded text-[11px] font-bold ${r.up ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"}`}>
-                    {r.chg}
-                  </span>
-                </div>
-                <div>
-                  <svg viewBox="0 0 400 40" className="w-full h-10" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id={`grad-${idx}`} x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor={r.up ? "#10b981" : "#ef4444"} stopOpacity="0.3" />
-                        <stop offset="100%" stopColor={r.up ? "#10b981" : "#ef4444"} stopOpacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <path d={`${r.spark} L400,40 L0,40 Z`} fill={`url(#grad-${idx})`} />
-                    <path className="spark-path" d={r.spark} fill="none" stroke={r.up ? "#10b981" : "#ef4444"} strokeWidth="1.5" style={{ animationDelay: `${idx * 0.2}s` }} />
-                  </svg>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider">
-                    <span className="text-white/40">{r.sentiment >= 60 ? "Bullish" : r.sentiment >= 40 ? "Neutral" : "Bearish"}</span>
-                    <span className={r.up ? "text-emerald-500" : "text-red-500"}>{r.sentiment}%</span>
-                  </div>
-                  <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${r.up ? "bg-emerald-500" : "bg-red-500"} bar-grow`}
-                      style={{ width: `${r.sentiment}%`, animationDelay: `${idx * 0.15}s` }}
-                    />
-                  </div>
+                <div className="p-5 border-t border-zinc-900">
+                  <Link
+                    to="/signals-live"
+                    className="block w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold uppercase tracking-widest rounded transition-all active:scale-[0.98] text-center"
+                  >
+                    Open Trading View
+                  </Link>
                 </div>
               </div>
-            ))}
+            </div>
 
-            {/* footer status */}
-            <div className="px-6 py-3 border-t border-white/10 bg-white/[0.02] flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className={`${MONO} text-[10px] text-white/60 uppercase tracking-widest`}>Streaming · 12 LPs</span>
-                </div>
-                <span className={`${MONO} text-[10px] text-white/40 uppercase tracking-widest`}>Next: US CPI 08:30 EST</span>
+            {/* Bottom Ticker Tape */}
+            <div className="bg-zinc-900/60 border-t border-zinc-800 p-2 overflow-hidden whitespace-nowrap">
+              <div className="flex gap-12 jv-ticker will-change-transform">
+                {[...Array(2)].map((_, dup) => (
+                  <div key={dup} className="flex gap-8 shrink-0">
+                    {[
+                      ["PAXG", "$2,045.10", "▲ 0.22%", true],
+                      ["SILVER", "$22.84", "▼ 1.15%", false],
+                      ["PLAT", "$904.30", "▲ 0.51%", true],
+                      ["PALL", "$1,024.10", "-- 0.00%", null],
+                      ["BTC/XAU", "31.22", "▼ 0.42%", false],
+                      ["DXY", "104.22", "▼ 0.18%", false],
+                      ["US10Y", "4.284", "▲ 0.03", true],
+                    ].map(([sym, px, chg, up], i) => (
+                      <span key={`${dup}-${i}`} className={`${MONO} text-[10px] text-zinc-400`}>
+                        <span className="text-zinc-600">{sym}:</span> {px}{" "}
+                        <span className={up === null ? "text-zinc-500" : up ? "text-emerald-500" : "text-rose-500"}>{chg}</span>
+                      </span>
+                    ))}
+                  </div>
+                ))}
               </div>
-              <span className={`${MONO} text-[10px] text-white/40`}>SYNC · UTC 14:02:11</span>
             </div>
           </div>
         </div>
