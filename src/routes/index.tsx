@@ -731,10 +731,10 @@ function HomePage() {
                     return (
                     <th
                       key={p.name}
-                      className={`p-6 text-left align-top border-l border-white/10 ${isCurrent ? "bg-emerald-500/10" : p.accent ? "bg-amber-500/10" : ""}`}
+                      className="p-6 text-left align-top border-l border-white/10 bg-black"
                     >
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-white"}`}>{p.name}</span>
+                        <span className="text-base font-semibold text-white">{p.name}</span>
                         {isCurrent && (
                           <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
                             Current
