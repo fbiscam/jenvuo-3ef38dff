@@ -887,7 +887,7 @@ function HomePage() {
               ["ICT setups marked live on the chart, with voice — I stopped second-guessing my entries.", "M. Chen", "Independent · Singapore"],
               ["Gold execution is on another level. The killzone + sweep logic is exactly how I trade.", "S. Patel", "Family Office · London"],
             ].map(([q, n, r]) => (
-              <figure key={n} className="rounded-2xl border border-zinc-200 bg-white p-6">
+              <figure key={n} className="rounded-2xl border border-emerald-500 bg-white p-6">
                 <blockquote className="text-sm leading-relaxed text-zinc-700">"{q}"</blockquote>
                 <figcaption className="mt-4 flex items-center justify-between text-xs">
                   <div>
@@ -909,8 +909,8 @@ function HomePage() {
           <h2 className="text-left text-xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
             Why traders move to JENVU.
           </h2>
-          <div className="mt-10 rounded-2xl border border-zinc-200 bg-white overflow-hidden">
-            <div className={`hidden md:grid grid-cols-4 px-6 py-4 border-b border-zinc-200 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
+          <div className="mt-10 rounded-2xl border border-emerald-500 bg-white overflow-hidden">
+            <div className={`hidden md:grid grid-cols-4 px-6 py-4 border-b border-emerald-500 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
               <span>Capability</span>
               <span className="text-center">Generic AI</span>
               <span className="text-center">Signal Group</span>
@@ -926,7 +926,7 @@ function HomePage() {
             ].map(([cap, a, b, c], i) => (
               <div
                 key={String(cap)}
-                className={`px-5 sm:px-6 py-4 text-sm ${i !== 0 ? "border-t border-zinc-100" : ""}`}
+                className={`px-5 sm:px-6 py-4 text-sm ${i !== 0 ? "border-t border-emerald-500/30" : ""}`}
               >
                 {/* desktop row */}
                 <div className="hidden md:grid grid-cols-4 items-center">
@@ -1039,7 +1039,7 @@ function HomePage() {
       <section className="overflow-hidden">
 
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
+          <div className="rounded-2xl border border-emerald-500 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
             <div className="max-w-xl text-left md:text-left">
               <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal.&nbsp;<br />
