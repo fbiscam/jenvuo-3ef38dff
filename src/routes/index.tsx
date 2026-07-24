@@ -827,9 +827,9 @@ function HomePage() {
                         className="px-2 py-3.5 text-center border-l border-white/10 min-w-[120px] bg-black"
                       >
                         {v === true ? (
-                          <span className="inline-block h-1.5 w-1.5 rounded-full bg-white" />
+                          <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: "#ffffff" }} />
                         ) : v === false ? (
-                          <span className="inline-block h-px w-4 bg-white" />
+                          <span className="inline-block h-px w-4" style={{ backgroundColor: "#ffffff" }} />
                         ) : (
                           <span className={`${MONO} text-[11px] tracking-wider text-white ${row.isHeading ? "font-semibold" : ""}`}>
                             {v}
