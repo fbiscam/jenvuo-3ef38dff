@@ -299,160 +299,137 @@ function HomePage() {
       <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28 overflow-hidden">
         {/* aurora market pulse background — desktop + tablet only */}
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block overflow-hidden">
-          {/* aurora gradient waves — bull/bear reflection */}
-          <div
-            className="absolute -inset-[20%] opacity-80"
-            style={{
-              background:
-                "conic-gradient(from 180deg at 50% 50%, rgba(16,185,129,0.28), rgba(244,63,94,0.10), rgba(16,185,129,0.05), rgba(234,88,12,0.14), rgba(16,185,129,0.28), rgba(244,63,94,0.10), rgba(16,185,129,0.28))",
-              filter: "blur(60px)",
-              animation: "hero-aurora 24s linear infinite, hero-hue 12s ease-in-out infinite",
-            }}
-          />
-          {/* deep glow orbs — green up, red down */}
-          <div
-            className="absolute left-[8%] top-[60%] h-[380px] w-[380px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(16,185,129,0.42), transparent 70%)", animation: "hero-drift 14s ease-in-out infinite, hero-pulse-up 6s ease-in-out infinite" }}
-          />
-          <div
-            className="absolute right-[10%] top-[15%] h-[340px] w-[340px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(244,63,94,0.34), transparent 70%)", animation: "hero-drift 18s ease-in-out infinite -6s, hero-pulse-down 6s ease-in-out infinite -3s" }}
-          />
-          <div
-            className="absolute left-[55%] top-[5%] h-[260px] w-[260px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(234,179,8,0.22), transparent 70%)", animation: "hero-drift 22s ease-in-out infinite -10s" }}
-          />
-
-          {/* perspective grid floor */}
-          <div
-            className="absolute inset-x-0 bottom-0 h-[60%] opacity-[0.18]"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, rgba(16,185,129,0.35) 1px, transparent 1px), linear-gradient(to bottom, rgba(16,185,129,0.35) 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
-              transform: "perspective(600px) rotateX(60deg)",
-              transformOrigin: "center bottom",
-              maskImage: "linear-gradient(to top, black 20%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(to top, black 20%, transparent 100%)",
-              animation: "hero-floor 8s linear infinite",
-            }}
-          />
-
-          {/* orbital rings + radar sweep */}
-          <svg className="absolute right-[-120px] top-1/2 -translate-y-1/2 h-[720px] w-[720px] opacity-60" viewBox="0 0 400 400">
-            <defs>
-              <radialGradient id="radar" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#10b981" stopOpacity="0.35" />
-                <stop offset="70%" stopColor="#10b981" stopOpacity="0" />
-              </radialGradient>
-              <linearGradient id="sweep" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
-                <stop offset="100%" stopColor="#10b981" stopOpacity="0.8" />
-              </linearGradient>
-            </defs>
-            <circle cx="200" cy="200" r="80" fill="none" stroke="rgba(16,185,129,0.28)" strokeWidth="0.8" />
-            <circle cx="200" cy="200" r="130" fill="none" stroke="rgba(16,185,129,0.22)" strokeWidth="0.8" strokeDasharray="2 6" />
-            <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(16,185,129,0.18)" strokeWidth="0.8" />
-            <circle cx="200" cy="200" r="180" fill="url(#radar)" />
-            {/* radar sweep arm */}
-            <g style={{ transformOrigin: "200px 200px", animation: "hero-spin 6s linear infinite" }}>
-              <path d="M200 200 L200 20 A180 180 0 0 1 355 130 Z" fill="url(#sweep)" opacity="0.35" />
-              <line x1="200" y1="200" x2="200" y2="20" stroke="#10b981" strokeWidth="1" />
-            </g>
-            {/* orbiting nodes */}
-            <g style={{ transformOrigin: "200px 200px", animation: "hero-spin 20s linear infinite" }}>
-              <circle cx="200" cy="20" r="3.5" fill="#10b981" />
-              <circle cx="200" cy="20" r="7" fill="#10b981" opacity="0.25" />
-            </g>
-            <g style={{ transformOrigin: "200px 200px", animation: "hero-spin-rev 14s linear infinite" }}>
-              <circle cx="330" cy="200" r="2.5" fill="#34d399" />
-            </g>
-            <g style={{ transformOrigin: "200px 200px", animation: "hero-spin 28s linear infinite" }}>
-              <circle cx="20" cy="200" r="2" fill="#6ee7b7" opacity="0.7" />
-            </g>
-          </svg>
-
-          {/* heartbeat / EKG price line */}
-          <svg className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[260px] w-full opacity-70" viewBox="0 0 1200 200" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="ekgGrad" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
-                <stop offset="20%" stopColor="#10b981" stopOpacity="0.85" />
-                <stop offset="50%" stopColor="#eab308" stopOpacity="0.8" />
-                <stop offset="80%" stopColor="#f43f5e" stopOpacity="0.85" />
-                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M0 100 L180 100 L200 100 L210 60 L220 140 L235 40 L250 160 L265 100 L420 100 L440 100 L455 70 L470 130 L485 100 L640 100 L660 100 L675 50 L690 150 L705 100 L860 100 L880 100 L895 80 L910 120 L925 100 L1200 100"
-              fill="none"
-              stroke="url(#ekgGrad)"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeDasharray="2400"
-              strokeDashoffset="2400"
-              style={{ animation: "hero-draw 6s ease-in-out infinite" }}
-            />
-          </svg>
-
-          {/* ticker tape numbers */}
-          <div
-            className="absolute left-0 right-0 top-6 flex gap-8 whitespace-nowrap text-[10px] font-mono tracking-widest text-emerald-400/40"
-            style={{ animation: "hero-ticker 40s linear infinite" }}
-          >
-            {Array.from({ length: 2 }).map((_, r) => (
-              <div key={r} className="flex gap-8">
-                <span>XAU/USD 2648.32 ▲</span><span>DXY 106.14 ▼</span><span>XAU/EUR 2510.88 ▲</span>
-                <span>US10Y 4.28% ▲</span><span>XAU/GBP 2098.44 ▼</span><span>VIX 14.62 ▼</span>
-                <span>XAU/JPY 411820 ▲</span><span>SPX 6041.7 ▲</span><span>XAU/AUD 4082.11 ▲</span>
-              </div>
-            ))}
-          </div>
-
-          {/* floating particles */}
-          <svg className="absolute inset-0 h-full w-full">
-            {Array.from({ length: 22 }).map((_, i) => {
-              const cx = (i * 73) % 1200;
-              const cy = (i * 47) % 500 + 30;
-              const up = i % 2 === 0;
-              return (
-                <circle
-                  key={`p-${i}`}
-                  cx={cx}
-                  cy={cy}
-                  r={1.6}
-                  fill={up ? "#10b981" : "#f43f5e"}
-                  opacity="0.6"
-                  style={{ animation: `${up ? "hero-float-up" : "hero-float-down"} ${5 + (i % 5)}s ease-in-out ${i * 0.3}s infinite` }}
-                />
-              );
-            })}
-          </svg>
-
-          {/* soft vignette to keep text readable */}
+          {/* base gradient wash */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(ellipse at 25% 45%, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.92) 55%, #000 100%)",
+                "radial-gradient(ellipse 80% 60% at 80% 20%, rgba(16,185,129,0.18), transparent 60%), radial-gradient(ellipse 70% 60% at 15% 80%, rgba(244,63,94,0.14), transparent 60%), #000",
+            }}
+          />
+
+          {/* trading grid floor */}
+          <div
+            className="absolute inset-0 opacity-[0.18]"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, rgba(16,185,129,0.28) 1px, transparent 1px), linear-gradient(to bottom, rgba(16,185,129,0.18) 1px, transparent 1px)",
+              backgroundSize: "80px 40px",
+              maskImage: "linear-gradient(to bottom, black 0%, transparent 90%)",
+              WebkitMaskImage: "linear-gradient(to bottom, black 0%, transparent 90%)",
+              animation: "hero-grid-scroll 12s linear infinite",
+            }}
+          />
+
+          {/* horizontal price levels (support/resistance) */}
+          <div className="absolute inset-x-0 top-[22%] h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
+          <div className="absolute inset-x-0 top-[48%] h-px bg-gradient-to-r from-transparent via-yellow-400/30 to-transparent" style={{ animation: "hero-level 4s ease-in-out infinite" }} />
+          <div className="absolute inset-x-0 top-[72%] h-px bg-gradient-to-r from-transparent via-rose-400/40 to-transparent" />
+
+          {/* scrolling candlesticks */}
+          <div
+            className="absolute left-0 top-[28%] flex h-[45%] items-end gap-[6px] whitespace-nowrap will-change-transform"
+            style={{ animation: "hero-candles 40s linear infinite", width: "200%" }}
+          >
+            {Array.from({ length: 120 }).map((_, i) => {
+              // deterministic pseudo-random candle shape
+              const seed = Math.sin(i * 12.9898) * 43758.5453;
+              const rand = seed - Math.floor(seed);
+              const bull = rand > 0.45;
+              const bodyH = 12 + Math.floor(rand * 60);
+              const wickH = bodyH + 10 + Math.floor(rand * 30);
+              const offsetY = Math.floor((rand - 0.5) * 60);
+              const color = bull ? "#10b981" : "#f43f5e";
+              return (
+                <div
+                  key={`c-${i}`}
+                  className="relative flex flex-col items-center justify-end"
+                  style={{ transform: `translateY(${offsetY}px)`, opacity: 0.65 }}
+                >
+                  <div style={{ width: 1, height: wickH, background: color, opacity: 0.55 }} />
+                  <div
+                    className="absolute bottom-0"
+                    style={{ width: 6, height: bodyH, background: color, boxShadow: `0 0 8px ${color}55` }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          {/* moving average line overlay */}
+          <svg className="absolute inset-x-0 top-[28%] h-[45%] w-full opacity-70" viewBox="0 0 1200 200" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="maGrad" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
+                <stop offset="30%" stopColor="#10b981" stopOpacity="0.9" />
+                <stop offset="70%" stopColor="#eab308" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M0 120 C 120 60, 240 140, 360 100 S 600 40, 720 110 S 960 170, 1200 90"
+              fill="none"
+              stroke="url(#maGrad)"
+              strokeWidth="1.6"
+              strokeDasharray="2400"
+              strokeDashoffset="2400"
+              style={{ animation: "hero-draw 8s ease-in-out infinite" }}
+            />
+          </svg>
+
+          {/* order book depth — left (bids) */}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 flex w-[180px] flex-col gap-[3px] px-3">
+            {Array.from({ length: 14 }).map((_, i) => (
+              <div
+                key={`bid-${i}`}
+                className="h-[6px] rounded-r-sm bg-gradient-to-r from-emerald-500/50 to-emerald-500/0"
+                style={{ width: `${30 + ((i * 37) % 60)}%`, animation: `hero-book 3s ease-in-out ${i * 0.15}s infinite` }}
+              />
+            ))}
+          </div>
+          {/* order book depth — right (asks) */}
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex w-[180px] flex-col items-end gap-[3px] px-3">
+            {Array.from({ length: 14 }).map((_, i) => (
+              <div
+                key={`ask-${i}`}
+                className="h-[6px] rounded-l-sm bg-gradient-to-l from-rose-500/50 to-rose-500/0"
+                style={{ width: `${30 + ((i * 53) % 60)}%`, animation: `hero-book 3s ease-in-out ${i * 0.18}s infinite` }}
+              />
+            ))}
+          </div>
+
+          {/* scrolling ticker tape */}
+          <div
+            className="absolute left-0 right-0 top-4 flex gap-8 whitespace-nowrap text-[10px] font-mono tracking-widest text-emerald-400/40"
+            style={{ animation: "hero-ticker 40s linear infinite" }}
+          >
+            {Array.from({ length: 2 }).map((_, r) => (
+              <div key={r} className="flex gap-8">
+                <span>XAU/USD 2648.32 ▲</span><span className="text-rose-400/40">DXY 106.14 ▼</span><span>XAU/EUR 2510.88 ▲</span>
+                <span>US10Y 4.28% ▲</span><span className="text-rose-400/40">XAU/GBP 2098.44 ▼</span><span className="text-rose-400/40">VIX 14.62 ▼</span>
+                <span>XAU/JPY 4118.20 ▲</span><span>SPX 6041.7 ▲</span><span>XAU/AUD 4082.11 ▲</span>
+              </div>
+            ))}
+          </div>
+
+          {/* vignette for readability */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse at 25% 45%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 60%, #000 100%)",
             }}
           />
         </div>
         <style>{`
-          @keyframes hero-aurora { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-          @keyframes hero-drift { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px,-20px) scale(1.1); } }
-          @keyframes hero-floor { from { background-position: 0 0; } to { background-position: 0 60px; } }
-          @keyframes hero-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-          @keyframes hero-spin-rev { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
-          @keyframes hero-draw { 0% { stroke-dashoffset: 2400; } 60% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -2400; } }
+          @keyframes hero-candles { from { transform: translateX(0); } to { transform: translateX(-50%); } }
           @keyframes hero-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-          @keyframes hero-float { 0%,100% { transform: translateY(0); opacity: 0.35; } 50% { transform: translateY(-14px); opacity: 0.75; } }
-          @keyframes hero-float-up { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(-22px); opacity: 0.9; } }
-          @keyframes hero-float-down { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(22px); opacity: 0.9; } }
-          @keyframes hero-hue { 0%,100% { filter: blur(60px) hue-rotate(0deg); } 50% { filter: blur(60px) hue-rotate(40deg); } }
-          @keyframes hero-pulse-up { 0%,100% { opacity: 0.5; transform: translateY(0) scale(1); } 50% { opacity: 1; transform: translateY(-18px) scale(1.08); } }
-          @keyframes hero-pulse-down { 0%,100% { opacity: 0.5; transform: translateY(0) scale(1); } 50% { opacity: 1; transform: translateY(18px) scale(1.08); } }
+          @keyframes hero-grid-scroll { from { background-position: 0 0; } to { background-position: 0 40px; } }
+          @keyframes hero-draw { 0% { stroke-dashoffset: 2400; } 60% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -2400; } }
+          @keyframes hero-level { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+          @keyframes hero-book { 0%,100% { opacity: 0.4; transform: scaleX(1); } 50% { opacity: 1; transform: scaleX(1.08); } }
         `}</style>
+
 
         <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
 
