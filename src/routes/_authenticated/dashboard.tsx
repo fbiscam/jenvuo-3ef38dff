@@ -891,7 +891,7 @@ function DashboardLayout() {
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
             <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             {!sidebarCollapsed && (
-              <span className="brand-wordmark truncate text-[15px] font-medium tracking-tight text-white" style={{ fontFamily: '"Google Sans", "Product Sans", ui-sans-serif, system-ui, sans-serif' }}>JENVU</span>
+              <span className="brand-wordmark truncate text-[22px] font-normal tracking-tight text-white" style={{ fontFamily: '"Google Sans", "Product Sans", ui-sans-serif, system-ui, sans-serif' }}>Jenvu</span>
             )}
           </Link>
           <button
