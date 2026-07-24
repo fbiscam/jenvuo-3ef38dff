@@ -464,6 +464,22 @@ html, body { background-color: #000 !important; color: #fff; }
 .dash-dark [class*="bg-\\[\\#FAFAFA\\]"],
 .dash-dark [class*="bg-\\[\\#FFFFFF\\]"] { background-color: var(--dd-surface) !important; }
 
+/* Keep buttons & links pinned to pure white + black text (site-wide CTA style) */
+.dash-dark button.bg-white,
+.dash-dark a.bg-white,
+.dash-dark [role="button"].bg-white,
+.dash-dark input[type="submit"].bg-white,
+.dash-dark input[type="button"].bg-white { background-color: #ffffff !important; color: #000000 !important; }
+
+.dash-dark button.bg-white .text-black,
+.dash-dark a.bg-white .text-black,
+.dash-dark button.bg-white,
+.dash-dark a.bg-white { color: #000000 !important; }
+
+.dash-dark button.bg-white:hover,
+.dash-dark a.bg-white:hover { background-color: rgba(255,255,255,0.9) !important; }
+
+
 .dash-dark .bg-zinc-50 { background-color: var(--dd-surface-2) !important; }
 .dash-dark .bg-zinc-100 { background-color: var(--dd-surface-3) !important; }
 .dash-dark .bg-zinc-200 { background-color: var(--dd-surface-3) !important; }
