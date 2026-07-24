@@ -460,14 +460,14 @@ html, body { background-color: #000 !important; color: #fff; }
 /* Base surfaces */
 .dash-dark { background-color: var(--dd-bg) !important; color: var(--dd-fg) !important; }
 .dash-dark .bg-white,
-.dash-dark [class*="bg-white\\/"],
+.dash-dark [class*="bg-white/"],
 .dash-dark [class*="bg-\\[\\#F8F8F8\\]"],
 .dash-dark [class*="bg-\\[\\#FAFAFA\\]"],
 .dash-dark [class*="bg-\\[\\#FFFFFF\\]"] { background-color: var(--dd-surface) !important; }
 
 /* Translucent white headers / navs → dark translucent */
-.dash-dark header[class*="bg-white\\/"],
-.dash-dark nav[class*="bg-white\\/"] { background-color: rgba(0,0,0,0.75) !important; }
+.dash-dark header[class*="bg-white/"],
+.dash-dark nav[class*="bg-white/"] { background-color: rgba(0,0,0,0.75) !important; }
 
 /* Keep buttons & links pinned to pure white + black text (site-wide CTA style) */
 .dash-dark button.bg-white,
