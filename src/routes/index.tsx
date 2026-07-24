@@ -778,7 +778,7 @@ function HomePage() {
                           className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
                             p.accent || p.dark
                               ? "bg-white text-black hover:bg-white/90"
-                              : "border border-white/20 bg-white text-white hover:bg-zinc-50"
+                              : "border border-white/20 bg-white text-black hover:bg-white/90"
                           }`}
                         >
                           {cta}
