@@ -399,11 +399,11 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
                   text: `⚙️ Scanning <b>${escapeHtml(pair)}</b> — running analysis, results in ~15s…`,
                   parse_mode: "HTML",
                 });
-                await triggerScanAsync({
+                await runScanInline({
+                  botToken,
                   chatId: cbChatId,
                   userId: link.user_id as string,
                   pair,
-                  originUrl: new URL(request.url),
                 });
               }
             } catch (err) {
