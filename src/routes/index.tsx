@@ -455,10 +455,11 @@ function HomePage() {
                       <div
                         key={i}
                         className="flex-1 rounded-t-sm bg-white"
-                        style={{ height: `${h}%` }}
+                        style={{ height: `${h}%`, opacity: 0.3 + (h / 100) * 0.7 }}
                       />
                     ))}
                   </div>
+
                 </div>
 
                 <div className="space-y-3">
