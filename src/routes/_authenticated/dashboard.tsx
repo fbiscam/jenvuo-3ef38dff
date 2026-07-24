@@ -889,10 +889,9 @@ function DashboardLayout() {
         {/* Brand */}
         <div className={`flex h-11 shrink-0 items-center gap-2.5 ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
-            {sidebarCollapsed ? (
-              <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            ) : (
-              <img src={jenvuWordmark} alt="JENVU" className="h-6 w-auto shrink-0 object-contain" style={{ filter: "drop-shadow(0 0 4px rgba(255,255,255,0.35))" }} />
+            <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
+            {!sidebarCollapsed && (
+              <span className="brand-wordmark truncate text-[15px] font-semibold tracking-tight text-zinc-900">JENVU</span>
             )}
           </Link>
           <button
