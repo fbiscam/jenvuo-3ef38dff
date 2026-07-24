@@ -385,7 +385,7 @@ function HomePage() {
                 {SIGNALS.map((s) => (
                   <div
                     key={s.pair + s.t}
-                    className={`p-3 rounded-lg border border-zinc-200 bg-white text-zinc-900 space-y-2`}
+                    className={`light-card p-3 rounded-lg border border-zinc-200 bg-white text-zinc-900 space-y-2`}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-xs font-semibold text-zinc-900">{s.pair}</span>
