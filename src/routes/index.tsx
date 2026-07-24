@@ -964,7 +964,7 @@ function HomePage() {
               <h2 className="text-xl font-semibold tracking-tight sm:text-3xl">Asked often.</h2>
               <p className="mt-3 text-zinc-900">Everything else lives in the docs&nbsp;</p>
             </div>
-            <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
+            <div className="lg:col-span-8">
               {[
                 {
                   q: "Which pairs does JENVU cover?",
