@@ -881,6 +881,10 @@ function DashboardLayout() {
         .dashboard-sidebar-root .material-symbols-rounded { color: #ffffff !important; }
         .dashboard-sidebar-root svg { color: #ffffff !important; }
         .dashboard-sidebar-root .brand-logo { filter: brightness(0) invert(1); }
+        /* Active nav item: distinct white pill on black sidebar */
+        .dashboard-sidebar-root a.sidebar-nav-active { background: #ffffff !important; }
+        .dashboard-sidebar-root a.sidebar-nav-active, .dashboard-sidebar-root a.sidebar-nav-active span, .dashboard-sidebar-root a.sidebar-nav-active .material-symbols-rounded, .dashboard-sidebar-root a.sidebar-nav-active svg { color: #000000 !important; }
+        .dashboard-sidebar-root a:not(.sidebar-nav-active):hover { background: rgba(255,255,255,0.08) !important; }
         `}</style>
         {/* Brand */}
         <div className={`flex h-11 shrink-0 items-center gap-2.5 ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
@@ -931,8 +935,8 @@ function DashboardLayout() {
                       className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition
                         ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}
                         ${active
-                          ? "bg-zinc-100 text-zinc-900 font-semibold"
-                          : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
+                          ? "sidebar-nav-active font-semibold"
+                          : "text-[#5E5E5E]"}`}
                     >
                       <span
                         className="material-symbols-rounded shrink-0"
