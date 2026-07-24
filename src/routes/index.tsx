@@ -299,24 +299,28 @@ function HomePage() {
       <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28 overflow-hidden">
         {/* aurora market pulse background — desktop + tablet only */}
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block overflow-hidden">
-          {/* aurora gradient waves */}
+          {/* aurora gradient waves — bull/bear reflection */}
           <div
-            className="absolute -inset-[20%] opacity-70"
+            className="absolute -inset-[20%] opacity-80"
             style={{
               background:
-                "conic-gradient(from 180deg at 50% 50%, rgba(16,185,129,0.18), rgba(5,150,105,0.05), rgba(16,185,129,0.22), rgba(4,120,87,0.04), rgba(16,185,129,0.18))",
+                "conic-gradient(from 180deg at 50% 50%, rgba(16,185,129,0.28), rgba(244,63,94,0.10), rgba(16,185,129,0.05), rgba(234,88,12,0.14), rgba(16,185,129,0.28), rgba(244,63,94,0.10), rgba(16,185,129,0.28))",
               filter: "blur(60px)",
-              animation: "hero-aurora 24s linear infinite",
+              animation: "hero-aurora 24s linear infinite, hero-hue 12s ease-in-out infinite",
             }}
           />
-          {/* deep glow orbs */}
+          {/* deep glow orbs — green up, red down */}
           <div
-            className="absolute left-[8%] top-[45%] h-[380px] w-[380px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(16,185,129,0.32), transparent 70%)", animation: "hero-drift 14s ease-in-out infinite" }}
+            className="absolute left-[8%] top-[60%] h-[380px] w-[380px] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(16,185,129,0.42), transparent 70%)", animation: "hero-drift 14s ease-in-out infinite, hero-pulse-up 6s ease-in-out infinite" }}
           />
           <div
-            className="absolute right-[6%] top-[8%] h-[300px] w-[300px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(52,211,153,0.16), transparent 70%)", animation: "hero-drift 18s ease-in-out infinite -6s" }}
+            className="absolute right-[10%] top-[15%] h-[340px] w-[340px] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(244,63,94,0.34), transparent 70%)", animation: "hero-drift 18s ease-in-out infinite -6s, hero-pulse-down 6s ease-in-out infinite -3s" }}
+          />
+          <div
+            className="absolute left-[55%] top-[5%] h-[260px] w-[260px] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(234,179,8,0.22), transparent 70%)", animation: "hero-drift 22s ease-in-out infinite -10s" }}
           />
 
           {/* perspective grid floor */}
