@@ -196,8 +196,6 @@ function HomePage() {
             <Link to="/signals-live" className="hover:text-white/80">Signals Live</Link>
             <Link to="/ai-engine" className="hover:text-white/80">AI Engine</Link>
             <Link to="/founding" className="hover:text-white/80">Founding</Link>
-            <Link to="/about" className="hover:text-white/80">About</Link>
-
             <Link to="/contact" className="hover:text-white/80">Contact</Link>
           </nav>
           <div className="flex items-center gap-2">
