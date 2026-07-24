@@ -298,8 +298,76 @@ function HomePage() {
 
       <main>
       {/* HERO */}
-      <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
+      <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28 overflow-hidden">
+        {/* trading background animation — desktop + tablet only */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block">
+          {/* grid */}
+          <div
+            className="absolute inset-0 opacity-[0.18]"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
+              maskImage: "radial-gradient(ellipse at center, black 55%, transparent 90%)",
+              WebkitMaskImage: "radial-gradient(ellipse at center, black 55%, transparent 90%)",
+            }}
+          />
+          {/* candlesticks */}
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1200 500" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="lineGrad" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
+                <stop offset="50%" stopColor="#10b981" stopOpacity="0.55" />
+                <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            {/* scrolling price line */}
+            <g style={{ animation: "hero-scroll 22s linear infinite" }}>
+              <polyline
+                fill="none"
+                stroke="url(#lineGrad)"
+                strokeWidth="1.5"
+                points="0,320 60,300 120,340 180,280 240,310 300,240 360,270 420,220 480,260 540,200 600,230 660,180 720,220 780,170 840,200 900,150 960,190 1020,140 1080,170 1140,120 1200,150 1260,110 1320,140 1380,90 1440,120 1500,70 1560,100 1620,50 1680,80 1740,30 1800,60 1860,20 1920,50 1980,10 2040,40 2100,0 2160,30 2220,-10 2280,20"
+              />
+            </g>
+            {/* candles */}
+            {Array.from({ length: 26 }).map((_, i) => {
+              const x = i * 48 + 20;
+              const isUp = i % 3 !== 0;
+              const color = isUp ? "#10b981" : "#ef4444";
+              const bodyH = 18 + ((i * 13) % 40);
+              const wickTop = 30 + ((i * 7) % 60);
+              const bodyY = 220 + ((i * 17) % 90);
+              return (
+                <g
+                  key={i}
+                  opacity="0.35"
+                  style={{
+                    animation: `hero-candle 4s ease-in-out ${i * 0.15}s infinite`,
+                    transformOrigin: `${x + 6}px ${bodyY + bodyH / 2}px`,
+                  }}
+                >
+                  <line x1={x + 6} x2={x + 6} y1={bodyY - wickTop} y2={bodyY + bodyH + wickTop / 2} stroke={color} strokeWidth="1" />
+                  <rect x={x} y={bodyY} width="12" height={bodyH} fill={color} />
+                </g>
+              );
+            })}
+          </svg>
+          {/* soft vignette to keep text readable */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse at 30% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.9) 60%, #000 100%)",
+            }}
+          />
+        </div>
+        <style>{`
+          @keyframes hero-scroll { from { transform: translateX(0); } to { transform: translateX(-1080px); } }
+          @keyframes hero-candle { 0%,100% { transform: scaleY(1); opacity: 0.3; } 50% { transform: scaleY(1.15); opacity: 0.55; } }
+        `}</style>
         <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
+
           <div className="text-left lg:col-span-7 lg:text-left">
 
             <h1 className="mt-5 max-w-3xl text-[28px] font-semibold tracking-tight leading-[1.1] sm:text-[42px] md:text-[56px] lg:mx-0 text-zinc-900">
