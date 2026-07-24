@@ -5,7 +5,6 @@ import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { LiveMarketTerminal } from "@/components/LiveMarketTerminal";
-import { KillzoneClockSection } from "@/components/KillzoneClockSection";
 
 
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -723,9 +722,6 @@ function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* KILLZONE CLOCK */}
-      <KillzoneClockSection />
 
       {/* PRICING — comparison matrix (old style) */}
       <section className="bg-black">
