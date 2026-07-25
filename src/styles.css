@@ -456,3 +456,45 @@
 .dashboard-dark-widget .hover\:bg-zinc-100:hover { background-color: rgba(255,255,255,0.04) !important; }
 .dashboard-dark-widget .shadow-sm { box-shadow: none !important; }
 .dashboard-dark-widget .ring-zinc-200 { --tw-ring-color: rgb(39 39 42) !important; }
+
+/* ------------------------------------------------------------------
+ * Dashboard dark theme — scoped to the dashboard shell only.
+ * Remaps the existing zinc/white utility classes to a deep neutral
+ * palette so text/background contrast stays crisp without touching
+ * every className in the 1600-line component.
+ * ------------------------------------------------------------------ */
+.jenvu-zoom-dashboard { background-color: #0b0b0f; color: rgb(228 228 231); }
+.jenvu-zoom-dashboard .bg-white { background-color: #16171b !important; }
+.jenvu-zoom-dashboard .bg-\[\#FAFAFA\],
+.jenvu-zoom-dashboard .bg-\[\#F8F8F8\] { background-color: #1c1d22 !important; }
+.jenvu-zoom-dashboard .bg-zinc-50 { background-color: #17181c !important; }
+.jenvu-zoom-dashboard .bg-zinc-100 { background-color: #1e1f24 !important; }
+.jenvu-zoom-dashboard .hover\:bg-zinc-50:hover { background-color: #1c1d22 !important; }
+.jenvu-zoom-dashboard .hover\:bg-zinc-100:hover { background-color: #24252b !important; }
+
+.jenvu-zoom-dashboard .border-zinc-200 { border-color: #26272d !important; }
+.jenvu-zoom-dashboard .border-zinc-100 { border-color: #202126 !important; }
+.jenvu-zoom-dashboard .divide-zinc-100 > * + * { border-color: #202126 !important; }
+.jenvu-zoom-dashboard .ring-zinc-200 { --tw-ring-color: #26272d !important; }
+
+.jenvu-zoom-dashboard .text-zinc-900 { color: rgb(244 244 245) !important; }
+.jenvu-zoom-dashboard .text-zinc-800 { color: rgb(228 228 231) !important; }
+.jenvu-zoom-dashboard .text-zinc-700 { color: rgb(212 212 216) !important; }
+.jenvu-zoom-dashboard .text-zinc-600 { color: rgb(161 161 170) !important; }
+.jenvu-zoom-dashboard .text-zinc-500 { color: rgb(140 140 150) !important; }
+.jenvu-zoom-dashboard .text-zinc-400 { color: rgb(110 110 120) !important; }
+.jenvu-zoom-dashboard .text-zinc-300 { color: rgb(90 90 100) !important; }
+
+.jenvu-zoom-dashboard .shadow-sm,
+.jenvu-zoom-dashboard .shadow { box-shadow: 0 1px 2px rgba(0,0,0,0.4) !important; }
+
+/* Sidebar brand text swap so it reads on dark */
+.jenvu-zoom-dashboard .dashboard-sidebar-root span[style*="#3c4043"] { color: rgb(244 244 245) !important; }
+
+/* Copy input / muted surfaces */
+.jenvu-zoom-dashboard input,
+.jenvu-zoom-dashboard textarea { background-color: #1c1d22; color: rgb(228 228 231); border-color: #2a2b31; }
+.jenvu-zoom-dashboard input::placeholder,
+.jenvu-zoom-dashboard textarea::placeholder { color: rgb(120 120 130); }
+
+/* Preserve accent colors (emerald/rose/amber/blue) — no override needed */
