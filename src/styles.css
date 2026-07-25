@@ -506,12 +506,12 @@ html[data-pwa="1"] .pwa-tabbar {
 /* ====== PWA App-Mode: iOS Cards look for dashboard blocks ====== */
 /* Softer background, bigger radii, layered shadows, no hard borders. */
 html[data-pwa="1"] body {
-  background: #f2f2f7 !important; /* iOS system grouped bg */
+  background: #ffffff !important;
 }
 html[data-pwa="1"] .jenvu-zoom,
 html[data-pwa="1"] .jenvu-zoom-dashboard {
   zoom: 1 !important;
-  background: #f2f2f7 !important;
+  background: #ffffff !important;
 }
 
 /* Upgrade every card-ish surface inside the app */
