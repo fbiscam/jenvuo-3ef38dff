@@ -22,7 +22,7 @@ export function PageShell({
     <>
       <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
         {/* NAV — matches homepage */}
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <header className="hide-in-pwa sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu Logo" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -67,7 +67,7 @@ export function PageShell({
           </p>
         </main>
 
-        <SiteFooter />
+        <div className="hide-in-pwa"><SiteFooter /></div>
       </div>
     </>
   );
