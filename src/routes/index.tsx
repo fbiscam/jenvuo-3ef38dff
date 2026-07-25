@@ -613,12 +613,12 @@ function HomePage() {
           </div>
           <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
             {[
-              ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions."],
-              ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts."],
-              ["2026.05.30", "v2.02", "Red-folder USD, EUR, GBP, JPY, AUD & CHF news injected per XAU cross."],
-              ["2026.05.12", "v2.01", "Push-to-talk replaces always-on; cleaner mic control."],
-              ["2026.04.28", "v2.00", "Voice-native rewrite. New orb. New signal engine."],
-            ].map(([d, v, n], i) => (
+              ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions.", "Killzone narration for London & NY."],
+              ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts.", "FVG + OB auto-markup on 1H/15m."],
+              ["2026.05.30", "v2.02", "Red-folder USD, EUR, GBP, JPY, AUD & CHF news injected per XAU cross.", "Red-folder news injected per XAU cross."],
+              ["2026.05.12", "v2.01", "Push-to-talk replaces always-on; cleaner mic control.", "Push-to-talk replaces always-on mic."],
+              ["2026.04.28", "v2.00", "Voice-native rewrite. New orb. New signal engine.", "Voice-native rewrite. New orb & engine."],
+            ].map(([d, v, n, nShort], i) => (
               <div
                 key={v}
                 className={`grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-1 px-5 py-4 sm:grid-cols-12 sm:items-center sm:gap-y-0 sm:px-6 ${
@@ -627,7 +627,10 @@ function HomePage() {
               >
                 <span className={`min-w-0 sm:col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
                 <span className={`shrink-0 sm:col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900 text-right sm:text-left`}>{v}</span>
-                <span className="col-span-2 text-sm text-zinc-900 sm:col-span-7">{n}</span>
+                <span className="col-span-2 text-sm text-zinc-900 sm:col-span-7 truncate sm:whitespace-normal sm:overflow-visible">
+                  <span className="sm:hidden">{nShort}</span>
+                  <span className="hidden sm:inline">{n}</span>
+                </span>
               </div>
             ))}
           </div>
