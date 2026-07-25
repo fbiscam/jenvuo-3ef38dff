@@ -3102,7 +3102,10 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       setupGrade,
       setupChecks,
       generatedAt: new Date().toISOString(),
-      htfCandles: htf.map(toDTO),
+      // HTF chart shows 4H candles (bigger institutional context) while
+      // engine math and AI markings remain on 1H — box x-coords still map
+      // correctly via timeToCoordinate interpolation.
+      htfCandles: (h4Raw.length >= 20 ? h4Raw : htf).slice(-160).map(toDTO),
       ltfCandles: ltf.map(toDTO),
       currentPrice: last.c,
       instrument: { symbol: canonicalSymbol, display: inst.display, kind: inst.kind, decimals: inst.decimals },
