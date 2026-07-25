@@ -99,6 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
       { name: "google-site-verification", content: "tbza8oQV5Q94J94ETfj9TDnV7gI8eoXIAF6q9nctPnQ" },
+      { name: "google-adsense-account", content: "ca-pub-7687697849515472" },
       { title: "Jenvu — Voice Powered Gold Trading Intelligence" },
       { name: "description", content: "Voice-native AI gold desk for XAU/USD and every major XAU cross — live ICT/SMC analysis, A+ setups and spoken execution." },
       { name: "author", content: "Jenvu AI" },
