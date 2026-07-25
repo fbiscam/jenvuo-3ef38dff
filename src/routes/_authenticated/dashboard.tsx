@@ -367,19 +367,19 @@ function TickerRow({ label, symbol, decimals = 2, dark = false }: { label: strin
   const up = (change ?? 0) >= 0;
 
   return (
-    <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-2.5 last:border-b-0">
+    <div className={`flex items-center justify-between px-4 py-2.5 last:border-b-0 ${dark ? "border-b border-zinc-800/60" : "border-b border-zinc-100"}`}>
       <div className="flex items-center gap-2">
-        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-        <span className="text-[13px] font-medium text-zinc-800">{label}</span>
+        <span className={`h-1.5 w-1.5 rounded-full ${up ? "bg-emerald-500" : "bg-rose-500"}`} />
+        <span className={`text-[13px] font-medium ${dark ? "text-zinc-200" : "text-zinc-800"}`}>{label}</span>
       </div>
       <div className="flex items-center gap-3">
-        <span className="font-mono text-[12px] text-zinc-600">{price != null ? price.toFixed(decimals) : "—"}</span>
+        <span className={`font-mono text-[12px] ${dark ? "text-white" : "text-zinc-600"}`}>{price != null ? price.toFixed(decimals) : "—"}</span>
         {change != null ? (
-          <span className={`font-mono text-[11px] ${up ? "text-emerald-600" : "text-rose-600"}`}>
+          <span className={`font-mono text-[11px] ${up ? (dark ? "text-emerald-400" : "text-emerald-600") : (dark ? "text-rose-400" : "text-rose-600")}`}>
             {up ? "+" : ""}{change.toFixed(2)}%
           </span>
         ) : (
-          <span className="font-mono text-[11px] text-zinc-400">—</span>
+          <span className={`font-mono text-[11px] ${dark ? "text-zinc-600" : "text-zinc-400"}`}>—</span>
         )}
       </div>
     </div>
