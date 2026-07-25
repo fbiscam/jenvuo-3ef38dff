@@ -921,14 +921,14 @@ function SignalPage() {
             </div>
           )}
           {!broadcastedLoading && !broadcastedAlert && (
-            <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center">
+            <div className="rounded-[24px] border border-zinc-200/70 bg-white p-8 text-center shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10),0_32px_64px_-24px_rgba(16,24,40,0.08)] ring-1 ring-white/60">
               <AlertTriangle className="mx-auto h-6 w-6 text-amber-500 mb-2" />
               <p className="text-sm text-zinc-700 font-medium">Alert not available</p>
               <p className="mt-1 text-[12px] text-zinc-500">It may have expired or you don't have access.</p>
             </div>
           )}
           {broadcastedAlert && (
-            <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_4px_20px_-8px_rgba(0,0,0,0.08)] overflow-hidden">
+            <div className="rounded-[24px] border border-zinc-200/70 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10),0_32px_64px_-24px_rgba(16,24,40,0.08)] ring-1 ring-white/60 overflow-hidden">
               <div className={cn(
                 "px-6 py-5 flex items-center justify-between border-b border-zinc-100",
                 broadcastedAlert.direction === "BUY" ? "bg-emerald-50/60" : "bg-red-50/60",
@@ -1168,7 +1168,7 @@ function SignalPage() {
       <main className="mx-auto max-w-[1600px] px-5 py-5 sm:px-6 sm:py-8">
 
         <h1 className="sr-only">Live institutional signal desk — ICT & SMC analysis for {sym}</h1>
-        <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+        <div className="rounded-[24px] border border-zinc-200/70 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10),0_32px_64px_-24px_rgba(16,24,40,0.08)] ring-1 ring-white/60 overflow-hidden">
           {/* terminal header */}
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
             <div className="flex items-center gap-3 min-w-0">
