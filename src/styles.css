@@ -659,9 +659,10 @@ html[data-pwa="1"] .pwa-tabbar {
 }
 .dashboard-sidebar-root .sidebar-group-label,
 .dashboard-sidebar-root nav > div > div:first-child {
-  text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
   font-size: 11px !important;
   color: rgb(113 113 122) !important;
 }
+
 
