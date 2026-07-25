@@ -121,7 +121,7 @@ function FeedBody() {
   const [pairFilter, setPairFilter] = useState<string>("ALL");
   const [outcomeFilter, setOutcomeFilter] = useState<"all" | "win" | "loss" | "pending">("all");
   const [dirFilter, setDirFilter] = useState<"all" | "BUY" | "SELL">("all");
-  const [page, setPage] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const signals = useMemo(
     () => data.signals.filter((s) => new Date(s.fired_at).getTime() >= SIGNALS_START_AT),
@@ -136,12 +136,14 @@ function FeedBody() {
     return true;
   }), [signals, pairFilter, outcomeFilter, dirFilter]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const pageStart = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = filtered.slice(pageStart, pageStart + PAGE_SIZE);
-  // Reset to page 1 whenever filters shrink the list below current page
-  if (page !== currentPage) setTimeout(() => setPage(currentPage), 0);
+  // Reset visible count whenever filters change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [pairFilter, outcomeFilter, dirFilter, days]);
+
+  const shownCount = Math.min(visibleCount, filtered.length);
+  const pageItems = filtered.slice(0, shownCount);
+  const hasMore = shownCount < filtered.length;
 
   // Recompute stats from the SIGNALS_START_AT-filtered signals so nothing is shown before real signals exist
   const liveStats = useMemo(() => {
@@ -341,40 +343,26 @@ function FeedBody() {
             <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {pageItems.map((s) => <SignalCard key={s.id} s={s} />)}
             </ul>
-            {totalPages > 1 && (
-              <nav className="mt-6 flex flex-wrap items-center justify-center gap-1.5" aria-label="Pagination">
+            <div className="mt-6 flex flex-col items-center gap-2">
+              {hasMore ? (
                 <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  className="rounded-full bg-zinc-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-zinc-800"
                 >
-                  Prev
+                  Show more ({filtered.length - shownCount} more)
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setPage(n)}
-                    className={`min-w-[32px] rounded-full px-3 py-1.5 text-xs font-medium ${
-                      n === currentPage
-                        ? "bg-zinc-900 text-white"
-                        : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
-                    }`}
-                  >
-                    {n}
-                  </button>
-                ))}
+              ) : filtered.length > PAGE_SIZE ? (
                 <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  onClick={() => setVisibleCount(PAGE_SIZE)}
+                  className="rounded-full border border-zinc-200 bg-white px-5 py-2.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50"
                 >
-                  Next
+                  Show less
                 </button>
-                <span className="ml-2 text-[11px] text-zinc-500">
-                  Page {currentPage} of {totalPages} · {filtered.length} signals
-                </span>
-              </nav>
-            )}
+              ) : null}
+              <span className="text-[11px] text-zinc-500">
+                Showing <span className="font-mono text-zinc-900">{shownCount}</span> of <span className="font-mono text-zinc-900">{filtered.length}</span> signals
+              </span>
+            </div>
           </>
         )}
         <p className="mt-6 text-center text-[11px] text-zinc-400">
