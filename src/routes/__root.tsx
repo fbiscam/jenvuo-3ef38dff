@@ -291,7 +291,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <PwaTabBar />
+      {/* <PwaTabBar /> disabled */}
       <div className="hide-in-pwa">
         <LiveChatWidget />
       </div>
