@@ -184,10 +184,10 @@ function DocumentsPage() {
                         className={[
                           "mt-0.5 h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold ring-2",
                           done
-                            ? "bg-emerald-50 text-emerald-600 ring-emerald-500"
+                            ? "bg-white text-emerald-600 ring-emerald-500"
                             : active
-                            ? "bg-blue-600 text-white ring-blue-600"
-                            : "bg-zinc-900 text-white ring-zinc-900",
+                            ? "bg-white text-blue-600 ring-blue-600"
+                            : "bg-white text-zinc-900 ring-zinc-900",
                         ].join(" ")}
                       >
                         {done ? <Check className="h-4 w-4" strokeWidth={3} /> : i + 1}
