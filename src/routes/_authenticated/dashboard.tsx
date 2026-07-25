@@ -1037,15 +1037,15 @@ function DashboardLayout() {
                 title="AI models powering your signals"
               >
                 <span className="inline-flex items-center gap-1.5 rounded-md bg-transparent px-1.5 py-1 leading-none">
-                  <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" width={20} height={20} className="h-[20px] w-[20px] shrink-0 rounded object-contain" loading="lazy" />
+                  <img src="https://cdn.simpleicons.org/openai/000000" alt="OpenAI" width={20} height={20} className="h-[20px] w-[20px] shrink-0 object-contain" loading="lazy" />
                   <span className="text-[11px] font-medium leading-none text-zinc-800">OpenAI</span>
                   {showDeepSeek && (
                     <>
                       <span className="leading-none text-zinc-300">·</span>
-                      <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="DeepSeek" width={20} height={20} className="h-[20px] w-[20px] shrink-0 rounded object-contain" loading="lazy" />
+                      <img src="https://cdn.simpleicons.org/deepseek/4D6BFE" alt="DeepSeek" width={20} height={20} className="h-[20px] w-[20px] shrink-0 object-contain" loading="lazy" />
                       <span className="text-[11px] font-medium leading-none text-zinc-800">DeepSeek</span>
                       <span className="leading-none text-zinc-300">·</span>
-                      <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" width={20} height={20} className="h-[20px] w-[20px] shrink-0 rounded object-contain" loading="lazy" />
+                      <img src="https://cdn.simpleicons.org/google" alt="Google" width={20} height={20} className="h-[20px] w-[20px] shrink-0 object-contain" loading="lazy" />
                       <span className="text-[11px] font-medium leading-none text-zinc-800">Google</span>
                     </>
                   )}
