@@ -301,8 +301,7 @@ function HomePage() {
           <div className="text-left lg:col-span-7 lg:text-left">
 
             <h1 className="mt-5 max-w-3xl text-[28px] font-semibold tracking-tight leading-[1.1] sm:text-[42px] md:text-[56px] lg:mx-0 text-zinc-900">
-              Institutional intelligence<br />
-              vocalized in real time.
+              Institutional intelligence vocalized in real time.
             </h1>
             <p className="mt-5 max-w-3xl text-[13px] leading-relaxed text-zinc-700 sm:text-base md:text-lg lg:mx-0">
               <span className="sm:hidden">Voice native gold desk narrating live A+ ICT/SMC setups every XAU pair with institutional precision.</span>
