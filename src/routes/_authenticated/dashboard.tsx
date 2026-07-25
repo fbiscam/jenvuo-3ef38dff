@@ -1065,7 +1065,7 @@ function DashboardLayout() {
 
 
         {/* Analytics header */}
-        <div className="mt-2 flex items-center justify-between">
+        <div className="-mt-2 flex items-center justify-between">
           <div />
           <div className="flex items-center gap-2">
             <button
