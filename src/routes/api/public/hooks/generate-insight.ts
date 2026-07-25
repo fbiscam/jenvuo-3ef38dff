@@ -111,9 +111,8 @@ Return STRICT JSON only, no prose, with this exact shape:
 }`;
 
         const bmindKey = process.env.BLUESMINDS_API_KEY;
-        const lovableKey = process.env.LOVABLE_API_KEY;
-        if (!bmindKey && !lovableKey) {
-          return new Response(JSON.stringify({ error: "no-ai-key-configured" }), { status: 500 });
+        if (!bmindKey) {
+          return new Response(JSON.stringify({ error: "no-bluesminds-key" }), { status: 500 });
         }
 
         async function callBmind(model: string, timeoutMs: number) {
@@ -140,70 +139,34 @@ Return STRICT JSON only, no prose, with this exact shape:
           }
         }
 
-        async function callLovable(model: string, timeoutMs: number) {
-          const ctrl = new AbortController();
-          const t = setTimeout(() => ctrl.abort(), timeoutMs);
-          try {
-            return await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${lovableKey!}`,
-              },
-              body: JSON.stringify({
-                model,
-                messages: [
-                  { role: "system", content: sys },
-                  { role: "user", content: userPrompt },
-                ],
-              }),
-              signal: ctrl.signal,
-            });
-          } finally {
-            clearTimeout(t);
-          }
-        }
-
-        // Layered fallback — Bluesminds first, then Lovable AI Gateway.
-        const chain: Array<{ provider: "bmind" | "lovable"; model: string }> = [
-          ...(bmindKey
-            ? [
-                { provider: "bmind" as const, model: "gpt-5.5" },
-                { provider: "bmind" as const, model: "gpt-5.2-chat" },
-                { provider: "bmind" as const, model: "deepseek-v4-pro" },
-                { provider: "bmind" as const, model: "grok-4.5" },
-                { provider: "bmind" as const, model: "claude-4.5-sonnet" },
-              ]
-            : []),
-          ...(lovableKey
-            ? [
-                { provider: "lovable" as const, model: "google/gemini-2.5-flash" },
-                { provider: "lovable" as const, model: "google/gemini-2.5-pro" },
-                { provider: "lovable" as const, model: "openai/gpt-5-mini" },
-              ]
-            : []),
+        // Bluesminds only — no external fallback. If all models are down,
+        // skip this run; the next scheduled cron will retry a few hours later.
+        const chain: Array<{ model: string }> = [
+          { model: "gpt-5.5" },
+          { model: "gpt-5.2-chat" },
+          { model: "deepseek-v4-pro" },
+          { model: "grok-4.5" },
+          { model: "claude-4.5-sonnet" },
         ];
 
         let aiRes: Response | null = null;
         let lastErr = "";
         for (const step of chain) {
           try {
-            const r =
-              step.provider === "bmind"
-                ? await callBmind(step.model, 90_000)
-                : await callLovable(step.model, 90_000);
+            const r = await callBmind(step.model, 90_000);
             if (r.ok) { aiRes = r; break; }
-            lastErr = `${step.provider}:${step.model} ${r.status}`;
+            lastErr = `bmind:${step.model} ${r.status}`;
             const txt = await r.text().catch(() => "");
             console.warn("[generate-insight] provider failed", lastErr, txt.slice(0, 200));
           } catch (e) {
-            lastErr = `${step.provider}:${step.model} ${String(e)}`;
+            lastErr = `bmind:${step.model} ${String(e)}`;
             console.warn("[generate-insight] provider threw", lastErr);
           }
         }
 
         if (!aiRes) {
-          return new Response(JSON.stringify({ error: "all-providers-failed", detail: lastErr }), { status: 502 });
+          // Do not write an article. Next cron run will retry.
+          return Response.json({ skipped: "bluesminds-unavailable", detail: lastErr, willRetry: true });
         }
 
         const ai = await aiRes.json();
