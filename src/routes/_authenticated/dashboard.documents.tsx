@@ -186,8 +186,8 @@ function DocumentsPage() {
                           done
                             ? "bg-white text-emerald-600 ring-emerald-500"
                             : active
-                            ? "bg-white text-blue-600 ring-blue-600"
-                            : "bg-white text-zinc-900 ring-zinc-900",
+                            ? "bg-white text-emerald-600 ring-emerald-500"
+                            : "bg-white text-emerald-600 ring-emerald-500",
                         ].join(" ")}
                       >
                         {done ? <Check className="h-4 w-4" strokeWidth={3} /> : i + 1}
