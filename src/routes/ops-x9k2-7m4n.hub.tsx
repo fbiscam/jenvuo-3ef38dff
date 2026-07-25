@@ -156,7 +156,7 @@ function OpsHub() {
                 key={t.key}
                 type="button"
                 onClick={() => setActive(t)}
-                className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-5 text-left shadow-[0_12px_30px_-20px_rgba(0,0,0,0.08)] transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_24px_60px_-24px_rgba(0,0,0,0.14)]"
+                className="group flex flex-col rounded-[22px] border border-zinc-200/70 bg-white p-5 text-left shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-12px_rgba(16,24,40,0.10)] ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 hover:border-zinc-300/70 hover:shadow-[0_2px_4px_rgba(16,24,40,0.05),0_18px_40px_-16px_rgba(16,24,40,0.14),0_32px_64px_-24px_rgba(16,24,40,0.10)]"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="text-[15px] font-semibold text-zinc-900">{t.title}</div>
