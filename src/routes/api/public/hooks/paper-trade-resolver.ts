@@ -101,9 +101,7 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
 
             const entry = Number(t.entry);
             const sl = Number(t.sl);
-            const tp = Number(t.tp);
             const riskDist = Math.abs(entry - sl);
-            const rewardDist = Math.abs(tp - entry);
             const isBuy = t.direction === "BUY";
 
             let outcome: "win" | "loss" | "timeout" | "cancelled" = "timeout";
