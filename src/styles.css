@@ -301,15 +301,16 @@
 
 /* Per-page zoom scaling — proportional across laptop widths so blocks/text
    keep the same layout and only scale with the viewport (no reflow). */
-/* Laptop range — unchanged */
- @media (min-width: 1024px) { .jenvu-zoom { zoom: 1.05; } .jenvu-zoom-dashboard { zoom: 0.878; } }
- @media (min-width: 1200px) { .jenvu-zoom { zoom: 1.15; } .jenvu-zoom-dashboard { zoom: 0.970; } }
- @media (min-width: 1360px) { .jenvu-zoom { zoom: 1.28; } .jenvu-zoom-dashboard { zoom: 1.063; } }
- @media (min-width: 1500px) { .jenvu-zoom { zoom: 1.4; } .jenvu-zoom-dashboard { zoom: 1.155; } }
+/* Laptop range — dashboard zoom disabled to keep text crisp (fractional zoom blurs glyphs) */
+ @media (min-width: 1024px) { .jenvu-zoom { zoom: 1.05; } .jenvu-zoom-dashboard { zoom: 1; } }
+ @media (min-width: 1200px) { .jenvu-zoom { zoom: 1.15; } .jenvu-zoom-dashboard { zoom: 1; } }
+ @media (min-width: 1360px) { .jenvu-zoom { zoom: 1.28; } .jenvu-zoom-dashboard { zoom: 1; } }
+ @media (min-width: 1500px) { .jenvu-zoom { zoom: 1.4; } .jenvu-zoom-dashboard { zoom: 1; } }
  /* Desktop range */
- @media (min-width: 1600px) { .jenvu-zoom-dashboard { zoom: 1.271; } }
- @media (min-width: 1680px) { .jenvu-zoom { zoom: 1.5; } .jenvu-zoom-dashboard { zoom: 1.342; } }
- @media (min-width: 1920px) { .jenvu-zoom-dashboard { zoom: 1.432; } }
+ @media (min-width: 1600px) { .jenvu-zoom-dashboard { zoom: 1; } }
+ @media (min-width: 1680px) { .jenvu-zoom { zoom: 1.5; } .jenvu-zoom-dashboard { zoom: 1; } }
+ @media (min-width: 1920px) { .jenvu-zoom-dashboard { zoom: 1; } }
+
 
 
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
