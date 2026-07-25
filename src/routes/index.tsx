@@ -655,10 +655,10 @@ function HomePage() {
 
           <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
             {[
-              { k: "ISMABI", t: "Speak", d: "Push-to-talk and ask in plain English anything." },
-              { k: "02", t: "Reason", d: "JENVU pulls structure, ICT/SMC, DXY and news." },
-              { k: "03", t: "Mark Up", d: "Charts auto-annotate FVG, OB, BOS and sweeps." },
-              { k: "04", t: "Narrate", d: "Hear an A, A+, B, C plans: entry, SL, TP, R:R." },
+              { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English anything.", dm: "Push-to-talk in plain English." },
+              { k: "02", t: "Reason", d: "JENVU pulls structure, ICT/SMC, DXY and news.", dm: "Structure, ICT/SMC, DXY, news." },
+              { k: "03", t: "Mark Up", d: "Charts auto-annotate FVG, OB, BOS and sweeps.", dm: "Auto-marks FVG, OB, BOS, sweeps." },
+              { k: "04", t: "Narrate", d: "Hear an A, A+, B, C plans: entry, SL, TP, R:R.", dm: "A/A+/B/C plans: entry, SL, TP." },
             ].map((s) => (
               <div key={s.k} className="bg-white p-6 text-left sm:p-7">
                 <div className={`flex items-center justify-between ${MONO} text-[10px] tracking-widest uppercase text-zinc-900`}>
@@ -666,7 +666,7 @@ function HomePage() {
                   <span className="h-px w-10 bg-zinc-900" />
                 </div>
                 <h3 className="mt-5 text-base font-semibold tracking-tight sm:text-lg">{s.t}</h3>
-                <p className="mt-2 text-sm text-zinc-900 leading-relaxed line-clamp-2 min-h-[2.75rem]">{s.d}</p>
+                <p className="mt-2 text-sm text-zinc-900 leading-relaxed sm:line-clamp-2 sm:min-h-[2.75rem]"><span className="sm:hidden whitespace-nowrap block overflow-hidden text-ellipsis text-[13px]">{s.dm}</span><span className="hidden sm:inline">{s.d}</span></p>
               </div>
             ))}
           </div>
