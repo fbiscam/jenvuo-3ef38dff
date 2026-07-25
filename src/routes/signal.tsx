@@ -921,7 +921,7 @@ function SignalPage() {
             </div>
           )}
           {!broadcastedLoading && !broadcastedAlert && (
-            <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center">
+            <div className="rounded-[24px] border border-zinc-200/70 bg-white p-8 text-center shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10),0_32px_64px_-24px_rgba(16,24,40,0.08)] ring-1 ring-white/60">
               <AlertTriangle className="mx-auto h-6 w-6 text-amber-500 mb-2" />
               <p className="text-sm text-zinc-700 font-medium">Alert not available</p>
               <p className="mt-1 text-[12px] text-zinc-500">It may have expired or you don't have access.</p>
