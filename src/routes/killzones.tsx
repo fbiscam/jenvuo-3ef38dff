@@ -469,7 +469,7 @@ function KillzonesPage() {
             );
           })}
           {rows.length === 0 && (
-            <div className="rounded-xl border border-dashed border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
+            <div className="rounded-[22px] border border-dashed border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
               No instruments match your search.
             </div>
           )}
