@@ -10,6 +10,7 @@ import {
 import { useEffect, useState, type ReactNode } from "react";
 import { Toaster as SonnerToaster } from "sonner";
 import { LiveChatWidget } from "@/components/LiveChatWidget";
+import { PwaTabBar } from "@/components/PwaTabBar";
 
 
 import appCss from "../styles.css?url";
@@ -195,6 +196,11 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var s=window.matchMedia&&window.matchMedia('(display-mode:standalone)').matches;var i=window.navigator&&window.navigator.standalone;if(s||i){document.documentElement.setAttribute('data-pwa','1');}}catch(e){}`,
+          }}
+        />
       </head>
       <body>
         {children}
@@ -288,7 +294,10 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <LiveChatWidget />
+      <PwaTabBar />
+      <div className="hide-in-pwa">
+        <LiveChatWidget />
+      </div>
       
       <SonnerToaster
         theme="light"
