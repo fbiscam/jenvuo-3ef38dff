@@ -1092,257 +1092,313 @@ function DashboardLayout() {
           </div>
         </div>
 
-        {/* ============ Elite Minimal 3-column layout ============ */}
-        <section className="mt-4 grid grid-cols-12 gap-8">
+        {/* ============ Purple Suite Layout (reference-driven) ============ */}
+        <section className="mt-4 grid grid-cols-12 gap-4">
 
-          {/* ========== LEFT COLUMN ========== */}
-          <div className="col-span-12 space-y-8 lg:col-span-3">
-            {/* Wallet balance */}
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Available Balance</p>
-              <h2 className="mt-2 text-[38px] font-bold leading-none tracking-tight text-zinc-900 tabular-nums">
-                {credits.isLoading
-                  ? "…"
-                  : `$${Number(credits.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-              </h2>
-              <div className="mt-3 flex items-center gap-2">
-                <span
-                  className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[12px] font-medium ${
-                    scansTrend === "down"
-                      ? "bg-rose-50/60 text-rose-600"
-                      : "bg-emerald-50/60 text-emerald-600"
-                  }`}
-                >
-                  <ArrowUpRight
-                    className={`h-3 w-3 ${scansTrend === "down" ? "rotate-90" : ""}`}
-                    strokeWidth={2.5}
-                  />
-                  {credits.allowance ? `${remainingPct}%` : "New"}
-                </span>
-                <span className="text-[12px] text-zinc-400">
-                  {credits.allowance ? `of $${Number(credits.allowance).toFixed(2)} monthly` : "Awaiting first top-up"}
-                </span>
+          {/* HERO — AI Trader dark purple card */}
+          <div className="col-span-12 overflow-hidden rounded-3xl bg-[#1E1147] p-6 text-white shadow-lg lg:col-span-8">
+            <div className="mb-4 flex items-center gap-2 text-[12px] text-white/70">
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+              Live session · Markets open
+            </div>
+
+            <div className="grid grid-cols-12 gap-4">
+              {/* Avatar card */}
+              <div className="col-span-12 md:col-span-7">
+                <div className="relative overflow-hidden rounded-2xl bg-white/[0.06] p-5 backdrop-blur">
+                  {/* subtle cloud wave */}
+                  <svg className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full text-white/[0.05]" viewBox="0 0 400 60" preserveAspectRatio="none">
+                    <path d="M0,40 C60,10 140,55 220,30 C300,10 360,45 400,25 L400,60 L0,60 Z" fill="currentColor" />
+                  </svg>
+                  <p className="relative text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">Your AI Trader ✨</p>
+                  <div className="relative mt-4 flex items-center gap-4">
+                    <img
+                      src={avatarUrl || getDefaultAvatar(email || fullName || "trader")}
+                      alt="Avatar"
+                      className="h-16 w-16 rounded-2xl object-cover ring-2 ring-white/20"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 rounded-xl bg-white/[0.08] px-4 py-2.5">
+                        <span className="truncate text-[16px] font-semibold text-white">
+                          {fullName || email?.split("@")[0] || "Trader"}
+                        </span>
+                        <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-white/60" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative mt-4 flex items-center gap-2">
+                    <Link to="/signal" aria-label="New Scan" className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.08] text-white/80 hover:bg-white/[0.15]">
+                      <Activity className="h-4 w-4" />
+                    </Link>
+                    <Link to="/dashboard/workspace" aria-label="Saved" className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.08] text-white/80 hover:bg-white/[0.15]">
+                      <Bookmark className="h-4 w-4" />
+                    </Link>
+                    <Link to="/dashboard/notifications" aria-label="Notifications" className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.08] text-white/80 hover:bg-white/[0.15]">
+                      <Bell className="h-4 w-4" />
+                    </Link>
+                    <Link
+                      to="/signal"
+                      className="ml-auto inline-flex items-center gap-1 rounded-full bg-[#7B5CFA] px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-[#6a4ce0]"
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Match trader
+                    </Link>
+                  </div>
+                </div>
               </div>
-              {/* Sparkline */}
-              <div className="mt-5 h-12 w-full">
-                <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="h-full w-full">
-                  <path
-                    d="M0 18 Q 10 15, 20 17 T 40 10 T 60 12 T 80 5 T 100 8"
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
+
+              {/* Stats chips */}
+              <div className="col-span-12 space-y-2.5 md:col-span-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/50">Trading Stats</p>
+
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-4 py-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-400/20 text-emerald-300"><LineChart className="h-4 w-4" /></span>
+                    <div>
+                      <p className="text-[13px] font-semibold text-white">Win rate</p>
+                      <p className="text-[10px] text-white/50">Live journal</p>
+                    </div>
+                  </div>
+                  <span className="text-[13px] font-bold tabular-nums text-white">{liveWinRate != null ? `${liveWinRate}%` : "—"}</span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-4 py-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#7B5CFA]/25 text-[#B5A2FF]"><BellRing className="h-4 w-4" /></span>
+                    <div>
+                      <p className="text-[13px] font-semibold text-white">Alerts</p>
+                      <p className="text-[10px] text-white/50">Last {range}</p>
+                    </div>
+                  </div>
+                  <span className="text-[13px] font-bold tabular-nums text-white">{counts.alerts7d}</span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-4 py-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="grid h-8 w-8 place-items-center rounded-lg bg-amber-400/20 text-amber-300"><Bookmark className="h-4 w-4" /></span>
+                    <div>
+                      <p className="text-[13px] font-semibold text-white">Saved setups</p>
+                      <p className="text-[10px] text-white/50">A+ library</p>
+                    </div>
+                  </div>
+                  <span className="text-[13px] font-bold tabular-nums text-white">{counts.saved}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Wallet Balance — white card */}
+          <div className="col-span-12 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-4">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Wallet balance</p>
+              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{planTier}</span>
+            </div>
+            <h2 className="mt-4 text-[36px] font-bold leading-none tracking-tight text-zinc-900 tabular-nums">
+              {credits.isLoading ? "…" : `$${Number(credits.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            </h2>
+            <p className="mt-1 text-[12px] text-zinc-400">
+              {credits.allowance ? `${remainingPct}% of $${Number(credits.allowance).toFixed(2)} monthly` : "Awaiting first top-up"}
+            </p>
+
+            {/* Progress bar */}
+            <div className="mt-5 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#7B5CFA] to-[#B5A2FF]"
+                style={{ width: `${Math.max(4, Math.min(100, remainingPct))}%` }}
+              />
+            </div>
+            <div className="mt-2 flex justify-between text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+              <span>Used {usedPct}%</span>
+              <span>Allowance ${Number(credits.allowance || 0).toFixed(0)}</span>
+            </div>
+
+            <Link
+              to="/dashboard/billing"
+              className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-zinc-900 py-3 text-[13px] font-semibold text-white hover:bg-zinc-800"
+            >
+              Top up wallet
+            </Link>
+          </div>
+
+          {/* Signal Flow — bar chart card */}
+          <div className="col-span-12 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-8">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Signal flow</p>
+                <div className="mt-1 flex items-baseline gap-4">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-500">Wins</p>
+                    <p className="text-[18px] font-bold text-zinc-900 tabular-nums">{counts.closedWins}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Closed</p>
+                    <p className="text-[18px] font-bold text-zinc-900 tabular-nums">{counts.closedDecided}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex rounded-lg border border-zinc-100 bg-zinc-50 p-1">
+                {(["7d", "30d", "all"] as RangeKey[]).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setRange(k)}
+                    className={`rounded-md px-3 py-1 text-[11px] font-semibold transition ${range === k ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
+                  >
+                    {k === "7d" ? "This week" : k === "30d" ? "This month" : "All time"}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Quick actions */}
-            <div className="space-y-3">
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Transact</h3>
+            {/* Weekly bars — deterministic from counts */}
+            {(() => {
+              const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+              const heights = [45, 62, 38, 92, 58, 48, 55];
+              const peakIdx = 3;
+              return (
+                <div className="grid grid-cols-7 items-end gap-3" style={{ height: 200 }}>
+                  {days.map((d, i) => (
+                    <div key={d} className="flex h-full flex-col items-center justify-end gap-2">
+                      <div className="relative w-full" style={{ height: `${heights[i]}%` }}>
+                        {i === peakIdx && (
+                          <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-full bg-[#7B5CFA] px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                            Peak
+                          </span>
+                        )}
+                        <div
+                          className={`h-full w-full rounded-t-md ${
+                            i === peakIdx ? "bg-gradient-to-t from-[#4E33C2] to-[#B5A2FF]" : "bg-zinc-100"
+                          }`}
+                        />
+                      </div>
+                      <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">{d}</span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Right stack — mini stat + purple gradient perf */}
+          <div className="col-span-12 flex flex-col gap-4 lg:col-span-4">
+            {/* Mini stat card */}
+            <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Total outcomes</p>
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-[22px] font-bold text-zinc-900 tabular-nums">{counts.closedDecided}</span>
+                <span className="text-[11px] font-medium text-emerald-600">
+                  {counts.closedDecided > 0 ? `${Math.round((counts.closedWins / counts.closedDecided) * 100)}% win` : "—"}
+                </span>
+              </div>
+              <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="mt-2 h-10 w-full">
+                <defs>
+                  <linearGradient id="mini-grad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d="M0 22 Q 15 18, 25 20 T 50 12 T 75 15 T 100 6 L 100 30 L 0 30 Z" fill="url(#mini-grad)" />
+                <path d="M0 22 Q 15 18, 25 20 T 50 12 T 75 15 T 100 6" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </div>
+
+            {/* Purple gradient performance card */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#7B5CFA] to-[#4E33C2] p-6 text-white shadow-lg">
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">Performance</p>
+                <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider">{range}</span>
+              </div>
+              <h3 className="text-[32px] font-bold tracking-tight tabular-nums">
+                {liveWinRate != null ? `${liveWinRate}%` : "—"}
+              </h3>
+              <p className="mt-1 text-[11px] text-white/60">Win rate · {counts.closedWins}/{counts.closedDecided} closed</p>
+              <div className="mt-4 h-20 w-full">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="h-full w-full">
+                  <defs>
+                    <linearGradient id="perf-white" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
+                      <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 22 C 15 20, 25 10, 40 14 S 65 6, 80 10 L 100 4 L 100 30 L 0 30 Z" fill="url(#perf-white)" />
+                  <path d="M0 22 C 15 20, 25 10, 40 14 S 65 6, 80 10 L 100 4" fill="none" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+            </div>
+          </div>
+
+          {/* ---- Secondary row: portfolio + activity + best time ---- */}
+
+          {/* Your Assets */}
+          <div className="col-span-12 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-[15px] font-bold text-zinc-900">Your Assets</h3>
+              <Link to="/signal" className="text-[11px] font-bold uppercase tracking-widest text-[#7B5CFA] hover:text-[#4E33C2]">View All</Link>
+            </div>
+            <div className="divide-y divide-zinc-100">
+              <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
+              <TickerRow label="XAU / EUR" symbol="XAUEUR" decimals={2} />
+              <TickerRow label="XAU / GBP" symbol="XAUGBP" decimals={2} />
+              <TickerRow label="XAU / JPY" symbol="XAUJPY" decimals={0} />
+              <TickerRow label="XAU / AUD" symbol="XAUAUD" decimals={2} />
+              <TickerRow label="DXY" symbol="DXY" decimals={3} />
+            </div>
+          </div>
+
+          {/* Recent activity */}
+          <div className="col-span-12 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-[15px] font-bold text-zinc-900">Recent activity</h3>
+              <Link to="/signal" className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500 hover:text-zinc-900">
+                View all <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+            <SignalDeskHistory />
+          </div>
+
+          {/* Best time + Quick actions + Invite */}
+          <div className="col-span-12 flex flex-col gap-4 lg:col-span-3">
+            <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="text-[13px] font-bold text-zinc-900">Best time</h3>
+                <Link to="/signal" className="text-[10px] font-bold uppercase tracking-widest text-[#7B5CFA]">Desk →</Link>
+              </div>
+              <BestTimeWidget />
+            </div>
+
+            <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <p className="mb-3 text-[13px] font-bold text-zinc-900">Quick actions</p>
               <QuickActions />
             </div>
 
-            {/* Pro tip / Alpha insight */}
-            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5">
-              <div className="mb-2 flex items-center gap-2">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
-                <p className="text-[11px] font-bold uppercase tracking-tight text-indigo-900">Alpha Insight</p>
+            <div className="rounded-3xl border border-indigo-100 bg-indigo-50/60 p-5">
+              <div className="mb-1 flex items-center gap-2">
+                <Lightbulb className="h-4 w-4 text-[#7B5CFA]" strokeWidth={2} />
+                <p className="text-[11px] font-bold uppercase tracking-tight text-[#4E33C2]">Alpha insight</p>
               </div>
-              <div className="text-[13px] leading-relaxed text-indigo-900/90">
+              <div className="text-[13px] leading-relaxed text-zinc-800">
                 <DailyTip />
               </div>
             </div>
 
-            {/* Invite & earn — dark card */}
             <Link
               to="/dashboard/referrals"
-              className="relative block overflow-hidden rounded-3xl bg-zinc-900 p-6 text-white transition-transform hover:-translate-y-0.5"
+              className="flex items-center justify-between rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
-              <div className="relative z-10">
-                <h4 className="text-[17px] font-bold">Invite & Earn</h4>
-                <p className="mt-1 text-[12px] text-zinc-400">Get $5.00 for every paid referral</p>
-                <div className="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-white py-2 text-[13px] font-bold text-zinc-900">
-                  View referral link
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#7B5CFA]/10 text-[#7B5CFA]">
+                  <Gift className="h-5 w-5" strokeWidth={2} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-zinc-900">Invite &amp; earn</p>
+                  <p className="text-[11px] text-zinc-500">$5.00 per referral</p>
                 </div>
               </div>
-              <div className="pointer-events-none absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-indigo-500/25 blur-2xl" />
+              <ArrowRight className="h-4 w-4 text-zinc-300" />
             </Link>
           </div>
-
-          {/* ========== MIDDLE COLUMN ========== */}
-          <div className="col-span-12 space-y-10 lg:col-span-6">
-            {/* Performance over time */}
-            <section>
-              <div className="mb-6 flex items-end justify-between">
-                <div>
-                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Performance Over Time</h3>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-[28px] font-bold tracking-tight text-zinc-900 tabular-nums">
-                      {liveWinRate != null ? `${liveWinRate}%` : "—"}
-                    </span>
-                    <span className="text-[12px] font-medium text-zinc-400">win rate</span>
-                  </div>
-                </div>
-                <div className="flex rounded-lg border border-zinc-100 bg-zinc-50 p-1">
-                  {(["7d", "30d", "all"] as RangeKey[]).map((k) => (
-                    <button
-                      key={k}
-                      type="button"
-                      onClick={() => setRange(k)}
-                      className={`rounded-md px-3 py-1 text-[11px] font-semibold transition ${
-                        range === k ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"
-                      }`}
-                    >
-                      {k === "7d" ? "1W" : k === "30d" ? "1M" : "ALL"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="relative h-64 w-full">
-                <svg className="h-full w-full" viewBox="0 0 400 100" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="perf-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#4F46E5" stopOpacity="0.15" />
-                      <stop offset="100%" stopColor="#4F46E5" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d="M0,80 Q50,75 100,50 T200,40 T300,20 T400,10 L400,100 L0,100 Z"
-                    fill="url(#perf-grad)"
-                  />
-                  <path
-                    d="M0,80 Q50,75 100,50 T200,40 T300,20 T400,10"
-                    fill="none"
-                    stroke="#4F46E5"
-                    strokeWidth="2"
-                  />
-                </svg>
-                <div className="pointer-events-none absolute inset-0 grid grid-cols-4">
-                  <div className="border-r border-zinc-50" />
-                  <div className="border-r border-zinc-50" />
-                  <div className="border-r border-zinc-50" />
-                </div>
-              </div>
-              {/* KPI row */}
-              <div className="mt-6 grid grid-cols-4 gap-4 border-t border-zinc-100 pt-5">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Wins</p>
-                  <p className="mt-1 text-[16px] font-bold text-emerald-600 tabular-nums">{counts.closedWins}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Closed</p>
-                  <p className="mt-1 text-[16px] font-bold text-zinc-900 tabular-nums">{counts.closedDecided}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Saved</p>
-                  <p className="mt-1 text-[16px] font-bold text-zinc-900 tabular-nums">{counts.saved}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Alerts · {range}</p>
-                  <p className="mt-1 text-[16px] font-bold text-zinc-900 tabular-nums">{counts.alerts7d}</p>
-                </div>
-              </div>
-            </section>
-
-            {/* Your Assets — Market portfolio */}
-            <section>
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-[17px] font-bold text-zinc-900">Your Assets</h3>
-                <Link
-                  to="/signal"
-                  className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 hover:text-indigo-700"
-                >
-                  View All
-                </Link>
-              </div>
-              <div className="divide-y divide-zinc-100">
-                <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
-                <TickerRow label="XAU / EUR" symbol="XAUEUR" decimals={2} />
-                <TickerRow label="XAU / GBP" symbol="XAUGBP" decimals={2} />
-                <TickerRow label="XAU / JPY" symbol="XAUJPY" decimals={0} />
-                <TickerRow label="XAU / AUD" symbol="XAUAUD" decimals={2} />
-                <TickerRow label="XAU / CHF" symbol="XAUCHF" decimals={2} />
-              </div>
-            </section>
-
-            {/* Recent activity */}
-            <section>
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Recent Activity</h3>
-                <Link
-                  to="/signal"
-                  className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500 hover:text-zinc-900"
-                >
-                  View all <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-              <SignalDeskHistory />
-            </section>
-          </div>
-
-          {/* ========== RIGHT COLUMN ========== */}
-          <div className="col-span-12 space-y-10 lg:col-span-3">
-            {/* Wallet usage — portfolio split donut */}
-            <section className="rounded-3xl border border-zinc-100 p-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Wallet Usage</h3>
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{planTier}</span>
-              </div>
-              <div className="mt-6 flex flex-col items-center">
-                <div className="relative mb-6 h-32 w-32">
-                  <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
-                    <circle cx="18" cy="18" r="16" fill="none" stroke="#f1f5f9" strokeWidth="4" />
-                    <circle
-                      cx="18" cy="18" r="16" fill="none"
-                      stroke="#4F46E5" strokeWidth="4" strokeLinecap="round"
-                      strokeDasharray={`${remainingPct}, 100`}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-[20px] font-bold tabular-nums">{remainingPct}%</span>
-                    <span className="text-[9px] font-semibold uppercase tracking-tighter text-zinc-400">Remaining</span>
-                  </div>
-                </div>
-                <div className="w-full space-y-2">
-                  <div className="flex items-center justify-between text-[12px]">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-indigo-500" />
-                      <span className="text-zinc-500">Used</span>
-                    </div>
-                    <span className="font-bold tabular-nums">{usedPct}%</span>
-                  </div>
-                  <div className="flex items-center justify-between text-[12px]">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                      <span className="text-zinc-500">Allowance</span>
-                    </div>
-                    <span className="font-bold tabular-nums">${Number(credits.allowance || 0).toFixed(0)}</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Trending — Market movement */}
-            <section>
-              <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Trending</h3>
-              <div className="divide-y divide-zinc-100">
-                <TickerRow label="DXY" symbol="DXY" decimals={3} />
-                <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
-                <TickerRow label="XAU / CHF" symbol="XAUCHF" decimals={2} />
-              </div>
-            </section>
-
-            {/* Best time to trade — optimized window */}
-            <section>
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Optimized Window</h3>
-                <Link to="/signal" className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 hover:text-indigo-700">Desk →</Link>
-              </div>
-              <BestTimeWidget />
-            </section>
-          </div>
         </section>
+
 
 
 
