@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Jenvu AI is a voice-native gold trading desk for gold pairs delivering precision entries, stops and targets across every major XAU cross-pair in real time — live ICT/SMC analysis, A+ setups and spoken execution.",
+          "Jenvu AI — voice-native gold trading desk narrating live ICT/SMC A+ setups with precision entries, stops and targets across every XAU cross-pair.",
       },
       { property: "og:title", content: "Voice-Native Gold Trading Intelligence — Jenvu" },
       {
@@ -301,7 +301,7 @@ function HomePage() {
           <div className="text-left lg:col-span-7 lg:text-left">
 
             <h1 className="mt-5 max-w-3xl text-[28px] font-semibold tracking-tight leading-[1.1] sm:text-[42px] md:text-[56px] lg:mx-0 text-zinc-900">
-              Institutional intelligence<br />
+              Jenvu — Institutional intelligence<br />
               vocalized in real time.
             </h1>
             <p className="mt-5 max-w-3xl text-[13px] leading-relaxed text-zinc-700 sm:text-base md:text-lg lg:mx-0">
@@ -700,7 +700,7 @@ function HomePage() {
       <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
           <div className="mb-10">
-            <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Pick your tier, line by line.</h2>
+            <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Compare Jenvu Pro and Elite Plans</h2>
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
