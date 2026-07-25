@@ -196,11 +196,8 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{var s=window.matchMedia&&window.matchMedia('(display-mode:standalone)').matches;var i=window.navigator&&window.navigator.standalone;if(s||i){document.documentElement.setAttribute('data-pwa','1');}}catch(e){}`,
-          }}
-        />
+        {/* PWA standalone mode disabled — always render website look */}
+
       </head>
       <body>
         {children}
