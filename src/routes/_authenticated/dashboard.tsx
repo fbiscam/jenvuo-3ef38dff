@@ -1092,214 +1092,258 @@ function DashboardLayout() {
           </div>
         </div>
 
-        {/* ============ ROW 1: Hero balance + donut + portfolio (ZEEX layout) ============ */}
-        <section className="mt-3 grid grid-cols-12 gap-4">
-          {/* Hero balance card with area chart */}
-          <div className="col-span-12 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6 lg:col-span-5">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-zinc-500">Total wallet balance</p>
-                <div className="mt-2 flex items-baseline gap-2">
-                  <h2 className="text-3xl font-bold tracking-tight text-zinc-900 tabular-nums sm:text-[36px]">
-                    {credits.isLoading ? "…" : `$${Number(credits.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                  </h2>
-                  <span className="text-[12px] font-medium text-zinc-400">USD</span>
-                </div>
-                <div className="mt-1.5 inline-flex items-center gap-1 text-[12px] font-medium text-emerald-600">
-                  <ArrowUpRight className={`h-3.5 w-3.5 ${scansTrend === "down" ? "rotate-90 text-rose-500" : ""}`} strokeWidth={2.5} />
-                  <span className={scansTrend === "down" ? "text-rose-500" : ""}>
-                    {credits.allowance ? `${remainingPct}% of $${Number(credits.allowance).toFixed(2)} monthly` : "Awaiting first top-up"}
-                  </span>
-                </div>
+        {/* ============ Elite Minimal 3-column layout ============ */}
+        <section className="mt-4 grid grid-cols-12 gap-8">
+
+          {/* ========== LEFT COLUMN ========== */}
+          <div className="col-span-12 space-y-8 lg:col-span-3">
+            {/* Wallet balance */}
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Available Balance</p>
+              <h2 className="mt-2 text-[38px] font-bold leading-none tracking-tight text-zinc-900 tabular-nums">
+                {credits.isLoading
+                  ? "…"
+                  : `$${Number(credits.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              </h2>
+              <div className="mt-3 flex items-center gap-2">
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[12px] font-medium ${
+                    scansTrend === "down"
+                      ? "bg-rose-50/60 text-rose-600"
+                      : "bg-emerald-50/60 text-emerald-600"
+                  }`}
+                >
+                  <ArrowUpRight
+                    className={`h-3 w-3 ${scansTrend === "down" ? "rotate-90" : ""}`}
+                    strokeWidth={2.5}
+                  />
+                  {credits.allowance ? `${remainingPct}%` : "New"}
+                </span>
+                <span className="text-[12px] text-zinc-400">
+                  {credits.allowance ? `of $${Number(credits.allowance).toFixed(2)} monthly` : "Awaiting first top-up"}
+                </span>
               </div>
-              {/* Range chips */}
-              <div className="hidden shrink-0 items-center gap-0.5 rounded-lg border border-zinc-200 bg-zinc-50 p-0.5 sm:flex">
-                {(["24h", "7d", "30d", "90d", "all"] as RangeKey[]).map((k) => (
-                  <button
-                    key={k}
-                    type="button"
-                    onClick={() => setRange(k)}
-                    className={`rounded-md px-2 py-1 text-[10.5px] font-semibold transition ${range === k ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
-                  >
-                    {k === "24h" ? "1D" : k === "7d" ? "1W" : k === "30d" ? "1M" : k === "90d" ? "3M" : "All"}
-                  </button>
-                ))}
+              {/* Sparkline */}
+              <div className="mt-5 h-12 w-full">
+                <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="h-full w-full">
+                  <path
+                    d="M0 18 Q 10 15, 20 17 T 40 10 T 60 12 T 80 5 T 100 8"
+                    fill="none"
+                    stroke="#10b981"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </div>
             </div>
 
-            {/* Big area sparkline */}
-            <div className="mt-4 h-40 w-full sm:h-44">
-              <svg viewBox="0 0 400 140" preserveAspectRatio="none" className="h-full w-full">
-                <defs>
-                  <linearGradient id="hero-area" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.28" />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                {/* dashed guide grid */}
-                {[35, 70, 105].map((y) => (
-                  <line key={y} x1="0" x2="400" y1={y} y2={y} stroke="#f4f4f5" strokeDasharray="3 4" />
-                ))}
-                <path
-                  d="M0 105 C 30 90, 55 115, 85 78 S 145 55, 175 62 T 235 42 T 295 55 T 355 25 L 400 18"
-                  fill="none" stroke="#10b981" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round"
-                />
-                <path
-                  d="M0 105 C 30 90, 55 115, 85 78 S 145 55, 175 62 T 235 42 T 295 55 T 355 25 L 400 18 L 400 140 L 0 140 Z"
-                  fill="url(#hero-area)"
-                />
-                {/* End dot */}
-                <circle cx="400" cy="18" r="4" fill="#10b981" />
-                <circle cx="400" cy="18" r="8" fill="#10b981" fillOpacity="0.15" />
-              </svg>
+            {/* Quick actions */}
+            <div className="space-y-3">
+              <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Transact</h3>
+              <QuickActions />
             </div>
-          </div>
 
-          {/* Donut usage card */}
-          <div className="col-span-12 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:col-span-6 lg:col-span-3">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-zinc-500">Wallet usage</p>
-              <span className="text-[10px] font-semibold text-zinc-400">{planTier}</span>
-            </div>
-            <div className="relative mx-auto mt-2 grid h-40 w-40 place-items-center">
-              <svg viewBox="0 0 120 120" className="absolute inset-0 -rotate-90">
-                <circle cx="60" cy="60" r="48" stroke="#f4f4f5" strokeWidth="12" fill="none" />
-                <circle
-                  cx="60" cy="60" r="48"
-                  stroke="#10b981" strokeWidth="12" fill="none"
-                  strokeLinecap="round"
-                  strokeDasharray={`${(remainingPct / 100) * 301.6} 301.6`}
-                />
-              </svg>
-              <div className="relative text-center">
-                <div className="text-[26px] font-bold tracking-tight text-zinc-900 tabular-nums">{remainingPct}%</div>
-                <div className="text-[10px] font-medium text-zinc-500">remaining</div>
+            {/* Pro tip / Alpha insight */}
+            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
+                <p className="text-[11px] font-bold uppercase tracking-tight text-indigo-900">Alpha Insight</p>
+              </div>
+              <div className="text-[13px] leading-relaxed text-indigo-900/90">
+                <DailyTip />
               </div>
             </div>
-            <div className="mt-3 flex items-center justify-between border-t border-zinc-100 pt-3 text-[11px]">
-              <div>
-                <div className="text-zinc-400">Used</div>
-                <div className="mt-0.5 font-semibold text-zinc-900 tabular-nums">{usedPct}%</div>
-              </div>
-              <div className="text-right">
-                <div className="text-zinc-400">Allowance</div>
-                <div className="mt-0.5 font-semibold text-zinc-900 tabular-nums">${Number(credits.allowance || 0).toFixed(0)}</div>
-              </div>
-            </div>
-          </div>
 
-          {/* My Portfolio (live gold pairs) */}
-          <div className="col-span-12 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:col-span-6 lg:col-span-4">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-zinc-500">Market portfolio</p>
-              <Link to="/signal" className="text-[11px] font-medium text-emerald-600 hover:text-emerald-700">Trade →</Link>
-            </div>
-            <div className="mt-2 divide-y divide-zinc-100">
-              <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
-              <TickerRow label="XAU / EUR" symbol="XAUEUR" decimals={2} />
-              <TickerRow label="XAU / GBP" symbol="XAUGBP" decimals={2} />
-              <TickerRow label="XAU / JPY" symbol="XAUJPY" decimals={0} />
-            </div>
-          </div>
-        </section>
-
-        {/* ============ ROW 2: Market movement + Recent activity + Total invest ============ */}
-        <section className="mt-4 grid grid-cols-12 gap-4">
-          {/* Market movement table */}
-          <div className="col-span-12 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm lg:col-span-4">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-[13px] font-semibold text-zinc-900">Market movement</p>
-              <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">24h</span>
-            </div>
-            <div className="divide-y divide-zinc-100">
-              <TickerRow label="XAU / AUD" symbol="XAUAUD" decimals={2} />
-              <TickerRow label="XAU / CHF" symbol="XAUCHF" decimals={2} />
-              <TickerRow label="DXY" symbol="DXY" decimals={3} />
-              <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
-            </div>
-          </div>
-
-          {/* Recent activity — Signal Desk history */}
-          <div className="col-span-12 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm lg:col-span-5">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-[13px] font-semibold text-zinc-900">Recent activity</p>
-              <Link to="/signal" className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500 hover:text-zinc-900">
-                View all <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-            <SignalDeskHistory />
-          </div>
-
-          {/* Total performance card */}
-          <div className="col-span-12 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm lg:col-span-3">
-            <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-zinc-500">Total performance</p>
-            <div className="mt-2 flex items-baseline gap-2">
-              <h3 className="text-2xl font-bold tracking-tight text-zinc-900 tabular-nums">
-                {liveWinRate != null ? `${liveWinRate}%` : "—"}
-              </h3>
-              <span className="text-[11px] font-medium text-zinc-400">win rate</span>
-            </div>
-            <div className="mt-4 space-y-2.5 border-t border-zinc-100 pt-3">
-              <div className="flex items-center justify-between text-[12px]">
-                <span className="text-zinc-500">Wins</span>
-                <span className="font-semibold text-emerald-600 tabular-nums">{counts.closedWins}</span>
-              </div>
-              <div className="flex items-center justify-between text-[12px]">
-                <span className="text-zinc-500">Total closed</span>
-                <span className="font-semibold text-zinc-900 tabular-nums">{counts.closedDecided}</span>
-              </div>
-              <div className="flex items-center justify-between text-[12px]">
-                <span className="text-zinc-500">Saved setups</span>
-                <span className="font-semibold text-zinc-900 tabular-nums">{counts.saved}</span>
-              </div>
-              <div className="flex items-center justify-between text-[12px]">
-                <span className="text-zinc-500">Alerts · {range}</span>
-                <span className="font-semibold text-zinc-900 tabular-nums">{counts.alerts7d}</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ============ ROW 3: Best time + Quick actions + Invite ============ */}
-        <section className="mt-4 grid grid-cols-12 gap-4">
-          <div className="col-span-12 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm lg:col-span-4">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-[13px] font-semibold text-zinc-900">Best time to trade</p>
-              <Link to="/signal" className="text-[11px] font-medium text-emerald-600 hover:text-emerald-700">Open desk →</Link>
-            </div>
-            <BestTimeWidget />
-          </div>
-
-          <div className="col-span-12 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm lg:col-span-4">
-            <p className="mb-3 text-[13px] font-semibold text-zinc-900">Quick actions</p>
-            <QuickActions />
-          </div>
-
-          <div className="col-span-12 flex flex-col gap-4 lg:col-span-4">
-            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="h-4 w-4 text-amber-500" strokeWidth={2} />
-                <p className="text-[13px] font-semibold text-zinc-900">Pro tip</p>
-              </div>
-              <div className="mt-2"><DailyTip /></div>
-            </div>
+            {/* Invite & earn — dark card */}
             <Link
               to="/dashboard/referrals"
-              className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
+              className="relative block overflow-hidden rounded-3xl bg-zinc-900 p-6 text-white transition-transform hover:-translate-y-0.5"
             >
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-50 text-amber-600">
-                  <Gift className="h-5 w-5" strokeWidth={2} />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[13px] font-semibold text-zinc-900">Invite & earn</p>
-                  <p className="text-[11px] text-zinc-500">$5.00 per paid referral</p>
+              <div className="relative z-10">
+                <h4 className="text-[17px] font-bold">Invite & Earn</h4>
+                <p className="mt-1 text-[12px] text-zinc-400">Get $5.00 for every paid referral</p>
+                <div className="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-white py-2 text-[13px] font-bold text-zinc-900">
+                  View referral link
                 </div>
               </div>
-              <ArrowRight className="h-4 w-4 text-zinc-300" />
+              <div className="pointer-events-none absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-indigo-500/25 blur-2xl" />
             </Link>
           </div>
+
+          {/* ========== MIDDLE COLUMN ========== */}
+          <div className="col-span-12 space-y-10 lg:col-span-6">
+            {/* Performance over time */}
+            <section>
+              <div className="mb-6 flex items-end justify-between">
+                <div>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Performance Over Time</h3>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <span className="text-[28px] font-bold tracking-tight text-zinc-900 tabular-nums">
+                      {liveWinRate != null ? `${liveWinRate}%` : "—"}
+                    </span>
+                    <span className="text-[12px] font-medium text-zinc-400">win rate</span>
+                  </div>
+                </div>
+                <div className="flex rounded-lg border border-zinc-100 bg-zinc-50 p-1">
+                  {(["7d", "30d", "all"] as RangeKey[]).map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => setRange(k)}
+                      className={`rounded-md px-3 py-1 text-[11px] font-semibold transition ${
+                        range === k ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"
+                      }`}
+                    >
+                      {k === "7d" ? "1W" : k === "30d" ? "1M" : "ALL"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="relative h-64 w-full">
+                <svg className="h-full w-full" viewBox="0 0 400 100" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="perf-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#4F46E5" stopOpacity="0.15" />
+                      <stop offset="100%" stopColor="#4F46E5" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M0,80 Q50,75 100,50 T200,40 T300,20 T400,10 L400,100 L0,100 Z"
+                    fill="url(#perf-grad)"
+                  />
+                  <path
+                    d="M0,80 Q50,75 100,50 T200,40 T300,20 T400,10"
+                    fill="none"
+                    stroke="#4F46E5"
+                    strokeWidth="2"
+                  />
+                </svg>
+                <div className="pointer-events-none absolute inset-0 grid grid-cols-4">
+                  <div className="border-r border-zinc-50" />
+                  <div className="border-r border-zinc-50" />
+                  <div className="border-r border-zinc-50" />
+                </div>
+              </div>
+              {/* KPI row */}
+              <div className="mt-6 grid grid-cols-4 gap-4 border-t border-zinc-100 pt-5">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Wins</p>
+                  <p className="mt-1 text-[16px] font-bold text-emerald-600 tabular-nums">{counts.closedWins}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Closed</p>
+                  <p className="mt-1 text-[16px] font-bold text-zinc-900 tabular-nums">{counts.closedDecided}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Saved</p>
+                  <p className="mt-1 text-[16px] font-bold text-zinc-900 tabular-nums">{counts.saved}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Alerts · {range}</p>
+                  <p className="mt-1 text-[16px] font-bold text-zinc-900 tabular-nums">{counts.alerts7d}</p>
+                </div>
+              </div>
+            </section>
+
+            {/* Your Assets — Market portfolio */}
+            <section>
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-[17px] font-bold text-zinc-900">Your Assets</h3>
+                <Link
+                  to="/signal"
+                  className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 hover:text-indigo-700"
+                >
+                  View All
+                </Link>
+              </div>
+              <div className="divide-y divide-zinc-100">
+                <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
+                <TickerRow label="XAU / EUR" symbol="XAUEUR" decimals={2} />
+                <TickerRow label="XAU / GBP" symbol="XAUGBP" decimals={2} />
+                <TickerRow label="XAU / JPY" symbol="XAUJPY" decimals={0} />
+                <TickerRow label="XAU / AUD" symbol="XAUAUD" decimals={2} />
+                <TickerRow label="XAU / CHF" symbol="XAUCHF" decimals={2} />
+              </div>
+            </section>
+
+            {/* Recent activity */}
+            <section>
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Recent Activity</h3>
+                <Link
+                  to="/signal"
+                  className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500 hover:text-zinc-900"
+                >
+                  View all <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
+              <SignalDeskHistory />
+            </section>
+          </div>
+
+          {/* ========== RIGHT COLUMN ========== */}
+          <div className="col-span-12 space-y-10 lg:col-span-3">
+            {/* Wallet usage — portfolio split donut */}
+            <section className="rounded-3xl border border-zinc-100 p-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Wallet Usage</h3>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{planTier}</span>
+              </div>
+              <div className="mt-6 flex flex-col items-center">
+                <div className="relative mb-6 h-32 w-32">
+                  <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
+                    <circle cx="18" cy="18" r="16" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                    <circle
+                      cx="18" cy="18" r="16" fill="none"
+                      stroke="#4F46E5" strokeWidth="4" strokeLinecap="round"
+                      strokeDasharray={`${remainingPct}, 100`}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-[20px] font-bold tabular-nums">{remainingPct}%</span>
+                    <span className="text-[9px] font-semibold uppercase tracking-tighter text-zinc-400">Remaining</span>
+                  </div>
+                </div>
+                <div className="w-full space-y-2">
+                  <div className="flex items-center justify-between text-[12px]">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                      <span className="text-zinc-500">Used</span>
+                    </div>
+                    <span className="font-bold tabular-nums">{usedPct}%</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[12px]">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                      <span className="text-zinc-500">Allowance</span>
+                    </div>
+                    <span className="font-bold tabular-nums">${Number(credits.allowance || 0).toFixed(0)}</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Trending — Market movement */}
+            <section>
+              <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Trending</h3>
+              <div className="divide-y divide-zinc-100">
+                <TickerRow label="DXY" symbol="DXY" decimals={3} />
+                <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
+                <TickerRow label="XAU / CHF" symbol="XAUCHF" decimals={2} />
+              </div>
+            </section>
+
+            {/* Best time to trade — optimized window */}
+            <section>
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Optimized Window</h3>
+                <Link to="/signal" className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 hover:text-indigo-700">Desk →</Link>
+              </div>
+              <BestTimeWidget />
+            </section>
+          </div>
         </section>
+
 
 
 
