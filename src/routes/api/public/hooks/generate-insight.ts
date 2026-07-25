@@ -111,8 +111,9 @@ Return STRICT JSON only, no prose, with this exact shape:
 }`;
 
         const bmindKey = process.env.BLUESMINDS_API_KEY;
-        if (!bmindKey) {
-          return new Response(JSON.stringify({ error: "bluesminds-api-key-missing" }), { status: 500 });
+        const lovableKey = process.env.LOVABLE_API_KEY;
+        if (!bmindKey && !lovableKey) {
+          return new Response(JSON.stringify({ error: "no-ai-key-configured" }), { status: 500 });
         }
 
         async function callBmind(model: string, timeoutMs: number) {
@@ -139,21 +140,58 @@ Return STRICT JSON only, no prose, with this exact shape:
           }
         }
 
-        // Bluesminds-only chain — layer through available models until one succeeds.
-        const chain: Array<{ provider: "bmind"; model: string }> = [
-          { provider: "bmind", model: "gpt-5.5" },
-          { provider: "bmind", model: "gpt-5.2-chat" },
-          { provider: "bmind", model: "deepseek-v4-pro" },
-          { provider: "bmind", model: "grok-4.5" },
-          { provider: "bmind", model: "claude-4.5-sonnet" },
-        ];
+        async function callLovable(model: string, timeoutMs: number) {
+          const ctrl = new AbortController();
+          const t = setTimeout(() => ctrl.abort(), timeoutMs);
+          try {
+            return await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${lovableKey!}`,
+              },
+              body: JSON.stringify({
+                model,
+                messages: [
+                  { role: "system", content: sys },
+                  { role: "user", content: userPrompt },
+                ],
+              }),
+              signal: ctrl.signal,
+            });
+          } finally {
+            clearTimeout(t);
+          }
+        }
 
+        // Layered fallback — Bluesminds first, then Lovable AI Gateway.
+        const chain: Array<{ provider: "bmind" | "lovable"; model: string }> = [
+          ...(bmindKey
+            ? [
+                { provider: "bmind" as const, model: "gpt-5.5" },
+                { provider: "bmind" as const, model: "gpt-5.2-chat" },
+                { provider: "bmind" as const, model: "deepseek-v4-pro" },
+                { provider: "bmind" as const, model: "grok-4.5" },
+                { provider: "bmind" as const, model: "claude-4.5-sonnet" },
+              ]
+            : []),
+          ...(lovableKey
+            ? [
+                { provider: "lovable" as const, model: "google/gemini-2.5-flash" },
+                { provider: "lovable" as const, model: "google/gemini-2.5-pro" },
+                { provider: "lovable" as const, model: "openai/gpt-5-mini" },
+              ]
+            : []),
+        ];
 
         let aiRes: Response | null = null;
         let lastErr = "";
         for (const step of chain) {
           try {
-            const r = await callBmind(step.model, 90_000);
+            const r =
+              step.provider === "bmind"
+                ? await callBmind(step.model, 90_000)
+                : await callLovable(step.model, 90_000);
             if (r.ok) { aiRes = r; break; }
             lastErr = `${step.provider}:${step.model} ${r.status}`;
             const txt = await r.text().catch(() => "");
