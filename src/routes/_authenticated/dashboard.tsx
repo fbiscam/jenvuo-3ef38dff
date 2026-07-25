@@ -1261,13 +1261,17 @@ function DashboardLayout() {
             <div className="relative overflow-hidden rounded-2xl bg-zinc-900 p-5 text-white shadow-sm">
               <div className="pointer-events-none absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-indigo-500/15 blur-3xl" />
               <div className="relative">
-                <div className="mb-2 flex items-center gap-2">
+                <div className="mb-3 flex items-center gap-2">
                   <div className="grid h-6 w-6 place-items-center rounded-full bg-indigo-500/20 text-indigo-300">
                     <Lightbulb className="h-3.5 w-3.5" />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-300">Pro Tip</span>
                 </div>
-                <DailyTip />
+                <h4 className="text-[14px] font-semibold leading-snug text-white">{PRO_TIPS[Math.floor(Date.now() / 86_400_000) % PRO_TIPS.length].title}</h4>
+                <p className="mt-1.5 text-[12px] leading-relaxed text-zinc-400">{PRO_TIPS[Math.floor(Date.now() / 86_400_000) % PRO_TIPS.length].body}</p>
+                <Link to="/insights" className="mt-4 inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-300 hover:text-indigo-200">
+                  Read more insights <ArrowRight className="h-3 w-3" />
+                </Link>
               </div>
             </div>
 
