@@ -12,7 +12,7 @@ export const Route = createFileRoute("/contact")({
       {
         name: "description",
         content:
-          "Partner with Jenvu — collaborate with our desk on integrations, institutional access, media, and support. Reach the team behind the voice-native trading terminal.",
+          "Partner with Jenvu — collaborate with our desk on integrations, institutional access, media, and support.",
       },
       { property: "og:title", content: "Partner With Us — Jenvu" },
       {
