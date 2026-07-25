@@ -799,7 +799,7 @@ function HomePage() {
 
               <tbody>
                 {([
-                  { f: "PAY AFTER RAISING $100 IN REVENUE\u00A0", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
+                  { f: "", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
                   { f: "Monthly wallet (USD)", b: "$15", c: "$50", d: "$100" },
                   { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
                   { f: "Signal latency", b: "Realtime", c: "Realtime", d: "Realtime" },
