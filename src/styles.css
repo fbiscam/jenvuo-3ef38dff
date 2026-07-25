@@ -182,7 +182,10 @@
 
   html, body {
     min-height: 100%;
+    overflow-x: hidden;
+    max-width: 100%;
   }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
