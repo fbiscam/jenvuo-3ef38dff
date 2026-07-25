@@ -597,16 +597,17 @@ html[data-pwa="1"] .pwa-tabbar {
 }
 .jenvu-zoom-dashboard main .bg-white {
   background-color: #ffffff !important;
-  border-color: transparent !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
   box-shadow:
-    0 1px 2px rgba(0,0,0,0.04),
-    0 8px 24px -12px rgba(0,0,0,0.08) !important;
+    0 1px 2px rgba(0,0,0,0.03),
+    0 4px 16px -8px rgba(0,0,0,0.06) !important;
 }
 .jenvu-zoom-dashboard main .border,
 .jenvu-zoom-dashboard main .border-zinc-100,
 .jenvu-zoom-dashboard main .border-zinc-200 {
-  border-color: transparent !important;
+  border-color: rgba(0,0,0,0.08) !important;
 }
+
 .jenvu-zoom-dashboard main .p-4 { padding: 18px !important; }
 .jenvu-zoom-dashboard main .p-5 { padding: 20px !important; }
 .jenvu-zoom-dashboard main .p-6 { padding: 24px !important; }
@@ -635,11 +636,11 @@ html[data-pwa="1"] .pwa-tabbar {
 
 /* ====== Dashboard Sidebar: iOS Cards look ====== */
 .dashboard-sidebar-root {
-  border-right-color: transparent !important;
   background-color: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
   box-shadow:
-    0 1px 2px rgba(0,0,0,0.04),
-    0 8px 24px -12px rgba(0,0,0,0.08) !important;
+    0 1px 2px rgba(0,0,0,0.03),
+    0 4px 16px -8px rgba(0,0,0,0.06) !important;
 }
 @media (min-width: 1024px) {
   .dashboard-sidebar-root {
@@ -653,6 +654,7 @@ html[data-pwa="1"] .pwa-tabbar {
   }
   .dashboard-main-shift { padding-left: 12px !important; }
 }
+
 .dashboard-sidebar-root nav a,
 .dashboard-sidebar-root nav button {
   border-radius: 12px !important;
