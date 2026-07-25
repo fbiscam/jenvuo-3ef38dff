@@ -121,7 +121,7 @@ function FeedBody() {
   const [pairFilter, setPairFilter] = useState<string>("ALL");
   const [outcomeFilter, setOutcomeFilter] = useState<"all" | "win" | "loss" | "pending">("all");
   const [dirFilter, setDirFilter] = useState<"all" | "BUY" | "SELL">("all");
-  const [page, setPage] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const signals = useMemo(
     () => data.signals.filter((s) => new Date(s.fired_at).getTime() >= SIGNALS_START_AT),
@@ -136,12 +136,14 @@ function FeedBody() {
     return true;
   }), [signals, pairFilter, outcomeFilter, dirFilter]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const pageStart = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = filtered.slice(pageStart, pageStart + PAGE_SIZE);
-  // Reset to page 1 whenever filters shrink the list below current page
-  if (page !== currentPage) setTimeout(() => setPage(currentPage), 0);
+  // Reset visible count whenever filters change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [pairFilter, outcomeFilter, dirFilter, days]);
+
+  const shownCount = Math.min(visibleCount, filtered.length);
+  const pageItems = filtered.slice(0, shownCount);
+  const hasMore = shownCount < filtered.length;
 
   // Recompute stats from the SIGNALS_START_AT-filtered signals so nothing is shown before real signals exist
   const liveStats = useMemo(() => {
