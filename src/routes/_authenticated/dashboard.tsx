@@ -1064,343 +1064,185 @@ function DashboardLayout() {
 
 
 
-        {/* Header row — controls */}
+        {/* Analytics header */}
         <div className="mt-7 flex items-center justify-between">
-          <h2 className="text-[15px] font-semibold text-zinc-900">Overview</h2>
+          <h2 className="text-[15px] font-semibold text-zinc-900">Analytics</h2>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleRefresh}
               disabled={refreshing}
-              aria-label="Refresh"
-              className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border border-zinc-200 bg-white p-0 text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 disabled:opacity-60"
+              aria-label="Refresh analytics"
+              title="Refresh analytics"
+              className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border border-zinc-200 bg-white p-0 leading-none text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 active:bg-zinc-100 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
             >
               <RefreshCw className={`h-3.5 w-3.5 shrink-0 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
             </button>
             <DropdownMenu>
-              <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50">
-                <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
-                  <DropdownMenuCheckboxItem key={k} checked={range === k} onCheckedChange={() => setRange(k)} className="text-[12px] md:text-[14px]">
-                    {RANGE_LABELS[k]}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
+            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
+              <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
+                <DropdownMenuCheckboxItem
+                  key={k}
+                  checked={range === k}
+                  onCheckedChange={() => setRange(k)}
+                  className="text-[12px] md:text-[14px]"
+                >
+                  {RANGE_LABELS[k]}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+
+
             </DropdownMenu>
           </div>
         </div>
 
-        {/* ============ Purple Suite Layout (reference-driven) ============ */}
-        <section className="mt-4 grid grid-cols-12 gap-4">
-
-          {/* HERO — AI Trader dark purple card */}
-          <div className="col-span-12 overflow-hidden rounded-3xl bg-[#1E1147] p-6 text-white shadow-lg lg:col-span-8">
-            <div className="mb-4 flex items-center gap-2 text-[12px] text-white/70">
-              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-              Live session · Markets open
-            </div>
-
-            <div className="grid grid-cols-12 gap-4">
-              {/* Avatar card */}
-              <div className="col-span-12 md:col-span-7">
-                <div className="relative overflow-hidden rounded-2xl bg-white/[0.06] p-5 backdrop-blur">
-                  {/* subtle cloud wave */}
-                  <svg className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full text-white/[0.05]" viewBox="0 0 400 60" preserveAspectRatio="none">
-                    <path d="M0,40 C60,10 140,55 220,30 C300,10 360,45 400,25 L400,60 L0,60 Z" fill="currentColor" />
-                  </svg>
-                  <p className="relative text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">Your AI Trader ✨</p>
-                  <div className="relative mt-4 flex items-center gap-4">
-                    <img
-                      src={avatarUrl || getDefaultAvatar(email || fullName || "trader")}
-                      alt="Avatar"
-                      className="h-16 w-16 rounded-2xl object-cover ring-2 ring-white/20"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 rounded-xl bg-white/[0.08] px-4 py-2.5">
-                        <span className="truncate text-[16px] font-semibold text-white">
-                          {fullName || email?.split("@")[0] || "Trader"}
-                        </span>
-                        <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-white/60" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="relative mt-4 flex items-center gap-2">
-                    <Link to="/signal" aria-label="New Scan" className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.08] text-white/80 hover:bg-white/[0.15]">
-                      <Activity className="h-4 w-4" />
-                    </Link>
-                    <Link to="/dashboard/workspace" aria-label="Saved" className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.08] text-white/80 hover:bg-white/[0.15]">
-                      <Bookmark className="h-4 w-4" />
-                    </Link>
-                    <Link to="/dashboard/notifications" aria-label="Notifications" className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.08] text-white/80 hover:bg-white/[0.15]">
-                      <Bell className="h-4 w-4" />
-                    </Link>
-                    <Link
-                      to="/signal"
-                      className="ml-auto inline-flex items-center gap-1 rounded-full bg-[#7B5CFA] px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-[#6a4ce0]"
-                    >
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Match trader
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stats chips */}
-              <div className="col-span-12 space-y-2.5 md:col-span-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/50">Trading Stats</p>
-
-                <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-4 py-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-400/20 text-emerald-300"><LineChart className="h-4 w-4" /></span>
-                    <div>
-                      <p className="text-[13px] font-semibold text-white">Win rate</p>
-                      <p className="text-[10px] text-white/50">Live journal</p>
-                    </div>
-                  </div>
-                  <span className="text-[13px] font-bold tabular-nums text-white">{liveWinRate != null ? `${liveWinRate}%` : "—"}</span>
-                </div>
-
-                <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-4 py-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#7B5CFA]/25 text-[#B5A2FF]"><BellRing className="h-4 w-4" /></span>
-                    <div>
-                      <p className="text-[13px] font-semibold text-white">Alerts</p>
-                      <p className="text-[10px] text-white/50">Last {range}</p>
-                    </div>
-                  </div>
-                  <span className="text-[13px] font-bold tabular-nums text-white">{counts.alerts7d}</span>
-                </div>
-
-                <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-4 py-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="grid h-8 w-8 place-items-center rounded-lg bg-amber-400/20 text-amber-300"><Bookmark className="h-4 w-4" /></span>
-                    <div>
-                      <p className="text-[13px] font-semibold text-white">Saved setups</p>
-                      <p className="text-[10px] text-white/50">A+ library</p>
-                    </div>
-                  </div>
-                  <span className="text-[13px] font-bold tabular-nums text-white">{counts.saved}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Wallet Balance — white card */}
-          <div className="col-span-12 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-4">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Wallet balance</p>
-              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{planTier}</span>
-            </div>
-            <h2 className="mt-4 text-[36px] font-bold leading-none tracking-tight text-zinc-900 tabular-nums">
-              {credits.isLoading ? "…" : `$${Number(credits.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-            </h2>
-            <p className="mt-1 text-[12px] text-zinc-400">
-              {credits.allowance ? `${remainingPct}% of $${Number(credits.allowance).toFixed(2)} monthly` : "Awaiting first top-up"}
-            </p>
-
-            {/* Progress bar */}
-            <div className="mt-5 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-[#7B5CFA] to-[#B5A2FF]"
-                style={{ width: `${Math.max(4, Math.min(100, remainingPct))}%` }}
+        {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
+        <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Card>
+            <CardHeader icon={ShieldCheck} title="Wallet & Plan" />
+            <div className="flex divide-x divide-zinc-200">
+              <Metric
+                label={`Balance · ${planTier}`}
+                value={credits.isLoading ? "…" : `$${Number(credits.balance || 0).toFixed(2)}`}
+                delta={credits.allowance ? `${remainingPct}%` : null}
+                tone={balanceTone}
+                trend={scansTrend}
+                seed={3}
+              />
+              <Metric
+                label="Monthly wallet"
+                value={credits.isLoading ? "…" : `$${Number(credits.allowance || 0).toFixed(2)}`}
+                delta={null}
+                tone="zinc"
+                seed={5}
               />
             </div>
-            <div className="mt-2 flex justify-between text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-              <span>Used {usedPct}%</span>
-              <span>Allowance ${Number(credits.allowance || 0).toFixed(0)}</span>
+          </Card>
+
+          <Card>
+            <CardHeader icon={Gauge} title="Performance" />
+            <div className="flex divide-x divide-zinc-200">
+              <Metric
+                label="Win rate"
+                value={liveWinRate != null ? `${liveWinRate}%` : "0.0%"}
+                delta={null}
+                trend={liveWinRate == null ? "flat" : liveWinRate >= 50 ? "up" : "down"}
+                magnitude={liveWinRate != null ? Math.min(60, Math.abs(liveWinRate - 50) + 20) : 0}
+                seed={7}
+              />
+              <Metric
+                label="Journal entries"
+                value={counts.journalTotal}
+                delta={null}
+                tone="zinc"
+                seed={11}
+              />
             </div>
+          </Card>
 
-            <Link
-              to="/dashboard/billing"
-              className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-zinc-900 py-3 text-[13px] font-semibold text-white hover:bg-zinc-800"
-            >
-              Top up wallet
-            </Link>
-          </div>
-
-          {/* Signal Flow — bar chart card */}
-          <div className="col-span-12 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-8">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Signal flow</p>
-                <div className="mt-1 flex items-baseline gap-4">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-500">Wins</p>
-                    <p className="text-[18px] font-bold text-zinc-900 tabular-nums">{counts.closedWins}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Closed</p>
-                    <p className="text-[18px] font-bold text-zinc-900 tabular-nums">{counts.closedDecided}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex rounded-lg border border-zinc-100 bg-zinc-50 p-1">
-                {(["7d", "30d", "all"] as RangeKey[]).map((k) => (
-                  <button
-                    key={k}
-                    type="button"
-                    onClick={() => setRange(k)}
-                    className={`rounded-md px-3 py-1 text-[11px] font-semibold transition ${range === k ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
-                  >
-                    {k === "7d" ? "This week" : k === "30d" ? "This month" : "All time"}
-                  </button>
-                ))}
-              </div>
+          <Card>
+            <CardHeader icon={Activity} title="Activity" />
+            <div className="flex divide-x divide-zinc-200">
+              <Metric
+                label="Saved A+ setups"
+                value={counts.saved}
+                delta={null}
+                tone="blue"
+                seed={13}
+              />
+              <Metric
+                label={`Alerts · ${range}`}
+                value={counts.alerts7d}
+                delta={null}
+                tone="blue"
+                seed={17}
+              />
             </div>
+          </Card>
+        </section>
 
-            {/* Weekly bars — deterministic from counts */}
-            {(() => {
-              const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-              const heights = [45, 62, 38, 92, 58, 48, 55];
-              const peakIdx = 3;
-              return (
-                <div className="grid grid-cols-7 items-end gap-3" style={{ height: 200 }}>
-                  {days.map((d, i) => (
-                    <div key={d} className="flex h-full flex-col items-center justify-end gap-2">
-                      <div className="relative w-full" style={{ height: `${heights[i]}%` }}>
-                        {i === peakIdx && (
-                          <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-full bg-[#7B5CFA] px-2 py-0.5 text-[10px] font-bold text-white shadow">
-                            Peak
-                          </span>
-                        )}
-                        <div
-                          className={`h-full w-full rounded-t-md ${
-                            i === peakIdx ? "bg-gradient-to-t from-[#4E33C2] to-[#B5A2FF]" : "bg-zinc-100"
-                          }`}
-                        />
-                      </div>
-                      <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">{d}</span>
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* Right stack — mini stat + purple gradient perf */}
-          <div className="col-span-12 flex flex-col gap-4 lg:col-span-4">
-            {/* Mini stat card */}
-            <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Total outcomes</p>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-[22px] font-bold text-zinc-900 tabular-nums">{counts.closedDecided}</span>
-                <span className="text-[11px] font-medium text-emerald-600">
-                  {counts.closedDecided > 0 ? `${Math.round((counts.closedWins / counts.closedDecided) * 100)}% win` : "—"}
-                </span>
-              </div>
-              <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="mt-2 h-10 w-full">
-                <defs>
-                  <linearGradient id="mini-grad" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <path d="M0 22 Q 15 18, 25 20 T 50 12 T 75 15 T 100 6 L 100 30 L 0 30 Z" fill="url(#mini-grad)" />
-                <path d="M0 22 Q 15 18, 25 20 T 50 12 T 75 15 T 100 6" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            </div>
-
-            {/* Purple gradient performance card */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#7B5CFA] to-[#4E33C2] p-6 text-white shadow-lg">
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">Performance</p>
-                <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider">{range}</span>
-              </div>
-              <h3 className="text-[32px] font-bold tracking-tight tabular-nums">
-                {liveWinRate != null ? `${liveWinRate}%` : "—"}
-              </h3>
-              <p className="mt-1 text-[11px] text-white/60">Win rate · {counts.closedWins}/{counts.closedDecided} closed</p>
-              <div className="mt-4 h-20 w-full">
-                <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="h-full w-full">
-                  <defs>
-                    <linearGradient id="perf-white" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
-                      <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M0 22 C 15 20, 25 10, 40 14 S 65 6, 80 10 L 100 4 L 100 30 L 0 30 Z" fill="url(#perf-white)" />
-                  <path d="M0 22 C 15 20, 25 10, 40 14 S 65 6, 80 10 L 100 4" fill="none" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </div>
-              <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
-            </div>
-          </div>
-
-          {/* ---- Secondary row: portfolio + activity + best time ---- */}
-
-          {/* Your Assets */}
-          <div className="col-span-12 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-zinc-900">Your Assets</h3>
-              <Link to="/signal" className="text-[11px] font-bold uppercase tracking-widest text-[#7B5CFA] hover:text-[#4E33C2]">View All</Link>
-            </div>
-            <div className="divide-y divide-zinc-100">
+        {/* Row 2 — Market Pulse + two CTA cards */}
+        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Card className="flex flex-col">
+            <CardHeader
+              icon={LineChart}
+              title="Market Pulse"
+              right={
+                <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] text-zinc-500 hover:text-zinc-900">
+                  <span>12</span> <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              }
+            />
+            <div className="flex-1 overflow-y-auto scrollbar-auto-hide">
               <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
               <TickerRow label="XAU / EUR" symbol="XAUEUR" decimals={2} />
               <TickerRow label="XAU / GBP" symbol="XAUGBP" decimals={2} />
               <TickerRow label="XAU / JPY" symbol="XAUJPY" decimals={0} />
               <TickerRow label="XAU / AUD" symbol="XAUAUD" decimals={2} />
+              <TickerRow label="XAU / CHF" symbol="XAUCHF" decimals={2} />
               <TickerRow label="DXY" symbol="DXY" decimals={3} />
             </div>
-          </div>
+          </Card>
 
-          {/* Recent activity */}
-          <div className="col-span-12 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-zinc-900">Recent activity</h3>
-              <Link to="/signal" className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500 hover:text-zinc-900">
-                View all <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
+
+
+          <Card className="flex flex-col">
+            <CardHeader
+              icon={Gauge}
+              title="Best Time to Trade"
+              right={
+                <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                  Open desk <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              }
+            />
+            <BestTimeWidget />
+          </Card>
+
+
+          <Card className="flex flex-col">
+            <CardHeader
+              icon={Activity}
+              title="Signal Desk"
+              right={
+                <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                  Open desk <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              }
+            />
             <SignalDeskHistory />
-          </div>
-
-          {/* Best time + Quick actions + Invite */}
-          <div className="col-span-12 flex flex-col gap-4 lg:col-span-3">
-            <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
-              <div className="mb-2 flex items-center justify-between">
-                <h3 className="text-[13px] font-bold text-zinc-900">Best time</h3>
-                <Link to="/signal" className="text-[10px] font-bold uppercase tracking-widest text-[#7B5CFA]">Desk →</Link>
-              </div>
-              <BestTimeWidget />
-            </div>
-
-            <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
-              <p className="mb-3 text-[13px] font-bold text-zinc-900">Quick actions</p>
-              <QuickActions />
-            </div>
-
-            <div className="rounded-3xl border border-indigo-100 bg-indigo-50/60 p-5">
-              <div className="mb-1 flex items-center gap-2">
-                <Lightbulb className="h-4 w-4 text-[#7B5CFA]" strokeWidth={2} />
-                <p className="text-[11px] font-bold uppercase tracking-tight text-[#4E33C2]">Alpha insight</p>
-              </div>
-              <div className="text-[13px] leading-relaxed text-zinc-800">
-                <DailyTip />
-              </div>
-            </div>
-
-            <Link
-              to="/dashboard/referrals"
-              className="flex items-center justify-between rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#7B5CFA]/10 text-[#7B5CFA]">
-                  <Gift className="h-5 w-5" strokeWidth={2} />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[13px] font-semibold text-zinc-900">Invite &amp; earn</p>
-                  <p className="text-[11px] text-zinc-500">$5.00 per referral</p>
-                </div>
-              </div>
-              <ArrowRight className="h-4 w-4 text-zinc-300" />
-            </Link>
-          </div>
+          </Card>
         </section>
 
+        {/* Row 3 — Quick Actions + Pro Tip + Referral */}
+        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Card className="hover-lift flex flex-col">
+            <CardHeader icon={LayoutGrid} title="Quick Actions" />
+            <QuickActions />
+          </Card>
 
+          <Card className="hover-lift flex flex-col">
+            <CardHeader icon={Lightbulb} title="Pro Tip" />
+            <DailyTip />
+          </Card>
 
+          <Card className="hover-lift flex flex-col">
+            <CardHeader
+              icon={Gift}
+              title="Invite & Earn"
+              right={
+                <Link to="/dashboard/referrals" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                  Manage <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              }
+            />
+            <ReferralSnapshot />
+          </Card>
+        </section>
 
 
         <div className="h-12" />
