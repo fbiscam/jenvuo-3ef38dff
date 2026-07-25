@@ -191,7 +191,7 @@ function Metric({
 
   return (
     <div className="flex flex-1 min-w-0 flex-col px-3 pt-2 pb-4 sm:px-4">
-      <div className="truncate text-[12px] text-zinc-500" title={label}>
+      <div className="truncate text-[12px] text-zinc-700" title={label}>
         {label}
       </div>
       <div className="mt-1 flex min-h-[26px] items-baseline gap-2 sm:min-h-[28px]">
