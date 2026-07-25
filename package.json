@@ -3,6 +3,7 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -13,7 +14,11 @@
     "cap:sync": "vite build --base=./ && cap sync",
     "cap:ios": "vite build --base=./ && cap sync ios && cap open ios",
     "cap:android": "vite build --base=./ && cap sync android && cap open android",
-    "cap:live": "CAP_SERVER_URL=https://jenvu.com cap sync"
+    "cap:live": "CAP_SERVER_URL=https://jenvu.com cap sync",
+    "electron:dev": "electron .",
+    "electron:pack:linux": "electron-packager . Jenvu --platform=linux --arch=x64 --out=electron-release --overwrite --ignore='^/electron-release' --ignore='^/src' --ignore='^/android' --ignore='^/ios' --ignore='^/supabase' --ignore='^/.lovable' --ignore='^/.output' --ignore='^/dist'",
+    "electron:pack:win": "electron-packager . Jenvu --platform=win32 --arch=x64 --out=electron-release --overwrite --ignore='^/electron-release' --ignore='^/src' --ignore='^/android' --ignore='^/ios' --ignore='^/supabase' --ignore='^/.lovable' --ignore='^/.output' --ignore='^/dist'",
+    "electron:pack:mac": "electron-packager . Jenvu --platform=darwin --arch=x64 --out=electron-release --overwrite --ignore='^/electron-release' --ignore='^/src' --ignore='^/android' --ignore='^/ios' --ignore='^/supabase' --ignore='^/.lovable' --ignore='^/.output' --ignore='^/dist'"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.1",
@@ -93,6 +98,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@electron/packager": "^20.0.4",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "2.7.7",
     "@types/node": "^22.16.5",
@@ -100,6 +106,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^43.2.0",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.6",
