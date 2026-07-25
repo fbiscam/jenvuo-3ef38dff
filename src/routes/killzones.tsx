@@ -280,17 +280,17 @@ function KillzonesPage() {
 
         {/* Live clock strip */}
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-zinc-200 bg-white p-4">
+          <div className="rounded-[22px] border border-zinc-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-12px_rgba(16,24,40,0.10)] ring-1 ring-white/60">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>UTC</div>
             <div className={`${MONO} text-xl sm:text-2xl font-semibold mt-1`}>{utcNow}</div>
           </div>
-          <div className="rounded-xl border border-zinc-200 bg-white p-4">
+          <div className="rounded-[22px] border border-zinc-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-12px_rgba(16,24,40,0.10)] ring-1 ring-white/60">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
               Local · {tzShort}
             </div>
             <div className={`${MONO} text-xl sm:text-2xl font-semibold mt-1`}>{localNow}</div>
           </div>
-          <div className="col-span-2 sm:col-span-1 rounded-xl border border-zinc-200 bg-white p-4">
+          <div className="col-span-2 sm:col-span-1 rounded-[22px] border border-zinc-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-12px_rgba(16,24,40,0.10)] ring-1 ring-white/60">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
               {ipCity ? "Detected location" : "Timezone"}
             </div>
@@ -368,10 +368,10 @@ function KillzonesPage() {
                           }
                           navigate({ to: "/signal", search: { symbol: profile.key } as never });
                         }}
-                        className={`group text-left rounded-xl border p-4 transition ${
+                        className={`group text-left rounded-[22px] border p-4 ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 ${
                           locked
-                            ? "border-zinc-200 bg-zinc-50/60 hover:border-zinc-300"
-                            : "border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-sm"
+                            ? "border-zinc-200/70 bg-zinc-50/60 shadow-[0_1px_2px_rgba(16,24,40,0.03),0_8px_20px_-12px_rgba(16,24,40,0.08)] hover:border-zinc-300/70"
+                            : "border-zinc-200/70 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-12px_rgba(16,24,40,0.10)] hover:border-zinc-300/70 hover:shadow-[0_2px_4px_rgba(16,24,40,0.05),0_18px_40px_-16px_rgba(16,24,40,0.14)]"
                         }`}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -469,7 +469,7 @@ function KillzonesPage() {
             );
           })}
           {rows.length === 0 && (
-            <div className="rounded-xl border border-dashed border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
+            <div className="rounded-[22px] border border-dashed border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
               No instruments match your search.
             </div>
           )}
