@@ -332,7 +332,7 @@ function relTime(d: Date) {
 
 /* ---------- live ticker row ---------- */
 
-function TickerRow({ label, symbol, decimals = 2 }: { label: string; symbol: string; decimals?: number }) {
+function TickerRow({ label, symbol, decimals = 2, dark = false }: { label: string; symbol: string; decimals?: number; dark?: boolean }) {
   const livePrice = useLivePriceStream(symbol, null, undefined, { intervalMs: 5000 });
   const fetchSnapshot = useServerFn(getMarketSnapshot);
   const [snap, setSnap] = useState<{ price: number; prevClose: number | null; changePct: number | null } | null>(null);
