@@ -1314,13 +1314,69 @@ function SignalPage() {
 
 
 
-            {/* CENTER — charts + multi-tf strip */}
-            <div className="lg:col-span-6 bg-white flex flex-col gap-px">
-              {/* Multi-TF alignment strip */}
+            {/* CENTER — TradingView-style chart deck */}
+            <div className="lg:col-span-6 bg-[#0b0e13] flex flex-col">
+              {/* TV-style top toolbar */}
               {plan && (
-                <div className="bg-white px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-3 border-b border-zinc-100">
+                <div className="bg-[#131722] border-b border-white/5 px-3 sm:px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-[13px] font-bold text-white tracking-tight truncate">
+                      {plan.instrument.display}
+                    </span>
+                    <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+                      {plan.instrument.kind === "crypto" ? "CRYPTO" : "OANDA"}
+                    </span>
+                    {(() => {
+                      const px = displayPrice ?? plan.currentPrice;
+                      const first = plan.ltfCandles[0]?.open ?? plan.currentPrice;
+                      const chg = px - first;
+                      const chgPct = first > 0 ? (chg / first) * 100 : 0;
+                      const up = chg >= 0;
+                      return (
+                        <>
+                          <span className={`text-[15px] font-bold ${MONO} tabular-nums text-white`}>
+                            {plan.instrument.kind === "crypto" ? "" : "$"}
+                            {px.toFixed(plan.instrument.decimals)}
+                          </span>
+                          <span className={cn(
+                            "text-[11px] font-semibold tabular-nums px-1.5 py-0.5 rounded",
+                            up ? "bg-emerald-500/15 text-emerald-400" : "bg-rose-500/15 text-rose-400",
+                          )}>
+                            {up ? "▲" : "▼"} {Math.abs(chg).toFixed(plan.instrument.decimals)} ({chgPct >= 0 ? "+" : ""}{chgPct.toFixed(2)}%)
+                          </span>
+                        </>
+                      );
+                    })()}
+                  </div>
+                  {/* TF pills — click to focus that chart */}
+                  <div className="flex items-center gap-1 shrink-0">
+                    {[
+                      { key: "htf" as const, label: "4H" },
+                      { key: "ltf" as const, label: "15M" },
+                    ].map((p) => (
+                      <button
+                        key={p.key}
+                        type="button"
+                        onClick={() => setActiveTf(p.key)}
+                        className={cn(
+                          "px-2.5 py-1 rounded text-[11px] font-bold tracking-wider transition",
+                          activeTf === p.key
+                            ? "bg-white text-[#131722]"
+                            : "text-zinc-400 hover:bg-white/10 hover:text-white",
+                        )}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* MTF alignment strip */}
+              {plan && (
+                <div className="bg-[#0f1218] px-3 sm:px-4 py-1.5 flex items-center justify-between gap-3 border-b border-white/5">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-500 mr-1`}>
+                    <span className={`text-[9px] font-bold ${MONO} tracking-widest uppercase text-zinc-500 mr-1`}>
                       MTF
                     </span>
                     {plan.multiTf.map((b) => (
@@ -1328,12 +1384,12 @@ function SignalPage() {
                     ))}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+                    <span className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-500`}>
                       {plan.alignmentLabel}
                     </span>
-                    <div className="w-24 h-1.5 bg-gradient-to-r from-rose-100 via-zinc-100 to-emerald-100 rounded-full relative overflow-hidden">
+                    <div className="w-24 h-1.5 bg-white/5 rounded-full relative overflow-hidden">
                       <div
-                        className="absolute top-1/2 -translate-y-1/2 w-2 h-3 bg-zinc-900 rounded-sm"
+                        className="absolute top-1/2 -translate-y-1/2 w-2 h-3 bg-white rounded-sm"
                         style={{ left: `${Math.max(0, Math.min(96, plan.alignmentScore))}%` }}
                       />
                     </div>
@@ -1341,64 +1397,81 @@ function SignalPage() {
                 </div>
               )}
 
-              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
+              {/* HTF chart */}
+              <div className="bg-[#0b0e13] px-3 sm:px-4 pt-3 pb-2 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal normal-case text-zinc-900">
-                    HTF // 4H · Bias
-                  </span>
-                  {plan && (
-                    <span className={cn(
-                      "text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded",
-                      plan.htfBias === "bullish" ? "bg-emerald-100 text-emerald-700" :
-                      plan.htfBias === "bearish" ? "bg-rose-100 text-rose-700" :
-                      "bg-zinc-100 text-zinc-700",
-                    )}>
-                      {plan.htfBias}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">
+                      4H · HTF Bias
                     </span>
+                    {plan && (
+                      <span className={cn(
+                        "text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded",
+                        plan.htfBias === "bullish" ? "bg-emerald-500/15 text-emerald-400" :
+                        plan.htfBias === "bearish" ? "bg-rose-500/15 text-rose-400" :
+                        "bg-white/10 text-zinc-400",
+                      )}>
+                        {plan.htfBias}
+                      </span>
+                    )}
+                  </div>
+                  {activeTf === "htf" && (
+                    <span className="text-[9px] font-bold tracking-widest uppercase text-sky-400 animate-pulse">● ANALYZING</span>
                   )}
                 </div>
-                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
+                <div className={cn(
+                  "rounded-lg overflow-hidden h-[380px] sm:h-[440px] transition-all duration-300 border",
+                  activeTf === "ltf" ? "opacity-40 border-white/5" : "opacity-100 border-white/10 ring-1 ring-sky-500/20",
+                )}>
                   {plan ? (
                     <SignalChart
                       ref={htfRef}
                       candles={plan.htfCandles}
                       tf="htf"
-                      dark={false}
+                      dark={true}
                       title="4H"
                     />
                   ) : null}
                 </div>
-
               </div>
-              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100">
+
+              {/* LTF chart */}
+              <div className="bg-[#0b0e13] px-3 sm:px-4 pt-2 pb-3 flex flex-col gap-2 border-t border-white/5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal normal-case text-zinc-900">
-                    LTF // 15M · Execution
-                  </span>
-                  {t && (
-                    <span className={cn(
-                      "text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded",
-                      isBuy ? "bg-emerald-100 text-emerald-700" :
-                      isSell ? "bg-rose-100 text-rose-700" :
-                      "bg-zinc-100 text-zinc-700",
-                    )}>
-                      {t.direction}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">
+                      15M · LTF Execution
                     </span>
+                    {t && (
+                      <span className={cn(
+                        "text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded",
+                        isBuy ? "bg-emerald-500/15 text-emerald-400" :
+                        isSell ? "bg-rose-500/15 text-rose-400" :
+                        "bg-white/10 text-zinc-400",
+                      )}>
+                        {t.direction}
+                      </span>
+                    )}
+                  </div>
+                  {activeTf === "ltf" && (
+                    <span className="text-[9px] font-bold tracking-widest uppercase text-sky-400 animate-pulse">● ANALYZING</span>
                   )}
                 </div>
-                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "htf" ? "opacity-55" : "opacity-100")}>
+                <div className={cn(
+                  "rounded-lg overflow-hidden h-[380px] sm:h-[440px] transition-all duration-300 border",
+                  activeTf === "htf" ? "opacity-40 border-white/5" : "opacity-100 border-white/10 ring-1 ring-sky-500/20",
+                )}>
                   {plan ? (
                     <SignalChart
                       ref={ltfRef}
                       candles={plan.ltfCandles}
                       tf="ltf"
-                      dark={false}
+                      dark={true}
                       title="15M"
                     />
                   ) : null}
-
                 </div>
-                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-800 font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
+                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-400 font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
                   <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
                   <LegendDot color="bg-sky-500/70" label="OB" />
                   <LegendDot color="bg-amber-500/70" label="Liquidity" />
@@ -1409,6 +1482,7 @@ function SignalPage() {
                 </div>
               </div>
             </div>
+
 
             {/* RIGHT — intelligence */}
             <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 space-y-6 overflow-y-auto max-h-[820px]">
