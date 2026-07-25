@@ -1061,286 +1061,234 @@ function DashboardLayout() {
 
         </div>
 
-        {/* Premium Portfolio Hero — bank-style */}
-        <section className="mt-6 grid grid-cols-12 gap-4">
-          {/* Hero balance card */}
-          <div className="col-span-12 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8 lg:col-span-8">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
-                  Total Wallet Balance
-                </p>
-                <h2 className="mt-2 text-4xl font-bold tracking-tight text-zinc-900 tabular-nums sm:text-5xl">
-                  {credits.isLoading ? "…" : `$${Number(credits.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                </h2>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-semibold ${scansTrend === "down" ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"}`}>
-                    <ArrowUpRight className={`h-3.5 w-3.5 ${scansTrend === "down" ? "rotate-90" : ""}`} strokeWidth={2.5} />
-                    {credits.allowance ? `${remainingPct}%` : "Fresh"}
-                  </span>
-                  <span className="text-[12px] text-zinc-500">
-                    {credits.allowance ? `of $${Number(credits.allowance).toFixed(2)} monthly wallet` : "Awaiting first top-up"}
-                  </span>
-                </div>
+        {/* Elite Terminal — Hyper-Premium Layout */}
+
+        {/* Session Timeline Ribbon */}
+        <section className="mt-6 rounded-2xl border border-zinc-200 bg-white px-5 py-3 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">Market Sessions</span>
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                </span>
+                <span className="text-[12px] font-semibold text-zinc-900">Live</span>
               </div>
-              <div className="h-16 w-40 sm:h-20 sm:w-56">
-                <svg viewBox="0 0 220 70" className="h-full w-full">
+              <div className="hidden h-4 w-px bg-zinc-200 sm:block" />
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-semibold text-zinc-700">London</span>
+                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-zinc-100"><div className="h-full w-2/3 bg-emerald-500" /></div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-semibold text-zinc-700">New York</span>
+                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-zinc-100"><div className="h-full w-1/3 bg-indigo-500" /></div>
+              </div>
+              <div className="flex items-center gap-2 opacity-60">
+                <span className="text-[11px] font-semibold text-zinc-500">Asia</span>
+                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-zinc-100"><div className="h-full w-0 bg-zinc-400" /></div>
+              </div>
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Strategy</span>
+              <span className="text-[11px] font-semibold italic text-zinc-800">ICT · Order Block Rejection</span>
+              <span className="rounded bg-indigo-600 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-white">{planTier.toUpperCase()}</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Main Terminal Grid */}
+        <section className="mt-4 grid grid-cols-12 gap-4">
+
+          {/* LEFT RAIL — Wallet + Metrics + Market Pulse + Signal Desk CTA */}
+          <aside className="col-span-12 space-y-4 lg:col-span-3">
+
+            {/* Wallet Hero */}
+            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <div className="flex items-start justify-between">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">Total Equity</p>
+                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${scansTrend === "down" ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"}`}>
+                  <ArrowUpRight className={`h-3 w-3 ${scansTrend === "down" ? "rotate-90" : ""}`} strokeWidth={2.75} />
+                  {credits.allowance ? `${remainingPct}%` : "Fresh"}
+                </span>
+              </div>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 tabular-nums">
+                {credits.isLoading ? "…" : `$${Number(credits.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              </h2>
+              <p className="mt-1 text-[11px] text-zinc-500">
+                of ${Number(credits.allowance || 0).toFixed(2)} monthly wallet
+              </p>
+              <div className="mt-4 h-16 w-full">
+                <svg viewBox="0 0 220 60" preserveAspectRatio="none" className="h-full w-full">
                   <defs>
-                    <linearGradient id="hero-spark" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
+                    <linearGradient id="wallet-spark" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
                       <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
                     </linearGradient>
                   </defs>
-                  <path
-                    d="M0 55 C 25 45, 45 62, 65 38 S 105 28, 125 22 T 175 30 T 220 12"
-                    fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                  />
-                  <path
-                    d="M0 55 C 25 45, 45 62, 65 38 S 105 28, 125 22 T 175 30 T 220 12 L 220 70 L 0 70 Z"
-                    fill="url(#hero-spark)"
-                  />
+                  <path d="M0 48 C 25 40, 45 55, 65 32 S 105 22, 125 18 T 175 24 T 220 8" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M0 48 C 25 40, 45 55, 65 32 S 105 22, 125 18 T 175 24 T 220 8 L 220 60 L 0 60 Z" fill="url(#wallet-spark)" />
                 </svg>
               </div>
             </div>
 
-            {/* KPI strip */}
-            <div className="mt-8 grid grid-cols-3 gap-6 border-t border-zinc-100 pt-6">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Plan Tier</p>
-                <p className="mt-1.5 text-lg font-bold tracking-tight text-zinc-900 sm:text-xl">{planTier}</p>
+            {/* Mini KPI trio */}
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-xl border border-zinc-200 bg-white p-3 shadow-sm">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Win</p>
+                <p className="mt-1 text-base font-bold tabular-nums text-zinc-900">{liveWinRate != null ? `${liveWinRate}%` : "—"}</p>
               </div>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Win Rate</p>
-                <p className="mt-1.5 text-lg font-bold tracking-tight text-zinc-900 sm:text-xl tabular-nums">
-                  {liveWinRate != null ? `${liveWinRate}%` : "—"}
-                </p>
+              <div className="rounded-xl border border-zinc-200 bg-white p-3 shadow-sm">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Plan</p>
+                <p className="mt-1 truncate text-base font-bold text-zinc-900">{planTier}</p>
               </div>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Saved Setups</p>
-                <p className="mt-1.5 text-lg font-bold tracking-tight text-zinc-900 sm:text-xl tabular-nums">
-                  {counts.saved}
-                </p>
+              <div className="rounded-xl border border-zinc-200 bg-white p-3 shadow-sm">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Saved</p>
+                <p className="mt-1 text-base font-bold tabular-nums text-zinc-900">{counts.saved}</p>
               </div>
             </div>
-          </div>
 
-          {/* Right rail: Signal desk CTA + Invite */}
-          <div className="col-span-12 flex flex-col gap-4 lg:col-span-4">
-            <div className="relative flex flex-1 flex-col justify-between overflow-hidden rounded-2xl bg-zinc-900 p-6 text-white shadow-sm">
-              <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl" />
+            {/* Market Pulse */}
+            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-zinc-100 bg-[#FAFAFA] px-4 py-2.5">
+                <div className="flex items-center gap-2">
+                  <LineChart className="h-4 w-4 text-zinc-500" />
+                  <span className="text-[12px] font-semibold text-zinc-800">Market Pulse</span>
+                </div>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Live</span>
+              </div>
+              <div className="max-h-[280px] overflow-y-auto scrollbar-auto-hide">
+                <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
+                <TickerRow label="XAU / EUR" symbol="XAUEUR" decimals={2} />
+                <TickerRow label="XAU / GBP" symbol="XAUGBP" decimals={2} />
+                <TickerRow label="XAU / JPY" symbol="XAUJPY" decimals={0} />
+                <TickerRow label="XAU / AUD" symbol="XAUAUD" decimals={2} />
+                <TickerRow label="XAU / CHF" symbol="XAUCHF" decimals={2} />
+                <TickerRow label="DXY" symbol="DXY" decimals={3} />
+              </div>
+            </div>
+
+            {/* Signal Desk CTA — dark premium */}
+            <div className="relative overflow-hidden rounded-2xl bg-zinc-900 p-5 text-white shadow-sm">
+              <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-emerald-500/15 blur-3xl" />
               <div className="relative">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-400">Signal Desk</p>
-                <h3 className="mt-2 text-lg font-bold leading-tight">Precision AI setups, delivered live</h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-zinc-400">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-400">Signal Desk</p>
+                <h3 className="mt-2 text-[15px] font-bold leading-tight">Precision AI setups, delivered live</h3>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-zinc-400">
                   A+ ICT/SMC setups from OpenAI + DeepSeek, only when confluence is strong.
                 </p>
-              </div>
-              <Link
-                to="/signal"
-                className="relative mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13px] font-bold text-zinc-900 transition-colors hover:bg-zinc-100"
-              >
-                Open Signal Desk <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-
-            <Link
-              to="/dashboard/referrals"
-              className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
-            >
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600">
-                  <Gift className="h-5 w-5" strokeWidth={2} />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[13px] font-bold text-zinc-900">Invite & Earn</p>
-                  <p className="text-[11px] text-zinc-500">$5.00 per paid referral</p>
-                </div>
-              </div>
-              <ArrowRight className="h-4 w-4 text-zinc-300" />
-            </Link>
-          </div>
-        </section>
-
-        {/* Analytics header */}
-        <div className="mt-7 flex items-center justify-between">
-          <h2 className="text-[15px] font-semibold text-zinc-900">Analytics</h2>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleRefresh}
-              disabled={refreshing}
-              aria-label="Refresh analytics"
-              title="Refresh analytics"
-              className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border border-zinc-200 bg-white p-0 leading-none text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 active:bg-zinc-100 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 shrink-0 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
-            </button>
-            <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
-              <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44">
-              {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
-                <DropdownMenuCheckboxItem
-                  key={k}
-                  checked={range === k}
-                  onCheckedChange={() => setRange(k)}
-                  className="text-[12px] md:text-[14px]"
+                <Link
+                  to="/signal"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[12px] font-bold text-zinc-900 transition-colors hover:bg-zinc-100"
                 >
-                  {RANGE_LABELS[k]}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
+                  Open Signal Desk <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+          </aside>
 
+          {/* CENTER RAIL — Live AI Analysis + Best Time + Recent Outcomes */}
+          <div className="col-span-12 space-y-4 lg:col-span-6">
 
-            </DropdownMenu>
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-zinc-900">Live AI Analysis</h1>
+                <p className="mt-0.5 text-[11px] text-zinc-500">Institutional-grade setups scored by GPT-5.5 + DeepSeek</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  aria-label="Refresh"
+                  className="grid h-8 w-8 place-items-center rounded-md border border-zinc-200 bg-white text-zinc-600 transition hover:bg-zinc-50 disabled:opacity-60"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50">
+                    <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-44">
+                    {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
+                      <DropdownMenuCheckboxItem key={k} checked={range === k} onCheckedChange={() => setRange(k)} className="text-[12px] md:text-[14px]">
+                        {RANGE_LABELS[k]}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+
+            {/* Best Time to Trade */}
+            <Card className="overflow-hidden flex flex-col">
+              <CardHeader
+                icon={Gauge}
+                title="Best Time to Trade"
+                right={
+                  <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                    Open desk <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                }
+              />
+              <BestTimeWidget />
+            </Card>
+
+            {/* Signal Desk history — the recent outcomes / active feed */}
+            <Card className="flex flex-col">
+              <CardHeader
+                icon={Activity}
+                title="Signal Desk · Recent Outcomes"
+                right={
+                  <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                    Open desk <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                }
+              />
+              <SignalDeskHistory />
+            </Card>
           </div>
-        </div>
 
-        {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
-        <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card>
-            <CardHeader icon={ShieldCheck} title="Wallet & Plan" />
-            <div className="flex divide-x divide-zinc-200">
-              <Metric
-                label={`Balance · ${planTier}`}
-                value={credits.isLoading ? "…" : `$${Number(credits.balance || 0).toFixed(2)}`}
-                delta={credits.allowance ? `${remainingPct}%` : null}
-                tone={balanceTone}
-                trend={scansTrend}
-                seed={3}
-              />
-              <Metric
-                label="Monthly wallet"
-                value={credits.isLoading ? "…" : `$${Number(credits.allowance || 0).toFixed(2)}`}
-                delta={null}
-                tone="zinc"
-                seed={5}
-              />
-            </div>
-          </Card>
+          {/* RIGHT RAIL — Quick Actions + Pro Tip + Invite */}
+          <aside className="col-span-12 space-y-4 lg:col-span-3">
+            <Card className="hover-lift flex flex-col">
+              <CardHeader icon={LayoutGrid} title="Quick Actions" />
+              <QuickActions />
+            </Card>
 
-          <Card>
-            <CardHeader icon={Gauge} title="Performance" />
-            <div className="flex divide-x divide-zinc-200">
-              <Metric
-                label="Win rate"
-                value={liveWinRate != null ? `${liveWinRate}%` : "0.0%"}
-                delta={null}
-                trend={liveWinRate == null ? "flat" : liveWinRate >= 50 ? "up" : "down"}
-                magnitude={liveWinRate != null ? Math.min(60, Math.abs(liveWinRate - 50) + 20) : 0}
-                seed={7}
-              />
-              <Metric
-                label="Journal entries"
-                value={counts.journalTotal}
-                delta={null}
-                tone="zinc"
-                seed={11}
-              />
+            {/* Pro Tip — premium dark */}
+            <div className="relative overflow-hidden rounded-2xl bg-zinc-900 p-5 text-white shadow-sm">
+              <div className="pointer-events-none absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-indigo-500/15 blur-3xl" />
+              <div className="relative">
+                <div className="mb-3 flex items-center gap-2">
+                  <div className="grid h-6 w-6 place-items-center rounded-full bg-indigo-500/20 text-indigo-300">
+                    <Lightbulb className="h-3.5 w-3.5" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-300">Pro Tip</span>
+                </div>
+                <h4 className="text-[14px] font-semibold leading-snug text-white">{PRO_TIPS[Math.floor(Date.now() / 86_400_000) % PRO_TIPS.length].title}</h4>
+                <p className="mt-1.5 text-[12px] leading-relaxed text-zinc-400">{PRO_TIPS[Math.floor(Date.now() / 86_400_000) % PRO_TIPS.length].body}</p>
+                <Link to="/insights" className="mt-4 inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-300 hover:text-indigo-200">
+                  Read more insights <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
             </div>
-          </Card>
 
-          <Card>
-            <CardHeader icon={Activity} title="Activity" />
-            <div className="flex divide-x divide-zinc-200">
-              <Metric
-                label="Saved A+ setups"
-                value={counts.saved}
-                delta={null}
-                tone="blue"
-                seed={13}
+            <Card className="hover-lift flex flex-col">
+              <CardHeader
+                icon={Gift}
+                title="Invite & Earn"
+                right={
+                  <Link to="/dashboard/referrals" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
+                    Manage <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                }
               />
-              <Metric
-                label={`Alerts · ${range}`}
-                value={counts.alerts7d}
-                delta={null}
-                tone="blue"
-                seed={17}
-              />
-            </div>
-          </Card>
+              <ReferralSnapshot />
+            </Card>
+          </aside>
         </section>
-
-        {/* Row 2 — Market Pulse + two CTA cards */}
-        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card className="flex flex-col">
-            <CardHeader
-              icon={LineChart}
-              title="Market Pulse"
-              right={
-                <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] text-zinc-500 hover:text-zinc-900">
-                  <span>12</span> <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              }
-            />
-            <div className="flex-1 overflow-y-auto scrollbar-auto-hide">
-              <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
-              <TickerRow label="XAU / EUR" symbol="XAUEUR" decimals={2} />
-              <TickerRow label="XAU / GBP" symbol="XAUGBP" decimals={2} />
-              <TickerRow label="XAU / JPY" symbol="XAUJPY" decimals={0} />
-              <TickerRow label="XAU / AUD" symbol="XAUAUD" decimals={2} />
-              <TickerRow label="XAU / CHF" symbol="XAUCHF" decimals={2} />
-              <TickerRow label="DXY" symbol="DXY" decimals={3} />
-            </div>
-          </Card>
-
-
-
-          <Card className="flex flex-col">
-            <CardHeader
-              icon={Gauge}
-              title="Best Time to Trade"
-              right={
-                <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
-                  Open desk <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              }
-            />
-            <BestTimeWidget />
-          </Card>
-
-
-          <Card className="flex flex-col">
-            <CardHeader
-              icon={Activity}
-              title="Signal Desk"
-              right={
-                <Link to="/signal" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
-                  Open desk <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              }
-            />
-            <SignalDeskHistory />
-          </Card>
-        </section>
-
-        {/* Row 3 — Quick Actions + Pro Tip + Referral */}
-        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card className="hover-lift flex flex-col">
-            <CardHeader icon={LayoutGrid} title="Quick Actions" />
-            <QuickActions />
-          </Card>
-
-          <Card className="hover-lift flex flex-col">
-            <CardHeader icon={Lightbulb} title="Pro Tip" />
-            <DailyTip />
-          </Card>
-
-          <Card className="hover-lift flex flex-col">
-            <CardHeader
-              icon={Gift}
-              title="Invite & Earn"
-              right={
-                <Link to="/dashboard/referrals" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
-                  Manage <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              }
-            />
-            <ReferralSnapshot />
-          </Card>
-        </section>
-
 
         <div className="h-12" />
         </>
