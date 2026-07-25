@@ -212,9 +212,11 @@ function Metric({
 
 function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof ShieldCheck; title: string; right?: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex items-center justify-between rounded-t-xl border-b border-zinc-200 bg-[#F8F8F8] px-4 py-2.5 ${className}`}>
-      <div className="flex items-center gap-2 text-[13px] font-medium text-zinc-700">
-        <Icon className="h-4 w-4 text-zinc-500" />
+    <div className={`flex items-center justify-between rounded-t-[14px] border-b border-zinc-200/70 bg-gradient-to-b from-white to-[#FAFAF9] px-4 py-2.5 ${className}`}>
+      <div className="flex items-center gap-2 text-[13px] font-semibold tracking-tight text-zinc-800">
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-white ring-1 ring-inset ring-zinc-200 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+          <Icon className="h-3.5 w-3.5 text-zinc-600" />
+        </span>
         {title}
       </div>
       {right}
@@ -225,8 +227,18 @@ function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-xl border border-zinc-200 bg-white ${className}`}>
-      {children}
+    <div
+      className={`group relative overflow-hidden rounded-[14px] border border-zinc-200/80 bg-white shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(24,24,27,0.10)] transition-all duration-200 hover:-translate-y-[1px] hover:border-zinc-300 hover:shadow-[0_1px_0_rgba(0,0,0,0.03),0_18px_40px_-20px_rgba(24,24,27,0.18)] ${className}`}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-200/80 to-transparent"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.06),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+      />
+      <div className="relative">{children}</div>
     </div>
   );
 }
