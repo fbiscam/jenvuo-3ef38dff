@@ -1338,6 +1338,32 @@ function computeSetupScore(args: {
 }
 
 // Quick real-time quote (no candle cache) — used by /signal live ticker.
+async function fetchYahooQuoteViaChart(sym: string): Promise<LiveTick | null> {
+  const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
+  for (const host of hosts) {
+    try {
+      const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=1m&range=1d`;
+      const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+      if (!res.ok) continue;
+      const j: any = await res.json();
+      const r = j?.chart?.result?.[0];
+      const meta = r?.meta;
+      const p = typeof meta?.regularMarketPrice === "number" ? meta.regularMarketPrice : null;
+      const t = (typeof meta?.regularMarketTime === "number" ? meta.regularMarketTime : Math.floor(Date.now() / 1000)) * 1000;
+      if (typeof p === "number" && isFinite(p) && p > 0) return { price: p, t };
+      const closes: number[] = r?.indicators?.quote?.[0]?.close ?? [];
+      const times: number[] = r?.timestamp ?? [];
+      for (let i = closes.length - 1; i >= 0; i--) {
+        const c = closes[i];
+        if (typeof c === "number" && isFinite(c) && c > 0) {
+          return { price: c, t: (times[i] ?? Math.floor(Date.now() / 1000)) * 1000 };
+        }
+      }
+    } catch { /* try next */ }
+  }
+  return null;
+}
+
 async function fetchYahooQuote(symbols: string[]): Promise<LiveTick | null> {
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
   for (const host of hosts) {
@@ -1363,6 +1389,12 @@ async function fetchYahooQuote(symbols: string[]): Promise<LiveTick | null> {
         if (typeof p === "number" && isFinite(p)) return { price: p, t };
       } catch { /* try next */ }
     }
+  }
+  // Yahoo v7 quote returns 401 for anonymous callers — fall back to v8 chart
+  // meta (regularMarketPrice) so DXY / futures still get a live tick.
+  for (const sym of symbols) {
+    const q = await fetchYahooQuoteViaChart(sym).catch(() => null);
+    if (q) return q;
   }
   return null;
 }
