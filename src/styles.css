@@ -589,7 +589,7 @@ html[data-pwa="1"] .pwa-tabbar {
    desktop dashboard shell. Scoped to .jenvu-zoom-dashboard so marketing
    pages stay untouched. PWA rules above still win on mobile via !important. */
 .jenvu-zoom-dashboard {
-  background: #ffffff !important;
+  background: #f2f2f7 !important;
 }
 .jenvu-zoom-dashboard main .rounded-xl,
 .jenvu-zoom-dashboard main .rounded-2xl,
