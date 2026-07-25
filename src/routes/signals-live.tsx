@@ -415,11 +415,27 @@ function SignalCard({ s }: { s: Signal }) {
   const isWin = s.outcome === "win";
   const isLoss = s.outcome === "loss";
   const pending = s.outcome === "pending";
+  const isCancelled = s.outcome === "cancelled";
+  const isTimeout = s.outcome === "timeout";
+  const isSkipped = isCancelled || isTimeout;
   const OutcomeIcon = isWin ? CheckCircle2 : isLoss ? XCircle : Circle;
-  const outcomeClass = isWin ? "text-emerald-700 bg-emerald-50 border-emerald-200" : isLoss ? "text-rose-700 bg-rose-50 border-rose-200" : "text-zinc-500 bg-zinc-50 border-zinc-200";
+  const outcomeClass = isWin
+    ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+    : isLoss
+      ? "text-rose-700 bg-rose-50 border-rose-200"
+      : isSkipped
+        ? "text-amber-700 bg-amber-50 border-amber-200"
+        : "text-zinc-500 bg-zinc-50 border-zinc-200";
+  const outcomeLabel = pending
+    ? "Live"
+    : isCancelled
+      ? "Not Triggered"
+      : isTimeout
+        ? "Expired"
+        : s.outcome;
   const fired = new Date(s.fired_at);
   return (
-    <li className={`group relative flex flex-col rounded-2xl border bg-white p-4 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-16px_rgba(0,0,0,0.15)] ${isWin ? "border-emerald-200" : isLoss ? "border-rose-200" : "border-zinc-200"}`}>
+    <li className={`group relative flex flex-col rounded-2xl border bg-white p-4 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-16px_rgba(0,0,0,0.15)] ${isWin ? "border-emerald-200" : isLoss ? "border-rose-200" : isSkipped ? "border-amber-200" : "border-zinc-200"}`}>
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
         <div className="min-w-0 flex flex-wrap items-center gap-1.5">
           <span className={`shrink-0 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${isBuy ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
@@ -432,9 +448,10 @@ function SignalCard({ s }: { s: Signal }) {
         </div>
         <span className={`shrink-0 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${outcomeClass}`}>
           <OutcomeIcon className="h-3 w-3" />
-          {pending ? "Live" : s.outcome}
+          {outcomeLabel}
         </span>
       </header>
+
 
       <dl className="mt-3 grid grid-cols-4 gap-1.5 text-center">
         {([
