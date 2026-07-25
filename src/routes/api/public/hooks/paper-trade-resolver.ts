@@ -106,13 +106,23 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
             const rewardDist = Math.abs(tp - entry);
             const isBuy = t.direction === "BUY";
 
-            let outcome: "win" | "loss" | "timeout" = "timeout";
+            let outcome: "win" | "loss" | "timeout" | "cancelled" = "timeout";
             let realizedR = 0;
             let bestExcursion = 0; // in R units
+            let entryHit = false;
+            const tol = Math.max(riskDist * 0.02, entry * 0.00005);
 
             for (let i = 0; i < highs.length; i++) {
               const hi = highs[i];
               const lo = lows[i];
+              // Wait until the limit entry is actually touched before
+              // tracking SL/TP — otherwise a reversal that never reaches
+              // entry gets wrongly labelled as a loss.
+              if (!entryHit) {
+                if (isBuy && lo <= entry + tol) entryHit = true;
+                else if (!isBuy && hi >= entry - tol) entryHit = true;
+                if (!entryHit) continue;
+              }
               if (isBuy) {
                 if (lo <= sl) {
                   outcome = "loss";
@@ -142,14 +152,19 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
               }
             }
 
-            // If window elapsed and nothing hit, mark timeout with MFE
+            // Window elapsed without a decisive hit
             if (outcome === "timeout") {
               if (ageH < EVAL_WINDOW_HOURS) {
-                // Still in window and no hit yet — leave pending
                 results.push({ id: t.id, action: "still_open" });
                 continue;
               }
-              realizedR = Math.max(-1, Math.min(1, bestExcursion));
+              if (!entryHit) {
+                // Limit price never touched — not a win/loss
+                outcome = "cancelled";
+                realizedR = 0;
+              } else {
+                realizedR = Math.max(-1, Math.min(1, bestExcursion));
+              }
             }
 
             await supabaseAdmin
