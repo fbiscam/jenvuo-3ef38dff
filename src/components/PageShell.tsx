@@ -32,10 +32,7 @@ export function PageShell({
               <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
               <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
               <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
-              <Link to="/briefs" className="hover:text-zinc-900">Briefs</Link>
               <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
-              <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
-              <Link to="/about" className="hover:text-zinc-900">About</Link>
               <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
             </nav>
             <HeaderAuthButtons />
