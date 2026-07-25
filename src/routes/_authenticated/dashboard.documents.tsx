@@ -182,12 +182,12 @@ function DocumentsPage() {
                     <div className="flex flex-col items-center self-stretch">
                       <div
                         className={[
-                          "mt-0.5 h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold ring-2",
+                          "mt-0.5 h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold border-2 border-emerald-500 bg-white text-emerald-600",
                           done
-                            ? "bg-white text-emerald-600 ring-emerald-500"
+                            ? ""
                             : active
-                            ? "bg-white text-emerald-600 ring-emerald-500"
-                            : "bg-white text-emerald-600 ring-emerald-500",
+                            ? ""
+                            : "",
                         ].join(" ")}
                       >
                         {done ? <Check className="h-4 w-4" strokeWidth={3} /> : i + 1}
