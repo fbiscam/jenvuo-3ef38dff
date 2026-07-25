@@ -1061,6 +1061,106 @@ function DashboardLayout() {
 
         </div>
 
+        {/* Premium Portfolio Hero — bank-style */}
+        <section className="mt-6 grid grid-cols-12 gap-4">
+          {/* Hero balance card */}
+          <div className="col-span-12 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8 lg:col-span-8">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                  Total Wallet Balance
+                </p>
+                <h2 className="mt-2 text-4xl font-bold tracking-tight text-zinc-900 tabular-nums sm:text-5xl">
+                  {credits.isLoading ? "…" : `$${Number(credits.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                </h2>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-semibold ${scansTrend === "down" ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"}`}>
+                    <ArrowUpRight className={`h-3.5 w-3.5 ${scansTrend === "down" ? "rotate-90" : ""}`} strokeWidth={2.5} />
+                    {credits.allowance ? `${remainingPct}%` : "Fresh"}
+                  </span>
+                  <span className="text-[12px] text-zinc-500">
+                    {credits.allowance ? `of $${Number(credits.allowance).toFixed(2)} monthly wallet` : "Awaiting first top-up"}
+                  </span>
+                </div>
+              </div>
+              <div className="h-16 w-40 sm:h-20 sm:w-56">
+                <svg viewBox="0 0 220 70" className="h-full w-full">
+                  <defs>
+                    <linearGradient id="hero-spark" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M0 55 C 25 45, 45 62, 65 38 S 105 28, 125 22 T 175 30 T 220 12"
+                    fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  />
+                  <path
+                    d="M0 55 C 25 45, 45 62, 65 38 S 105 28, 125 22 T 175 30 T 220 12 L 220 70 L 0 70 Z"
+                    fill="url(#hero-spark)"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* KPI strip */}
+            <div className="mt-8 grid grid-cols-3 gap-6 border-t border-zinc-100 pt-6">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Plan Tier</p>
+                <p className="mt-1.5 text-lg font-bold tracking-tight text-zinc-900 sm:text-xl">{planTier}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Win Rate</p>
+                <p className="mt-1.5 text-lg font-bold tracking-tight text-zinc-900 sm:text-xl tabular-nums">
+                  {liveWinRate != null ? `${liveWinRate}%` : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Saved Setups</p>
+                <p className="mt-1.5 text-lg font-bold tracking-tight text-zinc-900 sm:text-xl tabular-nums">
+                  {counts.saved}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right rail: Signal desk CTA + Invite */}
+          <div className="col-span-12 flex flex-col gap-4 lg:col-span-4">
+            <div className="relative flex flex-1 flex-col justify-between overflow-hidden rounded-2xl bg-zinc-900 p-6 text-white shadow-sm">
+              <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl" />
+              <div className="relative">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-400">Signal Desk</p>
+                <h3 className="mt-2 text-lg font-bold leading-tight">Precision AI setups, delivered live</h3>
+                <p className="mt-2 text-[13px] leading-relaxed text-zinc-400">
+                  A+ ICT/SMC setups from OpenAI + DeepSeek, only when confluence is strong.
+                </p>
+              </div>
+              <Link
+                to="/signal"
+                className="relative mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13px] font-bold text-zinc-900 transition-colors hover:bg-zinc-100"
+              >
+                Open Signal Desk <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <Link
+              to="/dashboard/referrals"
+              className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
+            >
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600">
+                  <Gift className="h-5 w-5" strokeWidth={2} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[13px] font-bold text-zinc-900">Invite & Earn</p>
+                  <p className="text-[11px] text-zinc-500">$5.00 per paid referral</p>
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-zinc-300" />
+            </Link>
+          </div>
+        </section>
+
         {/* Analytics header */}
         <div className="mt-7 flex items-center justify-between">
           <h2 className="text-[15px] font-semibold text-zinc-900">Analytics</h2>
