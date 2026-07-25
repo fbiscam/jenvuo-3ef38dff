@@ -47,8 +47,8 @@
  */
 
 @theme inline {
-  --font-display: "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
-  --font-sans: "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
+  --font-display: "Google Sans Text", "Product Sans", "Poppins", system-ui, sans-serif;
+  --font-sans: "Google Sans Text", "Product Sans", "Poppins", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -189,7 +189,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: "Google Sans", "Product Sans", "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    font-family: "Google Sans Text", "Product Sans", "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   }
 
 }
@@ -496,7 +496,7 @@ html[data-pwa="1"] .pwa-tabbar {
   background: #ffffff;
   border-top: 1px solid rgb(228 228 231);
   padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
-  font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif;
+  font-family: "Google Sans Text", "Product Sans", "Roboto", system-ui, sans-serif;
 }
 .pwa-tabbar a {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
