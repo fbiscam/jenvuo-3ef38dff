@@ -76,7 +76,7 @@ function OpsHub() {
     <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
       <main className="mx-auto max-w-7xl px-5 py-8 sm:px-6 sm:py-10">
         {/* Header card */}
-        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.08)] sm:p-6">
+        <div className="rounded-[24px] border border-zinc-200/70 bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10),0_32px_64px_-24px_rgba(16,24,40,0.08)] ring-1 ring-white/60 sm:p-6">
           <div className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />
             <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />
