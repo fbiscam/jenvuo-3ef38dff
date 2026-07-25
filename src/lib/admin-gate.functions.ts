@@ -60,15 +60,10 @@ export const adminLogout = createServerFn({ method: "POST" }).handler(async () =
 });
 
 export const adminMe = createServerFn({ method: "GET" }).handler(async () => {
-  const session = await useSession<AdminSession>(sessionConfig());
-  if (!session.data?.unlocked) {
-    return { unlocked: false as const };
-  }
-  return {
-    unlocked: true as const,
-    username: session.data.username ?? "admin",
-  };
+  // Gate disabled — always report unlocked.
+  return { unlocked: true as const, username: "admin" };
 });
+
 
 // ---- Unified inbox (chat sessions + contact form messages) ----
 
