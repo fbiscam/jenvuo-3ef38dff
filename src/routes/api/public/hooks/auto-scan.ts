@@ -273,25 +273,11 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               continue;
             }
 
-            // Killzone gate — fire during London / NY AM / NY PM / Asia killzones.
-            // Asia killzone (00-03 UTC) is now allowed with a stricter confidence
-            // bump because Tokyo session on gold can produce clean setups.
+            // Killzone gate DISABLED — user requested signals fire any time
+            // a valid setup meets confidence, regardless of session window.
             const kz = String(plan.killzone ?? "");
-            const inKillzone = /Killzone/i.test(kz) && !/Outside/i.test(kz);
-            const isAsia = /asia/i.test(kz);
-            if (!inKillzone) {
-              await supabaseAdmin
-                .from("auto_scan_state")
-                .delete()
-                .eq("pair", pair);
-              results.push({ pair, action: "outside_killzone", conf, killzone: kz });
-              continue;
-            }
-            // Asia killzone: require +5 extra confidence points (thinner liquidity).
-            if (isAsia && conf < minConf + 5) {
-              results.push({ pair, action: "asia_below_stricter_threshold", conf, killzone: kz });
-              continue;
-            }
+            void kz;
+
 
             // HTF bias alignment gate — never fire against higher-timeframe trend.
             // Today's losses were SELLs into a bullish macro rally; this guard
