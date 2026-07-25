@@ -611,6 +611,21 @@ html[data-pwa="1"] .pwa-tabbar {
   border-color: rgba(0,0,0,0.08) !important;
 }
 
+.jenvu-zoom-dashboard main h1,
+.jenvu-zoom-dashboard main h2,
+.jenvu-zoom-dashboard main h3,
+.jenvu-zoom-dashboard main h4 {
+  color: #000 !important;
+  text-transform: lowercase !important;
+}
+.jenvu-zoom-dashboard main h1::first-letter,
+.jenvu-zoom-dashboard main h2::first-letter,
+.jenvu-zoom-dashboard main h3::first-letter,
+.jenvu-zoom-dashboard main h4::first-letter {
+  text-transform: uppercase !important;
+}
+
+
 .jenvu-zoom-dashboard main .jenvu-proof-step-circle {
   border-color: rgb(16 185 129) !important;
   border-width: 2px !important;
