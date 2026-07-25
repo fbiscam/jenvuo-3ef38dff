@@ -928,7 +928,7 @@ function SignalPage() {
             </div>
           )}
           {broadcastedAlert && (
-            <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_4px_20px_-8px_rgba(0,0,0,0.08)] overflow-hidden">
+            <div className="rounded-[24px] border border-zinc-200/70 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10),0_32px_64px_-24px_rgba(16,24,40,0.08)] ring-1 ring-white/60 overflow-hidden">
               <div className={cn(
                 "px-6 py-5 flex items-center justify-between border-b border-zinc-100",
                 broadcastedAlert.direction === "BUY" ? "bg-emerald-50/60" : "bg-red-50/60",
