@@ -580,3 +580,56 @@ html[data-pwa="1"] .pwa-tabbar {
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
+
+/* ====== Desktop Dashboard: iOS Cards look (matches PWA app-mode) ====== */
+/* Apply the same softer surfaces, bigger radii, and layered shadows to the
+   desktop dashboard shell. Scoped to .jenvu-zoom-dashboard so marketing
+   pages stay untouched. PWA rules above still win on mobile via !important. */
+.jenvu-zoom-dashboard {
+  background: #f2f2f7 !important;
+}
+.jenvu-zoom-dashboard main .rounded-xl,
+.jenvu-zoom-dashboard main .rounded-2xl,
+.jenvu-zoom-dashboard main .rounded-\[14px\],
+.jenvu-zoom-dashboard main .rounded-\[16px\],
+.jenvu-zoom-dashboard main .rounded-lg {
+  border-radius: 20px !important;
+}
+.jenvu-zoom-dashboard main .bg-white {
+  background-color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 8px 24px -12px rgba(0,0,0,0.08) !important;
+}
+.jenvu-zoom-dashboard main .border,
+.jenvu-zoom-dashboard main .border-zinc-100,
+.jenvu-zoom-dashboard main .border-zinc-200 {
+  border-color: transparent !important;
+}
+.jenvu-zoom-dashboard main .p-4 { padding: 18px !important; }
+.jenvu-zoom-dashboard main .p-5 { padding: 20px !important; }
+.jenvu-zoom-dashboard main .p-6 { padding: 24px !important; }
+
+.jenvu-zoom-dashboard main h2 {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: rgb(113 113 122) !important;
+  padding: 0 4px 8px !important;
+  border: 0 !important;
+}
+.jenvu-zoom-dashboard main .text-3xl,
+.jenvu-zoom-dashboard main .text-4xl {
+  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+}
+.jenvu-zoom-dashboard main button,
+.jenvu-zoom-dashboard main a[role="button"] {
+  border-radius: 14px !important;
+}
+.jenvu-zoom-dashboard main .divide-y > * + * {
+  border-color: rgba(0,0,0,0.06) !important;
+}
+
