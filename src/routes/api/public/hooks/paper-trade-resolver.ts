@@ -11,16 +11,44 @@ import { createFileRoute } from "@tanstack/react-router";
 //
 // Called every 30 min by pg_cron.
 
-const YAHOO_SYMBOLS: Record<string, string> = {
-  XAUUSD: "GC=F",
-  XAUEUR: "XAUEUR=X",
-  XAUGBP: "XAUGBP=X",
-  XAUJPY: "XAUJPY=X",
-  XAUAUD: "XAUAUD=X",
-  XAUCHF: "XAUCHF=X",
+// Yahoo doesn't publish direct XAU cross-rate candles for
+// EUR/GBP/JPY/AUD/CHF, so we compute them from GC=F + the matching FX
+// pair. `op` describes how to combine (base = GC=F, fx = the pair):
+//   div  → XAU/foreign = base / fx  (EURUSD, GBPUSD, AUDUSD)
+//   mul  → XAU/foreign = base * fx  (USDJPY, USDCHF)
+//   none → XAUUSD, use GC=F directly
+type PairSpec = { base: string; fx?: string; op: "none" | "mul" | "div" };
+const PAIR_SPECS: Record<string, PairSpec> = {
+  XAUUSD: { base: "GC=F", op: "none" },
+  XAUEUR: { base: "GC=F", fx: "EURUSD=X", op: "div" },
+  XAUGBP: { base: "GC=F", fx: "GBPUSD=X", op: "div" },
+  XAUJPY: { base: "GC=F", fx: "USDJPY=X", op: "mul" },
+  XAUAUD: { base: "GC=F", fx: "AUDUSD=X", op: "div" },
+  XAUCHF: { base: "GC=F", fx: "USDCHF=X", op: "mul" },
 };
 
 const EVAL_WINDOW_HOURS = 24;
+
+async function fetchCandles(sym: string, from: number, to: number) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?period1=${from}&period2=${to}&interval=5m`;
+  const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+  if (!res.ok) return null;
+  const json = (await res.json()) as {
+    chart: {
+      result?: Array<{
+        timestamp?: number[];
+        indicators: { quote: Array<{ high?: number[]; low?: number[] }> };
+      }>;
+    };
+  };
+  const r = json.chart?.result?.[0];
+  const ts = r?.timestamp ?? [];
+  const q = r?.indicators?.quote?.[0];
+  const highs = q?.high ?? [];
+  const lows = q?.low ?? [];
+  return { ts, highs, lows };
+}
+
 
 export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
   server: {
@@ -57,8 +85,8 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
         const results: Array<Record<string, unknown>> = [];
 
         for (const t of pending) {
-          const sym = YAHOO_SYMBOLS[t.pair];
-          if (!sym) {
+          const spec = PAIR_SPECS[t.pair];
+          if (!spec) {
             results.push({ id: t.id, action: "unknown_symbol" });
             continue;
           }
@@ -76,24 +104,51 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
             const to = Math.floor(
               Math.min(now, firedAt + EVAL_WINDOW_HOURS * 3_600_000) / 1000,
             );
-            const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?period1=${from}&period2=${to}&interval=5m`;
-            const res = await fetch(url, {
-              headers: { "User-Agent": "Mozilla/5.0" },
-            });
-            if (!res.ok) {
-              results.push({ id: t.id, action: "fetch_failed", status: res.status });
+            const base = await fetchCandles(spec.base, from, to);
+            if (!base) {
+              results.push({ id: t.id, action: "fetch_failed", sym: spec.base });
               continue;
             }
-            const json = (await res.json()) as {
-              chart: {
-                result?: Array<{
-                  indicators: { quote: Array<{ high?: number[]; low?: number[] }> };
-                }>;
-              };
-            };
-            const q = json.chart?.result?.[0]?.indicators?.quote?.[0];
-            const highs = (q?.high ?? []).filter((n) => typeof n === "number");
-            const lows = (q?.low ?? []).filter((n) => typeof n === "number");
+            let highs: number[] = [];
+            let lows: number[] = [];
+            if (spec.op === "none" || !spec.fx) {
+              highs = base.highs.filter((n) => typeof n === "number");
+              lows = base.lows.filter((n) => typeof n === "number");
+            } else {
+              const fx = await fetchCandles(spec.fx, from, to);
+              if (!fx) {
+                results.push({ id: t.id, action: "fetch_failed", sym: spec.fx });
+                continue;
+              }
+              // Align by timestamp (5m buckets should match; fall back to
+              // nearest index if not).
+              const fxByTs = new Map<number, { h: number; l: number }>();
+              for (let i = 0; i < fx.ts.length; i++) {
+                const h = fx.highs[i];
+                const l = fx.lows[i];
+                if (typeof h === "number" && typeof l === "number") {
+                  fxByTs.set(fx.ts[i], { h, l });
+                }
+              }
+              for (let i = 0; i < base.ts.length; i++) {
+                const bh = base.highs[i];
+                const bl = base.lows[i];
+                const fxRow = fxByTs.get(base.ts[i]);
+                if (
+                  typeof bh !== "number" ||
+                  typeof bl !== "number" ||
+                  !fxRow
+                ) continue;
+                if (spec.op === "mul") {
+                  highs.push(bh * fxRow.h);
+                  lows.push(bl * fxRow.l);
+                } else {
+                  // div: XAU/foreign = base / fx
+                  highs.push(bh / fxRow.l);
+                  lows.push(bl / fxRow.h);
+                }
+              }
+            }
             if (highs.length === 0 || lows.length === 0) {
               results.push({ id: t.id, action: "no_candles" });
               continue;
