@@ -817,7 +817,7 @@ function AlertPrefs() {
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-base font-semibold">Alert filters</h2>
+        <h2 className="text-base font-semibold text-black normal-case">Alert filters</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Applies to <span className="font-medium text-zinc-800">all channels</span> — email, browser push, and Telegram.
           Choose which signals qualify — grade, pair, and direction all must match.
@@ -926,7 +926,7 @@ function AlertPrefs() {
 
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-base font-semibold">Quiet hours</h2>
+        <h2 className="text-base font-semibold text-black normal-case">Quiet hours</h2>
         <p className="mt-1 text-sm text-zinc-500">No alerts will be sent during this window (your local time).</p>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <label className="text-xs font-medium text-zinc-600">
