@@ -638,11 +638,14 @@ html[data-pwa="1"] .pwa-tabbar {
 .jenvu-zoom-dashboard main h2 {
   font-size: 13px !important;
   font-weight: 600 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  color: rgb(113 113 122) !important;
+  text-transform: lowercase !important;
+  letter-spacing: 0 !important;
+  color: rgb(0 0 0) !important;
   padding: 0 4px 8px !important;
   border: 0 !important;
+}
+.jenvu-zoom-dashboard main h2::first-letter {
+  text-transform: uppercase !important;
 }
 .jenvu-zoom-dashboard main .text-3xl,
 .jenvu-zoom-dashboard main .text-4xl {
