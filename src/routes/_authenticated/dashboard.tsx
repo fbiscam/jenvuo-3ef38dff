@@ -212,13 +212,10 @@ function Metric({
 
 function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof ShieldCheck; title: string; right?: React.ReactNode; className?: string }) {
   return (
-    <div className={`relative flex items-center justify-between rounded-t-2xl border-b border-zinc-100 bg-gradient-to-b from-white to-[#FAFAF9] px-4 py-3 ${className}`}>
-      <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-[#d4af37]/40 to-transparent" />
-      <div className="flex items-center gap-2.5 text-[13px] font-medium text-zinc-800">
-        <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-white ring-1 ring-zinc-200 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
-          <Icon className="h-3.5 w-3.5 text-zinc-600" />
-        </span>
-        <span className="tracking-tight">{title}</span>
+    <div className={`flex items-center justify-between rounded-t-xl border-b border-zinc-200 bg-[#F8F8F8] px-4 py-2.5 ${className}`}>
+      <div className="flex items-center gap-2 text-[13px] font-medium text-zinc-700">
+        <Icon className="h-4 w-4 text-zinc-500" />
+        {title}
       </div>
       {right}
     </div>
@@ -228,9 +225,7 @@ function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div
-      className={`group/card relative overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(24,24,27,0.10)] ring-1 ring-white/60 transition-all duration-200 hover:-translate-y-[1px] hover:border-zinc-300 hover:shadow-[0_1px_0_rgba(0,0,0,0.02),0_16px_36px_-18px_rgba(24,24,27,0.18)] ${className}`}
-    >
+    <div className={`rounded-xl border border-zinc-200 bg-white ${className}`}>
       {children}
     </div>
   );
