@@ -502,3 +502,81 @@ html[data-pwa="1"] .pwa-tabbar {
 }
 .pwa-tabbar a[data-active="true"] { color: #000; background: rgb(244 244 245); }
 .pwa-tabbar a .material-symbols-rounded { font-size: 22px; }
+
+/* ====== PWA App-Mode: iOS Cards look for dashboard blocks ====== */
+/* Softer background, bigger radii, layered shadows, no hard borders. */
+html[data-pwa="1"] body {
+  background: #f2f2f7 !important; /* iOS system grouped bg */
+}
+html[data-pwa="1"] .jenvu-zoom,
+html[data-pwa="1"] .jenvu-zoom-dashboard {
+  zoom: 1 !important;
+  background: #f2f2f7 !important;
+}
+
+/* Upgrade every card-ish surface inside the app */
+html[data-pwa="1"] main .rounded-xl,
+html[data-pwa="1"] main .rounded-2xl,
+html[data-pwa="1"] main .rounded-\[14px\],
+html[data-pwa="1"] main .rounded-\[16px\],
+html[data-pwa="1"] main .rounded-lg {
+  border-radius: 20px !important;
+}
+html[data-pwa="1"] main .bg-white {
+  background-color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 8px 24px -12px rgba(0,0,0,0.08) !important;
+}
+html[data-pwa="1"] main .border,
+html[data-pwa="1"] main .border-zinc-100,
+html[data-pwa="1"] main .border-zinc-200 {
+  border-color: transparent !important;
+}
+/* More generous padding on primary card blocks */
+html[data-pwa="1"] main .p-4 { padding: 18px !important; }
+html[data-pwa="1"] main .p-5 { padding: 20px !important; }
+html[data-pwa="1"] main .p-6 { padding: 22px !important; }
+
+/* Section headings as iOS-style small caps labels */
+html[data-pwa="1"] main h2 {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: rgb(113 113 122) !important;
+  padding: 0 8px 8px !important;
+  border: 0 !important;
+}
+/* Big hero numbers/balances */
+html[data-pwa="1"] main .text-3xl,
+html[data-pwa="1"] main .text-4xl {
+  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+}
+
+/* Buttons feel more tactile — pill shape */
+html[data-pwa="1"] main button,
+html[data-pwa="1"] main a[role="button"] {
+  border-radius: 14px !important;
+}
+
+/* Tighten outer container gutter, iOS-style edge padding */
+html[data-pwa="1"] main {
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+}
+
+/* Grouped list rows — remove double borders inside stacked lists */
+html[data-pwa="1"] main .divide-y > * + * {
+  border-color: rgba(0,0,0,0.06) !important;
+}
+
+/* Tab bar shadow lift */
+html[data-pwa="1"] .pwa-tabbar {
+  box-shadow: 0 -8px 24px -12px rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
