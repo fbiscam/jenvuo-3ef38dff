@@ -608,7 +608,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (m.tf !== tf) return;
       // User asked: don't zoom. Keep the full chart in view instead of
       // narrowing the visible range around the marking.
-      try { chart.timeScale().fitContent(); } catch {}
+      try { chart.timeScale().applyOptions({ barSpacing: 14, rightOffset: 12 }); chart.timeScale().scrollToRealTime(); } catch {}
     },
 
 
