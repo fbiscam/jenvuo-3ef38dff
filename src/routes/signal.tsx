@@ -458,29 +458,25 @@ function SignalPage() {
       setPlaying(true);
       abortRef.current = false;
 
-      // Gate: only show entry/SL/TP price lines when a real trade plan exists
-      // (BUY/SELL direction + all three levels finite + confidence ≥ 65%).
-      const hasTradePlan =
-        (p.trade?.direction === "BUY" || p.trade?.direction === "SELL") &&
+      // Gate: only show entry/SL/TP levels + shaded R:R zones when confidence ≥ 65%.
+      const conf65 = Number(p.trade?.confidence ?? 0) >= 65 &&
         Number.isFinite(p.trade?.entry) && Number.isFinite(p.trade?.sl) && Number.isFinite(p.trade?.tp) &&
-        Number(p.trade?.confidence ?? 0) >= 65;
-      const conf65 = hasTradePlan;
+        p.trade?.direction !== "WAIT";
 
       // Draw EVERY marking up-front as PERSISTENT so nothing gets removed while walking through.
-      // Entry / SL / TP are gated behind a valid trade plan; otherwise only context markings render.
+      // Entry / SL / TP are gated by confidence (≥65%); below that, only context markings render.
       for (const m of p.markings) {
-        if (!hasTradePlan && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
+        if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
         try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
       }
       // Risk/profit shaded zones removed per user request.
       const entry = p.markings.find((m) => m.type === "entry");
-      if (entry && hasTradePlan) {
+      if (entry && conf65) {
         try {
           ltfRef.current?.panToMarking(entry);
           ltfRef.current?.focusMarking(entry);
         } catch (e) { console.warn("entry focus failed", e); }
       }
-
 
       try {
         // Skip the intro monologue — go straight to marking-by-marking focus.
@@ -666,19 +662,17 @@ function SignalPage() {
           htfRef.current?.clear();
           ltfRef.current?.clear();
           // Draw EVERY marking persistently — nothing gets removed while user views the signal.
-          const hasTradePlan =
-            (p.trade?.direction === "BUY" || p.trade?.direction === "SELL") &&
+          const conf65 = Number(p.trade?.confidence ?? 0) >= 65 &&
             Number.isFinite(p.trade?.entry) && Number.isFinite(p.trade?.sl) && Number.isFinite(p.trade?.tp) &&
-            Number(p.trade?.confidence ?? 0) >= 65;
+            p.trade?.direction !== "WAIT";
           for (const m of p.markings) {
-            if (!hasTradePlan && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
+            if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
             try { ltfRef.current?.drawMarking(m, { transient: false }); } catch {}
           }
           // Risk/profit shaded zones removed per user request.
 
           const entry = p.markings.find((m) => m.type === "entry");
-          if (entry && hasTradePlan) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
-
+          if (entry && conf65) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
         }, 400);
         toast.success("Saved signal restored");
       } else {
@@ -1198,10 +1192,10 @@ function SignalPage() {
 
         <h1 className="sr-only">Live institutional signal desk — ICT & SMC analysis for {sym}</h1>
         <div className="rounded-[24px] border border-zinc-200/70 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10),0_32px_64px_-24px_rgba(16,24,40,0.08)] ring-1 ring-white/60 overflow-hidden">
-          {/* terminal header — single row on desktop, two rows on mobile */}
-          <div className="border-b border-zinc-100 bg-white sm:flex sm:items-center sm:gap-4 sm:px-6 sm:py-3">
-            {/* top row (mobile) / left cluster (desktop): mac dots + status */}
-            <div className="flex items-center justify-between gap-3 px-4 pt-3 sm:p-0 sm:justify-start sm:gap-4 sm:shrink-0">
+          {/* terminal header — restructured for mobile */}
+          <div className="border-b border-zinc-100 bg-white">
+            {/* top row: mac dots + status */}
+            <div className="flex items-center justify-between gap-3 px-4 pt-3 sm:px-6 sm:pt-4">
               <div className="flex gap-1.5 shrink-0">
                 <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
@@ -1231,9 +1225,9 @@ function SignalPage() {
               </div>
             </div>
 
-            {/* pair selector — inline on desktop, full-row on mobile */}
+            {/* pair selector — full width, horizontally scrollable, ALWAYS visible */}
             <div
-              className="mt-2.5 sm:mt-0 mx-4 sm:mx-0 mb-3 sm:mb-0 sm:flex-1 sm:min-w-0 flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-[14px] border border-zinc-200/70 bg-white px-1.5 py-1.5 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_20px_-10px_rgba(16,24,40,0.08)] ring-1 ring-white/60 sm:shadow-none sm:border-0 sm:ring-0 sm:px-0 sm:py-0"
+              className="mt-2.5 sm:mt-3 mx-4 sm:mx-6 mb-3 sm:mb-4 flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-[14px] border border-zinc-200/70 bg-white px-1.5 py-1.5 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_20px_-10px_rgba(16,24,40,0.08)] ring-1 ring-white/60"
               style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
             >
               {XAU_PAIRS.map((p) => {
@@ -1273,7 +1267,6 @@ function SignalPage() {
                     {locked && <Lock className="h-3 w-3 opacity-60" />}
                     {XAU_LABELS[p]}
                   </button>
-
                 );
               })}
             </div>
