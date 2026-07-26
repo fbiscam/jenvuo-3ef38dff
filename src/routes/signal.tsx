@@ -1446,10 +1446,10 @@ function SignalPage() {
                 <div
                   ref={chartStageRef}
                   className={cn(
-                    "relative rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)]",
+                    "relative overflow-hidden bg-white",
                     isChartFullscreen
-                      ? "h-screen w-screen rounded-none border-0"
-                      : "h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
+                      ? "fixed inset-0 z-[9999] h-screen w-screen rounded-none border-0"
+                      : "rounded-2xl border border-zinc-200/60 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)] h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
                   )}>
                   <button
                     type="button"
