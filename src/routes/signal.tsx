@@ -1204,10 +1204,20 @@ function SignalPage() {
             </div>
           </div>
 
-          {/* body grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
-            {/* LEFT — ICT execution feed */}
-            <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-4 min-h-[280px]">
+          {/* body grid — full-page chart stage with overlay panels */}
+          <div className="relative bg-white lg:min-h-[calc(100vh-160px)]">
+            {/* LEFT — ICT execution feed (overlay on desktop, stacked on mobile) */}
+            <div className={cn(
+              "bg-white p-4 flex flex-col gap-3 border-b border-zinc-100",
+              "lg:absolute lg:z-30 lg:top-4 lg:left-4 lg:w-[340px] lg:max-h-[calc(100%-32px)]",
+              "lg:bg-white/85 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)]",
+              "lg:p-4 lg:transition-transform lg:duration-300",
+              !narrationOpen && "lg:-translate-x-[calc(100%+20px)]",
+            )}>
+              <div className="hidden lg:flex items-center justify-between -mb-1">
+                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">Live Narration</span>
+                <button onClick={() => setNarrationOpen(false)} className="text-zinc-400 hover:text-zinc-900 h-6 w-6 inline-flex items-center justify-center rounded-md hover:bg-zinc-100" aria-label="Hide narration"><X className="h-3.5 w-3.5" /></button>
+              </div>
               {/* Voice AI Agent — orb + chat, can mark on chart */}
               <div className="pb-3 border-b border-zinc-100">
                 <SignalVoiceAgent
