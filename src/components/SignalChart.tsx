@@ -31,7 +31,9 @@ export type SignalChartHandle = {
   clear: () => void;
   clearTransient: () => void;
   updateLivePrice: (price: number, tSeconds?: number) => void;
+  drawRRZones: (entry: number, sl: number, tp: number, opts?: { transient?: boolean }) => void;
 };
+
 
 
 
