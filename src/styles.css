@@ -626,10 +626,6 @@ html[data-pwa="1"] .pwa-tabbar {
 }
 
 
-.jenvu-zoom-dashboard main .jenvu-proof-step-circle {
-  border-color: rgb(16 185 129) !important;
-  border-width: 2px !important;
-}
 
 .jenvu-zoom-dashboard main .p-4 { padding: 18px !important; }
 .jenvu-zoom-dashboard main .p-5 { padding: 20px !important; }
