@@ -1354,38 +1354,19 @@ function SignalPage() {
                 </div>
               )}
 
-              {/* HTF — mini overview (bottom-left overlay on desktop, stacked on mobile) */}
-              <div className={cn(
-                "bg-white p-3 sm:p-4 flex flex-col gap-2 border-b border-zinc-100",
-                "lg:absolute lg:z-20 lg:bottom-4 lg:left-4 lg:w-[280px] lg:p-2.5 lg:border lg:border-zinc-200/70 lg:rounded-2xl lg:shadow-[0_20px_60px_-24px_rgba(0,0,0,0.25)] lg:bg-white/90 lg:backdrop-blur-xl",
-              )}>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold tracking-wide text-zinc-900">
-                    HTF · 4H · Bias
-                  </span>
-                  {plan && (
-                    <span className={cn(
-                      "text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded",
-                      plan.htfBias === "bullish" ? "bg-emerald-100 text-emerald-700" :
-                      plan.htfBias === "bearish" ? "bg-rose-100 text-rose-700" :
-                      "bg-zinc-100 text-zinc-700",
-                    )}>
-                      {plan.htfBias}
-                    </span>
-                  )}
-                </div>
-                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[180px] lg:h-[130px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
-                  {plan ? (
-                    <SignalChart
-                      ref={htfRef}
-                      candles={plan.htfCandles}
-                      tf="htf"
-                      dark={false}
-                      title="4H"
-                    />
-                  ) : null}
-                </div>
+              {/* HTF mini overview hidden — chart kept mounted offscreen so narration/markings still run */}
+              <div className="hidden" aria-hidden="true">
+                {plan ? (
+                  <SignalChart
+                    ref={htfRef}
+                    candles={plan.htfCandles}
+                    tf="htf"
+                    dark={false}
+                    title="4H"
+                  />
+                ) : null}
               </div>
+
 
               {/* LTF — the main stage, full page */}
               <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
