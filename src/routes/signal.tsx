@@ -1423,7 +1423,42 @@ function SignalPage() {
                       dark={false}
                       title="15M · Execution"
                     />
-                  ) : null}
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-white">
+                      <div className="max-w-sm text-center px-6 py-10">
+                        {analysisError ? (
+                          <>
+                            <AlertTriangle className="mx-auto h-8 w-8 text-amber-500 mb-3" />
+                            <div className="text-[14px] font-medium text-zinc-900 mb-2">Chart unavailable</div>
+                            <div className="text-[13px] text-zinc-600 mb-4">{analysisError}</div>
+                            {credits.balance < 0.20 ? (
+                              <Link
+                                to="/dashboard/billing"
+                                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900 px-4 text-[13px] font-medium text-white hover:bg-black"
+                              >
+                                Add funds
+                              </Link>
+                            ) : (
+                              <button
+                                onClick={load}
+                                disabled={loading}
+                                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900 px-4 text-[13px] font-medium text-white disabled:opacity-50"
+                              >
+                                {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                                Retry analysis
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <Loader2 className="mx-auto h-6 w-6 animate-spin text-zinc-400 mb-3" />
+                            <div className="text-[13px] text-zinc-500">Preparing chart & analysis…</div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                 </div>
 
 
