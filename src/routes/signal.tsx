@@ -1170,8 +1170,8 @@ function SignalPage() {
                       className={cn(
                         "shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-[10px] text-[12px] transition",
                         active
-                          ? "bg-zinc-900 text-white shadow-[0_1px_2px_rgba(16,24,40,0.15)]"
-                          : "text-zinc-700 hover:bg-zinc-100",
+                          ? "bg-white text-black ring-1 ring-zinc-200 shadow-[0_1px_2px_rgba(16,24,40,0.08)]"
+                          : "text-black/80 hover:bg-zinc-100",
                       )}
                       style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
                       title={locked ? "Pro feature — upgrade to unlock" : undefined}
