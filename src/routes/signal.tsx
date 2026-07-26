@@ -369,6 +369,12 @@ function SignalPage() {
 
 
   const [voiceBlocked, setVoiceBlocked] = useState(false);
+  const [voiceMuted, setVoiceMuted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try { return window.localStorage.getItem("jenvu:voice-muted") === "1"; } catch { return false; }
+  });
+  const voiceMutedRef = useRef(voiceMuted);
+  useEffect(() => { voiceMutedRef.current = voiceMuted; }, [voiceMuted]);
   const [activeTf, setActiveTf] = useState<"htf" | "ltf" | null>(null);
   const [intelOpen, setIntelOpen] = useState(true);
   const [narrationOpen, setNarrationOpen] = useState(true);
