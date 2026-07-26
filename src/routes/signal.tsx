@@ -512,6 +512,9 @@ function SignalPage() {
 
     // Pre-flight: block the scan if wallet is below the flat $0.20 per-signal charge.
     if (!credits.isLoading && credits.balance < 0.20) {
+      const msg = `Balance too low ($${credits.balance.toFixed(2)}). You need at least $0.20 to run a signal scan. Add funds to continue.`;
+      setAnalysisError(msg);
+      setPlan(null);
       toast.error("Balance too low to run analysis", {
         description: `Low balance — add funds to continue.`,
         action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
@@ -526,7 +529,13 @@ function SignalPage() {
     try {
       const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
       const ok = await credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
-      if (!ok) { setLoading(false); return; }
+      if (!ok) {
+        setPlan(null);
+        setAnalysisError("Couldn't start the scan — please check your balance or documents and try again.");
+        setLoading(false);
+        activeScanRef.current = null;
+        return;
+      }
       const result = await fetchPlan({ data: { symbol: sym, scanId, force: true } });
       if (!result.ok) {
         setPlan(null);
@@ -534,6 +543,7 @@ function SignalPage() {
         toast.error(result.error);
         return;
       }
+
       const p = withSignalIntelligence(result.plan);
 
       // Mirror the auto-scan pipeline gates so a manual scan never surfaces a
@@ -1413,7 +1423,42 @@ function SignalPage() {
                       dark={false}
                       title="15M · Execution"
                     />
-                  ) : null}
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-white">
+                      <div className="max-w-sm text-center px-6 py-10">
+                        {analysisError ? (
+                          <>
+                            <AlertTriangle className="mx-auto h-8 w-8 text-amber-500 mb-3" />
+                            <div className="text-[14px] font-medium text-zinc-900 mb-2">Chart unavailable</div>
+                            <div className="text-[13px] text-zinc-600 mb-4">{analysisError}</div>
+                            {credits.balance < 0.20 ? (
+                              <Link
+                                to="/dashboard/billing"
+                                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900 px-4 text-[13px] font-medium text-white hover:bg-black"
+                              >
+                                Add funds
+                              </Link>
+                            ) : (
+                              <button
+                                onClick={load}
+                                disabled={loading}
+                                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900 px-4 text-[13px] font-medium text-white disabled:opacity-50"
+                              >
+                                {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                                Retry analysis
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <Loader2 className="mx-auto h-6 w-6 animate-spin text-zinc-400 mb-3" />
+                            <div className="text-[13px] text-zinc-500">Preparing chart & analysis…</div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                 </div>
 
 
