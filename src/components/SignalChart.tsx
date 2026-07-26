@@ -391,7 +391,9 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       crosshair: { mode: CrosshairMode.Normal },
       rightPriceScale: { borderVisible: false },
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, barSpacing: 14, rightOffset: 12 },
-      autoSize: true,
+      autoSize: false,
+      width: Math.max(1, Math.floor(containerRef.current.clientWidth || 800)),
+      height: Math.max(1, Math.floor(containerRef.current.clientHeight || 500)),
     });
     const series = chart.addSeries(CandlestickSeries, {
       upColor: "#22c55e",
