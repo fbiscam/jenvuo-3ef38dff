@@ -548,7 +548,23 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (!el || !chartRef.current) return;
       const w = Math.max(1, Math.floor(el.clientWidth));
       const h = Math.max(1, Math.floor(el.clientHeight));
-      try { chartRef.current.resize(w, h); } catch {}
+      try { chartRef.current.resize(w, h, true); } catch {}
+      // In some WebKit/PWA and preview layouts lightweight-charts updates the
+      // canvas CSS size but leaves the backing bitmap at 300×150. That stretches
+      // candles into blurry / strange shapes, so force every chart canvas bitmap
+      // to match its rendered box after resize.
+      requestAnimationFrame(() => {
+        for (const canvas of el.querySelectorAll("canvas")) {
+          const rect = canvas.getBoundingClientRect();
+          const cw = Math.max(1, Math.round(rect.width));
+          const ch = Math.max(1, Math.round(rect.height));
+          if (canvas.width !== cw || canvas.height !== ch) {
+            canvas.width = cw;
+            canvas.height = ch;
+          }
+        }
+        try { chartRef.current?.timeScale().applyOptions({ barSpacing: 14, rightOffset: 12 }); } catch {}
+      });
     };
     applySize();
     // Retry after a tick in case the container layout finishes after mount.
@@ -582,8 +598,13 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     updateLivePrice: (price: number, tSeconds?: number) => {
       const s = seriesRef.current;
       if (!s) return;
+      if (!Number.isFinite(price) || price <= 0) return;
       const bar = liveBarRef.current;
       if (!bar) return;
+      // Reject bad provider ticks that are on the wrong scale for the loaded
+      // candles; otherwise one quote can stretch the chart into "weird" wicks.
+      const scaleGap = Math.abs(price - bar.close) / Math.max(bar.close, 1);
+      if (scaleGap > 0.12) return;
       const bucket = bucketSecRef.current || 60;
       const nowSec = typeof tSeconds === "number" && Number.isFinite(tSeconds)
         ? Math.floor(tSeconds)
