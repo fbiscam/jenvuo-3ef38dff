@@ -2932,7 +2932,80 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       } as Marking);
     }
 
+    // ============ ENGINE-DERIVED RICH MARKINGS ============
+    // Guarantee that trendline, sweep, and reversalZone are always present
+    // even when the AI stage omits them, so the chart renders the same
+    // institutional-grade markup style on every scan.
+    try {
+      const nowS2 = Math.floor(Date.now() / 1000);
+      for (const [tfKey, an, tfCandles] of [["htf", htfA, htf] as const, ["ltf", ltfA, ltf] as const]) {
+        // Trendline: connect the last two same-kind swings to show the
+        // prior leg direction (up-leg = low→low, down-leg = high→high).
+        const swings = an.swings ?? [];
+        const lastHighs = swings.filter((s: any) => s.kind === "high").slice(-2);
+        const lastLows = swings.filter((s: any) => s.kind === "low").slice(-2);
+        if (lastHighs.length === 2 && lastHighs[1].price < lastHighs[0].price) {
+          addMark({
+            type: "trendline", tf: tfKey,
+            fromTime: lastHighs[0].t, toTime: lastHighs[1].t,
+            fromPrice: +lastHighs[0].price.toFixed(dec),
+            toPrice: +lastHighs[1].price.toFixed(dec),
+            kind: "down", label: `${tfKey === "htf" ? "HTF" : "LTF"} Downtrend Leg`,
+          } as Marking);
+        }
+        if (lastLows.length === 2 && lastLows[1].price > lastLows[0].price) {
+          addMark({
+            type: "trendline", tf: tfKey,
+            fromTime: lastLows[0].t, toTime: lastLows[1].t,
+            fromPrice: +lastLows[0].price.toFixed(dec),
+            toPrice: +lastLows[1].price.toFixed(dec),
+            kind: "up", label: `${tfKey === "htf" ? "HTF" : "LTF"} Uptrend Leg`,
+          } as Marking);
+        }
 
+        // Sweep: detect the last candle that wicked through a prior
+        // equal-high / equal-low pool and closed back inside it.
+        const recent = tfCandles.slice(-30);
+        const prior = tfCandles.slice(0, -30);
+        if (prior.length > 5 && recent.length > 3) {
+          const priorHigh = Math.max(...prior.map((c: any) => c.h));
+          const priorLow = Math.min(...prior.map((c: any) => c.l));
+          const sweepHigh = recent.find((c: any) => c.h > priorHigh && c.c < priorHigh);
+          const sweepLow = recent.find((c: any) => c.l < priorLow && c.c > priorLow);
+          if (sweepHigh) {
+            addMark({
+              type: "sweep", tf: tfKey, time: sweepHigh.t,
+              price: +priorHigh.toFixed(dec), kind: "sell",
+              label: `Buy-side Liquidity Sweep`,
+            } as Marking);
+          }
+          if (sweepLow) {
+            addMark({
+              type: "sweep", tf: tfKey, time: sweepLow.t,
+              price: +priorLow.toFixed(dec), kind: "buy",
+              label: `Sell-side Liquidity Sweep`,
+            } as Marking);
+          }
+        }
+
+        // Reversal zone: highlight the area around the last structure flip
+        // (BOS/CHoCH) so it's visible where price actually pivoted.
+        const ev = an.lastStructure;
+        if (ev) {
+          const pad = Math.max(Math.abs(ev.price) * 0.0015, (last.h - last.l) * 0.5);
+          addMark({
+            type: "reversalZone", tf: tfKey,
+            fromTime: ev.fromTime, toTime: Math.max(ev.toTime, nowS2),
+            priceLow: +(ev.price - pad).toFixed(dec),
+            priceHigh: +(ev.price + pad).toFixed(dec),
+            kind: (ev.dir === "bullish" ? "bullish" : "bearish") as any,
+            label: `${ev.dir === "bullish" ? "Bullish" : "Bearish"} Reversal Zone`,
+          } as Marking);
+        }
+      }
+    } catch (e) {
+      console.warn("engine-derived rich markings failed:", (e as Error)?.message ?? e);
+    }
 
 
     // ============ GUIDED NARRATION ============
