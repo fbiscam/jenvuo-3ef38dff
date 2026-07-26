@@ -1400,13 +1400,8 @@ function SignalPage() {
                     />
                   ) : null}
                 </div>
-                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-700 font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1 lg:absolute lg:z-20 lg:bottom-4 lg:right-4 lg:bg-white/85 lg:backdrop-blur-xl lg:rounded-full lg:px-3 lg:py-1.5 lg:border lg:border-zinc-200/70 lg:shadow-md`}>
-                  <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
-                  <LegendDot color="bg-sky-500/70" label="OB" />
-                  <LegendDot color="bg-amber-500/70" label="Liquidity" />
-                  <LegendDot color="bg-violet-500/70" label="EQH/EQL" />
-                  <LegendDot color="bg-yellow-400/70" label="OTE" />
-                </div>
+
+
               </div>
             </div>
 
@@ -1867,9 +1862,17 @@ function SignalPage() {
                 </span>
               </div>
             </div>
+            <div className="hidden sm:flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
+              <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
+              <LegendDot color="bg-sky-500/70" label="OB" />
+              <LegendDot color="bg-amber-500/70" label="Liquidity" />
+              <LegendDot color="bg-violet-500/70" label="EQH/EQL" />
+              <LegendDot color="bg-yellow-400/70" label="OTE" />
+            </div>
             <span className={`hidden sm:inline text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900 tracking-normal truncate`}>
               Pro Version 2.04.1 · ICT/SMC Engine
             </span>
+
           </div>
         </div>
       </main>
