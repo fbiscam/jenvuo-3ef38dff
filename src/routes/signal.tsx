@@ -372,6 +372,8 @@ function SignalPage() {
   const [activeTf, setActiveTf] = useState<"htf" | "ltf" | null>(null);
   const [intelOpen, setIntelOpen] = useState(true);
   const [narrationOpen, setNarrationOpen] = useState(true);
+  const [pairMenuOpen, setPairMenuOpen] = useState(false);
+
 
   const speakWait = useCallback(
     (text: string) =>
