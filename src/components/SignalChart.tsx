@@ -423,54 +423,57 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       let style: LineStyle = LineStyle.Solid;
       let price = 0;
       let lineWidth: 1 | 2 | 3 | 4 = 2;
-      const title = m.label;
+      let pillText = m.label;
       if (m.type === "liquidity") {
         price = m.price;
         color = m.side === "buy" ? COLORS.liqBuy : COLORS.liqSell;
         style = LineStyle.Dashed;
+        pillText = m.side === "buy" ? "BSL" : "SSL";
       } else if (m.type === "eqh" || m.type === "eql") {
         price = m.price;
         color = m.type === "eqh" ? COLORS.eqh : COLORS.eql;
         style = LineStyle.Dotted;
         lineWidth = 1;
+        pillText = m.type.toUpperCase();
       } else if (m.type === "bos" || m.type === "choch") {
         price = m.price;
         color = m.kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
         style = LineStyle.LargeDashed;
-        const text = m.type.toUpperCase();
+        pillText = m.type === "bos" ? "BOS" : "CHoCH";
         const time = Number(m.fromTime) as Time;
-        if (!Number.isFinite(time as unknown as number)) {
-          // skip marker if time is invalid, but still draw the price line below
-        } else {
+        if (Number.isFinite(time as unknown as number)) {
           markersRef.current.push({
             time,
             position: m.kind === "bullish" ? "belowBar" : "aboveBar",
             color,
             shape: m.kind === "bullish" ? "arrowUp" : "arrowDown",
-            text,
+            text: pillText,
           });
-          if (transient) transientMarkerKeysRef.current.add(`${time}:${text}`);
+          if (transient) transientMarkerKeysRef.current.add(`${time}:${pillText}`);
           try { markersPluginRef.current?.setMarkers(markersRef.current); } catch {}
         }
       } else if (m.type === "entry") {
         price = m.price; color = COLORS.entry; lineWidth = 3;
+        pillText = `ENTRY @ ${price}`;
       } else if (m.type === "sl") {
         price = m.price; color = COLORS.sl; lineWidth = 3;
+        pillText = `SL @ ${price}`;
       } else if (m.type === "tp") {
         price = m.price; color = COLORS.tp; lineWidth = 3;
+        pillText = `TP @ ${price}`;
       }
 
       const line = s.createPriceLine({
         price, color, lineWidth, lineStyle: style,
-        axisLabelVisible: true, title,
+        axisLabelVisible: false, title: "",
       });
       linesRef.current.push({ line, transient });
 
-      // Floating on-chart label so every marking is named right on the chart (like FVG/OB boxes).
+      // Compact right-edge pill so every marking is named right on the chart.
       if (overlayRef.current && Number.isFinite(price)) {
         const lbl = document.createElement("div");
-        lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.03em;padding:2px 6px;border-radius:3px;background:${color};color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.25);opacity:0;transition:opacity 400ms ease;white-space:nowrap;transform:translateY(-2px);`;
-        lbl.textContent = title;
+        lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:10px;background:${color};color:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);opacity:0;transition:opacity 400ms ease;white-space:nowrap;font-family:'Google Sans',system-ui,sans-serif;`;
+        lbl.textContent = pillText;
         overlayRef.current.appendChild(lbl);
         labelsRef.current.push({ marking: m, price, color, el: lbl, transient });
         (chart as any).__redrawBoxes?.();
