@@ -609,12 +609,9 @@ function SignalPage() {
           const p = withSignalIntelligence(snap.plan as SignalPlan);
           htfRef.current?.clear();
           ltfRef.current?.clear();
-          const autoTypes = new Set(["premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql"]);
+          // Draw EVERY marking persistently — nothing gets removed while user views the signal.
           for (const m of p.markings) {
-            const target = ltfRef.current;
-            if (autoTypes.has(m.type) || m.type === "entry" || m.type === "sl" || m.type === "tp") {
-              try { target?.drawMarking(m, { transient: false }); } catch {}
-            }
+            try { ltfRef.current?.drawMarking(m, { transient: false }); } catch {}
           }
           const entry = p.markings.find((m) => m.type === "entry");
           if (entry) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
