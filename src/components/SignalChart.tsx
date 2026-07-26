@@ -771,7 +771,80 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         return;
       }
 
-      // Liquidity / EQH / EQL / entry / sl / tp — dotted price line + floating pill label
+      // Reversal Zone — split two-tone box (green upper half / red lower for bullish, mirrored for bearish)
+      if (m.type === "reversalZone") {
+        if (!overlayRef.current) return;
+        const el = document.createElement("div");
+        const isBull = (m as any).kind === "bullish";
+        const upper = isBull ? "rgba(34,197,94,0.20)" : "rgba(239,68,68,0.20)";
+        const lower = isBull ? "rgba(239,68,68,0.16)" : "rgba(34,197,94,0.16)";
+        const border = isBull ? "#16a34a" : "#dc2626";
+        el.style.cssText = `position:absolute;border:1.5px solid ${border};border-radius:3px;pointer-events:none;opacity:0;transition:opacity 500ms ease;overflow:hidden;background:linear-gradient(to bottom, ${upper} 0%, ${upper} 50%, ${lower} 50%, ${lower} 100%);box-shadow:0 0 0 1px rgba(255,255,255,0.5) inset;`;
+        const pill = document.createElement("span");
+        pill.style.cssText = `position:absolute;top:4px;right:4px;font-size:10px;font-weight:800;letter-spacing:0.08em;padding:2px 8px;border-radius:4px;background:${border};color:#fff;line-height:1.2;font-family:'Google Sans',system-ui,sans-serif;box-shadow:0 1px 2px rgba(0,0,0,0.2);white-space:nowrap;`;
+        pill.textContent = "REVERSAL";
+        el.appendChild(pill);
+        overlayRef.current.appendChild(el);
+        boxesRef.current.push({ marking: m, el, transient });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
+        return;
+      }
+
+      // Sweep — small chip pinned above/below the wick that grabbed liquidity, with a thin down/up arrow
+      if (m.type === "sweep") {
+        if (!overlayRef.current) return;
+        const kind = (m as any).kind as "buy" | "sell";
+        const color = kind === "buy" ? COLORS.liqBuy : COLORS.liqSell;
+        const label = kind === "buy" ? "BSL SWEEP" : "SSL SWEEP";
+        const arrow = kind === "buy" ? "↓" : "↑";
+        const el = document.createElement("div");
+        el.style.cssText = `position:absolute;pointer-events:none;opacity:0;transition:opacity 400ms ease;display:flex;align-items:center;gap:4px;font-family:'Google Sans',system-ui,sans-serif;`;
+        const chip = document.createElement("span");
+        chip.style.cssText = `font-size:10px;font-weight:800;letter-spacing:0.05em;padding:2px 7px;border-radius:10px;background:${color};color:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);white-space:nowrap;`;
+        chip.textContent = `${arrow} ${label}`;
+        el.appendChild(chip);
+        overlayRef.current.appendChild(el);
+        boxesRef.current.push({ marking: m, el, transient });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
+        return;
+      }
+
+      // Trendline — angled arrow with rotated label like "UPTREND"/"DOWNTREND"
+      if (m.type === "trendline") {
+        if (!overlayRef.current) return;
+        const kind = (m as any).kind as "up" | "down";
+        const color = kind === "up" ? COLORS.bullLine : COLORS.bearLine;
+        const el = document.createElement("div");
+        el.style.cssText = `position:absolute;pointer-events:none;opacity:0;transition:opacity 500ms ease;`;
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("style", "position:absolute;inset:0;overflow:visible;");
+        const markerId = `jv-arrow-${Math.random().toString(36).slice(2, 8)}`;
+        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+        defs.innerHTML = `<marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${color}"/></marker>`;
+        svg.appendChild(defs);
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("stroke", color);
+        line.setAttribute("stroke-width", "2");
+        line.setAttribute("stroke-linecap", "round");
+        line.setAttribute("marker-end", `url(#${markerId})`);
+        svg.appendChild(line);
+        el.appendChild(svg);
+        const label = document.createElement("span");
+        label.className = "jv-tl-label";
+        const text = ((m as any).label || (kind === "up" ? "UPTREND" : "DOWNTREND")).toUpperCase();
+        label.style.cssText = `position:absolute;font-size:10px;font-weight:800;letter-spacing:0.14em;color:${color};background:#fff;padding:2px 7px;border-radius:3px;border:1px solid ${color};font-family:'Google Sans',system-ui,sans-serif;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,0.08);`;
+        label.textContent = text;
+        el.appendChild(label);
+        overlayRef.current.appendChild(el);
+        boxesRef.current.push({ marking: m, el, transient });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
+        return;
+      }
+
+
       const anyM: any = m;
       if (typeof anyM.price === "number") {
         let color = "#334155";
