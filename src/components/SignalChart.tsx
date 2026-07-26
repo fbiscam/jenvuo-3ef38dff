@@ -359,7 +359,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       },
       crosshair: { mode: CrosshairMode.Normal },
       rightPriceScale: { borderVisible: false },
-      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
+      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, barSpacing: 14, rightOffset: 12 },
       autoSize: true,
     });
     const series = chart.addSeries(CandlestickSeries, {
@@ -371,7 +371,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       wickDownColor: "#ef4444",
     });
     series.setData(candles.map((c) => ({ ...c, time: Number(c.time) as Time })));
-    chart.timeScale().fitContent();
+    try { chart.timeScale().applyOptions({ barSpacing: 14, rightOffset: 12 }); } catch {}
+    try { chart.timeScale().scrollToRealTime(); } catch {}
     chartRef.current = chart;
     seriesRef.current = series;
     markersPluginRef.current = createSeriesMarkers(series, []);
