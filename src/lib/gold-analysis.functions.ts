@@ -483,7 +483,8 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
           if (o == null || h == null || l == null || c == null) continue;
           candles.push({ t: ts[i] * 1000, o, h, l, c, v });
         }
-        if (candles.length >= 10) return candles.slice(-1000);
+        const clean = sanitizeCandles(candles, tf);
+        if (clean.length >= 10) return clean.slice(-1000);
         throw new Error("Too few Yahoo candles");
   })()));
   try {
@@ -507,8 +508,9 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
           t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
-        })).filter((c) => isFinite(c.c));
-        if (candles.length >= 10) return candles.slice(-1000);
+        }));
+        const clean = sanitizeCandles(candles, tf);
+        if (clean.length >= 10) return clean.slice(-1000);
         throw new Error("Too few Binance candles");
   })()));
   try {
@@ -547,9 +549,9 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
           c: Number(r[4]),
           v: Number(r[5] ?? 0),
         }))
-        .filter((c) => Number.isFinite(c.t) && Number.isFinite(c.c) && c.c > 0)
         .sort((a, b) => a.t - b.t);
-      if (candles.length >= 10) return candles.slice(-1000);
+      const clean = sanitizeCandles(candles, tf);
+      if (clean.length >= 10) return clean.slice(-1000);
     } catch (e) { lastErr = e; }
   }
   throw lastErr ?? new Error("Coinbase unavailable");
@@ -633,15 +635,16 @@ async function fetchCrossPairCandlesFromProxy(
     if (![o, h, l, c].every((n) => Number.isFinite(n) && n > 0)) continue;
     converted.push({ t: x.t, o, h: Math.max(o, h, c), l: Math.min(o, l, c), c, v: 0 });
   }
-  if (converted.length < 20) throw new Error("proxy conversion yielded too few candles");
-  return converted.slice(-1000);
+  const clean = sanitizeCandles(converted, tf);
+  if (clean.length < 20) throw new Error("proxy conversion yielded too few candles");
+  return clean.slice(-1000);
 }
 
 export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Promise<Candle[]> {
   const cacheKey = `${inst.key}:${tf}`;
   const cached = candleCache.get(cacheKey);
   const now = Date.now();
-  if (cached && now - cached.at < CACHE_TTL) return cached.data;
+  if (cached && now - cached.at < CACHE_TTL) return cloneCandles(cached.data);
 
   const pairKey = inst.key.startsWith("METAL:") ? inst.key.slice("METAL:".length) : inst.key;
   const hasProxy = !!XAU_PAIRS[pairKey]?.usdProxy;
@@ -658,20 +661,21 @@ export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: strin
   let lastErr: any = null;
   for (const f of tries) {
     try {
-      const data = await f();
-      candleCache.set(cacheKey, { at: now, data });
+      const data = sanitizeCandles(await f(), tf);
+      if (data.length < 10) throw new Error("Too few clean candles");
+      candleCache.set(cacheKey, { at: now, data: cloneCandles(data) });
       syntheticCandleKeys.delete(cacheKey);
-      return data;
+      return cloneCandles(data);
     } catch (e) { lastErr = e; }
   }
-  if (cached) return cached.data;
+  if (cached) return cloneCandles(cached.data);
   const quote = await resolveLiveTick(inst).catch(() => null);
   if (quote?.price && Number.isFinite(quote.price) && quote.price > 0) {
-    const synthetic = buildSyntheticCandles(inst, tf, quote.price);
+    const synthetic = sanitizeCandles(buildSyntheticCandles(inst, tf, quote.price), tf);
     if (synthetic.length >= 20) {
-      candleCache.set(cacheKey, { at: now, data: synthetic });
+      candleCache.set(cacheKey, { at: now, data: cloneCandles(synthetic) });
       syntheticCandleKeys.add(cacheKey);
-      return synthetic;
+      return cloneCandles(synthetic);
     }
   }
   throw lastErr ?? new Error(`No data source available for ${inst.display}`);
