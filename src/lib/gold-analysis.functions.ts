@@ -446,19 +446,19 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
   };
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
-  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
+  const makers = hosts.flatMap((host) => symbols.map((sym) => (signal: AbortSignal) => (async () => {
         const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
-        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) throw new Error(`Binance ${sym}: ${res.status}`);
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" }, signal });
+        if (!res.ok) { try { res.body?.cancel(); } catch {} throw new Error(`Binance ${sym}: ${res.status}`); }
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
           t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
         })).filter((c) => isFinite(c.c));
         if (candles.length >= 10) return candles.slice(-200);
         throw new Error("Too few Binance candles");
-  }));
+  })()));
   try {
-    return await Promise.any(attempts);
+    return await raceAndCancel(makers);
   } catch (e) {
     throw e instanceof Error ? e : new Error("Binance unavailable");
   }
