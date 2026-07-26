@@ -1391,10 +1391,10 @@ function SignalPage() {
                   )}
                 </div>
                 <div className={cn(
-                  "rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)] transition-opacity duration-300",
+                  "rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)]",
                   "h-[360px] sm:h-[420px] lg:h-[calc(100vh-220px)]",
-                  activeTf === "htf" ? "opacity-55" : "opacity-100",
                 )}>
+
                   {plan ? (
                     <SignalChart
                       ref={ltfRef}
