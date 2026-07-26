@@ -1188,7 +1188,7 @@ function SignalPage() {
 
 
       {/* TERMINAL CARD */}
-      <main className="mx-auto max-w-[1600px] px-5 py-5 sm:px-6 sm:py-8">
+      <main className="mx-auto max-w-[1600px] px-3 py-3 sm:px-6 sm:py-8">
 
         <h1 className="sr-only">Live institutional signal desk — ICT & SMC analysis for {sym}</h1>
         <div className="rounded-[24px] border border-zinc-200/70 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10),0_32px_64px_-24px_rgba(16,24,40,0.08)] ring-1 ring-white/60 overflow-hidden">
