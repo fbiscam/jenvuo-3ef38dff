@@ -1040,7 +1040,24 @@ function SignalPage() {
               className="hidden sm:inline-flex h-9 items-center gap-1.5 px-3.5 rounded-lg border border-zinc-200 bg-white font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[14px] font-normal text-zinc-700 hover:bg-zinc-50 transition"
             >
               Killzones
-            </Link>
+            <button
+              onClick={() => {
+                const next = !voiceMuted;
+                setVoiceMuted(next);
+                voiceMutedRef.current = next;
+                try { window.localStorage.setItem("jenvu:voice-muted", next ? "1" : "0"); } catch {}
+                if (next) {
+                  try { stopAllBrowserSpeech(); } catch {}
+                  try { speech.cancel?.(); } catch {}
+                }
+              }}
+              className={`shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border text-[12px] font-medium transition ${voiceMuted ? "border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-200" : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"}`}
+              title={voiceMuted ? "Voice agent muted — tap to unmute" : "Mute voice agent"}
+              aria-pressed={voiceMuted}
+            >
+              {voiceMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+              <span className="hidden sm:inline">{voiceMuted ? "Voice off" : "Voice on"}</span>
+            </button>
             {voiceBlocked && (
               <button
                 onClick={() => {
