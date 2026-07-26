@@ -2819,11 +2819,16 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     // chart shows exactly what the engine used.
     if (built.direction !== "WAIT" && built.zone) {
       const nowS = Math.floor(Date.now() / 1000);
+      // Anchor the engine's chosen zone to the ACTUAL candle that formed it,
+      // then extend the box's right edge to "now" so the zone visually reaches
+      // the live bar — exactly how an ICT trader draws an active zone by hand.
+      const zFrom = (built.zone as any).fromTime ?? nowS - 3600;
+      const zTo = Math.max((built.zone as any).toTime ?? nowS, nowS);
       allMarkings.push({
         type: built.zone.kind === "OB" ? "orderBlock" : "fvg",
         tf: "ltf",
-        fromTime: nowS - 3600,
-        toTime: nowS,
+        fromTime: zFrom,
+        toTime: zTo,
         priceLow: built.zone.priceLow,
         priceHigh: built.zone.priceHigh,
         kind: (built.direction === "BUY" ? (built.zone.kind === "OB" ? "demand" : "bullish") : (built.zone.kind === "OB" ? "supply" : "bearish")) as any,
