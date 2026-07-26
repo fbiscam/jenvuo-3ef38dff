@@ -202,8 +202,11 @@ function SignalPage() {
   }, []);
 
 
-  const { user: authUser, loading: authLoading } = useAuthUser();
-  const authReady = !authLoading && !!authUser;
+  const { user: authUser, loading: authLoading, rawUser } = useAuthUser();
+  // Signal page is public-accessible; even an MFA-pending session should be
+  // able to run scans (backend uses whatever bearer they already have).
+  const authReady = !authLoading && !!rawUser;
+
   const dark = false;
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
