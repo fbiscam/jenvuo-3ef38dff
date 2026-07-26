@@ -407,7 +407,7 @@ function coinbaseProductFromSymbol(sym: string): string | null {
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
+  const makers = hosts.flatMap((host) => symbols.map((sym) => (signal: AbortSignal) => (async () => {
         const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${cfg.interval}&range=${cfg.range}`;
         const res = await fetchWithTimeout(url, {
           headers: {
@@ -415,8 +415,9 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
             Accept: "application/json",
           },
+          signal,
         });
-        if (!res.ok) throw new Error(`Yahoo ${sym}: ${res.status}`);
+        if (!res.ok) { try { res.body?.cancel(); } catch {} throw new Error(`Yahoo ${sym}: ${res.status}`); }
         const json: any = await res.json();
         const result = json?.chart?.result?.[0];
         if (!result) throw new Error("No price data");
@@ -430,9 +431,9 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
         }
         if (candles.length >= 10) return candles.slice(-200);
         throw new Error("Too few Yahoo candles");
-  }));
+  })()));
   try {
-    return await Promise.any(attempts);
+    return await raceAndCancel(makers);
   } catch (e) {
     throw e instanceof Error ? e : new Error("Yahoo unavailable");
   }
