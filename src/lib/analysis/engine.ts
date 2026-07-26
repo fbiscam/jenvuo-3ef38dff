@@ -241,7 +241,7 @@ export type BuiltTrade = {
   entryType: "MARKET" | "LIMIT";
   entry: number; sl: number; tp: number; rr: number;
   tp1?: number; tp2?: number; tp3?: number;
-  zone: { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number } | null;
+  zone: { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number; fromTime?: number; toTime?: number } | null;
   reason: string;
   notes?: string[];
 };
