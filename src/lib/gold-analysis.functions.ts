@@ -85,14 +85,15 @@ export type GoldSignal = {
 };
 
 const YAHOO_INTERVAL: Record<string, { interval: string; range: string }> = {
-  "1m": { interval: "1m", range: "1d" },
-  "5m": { interval: "5m", range: "5d" },
-  "15m": { interval: "15m", range: "10d" },
-  "30m": { interval: "30m", range: "20d" },
-  "1h": { interval: "60m", range: "30d" },
-  "4h": { interval: "1h", range: "60d" },
-  "1d": { interval: "1d", range: "1y" },
+  "1m": { interval: "1m", range: "5d" },
+  "5m": { interval: "5m", range: "1mo" },
+  "15m": { interval: "15m", range: "2mo" },
+  "30m": { interval: "30m", range: "3mo" },
+  "1h": { interval: "60m", range: "6mo" },
+  "4h": { interval: "1h", range: "1y" },
+  "1d": { interval: "1d", range: "5y" },
 };
+
 
 // ============================================================
 // UNIVERSAL INSTRUMENT RESOLVER
