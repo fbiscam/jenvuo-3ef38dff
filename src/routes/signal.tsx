@@ -1392,7 +1392,7 @@ function SignalPage() {
                 </div>
                 <div className={cn(
                   "rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)]",
-                  "h-[360px] sm:h-[420px] lg:h-[calc(100vh-220px)]",
+                  "h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
                 )}>
 
                   {plan ? (
