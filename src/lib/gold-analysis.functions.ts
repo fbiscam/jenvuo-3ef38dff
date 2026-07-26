@@ -944,6 +944,7 @@ export type Marking =
   | { type: "sweep"; tf: "htf" | "ltf"; time: number; price: number; kind: "buy" | "sell"; label: string }
   | { type: "trendline"; tf: "htf" | "ltf"; fromTime: number; toTime: number; fromPrice: number; toPrice: number; kind: "up" | "down"; label: string }
   | { type: "reversalZone"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "bullish" | "bearish"; label: string }
+  | { type: "support" | "resistance"; tf: "htf" | "ltf"; price: number; strength?: number; label: string }
   | { type: "entry" | "sl" | "tp"; tf: "htf" | "ltf"; price: number; label: string };
 
 export type NewsItem = {

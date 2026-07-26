@@ -45,14 +45,15 @@ type Props = {
 };
 
 const COLORS = {
-  fvgBull:      { fill: "rgba(34,197,94,0.18)",  border: "#16a34a", tag: "Bullish FVG" },
-  fvgBear:      { fill: "rgba(239,68,68,0.18)",  border: "#dc2626", tag: "Bearish FVG" },
-  obDemand:     { fill: "rgba(59,130,246,0.20)", border: "#2563eb", tag: "Demand OB" },
-  obSupply:     { fill: "rgba(244,114,182,0.22)",border: "#db2777", tag: "Supply OB" },
-  zoneDemand:   { fill: "rgba(34,197,94,0.14)",  border: "#16a34a", tag: "Demand Zone" },
-  zoneSupply:   { fill: "rgba(239,68,68,0.14)",  border: "#dc2626", tag: "Supply Zone" },
-  breakerBull:  { fill: "rgba(20,184,166,0.20)", border: "#0d9488", tag: "Bullish Breaker" },
-  breakerBear:  { fill: "rgba(217,70,239,0.20)", border: "#a21caf", tag: "Bearish Breaker" },
+  // Zones — each type gets a distinct hue family so overlapping markings stay readable
+  fvgBull:      { fill: "rgba(16,185,129,0.18)",  border: "#10b981", tag: "Bullish FVG" },
+  fvgBear:      { fill: "rgba(244,63,94,0.18)",   border: "#f43f5e", tag: "Bearish FVG" },
+  obDemand:     { fill: "rgba(79,70,229,0.20)",   border: "#4f46e5", tag: "Demand OB" },
+  obSupply:     { fill: "rgba(192,38,211,0.22)",  border: "#c026d3", tag: "Supply OB" },
+  zoneDemand:   { fill: "rgba(101,163,13,0.16)",  border: "#65a30d", tag: "Demand Zone" },
+  zoneSupply:   { fill: "rgba(234,88,12,0.16)",   border: "#ea580c", tag: "Supply Zone" },
+  breakerBull:  { fill: "rgba(13,148,136,0.20)",  border: "#0d9488", tag: "Bullish Breaker" },
+  breakerBear:  { fill: "rgba(124,58,237,0.20)",  border: "#7c3aed", tag: "Bearish Breaker" },
   premium:  "rgba(244,63,94,0.06)",
   discount: "rgba(16,185,129,0.06)",
   ote:      "rgba(234,179,8,0.14)",
@@ -61,11 +62,17 @@ const COLORS = {
   oteBorder:      "#ca8a04",
   bullLine: "#16a34a",
   bearLine: "#dc2626",
+  // Liquidity — warm amber family, distinct from red/green zone hues
   liqBuy: "#f59e0b",
-  liqSell: "#ea580c",
-  eqh: "#9333ea",
-  eql: "#9333ea",
-  entry: "#2563eb",
+  liqSell: "#b45309",
+  // Equal highs/lows — cool violet/cyan so they don't clash with liquidity
+  eqh: "#8b5cf6",
+  eql: "#06b6d4",
+  // Support / Resistance — bold saturated dashed lines
+  support:    "#059669",
+  resistance: "#e11d48",
+  // Trade levels
+  entry: "#0284c7",
   sl: "#dc2626",
   tp: "#059669",
 };
@@ -878,19 +885,27 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (typeof anyM.price === "number") {
         let color = "#334155";
         let label = m.type.toUpperCase();
+        let lineStyle = LineStyle.Dotted;
+        let lineWidth: 1 | 2 = 1;
         if (m.type === "liquidity") {
           color = anyM.kind === "buy" ? COLORS.liqBuy : COLORS.liqSell;
           label = anyM.kind === "buy" ? "BSL" : "SSL";
         } else if (m.type === "eqh") { color = COLORS.eqh; label = "EQH"; }
         else if (m.type === "eql") { color = COLORS.eql; label = "EQL"; }
-        else if (m.type === "entry") { color = COLORS.entry; label = "ENTRY"; }
-        else if (m.type === "sl") { color = COLORS.sl; label = "SL"; }
-        else if (m.type === "tp") { color = COLORS.tp; label = "TP"; }
+        else if (m.type === "support") {
+          color = COLORS.support; label = "SUPPORT";
+          lineStyle = LineStyle.Dashed; lineWidth = 2;
+        } else if (m.type === "resistance") {
+          color = COLORS.resistance; label = "RESISTANCE";
+          lineStyle = LineStyle.Dashed; lineWidth = 2;
+        } else if (m.type === "entry") { color = COLORS.entry; label = "ENTRY"; lineWidth = 2; }
+        else if (m.type === "sl") { color = COLORS.sl; label = "SL"; lineWidth = 2; }
+        else if (m.type === "tp") { color = COLORS.tp; label = "TP"; lineWidth = 2; }
         const line = s.createPriceLine({
           price: anyM.price,
           color,
-          lineWidth: 1,
-          lineStyle: LineStyle.Dotted,
+          lineWidth,
+          lineStyle,
           axisLabelVisible: true,
           title: label,
         });
