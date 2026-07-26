@@ -640,6 +640,16 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         } else keepLabels.push(lb);
       }
       labelsRef.current = keepLabels;
+      // Remove transient R:R zones
+      const keepZones: typeof rrZonesRef.current = [];
+      for (const z of rrZonesRef.current) {
+        if (z.transient) {
+          z.el.style.opacity = "0";
+          const el = z.el;
+          setTimeout(() => { try { el.remove(); } catch {} }, 260);
+        } else keepZones.push(z);
+      }
+      rrZonesRef.current = keepZones;
       // Remove transient markers (BOS/CHoCH arrows)
       if (transientMarkerKeysRef.current.size > 0) {
         const kept = markersRef.current.filter((mk) => {
