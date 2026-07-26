@@ -1159,8 +1159,74 @@ function SignalPage() {
                   </>
                 )}
               </div>
+
+              {/* Pair selector — kebab menu */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setPairMenuOpen((v) => !v)}
+                  className="h-7 w-7 inline-flex items-center justify-center rounded-md text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition"
+                  aria-label="Choose gold pair"
+                  title="Choose gold pair"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </button>
+                {pairMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setPairMenuOpen(false)} />
+                    <div className="absolute right-0 top-full mt-2 z-50 w-[220px] rounded-xl border border-zinc-200/70 bg-white/95 backdrop-blur-xl shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] p-2">
+                      <div className="px-2 pb-1.5 text-[10px] font-semibold tracking-widest uppercase text-zinc-500">
+                        Gold pair
+                      </div>
+                      <div className="flex flex-col">
+                        {XAU_PAIRS.map((p) => {
+                          const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
+                          const isFree = !credits.isLoading && credits.plan?.id === "free";
+                          const locked = isFree && p !== "XAUUSD";
+                          return (
+                            <button
+                              key={p}
+                              onClick={() => {
+                                setPairMenuOpen(false);
+                                if (active) return;
+                                if (locked) {
+                                  toast.info("Multi-pair analysis is a Pro feature", {
+                                    description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
+                                    action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+                                  });
+                                  return;
+                                }
+                                abortRef.current = true;
+                                try { speech.stopSpeaking(); } catch {}
+                                setPlaying(false);
+                                setActiveTf(null);
+                                setPlan(null);
+                                setLoading(true);
+                                setStep(-1);
+                                navigate({ to: "/signal", search: { symbol: p }, replace: true });
+                              }}
+                              className={cn(
+                                "w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal transition",
+                                active ? "bg-zinc-100 text-zinc-900 font-medium" : "text-zinc-800 hover:bg-zinc-50",
+                              )}
+                              title={locked ? "Pro feature — upgrade to unlock" : undefined}
+                            >
+                              <span className="inline-flex items-center gap-1.5">
+                                {locked && <Lock className="h-3 w-3 text-zinc-400" />}
+                                {XAU_LABELS[p]}
+                              </span>
+                              {active && <Check className="h-3.5 w-3.5 text-emerald-600" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
+
 
           {/* body grid — full-page chart stage with overlay panels */}
           <div className="relative bg-white lg:min-h-[calc(100vh-160px)]">
