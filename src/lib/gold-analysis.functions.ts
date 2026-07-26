@@ -361,6 +361,43 @@ async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs
   }
 }
 
+// Runs parallel attempts but aborts + drains losers as soon as one wins,
+// so we don't hold Cloudflare's 6-in-flight subrequest slots hostage.
+async function raceAndCancel<T>(
+  makers: Array<(signal: AbortSignal) => Promise<T>>,
+): Promise<T> {
+  const controllers = makers.map(() => new AbortController());
+  const promises = makers.map((m, i) =>
+    m(controllers[i].signal).then(
+      (v) => ({ ok: true as const, i, v }),
+      (e) => ({ ok: false as const, i, e }),
+    ),
+  );
+  const errors: any[] = [];
+  const pending = new Set(promises);
+  while (pending.size) {
+    const settled = await Promise.race(pending);
+    pending.delete(promises[settled.i]);
+    if (settled.ok) {
+      // Abort every other attempt and best-effort drain any Response bodies.
+      for (let j = 0; j < controllers.length; j++) {
+        if (j !== settled.i) controllers[j].abort();
+      }
+      for (const p of pending) {
+        p.then((r) => {
+          if (r.ok && (r.v as any)?.body?.cancel) {
+            try { (r.v as any).body.cancel(); } catch {}
+          }
+        }).catch(() => {});
+      }
+      return settled.v;
+    }
+    errors.push(settled.e);
+  }
+  throw errors[errors.length - 1] ?? new Error("All attempts failed");
+}
+
+
 function coinbaseProductFromSymbol(sym: string): string | null {
   const m = sym.match(/^([A-Z0-9]{2,15})(USDT|USDC|USD)$/);
   if (!m) return null;
