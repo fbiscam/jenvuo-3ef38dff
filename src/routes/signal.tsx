@@ -627,11 +627,18 @@ function SignalPage() {
           htfRef.current?.clear();
           ltfRef.current?.clear();
           // Draw EVERY marking persistently — nothing gets removed while user views the signal.
+          const conf65 = Number(p.trade?.confidence ?? 0) >= 65 &&
+            Number.isFinite(p.trade?.entry) && Number.isFinite(p.trade?.sl) && Number.isFinite(p.trade?.tp) &&
+            p.trade?.direction !== "WAIT";
           for (const m of p.markings) {
+            if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
             try { ltfRef.current?.drawMarking(m, { transient: false }); } catch {}
           }
+          if (conf65) {
+            try { ltfRef.current?.drawRRZones(p.trade.entry, p.trade.sl, p.trade.tp, { transient: false }); } catch {}
+          }
           const entry = p.markings.find((m) => m.type === "entry");
-          if (entry) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
+          if (entry && conf65) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
         }, 400);
         toast.success("Saved signal restored");
       } else {
