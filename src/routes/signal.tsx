@@ -1208,12 +1208,12 @@ function SignalPage() {
           <div className="relative bg-white lg:min-h-[calc(100vh-160px)]">
             {/* LEFT — ICT execution feed (overlay on desktop, stacked on mobile) */}
             <div className={cn(
-              "hidden",
               "bg-white p-4 flex flex-col gap-3 border-b border-zinc-100",
               "lg:absolute lg:z-30 lg:top-4 lg:left-4 lg:w-[340px] lg:max-h-[calc(100%-32px)]",
               "lg:bg-white/85 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)]",
               "lg:p-4 lg:transition-transform lg:duration-300",
               !narrationOpen && "lg:-translate-x-[calc(100%+20px)]",
+              "hidden",
             )}>
               <div className="hidden lg:flex items-center justify-between -mb-1">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">Live Narration</span>
