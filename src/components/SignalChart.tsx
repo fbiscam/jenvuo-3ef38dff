@@ -122,11 +122,24 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     const rect = svg.getBoundingClientRect();
     const x = (ev as PointerEvent).clientX - rect.left;
     const y = (ev as PointerEvent).clientY - rect.top;
-    const t = chart.timeScale().coordinateToTime(x);
+    const ts = chart.timeScale();
+    let t: number | null = null;
+    const tRaw = ts.coordinateToTime(x);
+    if (tRaw != null) {
+      t = Number(tRaw);
+    } else {
+      // Fallback: derive time from logical index → allows drawing in blank right zone
+      const logical = ts.coordinateToLogical(x);
+      if (logical != null && liveBarRef.current) {
+        const lastIdx = Math.max(0, (candles.length - 1));
+        const delta = Number(logical) - lastIdx;
+        t = Number(liveBarRef.current.time) + Math.round(delta) * (bucketSecRef.current || 60);
+      }
+    }
     const p = s.coordinateToPrice(y);
     if (t == null || p == null) return null;
-    return { time: Number(t), price: Number(p) };
-  }, []);
+    return { time: t, price: Number(p) };
+  }, [candles.length]);
 
   const redrawUserDrawings = useCallback(() => {
     const svg = drawSvgRef.current;
@@ -423,10 +436,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       }
       redrawUserDrawings();
     };
-    chart.timeScale().subscribeVisibleTimeRangeChange(redrawBoxes);
+    chart.timeScale().subscribeVisibleTimeRangeChange(() => { redrawBoxes(); redrawUserDrawings(); });
     chart.subscribeCrosshairMove(redrawBoxes);
-    const ro = new ResizeObserver(redrawBoxes);
-    if (containerRef.current) ro.observe(containerRef.current);
+    const ro = new ResizeObserver(() => { redrawBoxes(); redrawUserDrawings(); });
+    ro.observe(containerRef.current);
     (chartRef.current as any).__redrawBoxes = redrawBoxes;
 
     return () => {
@@ -815,9 +828,12 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       <svg
         ref={drawSvgRef}
         className="absolute inset-0"
+        width="100%"
+        height="100%"
         style={{
           pointerEvents: drawingActive ? "auto" : "none",
           cursor: tool === "cursor" ? "default" : tool === "erase" ? "not-allowed" : "crosshair",
+          touchAction: "none",
         }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
