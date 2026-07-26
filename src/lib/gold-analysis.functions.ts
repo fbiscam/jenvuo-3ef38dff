@@ -2181,7 +2181,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       if (!m || typeof m !== "object" || typeof m.type !== "string") return false;
       // Time window: allow up to 1 day past the last candle for projected zones.
       const timeMax = maxTime + 86400;
-      for (const k of ["fromTime", "toTime"]) {
+      for (const k of ["fromTime", "toTime", "time"]) {
         if (m[k] != null) {
           let t = Number(m[k]);
           if (!Number.isFinite(t)) return false;
@@ -2190,7 +2190,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
           if (t < minTime || t > timeMax) return false;
         }
       }
-      for (const k of ["price", "priceLow", "priceHigh"]) {
+      for (const k of ["price", "priceLow", "priceHigh", "fromPrice", "toPrice"]) {
         if (m[k] != null) {
           const p = Number(m[k]);
           if (!Number.isFinite(p) || p < priceLoBound || p > priceHiBound) return false;
