@@ -339,24 +339,11 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       const chart = chartRef.current;
       if (!chart) return;
       if (m.tf !== tf) return;
-      const ts = chart.timeScale();
-      const anyM: any = m;
-      let from = Number(anyM.fromTime);
-      let to = Number(anyM.toTime);
-      const bucket = bucketSecRef.current || 60;
-      // Price-only markings (eqh, eql, liquidity, entry/sl/tp) — tight window around live bar
-      if (!Number.isFinite(from) || !Number.isFinite(to)) {
-        const lastT = liveBarRef.current?.time;
-        if (typeof lastT !== "number") return;
-        from = lastT - bucket * 8;
-        to = lastT + bucket * 3;
-      }
-      try {
-        const span = Math.max(to - from, bucket);
-        const pad = Math.max(span * 2.5, bucket * 8);
-        ts.setVisibleRange({ from: (from - pad) as Time, to: (to + pad) as Time });
-      } catch {}
+      // User asked: don't zoom. Keep the full chart in view instead of
+      // narrowing the visible range around the marking.
+      try { chart.timeScale().fitContent(); } catch {}
     },
+
 
     drawMarking: (m: Marking, opts?: { transient?: boolean }) => {
       const s = seriesRef.current;
