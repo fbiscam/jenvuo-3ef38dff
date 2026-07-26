@@ -428,13 +428,25 @@ function SignalPage() {
       setPlaying(true);
       abortRef.current = false;
 
+      // Gate: only show entry/SL/TP levels + shaded R:R zones when confidence ≥ 65%.
+      const conf65 = Number(p.trade?.confidence ?? 0) >= 65 &&
+        Number.isFinite(p.trade?.entry) && Number.isFinite(p.trade?.sl) && Number.isFinite(p.trade?.tp) &&
+        p.trade?.direction !== "WAIT";
+
       // Draw EVERY marking up-front as PERSISTENT so nothing gets removed while walking through.
-      // Entry / SL / TP live on the chart from the very first frame — no waiting till the end.
+      // Entry / SL / TP are gated by confidence (≥65%); below that, only context markings render.
       for (const m of p.markings) {
+        if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
         try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
       }
+      // Shaded R:R zones (green entry→TP, red entry→SL) — only when qualified.
+      if (conf65) {
+        try {
+          ltfRef.current?.drawRRZones(p.trade.entry, p.trade.sl, p.trade.tp, { transient: false });
+        } catch (e) { console.warn("drawRRZones failed", e); }
+      }
       const entry = p.markings.find((m) => m.type === "entry");
-      if (entry) {
+      if (entry && conf65) {
         try {
           ltfRef.current?.panToMarking(entry);
           ltfRef.current?.focusMarking(entry);
@@ -446,15 +458,19 @@ function SignalPage() {
         for (let i = 0; i < p.narration.length; i++) {
           if (abortRef.current) break;
           const n = p.narration[i];
+          // Skip narration lines that reference entry/SL/TP execution when confidence < 65%.
+          const refM = n.markingIndex != null ? p.markings[n.markingIndex] : null;
+          const refIsExec = !!refM && (refM.type === "entry" || refM.type === "sl" || refM.type === "tp");
+          const sayIsExec = /\b(entry|stop\s*loss|\bsl\b|take\s*profit|\btp\b|target)\b/i.test(n.say || "");
+          if (!conf65 && (refIsExec || sayIsExec)) continue;
           setStep(i);
           setActiveTf(n.tf);
           // Pan to the referenced marking WITHOUT redrawing / clearing anything —
           // markings stay locked on the chart.
-          if (n.markingIndex != null && p.markings[n.markingIndex]) {
-            const m = p.markings[n.markingIndex];
+          if (refM) {
             try {
-              ltfRef.current?.panToMarking(m);
-              ltfRef.current?.focusMarking(m);
+              ltfRef.current?.panToMarking(refM);
+              ltfRef.current?.focusMarking(refM);
             } catch (e) {
               console.warn("marking pan failed", e);
             }
@@ -465,6 +481,7 @@ function SignalPage() {
             await new Promise((r) => setTimeout(r, 120));
           }
         }
+
         if (!abortRef.current) {
           setActiveTf("ltf");
           if (entry) {
@@ -610,11 +627,18 @@ function SignalPage() {
           htfRef.current?.clear();
           ltfRef.current?.clear();
           // Draw EVERY marking persistently — nothing gets removed while user views the signal.
+          const conf65 = Number(p.trade?.confidence ?? 0) >= 65 &&
+            Number.isFinite(p.trade?.entry) && Number.isFinite(p.trade?.sl) && Number.isFinite(p.trade?.tp) &&
+            p.trade?.direction !== "WAIT";
           for (const m of p.markings) {
+            if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
             try { ltfRef.current?.drawMarking(m, { transient: false }); } catch {}
           }
+          if (conf65) {
+            try { ltfRef.current?.drawRRZones(p.trade.entry, p.trade.sl, p.trade.tp, { transient: false }); } catch {}
+          }
           const entry = p.markings.find((m) => m.type === "entry");
-          if (entry) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
+          if (entry && conf65) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
         }, 400);
         toast.success("Saved signal restored");
       } else {

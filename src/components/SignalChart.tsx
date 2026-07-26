@@ -31,7 +31,9 @@ export type SignalChartHandle = {
   clear: () => void;
   clearTransient: () => void;
   updateLivePrice: (price: number, tSeconds?: number) => void;
+  drawRRZones: (entry: number, sl: number, tp: number, opts?: { transient?: boolean }) => void;
 };
+
 
 
 
@@ -98,6 +100,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement; transient: boolean }[]>([]);
   // Floating text labels for price-line markings (liquidity, EQH/EQL, BOS/CHOCH, entry/sl/tp)
   const labelsRef = useRef<{ marking: Marking; price: number; color: string; el: HTMLDivElement; transient: boolean }[]>([]);
+  // R:R shaded zones — full-width green (entry→tp) and red (entry→sl) bands
+  const rrZonesRef = useRef<{ kind: "profit" | "risk"; p1: number; p2: number; el: HTMLDivElement; transient: boolean }[]>([]);
   // Live tick state — mutable, survives across ticks within the same bar
   const liveBarRef = useRef<{ time: number; open: number; high: number; low: number; close: number } | null>(null);
   const bucketSecRef = useRef<number>(60);
@@ -510,6 +514,19 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         lb.el.style.top = `${Math.max(2, y - 9)}px`;
         lb.el.style.right = `4px`;
       }
+      // Reposition R:R shaded zones — full-width, between two price coordinates.
+      for (const z of rrZonesRef.current) {
+        const y1 = seriesRef.current.priceToCoordinate(z.p1);
+        const y2 = seriesRef.current.priceToCoordinate(z.p2);
+        if (y1 == null || y2 == null) { z.el.style.display = "none"; continue; }
+        const top = Math.min(y1 as unknown as number, y2 as unknown as number);
+        const height = Math.max(1, Math.abs((y2 as unknown as number) - (y1 as unknown as number)));
+        z.el.style.display = "block";
+        z.el.style.left = "0px";
+        z.el.style.width = `${containerWidth}px`;
+        z.el.style.top = `${top}px`;
+        z.el.style.height = `${height}px`;
+      }
       redrawUserDrawings();
     };
     chart.timeScale().subscribeVisibleTimeRangeChange(() => { redrawBoxes(); redrawUserDrawings(); });
@@ -586,6 +603,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       boxesRef.current = [];
       labelsRef.current.forEach((lb) => { try { lb.el.remove(); } catch {} });
       labelsRef.current = [];
+      rrZonesRef.current.forEach((z) => { try { z.el.remove(); } catch {} });
+      rrZonesRef.current = [];
       if (lastPriceLineRef.current) {
         try { s.removePriceLine(lastPriceLineRef.current); } catch {}
         lastPriceLineRef.current = null;
@@ -621,6 +640,16 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         } else keepLabels.push(lb);
       }
       labelsRef.current = keepLabels;
+      // Remove transient R:R zones
+      const keepZones: typeof rrZonesRef.current = [];
+      for (const z of rrZonesRef.current) {
+        if (z.transient) {
+          z.el.style.opacity = "0";
+          const el = z.el;
+          setTimeout(() => { try { el.remove(); } catch {} }, 260);
+        } else keepZones.push(z);
+      }
+      rrZonesRef.current = keepZones;
       // Remove transient markers (BOS/CHoCH arrows)
       if (transientMarkerKeysRef.current.size > 0) {
         const kept = markersRef.current.filter((mk) => {
@@ -877,7 +906,33 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       }
     }
     },
+    drawRRZones: (entry: number, sl: number, tp: number, opts?: { transient?: boolean }) => {
+      const chart = chartRef.current;
+      if (!chart || !overlayRef.current) return;
+      if (!Number.isFinite(entry) || !Number.isFinite(sl) || !Number.isFinite(tp)) return;
+      const transient = !!opts?.transient;
+      const mk = (kind: "profit" | "risk", p1: number, p2: number) => {
+        const el = document.createElement("div");
+        const fill = kind === "profit"
+          ? "linear-gradient(180deg, rgba(34,197,94,0.22), rgba(34,197,94,0.10))"
+          : "linear-gradient(180deg, rgba(239,68,68,0.22), rgba(239,68,68,0.10))";
+        const border = kind === "profit" ? "#16a34a" : "#dc2626";
+        const tag = kind === "profit" ? "PROFIT" : "RISK";
+        el.style.cssText = `position:absolute;background:${fill};border-top:1px dashed ${border};border-bottom:1px dashed ${border};pointer-events:none;opacity:0;transition:opacity 500ms ease;z-index:1;`;
+        const ribbon = document.createElement("span");
+        ribbon.style.cssText = `position:absolute;left:8px;top:4px;font-size:9px;font-weight:800;letter-spacing:0.16em;color:#fff;background:${border};padding:2px 8px;border-radius:3px;font-family:'Google Sans',system-ui,sans-serif;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,0.2);`;
+        ribbon.textContent = tag;
+        el.appendChild(ribbon);
+        overlayRef.current!.appendChild(el);
+        rrZonesRef.current.push({ kind, p1, p2, el, transient });
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
+      };
+      mk("profit", entry, tp);
+      mk("risk", entry, sl);
+      (chart as any).__redrawBoxes?.();
+    },
   }));
+
 
   // ---- Pointer handlers for manual drawing ----
   const onPointerDown = useCallback((ev: React.PointerEvent<SVGSVGElement>) => {
