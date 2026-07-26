@@ -440,14 +440,14 @@ function SignalPage() {
           const n = p.narration[i];
           setStep(i);
           setActiveTf(n.tf);
-          const target = n.tf === "htf" ? htfRef.current : ltfRef.current;
+          const target = ltfRef.current;
           // Sequential lifecycle: clear previous transient marking, draw + pan to the new one,
           // then narrate. Only ONE active ICT/SMC marking is visible at a time.
           htfRef.current?.clearTransient();
           ltfRef.current?.clearTransient();
           if (n.markingIndex != null && p.markings[n.markingIndex]) {
             const m = p.markings[n.markingIndex];
-            const drawTarget = m.tf === "htf" ? htfRef.current : ltfRef.current;
+            const drawTarget = ltfRef.current;
             try {
               drawTarget?.drawMarking(m, { transient: true });
               drawTarget?.panToMarking(m);
