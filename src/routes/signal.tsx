@@ -666,9 +666,8 @@ function SignalPage() {
             if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
             try { ltfRef.current?.drawMarking(m, { transient: false }); } catch {}
           }
-          if (conf65) {
-            try { ltfRef.current?.drawRRZones(p.trade.entry, p.trade.sl, p.trade.tp, { transient: false }); } catch {}
-          }
+          // Risk/profit shaded zones removed per user request.
+
           const entry = p.markings.find((m) => m.type === "entry");
           if (entry && conf65) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
         }, 400);
