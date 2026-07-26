@@ -634,7 +634,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         }
         el.style.cssText = `position:absolute;background:${palette.fill};border:1px solid ${palette.border};border-radius:2px;pointer-events:none;opacity:0;transition:opacity 500ms ease;overflow:hidden;`;
         const pill = document.createElement("span");
-        pill.style.cssText = `position:absolute;top:2px;left:2px;font-size:9px;font-weight:700;letter-spacing:0.06em;padding:1px 5px;border-radius:3px;background:${palette.border};color:#fff;line-height:1.2;font-family:'Google Sans',system-ui,sans-serif;`;
+        pill.style.cssText = `position:absolute;top:3px;left:3px;font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:4px;background:${palette.border};color:#fff;line-height:1.2;font-family:'Google Sans',system-ui,sans-serif;box-shadow:0 1px 2px rgba(0,0,0,0.15);white-space:nowrap;`;
         pill.textContent = palette.tag;
         el.appendChild(pill);
         overlayRef.current.appendChild(el);
