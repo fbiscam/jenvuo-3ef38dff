@@ -481,7 +481,12 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const dec = broadcastPlan.instrument?.decimals ?? 2;
             const entry = Number(broadcastPlan.trade?.entry);
             const sl = Number(broadcastPlan.trade?.sl);
-            const tp = Number(broadcastPlan.trade?.tp1 ?? broadcastPlan.trade?.tp);
+            // Use the final TP target (2–3R), NOT tp1 which is hard-coded to
+            // exactly 1R by the engine. Using tp1 caused every stored `rr` to
+            // collapse to 1.0 in the DB even though the engine planned a 2R+
+            // target. Fall back to tp1 only if the higher targets are missing.
+            const tpAny = broadcastPlan.trade as any;
+            const tp = Number(tpAny?.tp ?? tpAny?.tp3 ?? tpAny?.tp2 ?? tpAny?.tp1);
             if (!isFinite(entry) || !isFinite(sl) || !isFinite(tp)) {
               results.push({ pair, action: "invalid_levels" });
               continue;
