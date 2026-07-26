@@ -385,6 +385,7 @@ function SignalPage() {
     (text: string) =>
       new Promise<void>((resolve) => {
         if (!text || !text.trim()) return resolve();
+        if (voiceMutedRef.current) return resolve();
         const words = text.split(/\s+/).filter(Boolean).length;
         const minMs = Math.max(2500, words * 320);
         let done = false;
