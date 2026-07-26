@@ -466,12 +466,7 @@ function SignalPage() {
         if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
         try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
       }
-      // Shaded R:R zones (green entry→TP, red entry→SL) — only when qualified.
-      if (conf65) {
-        try {
-          ltfRef.current?.drawRRZones(p.trade.entry, p.trade.sl, p.trade.tp, { transient: false });
-        } catch (e) { console.warn("drawRRZones failed", e); }
-      }
+      // Risk/profit shaded zones removed per user request.
       const entry = p.markings.find((m) => m.type === "entry");
       if (entry && conf65) {
         try {
