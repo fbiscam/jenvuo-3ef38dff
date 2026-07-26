@@ -428,8 +428,8 @@ function SignalPage() {
       ]);
       for (const m of p.markings) {
         if (autoTypes.has(m.type)) {
-          const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
-          try { target?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
+          // All markings (HTF + LTF) render on the single LTF chart stage.
+          try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
         }
       }
 
@@ -440,14 +440,14 @@ function SignalPage() {
           const n = p.narration[i];
           setStep(i);
           setActiveTf(n.tf);
-          const target = n.tf === "htf" ? htfRef.current : ltfRef.current;
+          const target = ltfRef.current;
           // Sequential lifecycle: clear previous transient marking, draw + pan to the new one,
           // then narrate. Only ONE active ICT/SMC marking is visible at a time.
           htfRef.current?.clearTransient();
           ltfRef.current?.clearTransient();
           if (n.markingIndex != null && p.markings[n.markingIndex]) {
             const m = p.markings[n.markingIndex];
-            const drawTarget = m.tf === "htf" ? htfRef.current : ltfRef.current;
+            const drawTarget = ltfRef.current;
             try {
               drawTarget?.drawMarking(m, { transient: true });
               drawTarget?.panToMarking(m);
@@ -621,7 +621,7 @@ function SignalPage() {
           ltfRef.current?.clear();
           const autoTypes = new Set(["premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql"]);
           for (const m of p.markings) {
-            const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
+            const target = ltfRef.current;
             if (autoTypes.has(m.type) || m.type === "entry" || m.type === "sl" || m.type === "tp") {
               try { target?.drawMarking(m, { transient: false }); } catch {}
             }
@@ -1391,10 +1391,10 @@ function SignalPage() {
                   )}
                 </div>
                 <div className={cn(
-                  "rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)] transition-opacity duration-300",
+                  "rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)]",
                   "h-[360px] sm:h-[420px] lg:h-[calc(100vh-220px)]",
-                  activeTf === "htf" ? "opacity-55" : "opacity-100",
                 )}>
+
                   {plan ? (
                     <SignalChart
                       ref={ltfRef}
