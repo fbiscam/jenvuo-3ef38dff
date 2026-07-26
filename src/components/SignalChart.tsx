@@ -582,8 +582,13 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     updateLivePrice: (price: number, tSeconds?: number) => {
       const s = seriesRef.current;
       if (!s) return;
+      if (!Number.isFinite(price) || price <= 0) return;
       const bar = liveBarRef.current;
       if (!bar) return;
+      // Reject bad provider ticks that are on the wrong scale for the loaded
+      // candles; otherwise one quote can stretch the chart into "weird" wicks.
+      const scaleGap = Math.abs(price - bar.close) / Math.max(bar.close, 1);
+      if (scaleGap > 0.12) return;
       const bucket = bucketSecRef.current || 60;
       const nowSec = typeof tSeconds === "number" && Number.isFinite(tSeconds)
         ? Math.floor(tSeconds)
