@@ -436,10 +436,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       }
       redrawUserDrawings();
     };
-    chart.timeScale().subscribeVisibleTimeRangeChange(redrawBoxes);
+    chart.timeScale().subscribeVisibleTimeRangeChange(() => { redrawBoxes(); redrawUserDrawings(); });
     chart.subscribeCrosshairMove(redrawBoxes);
-    const ro = new ResizeObserver(redrawBoxes);
-    if (containerRef.current) ro.observe(containerRef.current);
+    const ro = new ResizeObserver(() => { redrawBoxes(); redrawUserDrawings(); });
+    ro.observe(containerRef.current);
     (chartRef.current as any).__redrawBoxes = redrawBoxes;
 
     return () => {
