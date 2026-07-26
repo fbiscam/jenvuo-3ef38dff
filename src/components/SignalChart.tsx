@@ -122,11 +122,24 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     const rect = svg.getBoundingClientRect();
     const x = (ev as PointerEvent).clientX - rect.left;
     const y = (ev as PointerEvent).clientY - rect.top;
-    const t = chart.timeScale().coordinateToTime(x);
+    const ts = chart.timeScale();
+    let t: number | null = null;
+    const tRaw = ts.coordinateToTime(x);
+    if (tRaw != null) {
+      t = Number(tRaw);
+    } else {
+      // Fallback: derive time from logical index → allows drawing in blank right zone
+      const logical = ts.coordinateToLogical(x);
+      if (logical != null && liveBarRef.current) {
+        const lastIdx = Math.max(0, (candles.length - 1));
+        const delta = Number(logical) - lastIdx;
+        t = Number(liveBarRef.current.time) + Math.round(delta) * (bucketSecRef.current || 60);
+      }
+    }
     const p = s.coordinateToPrice(y);
     if (t == null || p == null) return null;
-    return { time: Number(t), price: Number(p) };
-  }, []);
+    return { time: t, price: Number(p) };
+  }, [candles.length]);
 
   const redrawUserDrawings = useCallback(() => {
     const svg = drawSvgRef.current;
