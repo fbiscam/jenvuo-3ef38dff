@@ -1188,90 +1188,88 @@ function SignalPage() {
 
 
       {/* TERMINAL CARD */}
-      <main className="mx-auto max-w-[1600px] px-3 py-3 sm:px-6 sm:py-8">
+      <main className="mx-auto max-w-[1600px] px-5 py-5 sm:px-6 sm:py-8">
 
         <h1 className="sr-only">Live institutional signal desk — ICT & SMC analysis for {sym}</h1>
         <div className="rounded-[24px] border border-zinc-200/70 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10),0_32px_64px_-24px_rgba(16,24,40,0.08)] ring-1 ring-white/60 overflow-hidden">
-          {/* terminal header — restructured for mobile */}
-          <div className="border-b border-zinc-100 bg-white">
-            {/* top row: mac dots + status */}
-            <div className="flex items-center justify-between gap-3 px-4 pt-3 sm:px-6 sm:pt-4">
+          {/* terminal header */}
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
+            <div className="flex items-center gap-3 min-w-0">
               <div className="flex gap-1.5 shrink-0">
                 <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
               </div>
-              <div className="flex shrink-0 items-center gap-2 sm:gap-4 min-w-0">
-                <span className={`text-[11px] ${MONO} tabular-nums text-zinc-900 truncate`}>{priceStr}</span>
-                <div className="hidden sm:block h-4 w-px bg-zinc-200" />
-                {plan && (
-                  <span className="hidden sm:inline text-[12px] tracking-wide uppercase px-2.5 py-1 rounded bg-white text-zinc-900 border border-zinc-200" style={{ fontFamily: '"Google Sans", "Product Sans", system-ui, sans-serif', fontWeight: 400 }}>
-                    {plan.killzone}
-                  </span>
-                )}
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {plan && !isMarketOpen(plan.instrument.symbol) ? (
-                    <>
-                      <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-                      <span className={`text-[10px] sm:text-[11px] font-medium text-zinc-500 tracking-tight ${MONO} uppercase`}>Closed</span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">LIVE</span>
-                    </>
-                  )}
-                </div>
+              <div
+                className="hidden sm:flex items-center gap-1.5 overflow-x-auto no-scrollbar min-w-0 rounded-[16px] border border-zinc-200/70 bg-white px-2 py-1.5 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_20px_-10px_rgba(16,24,40,0.08)] ring-1 ring-white/60"
+                style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
+              >
+                <span className="text-[12px] text-zinc-500 shrink-0 pl-1">{"\n"}</span>
+                {XAU_PAIRS.map((p) => {
+                  const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
+                  const isFree = !credits.isLoading && credits.plan?.id === "free";
+                  const locked = isFree && p !== "XAUUSD";
+                  return (
+                    <button
+                      key={p}
+                      onClick={() => {
+                        if (active) return;
+                        if (locked) {
+                          toast.info("Multi-pair analysis is a Pro feature", {
+                            description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
+                            action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+                          });
+                          return;
+                        }
+                        abortRef.current = true;
+                        try { speech.stopSpeaking(); } catch {}
+                        setPlaying(false);
+                        setActiveTf(null);
+                        setPlan(null);
+                        setLoading(true);
+                        setStep(-1);
+                        navigate({ to: "/signal", search: { symbol: p }, replace: true });
+                      }}
+                      className={cn(
+                        "shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-[10px] text-[12px] transition",
+                        active
+                          ? "bg-white text-black ring-1 ring-zinc-200 shadow-[0_1px_2px_rgba(16,24,40,0.08)]"
+                          : "text-black/80 hover:bg-zinc-100",
+                      )}
+                      style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
+                      title={locked ? "Pro feature — upgrade to unlock" : undefined}
+                    >
+                      {locked && <Lock className="h-3 w-3 opacity-60" />}
+                      {XAU_LABELS[p]}
+                    </button>
+                  );
+                })}
               </div>
             </div>
+            <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+              <span className={`text-[11px] ${MONO} tabular-nums text-zinc-900`}>{priceStr}</span>
+              <div className="hidden sm:block h-4 w-px bg-zinc-200" />
+              {plan && (
+                <span className="hidden sm:inline text-[12px] tracking-wide uppercase px-2.5 py-1 rounded bg-white text-zinc-900 border border-zinc-200" style={{ fontFamily: '"Google Sans", "Product Sans", system-ui, sans-serif', fontWeight: 400 }}>
+                  {plan.killzone}
+                </span>
+              )}
+              <div className="flex items-center gap-2">
+                {plan && !isMarketOpen(plan.instrument.symbol) ? (
+                  <>
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                    <span className={`text-[10px] sm:text-[11px] font-medium text-zinc-500 tracking-tight ${MONO} uppercase`}>Market Closed</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">LIVE FEED</span>
+                  </>
+                )}
+              </div>
 
-            {/* pair selector — full width, horizontally scrollable, ALWAYS visible */}
-            <div
-              className="mt-2.5 sm:mt-3 mx-4 sm:mx-6 mb-3 sm:mb-4 flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-[14px] border border-zinc-200/70 bg-white px-1.5 py-1.5 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_20px_-10px_rgba(16,24,40,0.08)] ring-1 ring-white/60"
-              style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
-            >
-              {XAU_PAIRS.map((p) => {
-                const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
-                const isFree = !credits.isLoading && credits.plan?.id === "free";
-                const locked = isFree && p !== "XAUUSD";
-                return (
-                  <button
-                    key={p}
-                    onClick={() => {
-                      if (active) return;
-                      if (locked) {
-                        toast.info("Multi-pair analysis is a Pro feature", {
-                          description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
-                          action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
-                        });
-                        return;
-                      }
-                      abortRef.current = true;
-                      try { speech.stopSpeaking(); } catch {}
-                      setPlaying(false);
-                      setActiveTf(null);
-                      setPlan(null);
-                      setLoading(true);
-                      setStep(-1);
-                      navigate({ to: "/signal", search: { symbol: p }, replace: true });
-                    }}
-                    className={cn(
-                      "shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-[10px] text-[12px] transition",
-                      active
-                        ? "bg-zinc-900 text-white shadow-[0_1px_2px_rgba(16,24,40,0.16)]"
-                        : "text-zinc-700 hover:bg-zinc-100",
-                    )}
-                    style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
-                    title={locked ? "Pro feature — upgrade to unlock" : undefined}
-                  >
-                    {locked && <Lock className="h-3 w-3 opacity-60" />}
-                    {XAU_LABELS[p]}
-                  </button>
-                );
-              })}
             </div>
           </div>
-
 
 
 
@@ -1454,7 +1452,7 @@ function SignalPage() {
                     "relative overflow-hidden bg-white",
                     isChartFullscreen
                       ? "fixed inset-0 z-[9999] h-screen w-screen rounded-none border-0"
-                      : "rounded-2xl border border-zinc-200/60 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)] h-[62vh] min-h-[380px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
+                      : "rounded-2xl border border-zinc-200/60 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)] h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
                   )}>
                   <button
                     type="button"
@@ -1538,7 +1536,7 @@ function SignalPage() {
 
             {/* RIGHT — intelligence drawer (overlay on desktop, stacked on mobile) */}
             <div className={cn(
-              "bg-white p-4 sm:p-6 border-t border-zinc-100 space-y-5 sm:space-y-6",
+              "bg-white p-5 sm:p-6 border-t border-zinc-100 space-y-6",
               "lg:absolute lg:z-30 lg:top-4 lg:right-4 lg:w-[380px] lg:max-h-[calc(100%-32px)] lg:overflow-y-auto",
               "lg:bg-white/92 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] lg:border-t-0",
               "lg:transition-transform lg:duration-300",
