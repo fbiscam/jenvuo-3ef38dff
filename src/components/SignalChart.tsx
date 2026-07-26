@@ -147,12 +147,13 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         // Extend the right edge ~8 bars forward so the zone reads as "live".
         const toT = toTRaw + (bucketSecRef.current || 60) * 8;
         const x1 = ts.timeToCoordinate(fromT as Time);
-        let x2 = ts.timeToCoordinate(toT as Time);
+        const x2raw = ts.timeToCoordinate(toT as Time);
         if (x1 == null) { b.el.style.display = "none"; continue; }
-        if (x2 == null) x2 = containerWidth; // right edge if projected beyond view
+        const x2 = (x2raw == null ? containerWidth : (x2raw as unknown as number));
+        const x1n = x1 as unknown as number;
         b.el.style.display = "block";
-        const left = Math.min(x1, x2);
-        const width = Math.max(2, Math.abs(x2 - x1));
+        const left = Math.min(x1n, x2);
+        const width = Math.max(2, Math.abs(x2 - x1n));
         const top = Math.min(y1, y2);
         const height = Math.max(2, Math.abs(y2 - y1));
         b.el.style.left = `${left}px`;
