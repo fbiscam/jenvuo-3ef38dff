@@ -424,72 +424,55 @@ function SignalPage() {
       htfRef.current?.clear();
       ltfRef.current?.clear();
       setStep(-1);
-      setActiveTf(null);
+      setActiveTf("ltf");
       setPlaying(true);
       abortRef.current = false;
 
-      // Pre-draw static context zones (Premium/Discount/OTE/Liquidity/EQH/EQL)
-      // as PERSISTENT background context so they stay visible the whole walkthrough.
-      const autoTypes = new Set([
-        "premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql",
-      ]);
+      // Draw EVERY marking up-front as PERSISTENT so nothing gets removed while walking through.
+      // Entry / SL / TP live on the chart from the very first frame — no waiting till the end.
       for (const m of p.markings) {
-        if (autoTypes.has(m.type)) {
-          // All markings (HTF + LTF) render on the single LTF chart stage.
-          try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
-        }
+        try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
+      }
+      const entry = p.markings.find((m) => m.type === "entry");
+      if (entry) {
+        try {
+          ltfRef.current?.panToMarking(entry);
+          ltfRef.current?.focusMarking(entry);
+        } catch (e) { console.warn("entry focus failed", e); }
       }
 
       try {
-        await speakWait(p.intro);
+        // Skip the intro monologue — go straight to marking-by-marking focus.
         for (let i = 0; i < p.narration.length; i++) {
           if (abortRef.current) break;
           const n = p.narration[i];
           setStep(i);
           setActiveTf(n.tf);
-          const target = ltfRef.current;
-          // Sequential lifecycle: clear previous transient marking, draw + pan to the new one,
-          // then narrate. Only ONE active ICT/SMC marking is visible at a time.
-          htfRef.current?.clearTransient();
-          ltfRef.current?.clearTransient();
+          // Pan to the referenced marking WITHOUT redrawing / clearing anything —
+          // markings stay locked on the chart.
           if (n.markingIndex != null && p.markings[n.markingIndex]) {
             const m = p.markings[n.markingIndex];
-            const drawTarget = ltfRef.current;
             try {
-              drawTarget?.drawMarking(m, { transient: true });
-              drawTarget?.panToMarking(m);
-              await new Promise((r) => setTimeout(r, 80));
-              drawTarget?.focusMarking(m);
+              ltfRef.current?.panToMarking(m);
+              ltfRef.current?.focusMarking(m);
             } catch (e) {
-              console.warn("marking step failed", e);
+              console.warn("marking pan failed", e);
             }
-          } else if (target) {
-            // No specific marking — just keep current view
           }
+          // Short one-line callout only — no verbose walkthrough.
           await speakWait(n.say);
-          // Brief fade-out pause before next step
           if (i < p.narration.length - 1) {
-            await new Promise((r) => setTimeout(r, 220));
+            await new Promise((r) => setTimeout(r, 120));
           }
         }
         if (!abortRef.current) {
-          // Final reveal — clear any transient marker, then draw entry/sl/tp together (persistent).
-          htfRef.current?.clearTransient();
-          ltfRef.current?.clearTransient();
           setActiveTf("ltf");
-          for (const m of p.markings) {
-            if (m.type === "entry" || m.type === "sl" || m.type === "tp") {
-              try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("final marking failed", e); }
-            }
-          }
-          const entry = p.markings.find((m) => m.type === "entry");
           if (entry) {
             try {
               ltfRef.current?.panToMarking(entry);
               ltfRef.current?.focusMarking(entry);
             } catch (e) { console.warn("entry focus failed", e); }
           }
-          await speakWait(p.trade.summary);
           const hasLevels =
             Number.isFinite(p.trade.entry) && Number.isFinite(p.trade.sl) && Number.isFinite(p.trade.tp);
           if ((p.trade.confidence ?? 0) >= 70 && hasLevels && p.trade.direction !== "WAIT") {
