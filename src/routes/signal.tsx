@@ -342,17 +342,20 @@ function SignalPage() {
   const toggleChartFullscreen = useCallback(async () => {
     const el = chartStageRef.current;
     if (!el) return;
+    const goingFs = !document.fullscreenElement && !isChartFullscreen;
+    // Optimistically toggle CSS fullscreen so the chart fills the viewport
+    // even if the browser Fullscreen API is unavailable (iOS Safari, PWAs).
+    setIsChartFullscreen(goingFs);
     try {
-      if (!document.fullscreenElement) {
+      if (goingFs) {
         await el.requestFullscreen?.();
-      } else {
+      } else if (document.fullscreenElement) {
         await document.exitFullscreen?.();
       }
     } catch {
-      // Fallback: toggle CSS-only fullscreen if the Fullscreen API is unavailable
-      setIsChartFullscreen((v) => !v);
+      // Keep CSS-only fullscreen state
     }
-  }, []);
+  }, [isChartFullscreen]);
 
   useEffect(() => {
     const onFsChange = () => setIsChartFullscreen(!!document.fullscreenElement);
