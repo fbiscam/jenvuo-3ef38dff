@@ -369,27 +369,25 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (m.tf !== tf) return;
       const transient = !!opts?.transient;
 
-      // Box-style markings (FVG, OB, zone, breaker)
+      // Box-style markings (FVG, OB, zone, breaker) — hand-drawn pastel style with inner pill label
       if (m.type === "fvg" || m.type === "orderBlock" || m.type === "zone" || m.type === "breaker") {
         if (!overlayRef.current) return;
         const el = document.createElement("div");
-        let color: string;
-        let border: string;
+        let palette: { fill: string; border: string; tag: string };
         if (m.type === "fvg") {
-          color = m.kind === "bullish" ? COLORS.fvgBull : COLORS.fvgBear;
-          border = m.kind === "bullish" ? "#22c55e" : "#ef4444";
+          palette = m.kind === "bullish" ? COLORS.fvgBull : COLORS.fvgBear;
         } else if (m.type === "orderBlock") {
-          color = m.kind === "demand" ? COLORS.obDemand : COLORS.obSupply;
-          border = m.kind === "demand" ? "#3b82f6" : "#f472b6";
+          palette = m.kind === "demand" ? COLORS.obDemand : COLORS.obSupply;
         } else if (m.type === "zone") {
-          color = m.kind === "demand" ? COLORS.zoneDemand : COLORS.zoneSupply;
-          border = m.kind === "demand" ? "#10b981" : "#f43f5e";
+          palette = m.kind === "demand" ? COLORS.zoneDemand : COLORS.zoneSupply;
         } else {
-          color = m.kind === "bullish" ? COLORS.breakerBull : COLORS.breakerBear;
-          border = m.kind === "bullish" ? "#14b8a6" : "#d946ef";
+          palette = m.kind === "bullish" ? COLORS.breakerBull : COLORS.breakerBear;
         }
-        el.style.cssText = `position:absolute;background:${color};border:1px dashed ${border};border-radius:3px;pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:10px;color:${dark ? "#fff" : "#000"};padding:2px 4px;font-weight:600;`;
-        el.textContent = m.label;
+        el.style.cssText = `position:absolute;background:${palette.fill};border:1px solid ${palette.border};border-radius:2px;pointer-events:none;opacity:0;transition:opacity 500ms ease;overflow:hidden;`;
+        const pill = document.createElement("span");
+        pill.style.cssText = `position:absolute;top:2px;left:2px;font-size:9px;font-weight:700;letter-spacing:0.06em;padding:1px 5px;border-radius:3px;background:${palette.border};color:#fff;line-height:1.2;font-family:'Google Sans',system-ui,sans-serif;`;
+        pill.textContent = palette.tag;
+        el.appendChild(pill);
         overlayRef.current.appendChild(el);
         boxesRef.current.push({ marking: m, el, transient });
         (chart as any).__redrawBoxes?.();
@@ -397,18 +395,22 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         return;
       }
 
-      // Full-width zones (Premium/Discount/OTE)
+      // Full-width zones (Premium/Discount/OTE) — faint band + vertical right ribbon label
       if (m.type === "premiumZone" || m.type === "discountZone" || m.type === "oteZone") {
         if (!overlayRef.current) return;
         const el = document.createElement("div");
-        const color =
+        const fill =
           m.type === "premiumZone" ? COLORS.premium :
           m.type === "discountZone" ? COLORS.discount : COLORS.ote;
         const border =
-          m.type === "premiumZone" ? "rgba(244,63,94,0.4)" :
-          m.type === "discountZone" ? "rgba(16,185,129,0.4)" : "rgba(234,179,8,0.6)";
-        el.style.cssText = `position:absolute;background:${color};border-top:1px dashed ${border};border-bottom:1px dashed ${border};pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:9px;color:${dark ? "#fff" : "#000"};padding:1px 6px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;`;
-        el.textContent = m.label;
+          m.type === "premiumZone" ? COLORS.premiumBorder :
+          m.type === "discountZone" ? COLORS.discountBorder : COLORS.oteBorder;
+        const tag = m.type === "premiumZone" ? "PREMIUM" : m.type === "discountZone" ? "DISCOUNT" : "OTE";
+        el.style.cssText = `position:absolute;background:${fill};border-top:1px dashed ${border};border-bottom:1px dashed ${border};pointer-events:none;opacity:0;transition:opacity 600ms ease;`;
+        const ribbon = document.createElement("span");
+        ribbon.style.cssText = `position:absolute;right:0;top:50%;transform:translate(0,-50%) rotate(-90deg);transform-origin:right center;font-size:9px;font-weight:800;letter-spacing:0.18em;color:#fff;background:${border};padding:2px 8px;border-radius:3px;font-family:'Google Sans',system-ui,sans-serif;white-space:nowrap;`;
+        ribbon.textContent = tag;
+        el.appendChild(ribbon);
         overlayRef.current.appendChild(el);
         boxesRef.current.push({ marking: m, el, transient });
         (chart as any).__redrawBoxes?.();
