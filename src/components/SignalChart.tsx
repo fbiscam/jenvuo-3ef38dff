@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useRef, forwardRef } from "react";
+import { useEffect, useImperativeHandle, useRef, forwardRef, useState, useCallback } from "react";
 import {
   createChart,
   CandlestickSeries,
@@ -13,6 +13,16 @@ import {
   LineStyle,
 } from "lightweight-charts";
 import type { CandleDTO, Marking } from "@/lib/gold-analysis.functions";
+import {
+  MousePointer2,
+  Minus,
+  TrendingUp,
+  Square,
+  Type as TypeIcon,
+  Ruler,
+  Eraser,
+  Trash2,
+} from "lucide-react";
 
 export type SignalChartHandle = {
   drawMarking: (m: Marking, opts?: { transient?: boolean }) => void;
@@ -58,6 +68,20 @@ const COLORS = {
   tp: "#059669",
 };
 
+// ---- Manual drawing types ----
+type DrawTool = "cursor" | "hline" | "trend" | "rect" | "fib" | "measure" | "text" | "erase";
+type Anchor = { time: number; price: number };
+type UserDrawing =
+  | { id: string; type: "hline"; a: Anchor; color: string }
+  | { id: string; type: "trend"; a: Anchor; b: Anchor; color: string }
+  | { id: string; type: "rect"; a: Anchor; b: Anchor; color: string }
+  | { id: string; type: "fib"; a: Anchor; b: Anchor; color: string }
+  | { id: string; type: "measure"; a: Anchor; b: Anchor; color: string }
+  | { id: string; type: "text"; a: Anchor; text: string; color: string };
+
+const FIB_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
+const TOOL_COLOR = "#2563eb";
+
 const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   { candles, tf, dark, title },
   ref,
@@ -78,6 +102,234 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   const liveBarRef = useRef<{ time: number; open: number; high: number; low: number; close: number } | null>(null);
   const bucketSecRef = useRef<number>(60);
   const lastPriceLineRef = useRef<IPriceLine | null>(null);
+
+  // ---- Manual drawing state ----
+  const drawSvgRef = useRef<SVGSVGElement>(null);
+  const drawingsRef = useRef<UserDrawing[]>([]);
+  const [tool, setTool] = useState<DrawTool>("cursor");
+  const toolRef = useRef<DrawTool>("cursor");
+  useEffect(() => { toolRef.current = tool; }, [tool]);
+  const pendingRef = useRef<Anchor | null>(null);
+  const previewRef = useRef<{ x: number; y: number } | null>(null);
+  const [, forceTick] = useState(0);
+  const rerender = useCallback(() => forceTick((v) => v + 1), []);
+
+  const anchorFromEvent = useCallback((ev: PointerEvent | React.PointerEvent): Anchor | null => {
+    const chart = chartRef.current;
+    const s = seriesRef.current;
+    const svg = drawSvgRef.current;
+    if (!chart || !s || !svg) return null;
+    const rect = svg.getBoundingClientRect();
+    const x = (ev as PointerEvent).clientX - rect.left;
+    const y = (ev as PointerEvent).clientY - rect.top;
+    const t = chart.timeScale().coordinateToTime(x);
+    const p = s.coordinateToPrice(y);
+    if (t == null || p == null) return null;
+    return { time: Number(t), price: Number(p) };
+  }, []);
+
+  const redrawUserDrawings = useCallback(() => {
+    const svg = drawSvgRef.current;
+    const chart = chartRef.current;
+    const s = seriesRef.current;
+    if (!svg || !chart || !s) return;
+    const ts = chart.timeScale();
+    const w = svg.clientWidth;
+    const h = svg.clientHeight;
+    const NS = "http://www.w3.org/2000/svg";
+    // clear
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    const px = (a: Anchor) => {
+      const x = ts.timeToCoordinate(a.time as Time);
+      const y = s.priceToCoordinate(a.price);
+      return { x: x == null ? null : (x as unknown as number), y: y == null ? null : (y as number) };
+    };
+    for (const d of drawingsRef.current) {
+      if (d.type === "hline") {
+        const p = px(d.a);
+        if (p.y == null) continue;
+        const line = document.createElementNS(NS, "line");
+        line.setAttribute("x1", "0"); line.setAttribute("x2", String(w));
+        line.setAttribute("y1", String(p.y)); line.setAttribute("y2", String(p.y));
+        line.setAttribute("stroke", d.color); line.setAttribute("stroke-width", "1.4");
+        line.setAttribute("stroke-dasharray", "6 4");
+        svg.appendChild(line);
+        const tag = document.createElementNS(NS, "rect");
+        const label = d.a.price.toFixed(2);
+        tag.setAttribute("x", String(w - 62)); tag.setAttribute("y", String(p.y - 9));
+        tag.setAttribute("width", "58"); tag.setAttribute("height", "18");
+        tag.setAttribute("rx", "3"); tag.setAttribute("fill", d.color);
+        svg.appendChild(tag);
+        const txt = document.createElementNS(NS, "text");
+        txt.setAttribute("x", String(w - 33)); txt.setAttribute("y", String(p.y + 4));
+        txt.setAttribute("text-anchor", "middle"); txt.setAttribute("fill", "#fff");
+        txt.setAttribute("font-size", "10"); txt.setAttribute("font-family", "Google Sans, system-ui, sans-serif");
+        txt.setAttribute("font-weight", "700");
+        txt.textContent = label;
+        svg.appendChild(txt);
+      } else if (d.type === "trend" || d.type === "measure") {
+        const a = px(d.a); const b = px(d.b);
+        if (a.x == null || a.y == null || b.x == null || b.y == null) continue;
+        const line = document.createElementNS(NS, "line");
+        line.setAttribute("x1", String(a.x)); line.setAttribute("y1", String(a.y));
+        line.setAttribute("x2", String(b.x)); line.setAttribute("y2", String(b.y));
+        line.setAttribute("stroke", d.color); line.setAttribute("stroke-width", "1.6");
+        line.setAttribute("stroke-linecap", "round");
+        svg.appendChild(line);
+        // endpoints
+        for (const p of [a, b]) {
+          const c = document.createElementNS(NS, "circle");
+          c.setAttribute("cx", String(p.x)); c.setAttribute("cy", String(p.y));
+          c.setAttribute("r", "3"); c.setAttribute("fill", "#fff");
+          c.setAttribute("stroke", d.color); c.setAttribute("stroke-width", "1.4");
+          svg.appendChild(c);
+        }
+        if (d.type === "measure") {
+          const diff = d.b.price - d.a.price;
+          const pctText = d.a.price !== 0 ? ((diff / d.a.price) * 100).toFixed(2) + "%" : "";
+          const label = `${diff >= 0 ? "+" : ""}${diff.toFixed(2)}  ${pctText}`;
+          const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2 - 14;
+          const bg = document.createElementNS(NS, "rect");
+          const est = label.length * 6.2 + 16;
+          bg.setAttribute("x", String(mx - est / 2)); bg.setAttribute("y", String(my - 11));
+          bg.setAttribute("width", String(est)); bg.setAttribute("height", "18");
+          bg.setAttribute("rx", "4"); bg.setAttribute("fill", diff >= 0 ? "#16a34a" : "#dc2626");
+          svg.appendChild(bg);
+          const t = document.createElementNS(NS, "text");
+          t.setAttribute("x", String(mx)); t.setAttribute("y", String(my + 3));
+          t.setAttribute("text-anchor", "middle"); t.setAttribute("fill", "#fff");
+          t.setAttribute("font-size", "10"); t.setAttribute("font-weight", "700");
+          t.setAttribute("font-family", "Google Sans, system-ui, sans-serif");
+          t.textContent = label;
+          svg.appendChild(t);
+        }
+      } else if (d.type === "rect") {
+        const a = px(d.a); const b = px(d.b);
+        if (a.x == null || a.y == null || b.x == null || b.y == null) continue;
+        const r = document.createElementNS(NS, "rect");
+        const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y);
+        const width = Math.abs(b.x - a.x), height = Math.abs(b.y - a.y);
+        r.setAttribute("x", String(x)); r.setAttribute("y", String(y));
+        r.setAttribute("width", String(width)); r.setAttribute("height", String(height));
+        r.setAttribute("fill", d.color + "22");
+        r.setAttribute("stroke", d.color); r.setAttribute("stroke-width", "1.2");
+        svg.appendChild(r);
+      } else if (d.type === "fib") {
+        const a = px(d.a); const b = px(d.b);
+        if (a.x == null || a.y == null || b.x == null || b.y == null) continue;
+        const x1 = Math.min(a.x, b.x), x2 = Math.max(a.x, b.x);
+        const priceHi = Math.max(d.a.price, d.b.price);
+        const priceLo = Math.min(d.a.price, d.b.price);
+        for (const lvl of FIB_LEVELS) {
+          const price = priceHi - (priceHi - priceLo) * lvl;
+          const y = s.priceToCoordinate(price);
+          if (y == null) continue;
+          const ln = document.createElementNS(NS, "line");
+          ln.setAttribute("x1", String(x1)); ln.setAttribute("x2", String(x2));
+          ln.setAttribute("y1", String(y)); ln.setAttribute("y2", String(y));
+          ln.setAttribute("stroke", d.color); ln.setAttribute("stroke-width", "1");
+          ln.setAttribute("stroke-dasharray", lvl === 0 || lvl === 1 ? "0" : "3 3");
+          ln.setAttribute("opacity", "0.85");
+          svg.appendChild(ln);
+          const t = document.createElementNS(NS, "text");
+          t.setAttribute("x", String(x1 + 4)); t.setAttribute("y", String((y as number) - 2));
+          t.setAttribute("fill", d.color); t.setAttribute("font-size", "9");
+          t.setAttribute("font-family", "Google Sans, system-ui, sans-serif");
+          t.setAttribute("font-weight", "600");
+          t.textContent = `${(lvl * 100).toFixed(1)}%  ${price.toFixed(2)}`;
+          svg.appendChild(t);
+        }
+      } else if (d.type === "text") {
+        const p = px(d.a);
+        if (p.x == null || p.y == null) continue;
+        const t = document.createElementNS(NS, "text");
+        t.setAttribute("x", String(p.x)); t.setAttribute("y", String(p.y));
+        t.setAttribute("fill", d.color); t.setAttribute("font-size", "12");
+        t.setAttribute("font-family", "Google Sans, system-ui, sans-serif");
+        t.setAttribute("font-weight", "600");
+        t.textContent = d.text;
+        svg.appendChild(t);
+      }
+    }
+    // preview stroke while placing second point
+    const pending = pendingRef.current;
+    const preview = previewRef.current;
+    const t = toolRef.current;
+    if (pending && preview && (t === "trend" || t === "rect" || t === "fib" || t === "measure")) {
+      const a = px(pending);
+      if (a.x != null && a.y != null) {
+        if (t === "rect") {
+          const r = document.createElementNS(NS, "rect");
+          const x = Math.min(a.x, preview.x), y = Math.min(a.y, preview.y);
+          const width = Math.abs(preview.x - a.x), height = Math.abs(preview.y - a.y);
+          r.setAttribute("x", String(x)); r.setAttribute("y", String(y));
+          r.setAttribute("width", String(width)); r.setAttribute("height", String(height));
+          r.setAttribute("fill", TOOL_COLOR + "18");
+          r.setAttribute("stroke", TOOL_COLOR); r.setAttribute("stroke-width", "1");
+          r.setAttribute("stroke-dasharray", "4 3");
+          svg.appendChild(r);
+        } else {
+          const ln = document.createElementNS(NS, "line");
+          ln.setAttribute("x1", String(a.x)); ln.setAttribute("y1", String(a.y));
+          ln.setAttribute("x2", String(preview.x)); ln.setAttribute("y2", String(preview.y));
+          ln.setAttribute("stroke", TOOL_COLOR); ln.setAttribute("stroke-width", "1.2");
+          ln.setAttribute("stroke-dasharray", "4 3");
+          svg.appendChild(ln);
+        }
+      }
+    }
+  }, []);
+
+  const hitTest = useCallback((x: number, y: number): string | null => {
+    const chart = chartRef.current;
+    const s = seriesRef.current;
+    if (!chart || !s) return null;
+    const ts = chart.timeScale();
+    const near = 6;
+    const distToSeg = (px: number, py: number, x1: number, y1: number, x2: number, y2: number) => {
+      const dx = x2 - x1, dy = y2 - y1;
+      const len2 = dx * dx + dy * dy;
+      if (len2 === 0) return Math.hypot(px - x1, py - y1);
+      let t = ((px - x1) * dx + (py - y1) * dy) / len2;
+      t = Math.max(0, Math.min(1, t));
+      return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+    };
+    for (let i = drawingsRef.current.length - 1; i >= 0; i--) {
+      const d = drawingsRef.current[i];
+      if (d.type === "hline") {
+        const yy = s.priceToCoordinate(d.a.price);
+        if (yy != null && Math.abs(y - (yy as number)) <= near) return d.id;
+      } else if (d.type === "trend" || d.type === "measure" || d.type === "fib") {
+        const ax = ts.timeToCoordinate(d.a.time as Time);
+        const ay = s.priceToCoordinate(d.a.price);
+        const bx = ts.timeToCoordinate(d.b.time as Time);
+        const by = s.priceToCoordinate(d.b.price);
+        if (ax == null || ay == null || bx == null || by == null) continue;
+        if (distToSeg(x, y, ax as unknown as number, ay as number, bx as unknown as number, by as number) <= near) return d.id;
+      } else if (d.type === "rect") {
+        const ax = ts.timeToCoordinate(d.a.time as Time);
+        const ay = s.priceToCoordinate(d.a.price);
+        const bx = ts.timeToCoordinate(d.b.time as Time);
+        const by = s.priceToCoordinate(d.b.price);
+        if (ax == null || ay == null || bx == null || by == null) continue;
+        const x1 = Math.min(ax as unknown as number, bx as unknown as number);
+        const x2 = Math.max(ax as unknown as number, bx as unknown as number);
+        const y1 = Math.min(ay as number, by as number);
+        const y2 = Math.max(ay as number, by as number);
+        // edges
+        if (Math.abs(y - y1) <= near && x >= x1 - near && x <= x2 + near) return d.id;
+        if (Math.abs(y - y2) <= near && x >= x1 - near && x <= x2 + near) return d.id;
+        if (Math.abs(x - x1) <= near && y >= y1 - near && y <= y2 + near) return d.id;
+        if (Math.abs(x - x2) <= near && y >= y1 - near && y <= y2 + near) return d.id;
+      } else if (d.type === "text") {
+        const ax = ts.timeToCoordinate(d.a.time as Time);
+        const ay = s.priceToCoordinate(d.a.price);
+        if (ax == null || ay == null) continue;
+        if (Math.abs(x - (ax as unknown as number)) <= 40 && Math.abs(y - (ay as number)) <= 12) return d.id;
+      }
+    }
+    return null;
+  }, []);
 
 
   useEffect(() => {
@@ -169,6 +421,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         lb.el.style.top = `${Math.max(2, y - 9)}px`;
         lb.el.style.right = `4px`;
       }
+      redrawUserDrawings();
     };
     chart.timeScale().subscribeVisibleTimeRangeChange(redrawBoxes);
     chart.subscribeCrosshairMove(redrawBoxes);
@@ -401,70 +654,156 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         return;
       }
 
-      // Line markings (liquidity, EQH/EQL, BOS/CHOCH, entry/sl/tp)
-      let color = COLORS.entry;
-      let style: LineStyle = LineStyle.Solid;
-      let price = 0;
-      let lineWidth: 1 | 2 | 3 | 4 = 2;
-      let pillText = m.label;
-      if (m.type === "liquidity") {
-        price = m.price;
-        color = m.side === "buy" ? COLORS.liqBuy : COLORS.liqSell;
-        style = LineStyle.Dashed;
-        pillText = m.side === "buy" ? "BSL" : "SSL";
-      } else if (m.type === "eqh" || m.type === "eql") {
-        price = m.price;
-        color = m.type === "eqh" ? COLORS.eqh : COLORS.eql;
-        style = LineStyle.Dotted;
-        lineWidth = 1;
-        pillText = m.type.toUpperCase();
-      } else if (m.type === "bos" || m.type === "choch") {
-        price = m.price;
-        color = m.kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
-        style = LineStyle.LargeDashed;
-        pillText = m.type === "bos" ? "BOS" : "CHoCH";
-        const time = Number(m.fromTime) as Time;
-        if (Number.isFinite(time as unknown as number)) {
-          markersRef.current.push({
-            time,
-            position: m.kind === "bullish" ? "belowBar" : "aboveBar",
-            color,
-            shape: m.kind === "bullish" ? "arrowUp" : "arrowDown",
-            text: pillText,
-          });
-          if (transient) transientMarkerKeysRef.current.add(`${time}:${pillText}`);
-          try { markersPluginRef.current?.setMarkers(markersRef.current); } catch {}
+      // BOS / CHoCH — short dashed segment across the break level + small chip label
+      if (m.type === "bos" || m.type === "choch") {
+        const price = (m as any).price as number;
+        const color = (m as any).kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
+        const line = s.createPriceLine({
+          price,
+          color,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dashed,
+          axisLabelVisible: false,
+          title: m.type.toUpperCase(),
+        });
+        linesRef.current.push({ line, transient });
+        // Right-edge label chip
+        if (overlayRef.current) {
+          const lbl = document.createElement("div");
+          lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:10px;background:${color};color:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);opacity:0;transition:opacity 400ms ease;white-space:nowrap;font-family:'Google Sans',system-ui,sans-serif;`;
+          lbl.textContent = m.type.toUpperCase();
+          overlayRef.current.appendChild(lbl);
+          labelsRef.current.push({ marking: m, price, color, el: lbl, transient });
+          (chart as any).__redrawBoxes?.();
+          requestAnimationFrame(() => { lbl.style.opacity = "1"; });
         }
-      } else if (m.type === "entry") {
-        price = m.price; color = COLORS.entry; lineWidth = 3;
-        pillText = `ENTRY @ ${price}`;
-      } else if (m.type === "sl") {
-        price = m.price; color = COLORS.sl; lineWidth = 3;
-        pillText = `SL @ ${price}`;
-      } else if (m.type === "tp") {
-        price = m.price; color = COLORS.tp; lineWidth = 3;
-        pillText = `TP @ ${price}`;
+        return;
       }
 
-      const line = s.createPriceLine({
-        price, color, lineWidth, lineStyle: style,
-        axisLabelVisible: false, title: "",
-      });
-      linesRef.current.push({ line, transient });
-
-      // Compact right-edge pill so every marking is named right on the chart.
-      if (overlayRef.current && Number.isFinite(price)) {
-        const lbl = document.createElement("div");
-        lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:10px;background:${color};color:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);opacity:0;transition:opacity 400ms ease;white-space:nowrap;font-family:'Google Sans',system-ui,sans-serif;`;
-        lbl.textContent = pillText;
+      // Liquidity / EQH / EQL / entry / sl / tp — dotted price line + floating pill label
+      const anyM: any = m;
+      if (typeof anyM.price === "number") {
+        let color = "#334155";
+        let label = m.type.toUpperCase();
+        if (m.type === "liquidity") {
+          color = anyM.kind === "buy" ? COLORS.liqBuy : COLORS.liqSell;
+          label = anyM.kind === "buy" ? "BSL" : "SSL";
+        } else if (m.type === "eqh") { color = COLORS.eqh; label = "EQH"; }
+        else if (m.type === "eql") { color = COLORS.eql; label = "EQL"; }
+        else if (m.type === "entry") { color = COLORS.entry; label = "ENTRY"; }
+        else if (m.type === "sl") { color = COLORS.sl; label = "SL"; }
+        else if (m.type === "tp") { color = COLORS.tp; label = "TP"; }
+        const line = s.createPriceLine({
+          price: anyM.price,
+          color,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dotted,
+          axisLabelVisible: true,
+          title: label,
+        });
+        linesRef.current.push({ line, transient });
+        if (overlayRef.current) {
+          const lbl = document.createElement("div");
+          lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:10px;background:${color};color:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);opacity:0;transition:opacity 400ms ease;white-space:nowrap;font-family:'Google Sans',system-ui,sans-serif;`;
+        lbl.textContent = label;
         overlayRef.current.appendChild(lbl);
-        labelsRef.current.push({ marking: m, price, color, el: lbl, transient });
+        labelsRef.current.push({ marking: m, price: anyM.price, color, el: lbl, transient });
         (chart as any).__redrawBoxes?.();
         requestAnimationFrame(() => { lbl.style.opacity = "1"; });
       }
+    }
     },
   }));
 
+  // ---- Pointer handlers for manual drawing ----
+  const onPointerDown = useCallback((ev: React.PointerEvent<SVGSVGElement>) => {
+    const t = toolRef.current;
+    if (t === "cursor") return;
+    const rect = drawSvgRef.current!.getBoundingClientRect();
+    const x = ev.clientX - rect.left, y = ev.clientY - rect.top;
+    if (t === "erase") {
+      const id = hitTest(x, y);
+      if (id) {
+        drawingsRef.current = drawingsRef.current.filter((d) => d.id !== id);
+        redrawUserDrawings();
+      }
+      return;
+    }
+    const anchor = anchorFromEvent(ev.nativeEvent);
+    if (!anchor) return;
+    const id = Math.random().toString(36).slice(2, 10);
+    if (t === "hline") {
+      drawingsRef.current.push({ id, type: "hline", a: anchor, color: TOOL_COLOR });
+      redrawUserDrawings();
+      return;
+    }
+    if (t === "text") {
+      const text = window.prompt("Note text:", "");
+      if (text && text.trim()) {
+        drawingsRef.current.push({ id, type: "text", a: anchor, text: text.trim(), color: "#111827" });
+        redrawUserDrawings();
+      }
+      return;
+    }
+    // Two-point tools — set first anchor, wait for second click
+    if (!pendingRef.current) {
+      pendingRef.current = anchor;
+      previewRef.current = { x, y };
+      redrawUserDrawings();
+    } else {
+      const a = pendingRef.current;
+      const b = anchor;
+      pendingRef.current = null;
+      previewRef.current = null;
+      if (t === "trend") drawingsRef.current.push({ id, type: "trend", a, b, color: TOOL_COLOR });
+      else if (t === "rect") drawingsRef.current.push({ id, type: "rect", a, b, color: TOOL_COLOR });
+      else if (t === "fib") drawingsRef.current.push({ id, type: "fib", a, b, color: "#a16207" });
+      else if (t === "measure") drawingsRef.current.push({ id, type: "measure", a, b, color: "#0ea5e9" });
+      redrawUserDrawings();
+    }
+  }, [anchorFromEvent, hitTest, redrawUserDrawings]);
+
+  const onPointerMove = useCallback((ev: React.PointerEvent<SVGSVGElement>) => {
+    if (!pendingRef.current) return;
+    const rect = drawSvgRef.current!.getBoundingClientRect();
+    previewRef.current = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+    redrawUserDrawings();
+  }, [redrawUserDrawings]);
+
+  const onPointerLeave = useCallback(() => {
+    // keep pending anchor but drop preview so nothing "drags" off-chart
+    if (pendingRef.current) {
+      previewRef.current = null;
+      redrawUserDrawings();
+    }
+  }, [redrawUserDrawings]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        pendingRef.current = null;
+        previewRef.current = null;
+        setTool("cursor");
+        redrawUserDrawings();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [redrawUserDrawings]);
+
+  const tools: { id: DrawTool; label: string; Icon: typeof MousePointer2 }[] = [
+    { id: "cursor",  label: "Cursor",         Icon: MousePointer2 },
+    { id: "hline",   label: "Horizontal Line",Icon: Minus },
+    { id: "trend",   label: "Trend Line",     Icon: TrendingUp },
+    { id: "rect",    label: "Rectangle",      Icon: Square },
+    { id: "fib",     label: "Fibonacci",      Icon: Ruler },
+    { id: "measure", label: "Measure",        Icon: Ruler },
+    { id: "text",    label: "Text Note",      Icon: TypeIcon },
+    { id: "erase",   label: "Erase",          Icon: Eraser },
+  ];
+
+  const drawingActive = tool !== "cursor";
+  rerender; // keep referenced
 
   return (
     <div className="relative w-full h-full">
@@ -473,6 +812,57 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       </div>
       <div ref={containerRef} className="absolute inset-0" />
       <div ref={overlayRef} className="absolute inset-0 pointer-events-none overflow-hidden" />
+      <svg
+        ref={drawSvgRef}
+        className="absolute inset-0"
+        style={{
+          pointerEvents: drawingActive ? "auto" : "none",
+          cursor: tool === "cursor" ? "default" : tool === "erase" ? "not-allowed" : "crosshair",
+        }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerLeave={onPointerLeave}
+      />
+      {/* Drawing toolbar */}
+      <div className="absolute top-10 left-2 z-30 flex flex-col gap-1 rounded-xl border border-zinc-200/70 bg-white/95 backdrop-blur px-1 py-1 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.12)]">
+        {tools.map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            type="button"
+            title={label}
+            aria-label={label}
+            onClick={() => {
+              setTool(id);
+              pendingRef.current = null;
+              previewRef.current = null;
+              redrawUserDrawings();
+            }}
+            className={
+              "h-7 w-7 inline-flex items-center justify-center rounded-md transition " +
+              (tool === id
+                ? "bg-zinc-900 text-white"
+                : "text-zinc-600 hover:bg-zinc-100")
+            }
+          >
+            <Icon className="h-3.5 w-3.5" />
+          </button>
+        ))}
+        <div className="my-0.5 h-px w-full bg-zinc-200" />
+        <button
+          type="button"
+          title="Clear all drawings"
+          aria-label="Clear all drawings"
+          onClick={() => {
+            drawingsRef.current = [];
+            pendingRef.current = null;
+            previewRef.current = null;
+            redrawUserDrawings();
+          }}
+          className="h-7 w-7 inline-flex items-center justify-center rounded-md text-red-600 hover:bg-red-50"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      </div>
     </div>
   );
 });
