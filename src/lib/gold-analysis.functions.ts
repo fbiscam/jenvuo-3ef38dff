@@ -2180,8 +2180,11 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       const timeMax = maxTime + 86400;
       for (const k of ["fromTime", "toTime"]) {
         if (m[k] != null) {
-          const t = Number(m[k]);
-          if (!Number.isFinite(t) || t < minTime || t > timeMax) return false;
+          let t = Number(m[k]);
+          if (!Number.isFinite(t)) return false;
+          // Coerce ms → s if AI accidentally sent millisecond timestamps.
+          if (t > 1e12) { t = Math.floor(t / 1000); m[k] = t; }
+          if (t < minTime || t > timeMax) return false;
         }
       }
       for (const k of ["price", "priceLow", "priceHigh"]) {
