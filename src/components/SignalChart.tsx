@@ -411,6 +411,61 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       const containerWidth = overlayRef.current.clientWidth;
       for (const b of boxesRef.current) {
         const m: any = b.marking;
+
+        // Sweep: single point (time,price) — pin a small chip + wick arrow near that candle.
+        if (m.type === "sweep") {
+          const y = seriesRef.current.priceToCoordinate(m.price);
+          const x = ts.timeToCoordinate(Number(m.time) as Time);
+          if (y == null || x == null) { b.el.style.display = "none"; continue; }
+          b.el.style.display = "block";
+          b.el.style.left = `${(x as unknown as number) - 44}px`;
+          b.el.style.top = `${(y as unknown as number) - 28}px`;
+          b.el.style.width = `auto`;
+          b.el.style.height = `auto`;
+          continue;
+        }
+
+        // Trendline: an SVG line from (fromTime,fromPrice) → (toTime,toPrice) with arrowhead + rotated label.
+        if (m.type === "trendline") {
+          const x1c = ts.timeToCoordinate(Number(m.fromTime) as Time);
+          const x2c = ts.timeToCoordinate(Number(m.toTime) as Time);
+          const y1c = seriesRef.current.priceToCoordinate(Number(m.fromPrice));
+          const y2c = seriesRef.current.priceToCoordinate(Number(m.toPrice));
+          if (x1c == null || x2c == null || y1c == null || y2c == null) { b.el.style.display = "none"; continue; }
+          const x1 = x1c as unknown as number, x2 = x2c as unknown as number;
+          const y1 = y1c as unknown as number, y2 = y2c as unknown as number;
+          const left = Math.min(x1, x2) - 6, top = Math.min(y1, y2) - 6;
+          const w = Math.max(4, Math.abs(x2 - x1)) + 12, h = Math.max(4, Math.abs(y2 - y1)) + 12;
+          b.el.style.display = "block";
+          b.el.style.left = `${left}px`;
+          b.el.style.top = `${top}px`;
+          b.el.style.width = `${w}px`;
+          b.el.style.height = `${h}px`;
+          const svg = b.el.querySelector("svg") as SVGSVGElement | null;
+          const label = b.el.querySelector(".jv-tl-label") as HTMLElement | null;
+          if (svg) {
+            svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+            svg.setAttribute("width", `${w}`);
+            svg.setAttribute("height", `${h}`);
+            const line = svg.querySelector("line") as SVGLineElement | null;
+            if (line) {
+              line.setAttribute("x1", `${x1 - left}`);
+              line.setAttribute("y1", `${y1 - top}`);
+              line.setAttribute("x2", `${x2 - left}`);
+              line.setAttribute("y2", `${y2 - top}`);
+            }
+          }
+          if (label) {
+            const midX = (x1 + x2) / 2 - left;
+            const midY = (y1 + y2) / 2 - top;
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            label.style.left = `${midX}px`;
+            label.style.top = `${midY}px`;
+            label.style.transform = `translate(-50%,-50%) rotate(${angle}deg)`;
+          }
+          continue;
+        }
+
         const y1 = seriesRef.current.priceToCoordinate(m.priceHigh);
         const y2 = seriesRef.current.priceToCoordinate(m.priceLow);
         if (y1 == null || y2 == null) { b.el.style.display = "none"; continue; }
@@ -716,7 +771,80 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         return;
       }
 
-      // Liquidity / EQH / EQL / entry / sl / tp — dotted price line + floating pill label
+      // Reversal Zone — split two-tone box (green upper half / red lower for bullish, mirrored for bearish)
+      if (m.type === "reversalZone") {
+        if (!overlayRef.current) return;
+        const el = document.createElement("div");
+        const isBull = (m as any).kind === "bullish";
+        const upper = isBull ? "rgba(34,197,94,0.20)" : "rgba(239,68,68,0.20)";
+        const lower = isBull ? "rgba(239,68,68,0.16)" : "rgba(34,197,94,0.16)";
+        const border = isBull ? "#16a34a" : "#dc2626";
+        el.style.cssText = `position:absolute;border:1.5px solid ${border};border-radius:3px;pointer-events:none;opacity:0;transition:opacity 500ms ease;overflow:hidden;background:linear-gradient(to bottom, ${upper} 0%, ${upper} 50%, ${lower} 50%, ${lower} 100%);box-shadow:0 0 0 1px rgba(255,255,255,0.5) inset;`;
+        const pill = document.createElement("span");
+        pill.style.cssText = `position:absolute;top:4px;right:4px;font-size:10px;font-weight:800;letter-spacing:0.08em;padding:2px 8px;border-radius:4px;background:${border};color:#fff;line-height:1.2;font-family:'Google Sans',system-ui,sans-serif;box-shadow:0 1px 2px rgba(0,0,0,0.2);white-space:nowrap;`;
+        pill.textContent = "REVERSAL";
+        el.appendChild(pill);
+        overlayRef.current.appendChild(el);
+        boxesRef.current.push({ marking: m, el, transient });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
+        return;
+      }
+
+      // Sweep — small chip pinned above/below the wick that grabbed liquidity, with a thin down/up arrow
+      if (m.type === "sweep") {
+        if (!overlayRef.current) return;
+        const kind = (m as any).kind as "buy" | "sell";
+        const color = kind === "buy" ? COLORS.liqBuy : COLORS.liqSell;
+        const label = kind === "buy" ? "BSL SWEEP" : "SSL SWEEP";
+        const arrow = kind === "buy" ? "↓" : "↑";
+        const el = document.createElement("div");
+        el.style.cssText = `position:absolute;pointer-events:none;opacity:0;transition:opacity 400ms ease;display:flex;align-items:center;gap:4px;font-family:'Google Sans',system-ui,sans-serif;`;
+        const chip = document.createElement("span");
+        chip.style.cssText = `font-size:10px;font-weight:800;letter-spacing:0.05em;padding:2px 7px;border-radius:10px;background:${color};color:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);white-space:nowrap;`;
+        chip.textContent = `${arrow} ${label}`;
+        el.appendChild(chip);
+        overlayRef.current.appendChild(el);
+        boxesRef.current.push({ marking: m, el, transient });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
+        return;
+      }
+
+      // Trendline — angled arrow with rotated label like "UPTREND"/"DOWNTREND"
+      if (m.type === "trendline") {
+        if (!overlayRef.current) return;
+        const kind = (m as any).kind as "up" | "down";
+        const color = kind === "up" ? COLORS.bullLine : COLORS.bearLine;
+        const el = document.createElement("div");
+        el.style.cssText = `position:absolute;pointer-events:none;opacity:0;transition:opacity 500ms ease;`;
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("style", "position:absolute;inset:0;overflow:visible;");
+        const markerId = `jv-arrow-${Math.random().toString(36).slice(2, 8)}`;
+        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+        defs.innerHTML = `<marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${color}"/></marker>`;
+        svg.appendChild(defs);
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("stroke", color);
+        line.setAttribute("stroke-width", "2");
+        line.setAttribute("stroke-linecap", "round");
+        line.setAttribute("marker-end", `url(#${markerId})`);
+        svg.appendChild(line);
+        el.appendChild(svg);
+        const label = document.createElement("span");
+        label.className = "jv-tl-label";
+        const text = ((m as any).label || (kind === "up" ? "UPTREND" : "DOWNTREND")).toUpperCase();
+        label.style.cssText = `position:absolute;font-size:10px;font-weight:800;letter-spacing:0.14em;color:${color};background:#fff;padding:2px 7px;border-radius:3px;border:1px solid ${color};font-family:'Google Sans',system-ui,sans-serif;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,0.08);`;
+        label.textContent = text;
+        el.appendChild(label);
+        overlayRef.current.appendChild(el);
+        boxesRef.current.push({ marking: m, el, transient });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
+        return;
+      }
+
+
       const anyM: any = m;
       if (typeof anyM.price === "number") {
         let color = "#334155";
