@@ -2785,12 +2785,16 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
             const ageMin = (Date.now() - new Date(mem.updated_at as string).getTime()) / 60000;
             const prev = Number(mem.smoothed_conf);
             if (Number.isFinite(prev) && ageMin <= 15) {
-              // EMA: weight previous higher to damp jitter
-              smoothed = Math.round(prev * 0.55 + rawConf * 0.45);
-              // Cap drop to 8 points within the window
-              if (smoothed < prev - 8) smoothed = prev - 8;
-              // Cap rise to 10 points so pops also settle in
-              if (smoothed > prev + 10) smoothed = prev + 10;
+              const gap = Math.abs(rawConf - prev);
+              if (gap <= 5) {
+                // Small gap — keep previous confidence, ignore minor jitter.
+                smoothed = prev;
+              } else {
+                // Large gap — allow movement but cap step size so it settles gradually.
+                const maxStep = 10;
+                if (rawConf > prev) smoothed = Math.min(rawConf, prev + maxStep);
+                else smoothed = Math.max(rawConf, prev - maxStep);
+              }
               smoothed = Math.min(95, Math.max(0, smoothed));
             }
           }
