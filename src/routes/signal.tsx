@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2, MoreVertical, Volume2, VolumeX } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2, MoreVertical, Volume2, VolumeX, Maximize2, Minimize2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
@@ -336,6 +336,30 @@ function SignalPage() {
 
   const htfRef = useRef<SignalChartHandle>(null);
   const ltfRef = useRef<SignalChartHandle>(null);
+  const chartStageRef = useRef<HTMLDivElement>(null);
+  const [isChartFullscreen, setIsChartFullscreen] = useState(false);
+
+  const toggleChartFullscreen = useCallback(async () => {
+    const el = chartStageRef.current;
+    if (!el) return;
+    try {
+      if (!document.fullscreenElement) {
+        await el.requestFullscreen?.();
+      } else {
+        await document.exitFullscreen?.();
+      }
+    } catch {
+      // Fallback: toggle CSS-only fullscreen if the Fullscreen API is unavailable
+      setIsChartFullscreen((v) => !v);
+    }
+  }, []);
+
+  useEffect(() => {
+    const onFsChange = () => setIsChartFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => document.removeEventListener("fullscreenchange", onFsChange);
+  }, []);
+
   const abortRef = useRef(false);
   const feedScrollRef = useRef<HTMLDivElement>(null);
 
@@ -1413,10 +1437,24 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div className={cn(
-                  "rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)]",
-                  "h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
-                )}>
+                <div
+                  ref={chartStageRef}
+                  className={cn(
+                    "relative rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)]",
+                    isChartFullscreen
+                      ? "h-screen w-screen rounded-none border-0"
+                      : "h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
+                  )}>
+                  <button
+                    type="button"
+                    onClick={toggleChartFullscreen}
+                    className="absolute top-3 right-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 backdrop-blur border border-zinc-200 text-zinc-700 shadow-sm hover:bg-white hover:text-zinc-900 transition"
+                    title={isChartFullscreen ? "Exit fullscreen" : "Fullscreen chart"}
+                    aria-label={isChartFullscreen ? "Exit fullscreen" : "Fullscreen chart"}
+                  >
+                    {isChartFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  </button>
+
 
                   {plan ? (
                     <SignalChart
