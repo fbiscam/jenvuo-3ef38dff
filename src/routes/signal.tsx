@@ -1238,15 +1238,15 @@ function SignalPage() {
             <div className="px-4 sm:px-6 pt-3 pb-4 border-b border-zinc-100 bg-gradient-to-b from-zinc-50/60 to-white">
               <div className="rounded-2xl bg-white/90 backdrop-blur-xl border border-zinc-200/70 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-14px_rgba(16,24,40,0.12)] ring-1 ring-white/60 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-500 mr-1`}>
-                    MTF
+                  <span className="text-[13px] font-normal text-zinc-900 mr-1">
+                    MTF // Alignment
                   </span>
                   {plan.multiTf.map((b) => (
                     <TfPill key={b.tf} tfBias={b} />
                   ))}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+                  <span className="text-[13px] font-normal text-zinc-900">
                     {plan.alignmentLabel}
                   </span>
                   <div className="w-28 h-1.5 bg-gradient-to-r from-rose-100 via-zinc-100 to-emerald-100 rounded-full relative overflow-hidden">
