@@ -342,17 +342,20 @@ function SignalPage() {
   const toggleChartFullscreen = useCallback(async () => {
     const el = chartStageRef.current;
     if (!el) return;
+    const goingFs = !document.fullscreenElement && !isChartFullscreen;
+    // Optimistically toggle CSS fullscreen so the chart fills the viewport
+    // even if the browser Fullscreen API is unavailable (iOS Safari, PWAs).
+    setIsChartFullscreen(goingFs);
     try {
-      if (!document.fullscreenElement) {
+      if (goingFs) {
         await el.requestFullscreen?.();
-      } else {
+      } else if (document.fullscreenElement) {
         await document.exitFullscreen?.();
       }
     } catch {
-      // Fallback: toggle CSS-only fullscreen if the Fullscreen API is unavailable
-      setIsChartFullscreen((v) => !v);
+      // Keep CSS-only fullscreen state
     }
-  }, []);
+  }, [isChartFullscreen]);
 
   useEffect(() => {
     const onFsChange = () => setIsChartFullscreen(!!document.fullscreenElement);
@@ -1446,10 +1449,10 @@ function SignalPage() {
                 <div
                   ref={chartStageRef}
                   className={cn(
-                    "relative rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)]",
+                    "relative overflow-hidden bg-white",
                     isChartFullscreen
-                      ? "h-screen w-screen rounded-none border-0"
-                      : "h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
+                      ? "fixed inset-0 z-[9999] h-screen w-screen rounded-none border-0"
+                      : "rounded-2xl border border-zinc-200/60 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)] h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
                   )}>
                   <button
                     type="button"
