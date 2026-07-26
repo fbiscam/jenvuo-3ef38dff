@@ -33,26 +33,29 @@ type Props = {
 };
 
 const COLORS = {
-  fvgBull: "rgba(34,197,94,0.22)",
-  fvgBear: "rgba(239,68,68,0.22)",
-  obDemand: "rgba(59,130,246,0.28)",
-  obSupply: "rgba(244,114,182,0.28)",
-  zoneDemand: "rgba(16,185,129,0.18)",
-  zoneSupply: "rgba(244,63,94,0.18)",
-  premium: "rgba(244,63,94,0.08)",
-  discount: "rgba(16,185,129,0.08)",
-  ote: "rgba(234,179,8,0.20)",
-  breakerBull: "rgba(20,184,166,0.25)",
-  breakerBear: "rgba(217,70,239,0.25)",
-  bullLine: "#22c55e",
-  bearLine: "#ef4444",
-  liqBuy: "#fbbf24",
-  liqSell: "#f97316",
-  eqh: "#a855f7",
-  eql: "#a855f7",
-  entry: "#3b82f6",
-  sl: "#ef4444",
-  tp: "#10b981",
+  fvgBull:      { fill: "rgba(34,197,94,0.18)",  border: "#16a34a", tag: "FVG+" },
+  fvgBear:      { fill: "rgba(239,68,68,0.18)",  border: "#dc2626", tag: "FVG-" },
+  obDemand:     { fill: "rgba(59,130,246,0.20)", border: "#2563eb", tag: "OB+"  },
+  obSupply:     { fill: "rgba(244,114,182,0.22)",border: "#db2777", tag: "OB-"  },
+  zoneDemand:   { fill: "rgba(34,197,94,0.14)",  border: "#16a34a", tag: "DEMAND" },
+  zoneSupply:   { fill: "rgba(239,68,68,0.14)",  border: "#dc2626", tag: "SUPPLY" },
+  breakerBull:  { fill: "rgba(20,184,166,0.20)", border: "#0d9488", tag: "BRK+" },
+  breakerBear:  { fill: "rgba(217,70,239,0.20)", border: "#a21caf", tag: "BRK-" },
+  premium:  "rgba(244,63,94,0.06)",
+  discount: "rgba(16,185,129,0.06)",
+  ote:      "rgba(234,179,8,0.14)",
+  premiumBorder:  "#e11d48",
+  discountBorder: "#059669",
+  oteBorder:      "#ca8a04",
+  bullLine: "#16a34a",
+  bearLine: "#dc2626",
+  liqBuy: "#f59e0b",
+  liqSell: "#ea580c",
+  eqh: "#9333ea",
+  eql: "#9333ea",
+  entry: "#2563eb",
+  sl: "#dc2626",
+  tp: "#059669",
 };
 
 const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
@@ -139,14 +142,18 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         }
 
         const fromT = Number(m.fromTime);
-        const toT = Number(m.toTime);
-        if (!Number.isFinite(fromT) || !Number.isFinite(toT)) { b.el.style.display = "none"; continue; }
+        const toTRaw = Number(m.toTime);
+        if (!Number.isFinite(fromT) || !Number.isFinite(toTRaw)) { b.el.style.display = "none"; continue; }
+        // Extend the right edge ~8 bars forward so the zone reads as "live".
+        const toT = toTRaw + (bucketSecRef.current || 60) * 8;
         const x1 = ts.timeToCoordinate(fromT as Time);
-        const x2 = ts.timeToCoordinate(toT as Time);
-        if (x1 == null || x2 == null) { b.el.style.display = "none"; continue; }
+        const x2raw = ts.timeToCoordinate(toT as Time);
+        if (x1 == null) { b.el.style.display = "none"; continue; }
+        const x2 = (x2raw == null ? containerWidth : (x2raw as unknown as number));
+        const x1n = x1 as unknown as number;
         b.el.style.display = "block";
-        const left = Math.min(x1, x2);
-        const width = Math.max(2, Math.abs(x2 - x1));
+        const left = Math.min(x1n, x2);
+        const width = Math.max(2, Math.abs(x2 - x1n));
         const top = Math.min(y1, y2);
         const height = Math.max(2, Math.abs(y2 - y1));
         b.el.style.left = `${left}px`;
@@ -362,27 +369,25 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (m.tf !== tf) return;
       const transient = !!opts?.transient;
 
-      // Box-style markings (FVG, OB, zone, breaker)
+      // Box-style markings (FVG, OB, zone, breaker) — hand-drawn pastel style with inner pill label
       if (m.type === "fvg" || m.type === "orderBlock" || m.type === "zone" || m.type === "breaker") {
         if (!overlayRef.current) return;
         const el = document.createElement("div");
-        let color: string;
-        let border: string;
+        let palette: { fill: string; border: string; tag: string };
         if (m.type === "fvg") {
-          color = m.kind === "bullish" ? COLORS.fvgBull : COLORS.fvgBear;
-          border = m.kind === "bullish" ? "#22c55e" : "#ef4444";
+          palette = m.kind === "bullish" ? COLORS.fvgBull : COLORS.fvgBear;
         } else if (m.type === "orderBlock") {
-          color = m.kind === "demand" ? COLORS.obDemand : COLORS.obSupply;
-          border = m.kind === "demand" ? "#3b82f6" : "#f472b6";
+          palette = m.kind === "demand" ? COLORS.obDemand : COLORS.obSupply;
         } else if (m.type === "zone") {
-          color = m.kind === "demand" ? COLORS.zoneDemand : COLORS.zoneSupply;
-          border = m.kind === "demand" ? "#10b981" : "#f43f5e";
+          palette = m.kind === "demand" ? COLORS.zoneDemand : COLORS.zoneSupply;
         } else {
-          color = m.kind === "bullish" ? COLORS.breakerBull : COLORS.breakerBear;
-          border = m.kind === "bullish" ? "#14b8a6" : "#d946ef";
+          palette = m.kind === "bullish" ? COLORS.breakerBull : COLORS.breakerBear;
         }
-        el.style.cssText = `position:absolute;background:${color};border:1px dashed ${border};border-radius:3px;pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:10px;color:${dark ? "#fff" : "#000"};padding:2px 4px;font-weight:600;`;
-        el.textContent = m.label;
+        el.style.cssText = `position:absolute;background:${palette.fill};border:1px solid ${palette.border};border-radius:2px;pointer-events:none;opacity:0;transition:opacity 500ms ease;overflow:hidden;`;
+        const pill = document.createElement("span");
+        pill.style.cssText = `position:absolute;top:2px;left:2px;font-size:9px;font-weight:700;letter-spacing:0.06em;padding:1px 5px;border-radius:3px;background:${palette.border};color:#fff;line-height:1.2;font-family:'Google Sans',system-ui,sans-serif;`;
+        pill.textContent = palette.tag;
+        el.appendChild(pill);
         overlayRef.current.appendChild(el);
         boxesRef.current.push({ marking: m, el, transient });
         (chart as any).__redrawBoxes?.();
@@ -390,18 +395,22 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         return;
       }
 
-      // Full-width zones (Premium/Discount/OTE)
+      // Full-width zones (Premium/Discount/OTE) — faint band + vertical right ribbon label
       if (m.type === "premiumZone" || m.type === "discountZone" || m.type === "oteZone") {
         if (!overlayRef.current) return;
         const el = document.createElement("div");
-        const color =
+        const fill =
           m.type === "premiumZone" ? COLORS.premium :
           m.type === "discountZone" ? COLORS.discount : COLORS.ote;
         const border =
-          m.type === "premiumZone" ? "rgba(244,63,94,0.4)" :
-          m.type === "discountZone" ? "rgba(16,185,129,0.4)" : "rgba(234,179,8,0.6)";
-        el.style.cssText = `position:absolute;background:${color};border-top:1px dashed ${border};border-bottom:1px dashed ${border};pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:9px;color:${dark ? "#fff" : "#000"};padding:1px 6px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;`;
-        el.textContent = m.label;
+          m.type === "premiumZone" ? COLORS.premiumBorder :
+          m.type === "discountZone" ? COLORS.discountBorder : COLORS.oteBorder;
+        const tag = m.type === "premiumZone" ? "PREMIUM" : m.type === "discountZone" ? "DISCOUNT" : "OTE";
+        el.style.cssText = `position:absolute;background:${fill};border-top:1px dashed ${border};border-bottom:1px dashed ${border};pointer-events:none;opacity:0;transition:opacity 600ms ease;`;
+        const ribbon = document.createElement("span");
+        ribbon.style.cssText = `position:absolute;right:0;top:50%;transform:translate(0,-50%) rotate(-90deg);transform-origin:right center;font-size:9px;font-weight:800;letter-spacing:0.18em;color:#fff;background:${border};padding:2px 8px;border-radius:3px;font-family:'Google Sans',system-ui,sans-serif;white-space:nowrap;`;
+        ribbon.textContent = tag;
+        el.appendChild(ribbon);
         overlayRef.current.appendChild(el);
         boxesRef.current.push({ marking: m, el, transient });
         (chart as any).__redrawBoxes?.();
@@ -414,54 +423,57 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       let style: LineStyle = LineStyle.Solid;
       let price = 0;
       let lineWidth: 1 | 2 | 3 | 4 = 2;
-      const title = m.label;
+      let pillText = m.label;
       if (m.type === "liquidity") {
         price = m.price;
         color = m.side === "buy" ? COLORS.liqBuy : COLORS.liqSell;
         style = LineStyle.Dashed;
+        pillText = m.side === "buy" ? "BSL" : "SSL";
       } else if (m.type === "eqh" || m.type === "eql") {
         price = m.price;
         color = m.type === "eqh" ? COLORS.eqh : COLORS.eql;
         style = LineStyle.Dotted;
         lineWidth = 1;
+        pillText = m.type.toUpperCase();
       } else if (m.type === "bos" || m.type === "choch") {
         price = m.price;
         color = m.kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
         style = LineStyle.LargeDashed;
-        const text = m.type.toUpperCase();
+        pillText = m.type === "bos" ? "BOS" : "CHoCH";
         const time = Number(m.fromTime) as Time;
-        if (!Number.isFinite(time as unknown as number)) {
-          // skip marker if time is invalid, but still draw the price line below
-        } else {
+        if (Number.isFinite(time as unknown as number)) {
           markersRef.current.push({
             time,
             position: m.kind === "bullish" ? "belowBar" : "aboveBar",
             color,
             shape: m.kind === "bullish" ? "arrowUp" : "arrowDown",
-            text,
+            text: pillText,
           });
-          if (transient) transientMarkerKeysRef.current.add(`${time}:${text}`);
+          if (transient) transientMarkerKeysRef.current.add(`${time}:${pillText}`);
           try { markersPluginRef.current?.setMarkers(markersRef.current); } catch {}
         }
       } else if (m.type === "entry") {
         price = m.price; color = COLORS.entry; lineWidth = 3;
+        pillText = `ENTRY @ ${price}`;
       } else if (m.type === "sl") {
         price = m.price; color = COLORS.sl; lineWidth = 3;
+        pillText = `SL @ ${price}`;
       } else if (m.type === "tp") {
         price = m.price; color = COLORS.tp; lineWidth = 3;
+        pillText = `TP @ ${price}`;
       }
 
       const line = s.createPriceLine({
         price, color, lineWidth, lineStyle: style,
-        axisLabelVisible: true, title,
+        axisLabelVisible: false, title: "",
       });
       linesRef.current.push({ line, transient });
 
-      // Floating on-chart label so every marking is named right on the chart (like FVG/OB boxes).
+      // Compact right-edge pill so every marking is named right on the chart.
       if (overlayRef.current && Number.isFinite(price)) {
         const lbl = document.createElement("div");
-        lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.03em;padding:2px 6px;border-radius:3px;background:${color};color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.25);opacity:0;transition:opacity 400ms ease;white-space:nowrap;transform:translateY(-2px);`;
-        lbl.textContent = title;
+        lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:10px;background:${color};color:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);opacity:0;transition:opacity 400ms ease;white-space:nowrap;font-family:'Google Sans',system-ui,sans-serif;`;
+        lbl.textContent = pillText;
         overlayRef.current.appendChild(lbl);
         labelsRef.current.push({ marking: m, price, color, el: lbl, transient });
         (chart as any).__redrawBoxes?.();
