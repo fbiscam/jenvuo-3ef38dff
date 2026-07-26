@@ -2571,12 +2571,12 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         __planAllowsSenior = sub?.status === "active" && pid !== "free";
       } catch { __planAllowsSenior = false; __planId = "free"; }
     }
-    // Senior review re-enabled: acts as a 25-year veteran veto/downgrade layer.
-    // Runs whenever the rules engine produces a live BUY/SELL and the score
-    // is above SENIOR_REVIEW_MIN_RULE_SCORE (62). Failure soft-fails — the
-    // rules result still stands so a throttled AI provider never drops a signal.
-    __requiresSeniorReview =
-      built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
+    // Keep the visible chart/analysis fast and deterministic. Slow upstream
+    // model reviews were blocking the response, leaving users stuck on
+    // "Analyzing…" with no candles mounted. The rules engine remains the
+    // authority for ICT/SMC structure; model review is not required inline.
+    void SENIOR_REVIEW_MIN_RULE_SCORE;
+    __requiresSeniorReview = false;
 
     if (__requiresSeniorReview) {
       try {
@@ -2726,7 +2726,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
     // Triggers whenever there is (a) a live BUY/SELL setup, or (b) upcoming
     // USD/gold news within the window. Soft-fails on any error.
     let __macroContext: SignalPlan["macroContext"] = undefined;
-    const __macroShouldRun = built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null;
+    const __macroShouldRun = false;
     if (__macroShouldRun) {
       try {
         const newsLines = upcomingNews.slice(0, 5).map((n) =>
