@@ -1040,6 +1040,7 @@ function SignalPage() {
               className="hidden sm:inline-flex h-9 items-center gap-1.5 px-3.5 rounded-lg border border-zinc-200 bg-white font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[14px] font-normal text-zinc-700 hover:bg-zinc-50 transition"
             >
               Killzones
+            </Link>
             <button
               onClick={() => {
                 const next = !voiceMuted;
