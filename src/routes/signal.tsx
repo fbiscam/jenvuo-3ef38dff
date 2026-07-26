@@ -1454,7 +1454,7 @@ function SignalPage() {
                     "relative overflow-hidden bg-white",
                     isChartFullscreen
                       ? "fixed inset-0 z-[9999] h-screen w-screen rounded-none border-0"
-                      : "rounded-2xl border border-zinc-200/60 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)] h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
+                      : "rounded-2xl border border-zinc-200/60 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)] h-[62vh] min-h-[380px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
                   )}>
                   <button
                     type="button"
