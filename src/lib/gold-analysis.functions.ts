@@ -3003,6 +3003,42 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
             label: `${ev.dir === "bullish" ? "Bullish" : "Bearish"} Reversal Zone`,
           } as Marking);
         }
+
+        // Support / Resistance: cluster same-kind swings whose prices sit
+        // within a small tolerance and mark the ones with 2+ touches.
+        // Multi-touch levels are the strongest institutional S/R.
+        const tol = Math.max(Math.abs(last.c) * 0.0015, (last.h - last.l) * 0.75);
+        const cluster = (arr: any[]) => {
+          const clusters: { avg: number; touches: number }[] = [];
+          for (const s of arr) {
+            const c = clusters.find((k) => Math.abs(k.avg - s.price) <= tol);
+            if (c) {
+              c.avg = (c.avg * c.touches + s.price) / (c.touches + 1);
+              c.touches += 1;
+            } else {
+              clusters.push({ avg: s.price, touches: 1 });
+            }
+          }
+          return clusters.filter((c) => c.touches >= 2).sort((a, b) => b.touches - a.touches).slice(0, 2);
+        };
+        const resClusters = cluster(swings.filter((s: any) => s.kind === "high"));
+        const supClusters = cluster(swings.filter((s: any) => s.kind === "low"));
+        for (const r of resClusters) {
+          addMark({
+            type: "resistance", tf: tfKey,
+            price: +r.avg.toFixed(dec),
+            strength: r.touches,
+            label: `${tfKey === "htf" ? "HTF" : "LTF"} Resistance ×${r.touches}`,
+          } as Marking);
+        }
+        for (const s of supClusters) {
+          addMark({
+            type: "support", tf: tfKey,
+            price: +s.avg.toFixed(dec),
+            strength: s.touches,
+            label: `${tfKey === "htf" ? "HTF" : "LTF"} Support ×${s.touches}`,
+          } as Marking);
+        }
       }
     } catch (e) {
       console.warn("engine-derived rich markings failed:", (e as Error)?.message ?? e);
