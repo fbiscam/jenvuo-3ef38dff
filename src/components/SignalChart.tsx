@@ -828,9 +828,12 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       <svg
         ref={drawSvgRef}
         className="absolute inset-0"
+        width="100%"
+        height="100%"
         style={{
           pointerEvents: drawingActive ? "auto" : "none",
           cursor: tool === "cursor" ? "default" : tool === "erase" ? "not-allowed" : "crosshair",
+          touchAction: "none",
         }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
