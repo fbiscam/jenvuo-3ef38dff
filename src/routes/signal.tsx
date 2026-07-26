@@ -1363,7 +1363,19 @@ function SignalPage() {
                 )
               )}
               <div ref={feedScrollRef} className="space-y-3 overflow-y-auto pr-1 max-h-[520px]">
-                {plan?.narration.map((n, i) => {
+                {plan?.narration.filter((n) => {
+                  // Mirror the ≥65% confidence gate used for voice + chart: hide
+                  // execution lines (entry / SL / TP) from the visible feed when
+                  // the setup didn't qualify, so the panel matches the toast.
+                  const conf = Number(plan?.trade?.confidence ?? 0);
+                  const qualified = conf >= 65 && plan?.trade?.direction !== "WAIT";
+                  if (qualified) return true;
+                  const refM = n.markingIndex != null ? plan?.markings[n.markingIndex] : null;
+                  const refIsExec = !!refM && (refM.type === "entry" || refM.type === "sl" || refM.type === "tp");
+                  const sayIsExec = /\b(entry|stop\s*loss|\bsl\b|take\s*profit|\btp\b|target)\b/i.test(n.say || "");
+                  return !(refIsExec || sayIsExec);
+                }).map((n, i) => {
+
                   const { tag, tone } = tagOf(n.say);
                   const active = i === step;
                   const past = i < step;

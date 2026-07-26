@@ -538,11 +538,28 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     };
     chart.timeScale().subscribeVisibleTimeRangeChange(() => { redrawBoxes(); redrawUserDrawings(); });
     chart.subscribeCrosshairMove(redrawBoxes);
-    const ro = new ResizeObserver(() => { redrawBoxes(); redrawUserDrawings(); });
+    // Explicitly size the chart to its container — lightweight-charts' autoSize
+    // occasionally misses the initial layout when the container is hidden then
+    // shown, leaving the canvas stuck at the default 300×150 buffer.
+    const applySize = () => {
+      const el = containerRef.current;
+      if (!el || !chartRef.current) return;
+      const w = Math.max(1, Math.floor(el.clientWidth));
+      const h = Math.max(1, Math.floor(el.clientHeight));
+      try { chartRef.current.resize(w, h); } catch {}
+    };
+    applySize();
+    // Retry after a tick in case the container layout finishes after mount.
+    const sizeRaf = requestAnimationFrame(applySize);
+    const sizeTimer = window.setTimeout(applySize, 120);
+    const ro = new ResizeObserver(() => { applySize(); redrawBoxes(); redrawUserDrawings(); });
     ro.observe(containerRef.current);
     (chartRef.current as any).__redrawBoxes = redrawBoxes;
 
+
     return () => {
+      cancelAnimationFrame(sizeRaf);
+      clearTimeout(sizeTimer);
       ro.disconnect();
       chart.remove();
       chartRef.current = null;
@@ -555,6 +572,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       lastPriceLineRef.current = null;
       if (overlayRef.current) overlayRef.current.innerHTML = "";
     };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [candles, dark]);
 
