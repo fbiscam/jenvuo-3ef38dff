@@ -182,12 +182,12 @@ function DocumentsPage() {
                     <div className="flex flex-col items-center self-stretch">
                       <div
                         className={[
-                          "jenvu-proof-step-circle mt-0.5 h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold border-2 border-emerald-500 bg-white text-emerald-600",
+                          "jenvu-proof-step-circle mt-0.5 h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold border-2",
                           done
-                            ? ""
+                            ? "border-emerald-500 bg-emerald-500 text-white"
                             : active
-                            ? ""
-                            : "",
+                            ? "border-blue-600 bg-blue-600 text-white ring-4 ring-blue-100"
+                            : "border-zinc-300 bg-white text-zinc-500",
                         ].join(" ")}
                       >
                         {done ? <Check className="h-4 w-4" strokeWidth={3} /> : i + 1}
