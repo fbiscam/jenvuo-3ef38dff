@@ -1133,9 +1133,48 @@ function SignalPage() {
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="flex gap-1.5 shrink-0">
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+              </div>
+              <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto no-scrollbar min-w-0">
+                <span className="text-[12px] text-zinc-500 font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] shrink-0">Gold pair:</span>
+                {XAU_PAIRS.map((p) => {
+                  const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
+                  const isFree = !credits.isLoading && credits.plan?.id === "free";
+                  const locked = isFree && p !== "XAUUSD";
+                  return (
+                    <button
+                      key={p}
+                      onClick={() => {
+                        if (active) return;
+                        if (locked) {
+                          toast.info("Multi-pair analysis is a Pro feature", {
+                            description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
+                            action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+                          });
+                          return;
+                        }
+                        abortRef.current = true;
+                        try { speech.stopSpeaking(); } catch {}
+                        setPlaying(false);
+                        setActiveTf(null);
+                        setPlan(null);
+                        setLoading(true);
+                        setStep(-1);
+                        navigate({ to: "/signal", search: { symbol: p }, replace: true });
+                      }}
+                      className={cn(
+                        "shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-md text-[12px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] transition",
+                        active ? "bg-zinc-900 text-white" : "text-zinc-700 hover:bg-zinc-100",
+                      )}
+                      title={locked ? "Pro feature — upgrade to unlock" : undefined}
+                    >
+                      {locked && <Lock className="h-3 w-3 opacity-60" />}
+                      {XAU_LABELS[p]}
+                    </button>
+                  );
+                })}
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2 sm:gap-4">
