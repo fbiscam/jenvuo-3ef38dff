@@ -486,7 +486,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // collapse to 1.0 in the DB even though the engine planned a 2R+
             // target. Fall back to tp1 only if the higher targets are missing.
             const tpAny = broadcastPlan.trade as any;
-            const tp = Number(tpAny?.tp ?? tpAny?.tp3 ?? tpAny?.tp2 ?? tpAny?.tp1);
+            let tp = Number(tpAny?.tp ?? tpAny?.tp3 ?? tpAny?.tp2 ?? tpAny?.tp1);
             if (!isFinite(entry) || !isFinite(sl) || !isFinite(tp)) {
               results.push({ pair, action: "invalid_levels" });
               continue;
@@ -495,8 +495,16 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // upstream `plan.trade.rr`, which has produced inflated values
             // (e.g. reporting 3.0 when SL/TP are symmetric ~1:1).
             const riskDist = Math.abs(entry - sl);
-            const rewardDist = Math.abs(tp - entry);
-            const rr = riskDist > 0 ? rewardDist / riskDist : 0;
+            let rewardDist = Math.abs(tp - entry);
+            let rr = riskDist > 0 ? rewardDist / riskDist : 0;
+            // Enforce a minimum 2R target: if the engine only returned tp1
+            // (which is exactly 1R by design), stretch the stored TP to 2R so
+            // the DB always reflects a real risk/reward setup — not a coin flip.
+            if (riskDist > 0 && rr < 1.8) {
+              tp = dir === "BUY" ? entry + 2 * riskDist : entry - 2 * riskDist;
+              rewardDist = Math.abs(tp - entry);
+              rr = 2;
+            }
 
             // Freshness gate: refuse to broadcast if live price has already
             // drifted more than 40% of the risk distance toward SL (stale
