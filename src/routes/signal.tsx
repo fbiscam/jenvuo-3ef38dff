@@ -1049,7 +1049,7 @@ function SignalPage() {
                 try { window.localStorage.setItem("jenvu:voice-muted", next ? "1" : "0"); } catch {}
                 if (next) {
                   try { stopAllBrowserSpeech(); } catch {}
-                  try { speech.cancel?.(); } catch {}
+                  try { speech.stop?.(); } catch {}
                 }
               }}
               className={`shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border text-[12px] font-medium transition ${voiceMuted ? "border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-200" : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"}`}
