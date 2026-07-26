@@ -370,8 +370,6 @@ function SignalPage() {
 
   const [voiceBlocked, setVoiceBlocked] = useState(false);
   const [activeTf, setActiveTf] = useState<"htf" | "ltf" | null>(null);
-  const [intelOpen, setIntelOpen] = useState(true);
-  const [narrationOpen, setNarrationOpen] = useState(true);
 
   const speakWait = useCallback(
     (text: string) =>
@@ -1204,20 +1202,10 @@ function SignalPage() {
             </div>
           </div>
 
-          {/* body grid — full-page chart stage with overlay panels */}
-          <div className="relative bg-white lg:min-h-[calc(100vh-160px)]">
-            {/* LEFT — ICT execution feed (overlay on desktop, stacked on mobile) */}
-            <div className={cn(
-              "bg-white p-4 flex flex-col gap-3 border-b border-zinc-100",
-              "lg:absolute lg:z-30 lg:top-4 lg:left-4 lg:w-[340px] lg:max-h-[calc(100%-32px)]",
-              "lg:bg-white/85 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)]",
-              "lg:p-4 lg:transition-transform lg:duration-300",
-              !narrationOpen && "lg:-translate-x-[calc(100%+20px)]",
-            )}>
-              <div className="hidden lg:flex items-center justify-between -mb-1">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">Live Narration</span>
-                <button onClick={() => setNarrationOpen(false)} className="text-zinc-400 hover:text-zinc-900 h-6 w-6 inline-flex items-center justify-center rounded-md hover:bg-zinc-100" aria-label="Hide narration"><X className="h-3.5 w-3.5" /></button>
-              </div>
+          {/* body grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 bg-white">
+            {/* LEFT — ICT execution feed */}
+            <div className="lg:col-span-3 bg-white p-4 flex flex-col gap-3 border-b lg:border-b-0 lg:border-r border-zinc-100">
               {/* Voice AI Agent — orb + chat, can mark on chart */}
               <div className="pb-3 border-b border-zinc-100">
                 <SignalVoiceAgent
@@ -1324,13 +1312,11 @@ function SignalPage() {
               </div>
             </div>
 
-
-
-            {/* CENTER — full-page chart stage */}
-            <div className="w-full bg-white flex flex-col gap-px">
+            {/* CENTER — dual charts (HTF + LTF stacked) */}
+            <div className="lg:col-span-6 bg-white flex flex-col gap-px border-b lg:border-b-0 lg:border-r border-zinc-100">
               {/* Multi-TF alignment strip */}
               {plan && (
-                <div className="bg-white px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-3 border-b border-zinc-100 lg:absolute lg:z-20 lg:top-3 lg:left-1/2 lg:-translate-x-1/2 lg:bg-white/85 lg:backdrop-blur-xl lg:rounded-full lg:border lg:border-zinc-200/70 lg:shadow-md lg:py-1.5 lg:px-4">
+                <div className="bg-white px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-3 border-b border-zinc-100">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-500 mr-1`}>
                       MTF
@@ -1353,18 +1339,15 @@ function SignalPage() {
                 </div>
               )}
 
-              {/* HTF — mini overview (bottom-left overlay on desktop, stacked on mobile) */}
-              <div className={cn(
-                "bg-white p-3 sm:p-4 flex flex-col gap-2 border-b border-zinc-100",
-                "lg:absolute lg:z-20 lg:bottom-4 lg:left-4 lg:w-[280px] lg:p-2.5 lg:border lg:border-zinc-200/70 lg:rounded-2xl lg:shadow-[0_20px_60px_-24px_rgba(0,0,0,0.25)] lg:bg-white/90 lg:backdrop-blur-xl",
-              )}>
+              {/* HTF — 4H bias chart */}
+              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-b border-zinc-100">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold tracking-wide text-zinc-900">
+                  <span className="text-[13px] font-normal text-zinc-900">
                     HTF · 4H · Bias
                   </span>
                   {plan && (
                     <span className={cn(
-                      "text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded",
+                      "text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded",
                       plan.htfBias === "bullish" ? "bg-emerald-100 text-emerald-700" :
                       plan.htfBias === "bearish" ? "bg-rose-100 text-rose-700" :
                       "bg-zinc-100 text-zinc-700",
@@ -1373,7 +1356,7 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[180px] lg:h-[130px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
+                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
                   {plan ? (
                     <SignalChart
                       ref={htfRef}
@@ -1386,9 +1369,9 @@ function SignalPage() {
                 </div>
               </div>
 
-              {/* LTF — the main stage, full page */}
+              {/* LTF — 15M execution chart */}
               <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
-                <div className="flex items-center justify-between lg:hidden">
+                <div className="flex items-center justify-between">
                   <span className="text-[13px] font-normal text-zinc-900">
                     LTF // 15M · Execution
                   </span>
@@ -1404,8 +1387,7 @@ function SignalPage() {
                   )}
                 </div>
                 <div className={cn(
-                  "rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)] transition-opacity duration-300",
-                  "h-[360px] sm:h-[420px] lg:h-[calc(100vh-220px)]",
+                  "rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300",
                   activeTf === "htf" ? "opacity-55" : "opacity-100",
                 )}>
                   {plan ? (
@@ -1418,7 +1400,7 @@ function SignalPage() {
                     />
                   ) : null}
                 </div>
-                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-700 font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1 lg:absolute lg:z-20 lg:bottom-4 lg:right-4 lg:bg-white/85 lg:backdrop-blur-xl lg:rounded-full lg:px-3 lg:py-1.5 lg:border lg:border-zinc-200/70 lg:shadow-md`}>
+                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-700 font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
                   <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
                   <LegendDot color="bg-sky-500/70" label="OB" />
                   <LegendDot color="bg-amber-500/70" label="Liquidity" />
@@ -1428,39 +1410,12 @@ function SignalPage() {
               </div>
             </div>
 
-            {/* Floating toggles — desktop only */}
-            {!narrationOpen && (
-              <button
-                onClick={() => setNarrationOpen(true)}
-                className="hidden lg:inline-flex absolute z-30 top-4 left-4 items-center gap-1.5 h-9 px-3 rounded-full bg-white/95 backdrop-blur-xl border border-zinc-200 shadow-md text-[12px] font-medium text-zinc-800 hover:bg-white"
-              >
-                <Sparkles className="h-3.5 w-3.5" /> Narration
-              </button>
-            )}
-            {!intelOpen && (
-              <button
-                onClick={() => setIntelOpen(true)}
-                className="hidden lg:inline-flex absolute z-30 top-4 right-4 items-center gap-1.5 h-9 px-3 rounded-full bg-white/95 backdrop-blur-xl border border-zinc-200 shadow-md text-[12px] font-medium text-zinc-800 hover:bg-white"
-              >
-                <Activity className="h-3.5 w-3.5" /> Intelligence
-              </button>
-            )}
+            {/* RIGHT — intelligence dashboard */}
+            <div className="lg:col-span-3 bg-white p-5 sm:p-6 space-y-6">
+              <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case">
+                Intelligence Dashboard
+              </h3>
 
-
-            {/* RIGHT — intelligence drawer (overlay on desktop, stacked on mobile) */}
-            <div className={cn(
-              "bg-white p-5 sm:p-6 border-t border-zinc-100 space-y-6",
-              "lg:absolute lg:z-30 lg:top-4 lg:right-4 lg:w-[380px] lg:max-h-[calc(100%-32px)] lg:overflow-y-auto",
-              "lg:bg-white/92 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] lg:border-t-0",
-              "lg:transition-transform lg:duration-300",
-              !intelOpen && "lg:translate-x-[calc(100%+20px)]",
-            )}>
-              <div className="flex items-center justify-between">
-                <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case">
-                  Intelligence Dashboard
-                </h3>
-                <button onClick={() => setIntelOpen(false)} className="hidden lg:inline-flex text-zinc-400 hover:text-zinc-900 h-6 w-6 items-center justify-center rounded-md hover:bg-zinc-100" aria-label="Hide intelligence"><X className="h-3.5 w-3.5" /></button>
-              </div>
 
 
               {/* Confluence Heatmap removed */}
