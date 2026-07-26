@@ -1175,9 +1175,10 @@ function SignalPage() {
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setPairMenuOpen(false)} />
                     <div className="absolute right-0 top-full mt-2 z-50 w-[220px] rounded-xl border border-zinc-200/70 bg-white/95 backdrop-blur-xl shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] p-2">
-                      <div className="px-2 pb-1.5 text-[10px] font-semibold tracking-widest uppercase text-zinc-500">
-                        Gold pair
+                      <div className="px-2 pb-1.5 font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[13px] font-normal normal-case tracking-normal text-zinc-900">
+                        Gold pair:
                       </div>
+
                       <div className="flex flex-col">
                         {XAU_PAIRS.map((p) => {
                           const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
