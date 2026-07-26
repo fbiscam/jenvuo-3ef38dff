@@ -514,6 +514,19 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         lb.el.style.top = `${Math.max(2, y - 9)}px`;
         lb.el.style.right = `4px`;
       }
+      // Reposition R:R shaded zones — full-width, between two price coordinates.
+      for (const z of rrZonesRef.current) {
+        const y1 = seriesRef.current.priceToCoordinate(z.p1);
+        const y2 = seriesRef.current.priceToCoordinate(z.p2);
+        if (y1 == null || y2 == null) { z.el.style.display = "none"; continue; }
+        const top = Math.min(y1 as unknown as number, y2 as unknown as number);
+        const height = Math.max(1, Math.abs((y2 as unknown as number) - (y1 as unknown as number)));
+        z.el.style.display = "block";
+        z.el.style.left = "0px";
+        z.el.style.width = `${containerWidth}px`;
+        z.el.style.top = `${top}px`;
+        z.el.style.height = `${height}px`;
+      }
       redrawUserDrawings();
     };
     chart.timeScale().subscribeVisibleTimeRangeChange(() => { redrawBoxes(); redrawUserDrawings(); });
