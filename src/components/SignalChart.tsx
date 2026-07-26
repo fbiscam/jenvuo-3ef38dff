@@ -43,14 +43,14 @@ type Props = {
 };
 
 const COLORS = {
-  fvgBull:      { fill: "rgba(34,197,94,0.18)",  border: "#16a34a", tag: "FVG+" },
-  fvgBear:      { fill: "rgba(239,68,68,0.18)",  border: "#dc2626", tag: "FVG-" },
-  obDemand:     { fill: "rgba(59,130,246,0.20)", border: "#2563eb", tag: "OB+"  },
-  obSupply:     { fill: "rgba(244,114,182,0.22)",border: "#db2777", tag: "OB-"  },
-  zoneDemand:   { fill: "rgba(34,197,94,0.14)",  border: "#16a34a", tag: "DEMAND" },
-  zoneSupply:   { fill: "rgba(239,68,68,0.14)",  border: "#dc2626", tag: "SUPPLY" },
-  breakerBull:  { fill: "rgba(20,184,166,0.20)", border: "#0d9488", tag: "BRK+" },
-  breakerBear:  { fill: "rgba(217,70,239,0.20)", border: "#a21caf", tag: "BRK-" },
+  fvgBull:      { fill: "rgba(34,197,94,0.18)",  border: "#16a34a", tag: "Bullish FVG" },
+  fvgBear:      { fill: "rgba(239,68,68,0.18)",  border: "#dc2626", tag: "Bearish FVG" },
+  obDemand:     { fill: "rgba(59,130,246,0.20)", border: "#2563eb", tag: "Demand OB" },
+  obSupply:     { fill: "rgba(244,114,182,0.22)",border: "#db2777", tag: "Supply OB" },
+  zoneDemand:   { fill: "rgba(34,197,94,0.14)",  border: "#16a34a", tag: "Demand Zone" },
+  zoneSupply:   { fill: "rgba(239,68,68,0.14)",  border: "#dc2626", tag: "Supply Zone" },
+  breakerBull:  { fill: "rgba(20,184,166,0.20)", border: "#0d9488", tag: "Bullish Breaker" },
+  breakerBear:  { fill: "rgba(217,70,239,0.20)", border: "#a21caf", tag: "Bearish Breaker" },
   premium:  "rgba(244,63,94,0.06)",
   discount: "rgba(16,185,129,0.06)",
   ote:      "rgba(234,179,8,0.14)",
