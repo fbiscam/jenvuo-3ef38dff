@@ -512,6 +512,9 @@ function SignalPage() {
 
     // Pre-flight: block the scan if wallet is below the flat $0.20 per-signal charge.
     if (!credits.isLoading && credits.balance < 0.20) {
+      const msg = `Balance too low ($${credits.balance.toFixed(2)}). You need at least $0.20 to run a signal scan. Add funds to continue.`;
+      setAnalysisError(msg);
+      setPlan(null);
       toast.error("Balance too low to run analysis", {
         description: `Low balance — add funds to continue.`,
         action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
@@ -526,7 +529,13 @@ function SignalPage() {
     try {
       const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
       const ok = await credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
-      if (!ok) { setLoading(false); return; }
+      if (!ok) {
+        setPlan(null);
+        setAnalysisError("Couldn't start the scan — please check your balance or documents and try again.");
+        setLoading(false);
+        activeScanRef.current = null;
+        return;
+      }
       const result = await fetchPlan({ data: { symbol: sym, scanId, force: true } });
       if (!result.ok) {
         setPlan(null);
@@ -534,6 +543,7 @@ function SignalPage() {
         toast.error(result.error);
         return;
       }
+
       const p = withSignalIntelligence(result.plan);
 
       // Mirror the auto-scan pipeline gates so a manual scan never surfaces a
