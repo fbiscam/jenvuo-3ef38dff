@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2, MoreVertical } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2, MoreVertical, Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
@@ -369,6 +369,12 @@ function SignalPage() {
 
 
   const [voiceBlocked, setVoiceBlocked] = useState(false);
+  const [voiceMuted, setVoiceMuted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try { return window.localStorage.getItem("jenvu:voice-muted") === "1"; } catch { return false; }
+  });
+  const voiceMutedRef = useRef(voiceMuted);
+  useEffect(() => { voiceMutedRef.current = voiceMuted; }, [voiceMuted]);
   const [activeTf, setActiveTf] = useState<"htf" | "ltf" | null>(null);
   const [intelOpen, setIntelOpen] = useState(true);
   const [narrationOpen, setNarrationOpen] = useState(true);
@@ -379,6 +385,7 @@ function SignalPage() {
     (text: string) =>
       new Promise<void>((resolve) => {
         if (!text || !text.trim()) return resolve();
+        if (voiceMutedRef.current) return resolve();
         const words = text.split(/\s+/).filter(Boolean).length;
         const minMs = Math.max(2500, words * 320);
         let done = false;
@@ -1034,6 +1041,24 @@ function SignalPage() {
             >
               Killzones
             </Link>
+            <button
+              onClick={() => {
+                const next = !voiceMuted;
+                setVoiceMuted(next);
+                voiceMutedRef.current = next;
+                try { window.localStorage.setItem("jenvu:voice-muted", next ? "1" : "0"); } catch {}
+                if (next) {
+                  try { stopAllBrowserSpeech(); } catch {}
+                  try { speech.stopSpeaking?.(); } catch {}
+                }
+              }}
+              className={`shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border text-[12px] font-medium transition ${voiceMuted ? "border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-200" : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"}`}
+              title={voiceMuted ? "Voice agent muted — tap to unmute" : "Mute voice agent"}
+              aria-pressed={voiceMuted}
+            >
+              {voiceMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+              <span className="hidden sm:inline">{voiceMuted ? "Voice off" : "Voice on"}</span>
+            </button>
             {voiceBlocked && (
               <button
                 onClick={() => {
