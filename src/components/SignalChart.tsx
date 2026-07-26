@@ -411,6 +411,61 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       const containerWidth = overlayRef.current.clientWidth;
       for (const b of boxesRef.current) {
         const m: any = b.marking;
+
+        // Sweep: single point (time,price) — pin a small chip + wick arrow near that candle.
+        if (m.type === "sweep") {
+          const y = seriesRef.current.priceToCoordinate(m.price);
+          const x = ts.timeToCoordinate(Number(m.time) as Time);
+          if (y == null || x == null) { b.el.style.display = "none"; continue; }
+          b.el.style.display = "block";
+          b.el.style.left = `${(x as unknown as number) - 44}px`;
+          b.el.style.top = `${(y as unknown as number) - 28}px`;
+          b.el.style.width = `auto`;
+          b.el.style.height = `auto`;
+          continue;
+        }
+
+        // Trendline: an SVG line from (fromTime,fromPrice) → (toTime,toPrice) with arrowhead + rotated label.
+        if (m.type === "trendline") {
+          const x1c = ts.timeToCoordinate(Number(m.fromTime) as Time);
+          const x2c = ts.timeToCoordinate(Number(m.toTime) as Time);
+          const y1c = seriesRef.current.priceToCoordinate(Number(m.fromPrice));
+          const y2c = seriesRef.current.priceToCoordinate(Number(m.toPrice));
+          if (x1c == null || x2c == null || y1c == null || y2c == null) { b.el.style.display = "none"; continue; }
+          const x1 = x1c as unknown as number, x2 = x2c as unknown as number;
+          const y1 = y1c as unknown as number, y2 = y2c as unknown as number;
+          const left = Math.min(x1, x2) - 6, top = Math.min(y1, y2) - 6;
+          const w = Math.max(4, Math.abs(x2 - x1)) + 12, h = Math.max(4, Math.abs(y2 - y1)) + 12;
+          b.el.style.display = "block";
+          b.el.style.left = `${left}px`;
+          b.el.style.top = `${top}px`;
+          b.el.style.width = `${w}px`;
+          b.el.style.height = `${h}px`;
+          const svg = b.el.querySelector("svg") as SVGSVGElement | null;
+          const label = b.el.querySelector(".jv-tl-label") as HTMLElement | null;
+          if (svg) {
+            svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+            svg.setAttribute("width", `${w}`);
+            svg.setAttribute("height", `${h}`);
+            const line = svg.querySelector("line") as SVGLineElement | null;
+            if (line) {
+              line.setAttribute("x1", `${x1 - left}`);
+              line.setAttribute("y1", `${y1 - top}`);
+              line.setAttribute("x2", `${x2 - left}`);
+              line.setAttribute("y2", `${y2 - top}`);
+            }
+          }
+          if (label) {
+            const midX = (x1 + x2) / 2 - left;
+            const midY = (y1 + y2) / 2 - top;
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            label.style.left = `${midX}px`;
+            label.style.top = `${midY}px`;
+            label.style.transform = `translate(-50%,-50%) rotate(${angle}deg)`;
+          }
+          continue;
+        }
+
         const y1 = seriesRef.current.priceToCoordinate(m.priceHigh);
         const y2 = seriesRef.current.priceToCoordinate(m.priceLow);
         if (y1 == null || y2 == null) { b.el.style.display = "none"; continue; }
