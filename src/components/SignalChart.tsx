@@ -309,13 +309,9 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
           to = lastT + bucket * 2;
         }
       }
-      try {
-        if (Number.isFinite(from) && Number.isFinite(to)) {
-          const span = Math.max(to - from, bucket);
-          const pad = Math.max(span * 2.5, bucket * 8);
-          ts.setVisibleRange({ from: (from - pad) as Time, to: (to + pad) as Time });
-        }
-      } catch {}
+      // User asked: don't zoom while drawing — keep the full chart visible.
+      // We still pulse the marking below, but skip setVisibleRange.
+
       // Pulse the matching box (if any)
       const hit = boxesRef.current.find((b) => b.marking === m);
       if (hit) {
