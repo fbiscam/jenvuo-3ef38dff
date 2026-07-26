@@ -1433,7 +1433,7 @@ function SignalPage() {
             {!narrationOpen && (
               <button
                 onClick={() => setNarrationOpen(true)}
-                className="hidden lg:inline-flex absolute z-30 top-4 left-4 items-center gap-1.5 h-9 px-3 rounded-full bg-white/95 backdrop-blur-xl border border-zinc-200 shadow-md text-[12px] font-medium text-zinc-800 hover:bg-white"
+                className="hidden"
               >
                 <Sparkles className="h-3.5 w-3.5" /> Narration
               </button>
