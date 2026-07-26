@@ -1359,30 +1359,7 @@ function SignalPage() {
 
             {/* CENTER — full-page chart stage */}
             <div className="w-full bg-white flex flex-col gap-px">
-              {/* Multi-TF alignment strip */}
-              {plan && (
-                <div className="bg-white px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-3 border-b border-zinc-100 lg:absolute lg:z-20 lg:top-3 lg:left-1/2 lg:-translate-x-1/2 lg:bg-white/85 lg:backdrop-blur-xl lg:rounded-full lg:border lg:border-zinc-200/70 lg:shadow-md lg:py-1.5 lg:px-4">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-500 mr-1`}>
-                      MTF
-                    </span>
-                    {plan.multiTf.map((b) => (
-                      <TfPill key={b.tf} tfBias={b} />
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
-                      {plan.alignmentLabel}
-                    </span>
-                    <div className="w-24 h-1.5 bg-gradient-to-r from-rose-100 via-zinc-100 to-emerald-100 rounded-full relative overflow-hidden">
-                      <div
-                        className="absolute top-1/2 -translate-y-1/2 w-2 h-3 bg-zinc-900 rounded-sm"
-                        style={{ left: `${Math.max(0, Math.min(96, plan.alignmentScore))}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* MTF moved to top block below terminal header */}
 
               {/* HTF mini overview hidden — chart kept mounted offscreen so narration/markings still run */}
               <div className="hidden" aria-hidden="true">
