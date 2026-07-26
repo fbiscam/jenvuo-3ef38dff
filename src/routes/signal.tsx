@@ -1447,11 +1447,21 @@ function SignalPage() {
             )}
 
 
-            {/* RIGHT — intelligence */}
-            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 space-y-6 overflow-y-auto max-h-[820px]">
-              <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case">
-                Intelligence Dashboard
-              </h3>
+            {/* RIGHT — intelligence drawer (overlay on desktop, stacked on mobile) */}
+            <div className={cn(
+              "bg-white p-5 sm:p-6 border-t border-zinc-100 space-y-6",
+              "lg:absolute lg:z-30 lg:top-4 lg:right-4 lg:w-[380px] lg:max-h-[calc(100%-32px)] lg:overflow-y-auto",
+              "lg:bg-white/92 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] lg:border-t-0",
+              "lg:transition-transform lg:duration-300",
+              !intelOpen && "lg:translate-x-[calc(100%+20px)]",
+            )}>
+              <div className="flex items-center justify-between">
+                <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case">
+                  Intelligence Dashboard
+                </h3>
+                <button onClick={() => setIntelOpen(false)} className="hidden lg:inline-flex text-zinc-400 hover:text-zinc-900 h-6 w-6 items-center justify-center rounded-md hover:bg-zinc-100" aria-label="Hide intelligence"><X className="h-3.5 w-3.5" /></button>
+              </div>
+
 
               {/* Confluence Heatmap removed */}
 
