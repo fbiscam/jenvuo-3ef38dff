@@ -70,7 +70,7 @@ const COLORS = {
 
 // ---- Manual drawing types ----
 type DrawTool = "cursor" | "hline" | "trend" | "rect" | "fib" | "measure" | "text" | "erase";
-type Anchor = { time: number; price: number };
+type Anchor = { time: number; price: number; logical?: number };
 type UserDrawing =
   | { id: string; type: "hline"; a: Anchor; color: string }
   | { id: string; type: "trend"; a: Anchor; b: Anchor; color: string }
@@ -111,6 +111,12 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   useEffect(() => { toolRef.current = tool; }, [tool]);
   const pendingRef = useRef<Anchor | null>(null);
   const previewRef = useRef<{ x: number; y: number } | null>(null);
+  const dragRef = useRef<{
+    pointerId: number;
+    tool: DrawTool;
+    start: Anchor;
+    startPoint: { x: number; y: number };
+  } | null>(null);
   const [, forceTick] = useState(0);
   const rerender = useCallback(() => forceTick((v) => v + 1), []);
 
@@ -124,22 +130,46 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     const y = (ev as PointerEvent).clientY - rect.top;
     const ts = chart.timeScale();
     let t: number | null = null;
+    const logicalRaw = ts.coordinateToLogical(x);
+    const logical = logicalRaw == null ? undefined : Number(logicalRaw);
     const tRaw = ts.coordinateToTime(x);
     if (tRaw != null) {
       t = Number(tRaw);
     } else {
       // Fallback: derive time from logical index → allows drawing in blank right zone
-      const logical = ts.coordinateToLogical(x);
       if (logical != null && liveBarRef.current) {
         const lastIdx = Math.max(0, (candles.length - 1));
-        const delta = Number(logical) - lastIdx;
+        const delta = logical - lastIdx;
         t = Number(liveBarRef.current.time) + Math.round(delta) * (bucketSecRef.current || 60);
       }
     }
     const p = s.coordinateToPrice(y);
     if (t == null || p == null) return null;
-    return { time: t, price: Number(p) };
+    return { time: t, price: Number(p), logical };
   }, [candles.length]);
+
+  const pointFromAnchor = useCallback((a: Anchor) => {
+    const chart = chartRef.current;
+    const s = seriesRef.current;
+    if (!chart || !s) return { x: null as number | null, y: null as number | null };
+    const ts = chart.timeScale();
+    const xRaw = Number.isFinite(a.logical)
+      ? ts.logicalToCoordinate(a.logical as any)
+      : ts.timeToCoordinate(a.time as Time);
+    const yRaw = s.priceToCoordinate(a.price);
+    return {
+      x: xRaw == null ? null : Number(xRaw),
+      y: yRaw == null ? null : Number(yRaw),
+    };
+  }, []);
+
+  const addTwoPointDrawing = useCallback((drawingTool: DrawTool, a: Anchor, b: Anchor) => {
+    const id = Math.random().toString(36).slice(2, 10);
+    if (drawingTool === "trend") drawingsRef.current.push({ id, type: "trend", a, b, color: TOOL_COLOR });
+    else if (drawingTool === "rect") drawingsRef.current.push({ id, type: "rect", a, b, color: TOOL_COLOR });
+    else if (drawingTool === "fib") drawingsRef.current.push({ id, type: "fib", a, b, color: "#a16207" });
+    else if (drawingTool === "measure") drawingsRef.current.push({ id, type: "measure", a, b, color: "#0ea5e9" });
+  }, []);
 
   const redrawUserDrawings = useCallback(() => {
     const svg = drawSvgRef.current;
@@ -152,11 +182,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     const NS = "http://www.w3.org/2000/svg";
     // clear
     while (svg.firstChild) svg.removeChild(svg.firstChild);
-    const px = (a: Anchor) => {
-      const x = ts.timeToCoordinate(a.time as Time);
-      const y = s.priceToCoordinate(a.price);
-      return { x: x == null ? null : (x as unknown as number), y: y == null ? null : (y as number) };
-    };
+    const px = pointFromAnchor;
     for (const d of drawingsRef.current) {
       if (d.type === "hline") {
         const p = px(d.a);
@@ -291,13 +317,12 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         }
       }
     }
-  }, []);
+  }, [pointFromAnchor]);
 
   const hitTest = useCallback((x: number, y: number): string | null => {
     const chart = chartRef.current;
     const s = seriesRef.current;
     if (!chart || !s) return null;
-    const ts = chart.timeScale();
     const near = 6;
     const distToSeg = (px: number, py: number, x1: number, y1: number, x2: number, y2: number) => {
       const dx = x2 - x1, dy = y2 - y1;
@@ -310,39 +335,34 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     for (let i = drawingsRef.current.length - 1; i >= 0; i--) {
       const d = drawingsRef.current[i];
       if (d.type === "hline") {
-        const yy = s.priceToCoordinate(d.a.price);
-        if (yy != null && Math.abs(y - (yy as number)) <= near) return d.id;
+        const yy = pointFromAnchor(d.a).y;
+        if (yy != null && Math.abs(y - yy) <= near) return d.id;
       } else if (d.type === "trend" || d.type === "measure" || d.type === "fib") {
-        const ax = ts.timeToCoordinate(d.a.time as Time);
-        const ay = s.priceToCoordinate(d.a.price);
-        const bx = ts.timeToCoordinate(d.b.time as Time);
-        const by = s.priceToCoordinate(d.b.price);
-        if (ax == null || ay == null || bx == null || by == null) continue;
-        if (distToSeg(x, y, ax as unknown as number, ay as number, bx as unknown as number, by as number) <= near) return d.id;
+        const a = pointFromAnchor(d.a);
+        const b = pointFromAnchor(d.b);
+        if (a.x == null || a.y == null || b.x == null || b.y == null) continue;
+        if (distToSeg(x, y, a.x, a.y, b.x, b.y) <= near) return d.id;
       } else if (d.type === "rect") {
-        const ax = ts.timeToCoordinate(d.a.time as Time);
-        const ay = s.priceToCoordinate(d.a.price);
-        const bx = ts.timeToCoordinate(d.b.time as Time);
-        const by = s.priceToCoordinate(d.b.price);
-        if (ax == null || ay == null || bx == null || by == null) continue;
-        const x1 = Math.min(ax as unknown as number, bx as unknown as number);
-        const x2 = Math.max(ax as unknown as number, bx as unknown as number);
-        const y1 = Math.min(ay as number, by as number);
-        const y2 = Math.max(ay as number, by as number);
+        const a = pointFromAnchor(d.a);
+        const b = pointFromAnchor(d.b);
+        if (a.x == null || a.y == null || b.x == null || b.y == null) continue;
+        const x1 = Math.min(a.x, b.x);
+        const x2 = Math.max(a.x, b.x);
+        const y1 = Math.min(a.y, b.y);
+        const y2 = Math.max(a.y, b.y);
         // edges
         if (Math.abs(y - y1) <= near && x >= x1 - near && x <= x2 + near) return d.id;
         if (Math.abs(y - y2) <= near && x >= x1 - near && x <= x2 + near) return d.id;
         if (Math.abs(x - x1) <= near && y >= y1 - near && y <= y2 + near) return d.id;
         if (Math.abs(x - x2) <= near && y >= y1 - near && y <= y2 + near) return d.id;
       } else if (d.type === "text") {
-        const ax = ts.timeToCoordinate(d.a.time as Time);
-        const ay = s.priceToCoordinate(d.a.price);
-        if (ax == null || ay == null) continue;
-        if (Math.abs(x - (ax as unknown as number)) <= 40 && Math.abs(y - (ay as number)) <= 12) return d.id;
+        const a = pointFromAnchor(d.a);
+        if (a.x == null || a.y == null) continue;
+        if (Math.abs(x - a.x) <= 40 && Math.abs(y - a.y) <= 12) return d.id;
       }
     }
     return null;
-  }, []);
+  }, [pointFromAnchor]);
 
 
   useEffect(() => {
@@ -735,7 +755,11 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   const onPointerDown = useCallback((ev: React.PointerEvent<SVGSVGElement>) => {
     const t = toolRef.current;
     if (t === "cursor") return;
-    const rect = drawSvgRef.current!.getBoundingClientRect();
+    ev.preventDefault();
+    ev.stopPropagation();
+    const svg = drawSvgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
     const x = ev.clientX - rect.left, y = ev.clientY - rect.top;
     if (t === "erase") {
       const id = hitTest(x, y);
@@ -747,6 +771,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     }
     const anchor = anchorFromEvent(ev.nativeEvent);
     if (!anchor) return;
+    try { svg.setPointerCapture(ev.pointerId); } catch {}
     const id = Math.random().toString(36).slice(2, 10);
     if (t === "hline") {
       drawingsRef.current.push({ id, type: "hline", a: anchor, color: TOOL_COLOR });
@@ -765,26 +790,59 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     if (!pendingRef.current) {
       pendingRef.current = anchor;
       previewRef.current = { x, y };
+      dragRef.current = { pointerId: ev.pointerId, tool: t, start: anchor, startPoint: { x, y } };
       redrawUserDrawings();
     } else {
       const a = pendingRef.current;
       const b = anchor;
       pendingRef.current = null;
       previewRef.current = null;
-      if (t === "trend") drawingsRef.current.push({ id, type: "trend", a, b, color: TOOL_COLOR });
-      else if (t === "rect") drawingsRef.current.push({ id, type: "rect", a, b, color: TOOL_COLOR });
-      else if (t === "fib") drawingsRef.current.push({ id, type: "fib", a, b, color: "#a16207" });
-      else if (t === "measure") drawingsRef.current.push({ id, type: "measure", a, b, color: "#0ea5e9" });
+      dragRef.current = null;
+      addTwoPointDrawing(t, a, b);
       redrawUserDrawings();
     }
-  }, [anchorFromEvent, hitTest, redrawUserDrawings]);
+  }, [addTwoPointDrawing, anchorFromEvent, hitTest, redrawUserDrawings]);
 
   const onPointerMove = useCallback((ev: React.PointerEvent<SVGSVGElement>) => {
     if (!pendingRef.current) return;
-    const rect = drawSvgRef.current!.getBoundingClientRect();
+    ev.preventDefault();
+    ev.stopPropagation();
+    const svg = drawSvgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
     previewRef.current = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
     redrawUserDrawings();
   }, [redrawUserDrawings]);
+
+  const onPointerUp = useCallback((ev: React.PointerEvent<SVGSVGElement>) => {
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== ev.pointerId) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const svg = drawSvgRef.current;
+    try { svg?.releasePointerCapture(ev.pointerId); } catch {}
+    const rect = svg?.getBoundingClientRect();
+    if (!rect) return;
+    const x = ev.clientX - rect.left;
+    const y = ev.clientY - rect.top;
+    const moved = Math.hypot(x - drag.startPoint.x, y - drag.startPoint.y);
+    const end = anchorFromEvent(ev.nativeEvent);
+    dragRef.current = null;
+    if (moved >= 4 && end) {
+      pendingRef.current = null;
+      previewRef.current = null;
+      addTwoPointDrawing(drag.tool, drag.start, end);
+      redrawUserDrawings();
+      return;
+    }
+    previewRef.current = { x, y };
+    redrawUserDrawings();
+  }, [addTwoPointDrawing, anchorFromEvent, redrawUserDrawings]);
+
+  const onPointerCancel = useCallback((ev: React.PointerEvent<SVGSVGElement>) => {
+    if (dragRef.current?.pointerId === ev.pointerId) dragRef.current = null;
+    try { drawSvgRef.current?.releasePointerCapture(ev.pointerId); } catch {}
+  }, []);
 
   const onPointerLeave = useCallback(() => {
     // keep pending anchor but drop preview so nothing "drags" off-chart
@@ -799,6 +857,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (e.key === "Escape") {
         pendingRef.current = null;
         previewRef.current = null;
+        dragRef.current = null;
         setTool("cursor");
         redrawUserDrawings();
       }
@@ -827,10 +886,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         {title}
       </div>
       <div ref={containerRef} className="absolute inset-0" />
-      <div ref={overlayRef} className="absolute inset-0 pointer-events-none overflow-hidden" />
+      <div ref={overlayRef} className="absolute inset-0 z-10 pointer-events-none overflow-hidden" />
       <svg
         ref={drawSvgRef}
-        className="absolute inset-0"
+        className="absolute inset-0 z-20"
         width="100%"
         height="100%"
         style={{
@@ -840,6 +899,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
         onPointerLeave={onPointerLeave}
       />
       {/* Drawing toolbar */}
@@ -854,6 +915,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
               setTool(id);
               pendingRef.current = null;
               previewRef.current = null;
+              dragRef.current = null;
               redrawUserDrawings();
             }}
             className={
@@ -875,6 +937,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
             drawingsRef.current = [];
             pendingRef.current = null;
             previewRef.current = null;
+            dragRef.current = null;
             redrawUserDrawings();
           }}
           className="h-7 w-7 inline-flex items-center justify-center rounded-md text-red-600 hover:bg-red-50"
