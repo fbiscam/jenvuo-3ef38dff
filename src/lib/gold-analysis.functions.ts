@@ -2180,8 +2180,11 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       const timeMax = maxTime + 86400;
       for (const k of ["fromTime", "toTime"]) {
         if (m[k] != null) {
-          const t = Number(m[k]);
-          if (!Number.isFinite(t) || t < minTime || t > timeMax) return false;
+          let t = Number(m[k]);
+          if (!Number.isFinite(t)) return false;
+          // Coerce ms → s if AI accidentally sent millisecond timestamps.
+          if (t > 1e12) { t = Math.floor(t / 1000); m[k] = t; }
+          if (t < minTime || t > timeMax) return false;
         }
       }
       for (const k of ["price", "priceLow", "priceHigh"]) {
@@ -3149,10 +3152,10 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       setupGrade,
       setupChecks,
       generatedAt: new Date().toISOString(),
-      // HTF chart shows 4H candles (bigger institutional context) while
-      // engine math and AI markings remain on 1H — box x-coords still map
-      // correctly via timeToCoordinate interpolation.
-      htfCandles: (h4Raw.length >= 20 ? h4Raw : htf).slice(-160).map(toDTO),
+      // HTF chart uses the same 1H candles that the engine + AI markings are
+      // anchored to. This guarantees every box/line resolves via
+      // timeToCoordinate cleanly (no interpolation gaps that hide markings).
+      htfCandles: htf.slice(-200).map(toDTO),
       ltfCandles: ltf.map(toDTO),
       currentPrice: last.c,
       instrument: { symbol: canonicalSymbol, display: inst.display, kind: inst.kind, decimals: inst.decimals },
