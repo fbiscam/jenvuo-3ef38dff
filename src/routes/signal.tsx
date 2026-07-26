@@ -336,6 +336,30 @@ function SignalPage() {
 
   const htfRef = useRef<SignalChartHandle>(null);
   const ltfRef = useRef<SignalChartHandle>(null);
+  const chartStageRef = useRef<HTMLDivElement>(null);
+  const [isChartFullscreen, setIsChartFullscreen] = useState(false);
+
+  const toggleChartFullscreen = useCallback(async () => {
+    const el = chartStageRef.current;
+    if (!el) return;
+    try {
+      if (!document.fullscreenElement) {
+        await el.requestFullscreen?.();
+      } else {
+        await document.exitFullscreen?.();
+      }
+    } catch {
+      // Fallback: toggle CSS-only fullscreen if the Fullscreen API is unavailable
+      setIsChartFullscreen((v) => !v);
+    }
+  }, []);
+
+  useEffect(() => {
+    const onFsChange = () => setIsChartFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => document.removeEventListener("fullscreenchange", onFsChange);
+  }, []);
+
   const abortRef = useRef(false);
   const feedScrollRef = useRef<HTMLDivElement>(null);
 
