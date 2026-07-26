@@ -430,7 +430,7 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
           if (o == null || h == null || l == null || c == null) continue;
           candles.push({ t: ts[i] * 1000, o, h, l, c, v });
         }
-        if (candles.length >= 10) return candles.slice(-200);
+        if (candles.length >= 10) return candles.slice(-1000);
         throw new Error("Too few Yahoo candles");
   })()));
   try {
@@ -448,14 +448,14 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
   const makers = hosts.flatMap((host) => symbols.map((sym) => (signal: AbortSignal) => (async () => {
-        const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
+        const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=1000`;
         const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" }, signal });
         if (!res.ok) { try { res.body?.cancel(); } catch {} throw new Error(`Binance ${sym}: ${res.status}`); }
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
           t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
         })).filter((c) => isFinite(c.c));
-        if (candles.length >= 10) return candles.slice(-200);
+        if (candles.length >= 10) return candles.slice(-1000);
         throw new Error("Too few Binance candles");
   })()));
   try {
@@ -496,7 +496,7 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
         }))
         .filter((c) => Number.isFinite(c.t) && Number.isFinite(c.c) && c.c > 0)
         .sort((a, b) => a.t - b.t);
-      if (candles.length >= 10) return candles.slice(-200);
+      if (candles.length >= 10) return candles.slice(-1000);
     } catch (e) { lastErr = e; }
   }
   throw lastErr ?? new Error("Coinbase unavailable");
@@ -581,7 +581,7 @@ async function fetchCrossPairCandlesFromProxy(
     converted.push({ t: x.t, o, h: Math.max(o, h, c), l: Math.min(o, l, c), c, v: 0 });
   }
   if (converted.length < 20) throw new Error("proxy conversion yielded too few candles");
-  return converted.slice(-200);
+  return converted.slice(-1000);
 }
 
 export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Promise<Candle[]> {
@@ -1795,7 +1795,7 @@ function buildFeedFallbackPlan(args: {
   const kz = killzoneForPair(inst.raw || inst.key, now);
   const safePrice = Number.isFinite(price) && price > 0 ? price : 1;
   const htf = (args.htfRaw?.length ? args.htfRaw : buildSyntheticCandles(inst, "1h", safePrice, 80)).slice(-160);
-  const ltf = (args.ltfRaw?.length ? args.ltfRaw : buildSyntheticCandles(inst, "15m", safePrice, 120)).slice(-200);
+  const ltf = (args.ltfRaw?.length ? args.ltfRaw : buildSyntheticCandles(inst, "15m", safePrice, 120)).slice(-1000);
   const htfHigh = htf.length ? Math.max(...htf.map((c) => c.h)) : safePrice * 1.002;
   const htfLow = htf.length ? Math.min(...htf.map((c) => c.l)) : safePrice * 0.998;
   const eq = (htfHigh + htfLow) / 2;
@@ -1944,7 +1944,7 @@ export async function computeSignalPlan(
       throw new Error(`Live ${inst.display} quote unavailable. Try again in a moment.`);
     }
     const htf = htfRaw.slice(-160);
-    const ltf = ltfRaw.slice(-200);
+    const ltf = ltfRaw.slice(-1000);
     // Trimmed slices sent to the AI prompt — full arrays remain for engine math.
     // Keep the AI payload lean: the deterministic engine already reads the
     // full candle set below; Luna only needs a compact recent window to narrate
