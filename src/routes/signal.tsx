@@ -1413,10 +1413,24 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div className={cn(
-                  "rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)]",
-                  "h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
-                )}>
+                <div
+                  ref={chartStageRef}
+                  className={cn(
+                    "relative rounded-2xl border border-zinc-200/60 overflow-hidden bg-white shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)]",
+                    isChartFullscreen
+                      ? "h-screen w-screen rounded-none border-0"
+                      : "h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
+                  )}>
+                  <button
+                    type="button"
+                    onClick={toggleChartFullscreen}
+                    className="absolute top-3 right-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 backdrop-blur border border-zinc-200 text-zinc-700 shadow-sm hover:bg-white hover:text-zinc-900 transition"
+                    title={isChartFullscreen ? "Exit fullscreen" : "Fullscreen chart"}
+                    aria-label={isChartFullscreen ? "Exit fullscreen" : "Fullscreen chart"}
+                  >
+                    {isChartFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  </button>
+
 
                   {plan ? (
                     <SignalChart
