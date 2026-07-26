@@ -43,14 +43,14 @@ type Props = {
 };
 
 const COLORS = {
-  fvgBull:      { fill: "rgba(34,197,94,0.18)",  border: "#16a34a", tag: "FVG+" },
-  fvgBear:      { fill: "rgba(239,68,68,0.18)",  border: "#dc2626", tag: "FVG-" },
-  obDemand:     { fill: "rgba(59,130,246,0.20)", border: "#2563eb", tag: "OB+"  },
-  obSupply:     { fill: "rgba(244,114,182,0.22)",border: "#db2777", tag: "OB-"  },
-  zoneDemand:   { fill: "rgba(34,197,94,0.14)",  border: "#16a34a", tag: "DEMAND" },
-  zoneSupply:   { fill: "rgba(239,68,68,0.14)",  border: "#dc2626", tag: "SUPPLY" },
-  breakerBull:  { fill: "rgba(20,184,166,0.20)", border: "#0d9488", tag: "BRK+" },
-  breakerBear:  { fill: "rgba(217,70,239,0.20)", border: "#a21caf", tag: "BRK-" },
+  fvgBull:      { fill: "rgba(34,197,94,0.18)",  border: "#16a34a", tag: "Bullish FVG" },
+  fvgBear:      { fill: "rgba(239,68,68,0.18)",  border: "#dc2626", tag: "Bearish FVG" },
+  obDemand:     { fill: "rgba(59,130,246,0.20)", border: "#2563eb", tag: "Demand OB" },
+  obSupply:     { fill: "rgba(244,114,182,0.22)",border: "#db2777", tag: "Supply OB" },
+  zoneDemand:   { fill: "rgba(34,197,94,0.14)",  border: "#16a34a", tag: "Demand Zone" },
+  zoneSupply:   { fill: "rgba(239,68,68,0.14)",  border: "#dc2626", tag: "Supply Zone" },
+  breakerBull:  { fill: "rgba(20,184,166,0.20)", border: "#0d9488", tag: "Bullish Breaker" },
+  breakerBear:  { fill: "rgba(217,70,239,0.20)", border: "#a21caf", tag: "Bearish Breaker" },
   premium:  "rgba(244,63,94,0.06)",
   discount: "rgba(16,185,129,0.06)",
   ote:      "rgba(234,179,8,0.14)",
@@ -634,7 +634,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         }
         el.style.cssText = `position:absolute;background:${palette.fill};border:1px solid ${palette.border};border-radius:2px;pointer-events:none;opacity:0;transition:opacity 500ms ease;overflow:hidden;`;
         const pill = document.createElement("span");
-        pill.style.cssText = `position:absolute;top:2px;left:2px;font-size:9px;font-weight:700;letter-spacing:0.06em;padding:1px 5px;border-radius:3px;background:${palette.border};color:#fff;line-height:1.2;font-family:'Google Sans',system-ui,sans-serif;`;
+        pill.style.cssText = `position:absolute;top:3px;left:3px;font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:4px;background:${palette.border};color:#fff;line-height:1.2;font-family:'Google Sans',system-ui,sans-serif;box-shadow:0 1px 2px rgba(0,0,0,0.15);white-space:nowrap;`;
         pill.textContent = palette.tag;
         el.appendChild(pill);
         overlayRef.current.appendChild(el);
@@ -667,29 +667,31 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         return;
       }
 
-      // BOS / CHoCH — short dashed segment across the break level + small chip label
+      // BOS / CHoCH — dashed segment across the break span + centered chip anchored at midpoint
       if (m.type === "bos" || m.type === "choch") {
+        if (!overlayRef.current) return;
         const price = (m as any).price as number;
-        const color = (m as any).kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
-        const line = s.createPriceLine({
-          price,
-          color,
-          lineWidth: 1,
-          lineStyle: LineStyle.Dashed,
-          axisLabelVisible: false,
-          title: m.type.toUpperCase(),
-        });
-        linesRef.current.push({ line, transient });
-        // Right-edge label chip
-        if (overlayRef.current) {
-          const lbl = document.createElement("div");
-          lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:10px;background:${color};color:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);opacity:0;transition:opacity 400ms ease;white-space:nowrap;font-family:'Google Sans',system-ui,sans-serif;`;
-          lbl.textContent = m.type.toUpperCase();
-          overlayRef.current.appendChild(lbl);
-          labelsRef.current.push({ marking: m, price, color, el: lbl, transient });
-          (chart as any).__redrawBoxes?.();
-          requestAnimationFrame(() => { lbl.style.opacity = "1"; });
-        }
+        const kind = (m as any).kind as "bullish" | "bearish";
+        const color = kind === "bullish" ? COLORS.bullLine : COLORS.bearLine;
+        const arrow = kind === "bullish" ? "↑" : "↓";
+        const kindWord = m.type === "bos" ? "BOS" : "CHoCH";
+        const tag = `${kindWord} ${arrow}`;
+        // Container box positioned via redrawBoxes using fromTime/toTime + price
+        const el = document.createElement("div");
+        el.style.cssText = `position:absolute;pointer-events:none;opacity:0;transition:opacity 500ms ease;`;
+        const dash = document.createElement("div");
+        dash.style.cssText = `position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:0;border-top:1.5px dashed ${color};`;
+        el.appendChild(dash);
+        const chip = document.createElement("span");
+        chip.style.cssText = `position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:800;letter-spacing:0.05em;padding:3px 9px;border-radius:12px;background:${color};color:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.2);white-space:nowrap;font-family:'Google Sans',system-ui,sans-serif;`;
+        chip.textContent = tag;
+        el.appendChild(chip);
+        overlayRef.current.appendChild(el);
+        // Store as a box with priceHigh=priceLow so redrawBoxes stretches horizontally between fromTime→toTime
+        const boxMarking: any = { ...m, priceHigh: price, priceLow: price };
+        boxesRef.current.push({ marking: boxMarking, el, transient });
+        (chart as any).__redrawBoxes?.();
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
         return;
       }
 
