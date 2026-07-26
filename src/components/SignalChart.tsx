@@ -603,6 +603,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       boxesRef.current = [];
       labelsRef.current.forEach((lb) => { try { lb.el.remove(); } catch {} });
       labelsRef.current = [];
+      rrZonesRef.current.forEach((z) => { try { z.el.remove(); } catch {} });
+      rrZonesRef.current = [];
       if (lastPriceLineRef.current) {
         try { s.removePriceLine(lastPriceLineRef.current); } catch {}
         lastPriceLineRef.current = null;
