@@ -1862,9 +1862,17 @@ function SignalPage() {
                 </span>
               </div>
             </div>
+            <div className="hidden sm:flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
+              <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
+              <LegendDot color="bg-sky-500/70" label="OB" />
+              <LegendDot color="bg-amber-500/70" label="Liquidity" />
+              <LegendDot color="bg-violet-500/70" label="EQH/EQL" />
+              <LegendDot color="bg-yellow-400/70" label="OTE" />
+            </div>
             <span className={`hidden sm:inline text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900 tracking-normal truncate`}>
               Pro Version 2.04.1 · ICT/SMC Engine
             </span>
+
           </div>
         </div>
       </main>
