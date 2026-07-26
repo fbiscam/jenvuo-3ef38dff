@@ -2070,6 +2070,10 @@ Return ONLY valid JSON (no markdown) with this exact shape:
     { "type":"orderBlock", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"demand"|"supply", "label":"Demand OB" },
     { "type":"liquidity", "tf":"htf"|"ltf", "price":<n>, "side":"buy"|"sell", "label":"BSL above equal highs" },
     { "type":"zone", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"supply"|"demand", "label":"HTF Demand Zone" },
+    { "type":"breaker", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"bullish"|"bearish", "label":"Bullish Breaker" },
+    { "type":"sweep", "tf":"htf"|"ltf", "time":<s>, "price":<n>, "kind":"buy"|"sell", "label":"Sellside Liquidity Sweep" },
+    { "type":"trendline", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "fromPrice":<n>, "toPrice":<n>, "kind":"up"|"down", "label":"Downtrend Leg" },
+    { "type":"reversalZone", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"bullish"|"bearish", "label":"Reversal Zone" },
     { "type":"entry","tf":"ltf","price":<n>,"label":"Entry" },
     { "type":"sl","tf":"ltf","price":<n>,"label":"Stop Loss" },
     { "type":"tp","tf":"ltf","price":<n>,"label":"Take Profit" }
