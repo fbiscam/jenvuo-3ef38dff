@@ -1538,7 +1538,7 @@ function SignalPage() {
 
             {/* RIGHT — intelligence drawer (overlay on desktop, stacked on mobile) */}
             <div className={cn(
-              "bg-white p-5 sm:p-6 border-t border-zinc-100 space-y-6",
+              "bg-white p-4 sm:p-6 border-t border-zinc-100 space-y-5 sm:space-y-6",
               "lg:absolute lg:z-30 lg:top-4 lg:right-4 lg:w-[380px] lg:max-h-[calc(100%-32px)] lg:overflow-y-auto",
               "lg:bg-white/92 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] lg:border-t-0",
               "lg:transition-transform lg:duration-300",
