@@ -458,25 +458,29 @@ function SignalPage() {
       setPlaying(true);
       abortRef.current = false;
 
-      // Gate: only show entry/SL/TP levels + shaded R:R zones when confidence ≥ 65%.
-      const conf65 = Number(p.trade?.confidence ?? 0) >= 65 &&
+      // Gate: only show entry/SL/TP price lines when a real trade plan exists
+      // (BUY/SELL direction + all three levels finite + confidence ≥ 65%).
+      const hasTradePlan =
+        (p.trade?.direction === "BUY" || p.trade?.direction === "SELL") &&
         Number.isFinite(p.trade?.entry) && Number.isFinite(p.trade?.sl) && Number.isFinite(p.trade?.tp) &&
-        p.trade?.direction !== "WAIT";
+        Number(p.trade?.confidence ?? 0) >= 65;
+      const conf65 = hasTradePlan;
 
       // Draw EVERY marking up-front as PERSISTENT so nothing gets removed while walking through.
-      // Entry / SL / TP are gated by confidence (≥65%); below that, only context markings render.
+      // Entry / SL / TP are gated behind a valid trade plan; otherwise only context markings render.
       for (const m of p.markings) {
-        if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
+        if (!hasTradePlan && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
         try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
       }
       // Risk/profit shaded zones removed per user request.
       const entry = p.markings.find((m) => m.type === "entry");
-      if (entry && conf65) {
+      if (entry && hasTradePlan) {
         try {
           ltfRef.current?.panToMarking(entry);
           ltfRef.current?.focusMarking(entry);
         } catch (e) { console.warn("entry focus failed", e); }
       }
+
 
       try {
         // Skip the intro monologue — go straight to marking-by-marking focus.
@@ -662,17 +666,19 @@ function SignalPage() {
           htfRef.current?.clear();
           ltfRef.current?.clear();
           // Draw EVERY marking persistently — nothing gets removed while user views the signal.
-          const conf65 = Number(p.trade?.confidence ?? 0) >= 65 &&
+          const hasTradePlan =
+            (p.trade?.direction === "BUY" || p.trade?.direction === "SELL") &&
             Number.isFinite(p.trade?.entry) && Number.isFinite(p.trade?.sl) && Number.isFinite(p.trade?.tp) &&
-            p.trade?.direction !== "WAIT";
+            Number(p.trade?.confidence ?? 0) >= 65;
           for (const m of p.markings) {
-            if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
+            if (!hasTradePlan && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
             try { ltfRef.current?.drawMarking(m, { transient: false }); } catch {}
           }
           // Risk/profit shaded zones removed per user request.
 
           const entry = p.markings.find((m) => m.type === "entry");
-          if (entry && conf65) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
+          if (entry && hasTradePlan) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
+
         }, 400);
         toast.success("Saved signal restored");
       } else {
