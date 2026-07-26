@@ -421,7 +421,7 @@ export function buildTrade(
     entryType,
     entry, sl, tp, rr,
     tp1, tp2, tp3,
-    zone: { kind: zone.kind, priceLow: zone.priceLow, priceHigh: zone.priceHigh },
+    zone: { kind: zone.kind, priceLow: zone.priceLow, priceHigh: zone.priceHigh, fromTime: zone.fromTime, toTime: zone.toTime },
     reason,
 
     notes: notes.length ? notes : undefined,
