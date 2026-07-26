@@ -361,6 +361,43 @@ async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs
   }
 }
 
+// Runs parallel attempts but aborts + drains losers as soon as one wins,
+// so we don't hold Cloudflare's 6-in-flight subrequest slots hostage.
+async function raceAndCancel<T>(
+  makers: Array<(signal: AbortSignal) => Promise<T>>,
+): Promise<T> {
+  const controllers = makers.map(() => new AbortController());
+  const promises = makers.map((m, i) =>
+    m(controllers[i].signal).then(
+      (v) => ({ ok: true as const, i, v }),
+      (e) => ({ ok: false as const, i, e }),
+    ),
+  );
+  const errors: any[] = [];
+  const pending = new Set(promises);
+  while (pending.size) {
+    const settled = await Promise.race(pending);
+    pending.delete(promises[settled.i]);
+    if (settled.ok) {
+      // Abort every other attempt and best-effort drain any Response bodies.
+      for (let j = 0; j < controllers.length; j++) {
+        if (j !== settled.i) controllers[j].abort();
+      }
+      for (const p of pending) {
+        p.then((r) => {
+          if (r.ok && (r.v as any)?.body?.cancel) {
+            try { (r.v as any).body.cancel(); } catch {}
+          }
+        }).catch(() => {});
+      }
+      return settled.v;
+    }
+    errors.push(settled.e);
+  }
+  throw errors[errors.length - 1] ?? new Error("All attempts failed");
+}
+
+
 function coinbaseProductFromSymbol(sym: string): string | null {
   const m = sym.match(/^([A-Z0-9]{2,15})(USDT|USDC|USD)$/);
   if (!m) return null;
@@ -370,7 +407,7 @@ function coinbaseProductFromSymbol(sym: string): string | null {
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
+  const makers = hosts.flatMap((host) => symbols.map((sym) => (signal: AbortSignal) => (async () => {
         const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${cfg.interval}&range=${cfg.range}`;
         const res = await fetchWithTimeout(url, {
           headers: {
@@ -378,8 +415,9 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
             Accept: "application/json",
           },
+          signal,
         });
-        if (!res.ok) throw new Error(`Yahoo ${sym}: ${res.status}`);
+        if (!res.ok) { try { res.body?.cancel(); } catch {} throw new Error(`Yahoo ${sym}: ${res.status}`); }
         const json: any = await res.json();
         const result = json?.chart?.result?.[0];
         if (!result) throw new Error("No price data");
@@ -393,9 +431,9 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
         }
         if (candles.length >= 10) return candles.slice(-200);
         throw new Error("Too few Yahoo candles");
-  }));
+  })()));
   try {
-    return await Promise.any(attempts);
+    return await raceAndCancel(makers);
   } catch (e) {
     throw e instanceof Error ? e : new Error("Yahoo unavailable");
   }
@@ -408,19 +446,19 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
   };
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
-  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
+  const makers = hosts.flatMap((host) => symbols.map((sym) => (signal: AbortSignal) => (async () => {
         const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
-        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) throw new Error(`Binance ${sym}: ${res.status}`);
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" }, signal });
+        if (!res.ok) { try { res.body?.cancel(); } catch {} throw new Error(`Binance ${sym}: ${res.status}`); }
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
           t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
         })).filter((c) => isFinite(c.c));
         if (candles.length >= 10) return candles.slice(-200);
         throw new Error("Too few Binance candles");
-  }));
+  })()));
   try {
-    return await Promise.any(attempts);
+    return await raceAndCancel(makers);
   } catch (e) {
     throw e instanceof Error ? e : new Error("Binance unavailable");
   }
