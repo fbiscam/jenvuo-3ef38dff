@@ -906,7 +906,33 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       }
     }
     },
+    drawRRZones: (entry: number, sl: number, tp: number, opts?: { transient?: boolean }) => {
+      const chart = chartRef.current;
+      if (!chart || !overlayRef.current) return;
+      if (!Number.isFinite(entry) || !Number.isFinite(sl) || !Number.isFinite(tp)) return;
+      const transient = !!opts?.transient;
+      const mk = (kind: "profit" | "risk", p1: number, p2: number) => {
+        const el = document.createElement("div");
+        const fill = kind === "profit"
+          ? "linear-gradient(180deg, rgba(34,197,94,0.22), rgba(34,197,94,0.10))"
+          : "linear-gradient(180deg, rgba(239,68,68,0.22), rgba(239,68,68,0.10))";
+        const border = kind === "profit" ? "#16a34a" : "#dc2626";
+        const tag = kind === "profit" ? "PROFIT" : "RISK";
+        el.style.cssText = `position:absolute;background:${fill};border-top:1px dashed ${border};border-bottom:1px dashed ${border};pointer-events:none;opacity:0;transition:opacity 500ms ease;z-index:1;`;
+        const ribbon = document.createElement("span");
+        ribbon.style.cssText = `position:absolute;left:8px;top:4px;font-size:9px;font-weight:800;letter-spacing:0.16em;color:#fff;background:${border};padding:2px 8px;border-radius:3px;font-family:'Google Sans',system-ui,sans-serif;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,0.2);`;
+        ribbon.textContent = tag;
+        el.appendChild(ribbon);
+        overlayRef.current!.appendChild(el);
+        rrZonesRef.current.push({ kind, p1, p2, el, transient });
+        requestAnimationFrame(() => { el.style.opacity = "1"; });
+      };
+      mk("profit", entry, tp);
+      mk("risk", entry, sl);
+      (chart as any).__redrawBoxes?.();
+    },
   }));
+
 
   // ---- Pointer handlers for manual drawing ----
   const onPointerDown = useCallback((ev: React.PointerEvent<SVGSVGElement>) => {
