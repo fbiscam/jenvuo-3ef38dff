@@ -1141,7 +1141,7 @@ function SignalPage() {
                 className="hidden sm:flex items-center gap-1.5 overflow-x-auto no-scrollbar min-w-0 rounded-[16px] border border-zinc-200/70 bg-white px-2 py-1.5 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_20px_-10px_rgba(16,24,40,0.08)] ring-1 ring-white/60"
                 style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
               >
-                <span className="text-[12px] text-zinc-500 shrink-0 pl-1">Gold pair:</span>
+                <span className="text-[12px] text-zinc-500 shrink-0 pl-1">{"\n"}</span>
                 {XAU_PAIRS.map((p) => {
                   const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
                   const isFree = !credits.isLoading && credits.plan?.id === "free";
