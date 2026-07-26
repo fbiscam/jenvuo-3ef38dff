@@ -621,7 +621,7 @@ function SignalPage() {
           ltfRef.current?.clear();
           const autoTypes = new Set(["premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql"]);
           for (const m of p.markings) {
-            const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
+            const target = ltfRef.current;
             if (autoTypes.has(m.type) || m.type === "entry" || m.type === "sl" || m.type === "tp") {
               try { target?.drawMarking(m, { transient: false }); } catch {}
             }
