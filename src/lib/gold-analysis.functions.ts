@@ -2819,11 +2819,16 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     // chart shows exactly what the engine used.
     if (built.direction !== "WAIT" && built.zone) {
       const nowS = Math.floor(Date.now() / 1000);
+      // Anchor the engine's chosen zone to the ACTUAL candle that formed it,
+      // then extend the box's right edge to "now" so the zone visually reaches
+      // the live bar — exactly how an ICT trader draws an active zone by hand.
+      const zFrom = (built.zone as any).fromTime ?? nowS - 3600;
+      const zTo = Math.max((built.zone as any).toTime ?? nowS, nowS);
       allMarkings.push({
         type: built.zone.kind === "OB" ? "orderBlock" : "fvg",
         tf: "ltf",
-        fromTime: nowS - 3600,
-        toTime: nowS,
+        fromTime: zFrom,
+        toTime: zTo,
         priceLow: built.zone.priceLow,
         priceHigh: built.zone.priceHigh,
         kind: (built.direction === "BUY" ? (built.zone.kind === "OB" ? "demand" : "bullish") : (built.zone.kind === "OB" ? "supply" : "bearish")) as any,
@@ -2861,19 +2866,22 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       });
     }
 
-    // Rank helpers — closest to current price, unmitigated first
+    // Rank helpers — closest to current price, unmitigated first.
+    // Extend toTime to the live bar so each active zone visually reaches
+    // the right edge, exactly how a trader draws an unmitigated zone.
+    const nowSec = Math.floor(Date.now() / 1000);
     const distTo = (lo: number, hi: number) => Math.abs(((lo + hi) / 2) - last.c);
     const topFvgs = (arr: typeof htfA.fvgs, tf: "htf" | "ltf", n: number) =>
       arr.filter((f) => !f.mitigated).sort((a, b) => distTo(a.priceLow, a.priceHigh) - distTo(b.priceLow, b.priceHigh)).slice(0, n)
         .map((f): Marking => ({
-          type: "fvg", tf, fromTime: f.fromTime, toTime: f.toTime,
+          type: "fvg", tf, fromTime: f.fromTime, toTime: Math.max(f.toTime, nowSec),
           priceLow: +f.priceLow.toFixed(dec), priceHigh: +f.priceHigh.toFixed(dec),
           kind: f.kind, label: `${tf === "htf" ? "HTF" : "LTF"} ${f.kind === "bullish" ? "Bullish" : "Bearish"} FVG`,
         }));
     const topObs = (arr: typeof htfA.obs, tf: "htf" | "ltf", n: number) =>
       arr.filter((o) => !o.mitigated).sort((a, b) => distTo(a.priceLow, a.priceHigh) - distTo(b.priceLow, b.priceHigh)).slice(0, n)
         .map((o): Marking => ({
-          type: "orderBlock", tf, fromTime: o.fromTime, toTime: o.toTime,
+          type: "orderBlock", tf, fromTime: o.fromTime, toTime: Math.max(o.toTime, nowSec),
           priceLow: +o.priceLow.toFixed(dec), priceHigh: +o.priceHigh.toFixed(dec),
           kind: o.kind, label: `${tf === "htf" ? "HTF" : "LTF"} ${o.kind === "demand" ? "Demand" : "Supply"} OB`,
         }));
@@ -2883,11 +2891,11 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     for (const m of topObs(htfA.obs, "htf", 2)) addMark(m);
     for (const m of topObs(ltfA.obs, "ltf", 2)) addMark(m);
 
-    // Breakers + Inverted FVGs (LTF)
+    // Breakers + Inverted FVGs (LTF) — extend to live bar as active zones
     for (const b of breakers.slice(0, 2)) {
       addMark({
         type: "breaker", tf: "ltf",
-        fromTime: b.fromTime, toTime: b.toTime,
+        fromTime: b.fromTime, toTime: Math.max(b.toTime, nowSec),
         priceLow: +b.priceLow.toFixed(dec), priceHigh: +b.priceHigh.toFixed(dec),
         kind: b.kind, label: `${b.kind === "bullish" ? "Bullish" : "Bearish"} Breaker Block`,
       });
@@ -2895,7 +2903,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     for (const g of ifvgs.slice(0, 2)) {
       addMark({
         type: "fvg", tf: "ltf",
-        fromTime: g.fromTime, toTime: g.toTime,
+        fromTime: g.fromTime, toTime: Math.max(g.toTime, nowSec),
         priceLow: +g.priceLow.toFixed(dec), priceHigh: +g.priceHigh.toFixed(dec),
         kind: g.kind, label: `Inverted FVG (${g.kind})`,
       });

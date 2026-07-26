@@ -241,7 +241,7 @@ export type BuiltTrade = {
   entryType: "MARKET" | "LIMIT";
   entry: number; sl: number; tp: number; rr: number;
   tp1?: number; tp2?: number; tp3?: number;
-  zone: { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number } | null;
+  zone: { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number; fromTime?: number; toTime?: number } | null;
   reason: string;
   notes?: string[];
 };
@@ -300,7 +300,7 @@ export function buildTrade(
 
   // Collect all UNMITIGATED LTF FVG/OB on the trade side, regardless of whether
   // price already tapped. We rank by distance and pick MARKET vs LIMIT below.
-  type ZoneCandidate = { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number; dist: number };
+  type ZoneCandidate = { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number; dist: number; fromTime?: number; toTime?: number };
   const candidates: ZoneCandidate[] = [];
   const distanceFromExecutionZone = (lo: number, hi: number) => {
     if (lastPrice >= lo && lastPrice <= hi) return 0;
@@ -310,13 +310,13 @@ export function buildTrade(
     if (f.mitigated) continue;
     if (dir === "BUY" && f.kind !== "bullish") continue;
     if (dir === "SELL" && f.kind !== "bearish") continue;
-    candidates.push({ kind: "FVG", priceLow: f.priceLow, priceHigh: f.priceHigh, dist: distanceFromExecutionZone(f.priceLow, f.priceHigh) });
+    candidates.push({ kind: "FVG", priceLow: f.priceLow, priceHigh: f.priceHigh, dist: distanceFromExecutionZone(f.priceLow, f.priceHigh), fromTime: f.fromTime, toTime: f.toTime });
   }
   for (const o of ltf.obs) {
     if (o.mitigated) continue;
     if (dir === "BUY" && o.kind !== "demand") continue;
     if (dir === "SELL" && o.kind !== "supply") continue;
-    candidates.push({ kind: "OB", priceLow: o.priceLow, priceHigh: o.priceHigh, dist: distanceFromExecutionZone(o.priceLow, o.priceHigh) });
+    candidates.push({ kind: "OB", priceLow: o.priceLow, priceHigh: o.priceHigh, dist: distanceFromExecutionZone(o.priceLow, o.priceHigh), fromTime: o.fromTime, toTime: o.toTime });
   }
 
   // Fallback: synthesize an OTE (62-79%) zone from HTF swing range if no fresh OB/FVG.
@@ -421,7 +421,7 @@ export function buildTrade(
     entryType,
     entry, sl, tp, rr,
     tp1, tp2, tp3,
-    zone: { kind: zone.kind, priceLow: zone.priceLow, priceHigh: zone.priceHigh },
+    zone: { kind: zone.kind, priceLow: zone.priceLow, priceHigh: zone.priceHigh, fromTime: zone.fromTime, toTime: zone.toTime },
     reason,
 
     notes: notes.length ? notes : undefined,
