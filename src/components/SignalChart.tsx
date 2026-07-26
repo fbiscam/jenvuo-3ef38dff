@@ -558,6 +558,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
 
 
     return () => {
+      cancelAnimationFrame(sizeRaf);
+      clearTimeout(sizeTimer);
       ro.disconnect();
       chart.remove();
       chartRef.current = null;
@@ -570,6 +572,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       lastPriceLineRef.current = null;
       if (overlayRef.current) overlayRef.current.innerHTML = "";
     };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [candles, dark]);
 
