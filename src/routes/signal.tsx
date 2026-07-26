@@ -428,8 +428,8 @@ function SignalPage() {
       ]);
       for (const m of p.markings) {
         if (autoTypes.has(m.type)) {
-          const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
-          try { target?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
+          // All markings (HTF + LTF) render on the single LTF chart stage.
+          try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
         }
       }
 
