@@ -319,6 +319,59 @@ const TF_MS: Record<string, number> = {
   "1d": 24 * 60 * 60_000,
 };
 
+function cloneCandle(c: Candle): Candle {
+  return { t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v };
+}
+
+function cloneCandles(candles: Candle[]): Candle[] {
+  return candles.map(cloneCandle);
+}
+
+function sanitizeCandles(candles: Candle[], tf: string): Candle[] {
+  const step = TF_MS[tf] ?? TF_MS["15m"];
+  const normalized = candles
+    .map((raw) => {
+      const tRaw = Number(raw.t);
+      const t = tRaw > 0 && tRaw < 10_000_000_000 ? tRaw * 1000 : tRaw;
+      const o = Number(raw.o);
+      const hRaw = Number(raw.h);
+      const lRaw = Number(raw.l);
+      const c = Number(raw.c);
+      const v = Number(raw.v ?? 0);
+      if (![t, o, hRaw, lRaw, c].every((n) => Number.isFinite(n)) || t <= 0 || o <= 0 || c <= 0) return null;
+      const high = Math.max(hRaw, o, c);
+      const low = Math.min(lRaw, o, c);
+      if (!Number.isFinite(high) || !Number.isFinite(low) || low <= 0 || high <= 0 || high < low) return null;
+      return { t, o, h: high, l: low, c, v: Number.isFinite(v) ? v : 0 } satisfies Candle;
+    })
+    .filter((c): c is Candle => !!c)
+    .sort((a, b) => a.t - b.t);
+
+  const byTime = new Map<number, Candle>();
+  for (const c of normalized) byTime.set(Math.floor(c.t / step) * step, c);
+  const deduped = [...byTime.values()].sort((a, b) => a.t - b.t);
+  if (deduped.length < 3) return deduped;
+
+  const closes = deduped.map((c) => c.c).sort((a, b) => a - b);
+  const median = closes[Math.floor(closes.length / 2)] || deduped[deduped.length - 1].c;
+  const hardLow = median * 0.55;
+  const hardHigh = median * 1.45;
+  const cleaned: Candle[] = [];
+  for (const c of deduped) {
+    if (c.c < hardLow || c.c > hardHigh || c.o < hardLow || c.o > hardHigh) continue;
+    if (c.h / c.l > 1.18) continue;
+    const prev = cleaned[cleaned.length - 1];
+    if (prev) {
+      const gap = Math.abs(c.o - prev.c) / prev.c;
+      const closeJump = Math.abs(c.c - prev.c) / prev.c;
+      if (gap > 0.18 || closeJump > 0.18) continue;
+    }
+    cleaned.push(c);
+  }
+
+  return cleaned.length >= Math.min(20, deduped.length) ? cleaned : deduped;
+}
+
 function syntheticVolatility(inst: ResolvedInstrument): number {
   switch (inst.kind) {
     case "crypto": return 0.0065;
