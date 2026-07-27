@@ -570,7 +570,6 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         }
         try { chartRef.current?.timeScale().applyOptions({ barSpacing: 14, rightOffset: 12 }); } catch {}
         try { chartRef.current?.timeScale().scrollToRealTime(); } catch {}
-        try { chartRef.current?.resize(w, h); } catch {}
       });
     };
     applySize();
