@@ -1519,9 +1519,10 @@ function SignalPage() {
             {!narrationOpen && (
               <button
                 onClick={() => setNarrationOpen(true)}
-                className="hidden"
+                className="hidden lg:inline-flex fixed z-30 bottom-6 left-6 items-center gap-1.5 h-10 px-4 rounded-full bg-white/95 backdrop-blur-xl border border-zinc-200 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.18)] text-[12px] font-medium text-zinc-800 hover:bg-white hover:shadow-[0_10px_28px_-8px_rgba(0,0,0,0.22)] transition"
               >
                 <Sparkles className="h-3.5 w-3.5" /> Narration
+
               </button>
             )}
             {!intelOpen && (
