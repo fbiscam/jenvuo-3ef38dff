@@ -1285,7 +1285,8 @@ function SignalPage() {
               "lg:bg-white/85 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)]",
               "lg:p-4 lg:transition-transform lg:duration-300",
               !narrationOpen && "lg:-translate-x-[calc(100%+20px)]",
-              "hidden",
+            )}>
+
             )}>
               <div className="hidden lg:flex items-center justify-between -mb-1">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">Live Narration</span>
