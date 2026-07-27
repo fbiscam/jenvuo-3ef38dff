@@ -367,7 +367,7 @@ export function checkAnalyzeRateLimit(userId: string): { allowed: boolean; retry
 
 type CacheEntry<T> = { value: T; expiresAt: number };
 const planCache = new Map<string, CacheEntry<unknown>>();
-const PLAN_CACHE_TTL_MS = 3 * 60 * 1000; // 3 minutes
+const PLAN_CACHE_TTL_MS = 30 * 1000; // 30 seconds — keep scans fresh while still preventing accidental rapid repeats
 
 export function getCachedPlan<T>(key: string): T | null {
   const e = planCache.get(key);
