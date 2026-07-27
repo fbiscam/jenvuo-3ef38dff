@@ -1285,8 +1285,8 @@ function SignalPage() {
               "lg:bg-white/85 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)]",
               "lg:p-4 lg:transition-transform lg:duration-300",
               !narrationOpen && "lg:-translate-x-[calc(100%+20px)]",
-              "hidden",
             )}>
+
               <div className="hidden lg:flex items-center justify-between -mb-1">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">Live Narration</span>
                 <button onClick={() => setNarrationOpen(false)} className="text-zinc-400 hover:text-zinc-900 h-6 w-6 inline-flex items-center justify-center rounded-md hover:bg-zinc-100" aria-label="Hide narration"><X className="h-3.5 w-3.5" /></button>
@@ -1519,9 +1519,10 @@ function SignalPage() {
             {!narrationOpen && (
               <button
                 onClick={() => setNarrationOpen(true)}
-                className="hidden"
+                className="hidden lg:inline-flex fixed z-30 bottom-6 left-6 items-center gap-1.5 h-10 px-4 rounded-full bg-white/95 backdrop-blur-xl border border-zinc-200 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.18)] text-[12px] font-medium text-zinc-800 hover:bg-white hover:shadow-[0_10px_28px_-8px_rgba(0,0,0,0.22)] transition"
               >
                 <Sparkles className="h-3.5 w-3.5" /> Narration
+
               </button>
             )}
             {!intelOpen && (
