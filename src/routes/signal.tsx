@@ -1287,7 +1287,6 @@ function SignalPage() {
               !narrationOpen && "lg:-translate-x-[calc(100%+20px)]",
             )}>
 
-            )}>
               <div className="hidden lg:flex items-center justify-between -mb-1">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">Live Narration</span>
                 <button onClick={() => setNarrationOpen(false)} className="text-zinc-400 hover:text-zinc-900 h-6 w-6 inline-flex items-center justify-center rounded-md hover:bg-zinc-100" aria-label="Hide narration"><X className="h-3.5 w-3.5" /></button>
