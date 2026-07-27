@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2, MoreVertical, Volume2, VolumeX, Maximize2, Minimize2 } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
@@ -188,7 +188,7 @@ function SignalPage() {
   const fetchPlan = useServerFn(getSignalPlan);
   const triggerManualBroadcast = useServerFn(runManualScanBroadcast);
   const speech = useSpeech();
-  const credits = useCredits({ allowMfaPending: true });
+  const credits = useCredits();
 
   // Kill any narration / listening when the signal page unmounts
   useEffect(() => {
@@ -202,11 +202,8 @@ function SignalPage() {
   }, []);
 
 
-  const { user: authUser, loading: authLoading, rawUser } = useAuthUser();
-  // Signal page is public-accessible; even an MFA-pending session should be
-  // able to run scans (backend uses whatever bearer they already have).
-  const authReady = !authLoading && !!rawUser;
-
+  const { user: authUser, loading: authLoading } = useAuthUser();
+  const authReady = !authLoading && !!authUser;
   const dark = false;
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);
@@ -336,39 +333,12 @@ function SignalPage() {
 
   const htfRef = useRef<SignalChartHandle>(null);
   const ltfRef = useRef<SignalChartHandle>(null);
-  const chartStageRef = useRef<HTMLDivElement>(null);
-  const [isChartFullscreen, setIsChartFullscreen] = useState(false);
-
-  const toggleChartFullscreen = useCallback(async () => {
-    const el = chartStageRef.current;
-    if (!el) return;
-    const goingFs = !document.fullscreenElement && !isChartFullscreen;
-    // Optimistically toggle CSS fullscreen so the chart fills the viewport
-    // even if the browser Fullscreen API is unavailable (iOS Safari, PWAs).
-    setIsChartFullscreen(goingFs);
-    try {
-      if (goingFs) {
-        await el.requestFullscreen?.();
-      } else if (document.fullscreenElement) {
-        await document.exitFullscreen?.();
-      }
-    } catch {
-      // Keep CSS-only fullscreen state
-    }
-  }, [isChartFullscreen]);
-
-  useEffect(() => {
-    const onFsChange = () => setIsChartFullscreen(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", onFsChange);
-    return () => document.removeEventListener("fullscreenchange", onFsChange);
-  }, []);
-
   const abortRef = useRef(false);
   const feedScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!authLoading && !rawUser) navigate({ to: "/auth", replace: true });
-  }, [authLoading, rawUser, navigate]);
+    if (!authLoading && !authUser) navigate({ to: "/auth", replace: true });
+  }, [authLoading, authUser, navigate]);
 
   // ---------- Killzone warning popup ----------
   const [kzDismissed, setKzDismissed] = useState<boolean | null>(null);
@@ -399,23 +369,12 @@ function SignalPage() {
 
 
   const [voiceBlocked, setVoiceBlocked] = useState(false);
-  const [voiceMuted, setVoiceMuted] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    try { return window.localStorage.getItem("jenvu:voice-muted") === "1"; } catch { return false; }
-  });
-  const voiceMutedRef = useRef(voiceMuted);
-  useEffect(() => { voiceMutedRef.current = voiceMuted; }, [voiceMuted]);
   const [activeTf, setActiveTf] = useState<"htf" | "ltf" | null>(null);
-  const [intelOpen, setIntelOpen] = useState(true);
-  const [narrationOpen, setNarrationOpen] = useState(true);
-  const [pairMenuOpen, setPairMenuOpen] = useState(false);
-
 
   const speakWait = useCallback(
     (text: string) =>
       new Promise<void>((resolve) => {
         if (!text || !text.trim()) return resolve();
-        if (voiceMutedRef.current) return resolve();
         const words = text.split(/\s+/).filter(Boolean).length;
         const minMs = Math.max(2500, words * 320);
         let done = false;
@@ -454,70 +413,72 @@ function SignalPage() {
       htfRef.current?.clear();
       ltfRef.current?.clear();
       setStep(-1);
-      setActiveTf("ltf");
+      setActiveTf(null);
       setPlaying(true);
       abortRef.current = false;
 
-      // Gate: only show entry/SL/TP levels + shaded R:R zones when confidence ≥ 65%.
-      const conf65 = Number(p.trade?.confidence ?? 0) >= 65 &&
-        Number.isFinite(p.trade?.entry) && Number.isFinite(p.trade?.sl) && Number.isFinite(p.trade?.tp) &&
-        p.trade?.direction !== "WAIT";
-
-      // Only render the IMPORTANT markings: entry/SL/TP + core ICT/SMC (BOS, CHoCH, Order Block, FVG).
-      // Skip noisier context (liquidity sweeps, trendlines, S/R, EQH/EQL, premium/discount, breakers).
-      const IMPORTANT = new Set(["entry", "sl", "tp", "bos", "choch", "ob", "fvg", "trendline"]);
+      // Pre-draw static context zones (Premium/Discount/OTE/Liquidity/EQH/EQL)
+      // as PERSISTENT background context so they stay visible the whole walkthrough.
+      const autoTypes = new Set([
+        "premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql",
+      ]);
       for (const m of p.markings) {
-        if (!IMPORTANT.has(String(m.type).toLowerCase())) continue;
-        if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
-        const visibleMarking = { ...m, tf: "ltf" as const };
-        try { ltfRef.current?.drawMarking(visibleMarking, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
-      }
-      // Risk/profit shaded zones removed per user request.
-      const entry = p.markings.find((m) => m.type === "entry");
-      if (entry && conf65) {
-        try {
-          ltfRef.current?.panToMarking(entry);
-          ltfRef.current?.focusMarking(entry);
-        } catch (e) { console.warn("entry focus failed", e); }
+        if (autoTypes.has(m.type)) {
+          const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
+          try { target?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
+        }
       }
 
       try {
-        // Skip the intro monologue — go straight to marking-by-marking focus.
+        await speakWait(p.intro);
         for (let i = 0; i < p.narration.length; i++) {
           if (abortRef.current) break;
           const n = p.narration[i];
-          // Skip narration lines that reference entry/SL/TP execution when confidence < 65%.
-          const refM = n.markingIndex != null ? p.markings[n.markingIndex] : null;
-          const refIsExec = !!refM && (refM.type === "entry" || refM.type === "sl" || refM.type === "tp");
-          const sayIsExec = /\b(entry|stop\s*loss|\bsl\b|take\s*profit|\btp\b|target)\b/i.test(n.say || "");
-          if (!conf65 && (refIsExec || sayIsExec)) continue;
           setStep(i);
           setActiveTf(n.tf);
-          // Pan to the referenced marking WITHOUT redrawing / clearing anything —
-          // markings stay locked on the chart.
-          if (refM) {
+          const target = n.tf === "htf" ? htfRef.current : ltfRef.current;
+          // Sequential lifecycle: clear previous transient marking, draw + pan to the new one,
+          // then narrate. Only ONE active ICT/SMC marking is visible at a time.
+          htfRef.current?.clearTransient();
+          ltfRef.current?.clearTransient();
+          if (n.markingIndex != null && p.markings[n.markingIndex]) {
+            const m = p.markings[n.markingIndex];
+            const drawTarget = m.tf === "htf" ? htfRef.current : ltfRef.current;
             try {
-              ltfRef.current?.panToMarking(refM);
-              ltfRef.current?.focusMarking(refM);
+              drawTarget?.drawMarking(m, { transient: true });
+              drawTarget?.panToMarking(m);
+              await new Promise((r) => setTimeout(r, 80));
+              drawTarget?.focusMarking(m);
             } catch (e) {
-              console.warn("marking pan failed", e);
+              console.warn("marking step failed", e);
             }
+          } else if (target) {
+            // No specific marking — just keep current view
           }
-          // Short one-line callout only — no verbose walkthrough.
           await speakWait(n.say);
+          // Brief fade-out pause before next step
           if (i < p.narration.length - 1) {
-            await new Promise((r) => setTimeout(r, 120));
+            await new Promise((r) => setTimeout(r, 220));
           }
         }
-
         if (!abortRef.current) {
+          // Final reveal — clear any transient marker, then draw entry/sl/tp together (persistent).
+          htfRef.current?.clearTransient();
+          ltfRef.current?.clearTransient();
           setActiveTf("ltf");
+          for (const m of p.markings) {
+            if (m.type === "entry" || m.type === "sl" || m.type === "tp") {
+              try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("final marking failed", e); }
+            }
+          }
+          const entry = p.markings.find((m) => m.type === "entry");
           if (entry) {
             try {
               ltfRef.current?.panToMarking(entry);
               ltfRef.current?.focusMarking(entry);
             } catch (e) { console.warn("entry focus failed", e); }
           }
+          await speakWait(p.trade.summary);
           const hasLevels =
             Number.isFinite(p.trade.entry) && Number.isFinite(p.trade.sl) && Number.isFinite(p.trade.tp);
           if ((p.trade.confidence ?? 0) >= 70 && hasLevels && p.trade.direction !== "WAIT") {
@@ -540,9 +501,6 @@ function SignalPage() {
 
     // Pre-flight: block the scan if wallet is below the flat $0.20 per-signal charge.
     if (!credits.isLoading && credits.balance < 0.20) {
-      const msg = `Balance too low ($${credits.balance.toFixed(2)}). You need at least $0.20 to run a signal scan. Add funds to continue.`;
-      setAnalysisError(msg);
-      setPlan(null);
       toast.error("Balance too low to run analysis", {
         description: `Low balance — add funds to continue.`,
         action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
@@ -557,13 +515,7 @@ function SignalPage() {
     try {
       const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
       const ok = await credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
-      if (!ok) {
-        setPlan(null);
-        setAnalysisError("Couldn't start the scan — please check your balance or documents and try again.");
-        setLoading(false);
-        activeScanRef.current = null;
-        return;
-      }
+      if (!ok) { setLoading(false); return; }
       const result = await fetchPlan({ data: { symbol: sym, scanId, force: true } });
       if (!result.ok) {
         setPlan(null);
@@ -571,7 +523,6 @@ function SignalPage() {
         toast.error(result.error);
         return;
       }
-
       const p = withSignalIntelligence(result.plan);
 
       // Mirror the auto-scan pipeline gates so a manual scan never surfaces a
@@ -664,21 +615,15 @@ function SignalPage() {
           const p = withSignalIntelligence(snap.plan as SignalPlan);
           htfRef.current?.clear();
           ltfRef.current?.clear();
-          // Draw EVERY marking persistently — nothing gets removed while user views the signal.
-          const conf65 = Number(p.trade?.confidence ?? 0) >= 65 &&
-            Number.isFinite(p.trade?.entry) && Number.isFinite(p.trade?.sl) && Number.isFinite(p.trade?.tp) &&
-            p.trade?.direction !== "WAIT";
-          const IMPORTANT = new Set(["entry", "sl", "tp", "bos", "choch", "ob", "fvg", "trendline"]);
+          const autoTypes = new Set(["premiumZone", "discountZone", "oteZone", "liquidity", "eqh", "eql"]);
           for (const m of p.markings) {
-            if (!IMPORTANT.has(String(m.type).toLowerCase())) continue;
-            if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
-            const visibleMarking = { ...m, tf: "ltf" as const };
-            try { ltfRef.current?.drawMarking(visibleMarking, { transient: false }); } catch {}
+            const target = m.tf === "htf" ? htfRef.current : ltfRef.current;
+            if (autoTypes.has(m.type) || m.type === "entry" || m.type === "sl" || m.type === "tp") {
+              try { target?.drawMarking(m, { transient: false }); } catch {}
+            }
           }
-          // Risk/profit shaded zones removed per user request.
-
           const entry = p.markings.find((m) => m.type === "entry");
-          if (entry && conf65) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
+          if (entry) { try { ltfRef.current?.panToMarking(entry); ltfRef.current?.focusMarking(entry); } catch {} }
         }, 400);
         toast.success("Saved signal restored");
       } else {
@@ -1085,24 +1030,6 @@ function SignalPage() {
             >
               Killzones
             </Link>
-            <button
-              onClick={() => {
-                const next = !voiceMuted;
-                setVoiceMuted(next);
-                voiceMutedRef.current = next;
-                try { window.localStorage.setItem("jenvu:voice-muted", next ? "1" : "0"); } catch {}
-                if (next) {
-                  try { stopAllBrowserSpeech(); } catch {}
-                  try { speech.stopSpeaking?.(); } catch {}
-                }
-              }}
-              className={`shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border text-[12px] font-medium transition ${voiceMuted ? "border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-200" : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"}`}
-              title={voiceMuted ? "Voice agent muted — tap to unmute" : "Mute voice agent"}
-              aria-pressed={voiceMuted}
-            >
-              {voiceMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
-              <span className="hidden sm:inline">{voiceMuted ? "Voice off" : "Voice on"}</span>
-            </button>
             {voiceBlocked && (
               <button
                 onClick={() => {
@@ -1153,8 +1080,52 @@ function SignalPage() {
         </div>
       </header>
 
-      {/* XAU PAIR SELECTOR — moved into LIVE FEED 3-dot menu */}
-
+      {/* XAU PAIR SELECTOR */}
+      <div className="border-b border-zinc-100 bg-white/60">
+        <div className="mx-auto max-w-[1600px] px-5 py-2 sm:px-6 sm:py-2.5 flex items-center gap-2 overflow-x-auto">
+          <span className={`font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[15px] font-normal normal-case tracking-normal text-zinc-900 shrink-0`}>Gold pair:</span>
+          {XAU_PAIRS.map((p) => {
+            const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
+            const isFree = !credits.isLoading && credits.plan?.id === "free";
+            const locked = isFree && p !== "XAUUSD";
+            return (
+              <button
+                key={p}
+                onClick={() => {
+                  if (active) return;
+                  if (locked) {
+                    toast.info("Multi-pair analysis is a Pro feature", {
+                      description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
+                      action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+                    });
+                    return;
+                  }
+                  abortRef.current = true;
+                  try { speech.stopSpeaking(); } catch {}
+                  setPlaying(false);
+                  setActiveTf(null);
+                  setPlan(null);
+                  setLoading(true);
+                  setStep(-1);
+                  navigate({ to: "/signal", search: { symbol: p }, replace: true });
+                }}
+                className={cn(
+                  "shrink-0 h-7 px-2.5 rounded-md font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[13px] font-normal tracking-normal transition border inline-flex items-center gap-1",
+                  active
+                    ? "bg-zinc-50 text-zinc-900 border-zinc-400 ring-1 ring-zinc-300 shadow-sm font-medium"
+                    : locked
+                      ? "bg-white text-zinc-400 border-zinc-200 hover:bg-zinc-50 cursor-pointer"
+                      : "bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-50",
+                )}
+                title={locked ? "Pro feature — upgrade to unlock" : undefined}
+              >
+                {locked && <Lock className="h-3 w-3" />}
+                {XAU_LABELS[p]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {/* LOW BALANCE BANNER — blocks scan when wallet < $0.20 per-signal charge */}
       {!credits.isLoading && credits.balance < 0.20 && (
@@ -1202,54 +1173,9 @@ function SignalPage() {
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="flex gap-1.5 shrink-0">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
-              </div>
-              <div
-                className="hidden sm:flex items-center gap-1.5 overflow-x-auto no-scrollbar min-w-0 rounded-[16px] bg-transparent px-2 py-1.5"
-                style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
-              >
-                <span className="text-[12px] text-zinc-500 shrink-0 pl-1">{"\n"}</span>
-                {XAU_PAIRS.map((p) => {
-                  const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
-                  const isFree = !credits.isLoading && credits.plan?.id === "free";
-                  const locked = isFree && p !== "XAUUSD";
-                  return (
-                    <button
-                      key={p}
-                      onClick={() => {
-                        if (active) return;
-                        if (locked) {
-                          toast.info("Multi-pair analysis is a Pro feature", {
-                            description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
-                            action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
-                          });
-                          return;
-                        }
-                        abortRef.current = true;
-                        try { speech.stopSpeaking(); } catch {}
-                        setPlaying(false);
-                        setActiveTf(null);
-                        setPlan(null);
-                        setLoading(true);
-                        setStep(-1);
-                        navigate({ to: "/signal", search: { symbol: p }, replace: true });
-                      }}
-                      className={cn(
-                        "shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-[10px] text-[12px] transition",
-                        active
-                          ? "bg-white text-black ring-1 ring-zinc-200 shadow-[0_1px_2px_rgba(16,24,40,0.08)]"
-                          : "text-black/80 hover:bg-zinc-100",
-                      )}
-                      style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
-                      title={locked ? "Pro feature — upgrade to unlock" : undefined}
-                    >
-                      {locked && <Lock className="h-3 w-3 opacity-60" />}
-                      {XAU_LABELS[p]}
-                    </button>
-                  );
-                })}
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2 sm:gap-4">
@@ -1273,30 +1199,13 @@ function SignalPage() {
                   </>
                 )}
               </div>
-
             </div>
           </div>
 
-
-
-
-
-
-          {/* body grid — full-page chart stage with overlay panels */}
-          <div className="relative bg-white lg:min-h-[calc(100vh-160px)]">
-            {/* LEFT — ICT execution feed (overlay on desktop, stacked on mobile) */}
-            <div className={cn(
-              "bg-white p-4 flex flex-col gap-3 border-b border-zinc-100",
-              "lg:absolute lg:z-30 lg:top-4 lg:left-4 lg:w-[340px] lg:max-h-[calc(100%-32px)]",
-              "lg:bg-white/85 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)]",
-              "lg:p-4 lg:transition-transform lg:duration-300",
-              !narrationOpen && "lg:-translate-x-[calc(100%+20px)]",
-            )}>
-
-              <div className="hidden lg:flex items-center justify-between -mb-1">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">Live Narration</span>
-                <button onClick={() => setNarrationOpen(false)} className="text-zinc-400 hover:text-zinc-900 h-6 w-6 inline-flex items-center justify-center rounded-md hover:bg-zinc-100" aria-label="Hide narration"><X className="h-3.5 w-3.5" /></button>
-              </div>
+          {/* body grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
+            {/* LEFT — ICT execution feed */}
+            <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-4 min-h-[280px]">
               {/* Voice AI Agent — orb + chat, can mark on chart */}
               <div className="pb-3 border-b border-zinc-100">
                 <SignalVoiceAgent
@@ -1366,19 +1275,7 @@ function SignalPage() {
                 )
               )}
               <div ref={feedScrollRef} className="space-y-3 overflow-y-auto pr-1 max-h-[520px]">
-                {plan?.narration.filter((n) => {
-                  // Mirror the ≥65% confidence gate used for voice + chart: hide
-                  // execution lines (entry / SL / TP) from the visible feed when
-                  // the setup didn't qualify, so the panel matches the toast.
-                  const conf = Number(plan?.trade?.confidence ?? 0);
-                  const qualified = conf >= 65 && plan?.trade?.direction !== "WAIT";
-                  if (qualified) return true;
-                  const refM = n.markingIndex != null ? plan?.markings[n.markingIndex] : null;
-                  const refIsExec = !!refM && (refM.type === "entry" || refM.type === "sl" || refM.type === "tp");
-                  const sayIsExec = /\b(entry|stop\s*loss|\bsl\b|take\s*profit|\btp\b|target)\b/i.test(n.say || "");
-                  return !(refIsExec || sayIsExec);
-                }).map((n, i) => {
-
+                {plan?.narration.map((n, i) => {
                   const { tag, tone } = tagOf(n.say);
                   const active = i === step;
                   const past = i < step;
@@ -1417,28 +1314,65 @@ function SignalPage() {
 
 
 
-            {/* CENTER — full-page chart stage */}
-            <div className="w-full bg-white flex flex-col gap-px">
-              {/* MTF moved to top block below terminal header */}
+            {/* CENTER — charts + multi-tf strip */}
+            <div className="lg:col-span-6 bg-white flex flex-col gap-px">
+              {/* Multi-TF alignment strip */}
+              {plan && (
+                <div className="bg-white px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-3 border-b border-zinc-100">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-500 mr-1`}>
+                      MTF
+                    </span>
+                    {plan.multiTf.map((b) => (
+                      <TfPill key={b.tf} tfBias={b} />
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+                      {plan.alignmentLabel}
+                    </span>
+                    <div className="w-24 h-1.5 bg-gradient-to-r from-rose-100 via-zinc-100 to-emerald-100 rounded-full relative overflow-hidden">
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 w-2 h-3 bg-zinc-900 rounded-sm"
+                        style={{ left: `${Math.max(0, Math.min(96, plan.alignmentScore))}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
-              {/* HTF mini overview hidden — chart kept mounted offscreen so narration/markings still run */}
-              <div className="hidden" aria-hidden="true">
-                {plan ? (
-                  <SignalChart
-                    ref={htfRef}
-                    candles={plan.htfCandles}
-                    tf="htf"
-                    dark={false}
-                    title="4H"
-                  />
-                ) : null}
-              </div>
-
-
-              {/* LTF — the main stage, full page */}
               <div className="bg-white p-3 sm:p-4 flex flex-col gap-2">
-                <div className="flex items-center justify-between lg:hidden">
-                  <span className="text-[13px] font-normal text-zinc-900">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal normal-case text-zinc-900">
+                    HTF // 4H · Bias
+                  </span>
+                  {plan && (
+                    <span className={cn(
+                      "text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded",
+                      plan.htfBias === "bullish" ? "bg-emerald-100 text-emerald-700" :
+                      plan.htfBias === "bearish" ? "bg-rose-100 text-rose-700" :
+                      "bg-zinc-100 text-zinc-700",
+                    )}>
+                      {plan.htfBias}
+                    </span>
+                  )}
+                </div>
+                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "ltf" ? "opacity-55" : "opacity-100")}>
+                  {plan ? (
+                    <SignalChart
+                      ref={htfRef}
+                      candles={plan.htfCandles}
+                      tf="htf"
+                      dark={false}
+                      title="4H"
+                    />
+                  ) : null}
+                </div>
+
+              </div>
+              <div className="bg-white p-3 sm:p-4 flex flex-col gap-2 border-t border-zinc-100">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal normal-case text-zinc-900">
                     LTF // 15M · Execution
                   </span>
                   {t && (
@@ -1452,110 +1386,35 @@ function SignalPage() {
                     </span>
                   )}
                 </div>
-                <div
-                  ref={chartStageRef}
-                  className={cn(
-                    "relative overflow-hidden bg-white",
-                    isChartFullscreen
-                      ? "fixed inset-0 z-[9999] h-screen w-screen rounded-none border-0"
-                      : "rounded-2xl border border-zinc-200/60 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.08)] h-[520px] sm:h-[620px] lg:h-[calc(100vh-140px)] xl:h-[calc(100vh-120px)]",
-                  )}>
-                  <button
-                    type="button"
-                    onClick={toggleChartFullscreen}
-                    className="absolute top-3 right-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 backdrop-blur border border-zinc-200 text-zinc-700 shadow-sm hover:bg-white hover:text-zinc-900 transition"
-                    title={isChartFullscreen ? "Exit fullscreen" : "Fullscreen chart"}
-                    aria-label={isChartFullscreen ? "Exit fullscreen" : "Fullscreen chart"}
-                  >
-                    {isChartFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                  </button>
-
-
+                <div className={cn("rounded-xl border border-zinc-100 overflow-hidden h-[260px] sm:h-[300px] transition-opacity duration-300", activeTf === "htf" ? "opacity-55" : "opacity-100")}>
                   {plan ? (
                     <SignalChart
                       ref={ltfRef}
                       candles={plan.ltfCandles}
                       tf="ltf"
                       dark={false}
-                      title="15M · Execution"
+                      title="15M"
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-white">
-                      <div className="max-w-sm text-center px-6 py-10">
-                        {analysisError ? (
-                          <>
-                            <AlertTriangle className="mx-auto h-8 w-8 text-amber-500 mb-3" />
-                            <div className="text-[14px] font-medium text-zinc-900 mb-2">Chart unavailable</div>
-                            <div className="text-[13px] text-zinc-600 mb-4">{analysisError}</div>
-                            {credits.balance < 0.20 ? (
-                              <Link
-                                to="/dashboard/billing"
-                                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900 px-4 text-[13px] font-medium text-white hover:bg-black"
-                              >
-                                Add funds
-                              </Link>
-                            ) : (
-                              <button
-                                onClick={load}
-                                disabled={loading}
-                                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900 px-4 text-[13px] font-medium text-white disabled:opacity-50"
-                              >
-                                {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-                                Retry analysis
-                              </button>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            <Loader2 className="mx-auto h-6 w-6 animate-spin text-zinc-400 mb-3" />
-                            <div className="text-[13px] text-zinc-500">Preparing chart & analysis…</div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  ) : null}
 
                 </div>
-
-
+                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-800 font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
+                  <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
+                  <LegendDot color="bg-sky-500/70" label="OB" />
+                  <LegendDot color="bg-amber-500/70" label="Liquidity" />
+                  <LegendDot color="bg-violet-500/70" label="EQH/EQL" />
+                  <LegendDot color="bg-yellow-400/70" label="OTE" />
+                  <LegendDot color="bg-rose-400/40" label="Premium" />
+                  <LegendDot color="bg-emerald-400/40" label="Discount" />
+                </div>
               </div>
             </div>
 
-            {/* Floating toggles — desktop only */}
-            {!narrationOpen && (
-              <button
-                onClick={() => setNarrationOpen(true)}
-                className="hidden lg:inline-flex fixed z-30 bottom-6 left-6 items-center gap-1.5 h-10 px-4 rounded-full bg-white/95 backdrop-blur-xl border border-zinc-200 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.18)] text-[12px] font-medium text-zinc-800 hover:bg-white hover:shadow-[0_10px_28px_-8px_rgba(0,0,0,0.22)] transition"
-              >
-                <Sparkles className="h-3.5 w-3.5" /> Narration
-
-              </button>
-            )}
-            {!intelOpen && (
-              <button
-                onClick={() => setIntelOpen(true)}
-                className="hidden lg:inline-flex fixed z-30 bottom-6 right-6 items-center gap-1.5 h-10 px-4 rounded-full bg-white/95 backdrop-blur-xl border border-zinc-200 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.18)] text-[12px] font-medium text-zinc-800 hover:bg-white hover:shadow-[0_10px_28px_-8px_rgba(0,0,0,0.22)] transition"
-              >
-                <Activity className="h-3.5 w-3.5" /> Intelligence
-              </button>
-            )}
-
-
-            {/* RIGHT — intelligence drawer (overlay on desktop, stacked on mobile) */}
-            <div className={cn(
-              "bg-white p-5 sm:p-6 border-t border-zinc-100 space-y-6",
-              "lg:absolute lg:z-30 lg:top-4 lg:right-4 lg:w-[380px] lg:max-h-[calc(100%-32px)] lg:overflow-y-auto",
-              "lg:bg-white/92 lg:backdrop-blur-2xl lg:rounded-2xl lg:border lg:border-zinc-200/70 lg:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] lg:border-t-0",
-              "lg:transition-transform lg:duration-300",
-              !intelOpen && "lg:translate-x-[calc(100%+20px)]",
-            )}>
-              <div className="flex items-center justify-between">
-                <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case">
-                  Intelligence Dashboard
-                </h3>
-                <button onClick={() => setIntelOpen(false)} className="hidden lg:inline-flex text-zinc-400 hover:text-zinc-900 h-6 w-6 items-center justify-center rounded-md hover:bg-zinc-100" aria-label="Hide intelligence"><X className="h-3.5 w-3.5" /></button>
-              </div>
-
+            {/* RIGHT — intelligence */}
+            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 space-y-6 overflow-y-auto max-h-[820px]">
+              <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case">
+                Intelligence Dashboard
+              </h3>
 
               {/* Confluence Heatmap removed */}
 
@@ -1979,17 +1838,9 @@ function SignalPage() {
                 </span>
               </div>
             </div>
-            <div className="hidden sm:flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
-              <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
-              <LegendDot color="bg-sky-500/70" label="OB" />
-              <LegendDot color="bg-amber-500/70" label="Liquidity" />
-              <LegendDot color="bg-violet-500/70" label="EQH/EQL" />
-              <LegendDot color="bg-yellow-400/70" label="OTE" />
-            </div>
             <span className={`hidden sm:inline text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900 tracking-normal truncate`}>
               Pro Version 2.04.1 · ICT/SMC Engine
             </span>
-
           </div>
         </div>
       </main>

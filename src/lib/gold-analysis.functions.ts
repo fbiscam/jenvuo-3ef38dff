@@ -85,15 +85,14 @@ export type GoldSignal = {
 };
 
 const YAHOO_INTERVAL: Record<string, { interval: string; range: string }> = {
-  "1m": { interval: "1m", range: "5d" },
-  "5m": { interval: "5m", range: "1mo" },
-  "15m": { interval: "15m", range: "2mo" },
-  "30m": { interval: "30m", range: "3mo" },
-  "1h": { interval: "60m", range: "6mo" },
-  "4h": { interval: "1h", range: "1y" },
-  "1d": { interval: "1d", range: "5y" },
+  "1m": { interval: "1m", range: "1d" },
+  "5m": { interval: "5m", range: "5d" },
+  "15m": { interval: "15m", range: "10d" },
+  "30m": { interval: "30m", range: "20d" },
+  "1h": { interval: "60m", range: "30d" },
+  "4h": { interval: "1h", range: "60d" },
+  "1d": { interval: "1d", range: "1y" },
 };
-
 
 // ============================================================
 // UNIVERSAL INSTRUMENT RESOLVER
@@ -319,59 +318,6 @@ const TF_MS: Record<string, number> = {
   "1d": 24 * 60 * 60_000,
 };
 
-function cloneCandle(c: Candle): Candle {
-  return { t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v };
-}
-
-function cloneCandles(candles: Candle[]): Candle[] {
-  return candles.map(cloneCandle);
-}
-
-function sanitizeCandles(candles: Candle[], tf: string): Candle[] {
-  const step = TF_MS[tf] ?? TF_MS["15m"];
-  const normalized = candles
-    .map((raw) => {
-      const tRaw = Number(raw.t);
-      const t = tRaw > 0 && tRaw < 10_000_000_000 ? tRaw * 1000 : tRaw;
-      const o = Number(raw.o);
-      const hRaw = Number(raw.h);
-      const lRaw = Number(raw.l);
-      const c = Number(raw.c);
-      const v = Number(raw.v ?? 0);
-      if (![t, o, hRaw, lRaw, c].every((n) => Number.isFinite(n)) || t <= 0 || o <= 0 || c <= 0) return null;
-      const high = Math.max(hRaw, o, c);
-      const low = Math.min(lRaw, o, c);
-      if (!Number.isFinite(high) || !Number.isFinite(low) || low <= 0 || high <= 0 || high < low) return null;
-      return { t, o, h: high, l: low, c, v: Number.isFinite(v) ? v : 0 } satisfies Candle;
-    })
-    .filter((c): c is Candle => !!c)
-    .sort((a, b) => a.t - b.t);
-
-  const byTime = new Map<number, Candle>();
-  for (const c of normalized) byTime.set(Math.floor(c.t / step) * step, c);
-  const deduped = [...byTime.values()].sort((a, b) => a.t - b.t);
-  if (deduped.length < 3) return deduped;
-
-  const closes = deduped.map((c) => c.c).sort((a, b) => a - b);
-  const median = closes[Math.floor(closes.length / 2)] || deduped[deduped.length - 1].c;
-  const hardLow = median * 0.55;
-  const hardHigh = median * 1.45;
-  const cleaned: Candle[] = [];
-  for (const c of deduped) {
-    if (c.c < hardLow || c.c > hardHigh || c.o < hardLow || c.o > hardHigh) continue;
-      if (c.h / c.l > 1.50) continue;
-    const prev = cleaned[cleaned.length - 1];
-    if (prev) {
-      const gap = Math.abs(c.o - prev.c) / prev.c;
-      const closeJump = Math.abs(c.c - prev.c) / prev.c;
-      if (gap > 0.50 || closeJump > 0.50) continue;
-    }
-    cleaned.push(c);
-  }
-
-  return cleaned.length >= Math.min(20, deduped.length) ? cleaned : deduped;
-}
-
 function syntheticVolatility(inst: ResolvedInstrument): number {
   switch (inst.kind) {
     case "crypto": return 0.0065;
@@ -407,48 +353,13 @@ function buildSyntheticCandles(inst: ResolvedInstrument, tf: string, price: numb
 
 async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 1800): Promise<Response> {
   const controller = new AbortController();
-  const abortFromParent = () => controller.abort();
-  if (init.signal) {
-    if (init.signal.aborted) controller.abort();
-    else init.signal.addEventListener("abort", abortFromParent, { once: true });
-  }
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(input, { ...init, signal: controller.signal });
+    return await fetch(input, { ...init, signal: init.signal ?? controller.signal });
   } finally {
     clearTimeout(timer);
-    if (init.signal) init.signal.removeEventListener("abort", abortFromParent);
   }
 }
-
-function cancelResponseBody(response: Response): void {
-  try { response.body?.cancel(); } catch { /* ignore */ }
-}
-
-// Cloudflare Workers cap in-flight subrequests to 6 per invocation. True racing
-// (Promise.race across all mirrors) blows the cap once several timeframes are
-// analyzed in parallel, leaving orphaned Responses that trigger the "stalled
-// HTTP response was canceled to prevent deadlock" warning and force the plan
-// into the 25% WAIT fallback. Try mirrors sequentially instead — the per-try
-// timeout is short (1.8s) so total latency stays low, and we never hold more
-// than one candle-fetch slot per instrument-timeframe at a time.
-async function raceAndCancel<T>(
-  makers: Array<(signal: AbortSignal) => Promise<T>>,
-): Promise<T> {
-  const errors: any[] = [];
-  for (const m of makers) {
-    const controller = new AbortController();
-    try {
-      return await m(controller.signal);
-    } catch (e) {
-      try { controller.abort(); } catch {}
-      errors.push(e);
-    }
-  }
-  throw errors[errors.length - 1] ?? new Error("All attempts failed");
-}
-
-
 
 function coinbaseProductFromSymbol(sym: string): string | null {
   const m = sym.match(/^([A-Z0-9]{2,15})(USDT|USDC|USD)$/);
@@ -459,7 +370,7 @@ function coinbaseProductFromSymbol(sym: string): string | null {
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-  const makers = hosts.flatMap((host) => symbols.map((sym) => (signal: AbortSignal) => (async () => {
+  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
         const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${cfg.interval}&range=${cfg.range}`;
         const res = await fetchWithTimeout(url, {
           headers: {
@@ -467,9 +378,8 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
             Accept: "application/json",
           },
-          signal,
         });
-        if (!res.ok) { try { res.body?.cancel(); } catch {} throw new Error(`Yahoo ${sym}: ${res.status}`); }
+        if (!res.ok) throw new Error(`Yahoo ${sym}: ${res.status}`);
         const json: any = await res.json();
         const result = json?.chart?.result?.[0];
         if (!result) throw new Error("No price data");
@@ -481,12 +391,11 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
           if (o == null || h == null || l == null || c == null) continue;
           candles.push({ t: ts[i] * 1000, o, h, l, c, v });
         }
-        const clean = sanitizeCandles(candles, tf);
-        if (clean.length >= 10) return clean.slice(-1000);
+        if (candles.length >= 10) return candles.slice(-200);
         throw new Error("Too few Yahoo candles");
-  })()));
+  }));
   try {
-    return await raceAndCancel(makers);
+    return await Promise.any(attempts);
   } catch (e) {
     throw e instanceof Error ? e : new Error("Yahoo unavailable");
   }
@@ -499,20 +408,19 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
   };
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
-  const makers = hosts.flatMap((host) => symbols.map((sym) => (signal: AbortSignal) => (async () => {
-        const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=1000`;
-        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" }, signal });
-        if (!res.ok) { try { res.body?.cancel(); } catch {} throw new Error(`Binance ${sym}: ${res.status}`); }
+  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
+        const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        if (!res.ok) throw new Error(`Binance ${sym}: ${res.status}`);
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
           t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
-        }));
-        const clean = sanitizeCandles(candles, tf);
-        if (clean.length >= 10) return clean.slice(-1000);
+        })).filter((c) => isFinite(c.c));
+        if (candles.length >= 10) return candles.slice(-200);
         throw new Error("Too few Binance candles");
-  })()));
+  }));
   try {
-    return await raceAndCancel(makers);
+    return await Promise.any(attempts);
   } catch (e) {
     throw e instanceof Error ? e : new Error("Binance unavailable");
   }
@@ -536,7 +444,7 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
       const res = await fetchWithTimeout(`https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
       });
-      if (!res.ok) { cancelResponseBody(res); lastErr = new Error(`Coinbase ${product}: ${res.status}`); continue; }
+      if (!res.ok) { lastErr = new Error(`Coinbase ${product}: ${res.status}`); continue; }
       const rows: any[] = await res.json();
       const candles: Candle[] = rows
         .map((r) => ({
@@ -547,9 +455,9 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
           c: Number(r[4]),
           v: Number(r[5] ?? 0),
         }))
+        .filter((c) => Number.isFinite(c.t) && Number.isFinite(c.c) && c.c > 0)
         .sort((a, b) => a.t - b.t);
-      const clean = sanitizeCandles(candles, tf);
-      if (clean.length >= 10) return clean.slice(-1000);
+      if (candles.length >= 10) return candles.slice(-200);
     } catch (e) { lastErr = e; }
   }
   throw lastErr ?? new Error("Coinbase unavailable");
@@ -633,16 +541,15 @@ async function fetchCrossPairCandlesFromProxy(
     if (![o, h, l, c].every((n) => Number.isFinite(n) && n > 0)) continue;
     converted.push({ t: x.t, o, h: Math.max(o, h, c), l: Math.min(o, l, c), c, v: 0 });
   }
-  const clean = sanitizeCandles(converted, tf);
-  if (clean.length < 20) throw new Error("proxy conversion yielded too few candles");
-  return clean.slice(-1000);
+  if (converted.length < 20) throw new Error("proxy conversion yielded too few candles");
+  return converted.slice(-200);
 }
 
 export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: string): Promise<Candle[]> {
   const cacheKey = `${inst.key}:${tf}`;
   const cached = candleCache.get(cacheKey);
   const now = Date.now();
-  if (cached && now - cached.at < CACHE_TTL) return cloneCandles(cached.data);
+  if (cached && now - cached.at < CACHE_TTL) return cached.data;
 
   const pairKey = inst.key.startsWith("METAL:") ? inst.key.slice("METAL:".length) : inst.key;
   const hasProxy = !!XAU_PAIRS[pairKey]?.usdProxy;
@@ -659,21 +566,20 @@ export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: strin
   let lastErr: any = null;
   for (const f of tries) {
     try {
-      const data = sanitizeCandles(await f(), tf);
-      if (data.length < 10) throw new Error("Too few clean candles");
-      candleCache.set(cacheKey, { at: now, data: cloneCandles(data) });
+      const data = await f();
+      candleCache.set(cacheKey, { at: now, data });
       syntheticCandleKeys.delete(cacheKey);
-      return cloneCandles(data);
+      return data;
     } catch (e) { lastErr = e; }
   }
-  if (cached) return cloneCandles(cached.data);
+  if (cached) return cached.data;
   const quote = await resolveLiveTick(inst).catch(() => null);
   if (quote?.price && Number.isFinite(quote.price) && quote.price > 0) {
-    const synthetic = sanitizeCandles(buildSyntheticCandles(inst, tf, quote.price), tf);
+    const synthetic = buildSyntheticCandles(inst, tf, quote.price);
     if (synthetic.length >= 20) {
-      candleCache.set(cacheKey, { at: now, data: cloneCandles(synthetic) });
+      candleCache.set(cacheKey, { at: now, data: synthetic });
       syntheticCandleKeys.add(cacheKey);
-      return cloneCandles(synthetic);
+      return synthetic;
     }
   }
   throw lastErr ?? new Error(`No data source available for ${inst.display}`);
@@ -996,10 +902,6 @@ export type Marking =
   | { type: "premiumZone" | "discountZone"; tf: "htf" | "ltf"; priceLow: number; priceHigh: number; label: string }
   | { type: "oteZone"; tf: "htf" | "ltf"; priceLow: number; priceHigh: number; kind: "bullish" | "bearish"; label: string }
   | { type: "breaker"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "bullish" | "bearish"; label: string }
-  | { type: "sweep"; tf: "htf" | "ltf"; time: number; price: number; kind: "buy" | "sell"; label: string }
-  | { type: "trendline"; tf: "htf" | "ltf"; fromTime: number; toTime: number; fromPrice: number; toPrice: number; kind: "up" | "down"; label: string }
-  | { type: "reversalZone"; tf: "htf" | "ltf"; fromTime: number; toTime: number; priceLow: number; priceHigh: number; kind: "bullish" | "bearish"; label: string }
-  | { type: "support" | "resistance"; tf: "htf" | "ltf"; price: number; strength?: number; label: string }
   | { type: "entry" | "sl" | "tp"; tf: "htf" | "ltf"; price: number; label: string };
 
 export type NewsItem = {
@@ -1231,7 +1133,7 @@ async function fetchGoldNewsInline(): Promise<NewsItem[]> {
     const r = await fetchWithTimeout("https://nfs.faireconomy.media/ff_calendar_thisweek.json", {
       headers: { "User-Agent": "Mozilla/5.0" },
     });
-    if (!r.ok) { cancelResponseBody(r); return []; }
+    if (!r.ok) return [];
     const raw: any[] = await r.json();
     const now = Date.now();
     return raw
@@ -1442,7 +1344,7 @@ async function fetchYahooQuoteViaChart(sym: string): Promise<LiveTick | null> {
     try {
       const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=1m&range=1d`;
       const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-      if (!res.ok) { cancelResponseBody(res); continue; }
+      if (!res.ok) continue;
       const j: any = await res.json();
       const r = j?.chart?.result?.[0];
       const meta = r?.meta;
@@ -1469,7 +1371,7 @@ async function fetchYahooQuote(symbols: string[]): Promise<LiveTick | null> {
       try {
         const url = `https://${host}/v7/finance/quote?symbols=${encodeURIComponent(sym)}`;
         const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) { cancelResponseBody(res); continue; }
+        if (!res.ok) continue;
         const j: any = await res.json();
         const q = j?.quoteResponse?.result?.[0];
         const state = String(q?.marketState ?? "").toUpperCase();
@@ -1504,7 +1406,7 @@ async function fetchBinanceQuote(symbols: string[]): Promise<LiveTick | null> {
       try {
         const url = `https://${host}/api/v3/ticker/price?symbol=${sym}`;
         const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) { cancelResponseBody(res); continue; }
+        if (!res.ok) continue;
         const j: any = await res.json();
         const p = parseFloat(j?.price);
         if (isFinite(p)) return { price: p, t: Date.now() };
@@ -1537,7 +1439,7 @@ async function fetchFxProxyRate(symbol: string): Promise<number | null> {
     const res = await fetchWithTimeout(`https://open.er-api.com/v6/latest/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
-    if (!res.ok) { cancelResponseBody(res); return null; }
+    if (!res.ok) return null;
     const j: any = await res.json();
     const rate = j?.rates?.[quote];
     const p = typeof rate === "number" ? rate : parseFloat(rate);
@@ -1561,7 +1463,7 @@ async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick |
     const res = await fetchWithTimeout(`https://api.gold-api.com/price/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
-    if (!res.ok) { cancelResponseBody(res); return null; }
+    if (!res.ok) return null;
     const j: any = await res.json();
     const p = typeof j?.price === "number" ? j.price : parseFloat(j?.price);
     if (!isFinite(p) || p <= 0) return null;
@@ -1601,7 +1503,7 @@ async function fetchFxSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | nu
     const res = await fetchWithTimeout(`https://open.er-api.com/v6/latest/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
-    if (!res.ok) { cancelResponseBody(res); return null; }
+    if (!res.ok) return null;
     const j: any = await res.json();
     const rate = j?.rates?.[quote];
     const p = typeof rate === "number" ? rate : parseFloat(rate);
@@ -1624,7 +1526,7 @@ async function fetchCoinbaseQuote(symbols: string[]): Promise<LiveTick | null> {
       const res = await fetchWithTimeout(`https://api.coinbase.com/v2/prices/${base}-USD/spot`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
       });
-      if (!res.ok) { cancelResponseBody(res); continue; }
+      if (!res.ok) continue;
       const j: any = await res.json();
       const p = parseFloat(j?.data?.amount);
       if (isFinite(p) && p > 0) return { price: p, t: Date.now() };
@@ -1854,7 +1756,7 @@ function buildFeedFallbackPlan(args: {
   const kz = killzoneForPair(inst.raw || inst.key, now);
   const safePrice = Number.isFinite(price) && price > 0 ? price : 1;
   const htf = (args.htfRaw?.length ? args.htfRaw : buildSyntheticCandles(inst, "1h", safePrice, 80)).slice(-160);
-  const ltf = (args.ltfRaw?.length ? args.ltfRaw : buildSyntheticCandles(inst, "15m", safePrice, 120)).slice(-1000);
+  const ltf = (args.ltfRaw?.length ? args.ltfRaw : buildSyntheticCandles(inst, "15m", safePrice, 120)).slice(-200);
   const htfHigh = htf.length ? Math.max(...htf.map((c) => c.h)) : safePrice * 1.002;
   const htfLow = htf.length ? Math.min(...htf.map((c) => c.l)) : safePrice * 0.998;
   const eq = (htfHigh + htfLow) / 2;
@@ -2003,7 +1905,7 @@ export async function computeSignalPlan(
       throw new Error(`Live ${inst.display} quote unavailable. Try again in a moment.`);
     }
     const htf = htfRaw.slice(-160);
-    const ltf = ltfRaw.slice(-1000);
+    const ltf = ltfRaw.slice(-200);
     // Trimmed slices sent to the AI prompt — full arrays remain for engine math.
     // Keep the AI payload lean: the deterministic engine already reads the
     // full candle set below; Luna only needs a compact recent window to narrate
@@ -2073,6 +1975,25 @@ export async function computeSignalPlan(
     // ---- WISDOM: compute regime BEFORE AI so narration can reference it ----
     const marketRegime = detectMarketRegime(ltf);
 
+    // ---- PRE-FLIGHT GATE: skip AI entirely when a real setup is impossible.
+    // This saves Lovable AI credits on every "no setup" scan — no tokens burnt.
+    // Skip when: regime is unfavorable (choppy/ranging) AND outside every
+    // killzone AND no high-impact USD news is imminent (news creates its own
+    // volatility even in dead sessions).
+    const outsideKillzone = killzone === "Outside killzone" || killzone === "-" || !killzone;
+    const unfavorableTape = !marketRegime.favorable;
+    const noNewsDriver = !imminentHigh;
+    if (unfavorableTape && outsideKillzone && noNewsDriver) {
+      return buildFeedFallbackPlan({
+        inst,
+        price: last.c,
+        htfRaw: htf,
+        ltfRaw: ltf,
+        reason: `Tape is ${marketRegime.regime} and no killzone is active — waiting for a cleaner window before spending a scan.`,
+      });
+    }
+
+
     const system = `You are Jenvu — an elite institutional trader with 25+ years on bank/prop desks. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
 - Market structure: BOS, CHOCH, internal vs external structure, MSS
 - Premium / Discount arrays around equilibrium of the dealing range
@@ -2107,10 +2028,6 @@ Return ONLY valid JSON (no markdown) with this exact shape:
     { "type":"orderBlock", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"demand"|"supply", "label":"Demand OB" },
     { "type":"liquidity", "tf":"htf"|"ltf", "price":<n>, "side":"buy"|"sell", "label":"BSL above equal highs" },
     { "type":"zone", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"supply"|"demand", "label":"HTF Demand Zone" },
-    { "type":"breaker", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"bullish"|"bearish", "label":"Bullish Breaker" },
-    { "type":"sweep", "tf":"htf"|"ltf", "time":<s>, "price":<n>, "kind":"buy"|"sell", "label":"Sellside Liquidity Sweep" },
-    { "type":"trendline", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "fromPrice":<n>, "toPrice":<n>, "kind":"up"|"down", "label":"Downtrend Leg" },
-    { "type":"reversalZone", "tf":"htf"|"ltf", "fromTime":<s>, "toTime":<s>, "priceLow":<n>, "priceHigh":<n>, "kind":"bullish"|"bearish", "label":"Reversal Zone" },
     { "type":"entry","tf":"ltf","price":<n>,"label":"Entry" },
     { "type":"sl","tf":"ltf","price":<n>,"label":"Stop Loss" },
     { "type":"tp","tf":"ltf","price":<n>,"label":"Take Profit" }
@@ -2133,7 +2050,7 @@ STRICT RULES — non-negotiable, treat these as a compliance checklist:
 - ENTRY placement (sniper, not chase): Entry MUST be inside a real unmitigated OB/FVG you emit as a marking. For BUY: entry ≤ current price, inside a discount demand OB/FVG. For SELL: entry ≥ current price, inside a premium supply OB/FVG. Never enter mid-range with no zone. If price already ran past the zone and left it mitigated, WAIT — do not chase.
 - STOP LOSS placement (structural, buffered): SL MUST sit just beyond the swing/OB that invalidates the setup, with a small ATR-based buffer (~10-25% of recent ATR). BUY: sl < entry, below the demand OB / swing low. SELL: sl > entry, above the supply OB / swing high. Never place SL inside the entry zone or tighter than the wick that formed the OB. Stop distance must be realistic vs ATR — not 2 pips, not absurd.
 - TAKE PROFIT placement (liquidity target): TP MUST target a nameable liquidity pool or opposing structure — BSL/SSL, equal highs/lows, PDH/PDL, HTF swing, equilibrium, or opposing OB. BUY: tp > entry. SELL: tp < entry. State the exact TP target in summary (e.g. "TP at PDH liquidity 2678.40"). Recompute RR = |tp-entry| / |entry-sl| and verify RR ≥ 1.8 before returning; if it fails, either re-anchor entry or WAIT — do not force the trade.
-- Markings coverage: emit 8-14 markings for a rich institutional read — MUST include: HTF BOS/CHOCH, HTF OB or zone, at least one HTF trendline showing the prior leg (up or down), a reversalZone around the pivot/CHoCH where price flipped, at least one sweep marking the exact wick that grabbed BSL/SSL, HTF liquidity (BSL/SSL/PDH/PDL), LTF FVG or OB entry pocket, LTF liquidity. Draw the picture like a chartist marking up a screenshot — trend arrows show WHERE we came from, reversalZone shows WHERE structure flipped, sweep shows WHICH candle grabbed liquidity, boxes show WHERE we enter. Do not add entry/sl/tp; engine computes them.
+- Markings coverage: emit 5-8 markings only: HTF BOS/CHOCH, HTF OB/zone, HTF liquidity, LTF FVG/OB, LTF liquidity. Do not add entry/sl/tp; engine computes them.
 - Narration: produce EXACTLY 7 steps (never fewer), each 8-14 words, senior institutional tone. Cover in this order: (1) HTF bias/BOS, (2) premium/discount + equilibrium, (3) liquidity draw (BSL/SSL/PDH/PDL), (4) LTF FVG or OB entry zone, (5) confluence/killzone, (6) entry + SL rationale, (7) TP + RR + confidence. Do NOT skip any of the 7 slots. Every step should reference its marking via markingIndex when possible.
 - Killzone: state the current session/killzone (${session} / ${killzone}) and the premium-vs-discount read (${inPremium ? "PREMIUM" : "DISCOUNT"}) explicitly in both htfNarrative and the confluences array.
 - News veto: if a HIGH impact USD event is within 60 minutes AND this is a USD-sensitive instrument, direction="WAIT", confidence ≤ 50, call out the news title in summary and invalidation.
@@ -2222,16 +2139,13 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       if (!m || typeof m !== "object" || typeof m.type !== "string") return false;
       // Time window: allow up to 1 day past the last candle for projected zones.
       const timeMax = maxTime + 86400;
-      for (const k of ["fromTime", "toTime", "time"]) {
+      for (const k of ["fromTime", "toTime"]) {
         if (m[k] != null) {
-          let t = Number(m[k]);
-          if (!Number.isFinite(t)) return false;
-          // Coerce ms → s if AI accidentally sent millisecond timestamps.
-          if (t > 1e12) { t = Math.floor(t / 1000); m[k] = t; }
-          if (t < minTime || t > timeMax) return false;
+          const t = Number(m[k]);
+          if (!Number.isFinite(t) || t < minTime || t > timeMax) return false;
         }
       }
-      for (const k of ["price", "priceLow", "priceHigh", "fromPrice", "toPrice"]) {
+      for (const k of ["price", "priceLow", "priceHigh"]) {
         if (m[k] != null) {
           const p = Number(m[k]);
           if (!Number.isFinite(p) || p < priceLoBound || p > priceHiBound) return false;
@@ -2550,12 +2464,12 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         __planAllowsSenior = sub?.status === "active" && pid !== "free";
       } catch { __planAllowsSenior = false; __planId = "free"; }
     }
-    // Keep the visible chart/analysis fast and deterministic. Slow upstream
-    // model reviews were blocking the response, leaving users stuck on
-    // "Analyzing…" with no candles mounted. The rules engine remains the
-    // authority for ICT/SMC structure; model review is not required inline.
-    void SENIOR_REVIEW_MIN_RULE_SCORE;
-    __requiresSeniorReview = false;
+    // Senior review re-enabled: acts as a 25-year veteran veto/downgrade layer.
+    // Runs whenever the rules engine produces a live BUY/SELL and the score
+    // is above SENIOR_REVIEW_MIN_RULE_SCORE (62). Failure soft-fails — the
+    // rules result still stands so a throttled AI provider never drops a signal.
+    __requiresSeniorReview =
+      built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
 
     if (__requiresSeniorReview) {
       try {
@@ -2705,7 +2619,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
     // Triggers whenever there is (a) a live BUY/SELL setup, or (b) upcoming
     // USD/gold news within the window. Soft-fails on any error.
     let __macroContext: SignalPlan["macroContext"] = undefined;
-    const __macroShouldRun = false;
+    const __macroShouldRun = built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null;
     if (__macroShouldRun) {
       try {
         const newsLines = upcomingNews.slice(0, 5).map((n) =>
@@ -2821,16 +2735,12 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
             const ageMin = (Date.now() - new Date(mem.updated_at as string).getTime()) / 60000;
             const prev = Number(mem.smoothed_conf);
             if (Number.isFinite(prev) && ageMin <= 15) {
-              const gap = Math.abs(rawConf - prev);
-              if (gap <= 5) {
-                // Small gap — keep previous confidence, ignore minor jitter.
-                smoothed = prev;
-              } else {
-                // Large gap — allow movement but cap step size so it settles gradually.
-                const maxStep = 10;
-                if (rawConf > prev) smoothed = Math.min(rawConf, prev + maxStep);
-                else smoothed = Math.max(rawConf, prev - maxStep);
-              }
+              // EMA: weight previous higher to damp jitter
+              smoothed = Math.round(prev * 0.55 + rawConf * 0.45);
+              // Cap drop to 8 points within the window
+              if (smoothed < prev - 8) smoothed = prev - 8;
+              // Cap rise to 10 points so pops also settle in
+              if (smoothed > prev + 10) smoothed = prev + 10;
               smoothed = Math.min(95, Math.max(0, smoothed));
             }
           }
@@ -2870,16 +2780,11 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     // chart shows exactly what the engine used.
     if (built.direction !== "WAIT" && built.zone) {
       const nowS = Math.floor(Date.now() / 1000);
-      // Anchor the engine's chosen zone to the ACTUAL candle that formed it,
-      // then extend the box's right edge to "now" so the zone visually reaches
-      // the live bar — exactly how an ICT trader draws an active zone by hand.
-      const zFrom = (built.zone as any).fromTime ?? nowS - 3600;
-      const zTo = Math.max((built.zone as any).toTime ?? nowS, nowS);
       allMarkings.push({
         type: built.zone.kind === "OB" ? "orderBlock" : "fvg",
         tf: "ltf",
-        fromTime: zFrom,
-        toTime: zTo,
+        fromTime: nowS - 3600,
+        toTime: nowS,
         priceLow: built.zone.priceLow,
         priceHigh: built.zone.priceHigh,
         kind: (built.direction === "BUY" ? (built.zone.kind === "OB" ? "demand" : "bullish") : (built.zone.kind === "OB" ? "supply" : "bearish")) as any,
@@ -2917,22 +2822,19 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       });
     }
 
-    // Rank helpers — closest to current price, unmitigated first.
-    // Extend toTime to the live bar so each active zone visually reaches
-    // the right edge, exactly how a trader draws an unmitigated zone.
-    const nowSec = Math.floor(Date.now() / 1000);
+    // Rank helpers — closest to current price, unmitigated first
     const distTo = (lo: number, hi: number) => Math.abs(((lo + hi) / 2) - last.c);
     const topFvgs = (arr: typeof htfA.fvgs, tf: "htf" | "ltf", n: number) =>
       arr.filter((f) => !f.mitigated).sort((a, b) => distTo(a.priceLow, a.priceHigh) - distTo(b.priceLow, b.priceHigh)).slice(0, n)
         .map((f): Marking => ({
-          type: "fvg", tf, fromTime: f.fromTime, toTime: Math.max(f.toTime, nowSec),
+          type: "fvg", tf, fromTime: f.fromTime, toTime: f.toTime,
           priceLow: +f.priceLow.toFixed(dec), priceHigh: +f.priceHigh.toFixed(dec),
           kind: f.kind, label: `${tf === "htf" ? "HTF" : "LTF"} ${f.kind === "bullish" ? "Bullish" : "Bearish"} FVG`,
         }));
     const topObs = (arr: typeof htfA.obs, tf: "htf" | "ltf", n: number) =>
       arr.filter((o) => !o.mitigated).sort((a, b) => distTo(a.priceLow, a.priceHigh) - distTo(b.priceLow, b.priceHigh)).slice(0, n)
         .map((o): Marking => ({
-          type: "orderBlock", tf, fromTime: o.fromTime, toTime: Math.max(o.toTime, nowSec),
+          type: "orderBlock", tf, fromTime: o.fromTime, toTime: o.toTime,
           priceLow: +o.priceLow.toFixed(dec), priceHigh: +o.priceHigh.toFixed(dec),
           kind: o.kind, label: `${tf === "htf" ? "HTF" : "LTF"} ${o.kind === "demand" ? "Demand" : "Supply"} OB`,
         }));
@@ -2942,11 +2844,11 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     for (const m of topObs(htfA.obs, "htf", 2)) addMark(m);
     for (const m of topObs(ltfA.obs, "ltf", 2)) addMark(m);
 
-    // Breakers + Inverted FVGs (LTF) — extend to live bar as active zones
+    // Breakers + Inverted FVGs (LTF)
     for (const b of breakers.slice(0, 2)) {
       addMark({
         type: "breaker", tf: "ltf",
-        fromTime: b.fromTime, toTime: Math.max(b.toTime, nowSec),
+        fromTime: b.fromTime, toTime: b.toTime,
         priceLow: +b.priceLow.toFixed(dec), priceHigh: +b.priceHigh.toFixed(dec),
         kind: b.kind, label: `${b.kind === "bullish" ? "Bullish" : "Bearish"} Breaker Block`,
       });
@@ -2954,7 +2856,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     for (const g of ifvgs.slice(0, 2)) {
       addMark({
         type: "fvg", tf: "ltf",
-        fromTime: g.fromTime, toTime: Math.max(g.toTime, nowSec),
+        fromTime: g.fromTime, toTime: g.toTime,
         priceLow: +g.priceLow.toFixed(dec), priceHigh: +g.priceHigh.toFixed(dec),
         kind: g.kind, label: `Inverted FVG (${g.kind})`,
       });
@@ -2971,118 +2873,6 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         kind: (built.direction === "BUY" ? "demand" : "supply") as any,
         label: `⭐ Confluence Zone (OB + FVG)`,
       } as Marking);
-    }
-
-    // ============ ENGINE-DERIVED RICH MARKINGS ============
-    // Guarantee that trendline, sweep, and reversalZone are always present
-    // even when the AI stage omits them, so the chart renders the same
-    // institutional-grade markup style on every scan.
-    // Run each rich-marking sub-detector in isolation so ONE bad section
-    // (bad swing timestamp, empty candles, whatever) can never wipe out
-    // the whole block silently like the previous single try/catch did.
-    const nowS2 = Math.floor(Date.now() / 1000);
-    const richTFs: Array<{ tfKey: "htf" | "ltf"; an: typeof htfA; tfCandles: typeof htf }> = [
-      { tfKey: "htf", an: htfA, tfCandles: htf },
-      { tfKey: "ltf", an: ltfA, tfCandles: ltf },
-    ];
-    const safeRun = (label: string, fn: () => void) => {
-      try { fn(); } catch (e) {
-        console.error(`[rich-markings:${label}] failed:`, (e as Error)?.stack || (e as Error)?.message || e);
-      }
-    };
-    for (const { tfKey, an, tfCandles } of richTFs) {
-      const swings = Array.isArray(an?.swings) ? an.swings : [];
-      const highs = swings.filter((s: any) => s?.kind === "high" && Number.isFinite(s?.price) && Number.isFinite(s?.t));
-      const lows  = swings.filter((s: any) => s?.kind === "low"  && Number.isFinite(s?.price) && Number.isFinite(s?.t));
-
-      // Trendline
-      safeRun(`trendline-${tfKey}`, () => {
-        const lastHighs = highs.slice(-2);
-        const lastLows = lows.slice(-2);
-        if (lastHighs.length === 2 && lastHighs[1].price < lastHighs[0].price) {
-          addMark({
-            type: "trendline", tf: tfKey,
-            fromTime: lastHighs[0].t, toTime: lastHighs[1].t,
-            fromPrice: +lastHighs[0].price.toFixed(dec),
-            toPrice: +lastHighs[1].price.toFixed(dec),
-            kind: "down", label: `${tfKey === "htf" ? "HTF" : "LTF"} Downtrend Leg`,
-          } as Marking);
-        }
-        if (lastLows.length === 2 && lastLows[1].price > lastLows[0].price) {
-          addMark({
-            type: "trendline", tf: tfKey,
-            fromTime: lastLows[0].t, toTime: lastLows[1].t,
-            fromPrice: +lastLows[0].price.toFixed(dec),
-            toPrice: +lastLows[1].price.toFixed(dec),
-            kind: "up", label: `${tfKey === "htf" ? "HTF" : "LTF"} Uptrend Leg`,
-          } as Marking);
-        }
-      });
-
-      // Sweep
-      safeRun(`sweep-${tfKey}`, () => {
-        const recent = tfCandles.slice(-30);
-        const prior = tfCandles.slice(0, -30);
-        if (prior.length > 5 && recent.length > 3) {
-          const priorHigh = Math.max(...prior.map((c: any) => c.h));
-          const priorLow = Math.min(...prior.map((c: any) => c.l));
-          const sweepHigh = recent.find((c: any) => c.h > priorHigh && c.c < priorHigh);
-          const sweepLow = recent.find((c: any) => c.l < priorLow && c.c > priorLow);
-          if (sweepHigh) addMark({
-            type: "sweep", tf: tfKey, time: sweepHigh.t,
-            price: +priorHigh.toFixed(dec), kind: "sell",
-            label: `Buy-side Liquidity Sweep`,
-          } as Marking);
-          if (sweepLow) addMark({
-            type: "sweep", tf: tfKey, time: sweepLow.t,
-            price: +priorLow.toFixed(dec), kind: "buy",
-            label: `Sell-side Liquidity Sweep`,
-          } as Marking);
-        }
-      });
-
-      // Reversal zone
-      safeRun(`reversalZone-${tfKey}`, () => {
-        const ev = an?.lastStructure;
-        if (!ev) return;
-        const pad = Math.max(Math.abs(ev.price) * 0.0015, (last.h - last.l) * 0.5);
-        addMark({
-          type: "reversalZone", tf: tfKey,
-          fromTime: ev.fromTime, toTime: Math.max(ev.toTime, nowS2),
-          priceLow: +(ev.price - pad).toFixed(dec),
-          priceHigh: +(ev.price + pad).toFixed(dec),
-          kind: (ev.dir === "bullish" ? "bullish" : "bearish") as any,
-          label: `${ev.dir === "bullish" ? "Bullish" : "Bearish"} Reversal Zone`,
-        } as Marking);
-      });
-
-      // Support / Resistance clusters
-      safeRun(`sr-${tfKey}`, () => {
-        const tol = Math.max(Math.abs(last.c) * 0.0015, (last.h - last.l) * 0.75);
-        const cluster = (arr: any[]) => {
-          const clusters: { avg: number; touches: number }[] = [];
-          for (const s of arr) {
-            const c = clusters.find((k) => Math.abs(k.avg - s.price) <= tol);
-            if (c) {
-              c.avg = (c.avg * c.touches + s.price) / (c.touches + 1);
-              c.touches += 1;
-            } else {
-              clusters.push({ avg: s.price, touches: 1 });
-            }
-          }
-          return clusters.filter((c) => c.touches >= 2).sort((a, b) => b.touches - a.touches).slice(0, 2);
-        };
-        for (const r of cluster(highs)) addMark({
-          type: "resistance", tf: tfKey,
-          price: +r.avg.toFixed(dec), strength: r.touches,
-          label: `${tfKey === "htf" ? "HTF" : "LTF"} Resistance ×${r.touches}`,
-        } as Marking);
-        for (const s of cluster(lows)) addMark({
-          type: "support", tf: tfKey,
-          price: +s.avg.toFixed(dec), strength: s.touches,
-          label: `${tfKey === "htf" ? "HTF" : "LTF"} Support ×${s.touches}`,
-        } as Marking);
-      });
     }
 
 
@@ -3312,10 +3102,10 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       setupGrade,
       setupChecks,
       generatedAt: new Date().toISOString(),
-      // HTF chart uses the same 1H candles that the engine + AI markings are
-      // anchored to. This guarantees every box/line resolves via
-      // timeToCoordinate cleanly (no interpolation gaps that hide markings).
-      htfCandles: htf.slice(-200).map(toDTO),
+      // HTF chart shows 4H candles (bigger institutional context) while
+      // engine math and AI markings remain on 1H — box x-coords still map
+      // correctly via timeToCoordinate interpolation.
+      htfCandles: (h4Raw.length >= 20 ? h4Raw : htf).slice(-160).map(toDTO),
       ltfCandles: ltf.map(toDTO),
       currentPrice: last.c,
       instrument: { symbol: canonicalSymbol, display: inst.display, kind: inst.kind, decimals: inst.decimals },
@@ -3457,8 +3247,8 @@ export const getSignalPlan = createServerFn({ method: "POST" })
       return { ok: false, error: `Too many analyze requests. Try again in ~${Math.ceil(rl.retryInSec / 60)} min.` } satisfies SignalPlanResult;
     }
 
-    // 2. Short per-user per-symbol cache. Same pair asked twice very quickly
-    //    returns the same plan — prevents accidental rapid repeats without stale reports.
+    // 2. 3-minute per-user per-symbol cache. Same pair asked twice within
+    //    3 min returns the same plan — instant response, zero AI credits.
     const cacheKey = `${context.userId}:${data.symbol.toUpperCase()}`;
     if (!data.force) {
       const cached = getCachedPlan<SignalPlan>(cacheKey);

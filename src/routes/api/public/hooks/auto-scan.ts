@@ -481,12 +481,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const dec = broadcastPlan.instrument?.decimals ?? 2;
             const entry = Number(broadcastPlan.trade?.entry);
             const sl = Number(broadcastPlan.trade?.sl);
-            // Use the final TP target (2–3R), NOT tp1 which is hard-coded to
-            // exactly 1R by the engine. Using tp1 caused every stored `rr` to
-            // collapse to 1.0 in the DB even though the engine planned a 2R+
-            // target. Fall back to tp1 only if the higher targets are missing.
-            const tpAny = broadcastPlan.trade as any;
-            let tp = Number(tpAny?.tp ?? tpAny?.tp3 ?? tpAny?.tp2 ?? tpAny?.tp1);
+            const tp = Number(broadcastPlan.trade?.tp1 ?? broadcastPlan.trade?.tp);
             if (!isFinite(entry) || !isFinite(sl) || !isFinite(tp)) {
               results.push({ pair, action: "invalid_levels" });
               continue;
@@ -495,16 +490,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // upstream `plan.trade.rr`, which has produced inflated values
             // (e.g. reporting 3.0 when SL/TP are symmetric ~1:1).
             const riskDist = Math.abs(entry - sl);
-            let rewardDist = Math.abs(tp - entry);
-            let rr = riskDist > 0 ? rewardDist / riskDist : 0;
-            // Enforce a minimum 2R target: if the engine only returned tp1
-            // (which is exactly 1R by design), stretch the stored TP to 2R so
-            // the DB always reflects a real risk/reward setup — not a coin flip.
-            if (riskDist > 0 && rr < 1.8) {
-              tp = dir === "BUY" ? entry + 2 * riskDist : entry - 2 * riskDist;
-              rewardDist = Math.abs(tp - entry);
-              rr = 2;
-            }
+            const rewardDist = Math.abs(tp - entry);
+            const rr = riskDist > 0 ? rewardDist / riskDist : 0;
 
             // Freshness gate: refuse to broadcast if live price has already
             // drifted more than 40% of the risk distance toward SL (stale
@@ -570,7 +557,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // Claude-style step-by-step reveal, instead of just 3 price lines.
             const bpAny = broadcastPlan as any;
             const markingsPayload = Array.isArray(bpAny.markings)
-              ? bpAny.markings.slice(0, 80)
+              ? bpAny.markings.slice(0, 40)
               : null;
             const narrationPayload = Array.isArray(bpAny.narration)
               ? bpAny.narration.slice(0, 12)
