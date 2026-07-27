@@ -415,41 +415,29 @@ async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs
   }
 }
 
-// Runs parallel attempts but aborts + drains losers as soon as one wins,
-// so we don't hold Cloudflare's 6-in-flight subrequest slots hostage.
+// Cloudflare Workers cap in-flight subrequests to 6 per invocation. True racing
+// (Promise.race across all mirrors) blows the cap once several timeframes are
+// analyzed in parallel, leaving orphaned Responses that trigger the "stalled
+// HTTP response was canceled to prevent deadlock" warning and force the plan
+// into the 25% WAIT fallback. Try mirrors sequentially instead — the per-try
+// timeout is short (1.8s) so total latency stays low, and we never hold more
+// than one candle-fetch slot per instrument-timeframe at a time.
 async function raceAndCancel<T>(
   makers: Array<(signal: AbortSignal) => Promise<T>>,
 ): Promise<T> {
-  const controllers = makers.map(() => new AbortController());
-  const promises = makers.map((m, i) =>
-    m(controllers[i].signal).then(
-      (v) => ({ ok: true as const, i, v }),
-      (e) => ({ ok: false as const, i, e }),
-    ),
-  );
   const errors: any[] = [];
-  const pending = new Set(promises);
-  while (pending.size) {
-    const settled = await Promise.race(pending);
-    pending.delete(promises[settled.i]);
-    if (settled.ok) {
-      // Abort every other attempt and best-effort drain any Response bodies.
-      for (let j = 0; j < controllers.length; j++) {
-        if (j !== settled.i) controllers[j].abort();
-      }
-      for (const p of pending) {
-        p.then((r) => {
-          if (r.ok && (r.v as any)?.body?.cancel) {
-            try { (r.v as any).body.cancel(); } catch {}
-          }
-        }).catch(() => {});
-      }
-      return settled.v;
+  for (const m of makers) {
+    const controller = new AbortController();
+    try {
+      return await m(controller.signal);
+    } catch (e) {
+      try { controller.abort(); } catch {}
+      errors.push(e);
     }
-    errors.push(settled.e);
   }
   throw errors[errors.length - 1] ?? new Error("All attempts failed");
 }
+
 
 
 function coinbaseProductFromSymbol(sym: string): string | null {
