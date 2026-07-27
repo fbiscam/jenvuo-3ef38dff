@@ -1201,7 +1201,7 @@ function SignalPage() {
                 <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
               </div>
               <div
-                className="hidden sm:flex items-center gap-1.5 overflow-x-auto no-scrollbar min-w-0 rounded-[16px] border border-zinc-200/70 bg-white px-2 py-1.5 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_20px_-10px_rgba(16,24,40,0.08)] ring-1 ring-white/60"
+                className="hidden sm:flex items-center gap-1.5 overflow-x-auto no-scrollbar min-w-0 rounded-[16px] bg-transparent px-2 py-1.5"
                 style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
               >
                 <span className="text-[12px] text-zinc-500 shrink-0 pl-1">{"\n"}</span>
