@@ -668,7 +668,9 @@ function SignalPage() {
           const conf65 = Number(p.trade?.confidence ?? 0) >= 65 &&
             Number.isFinite(p.trade?.entry) && Number.isFinite(p.trade?.sl) && Number.isFinite(p.trade?.tp) &&
             p.trade?.direction !== "WAIT";
+          const IMPORTANT = new Set(["entry", "sl", "tp", "bos", "choch", "ob", "fvg"]);
           for (const m of p.markings) {
+            if (!IMPORTANT.has(String(m.type).toLowerCase())) continue;
             if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
             const visibleMarking = { ...m, tf: "ltf" as const };
             try { ltfRef.current?.drawMarking(visibleMarking, { transient: false }); } catch {}
