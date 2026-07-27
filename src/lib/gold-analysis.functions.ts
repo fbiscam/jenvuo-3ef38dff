@@ -2998,14 +2998,28 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     // Guarantee that trendline, sweep, and reversalZone are always present
     // even when the AI stage omits them, so the chart renders the same
     // institutional-grade markup style on every scan.
-    try {
-      const nowS2 = Math.floor(Date.now() / 1000);
-      for (const [tfKey, an, tfCandles] of [["htf", htfA, htf] as const, ["ltf", ltfA, ltf] as const]) {
-        // Trendline: connect the last two same-kind swings to show the
-        // prior leg direction (up-leg = low→low, down-leg = high→high).
-        const swings = an.swings ?? [];
-        const lastHighs = swings.filter((s: any) => s.kind === "high").slice(-2);
-        const lastLows = swings.filter((s: any) => s.kind === "low").slice(-2);
+    // Run each rich-marking sub-detector in isolation so ONE bad section
+    // (bad swing timestamp, empty candles, whatever) can never wipe out
+    // the whole block silently like the previous single try/catch did.
+    const nowS2 = Math.floor(Date.now() / 1000);
+    const richTFs: Array<{ tfKey: "htf" | "ltf"; an: typeof htfA; tfCandles: typeof htf }> = [
+      { tfKey: "htf", an: htfA, tfCandles: htf },
+      { tfKey: "ltf", an: ltfA, tfCandles: ltf },
+    ];
+    const safeRun = (label: string, fn: () => void) => {
+      try { fn(); } catch (e) {
+        console.error(`[rich-markings:${label}] failed:`, (e as Error)?.stack || (e as Error)?.message || e);
+      }
+    };
+    for (const { tfKey, an, tfCandles } of richTFs) {
+      const swings = Array.isArray(an?.swings) ? an.swings : [];
+      const highs = swings.filter((s: any) => s?.kind === "high" && Number.isFinite(s?.price) && Number.isFinite(s?.t));
+      const lows  = swings.filter((s: any) => s?.kind === "low"  && Number.isFinite(s?.price) && Number.isFinite(s?.t));
+
+      // Trendline
+      safeRun(`trendline-${tfKey}`, () => {
+        const lastHighs = highs.slice(-2);
+        const lastLows = lows.slice(-2);
         if (lastHighs.length === 2 && lastHighs[1].price < lastHighs[0].price) {
           addMark({
             type: "trendline", tf: tfKey,
@@ -3024,9 +3038,10 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
             kind: "up", label: `${tfKey === "htf" ? "HTF" : "LTF"} Uptrend Leg`,
           } as Marking);
         }
+      });
 
-        // Sweep: detect the last candle that wicked through a prior
-        // equal-high / equal-low pool and closed back inside it.
+      // Sweep
+      safeRun(`sweep-${tfKey}`, () => {
         const recent = tfCandles.slice(-30);
         const prior = tfCandles.slice(0, -30);
         if (prior.length > 5 && recent.length > 3) {
@@ -3034,40 +3049,36 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           const priorLow = Math.min(...prior.map((c: any) => c.l));
           const sweepHigh = recent.find((c: any) => c.h > priorHigh && c.c < priorHigh);
           const sweepLow = recent.find((c: any) => c.l < priorLow && c.c > priorLow);
-          if (sweepHigh) {
-            addMark({
-              type: "sweep", tf: tfKey, time: sweepHigh.t,
-              price: +priorHigh.toFixed(dec), kind: "sell",
-              label: `Buy-side Liquidity Sweep`,
-            } as Marking);
-          }
-          if (sweepLow) {
-            addMark({
-              type: "sweep", tf: tfKey, time: sweepLow.t,
-              price: +priorLow.toFixed(dec), kind: "buy",
-              label: `Sell-side Liquidity Sweep`,
-            } as Marking);
-          }
-        }
-
-        // Reversal zone: highlight the area around the last structure flip
-        // (BOS/CHoCH) so it's visible where price actually pivoted.
-        const ev = an.lastStructure;
-        if (ev) {
-          const pad = Math.max(Math.abs(ev.price) * 0.0015, (last.h - last.l) * 0.5);
-          addMark({
-            type: "reversalZone", tf: tfKey,
-            fromTime: ev.fromTime, toTime: Math.max(ev.toTime, nowS2),
-            priceLow: +(ev.price - pad).toFixed(dec),
-            priceHigh: +(ev.price + pad).toFixed(dec),
-            kind: (ev.dir === "bullish" ? "bullish" : "bearish") as any,
-            label: `${ev.dir === "bullish" ? "Bullish" : "Bearish"} Reversal Zone`,
+          if (sweepHigh) addMark({
+            type: "sweep", tf: tfKey, time: sweepHigh.t,
+            price: +priorHigh.toFixed(dec), kind: "sell",
+            label: `Buy-side Liquidity Sweep`,
+          } as Marking);
+          if (sweepLow) addMark({
+            type: "sweep", tf: tfKey, time: sweepLow.t,
+            price: +priorLow.toFixed(dec), kind: "buy",
+            label: `Sell-side Liquidity Sweep`,
           } as Marking);
         }
+      });
 
-        // Support / Resistance: cluster same-kind swings whose prices sit
-        // within a small tolerance and mark the ones with 2+ touches.
-        // Multi-touch levels are the strongest institutional S/R.
+      // Reversal zone
+      safeRun(`reversalZone-${tfKey}`, () => {
+        const ev = an?.lastStructure;
+        if (!ev) return;
+        const pad = Math.max(Math.abs(ev.price) * 0.0015, (last.h - last.l) * 0.5);
+        addMark({
+          type: "reversalZone", tf: tfKey,
+          fromTime: ev.fromTime, toTime: Math.max(ev.toTime, nowS2),
+          priceLow: +(ev.price - pad).toFixed(dec),
+          priceHigh: +(ev.price + pad).toFixed(dec),
+          kind: (ev.dir === "bullish" ? "bullish" : "bearish") as any,
+          label: `${ev.dir === "bullish" ? "Bullish" : "Bearish"} Reversal Zone`,
+        } as Marking);
+      });
+
+      // Support / Resistance clusters
+      safeRun(`sr-${tfKey}`, () => {
         const tol = Math.max(Math.abs(last.c) * 0.0015, (last.h - last.l) * 0.75);
         const cluster = (arr: any[]) => {
           const clusters: { avg: number; touches: number }[] = [];
@@ -3082,28 +3093,20 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           }
           return clusters.filter((c) => c.touches >= 2).sort((a, b) => b.touches - a.touches).slice(0, 2);
         };
-        const resClusters = cluster(swings.filter((s: any) => s.kind === "high"));
-        const supClusters = cluster(swings.filter((s: any) => s.kind === "low"));
-        for (const r of resClusters) {
-          addMark({
-            type: "resistance", tf: tfKey,
-            price: +r.avg.toFixed(dec),
-            strength: r.touches,
-            label: `${tfKey === "htf" ? "HTF" : "LTF"} Resistance ×${r.touches}`,
-          } as Marking);
-        }
-        for (const s of supClusters) {
-          addMark({
-            type: "support", tf: tfKey,
-            price: +s.avg.toFixed(dec),
-            strength: s.touches,
-            label: `${tfKey === "htf" ? "HTF" : "LTF"} Support ×${s.touches}`,
-          } as Marking);
-        }
-      }
-    } catch (e) {
-      console.warn("engine-derived rich markings failed:", (e as Error)?.message ?? e);
+        for (const r of cluster(highs)) addMark({
+          type: "resistance", tf: tfKey,
+          price: +r.avg.toFixed(dec), strength: r.touches,
+          label: `${tfKey === "htf" ? "HTF" : "LTF"} Resistance ×${r.touches}`,
+        } as Marking);
+        for (const s of cluster(lows)) addMark({
+          type: "support", tf: tfKey,
+          price: +s.avg.toFixed(dec), strength: s.touches,
+          label: `${tfKey === "htf" ? "HTF" : "LTF"} Support ×${s.touches}`,
+        } as Marking);
+      });
     }
+
+
 
 
     // ============ GUIDED NARRATION ============
