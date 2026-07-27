@@ -1195,6 +1195,11 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         {title}
       </div>
       <div ref={containerRef} className="absolute inset-0" />
+      <svg
+        ref={candleLayerRef}
+        className="absolute inset-0 z-[5] pointer-events-none overflow-hidden"
+        aria-hidden="true"
+      />
       <div ref={overlayRef} className="absolute inset-0 z-10 pointer-events-none overflow-hidden" />
       <svg
         ref={drawSvgRef}
