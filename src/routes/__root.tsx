@@ -212,6 +212,28 @@ function RootComponent() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const versionKey = "jenvu-runtime-refresh-2026-07-27";
+    if (window.localStorage.getItem(versionKey) === "done") return;
+    window.localStorage.setItem(versionKey, "done");
+
+    void (async () => {
+      try {
+        if ("serviceWorker" in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registrations.map((registration) => registration.unregister()));
+        }
+        if ("caches" in window) {
+          const names = await window.caches.keys();
+          await Promise.all(names.map((name) => window.caches.delete(name)));
+        }
+      } catch {
+        /* stale-cache cleanup is best effort */
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
     // Native (Capacitor) bootstrap: status bar + hide splash. No-op on web.
     import("../lib/native/bootstrap")
       .then((m) => m.bootstrapNative())

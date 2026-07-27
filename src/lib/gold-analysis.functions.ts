@@ -407,12 +407,22 @@ function buildSyntheticCandles(inst: ResolvedInstrument, tf: string, price: numb
 
 async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 1800): Promise<Response> {
   const controller = new AbortController();
+  const abortFromParent = () => controller.abort();
+  if (init.signal) {
+    if (init.signal.aborted) controller.abort();
+    else init.signal.addEventListener("abort", abortFromParent, { once: true });
+  }
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(input, { ...init, signal: init.signal ?? controller.signal });
+    return await fetch(input, { ...init, signal: controller.signal });
   } finally {
     clearTimeout(timer);
+    if (init.signal) init.signal.removeEventListener("abort", abortFromParent);
   }
+}
+
+function cancelResponseBody(response: Response): void {
+  try { response.body?.cancel(); } catch { /* ignore */ }
 }
 
 // Cloudflare Workers cap in-flight subrequests to 6 per invocation. True racing
@@ -526,7 +536,7 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
       const res = await fetchWithTimeout(`https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
       });
-      if (!res.ok) { lastErr = new Error(`Coinbase ${product}: ${res.status}`); continue; }
+      if (!res.ok) { cancelResponseBody(res); lastErr = new Error(`Coinbase ${product}: ${res.status}`); continue; }
       const rows: any[] = await res.json();
       const candles: Candle[] = rows
         .map((r) => ({
@@ -1221,7 +1231,7 @@ async function fetchGoldNewsInline(): Promise<NewsItem[]> {
     const r = await fetchWithTimeout("https://nfs.faireconomy.media/ff_calendar_thisweek.json", {
       headers: { "User-Agent": "Mozilla/5.0" },
     });
-    if (!r.ok) return [];
+    if (!r.ok) { cancelResponseBody(r); return []; }
     const raw: any[] = await r.json();
     const now = Date.now();
     return raw
@@ -1432,7 +1442,7 @@ async function fetchYahooQuoteViaChart(sym: string): Promise<LiveTick | null> {
     try {
       const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=1m&range=1d`;
       const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-      if (!res.ok) continue;
+      if (!res.ok) { cancelResponseBody(res); continue; }
       const j: any = await res.json();
       const r = j?.chart?.result?.[0];
       const meta = r?.meta;
@@ -1459,7 +1469,7 @@ async function fetchYahooQuote(symbols: string[]): Promise<LiveTick | null> {
       try {
         const url = `https://${host}/v7/finance/quote?symbols=${encodeURIComponent(sym)}`;
         const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) continue;
+        if (!res.ok) { cancelResponseBody(res); continue; }
         const j: any = await res.json();
         const q = j?.quoteResponse?.result?.[0];
         const state = String(q?.marketState ?? "").toUpperCase();
@@ -1494,7 +1504,7 @@ async function fetchBinanceQuote(symbols: string[]): Promise<LiveTick | null> {
       try {
         const url = `https://${host}/api/v3/ticker/price?symbol=${sym}`;
         const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) continue;
+        if (!res.ok) { cancelResponseBody(res); continue; }
         const j: any = await res.json();
         const p = parseFloat(j?.price);
         if (isFinite(p)) return { price: p, t: Date.now() };
@@ -1527,7 +1537,7 @@ async function fetchFxProxyRate(symbol: string): Promise<number | null> {
     const res = await fetchWithTimeout(`https://open.er-api.com/v6/latest/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
-    if (!res.ok) return null;
+    if (!res.ok) { cancelResponseBody(res); return null; }
     const j: any = await res.json();
     const rate = j?.rates?.[quote];
     const p = typeof rate === "number" ? rate : parseFloat(rate);
@@ -1551,7 +1561,7 @@ async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick |
     const res = await fetchWithTimeout(`https://api.gold-api.com/price/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
-    if (!res.ok) return null;
+    if (!res.ok) { cancelResponseBody(res); return null; }
     const j: any = await res.json();
     const p = typeof j?.price === "number" ? j.price : parseFloat(j?.price);
     if (!isFinite(p) || p <= 0) return null;
@@ -1591,7 +1601,7 @@ async function fetchFxSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | nu
     const res = await fetchWithTimeout(`https://open.er-api.com/v6/latest/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
     });
-    if (!res.ok) return null;
+    if (!res.ok) { cancelResponseBody(res); return null; }
     const j: any = await res.json();
     const rate = j?.rates?.[quote];
     const p = typeof rate === "number" ? rate : parseFloat(rate);
@@ -1614,7 +1624,7 @@ async function fetchCoinbaseQuote(symbols: string[]): Promise<LiveTick | null> {
       const res = await fetchWithTimeout(`https://api.coinbase.com/v2/prices/${base}-USD/spot`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
       });
-      if (!res.ok) continue;
+      if (!res.ok) { cancelResponseBody(res); continue; }
       const j: any = await res.json();
       const p = parseFloat(j?.data?.amount);
       if (isFinite(p) && p > 0) return { price: p, t: Date.now() };
