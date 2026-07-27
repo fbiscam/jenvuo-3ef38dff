@@ -391,7 +391,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       crosshair: { mode: CrosshairMode.Normal },
       rightPriceScale: { borderVisible: false },
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, barSpacing: 14, rightOffset: 12 },
-      autoSize: true,
+      autoSize: false,
       width: Math.max(1, Math.floor(containerRef.current.clientWidth || 800)),
       height: Math.max(1, Math.floor(containerRef.current.clientHeight || 500)),
     });
@@ -549,12 +549,28 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       const w = Math.max(1, Math.floor(el.clientWidth));
       const h = Math.max(1, Math.floor(el.clientHeight));
       try {
-        chartRef.current.applyOptions({ width: w, height: h, autoSize: true });
+        chartRef.current.applyOptions({ width: w, height: h, autoSize: false });
         chartRef.current.resize(w, h);
       } catch {}
       requestAnimationFrame(() => {
+        let bitmapAdjusted = false;
+        const ratio = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+        for (const canvas of el.querySelectorAll("canvas")) {
+          const rect = canvas.getBoundingClientRect();
+          const cw = Math.max(1, Math.round(rect.width * ratio));
+          const ch = Math.max(1, Math.round(rect.height * ratio));
+          if (canvas.width !== cw || canvas.height !== ch) {
+            canvas.width = cw;
+            canvas.height = ch;
+            bitmapAdjusted = true;
+          }
+        }
+        if (bitmapAdjusted) {
+          try { seriesRef.current?.setData(candles.map((c) => ({ ...c, time: Number(c.time) as Time }))); } catch {}
+        }
         try { chartRef.current?.timeScale().applyOptions({ barSpacing: 14, rightOffset: 12 }); } catch {}
         try { chartRef.current?.timeScale().scrollToRealTime(); } catch {}
+        try { chartRef.current?.resize(w, h); } catch {}
       });
     };
     applySize();
