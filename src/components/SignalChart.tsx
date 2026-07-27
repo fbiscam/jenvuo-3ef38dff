@@ -391,7 +391,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       crosshair: { mode: CrosshairMode.Normal },
       rightPriceScale: { borderVisible: false },
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, barSpacing: 14, rightOffset: 12 },
-      autoSize: false,
+      autoSize: true,
       width: Math.max(1, Math.floor(containerRef.current.clientWidth || 800)),
       height: Math.max(1, Math.floor(containerRef.current.clientHeight || 500)),
     });
@@ -548,9 +548,13 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (!el || !chartRef.current) return;
       const w = Math.max(1, Math.floor(el.clientWidth));
       const h = Math.max(1, Math.floor(el.clientHeight));
-      try { chartRef.current.resize(w, h, true); } catch {}
+      try {
+        chartRef.current.applyOptions({ width: w, height: h, autoSize: true });
+        chartRef.current.resize(w, h);
+      } catch {}
       requestAnimationFrame(() => {
         try { chartRef.current?.timeScale().applyOptions({ barSpacing: 14, rightOffset: 12 }); } catch {}
+        try { chartRef.current?.timeScale().scrollToRealTime(); } catch {}
       });
     };
     applySize();
