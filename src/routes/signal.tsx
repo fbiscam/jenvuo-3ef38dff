@@ -188,7 +188,7 @@ function SignalPage() {
   const fetchPlan = useServerFn(getSignalPlan);
   const triggerManualBroadcast = useServerFn(runManualScanBroadcast);
   const speech = useSpeech();
-  const credits = useCredits();
+  const credits = useCredits({ allowMfaPending: true });
 
   // Kill any narration / listening when the signal page unmounts
   useEffect(() => {
@@ -367,8 +367,8 @@ function SignalPage() {
   const feedScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!authLoading && !authUser) navigate({ to: "/auth", replace: true });
-  }, [authLoading, authUser, navigate]);
+    if (!authLoading && !rawUser) navigate({ to: "/auth", replace: true });
+  }, [authLoading, rawUser, navigate]);
 
   // ---------- Killzone warning popup ----------
   const [kzDismissed, setKzDismissed] = useState<boolean | null>(null);

@@ -7,52 +7,53 @@ import { useAuthUser } from "./useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
 
 
-export function useCredits() {
-  const { user, loading: authLoading } = useAuthUser();
+export function useCredits(options: { allowMfaPending?: boolean } = {}) {
+  const { user, loading: authLoading, rawUser } = useAuthUser();
+  const accountUser = options.allowMfaPending ? rawUser : user;
   const queryClient = useQueryClient();
   const fetchState = useServerFn(getCreditState);
   const spendFn = useServerFn(spendCredits);
 
   const query = useQuery({
-    queryKey: ["credit-state", user?.id],
+    queryKey: ["credit-state", accountUser?.id],
     queryFn: () => fetchState(),
-    enabled: !authLoading && !!user,
+    enabled: !authLoading && !!accountUser,
     retry: 2,
     staleTime: 15_000,
   });
 
   // Realtime: refresh whenever wallet, ledger, or subscription changes for this user
   useEffect(() => {
-    if (!user?.id) return;
+    if (!accountUser?.id) return;
     const invalidate = () =>
-      queryClient.invalidateQueries({ queryKey: ["credit-state", user.id] });
+      queryClient.invalidateQueries({ queryKey: ["credit-state", accountUser.id] });
     // Unique channel name per mount to avoid supabase-js returning a
     // stale, already-subscribed channel (React StrictMode double-invoke).
-    const channelName = `credit-state-${user.id}-${Math.random().toString(36).slice(2)}`;
+    const channelName = `credit-state-${accountUser.id}-${Math.random().toString(36).slice(2)}`;
     const ch = supabase
       .channel(channelName)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "credit_ledger", filter: `user_id=eq.${user.id}` },
+        { event: "*", schema: "public", table: "credit_ledger", filter: `user_id=eq.${accountUser.id}` },
         invalidate,
       )
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "credit_balances", filter: `user_id=eq.${user.id}` },
+        { event: "*", schema: "public", table: "credit_balances", filter: `user_id=eq.${accountUser.id}` },
         invalidate,
       )
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "user_subscriptions", filter: `user_id=eq.${user.id}` },
+        { event: "*", schema: "public", table: "user_subscriptions", filter: `user_id=eq.${accountUser.id}` },
         invalidate,
       )
       .subscribe();
     return () => {
       supabase.removeChannel(ch);
     };
-  }, [user?.id, queryClient]);
+  }, [accountUser?.id, queryClient]);
 
-  const waitingForFirstCreditState = !!user && !query.data && (query.isPending || query.isFetching);
+  const waitingForFirstCreditState = !!accountUser && !query.data && (query.isPending || query.isFetching);
 
   async function spend(action: CreditAction, metadata?: Record<string, unknown>): Promise<boolean> {
     try {
@@ -71,7 +72,7 @@ export function useCredits() {
         }
         return false;
       }
-      const uid = user?.id ?? "self";
+      const uid = accountUser?.id ?? "self";
       queryClient.setQueryData(["credit-state", uid], (prev: any) =>
         prev ? { ...prev, balance: res.balance } : prev,
       );
@@ -100,6 +101,6 @@ export function useCredits() {
     features: query.data?.features ?? { journal: false, realtime_alerts: false, full_ict: false, scanner: false },
     spend,
     costs: CREDIT_COSTS,
-    refresh: () => queryClient.invalidateQueries({ queryKey: ["credit-state", user?.id] }),
+    refresh: () => queryClient.invalidateQueries({ queryKey: ["credit-state", accountUser?.id] }),
   };
 }
