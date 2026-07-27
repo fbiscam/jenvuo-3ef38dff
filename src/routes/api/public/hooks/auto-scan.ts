@@ -570,7 +570,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // Claude-style step-by-step reveal, instead of just 3 price lines.
             const bpAny = broadcastPlan as any;
             const markingsPayload = Array.isArray(bpAny.markings)
-              ? bpAny.markings.slice(0, 40)
+              ? bpAny.markings.slice(0, 80)
               : null;
             const narrationPayload = Array.isArray(bpAny.narration)
               ? bpAny.narration.slice(0, 12)
