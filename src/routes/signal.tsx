@@ -465,7 +465,7 @@ function SignalPage() {
 
       // Only render the IMPORTANT markings: entry/SL/TP + core ICT/SMC (BOS, CHoCH, Order Block, FVG).
       // Skip noisier context (liquidity sweeps, trendlines, S/R, EQH/EQL, premium/discount, breakers).
-      const IMPORTANT = new Set(["entry", "sl", "tp", "bos", "choch", "ob", "fvg", "trendline", "support", "resistance"]);
+      const IMPORTANT = new Set(["entry", "sl", "tp", "bos", "choch", "ob", "fvg", "trendline"]);
       for (const m of p.markings) {
         if (!IMPORTANT.has(String(m.type).toLowerCase())) continue;
         if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
