@@ -104,6 +104,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   const markersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   // Box overlays drawn via DOM div absolutely positioned over chart
   const overlayRef = useRef<HTMLDivElement>(null);
+  const candleLayerRef = useRef<SVGSVGElement | null>(null);
   const boxesRef = useRef<{ marking: Marking; el: HTMLDivElement; transient: boolean }[]>([]);
   // Floating text labels for price-line markings (liquidity, EQH/EQL, BOS/CHOCH, entry/sl/tp)
   const labelsRef = useRef<{ marking: Marking; price: number; color: string; el: HTMLDivElement; transient: boolean }[]>([]);
@@ -418,7 +419,69 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       ? { time: Number(lastC.time), open: lastC.open, high: lastC.high, low: lastC.low, close: lastC.close }
       : null;
 
+    const redrawCandleLayer = () => {
+      const layer = candleLayerRef.current;
+      if (!layer || !seriesRef.current || !chartRef.current || !overlayRef.current) return;
+      const ts = chartRef.current.timeScale();
+      const width = overlayRef.current.clientWidth;
+      const height = overlayRef.current.clientHeight;
+      layer.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      layer.setAttribute("width", `${width}`);
+      layer.setAttribute("height", `${height}`);
+      while (layer.firstChild) layer.removeChild(layer.firstChild);
+
+      const visible = candles
+        .map((c) => {
+          const x = ts.timeToCoordinate(Number(c.time) as Time) as number | null;
+          if (x == null || x < -20 || x > width + 20) return null;
+          const openY = seriesRef.current?.priceToCoordinate(c.open) as number | null;
+          const highY = seriesRef.current?.priceToCoordinate(c.high) as number | null;
+          const lowY = seriesRef.current?.priceToCoordinate(c.low) as number | null;
+          const closeY = seriesRef.current?.priceToCoordinate(c.close) as number | null;
+          if (openY == null || highY == null || lowY == null || closeY == null) return null;
+          return { ...c, x, openY, highY, lowY, closeY };
+        })
+        .filter((c): c is NonNullable<typeof c> => !!c);
+
+      if (!visible.length) return;
+      const xs = visible.map((c) => c.x).sort((a, b) => a - b);
+      const spacing = xs.length > 1 ? Math.max(3, Math.min(18, Math.abs(xs[xs.length - 1] - xs[0]) / Math.max(1, xs.length - 1))) : 10;
+      const bodyWidth = Math.max(3, Math.min(11, spacing * 0.62));
+      const ns = "http://www.w3.org/2000/svg";
+      const frag = document.createDocumentFragment();
+
+      for (const c of visible.slice(-220)) {
+        const bullish = c.close >= c.open;
+        const color = bullish ? "#16a34a" : "#dc2626";
+        const wick = document.createElementNS(ns, "line");
+        wick.setAttribute("x1", `${c.x}`);
+        wick.setAttribute("x2", `${c.x}`);
+        wick.setAttribute("y1", `${c.highY}`);
+        wick.setAttribute("y2", `${c.lowY}`);
+        wick.setAttribute("stroke", color);
+        wick.setAttribute("stroke-width", "1.25");
+        wick.setAttribute("stroke-linecap", "round");
+        wick.setAttribute("opacity", "0.95");
+        frag.appendChild(wick);
+
+        const top = Math.min(c.openY, c.closeY);
+        const bodyHeight = Math.max(2, Math.abs(c.closeY - c.openY));
+        const body = document.createElementNS(ns, "rect");
+        body.setAttribute("x", `${c.x - bodyWidth / 2}`);
+        body.setAttribute("y", `${top}`);
+        body.setAttribute("width", `${bodyWidth}`);
+        body.setAttribute("height", `${bodyHeight}`);
+        body.setAttribute("rx", "1.5");
+        body.setAttribute("fill", bullish ? "rgba(22,163,74,0.82)" : "rgba(220,38,38,0.82)");
+        body.setAttribute("stroke", color);
+        body.setAttribute("stroke-width", "1");
+        frag.appendChild(body);
+      }
+      layer.appendChild(frag);
+    };
+
     const redrawBoxes = () => {
+      redrawCandleLayer();
       if (!overlayRef.current || !seriesRef.current || !chartRef.current) return;
       const ts = chartRef.current.timeScale();
       const containerWidth = overlayRef.current.clientWidth;
@@ -579,6 +642,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     const ro = new ResizeObserver(() => { applySize(); redrawBoxes(); redrawUserDrawings(); });
     ro.observe(containerRef.current);
     (chartRef.current as any).__redrawBoxes = redrawBoxes;
+    (chartRef.current as any).__redrawCandleLayer = redrawCandleLayer;
 
 
     return () => {
