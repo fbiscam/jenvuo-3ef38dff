@@ -467,7 +467,8 @@ function SignalPage() {
       // Entry / SL / TP are gated by confidence (≥65%); below that, only context markings render.
       for (const m of p.markings) {
         if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
-        try { ltfRef.current?.drawMarking(m, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
+        const visibleMarking = { ...m, tf: "ltf" as const };
+        try { ltfRef.current?.drawMarking(visibleMarking, { transient: false }); } catch (e) { console.warn("drawMarking failed", e); }
       }
       // Risk/profit shaded zones removed per user request.
       const entry = p.markings.find((m) => m.type === "entry");
@@ -667,7 +668,8 @@ function SignalPage() {
             p.trade?.direction !== "WAIT";
           for (const m of p.markings) {
             if (!conf65 && (m.type === "entry" || m.type === "sl" || m.type === "tp")) continue;
-            try { ltfRef.current?.drawMarking(m, { transient: false }); } catch {}
+            const visibleMarking = { ...m, tf: "ltf" as const };
+            try { ltfRef.current?.drawMarking(visibleMarking, { transient: false }); } catch {}
           }
           // Risk/profit shaded zones removed per user request.
 

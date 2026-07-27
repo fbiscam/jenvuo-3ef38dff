@@ -359,12 +359,12 @@ function sanitizeCandles(candles: Candle[], tf: string): Candle[] {
   const cleaned: Candle[] = [];
   for (const c of deduped) {
     if (c.c < hardLow || c.c > hardHigh || c.o < hardLow || c.o > hardHigh) continue;
-    if (c.h / c.l > 1.18) continue;
+      if (c.h / c.l > 1.50) continue;
     const prev = cleaned[cleaned.length - 1];
     if (prev) {
       const gap = Math.abs(c.o - prev.c) / prev.c;
       const closeJump = Math.abs(c.c - prev.c) / prev.c;
-      if (gap > 0.18 || closeJump > 0.18) continue;
+      if (gap > 0.50 || closeJump > 0.50) continue;
     }
     cleaned.push(c);
   }
@@ -2075,25 +2075,6 @@ export async function computeSignalPlan(
     // ---- WISDOM: compute regime BEFORE AI so narration can reference it ----
     const marketRegime = detectMarketRegime(ltf);
 
-    // ---- PRE-FLIGHT GATE: skip AI entirely when a real setup is impossible.
-    // This saves Lovable AI credits on every "no setup" scan — no tokens burnt.
-    // Skip when: regime is unfavorable (choppy/ranging) AND outside every
-    // killzone AND no high-impact USD news is imminent (news creates its own
-    // volatility even in dead sessions).
-    const outsideKillzone = killzone === "Outside killzone" || killzone === "-" || !killzone;
-    const unfavorableTape = !marketRegime.favorable;
-    const noNewsDriver = !imminentHigh;
-    if (unfavorableTape && outsideKillzone && noNewsDriver) {
-      return buildFeedFallbackPlan({
-        inst,
-        price: last.c,
-        htfRaw: htf,
-        ltfRaw: ltf,
-        reason: `Tape is ${marketRegime.regime} and no killzone is active — waiting for a cleaner window before spending a scan.`,
-      });
-    }
-
-
     const system = `You are Jenvu — an elite institutional trader with 25+ years on bank/prop desks. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
 - Market structure: BOS, CHOCH, internal vs external structure, MSS
 - Premium / Discount arrays around equilibrium of the dealing range
@@ -3478,8 +3459,8 @@ export const getSignalPlan = createServerFn({ method: "POST" })
       return { ok: false, error: `Too many analyze requests. Try again in ~${Math.ceil(rl.retryInSec / 60)} min.` } satisfies SignalPlanResult;
     }
 
-    // 2. 3-minute per-user per-symbol cache. Same pair asked twice within
-    //    3 min returns the same plan — instant response, zero AI credits.
+    // 2. Short per-user per-symbol cache. Same pair asked twice very quickly
+    //    returns the same plan — prevents accidental rapid repeats without stale reports.
     const cacheKey = `${context.userId}:${data.symbol.toUpperCase()}`;
     if (!data.force) {
       const cached = getCachedPlan<SignalPlan>(cacheKey);

@@ -549,20 +549,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       const w = Math.max(1, Math.floor(el.clientWidth));
       const h = Math.max(1, Math.floor(el.clientHeight));
       try { chartRef.current.resize(w, h, true); } catch {}
-      // In some WebKit/PWA and preview layouts lightweight-charts updates the
-      // canvas CSS size but leaves the backing bitmap at 300×150. That stretches
-      // candles into blurry / strange shapes, so force every chart canvas bitmap
-      // to match its rendered box after resize.
       requestAnimationFrame(() => {
-        for (const canvas of el.querySelectorAll("canvas")) {
-          const rect = canvas.getBoundingClientRect();
-          const cw = Math.max(1, Math.round(rect.width));
-          const ch = Math.max(1, Math.round(rect.height));
-          if (canvas.width !== cw || canvas.height !== ch) {
-            canvas.width = cw;
-            canvas.height = ch;
-          }
-        }
         try { chartRef.current?.timeScale().applyOptions({ barSpacing: 14, rightOffset: 12 }); } catch {}
       });
     };
