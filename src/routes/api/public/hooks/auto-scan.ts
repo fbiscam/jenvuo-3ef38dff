@@ -122,11 +122,16 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           (p) =>
             typeof p === "string" && p.toUpperCase().startsWith("XAU"),
         );
-        const minConf = Number(cfg.min_conf ?? 70);
+        // Threshold lowered 70→65 (matches grade B floor). With 70 the
+        // combined HTF-bias + two-hit + cooldown + XAU-dedup filters were
+        // producing < 1 broadcast/day on quiet sessions.
+        const minConf = Number(cfg.min_conf ?? 65);
         const confirmWindowMin = Number(cfg.confirm_window_min ?? 45);
-        const cooldownMin = Number(cfg.cooldown_min ?? 60);
-        const sameDirectionLockMin = Number(cfg.same_direction_lock_min ?? 240);
-        const maxPerDay = Number(cfg.max_broadcasts_per_day ?? 8);
+        const cooldownMin = Number(cfg.cooldown_min ?? 45);
+        // Same-direction lock relaxed 240→120 so a fresh killzone can re-fire
+        // a still-valid idea instead of being silenced for four hours.
+        const sameDirectionLockMin = Number(cfg.same_direction_lock_min ?? 120);
+        const maxPerDay = Number(cfg.max_broadcasts_per_day ?? 12);
 
         // Global daily rate limit — manual scans bypass so the user's
         // deliberate analyze still fires when the pool cap is hit.
@@ -287,11 +292,17 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // day's cleanest setups and a rigid bias gate was silencing them.
             const htfBias = String((plan as { htfBias?: string }).htfBias ?? "neutral");
             const utcHourNow = now.getUTCHours();
-            const isNyAmWindow = utcHourNow >= 12 && utcHourNow < 16;
+            // Neutral HTF passes through in London + NY sessions (7–20 UTC),
+            // not just NY-AM. Prior gate silenced clean London-session setups
+            // whenever the 4H trend was undecided.
+            const isActiveSession = utcHourNow >= 7 && utcHourNow < 20;
             const aligned =
               (dir === "BUY" && htfBias === "bullish") ||
               (dir === "SELL" && htfBias === "bearish") ||
-              (isNyAmWindow && htfBias === "neutral");
+              (isActiveSession && htfBias === "neutral") ||
+              // High-conviction override: a ≥80% setup fires even against
+              // HTF bias — that's the whole point of a reversal signal.
+              conf >= 80;
             if (!aligned) {
               await supabaseAdmin
                 .from("auto_scan_state")
