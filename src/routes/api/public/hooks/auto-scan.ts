@@ -292,11 +292,17 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // day's cleanest setups and a rigid bias gate was silencing them.
             const htfBias = String((plan as { htfBias?: string }).htfBias ?? "neutral");
             const utcHourNow = now.getUTCHours();
-            const isNyAmWindow = utcHourNow >= 12 && utcHourNow < 16;
+            // Neutral HTF passes through in London + NY sessions (7–20 UTC),
+            // not just NY-AM. Prior gate silenced clean London-session setups
+            // whenever the 4H trend was undecided.
+            const isActiveSession = utcHourNow >= 7 && utcHourNow < 20;
             const aligned =
               (dir === "BUY" && htfBias === "bullish") ||
               (dir === "SELL" && htfBias === "bearish") ||
-              (isNyAmWindow && htfBias === "neutral");
+              (isActiveSession && htfBias === "neutral") ||
+              // High-conviction override: a ≥80% setup fires even against
+              // HTF bias — that's the whole point of a reversal signal.
+              conf >= 80;
             if (!aligned) {
               await supabaseAdmin
                 .from("auto_scan_state")
