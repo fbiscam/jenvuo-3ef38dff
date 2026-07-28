@@ -202,8 +202,10 @@ function SignalPage() {
   }, []);
 
 
-  const { user: authUser, loading: authLoading } = useAuthUser();
-  const authReady = !authLoading && !!authUser;
+  const { user: authUser, loading: authLoading, rawUser } = useAuthUser();
+  // Signal page is accessible to MFA-pending sessions (AAL1 waiting for AAL2)
+  // — gate on rawUser so those users can still run scans.
+  const authReady = !authLoading && !!rawUser;
   const dark = false;
   const [plan, setPlan] = useState<SignalPlan | null>(null);
   const [loading, setLoading] = useState(false);

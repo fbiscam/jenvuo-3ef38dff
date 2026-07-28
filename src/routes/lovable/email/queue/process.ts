@@ -221,6 +221,16 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
             }
 
             try {
+              // Rotate idempotency key on retries. The provider caches the
+              // first attempt's key and responds with 409 "run_failed / send
+              // again with a new idempotency key" on subsequent sends using
+              // the same key, so retries must use a fresh suffix.
+              const rotatedIdemKey =
+                payload.idempotency_key
+                  ? failedAttempts > 0
+                    ? `${payload.idempotency_key}:r${failedAttempts}`
+                    : payload.idempotency_key
+                  : undefined
               await sendLovableEmail(
                 {
                   run_id: payload.run_id,
@@ -232,7 +242,7 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   text: payload.text,
                   purpose: payload.purpose,
                   label: payload.label,
-                  idempotency_key: payload.idempotency_key,
+                  idempotency_key: rotatedIdemKey,
                   unsubscribe_token: payload.unsubscribe_token,
                   message_id: payload.message_id,
                 },

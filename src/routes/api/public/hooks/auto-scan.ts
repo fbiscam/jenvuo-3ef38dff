@@ -481,7 +481,14 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const dec = broadcastPlan.instrument?.decimals ?? 2;
             const entry = Number(broadcastPlan.trade?.entry);
             const sl = Number(broadcastPlan.trade?.sl);
-            const tp = Number(broadcastPlan.trade?.tp1 ?? broadcastPlan.trade?.tp);
+            // Prefer engine's stretched TP (tp/tp3) which targets liquidity/2-3R.
+            // tp1 is by design exactly 1R and would produce a misleading 1:1 R:R.
+            const tRaw =
+              broadcastPlan.trade?.tp ??
+              broadcastPlan.trade?.tp3 ??
+              broadcastPlan.trade?.tp2 ??
+              broadcastPlan.trade?.tp1;
+            let tp = Number(tRaw);
             if (!isFinite(entry) || !isFinite(sl) || !isFinite(tp)) {
               results.push({ pair, action: "invalid_levels" });
               continue;
@@ -490,7 +497,13 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // upstream `plan.trade.rr`, which has produced inflated values
             // (e.g. reporting 3.0 when SL/TP are symmetric ~1:1).
             const riskDist = Math.abs(entry - sl);
-            const rewardDist = Math.abs(tp - entry);
+            let rewardDist = Math.abs(tp - entry);
+            // Enforce a minimum 2R target so broadcasts never carry a 1:1 R:R
+            // when the engine only surfaced tp1.
+            if (riskDist > 0 && rewardDist < riskDist * 2) {
+              tp = dir === "BUY" ? entry + riskDist * 2 : entry - riskDist * 2;
+              rewardDist = Math.abs(tp - entry);
+            }
             const rr = riskDist > 0 ? rewardDist / riskDist : 0;
 
             // Freshness gate: refuse to broadcast if live price has already
