@@ -122,16 +122,51 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           (p) =>
             typeof p === "string" && p.toUpperCase().startsWith("XAU"),
         );
-        // Threshold lowered 70→65 (matches grade B floor). With 70 the
-        // combined HTF-bias + two-hit + cooldown + XAU-dedup filters were
-        // producing < 1 broadcast/day on quiet sessions.
-        const minConf = Number(cfg.min_conf ?? 65);
-        const confirmWindowMin = Number(cfg.confirm_window_min ?? 45);
-        const cooldownMin = Number(cfg.cooldown_min ?? 45);
-        // Same-direction lock relaxed 240→120 so a fresh killzone can re-fire
-        // a still-valid idea instead of being silenced for four hours.
-        const sameDirectionLockMin = Number(cfg.same_direction_lock_min ?? 120);
-        const maxPerDay = Number(cfg.max_broadcasts_per_day ?? 12);
+        // Keep cron executions comfortably under the platform timeout. A full
+        // six-pair AI sweep can take 40–60s, so the scheduled worker rotates
+        // through small batches every 5 minutes. Manual scans still process the
+        // selected pair immediately.
+        const configuredBatchSize = Number(cfg.scan_batch_size ?? 2);
+        const scanBatchSize = manualMode
+          ? pairs.length
+          : Math.max(
+              1,
+              Math.min(
+                Number.isFinite(configuredBatchSize) ? configuredBatchSize : 2,
+                2,
+              ),
+            );
+        const batchCount = Math.max(1, Math.ceil(pairs.length / scanBatchSize));
+        const batchSlot = Math.floor(Date.now() / (5 * 60 * 1000)) % batchCount;
+        const scheduledPairs = manualMode
+          ? pairs
+          : pairs.slice(batchSlot * scanBatchSize, batchSlot * scanBatchSize + scanBatchSize);
+        // Runtime config can lag behind code deploys. Clamp the old strict
+        // values so a stale DB setting (75% / 240 min lock) cannot silently
+        // starve the signal feed again.
+        const configuredMinConf = Number(cfg.min_conf ?? 65);
+        const minConf = Math.min(
+          Number.isFinite(configuredMinConf) ? configuredMinConf : 65,
+          65,
+        );
+        const confirmWindowMin = Math.min(
+          Number(cfg.confirm_window_min ?? 45) || 45,
+          45,
+        );
+        const cooldownMin = Math.min(Number(cfg.cooldown_min ?? 45) || 45, 45);
+        const sameDirectionLockMin = Math.min(
+          Number(cfg.same_direction_lock_min ?? 120) || 120,
+          120,
+        );
+        const maxPerDay = Math.max(Number(cfg.max_broadcasts_per_day ?? 12) || 12, 12);
+        // 70%+ is strong enough to broadcast immediately. 65–69% still needs
+        // the second scan confirmation, preserving quality without missing the
+        // clean A/B setups that appear and move quickly.
+        const configuredSingleHit = Number(cfg.single_hit_min_conf ?? 70);
+        const singleHitMinConf = Math.max(
+          minConf,
+          Math.min(Number.isFinite(configuredSingleHit) ? configuredSingleHit : 70, 70),
+        );
 
         // Global daily rate limit — manual scans bypass so the user's
         // deliberate analyze still fires when the pool cap is hit.
@@ -191,56 +226,38 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         const results: Array<Record<string, unknown>> = [];
         const runStartedAt = new Date().toISOString();
 
-        // Multi-candidate arbitration: if 2+ pairs qualify simultaneously in
-        // this scan run, re-scan the candidates and only broadcast the
-        // strongest (highest confidence, R:R tiebreak). Prevents firing
-        // correlated XAU signals when the market gives multiple 70%+ setups
-        // in the same tick. Skipped in manual mode (user picks the pair).
-        let workingPairs = pairs.slice();
+        // Multi-candidate arbitration: scan all pairs once, cache those plans,
+        // then evaluate strongest-first. Earlier versions pre-scanned and then
+        // re-scanned each pair, which could exceed the Worker request budget;
+        // the DB cron saw those as status 0 and no alert was ever finalized.
+        const scanPlanCache = new Map<string, Awaited<ReturnType<typeof computeSignalPlan>>>();
+        let workingPairs = scheduledPairs.length > 0 ? scheduledPairs.slice() : pairs.slice(0, scanBatchSize);
         if (!manualMode && workingPairs.length > 1) {
           type Cand = { pair: string; conf: number; rr: number; dir: "BUY" | "SELL" };
           const candidates: Cand[] = [];
-          for (const p of workingPairs) {
-            try {
-              const pre = await computeSignalPlan({ symbol: p }, null);
-              const d = pre.trade?.direction;
-              const c = Number(pre.trade?.confidence ?? 0);
-              if ((d !== "BUY" && d !== "SELL") || c < minConf) continue;
-              const kzc = String(pre.killzone ?? "");
-              const inKz = /Killzone/i.test(kzc) && !/Outside/i.test(kzc) && !/asia/i.test(kzc);
-              if (!inKz) continue;
-              const e = Number(pre.trade?.entry);
-              const s = Number(pre.trade?.sl);
-              const t = Number(pre.trade?.tp1 ?? pre.trade?.tp);
-              const rd = Math.abs(e - s);
-              const rw = Math.abs(t - e);
-              const rr = rd > 0 ? rw / rd : 0;
-              candidates.push({ pair: p, conf: c, rr, dir: d });
-            } catch {
-              // ignore — pair will be re-evaluated in main loop where errors are logged
-            }
+          const preScans = await Promise.allSettled(
+            workingPairs.map(async (p) => ({
+              pair: p,
+              plan: await computeSignalPlan({ symbol: p }, null),
+            })),
+          );
+          for (const item of preScans) {
+            if (item.status !== "fulfilled") continue;
+            const { pair: p, plan: pre } = item.value;
+            scanPlanCache.set(p, pre);
+            const d = pre.trade?.direction;
+            const c = Number(pre.trade?.confidence ?? 0);
+            if ((d !== "BUY" && d !== "SELL") || c < minConf) continue;
+            const e = Number(pre.trade?.entry);
+            const s = Number(pre.trade?.sl);
+            const t = Number(pre.trade?.tp1 ?? pre.trade?.tp);
+            const rd = Math.abs(e - s);
+            const rw = Math.abs(t - e);
+            const rr = rd > 0 ? rw / rd : 0;
+            candidates.push({ pair: p, conf: c, rr, dir: d });
           }
           if (candidates.length > 1) {
-            // Re-scan qualifying candidates to confirm strength before picking winner.
-            const rescored: Cand[] = [];
-            for (const cand of candidates) {
-              try {
-                const re = await computeSignalPlan({ symbol: cand.pair }, null);
-                const d = re.trade?.direction;
-                const c = Number(re.trade?.confidence ?? 0);
-                if (d !== cand.dir || c < minConf) continue;
-                const e = Number(re.trade?.entry);
-                const s = Number(re.trade?.sl);
-                const t = Number(re.trade?.tp1 ?? re.trade?.tp);
-                const rd = Math.abs(e - s);
-                const rw = Math.abs(t - e);
-                rescored.push({ pair: cand.pair, conf: c, rr: rd > 0 ? rw / rd : 0, dir: cand.dir });
-              } catch {
-                // skip on re-scan error
-              }
-            }
-            const pool = rescored.length > 0 ? rescored : candidates;
-            pool.sort((a, b) => (b.conf - a.conf) || (b.rr - a.rr));
+            const pool = candidates.sort((a, b) => (b.conf - a.conf) || (b.rr - a.rr));
             // Order candidates strongest-first, but keep the runner-ups in
             // the working set. Previously we silenced them here — that meant
             // if the winner hit cooldown / duplicate lock / xau-correlation
@@ -255,7 +272,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
 
         for (const pair of workingPairs) {
           try {
-            const plan = await computeSignalPlan({ symbol: pair }, null);
+            const plan = scanPlanCache.get(pair) ?? await computeSignalPlan({ symbol: pair }, null);
             const dir = plan.trade?.direction;
             const conf = Number(plan.trade?.confidence ?? 0);
             const now = new Date();
@@ -428,6 +445,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               : Number.POSITIVE_INFINITY;
             const hasConfirmedHit =
               manualMode ||
+              conf >= singleHitMinConf ||
               (state?.direction === dir && firstAgeMin <= confirmWindowMin);
 
             if (!hasConfirmedHit) {
@@ -953,6 +971,9 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           started_at: runStartedAt,
           min_conf: minConf,
           pairs_checked: workingPairs,
+          pairs_configured: pairs,
+          scan_batch_size: scanBatchSize,
+          scan_batch_slot: manualMode ? null : batchSlot,
           broadcasted,
           blocked_after_qualification: qualifiedButBlocked,
           results,
