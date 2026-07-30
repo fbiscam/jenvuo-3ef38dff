@@ -221,6 +221,29 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
             }
 
             try {
+              let unsubscribeToken = payload.unsubscribe_token
+              if (!unsubscribeToken && payload.to && typeof payload.to === 'string') {
+                const email = payload.to.toLowerCase().trim()
+                const { data: existingToken } = await supabase
+                  .from('email_unsubscribe_tokens')
+                  .select('token, used_at')
+                  .eq('email', email)
+                  .maybeSingle()
+                if (!existingToken?.used_at) {
+                  if (existingToken?.token) {
+                    unsubscribeToken = existingToken.token
+                  } else {
+                    const bytes = new Uint8Array(32)
+                    crypto.getRandomValues(bytes)
+                    unsubscribeToken = Array.from(bytes)
+                      .map((b) => b.toString(16).padStart(2, '0'))
+                      .join('')
+                    await supabase
+                      .from('email_unsubscribe_tokens')
+                      .upsert({ token: unsubscribeToken, email }, { onConflict: 'email', ignoreDuplicates: true })
+                  }
+                }
+              }
               // Rotate idempotency key on retries. The provider caches the
               // first attempt's key and responds with 409 "run_failed / send
               // again with a new idempotency key" on subsequent sends using
@@ -243,7 +266,7 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   purpose: payload.purpose,
                   label: payload.label,
                   idempotency_key: rotatedIdemKey,
-                  unsubscribe_token: payload.unsubscribe_token,
+                  unsubscribe_token: unsubscribeToken,
                   message_id: payload.message_id,
                 },
                 { apiKey, sendUrl: process.env.LOVABLE_SEND_URL }
