@@ -176,9 +176,11 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
                 else if (!isBuy && hi >= entry - tol) entryHit = true;
                 if (!entryHit) continue;
               }
-              // Equity model: $10 stake, SL = full loss, WIN once
-              // unrealized profit reaches 30% of equity (= 0.3R).
-              const WIN_R = 0.3;
+              // Small-account model: for a $20 reference balance, mark a win
+              // once the move reaches +20% profit-equivalent. We evaluate this
+              // before final TP so the public page shows win/loss as soon as
+              // the realistic small-account target is achieved.
+              const WIN_R = 0.2;
               if (isBuy) {
                 if (lo <= sl) {
                   outcome = "loss";

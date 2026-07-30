@@ -393,6 +393,28 @@ export const Route = createFileRoute(
                       .eq("email", email)
                       .maybeSingle();
                     if (suppressed) continue;
+                    let token: string | null = null;
+                    const { data: existingToken } = await supabaseAdmin
+                      .from("email_unsubscribe_tokens")
+                      .select("token, used_at")
+                      .eq("email", email)
+                      .maybeSingle();
+                    if (existingToken?.used_at) continue;
+                    if (existingToken?.token) {
+                      token = existingToken.token;
+                    } else {
+                      const bytes = new Uint8Array(32);
+                      crypto.getRandomValues(bytes);
+                      token = Array.from(bytes)
+                        .map((b) => b.toString(16).padStart(2, "0"))
+                        .join("");
+                      await supabaseAdmin
+                        .from("email_unsubscribe_tokens")
+                        .upsert({ token, email }, { onConflict: "email", ignoreDuplicates: true });
+                    }
+                    const unsubscribeUrl = `https://jenvu.com/unsubscribe?token=${encodeURIComponent(token)}`;
+                    const htmlWithUnsubscribe = `${html}<p style="font-family:'Google Sans','Segoe UI',Arial,sans-serif;font-size:12px;color:#71717a;margin:18px 16px 0"><a href="${unsubscribeUrl}" style="color:#52525b">Unsubscribe</a> · <a href="https://jenvu.com/dashboard/notifications" style="color:#52525b">Manage alerts</a></p>`;
+                    const textWithUnsubscribe = `${textBody}\n\nUnsubscribe: ${unsubscribeUrl}`;
                     const messageId = crypto.randomUUID();
                     await supabaseAdmin.from("email_send_log").insert({
                       message_id: messageId,
@@ -410,11 +432,12 @@ export const Route = createFileRoute(
                           from: "Jenvu Signal Desk <signals@notify.jenvu.net>",
                           sender_domain: "notify.jenvu.net",
                           subject,
-                          html,
-                          text: textBody,
+                          html: htmlWithUnsubscribe,
+                          text: textWithUnsubscribe,
                           purpose: "transactional",
                           label: "signal-reversal",
                           idempotency_key: `reversal-${t.id}-${email}`,
+                          unsubscribe_token: token,
                           queued_at: new Date().toISOString(),
                         },
                       },
