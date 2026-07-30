@@ -2367,6 +2367,50 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const volumeSpike = detectVolumeSpikeOnBreak(htf, htfStructureEvents);
     const midnightOpen = detectMidnightOpenBias(htf, built.direction);
 
+    // ---- Capital-protection gate: no naked retracement calls ----
+    // Yesterday's bad trades came from treating an HTF pullback zone as a live
+    // signal before the lower timeframe confirmed. From now on a BUY/SELL must
+    // have short-term confirmation: LTF structure/MSS in the trade direction,
+    // or a real sweep + rejection/Turtle Soup/CE reaction at the entry pocket.
+    let executionVetoReason: string | null = null;
+    if (built.direction !== "WAIT") {
+      const wantDir = built.direction === "BUY" ? "bullish" : "bearish";
+      const ltfStructureConfirms = ltfA.trend === wantDir || ltfA.lastStructure?.dir === wantDir;
+      const opposingSweep = pools.some((p) => p.swept && (built.direction === "BUY" ? p.side === "sell" : p.side === "buy"));
+      const zoneReactionConfirmed =
+        rejection?.confirmed === true ||
+        turtleSoup.triggered === true ||
+        ceTap?.tapped === true ||
+        mitigationBlock?.present === true;
+      const pureRetracementLimit = built.entryType === "LIMIT" && !zoneReactionConfirmed;
+      const sweepThenConfirm = opposingSweep && zoneReactionConfirmed && ltfStructureConfirms;
+
+      if ((!ltfStructureConfirms || pureRetracementLimit) && !sweepThenConfirm) {
+        executionVetoReason = pureRetracementLimit
+          ? "Blocked: price is only retracing into a pending POI; no LTF rejection/MSS confirmation yet."
+          : "Blocked: HTF bias exists, but short-term LTF structure has not confirmed the trade direction after liquidity grab.";
+        built.direction = "WAIT" as typeof built.direction;
+        built.entry = 0;
+        built.sl = 0;
+        built.tp = 0;
+        built.tp1 = undefined;
+        built.tp2 = undefined;
+        built.tp3 = undefined;
+        built.rr = 0;
+        built.zone = null;
+        built.reason = executionVetoReason;
+        tradeFromAi.direction = "WAIT";
+        tradeFromAi.entry = 0;
+        tradeFromAi.sl = 0;
+        tradeFromAi.tp = 0;
+        tradeFromAi.tp1 = undefined;
+        tradeFromAi.tp2 = undefined;
+        tradeFromAi.tp3 = undefined;
+        tradeFromAi.rr = 0;
+        tradeFromAi.invalidation = executionVetoReason;
+      }
+    }
+
     // 10+ factor weighted score with hard-veto gates → only ≥88 is A+
     const scored = scoreSetup({
       trade: built,
@@ -2406,6 +2450,16 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // Add veto reasons as failed checks so the UI shows why an A+ was rejected
     for (const v of scored.vetos) {
       setupChecks.unshift({ key: `veto_${v.key}`, label: `⛔ ${v.label}`, pass: false, reason: v.reason });
+    }
+    if (executionVetoReason) {
+      setupScore = Math.min(setupScore, 49);
+      setupGrade = "C";
+      setupChecks.unshift({
+        key: "short_term_confirmation_veto",
+        label: "⛔ Short-term confirmation missing",
+        pass: false,
+        reason: executionVetoReason,
+      });
     }
 
     const SENIOR_REVIEW_MIN_RULE_SCORE = 62;
@@ -2524,7 +2578,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             jsonMode: true,
             maxTokens: 320,
             timeoutMs: 20000,
-            priority: false,
+            priority: true,
             retriesPerModel: 2,
             stage: "senior-review",
           });

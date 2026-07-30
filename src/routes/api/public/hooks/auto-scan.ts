@@ -141,13 +141,12 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         const scheduledPairs = manualMode
           ? pairs
           : pairs.slice(batchSlot * scanBatchSize, batchSlot * scanBatchSize + scanBatchSize);
-        // Runtime config can lag behind code deploys. Clamp the old strict
-        // values so a stale DB setting (75% / 240 min lock) cannot silently
-        // starve the signal feed again.
+        // Runtime config can lag behind code deploys. Keep a quality floor so
+        // stale permissive settings cannot send B/C retracement calls again.
         const configuredMinConf = Number(cfg.min_conf ?? 65);
-        const minConf = Math.min(
-          Number.isFinite(configuredMinConf) ? configuredMinConf : 65,
-          65,
+        const minConf = Math.max(
+          70,
+          Math.min(Number.isFinite(configuredMinConf) ? configuredMinConf : 75, 75),
         );
         const confirmWindowMin = Math.min(
           Number(cfg.confirm_window_min ?? 45) || 45,
@@ -159,14 +158,9 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           120,
         );
         const maxPerDay = Math.max(Number(cfg.max_broadcasts_per_day ?? 12) || 12, 12);
-        // 70%+ is strong enough to broadcast immediately. 65–69% still needs
-        // the second scan confirmation, preserving quality without missing the
-        // clean A/B setups that appear and move quickly.
-        const configuredSingleHit = Number(cfg.single_hit_min_conf ?? 70);
-        const singleHitMinConf = Math.max(
-          minConf,
-          Math.min(Number.isFinite(configuredSingleHit) ? configuredSingleHit : 70, 70),
-        );
+        // 78%+ can broadcast immediately. 70–77% must survive the confirmation
+        // window, so one-candle liquidity grabs do not alert everyone.
+        const singleHitMinConf = Math.max(minConf, 78);
 
         // Global daily rate limit — manual scans bypass so the user's
         // deliberate analyze still fires when the pool cap is hit.
@@ -569,11 +563,11 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // setup score — otherwise a 71% signal shows as grade "C".
             const gradeBasis = Math.round(conf);
             const grade =
-              gradeBasis >= 90
+              gradeBasis >= 88
                 ? "A+"
-                : gradeBasis >= 82
+                : gradeBasis >= 75
                   ? "A"
-                  : gradeBasis >= 75
+                  : gradeBasis >= 65
                     ? "B"
                     : "C";
 

@@ -420,7 +420,11 @@ function SignalCard({ s }: { s: Signal }) {
       ? "Not Triggered"
       : isTimeout
         ? "Expired"
-        : s.outcome;
+        : isWin
+          ? "Win +20%"
+          : isLoss
+            ? "Loss"
+            : s.outcome;
   const fired = new Date(s.fired_at);
   return (
     <li className={`group relative flex flex-col rounded-2xl border bg-white p-4 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-16px_rgba(0,0,0,0.15)] ${isWin ? "border-emerald-200" : isLoss ? "border-rose-200" : isSkipped ? "border-amber-200" : "border-zinc-200"}`}>
