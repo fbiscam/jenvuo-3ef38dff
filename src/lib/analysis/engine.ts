@@ -261,7 +261,10 @@ const RISK_PROFILE: Record<
   }
 > = {
   crypto: { pctBuffer: 0.0025, minRiskPct: 0.0030, atrMult: 0.90, maxDistPct: 0.0120, entryWindowPct: 0.0040, maxRiskPct: 0.0250 },
-  metal:  { pctBuffer: 0.0012, minRiskPct: 0.0018, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0120 },
+  // Metals widened after live review: 0.18% stops on gold sat inside normal
+  // NY-session noise, so post-liquidity-grab entries were getting wicked out
+  // before the intended leg. ~0.35% min risk ≈ 1.1x ATR on XAU/USD.
+  metal:  { pctBuffer: 0.0020, minRiskPct: 0.0035, atrMult: 1.10, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0150 },
   forex:  { pctBuffer: 0.0005, minRiskPct: 0.0008, atrMult: 0.45, maxDistPct: 0.0035, entryWindowPct: 0.0015, maxRiskPct: 0.0080 },
   index:  { pctBuffer: 0.0010, minRiskPct: 0.0015, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0150 },
   stock:  { pctBuffer: 0.0015, minRiskPct: 0.0020, atrMult: 0.65, maxDistPct: 0.0080, entryWindowPct: 0.0030, maxRiskPct: 0.0180 },
