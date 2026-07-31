@@ -172,30 +172,50 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
             const to = Math.floor(
               Math.min(now, firedAt + EVAL_WINDOW_HOURS * 3_600_000) / 1000,
             );
-            const base = await fetchCandles(spec.base, from, to);
-            if (!base) {
-              results.push({ id: t.id, action: "fetch_failed", sym: spec.base });
-              continue;
-            }
             let highs: number[] = [];
             let lows: number[] = [];
+            let priceSource = "";
+
             if (spec.op === "none" || !spec.fx) {
-              highs = base.highs.filter((n) => typeof n === "number");
-              lows = base.lows.filter((n) => typeof n === "number");
+              const spot = await fetchSpotGoldCandles(from, to, Number(t.entry));
+              if (!spot) {
+                results.push({ id: t.id, action: "fetch_failed", sym: "spot" });
+                continue;
+              }
+              priceSource = spot.source;
+              highs = spot.candles.highs.filter((n) => typeof n === "number");
+              lows = spot.candles.lows.filter((n) => typeof n === "number");
             } else {
               const fx = await fetchCandles(spec.fx, from, to);
-              if (!fx) {
+              if (!fx || !fx.ts.length) {
                 results.push({ id: t.id, action: "fetch_failed", sym: spec.fx });
                 continue;
               }
-              // Align by timestamp (5m buckets should match; fall back to
-              // nearest index if not).
+              // Convert the cross-scale entry into a USD-scale anchor so the
+              // futures fallback can de-bias correctly.
+              const fh = fx.highs.find((n) => typeof n === "number");
+              const fl = fx.lows.find((n) => typeof n === "number");
+              if (typeof fh !== "number" || typeof fl !== "number") {
+                results.push({ id: t.id, action: "no_candles", sym: spec.fx });
+                continue;
+              }
+              const fxMid = (fh + fl) / 2;
+              const anchorUsd =
+                spec.op === "mul" ? Number(t.entry) / fxMid : Number(t.entry) * fxMid;
+              const spot = await fetchSpotGoldCandles(from, to, anchorUsd);
+              if (!spot) {
+                results.push({ id: t.id, action: "fetch_failed", sym: "spot" });
+                continue;
+              }
+              priceSource = spot.source;
+              const base = spot.candles;
+              // Align by 5m timestamp bucket.
               const fxByTs = new Map<number, { h: number; l: number }>();
               for (let i = 0; i < fx.ts.length; i++) {
                 const h = fx.highs[i];
                 const l = fx.lows[i];
                 if (typeof h === "number" && typeof l === "number") {
-                  fxByTs.set(fx.ts[i], { h, l });
+                  fxByTs.set(fx.ts[i] - (fx.ts[i] % 300), { h, l });
                 }
               }
               for (let i = 0; i < base.ts.length; i++) {
@@ -211,12 +231,14 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
                   highs.push(bh * fxRow.h);
                   lows.push(bl * fxRow.l);
                 } else {
-                  // div: XAU/foreign = base / fx
+                  // div: XAU/foreign = spot / fx
                   highs.push(bh / fxRow.l);
                   lows.push(bl / fxRow.h);
                 }
               }
             }
+            void priceSource;
+
             if (highs.length === 0 || lows.length === 0) {
               results.push({ id: t.id, action: "no_candles" });
               continue;
