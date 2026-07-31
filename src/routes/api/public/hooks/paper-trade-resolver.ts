@@ -11,25 +11,32 @@ import { createFileRoute } from "@tanstack/react-router";
 //
 // Called every 30 min by pg_cron.
 
-// Yahoo doesn't publish direct XAU cross-rate candles for
-// EUR/GBP/JPY/AUD/CHF, so we compute them from GC=F + the matching FX
-// pair. `op` describes how to combine (base = GC=F, fx = the pair):
-//   div  → XAU/foreign = base / fx  (EURUSD, GBPUSD, AUDUSD)
-//   mul  → XAU/foreign = base * fx  (USDJPY, USDCHF)
-//   none → XAUUSD, use GC=F directly
-type PairSpec = { base: string; fx?: string; op: "none" | "mul" | "div" };
+// PRICE SOURCE — must match the signal engine, which quotes SPOT gold
+// (gold-api / PAXG scale). GC=F futures trade ~$50-60 ABOVE spot, so
+// resolving spot-scale tickets against futures candles produced fake wins
+// (TP looked "already hit") while the live desk saw the real SL fill.
+// Spot-tracking klines (PAXG/XAUT, stablecoin-quoted) are the primary feed;
+// GC=F is only used as a last resort with a per-trade basis correction.
+//
+// Cross pairs derive from spot XAU/USD + the matching FX pair:
+//   div  → XAU/foreign = spot / fx  (EURUSD, GBPUSD, AUDUSD)
+//   mul  → XAU/foreign = spot * fx  (USDJPY, USDCHF)
+//   none → XAUUSD, use spot directly
+type PairSpec = { fx?: string; op: "none" | "mul" | "div" };
 const PAIR_SPECS: Record<string, PairSpec> = {
-  XAUUSD: { base: "GC=F", op: "none" },
-  XAUEUR: { base: "GC=F", fx: "EURUSD=X", op: "div" },
-  XAUGBP: { base: "GC=F", fx: "GBPUSD=X", op: "div" },
-  XAUJPY: { base: "GC=F", fx: "USDJPY=X", op: "mul" },
-  XAUAUD: { base: "GC=F", fx: "AUDUSD=X", op: "div" },
-  XAUCHF: { base: "GC=F", fx: "USDCHF=X", op: "mul" },
+  XAUUSD: { op: "none" },
+  XAUEUR: { fx: "EURUSD=X", op: "div" },
+  XAUGBP: { fx: "GBPUSD=X", op: "div" },
+  XAUJPY: { fx: "USDJPY=X", op: "mul" },
+  XAUAUD: { fx: "AUDUSD=X", op: "div" },
+  XAUCHF: { fx: "USDCHF=X", op: "mul" },
 };
 
 const EVAL_WINDOW_HOURS = 24;
 
-async function fetchCandles(sym: string, from: number, to: number) {
+type Candles = { ts: number[]; highs: number[]; lows: number[] };
+
+async function fetchCandles(sym: string, from: number, to: number): Promise<Candles | null> {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?period1=${from}&period2=${to}&interval=5m`;
   const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
   if (!res.ok) return null;
@@ -48,6 +55,67 @@ async function fetchCandles(sym: string, from: number, to: number) {
   const lows = q?.low ?? [];
   return { ts, highs, lows };
 }
+
+// Spot-scale gold klines from Binance gold tokens (5m). PAXG tracks spot
+// within ~$1; XAUT is the backup.
+async function fetchTokenCandles(symbol: string, from: number, to: number): Promise<Candles | null> {
+  try {
+    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=5m&startTime=${from * 1000}&endTime=${to * 1000}&limit=1000`;
+    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+    if (!res.ok) return null;
+    const rows = (await res.json()) as Array<Array<string | number>>;
+    if (!Array.isArray(rows) || rows.length === 0) return null;
+    const ts: number[] = [];
+    const highs: number[] = [];
+    const lows: number[] = [];
+    for (const k of rows) {
+      const t = Math.floor(Number(k[0]) / 1000);
+      const h = Number(k[2]);
+      const l = Number(k[3]);
+      if (!Number.isFinite(h) || !Number.isFinite(l)) continue;
+      // snap to 5m bucket so it aligns with Yahoo FX timestamps
+      ts.push(t - (t % 300));
+      highs.push(h);
+      lows.push(l);
+    }
+    return ts.length ? { ts, highs, lows } : null;
+  } catch {
+    return null;
+  }
+}
+
+// Spot XAU/USD candles with fallbacks. `anchor` is the trade's own entry price
+// (spot scale) used to de-bias GC=F futures if we have to fall back to them.
+async function fetchSpotGoldCandles(
+  from: number,
+  to: number,
+  anchor: number,
+): Promise<{ candles: Candles; source: string } | null> {
+  const paxg = await fetchTokenCandles("PAXGUSDT", from, to);
+  if (paxg) return { candles: paxg, source: "PAXG" };
+  const xaut = await fetchTokenCandles("XAUTUSDT", from, to);
+  if (xaut) return { candles: xaut, source: "XAUT" };
+
+  const fut = await fetchCandles("GC=F", from, to);
+  if (!fut || !fut.highs.length) return null;
+  // Basis correction: futures premium ≈ first bar mid − entry (entry was taken
+  // at/near spot when the signal fired).
+  const h0 = fut.highs.find((n) => typeof n === "number");
+  const l0 = fut.lows.find((n) => typeof n === "number");
+  if (typeof h0 !== "number" || typeof l0 !== "number") return null;
+  const basis = (h0 + l0) / 2 - anchor;
+  // Sanity: gold basis is tens of dollars, never hundreds.
+  if (!Number.isFinite(basis) || Math.abs(basis) > 150) return null;
+  return {
+    candles: {
+      ts: fut.ts,
+      highs: fut.highs.map((n) => (typeof n === "number" ? n - basis : n)),
+      lows: fut.lows.map((n) => (typeof n === "number" ? n - basis : n)),
+    },
+    source: "GCF_debiased",
+  };
+}
+
 
 
 export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
