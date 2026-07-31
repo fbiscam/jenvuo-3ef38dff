@@ -261,7 +261,10 @@ const RISK_PROFILE: Record<
   }
 > = {
   crypto: { pctBuffer: 0.0025, minRiskPct: 0.0030, atrMult: 0.90, maxDistPct: 0.0120, entryWindowPct: 0.0040, maxRiskPct: 0.0250 },
-  metal:  { pctBuffer: 0.0012, minRiskPct: 0.0018, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0120 },
+  // Metals widened after live review: 0.18% stops on gold sat inside normal
+  // NY-session noise, so post-liquidity-grab entries were getting wicked out
+  // before the intended leg. ~0.35% min risk ≈ 1.1x ATR on XAU/USD.
+  metal:  { pctBuffer: 0.0020, minRiskPct: 0.0035, atrMult: 1.10, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0150 },
   forex:  { pctBuffer: 0.0005, minRiskPct: 0.0008, atrMult: 0.45, maxDistPct: 0.0035, entryWindowPct: 0.0015, maxRiskPct: 0.0080 },
   index:  { pctBuffer: 0.0010, minRiskPct: 0.0015, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0150 },
   stock:  { pctBuffer: 0.0015, minRiskPct: 0.0020, atrMult: 0.65, maxDistPct: 0.0080, entryWindowPct: 0.0030, maxRiskPct: 0.0180 },
@@ -360,6 +363,29 @@ export function buildTrade(
   const buffer = Math.max(pctBuffer, atrBuffer, zoneBuffer);
   let sl = dir === "BUY" ? zone.priceLow - buffer : zone.priceHigh + buffer;
 
+  // LIQUIDITY-GRAB PROTECTION — the classic killer: price sweeps a low, we buy
+  // the reversal, then the SAME pool gets re-swept a few points deeper and our
+  // stop dies before the real leg. So the stop must sit BEYOND the stop-side
+  // liquidity pool (already swept or still resting) that price is hunting,
+  // never in front of it.
+  const stopSide: "buy" | "sell" = dir === "BUY" ? "sell" : "buy";
+  const stopSidePools = pools
+    .filter((p) => p.side === stopSide && (dir === "BUY" ? p.price < entry : p.price > entry))
+    .sort((a, b) => Math.abs(a.price - entry) - Math.abs(b.price - entry));
+  const guardPool = stopSidePools.find((p) => {
+    const d = Math.abs(entry - p.price);
+    // Only respect pools inside a sane stop range (≤ 2.5% of price).
+    return d > 0 && d <= lastPrice * 0.025;
+  });
+  if (guardPool) {
+    const poolStop = dir === "BUY" ? guardPool.price - buffer : guardPool.price + buffer;
+    const deeper = dir === "BUY" ? poolStop < sl : poolStop > sl;
+    if (deeper) {
+      sl = poolStop;
+      notes.push("SL pushed beyond swept liquidity pool (anti stop-hunt)");
+    }
+  }
+
   // Enforce MINIMUM risk distance so tickets don't get wicked out on normal noise.
   const minRisk = lastPrice * profile.minRiskPct;
   let risk = Math.abs(entry - sl);
@@ -368,6 +394,7 @@ export function buildTrade(
     risk = minRisk;
     notes.push("SL widened to minimum safe distance");
   }
+
 
   const maxRisk = lastPrice * profile.maxRiskPct;
   if (risk > maxRisk) {
