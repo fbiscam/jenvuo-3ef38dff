@@ -47,6 +47,7 @@ import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as ToolsScamDetectorRouteImport } from './routes/tools.scam-detector'
 import { Route as ToolsLeadsRouteImport } from './routes/tools.leads'
 import { Route as ToolsImageEnhancerRouteImport } from './routes/tools.image-enhancer'
+import { Route as OpsX9k27m4nLeadsUsersRouteImport } from './routes/ops-x9k2-7m4n.leads-users'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
@@ -289,6 +290,11 @@ const ToolsImageEnhancerRoute = ToolsImageEnhancerRouteImport.update({
   id: '/image-enhancer',
   path: '/image-enhancer',
   getParentRoute: () => ToolsRoute,
+} as any)
+const OpsX9k27m4nLeadsUsersRoute = OpsX9k27m4nLeadsUsersRouteImport.update({
+  id: '/leads-users',
+  path: '/leads-users',
+  getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
 const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
   id: '/hub',
@@ -628,6 +634,7 @@ export interface FileRoutesByFullPath {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/leads-users': typeof OpsX9k27m4nLeadsUsersRoute
   '/tools/image-enhancer': typeof ToolsImageEnhancerRoute
   '/tools/leads': typeof ToolsLeadsRoute
   '/tools/scam-detector': typeof ToolsScamDetectorRoute
@@ -715,6 +722,7 @@ export interface FileRoutesByTo {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/leads-users': typeof OpsX9k27m4nLeadsUsersRoute
   '/tools/image-enhancer': typeof ToolsImageEnhancerRoute
   '/tools/leads': typeof ToolsLeadsRoute
   '/tools/scam-detector': typeof ToolsScamDetectorRoute
@@ -809,6 +817,7 @@ export interface FileRoutesById {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/leads-users': typeof OpsX9k27m4nLeadsUsersRoute
   '/tools/image-enhancer': typeof ToolsImageEnhancerRoute
   '/tools/leads': typeof ToolsLeadsRoute
   '/tools/scam-detector': typeof ToolsScamDetectorRoute
@@ -903,6 +912,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/leads-users'
     | '/tools/image-enhancer'
     | '/tools/leads'
     | '/tools/scam-detector'
@@ -990,6 +1000,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/leads-users'
     | '/tools/image-enhancer'
     | '/tools/leads'
     | '/tools/scam-detector'
@@ -1083,6 +1094,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/leads-users'
     | '/tools/image-enhancer'
     | '/tools/leads'
     | '/tools/scam-detector'
@@ -1465,6 +1477,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tools/image-enhancer'
       preLoaderRoute: typeof ToolsImageEnhancerRouteImport
       parentRoute: typeof ToolsRoute
+    }
+    '/ops-x9k2-7m4n/leads-users': {
+      id: '/ops-x9k2-7m4n/leads-users'
+      path: '/leads-users'
+      fullPath: '/ops-x9k2-7m4n/leads-users'
+      preLoaderRoute: typeof OpsX9k27m4nLeadsUsersRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
     }
     '/ops-x9k2-7m4n/hub': {
       id: '/ops-x9k2-7m4n/hub'
@@ -1951,11 +1970,13 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
 
 interface OpsX9k27m4nRouteChildren {
   OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
+  OpsX9k27m4nLeadsUsersRoute: typeof OpsX9k27m4nLeadsUsersRoute
   OpsX9k27m4nIndexRoute: typeof OpsX9k27m4nIndexRoute
 }
 
 const OpsX9k27m4nRouteChildren: OpsX9k27m4nRouteChildren = {
   OpsX9k27m4nHubRoute: OpsX9k27m4nHubRoute,
+  OpsX9k27m4nLeadsUsersRoute: OpsX9k27m4nLeadsUsersRoute,
   OpsX9k27m4nIndexRoute: OpsX9k27m4nIndexRoute,
 }
 
