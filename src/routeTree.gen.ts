@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as ToolsRouteImport } from './routes/tools'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalsLiveRouteImport } from './routes/signals-live'
@@ -38,6 +39,7 @@ import { Route as AiEngineRouteImport } from './routes/ai-engine'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.index'
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
@@ -99,6 +101,11 @@ import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './route
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsRoute = ToolsRouteImport.update({
+  id: '/tools',
+  path: '/tools',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -239,6 +246,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsIndexRoute = ToolsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ToolsRoute,
 } as any)
 const OpsX9k27m4nIndexRoute = OpsX9k27m4nIndexRouteImport.update({
   id: '/',
@@ -589,6 +601,7 @@ export interface FileRoutesByFullPath {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools': typeof ToolsRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
@@ -601,6 +614,7 @@ export interface FileRoutesByFullPath {
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/tools/': typeof ToolsIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -684,6 +698,7 @@ export interface FileRoutesByTo {
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
+  '/tools': typeof ToolsIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -761,6 +776,7 @@ export interface FileRoutesById {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools': typeof ToolsRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
@@ -773,6 +789,7 @@ export interface FileRoutesById {
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/tools/': typeof ToolsIndexRoute
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -850,6 +867,7 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools'
     | '/unsubscribe'
     | '/dashboard'
     | '/inbox'
@@ -862,6 +880,7 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/jenvu-ops-x9k2/'
     | '/ops-x9k2-7m4n/'
+    | '/tools/'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -945,6 +964,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/ops-x9k2-7m4n'
+    | '/tools'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -1021,6 +1041,7 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools'
     | '/unsubscribe'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
@@ -1033,6 +1054,7 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/jenvu-ops-x9k2/'
     | '/ops-x9k2-7m4n/'
+    | '/tools/'
     | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
@@ -1110,6 +1132,7 @@ export interface RootRouteChildren {
   SignalsLiveRoute: typeof SignalsLiveRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ToolsRoute: typeof ToolsRouteWithChildren
   UnsubscribeRoute: typeof UnsubscribeRoute
   BriefIdRoute: typeof BriefIdRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -1146,6 +1169,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools': {
+      id: '/tools'
+      path: '/tools'
+      fullPath: '/tools'
+      preLoaderRoute: typeof ToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -1343,6 +1373,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/tools/': {
+      id: '/tools/'
+      path: '/'
+      fullPath: '/tools/'
+      preLoaderRoute: typeof ToolsIndexRouteImport
+      parentRoute: typeof ToolsRoute
     }
     '/ops-x9k2-7m4n/': {
       id: '/ops-x9k2-7m4n/'
@@ -1869,6 +1906,16 @@ const OpsX9k27m4nRouteWithChildren = OpsX9k27m4nRoute._addFileChildren(
   OpsX9k27m4nRouteChildren,
 )
 
+interface ToolsRouteChildren {
+  ToolsIndexRoute: typeof ToolsIndexRoute
+}
+
+const ToolsRouteChildren: ToolsRouteChildren = {
+  ToolsIndexRoute: ToolsIndexRoute,
+}
+
+const ToolsRouteWithChildren = ToolsRoute._addFileChildren(ToolsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -1898,6 +1945,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignalsLiveRoute: SignalsLiveRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ToolsRoute: ToolsRouteWithChildren,
   UnsubscribeRoute: UnsubscribeRoute,
   BriefIdRoute: BriefIdRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
