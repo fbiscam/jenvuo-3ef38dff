@@ -44,7 +44,9 @@ import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.ind
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
+import { Route as ToolsScamDetectorRouteImport } from './routes/tools.scam-detector'
 import { Route as ToolsLeadsRouteImport } from './routes/tools.leads'
+import { Route as ToolsImageEnhancerRouteImport } from './routes/tools.image-enhancer'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
@@ -273,9 +275,19 @@ const HelpIndexRoute = HelpIndexRouteImport.update({
   path: '/help/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsScamDetectorRoute = ToolsScamDetectorRouteImport.update({
+  id: '/scam-detector',
+  path: '/scam-detector',
+  getParentRoute: () => ToolsRoute,
+} as any)
 const ToolsLeadsRoute = ToolsLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
+  getParentRoute: () => ToolsRoute,
+} as any)
+const ToolsImageEnhancerRoute = ToolsImageEnhancerRouteImport.update({
+  id: '/image-enhancer',
+  path: '/image-enhancer',
   getParentRoute: () => ToolsRoute,
 } as any)
 const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
@@ -616,7 +628,9 @@ export interface FileRoutesByFullPath {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/tools/image-enhancer': typeof ToolsImageEnhancerRoute
   '/tools/leads': typeof ToolsLeadsRoute
+  '/tools/scam-detector': typeof ToolsScamDetectorRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -701,7 +715,9 @@ export interface FileRoutesByTo {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/tools/image-enhancer': typeof ToolsImageEnhancerRoute
   '/tools/leads': typeof ToolsLeadsRoute
+  '/tools/scam-detector': typeof ToolsScamDetectorRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
@@ -793,7 +809,9 @@ export interface FileRoutesById {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/tools/image-enhancer': typeof ToolsImageEnhancerRoute
   '/tools/leads': typeof ToolsLeadsRoute
+  '/tools/scam-detector': typeof ToolsScamDetectorRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -885,7 +903,9 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/tools/image-enhancer'
     | '/tools/leads'
+    | '/tools/scam-detector'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -970,7 +990,9 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/tools/image-enhancer'
     | '/tools/leads'
+    | '/tools/scam-detector'
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
@@ -1061,7 +1083,9 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/tools/image-enhancer'
     | '/tools/leads'
+    | '/tools/scam-detector'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -1421,11 +1445,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/scam-detector': {
+      id: '/tools/scam-detector'
+      path: '/scam-detector'
+      fullPath: '/tools/scam-detector'
+      preLoaderRoute: typeof ToolsScamDetectorRouteImport
+      parentRoute: typeof ToolsRoute
+    }
     '/tools/leads': {
       id: '/tools/leads'
       path: '/leads'
       fullPath: '/tools/leads'
       preLoaderRoute: typeof ToolsLeadsRouteImport
+      parentRoute: typeof ToolsRoute
+    }
+    '/tools/image-enhancer': {
+      id: '/tools/image-enhancer'
+      path: '/image-enhancer'
+      fullPath: '/tools/image-enhancer'
+      preLoaderRoute: typeof ToolsImageEnhancerRouteImport
       parentRoute: typeof ToolsRoute
     }
     '/ops-x9k2-7m4n/hub': {
@@ -1926,12 +1964,16 @@ const OpsX9k27m4nRouteWithChildren = OpsX9k27m4nRoute._addFileChildren(
 )
 
 interface ToolsRouteChildren {
+  ToolsImageEnhancerRoute: typeof ToolsImageEnhancerRoute
   ToolsLeadsRoute: typeof ToolsLeadsRoute
+  ToolsScamDetectorRoute: typeof ToolsScamDetectorRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
 }
 
 const ToolsRouteChildren: ToolsRouteChildren = {
+  ToolsImageEnhancerRoute: ToolsImageEnhancerRoute,
   ToolsLeadsRoute: ToolsLeadsRoute,
+  ToolsScamDetectorRoute: ToolsScamDetectorRoute,
   ToolsIndexRoute: ToolsIndexRoute,
 }
 
