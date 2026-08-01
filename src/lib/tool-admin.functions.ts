@@ -54,7 +54,7 @@ export const adminUpdateToolUser = createServerFn({ method: "POST" })
       return { ok: true as const };
     }
 
-    const patch: Record<string, unknown> = {};
+    const patch: { active?: boolean; password_hash?: string; credits?: number } = {};
     if (typeof data.active === "boolean") patch.active = data.active;
     if (data.newPassword && data.newPassword.length >= 6) {
       const { hashPassword } = await import("./tools-auth.server");
