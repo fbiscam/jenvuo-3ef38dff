@@ -44,6 +44,7 @@ import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.ind
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
+import { Route as ToolsLeadsRouteImport } from './routes/tools.leads'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
@@ -271,6 +272,11 @@ const HelpIndexRoute = HelpIndexRouteImport.update({
   id: '/help/',
   path: '/help/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsLeadsRoute = ToolsLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => ToolsRoute,
 } as any)
 const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
   id: '/hub',
@@ -610,6 +616,7 @@ export interface FileRoutesByFullPath {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/tools/leads': typeof ToolsLeadsRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -694,6 +701,7 @@ export interface FileRoutesByTo {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/tools/leads': typeof ToolsLeadsRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
@@ -785,6 +793,7 @@ export interface FileRoutesById {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/tools/leads': typeof ToolsLeadsRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -876,6 +885,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/tools/leads'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -960,6 +970,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/tools/leads'
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
@@ -1050,6 +1061,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/tools/leads'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -1408,6 +1420,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/help/'
       preLoaderRoute: typeof HelpIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/tools/leads': {
+      id: '/tools/leads'
+      path: '/leads'
+      fullPath: '/tools/leads'
+      preLoaderRoute: typeof ToolsLeadsRouteImport
+      parentRoute: typeof ToolsRoute
     }
     '/ops-x9k2-7m4n/hub': {
       id: '/ops-x9k2-7m4n/hub'
@@ -1907,10 +1926,12 @@ const OpsX9k27m4nRouteWithChildren = OpsX9k27m4nRoute._addFileChildren(
 )
 
 interface ToolsRouteChildren {
+  ToolsLeadsRoute: typeof ToolsLeadsRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
 }
 
 const ToolsRouteChildren: ToolsRouteChildren = {
+  ToolsLeadsRoute: ToolsLeadsRoute,
   ToolsIndexRoute: ToolsIndexRoute,
 }
 
