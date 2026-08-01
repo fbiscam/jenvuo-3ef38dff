@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { callChat } from "./ai-gateway";
+import { callChatCompletion } from "./ai-gateway";
 
 const MODELS = ["bmind/gpt-5.5", "bmind/gpt-5.2", "google/gemini-3.6-flash", "openai/gpt-5.4-mini"];
 
@@ -64,7 +64,7 @@ export const analyzeScam = createServerFn({ method: "POST" })
     }
 
     try {
-      const res = await callChat({
+      const res = await callChatCompletion({
         models: MODELS,
         jsonMode: kind !== "image",
         maxTokens: 900,
