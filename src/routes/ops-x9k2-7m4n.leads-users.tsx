@@ -11,7 +11,7 @@ export const Route = createFileRoute("/ops-x9k2-7m4n/leads-users")({
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
-  component: LeadsUsersAdmin;
+  component: LeadsUsersAdmin,
 });
 
 type ToolUser = {
