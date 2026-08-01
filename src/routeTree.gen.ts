@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as ToolsRouteImport } from './routes/tools'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalsLiveRouteImport } from './routes/signals-live'
@@ -38,10 +39,15 @@ import { Route as AiEngineRouteImport } from './routes/ai-engine'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.index'
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
+import { Route as ToolsScamDetectorRouteImport } from './routes/tools.scam-detector'
+import { Route as ToolsLeadsRouteImport } from './routes/tools.leads'
+import { Route as ToolsImageEnhancerRouteImport } from './routes/tools.image-enhancer'
+import { Route as OpsX9k27m4nLeadsUsersRouteImport } from './routes/ops-x9k2-7m4n.leads-users'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
@@ -99,6 +105,11 @@ import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './route
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsRoute = ToolsRouteImport.update({
+  id: '/tools',
+  path: '/tools',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -240,6 +251,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsIndexRoute = ToolsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ToolsRoute,
+} as any)
 const OpsX9k27m4nIndexRoute = OpsX9k27m4nIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -259,6 +275,26 @@ const HelpIndexRoute = HelpIndexRouteImport.update({
   id: '/help/',
   path: '/help/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsScamDetectorRoute = ToolsScamDetectorRouteImport.update({
+  id: '/scam-detector',
+  path: '/scam-detector',
+  getParentRoute: () => ToolsRoute,
+} as any)
+const ToolsLeadsRoute = ToolsLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => ToolsRoute,
+} as any)
+const ToolsImageEnhancerRoute = ToolsImageEnhancerRouteImport.update({
+  id: '/image-enhancer',
+  path: '/image-enhancer',
+  getParentRoute: () => ToolsRoute,
+} as any)
+const OpsX9k27m4nLeadsUsersRoute = OpsX9k27m4nLeadsUsersRouteImport.update({
+  id: '/leads-users',
+  path: '/leads-users',
+  getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
 const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
   id: '/hub',
@@ -589,6 +625,7 @@ export interface FileRoutesByFullPath {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools': typeof ToolsRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
@@ -597,10 +634,15 @@ export interface FileRoutesByFullPath {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/leads-users': typeof OpsX9k27m4nLeadsUsersRoute
+  '/tools/image-enhancer': typeof ToolsImageEnhancerRoute
+  '/tools/leads': typeof ToolsLeadsRoute
+  '/tools/scam-detector': typeof ToolsScamDetectorRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/tools/': typeof ToolsIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -680,10 +722,15 @@ export interface FileRoutesByTo {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/leads-users': typeof OpsX9k27m4nLeadsUsersRoute
+  '/tools/image-enhancer': typeof ToolsImageEnhancerRoute
+  '/tools/leads': typeof ToolsLeadsRoute
+  '/tools/scam-detector': typeof ToolsScamDetectorRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
+  '/tools': typeof ToolsIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -761,6 +808,7 @@ export interface FileRoutesById {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools': typeof ToolsRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
@@ -769,10 +817,15 @@ export interface FileRoutesById {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/leads-users': typeof OpsX9k27m4nLeadsUsersRoute
+  '/tools/image-enhancer': typeof ToolsImageEnhancerRoute
+  '/tools/leads': typeof ToolsLeadsRoute
+  '/tools/scam-detector': typeof ToolsScamDetectorRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/tools/': typeof ToolsIndexRoute
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -850,6 +903,7 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools'
     | '/unsubscribe'
     | '/dashboard'
     | '/inbox'
@@ -858,10 +912,15 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/leads-users'
+    | '/tools/image-enhancer'
+    | '/tools/leads'
+    | '/tools/scam-detector'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
     | '/ops-x9k2-7m4n/'
+    | '/tools/'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -941,10 +1000,15 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/leads-users'
+    | '/tools/image-enhancer'
+    | '/tools/leads'
+    | '/tools/scam-detector'
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/ops-x9k2-7m4n'
+    | '/tools'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -1021,6 +1085,7 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools'
     | '/unsubscribe'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
@@ -1029,10 +1094,15 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/leads-users'
+    | '/tools/image-enhancer'
+    | '/tools/leads'
+    | '/tools/scam-detector'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
     | '/ops-x9k2-7m4n/'
+    | '/tools/'
     | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
@@ -1110,6 +1180,7 @@ export interface RootRouteChildren {
   SignalsLiveRoute: typeof SignalsLiveRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ToolsRoute: typeof ToolsRouteWithChildren
   UnsubscribeRoute: typeof UnsubscribeRoute
   BriefIdRoute: typeof BriefIdRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -1146,6 +1217,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools': {
+      id: '/tools'
+      path: '/tools'
+      fullPath: '/tools'
+      preLoaderRoute: typeof ToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -1344,6 +1422,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/': {
+      id: '/tools/'
+      path: '/'
+      fullPath: '/tools/'
+      preLoaderRoute: typeof ToolsIndexRouteImport
+      parentRoute: typeof ToolsRoute
+    }
     '/ops-x9k2-7m4n/': {
       id: '/ops-x9k2-7m4n/'
       path: '/'
@@ -1371,6 +1456,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/help/'
       preLoaderRoute: typeof HelpIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/tools/scam-detector': {
+      id: '/tools/scam-detector'
+      path: '/scam-detector'
+      fullPath: '/tools/scam-detector'
+      preLoaderRoute: typeof ToolsScamDetectorRouteImport
+      parentRoute: typeof ToolsRoute
+    }
+    '/tools/leads': {
+      id: '/tools/leads'
+      path: '/leads'
+      fullPath: '/tools/leads'
+      preLoaderRoute: typeof ToolsLeadsRouteImport
+      parentRoute: typeof ToolsRoute
+    }
+    '/tools/image-enhancer': {
+      id: '/tools/image-enhancer'
+      path: '/image-enhancer'
+      fullPath: '/tools/image-enhancer'
+      preLoaderRoute: typeof ToolsImageEnhancerRouteImport
+      parentRoute: typeof ToolsRoute
+    }
+    '/ops-x9k2-7m4n/leads-users': {
+      id: '/ops-x9k2-7m4n/leads-users'
+      path: '/leads-users'
+      fullPath: '/ops-x9k2-7m4n/leads-users'
+      preLoaderRoute: typeof OpsX9k27m4nLeadsUsersRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
     }
     '/ops-x9k2-7m4n/hub': {
       id: '/ops-x9k2-7m4n/hub'
@@ -1857,17 +1970,35 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
 
 interface OpsX9k27m4nRouteChildren {
   OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
+  OpsX9k27m4nLeadsUsersRoute: typeof OpsX9k27m4nLeadsUsersRoute
   OpsX9k27m4nIndexRoute: typeof OpsX9k27m4nIndexRoute
 }
 
 const OpsX9k27m4nRouteChildren: OpsX9k27m4nRouteChildren = {
   OpsX9k27m4nHubRoute: OpsX9k27m4nHubRoute,
+  OpsX9k27m4nLeadsUsersRoute: OpsX9k27m4nLeadsUsersRoute,
   OpsX9k27m4nIndexRoute: OpsX9k27m4nIndexRoute,
 }
 
 const OpsX9k27m4nRouteWithChildren = OpsX9k27m4nRoute._addFileChildren(
   OpsX9k27m4nRouteChildren,
 )
+
+interface ToolsRouteChildren {
+  ToolsImageEnhancerRoute: typeof ToolsImageEnhancerRoute
+  ToolsLeadsRoute: typeof ToolsLeadsRoute
+  ToolsScamDetectorRoute: typeof ToolsScamDetectorRoute
+  ToolsIndexRoute: typeof ToolsIndexRoute
+}
+
+const ToolsRouteChildren: ToolsRouteChildren = {
+  ToolsImageEnhancerRoute: ToolsImageEnhancerRoute,
+  ToolsLeadsRoute: ToolsLeadsRoute,
+  ToolsScamDetectorRoute: ToolsScamDetectorRoute,
+  ToolsIndexRoute: ToolsIndexRoute,
+}
+
+const ToolsRouteWithChildren = ToolsRoute._addFileChildren(ToolsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -1898,6 +2029,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignalsLiveRoute: SignalsLiveRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ToolsRoute: ToolsRouteWithChildren,
   UnsubscribeRoute: UnsubscribeRoute,
   BriefIdRoute: BriefIdRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
@@ -1930,13 +2062,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

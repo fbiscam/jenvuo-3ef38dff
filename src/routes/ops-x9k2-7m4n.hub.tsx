@@ -32,6 +32,11 @@ const TILES: Tile[] = [
   { key: "tuning", title: "Weight Tuning", desc: "Grid search & walk-forward configs", to: "/dashboard/admin/tuning" },
   { key: "tvmm", title: "TV Mismatch Checker", desc: "Telegram chart price drift audit", to: "/dashboard/admin/tv-mismatch" },
   { key: "bugs", title: "Bug Triage", desc: "Runtime errors + AI diagnosis", to: "/dashboard/admin/bugs" },
+  { key: "leadusers", title: "Leads Tool Users", desc: "Create accounts & top up credits", to: "/ops-x9k2-7m4n/leads-users" },
+  { key: "leads", title: "Leads Generation", desc: "Google Maps + Apollo lead extractor", to: "/tools/leads" },
+  { key: "scam", title: "Scam Detector", desc: "AI check for links, text & images", to: "/tools/scam-detector" },
+  { key: "imgfx", title: "Image Enhancer", desc: "Upscale & sharpen images", to: "/tools/image-enhancer" },
+
 
 ];
 

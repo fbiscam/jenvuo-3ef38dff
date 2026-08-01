@@ -1,58 +1,85 @@
 ## Goal
-`/signal` aur voice analyzer ko "25+ years ICT/SMC veteran" ki tarah analyze karne wala banao, aur server-side itna reliable karo ke har account pe bina baar-baar issue ke chalta rahe.
 
-## Model choice — Max Accuracy tier
+Teen naye tool pages banane hain, Leads tool ko login + credits system ke saath gate karna hai, Ops Console se bina dobara login ke access dena hai, aur header me Tools/Resources submenus add karne hain. Sab kuch `#FAFAFA` background pe.
 
-Abhi 3 stages sab `google/gemini-3.5-flash` par hain (fast lekin reasoning depth kam). Naya layout:
+---
 
-| Stage | Kaam | Model | Kyun |
-|---|---|---|---|
-| Voice intent detect | "analyze XAU/USD" jaise short phrase samajhna | `google/gemini-3.1-flash-lite` | Cheap + fast, sirf classification |
-| Chart narration (Stage 1) | HTF/LTF story, key levels, confluences JSON | `openai/gpt-5.4` + `service_tier: "priority"` | Deep ICT/SMC reasoning, priority tier = fast latency |
-| Senior trader review (Stage 2) | Veto / Confirm / Downgrade veteran opinion | `openai/gpt-5.5` + `service_tier: "priority"` | Best reasoning model — yehi "25-year trader" wali quality deta hai |
+## 1. Tool pages
 
-Deterministic price math (entry/SL/TP/score) code me hi rahega — models sirf narrate + veto karte hain, hallucinate nahi karte.
+| Page | URL | Access |
+|---|---|---|
+| Leads Generation | `/tools/leads` | Login required (ID/PASS) |
+| Scam Detector | `/tools/scam-detector` | Free / public |
+| Image Enhancer | `/tools/image-enhancer` | Free / public |
+| Tools landing | `/tools` | Public, teeno cards |
 
-## Reliability layer (server pe set-and-forget)
+Sab pages site header + iOS-card style + `#FAFAFA` background use karenge.
 
-Ek shared helper `src/lib/ai-gateway.server.ts` banayenge jo har AI call ko wrap karega:
+### Leads Generation Tool
+- Input: search query (e.g. "dentists in Dubai"), radius/limit.
+- Google Places API (Text Search + Place Details) se rows: **Name, Phone, Email, Address, Rating, Reviews count, Website, Google Maps URL**.
+- Google Maps se email nahi milta — jahan website ho, wahan Apollo API se enrichment (company/contact email, title, LinkedIn) hoga.
+- Features: results table with select-all, CSV export, saved search history, dedupe, per-search credit deduction.
+- Har search user ke credits se cut hoga (default 1 credit per 10 leads — admin console se rate badla ja sakega).
 
-1. **Auto retry** — 429 (rate limit) aur 5xx par exponential backoff (500ms → 1s → 2s), max 3 tries.
-2. **Model fallback chain** — agar primary model 3 baar fail ho, next model try karo:
-   - Stage 1: `gpt-5.4` → `gpt-5.4-mini` → `gemini-3.5-flash`
-   - Stage 2: `gpt-5.5` → `gpt-5.4` → skip (Stage 1 grade stands)
-3. **Timeout guard** — Stage 1: 25s, Stage 2: 20s. Timeout par fallback trigger.
-4. **Per-symbol cache** — same pair + timeframe agar 3 min ke andar dobara analyze ho, cached plan return. Credits bachega + user ko instant response.
-5. **Credit / 402 handling** — clear message user ko: "AI credits khatam, workspace me top-up karein" — silent fail nahi.
-6. **Per-user rate limit** — 1 user ko max 20 analyze / hour (abuse aur runaway credit burn se bachao).
-7. **Health telemetry** — har fail (model+status+latency) `ai_gateway_log` table me likha jayega taake baad me pattern dekh sako.
+### Scam Detector Tool
+- 3 tabs: **Link**, **Text**, **Image**.
+- Link: domain age/heuristics + AI verdict. Text: phishing/scam-pattern analysis. Image: screenshot/fake-invoice detection (vision model).
+- Bluesmind gateway (`BLUESMINDS_API_KEY`) ka available model use karega, existing `src/lib/ai-gateway.ts` priority chain ke through; fallback Lovable AI.
+- Output: Risk score 0–100, verdict badge (Safe / Suspicious / Scam), reasons list.
 
-## Files to change
+### Image Enhancer Tool
+- Upload → upscale/sharpen/denoise, before-after slider, download.
+- Client-side canvas pipeline (no server cost) + optional AI upscale via gateway agar model available ho.
 
-- `src/lib/ai-gateway.server.ts` (new) — `callAiWithRetryAndFallback()` helper, model chains, backoff, timeout.
-- `src/lib/gold-analysis.functions.ts` — 3 direct `fetch()` calls (lines 644, 1685, 1925) replace with helper. Stage 1 model → `openai/gpt-5.4` priority, Stage 2 → `openai/gpt-5.5` priority.
-- `src/lib/signal-agent.functions.ts` — voice intent model → `google/gemini-3.1-flash-lite` via same helper.
-- `src/lib/signal-cache.functions.ts` (new) — in-memory + optional DB-backed cache keyed on `userId:symbol:timeframe`.
-- `src/lib/rate-limit.server.ts` (new) — per-user token bucket (20/hour analyze).
-- Migration: `ai_gateway_log` table (model, status, latency_ms, user_id, created_at) with RLS + service_role write.
+---
 
-## Trade-offs — bata dena zaroori hai
+## 2. Leads login + admin-managed users
 
-- **Credits**: Har full `/signal` analyze abhi ~3 credits. Naye setup me `gpt-5.4` + `gpt-5.5` priority ke sath ~8–12 credits per analyze. Cache aur rate-limit se average kam rahega, but heavy users ka usage 3–4x badhega.
-- **Latency**: Priority tier ke saath Stage 1+2 combined ~4–7s (currently ~3–5s with gemini-flash).
-- **First failure recovery**: user ko dikhega bhi nahi — helper chup-chap fallback model use karega.
+Naya table `tool_users`:
+- `id`, `username` (unique), `password_hash`, `display_name`, `credits` (numeric), `active`, `created_at`, `last_login_at`.
+- Plus `tool_user_credit_log` (delta, reason, balance_after) aur `tool_lead_searches` (query, results_count, credits_spent, created_at).
+- RLS: locked down; sab access server functions ke through (admin/ops verified).
+
+Login flow:
+- `/tools/leads` pe apna login card (username + password), Ops Console jaisa design.
+- Server function password verify karega (PBKDF2/SHA-256 via Web Crypto — Worker-safe, ops-gate wale pattern jaisa), encrypted session cookie `jenvu-tools` set karega.
+- Session valid hone tak leads dashboard khulega; credits balance top-right pe.
+
+Ops Console me naya tile **"Leads Tool Users"**:
+- User add karo (username + password + starting credits), credits add/deduct, enable/disable, delete, search history dekho.
+- Ops session unlocked ho to `/tools/leads` **direct khulega** (koi ID/PASS prompt nahi) — bilkul waise hi jaise baaki admin pages.
+- Hub me teeno tools ke tiles bhi add honge.
+
+---
+
+## 3. Header navigation
+
+Nav items ab yeh honge:
+
+```
+Signal Engine · Signals Live · [Tools ▾] · [Resources ▾] · Founding · Contact
+   Tools ▾      → Leads Generation, Scam Detector, Image Enhancer
+   Resources ▾  → AI Engine, Broadcasts, Market Insights
+```
+
+Ek shared `SiteHeader` component banega aur `index.tsx`, `PageShell.tsx`, `signals-live`, `pricing`, `contact`, `download`, `insights` pages me reuse hoga (abhi nav 7 jagah duplicate hai). Mobile menu me bhi collapsible groups.
+
+---
+
+## 4. Background color
+
+`#FAFAFA` uniformly: naye tool pages, `PageShell`, dashboard shell aur uske andar ke pages jahan abhi white/off-white mismatch hai.
+
+---
 
 ## Technical notes
 
-- Gateway calls: `https://ai.gateway.lovable.dev/v1/chat/completions`, header `Authorization: Bearer ${LOVABLE_API_KEY}`, body `service_tier: "priority"` sirf ✓ models pe (gpt-5.4, gpt-5.5, gpt-5.4-mini) — Gemini pe nahi.
-- Structured JSON: `response_format: { type: "json_object" }` bracket + regex repair already handle karta hai; strict schema nahi lagayenge (OpenAI strict `json_schema` bade schemas pe fail hota hai).
-- Retry gate: sirf 429/5xx/timeout retry-able. 400 (bad request) aur 402 (no credits) terminal — turant surface karo.
-- Cache TTL: 3 min default; user "Re-analyze" button dabaye to bypass.
+- Routes: `src/routes/tools.tsx` (layout) + `tools.index.tsx`, `tools.leads.tsx`, `tools.scam-detector.tsx`, `tools.image-enhancer.tsx`. Har ek ka apna `head()` (title/description/og).
+- Server logic: `src/lib/tools-auth.functions.ts`, `src/lib/leads.functions.ts`, `src/lib/scam-detect.functions.ts`, `src/lib/tool-admin.functions.ts` (ops/admin gated).
+- Secrets chahiye honge: `GOOGLE_PLACES_API_KEY`, `APOLLO_API_KEY`, plus main `TOOLS_SESSION_SECRET` generate karunga.
+- Migration me `tool_users`, `tool_user_credit_log`, `tool_lead_searches` + GRANTs + RLS.
 
-## Post-build verification
+## Leads page credentials
 
-1. `/signal?symbol=XAUUSD` khol ke Stage 1 (`gpt-5.4`) latency + confidence check.
-2. Ek non-existent model force karke fallback chain trigger — user ko success dikhna chahiye.
-3. 21 requests in 1 hour → 21st request pe polite rate-limit message.
-4. Same pair 2 min me dobara analyze → "cached" response instant.
-5. AI Gateway logs me `gpt-5.4` + `gpt-5.5` calls dikh rahe hain, priority tier billing confirm.
+Build ke waqt main pehla admin account bana kar aapko ID/PASS chat me dunga (aap baad me Ops Console se change/naye users bana sakte hain). Planned default: **ID `haseeb`** — password build ke time generate karke bataunga.
