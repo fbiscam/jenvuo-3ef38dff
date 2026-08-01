@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import SiteFooter from "@/components/SiteFooter";
-import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import SiteHeader from "@/components/SiteHeader";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
