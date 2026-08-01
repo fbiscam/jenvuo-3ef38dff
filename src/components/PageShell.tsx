@@ -1,7 +1,7 @@
-
+import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
+import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
@@ -21,8 +21,24 @@ export function PageShell({
   return (
     <>
       <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
-        <SiteHeader />
+        {/* NAV — matches homepage */}
+        <header className="hide-in-pwa sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+          <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
+            <Link to="/" className="flex min-w-0 items-center gap-2.5">
+              <img src="/favicon.png" alt="Jenvu Logo" className="h-7 w-7 shrink-0 rounded-md object-contain" />
+              <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+            </Link>
+            <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900">
+              <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
+              <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
+              <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
+              <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
+              <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
+            </nav>
+            <HeaderAuthButtons />
 
+          </div>
+        </header>
 
         {/* HERO */}
         <section className="border-b border-zinc-100">
