@@ -20,6 +20,8 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OpsX9k27m4nRouteImport } from './routes/ops-x9k2-7m4n'
 import { Route as LlmRouteImport } from './routes/llm'
+import { Route as LeadsSigninRouteImport } from './routes/leads-signin'
+import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as JenvuOpsX9k2RouteImport } from './routes/jenvu-ops-x9k2'
 import { Route as InsightsRouteImport } from './routes/insights'
@@ -39,10 +41,12 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.index'
+import { Route as LeadsIndexRouteImport } from './routes/leads.index'
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
+import { Route as LeadsAccountRouteImport } from './routes/leads.account'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -52,6 +56,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as LeadsAdminUsersRouteImport } from './routes/leads.admin.users'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
 import { Route as ApiPublicSignalsFeedRouteImport } from './routes/api/public/signals-feed'
 import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
@@ -151,6 +156,16 @@ const LlmRoute = LlmRouteImport.update({
   path: '/llm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LeadsSigninRoute = LeadsSigninRouteImport.update({
+  id: '/leads-signin',
+  path: '/leads-signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeadsRoute = LeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KillzonesRoute = KillzonesRouteImport.update({
   id: '/killzones',
   path: '/killzones',
@@ -245,6 +260,11 @@ const OpsX9k27m4nIndexRoute = OpsX9k27m4nIndexRouteImport.update({
   path: '/',
   getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
+const LeadsIndexRoute = LeadsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LeadsRoute,
+} as any)
 const JenvuOpsX9k2IndexRoute = JenvuOpsX9k2IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -264,6 +284,11 @@ const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
   id: '/hub',
   path: '/hub',
   getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const LeadsAccountRoute = LeadsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => LeadsRoute,
 } as any)
 const JenvuOpsX9k2InboxRoute = JenvuOpsX9k2InboxRouteImport.update({
   id: '/inbox',
@@ -310,6 +335,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LeadsAdminUsersRoute = LeadsAdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => LeadsRoute,
 } as any)
 const HelpCollectionSlugRoute = HelpCollectionSlugRouteImport.update({
   id: '/help/$collection/$slug',
@@ -579,6 +609,8 @@ export interface FileRoutesByFullPath {
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
+  '/leads': typeof LeadsRouteWithChildren
+  '/leads-signin': typeof LeadsSigninRoute
   '/llm': typeof LlmRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -596,10 +628,12 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
+  '/leads/account': typeof LeadsAccountRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
+  '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -616,6 +650,7 @@ export interface FileRoutesByFullPath {
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
+  '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
@@ -664,6 +699,7 @@ export interface FileRoutesByTo {
   '/download': typeof DownloadRoute
   '/founding': typeof FoundingRoute
   '/killzones': typeof KillzonesRoute
+  '/leads-signin': typeof LeadsSigninRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -679,10 +715,12 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
+  '/leads/account': typeof LeadsAccountRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
+  '/leads': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -699,6 +737,7 @@ export interface FileRoutesByTo {
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
+  '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
@@ -751,6 +790,8 @@ export interface FileRoutesById {
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
+  '/leads': typeof LeadsRouteWithChildren
+  '/leads-signin': typeof LeadsSigninRoute
   '/llm': typeof LlmRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -768,10 +809,12 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
+  '/leads/account': typeof LeadsAccountRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
+  '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -788,6 +831,7 @@ export interface FileRoutesById {
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
+  '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
@@ -840,6 +884,8 @@ export interface FileRouteTypes {
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/killzones'
+    | '/leads'
+    | '/leads-signin'
     | '/llm'
     | '/ops-x9k2-7m4n'
     | '/pricing'
@@ -857,10 +903,12 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
+    | '/leads/account'
     | '/ops-x9k2-7m4n/hub'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
+    | '/leads/'
     | '/ops-x9k2-7m4n/'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
@@ -877,6 +925,7 @@ export interface FileRouteTypes {
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
+    | '/leads/admin/users'
     | '/lovable/email/suppression'
     | '/dashboard/'
     | '/help/$collection/'
@@ -925,6 +974,7 @@ export interface FileRouteTypes {
     | '/download'
     | '/founding'
     | '/killzones'
+    | '/leads-signin'
     | '/llm'
     | '/pricing'
     | '/privacy'
@@ -940,10 +990,12 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
+    | '/leads/account'
     | '/ops-x9k2-7m4n/hub'
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
+    | '/leads'
     | '/ops-x9k2-7m4n'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
@@ -960,6 +1012,7 @@ export interface FileRouteTypes {
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
+    | '/leads/admin/users'
     | '/lovable/email/suppression'
     | '/dashboard'
     | '/help/$collection'
@@ -1011,6 +1064,8 @@ export interface FileRouteTypes {
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/killzones'
+    | '/leads'
+    | '/leads-signin'
     | '/llm'
     | '/ops-x9k2-7m4n'
     | '/pricing'
@@ -1028,10 +1083,12 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
+    | '/leads/account'
     | '/ops-x9k2-7m4n/hub'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
+    | '/leads/'
     | '/ops-x9k2-7m4n/'
     | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
@@ -1048,6 +1105,7 @@ export interface FileRouteTypes {
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
+    | '/leads/admin/users'
     | '/lovable/email/suppression'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
@@ -1100,6 +1158,8 @@ export interface RootRouteChildren {
   InsightsRoute: typeof InsightsRouteWithChildren
   JenvuOpsX9k2Route: typeof JenvuOpsX9k2RouteWithChildren
   KillzonesRoute: typeof KillzonesRoute
+  LeadsRoute: typeof LeadsRouteWithChildren
+  LeadsSigninRoute: typeof LeadsSigninRoute
   LlmRoute: typeof LlmRoute
   OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
   PricingRoute: typeof PricingRoute
@@ -1216,6 +1276,20 @@ declare module '@tanstack/react-router' {
       path: '/llm'
       fullPath: '/llm'
       preLoaderRoute: typeof LlmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leads-signin': {
+      id: '/leads-signin'
+      path: '/leads-signin'
+      fullPath: '/leads-signin'
+      preLoaderRoute: typeof LeadsSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leads': {
+      id: '/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof LeadsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/killzones': {
@@ -1351,6 +1425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OpsX9k27m4nIndexRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
     }
+    '/leads/': {
+      id: '/leads/'
+      path: '/'
+      fullPath: '/leads/'
+      preLoaderRoute: typeof LeadsIndexRouteImport
+      parentRoute: typeof LeadsRoute
+    }
     '/jenvu-ops-x9k2/': {
       id: '/jenvu-ops-x9k2/'
       path: '/'
@@ -1378,6 +1459,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ops-x9k2-7m4n/hub'
       preLoaderRoute: typeof OpsX9k27m4nHubRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/leads/account': {
+      id: '/leads/account'
+      path: '/account'
+      fullPath: '/leads/account'
+      preLoaderRoute: typeof LeadsAccountRouteImport
+      parentRoute: typeof LeadsRoute
     }
     '/jenvu-ops-x9k2/inbox': {
       id: '/jenvu-ops-x9k2/inbox'
@@ -1441,6 +1529,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/leads/admin/users': {
+      id: '/leads/admin/users'
+      path: '/admin/users'
+      fullPath: '/leads/admin/users'
+      preLoaderRoute: typeof LeadsAdminUsersRouteImport
+      parentRoute: typeof LeadsRoute
     }
     '/help/$collection/$slug': {
       id: '/help/$collection/$slug'
@@ -1855,6 +1950,20 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
   JenvuOpsX9k2RouteChildren,
 )
 
+interface LeadsRouteChildren {
+  LeadsAccountRoute: typeof LeadsAccountRoute
+  LeadsIndexRoute: typeof LeadsIndexRoute
+  LeadsAdminUsersRoute: typeof LeadsAdminUsersRoute
+}
+
+const LeadsRouteChildren: LeadsRouteChildren = {
+  LeadsAccountRoute: LeadsAccountRoute,
+  LeadsIndexRoute: LeadsIndexRoute,
+  LeadsAdminUsersRoute: LeadsAdminUsersRoute,
+}
+
+const LeadsRouteWithChildren = LeadsRoute._addFileChildren(LeadsRouteChildren)
+
 interface OpsX9k27m4nRouteChildren {
   OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
   OpsX9k27m4nIndexRoute: typeof OpsX9k27m4nIndexRoute
@@ -1888,6 +1997,8 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsRoute: InsightsRouteWithChildren,
   JenvuOpsX9k2Route: JenvuOpsX9k2RouteWithChildren,
   KillzonesRoute: KillzonesRoute,
+  LeadsRoute: LeadsRouteWithChildren,
+  LeadsSigninRoute: LeadsSigninRoute,
   LlmRoute: LlmRoute,
   OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,
   PricingRoute: PricingRoute,
