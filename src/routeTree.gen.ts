@@ -56,6 +56,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as LeadsAdminUsersRouteImport } from './routes/leads.admin.users'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
 import { Route as ApiPublicSignalsFeedRouteImport } from './routes/api/public/signals-feed'
 import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
@@ -334,6 +335,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LeadsAdminUsersRoute = LeadsAdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => LeadsRoute,
 } as any)
 const HelpCollectionSlugRoute = HelpCollectionSlugRouteImport.update({
   id: '/help/$collection/$slug',
@@ -644,6 +650,7 @@ export interface FileRoutesByFullPath {
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
+  '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
@@ -730,6 +737,7 @@ export interface FileRoutesByTo {
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
+  '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
@@ -823,6 +831,7 @@ export interface FileRoutesById {
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
+  '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
@@ -916,6 +925,7 @@ export interface FileRouteTypes {
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
+    | '/leads/admin/users'
     | '/lovable/email/suppression'
     | '/dashboard/'
     | '/help/$collection/'
@@ -1002,6 +1012,7 @@ export interface FileRouteTypes {
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
+    | '/leads/admin/users'
     | '/lovable/email/suppression'
     | '/dashboard'
     | '/help/$collection'
@@ -1094,6 +1105,7 @@ export interface FileRouteTypes {
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
+    | '/leads/admin/users'
     | '/lovable/email/suppression'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
@@ -1518,6 +1530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/leads/admin/users': {
+      id: '/leads/admin/users'
+      path: '/admin/users'
+      fullPath: '/leads/admin/users'
+      preLoaderRoute: typeof LeadsAdminUsersRouteImport
+      parentRoute: typeof LeadsRoute
+    }
     '/help/$collection/$slug': {
       id: '/help/$collection/$slug'
       path: '/help/$collection/$slug'
@@ -1934,11 +1953,13 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
 interface LeadsRouteChildren {
   LeadsAccountRoute: typeof LeadsAccountRoute
   LeadsIndexRoute: typeof LeadsIndexRoute
+  LeadsAdminUsersRoute: typeof LeadsAdminUsersRoute
 }
 
 const LeadsRouteChildren: LeadsRouteChildren = {
   LeadsAccountRoute: LeadsAccountRoute,
   LeadsIndexRoute: LeadsIndexRoute,
+  LeadsAdminUsersRoute: LeadsAdminUsersRoute,
 }
 
 const LeadsRouteWithChildren = LeadsRoute._addFileChildren(LeadsRouteChildren)
