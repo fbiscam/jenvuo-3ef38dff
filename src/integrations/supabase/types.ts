@@ -1397,6 +1397,275 @@ export type Database = {
         }
         Relationships: []
       }
+      lg_lead_lists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lg_leads: {
+        Row: {
+          address: string | null
+          category: string | null
+          city: string | null
+          company: string | null
+          country: string | null
+          created_at: string
+          dedupe_key: string
+          email: string | null
+          external_id: string | null
+          id: string
+          list_id: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          rating: number | null
+          raw: Json
+          revealed: boolean
+          reviews: number | null
+          socials: Json
+          source: string
+          status: string
+          title: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          category?: string | null
+          city?: string | null
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          dedupe_key: string
+          email?: string | null
+          external_id?: string | null
+          id?: string
+          list_id?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          rating?: number | null
+          raw?: Json
+          revealed?: boolean
+          reviews?: number | null
+          socials?: Json
+          source?: string
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          category?: string | null
+          city?: string | null
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          dedupe_key?: string
+          email?: string | null
+          external_id?: string | null
+          id?: string
+          list_id?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          rating?: number | null
+          raw?: Json
+          revealed?: boolean
+          reviews?: number | null
+          socials?: Json
+          source?: string
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lg_leads_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "lg_lead_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lg_profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string | null
+          is_disabled: boolean
+          monthly_credit_limit: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string | null
+          is_disabled?: boolean
+          monthly_credit_limit?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          is_disabled?: boolean
+          monthly_credit_limit?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lg_role_grants: {
+        Row: {
+          created_at: string
+          email: string
+          role: Database["public"]["Enums"]["lg_role"]
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          role: Database["public"]["Enums"]["lg_role"]
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          role?: Database["public"]["Enums"]["lg_role"]
+        }
+        Relationships: []
+      }
+      lg_saved_searches: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          label: string | null
+          params: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          label?: string | null
+          params?: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          label?: string | null
+          params?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lg_search_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          expires_at: string
+          payload: Json
+          provider: string
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          expires_at: string
+          payload: Json
+          provider: string
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          expires_at?: string
+          payload?: Json
+          provider?: string
+        }
+        Relationships: []
+      }
+      lg_usage_events: {
+        Row: {
+          created_at: string
+          credits: number
+          id: string
+          kind: string
+          meta: Json
+          ref_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits?: number
+          id?: string
+          kind: string
+          meta?: Json
+          ref_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits?: number
+          id?: string
+          kind?: string
+          meta?: Json
+          ref_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lg_user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["lg_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["lg_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["lg_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       mail_addresses: {
         Row: {
           address: string
@@ -2758,6 +3027,13 @@ export type Database = {
         Returns: number
       }
       grant_monthly_credits: { Args: never; Returns: number }
+      has_lg_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["lg_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2766,6 +3042,24 @@ export type Database = {
         Returns: boolean
       }
       journal_stats: { Args: { _from?: string; _to?: string }; Returns: Json }
+      lg_charge_credits: {
+        Args: {
+          _credits: number
+          _kind: string
+          _meta?: Json
+          _ref?: string
+          _user_id: string
+        }
+        Returns: number
+      }
+      lg_credit_state: {
+        Args: { _user_id?: string }
+        Returns: {
+          monthly_limit: number
+          remaining: number
+          used: number
+        }[]
+      }
       log_charge_audit: {
         Args: {
           _amount: number
@@ -2893,6 +3187,7 @@ export type Database = {
       community_report_status: "open" | "reviewed" | "actioned" | "dismissed"
       community_verified_tier: "gold" | "blue"
       killzone_session: "london" | "new_york" | "asia"
+      lg_role: "admin" | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3024,6 +3319,7 @@ export const Constants = {
       community_report_status: ["open", "reviewed", "actioned", "dismissed"],
       community_verified_tier: ["gold", "blue"],
       killzone_session: ["london", "new_york", "asia"],
+      lg_role: ["admin", "member"],
     },
   },
 } as const
