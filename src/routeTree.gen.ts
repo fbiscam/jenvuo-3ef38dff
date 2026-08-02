@@ -41,6 +41,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.index'
+import { Route as LeadsIndexRouteImport } from './routes/leads.index'
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
@@ -256,6 +257,11 @@ const OpsX9k27m4nIndexRoute = OpsX9k27m4nIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const LeadsIndexRoute = LeadsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LeadsRoute,
 } as any)
 const JenvuOpsX9k2IndexRoute = JenvuOpsX9k2IndexRouteImport.update({
   id: '/',
@@ -591,7 +597,7 @@ export interface FileRoutesByFullPath {
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
-  '/leads': typeof LeadsRoute
+  '/leads': typeof LeadsRouteWithChildren
   '/leads-signin': typeof LeadsSigninRoute
   '/llm': typeof LlmRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
@@ -614,6 +620,7 @@ export interface FileRoutesByFullPath {
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
+  '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -678,7 +685,6 @@ export interface FileRoutesByTo {
   '/download': typeof DownloadRoute
   '/founding': typeof FoundingRoute
   '/killzones': typeof KillzonesRoute
-  '/leads': typeof LeadsRoute
   '/leads-signin': typeof LeadsSigninRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
@@ -699,6 +705,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
+  '/leads': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -767,7 +774,7 @@ export interface FileRoutesById {
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
-  '/leads': typeof LeadsRoute
+  '/leads': typeof LeadsRouteWithChildren
   '/leads-signin': typeof LeadsSigninRoute
   '/llm': typeof LlmRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
@@ -790,6 +797,7 @@ export interface FileRoutesById {
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
+  '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -881,6 +889,7 @@ export interface FileRouteTypes {
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
+    | '/leads/'
     | '/ops-x9k2-7m4n/'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
@@ -945,7 +954,6 @@ export interface FileRouteTypes {
     | '/download'
     | '/founding'
     | '/killzones'
-    | '/leads'
     | '/leads-signin'
     | '/llm'
     | '/pricing'
@@ -966,6 +974,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
+    | '/leads'
     | '/ops-x9k2-7m4n'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
@@ -1056,6 +1065,7 @@ export interface FileRouteTypes {
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
+    | '/leads/'
     | '/ops-x9k2-7m4n/'
     | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
@@ -1124,7 +1134,7 @@ export interface RootRouteChildren {
   InsightsRoute: typeof InsightsRouteWithChildren
   JenvuOpsX9k2Route: typeof JenvuOpsX9k2RouteWithChildren
   KillzonesRoute: typeof KillzonesRoute
-  LeadsRoute: typeof LeadsRoute
+  LeadsRoute: typeof LeadsRouteWithChildren
   LeadsSigninRoute: typeof LeadsSigninRoute
   LlmRoute: typeof LlmRoute
   OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
@@ -1390,6 +1400,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ops-x9k2-7m4n/'
       preLoaderRoute: typeof OpsX9k27m4nIndexRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/leads/': {
+      id: '/leads/'
+      path: '/'
+      fullPath: '/leads/'
+      preLoaderRoute: typeof LeadsIndexRouteImport
+      parentRoute: typeof LeadsRoute
     }
     '/jenvu-ops-x9k2/': {
       id: '/jenvu-ops-x9k2/'
@@ -1895,6 +1912,16 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
   JenvuOpsX9k2RouteChildren,
 )
 
+interface LeadsRouteChildren {
+  LeadsIndexRoute: typeof LeadsIndexRoute
+}
+
+const LeadsRouteChildren: LeadsRouteChildren = {
+  LeadsIndexRoute: LeadsIndexRoute,
+}
+
+const LeadsRouteWithChildren = LeadsRoute._addFileChildren(LeadsRouteChildren)
+
 interface OpsX9k27m4nRouteChildren {
   OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
   OpsX9k27m4nIndexRoute: typeof OpsX9k27m4nIndexRoute
@@ -1928,7 +1955,7 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsRoute: InsightsRouteWithChildren,
   JenvuOpsX9k2Route: JenvuOpsX9k2RouteWithChildren,
   KillzonesRoute: KillzonesRoute,
-  LeadsRoute: LeadsRoute,
+  LeadsRoute: LeadsRouteWithChildren,
   LeadsSigninRoute: LeadsSigninRoute,
   LlmRoute: LlmRoute,
   OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,
