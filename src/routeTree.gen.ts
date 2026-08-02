@@ -20,6 +20,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OpsX9k27m4nRouteImport } from './routes/ops-x9k2-7m4n'
 import { Route as LlmRouteImport } from './routes/llm'
+import { Route as LeadsSigninRouteImport } from './routes/leads-signin'
 import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as JenvuOpsX9k2RouteImport } from './routes/jenvu-ops-x9k2'
@@ -150,6 +151,11 @@ const OpsX9k27m4nRoute = OpsX9k27m4nRouteImport.update({
 const LlmRoute = LlmRouteImport.update({
   id: '/llm',
   path: '/llm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeadsSigninRoute = LeadsSigninRouteImport.update({
+  id: '/leads-signin',
+  path: '/leads-signin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeadsRoute = LeadsRouteImport.update({
@@ -586,6 +592,7 @@ export interface FileRoutesByFullPath {
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
   '/leads': typeof LeadsRoute
+  '/leads-signin': typeof LeadsSigninRoute
   '/llm': typeof LlmRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -672,6 +679,7 @@ export interface FileRoutesByTo {
   '/founding': typeof FoundingRoute
   '/killzones': typeof KillzonesRoute
   '/leads': typeof LeadsRoute
+  '/leads-signin': typeof LeadsSigninRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -760,6 +768,7 @@ export interface FileRoutesById {
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
   '/leads': typeof LeadsRoute
+  '/leads-signin': typeof LeadsSigninRoute
   '/llm': typeof LlmRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -850,6 +859,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2'
     | '/killzones'
     | '/leads'
+    | '/leads-signin'
     | '/llm'
     | '/ops-x9k2-7m4n'
     | '/pricing'
@@ -936,6 +946,7 @@ export interface FileRouteTypes {
     | '/founding'
     | '/killzones'
     | '/leads'
+    | '/leads-signin'
     | '/llm'
     | '/pricing'
     | '/privacy'
@@ -1023,6 +1034,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2'
     | '/killzones'
     | '/leads'
+    | '/leads-signin'
     | '/llm'
     | '/ops-x9k2-7m4n'
     | '/pricing'
@@ -1113,6 +1125,7 @@ export interface RootRouteChildren {
   JenvuOpsX9k2Route: typeof JenvuOpsX9k2RouteWithChildren
   KillzonesRoute: typeof KillzonesRoute
   LeadsRoute: typeof LeadsRoute
+  LeadsSigninRoute: typeof LeadsSigninRoute
   LlmRoute: typeof LlmRoute
   OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
   PricingRoute: typeof PricingRoute
@@ -1229,6 +1242,13 @@ declare module '@tanstack/react-router' {
       path: '/llm'
       fullPath: '/llm'
       preLoaderRoute: typeof LlmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leads-signin': {
+      id: '/leads-signin'
+      path: '/leads-signin'
+      fullPath: '/leads-signin'
+      preLoaderRoute: typeof LeadsSigninRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leads': {
@@ -1909,6 +1929,7 @@ const rootRouteChildren: RootRouteChildren = {
   JenvuOpsX9k2Route: JenvuOpsX9k2RouteWithChildren,
   KillzonesRoute: KillzonesRoute,
   LeadsRoute: LeadsRoute,
+  LeadsSigninRoute: LeadsSigninRoute,
   LlmRoute: LlmRoute,
   OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,
   PricingRoute: PricingRoute,
