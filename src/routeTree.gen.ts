@@ -46,6 +46,7 @@ import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.i
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
+import { Route as LeadsAccountRouteImport } from './routes/leads.account'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -282,6 +283,11 @@ const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
   id: '/hub',
   path: '/hub',
   getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const LeadsAccountRoute = LeadsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => LeadsRoute,
 } as any)
 const JenvuOpsX9k2InboxRoute = JenvuOpsX9k2InboxRouteImport.update({
   id: '/inbox',
@@ -616,6 +622,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
+  '/leads/account': typeof LeadsAccountRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -701,6 +708,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
+  '/leads/account': typeof LeadsAccountRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
@@ -793,6 +801,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
+  '/leads/account': typeof LeadsAccountRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -885,6 +894,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
+    | '/leads/account'
     | '/ops-x9k2-7m4n/hub'
     | '/help/'
     | '/insights/'
@@ -970,6 +980,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
+    | '/leads/account'
     | '/ops-x9k2-7m4n/hub'
     | '/help'
     | '/insights'
@@ -1061,6 +1072,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
+    | '/leads/account'
     | '/ops-x9k2-7m4n/hub'
     | '/help/'
     | '/insights/'
@@ -1435,6 +1447,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ops-x9k2-7m4n/hub'
       preLoaderRoute: typeof OpsX9k27m4nHubRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/leads/account': {
+      id: '/leads/account'
+      path: '/account'
+      fullPath: '/leads/account'
+      preLoaderRoute: typeof LeadsAccountRouteImport
+      parentRoute: typeof LeadsRoute
     }
     '/jenvu-ops-x9k2/inbox': {
       id: '/jenvu-ops-x9k2/inbox'
@@ -1913,10 +1932,12 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
 )
 
 interface LeadsRouteChildren {
+  LeadsAccountRoute: typeof LeadsAccountRoute
   LeadsIndexRoute: typeof LeadsIndexRoute
 }
 
 const LeadsRouteChildren: LeadsRouteChildren = {
+  LeadsAccountRoute: LeadsAccountRoute,
   LeadsIndexRoute: LeadsIndexRoute,
 }
 
