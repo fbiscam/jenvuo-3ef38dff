@@ -68,9 +68,16 @@ export function useCredits() {
             description: `You need at least $${(res.minRequired ?? 0.2).toFixed(2)} to run a signal scan. Add funds to continue.`,
             action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
           });
+        } else {
+          // Never fail silently — an unknown rejection code used to abort the
+          // scan with no message at all on the affected account.
+          toast.error("Scan blocked", {
+            description: String(res.error ?? "Account check failed. Please try again or contact support."),
+          });
         }
         return false;
       }
+
       const uid = user?.id ?? "self";
       queryClient.setQueryData(["credit-state", uid], (prev: any) =>
         prev ? { ...prev, balance: res.balance } : prev,
