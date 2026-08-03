@@ -46,6 +46,7 @@ import { Route as LeadsIndexRouteImport } from './routes/leads.index'
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
+import { Route as OpsX9k27m4nLeadsCreditsRouteImport } from './routes/ops-x9k2-7m4n.leads-credits'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as LeadsPeopleRouteImport } from './routes/leads.people'
 import { Route as LeadsMapsRouteImport } from './routes/leads.maps'
@@ -291,6 +292,11 @@ const HelpIndexRoute = HelpIndexRouteImport.update({
   id: '/help/',
   path: '/help/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const OpsX9k27m4nLeadsCreditsRoute = OpsX9k27m4nLeadsCreditsRouteImport.update({
+  id: '/leads-credits',
+  path: '/leads-credits',
+  getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
 const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
   id: '/hub',
@@ -679,6 +685,7 @@ export interface FileRoutesByFullPath {
   '/leads/maps': typeof LeadsMapsRoute
   '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -773,6 +780,7 @@ export interface FileRoutesByTo {
   '/leads/maps': typeof LeadsMapsRoute
   '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
@@ -874,6 +882,7 @@ export interface FileRoutesById {
   '/leads/maps': typeof LeadsMapsRoute
   '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -975,6 +984,7 @@ export interface FileRouteTypes {
     | '/leads/maps'
     | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/leads-credits'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -1069,6 +1079,7 @@ export interface FileRouteTypes {
     | '/leads/maps'
     | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/leads-credits'
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
@@ -1169,6 +1180,7 @@ export interface FileRouteTypes {
     | '/leads/maps'
     | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/leads-credits'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -1544,6 +1556,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/help/'
       preLoaderRoute: typeof HelpIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/ops-x9k2-7m4n/leads-credits': {
+      id: '/ops-x9k2-7m4n/leads-credits'
+      path: '/leads-credits'
+      fullPath: '/ops-x9k2-7m4n/leads-credits'
+      preLoaderRoute: typeof OpsX9k27m4nLeadsCreditsRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
     }
     '/ops-x9k2-7m4n/hub': {
       id: '/ops-x9k2-7m4n/hub'
@@ -2112,11 +2131,13 @@ const LeadsRouteWithChildren = LeadsRoute._addFileChildren(LeadsRouteChildren)
 
 interface OpsX9k27m4nRouteChildren {
   OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
+  OpsX9k27m4nLeadsCreditsRoute: typeof OpsX9k27m4nLeadsCreditsRoute
   OpsX9k27m4nIndexRoute: typeof OpsX9k27m4nIndexRoute
 }
 
 const OpsX9k27m4nRouteChildren: OpsX9k27m4nRouteChildren = {
   OpsX9k27m4nHubRoute: OpsX9k27m4nHubRoute,
+  OpsX9k27m4nLeadsCreditsRoute: OpsX9k27m4nLeadsCreditsRoute,
   OpsX9k27m4nIndexRoute: OpsX9k27m4nIndexRoute,
 }
 
@@ -2188,13 +2209,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
