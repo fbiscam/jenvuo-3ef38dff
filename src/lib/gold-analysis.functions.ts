@@ -2469,7 +2469,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       // Keep the real analysis score visible (it now varies per pair), just cap
       // it below every alert/broadcast threshold so nothing can fire.
       setupScore = Math.min(setupScore, 60);
-      setupGrade = setupScore >= 50 ? "C" : "C";
+      setupGrade = "C";
       setupChecks.unshift({
         key: "short_term_confirmation_veto",
         label: "⛔ Short-term confirmation missing",
