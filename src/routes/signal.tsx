@@ -501,8 +501,16 @@ function SignalPage() {
     if (activeScanRef.current === sym) return;
     // Free plan removed — all authenticated users are on a paid plan and can scan any XAU pair.
 
+    // Wallet state must be known before we decide anything. Previously a slow
+    // credit-state fetch skipped the pre-flight, the server-side spend then
+    // returned ok:false, and the scan died with no visible feedback — that is
+    // the "kisi account par scan hota hi nahi" report.
+    if (credits.isLoading) {
+      toast.info("Loading your account…", { description: "One moment, then press Analyze again." });
+      return;
+    }
     // Pre-flight: block the scan if wallet is below the flat $0.20 per-signal charge.
-    if (!credits.isLoading && credits.balance < 0.20) {
+    if (credits.balance < 0.20) {
       toast.error("Balance too low to run analysis", {
         description: `Low balance — add funds to continue.`,
         action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
@@ -517,7 +525,11 @@ function SignalPage() {
     try {
       const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
       const ok = await credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
-      if (!ok) { setLoading(false); return; }
+      if (!ok) {
+        setAnalysisError("Scan could not start — check the message above and try again.");
+        setLoading(false);
+        return;
+      }
       const result = await fetchPlan({ data: { symbol: sym, scanId, force: true } });
       if (!result.ok) {
         setPlan(null);
@@ -527,31 +539,28 @@ function SignalPage() {
       }
       const p = withSignalIntelligence(result.plan);
 
-      // Mirror the auto-scan pipeline gates so a manual scan never surfaces a
-      // setup the shared broadcaster would reject (below threshold, wrong
-      // killzone, HTF-bias conflict, or no directional bias). This keeps
-      // manual + auto results consistent — "qalt signal" ab manual ma nahi aya.
-      const AUTO_MIN_CONF = 65;
+      // Mirror the auto-scan pipeline gates EXACTLY so a manual scan never
+      // reports a rejection the shared broadcaster would not apply. The
+      // killzone gate is disabled server-side (signals fire any session), so
+      // it must not be re-applied here — that mismatch was rejecting perfectly
+      // valid scans on some accounts/sessions while others went through.
+      const AUTO_MIN_CONF = 70;
       const dir = p.trade?.direction;
       const conf = Number(p.trade?.confidence ?? 0);
-      const kz = String(p.killzone ?? "");
-      const inKillzone = /Killzone/i.test(kz) && !/Outside/i.test(kz);
-      const isAsia = /asia/i.test(kz);
       const htfBias = String((p as unknown as { htfBias?: string }).htfBias ?? "neutral");
       const utcH = new Date().getUTCHours();
-      const isNyAm = utcH >= 12 && utcH < 16;
+      const isActiveSession = utcH >= 7 && utcH < 20;
       const aligned =
         (dir === "BUY" && htfBias === "bullish") ||
         (dir === "SELL" && htfBias === "bearish") ||
-        (isNyAm && htfBias === "neutral");
+        (isActiveSession && htfBias === "neutral") ||
+        conf >= 80;
 
       let gateBlock: string | null = null;
       if (dir !== "BUY" && dir !== "SELL") {
         gateBlock = "No directional setup right now — market is in HOLD. Auto-scan pipeline would skip this too.";
       } else if (conf < AUTO_MIN_CONF) {
         gateBlock = `Confidence ${Math.round(conf)}% is below the ${AUTO_MIN_CONF}% minimum. No trade this scan — wait for the next qualifying setup.`;
-      } else if (!inKillzone || isAsia) {
-        gateBlock = `Outside a valid killzone (${kz || "n/a"}). Auto-scan only fires in London / NY AM / NY PM — Asia and off-hours are skipped.`;
       } else if (!aligned) {
         gateBlock = `${dir} conflicts with HTF bias (${htfBias}). Pipeline rejects counter-trend setups — waiting for alignment.`;
       }
@@ -572,6 +581,7 @@ function SignalPage() {
           (e) => console.error("manual broadcast failed", e),
         );
       }
+
 
       // ICT narration is included in the single "signal" charge above — no extra deduction.
       // Free users still don't get the guided narration.
