@@ -53,33 +53,15 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   });
 }
 
-// Subdomain → section mapping. Hitting the bare root of a subdomain lands
-// the visitor on the matching section of the app.
-const SUBDOMAIN_HOME: Record<string, string> = {
-  leads: "/leads",
-  blogs: "/insights",
-  support: "/help",
-};
-
-function subdomainRedirect(request: Request): Response | null {
-  const url = new URL(request.url);
-  if (url.pathname !== "/") return null;
-  const host = url.hostname.toLowerCase();
-  if (!host.endsWith(".jenvu.com")) return null;
-  const sub = host.slice(0, host.length - ".jenvu.com".length);
-  const target = SUBDOMAIN_HOME[sub];
-  if (!target) return null;
-  url.pathname = target;
-  return Response.redirect(url.toString(), 302);
-}
+// Subdomain mounting (leads./dash./blogs./support.jenvu.com) is handled by the
+// router's `rewrite` option in src/router.tsx so the section prefix never shows
+// in the address bar. No redirect happens here anymore.
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
-      const redirected = subdomainRedirect(request);
-      if (redirected) return redirected;
-
       const handler = await getServerEntry();
+
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
