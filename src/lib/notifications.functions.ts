@@ -122,7 +122,10 @@ export const createUserNotification = createServerFn({ method: 'POST' })
         .limit(1)
       if (existing && existing.length > 0) return { ok: true, skipped: true }
     }
-    await context.supabase.from('user_notifications').insert({
+    // Notifications are system-generated: inserts go through the trusted
+    // server-side client after the caller's identity has been verified.
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+    await supabaseAdmin.from('user_notifications').insert({
       user_id: context.userId,
       type: data.type,
       title: data.title,
