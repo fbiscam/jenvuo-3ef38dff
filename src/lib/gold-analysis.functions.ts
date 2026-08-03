@@ -2466,8 +2466,10 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       setupChecks.unshift({ key: `veto_${v.key}`, label: `⛔ ${v.label}`, pass: false, reason: v.reason });
     }
     if (executionVetoReason) {
-      setupScore = Math.min(setupScore, 49);
-      setupGrade = "C";
+      // Keep the real analysis score visible (it now varies per pair), just cap
+      // it below every alert/broadcast threshold so nothing can fire.
+      setupScore = Math.min(setupScore, 60);
+      setupGrade = setupScore >= 50 ? "C" : "C";
       setupChecks.unshift({
         key: "short_term_confirmation_veto",
         label: "⛔ Short-term confirmation missing",
