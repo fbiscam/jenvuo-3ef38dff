@@ -27,10 +27,56 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(ah, bh);
 }
 
+/**
+ * Real access gate for the Support Inbox server functions.
+ * Allows either:
+ *  - an unlocked ops-console session cookie, or
+ *  - the admin-gate session cookie, or
+ *  - a valid Supabase bearer token belonging to a user with the 'admin' role.
+ */
 async function requireUnlocked() {
-  // Gate disabled: Support Inbox is opened directly from Ops Console.
-  return { unlocked: true as const, username: "admin" };
+  // 1) Ops console session
+  const { isOpsUnlocked } = await import("./admin-guard.server");
+  if (await isOpsUnlocked()) return { unlocked: true as const, username: "ops" };
+
+  // 2) Admin-gate session cookie
+  try {
+    if (process.env.ADMIN_SESSION_SECRET) {
+      const session = await useSession<AdminSession>(sessionConfig());
+      if (session.data.unlocked) {
+        return { unlocked: true as const, username: session.data.username ?? "admin" };
+      }
+    }
+  } catch {
+    // fall through
+  }
+
+  // 3) Supabase bearer token with admin role
+  try {
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const header = getRequestHeader("authorization") ?? "";
+    const token = header.toLowerCase().startsWith("bearer ") ? header.slice(7).trim() : "";
+    if (token) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: userRes } = await supabaseAdmin.auth.getUser(token);
+      const uid = userRes?.user?.id;
+      if (uid) {
+        const { data: role } = await supabaseAdmin
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", uid)
+          .eq("role", "admin")
+          .maybeSingle();
+        if (role) return { unlocked: true as const, username: userRes.user!.email ?? "admin" };
+      }
+    }
+  } catch {
+    // fall through
+  }
+
+  throw new Error("Unauthorized");
 }
+
 
 
 

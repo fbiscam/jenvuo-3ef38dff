@@ -32,6 +32,8 @@ const TILES: Tile[] = [
   { key: "tuning", title: "Weight Tuning", desc: "Grid search & walk-forward configs", to: "/dashboard/admin/tuning" },
   { key: "tvmm", title: "TV Mismatch Checker", desc: "Telegram chart price drift audit", to: "/dashboard/admin/tv-mismatch" },
   { key: "bugs", title: "Bug Triage", desc: "Runtime errors + AI diagnosis", to: "/dashboard/admin/bugs" },
+  { key: "leadscredits", title: "Leads Credits", desc: "Add credits to Jenvu Leads accounts", to: "/ops-x9k2-7m4n/leads-credits" },
+
 
 ];
 
