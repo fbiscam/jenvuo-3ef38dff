@@ -12,6 +12,16 @@ import {
 } from "lucide-react";
 import type { Me } from "@/lib/leadgen/shared";
 
+/**
+ * Jenvu design language (matches jenvu.com):
+ *  - surface #FAFAFA, cards white with zinc-200 hairlines
+ *  - ink zinc-900 / zinc-700 / zinc-500, no coloured brand accent
+ *  - Google Sans for UI, JetBrains Mono for micro-labels and numerics
+ */
+export const JENVU_SANS =
+  '"Google Sans", "Product Sans", "Poppins", system-ui, sans-serif';
+export const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+
 const NAV = [
   { to: "/leads", label: "Overview", icon: LayoutGrid, exact: true },
   { to: "/leads/maps", label: "Maps search", icon: MapPin },
@@ -33,17 +43,15 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
 
   return (
     <div
-      className="lg-console flex min-h-dvh w-full bg-[#F8F9FA] text-[#202124] antialiased"
-      style={{
-        fontFamily:
-          '"Google Sans", "Product Sans", "Urbanist", "Roboto", system-ui, sans-serif',
-      }}
+      className="lg-console flex min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
+      style={{ fontFamily: JENVU_SANS }}
     >
-
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-[#DADCE0] bg-white md:flex">
-        <div className="flex h-14 items-center gap-2 border-b border-[#DADCE0] px-4">
-          <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded object-contain" />
-          <span className="text-[15px] font-medium text-[#3C4043]">Jenvu Leads</span>
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-zinc-200 bg-white md:flex">
+        <div className="flex h-14 items-center gap-2.5 border-b border-zinc-100 px-4">
+          <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
+          <span className="text-[17px] leading-none tracking-tight text-[#3c4043]" style={{ fontWeight: 500 }}>
+            Jenvu <span className="text-zinc-400">Leads</span>
+          </span>
         </div>
 
         <nav className="flex-1 overflow-y-auto py-2">
@@ -53,10 +61,10 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
               <Link
                 key={item.to}
                 to={item.to}
-                className={`mx-2 mb-0.5 flex items-center gap-3 rounded-r-full px-4 py-2 text-[13px] transition ${
+                className={`mx-2 mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition ${
                   active
-                    ? "bg-[#E8F0FE] font-medium text-[#1967D2]"
-                    : "text-[#3C4043] hover:bg-[#F1F3F4]"
+                    ? "bg-zinc-100 font-medium text-zinc-900"
+                    : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
                 }`}
               >
                 <item.icon className="h-4 w-4" strokeWidth={active ? 2.2 : 1.8} />
@@ -67,15 +75,15 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
 
           {me?.is_admin && (
             <>
-              <div className="mt-4 px-5 pb-1 text-[11px] font-medium uppercase tracking-wider text-[#80868B]">
+              <div className={`mt-4 px-4 pb-1 text-[10px] uppercase tracking-[0.14em] text-zinc-400 ${MONO}`}>
                 Admin
               </div>
               <Link
                 to="/leads/admin/users"
-                className={`mx-2 flex items-center gap-3 rounded-r-full px-4 py-2 text-[13px] transition ${
+                className={`mx-2 flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition ${
                   isActive("/leads/admin")
-                    ? "bg-[#E8F0FE] font-medium text-[#1967D2]"
-                    : "text-[#3C4043] hover:bg-[#F1F3F4]"
+                    ? "bg-zinc-100 font-medium text-zinc-900"
+                    : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
                 }`}
               >
                 <Shield className="h-4 w-4" strokeWidth={1.8} />
@@ -86,20 +94,17 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
         </nav>
 
         {me && (
-          <div className="border-t border-[#DADCE0] p-4">
-            <div className="flex items-baseline justify-between text-[12px] text-[#5F6368]">
+          <div className="border-t border-zinc-100 p-4">
+            <div className="flex items-baseline justify-between text-[12px] text-zinc-500">
               <span>Credits</span>
-              <span className="font-medium text-[#202124]">
+              <span className={`${MONO} text-[12px] font-medium text-zinc-900`}>
                 {me.credits.remaining.toFixed(2)} left
               </span>
             </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#E8EAED]">
-              <div
-                className="h-full rounded-full bg-[#1A73E8] transition-all"
-                style={{ width: `${pct}%` }}
-              />
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+              <div className="h-full rounded-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
             </div>
-            <div className="mt-1.5 text-[11px] text-[#80868B]">
+            <div className="mt-1.5 text-[11px] text-zinc-400">
               {me.credits.used.toFixed(2)} of {me.credits.monthly_limit.toFixed(0)} used this month
             </div>
           </div>
@@ -107,18 +112,20 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-[#DADCE0] bg-white px-4 md:px-6">
-          <div className="flex items-center gap-2 md:hidden">
-            <img src="/favicon.png" alt="" className="h-6 w-6 rounded object-contain" />
-            <span className="text-[15px] font-medium text-[#3C4043]">Jenvu Leads</span>
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-100 bg-white/85 px-4 backdrop-blur-md md:px-6">
+          <div className="flex items-center gap-2.5 md:hidden">
+            <img src="/favicon.png" alt="" className="h-7 w-7 rounded-md object-contain" />
+            <span className="text-[17px] tracking-tight text-[#3c4043]" style={{ fontWeight: 500 }}>
+              Jenvu <span className="text-zinc-400">Leads</span>
+            </span>
           </div>
           <div className="hidden md:block" />
           <div className="flex items-center gap-3">
             {me && (
-              <span className="hidden text-[12px] text-[#5F6368] sm:block">
+              <span className="hidden text-[12px] text-zinc-500 sm:block">
                 {me.email}
                 {me.is_admin && (
-                  <span className="ml-2 rounded bg-[#E8F0FE] px-1.5 py-0.5 text-[10px] font-medium text-[#1967D2]">
+                  <span className={`ml-2 rounded bg-zinc-900 px-1.5 py-0.5 text-[10px] text-white ${MONO}`}>
                     ADMIN
                   </span>
                 )}
@@ -126,22 +133,22 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
             )}
             <Link
               to="/leads/account"
-              className="rounded border border-[#DADCE0] px-3 py-1.5 text-[12px] font-medium text-[#3C4043] hover:bg-[#F1F3F4]"
+              className="rounded-lg border border-zinc-200 px-3 py-1.5 text-[12px] font-medium text-zinc-900 hover:bg-zinc-50"
             >
               Account
             </Link>
           </div>
         </header>
 
-        <nav className="flex gap-1 overflow-x-auto border-b border-[#DADCE0] bg-white px-2 md:hidden">
+        <nav className="flex gap-1 overflow-x-auto border-b border-zinc-100 bg-white px-2 md:hidden">
           {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
               className={`whitespace-nowrap px-3 py-2.5 text-[12px] ${
                 isActive(item.to, item.exact)
-                  ? "border-b-2 border-[#1A73E8] font-medium text-[#1967D2]"
-                  : "text-[#5F6368]"
+                  ? "border-b-2 border-zinc-900 font-medium text-zinc-900"
+                  : "text-zinc-500"
               }`}
             >
               {item.label}
@@ -167,8 +174,8 @@ export function PageHeader({
   return (
     <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h1 className="text-[22px] font-normal text-[#202124]">{title}</h1>
-        {description && <p className="mt-1 text-[13px] text-[#5F6368]">{description}</p>}
+        <h1 className="text-[22px] font-semibold tracking-tight text-zinc-900">{title}</h1>
+        {description && <p className="mt-1 text-[13px] text-zinc-600">{description}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
@@ -177,14 +184,18 @@ export function PageHeader({
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-lg border border-[#DADCE0] bg-white ${className}`}>{children}</div>
+    <div
+      className={`rounded-xl border border-zinc-200 bg-white shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)] ${className}`}
+    >
+      {children}
+    </div>
   );
 }
 
 export const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded bg-[#1A73E8] px-4 py-2 text-[13px] font-medium text-white transition hover:bg-[#1765CC] disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-[13px] font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50";
 export const btnGhost =
-  "inline-flex items-center justify-center gap-2 rounded border border-[#DADCE0] bg-white px-4 py-2 text-[13px] font-medium text-[#3C4043] transition hover:bg-[#F1F3F4] disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px] font-medium text-zinc-900 transition hover:bg-zinc-50 disabled:opacity-50";
 export const inputCls =
-  "w-full rounded border border-[#DADCE0] bg-white px-3 py-2 text-[13px] text-[#202124] outline-none transition placeholder:text-[#9AA0A6] focus:border-[#1A73E8] focus:ring-2 focus:ring-[#1A73E8]/15";
-export const labelCls = "mb-1.5 block text-[12px] font-medium text-[#5F6368]";
+  "w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px] text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10";
+export const labelCls = "mb-1.5 block text-[12px] font-medium text-zinc-600";
