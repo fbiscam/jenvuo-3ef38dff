@@ -2373,6 +2373,11 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // have short-term confirmation: LTF structure/MSS in the trade direction,
     // or a real sweep + rejection/Turtle Soup/CE reaction at the entry pocket.
     let executionVetoReason: string | null = null;
+    // Snapshot of the trade BEFORE any execution veto. The weighted score must
+    // be computed on the real setup, otherwise every vetoed pair collapses to
+    // the same flat floor score (the "always 26%" bug) and confidence stops
+    // telling the user anything about the actual market.
+    const preVetoTrade = { ...built };
     if (built.direction !== "WAIT") {
       const wantDir = built.direction === "BUY" ? "bullish" : "bearish";
       const ltfStructureConfirms = ltfA.trend === wantDir || ltfA.lastStructure?.dir === wantDir;
@@ -2382,11 +2387,20 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         turtleSoup.triggered === true ||
         ceTap?.tapped === true ||
         mitigationBlock?.present === true;
-      const pureRetracementLimit = built.entryType === "LIMIT" && !zoneReactionConfirmed;
-      const sweepThenConfirm = opposingSweep && zoneReactionConfirmed && ltfStructureConfirms;
+      const displacementConfirms = displacement?.passed === true;
+      // At least ONE real short-term confirmation is required (LTF structure/MSS,
+      // a reaction at the pocket, a sweep of opposing liquidity, or a displacement
+      // leg). Requiring all of them at once blocked every setup permanently.
+      const confirmations =
+        (ltfStructureConfirms ? 1 : 0) +
+        (zoneReactionConfirmed ? 1 : 0) +
+        (opposingSweep ? 1 : 0) +
+        (displacementConfirms ? 1 : 0);
+      // A pending LIMIT retracement is the riskiest shape — it needs 2 signs of life.
+      const needed = built.entryType === "LIMIT" ? 2 : 1;
 
-      if ((!ltfStructureConfirms || pureRetracementLimit) && !sweepThenConfirm) {
-        executionVetoReason = pureRetracementLimit
+      if (confirmations < needed) {
+        executionVetoReason = built.entryType === "LIMIT"
           ? "Blocked: price is only retracing into a pending POI; no LTF rejection/MSS confirmation yet."
           : "Blocked: HTF bias exists, but short-term LTF structure has not confirmed the trade direction after liquidity grab.";
         built.direction = "WAIT" as typeof built.direction;
@@ -2413,7 +2427,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     // 10+ factor weighted score with hard-veto gates → only ≥88 is A+
     const scored = scoreSetup({
-      trade: built,
+      trade: preVetoTrade,
       htf: htfA,
       ltf: ltfA,
       pools,
