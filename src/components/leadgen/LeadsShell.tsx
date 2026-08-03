@@ -32,7 +32,14 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
     : 0;
 
   return (
-    <div className="lg-console flex min-h-dvh w-full bg-[#F8F9FA] text-[#202124]">
+    <div
+      className="lg-console flex min-h-dvh w-full bg-[#F8F9FA] text-[#202124] antialiased"
+      style={{
+        fontFamily:
+          '"Google Sans", "Product Sans", "Urbanist", "Roboto", system-ui, sans-serif',
+      }}
+    >
+
       <aside className="hidden w-60 shrink-0 flex-col border-r border-[#DADCE0] bg-white md:flex">
         <div className="flex h-14 items-center gap-2 border-b border-[#DADCE0] px-4">
           <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded object-contain" />

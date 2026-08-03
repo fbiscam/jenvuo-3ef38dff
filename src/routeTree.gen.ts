@@ -46,6 +46,12 @@ import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.i
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
+import { Route as LeadsPeopleRouteImport } from './routes/leads.people'
+import { Route as LeadsMapsRouteImport } from './routes/leads.maps'
+import { Route as LeadsListsRouteImport } from './routes/leads.lists'
+import { Route as LeadsImportRouteImport } from './routes/leads.import'
+import { Route as LeadsEnrichRouteImport } from './routes/leads.enrich'
+import { Route as LeadsActivityRouteImport } from './routes/leads.activity'
 import { Route as LeadsAccountRouteImport } from './routes/leads.account'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
@@ -284,6 +290,36 @@ const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
   id: '/hub',
   path: '/hub',
   getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const LeadsPeopleRoute = LeadsPeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => LeadsRoute,
+} as any)
+const LeadsMapsRoute = LeadsMapsRouteImport.update({
+  id: '/maps',
+  path: '/maps',
+  getParentRoute: () => LeadsRoute,
+} as any)
+const LeadsListsRoute = LeadsListsRouteImport.update({
+  id: '/lists',
+  path: '/lists',
+  getParentRoute: () => LeadsRoute,
+} as any)
+const LeadsImportRoute = LeadsImportRouteImport.update({
+  id: '/import',
+  path: '/import',
+  getParentRoute: () => LeadsRoute,
+} as any)
+const LeadsEnrichRoute = LeadsEnrichRouteImport.update({
+  id: '/enrich',
+  path: '/enrich',
+  getParentRoute: () => LeadsRoute,
+} as any)
+const LeadsActivityRoute = LeadsActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => LeadsRoute,
 } as any)
 const LeadsAccountRoute = LeadsAccountRouteImport.update({
   id: '/account',
@@ -629,6 +665,12 @@ export interface FileRoutesByFullPath {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
+  '/leads/activity': typeof LeadsActivityRoute
+  '/leads/enrich': typeof LeadsEnrichRoute
+  '/leads/import': typeof LeadsImportRoute
+  '/leads/lists': typeof LeadsListsRoute
+  '/leads/maps': typeof LeadsMapsRoute
+  '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -716,6 +758,12 @@ export interface FileRoutesByTo {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
+  '/leads/activity': typeof LeadsActivityRoute
+  '/leads/enrich': typeof LeadsEnrichRoute
+  '/leads/import': typeof LeadsImportRoute
+  '/leads/lists': typeof LeadsListsRoute
+  '/leads/maps': typeof LeadsMapsRoute
+  '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
@@ -810,6 +858,12 @@ export interface FileRoutesById {
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
+  '/leads/activity': typeof LeadsActivityRoute
+  '/leads/enrich': typeof LeadsEnrichRoute
+  '/leads/import': typeof LeadsImportRoute
+  '/leads/lists': typeof LeadsListsRoute
+  '/leads/maps': typeof LeadsMapsRoute
+  '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -904,6 +958,12 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
+    | '/leads/activity'
+    | '/leads/enrich'
+    | '/leads/import'
+    | '/leads/lists'
+    | '/leads/maps'
+    | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
     | '/help/'
     | '/insights/'
@@ -991,6 +1051,12 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
+    | '/leads/activity'
+    | '/leads/enrich'
+    | '/leads/import'
+    | '/leads/lists'
+    | '/leads/maps'
+    | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
     | '/help'
     | '/insights'
@@ -1084,6 +1150,12 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
+    | '/leads/activity'
+    | '/leads/enrich'
+    | '/leads/import'
+    | '/leads/lists'
+    | '/leads/maps'
+    | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
     | '/help/'
     | '/insights/'
@@ -1459,6 +1531,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/ops-x9k2-7m4n/hub'
       preLoaderRoute: typeof OpsX9k27m4nHubRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/leads/people': {
+      id: '/leads/people'
+      path: '/people'
+      fullPath: '/leads/people'
+      preLoaderRoute: typeof LeadsPeopleRouteImport
+      parentRoute: typeof LeadsRoute
+    }
+    '/leads/maps': {
+      id: '/leads/maps'
+      path: '/maps'
+      fullPath: '/leads/maps'
+      preLoaderRoute: typeof LeadsMapsRouteImport
+      parentRoute: typeof LeadsRoute
+    }
+    '/leads/lists': {
+      id: '/leads/lists'
+      path: '/lists'
+      fullPath: '/leads/lists'
+      preLoaderRoute: typeof LeadsListsRouteImport
+      parentRoute: typeof LeadsRoute
+    }
+    '/leads/import': {
+      id: '/leads/import'
+      path: '/import'
+      fullPath: '/leads/import'
+      preLoaderRoute: typeof LeadsImportRouteImport
+      parentRoute: typeof LeadsRoute
+    }
+    '/leads/enrich': {
+      id: '/leads/enrich'
+      path: '/enrich'
+      fullPath: '/leads/enrich'
+      preLoaderRoute: typeof LeadsEnrichRouteImport
+      parentRoute: typeof LeadsRoute
+    }
+    '/leads/activity': {
+      id: '/leads/activity'
+      path: '/activity'
+      fullPath: '/leads/activity'
+      preLoaderRoute: typeof LeadsActivityRouteImport
+      parentRoute: typeof LeadsRoute
     }
     '/leads/account': {
       id: '/leads/account'
@@ -1952,12 +2066,24 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
 
 interface LeadsRouteChildren {
   LeadsAccountRoute: typeof LeadsAccountRoute
+  LeadsActivityRoute: typeof LeadsActivityRoute
+  LeadsEnrichRoute: typeof LeadsEnrichRoute
+  LeadsImportRoute: typeof LeadsImportRoute
+  LeadsListsRoute: typeof LeadsListsRoute
+  LeadsMapsRoute: typeof LeadsMapsRoute
+  LeadsPeopleRoute: typeof LeadsPeopleRoute
   LeadsIndexRoute: typeof LeadsIndexRoute
   LeadsAdminUsersRoute: typeof LeadsAdminUsersRoute
 }
 
 const LeadsRouteChildren: LeadsRouteChildren = {
   LeadsAccountRoute: LeadsAccountRoute,
+  LeadsActivityRoute: LeadsActivityRoute,
+  LeadsEnrichRoute: LeadsEnrichRoute,
+  LeadsImportRoute: LeadsImportRoute,
+  LeadsListsRoute: LeadsListsRoute,
+  LeadsMapsRoute: LeadsMapsRoute,
+  LeadsPeopleRoute: LeadsPeopleRoute,
   LeadsIndexRoute: LeadsIndexRoute,
   LeadsAdminUsersRoute: LeadsAdminUsersRoute,
 }
