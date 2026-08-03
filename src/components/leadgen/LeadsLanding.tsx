@@ -104,7 +104,7 @@ export function LeadsLanding() {
                 50 free credits — no card
               </span>
               <h1 className="mt-5 max-w-3xl text-[28px] font-semibold leading-[1.1] tracking-tight text-zinc-900 sm:text-[42px] md:text-[56px]">
-                <span className="block">B2B leads you can actually</span>
+                <span className="block sm:whitespace-nowrap">B2B leads you can actually</span>
                 <span className="block">reach — in one desk.</span>
               </h1>
               <p className="mt-5 max-w-2xl text-[13px] leading-relaxed text-zinc-700 sm:text-base md:text-lg">
