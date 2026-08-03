@@ -4,13 +4,25 @@ import { useQuery } from "@tanstack/react-query";
 import { MapPin, Users, Globe, Upload } from "lucide-react";
 import { getOverview } from "@/lib/leadgen/core.functions";
 import { Card, PageHeader } from "@/components/leadgen/LeadsShell";
+import { LeadsLanding } from "@/components/leadgen/LeadsLanding";
 
 export const Route = createFileRoute("/leads/")({
   head: () => ({
     meta: [
-      { title: "Overview — Jenvu Leads" },
-      { name: "description", content: "Credits, saved leads and recent campaign lists at a glance." },
-      { name: "robots", content: "noindex,nofollow" },
+      { title: "Jenvu Leads — Free B2B lead generation desk" },
+      {
+        name: "description",
+        content:
+          "Google Maps search, people search and website enrichment in one desk. Create a free account and get 50 credits — 100 saved leads, no card required.",
+      },
+      { property: "og:title", content: "Jenvu Leads — Free B2B lead generation desk" },
+      {
+        property: "og:description",
+        content:
+          "Search Maps, find decision makers, enrich websites and export leads. 50 free credits on sign-up.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Overview,
@@ -34,8 +46,17 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 }
 
 function Overview() {
+  const { signedIn } = Route.useRouteContext();
   const fetchOverview = useServerFn(getOverview);
-  const { data, isLoading } = useQuery({ queryKey: ["lg-overview"], queryFn: () => fetchOverview() });
+  const { data, isLoading } = useQuery({
+    queryKey: ["lg-overview"],
+    queryFn: () => fetchOverview(),
+    enabled: signedIn,
+  });
+
+  // Guests see the public marketing page (this is leads.jenvu.com's front door).
+  if (!signedIn) return <LeadsLanding />;
+
 
   return (
     <>

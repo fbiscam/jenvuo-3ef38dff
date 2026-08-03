@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { btnPrimary, inputCls, labelCls } from "@/components/leadgen/LeadsShell";
@@ -98,8 +98,13 @@ function SignIn() {
         </div>
 
         <p className="mt-6 text-center text-[12px] text-[#80868B]">
-          Jenvu Leads is invite-only. Ask an administrator for an account.
+          New here?{" "}
+          <Link to="/leads-signup" className="text-[#1A73E8] hover:underline">
+            Create a free account
+          </Link>{" "}
+          and get 50 credits.
         </p>
+
       </form>
     </div>
   );

@@ -20,6 +20,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OpsX9k27m4nRouteImport } from './routes/ops-x9k2-7m4n'
 import { Route as LlmRouteImport } from './routes/llm'
+import { Route as LeadsSignupRouteImport } from './routes/leads-signup'
 import { Route as LeadsSigninRouteImport } from './routes/leads-signin'
 import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as KillzonesRouteImport } from './routes/killzones'
@@ -160,6 +161,11 @@ const OpsX9k27m4nRoute = OpsX9k27m4nRouteImport.update({
 const LlmRoute = LlmRouteImport.update({
   id: '/llm',
   path: '/llm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeadsSignupRoute = LeadsSignupRouteImport.update({
+  id: '/leads-signup',
+  path: '/leads-signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeadsSigninRoute = LeadsSigninRouteImport.update({
@@ -647,6 +653,7 @@ export interface FileRoutesByFullPath {
   '/killzones': typeof KillzonesRoute
   '/leads': typeof LeadsRouteWithChildren
   '/leads-signin': typeof LeadsSigninRoute
+  '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -742,6 +749,7 @@ export interface FileRoutesByTo {
   '/founding': typeof FoundingRoute
   '/killzones': typeof KillzonesRoute
   '/leads-signin': typeof LeadsSigninRoute
+  '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -840,6 +848,7 @@ export interface FileRoutesById {
   '/killzones': typeof KillzonesRoute
   '/leads': typeof LeadsRouteWithChildren
   '/leads-signin': typeof LeadsSigninRoute
+  '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -940,6 +949,7 @@ export interface FileRouteTypes {
     | '/killzones'
     | '/leads'
     | '/leads-signin'
+    | '/leads-signup'
     | '/llm'
     | '/ops-x9k2-7m4n'
     | '/pricing'
@@ -1035,6 +1045,7 @@ export interface FileRouteTypes {
     | '/founding'
     | '/killzones'
     | '/leads-signin'
+    | '/leads-signup'
     | '/llm'
     | '/pricing'
     | '/privacy'
@@ -1132,6 +1143,7 @@ export interface FileRouteTypes {
     | '/killzones'
     | '/leads'
     | '/leads-signin'
+    | '/leads-signup'
     | '/llm'
     | '/ops-x9k2-7m4n'
     | '/pricing'
@@ -1232,6 +1244,7 @@ export interface RootRouteChildren {
   KillzonesRoute: typeof KillzonesRoute
   LeadsRoute: typeof LeadsRouteWithChildren
   LeadsSigninRoute: typeof LeadsSigninRoute
+  LeadsSignupRoute: typeof LeadsSignupRoute
   LlmRoute: typeof LlmRoute
   OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
   PricingRoute: typeof PricingRoute
@@ -1348,6 +1361,13 @@ declare module '@tanstack/react-router' {
       path: '/llm'
       fullPath: '/llm'
       preLoaderRoute: typeof LlmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leads-signup': {
+      id: '/leads-signup'
+      path: '/leads-signup'
+      fullPath: '/leads-signup'
+      preLoaderRoute: typeof LeadsSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leads-signin': {
@@ -2125,6 +2145,7 @@ const rootRouteChildren: RootRouteChildren = {
   KillzonesRoute: KillzonesRoute,
   LeadsRoute: LeadsRouteWithChildren,
   LeadsSigninRoute: LeadsSigninRoute,
+  LeadsSignupRoute: LeadsSignupRoute,
   LlmRoute: LlmRoute,
   OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,
   PricingRoute: PricingRoute,

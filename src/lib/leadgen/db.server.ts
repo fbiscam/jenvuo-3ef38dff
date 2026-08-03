@@ -24,10 +24,13 @@ export async function resolveActor(userId: string, email: string): Promise<Actor
     .maybeSingle()
 
   if (!profile) {
+    // Free tier: 50 credits on first sign-in (a saved/revealed lead costs 0.5,
+    // so that is 100 leads). Admins can raise the limit per user.
     await db.from('lg_profiles').upsert(
-      { user_id: userId, email: email.toLowerCase(), monthly_credit_limit: 150 },
+      { user_id: userId, email: email.toLowerCase(), monthly_credit_limit: 50 },
       { onConflict: 'user_id' },
     )
+
   } else if (profile.is_disabled) {
     throw new Error('Your account has been disabled. Contact an administrator.')
   }
