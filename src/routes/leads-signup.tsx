@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { btnPrimary, inputCls, labelCls } from "@/components/leadgen/LeadsShell";
+import { btnPrimary, inputCls, labelCls, JENVU_SANS } from "@/components/leadgen/LeadsShell";
 
 export const Route = createFileRoute("/leads-signup")({
   ssr: false,
@@ -72,17 +72,20 @@ function SignUp() {
 
   if (sent) {
     return (
-      <div className="lg-console flex min-h-dvh items-center justify-center bg-[#F8F9FA] px-5 py-16 text-[#202124]">
-        <div className="w-full max-w-[420px] rounded-lg border border-[#DADCE0] bg-white p-8 text-center">
+      <div
+        style={{ fontFamily: JENVU_SANS }}
+        className="lg-console flex min-h-dvh items-center justify-center bg-[#FAFAFA] px-5 py-16 text-zinc-900 antialiased"
+      >
+        <div className="w-full max-w-[420px] rounded-xl border border-zinc-200 bg-white p-8 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)] text-center">
           <img src="/favicon.png" alt="Jenvu" className="mx-auto h-10 w-10 rounded object-contain" />
-          <h1 className="mt-4 text-[22px] font-normal">Confirm your email</h1>
-          <p className="mt-2 text-[13px] leading-relaxed text-[#5F6368]">
+          <h1 className="mt-4 text-[22px] font-semibold tracking-tight">Confirm your email</h1>
+          <p className="mt-2 text-[13px] leading-relaxed text-zinc-600">
             We sent a confirmation link to <strong>{email}</strong>. Click it to activate your
             account — your 50 free credits are waiting inside.
           </p>
           <Link
             to="/leads-signin"
-            className="mt-6 inline-block rounded border border-[#DADCE0] px-5 py-2 text-[13px] hover:bg-[#F1F3F4]"
+            className="mt-6 inline-block rounded-lg border border-zinc-200 bg-white px-5 py-2 text-[13px] font-medium text-zinc-900 hover:bg-zinc-50"
           >
             Back to sign in
           </Link>
@@ -92,15 +95,18 @@ function SignUp() {
   }
 
   return (
-    <div className="lg-console flex min-h-dvh items-center justify-center bg-[#F8F9FA] px-5 py-16 text-[#202124]">
+    <div
+        style={{ fontFamily: JENVU_SANS }}
+        className="lg-console flex min-h-dvh items-center justify-center bg-[#FAFAFA] px-5 py-16 text-zinc-900 antialiased"
+      >
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-[420px] rounded-lg border border-[#DADCE0] bg-white p-8"
+        className="w-full max-w-[420px] rounded-xl border border-zinc-200 bg-white p-8 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)]"
       >
         <div className="flex flex-col items-center text-center">
-          <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 rounded object-contain" />
-          <h1 className="mt-4 text-[24px] font-normal">Create your account</h1>
-          <p className="mt-1.5 text-[13px] text-[#5F6368]">
+          <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 rounded-md object-contain" />
+          <h1 className="mt-4 text-[24px] font-semibold tracking-tight">Create your account</h1>
+          <p className="mt-1.5 text-[13px] text-zinc-600">
             Free to start — 50 credits included
           </p>
         </div>
@@ -149,11 +155,11 @@ function SignUp() {
               className={inputCls}
               required
             />
-            <p className="mt-1.5 text-[11px] text-[#80868B]">Minimum 8 characters.</p>
+            <p className="mt-1.5 text-[11px] text-zinc-400">Minimum 8 characters.</p>
           </div>
 
           {err && (
-            <div className="rounded border border-[#F5C6CB] bg-[#FCE8E6] px-3 py-2 text-[12px] text-[#C5221F]">
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700">
               {err}
             </div>
           )}
@@ -163,9 +169,9 @@ function SignUp() {
           </button>
         </div>
 
-        <p className="mt-6 text-center text-[12px] text-[#80868B]">
+        <p className="mt-6 text-center text-[12px] text-zinc-500">
           Already have an account?{" "}
-          <Link to="/leads-signin" className="text-[#1A73E8] hover:underline">
+          <Link to="/leads-signin" className="font-medium text-zinc-900 underline underline-offset-2 hover:text-zinc-700">
             Sign in
           </Link>
         </p>
