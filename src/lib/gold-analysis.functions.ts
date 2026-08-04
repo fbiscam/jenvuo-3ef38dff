@@ -1975,23 +1975,10 @@ export async function computeSignalPlan(
     // ---- WISDOM: compute regime BEFORE AI so narration can reference it ----
     const marketRegime = detectMarketRegime(ltf);
 
-    // ---- PRE-FLIGHT GATE: skip AI entirely when a real setup is impossible.
-    // This saves Lovable AI credits on every "no setup" scan — no tokens burnt.
-    // Skip when: regime is unfavorable (choppy/ranging) AND outside every
-    // killzone AND no high-impact USD news is imminent (news creates its own
-    // volatility even in dead sessions).
-    const outsideKillzone = killzone === "Outside killzone" || killzone === "-" || !killzone;
-    const unfavorableTape = !marketRegime.favorable;
-    const noNewsDriver = !imminentHigh;
-    if (unfavorableTape && outsideKillzone && noNewsDriver) {
-      return buildFeedFallbackPlan({
-        inst,
-        price: last.c,
-        htfRaw: htf,
-        ltfRaw: ltf,
-        reason: `Tape is ${marketRegime.regime} and no killzone is active — waiting for a cleaner window before spending a scan.`,
-      });
-    }
+    // Do not stop analysis merely because the current tape is outside a
+    // killzone. Auto alerts are intentionally 24/7; market regime remains a
+    // scored quality factor and can lower confidence below the broadcast
+    // threshold, but it must not force every otherwise-valid setup to WAIT.
 
 
     const system = `You are Jenvu — an elite institutional trader with 25+ years on bank/prop desks. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
