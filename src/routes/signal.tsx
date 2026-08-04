@@ -339,8 +339,8 @@ function SignalPage() {
   const feedScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!authLoading && !authUser) navigate({ to: "/auth", replace: true });
-  }, [authLoading, authUser, navigate]);
+    if (!authLoading && !rawUser) navigate({ to: "/auth", replace: true });
+  }, [authLoading, rawUser, navigate]);
 
   // ---------- Killzone warning popup ----------
   const [kzDismissed, setKzDismissed] = useState<boolean | null>(null);
