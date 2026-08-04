@@ -23,6 +23,16 @@ type Row = Awaited<ReturnType<typeof opsListLeadsAccounts>>[number];
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
+function opsToken(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  const fromUrl = new URLSearchParams(window.location.search).get("t");
+  if (fromUrl) {
+    try { window.sessionStorage.setItem("jenvu_ops_token", fromUrl); } catch { /* ignore */ }
+    return fromUrl;
+  }
+  try { return window.sessionStorage.getItem("jenvu_ops_token") ?? undefined; } catch { return undefined; }
+}
+
 function LeadsCredits() {
   const list = useServerFn(opsListLeadsAccounts);
   const adjust = useServerFn(opsAdjustLeadsCredits);
@@ -36,7 +46,7 @@ function LeadsCredits() {
 
   async function load() {
     try {
-      const data = await list();
+      const data = await list({ data: { token: opsToken() } });
       setRows(data);
       setError(null);
     } catch (e: any) {
@@ -58,7 +68,7 @@ function LeadsCredits() {
     }
     setBusy(userId);
     try {
-      const res = await adjust({ data: { userId, mode, amount } });
+      const res = await adjust({ data: { userId, mode, amount, token: opsToken() } });
       toast.success(mode === "add" ? `Added ${amount} credits` : `Limit set to ${res.limit}`);
       setAmounts((p) => ({ ...p, [userId]: "" }));
       await load();
@@ -72,7 +82,7 @@ function LeadsCredits() {
   async function toggleDisabled(row: Row) {
     setBusy(row.user_id);
     try {
-      await setDisabled({ data: { userId: row.user_id, disabled: !row.is_disabled } });
+      await setDisabled({ data: { userId: row.user_id, disabled: !row.is_disabled, token: opsToken() } });
       await load();
     } catch (e: any) {
       toast.error(String(e?.message ?? "Update failed."));
