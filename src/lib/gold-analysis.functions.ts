@@ -1975,23 +1975,10 @@ export async function computeSignalPlan(
     // ---- WISDOM: compute regime BEFORE AI so narration can reference it ----
     const marketRegime = detectMarketRegime(ltf);
 
-    // ---- PRE-FLIGHT GATE: skip AI entirely when a real setup is impossible.
-    // This saves Lovable AI credits on every "no setup" scan — no tokens burnt.
-    // Skip when: regime is unfavorable (choppy/ranging) AND outside every
-    // killzone AND no high-impact USD news is imminent (news creates its own
-    // volatility even in dead sessions).
-    const outsideKillzone = killzone === "Outside killzone" || killzone === "-" || !killzone;
-    const unfavorableTape = !marketRegime.favorable;
-    const noNewsDriver = !imminentHigh;
-    if (unfavorableTape && outsideKillzone && noNewsDriver) {
-      return buildFeedFallbackPlan({
-        inst,
-        price: last.c,
-        htfRaw: htf,
-        ltfRaw: ltf,
-        reason: `Tape is ${marketRegime.regime} and no killzone is active — waiting for a cleaner window before spending a scan.`,
-      });
-    }
+    // Do not stop analysis merely because the current tape is outside a
+    // killzone. Auto alerts are intentionally 24/7; market regime remains a
+    // scored quality factor and can lower confidence below the broadcast
+    // threshold, but it must not force every otherwise-valid setup to WAIT.
 
 
     const system = `You are Jenvu — an elite institutional trader with 25+ years on bank/prop desks. You operate at master level in ICT (Inner Circle Trader) and SMC (Smart Money Concepts):
@@ -2396,8 +2383,14 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         (zoneReactionConfirmed ? 1 : 0) +
         (opposingSweep ? 1 : 0) +
         (displacementConfirms ? 1 : 0);
-      // A pending LIMIT retracement is the riskiest shape — it needs 2 signs of life.
-      const needed = built.entryType === "LIMIT" ? 2 : 1;
+      // One objective short-term confirmation is enough to keep a nearby LIMIT
+      // setup visible. Requiring two independent confirmations here made the
+      // gate practically impossible to pass before the zone was tapped: the
+      // reaction signal cannot exist yet by definition, so valid displacement
+      // or an aligned LTF MSS was being discarded and every pair returned WAIT.
+      // Freshness, HTF alignment, confidence, two-hit confirmation and live
+      // re-quote gates still run before an auto alert can be broadcast.
+      const needed = 1;
 
       if (confirmations < needed) {
         executionVetoReason = built.entryType === "LIMIT"
@@ -2539,7 +2532,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // is above SENIOR_REVIEW_MIN_RULE_SCORE (62). Failure soft-fails — the
     // rules result still stands so a throttled AI provider never drops a signal.
     __requiresSeniorReview =
-      built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
+      __planAllowsSenior &&
+      built.direction !== "WAIT" &&
+      setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
 
     if (__requiresSeniorReview) {
       try {
