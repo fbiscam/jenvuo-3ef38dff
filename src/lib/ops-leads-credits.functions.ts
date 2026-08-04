@@ -2,20 +2,22 @@
 // Gated purely on the ops-console session cookie (no Supabase auth needed).
 
 import { createServerFn } from "@tanstack/react-start";
-import { isOpsUnlocked } from "./admin-guard.server";
+import { isOpsUnlockedOrToken } from "./admin-guard.server";
 
 async function db() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return supabaseAdmin as any;
 }
 
-async function gate() {
-  const ok = await isOpsUnlocked();
+async function gate(token?: string) {
+  const ok = await isOpsUnlockedOrToken(token);
   if (!ok) throw new Error("Locked");
 }
 
-export const opsListLeadsAccounts = createServerFn({ method: "GET" }).handler(async () => {
-  await gate();
+export const opsListLeadsAccounts = createServerFn({ method: "POST" })
+  .inputValidator((i?: { token?: string }) => ({ token: i?.token ? String(i.token) : undefined }))
+  .handler(async ({ data }) => {
+  await gate(data.token);
   const sb = await db();
   const { data: profiles } = await sb
     .from("lg_profiles")
@@ -55,17 +57,18 @@ export const opsListLeadsAccounts = createServerFn({ method: "GET" }).handler(as
 });
 
 export const opsAdjustLeadsCredits = createServerFn({ method: "POST" })
-  .inputValidator((i: { userId: string; mode: "add" | "set"; amount: number }) => {
+  .inputValidator((i: { userId: string; mode: "add" | "set"; amount: number; token?: string }) => {
     const amount = Number(i?.amount);
     if (!Number.isFinite(amount)) throw new Error("Enter a valid amount.");
     return {
       userId: String(i?.userId ?? ""),
       mode: i?.mode === "set" ? ("set" as const) : ("add" as const),
       amount: Math.max(-100000, Math.min(100000, amount)),
+      token: i?.token ? String(i.token) : undefined,
     };
   })
   .handler(async ({ data }) => {
-    await gate();
+    await gate(data.token);
     const sb = await db();
     const { data: profile, error: readErr } = await sb
       .from("lg_profiles")
@@ -88,12 +91,13 @@ export const opsAdjustLeadsCredits = createServerFn({ method: "POST" })
   });
 
 export const opsSetLeadsAccountDisabled = createServerFn({ method: "POST" })
-  .inputValidator((i: { userId: string; disabled: boolean }) => ({
+  .inputValidator((i: { userId: string; disabled: boolean; token?: string }) => ({
     userId: String(i?.userId ?? ""),
     disabled: !!i?.disabled,
+    token: i?.token ? String(i.token) : undefined,
   }))
   .handler(async ({ data }) => {
-    await gate();
+    await gate(data.token);
     const sb = await db();
     const { error } = await sb
       .from("lg_profiles")

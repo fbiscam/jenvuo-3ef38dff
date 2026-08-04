@@ -45,3 +45,50 @@ export async function isAdminOrOpsUnlocked(
   }
   return await isOpsUnlocked();
 }
+
+/* ---------- Signed ops token (cookie-less fallback) ---------- */
+
+function toB64Url(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function fromB64Url(value: string): Uint8Array {
+  const padded = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+  return Uint8Array.from(atob(padded), (c) => c.charCodeAt(0));
+}
+
+async function signPayload(payload: string, secret: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
+  return toB64Url(new Uint8Array(sig));
+}
+
+/** Verifies the HMAC ops token issued by opsUnlock (sessionStorage fallback). */
+export async function verifyOpsToken(token: string | undefined): Promise<boolean> {
+  const secret = process.env.OPS_CONSOLE_SESSION_SECRET;
+  if (!token || !secret || !token.includes(".")) return false;
+  const [payload, sig] = token.split(".");
+  if (!payload || !sig) return false;
+  const expected = await signPayload(payload, secret);
+  if (sig !== expected) return false;
+  try {
+    const data = JSON.parse(new TextDecoder().decode(fromB64Url(payload))) as { exp?: number };
+    return typeof data.exp === "number" && data.exp > Date.now();
+  } catch {
+    return false;
+  }
+}
+
+/** True when the ops cookie is unlocked OR a valid ops token is presented. */
+export async function isOpsUnlockedOrToken(token?: string): Promise<boolean> {
+  if (await isOpsUnlocked()) return true;
+  return await verifyOpsToken(token);
+}

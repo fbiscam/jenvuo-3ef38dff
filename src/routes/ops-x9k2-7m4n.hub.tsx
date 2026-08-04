@@ -208,7 +208,11 @@ function OpsHub() {
             </div>
             <iframe
               key={active.key}
-              src={`${active.to}${active.to.includes("?") ? "&" : "?"}embed=1`}
+              src={`${active.to}${active.to.includes("?") ? "&" : "?"}embed=1${
+                typeof window !== "undefined" && window.sessionStorage.getItem("jenvu_ops_token")
+                  ? `&t=${encodeURIComponent(window.sessionStorage.getItem("jenvu_ops_token") as string)}`
+                  : ""
+              }`}
               title={active.title}
               className="h-full w-full flex-1 bg-white"
             />
