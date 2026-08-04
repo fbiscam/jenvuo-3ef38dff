@@ -2396,8 +2396,14 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         (zoneReactionConfirmed ? 1 : 0) +
         (opposingSweep ? 1 : 0) +
         (displacementConfirms ? 1 : 0);
-      // A pending LIMIT retracement is the riskiest shape — it needs 2 signs of life.
-      const needed = built.entryType === "LIMIT" ? 2 : 1;
+      // One objective short-term confirmation is enough to keep a nearby LIMIT
+      // setup visible. Requiring two independent confirmations here made the
+      // gate practically impossible to pass before the zone was tapped: the
+      // reaction signal cannot exist yet by definition, so valid displacement
+      // or an aligned LTF MSS was being discarded and every pair returned WAIT.
+      // Freshness, HTF alignment, confidence, two-hit confirmation and live
+      // re-quote gates still run before an auto alert can be broadcast.
+      const needed = 1;
 
       if (confirmations < needed) {
         executionVetoReason = built.entryType === "LIMIT"
@@ -2539,7 +2545,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // is above SENIOR_REVIEW_MIN_RULE_SCORE (62). Failure soft-fails — the
     // rules result still stands so a throttled AI provider never drops a signal.
     __requiresSeniorReview =
-      built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
+      __planAllowsSenior &&
+      built.direction !== "WAIT" &&
+      setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
 
     if (__requiresSeniorReview) {
       try {

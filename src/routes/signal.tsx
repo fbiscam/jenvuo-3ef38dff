@@ -501,22 +501,6 @@ function SignalPage() {
     if (activeScanRef.current === sym) return;
     // Free plan removed — all authenticated users are on a paid plan and can scan any XAU pair.
 
-    // Wallet state must be known before we decide anything. Previously a slow
-    // credit-state fetch skipped the pre-flight, the server-side spend then
-    // returned ok:false, and the scan died with no visible feedback — that is
-    // the "kisi account par scan hota hi nahi" report.
-    if (credits.isLoading) {
-      toast.info("Loading your account…", { description: "One moment, then press Analyze again." });
-      return;
-    }
-    // Pre-flight: block the scan if wallet is below the flat $0.20 per-signal charge.
-    if (credits.balance < 0.20) {
-      toast.error("Balance too low to run analysis", {
-        description: `Low balance — add funds to continue.`,
-        action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
-      });
-      return;
-    }
     activeScanRef.current = sym;
     setLoading(true);
     setAnalysisError(null);
@@ -524,12 +508,6 @@ function SignalPage() {
     speech.stopSpeaking();
     try {
       const scanId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
-      const ok = await credits.spend("signal", { symbol: sym, scanId, caller: "signal.tsx:load" });
-      if (!ok) {
-        setAnalysisError("Scan could not start — check the message above and try again.");
-        setLoading(false);
-        return;
-      }
       const result = await fetchPlan({ data: { symbol: sym, scanId, force: true } });
       if (!result.ok) {
         setPlan(null);
