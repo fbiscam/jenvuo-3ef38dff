@@ -46,70 +46,87 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
       className="lg-console flex min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
       style={{ fontFamily: JENVU_SANS }}
     >
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-zinc-200 bg-white md:flex">
-        <div className="flex h-14 items-center gap-2.5 border-b border-zinc-100 px-4">
-          <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
-          <span className="text-[17px] leading-none tracking-tight text-[#3c4043]" style={{ fontWeight: 500 }}>
-            Jenvu <span className="text-zinc-400">Leads</span>
+      <aside
+        className="leads-sidebar-root hidden w-[200px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex"
+        style={{ fontFamily: JENVU_SANS, fontWeight: 400 }}
+      >
+        {/* Brand */}
+        <div className="flex h-11 shrink-0 items-center gap-2.5 px-4">
+          <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
+          <span
+            className="truncate text-[22px] leading-none tracking-tight"
+            style={{ color: "#3c4043", fontWeight: 500 }}
+          >
+            Jenvu
           </span>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-2">
-          {NAV.map((item) => {
-            const active = isActive(item.to, item.exact);
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`mx-2 mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition ${
-                  active
-                    ? "bg-zinc-100 font-medium text-zinc-900"
-                    : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
-                }`}
-              >
-                <item.icon className="h-4 w-4" strokeWidth={active ? 2.2 : 1.8} />
-                {item.label}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-2 py-2">
+          <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
+            LEADS
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {NAV.map((item) => {
+              const active = isActive(item.to, item.exact);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`group relative flex items-center gap-3 rounded-full px-2.5 py-1.5 text-[12.5px] font-medium transition ${
+                    active
+                      ? "bg-zinc-100 font-semibold text-zinc-900"
+                      : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"
+                  }`}
+                >
+                  <item.icon
+                    className="h-[19px] w-[19px] shrink-0"
+                    strokeWidth={active ? 2.1 : 1.7}
+                    style={{ color: active ? "#18181b" : "#5E5E5E" }}
+                  />
+                  <span className="truncate">{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
 
           {me?.is_admin && (
-            <>
-              <div className={`mt-4 px-4 pb-1 text-[10px] uppercase tracking-[0.14em] text-zinc-400 ${MONO}`}>
-                Admin
+            <div className="mt-2 border-t border-zinc-200 pt-3">
+              <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
+                ADMIN
               </div>
               <Link
                 to="/leads/admin/users"
-                className={`mx-2 flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition ${
+                className={`flex items-center gap-3 rounded-full px-2.5 py-1.5 text-[12.5px] font-medium transition ${
                   isActive("/leads/admin")
-                    ? "bg-zinc-100 font-medium text-zinc-900"
-                    : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                    ? "bg-zinc-100 font-semibold text-zinc-900"
+                    : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"
                 }`}
               >
-                <Shield className="h-4 w-4" strokeWidth={1.8} />
-                Users
+                <Shield className="h-[19px] w-[19px] shrink-0" strokeWidth={1.7} />
+                <span className="truncate">Users</span>
               </Link>
-            </>
+            </div>
           )}
         </nav>
 
         {me && (
-          <div className="border-t border-zinc-100 p-4">
-            <div className="flex items-baseline justify-between text-[12px] text-zinc-500">
+          <div className="mt-auto shrink-0 border-t border-zinc-200 bg-white px-3 py-3">
+            <div className="flex items-baseline justify-between text-[11.5px] text-zinc-500">
               <span>Credits</span>
-              <span className={`${MONO} text-[12px] font-medium text-zinc-900`}>
+              <span className={`${MONO} text-[11.5px] font-medium text-zinc-900`}>
                 {me.credits.remaining.toFixed(2)} left
               </span>
             </div>
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
               <div className="h-full rounded-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
             </div>
-            <div className="mt-1.5 text-[11px] text-zinc-400">
+            <div className="mt-1.5 text-[10.5px] text-zinc-400">
               {me.credits.used.toFixed(2)} of {me.credits.monthly_limit.toFixed(0)} used this month
             </div>
           </div>
         )}
       </aside>
+
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-100 bg-white/85 px-4 backdrop-blur-md md:px-6">
