@@ -69,7 +69,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`group relative flex items-center gap-3 rounded-full px-2.5 py-1.5 text-[12.5px] font-medium transition ${
+                  className={`group relative flex items-center gap-3 rounded-full px-2.5 py-1.5 text-[13.5px] font-medium transition ${
                     active
                       ? "bg-zinc-100 font-semibold text-zinc-900"
                       : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"
@@ -93,7 +93,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
               </div>
               <Link
                 to="/leads/admin/users"
-                className={`flex items-center gap-3 rounded-full px-2.5 py-1.5 text-[12.5px] font-medium transition ${
+                className={`flex items-center gap-3 rounded-full px-2.5 py-1.5 text-[13.5px] font-medium transition ${
                   isActive("/leads/admin")
                     ? "bg-zinc-100 font-semibold text-zinc-900"
                     : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"
