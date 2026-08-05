@@ -325,8 +325,10 @@
 @media (min-width: 1280px) { .founding-zoom { zoom: 1.28; } }
 @media (min-width: 1500px) { .founding-zoom { zoom: 1.44; } }
 
-/* Jenvu Leads landing page — 20% larger on desktop widths */
-@media (min-width: 1024px) { .leads-landing-zoom { zoom: 1.2; } }
+/* Jenvu Leads page — 10x zoom on desktop widths */
+@media (min-width: 1024px) { .leads-landing-zoom, .leads-shell-zoom { zoom: 10; } }
+@media (min-width: 1280px) { .leads-landing-zoom, .leads-shell-zoom { zoom: 10; } }
+@media (min-width: 1500px) { .leads-landing-zoom, .leads-shell-zoom { zoom: 10; } }
 
 
 @utility no-scrollbar {
