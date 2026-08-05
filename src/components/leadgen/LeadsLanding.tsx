@@ -73,7 +73,7 @@ export function LeadsLanding() {
               className="truncate text-[22px] leading-none tracking-tight text-[#3c4043]"
               style={{ fontWeight: 500 }}
             >
-              Jenvu <span className="text-zinc-400">Leads</span>
+              Jenvu <span className="text-zinc-900">Leads</span>
             </span>
           </Link>
           <div className="flex items-center gap-2">
