@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin, Users, Globe, Upload } from "lucide-react";
 import { getOverview } from "@/lib/leadgen/core.functions";
-import { Card, PageHeader } from "@/components/leadgen/LeadsShell";
+import { Card } from "@/components/leadgen/LeadsShell";
 import { LeadsLanding } from "@/components/leadgen/LeadsLanding";
 
 export const Route = createFileRoute("/leads/")({
