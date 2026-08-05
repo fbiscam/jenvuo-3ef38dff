@@ -61,7 +61,7 @@ const PLAN_POINTS = [
 export function LeadsLanding() {
   return (
     <div
-      className="leads-landing-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
+      className="min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
       style={{ fontFamily: JENVU_SANS }}
     >
       {/* NAV */}
