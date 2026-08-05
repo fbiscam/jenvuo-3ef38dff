@@ -62,9 +62,6 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
         </div>
 
         <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-2 py-2">
-          <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
-            LEADS
-          </div>
           <div className="flex flex-col gap-1.5">
             {NAV.map((item) => {
               const active = isActive(item.to, item.exact);
