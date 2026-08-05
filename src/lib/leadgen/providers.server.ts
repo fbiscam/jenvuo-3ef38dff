@@ -54,7 +54,7 @@ export async function mapsSearch(query: string, max: number): Promise<LeadInput[
   let pageToken: string | undefined
 
   while (out.length < max) {
-    const res = await fetch(`${GATEWAY}/google_maps/v1/places:searchText`, {
+    const res = await fetch(`${GATEWAY}/google_maps/places/v1/places:searchText`, {
       method: 'POST',
       headers: {
         ...gatewayHeaders(key),
