@@ -60,8 +60,6 @@ function Overview() {
 
   return (
     <>
-      <PageHeader title="Overview" description="Your credits, leads and recent lists." />
-
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Stat
           label="Credits remaining"
