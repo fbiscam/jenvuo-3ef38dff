@@ -85,7 +85,7 @@ function MapsSearch() {
             <div>
               <label className={labelCls}>Leads</label>
               <select
-                className={inputCls}
+                className={`${inputCls} appearance-none bg-[url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")] bg-[length:1rem] bg-[right_0.75rem_center] bg-no-repeat pr-8`}
                 value={max}
                 onChange={(e) => setMax(Number(e.target.value))}
               >
