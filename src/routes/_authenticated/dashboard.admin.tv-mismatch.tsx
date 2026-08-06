@@ -89,7 +89,7 @@ function TvMismatchPage() {
   }
 
   return (
-    <div className="min-h-full bg-white p-6" style={{ fontFamily: '"Google Sans", "Google Sans Text", system-ui, sans-serif' }}>
+    <div className="min-h-full bg-[#FAFAFA] p-6" style={{ fontFamily: '"Google Sans", "Google Sans Text", system-ui, sans-serif' }}>
       <div className="mx-auto max-w-5xl">
         <div className="mb-6 flex items-center justify-between">
           <div>

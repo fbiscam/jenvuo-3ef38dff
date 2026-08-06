@@ -214,7 +214,7 @@ function AdminFoundingPage() {
   );
 
   return (
-    <div className="-m-6 min-h-[calc(100vh-4rem)] bg-white p-6 text-zinc-900">
+    <div className="-m-6 min-h-[calc(100vh-4rem)] bg-[#FAFAFA] p-6 text-zinc-900">
       {/* Header */}
       <div className="mx-auto max-w-6xl">
         <div className="flex items-center justify-between gap-3 flex-wrap">
