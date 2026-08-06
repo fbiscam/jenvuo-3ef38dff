@@ -43,7 +43,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
 
   return (
     <div
-      className="lg-console flex min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
+      className="lg-console leads-shell-zoom flex min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
       style={{ fontFamily: JENVU_SANS }}
     >
       <aside
