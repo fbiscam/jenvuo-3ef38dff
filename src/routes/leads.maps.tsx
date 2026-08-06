@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { searchMaps } from "@/lib/leadgen/search.functions";
 import type { LeadInput } from "@/lib/leadgen/shared";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/leads/maps")({
 });
 
 function MapsSearch() {
+  const qc = useQueryClient();
   const run = useServerFn(searchMaps);
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
@@ -36,6 +38,11 @@ function MapsSearch() {
       setRows(res.results);
       setSearched(true);
       if (res.results.length === 0) toast.info("No businesses matched that search.");
+      else {
+      qc.invalidateQueries({ queryKey: ["lg-me"] });
+      qc.invalidateQueries({ queryKey: ["lg-overview"] });
+      toast.success(`${res.results.length} leads extracted · ${res.remaining.toFixed(2)} credits left`);
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Search failed.");
     } finally {
@@ -47,7 +54,7 @@ function MapsSearch() {
     <>
       <PageHeader
         title="Maps search"
-        description="Browsing is free. Saving a lead costs 0.50 credits."
+        description="0.50 credits per lead extracted. Saving them again is free."
       />
 
       <Card className="mb-5 p-5">

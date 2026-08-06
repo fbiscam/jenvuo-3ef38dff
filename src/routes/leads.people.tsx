@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { searchPeople } from "@/lib/leadgen/search.functions";
 import type { LeadInput } from "@/lib/leadgen/shared";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/leads/people")({
 });
 
 function PeopleSearch() {
+  const qc = useQueryClient();
   const run = useServerFn(searchPeople);
   const [f, setF] = useState({ name: "", title: "", company: "", domain: "" });
   const [rows, setRows] = useState<LeadInput[]>([]);
@@ -35,6 +37,11 @@ function PeopleSearch() {
       const res = await run({ data: { ...f, page: 1 } });
       setRows(res.results);
       setSearched(true);
+      if (res.results.length > 0) {
+      qc.invalidateQueries({ queryKey: ["lg-me"] });
+      qc.invalidateQueries({ queryKey: ["lg-overview"] });
+      toast.success(`${res.results.length} leads extracted · ${res.remaining.toFixed(2)} credits left`);
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Search failed.");
     } finally {
@@ -46,7 +53,7 @@ function PeopleSearch() {
     <>
       <PageHeader
         title="People search"
-        description="Contacts are revealed when you save them — 0.50 credits per lead."
+        description="0.50 credits per contact extracted. Saving them to a list is free."
       />
 
       <Card className="mb-5 p-5">
