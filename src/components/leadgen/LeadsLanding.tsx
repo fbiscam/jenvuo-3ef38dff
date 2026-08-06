@@ -15,7 +15,7 @@ const FEATURES = [
   {
     icon: MapPin,
     title: "Google Maps search",
-    body: "Pull local businesses by category and city — name, address, phone, website, rating and review count, ready to work.",
+    body: "Pull local businesses by category and city — name, address, phone, website, rating and ready to work.",
   },
   {
     icon: Users,
