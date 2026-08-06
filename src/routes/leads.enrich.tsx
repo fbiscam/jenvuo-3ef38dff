@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { enrichWebsite } from "@/lib/leadgen/search.functions";
 import type { LeadInput } from "@/lib/leadgen/shared";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/leads/enrich")({
 });
 
 function Enrich() {
+  const qc = useQueryClient();
   const run = useServerFn(enrichWebsite);
   const [domain, setDomain] = useState("");
   const [rows, setRows] = useState<LeadInput[]>([]);
@@ -33,6 +35,11 @@ function Enrich() {
       setRows(res.results);
       setPages(res.pages);
       if (res.results.length === 0) toast.info("No contact details found on that site.");
+      else {
+      qc.invalidateQueries({ queryKey: ["lg-me"] });
+      qc.invalidateQueries({ queryKey: ["lg-overview"] });
+      toast.success(`${res.results.length} leads extracted · ${res.remaining.toFixed(2)} credits left`);
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Enrichment failed.");
     } finally {

@@ -2,7 +2,8 @@
 
 import { createServerFn } from '@tanstack/react-start'
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
-import { admin, cached, creditState, logActivity } from './db.server'
+import { admin, cached, creditState, logActivity, charge } from './db.server'
+import { LEAD_CREDIT_COST } from './shared'
 import { mapsSearch, peopleSearch, enrichDomain, providerStatus } from './providers.server'
 import type { LeadInput } from './shared'
 
@@ -35,8 +36,12 @@ export const searchMaps = createServerFn({ method: 'POST' })
       60 * 24,
       () => mapsSearch(query, data.max),
     )
+    const cost = Number((results.length * LEAD_CREDIT_COST).toFixed(2))
+    const left = cost > 0
+      ? await charge(context.userId, 'maps_extract', cost, null, { query, count: results.length })
+      : remaining
     await logActivity(context.userId, 'maps_search', { query, results: results.length })
-    return { results, remaining }
+    return { results, remaining: left }
   })
 
 export const searchPeople = createServerFn({ method: 'POST' })
@@ -61,8 +66,12 @@ export const searchPeople = createServerFn({ method: 'POST' })
     const results = await cached<LeadInput[]>('apollo', key, 60 * 12, () =>
       peopleSearch({ ...data, perPage: 25 }),
     )
+    const cost = Number((results.length * LEAD_CREDIT_COST).toFixed(2))
+    const left = cost > 0
+      ? await charge(context.userId, 'people_extract', cost, null, { ...data, count: results.length })
+      : remaining
     await logActivity(context.userId, 'people_search', { ...data, results: results.length })
-    return { results, remaining }
+    return { results, remaining: left }
   })
 
 export const enrichWebsite = createServerFn({ method: 'POST' })
@@ -99,7 +108,11 @@ export const enrichWebsite = createServerFn({ method: 'POST' })
         socials: found.socials,
       })
     }
-    return { results, socials: found.socials, pages: found.pages, remaining }
+    const cost = Number((results.length * LEAD_CREDIT_COST).toFixed(2))
+    const left = cost > 0
+      ? await charge(context.userId, 'enrich_extract', cost, null, { domain: data.domain, count: results.length })
+      : remaining
+    return { results, socials: found.socials, pages: found.pages, remaining: left }
   })
 
 /** Existing dedupe keys so the import screen can preview duplicates before charging. */

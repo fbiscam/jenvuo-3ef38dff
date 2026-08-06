@@ -1,10 +1,9 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { saveLeads, listLists } from "@/lib/leadgen/core.functions";
 import type { LeadInput } from "@/lib/leadgen/shared";
-import { LEAD_CREDIT_COST } from "@/lib/leadgen/shared";
 import { btnPrimary, inputCls } from "@/components/leadgen/LeadsShell";
 
 export type Column = { key: keyof LeadInput | "socials"; label: string; width?: string };
@@ -28,7 +27,6 @@ export function ResultsTable({
   const [busy, setBusy] = useState(false);
 
   const allSelected = rows.length > 0 && selected.size === rows.length;
-  const cost = useMemo(() => (selected.size * LEAD_CREDIT_COST).toFixed(2), [selected.size]);
 
   const toggle = (i: number) => {
     setSelected((prev) => {
@@ -69,7 +67,7 @@ export function ResultsTable({
       <div className="flex flex-wrap items-center gap-3 border-b border-[#E8EAED] px-4 py-3">
         <span className="text-[13px] text-[#5F6368]">
           {rows.length} result{rows.length === 1 ? "" : "s"}
-          {selected.size > 0 && ` · ${selected.size} selected · ${cost} credits`}
+          {selected.size > 0 && ` · ${selected.size} selected`}
         </span>
         <div className="ml-auto flex items-center gap-2">
           <select

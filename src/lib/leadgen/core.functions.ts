@@ -130,10 +130,14 @@ export const saveLeads = createServerFn({ method: 'POST' })
       return { saved: 0, duplicates: data.leads.length, remaining: (await creditState(context.userId)).remaining }
     }
 
-    const cost = Number((fresh.length * LEAD_CREDIT_COST).toFixed(2))
-    const remaining = await charge(context.userId, 'lead_save', cost, data.listId, {
-      count: fresh.length,
-    })
+    // Provider-sourced leads are already charged the moment they are extracted
+    // (maps/people/enrich search). Only CSV imports are billed here.
+    const billable = fresh.filter((l) => l.source === 'csv').length
+    const cost = Number((billable * LEAD_CREDIT_COST).toFixed(2))
+    const remaining =
+      cost > 0
+        ? await charge(context.userId, 'lead_save', cost, data.listId, { count: billable })
+        : (await creditState(context.userId)).remaining
 
     const { error } = await db.from('lg_leads').insert(
       fresh.map((l) => ({
