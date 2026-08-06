@@ -320,8 +320,8 @@
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
 @media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
 
-/* Jenvu Leads: desktop-only zoom (landing +10x, console +10%) */
-@media (min-width: 1024px) { .leads-landing-zoom { zoom: 10; } }
+/* Jenvu Leads: desktop-only zoom (landing +20%, console +10%) */
+@media (min-width: 1024px) { .leads-landing-zoom { zoom: 1.2; } }
 @media (min-width: 1024px) { .leads-shell-zoom { zoom: 1.1; } }
 
 /* Founding page: no zoom on mobile/tablet; progressive zoom on desktop */
