@@ -48,6 +48,9 @@ const STEPS = [
   "Create your free account and get 50 credits instantly.",
   "Search Maps, people or enrich a website — results are free to browse.",
   "Save only the leads you want. Export to CSV and start outreach.",
+  "Organize saved leads into lists and move them through your pipeline.",
+  "Export clean CSVs and plug them into your CRM or outreach stack.",
+  "Top up credits anytime, or upgrade as your pipeline grows.",
 ];
 
 const PLAN_POINTS = [
