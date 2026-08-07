@@ -33,6 +33,8 @@ export function sectionForHost(hostname: string): string | null {
 function isReserved(pathname: string): boolean {
   return (
     pathname.startsWith("/api/") ||
+    pathname.startsWith("/lovable/") ||
+    pathname.startsWith("/email/unsubscribe") ||
     pathname.startsWith("/_serverFn") ||
     pathname.startsWith("/_build/") ||
     pathname.startsWith("/assets/") ||
