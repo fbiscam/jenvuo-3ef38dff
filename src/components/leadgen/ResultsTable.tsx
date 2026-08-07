@@ -158,11 +158,11 @@ function Cell({ row, field }: { row: LeadInput; field: Column["key"] }) {
         href={href}
         target="_blank"
         rel="noreferrer noopener"
-        className="text-[#1A73E8] hover:underline"
+        className="whitespace-nowrap text-[#1A73E8] hover:underline"
       >
-        {String(value).replace(/^https?:\/\//, "").slice(0, 40)}
+        {String(value).replace(/^https?:\/\//, "")}
       </a>
     );
   }
-  return <span className="line-clamp-2">{String(value)}</span>;
+  return <span className="whitespace-nowrap">{String(value)}</span>;
 }
