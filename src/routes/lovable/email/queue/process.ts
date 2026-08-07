@@ -64,9 +64,9 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LOVABLE_API_KEY
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+        const apiKey = process.env['LOVABLE_API_KEY']
+        const supabaseUrl = import.meta.env['VITE_SUPABASE_URL']
+        const supabaseServiceKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
 
         if (!apiKey || !supabaseUrl || !supabaseServiceKey) {
           console.error('Missing required environment variables')
@@ -221,39 +221,6 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
             }
 
             try {
-              let unsubscribeToken = payload.unsubscribe_token
-              if (!unsubscribeToken && payload.to && typeof payload.to === 'string') {
-                const email = payload.to.toLowerCase().trim()
-                const { data: existingToken } = await supabase
-                  .from('email_unsubscribe_tokens')
-                  .select('token, used_at')
-                  .eq('email', email)
-                  .maybeSingle()
-                if (!existingToken?.used_at) {
-                  if (existingToken?.token) {
-                    unsubscribeToken = existingToken.token
-                  } else {
-                    const bytes = new Uint8Array(32)
-                    crypto.getRandomValues(bytes)
-                    unsubscribeToken = Array.from(bytes)
-                      .map((b) => b.toString(16).padStart(2, '0'))
-                      .join('')
-                    await supabase
-                      .from('email_unsubscribe_tokens')
-                      .upsert({ token: unsubscribeToken, email }, { onConflict: 'email', ignoreDuplicates: true })
-                  }
-                }
-              }
-              // Rotate idempotency key on retries. The provider caches the
-              // first attempt's key and responds with 409 "run_failed / send
-              // again with a new idempotency key" on subsequent sends using
-              // the same key, so retries must use a fresh suffix.
-              const rotatedIdemKey =
-                payload.idempotency_key
-                  ? failedAttempts > 0
-                    ? `${payload.idempotency_key}:r${failedAttempts}`
-                    : payload.idempotency_key
-                  : undefined
               await sendLovableEmail(
                 {
                   run_id: payload.run_id,
@@ -265,11 +232,11 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   text: payload.text,
                   purpose: payload.purpose,
                   label: payload.label,
-                  idempotency_key: rotatedIdemKey,
-                  unsubscribe_token: unsubscribeToken,
+                  idempotency_key: payload.idempotency_key,
+                  unsubscribe_token: payload.unsubscribe_token,
                   message_id: payload.message_id,
                 },
-                { apiKey, sendUrl: process.env.LOVABLE_SEND_URL }
+                { apiKey, sendUrl: process.env['LOVABLE_SEND_URL'] }
               )
 
               // Log success
