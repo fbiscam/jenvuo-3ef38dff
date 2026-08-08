@@ -37,7 +37,7 @@ const PAIR_SPECS: Record<string, PairSpec> = {
   XAUCHF: { fx: "USDCHF=X", op: "mul" },
 };
 
-const EVAL_WINDOW_HOURS = 24;
+
 
 type Candles = { ts: number[]; highs: number[]; lows: number[] };
 
