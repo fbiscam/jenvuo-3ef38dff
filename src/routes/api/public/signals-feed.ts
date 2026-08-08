@@ -63,16 +63,26 @@ export const Route = createFileRoute("/api/public/signals-feed")({
             outcome: t?.outcome ?? "pending",
             realized_r: t?.realized_r ?? null,
             resolved_at: t?.resolved_at ?? null,
+            resolution_method: t?.resolution_method ?? null,
           };
         });
 
-        // Stats
+        // Stats — win rate uses TRUE TP/SL outcomes only. Expired and
+        // never-triggered tickets are reported separately, never as wins.
+        const summary = summarizeAccuracy(signals);
+        const legacy = summarizeAccuracy(
+          signals.filter((s) => s.resolution_method === LEGACY_RESOLUTION_METHOD),
+        );
+        const fullTarget = summarizeAccuracy(
+          signals.filter((s) => s.resolution_method === RESOLUTION_METHOD),
+        );
         const resolved = signals.filter((s) => s.outcome === "win" || s.outcome === "loss");
-        const wins = resolved.filter((s) => s.outcome === "win").length;
-        const losses = resolved.filter((s) => s.outcome === "loss").length;
-        const winRate = resolved.length > 0 ? (wins / resolved.length) * 100 : 0;
-        const rSum = resolved.reduce((s, x) => s + (Number(x.realized_r) || 0), 0);
-        const avgR = resolved.length > 0 ? rSum / resolved.length : 0;
+        const wins = summary.wins;
+        const losses = summary.losses;
+        const winRate = summary.win_rate;
+        const rSum = summary.total_r;
+        const avgR = summary.avg_r;
+
 
         // Streak (most recent resolved run)
         let streak = 0; let streakKind: "win" | "loss" | null = null;
