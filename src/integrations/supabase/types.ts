@@ -161,6 +161,51 @@ export type Database = {
         }
         Relationships: []
       }
+      auto_scan_runs: {
+        Row: {
+          broadcast_alert_id: string | null
+          broadcast_pair: string | null
+          created_at: string
+          duration_ms: number | null
+          error: string | null
+          finished_at: string | null
+          id: string
+          mode: string
+          pairs_checked: string[]
+          results: Json
+          skip_reason: string | null
+          started_at: string
+        }
+        Insert: {
+          broadcast_alert_id?: string | null
+          broadcast_pair?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          mode?: string
+          pairs_checked?: string[]
+          results?: Json
+          skip_reason?: string | null
+          started_at?: string
+        }
+        Update: {
+          broadcast_alert_id?: string | null
+          broadcast_pair?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          mode?: string
+          pairs_checked?: string[]
+          results?: Json
+          skip_reason?: string | null
+          started_at?: string
+        }
+        Relationships: []
+      }
       auto_scan_state: {
         Row: {
           direction: string
@@ -2153,6 +2198,7 @@ export type Database = {
           outcome: string | null
           pair: string
           realized_r: number | null
+          resolution_method: string | null
           resolved_at: string | null
           reversal_notified_at: string | null
           rr: number | null
@@ -2178,6 +2224,7 @@ export type Database = {
           outcome?: string | null
           pair: string
           realized_r?: number | null
+          resolution_method?: string | null
           resolved_at?: string | null
           reversal_notified_at?: string | null
           rr?: number | null
@@ -2203,6 +2250,7 @@ export type Database = {
           outcome?: string | null
           pair?: string
           realized_r?: number | null
+          resolution_method?: string | null
           resolved_at?: string | null
           reversal_notified_at?: string | null
           rr?: number | null
