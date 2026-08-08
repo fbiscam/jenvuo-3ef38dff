@@ -1,4 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import {
+  summarizeAccuracy,
+  RESOLUTION_METHOD,
+  LEGACY_RESOLUTION_METHOD,
+} from "@/lib/signals/outcome-resolver";
+
 
 // Public read-only feed of recent auto-scan signals with paper-trade outcomes.
 // No auth required. Uses supabaseAdmin because signal_alerts is gated to paid users.
@@ -24,7 +30,7 @@ export const Route = createFileRoute("/api/public/signals-feed")({
             .limit(limit),
           supabaseAdmin
             .from("signal_paper_trades")
-            .select("broadcast_alert_id, outcome, realized_r, resolved_at")
+            .select("broadcast_alert_id, outcome, realized_r, resolved_at, resolution_method")
             .gte("fired_at", since),
         ]);
 
@@ -35,12 +41,14 @@ export const Route = createFileRoute("/api/public/signals-feed")({
           });
         }
 
-        const tradeMap = new Map<string, { outcome: string | null; realized_r: number | null; resolved_at: string | null }>();
+        const tradeMap = new Map<string, { outcome: string | null; realized_r: number | null; resolved_at: string | null; resolution_method: string | null }>();
         for (const t of tradesRes.data ?? []) {
           if (t.broadcast_alert_id) tradeMap.set(t.broadcast_alert_id, {
             outcome: t.outcome, realized_r: t.realized_r, resolved_at: t.resolved_at,
+            resolution_method: (t as { resolution_method?: string | null }).resolution_method ?? null,
           });
         }
+
 
         const signals = (alertsRes.data ?? []).map((a) => {
           const t = tradeMap.get(a.id);
@@ -61,16 +69,26 @@ export const Route = createFileRoute("/api/public/signals-feed")({
             outcome: t?.outcome ?? "pending",
             realized_r: t?.realized_r ?? null,
             resolved_at: t?.resolved_at ?? null,
+            resolution_method: t?.resolution_method ?? null,
           };
         });
 
-        // Stats
+        // Stats — win rate uses TRUE TP/SL outcomes only. Expired and
+        // never-triggered tickets are reported separately, never as wins.
+        const summary = summarizeAccuracy(signals);
+        const legacy = summarizeAccuracy(
+          signals.filter((s) => s.resolution_method === LEGACY_RESOLUTION_METHOD),
+        );
+        const fullTarget = summarizeAccuracy(
+          signals.filter((s) => s.resolution_method === RESOLUTION_METHOD),
+        );
         const resolved = signals.filter((s) => s.outcome === "win" || s.outcome === "loss");
-        const wins = resolved.filter((s) => s.outcome === "win").length;
-        const losses = resolved.filter((s) => s.outcome === "loss").length;
-        const winRate = resolved.length > 0 ? (wins / resolved.length) * 100 : 0;
-        const rSum = resolved.reduce((s, x) => s + (Number(x.realized_r) || 0), 0);
-        const avgR = resolved.length > 0 ? rSum / resolved.length : 0;
+        const wins = summary.wins;
+        const losses = summary.losses;
+        const winRate = summary.win_rate;
+        const rSum = summary.total_r;
+        const avgR = summary.avg_r;
+
 
         // Streak (most recent resolved run)
         let streak = 0; let streakKind: "win" | "loss" | null = null;
@@ -117,13 +135,24 @@ export const Route = createFileRoute("/api/public/signals-feed")({
           stats: {
             total: signals.length,
             resolved: resolved.length,
-            pending: signals.length - resolved.length,
+            pending: summary.pending,
+            expired: summary.expired,
+            not_triggered: summary.not_triggered,
             wins, losses,
             win_rate: Number(winRate.toFixed(2)),
             avg_r: Number(avgR.toFixed(2)),
             total_r: Number(rSum.toFixed(2)),
             streak, streak_kind: streakKind,
           },
+          // Old +0.20R partial-target results are reported separately from
+          // results resolved against the real TP/SL.
+          methodology: {
+            current: RESOLUTION_METHOD,
+            legacy_method: LEGACY_RESOLUTION_METHOD,
+            legacy: legacy,
+            full_target: fullTarget,
+          },
+
           by_pair: byPair,
           by_session: bySession,
         }), {

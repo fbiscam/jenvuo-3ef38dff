@@ -1,4 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import {
+  resolveTradeOutcome,
+  EVAL_WINDOW_HOURS,
+} from "@/lib/signals/outcome-resolver";
+
 
 // Resolves pending paper trades by fetching post-signal price history
 // from Yahoo Finance and marking win / loss / timeout.
@@ -32,7 +37,7 @@ const PAIR_SPECS: Record<string, PairSpec> = {
   XAUCHF: { fx: "USDCHF=X", op: "mul" },
 };
 
-const EVAL_WINDOW_HOURS = 24;
+
 
 type Candles = { ts: number[]; highs: number[]; lows: number[] };
 
@@ -244,87 +249,43 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
               continue;
             }
 
-            const entry = Number(t.entry);
-            const sl = Number(t.sl);
-            const riskDist = Math.abs(entry - sl);
-            const isBuy = t.direction === "BUY";
+            const candles = highs.map((h, i) => ({ high: h, low: lows[i] }));
+            const res = resolveTradeOutcome({
+              direction: t.direction,
+              entry: Number(t.entry),
+              sl: Number(t.sl),
+              tp: Number(t.tp),
+              candles,
+              ageHours: ageH,
+              evalWindowHours: EVAL_WINDOW_HOURS,
+            });
 
-            let outcome: "win" | "loss" | "timeout" | "cancelled" = "timeout";
-            let realizedR = 0;
-            let bestExcursion = 0; // in R units
-            let entryHit = false;
-            const tol = Math.max(riskDist * 0.02, entry * 0.00005);
-
-            for (let i = 0; i < highs.length; i++) {
-              const hi = highs[i];
-              const lo = lows[i];
-              // Wait until the limit entry is actually touched before
-              // tracking SL/TP — otherwise a reversal that never reaches
-              // entry gets wrongly labelled as a loss.
-              if (!entryHit) {
-                if (isBuy && lo <= entry + tol) entryHit = true;
-                else if (!isBuy && hi >= entry - tol) entryHit = true;
-                if (!entryHit) continue;
-              }
-              // Small-account model: for a $20 reference balance, mark a win
-              // once the move reaches +20% profit-equivalent. We evaluate this
-              // before final TP so the public page shows win/loss as soon as
-              // the realistic small-account target is achieved.
-              const WIN_R = 0.2;
-              if (isBuy) {
-                if (lo <= sl) {
-                  outcome = "loss";
-                  realizedR = -1;
-                  break;
-                }
-                const excR = (hi - entry) / (riskDist || 1);
-                if (excR > bestExcursion) bestExcursion = excR;
-                if (excR >= WIN_R) {
-                  outcome = "win";
-                  realizedR = WIN_R;
-                  break;
-                }
-              } else {
-                if (hi >= sl) {
-                  outcome = "loss";
-                  realizedR = -1;
-                  break;
-                }
-                const excR = (entry - lo) / (riskDist || 1);
-                if (excR > bestExcursion) bestExcursion = excR;
-                if (excR >= WIN_R) {
-                  outcome = "win";
-                  realizedR = WIN_R;
-                  break;
-                }
-              }
-            }
-
-            // Window elapsed without a decisive hit
-            if (outcome === "timeout") {
-              if (ageH < EVAL_WINDOW_HOURS) {
-                results.push({ id: t.id, action: "still_open" });
-                continue;
-              }
-              if (!entryHit) {
-                // Limit price never touched — not a win/loss
-                outcome = "cancelled";
-                realizedR = 0;
-              } else {
-                realizedR = Math.max(-1, Math.min(1, bestExcursion));
-              }
+            if (res.outcome === "pending") {
+              results.push({ id: t.id, action: "still_open", reason: res.reason });
+              continue;
             }
 
             await supabaseAdmin
               .from("signal_paper_trades")
               .update({
-                outcome,
-                realized_r: Number(realizedR.toFixed(3)),
+                outcome: res.outcome,
+                realized_r: res.realizedR === null ? null : Number(res.realizedR.toFixed(3)),
                 resolved_at: new Date().toISOString(),
+                resolution_method: res.method,
               })
-              .eq("id", t.id);
+              .eq("id", t.id)
+              // Single-writer guard: never overwrite a row another resolver
+              // already closed.
+              .eq("outcome", "pending");
             resolved++;
-            results.push({ id: t.id, action: "resolved", outcome, r: realizedR });
+            results.push({
+              id: t.id,
+              action: "resolved",
+              outcome: res.outcome,
+              r: res.realizedR,
+              reason: res.reason,
+            });
+
           } catch (e) {
             results.push({
               id: t.id,
