@@ -1,4 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import {
+  resolveTradeOutcome,
+  EVAL_WINDOW_HOURS,
+} from "@/lib/signals/outcome-resolver";
+
 
 // Resolves pending paper trades by fetching post-signal price history
 // from Yahoo Finance and marking win / loss / timeout.
