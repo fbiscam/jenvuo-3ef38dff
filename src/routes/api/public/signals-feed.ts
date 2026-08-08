@@ -135,13 +135,24 @@ export const Route = createFileRoute("/api/public/signals-feed")({
           stats: {
             total: signals.length,
             resolved: resolved.length,
-            pending: signals.length - resolved.length,
+            pending: summary.pending,
+            expired: summary.expired,
+            not_triggered: summary.not_triggered,
             wins, losses,
             win_rate: Number(winRate.toFixed(2)),
             avg_r: Number(avgR.toFixed(2)),
             total_r: Number(rSum.toFixed(2)),
             streak, streak_kind: streakKind,
           },
+          // Old +0.20R partial-target results are reported separately from
+          // results resolved against the real TP/SL.
+          methodology: {
+            current: RESOLUTION_METHOD,
+            legacy_method: LEGACY_RESOLUTION_METHOD,
+            legacy: legacy,
+            full_target: fullTarget,
+          },
+
           by_pair: byPair,
           by_session: bySession,
         }), {
