@@ -47,7 +47,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
       style={{ fontFamily: JENVU_SANS }}
     >
       <aside
-        className="leads-sidebar-root sticky top-0 hidden h-dvh w-[200px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex"
+        className="leads-sidebar-root fixed left-0 top-0 z-20 hidden h-dvh w-[200px] flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex"
         style={{ fontFamily: JENVU_SANS, fontWeight: 400 }}
       >
         {/* Brand */}
