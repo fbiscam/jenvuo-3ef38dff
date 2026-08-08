@@ -1,4 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import {
+  summarizeAccuracy,
+  RESOLUTION_METHOD,
+  LEGACY_RESOLUTION_METHOD,
+} from "@/lib/signals/outcome-resolver";
+
 
 // Public read-only feed of recent auto-scan signals with paper-trade outcomes.
 // No auth required. Uses supabaseAdmin because signal_alerts is gated to paid users.
