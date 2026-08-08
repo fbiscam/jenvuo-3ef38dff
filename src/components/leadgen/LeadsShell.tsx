@@ -105,6 +105,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
             </div>
           )}
         </nav>
+      </aside>
 
 
 
