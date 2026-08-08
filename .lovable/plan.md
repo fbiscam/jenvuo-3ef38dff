@@ -1,58 +1,69 @@
-## Goal
-`/signal` aur voice analyzer ko "25+ years ICT/SMC veteran" ki tarah analyze karne wala banao, aur server-side itna reliable karo ke har account pe bina baar-baar issue ke chalta rahe.
+# Signal System Accuracy and Reliability Fix
 
-## Model choice — Max Accuracy tier
+## Confirmed audit findings
 
-Abhi 3 stages sab `google/gemini-3.5-flash` par hain (fast lekin reasoning depth kam). Naya layout:
+- This week has **10 recorded signals: 9 wins and 1 loss**, so the current public figure is **90% win rate**. By pair: XAUJPY 4/4, XAUCHF 1/1, XAUGBP 2/2, XAUAUD 1/1, and XAUUSD 1/2.
+- That 90% figure is not a reliable full-target win rate: the outcome resolver currently calls a trade a win at only **+0.20R**, and 8 of the 9 wins were recorded at exactly +0.20R. The public page then labels this as “Win +20%,” although +0.20R is not the same as 20% account profit.
+- Auto-scan is enabled and configured for all six XAU pairs at a 70% minimum, but its last diagnostic heartbeat was about **6 hours 40 minutes ago** even though the weekday schedule should still have been active.
+- Manual scans show “sent” before the background broadcast has actually succeeded. The broadcast worker also recomputes the plan, so the alerted trade can differ from the plan the user just saw.
+- The signal page and auto-scan share similar gates, but those rules are duplicated, making threshold, HTF-alignment, grading, and session behavior prone to drifting apart.
+- Current weekly alerts were recorded as using only the deterministic ICT/SMC engine; AI participation is not consistently represented in signal history.
+- Alert email delivery is unhealthy this week: 122 messages are in dead-letter status, 145 remain pending, and only 2 are marked sent.
+- There are no focused regression tests covering scan qualification, entry triggering, outcome resolution, or public accuracy calculations.
 
-| Stage | Kaam | Model | Kyun |
-|---|---|---|---|
-| Voice intent detect | "analyze XAU/USD" jaise short phrase samajhna | `google/gemini-3.1-flash-lite` | Cheap + fast, sirf classification |
-| Chart narration (Stage 1) | HTF/LTF story, key levels, confluences JSON | `openai/gpt-5.4` + `service_tier: "priority"` | Deep ICT/SMC reasoning, priority tier = fast latency |
-| Senior trader review (Stage 2) | Veto / Confirm / Downgrade veteran opinion | `openai/gpt-5.5` + `service_tier: "priority"` | Best reasoning model — yehi "25-year trader" wali quality deta hai |
+## Implementation plan
 
-Deterministic price math (entry/SL/TP/score) code me hi rahega — models sirf narrate + veto karte hain, hallucinate nahi karte.
+### 1. Make performance reporting honest
 
-## Reliability layer (server pe set-and-forget)
+- Replace the +0.20R “win” shortcut with candle-by-candle entry-first resolution against the actual configured TP and SL.
+- Preserve `Not Triggered` when the limit entry is never reached, and keep unresolved entered trades open until TP, SL, or the evaluation window closes.
+- Give timed-out entered trades a neutral/expired status rather than counting them as wins.
+- Update the public feed and admin accuracy report so win rate uses only true TP/SL outcomes and labels R-multiples correctly.
+- Do not rewrite historical outcomes silently. Clearly separate the old +0.20R methodology from newly resolved full-target results, or backfill only where complete candle history permits deterministic recalculation.
 
-Ek shared helper `src/lib/ai-gateway.server.ts` banayenge jo har AI call ko wrap karega:
+### 2. Repair and harden auto-scan execution
 
-1. **Auto retry** — 429 (rate limit) aur 5xx par exponential backoff (500ms → 1s → 2s), max 3 tries.
-2. **Model fallback chain** — agar primary model 3 baar fail ho, next model try karo:
-   - Stage 1: `gpt-5.4` → `gpt-5.4-mini` → `gemini-3.5-flash`
-   - Stage 2: `gpt-5.5` → `gpt-5.4` → skip (Stage 1 grade stands)
-3. **Timeout guard** — Stage 1: 25s, Stage 2: 20s. Timeout par fallback trigger.
-4. **Per-symbol cache** — same pair + timeframe agar 3 min ke andar dobara analyze ho, cached plan return. Credits bachega + user ko instant response.
-5. **Credit / 402 handling** — clear message user ko: "AI credits khatam, workspace me top-up karein" — silent fail nahi.
-6. **Per-user rate limit** — 1 user ko max 20 analyze / hour (abuse aur runaway credit burn se bachao).
-7. **Health telemetry** — har fail (model+status+latency) `ai_gateway_log` table me likha jayega taake baad me pattern dekh sako.
+- Inspect scheduler run history through the existing admin diagnostic path and identify why heartbeats stopped.
+- Restore the five-minute weekday job using the secured canonical auto-scan route.
+- Add explicit run records for start, completion, duration, checked pairs, skip reason, and failure so a stopped or timed-out scanner is immediately visible.
+- Keep bounded pair batches, but ensure all six pairs rotate deterministically and no pair can be starved after retries or timeouts.
 
-## Files to change
+### 3. Unify signal qualification
 
-- `src/lib/ai-gateway.server.ts` (new) — `callAiWithRetryAndFallback()` helper, model chains, backoff, timeout.
-- `src/lib/gold-analysis.functions.ts` — 3 direct `fetch()` calls (lines 644, 1685, 1925) replace with helper. Stage 1 model → `openai/gpt-5.4` priority, Stage 2 → `openai/gpt-5.5` priority.
-- `src/lib/signal-agent.functions.ts` — voice intent model → `google/gemini-3.1-flash-lite` via same helper.
-- `src/lib/signal-cache.functions.ts` (new) — in-memory + optional DB-backed cache keyed on `userId:symbol:timeframe`.
-- `src/lib/rate-limit.server.ts` (new) — per-user token bucket (20/hour analyze).
-- Migration: `ai_gateway_log` table (model, status, latency_ms, user_id, created_at) with RLS + service_role write.
+- Extract one shared qualification module for minimum confidence, HTF alignment, news pause, duplicate protection, freshness, grading, and valid entry/SL/TP checks.
+- Use that same module for both manual scans and scheduled scans.
+- Keep the current 70% minimum and 24/7 scanning behavior unless real outcome data supports a stricter rule; do not optimize thresholds from only ten trades.
+- Ensure stale or scale-invalid XAU cross prices fail closed instead of producing a trade.
 
-## Trade-offs — bata dena zaroori hai
+### 4. Make manual broadcasts authoritative
 
-- **Credits**: Har full `/signal` analyze abhi ~3 credits. Naye setup me `gpt-5.4` + `gpt-5.5` priority ke sath ~8–12 credits per analyze. Cache aur rate-limit se average kam rahega, but heavy users ka usage 3–4x badhega.
-- **Latency**: Priority tier ke saath Stage 1+2 combined ~4–7s (currently ~3–5s with gemini-flash).
-- **First failure recovery**: user ko dikhega bhi nahi — helper chup-chap fallback model use karega.
+- Stop marking a manual result as broadcast until the server confirms the alert row and recipient fan-out.
+- Use the exact qualified plan shown to the user, with a stable scan ID/fingerprint, instead of independently recomputing a potentially different plan.
+- Return and display a precise result: broadcast, blocked with gate reason, duplicate, or delivery failure.
+- Preserve idempotency so retries cannot duplicate alerts or charges.
 
-## Technical notes
+### 5. Stabilize AI analysis and model audit data
 
-- Gateway calls: `https://ai.gateway.lovable.dev/v1/chat/completions`, header `Authorization: Bearer ${LOVABLE_API_KEY}`, body `service_tier: "priority"` sirf ✓ models pe (gpt-5.4, gpt-5.5, gpt-5.4-mini) — Gemini pe nahi.
-- Structured JSON: `response_format: { type: "json_object" }` bracket + regex repair already handle karta hai; strict schema nahi lagayenge (OpenAI strict `json_schema` bade schemas pe fail hota hai).
-- Retry gate: sirf 429/5xx/timeout retry-able. 400 (bad request) aur 402 (no credits) terminal — turant surface karo.
-- Cache TTL: 3 min default; user "Re-analyze" button dabaye to bypass.
+- Keep deterministic ICT/SMC structure as the base, then run AI as a documented review/enrichment stage with bounded timeouts and fallback.
+- Record only models that actually completed work; never list an attempted fallback chain as if every model participated.
+- Persist review verdict, confidence adjustment, and model usage on the alert and paper-trade record so history matches the real scan.
+- Ensure failed AI enrichment does not fabricate analysis or change the deterministic setup invisibly.
 
-## Post-build verification
+### 6. Repair alert delivery
 
-1. `/signal?symbol=XAUUSD` khol ke Stage 1 (`gpt-5.4`) latency + confidence check.
-2. Ek non-existent model force karke fallback chain trigger — user ko success dikhna chahiye.
-3. 21 requests in 1 hour → 21st request pe polite rate-limit message.
-4. Same pair 2 min me dobara analyze → "cached" response instant.
-5. AI Gateway logs me `gpt-5.4` + `gpt-5.5` calls dikh rahe hain, priority tier billing confirm.
+- Trace the pending/dead-letter email queue and correct the failing dispatch/retry path for signal alerts.
+- Keep per-recipient idempotency keys and update send-log status atomically so retries neither duplicate nor remain permanently pending.
+- Verify in-app, Telegram, and email delivery independently; one channel failing must not roll back the signal record.
+
+### 7. Add regression coverage and verify end to end
+
+- Add tests for entry-before-TP/SL ordering, never-triggered limits, same-candle ambiguity, TP wins, SL losses, expiry, cross-pair price scale, qualification parity, and broadcast idempotency.
+- Run an authenticated manual scan and verify the displayed plan exactly matches the stored alert.
+- Verify scheduler heartbeats resume, all six pairs rotate, delivery logs advance, and the public feed reports the corrected outcome methodology.
+- Recalculate and provide the final weekly signal list and accuracy after the resolver correction, clearly distinguishing true wins, losses, pending/expired, and not-triggered trades.
+
+## Technical structure
+
+- Move runtime analysis helpers out of the large server-function module into server-only helper modules, leaving server-function files as thin RPC wrappers.
+- Introduce shared pure modules for qualification and outcome resolution so both runtime code and tests execute the same rules.
+- Apply backend schema changes through a migration only if additional run/outcome metadata is required; preserve existing RLS and grants.
