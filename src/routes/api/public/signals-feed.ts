@@ -24,7 +24,7 @@ export const Route = createFileRoute("/api/public/signals-feed")({
             .limit(limit),
           supabaseAdmin
             .from("signal_paper_trades")
-            .select("broadcast_alert_id, outcome, realized_r, resolved_at")
+            .select("broadcast_alert_id, outcome, realized_r, resolved_at, resolution_method")
             .gte("fired_at", since),
         ]);
 
@@ -35,12 +35,14 @@ export const Route = createFileRoute("/api/public/signals-feed")({
           });
         }
 
-        const tradeMap = new Map<string, { outcome: string | null; realized_r: number | null; resolved_at: string | null }>();
+        const tradeMap = new Map<string, { outcome: string | null; realized_r: number | null; resolved_at: string | null; resolution_method: string | null }>();
         for (const t of tradesRes.data ?? []) {
           if (t.broadcast_alert_id) tradeMap.set(t.broadcast_alert_id, {
             outcome: t.outcome, realized_r: t.realized_r, resolved_at: t.resolved_at,
+            resolution_method: (t as { resolution_method?: string | null }).resolution_method ?? null,
           });
         }
+
 
         const signals = (alertsRes.data ?? []).map((a) => {
           const t = tradeMap.get(a.id);
