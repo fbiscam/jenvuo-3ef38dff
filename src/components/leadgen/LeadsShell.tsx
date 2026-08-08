@@ -61,24 +61,6 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
           </span>
         </div>
 
-        {me && (
-          <div className="shrink-0 border-b border-zinc-200 bg-white px-3 py-3">
-            <div className="flex items-baseline justify-between text-[11.5px] text-zinc-500">
-              <span>Credits</span>
-              <span className={`${MONO} text-[11.5px] font-medium text-zinc-900`}>
-                {me.credits.remaining.toFixed(2)} left
-              </span>
-            </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
-              <div className="h-full rounded-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
-            </div>
-            <div className="mt-1.5 text-[10.5px] text-zinc-400">
-              {me.credits.used.toFixed(2)} of {me.credits.monthly_limit.toFixed(0)} used this month
-            </div>
-          </div>
-        )}
-
-        <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-2 py-2">
           <div className="flex flex-col gap-1.5">
             {NAV.map((item) => {
               const active = isActive(item.to, item.exact);
