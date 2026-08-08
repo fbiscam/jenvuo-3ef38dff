@@ -47,7 +47,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
       style={{ fontFamily: JENVU_SANS }}
     >
       <aside
-        className="leads-sidebar-root sticky top-0 hidden h-dvh w-[200px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex"
+        className="leads-sidebar-root fixed left-0 top-0 z-20 hidden h-dvh w-[200px] flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex"
         style={{ fontFamily: JENVU_SANS, fontWeight: 400 }}
       >
         {/* Brand */}
@@ -60,6 +60,23 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
             Jenvu
           </span>
         </div>
+
+        {me && (
+          <div className="shrink-0 border-b border-zinc-200 bg-white px-3 py-3">
+            <div className="flex items-baseline justify-between text-[11.5px] text-zinc-500">
+              <span>Credits</span>
+              <span className={`${MONO} text-[11.5px] font-medium text-zinc-900`}>
+                {me.credits.remaining.toFixed(2)} left
+              </span>
+            </div>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+              <div className="h-full rounded-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
+            </div>
+            <div className="mt-1.5 text-[10.5px] text-zinc-400">
+              {me.credits.used.toFixed(2)} of {me.credits.monthly_limit.toFixed(0)} used this month
+            </div>
+          </div>
+        )}
 
         <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-2 py-2">
           <div className="flex flex-col gap-1.5">
@@ -106,26 +123,10 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
           )}
         </nav>
 
-        {me && (
-          <div className="mt-auto shrink-0 border-t border-zinc-200 bg-white px-3 py-3">
-            <div className="flex items-baseline justify-between text-[11.5px] text-zinc-500">
-              <span>Credits</span>
-              <span className={`${MONO} text-[11.5px] font-medium text-zinc-900`}>
-                {me.credits.remaining.toFixed(2)} left
-              </span>
-            </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
-              <div className="h-full rounded-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
-            </div>
-            <div className="mt-1.5 text-[10.5px] text-zinc-400">
-              {me.credits.used.toFixed(2)} of {me.credits.monthly_limit.toFixed(0)} used this month
-            </div>
-          </div>
-        )}
       </aside>
 
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col md:ml-[200px]">
         <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-100 bg-white/85 px-4 backdrop-blur-md md:px-6">
           <div className="flex items-center gap-2.5 md:hidden">
             <img src="/favicon.png" alt="" className="h-7 w-7 rounded-md object-contain" />
