@@ -125,7 +125,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
       </aside>
 
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col md:ml-[200px]">
         <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-100 bg-white/85 px-4 backdrop-blur-md md:px-6">
           <div className="flex items-center gap-2.5 md:hidden">
             <img src="/favicon.png" alt="" className="h-7 w-7 rounded-md object-contain" />
