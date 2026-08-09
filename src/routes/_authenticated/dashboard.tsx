@@ -850,7 +850,7 @@ function DashboardLayout() {
   }, [displayRemaining, credits.isLoading, credits.allowance]);
 
   return (
-    <div className={`flex bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
+    <div className={`flex bg-[#FAFAFA] text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
 
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -1012,7 +1012,7 @@ function DashboardLayout() {
 
 
 
-      <main className="mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
+      <main className="mx-auto w-full max-w-7xl flex-1 bg-[#FAFAFA] px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
 
 
         {pathname === "/dashboard" ? (

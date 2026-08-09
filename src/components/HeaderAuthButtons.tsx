@@ -6,7 +6,7 @@ import CreditsPill from "@/components/CreditsPill";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
-export default function HeaderAuthButtons() {
+export default function HeaderAuthButtons({ signInOnly = false }: { signInOnly?: boolean } = {}) {
   const { user } = useAuthUser();
   // Avoid SSR/CSR hydration mismatch: server has no localStorage, so it
   // always renders the signed-out UI. Only reveal the signed-in variant
@@ -32,6 +32,20 @@ export default function HeaderAuthButtons() {
         >
           Launch
           <span className={`${MONO} text-[10px] opacity-70`}>↗</span>
+        </Link>
+      </div>
+    );
+  }
+
+  if (signInOnly) {
+    return (
+      <div className="flex shrink-0 items-center gap-2">
+        <Link
+          to="/auth"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 sm:gap-2 sm:px-3.5 sm:text-sm"
+        >
+          Sign In
+          <span className={`${MONO} text-[10px] opacity-70`}>→</span>
         </Link>
       </div>
     );
