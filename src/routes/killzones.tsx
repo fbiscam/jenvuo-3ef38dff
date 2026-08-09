@@ -1,3 +1,4 @@
+import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Search, Clock, MapPin, Radar, Lock } from "lucide-react";

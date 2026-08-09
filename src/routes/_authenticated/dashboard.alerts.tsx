@@ -1,3 +1,4 @@
+import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
