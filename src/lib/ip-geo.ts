@@ -33,19 +33,37 @@ function writeCache(data: IpGeo) {
   }
 }
 
+const FAIL_KEY = "jenvu:ipGeoFailAt";
+const FAIL_BACKOFF_MS = 30 * 60 * 1000;
+
+function recentlyFailed(): boolean {
+  try {
+    const at = Number(window.localStorage.getItem(FAIL_KEY) ?? 0);
+    return !!at && Date.now() - at < FAIL_BACKOFF_MS;
+  } catch {
+    return false;
+  }
+}
+
+function markFailed() {
+  try { window.localStorage.setItem(FAIL_KEY, String(Date.now())); } catch { /* ignore */ }
+}
+
 /** Cached geo lookup. Returns null when offline, blocked or rate-limited. */
 export async function getIpGeo(): Promise<IpGeo | null> {
   if (typeof window === "undefined") return null;
   const cached = readCache();
   if (cached) return cached;
   if (inFlight) return inFlight;
+  // Negative cache: after a failure (429 / offline) stop hammering the API.
+  if (recentlyFailed()) return null;
 
   inFlight = (async () => {
     try {
       const res = await fetch("https://ipapi.co/json/");
-      if (!res.ok) return null; // 429 etc — caller falls back to device TZ
+      if (!res.ok) { markFailed(); return null; } // 429 etc — fall back to device TZ
       const json = (await res.json()) as IpGeo & { error?: boolean };
-      if (!json || json.error || !json.timezone) return null;
+      if (!json || json.error || !json.timezone) { markFailed(); return null; }
       const data: IpGeo = {
         timezone: json.timezone,
         city: json.city,
@@ -54,6 +72,7 @@ export async function getIpGeo(): Promise<IpGeo | null> {
       writeCache(data);
       return data;
     } catch {
+      markFailed();
       return null;
     } finally {
       inFlight = null;
