@@ -703,7 +703,10 @@ function HomePage() {
       <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
           <div className="mb-10">
-            <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Compare Jenvu Pro and Elite Plans</h2>
+            <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">
+              <span className="sm:hidden">Compare Plans</span>
+              <span className="hidden sm:inline">Compare Jenvu Pro and Elite Plans</span>
+            </h2>
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
