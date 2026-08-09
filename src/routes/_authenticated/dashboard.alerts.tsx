@@ -1,3 +1,4 @@
+import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -135,14 +136,10 @@ function AlertPrefs() {
   });
   useEffect(() => {
     let cancelled = false;
-    fetch("https://ipapi.co/json/")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (cancelled || !d?.timezone) return;
-        setIpTimezone(d.timezone);
-        try { window.localStorage.setItem("jenvu:ipTimezone", d.timezone); } catch { /* ignore */ }
-      })
-      .catch(() => { /* fall back to device tz */ });
+    getIpGeo().then((d) => {
+      if (cancelled || !d?.timezone) return;
+      setIpTimezone(d.timezone);
+    });
     return () => { cancelled = true; };
   }, []);
   const formatVerifiedAt = useCallback((iso: string) => {

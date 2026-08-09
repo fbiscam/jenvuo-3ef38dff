@@ -111,7 +111,7 @@ function FoundingPage() {
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             Jenvu
           </Link>
-          <HeaderAuthButtons />
+          <HeaderAuthButtons signInOnly />
         </div>
       </header>
 
