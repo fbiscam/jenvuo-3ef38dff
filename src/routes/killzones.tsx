@@ -169,21 +169,15 @@ function KillzonesPage() {
   }, []);
 
 
-  // Detect timezone from user IP (free, no key). Falls back to browser TZ on error.
+  // Detect timezone from user IP (cached 24h). Falls back to browser TZ on error.
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      try {
-        const res = await fetch("https://ipapi.co/json/", { cache: "no-store" });
-        if (!res.ok) return;
-        const j = (await res.json()) as { timezone?: string; city?: string; country_name?: string };
-        if (cancelled) return;
-        if (j.timezone) setIpTZ(j.timezone);
-        if (j.city || j.country_name)
-          setIpCity([j.city, j.country_name].filter(Boolean).join(", "));
-      } catch {
-        // ignore; browser TZ fallback stays in effect
-      }
+      const j = await getIpGeo();
+      if (cancelled || !j) return;
+      if (j.timezone) setIpTZ(j.timezone);
+      if (j.city || j.country_name)
+        setIpCity([j.city, j.country_name].filter(Boolean).join(", "));
     })();
     return () => {
       cancelled = true;

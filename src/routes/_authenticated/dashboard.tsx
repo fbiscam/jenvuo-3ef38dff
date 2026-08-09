@@ -422,9 +422,8 @@ function useLocalHour(): number {
       } catch { /* ignore invalid tz */ }
     };
     update();
-    fetch("https://ipapi.co/json/")
-      .then((r) => r.ok ? r.json() : null)
-      .then((d) => { if (d?.timezone) update(d.timezone); })
+    getIpGeo()
+      .then((d) => { if (!cancelled && d?.timezone) update(d.timezone); })
       .catch(() => { /* offline / blocked — fall back to device time */ });
     const id = setInterval(() => update(), 5 * 60_000);
     return () => { cancelled = true; clearInterval(id); };
