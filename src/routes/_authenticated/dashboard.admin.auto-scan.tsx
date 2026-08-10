@@ -401,7 +401,7 @@ function PerformanceDashboard({
                 key={d}
                 onClick={() => onDaysChange(d)}
                 className={`px-2.5 py-1 text-[11px] font-medium rounded-lg transition ${
-                  days === d ? "bg-primary text-primary-foreground" : "text-zinc-600 hover:bg-zinc-50"
+                  days === d ? "bg-zinc-900 text-white" : "text-zinc-600 hover:bg-zinc-50"
                 }`}
               >
                 {d}d

@@ -61,7 +61,7 @@ export function SignalTicker() {
   return (
     <section aria-label="Recent signals" className="relative border-y border-zinc-200 bg-white/70 backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-5 py-3 sm:px-6">
-        <span className={`shrink-0 rounded-md bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-foreground ${MONO}`}>
+        <span className={`shrink-0 rounded-md bg-zinc-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white ${MONO}`}>
           Live · 48h
         </span>
         <div className="relative flex-1 overflow-hidden">

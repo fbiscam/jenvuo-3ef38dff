@@ -172,7 +172,7 @@ export default function AvatarAdjuster({ file, onCancel, onDone }: Props) {
             type="button"
             onClick={doExport}
             disabled={!img || saving}
-            className="rounded-lg bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+            className="rounded-lg bg-zinc-900 px-4 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save photo"}
           </button>

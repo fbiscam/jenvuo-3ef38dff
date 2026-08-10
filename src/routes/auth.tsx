@@ -948,7 +948,7 @@ function AuthPage() {
                       <button
                         type="submit"
                         disabled={loading || mfaCode.length !== 6}
-                        className="group w-full rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                        className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                       >
                         {loading ? btnLoading("Verifying...") : (<>Verify <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                       </button>
@@ -1017,7 +1017,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Verifying...") : (<>Verify & Continue <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
@@ -1097,7 +1097,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Sending...") : (<>Send Reset <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
@@ -1150,7 +1150,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Verifying...") : (<>Verify Code <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
@@ -1222,7 +1222,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Updating...") : (<>Update Password <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
@@ -1291,7 +1291,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading
                             ? btnLoading("Authenticating...")

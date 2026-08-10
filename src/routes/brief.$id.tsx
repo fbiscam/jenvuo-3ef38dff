@@ -38,7 +38,7 @@ export const Route = createFileRoute("/brief/$id")({
       <div className="max-w-md text-center">
         <h2 className="text-xl font-semibold text-zinc-900">Couldn't load this brief</h2>
         <p className="mt-2 text-sm text-zinc-600">{error.message}</p>
-        <button onClick={() => reset()} className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90">
+        <button onClick={() => reset()} className="mt-4 rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-800">
           Try again
         </button>
       </div>
@@ -181,7 +181,7 @@ function BriefBody() {
           <button
             onClick={toggle}
             aria-label={playing ? "Pause" : "Play"}
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-white hover:bg-zinc-800"
           >
             {playing ? <Pause className="h-6 w-6" /> : <Play className="ml-0.5 h-6 w-6" />}
           </button>
@@ -203,7 +203,7 @@ function BriefBody() {
               key={s}
               onClick={() => setSpeed(s)}
               className={`rounded-full px-2.5 py-1 ring-1 ring-inset ${
-                speed === s ? "bg-primary text-primary-foreground ring-primary" : "bg-white text-zinc-700 ring-zinc-200 hover:bg-zinc-50"
+                speed === s ? "bg-zinc-900 text-white ring-zinc-900" : "bg-white text-zinc-700 ring-zinc-200 hover:bg-zinc-50"
               }`}
             >
               {s}×

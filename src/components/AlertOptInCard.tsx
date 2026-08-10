@@ -90,7 +90,7 @@ export default function AlertOptInCard() {
             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
             : permBlocked
               ? 'bg-zinc-50 text-zinc-400 border border-zinc-200 cursor-not-allowed'
-              : 'bg-primary text-primary-foreground hover:bg-primary/90'
+              : 'bg-zinc-900 text-white hover:bg-zinc-800'
         }`}
       >
         {permGranted ? (

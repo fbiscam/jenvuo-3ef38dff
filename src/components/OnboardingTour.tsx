@@ -123,7 +123,7 @@ export function OnboardingTour() {
             </Link>
             <button
               onClick={() => (isLast ? dismiss() : setStep((s) => s + 1))}
-              className="hover-lift inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="hover-lift inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
             >
               {isLast ? "Get started" : "Next"}
               <ArrowRight className="h-3.5 w-3.5" />

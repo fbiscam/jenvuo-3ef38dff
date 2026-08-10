@@ -301,7 +301,7 @@ export function LiveChatWidget() {
               <button
                 type="submit"
                 disabled={starting}
-                className="mt-auto rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
+                className="mt-auto rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 disabled:opacity-60"
               >
                 {starting ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : "Start chat"}
               </button>
@@ -369,7 +369,7 @@ export function LiveChatWidget() {
                       type="submit"
                       disabled={sending || !input.trim()}
                       aria-label="Send"
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-50"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black text-white shadow-sm transition hover:bg-zinc-800 disabled:opacity-50"
                     >
                       {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     </button>

@@ -827,7 +827,7 @@ function AlertPrefs() {
               {ALL_GRADES.map((g) => {
                 const on = prefs.email_grades.includes(g);
                 const s = {
-                  on: "bg-primary text-primary-foreground border-primary",
+                  on: "bg-zinc-900 text-white border-zinc-900",
                   off: "bg-white text-zinc-900 border-zinc-200 hover:border-zinc-400",
                 };
                 return (

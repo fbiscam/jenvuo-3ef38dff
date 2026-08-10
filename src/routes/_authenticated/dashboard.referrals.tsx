@@ -131,7 +131,7 @@ function ReferralsPage() {
             </button>
             <button
               onClick={shareLink}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
             >
               <Share2 className="h-4 w-4" /> Share
             </button>
@@ -264,14 +264,14 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
                   onClick={() => setFilter(f.key)}
                   className={`inline-flex items-center justify-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition sm:gap-1.5 sm:px-2.5 sm:text-[12px] ${
                     active
-                      ? "border border-primary bg-primary text-primary-foreground"
+                      ? "border border-zinc-900 bg-white text-zinc-900"
                       : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
                   }`}
                 >
                   <span className="truncate">{f.label}</span>
                   <span
                     className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${
-                      active ? "bg-primary text-primary-foreground" : "bg-zinc-100 text-zinc-600"
+                      active ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600"
                     }`}
                   >
                     {counts[f.key]}

@@ -220,7 +220,7 @@ function FoundingPage() {
                   </p>
                   <Link
                     to="/"
-                    className="mt-6 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                    className="mt-6 inline-flex items-center justify-center rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
                   >
                     Back to home
                   </Link>
@@ -257,8 +257,8 @@ function FoundingPage() {
                         onClick={() => setPlan(p.id)}
                         className={`rounded-xl border px-3 py-2.5 text-left transition ${
                           active
-                            ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                            : "border-zinc-200 bg-white text-zinc-900 hover:border-primary"
+                            ? "border-zinc-900 bg-white text-zinc-900 shadow-sm"
+                            : "border-zinc-200 bg-white text-zinc-900 hover:border-zinc-400"
                         }`}
                       >
                         <div className="text-[13px] font-semibold">{p.label}</div>
@@ -307,7 +307,7 @@ function FoundingPage() {
               <button
                 type="submit"
                 disabled={submitting || remaining === 0}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:opacity-60"
               >
                 {submitting ? "Submitting…" : remaining === 0 ? "This month is full — join waitlist" : "Submit application"}
                 <ArrowRight className="h-4 w-4" />

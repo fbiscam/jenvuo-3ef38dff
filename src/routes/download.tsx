@@ -126,7 +126,7 @@ function DownloadPage() {
             <div className="flex shrink-0 items-center gap-2">
               <Link
                 to="/app"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 sm:gap-2 sm:px-3.5 sm:text-sm"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 sm:gap-2 sm:px-3.5 sm:text-sm"
               >
                 <span className="sm:hidden">Launch</span>
                 <span className="hidden sm:inline">Launch Agent</span>
@@ -170,7 +170,7 @@ function DownloadPage() {
                     </div>
                     <span
                       className={`text-[10px] px-2 py-0.5 rounded ${MONO} uppercase tracking-wider ${
-                        available ? "bg-emerald-500 text-primary-foreground" : "bg-primary text-primary-foreground"
+                        available ? "bg-emerald-500 text-white" : "bg-zinc-900 text-white"
                       }`}
                     >
                       {p.status}
@@ -189,7 +189,7 @@ function DownloadPage() {
                         href={p.href}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
                       >
                         {p.cta}
                         <span className={`${MONO} text-xs opacity-80`}>→</span>

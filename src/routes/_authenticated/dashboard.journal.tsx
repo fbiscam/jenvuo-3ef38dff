@@ -244,7 +244,7 @@ function Journal() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowLog(true)}
-            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition"
+            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 transition"
           >
             <Plus className="h-3.5 w-3.5" /> Log Trade
           </button>
@@ -286,7 +286,7 @@ function Journal() {
           <p className="mt-1 text-sm text-zinc-500">Track entries, exits and outcomes to surface your real win rate.</p>
           <button
             onClick={() => setShowLog(true)}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 transition"
           >
             <Plus className="h-3.5 w-3.5" /> Log Trade
           </button>
@@ -566,7 +566,7 @@ function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t:
           <button type="button" onClick={onClose} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50">
             Cancel
           </button>
-          <button type="submit" disabled={saving} className="rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60">
+          <button type="submit" disabled={saving} className="rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-60">
             {saving ? "Saving…" : "Save trade"}
           </button>
         </div>

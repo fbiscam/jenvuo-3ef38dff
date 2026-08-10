@@ -132,12 +132,12 @@ function AdminMessagesPage() {
                 onClick={() => setFilter(f.key)}
                 className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition ${
                   active
-                    ? "border border-primary bg-primary text-primary-foreground"
+                    ? "border border-zinc-900 bg-white text-zinc-900"
                     : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
                 }`}
               >
                 {f.label}
-                <span className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${active ? "bg-primary-foreground text-primary" : "bg-zinc-100 text-zinc-600"}`}>
+                <span className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${active ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600"}`}>
                   {counts[f.key]}
                 </span>
               </button>
@@ -230,7 +230,7 @@ function AdminMessagesPage() {
                 <a
                   href={`mailto:${selected.email}?subject=Re: ${encodeURIComponent(selected.subject)}`}
                   onClick={() => void setStatus(selected.id, "replied")}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800"
                 >
                   <Reply className="h-3.5 w-3.5" /> Reply by email
                 </a>

@@ -99,7 +99,7 @@ export const Route = createFileRoute("/insights/$slug")({
       <h1 className="text-2xl font-semibold mb-3">We couldn't load this briefing.</h1>
       <p className="text-sm text-zinc-500 max-w-md mb-6">{error?.message || "The article may have moved or the connection failed."}</p>
       <div className="flex gap-3">
-        <button onClick={() => reset()} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">Retry</button>
+        <button onClick={() => reset()} className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white">Retry</button>
         <Link to="/insights" className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium">Back to insights</Link>
       </div>
     </div>
@@ -107,7 +107,7 @@ export const Route = createFileRoute("/insights/$slug")({
   notFoundComponent: () => (
     <div className="min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
       <h1 className="text-2xl font-semibold mb-3">Briefing not found</h1>
-      <Link to="/insights" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">Back to insights</Link>
+      <Link to="/insights" className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white">Back to insights</Link>
     </div>
   ),
 });
@@ -162,7 +162,7 @@ function InsightDetailPage() {
             <div className="flex shrink-0 items-center gap-2">
               <Link
                 to="/app"
-                className="inline-flex items-center justify-center rounded-lg bg-primary px-3.5 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-zinc-800"
               >
                 Launch
               </Link>

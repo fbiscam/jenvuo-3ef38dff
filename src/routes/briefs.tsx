@@ -39,7 +39,7 @@ export const Route = createFileRoute("/briefs")({
         <p className="mt-2 text-sm text-zinc-600">{error.message}</p>
         <button
           onClick={() => reset()}
-          className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+          className="mt-4 rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-800"
         >
           Try again
         </button>
@@ -219,7 +219,7 @@ function BriefRow({ brief }: { brief: BriefListItem }) {
         <button
           onClick={toggle}
           aria-label={playing ? "Pause brief" : "Play brief"}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition hover:bg-primary/90"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-white transition hover:bg-zinc-800"
         >
           {playing ? <Pause className="h-5 w-5" /> : <Play className="ml-0.5 h-5 w-5" />}
         </button>

@@ -106,10 +106,10 @@ function tagOf(text: string): { tag: string; tone: "violet" | "blue" | "emerald"
 }
 const toneClass: Record<string, string> = {
   violet: "bg-emerald-500 text-white",
-  blue: "bg-primary text-primary-foreground",
+  blue: "bg-zinc-900 text-white",
   emerald: "bg-zinc-100 text-zinc-700 border border-zinc-200",
-  amber: "bg-primary text-primary-foreground",
-  rose: "bg-primary text-primary-foreground",
+  amber: "bg-zinc-900 text-white",
+  rose: "bg-zinc-900 text-white",
   zinc: "bg-zinc-100 text-zinc-700 border border-zinc-200",
 };
 const toneCardClass: Record<string, string> = {
@@ -894,7 +894,7 @@ function SignalPage() {
             </div>
             <button
               onClick={() => navigate({ to: "/signal", search: { symbol: broadcastedAlert?.pair || "XAUUSD" }, replace: true })}
-              className="h-8 shrink-0 inline-flex items-center gap-1.5 px-2.5 sm:px-3 rounded-lg bg-primary text-[11px] sm:text-[12px] font-medium text-primary-foreground hover:bg-primary/90 transition whitespace-nowrap"
+              className="h-8 shrink-0 inline-flex items-center gap-1.5 px-2.5 sm:px-3 rounded-lg bg-zinc-900 text-[11px] sm:text-[12px] font-medium text-white hover:bg-zinc-800 transition whitespace-nowrap"
               title="Run a fresh AI analysis (uses credits)"
             >
               <RefreshCw className="h-3.5 w-3.5 shrink-0" /> Fresh analysis
@@ -1045,7 +1045,7 @@ function SignalPage() {
                 onClick={load}
                 disabled={loading || (!credits.isLoading && credits.balance < 0.20)}
                 title={!credits.isLoading && credits.balance < 0.20 ? "Balance too low — add funds to run an analysis" : "Run a fresh AI analysis"}
-                className="shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-primary text-[12px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
                 {loading ? (
@@ -1102,7 +1102,7 @@ function SignalPage() {
                 className={cn(
                   "shrink-0 h-7 px-2.5 rounded-md font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[13px] font-normal tracking-normal transition border inline-flex items-center gap-1",
                   active
-                    ? "bg-primary text-primary-foreground border-primary ring-1 ring-primary/30 shadow-sm font-medium"
+                    ? "bg-zinc-50 text-zinc-900 border-zinc-400 ring-1 ring-zinc-300 shadow-sm font-medium"
                     : locked
                       ? "bg-white text-zinc-400 border-zinc-200 hover:bg-zinc-50 cursor-pointer"
                       : "bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-50",
@@ -1127,7 +1127,7 @@ function SignalPage() {
                 Your balance is <strong className="tabular-nums">${credits.balance.toFixed(2)}</strong> — you need at least <strong>$0.20</strong> per signal scan. Add funds to continue.
               </span>
             </div>
-            <Link to="/dashboard/billing" className="rounded-md bg-primary px-3 py-1.5 text-[13px] font-medium text-primary-foreground hover:bg-primary">
+            <Link to="/dashboard/billing" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[13px] font-medium text-white hover:bg-black">
               Add funds
             </Link>
           </div>
@@ -1146,7 +1146,7 @@ function SignalPage() {
                 Upgrade to unlock the full signal desk.
               </span>
             </div>
-            <Link to="/pricing" className="rounded-md bg-primary px-3 py-1.5 text-[13px] font-medium text-primary-foreground hover:bg-primary">
+            <Link to="/pricing" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[13px] font-medium text-white hover:bg-black">
               Upgrade
             </Link>
           </div>
@@ -1252,7 +1252,7 @@ function SignalPage() {
                     <button
                       onClick={load}
                       disabled={loading}
-                      className="mt-3 inline-flex h-7 items-center gap-1.5 rounded-lg bg-primary px-3 text-[11px] font-medium text-primary-foreground disabled:opacity-50"
+                      className="mt-3 inline-flex h-7 items-center gap-1.5 rounded-lg bg-zinc-900 px-3 text-[11px] font-medium text-white disabled:opacity-50"
                     >
                       {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
                       Retry analysis
@@ -2835,7 +2835,7 @@ function SignalVoiceAgent({
           onClick={() => submit()}
           disabled={busy || !q.trim()}
           tabIndex={showInput ? 0 : -1}
-          className="h-7 w-7 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground disabled:opacity-40 hover:bg-primary/90"
+          className="h-7 w-7 inline-flex items-center justify-center rounded-md bg-zinc-900 text-white disabled:opacity-40 hover:bg-zinc-800"
           aria-label="Send"
         >
           <Send className="h-3.5 w-3.5" />
@@ -3061,7 +3061,7 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 text-xs"
+              className="rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white px-3 py-1.5 text-xs"
             >
               Close
             </button>

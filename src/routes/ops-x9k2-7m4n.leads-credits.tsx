@@ -169,7 +169,7 @@ function LeadsCredits() {
                 <button
                   disabled={busy === r.user_id}
                   onClick={() => void run(r.user_id, "add")}
-                  className="rounded-lg bg-primary px-3.5 py-2 text-sm text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
+                  className="rounded-lg bg-zinc-900 px-3.5 py-2 text-sm text-white transition hover:bg-zinc-800 disabled:opacity-50"
                 >
                   Add credits
                 </button>

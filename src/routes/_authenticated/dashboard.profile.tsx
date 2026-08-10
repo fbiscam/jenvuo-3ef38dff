@@ -227,7 +227,7 @@ function Profile() {
               className="mt-1 block w-full cursor-not-allowed rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500"
             />
           </label>
-          <button onClick={saveProfile} disabled={saving} className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+          <button onClick={saveProfile} disabled={saving} className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50">
             {saving ? "Saving…" : "Save changes"}
           </button>
         </div>
@@ -253,7 +253,7 @@ function Profile() {
             <button
               onClick={changeEmail}
               disabled={changingEmail || !newEmail}
-              className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
             >
               {changingEmail ? "Sending…" : "Change email"}
             </button>
