@@ -206,7 +206,7 @@ export default function NotificationBell() {
             <div className="flex items-center gap-2">
               <span className="text-[13px] font-semibold text-zinc-900">Notifications</span>
               {unread > 0 && (
-                <span className="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-zinc-900 px-1 text-[10px] font-semibold text-white">
+                <span className="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
                   {unread}
                 </span>
               )}
