@@ -264,7 +264,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
                   onClick={() => setFilter(f.key)}
                   className={`inline-flex items-center justify-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition sm:gap-1.5 sm:px-2.5 sm:text-[12px] ${
                     active
-                      ? "border border-zinc-900 bg-white text-zinc-900"
+                      ? "border border-primary bg-primary text-primary-foreground"
                       : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
                   }`}
                 >
