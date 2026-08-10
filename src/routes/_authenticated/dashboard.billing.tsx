@@ -169,11 +169,11 @@ function Billing() {
             </p>
           </div>
           {plan ? (
-            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+            <Link to="/pricing" className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
               Manage plan
             </Link>
           ) : (
-            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+            <Link to="/pricing" className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
               Choose plan
             </Link>
           )}

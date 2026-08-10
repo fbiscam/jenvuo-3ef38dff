@@ -70,7 +70,7 @@ function UsagePage() {
     return (
       <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center">
         <p className="text-sm text-zinc-600">Failed to load usage data.</p>
-        <button onClick={() => refetch()} className="mt-3 rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white">
+        <button onClick={() => refetch()} className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground">
           Retry
         </button>
       </div>

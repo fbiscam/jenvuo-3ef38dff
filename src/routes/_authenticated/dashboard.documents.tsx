@@ -163,7 +163,7 @@ function DocumentsPage() {
           </div>
           <a
             href="/founding"
-            className="inline-block mt-4 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800"
+            className="inline-block mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
             Apply now
           </a>
@@ -324,7 +324,7 @@ function DocumentsPage() {
                   type="button"
                   onClick={submitPending}
                   disabled={pending.length === 0 || uploading}
-                  className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {uploading ? "Submitting…" : `Submit${pending.length ? ` (${pending.length})` : ""}`}
                 </button>

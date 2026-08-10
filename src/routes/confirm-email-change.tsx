@@ -207,7 +207,7 @@ function ConfirmEmailChangePage() {
               )}
               <button
                 onClick={goToSignIn}
-                className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
+                className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
                 Go to sign in
               </button>
@@ -224,7 +224,7 @@ function ConfirmEmailChangePage() {
               <div className="flex flex-wrap gap-2 pt-2">
                 <button
                   onClick={() => navigate({ to: "/dashboard/profile", hash: "change-email" })}
-                  className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Restart email change
                 </button>

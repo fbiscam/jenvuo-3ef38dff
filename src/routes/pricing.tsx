@@ -520,7 +520,7 @@ function CustomTopUp() {
           </div>
           <Link
             to="/contact"
-            className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary whitespace-nowrap"
           >
             Continue
           </Link>

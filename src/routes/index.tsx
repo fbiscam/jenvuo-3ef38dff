@@ -283,7 +283,7 @@ function HomePage() {
                 <Link
                   to="/founding"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Apply Now
                 </Link>
@@ -311,7 +311,7 @@ function HomePage() {
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
                 to={isAuthed ? "/app" : "/auth"}
-                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
                 Launch Voice Agent
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
@@ -1031,7 +1031,7 @@ function HomePage() {
               <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row md:justify-start">
                 <Link
                   to="/app"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Launch Voice Agent
                 </Link>

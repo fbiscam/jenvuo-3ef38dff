@@ -150,7 +150,7 @@ function InsightsPage() {
             <div className="flex shrink-0 items-center gap-2">
               <Link
                 to="/app"
-                className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-zinc-800"
+                className="inline-flex items-center justify-center rounded-lg bg-primary px-3.5 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
               >
                 Launch
               </Link>
@@ -432,7 +432,7 @@ function SubscribeForm() {
       <button
         type="submit"
         disabled={busy}
-        className="bg-zinc-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-zinc-800 transition-colors whitespace-nowrap disabled:opacity-60"
+        className="bg-primary text-primary-foreground px-6 py-3 rounded-xl text-sm font-bold hover:bg-primary/90 transition-colors whitespace-nowrap disabled:opacity-60"
       >
         {busy ? "…" : "SUBSCRIBE"}
       </button>

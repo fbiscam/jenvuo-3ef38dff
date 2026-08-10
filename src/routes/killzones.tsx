@@ -252,7 +252,7 @@ function KillzonesPage() {
           </div>
           <Link
             to="/signal"
-            className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 transition"
+            className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-primary text-[12px] font-medium text-primary-foreground hover:bg-primary/90 transition"
           >
             <Radar className="h-3.5 w-3.5" /> Signal Desk
           </Link>

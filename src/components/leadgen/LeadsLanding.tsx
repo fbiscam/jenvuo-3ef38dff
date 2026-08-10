@@ -88,7 +88,7 @@ export function LeadsLanding() {
             </Link>
             <Link
               to="/leads-signup"
-              className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+              className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
               Create free account
             </Link>
@@ -118,7 +118,7 @@ export function LeadsLanding() {
               <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:items-start">
                 <Link
                   to="/leads-signup"
-                  className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Get 50 free credits
                   <ArrowRight className="h-4 w-4 opacity-80" />

@@ -189,7 +189,7 @@ function BugTriagePage() {
                       <button
                         onClick={() => analyzeMut.mutate(g.fingerprint)}
                         disabled={analyzeMut.isPending}
-                        className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+                        className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                       >
                         {analyzeMut.isPending ? 'Analyzing…' : g.ai_root_cause ? 'Re-analyze' : 'Analyze with AI'}
                       </button>

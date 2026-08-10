@@ -230,7 +230,7 @@ function AdminMessagesPage() {
                 <a
                   href={`mailto:${selected.email}?subject=Re: ${encodeURIComponent(selected.subject)}`}
                   onClick={() => void setStatus(selected.id, "replied")}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   <Reply className="h-3.5 w-3.5" /> Reply by email
                 </a>
