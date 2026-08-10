@@ -132,12 +132,12 @@ function AdminMessagesPage() {
                 onClick={() => setFilter(f.key)}
                 className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition ${
                   active
-                    ? "border border-zinc-900 bg-white text-zinc-900"
+                    ? "border border-primary bg-primary text-primary-foreground"
                     : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
                 }`}
               >
                 {f.label}
-                <span className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${active ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600"}`}>
+                <span className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${active ? "bg-primary-foreground text-primary" : "bg-zinc-100 text-zinc-600"}`}>
                   {counts[f.key]}
                 </span>
               </button>
