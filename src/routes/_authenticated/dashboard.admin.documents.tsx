@@ -142,7 +142,7 @@ function AdminDocumentsPage() {
               className={[
                 "text-xs px-3 py-1.5 rounded-full border capitalize",
                 filter === s
-                  ? "bg-zinc-900 text-white border-zinc-900"
+                  ? "bg-primary text-primary-foreground border-primary"
                   : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50",
               ].join(" ")}
             >

@@ -131,7 +131,7 @@ function ContactPage() {
             <div className="flex shrink-0 items-center gap-2">
               <Link
                 to="/app"
-                className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-zinc-800"
+                className="inline-flex items-center justify-center rounded-lg bg-primary px-3.5 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
               >
                 Launch
               </Link>
@@ -300,7 +300,7 @@ function ContactPage() {
                     <button
                       type="submit"
                       disabled={busy}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       {busy ? "Sending…" : "Send message"}
                       {!busy && (

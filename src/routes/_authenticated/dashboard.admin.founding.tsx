@@ -457,7 +457,7 @@ function AdminFoundingPage() {
                         <button
                           onClick={() => saveNote(r.id)}
                           disabled={savingNote === r.id}
-                          className="rounded-lg bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+                          className="rounded-lg bg-primary px-3 py-1.5 text-[12px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                         >
                           {savingNote === r.id ? "Saving…" : "Save note"}
                         </button>

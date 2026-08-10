@@ -198,7 +198,7 @@ function HelpCenterPage() {
             </div>
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 rounded-full bg-zinc-900 text-white px-5 py-3 text-sm font-medium hover:bg-zinc-800 transition"
+              className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-3 text-sm font-medium hover:bg-primary/90 transition"
             >
               <MessageCircle className="h-4 w-4" />
               Contact support

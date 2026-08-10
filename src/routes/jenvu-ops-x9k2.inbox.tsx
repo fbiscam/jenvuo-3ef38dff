@@ -313,7 +313,7 @@ function AdminInbox() {
           <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-400 sm:inline">{username}</span>
           <button
             onClick={handleLogout}
-            className="grid h-8 w-8 place-items-center rounded-sm text-neutral-500 transition hover:bg-black hover:text-white"
+            className="grid h-8 w-8 place-items-center rounded-sm text-neutral-500 transition hover:bg-primary hover:text-primary-foreground"
             title="Sign out"
           >
             <LogOut className="h-3.5 w-3.5" />
@@ -542,7 +542,7 @@ function AdminInbox() {
                   {activeSession.status === "open" ? (
                     <button
                       onClick={handleClose}
-                      className="inline-flex items-center gap-1.5 rounded-sm border border-neutral-200 bg-white px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-700 transition hover:border-black hover:bg-black hover:text-white"
+                      className="inline-flex items-center gap-1.5 rounded-sm border border-neutral-200 bg-white px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-700 transition hover:border-primary hover:bg-primary hover:text-primary-foreground"
                       title="Close (E)"
                     >
                       <Archive className="h-3 w-3" /> Close
@@ -672,7 +672,7 @@ function AdminInbox() {
                             disabled={sending || !input.trim()}
                             aria-label="Send"
                             title="Send (Enter)"
-                            className="grid h-10 w-10 place-items-center rounded-sm bg-black text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="grid h-10 w-10 place-items-center rounded-sm bg-primary text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {sending ? (
                               <Loader2 className="h-4 w-4 animate-spin" />

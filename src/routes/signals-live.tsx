@@ -218,7 +218,7 @@ function FeedBody() {
                 <button
                   key={d}
                   onClick={() => setDays(d)}
-                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${days === d ? "bg-zinc-900 text-white" : "border border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400"}`}
+                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${days === d ? "bg-primary text-primary-foreground" : "border border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400"}`}
                 >
                   {d}D
                 </button>
@@ -313,14 +313,14 @@ function FeedBody() {
             </select>
             <div className="shrink-0 inline-flex rounded-lg border border-zinc-200 p-0.5">
               {(["all", "BUY", "SELL"] as const).map((d) => (
-                <button key={d} onClick={() => setDirFilter(d)} className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${dirFilter === d ? (d === "BUY" ? "bg-emerald-600 text-white" : d === "SELL" ? "bg-rose-600 text-white" : "bg-zinc-900 text-white") : "text-zinc-600 hover:text-zinc-900"}`}>
+                <button key={d} onClick={() => setDirFilter(d)} className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${dirFilter === d ? (d === "BUY" ? "bg-emerald-600 text-primary-foreground" : d === "SELL" ? "bg-rose-600 text-primary-foreground" : "bg-primary text-primary-foreground") : "text-zinc-600 hover:text-zinc-900"}`}>
                   {d === "all" ? "Both" : d}
                 </button>
               ))}
             </div>
             <div className="shrink-0 inline-flex rounded-lg border border-zinc-200 p-0.5">
               {(["all", "win", "loss", "pending"] as const).map((o) => (
-                <button key={o} onClick={() => setOutcomeFilter(o)} className={`rounded-md px-2.5 py-1 text-[11px] font-semibold capitalize ${outcomeFilter === o ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"}`}>
+                <button key={o} onClick={() => setOutcomeFilter(o)} className={`rounded-md px-2.5 py-1 text-[11px] font-semibold capitalize ${outcomeFilter === o ? "bg-primary text-primary-foreground" : "text-zinc-600 hover:text-zinc-900"}`}>
                   {o}
                 </button>
               ))}
@@ -347,7 +347,7 @@ function FeedBody() {
               {hasMore ? (
                 <button
                   onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                  className="rounded-full bg-zinc-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-zinc-800"
+                  className="rounded-full bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
                 >
                   Show more ({filtered.length - shownCount} more)
                 </button>
@@ -376,7 +376,7 @@ function FeedBody() {
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Want these signals the moment they fire?</h2>
           <p className="mt-2 text-sm text-zinc-600">Sign in to Jenvu, upgrade a plan, and get alerts via email, browser, and Telegram.</p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <Link to="/pricing" className="rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800">See pricing</Link>
+            <Link to="/pricing" className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90">See pricing</Link>
             <Link to="/auth" className="rounded-full border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-800 hover:border-zinc-400">Sign in</Link>
           </div>
         </div>
@@ -436,7 +436,7 @@ function SignalCard({ s }: { s: Signal }) {
             {s.direction}
           </span>
           <span className="shrink-0 font-mono text-sm font-semibold text-zinc-900">{s.pair}</span>
-          {s.grade && <span className="shrink-0 rounded-md bg-zinc-900 px-1.5 py-0.5 text-[10px] font-bold text-white">{s.grade}</span>}
+          {s.grade && <span className="shrink-0 rounded-md bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">{s.grade}</span>}
           <span className="shrink-0 text-[10px] font-semibold text-zinc-500">{s.confidence ?? "—"}%</span>
         </div>
         <span className={`shrink-0 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${outcomeClass}`}>

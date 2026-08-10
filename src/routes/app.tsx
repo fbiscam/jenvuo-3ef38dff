@@ -557,7 +557,7 @@ function Home() {
                 disabled={loading}
                 className={cn(
                   "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition disabled:opacity-50",
-                  dark ? "bg-white text-black hover:bg-neutral-200" : "bg-black text-white hover:bg-neutral-800",
+                  dark ? "bg-white text-black hover:bg-neutral-200" : "bg-primary text-primary-foreground hover:bg-primary/90",
                 )}
                 aria-label="Send message"
               >

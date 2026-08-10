@@ -116,7 +116,7 @@ function UnsubscribePage() {
             >
               <button
                 onClick={onConfirm}
-                className="mt-6 w-full bg-zinc-900 text-white rounded-xl px-5 py-3 text-sm font-bold hover:bg-zinc-800 transition-colors"
+                className="mt-6 w-full bg-primary text-primary-foreground rounded-xl px-5 py-3 text-sm font-bold hover:bg-primary/90 transition-colors"
               >
                 Confirm unsubscribe
               </button>
@@ -140,7 +140,7 @@ function UnsubscribePage() {
             >
               <Link
                 to="/insights"
-                className="mt-6 inline-block bg-zinc-900 text-white rounded-xl px-5 py-3 text-sm font-bold hover:bg-zinc-800 transition-colors"
+                className="mt-6 inline-block bg-primary text-primary-foreground rounded-xl px-5 py-3 text-sm font-bold hover:bg-primary/90 transition-colors"
               >
                 Back to Insights →
               </Link>

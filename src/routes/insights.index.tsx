@@ -150,7 +150,7 @@ function InsightsPage() {
             <div className="flex shrink-0 items-center gap-2">
               <Link
                 to="/app"
-                className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-zinc-800"
+                className="inline-flex items-center justify-center rounded-lg bg-primary px-3.5 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
               >
                 Launch
               </Link>
@@ -244,7 +244,7 @@ function InsightsPage() {
                     onClick={() => onFilterChange(f.id)}
                     className={`px-4 py-1.5 rounded-full transition-colors ${
                       active
-                        ? "bg-zinc-900 text-white shadow-sm"
+                        ? "bg-primary text-primary-foreground shadow-sm"
                         : "text-zinc-500 hover:text-zinc-900"
                     }`}
                   >
@@ -325,7 +325,7 @@ function InsightsPage() {
                   aria-current={n === currentPage ? "page" : undefined}
                   className={`min-w-[36px] rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
                     n === currentPage
-                      ? "bg-zinc-900 text-white"
+                      ? "bg-primary text-primary-foreground"
                       : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
                   }`}
                 >
@@ -432,7 +432,7 @@ function SubscribeForm() {
       <button
         type="submit"
         disabled={busy}
-        className="bg-zinc-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-zinc-800 transition-colors whitespace-nowrap disabled:opacity-60"
+        className="bg-primary text-primary-foreground px-6 py-3 rounded-xl text-sm font-bold hover:bg-primary/90 transition-colors whitespace-nowrap disabled:opacity-60"
       >
         {busy ? "…" : "SUBSCRIBE"}
       </button>

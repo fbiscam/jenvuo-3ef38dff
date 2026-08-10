@@ -45,7 +45,7 @@ function NewsletterSubscribe() {
       <button
         type="submit"
         disabled={loading || done}
-        className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-zinc-800 disabled:opacity-60"
+        className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
       >
         {done ? "Subscribed" : loading ? "…" : "Subscribe"}
       </button>

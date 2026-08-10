@@ -232,7 +232,7 @@ function TuningPage() {
           <button
             onClick={startGrid}
             disabled={busy}
-            className="inline-flex items-center gap-1 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             <Play className="h-3.5 w-3.5" /> {busy ? "Running…" : "Run grid search"}
           </button>
@@ -364,7 +364,7 @@ function TuningPage() {
                               onClick={() => doActivate(c.id, c.version, c.validated)}
                               className={
                                 c.validated
-                                  ? "rounded-lg bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
+                                  ? "rounded-lg bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90"
                                   : "rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs text-rose-700 hover:bg-rose-50"
                               }
                             >

@@ -148,7 +148,7 @@ function TagPill({ tag, tone }: { tag: string; tone: "ink" | "green" | "muted" }
       ? "bg-emerald-500 text-white"
       : tone === "muted"
       ? "bg-zinc-200 text-zinc-900"
-      : "bg-zinc-900 text-white";
+      : "bg-primary text-primary-foreground";
   return (
     <span className={`text-[10px] px-1.5 py-0.5 rounded ${MONO} uppercase tracking-wider ${cls}`}>
       {tag}
@@ -283,7 +283,7 @@ function HomePage() {
                 <Link
                   to="/founding"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Apply Now
                 </Link>
@@ -311,7 +311,7 @@ function HomePage() {
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
                 to={isAuthed ? "/app" : "/auth"}
-                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
                 Launch Voice Agent
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
@@ -488,7 +488,7 @@ function HomePage() {
 
                 <Link
                   to="/app"
-                  className={`w-full inline-flex items-center justify-center mt-2 py-3 bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-800 transition-colors uppercase`}
+                  className={`w-full inline-flex items-center justify-center mt-2 py-3 bg-primary text-primary-foreground text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-primary/90 transition-colors uppercase`}
                 >
                   Execute Voice Trade
                 </Link>
@@ -787,7 +787,7 @@ function HomePage() {
                           to="/founding"
                           className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
                             p.accent || p.dark
-                              ? "bg-zinc-900 text-white hover:bg-black"
+                              ? "bg-primary text-primary-foreground hover:bg-primary"
                               : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
                           }`}
                         >
@@ -1031,7 +1031,7 @@ function HomePage() {
               <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row md:justify-start">
                 <Link
                   to="/app"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Launch Voice Agent
                 </Link>
