@@ -69,7 +69,7 @@ export function SavedSignalsList() {
           On the Signal Desk, tap <span className="font-medium text-zinc-700">Save Signal</span> to keep an A+ setup here for later.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-          <Link to="/signal" className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">
+          <Link to="/signal" className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
             Open Signal Desk <ExternalLink className="h-3.5 w-3.5" />
           </Link>
           <Link to="/dashboard/alerts" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">

@@ -98,7 +98,7 @@ export function useGlobalNotificationToasts() {
                         toast.dismiss(t);
                         window.location.href = href;
                       }}
-                      className="rounded-lg bg-zinc-900 px-3 py-1 text-[12px] font-medium text-white transition hover:bg-zinc-800"
+                      className="rounded-lg bg-primary px-3 py-1 text-[12px] font-medium text-primary-foreground transition hover:bg-primary/90"
                     >
                       {isSignal ? "View alert" : "View"}
                     </button>

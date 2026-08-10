@@ -126,7 +126,7 @@ export default function SetupPicker({ value, onChange, compact }: Props) {
                 type="button"
                 onClick={add}
                 disabled={!newName.trim()}
-                className="inline-flex items-center gap-1 rounded bg-zinc-900 px-2 py-1 text-[10px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+                className="inline-flex items-center gap-1 rounded bg-primary px-2 py-1 text-[10px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               >
                 <Plus className="h-3 w-3" /> Add
               </button>
