@@ -170,7 +170,7 @@ function DownloadPage() {
                     </div>
                     <span
                       className={`text-[10px] px-2 py-0.5 rounded ${MONO} uppercase tracking-wider ${
-                        available ? "bg-emerald-500 text-white" : "bg-zinc-900 text-white"
+                        available ? "bg-emerald-500 text-primary-foreground" : "bg-primary text-primary-foreground"
                       }`}
                     >
                       {p.status}

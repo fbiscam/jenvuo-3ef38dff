@@ -244,7 +244,7 @@ function InsightsPage() {
                     onClick={() => onFilterChange(f.id)}
                     className={`px-4 py-1.5 rounded-full transition-colors ${
                       active
-                        ? "bg-zinc-900 text-white shadow-sm"
+                        ? "bg-primary text-primary-foreground shadow-sm"
                         : "text-zinc-500 hover:text-zinc-900"
                     }`}
                   >
@@ -325,7 +325,7 @@ function InsightsPage() {
                   aria-current={n === currentPage ? "page" : undefined}
                   className={`min-w-[36px] rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
                     n === currentPage
-                      ? "bg-zinc-900 text-white"
+                      ? "bg-primary text-primary-foreground"
                       : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
                   }`}
                 >

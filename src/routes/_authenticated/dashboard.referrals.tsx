@@ -271,7 +271,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
                   <span className="truncate">{f.label}</span>
                   <span
                     className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${
-                      active ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600"
+                      active ? "bg-primary text-primary-foreground" : "bg-zinc-100 text-zinc-600"
                     }`}
                   >
                     {counts[f.key]}

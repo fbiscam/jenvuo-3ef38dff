@@ -129,7 +129,7 @@ function RiskPage() {
             <button
               onClick={onSave}
               disabled={saving}
-              className="px-4 py-2 rounded-lg bg-black text-white text-sm disabled:opacity-50"
+              className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save settings"}
             </button>

@@ -318,7 +318,7 @@ function KillzonesPage() {
                 onClick={() => setCat(c)}
                 className={`h-8 px-3 rounded-lg border text-[12px] font-medium transition ${
                   cat === c
-                    ? "border-zinc-900 bg-zinc-900 text-white"
+                    ? "border-primary bg-primary text-primary-foreground"
                     : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
                 }`}
               >

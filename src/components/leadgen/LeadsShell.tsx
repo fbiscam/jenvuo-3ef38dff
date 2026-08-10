@@ -123,7 +123,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
               <span className="hidden text-[12px] text-zinc-500 sm:block">
                 {me.email}
                 {me.is_admin && (
-                  <span className={`ml-2 rounded bg-zinc-900 px-1.5 py-0.5 text-[10px] text-white ${MONO}`}>
+                  <span className={`ml-2 rounded bg-primary px-1.5 py-0.5 text-[10px] text-primary-foreground ${MONO}`}>
                     ADMIN
                   </span>
                 )}
@@ -191,7 +191,7 @@ export function Card({ children, className = "" }: { children: ReactNode; classN
 }
 
 export const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-[13px] font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50";
 export const btnGhost =
   "inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px] font-medium text-zinc-900 transition hover:bg-zinc-50 disabled:opacity-50";
 export const inputCls =

@@ -102,7 +102,7 @@ function BugTriagePage() {
                 onClick={() => setStatusFilter(s)}
                 className={`rounded-full px-3 py-1 text-xs capitalize transition ${
                   statusFilter === s
-                    ? 'bg-zinc-900 text-white'
+                    ? 'bg-primary text-primary-foreground'
                     : 'border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50'
                 }`}
               >

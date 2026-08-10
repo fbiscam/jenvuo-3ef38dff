@@ -56,7 +56,7 @@ export default function AlertsHistoryPanel({
                       className={cn(
                         `text-[9px] ${MONO} font-bold tracking-widest px-1.5 py-0.5 rounded`,
                         a.grade === 'A+'
-                          ? 'bg-zinc-900 text-white'
+                          ? 'bg-primary text-primary-foreground'
                           : 'bg-zinc-100 text-zinc-700 border border-zinc-200',
                       )}
                     >

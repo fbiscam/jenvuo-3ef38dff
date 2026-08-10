@@ -233,7 +233,7 @@ export function LeadsLanding() {
 
                 <Link
                   to="/leads-signup"
-                  className="mt-7 inline-flex w-full items-center justify-center rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="mt-7 inline-flex w-full items-center justify-center rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Create free account
                 </Link>

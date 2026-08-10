@@ -364,7 +364,7 @@ function TuningPage() {
                               onClick={() => doActivate(c.id, c.version, c.validated)}
                               className={
                                 c.validated
-                                  ? "rounded-lg bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
+                                  ? "rounded-lg bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90"
                                   : "rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs text-rose-700 hover:bg-rose-50"
                               }
                             >

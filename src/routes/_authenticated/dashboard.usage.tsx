@@ -129,7 +129,7 @@ function UsagePage() {
             const earnedH = totalH - spentH;
             return (
               <div key={d.date} className="group relative flex flex-1 flex-col items-center justify-end">
-                <div className="pointer-events-none absolute -top-8 z-10 hidden whitespace-nowrap rounded bg-zinc-900 px-2 py-1 text-[10px] text-white group-hover:block">
+                <div className="pointer-events-none absolute -top-8 z-10 hidden whitespace-nowrap rounded bg-primary px-2 py-1 text-[10px] text-primary-foreground group-hover:block">
                   {new Date(d.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })} · −{fmtUsd(d.spent)} / +{fmtUsd(d.earned)}
                 </div>
                 <div className="flex w-full flex-col justify-end" style={{ height: "100%" }}>
