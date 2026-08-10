@@ -181,7 +181,7 @@ function BriefBody() {
           <button
             onClick={toggle}
             aria-label={playing ? "Pause" : "Play"}
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-white hover:bg-zinc-800"
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {playing ? <Pause className="h-6 w-6" /> : <Play className="ml-0.5 h-6 w-6" />}
           </button>
@@ -203,7 +203,7 @@ function BriefBody() {
               key={s}
               onClick={() => setSpeed(s)}
               className={`rounded-full px-2.5 py-1 ring-1 ring-inset ${
-                speed === s ? "bg-primary text-primary-foreground ring-zinc-900" : "bg-white text-zinc-700 ring-zinc-200 hover:bg-zinc-50"
+                speed === s ? "bg-primary text-primary-foreground ring-primary" : "bg-white text-zinc-700 ring-zinc-200 hover:bg-zinc-50"
               }`}
             >
               {s}×
