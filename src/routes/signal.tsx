@@ -1102,7 +1102,7 @@ function SignalPage() {
                 className={cn(
                   "shrink-0 h-7 px-2.5 rounded-md font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[13px] font-normal tracking-normal transition border inline-flex items-center gap-1",
                   active
-                    ? "bg-zinc-50 text-zinc-900 border-zinc-400 ring-1 ring-zinc-300 shadow-sm font-medium"
+                    ? "bg-primary text-primary-foreground border-primary ring-1 ring-primary/30 shadow-sm font-medium"
                     : locked
                       ? "bg-white text-zinc-400 border-zinc-200 hover:bg-zinc-50 cursor-pointer"
                       : "bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-50",
