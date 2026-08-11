@@ -14,6 +14,7 @@ import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
   MODEL_CHAIN, SENIOR_REVIEW_CHAIN, MACRO_CONTEXT_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
 } from "@/lib/ai-gateway";
+import { MIN_CONFIDENCE } from "@/lib/signals/qualification";
 
 async function _spendUserCredits(
   userId: string,
