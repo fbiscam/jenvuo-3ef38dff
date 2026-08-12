@@ -19,7 +19,7 @@ import { getDefaultAvatar } from "@/lib/default-avatar";
 
 
 import {
-  Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Power, Mic, Plus,
+  Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Power, Mic, Plus, Globe,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
@@ -464,10 +464,15 @@ function DashboardLayout() {
   }, []);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [isAdminUser, setIsAdminUser] = useState(false);
+  const [hostname, setHostname] = useState("");
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
   const greetingText = pickGreeting(localHour);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") setHostname(window.location.hostname);
+  }, []);
   const currentPlan = useCurrentPlan();
   const showDeepSeek = true;
   const showGrok = true;
@@ -1021,7 +1026,16 @@ function DashboardLayout() {
 
         <div className="flex flex-wrap items-start justify-between gap-4 lg:items-end" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
           <div className="min-w-0">
-            <div className="text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>Account home</div>
+            <div className="flex items-center gap-2 text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+              <span>Account home</span>
+              <a
+                href="https://dash.jenvu.com/"
+                className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] text-zinc-700 hover:bg-zinc-200 transition-colors"
+              >
+                <Globe className="h-3 w-3" />
+                dash.jenvu.com
+              </a>
+            </div>
             <h1 className="pl-1 mt-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span>{email || fullName}</span><span>'s Account</span>
             </h1>
