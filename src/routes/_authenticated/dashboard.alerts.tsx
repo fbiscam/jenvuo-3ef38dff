@@ -780,6 +780,7 @@ function AlertPrefs() {
         <p className="mt-1 text-sm text-zinc-500">Only fire when confidence meets this threshold.</p>
         <div className="mt-4 inline-flex flex-wrap gap-1 rounded-lg border border-zinc-200 p-1">
           {([
+            { key: 0, label: "All" },
             { key: 70, label: "70%" },
             { key: 80, label: "80%" },
             { key: 85, label: "85%" },
@@ -789,7 +790,7 @@ function AlertPrefs() {
                 const v = Number(window.localStorage.getItem("jenvu:minConfidence"));
                 if (!Number.isNaN(v)) return v;
               }
-              return prefs.min_grade === "A+" ? 75 : 0;
+              return 0;
             })();
             const isActive = currentThreshold === opt.key;
             return (
