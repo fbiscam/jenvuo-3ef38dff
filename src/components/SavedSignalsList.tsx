@@ -81,23 +81,26 @@ export function SavedSignalsList() {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2">
       {rows.map((r) => {
         const snap = r.snapshot ?? null;
         const a = r.signal_alerts;
         const direction = (snap?.direction ?? a?.direction ?? "—").toString();
         const isLong = direction.toLowerCase() === "long" || direction.toLowerCase() === "buy";
-        const grade = snap?.confidence ? (snap.confidence >= 90 ? "A+" : snap.confidence >= 80 ? "A" : snap.confidence >= 65 ? "B" : "C") : (a?.grade ?? "—");
+        const confidence = snap?.confidence ?? null;
+        const grade = confidence ? (confidence >= 90 ? "A+" : confidence >= 80 ? "A" : confidence >= 65 ? "B" : "C") : (a?.grade ?? "—");
         const pair = snap?.pair ?? "—";
         const entry = snap?.entry ?? a?.entry;
         const sl = snap?.stop_loss ?? a?.sl;
         const tp = snap?.take_profit ?? a?.tp;
         const rr = snap?.rr ?? a?.rr;
-        const summary = snap?.confluences?.slice(0, 3).join(" · ") ?? a?.rationale ?? "—";
+        const session = snap?.session ?? null;
+        const summary = snap?.confluences?.slice(0, 5).join(" · ") ?? a?.rationale ?? "—";
+        const notes = r.notes;
 
         if (!snap && !a) return null;
         return (
-          <article key={r.id} className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)] transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
+          <article key={r.id} className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)] transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
             <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
               <div className="min-w-0 flex flex-wrap items-center gap-1.5">
                 <span className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold tracking-wider text-white ${grade === "A+" ? "bg-gradient-to-r from-amber-500 to-amber-600 shadow-sm shadow-amber-500/30" : "bg-zinc-900"}`}>{grade}</span>
@@ -110,7 +113,24 @@ export function SavedSignalsList() {
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </header>
-            <p className="mt-3 text-sm text-zinc-700 line-clamp-3 break-words">{summary}</p>
+
+            {confidence && (
+              <div className="mt-3 flex items-center gap-2">
+                <div className="h-1.5 flex-1 rounded-full bg-zinc-100">
+                  <div className="h-1.5 rounded-full bg-zinc-900" style={{ width: `${Math.min(100, Math.max(0, confidence))}%` }} />
+                </div>
+                <span className="text-xs font-medium text-zinc-700">{confidence.toFixed(0)}%</span>
+              </div>
+            )}
+
+            <p className="mt-3 text-sm text-zinc-700 line-clamp-4 break-words">{summary}</p>
+
+            {notes && (
+              <div className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 ring-1 ring-inset ring-amber-100">
+                <span className="font-semibold">Notes:</span> {notes}
+              </div>
+            )}
+
             <dl className="mt-4 grid grid-cols-2 gap-2 text-[11px] xs:grid-cols-4 min-[380px]:grid-cols-4">
               {([
                 ["Entry", entry],
@@ -124,8 +144,12 @@ export function SavedSignalsList() {
                 </div>
               ))}
             </dl>
+
             <footer className="mt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-400">
-              <span className="font-mono uppercase tracking-wider">Saved {new Date(r.created_at).toLocaleDateString()}</span>
+              <span className="font-mono uppercase tracking-wider">
+                {session ? `${session} · ` : ""}
+                Saved {new Date(r.created_at).toLocaleDateString()}
+              </span>
               {snap && <Link to="/signal" search={{ symbol: pair, savedId: r.id }} className="text-zinc-600 hover:text-zinc-900">Re-open →</Link>}
             </footer>
           </article>

@@ -86,20 +86,23 @@ function SavedSignals() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 sm:grid-cols-2">
       {rows.map((r) => {
         // Normalize either an alert-backed row or a snapshot row into one display shape
         const snap = r.snapshot ?? null;
         const a = r.signal_alerts;
         const direction = (snap?.direction ?? a?.direction ?? "—").toString();
         const isLong = direction.toLowerCase() === "long" || direction.toLowerCase() === "buy";
-        const grade = snap?.confidence ? (snap.confidence >= 85 ? "A+" : snap.confidence >= 70 ? "A" : "B") : (a?.grade ?? "—");
+        const confidence = snap?.confidence ?? null;
+        const grade = confidence ? (confidence >= 90 ? "A+" : confidence >= 80 ? "A" : confidence >= 65 ? "B" : "C") : (a?.grade ?? "—");
         const pair = snap?.pair ?? "—";
         const entry = snap?.entry ?? a?.entry;
         const sl = snap?.stop_loss ?? a?.sl;
         const tp = snap?.take_profit ?? a?.tp;
         const rr = snap?.rr ?? a?.rr;
-        const summary = snap?.confluences?.slice(0, 3).join(" · ") ?? a?.rationale ?? "—";
+        const session = snap?.session ?? null;
+        const summary = snap?.confluences?.slice(0, 5).join(" · ") ?? a?.rationale ?? "—";
+        const notes = r.notes;
 
         if (!snap && !a) return null;
         return (
@@ -116,7 +119,24 @@ function SavedSignals() {
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </header>
-            <p className="mt-3 text-sm text-zinc-700 line-clamp-3">{summary}</p>
+
+            {confidence && (
+              <div className="mt-3 flex items-center gap-2">
+                <div className="h-1.5 flex-1 rounded-full bg-zinc-100">
+                  <div className="h-1.5 rounded-full bg-zinc-900" style={{ width: `${Math.min(100, Math.max(0, confidence))}%` }} />
+                </div>
+                <span className="text-xs font-medium text-zinc-700">{confidence.toFixed(0)}%</span>
+              </div>
+            )}
+
+            <p className="mt-3 text-sm text-zinc-700 line-clamp-4">{summary}</p>
+
+            {notes && (
+              <div className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 ring-1 ring-inset ring-amber-100">
+                <span className="font-semibold">Notes:</span> {notes}
+              </div>
+            )}
+
             <dl className="mt-4 grid grid-cols-4 gap-2 text-[11px]">
               {([
                 ["Entry", entry],
@@ -131,9 +151,11 @@ function SavedSignals() {
               ))}
             </dl>
 
-
             <footer className="mt-4 flex items-center justify-between text-[11px] text-zinc-400">
-              <span className="font-mono uppercase tracking-wider">Saved {new Date(r.created_at).toLocaleDateString()}</span>
+              <span className="font-mono uppercase tracking-wider">
+                {session ? `${session} · ` : ""}
+                Saved {new Date(r.created_at).toLocaleDateString()}
+              </span>
               {snap && <Link to="/signal" search={{ symbol: pair, savedId: r.id }} className="text-zinc-600 hover:text-zinc-900">Re-open →</Link>}
             </footer>
           </article>
