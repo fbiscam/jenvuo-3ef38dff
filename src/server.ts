@@ -55,15 +55,21 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 // Subdomain mounting (leads./dash./blogs./support.jenvu.com) is handled by the
 // router's `rewrite` option in src/router.tsx so the section prefix never shows
-// in the address bar. No redirect happens here anymore.
+// in the address bar. On the apex/www domain we additionally redirect section
+// URLs to their subdomain (jenvu.com/dashboard -> dash.jenvu.com).
+import { apexRedirectTarget } from "./lib/subdomain";
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const target = apexRedirectTarget(new URL(request.url));
+      if (target) return Response.redirect(target, 301);
+
       const handler = await getServerEntry();
 
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
+
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
