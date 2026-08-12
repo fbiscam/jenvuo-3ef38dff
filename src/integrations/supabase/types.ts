@@ -1207,6 +1207,7 @@ export type Database = {
           updated_at: string
           user_agent: string | null
           user_id: string | null
+          whatsapp_number: string | null
           why_joining: string | null
         }
         Insert: {
@@ -1239,6 +1240,7 @@ export type Database = {
           updated_at?: string
           user_agent?: string | null
           user_id?: string | null
+          whatsapp_number?: string | null
           why_joining?: string | null
         }
         Update: {
@@ -1271,6 +1273,7 @@ export type Database = {
           updated_at?: string
           user_agent?: string | null
           user_id?: string | null
+          whatsapp_number?: string | null
           why_joining?: string | null
         }
         Relationships: []
