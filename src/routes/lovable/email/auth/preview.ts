@@ -19,7 +19,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 
 // Configuration
 const SITE_NAME = "Jenvu"
-const ROOT_DOMAIN = "jenvu.net"
+const ROOT_DOMAIN = "jenvu.com"
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 // URLs are baked in at scaffold time from the project's real data.

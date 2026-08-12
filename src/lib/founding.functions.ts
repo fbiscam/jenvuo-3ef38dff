@@ -36,9 +36,9 @@ export type FoundingApplication = {
   requested_plan?: string | null;
 };
 
-const SUPPORT_INBOX = "support@jenvu.net";
-const FROM_ADDRESS = "Jenvu Founding <founding@jenvu.net>";
-const SENDER_DOMAIN = "notify.jenvu.net";
+const SUPPORT_INBOX = "support@jenvu.com";
+const FROM_ADDRESS = "Jenvu Founding <founding@jenvu.com>";
+const SENDER_DOMAIN = "notify.jenvu.com";
 const APP_URL = "https://jenvu.com";
 
 function escapeHtml(s: string) {

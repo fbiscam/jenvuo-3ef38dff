@@ -2,8 +2,8 @@
 // Used by manual admin broadcast and auto-scan cron.
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
 
-const SENDER_DOMAIN = 'notify.jenvu.net'
-const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.net>'
+const SENDER_DOMAIN = 'notify.jenvu.com'
+const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.com>'
 
 export interface EnqueueAlertEmailsArgs {
   alertId: string
