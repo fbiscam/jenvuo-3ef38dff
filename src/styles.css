@@ -647,7 +647,9 @@ html[data-pwa="1"] .pwa-tabbar {
   text-transform: lowercase !important;
   letter-spacing: 0 !important;
   color: rgb(0 0 0) !important;
-  padding: 0 4px 8px !important;
+  padding: 0 0 8px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
   border: 0 !important;
 }
 .jenvu-zoom-dashboard main h2::first-letter {
