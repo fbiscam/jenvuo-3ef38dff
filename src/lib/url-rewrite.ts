@@ -72,8 +72,15 @@ export function apexRedirectTarget(url: URL): string | null {
   const p = url.pathname;
   if (isReserved(p)) return null;
 
-  // 1. Subdomain -> apex (with section prefix).
-  if (host !== ROOT_DOMAIN && host.endsWith(`.${ROOT_DOMAIN}`) && !host.startsWith("www.")) {
+  // 1. Subdomain -> apex (with section prefix). Handle www. specially.
+  if (host === `www.${ROOT_DOMAIN}`) {
+    if (isReserved(p)) return null;
+    const next = new URL(url);
+    next.hostname = ROOT_DOMAIN;
+    return next.toString();
+  }
+
+  if (host !== ROOT_DOMAIN && host.endsWith(`.${ROOT_DOMAIN}`)) {
     const sub = host.slice(0, host.length - `.${ROOT_DOMAIN}`.length);
     if (sub.includes(".")) return null;
     const section = SUBDOMAIN_SECTIONS[sub];
@@ -88,6 +95,7 @@ export function apexRedirectTarget(url: URL): string | null {
     }
     return next.toString();
   }
+
 
   // 2. Apex domain: redirect /dashboard/child -> /child for clean URLs.
   if (isApex(host)) {
