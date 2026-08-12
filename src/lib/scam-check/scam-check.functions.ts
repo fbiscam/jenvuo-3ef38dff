@@ -39,7 +39,7 @@ const SYSTEM = `You are a fraud analyst. You judge whether a link, email address
 You receive the raw input plus deterministic heuristic signals already detected.
 Return STRICT JSON only:
 {"score": number 0-100 risk, "summary": string (max 45 words, plain simple English), "recommendation": string (max 30 words, what the person should do), "extra_signals": [{"label": string, "detail": string, "severity": "low"|"medium"|"high"}]}
-Rules: be decisive but fair. A normal well-known domain or a plain harmless message must score low (<25). Never invent facts about domain age or blacklists you cannot verify. extra_signals may be an empty array; include at most 3 that the heuristics missed.`;
+Rules: be decisive but fair. Write every string in plain English only — never mix in other languages. A normal well-known domain or a plain harmless message must score low (<25). Never invent facts about domain age or blacklists you cannot verify. extra_signals may be an empty array; include at most 3 that the heuristics missed.`;
 
 export const scamCheck = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
