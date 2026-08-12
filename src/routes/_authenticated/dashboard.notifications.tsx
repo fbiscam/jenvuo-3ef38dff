@@ -187,10 +187,10 @@ function NotificationsPage() {
     const url = explicit ?? (n.type === "signal_alert" || categoryOf(n) === "signals" ? "/dashboard/alerts" : undefined);
     const inner = (
       <div className={cn(
-        "group relative flex gap-3 rounded-2xl px-4 py-3.5 transition",
+        "group relative flex gap-3 rounded-2xl border border-zinc-200 bg-white px-4 py-3.5 shadow-sm transition",
         unread
-          ? "bg-blue-50/40 hover:bg-blue-50/70"
-          : "bg-white hover:bg-zinc-50",
+          ? "hover:border-zinc-300 hover:bg-zinc-50"
+          : "hover:border-zinc-300 hover:bg-zinc-50",
       )}>
         {unread && <span className="absolute left-1.5 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-blue-500" aria-hidden />}
         <div className={cn("mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full", tone)}>
