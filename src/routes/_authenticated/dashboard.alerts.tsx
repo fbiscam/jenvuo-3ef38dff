@@ -424,10 +424,10 @@ function AlertPrefs() {
     >
     <div className="max-w-6xl space-y-6">
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-base font-semibold text-black normal-case">Recent alerts</h2>
+            <h2 className="text-base font-semibold text-black normal-case pl-2">Recent alerts</h2>
             <p className="mt-1 text-sm text-zinc-500">Live A+ setups across all pairs & coins. Updates in realtime.</p>
           </div>
           <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -648,7 +648,7 @@ function AlertPrefs() {
 
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-base font-semibold text-black normal-case">Delivery channels</h2>
+        <h2 className="pl-2 text-base font-semibold text-black normal-case">Delivery channels</h2>
         <p className="mt-1 text-sm text-zinc-500">Choose how new A+ setups reach you.</p>
         <div className="mt-5 space-y-3">
           <Toggle
@@ -776,7 +776,7 @@ function AlertPrefs() {
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-base font-semibold text-black normal-case">Conviction filter</h2>
+        <h2 className="pl-2 text-base font-semibold text-black normal-case">Conviction filter</h2>
         <p className="mt-1 text-sm text-zinc-500">Only fire when confidence meets this threshold.</p>
         <div className="mt-4 inline-flex flex-wrap gap-1 rounded-lg border border-zinc-200 p-1">
           {([
@@ -813,7 +813,7 @@ function AlertPrefs() {
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-base font-semibold text-black normal-case">Alert filters</h2>
+        <h2 className="pl-2 text-base font-semibold text-black normal-case">Alert filters</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Applies to <span className="font-medium text-zinc-800">all channels</span> — email, browser push, and Telegram.
           Choose which signals qualify — grade, pair, and direction all must match.
@@ -922,7 +922,7 @@ function AlertPrefs() {
 
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-base font-semibold text-black normal-case">Quiet hours</h2>
+        <h2 className="pl-2 text-base font-semibold text-black normal-case">Quiet hours</h2>
         <p className="mt-1 text-sm text-zinc-500">No alerts will be sent during this window (your local time).</p>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <label className="text-xs font-medium text-zinc-600">
