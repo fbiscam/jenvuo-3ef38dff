@@ -3,7 +3,7 @@
 // computeSignalPlan → same gates (killzone, HTF, min conf).
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const AUTO_MIN_CONF = 70;
+const AUTO_MIN_CONF = 75;
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
