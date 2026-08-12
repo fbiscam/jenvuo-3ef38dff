@@ -97,6 +97,7 @@ function AdminFoundingPage() {
       return (
         r.email.toLowerCase().includes(needle) ||
         r.full_name.toLowerCase().includes(needle) ||
+        String((r as any).whatsapp_number || "").toLowerCase().includes(needle) ||
         (r.country || "").toLowerCase().includes(needle) ||
         (r.broker || "").toLowerCase().includes(needle)
       );
