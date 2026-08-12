@@ -304,10 +304,10 @@ function NotificationsPage() {
                 key={f.key}
                 onClick={() => setFilter(f.key)}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition",
+                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium shadow-sm transition",
                   active
-                    ? "border-zinc-300 bg-zinc-50 text-zinc-900"
-                    : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50",
+                    ? "bg-zinc-50 text-zinc-900"
+                    : "bg-white text-zinc-600 hover:bg-zinc-50",
                 )}
               >
                 {f.label}
