@@ -244,8 +244,6 @@ function FoundingPage() {
                 label="WhatsApp number"
                 type="tel"
                 required
-                inputMode="tel"
-                pattern="^\+?[0-9][0-9\s-]{6,23}$"
                 placeholder="+92 300 1234567"
               />
 
