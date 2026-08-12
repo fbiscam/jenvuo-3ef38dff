@@ -27,6 +27,15 @@ function isForbidden(error: unknown): boolean {
   return error instanceof Error && error.message.includes('403')
 }
 
+// Lovable API key registry lookup failures are transient infrastructure errors,
+// not permanent auth failures. Retry them via the queue instead of moving to DLQ.
+function isRetryableKeyError(error: unknown): boolean {
+  if (error && typeof error === 'object' && 'type' in error) {
+    return (error as { type: string }).type === 'lovable_api_key_registry_lookup_failed'
+  }
+  return error instanceof Error && error.message.includes('lovable_api_key_registry_lookup_failed')
+}
+
 // Extract Retry-After seconds from a structured EmailAPIError, or default to 60s.
 function getRetryAfterSeconds(error: unknown): number {
   if (error && typeof error === 'object' && 'retryAfterSeconds' in error) {
