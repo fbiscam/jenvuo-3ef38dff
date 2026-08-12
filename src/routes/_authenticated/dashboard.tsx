@@ -464,10 +464,15 @@ function DashboardLayout() {
   }, []);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [isAdminUser, setIsAdminUser] = useState(false);
+  const [hostname, setHostname] = useState("");
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
   const greetingText = pickGreeting(localHour);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") setHostname(window.location.hostname);
+  }, []);
   const currentPlan = useCurrentPlan();
   const showDeepSeek = true;
   const showGrok = true;
