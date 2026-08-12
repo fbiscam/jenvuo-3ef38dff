@@ -7,6 +7,12 @@ import type { Database } from "@/integrations/supabase/types";
 const ApplyInput = z.object({
   full_name: z.string().trim().min(2).max(100),
   email: z.string().trim().email().max(255),
+  whatsapp_number: z
+    .string()
+    .trim()
+    .min(7, "Enter a valid WhatsApp number")
+    .max(24)
+    .regex(/^\+?[0-9][0-9\s-]{6,23}$/, "Enter a valid WhatsApp number"),
   country: z.string().trim().max(60).optional().default(""),
   broker: z.string().trim().max(80).optional().default(""),
   experience_years: z.coerce.number().int().min(0).max(80).optional(),
@@ -21,6 +27,7 @@ export type FoundingApplication = {
   id: string;
   full_name: string;
   email: string;
+  whatsapp_number?: string | null;
   country: string | null;
   broker: string | null;
   experience_years: number | null;
@@ -36,9 +43,9 @@ export type FoundingApplication = {
   requested_plan?: string | null;
 };
 
-const SUPPORT_INBOX = "support@jenvu.net";
-const FROM_ADDRESS = "Jenvu Founding <founding@jenvu.net>";
-const SENDER_DOMAIN = "notify.jenvu.net";
+const SUPPORT_INBOX = "support@jenvu.com";
+const FROM_ADDRESS = "Jenvu Founding <founding@jenvu.com>";
+const SENDER_DOMAIN = "notify.jenvu.com";
 const APP_URL = "https://jenvu.com";
 
 function escapeHtml(s: string) {
@@ -382,6 +389,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
     const { error } = await supabase.from("founding_applications" as any).insert({
       full_name: data.full_name,
       email: data.email.toLowerCase(),
+      whatsapp_number: data.whatsapp_number,
       country: data.country || null,
       broker: data.broker || null,
       experience_years: data.experience_years ?? null,
@@ -409,6 +417,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
         const safe = {
           n: escapeHtml(data.full_name),
           e: escapeHtml(data.email),
+          wa: escapeHtml(data.whatsapp_number),
           c: escapeHtml(data.country || "—"),
           b: escapeHtml(data.broker || "—"),
           y: String(data.experience_years ?? "—"),
@@ -422,6 +431,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
             <h1 style="font-size:20px;margin:8px 0 16px">${safe.n}</h1>
             <table style="width:100%;font-size:14px;border-collapse:collapse;margin-bottom:16px">
               <tr><td style="color:#6b7280;padding:4px 0;width:140px">Email</td><td>${safe.e}</td></tr>
+              <tr><td style="color:#6b7280;padding:4px 0">WhatsApp</td><td><a href="https://wa.me/${safe.wa.replace(/[^0-9]/g, "")}">${safe.wa}</a></td></tr>
               <tr><td style="color:#6b7280;padding:4px 0">Requested plan</td><td><strong>${escapeHtml(data.requested_plan.toUpperCase())}</strong></td></tr>
               <tr><td style="color:#6b7280;padding:4px 0">Country</td><td>${safe.c}</td></tr>
               <tr><td style="color:#6b7280;padding:4px 0">Broker</td><td>${safe.b}</td></tr>
@@ -432,7 +442,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
             <div style="font-size:14px;line-height:1.6;white-space:pre-wrap;border-top:1px solid #e5e7eb;padding-top:16px">${safe.w}</div>
             <p style="font-size:12px;color:#6b7280;margin-top:24px">Review in the Founding admin panel.</p>
           </div></body></html>`;
-        const text = `New founding application\n\n${data.full_name} <${data.email}>\nRequested plan: ${data.requested_plan.toUpperCase()}\nCountry: ${data.country || "—"}\nBroker: ${data.broker || "—"}\nExperience: ${data.experience_years ?? "—"} yrs\nMonthly volume: $${data.monthly_volume_usd ?? "—"}\nMyFxBook: ${data.myfxbook_url || "—"}\n\n${data.why_joining}`;
+        const text = `New founding application\n\n${data.full_name} <${data.email}>\nWhatsApp: ${data.whatsapp_number}\nRequested plan: ${data.requested_plan.toUpperCase()}\nCountry: ${data.country || "—"}\nBroker: ${data.broker || "—"}\nExperience: ${data.experience_years ?? "—"} yrs\nMonthly volume: $${data.monthly_volume_usd ?? "—"}\nMyFxBook: ${data.myfxbook_url || "—"}\n\n${data.why_joining}`;
         const messageId = crypto.randomUUID();
         const adminUnsubToken = await getOrCreateUnsubToken(admin, SUPPORT_INBOX);
         await admin.from("email_send_log").insert({

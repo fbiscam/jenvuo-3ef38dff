@@ -80,6 +80,7 @@ function FoundingPage() {
         data: {
           full_name: String(fd.get("full_name") || ""),
           email: String(fd.get("email") || ""),
+          whatsapp_number: String(fd.get("whatsapp_number") || ""),
           country: String(fd.get("country") || ""),
           broker: String(fd.get("broker") || ""),
           experience_years: fd.get("experience_years") ? Number(fd.get("experience_years")) : undefined,
@@ -238,6 +239,14 @@ function FoundingPage() {
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
               <Field name="full_name" label="Full name" required placeholder="Your full name" />
               <Field name="email" label="Email" type="email" required placeholder="you@example.com" />
+              <Field
+                name="whatsapp_number"
+                label="WhatsApp number"
+                type="tel"
+                required
+                placeholder="+92 300 1234567"
+              />
+
 
               <div>
                 <label className="text-[13px] font-medium text-zinc-800">

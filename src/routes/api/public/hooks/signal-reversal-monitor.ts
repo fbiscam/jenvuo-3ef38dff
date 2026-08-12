@@ -429,8 +429,8 @@ export const Route = createFileRoute(
                         payload: {
                           message_id: messageId,
                           to: email,
-                          from: "Jenvu Signal Desk <signals@notify.jenvu.net>",
-                          sender_domain: "notify.jenvu.net",
+                          from: "Jenvu Signal Desk <signals@notify.jenvu.com>",
+                          sender_domain: "notify.jenvu.com",
                           subject,
                           html: htmlWithUnsubscribe,
                           text: textWithUnsubscribe,

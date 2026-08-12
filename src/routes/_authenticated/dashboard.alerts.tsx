@@ -780,8 +780,8 @@ function AlertPrefs() {
         <p className="mt-1 text-sm text-zinc-500">Only fire when confidence meets this threshold.</p>
         <div className="mt-4 inline-flex flex-wrap gap-1 rounded-lg border border-zinc-200 p-1">
           {([
-            { key: 70, label: "70%" },
             { key: 75, label: "75%" },
+            { key: 80, label: "80%" },
             { key: 85, label: "85%" },
           ] as const).map((opt) => {
             const currentThreshold = (() => {
