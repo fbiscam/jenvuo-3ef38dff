@@ -257,111 +257,104 @@ function NotificationsPage() {
   };
 
   return (
-    <div className="h-screen bg-white">
-      <div className="mx-auto flex h-full max-w-3xl flex-col px-4 sm:px-6">
-        {/* Sticky header + filters */}
-        <div className="sticky top-0 z-10 bg-white pt-6 pb-4 sm:pt-8">
-          <header className="mb-6 flex items-start justify-between gap-4">
-            <div>
-              <h1 className="pl-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
-                Notifications
-              </h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                {unreadCount > 0
-                  ? `You have ${unreadCount} unread ${unreadCount === 1 ? "update" : "updates"}.`
-                  : "You're all caught up."}
-              </p>
-            </div>
-            {unreadCount > 0 && (
+    <div className="min-h-screen bg-white px-4 pb-8 sm:px-6">
+      <div className="mx-auto max-w-3xl pt-6 sm:pt-8">
+        <header className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="pl-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
+              Notifications
+            </h1>
+            <p className="mt-1 text-sm text-zinc-500">
+              {unreadCount > 0
+                ? `You have ${unreadCount} unread ${unreadCount === 1 ? "update" : "updates"}.`
+                : "You're all caught up."}
+            </p>
+          </div>
+          {unreadCount > 0 && (
+            <button
+              onClick={async () => {
+                await markAll();
+                setItems((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() })));
+                try {
+                  const { data } = await supabase.auth.getUser();
+                  if (data.user?.id) {
+                    window.localStorage.setItem(`jenvu:notifs:last-seen:${data.user.id}`, new Date().toISOString());
+                  }
+                } catch {}
+              }}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm hover:bg-zinc-50"
+            >
+              <CheckCheck className="h-3.5 w-3.5" /> Mark all as read
+            </button>
+          )}
+        </header>
+
+        {/* Filter pills */}
+        <div className="mb-6 flex flex-wrap gap-1.5">
+          {FILTERS.map((f) => {
+            const active = filter === f.key;
+            const count =
+              f.key === "all"
+                ? items.length
+                : f.key === "unread"
+                  ? unreadCount
+                  : items.filter((n) => categoryOf(n) === f.key).length;
+            return (
               <button
-                onClick={async () => {
-                  await markAll();
-                  setItems((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() })));
-                  try {
-                    const { data } = await supabase.auth.getUser();
-                    if (data.user?.id) {
-                      window.localStorage.setItem(`jenvu:notifs:last-seen:${data.user.id}`, new Date().toISOString());
-                    }
-                  } catch {}
-                }}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm hover:bg-zinc-50"
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition",
+                  active
+                    ? "border-zinc-300 bg-zinc-50 text-zinc-900"
+                    : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50",
+                )}
               >
-                <CheckCheck className="h-3.5 w-3.5" /> Mark all as read
+                {f.label}
+                {count > 0 && (
+                  <span className={cn(
+                    "rounded-full px-1.5 text-[10px]",
+                    active ? "bg-white text-zinc-900" : "bg-zinc-100 text-zinc-500",
+                  )}>{count}</span>
+                )}
               </button>
+            );
+          })}
+        </div>
 
-            )}
-          </header>
-
-          {/* Filter pills */}
-          <div className="flex flex-wrap gap-1.5">
-            {FILTERS.map((f) => {
-              const active = filter === f.key;
-              const count =
-                f.key === "all"
-                  ? items.length
-                  : f.key === "unread"
-                    ? unreadCount
-                    : items.filter((n) => categoryOf(n) === f.key).length;
+        {loading ? (
+          <div className="flex items-center justify-center py-20 text-zinc-400">
+            <Loader2 className="h-5 w-5 animate-spin" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-zinc-200 p-14 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">
+              <Bell className="h-5 w-5" />
+            </div>
+            <div className="text-sm font-medium text-zinc-800">Nothing here</div>
+            <div className="mt-1 text-xs text-zinc-500">
+              {filter === "unread"
+                ? "No unread notifications."
+                : "New notifications will appear here."}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {(["today", "yesterday", "earlier"] as const).map((key) => {
+              const list = groups[key];
+              if (list.length === 0) return null;
+              const label = key === "today" ? "Today" : key === "yesterday" ? "Yesterday" : "Earlier";
               return (
-                <button
-                  key={f.key}
-                  onClick={() => setFilter(f.key)}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition",
-                    active
-                      ? "border-zinc-300 bg-zinc-50 text-zinc-900"
-                      : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50",
-                  )}
-                >
-                  {f.label}
-                  {count > 0 && (
-                    <span className={cn(
-                      "rounded-full px-1.5 text-[10px]",
-                      active ? "bg-white text-zinc-900" : "bg-zinc-100 text-zinc-500",
-                    )}>{count}</span>
-                  )}
-                </button>
+                <section key={key}>
+                  <div className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-widest text-zinc-400">
+                    {label}
+                  </div>
+                  <div className="space-y-2">{list.map(renderItem)}</div>
+                </section>
               );
             })}
           </div>
-        </div>
-
-        {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto pb-6 sm:pb-8">
-          {loading ? (
-            <div className="flex items-center justify-center py-20 text-zinc-400">
-              <Loader2 className="h-5 w-5 animate-spin" />
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-zinc-200 p-14 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">
-                <Bell className="h-5 w-5" />
-              </div>
-              <div className="text-sm font-medium text-zinc-800">Nothing here</div>
-              <div className="mt-1 text-xs text-zinc-500">
-                {filter === "unread"
-                  ? "No unread notifications."
-                  : "New notifications will appear here."}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              {(["today", "yesterday", "earlier"] as const).map((key) => {
-                const list = groups[key];
-                if (list.length === 0) return null;
-                const label = key === "today" ? "Today" : key === "yesterday" ? "Yesterday" : "Earlier";
-                return (
-                  <section key={key}>
-                    <div className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-widest text-zinc-400">
-                      {label}
-                    </div>
-                    <div className="space-y-2">{list.map(renderItem)}</div>
-                  </section>
-                );
-              })}
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
