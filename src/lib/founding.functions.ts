@@ -388,6 +388,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
     const { error } = await supabase.from("founding_applications" as any).insert({
       full_name: data.full_name,
       email: data.email.toLowerCase(),
+      whatsapp_number: data.whatsapp_number,
       country: data.country || null,
       broker: data.broker || null,
       experience_years: data.experience_years ?? null,
