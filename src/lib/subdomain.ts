@@ -43,6 +43,30 @@ function isReserved(pathname: string): boolean {
   );
 }
 
+/**
+ * On the apex/www domain, send section URLs to their subdomain home:
+ *   jenvu.com/dashboard/billing -> dash.jenvu.com/billing
+ *   jenvu.com/leads/maps        -> leads.jenvu.com/maps
+ * Returns the absolute target URL, or null when no redirect applies.
+ */
+export function apexRedirectTarget(url: URL): string | null {
+  const host = url.hostname.toLowerCase();
+  if (host !== "jenvu.com" && host !== "www.jenvu.com") return null;
+  const p = url.pathname;
+  if (isReserved(p)) return null;
+  for (const [sub, section] of Object.entries(SUBDOMAIN_SECTIONS)) {
+    if (p === section || p.startsWith(`${section}/`)) {
+      const next = new URL(url);
+      next.hostname = `${sub}.jenvu.com`;
+      next.pathname = p.slice(section.length) || "/";
+      return next.toString();
+    }
+  }
+  return null;
+}
+
+
+
 /** Address-bar URL → internal router URL (adds the section prefix). */
 export function rewriteInput(url: URL): URL | undefined {
   const section = sectionForHost(url.hostname);
