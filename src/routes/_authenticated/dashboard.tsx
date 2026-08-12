@@ -1065,38 +1065,46 @@ function DashboardLayout() {
 
 
         {/* Analytics header */}
-        <div className="-mt-2 flex items-center justify-between">
+        <div className="-mt-2 flex items-start justify-between">
           <div />
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleRefresh}
-              disabled={refreshing}
-              aria-label="Refresh analytics"
-              title="Refresh analytics"
-              className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border border-zinc-200 bg-white p-0 leading-none text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 active:bg-zinc-100 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+          <div className="flex flex-col items-end gap-2">
+            <Link
+              to="/dashboard/profile"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-900"
+              aria-label="Profile"
+              title="Profile"
             >
-              <RefreshCw className={`h-3.5 w-3.5 shrink-0 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
-            </button>
-            <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
-              <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44">
-              {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
-                <DropdownMenuCheckboxItem
-                  key={k}
-                  checked={range === k}
-                  onCheckedChange={() => setRange(k)}
-                  className="text-[12px] md:text-[14px]"
-                >
-                  {RANGE_LABELS[k]}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-
-
-            </DropdownMenu>
+              <User className="h-4 w-4" />
+            </Link>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleRefresh}
+                disabled={refreshing}
+                aria-label="Refresh analytics"
+                title="Refresh analytics"
+                className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border border-zinc-200 bg-white p-0 leading-none text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 active:bg-zinc-100 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 shrink-0 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
+              </button>
+              <DropdownMenu>
+              <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
+                <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
+                  <DropdownMenuCheckboxItem
+                    key={k}
+                    checked={range === k}
+                    onCheckedChange={() => setRange(k)}
+                    className="text-[12px] md:text-[14px]"
+                  >
+                    {RANGE_LABELS[k]}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
 
