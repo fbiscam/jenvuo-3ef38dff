@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { MapPin, Users, Globe, Upload } from "lucide-react";
+import { MapPin, Users, Globe, Upload, Wallet, Activity, ListChecks } from "lucide-react";
 import { getOverview } from "@/lib/leadgen/core.functions";
 import { Card } from "@/components/leadgen/LeadsShell";
 import { LeadsLanding } from "@/components/leadgen/LeadsLanding";
