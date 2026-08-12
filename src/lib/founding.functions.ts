@@ -27,6 +27,7 @@ export type FoundingApplication = {
   id: string;
   full_name: string;
   email: string;
+  whatsapp_number?: string | null;
   country: string | null;
   broker: string | null;
   experience_years: number | null;
