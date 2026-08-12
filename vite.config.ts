@@ -114,6 +114,10 @@ export default defineConfig({
   },
   vite: {
     plugins: [serverFnManifestRegen()],
+    server: {
+      // Allow the jenvu.com subdomains so dev/preview can serve them too.
+      allowedHosts: [".jenvu.com", ".lovable.app", "localhost"],
+    },
     resolve: {
       alias: {
         "entities/lib/decode.js": path.resolve(__dirname, "node_modules/entities/lib/decode.js"),
