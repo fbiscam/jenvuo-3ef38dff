@@ -1499,7 +1499,7 @@ function DailyTip() {
 
 
 
-      <h4 className="mt-1 text-[14px] font-semibold text-zinc-900">{tip.title}</h4>
+      <h4 className="pl-1 mt-1 text-[14px] font-semibold text-zinc-900">{tip.title}</h4>
       <p className="text-[12px] leading-relaxed text-zinc-600">{tip.body}</p>
       <div className="mt-auto pt-3">
         <Link to="/insights" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">

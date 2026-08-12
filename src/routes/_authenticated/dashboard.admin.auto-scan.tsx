@@ -388,7 +388,7 @@ function PerformanceDashboard({
             <BarChart3 className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold tracking-tight text-zinc-900">Signal Performance</h2>
+            <h2 className="pl-1 text-sm font-semibold tracking-tight text-zinc-900">Signal Performance</h2>
             <p className="text-[11px] text-zinc-500">
               Win rate, R:R, correct vs wrong — evaluated against 15m market candles
             </p>
@@ -465,19 +465,19 @@ function PerformanceDashboard({
 
       {/* By pair */}
       <div className="p-5 pt-4">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Per pair</h3>
+        <h3 className="pl-1 mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Per pair</h3>
         <PerfTable buckets={perf?.byPair ?? []} loading={loading} />
       </div>
 
       {/* By pair + direction */}
       <div className="p-5 pt-1">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Per pair · direction</h3>
+        <h3 className="pl-1 mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Per pair · direction</h3>
         <PerfTable buckets={perf?.byPairDirection ?? []} loading={loading} showDirection />
       </div>
 
       {/* Recent signals */}
       <div className="p-5 pt-1 pb-6">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Recent signals</h3>
+        <h3 className="pl-1 mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Recent signals</h3>
         <div className="overflow-x-auto rounded-xl border border-zinc-100">
           <table className="w-full text-xs">
             <thead className="bg-zinc-50 text-zinc-500">
@@ -640,7 +640,7 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
   return (
     <section className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
       <div className="flex items-baseline justify-between gap-3 px-4 sm:px-5 py-3 border-b border-zinc-100">
-        <h2 className="text-sm font-semibold text-zinc-900">{title}</h2>
+        <h2 className="pl-1 text-sm font-semibold text-zinc-900">{title}</h2>
         {hint && <span className="text-[11px] text-zinc-500">{hint}</span>}
       </div>
       <div className="overflow-x-auto">{children}</div>

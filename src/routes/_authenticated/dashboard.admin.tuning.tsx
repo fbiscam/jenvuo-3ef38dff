@@ -215,7 +215,7 @@ function TuningPage() {
       )}
 
       <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h2 className="mb-3 text-lg font-semibold text-slate-900">Run grid search</h2>
+        <h2 className="pl-1 mb-3 text-lg font-semibold text-slate-900">Run grid search</h2>
         <div className="flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1 text-xs text-slate-600">
             Symbol
@@ -246,7 +246,7 @@ function TuningPage() {
       </section>
 
       <section className="rounded-xl border border-slate-200 bg-white">
-        <h2 className="border-b border-slate-100 p-4 text-lg font-semibold text-slate-900">Tuning runs</h2>
+        <h2 className="pl-1 border-b border-slate-100 p-4 text-lg font-semibold text-slate-900">Tuning runs</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500">
@@ -286,7 +286,7 @@ function TuningPage() {
       </section>
 
       <section className="rounded-xl border border-slate-200 bg-white">
-        <h2 className="border-b border-slate-100 p-4 text-lg font-semibold text-slate-900">Weight configurations</h2>
+        <h2 className="pl-1 border-b border-slate-100 p-4 text-lg font-semibold text-slate-900">Weight configurations</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500">
