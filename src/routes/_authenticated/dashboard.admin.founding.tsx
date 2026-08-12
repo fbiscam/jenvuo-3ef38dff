@@ -339,6 +339,31 @@ function AdminFoundingPage() {
                       >
                         <Copy className="h-3 w-3" />
                       </button>
+                      {(r as any).whatsapp_number && (
+                        <>
+                          <span>·</span>
+                          <a
+                            href={`https://wa.me/${String((r as any).whatsapp_number).replace(/[^0-9]/g, "")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-700 hover:underline"
+                            title="Open WhatsApp chat"
+                          >
+                            {(r as any).whatsapp_number}
+                          </a>
+                          <button
+                            onClick={() =>
+                              navigator.clipboard
+                                .writeText(String((r as any).whatsapp_number))
+                                .then(() => toast.success("WhatsApp number copied"))
+                            }
+                            className="rounded p-0.5 text-zinc-400 hover:text-zinc-700"
+                            title="Copy WhatsApp number"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
+                        </>
+                      )}
                       {r.country && <span>· {r.country}</span>}
                       {r.broker && <span>· {r.broker}</span>}
                       {r.experience_years !== null && <span>· {r.experience_years}y exp</span>}
