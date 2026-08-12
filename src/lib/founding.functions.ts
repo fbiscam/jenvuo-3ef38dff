@@ -7,6 +7,12 @@ import type { Database } from "@/integrations/supabase/types";
 const ApplyInput = z.object({
   full_name: z.string().trim().min(2).max(100),
   email: z.string().trim().email().max(255),
+  whatsapp_number: z
+    .string()
+    .trim()
+    .min(7, "Enter a valid WhatsApp number")
+    .max(24)
+    .regex(/^\+?[0-9][0-9\s-]{6,23}$/, "Enter a valid WhatsApp number"),
   country: z.string().trim().max(60).optional().default(""),
   broker: z.string().trim().max(80).optional().default(""),
   experience_years: z.coerce.number().int().min(0).max(80).optional(),
