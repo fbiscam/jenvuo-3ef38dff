@@ -81,7 +81,7 @@ function BugTriagePage() {
         <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.08)] sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Bug Triage</h1>
+              <h1 className="pl-1 text-xl font-semibold tracking-tight sm:text-2xl">Bug Triage</h1>
               <p className="mt-1 text-sm text-zinc-500">
                 Grouped runtime errors from the app. Analyze with AI to get root cause + suggested fix.
               </p>

@@ -148,7 +148,7 @@ function DocumentsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 font-['Google_Sans',_'Inter',_system-ui,_sans-serif]">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-zinc-900 mt-1">Earning proof</h1>
+        <h1 className="pl-1 text-2xl font-semibold text-zinc-900 mt-1">Earning proof</h1>
         <p className="text-sm text-zinc-600 mt-2">
           Upload screenshots or a short recording of recent earnings — billing activates only after our team verifies your proof.
         </p>

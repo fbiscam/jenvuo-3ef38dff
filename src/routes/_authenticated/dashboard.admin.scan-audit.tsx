@@ -68,7 +68,7 @@ function ScanAuditPage() {
     <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold flex items-center gap-2">
+          <h1 className="pl-1 text-xl font-semibold flex items-center gap-2">
             <ShieldCheck className="h-5 w-5" /> Scan Charge Audit
           </h1>
           <p className="text-xs text-muted-foreground mt-1">

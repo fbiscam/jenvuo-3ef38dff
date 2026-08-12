@@ -263,7 +263,7 @@ function NotificationsPage() {
         <div className="sticky top-0 z-10 bg-white pt-6 pb-4 sm:pt-8">
           <header className="mb-6 flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
+              <h1 className="pl-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
                 Notifications
               </h1>
               <p className="mt-1 text-sm text-zinc-500">

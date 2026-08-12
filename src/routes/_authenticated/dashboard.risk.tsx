@@ -57,7 +57,7 @@ function RiskPage() {
   return (
     <div className="h-full max-w-5xl mx-auto px-6 py-4 flex flex-col overflow-hidden" style={{ fontFamily: "Urbanist, system-ui, sans-serif" }}>
       <div className="mb-3">
-        <h1 className="text-xl font-semibold text-black">Risk Management</h1>
+        <h1 className="pl-1 text-xl font-semibold text-black">Risk Management</h1>
         <p className="text-xs text-gray-600 mt-0.5">
           Position size and daily loss guard. Applies to signal cards and Telegram alerts.
         </p>

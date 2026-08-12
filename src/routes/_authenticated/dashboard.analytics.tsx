@@ -65,7 +65,7 @@ function Analytics() {
           {/* Header */}
           <div className="flex items-end justify-between flex-wrap gap-3">
             <div>
-              <h1 className={`text-xl font-bold ${MONO} text-zinc-900 tracking-tight`}>Trade Analytics</h1>
+              <h1 className={`pl-1 text-xl font-bold ${MONO} text-zinc-900 tracking-tight`}>Trade Analytics</h1>
               <p className="text-[13px] text-zinc-500 mt-1">Personalised insights from your last {trades.length} logged trades.</p>
             </div>
             <div className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-400`}>

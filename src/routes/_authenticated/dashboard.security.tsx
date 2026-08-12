@@ -34,7 +34,7 @@ function SecurityPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-lg font-semibold">Security</h1>
+        <h1 className="pl-1 text-lg font-semibold">Security</h1>
         <p className="mt-1 text-sm text-zinc-500">
           Manage how you sign in to Jenvu — password, two-factor authentication and trusted devices.
         </p>
