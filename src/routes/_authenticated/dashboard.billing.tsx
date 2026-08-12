@@ -339,7 +339,7 @@ function Billing() {
       <section>
         <div className="mb-6">
           <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>&nbsp;</div>
-          <h3 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Pick your tier, line by line.</h3>
+          <h3 className="pl-1 mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Pick your tier, line by line.</h3>
         </div>
 
         <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">

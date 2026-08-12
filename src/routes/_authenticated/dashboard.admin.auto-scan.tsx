@@ -465,19 +465,19 @@ function PerformanceDashboard({
 
       {/* By pair */}
       <div className="p-5 pt-4">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Per pair</h3>
+        <h3 className="pl-1 mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Per pair</h3>
         <PerfTable buckets={perf?.byPair ?? []} loading={loading} />
       </div>
 
       {/* By pair + direction */}
       <div className="p-5 pt-1">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Per pair · direction</h3>
+        <h3 className="pl-1 mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Per pair · direction</h3>
         <PerfTable buckets={perf?.byPairDirection ?? []} loading={loading} showDirection />
       </div>
 
       {/* Recent signals */}
       <div className="p-5 pt-1 pb-6">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Recent signals</h3>
+        <h3 className="pl-1 mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Recent signals</h3>
         <div className="overflow-x-auto rounded-xl border border-zinc-100">
           <table className="w-full text-xs">
             <thead className="bg-zinc-50 text-zinc-500">
