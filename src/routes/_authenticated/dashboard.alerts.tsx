@@ -781,7 +781,7 @@ function AlertPrefs() {
         <div className="mt-4 inline-flex flex-wrap gap-1 rounded-lg border border-zinc-200 p-1">
           {([
             { key: 75, label: "75%" },
-            { key: 75, label: "75%" },
+            { key: 80, label: "80%" },
             { key: 85, label: "85%" },
           ] as const).map((opt) => {
             const currentThreshold = (() => {
