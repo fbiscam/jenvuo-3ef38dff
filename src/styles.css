@@ -627,6 +627,7 @@ html[data-pwa="1"] .pwa-tabbar {
 .jenvu-zoom-dashboard main h4 {
   color: #000 !important;
   text-transform: lowercase !important;
+  margin-left: -5px !important;
 }
 .jenvu-zoom-dashboard main h1::first-letter,
 .jenvu-zoom-dashboard main h2::first-letter,
