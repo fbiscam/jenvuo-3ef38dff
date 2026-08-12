@@ -80,6 +80,7 @@ function FoundingPage() {
         data: {
           full_name: String(fd.get("full_name") || ""),
           email: String(fd.get("email") || ""),
+          whatsapp_number: String(fd.get("whatsapp_number") || ""),
           country: String(fd.get("country") || ""),
           broker: String(fd.get("broker") || ""),
           experience_years: fd.get("experience_years") ? Number(fd.get("experience_years")) : undefined,
