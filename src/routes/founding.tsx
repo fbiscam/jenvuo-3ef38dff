@@ -239,6 +239,16 @@ function FoundingPage() {
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
               <Field name="full_name" label="Full name" required placeholder="Your full name" />
               <Field name="email" label="Email" type="email" required placeholder="you@example.com" />
+              <Field
+                name="whatsapp_number"
+                label="WhatsApp number"
+                type="tel"
+                required
+                inputMode="tel"
+                pattern="^\+?[0-9][0-9\s-]{6,23}$"
+                placeholder="+92 300 1234567"
+              />
+
 
               <div>
                 <label className="text-[13px] font-medium text-zinc-800">
