@@ -183,7 +183,7 @@ export function PageHeader({
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-xl border border-zinc-200 bg-white shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)] ${className}`}
+      className={`rounded-2xl border border-zinc-200 bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)] ${className}`}
     >
       {children}
     </div>

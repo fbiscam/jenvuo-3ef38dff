@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { MapPin, Users, Globe, Upload } from "lucide-react";
+import { MapPin, Users, Globe, Upload, Wallet, Activity, ListChecks } from "lucide-react";
 import { getOverview } from "@/lib/leadgen/core.functions";
 import { Card } from "@/components/leadgen/LeadsShell";
 import { LeadsLanding } from "@/components/leadgen/LeadsLanding";
@@ -35,12 +35,31 @@ const SHORTCUTS = [
   { to: "/leads/import", label: "Import CSV", desc: "Bring your own list", icon: Upload },
 ];
 
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function Stat({
+  label,
+  value,
+  sub,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  icon?: typeof MapPin;
+}) {
   return (
-    <Card className="p-5">
-      <div className="text-[12px] font-medium uppercase tracking-wide text-[#5F6368]">{label}</div>
-      <div className="mt-2 text-[28px] font-normal leading-none text-[#202124]">{value}</div>
-      {sub && <div className="mt-1.5 text-[12px] text-[#80868B]">{sub}</div>}
+    <Card className="p-5 transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-500">{label}</div>
+        {Icon && (
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-600">
+            <Icon className="h-4 w-4" strokeWidth={1.8} />
+          </span>
+        )}
+      </div>
+      <div className="mt-3 text-[30px] font-semibold leading-none tracking-tight text-zinc-900 tabular-nums">
+        {value}
+      </div>
+      {sub && <div className="mt-2 text-[12px] text-zinc-500">{sub}</div>}
     </Card>
   );
 }
@@ -62,33 +81,37 @@ function Overview() {
     <>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Stat
+          icon={Wallet}
           label="Credits remaining"
           value={isLoading ? "—" : (data?.credits.remaining ?? 0).toFixed(2)}
           sub={`Limit ${(data?.credits.monthly_limit ?? 0).toFixed(0)} / month`}
         />
         <Stat
+          icon={Activity}
           label="Credits used"
           value={isLoading ? "—" : (data?.credits.used ?? 0).toFixed(2)}
           sub="Resets on the 1st"
         />
-        <Stat label="Saved leads" value={isLoading ? "—" : String(data?.leads ?? 0)} />
-        <Stat label="Lists" value={isLoading ? "—" : String(data?.lists ?? 0)} />
+        <Stat icon={Users} label="Saved leads" value={isLoading ? "—" : String(data?.leads ?? 0)} />
+        <Stat icon={ListChecks} label="Lists" value={isLoading ? "—" : String(data?.lists ?? 0)} />
       </div>
 
-      <h2 className="mb-3 mt-8 text-[15px] font-medium text-[#3C4043]">Shortcuts</h2>
+      <h2 className="mb-3 mt-8 text-[13px] font-semibold uppercase tracking-[0.08em] text-zinc-500">Shortcuts</h2>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {SHORTCUTS.map((s) => (
           <Link key={s.to} to={s.to}>
-            <Card className="h-full p-5 transition hover:border-[#1A73E8] hover:bg-[#F8FBFF]">
-              <s.icon className="h-5 w-5 text-[#1A73E8]" strokeWidth={1.8} />
-              <div className="mt-3 text-[14px] font-medium text-[#202124]">{s.label}</div>
-              <div className="mt-1 text-[12px] text-[#5F6368]">{s.desc}</div>
+            <Card className="group h-full p-5 transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-700 transition group-hover:bg-zinc-900 group-hover:text-white">
+                <s.icon className="h-4.5 w-4.5" strokeWidth={1.8} />
+              </span>
+              <div className="mt-3 text-[14px] font-semibold text-zinc-900">{s.label}</div>
+              <div className="mt-1 text-[12px] text-zinc-500">{s.desc}</div>
             </Card>
           </Link>
         ))}
       </div>
 
-      <h2 className="mb-3 mt-8 text-[15px] font-medium text-[#3C4043]">Recent lists</h2>
+      <h2 className="mb-3 mt-8 text-[13px] font-semibold uppercase tracking-[0.08em] text-zinc-500">Recent lists</h2>
       <Card>
         {(data?.recentLists ?? []).length === 0 ? (
           <div className="p-6 text-[13px] text-[#5F6368]">

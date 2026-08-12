@@ -97,6 +97,7 @@ function AdminFoundingPage() {
       return (
         r.email.toLowerCase().includes(needle) ||
         r.full_name.toLowerCase().includes(needle) ||
+        String((r as any).whatsapp_number || "").toLowerCase().includes(needle) ||
         (r.country || "").toLowerCase().includes(needle) ||
         (r.broker || "").toLowerCase().includes(needle)
       );
@@ -167,6 +168,7 @@ function AdminFoundingPage() {
       "status",
       "full_name",
       "email",
+      "whatsapp_number",
       "country",
       "broker",
       "experience_years",
@@ -252,7 +254,7 @@ function AdminFoundingPage() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search name, email, country, broker…"
+              placeholder="Search name, email, WhatsApp, country, broker…"
               className="w-full rounded-lg border border-zinc-200 bg-white pl-9 pr-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-amber-400 focus:outline-none"
             />
           </div>
@@ -339,6 +341,31 @@ function AdminFoundingPage() {
                       >
                         <Copy className="h-3 w-3" />
                       </button>
+                      {(r as any).whatsapp_number && (
+                        <>
+                          <span>·</span>
+                          <a
+                            href={`https://wa.me/${String((r as any).whatsapp_number).replace(/[^0-9]/g, "")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-700 hover:underline"
+                            title="Open WhatsApp chat"
+                          >
+                            {(r as any).whatsapp_number}
+                          </a>
+                          <button
+                            onClick={() =>
+                              navigator.clipboard
+                                .writeText(String((r as any).whatsapp_number))
+                                .then(() => toast.success("WhatsApp number copied"))
+                            }
+                            className="rounded p-0.5 text-zinc-400 hover:text-zinc-700"
+                            title="Copy WhatsApp number"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
+                        </>
+                      )}
                       {r.country && <span>· {r.country}</span>}
                       {r.broker && <span>· {r.broker}</span>}
                       {r.experience_years !== null && <span>· {r.experience_years}y exp</span>}
