@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeader } from "@tanstack/react-start/server";
+
 import { z } from "zod";
 import { callChatCompletion } from "@/lib/ai-gateway";
 import { runRules, verdictFor, type Signal, type Verdict } from "@/lib/scam-check/rules";
