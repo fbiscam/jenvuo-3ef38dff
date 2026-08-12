@@ -99,7 +99,7 @@ function ReferralsPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Refer & Earn</h1>
+        <h1 className="pl-1 text-2xl font-semibold text-zinc-900 tracking-tight">Refer & Earn</h1>
         <p className="mt-1 text-sm text-zinc-500">
           Share your link. When a friend upgrades to Pro, Elite, or Ultra, you both get{" "}
           <span className="font-medium text-emerald-600">$5 bonus wallet credit</span> each.

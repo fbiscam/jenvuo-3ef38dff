@@ -86,7 +86,7 @@ function UsagePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Wallet usage</h1>
+        <h1 className="pl-1 text-2xl font-semibold text-zinc-900">Wallet usage</h1>
         <p className="mt-1 text-sm text-zinc-500">Actual $ cost per scan · model used · tokens processed.</p>
       </div>
 

@@ -164,7 +164,7 @@ function Profile() {
   return (
     <div className="max-w-2xl space-y-6">
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-base font-semibold">Profile</h2>
+        <h2 className="pl-1 text-base font-semibold">Profile</h2>
 
         {/* Profile photo */}
         <div className="mt-5 flex items-center gap-5">

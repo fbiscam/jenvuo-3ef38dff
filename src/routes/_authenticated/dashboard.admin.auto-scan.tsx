@@ -156,7 +156,7 @@ function AutoScanAdminPage() {
             <div className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] text-white/70">
               <Activity className="h-3 w-3" /> Auto-Scan Ops
             </div>
-            <h1 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">Auto-Scan Monitor</h1>
+            <h1 className="pl-1 mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">Auto-Scan Monitor</h1>
             <p className="mt-1 text-sm text-white/60">
               15-min cron · 2-hit confirmation · paid-tier broadcast · signal performance analytics
             </p>

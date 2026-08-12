@@ -131,7 +131,7 @@ function AdminDocumentsPage() {
     <div className="mx-auto max-w-6xl px-4 py-8 font-['Google_Sans',_'Inter',_system-ui,_sans-serif]">
       <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Earning proof submissions</h1>
+          <h1 className="pl-1 text-2xl font-semibold text-zinc-900">Earning proof submissions</h1>
           <p className="text-sm text-zinc-600 mt-1">Review uploads and approve or reject users' earning proof.</p>
         </div>
         <div className="flex gap-2 flex-wrap">

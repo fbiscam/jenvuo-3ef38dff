@@ -93,7 +93,7 @@ function TvMismatchPage() {
       <div className="mx-auto max-w-5xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">TradingView Mismatch Checker</h1>
+            <h1 className="pl-1 text-2xl font-semibold text-slate-900">TradingView Mismatch Checker</h1>
             <p className="mt-1 text-sm text-slate-500">
               Compares our Yahoo-computed cross-pair candles (used in Telegram signal images) against an
               independent live reference (gold-api spot × ECB FX) and reports drift.
