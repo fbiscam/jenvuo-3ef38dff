@@ -1598,7 +1598,7 @@ function SignalPage() {
 
 
 
-                  {/* Take Trade / Save Signal — only when valid trade plan (conf ≥ 75, entry/SL/TP present) */}
+                  {/* Take Trade / Save Signal — only when valid trade plan (conf ≥ 70, entry/SL/TP present) */}
                   {(isBuy || isSell) && t.confidence >= 70 && Number.isFinite(t.entry) && Number.isFinite(t.sl) && Number.isFinite(t.tp) && t.entry > 0 && t.sl > 0 && t.tp > 0 && (
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
@@ -2479,7 +2479,7 @@ function TradeTrackerCard({
         </svg>
       )}
 
-      {/* Trade Management Ladder — only when a real trade plan is issued (confidence ≥ 75) */}
+      {/* Trade Management Ladder — only when a real trade plan is issued (confidence ≥ 70) */}
       {(plan.trade?.confidence ?? 0) >= 70 && plan.trade?.direction !== "WAIT" && (
         <TradeManagementLadder plan={plan} rMultiple={rMultiple} status={status} />
       )}
@@ -2974,7 +2974,7 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
   const onRun = async () => {
     setLoading(true);
     try {
-      const r = await run({ data: { symbol, threshold: 75 } });
+      const r = await run({ data: { symbol, threshold: 70 } });
       setResult(r);
       setOpen(true);
     } catch (e: any) {
@@ -2993,7 +2993,7 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
         className="w-full mt-2 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 disabled:opacity-50 px-3 py-2 text-xs font-medium text-zinc-900 flex items-center justify-center gap-2"
       >
         {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
-        {loading ? "Running historical backtest…" : "Run historical backtest (75%+ setups)"}
+        {loading ? "Running historical backtest…" : "Run historical backtest (70%+ setups)"}
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -3001,7 +3001,7 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
           <DialogHeader>
             <DialogTitle className="text-zinc-900">Historical Backtest — {result?.symbol}</DialogTitle>
             <DialogDescription className="text-zinc-600">
-              Deterministic SMC engine, {result?.bars ?? 0} bars scanned, score threshold {result?.threshold ?? 75}.
+              Deterministic SMC engine, {result?.bars ?? 0} bars scanned, score threshold {result?.threshold ?? 70}.
             </DialogDescription>
           </DialogHeader>
 
