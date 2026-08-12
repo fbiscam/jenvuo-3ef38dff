@@ -254,7 +254,7 @@ function AdminFoundingPage() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search name, email, country, broker…"
+              placeholder="Search name, email, WhatsApp, country, broker…"
               className="w-full rounded-lg border border-zinc-200 bg-white pl-9 pr-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-amber-400 focus:outline-none"
             />
           </div>
