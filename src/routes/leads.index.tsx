@@ -35,12 +35,31 @@ const SHORTCUTS = [
   { to: "/leads/import", label: "Import CSV", desc: "Bring your own list", icon: Upload },
 ];
 
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function Stat({
+  label,
+  value,
+  sub,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  icon?: typeof MapPin;
+}) {
   return (
-    <Card className="p-5">
-      <div className="text-[12px] font-medium uppercase tracking-wide text-[#5F6368]">{label}</div>
-      <div className="mt-2 text-[28px] font-normal leading-none text-[#202124]">{value}</div>
-      {sub && <div className="mt-1.5 text-[12px] text-[#80868B]">{sub}</div>}
+    <Card className="p-5 transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-500">{label}</div>
+        {Icon && (
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-600">
+            <Icon className="h-4 w-4" strokeWidth={1.8} />
+          </span>
+        )}
+      </div>
+      <div className="mt-3 text-[30px] font-semibold leading-none tracking-tight text-zinc-900 tabular-nums">
+        {value}
+      </div>
+      {sub && <div className="mt-2 text-[12px] text-zinc-500">{sub}</div>}
     </Card>
   );
 }
