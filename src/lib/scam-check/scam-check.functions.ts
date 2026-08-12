@@ -44,6 +44,7 @@ Rules: be decisive but fair. A normal well-known domain or a plain harmless mess
 export const scamCheck = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<ScamCheckResult> => {
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
     const ip =
       getRequestHeader("cf-connecting-ip") ||
       (getRequestHeader("x-forwarded-for") ?? "").split(",")[0]?.trim() ||
