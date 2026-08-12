@@ -166,10 +166,10 @@ export function rewriteOutput(url: URL): URL | undefined {
   // Admin paths: /dashboard/admin/* -> /admin/*
   if (p === "/dashboard/admin" || p.startsWith("/dashboard/admin/")) {
     const next = new URL(url);
-    next.pathname = "/" + p.slice("/dashboard/admin/".length).replace(/^\//, "");
-    if (!next.pathname || next.pathname === "/") next.pathname = "/admin";
+    next.pathname = "/admin" + (p === "/dashboard/admin" ? "" : p.slice("/dashboard/admin".length));
     return next;
   }
+
 
   // Dashboard child paths: /dashboard/alerts -> /alerts
   const segments = p.split("/").filter(Boolean);
