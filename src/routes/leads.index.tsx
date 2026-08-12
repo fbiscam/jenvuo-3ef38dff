@@ -81,33 +81,37 @@ function Overview() {
     <>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Stat
+          icon={Wallet}
           label="Credits remaining"
           value={isLoading ? "—" : (data?.credits.remaining ?? 0).toFixed(2)}
           sub={`Limit ${(data?.credits.monthly_limit ?? 0).toFixed(0)} / month`}
         />
         <Stat
+          icon={Activity}
           label="Credits used"
           value={isLoading ? "—" : (data?.credits.used ?? 0).toFixed(2)}
           sub="Resets on the 1st"
         />
-        <Stat label="Saved leads" value={isLoading ? "—" : String(data?.leads ?? 0)} />
-        <Stat label="Lists" value={isLoading ? "—" : String(data?.lists ?? 0)} />
+        <Stat icon={Users} label="Saved leads" value={isLoading ? "—" : String(data?.leads ?? 0)} />
+        <Stat icon={ListChecks} label="Lists" value={isLoading ? "—" : String(data?.lists ?? 0)} />
       </div>
 
-      <h2 className="mb-3 mt-8 text-[15px] font-medium text-[#3C4043]">Shortcuts</h2>
+      <h2 className="mb-3 mt-8 text-[13px] font-semibold uppercase tracking-[0.08em] text-zinc-500">Shortcuts</h2>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {SHORTCUTS.map((s) => (
           <Link key={s.to} to={s.to}>
-            <Card className="h-full p-5 transition hover:border-[#1A73E8] hover:bg-[#F8FBFF]">
-              <s.icon className="h-5 w-5 text-[#1A73E8]" strokeWidth={1.8} />
-              <div className="mt-3 text-[14px] font-medium text-[#202124]">{s.label}</div>
-              <div className="mt-1 text-[12px] text-[#5F6368]">{s.desc}</div>
+            <Card className="group h-full p-5 transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-700 transition group-hover:bg-zinc-900 group-hover:text-white">
+                <s.icon className="h-4.5 w-4.5" strokeWidth={1.8} />
+              </span>
+              <div className="mt-3 text-[14px] font-semibold text-zinc-900">{s.label}</div>
+              <div className="mt-1 text-[12px] text-zinc-500">{s.desc}</div>
             </Card>
           </Link>
         ))}
       </div>
 
-      <h2 className="mb-3 mt-8 text-[15px] font-medium text-[#3C4043]">Recent lists</h2>
+      <h2 className="mb-3 mt-8 text-[13px] font-semibold uppercase tracking-[0.08em] text-zinc-500">Recent lists</h2>
       <Card>
         {(data?.recentLists ?? []).length === 0 ? (
           <div className="p-6 text-[13px] text-[#5F6368]">
