@@ -168,6 +168,7 @@ function AdminFoundingPage() {
       "status",
       "full_name",
       "email",
+      "whatsapp_number",
       "country",
       "broker",
       "experience_years",
