@@ -648,7 +648,7 @@ html[data-pwa="1"] .pwa-tabbar {
   letter-spacing: 0 !important;
   color: rgb(0 0 0) !important;
   padding: 0 0 8px !important;
-  margin-left: 0 !important;
+  margin-left: -5px !important;
   margin-right: 0 !important;
   border: 0 !important;
 }
