@@ -299,9 +299,29 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                 return Response.json({ processed: totalProcessed, stopped: 'rate_limited' })
               }
 
-              // 403s are permanent configuration or authorization failures for this
-              // message, so move straight to DLQ and stop processing the rest of the batch.
+              // 403s are normally permanent configuration or authorization failures.
+              // However, LOVABLE_API_KEY registry lookup failures are transient, so we
+              // log them and retry via the queue instead of DLQing immediately.
               if (isForbidden(error)) {
+                if (isRetryableKeyError(error)) {
+                  console.warn('Email send failed due to key registry lookup; retrying', {
+                    queue,
+                    msg_id: msg.msg_id,
+                    message_id: payload.message_id,
+                    error: errorMsg,
+                  })
+                  await supabase.from('email_send_log').insert({
+                    message_id: payload.message_id,
+                    template_name: payload.label || queue,
+                    recipient_email: payload.to,
+                    status: 'failed',
+                    error_message: errorMsg.slice(0, 1000),
+                  })
+                  if (payload?.message_id && typeof payload.message_id === 'string') {
+                    failedAttemptsByMessageId.set(payload.message_id, failedAttempts + 1)
+                  }
+                  return Response.json({ processed: totalProcessed, stopped: 'key_registry_lookup_failed' })
+                }
                 await moveToDlq(supabase, queue, msg, errorMsg.slice(0, 1000))
                 return Response.json({ processed: totalProcessed, stopped: 'forbidden' })
               }
