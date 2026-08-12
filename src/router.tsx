@@ -2,7 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { RouteSpinner } from "./components/RouteSpinner";
-import { rewriteInput, rewriteOutput } from "./lib/subdomain";
+import { rewriteInput, rewriteOutput } from "./lib/url-rewrite";
 
 export const getRouter = () => {
   const queryClient = new QueryClient({
@@ -25,8 +25,8 @@ export const getRouter = () => {
     defaultPendingMs: 200,
     defaultPendingMinMs: 100,
     defaultPendingComponent: RouteSpinner,
-    // Mount each jenvu.com subdomain on its section without ever showing the
-    // section prefix in the address bar (leads.jenvu.com/maps, dash.jenvu.com/billing).
+    // Clean URLs on the apex domain: /alerts, /billing, /admin/*, etc.
+    // The internal route tree still lives at /dashboard/* for the dashboard section.
     rewrite: {
       input: ({ url }) => rewriteInput(url),
       output: ({ url }) => rewriteOutput(url),
@@ -35,5 +35,6 @@ export const getRouter = () => {
 
   return router;
 };
+
 
 

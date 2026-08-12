@@ -53,11 +53,12 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   });
 }
 
-// Subdomain mounting (leads./dash./blogs./support.jenvu.com) is handled by the
-// router's `rewrite` option in src/router.tsx so the section prefix never shows
-// in the address bar. On the apex/www domain we additionally redirect section
-// URLs to their subdomain (jenvu.com/dashboard -> dash.jenvu.com).
-import { apexRedirectTarget } from "./lib/subdomain";
+// Subdomain mounting and dashboard URL rewriting are handled in
+// src/lib/url-rewrite.ts and applied by the router in src/router.tsx.
+// On the server we also redirect old subdomain URLs and legacy /dashboard/*
+// paths to the clean apex-domain URLs.
+import { apexRedirectTarget } from "./lib/url-rewrite";
+
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
