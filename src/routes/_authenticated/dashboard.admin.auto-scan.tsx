@@ -388,7 +388,7 @@ function PerformanceDashboard({
             <BarChart3 className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold tracking-tight text-zinc-900">Signal Performance</h2>
+            <h2 className="pl-1 text-sm font-semibold tracking-tight text-zinc-900">Signal Performance</h2>
             <p className="text-[11px] text-zinc-500">
               Win rate, R:R, correct vs wrong — evaluated against 15m market candles
             </p>
@@ -640,7 +640,7 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
   return (
     <section className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
       <div className="flex items-baseline justify-between gap-3 px-4 sm:px-5 py-3 border-b border-zinc-100">
-        <h2 className="text-sm font-semibold text-zinc-900">{title}</h2>
+        <h2 className="pl-1 text-sm font-semibold text-zinc-900">{title}</h2>
         {hint && <span className="text-[11px] text-zinc-500">{hint}</span>}
       </div>
       <div className="overflow-x-auto">{children}</div>

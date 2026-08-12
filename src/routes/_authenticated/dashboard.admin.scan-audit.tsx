@@ -85,7 +85,7 @@ function ScanAuditPage() {
 
       {/* Mismatches */}
       <section className="border rounded-lg p-4 bg-card">
-        <h2 className="text-sm font-semibold flex items-center gap-2 mb-3">
+        <h2 className="pl-1 text-sm font-semibold flex items-center gap-2 mb-3">
           <AlertTriangle className="h-4 w-4 text-amber-500" />
           Mismatched scans ({mismatches.length})
           <span className="text-[10px] font-normal text-muted-foreground">— any scan_id with more than 1 deduction</span>

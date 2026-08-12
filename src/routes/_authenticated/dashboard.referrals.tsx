@@ -152,7 +152,7 @@ function ReferralsPage() {
       {/* Redeem code (if not yet referred) */}
       {!info.incoming && (
         <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <h2 className="text-sm font-semibold text-zinc-900">Have a friend's code?</h2>
+          <h2 className="pl-1 text-sm font-semibold text-zinc-900">Have a friend's code?</h2>
           <p className="mt-1 text-xs text-zinc-500">
             Enter it before upgrading to earn $5 bonus wallet credit.
           </p>

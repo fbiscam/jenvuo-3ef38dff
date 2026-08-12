@@ -234,7 +234,7 @@ function Profile() {
       </section>
 
       <section id="change-email" className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-base font-semibold">Change email</h2>
+        <h2 className="pl-1 text-base font-semibold">Change email</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Enter a new email and we'll send a confirmation link to your current email address. Your email changes only after you click that link.
         </p>
@@ -270,7 +270,7 @@ function Profile() {
 
 
       <section className="rounded-2xl border border-rose-200 bg-rose-50/40 p-6">
-        <h2 className="text-base font-semibold text-rose-700">Danger zone</h2>
+        <h2 className="pl-1 text-base font-semibold text-rose-700">Danger zone</h2>
         <p className="mt-1 text-sm text-rose-600/80">Deleting your account is permanent and cannot be undone.</p>
         {!confirmDelete ? (
           <button onClick={() => setConfirmDelete(true)} className="mt-4 rounded-lg border border-rose-300 bg-white px-4 py-2 text-sm font-medium text-rose-700 hover:bg-rose-50">
