@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
-import { Target, Zap, Shield, TrendingUp, Cpu, Brain, Award } from "lucide-react";
+import { Target, Zap, Shield, TrendingUp, Cpu, Brain, Award, Search, Megaphone, AlertTriangle } from "lucide-react";
+import founderPhoto from "@/assets/haseeb-ijaz-founder.png.asset.json";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
@@ -29,7 +30,8 @@ const FOUNDING_STORY = {
   bio: [
     "Haseeb Ijaz started Jenvu at age 21 with a single conviction: institutional-grade gold analysis should not be locked behind a Bloomberg terminal or a Wall Street desk.",
     "He spent years dissecting ICT, SMC, liquidity engineering and market structure across XAU/USD and every major gold cross-pair. The patterns were repeatable, but the execution tools were fragmented. So he built the desk he wished he had at 18 — voice-native, AI-augmented, and ruthlessly honest about risk.",
-    "Today, Jenvu combines 25 proprietary skills and techniques into a single terminal that speaks in real time, draws institutional logic on the chart, and tells traders exactly when to step aside.",
+    "Beyond the terminal, Haseeb has sharpened 25 proprietary skills and techniques spanning market research, product marketing, community building and AI-driven growth. That same research discipline is why Jenvu learns faster with every scan.",
+    "Today, Jenvu combines those 25 disciplines into a single terminal that speaks in real time, draws institutional logic on the chart, and tells traders exactly when to step aside.",
   ],
 };
 
@@ -89,6 +91,17 @@ const SKILL_PILLARS = [
       "Go-to-Market Execution",
     ],
   },
+  {
+    icon: <Search className="h-5 w-5" />,
+    title: "Marketing & Research",
+    skills: [
+      "Market Research & Validation",
+      "Product Marketing & Positioning",
+      "Community Growth",
+      "Scams Awareness & Education",
+      "Competitive Intelligence",
+    ],
+  },
 ];
 
 const ALL_SKILLS = SKILL_PILLARS.flatMap((p) => p.skills);
@@ -105,20 +118,31 @@ function FounderPage() {
         <div className="relative">
           <div className="aspect-square overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100">
             <img
-              src="/haseeb-ijaz-founder.jpg"
+              src={founderPhoto.url}
               alt="Haseeb Ijaz — Founder of Jenvu"
               className="h-full w-full object-cover"
               width={1024}
               height={1024}
             />
           </div>
-          <div className="mt-4 flex items-center gap-3 rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white">
-              <Award className="h-5 w-5" />
+          <div className="mt-4 space-y-3">
+            <div className="flex items-center gap-3 rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white">
+                <Award className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-zinc-900">Founded at age {FOUNDING_STORY.foundedAge}</p>
+                <p className={`text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>Jenvu · Voice Trading Desk</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-zinc-900">Founded at age {FOUNDING_STORY.foundedAge}</p>
-              <p className={`text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>Jenvu · Voice Trading Desk</p>
+            <div className="flex items-center gap-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500 text-white">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-zinc-900">Pakistan No. #1 Scams Awareness Provider</p>
+                <p className={`text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>Protecting traders online</p>
+              </div>
             </div>
           </div>
         </div>
@@ -161,7 +185,7 @@ function FounderPage() {
             25 skills & techniques
           </h2>
           <p className="mt-2 max-w-2xl text-zinc-600">
-            The stack Haseeb used to architect Jenvu — from institutional market structure to AI orchestration and product execution.
+            The stack Haseeb used to architect Jenvu — from institutional market structure to AI orchestration, product marketing, market research and growth execution.
           </p>
         </div>
 
@@ -191,8 +215,40 @@ function FounderPage() {
 
         <div className="rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3">
           <p className={`text-center text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>
-            Total skill stack: {ALL_SKILLS.length} disciplines
+            Total skill stack: {ALL_SKILLS.length} disciplines across trading, AI, engineering & marketing
           </p>
+        </div>
+      </section>
+
+      {/* Scams Awareness */}
+      <section className="rounded-2xl border border-amber-100 bg-amber-50/60 p-6 sm:p-8">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+            <Megaphone className="h-6 w-6" />
+          </div>
+          <div className="space-y-3">
+            <h2 className={`text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl ${SANS}`}>
+              Pakistan's No. #1 Scams Awareness Provider
+            </h2>
+            <p className="text-zinc-700 leading-relaxed">
+              Haseeb is on a mission to make Pakistan's trading community the safest in the region. Through Jenvu's free Scam Check Tool, public awareness campaigns and real-time fraud alerts, he helps traders spot fake signal sellers, Ponzi schemes, copy-trading fraud and account-management scams before they lose a single rupee.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              <Link
+                to="/scam-tool"
+                className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-amber-600 transition-colors"
+              >
+                <Shield className="h-4 w-4" />
+                Check a Scam Now
+              </Link>
+              <Link
+                to="/contact"
+                className="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 hover:bg-amber-50 transition-colors"
+              >
+                Report a Scam
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
