@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
-import { Target, Zap, Shield, TrendingUp, Cpu, Brain, Award, Search, Megaphone, AlertTriangle } from "lucide-react";
+import { Zap, Shield, Award, Megaphone, AlertTriangle } from "lucide-react";
 import founderPhoto from "@/assets/haseeb-ijaz-founder.png.asset.json";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
@@ -35,88 +35,6 @@ const FOUNDING_STORY = {
   ],
 };
 
-const SKILL_PILLARS = [
-  {
-    icon: <TrendingUp className="h-5 w-5" />,
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-    title: "Institutional Structure",
-    skills: [
-      "Market Structure (BOS/CHoCH)",
-      "Order Block Analysis",
-      "Fair Value Gaps (FVG)",
-      "Breaker & Mitigation Blocks",
-      "Liquidity Sweeps & Engineering",
-    ],
-  },
-  {
-    icon: <Target className="h-5 w-5" />,
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-    title: "Precision Timing",
-    skills: [
-      "Killzone Timing",
-      "Premium/Discount Zones",
-      "Optimal Trade Entry (OTE)",
-      "Fibonacci Confluence",
-      "Wyckoff Logic",
-    ],
-  },
-  {
-    icon: <Shield className="h-5 w-5" />,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-    title: "Risk & Capital",
-    skills: [
-      "Risk-Reward Engineering",
-      "Position Sizing Models",
-      "Portfolio Heat Mapping",
-      "Drawdown Control",
-      "Correlation Risk",
-    ],
-  },
-  {
-    icon: <Brain className="h-5 w-5" />,
-    color: "text-purple-600",
-    bg: "bg-purple-50",
-    title: "AI & Quantitative",
-    skills: [
-      "LLM Orchestration",
-      "Multi-Model Confidence Scoring",
-      "Backtesting Frameworks",
-      "Statistical Edge Detection",
-      "Feature Engineering",
-    ],
-  },
-  {
-    icon: <Cpu className="h-5 w-5" />,
-    color: "text-rose-600",
-    bg: "bg-rose-50",
-    title: "Engineering & Growth",
-    skills: [
-      "Python & Quant Scripting",
-      "API Architecture",
-      "Real-Time Data Pipelines",
-      "Voice Interface Design",
-      "Go-to-Market Execution",
-    ],
-  },
-  {
-    icon: <Search className="h-5 w-5" />,
-    color: "text-cyan-600",
-    bg: "bg-cyan-50",
-    title: "Marketing & Research",
-    skills: [
-      "Market Research & Validation",
-      "Product Marketing & Positioning",
-      "Community Growth",
-      "Scams Awareness & Education",
-      "Competitive Intelligence",
-    ],
-  },
-];
-
-const ALL_SKILLS = SKILL_PILLARS.flatMap((p) => p.skills);
 
 function FounderPage() {
   return (
@@ -190,47 +108,6 @@ function FounderPage() {
         </div>
       </section>
 
-      {/* 25 Skills */}
-      <section className="space-y-6">
-        <div className="border-t border-zinc-100 pt-8">
-          <h2 className={`text-2xl font-semibold tracking-tight text-zinc-900 ${SANS}`}>
-            25 skills & techniques
-          </h2>
-          <p className="mt-2 max-w-2xl text-zinc-600">
-            The stack Haseeb used to architect Jenvu — from institutional market structure to AI orchestration, product marketing, market research and growth execution.
-          </p>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SKILL_PILLARS.map((pillar) => (
-            <div
-              key={pillar.title}
-              className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-            >
-              <div className="mb-4 flex items-center gap-3">
-                <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${pillar.bg} ${pillar.color}`}>
-                  {pillar.icon}
-                </div>
-                <h3 className="font-semibold text-zinc-900">{pillar.title}</h3>
-              </div>
-              <ul className="space-y-2 text-sm text-zinc-700">
-                {pillar.skills.map((skill) => (
-                  <li key={skill} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-400" />
-                    {skill}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3">
-          <p className={`text-center text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>
-            Total skill stack: {ALL_SKILLS.length} disciplines across trading, AI, engineering & marketing
-          </p>
-        </div>
-      </section>
 
       {/* Scams Awareness */}
       <section className="rounded-2xl border border-amber-100 bg-amber-50/60 p-6 sm:p-8">
