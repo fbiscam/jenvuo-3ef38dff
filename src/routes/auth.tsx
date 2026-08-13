@@ -1051,16 +1051,100 @@ function AuthPage() {
                         </div>
                       </form>
                     ) : (
-                      <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3.5 text-[13px] leading-snug text-amber-900">
-                        <div className="font-semibold text-amber-950">Jenvu Founding Program — Invite Only</div>
-                        <p className="mt-1.5">
-                          Access to Jenvu is currently limited to founding members. Read the program details and submit your application to receive access:{" "}
-                          <a href="/founding" className="font-semibold underline hover:text-amber-950">
-                            Read more & apply →
-                          </a>
+                      <form onSubmit={signUp} className="mt-4 space-y-3">
+                        <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-[12.5px] leading-snug text-zinc-700">
+                          <span className="font-semibold text-zinc-900">14 days of Pro, free.</span>{" "}
+                          $15 of scan credits, realtime alerts and the full ICT engine — no card required.
+                        </div>
+
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            Full Name
+                          </label>
+                          <div className="relative">
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                              type="text"
+                              required
+                              maxLength={100}
+                              autoComplete="name"
+                              value={fullName}
+                              onChange={(e) => setFullName(e.target.value)}
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              placeholder="Your name..."
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            Email
+                          </label>
+                          <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                              type="email"
+                              required
+                              maxLength={255}
+                              autoComplete="username"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              placeholder="Institutional email..."
+                            />
+                          </div>
+                          {flashInline("email")}
+                        </div>
+
+                        <div>
+                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                            Password
+                          </label>
+                          <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                              type={showPassword ? "text" : "password"}
+                              required
+                              minLength={8}
+                              autoComplete="new-password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-11 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              placeholder="Min 8 characters..."
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword((v) => !v)}
+                              aria-label={showPassword ? "Hide password" : "Show password"}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                            >
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                          {flashInline("password")}
+                        </div>
+
+                        {errorMsg && (
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                            <span className="leading-snug">{errorMsg}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                        >
+                          {loading ? btnLoading("Creating account...") : (<>Start 14-day Pro trial <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
+                        </button>
+
+                        <p className="pt-1 text-center text-[11.5px] text-zinc-500">
+                          Trial ends automatically after 14 days — no charge, no card.
                         </p>
-                      </div>
+                      </form>
                     )
+
                   ) : mode === "forgot" ? (
                     forgotStep === "email" ? (
                       <form onSubmit={sendResetLink} className="mt-4 space-y-3">
@@ -1302,14 +1386,16 @@ function AuthPage() {
                       <div className="mt-4 pt-3 border-t border-zinc-100">
                         <p className="text-sm text-zinc-500 leading-relaxed">
                           New here?{" "}
-                          <a
-                            href="/founding"
+                          <button
+                            type="button"
+                            onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
                             className="font-medium text-zinc-900 underline-offset-2 hover:underline"
                           >
-                            Apply to the Founding Program →
-                          </a>
+                            Start your 14-day Pro trial →
+                          </button>
                         </p>
                       </div>
+
                     </>
                   )}
 

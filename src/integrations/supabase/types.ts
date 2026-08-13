@@ -2834,6 +2834,30 @@ export type Database = {
         }
         Relationships: []
       }
+      trial_claims: {
+        Row: {
+          created_at: string
+          fingerprint: string | null
+          id: string
+          ip_hash: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip_hash?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip_hash?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       trusted_devices: {
         Row: {
           created_at: string
@@ -2958,8 +2982,10 @@ export type Database = {
           current_period_end: string
           current_period_start: string
           id: string
+          is_trial: boolean
           plan_id: string
           status: string
+          trial_ends_at: string | null
           updated_at: string
           user_id: string
         }
@@ -2969,8 +2995,10 @@ export type Database = {
           current_period_end?: string
           current_period_start?: string
           id?: string
+          is_trial?: boolean
           plan_id: string
           status?: string
+          trial_ends_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -2980,8 +3008,10 @@ export type Database = {
           current_period_end?: string
           current_period_start?: string
           id?: string
+          is_trial?: boolean
           plan_id?: string
           status?: string
+          trial_ends_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -3093,6 +3123,7 @@ export type Database = {
         Returns: string
       }
       expire_credits: { Args: never; Returns: number }
+      expire_pro_trials: { Args: never; Returns: number }
       get_guest_messages: {
         Args: { _token: string }
         Returns: {
@@ -3253,6 +3284,10 @@ export type Database = {
         }[]
       }
       resync_all_credit_lots: { Args: never; Returns: number }
+      revoke_pro_trial: {
+        Args: { _reason?: string; _user_id: string }
+        Returns: undefined
+      }
       seed_default_setups: { Args: { _user_id: string }; Returns: undefined }
       set_user_plan: {
         Args: { _billing_interval?: string; _plan_id: string; _user_id: string }

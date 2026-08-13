@@ -3,7 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
+import TrialBanner from "@/components/TrialBanner";
 import xaiLogo from "@/assets/xai-logo.png";
+
 
 
 
@@ -146,13 +148,18 @@ function Billing() {
 
   return (
     <div className="space-y-10">
+      <TrialBanner />
       {/* CURRENT PLAN */}
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="mt-2 flex items-center gap-3">
               <h2 className="pl-1 mt-2 text-2xl font-semibold">&nbsp;{planLabel}</h2>
-              {plan ? (
+              {credits.state?.trial?.active ? (
+                <span className="rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+                  Trial · {credits.state.trial.daysLeft}d left
+                </span>
+              ) : plan ? (
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-800">
                   Active
                 </span>
@@ -162,6 +169,7 @@ function Billing() {
                 </span>
               )}
             </div>
+
             <p className="mt-2 max-w-xl text-[12px] leading-snug sm:text-sm sm:leading-normal text-zinc-500">
               {plan
                 ? "Your plan renews automatically. Manage billing via the customer portal."

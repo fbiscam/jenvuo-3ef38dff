@@ -35,12 +35,15 @@ export type LedgerEntry = {
   metadata?: Record<string, any> | null;
 };
 
+export type TrialInfo = { active: boolean; endsAt: string | null; daysLeft: number };
+
 export type CreditState = {
   plan: { id: string; name: string; price_usd: number; wallet_usd: number };
   features: PlanFeatures;
   balance: number;      // USD wallet balance
   allowance: number;    // monthly wallet allowance (USD)
   periodResetsAt: string | null;
+  trial: TrialInfo;
   recent: LedgerEntry[];
 };
 
@@ -52,9 +55,10 @@ export const getCreditState = createServerFn({ method: "GET" })
     const [{ data: sub }, { data: bal }, { data: ledger }] = await Promise.all([
       supabase
         .from("user_subscriptions")
-        .select("plan_id, status")
+        .select("plan_id, status, is_trial, trial_ends_at")
         .eq("user_id", userId)
         .maybeSingle(),
+
       supabase.from("credit_balances").select("balance, monthly_allowance, period_resets_at").eq("user_id", userId).maybeSingle(),
       supabase.from("credit_ledger")
         .select("id, delta, reason, balance_after, created_at, model, stage, prompt_tokens, completion_tokens, raw_cost_usd, metadata")
@@ -91,8 +95,20 @@ export const getCreditState = createServerFn({ method: "GET" })
     const plan = (planRow as any) ?? { id: "free", name: "Free", price_usd: 0, wallet_usd: 1.00, feature_journal: false, feature_realtime_alerts: false, feature_full_ict: false, feature_scanner: false };
     const walletUsd = Number(plan.wallet_usd ?? 0);
 
+    const trialEndsAt = (sub as any)?.trial_ends_at as string | null | undefined;
+    const trialActive = !!(sub as any)?.is_trial && !!trialEndsAt && new Date(trialEndsAt).getTime() > Date.now();
+    const trial = {
+      active: trialActive,
+      endsAt: trialActive ? trialEndsAt! : null,
+      daysLeft: trialActive
+        ? Math.max(0, Math.ceil((new Date(trialEndsAt!).getTime() - Date.now()) / 86_400_000))
+        : 0,
+    };
+
     return {
+      trial,
       plan: { id: plan.id, name: plan.name, price_usd: Number(plan.price_usd ?? 0), wallet_usd: walletUsd },
+
       features: {
         journal: !!plan.feature_journal,
         realtime_alerts: !!plan.feature_realtime_alerts,
