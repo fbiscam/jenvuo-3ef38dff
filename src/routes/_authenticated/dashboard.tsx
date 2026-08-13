@@ -963,7 +963,7 @@ function DashboardLayout() {
 
 
         {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
-        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-white py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}>
+        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-[#FAFAFA] py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}>
           {!sidebarCollapsed && (
             <button
               type="button"
