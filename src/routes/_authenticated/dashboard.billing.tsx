@@ -183,15 +183,15 @@ function Billing() {
 
           </div>
           {trial.active ? (
-            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+            <Link to="/dashboard/pay" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
               Upgrade to Pro
             </Link>
           ) : plan ? (
-            <Link to="/pricing" className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
+            <Link to="/dashboard/pay" className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
               Manage plan
             </Link>
           ) : (
-            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+            <Link to="/dashboard/pay" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
               Choose plan
             </Link>
           )}
@@ -375,9 +375,9 @@ function Billing() {
                   <span className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">Invite Only Pricing</span>
                 </th>
                 {[
-                  { name: "Pro", price: "$15", tag: "Active", to: "/founding" as const, cta: "Upgrade now", dark: false, accent: true, key: "pro" },
-                  { name: "Elite", price: "$50", tag: "Desk", to: "/founding" as const, cta: "Upgrade now", dark: true, key: "elite" },
-                  { name: "Ultra", price: "$100", tag: "Fund / Desk+", to: "/founding" as const, cta: "Upgrade now", dark: false, key: "ultra" },
+                  { name: "Pro", price: "$15", tag: "Active", to: "/dashboard/pay" as const, cta: "Upgrade now", dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: "$50", tag: "Desk", to: "/dashboard/pay" as const, cta: "Upgrade now", dark: true, key: "elite" },
+                  { name: "Ultra", price: "$100", tag: "Fund / Desk+", to: "/dashboard/pay" as const, cta: "Upgrade now", dark: false, key: "ultra" },
                 ].map((p) => {
                   const isCurrent = plan === p.key;
                   return (
