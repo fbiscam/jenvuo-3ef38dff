@@ -87,7 +87,7 @@ function SignalsLivePage() {
             <Link to="/signals-live" className="font-semibold text-emerald-700">Live Feed</Link>
             <Link to="/briefs" className="hover:text-zinc-900">Briefs</Link>
             <Link to="/pricing" className="hover:text-zinc-900">Pricing</Link>
-            <Link to="/about" className="hover:text-zinc-900">About</Link>
+            <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
           </nav>
           <HeaderAuthButtons />
         </div>
@@ -151,7 +151,7 @@ function FeedBody() {
     const resolved = signals.filter((s) => s.outcome === "win" || s.outcome === "loss");
     const wins = resolved.filter((s) => s.outcome === "win").length;
     const losses = resolved.filter((s) => s.outcome === "loss").length;
-    const pending = total - resolved.length;
+    const pending = signals.filter((s) => s.outcome === "pending").length;
     const rSum = resolved.reduce((sum, s) => sum + (s.realized_r ?? 0), 0);
     const win_rate = resolved.length ? (wins / resolved.length) * 100 : 0;
     const avg_r = resolved.length ? rSum / resolved.length : 0;
