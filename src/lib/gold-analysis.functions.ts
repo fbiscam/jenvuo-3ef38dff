@@ -143,6 +143,60 @@ const XAU_ALIASES: Record<string, string> = {
   "GOLDCHF": "XAUCHF", "XAUCHF": "XAUCHF",
 };
 
+// ------------------------------------------------------------
+// NON-GOLD INSTRUMENTS — FX majors, other metals, major crypto.
+// These run through the exact same ICT/SMC + AI pipeline as gold:
+// real OHLC candles (Yahoo / Binance / Coinbase) + live spot ticks.
+// ------------------------------------------------------------
+type ExtraInstrument = {
+  key: string;
+  display: string;
+  kind: "forex" | "metal" | "crypto";
+  decimals: number;
+  quote: string;
+  yahooSymbols?: string[];
+  binanceSymbols?: string[];
+  needsUsdNews: boolean;
+};
+
+const EXTRA_INSTRUMENTS: Record<string, ExtraInstrument> = {
+  // --- FX majors ---
+  EURUSD: { key: "FX:EURUSD", display: "EUR/USD", kind: "forex", decimals: 5, quote: "USD", yahooSymbols: ["EURUSD=X"], needsUsdNews: true },
+  GBPUSD: { key: "FX:GBPUSD", display: "GBP/USD", kind: "forex", decimals: 5, quote: "USD", yahooSymbols: ["GBPUSD=X"], needsUsdNews: true },
+  USDJPY: { key: "FX:USDJPY", display: "USD/JPY", kind: "forex", decimals: 3, quote: "JPY", yahooSymbols: ["USDJPY=X"], needsUsdNews: true },
+  AUDUSD: { key: "FX:AUDUSD", display: "AUD/USD", kind: "forex", decimals: 5, quote: "USD", yahooSymbols: ["AUDUSD=X"], needsUsdNews: true },
+  USDCHF: { key: "FX:USDCHF", display: "USD/CHF", kind: "forex", decimals: 5, quote: "CHF", yahooSymbols: ["USDCHF=X"], needsUsdNews: true },
+  USDCAD: { key: "FX:USDCAD", display: "USD/CAD", kind: "forex", decimals: 5, quote: "CAD", yahooSymbols: ["USDCAD=X"], needsUsdNews: true },
+  // --- Other metals (gold-api spot + Yahoo/futures fallback) ---
+  XAGUSD: { key: "METAL:XAGUSD", display: "XAG/USD", kind: "metal", decimals: 3, quote: "USD", yahooSymbols: ["XAGUSD=X", "SI=F"], needsUsdNews: true },
+  XPTUSD: { key: "METAL:XPTUSD", display: "XPT/USD", kind: "metal", decimals: 2, quote: "USD", yahooSymbols: ["XPTUSD=X", "PL=F"], needsUsdNews: true },
+  // --- Crypto (24/7) ---
+  BTCUSD: { key: "CRYPTO:BTCUSD", display: "BTC/USD", kind: "crypto", decimals: 2, quote: "USD", binanceSymbols: ["BTCUSDT"], yahooSymbols: ["BTC-USD"], needsUsdNews: false },
+  ETHUSD: { key: "CRYPTO:ETHUSD", display: "ETH/USD", kind: "crypto", decimals: 2, quote: "USD", binanceSymbols: ["ETHUSDT"], yahooSymbols: ["ETH-USD"], needsUsdNews: false },
+};
+
+const EXTRA_ALIASES: Record<string, string> = {
+  EUR: "EURUSD", EURO: "EURUSD", EURUSDT: "EURUSD", FIBER: "EURUSD",
+  GBP: "GBPUSD", CABLE: "GBPUSD", POUND: "GBPUSD",
+  JPY: "USDJPY", YEN: "USDJPY", JPYUSD: "USDJPY",
+  AUD: "AUDUSD", AUSSIE: "AUDUSD",
+  CHF: "USDCHF", SWISSY: "USDCHF", FRANC: "USDCHF",
+  CAD: "USDCAD", LOONIE: "USDCAD",
+  XAG: "XAGUSD", SILVER: "XAGUSD", SILVERUSD: "XAGUSD", CHANDI: "XAGUSD",
+  XPT: "XPTUSD", PLATINUM: "XPTUSD",
+  BTC: "BTCUSD", BITCOIN: "BTCUSD", BTCUSDT: "BTCUSD",
+  ETH: "ETHUSD", ETHEREUM: "ETHUSD", ETHUSDT: "ETHUSD",
+};
+
+/** Every symbol the analysis pipeline can scan (gold pairs + FX + metals + crypto). */
+export const SUPPORTED_PAIR_LIST = [...Object.keys(XAU_PAIRS), ...Object.keys(EXTRA_INSTRUMENTS)];
+
+export function isCryptoSymbol(sym: string): boolean {
+  const cleaned = (sym || "").toUpperCase().replace(/[\s_\-/]/g, "");
+  const key = EXTRA_ALIASES[cleaned] ?? cleaned;
+  return EXTRA_INSTRUMENTS[key]?.kind === "crypto";
+}
+
 export function resolveInstrument(input: string): ResolvedInstrument {
   const raw = (input || "").trim();
   const cleaned = raw.toUpperCase().replace(/[\s_\-/]/g, "");
@@ -163,7 +217,25 @@ export function resolveInstrument(input: string): ResolvedInstrument {
     };
   }
 
+  // FX majors / silver / platinum / crypto — same pipeline, own data sources.
+  const extraKey = EXTRA_ALIASES[cleaned] ?? (EXTRA_INSTRUMENTS[cleaned] ? cleaned : null);
+  if (extraKey && EXTRA_INSTRUMENTS[extraKey]) {
+    const e = EXTRA_INSTRUMENTS[extraKey];
+    return {
+      raw: raw || extraKey,
+      key: e.key,
+      display: e.display,
+      kind: e.kind,
+      decimals: e.decimals,
+      yahooSymbols: e.yahooSymbols,
+      binanceSymbols: e.binanceSymbols,
+      quote: e.quote,
+      needsUsdNews: e.needsUsdNews,
+    };
+  }
+
   const key = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : "XAUUSD");
+
   const p = XAU_PAIRS[key];
   // Gold spot from gold-api.com covers XAU/USD; cross-quote pairs derive
   // from XAU/USD × the currency rate at getLiveTick time. Yahoo cross-pair
