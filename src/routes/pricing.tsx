@@ -287,7 +287,6 @@ function PricingPage() {
 
             <tbody>
               {([
-                { f: "AFTER RAISING $100 IN REVENUE - PRICING", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
                 { f: "Monthly wallet (USD)", b: "$15", c: "$50", d: "$100" },
 
                 { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
