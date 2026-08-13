@@ -157,28 +157,50 @@ function PayPage() {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6 px-1 pb-16" style={SANS}>
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Add funds</h1>
-          <p className="mt-1 text-sm text-zinc-500">Pay with USDT — credits land in your scan wallet after verification.</p>
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 p-6 sm:p-8">
+        <div className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full bg-emerald-500/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 left-10 h-56 w-56 rounded-full bg-sky-500/10 blur-3xl" />
+        <div className="relative flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <UsdtIcon className="h-8 w-8" />
+              <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] uppercase tracking-[0.16em] text-white/70">
+                USDT top-up
+              </span>
+            </div>
+            <h1 className="mt-4 text-3xl font-semibold text-white">Add funds</h1>
+            <p className="mt-2 max-w-md text-sm text-white/60">
+              Send USDT on Tron, BNB Smart Chain or Ethereum — credits land in your scan wallet right after on-chain verification.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-2">
+              <TronIcon className="h-8 w-8 rounded-full ring-2 ring-zinc-900" />
+              <BnbIcon className="h-8 w-8 rounded-full ring-2 ring-zinc-900" />
+              <EthIcon className="h-8 w-8 rounded-full ring-2 ring-zinc-900" />
+            </div>
+            <Link
+              to="/dashboard/billing"
+              className="rounded-xl border border-white/15 bg-white/5 px-3.5 py-2 text-sm text-white/80 transition hover:bg-white/10"
+            >
+              Billing
+            </Link>
+          </div>
         </div>
-        <Link to="/dashboard/billing" className="rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
-          Billing
-        </Link>
       </div>
 
       {!order || order.status === "expired" ? (
-        <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-          <div className="text-[13px] font-medium uppercase tracking-[0.14em] text-zinc-400">Amount</div>
-          <div className="mt-3 flex flex-wrap gap-2">
+        <section className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-24px_rgba(0,0,0,0.25)] sm:p-7">
+          <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-zinc-400">Amount</div>
+          <div className="mt-3 flex flex-wrap gap-2.5">
             {PRESET_AMOUNTS.map((a) => (
               <button
                 key={a}
                 onClick={() => { setAmount(a); setCustom(""); }}
-                className={`rounded-xl border px-4 py-2.5 text-sm transition ${
+                className={`min-w-[86px] rounded-2xl border px-4 py-3 text-sm font-medium transition ${
                   !custom.trim() && amount === a
-                    ? "border-zinc-900 bg-zinc-900 text-white"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+                    ? "border-zinc-900 bg-zinc-900 text-white shadow-[0_10px_24px_-14px_rgba(0,0,0,0.9)]"
+                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-900/30 hover:bg-zinc-50"
                 }`}
               >
                 ${a}
@@ -189,44 +211,60 @@ function PayPage() {
               onChange={(e) => setCustom(e.target.value.replace(/[^0-9.]/g, ""))}
               placeholder="Custom $"
               inputMode="decimal"
-              className="w-32 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-zinc-400"
+              className="w-32 rounded-2xl border border-zinc-200 px-3 py-3 text-sm outline-none transition focus:border-zinc-900/40 focus:ring-2 focus:ring-zinc-900/10"
             />
           </div>
 
-          <div className="mt-6 text-[13px] font-medium uppercase tracking-[0.14em] text-zinc-400">Network</div>
-          <div className="mt-3 grid gap-2 sm:grid-cols-3">
-            {NETWORKS.map((n) => (
-              <button
-                key={n.id}
-                onClick={() => setNetwork(n.id)}
-                className={`rounded-xl border p-3 text-left transition ${
-                  network === n.id ? "border-zinc-900 ring-1 ring-zinc-900" : "border-zinc-200 hover:border-zinc-300"
-                }`}
-              >
-                <div className="text-sm font-medium text-zinc-900">{n.label}</div>
-                <div className="mt-0.5 text-[12px] text-zinc-500">{n.note}</div>
-              </button>
-            ))}
+          <div className="mt-7 text-[12px] font-medium uppercase tracking-[0.16em] text-zinc-400">Network</div>
+          <div className="mt-3 grid gap-2.5 sm:grid-cols-3">
+            {NETWORKS.map((n) => {
+              const active = network === n.id;
+              return (
+                <button
+                  key={n.id}
+                  onClick={() => setNetwork(n.id)}
+                  className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition ${
+                    active
+                      ? "border-zinc-900 bg-zinc-50/80 ring-1 ring-zinc-900"
+                      : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50/60"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="relative inline-flex">
+                      <NetworkIcon id={n.id} className="h-8 w-8" />
+                      <UsdtIcon className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full ring-2 ring-white" />
+                    </span>
+                    {active && (
+                      <span className="ml-auto rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-white">
+                        Selected
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-3 text-sm font-medium text-zinc-900">{n.label}</div>
+                  <div className="mt-0.5 text-[12px] text-zinc-500">{n.note}</div>
+                </button>
+              );
+            })}
           </div>
 
-          <div className="mt-6 text-[13px] font-medium uppercase tracking-[0.14em] text-zinc-400">Promo code</div>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div className="mt-7 text-[12px] font-medium uppercase tracking-[0.16em] text-zinc-400">Promo code</div>
+          <div className="mt-3 flex flex-wrap items-center gap-2.5">
             <input
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="e.g. EXTRA5"
-              className="w-48 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm uppercase outline-none focus:border-zinc-400"
+              className="w-48 rounded-2xl border border-zinc-200 px-3 py-3 text-sm uppercase outline-none transition focus:border-zinc-900/40 focus:ring-2 focus:ring-zinc-900/10"
             />
             <button
               onClick={onRedeem}
               disabled={busy}
-              className="rounded-xl border border-zinc-200 px-3 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+              className="rounded-2xl border border-zinc-200 px-4 py-3 text-sm text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50"
             >
               Redeem free credit
             </button>
             {quote?.error && <span className="text-[13px] text-red-600">{quote.error}</span>}
             {!quote?.error && quote?.promoCode && (
-              <span className="text-[13px] text-emerald-700">
+              <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-[13px] text-emerald-700">
                 {quote.promoType === "discount"
                   ? `You pay $${quote.payUsd.toFixed(2)} and receive $${quote.creditUsd.toFixed(2)}`
                   : quote.promoType === "free"
@@ -236,24 +274,28 @@ function PayPage() {
             )}
           </div>
 
-          <div className="mt-7 flex flex-wrap items-end justify-between gap-4 border-t border-zinc-100 pt-5">
+          <div className="mt-7 flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-zinc-50 p-5">
             <div>
-              <div className="text-[13px] text-zinc-500">You pay</div>
-              <div className="text-2xl font-semibold text-zinc-900">${(quote?.payUsd ?? effAmount).toFixed(2)}</div>
-              <div className="mt-1 text-[13px] text-zinc-500">
+              <div className="text-[12px] uppercase tracking-[0.16em] text-zinc-400">You pay</div>
+              <div className="mt-1 flex items-center gap-2">
+                <UsdtIcon className="h-7 w-7" />
+                <span className="text-3xl font-semibold text-zinc-900">${(quote?.payUsd ?? effAmount).toFixed(2)}</span>
+              </div>
+              <div className="mt-1.5 text-[13px] text-zinc-500">
                 You receive <span className="font-medium text-zinc-900">${(quote?.creditUsd ?? effAmount).toFixed(2)}</span> in scan credits
               </div>
             </div>
             <button
               onClick={onCreate}
               disabled={busy || !!quote?.error}
-              className="rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50"
+              className="rounded-2xl bg-zinc-900 px-6 py-3.5 text-sm font-medium text-white shadow-[0_14px_30px_-16px_rgba(0,0,0,0.9)] transition hover:bg-zinc-800 disabled:opacity-50"
             >
               Continue to payment
             </button>
           </div>
         </section>
       ) : (
+
         <section className="rounded-2xl border border-zinc-200 bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
