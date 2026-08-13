@@ -54,7 +54,7 @@ async function loadFontBase64(path: string): Promise<string | null> {
   }
 }
 
-async function embedGoogleSans(doc: jsPDF) {
+async function embedGoogleSans(doc: JsPDF) {
   const [normal, medium, semibold, bold] = await Promise.all([
     loadFontBase64("/fonts/googlesans-400.ttf"),
     loadFontBase64("/fonts/googlesans-500.ttf"),
