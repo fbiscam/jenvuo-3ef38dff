@@ -307,8 +307,8 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
   if (error || !data.session) return { ok: false, error: error?.message || 'Account verified. Please sign in.' }
 
   // Log this confirmed account against the device / IP so the cap holds for future signups.
+  const uid = data.session.user.id
   try {
-    const uid = data.session.user.id
     if (uid) {
       await (supabaseAdmin as any).from('account_devices').insert({
         user_id: uid,
@@ -319,9 +319,53 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
     }
   } catch { /* logging failure must not block signup */ }
 
+  // 14-day Pro trial abuse guard: one trial per device fingerprint / IP.
+  try {
+    if (uid) await claimProTrial(uid, input.fingerprint, input.ip)
+  } catch { /* never block signup on trial bookkeeping */ }
+
   await consumeOtp(verified.row.id)
   return { ok: true, session: data.session }
 }
+
+/**
+ * Records the 14-day Pro trial against this device/IP. If the same device or IP
+ * already consumed a trial, the freshly granted trial is revoked and the account
+ * starts on Free instead.
+ */
+async function claimProTrial(userId: string, fingerprint?: string, ip?: string) {
+  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  const admin = supabaseAdmin as any
+  const fp = (fingerprint || '').slice(0, 128) || null
+  const ipHash = ip ? await sha256Hex(`jenvu-trial:${ip}`) : null
+
+  let alreadyUsed = false
+  if (fp || ipHash) {
+    const filters: string[] = []
+    if (fp) filters.push(`fingerprint.eq.${fp}`)
+    if (ipHash) filters.push(`ip_hash.eq.${ipHash}`)
+    const { data: prior } = await admin
+      .from('trial_claims')
+      .select('id')
+      .or(filters.join(','))
+      .neq('user_id', userId)
+      .limit(1)
+    alreadyUsed = Array.isArray(prior) && prior.length > 0
+  }
+
+  if (alreadyUsed) {
+    await admin.rpc('revoke_pro_trial', { _user_id: userId, _reason: 'duplicate_device' })
+    return
+  }
+
+  await admin.from('trial_claims').insert({ user_id: userId, fingerprint: fp, ip_hash: ipHash })
+}
+
+async function sha256Hex(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
 
 export async function verifyRecoveryOtp(input: { email: string; code: string; siteUrl?: string }): Promise<CustomAuthResult> {
   const email = normalizeEmail(input.email)
