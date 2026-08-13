@@ -62,6 +62,7 @@ const columns = [
       { to: "/", label: "Home" },
       { to: "/app", label: "Voice Agent" },
       { to: "/signal", label: "Signal Desk" },
+      { to: "/broadcasts", label: "Broadcast" },
       { to: "/pricing", label: "Pricing" },
       { to: "/download", label: "Download App" },
     ],
