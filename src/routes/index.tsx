@@ -996,10 +996,10 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="bg-white border-t border-zinc-100 overflow-hidden">
+      <section className="bg-white/40 border-t border-zinc-100 overflow-hidden">
 
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
+          <div className="rounded-2xl border border-zinc-200 bg-[#FAFAFA] p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
             <div className="max-w-xl text-left md:text-left">
               <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal.&nbsp;<br />
