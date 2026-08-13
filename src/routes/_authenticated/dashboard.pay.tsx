@@ -33,9 +33,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/pay")({
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>) => {
+  validateSearch: (search: Record<string, unknown>): { amount?: number } => {
     const raw = Number(search['amount']);
-    return { amount: Number.isFinite(raw) && raw > 0 ? Math.min(1000, Math.round(raw * 100) / 100) : undefined };
+    if (!Number.isFinite(raw) || raw <= 0) return {};
+    return { amount: Math.min(1000, Math.round(raw * 100) / 100) };
   },
   component: PayPage,
 });
