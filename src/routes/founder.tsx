@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
-import { Target, Zap, Shield, TrendingUp, Cpu, Mic, Brain, Award } from "lucide-react";
+import { Target, Zap, Shield, TrendingUp, Cpu, Brain, Award } from "lucide-react";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
@@ -80,24 +80,13 @@ const SKILL_PILLARS = [
   },
   {
     icon: <Cpu className="h-5 w-5" />,
-    title: "Engineering",
+    title: "Engineering & Growth",
     skills: [
       "Python & Quant Scripting",
       "API Architecture",
       "Real-Time Data Pipelines",
       "Voice Interface Design",
-      "Cloud Infrastructure",
-    ],
-  },
-  {
-    icon: <Mic className="h-5 w-5" />,
-    title: "Product & Growth",
-    skills: [
-      "Product Strategy",
       "Go-to-Market Execution",
-      "Community Building",
-      "Partnership Design",
-      "Brand Storytelling",
     ],
   },
 ];
