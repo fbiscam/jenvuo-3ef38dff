@@ -114,6 +114,8 @@ function Billing() {
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
   const credits = useCredits();
+  const trial = useTrial();
+
   const [showAllActivity, setShowAllActivity] = useState(false);
 
   // Only show skeleton on the very first load — once we've resolved plan/credits
