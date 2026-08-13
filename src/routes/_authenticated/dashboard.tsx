@@ -1058,39 +1058,86 @@ function DashboardLayout() {
         </div>
 
         {/* Analytics header */}
-        <div className="-mt-2 flex items-start justify-between">
+        <div className="-mt-2 flex items-center justify-between">
           <div />
-          <div className="flex flex-col items-end gap-2">
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleRefresh}
-                disabled={refreshing}
-                aria-label="Refresh analytics"
-                title="Refresh analytics"
-                className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border border-zinc-200 bg-white p-0 leading-none text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 active:bg-zinc-100 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className="flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                aria-label="Profile menu"
+                title={fullName || email || "Profile"}
               >
-                <RefreshCw className={`h-3.5 w-3.5 shrink-0 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
-              </button>
-              <DropdownMenu>
-              <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
-                <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
+                <img
+                  src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
+                  alt={fullName || email || "Account avatar"}
+                  className="h-[4.5rem] w-[4.5rem] rounded-full object-cover"
+                  loading="lazy"
+                />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
-                  <DropdownMenuCheckboxItem
-                    key={k}
-                    checked={range === k}
-                    onCheckedChange={() => setRange(k)}
-                    className="text-[12px] md:text-[14px]"
-                  >
-                    {RANGE_LABELS[k]}
-                  </DropdownMenuCheckboxItem>
-                ))}
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="flex items-center gap-3 px-3 py-2.5">
+                  <img
+                    src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
+                    alt={fullName || email || "Account avatar"}
+                    className="h-9 w-9 rounded-full object-cover"
+                  />
+                  <div className="min-w-0">
+                    <p className="truncate text-[13px] font-medium text-zinc-900">{fullName || "Trader"}</p>
+                    <p className="truncate text-[11px] text-zinc-500">{email || ""}</p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/profile" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
+                    <User className="h-4 w-4 text-zinc-500" /> Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/billing" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
+                    <CreditCard className="h-4 w-4 text-zinc-500" /> Billing
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/security" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
+                    <ShieldCheck className="h-4 w-4 text-zinc-500" /> Security
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={signOut}
+                  className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700 focus:text-rose-600"
+                >
+                  <LogOut className="h-4 w-4 text-zinc-500" /> Sign out
+                </DropdownMenuItem>
               </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            </DropdownMenu>
+            <button
+              type="button"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              aria-label="Refresh analytics"
+              title="Refresh analytics"
+              className="group grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md border border-zinc-200 bg-white p-0 leading-none text-zinc-600 transition-all duration-150 hover:bg-zinc-50 active:scale-90 active:bg-zinc-100 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 shrink-0 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-45"}`} />
+            </button>
+            <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300">
+              <Calendar className="h-3.5 w-3.5" /> {RANGE_LABELS[range]}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
+                <DropdownMenuCheckboxItem
+                  key={k}
+                  checked={range === k}
+                  onCheckedChange={() => setRange(k)}
+                  className="text-[12px] md:text-[14px]"
+                >
+                  {RANGE_LABELS[k]}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
