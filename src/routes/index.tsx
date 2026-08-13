@@ -4,6 +4,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -11,7 +17,7 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 
-import { Check, Sparkles, Zap, Crown, Minus, Menu, X } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Minus, Menu, X, ChevronDown } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 
 export const Route = createFileRoute("/")({
@@ -195,9 +201,34 @@ function HomePage() {
             <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
             <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
             <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
+                Resources <ChevronDown className="h-3.5 w-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-44">
+                <DropdownMenuItem asChild>
+                  <Link to="/broadcasts" className="cursor-pointer text-[13px]">Broadcasts</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/insights" className="cursor-pointer text-[13px]">Insights</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
+                Tools <ChevronDown className="h-3.5 w-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-44">
+                <DropdownMenuItem asChild>
+                  <Link to="/leads" className="cursor-pointer text-[13px]">Leads</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/scam-check" className="cursor-pointer text-[13px]">Scam Check</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
             <Link to="/about" className="hover:text-zinc-900">About</Link>
-
             <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
           </nav>
           <div className="flex items-center gap-2">
@@ -256,6 +287,45 @@ function HomePage() {
                 { to: "/signal", label: "Signal Engine" },
                 { to: "/signals-live", label: "Signals Live" },
                 { to: "/ai-engine", label: "AI Engine" },
+              ].map((it) => (
+                <Link
+                  key={it.to}
+                  to={it.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-lg px-3 py-3 hover:bg-zinc-50"
+                >
+                  {it.label}
+                </Link>
+              ))}
+              <div className="mt-1 px-3 py-2 text-[12px] font-medium uppercase tracking-wider text-zinc-500">Resources</div>
+              {[
+                { to: "/broadcasts", label: "Broadcasts" },
+                { to: "/insights", label: "Insights" },
+              ].map((it) => (
+                <Link
+                  key={it.to}
+                  to={it.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-lg px-3 py-3 pl-6 hover:bg-zinc-50"
+                >
+                  {it.label}
+                </Link>
+              ))}
+              <div className="mt-1 px-3 py-2 text-[12px] font-medium uppercase tracking-wider text-zinc-500">Tools</div>
+              {[
+                { to: "/leads", label: "Leads" },
+                { to: "/scam-check", label: "Scam Check" },
+              ].map((it) => (
+                <Link
+                  key={it.to}
+                  to={it.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-lg px-3 py-3 pl-6 hover:bg-zinc-50"
+                >
+                  {it.label}
+                </Link>
+              ))}
+              {[
                 { to: "/founding", label: "Founding" },
                 { to: "/about", label: "About" },
                 { to: "/contact", label: "Contact" },
