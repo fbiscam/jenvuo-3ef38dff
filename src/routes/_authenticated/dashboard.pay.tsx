@@ -184,7 +184,7 @@ function PayPage() {
             </div>
             <Link
               to="/dashboard/billing"
-              className="rounded-xl border border-black/10 bg-black/5 px-3.5 py-2 text-sm text-black/80 transition hover:bg-black/10"
+              className="rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-sm font-medium text-black shadow-sm transition hover:bg-zinc-50"
             >
               Billing
             </Link>
