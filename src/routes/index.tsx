@@ -4,6 +4,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -11,7 +17,7 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 
-import { Check, Sparkles, Zap, Crown, Minus, Menu, X } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Minus, Menu, X, ChevronDown } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 
 export const Route = createFileRoute("/")({
