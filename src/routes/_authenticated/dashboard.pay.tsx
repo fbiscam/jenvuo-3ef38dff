@@ -63,8 +63,13 @@ function PayPage() {
   const cancelFn = useServerFn(cancelOrder);
   const redeemFn = useServerFn(redeemFreeCode);
 
-  const [amount, setAmount] = useState<number>(25);
-  const [custom, setCustom] = useState("");
+  const { amount: presetFromUrl } = Route.useSearch();
+  const [amount, setAmount] = useState<number>(
+    presetFromUrl && PRESET_AMOUNTS.includes(presetFromUrl) ? presetFromUrl : 25,
+  );
+  const [custom, setCustom] = useState(
+    presetFromUrl && !PRESET_AMOUNTS.includes(presetFromUrl) ? String(presetFromUrl) : "",
+  );
   const [network, setNetwork] = useState<NetworkId>("trc20");
   const [code, setCode] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
