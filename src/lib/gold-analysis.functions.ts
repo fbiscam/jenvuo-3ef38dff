@@ -2273,15 +2273,26 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // inside it; that was flattening confidence across instruments.
     const zoneMitigated = false;
 
+    const roundedEntry = +built.entry.toFixed(dec);
+    const roundedSl = +built.sl.toFixed(dec);
+    const roundedTp = +built.tp.toFixed(dec);
+    // Derive R:R from the exact entry/SL/TP we hand to the UI. `built.rr` has
+    // produced inflated values (e.g. 3.0 on a symmetric ~1:1 setup) because it
+    // was measured against a deeper TP than the one actually published, which
+    // made the app UI disagree with the broadcast alert for the same signal.
+    const riskDistAi = Math.abs(roundedEntry - roundedSl);
+    const rewardDistAi = Math.abs(roundedTp - roundedEntry);
+    const derivedRr = riskDistAi > 0 ? rewardDistAi / riskDistAi : 0;
+
     const tradeFromAi = {
       direction: built.direction,
-      entry: +built.entry.toFixed(dec),
-      sl: +built.sl.toFixed(dec),
-      tp: +built.tp.toFixed(dec),
+      entry: roundedEntry,
+      sl: roundedSl,
+      tp: roundedTp,
       tp1: built.tp1 != null ? +built.tp1.toFixed(dec) : undefined,
       tp2: built.tp2 != null ? +built.tp2.toFixed(dec) : undefined,
       tp3: built.tp3 != null ? +built.tp3.toFixed(dec) : undefined,
-      rr: +built.rr.toFixed(2),
+      rr: built.direction === "WAIT" ? +built.rr.toFixed(2) : +derivedRr.toFixed(2),
       confidence: 0, // set after scoring
       summary: "",   // filled after scoring
       invalidation: built.direction === "WAIT"

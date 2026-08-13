@@ -291,8 +291,10 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
 
             // Killzone gate DISABLED — user requested signals fire any time
             // a valid setup meets confidence, regardless of session window.
-            const kz = String(plan.killzone ?? "");
-            void kz;
+            // We still record whether the setup actually landed inside a
+            // killzone so scan history / accuracy analytics stay truthful.
+            const kz = String(plan.killzone ?? "").trim();
+            const killzonePassed = kz.length > 0 && !/^(none|off|outside)$/i.test(kz);
 
 
             // HTF bias alignment gate — never fire against higher-timeframe trend.
@@ -677,7 +679,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               gates: {
                 min_conf: minConf,
                 confirmed_hit: true,
-                killzone_passed: true,
+                killzone_passed: killzonePassed,
                 cooldown_passed: true,
               },
               broadcast_alert_id: inserted.id,
