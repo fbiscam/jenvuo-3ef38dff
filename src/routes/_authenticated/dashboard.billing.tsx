@@ -5,6 +5,7 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import TrialBanner from "@/components/TrialBanner";
 import { useTrial } from "@/hooks/useTrial";
+import InvoiceHistory from "@/components/billing/InvoiceHistory";
 
 import xaiLogo from "@/assets/xai-logo.png";
 
