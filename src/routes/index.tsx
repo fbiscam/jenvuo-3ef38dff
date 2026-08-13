@@ -320,9 +320,10 @@ function HomePage() {
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
                 to={isAuthed ? "/app" : "/auth"}
+                search={isAuthed ? undefined : { mode: "signup" }}
                 className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
               >
-                Launch Voice Agent
+                {isAuthed ? "Launch Voice Agent" : "Start 14 day trial"}
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
               <Link
