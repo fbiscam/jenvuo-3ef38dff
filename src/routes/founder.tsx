@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
-import { Target, Zap, Shield, TrendingUp, Cpu, Brain, Award } from "lucide-react";
+import { Target, Zap, Shield, TrendingUp, Cpu, Brain, Award, Search, Megaphone, AlertTriangle } from "lucide-react";
+import founderPhoto from "@/assets/haseeb-ijaz-founder.png.asset.json";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
