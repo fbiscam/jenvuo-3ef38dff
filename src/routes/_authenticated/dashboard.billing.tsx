@@ -375,9 +375,9 @@ function Billing() {
                   <span className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">Invite Only Pricing</span>
                 </th>
                 {[
-                  { name: "Pro", price: "$15", tag: "Active", to: "/founding" as const, cta: "Upgrade now", dark: false, accent: true, key: "pro" },
-                  { name: "Elite", price: "$50", tag: "Desk", to: "/founding" as const, cta: "Upgrade now", dark: true, key: "elite" },
-                  { name: "Ultra", price: "$100", tag: "Fund / Desk+", to: "/founding" as const, cta: "Upgrade now", dark: false, key: "ultra" },
+                  { name: "Pro", price: "$15", tag: "Active", to: "/dashboard/pay" as const, cta: "Upgrade now", dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: "$50", tag: "Desk", to: "/dashboard/pay" as const, cta: "Upgrade now", dark: true, key: "elite" },
+                  { name: "Ultra", price: "$100", tag: "Fund / Desk+", to: "/dashboard/pay" as const, cta: "Upgrade now", dark: false, key: "ultra" },
                 ].map((p) => {
                   const isCurrent = plan === p.key;
                   return (
