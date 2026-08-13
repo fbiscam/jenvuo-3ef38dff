@@ -71,7 +71,7 @@ function FounderPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-zinc-900">Pakistan No. #1 Scams Awareness Provider</p>
-                <p className={`text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>PROTECTING PEOPLEONLINE</p>
+                <p className={`text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>PROTECTING PEOPLE ONLINE</p>
               </div>
             </div>
           </div>
