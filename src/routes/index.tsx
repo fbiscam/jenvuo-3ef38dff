@@ -7,6 +7,7 @@ import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 
 
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { useTrial } from "@/hooks/useTrial";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
