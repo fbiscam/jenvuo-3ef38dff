@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
-import TrialBanner from "@/components/TrialBanner";
 import { useTrial } from "@/hooks/useTrial";
 import InvoiceHistory from "@/components/billing/InvoiceHistory";
 
@@ -153,7 +152,6 @@ function Billing() {
 
   return (
     <div className="space-y-10">
-      <TrialBanner />
       {/* CURRENT PLAN */}
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
