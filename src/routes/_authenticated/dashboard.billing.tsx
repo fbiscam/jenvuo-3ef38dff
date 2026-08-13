@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
-import TrialBanner from "@/components/TrialBanner";
 import { useTrial } from "@/hooks/useTrial";
 import InvoiceHistory from "@/components/billing/InvoiceHistory";
 
