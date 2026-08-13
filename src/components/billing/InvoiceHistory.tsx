@@ -187,7 +187,7 @@ export default function InvoiceHistory() {
     <section className="rounded-2xl border border-zinc-200 bg-white p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-zinc-900">Invoices</h2>
+          <h2 className="text-sm font-semibold text-zinc-900">&nbsp; Invoices</h2>
           <p className="mt-0.5 text-xs text-zinc-500">Successful payments with downloadable PDF receipts.</p>
         </div>
       </div>
