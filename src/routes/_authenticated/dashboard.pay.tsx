@@ -298,7 +298,7 @@ function PayPage() {
                 <UsdtIcon className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full ring-2 ring-white" />
               </span>
               <div>
-                <div className="text-[12px] uppercase tracking-[0.16em] text-zinc-400">{net.chain}</div>
+                
                 <div className="mt-0.5 text-2xl font-semibold text-zinc-900">
                   {Number(order.pay_amount_usd).toFixed(2)} USDT
                 </div>
