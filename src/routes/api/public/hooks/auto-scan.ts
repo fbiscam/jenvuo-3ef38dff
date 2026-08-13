@@ -671,7 +671,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 htf_bias: plan.htfBias ?? null,
                 session,
                 killzone: plan.killzone ?? null,
-                rationale: `${manualMode ? "Manual scan" : "Auto-scan · single-hit"} · ${plan.alignmentLabel ?? ""}`.slice(
+                rationale: `${manualMode ? "Manual scan" : "Auto-scan · single-hit"}${newsContext ? ` · Post-news reaction (${newsContext.title}, ${newsContext.minutesAgo}m ago)` : ""} · ${plan.alignmentLabel ?? ""}`.slice(
                   0,
                   1000,
                 ),
