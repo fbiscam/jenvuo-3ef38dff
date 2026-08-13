@@ -1,4 +1,5 @@
 import * as React from "react";
+import SiteNavLinks from "@/components/SiteNavLinks";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Compass, Mic, LineChart, CreditCard, Shield, Smartphone,
@@ -67,14 +68,7 @@ function HelpCenterPage() {
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
               <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
             </Link>
-            <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm">
-              <Link to="/signal">Signal Engine</Link>
-              <Link to="/ai-engine">AI Engine</Link>
-              <Link to="/founding">Founding</Link>
-              <Link to="/insights">Insights</Link>
-              <Link to="/about">About</Link>
-              <Link to="/contact">Contact</Link>
-            </nav>
+            <SiteNavLinks />
             <HeaderAuthButtons />
           </div>
         </header>

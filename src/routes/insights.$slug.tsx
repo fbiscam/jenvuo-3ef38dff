@@ -1,4 +1,6 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import SiteNavLinks from "@/components/SiteNavLinks";
+import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import { createFileRoute, Link, useParams, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
@@ -24,9 +26,10 @@ const insightDetailQueryOptions = (slug: string) => queryOptions({
       .from("insights")
       .select("*")
       .eq("slug", slug)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw notFound();
     return data as Insight;
   },
 });
@@ -152,21 +155,8 @@ function InsightDetailPage() {
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
               <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
             </Link>
-            <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900">
-              <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
-              <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
-              <Link to="/insights" className="hover:text-zinc-900 font-medium">Insights</Link>
-              <Link to="/download" className="hover:text-zinc-900">Download</Link>
-              <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
-            </nav>
-            <div className="flex shrink-0 items-center gap-2">
-              <Link
-                to="/app"
-                className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-zinc-800"
-              >
-                Launch
-              </Link>
-            </div>
+            <SiteNavLinks active="/insights" />
+            <HeaderAuthButtons />
           </div>
         </header>
 
