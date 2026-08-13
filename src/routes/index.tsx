@@ -333,7 +333,7 @@ function HomePage() {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[#FAFAFA] rounded-xl overflow-hidden border border-zinc-200 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)]">
               {[
                 ["Markets", "XAU"],
                 ["Frameworks", "ICT, SMC"],
@@ -531,7 +531,7 @@ function HomePage() {
             <span className="sm:hidden">Built like a trading desk<br />spoken just like a real partner</span>
             <span className="hidden sm:inline">Built like a trading desk, spoken like a partner.</span>
           </h2>
-          <div className="mt-12 grid gap-px bg-[#FAFAFA] border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
+          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
             {[
               {
                 k: "01",
