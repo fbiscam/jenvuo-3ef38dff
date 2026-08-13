@@ -679,7 +679,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               gates: {
                 min_conf: minConf,
                 confirmed_hit: true,
-                killzone_passed: true,
+                killzone_passed: killzonePassed,
                 cooldown_passed: true,
               },
               broadcast_alert_id: inserted.id,
