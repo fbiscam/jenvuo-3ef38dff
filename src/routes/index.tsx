@@ -204,17 +204,15 @@ function HomePage() {
             <div className={isAuthed ? "" : "hidden md:block"}>
               <HeaderAuthButtons />
             </div>
-            {!isAuthed && (
-              <button
-                type="button"
-                aria-label="Open menu"
-                aria-expanded={mobileMenuOpen}
-                onClick={() => setMobileMenuOpen(true)}
-                className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
-              >
-                <Menu className="h-4 w-4" />
-              </button>
-            )}
+            <button
+              type="button"
+              aria-label="Open menu"
+              aria-expanded={mobileMenuOpen}
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
           </div>
 
 
