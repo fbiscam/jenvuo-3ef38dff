@@ -1024,7 +1024,7 @@ function DashboardLayout() {
             <h1 className="pl-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span>{email || fullName}</span><span>'s Account</span>
             </h1>
-            <DropdownMenu>
+            <DropdownMenu className="hidden sm:block">
               <DropdownMenuTrigger
                 className="mr-4 flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
                 aria-label="Profile menu"
