@@ -1,16 +1,20 @@
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
-import { useCredits } from "@/hooks/useCredits";
+import { useTrial } from "@/hooks/useTrial";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
 export default function TrialBanner({ className = "" }: { className?: string }) {
-  const { state } = useCredits();
-  const trial = state?.trial;
-  if (!trial?.active) return null;
+  const trial = useTrial();
+  if (!trial.active) return null;
 
   const urgent = trial.daysLeft <= 3;
-  const endsAt = trial.endsAt ? new Date(trial.endsAt) : null;
+  const remaining =
+    trial.daysLeft > 1
+      ? `${trial.daysLeft} days left`
+      : trial.hoursLeft > 1
+        ? `${trial.hoursLeft} hours left`
+        : "Ends today";
 
   return (
     <div
@@ -28,11 +32,10 @@ export default function TrialBanner({ className = "" }: { className?: string }) 
         </span>
         <div className="leading-tight">
           <div className={`text-sm font-semibold ${urgent ? "text-amber-900" : "text-zinc-900"}`}>
-            Pro Trial — {trial.daysLeft} {trial.daysLeft === 1 ? "day" : "days"} left
+            Pro Trial — {remaining}
           </div>
           <div className={`${MONO} text-[11px] ${urgent ? "text-amber-700" : "text-zinc-500"}`}>
-            All Pro features unlocked
-            {endsAt ? ` · ends ${endsAt.toLocaleDateString()}` : ""}
+            All Pro features unlocked · Ends {trial.endsAtLabel}
           </div>
         </div>
       </div>
