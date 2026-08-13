@@ -67,7 +67,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type OpenTrade = { pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null };
 type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number; closedWins: number; closedDecided: number; openTrades: OpenTrade[] };
 
-type TabItem = { to: string; label: string; icon: string; iconColor?: string; exact?: boolean; countKey?: keyof Counts };
+type TabItem = { to: string; label: string; icon: string; exact?: boolean; countKey?: keyof Counts };
 
 const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
