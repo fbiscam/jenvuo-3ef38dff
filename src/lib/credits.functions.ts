@@ -35,12 +35,15 @@ export type LedgerEntry = {
   metadata?: Record<string, any> | null;
 };
 
+export type TrialInfo = { active: boolean; endsAt: string | null; daysLeft: number };
+
 export type CreditState = {
   plan: { id: string; name: string; price_usd: number; wallet_usd: number };
   features: PlanFeatures;
   balance: number;      // USD wallet balance
   allowance: number;    // monthly wallet allowance (USD)
   periodResetsAt: string | null;
+  trial: TrialInfo;
   recent: LedgerEntry[];
 };
 
@@ -52,9 +55,10 @@ export const getCreditState = createServerFn({ method: "GET" })
     const [{ data: sub }, { data: bal }, { data: ledger }] = await Promise.all([
       supabase
         .from("user_subscriptions")
-        .select("plan_id, status")
+        .select("plan_id, status, is_trial, trial_ends_at")
         .eq("user_id", userId)
         .maybeSingle(),
+
       supabase.from("credit_balances").select("balance, monthly_allowance, period_resets_at").eq("user_id", userId).maybeSingle(),
       supabase.from("credit_ledger")
         .select("id, delta, reason, balance_after, created_at, model, stage, prompt_tokens, completion_tokens, raw_cost_usd, metadata")
