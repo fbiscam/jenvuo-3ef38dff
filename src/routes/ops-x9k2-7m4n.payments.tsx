@@ -74,6 +74,8 @@ function OpsPayments() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ ...emptyPromo });
+  const [query, setQuery] = useState("");
+
 
   const load = useCallback(async () => {
     try {
