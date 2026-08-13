@@ -867,7 +867,7 @@ function DashboardLayout() {
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
         style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
       >
-        <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; }`}</style>
+        <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
         {/* Brand */}
         <div className={`flex h-11 shrink-0 items-center gap-2.5 bg-[#FAFAFA] ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
