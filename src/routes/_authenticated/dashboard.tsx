@@ -1026,7 +1026,7 @@ function DashboardLayout() {
             </h1>
             <DropdownMenu>
               <DropdownMenuTrigger
-                className="flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                className="mr-4 flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
                 aria-label="Profile menu"
                 title={fullName || email || "Profile"}
               >
