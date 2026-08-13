@@ -66,7 +66,7 @@ function RiskPage() {
       {loading ? (
         <div className="text-sm text-gray-500">Loading…</div>
       ) : (
-        <div className="flex-1 min-h-0 bg-white border border-gray-200 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block text-[11px] font-medium text-black mb-0.5">Account balance (USD)</label>
