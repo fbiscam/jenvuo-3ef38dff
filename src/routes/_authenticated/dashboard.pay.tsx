@@ -269,8 +269,7 @@ function PayPage() {
 
           <div className="mt-7 flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-zinc-50 p-5">
             <div>
-              <div className="text-[12px] uppercase tracking-[0.16em] text-zinc-400">You pay</div>
-              <div className="mt-1 flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <UsdtIcon className="h-7 w-7" />
                 <span className="text-3xl font-semibold text-zinc-900">${(quote?.payUsd ?? effAmount).toFixed(2)}</span>
               </div>
