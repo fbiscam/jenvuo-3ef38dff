@@ -173,7 +173,7 @@ function Billing() {
               )}
             </div>
 
-            <p className="mt-2 max-w-xl text-[12px] leading-snug sm:text-sm sm:leading-normal text-zinc-500">
+            <p className="mt-2 max-w-xl text-[12px] leading-snug sm:max-w-none sm:text-sm sm:leading-normal sm:whitespace-nowrap text-zinc-500">
               {trial.active
                 ? `Your free Pro trial ends on ${trial.endsAtLabel}. Upgrade any time to keep Pro features after that date.`
                 : plan
