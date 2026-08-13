@@ -259,7 +259,7 @@ function PayPage() {
             )}
           </div>
 
-          <div className="mt-7 flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-zinc-50 p-5">
+          <div className="mt-7 flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-white p-5">
             <div>
               <div className="flex items-center gap-2">
                 <UsdtIcon className="h-7 w-7" />
