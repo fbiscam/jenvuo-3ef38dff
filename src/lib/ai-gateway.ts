@@ -435,16 +435,12 @@ export const MACRO_CONTEXT_CHAIN = [
 
 export const SENIOR_REVIEW_CHAIN = [
   "bmind/gpt-5.5",
-  "bmind/claude-sonnet-4.5",
-  "bmind/deepseek-v4-pro",
-  "bmind/grok-4.5",
-  "bmind/claude-3.7-sonnet",
   "bmind/gpt-5.2-chat",
   "bmind/gpt-5-mini",
   "bmind/gpt-4.1-mini",
   "bmind/gpt-4o-mini",
-  "bmind/deepseek-v4-flash",
 ] as const;
+
 
 
 
