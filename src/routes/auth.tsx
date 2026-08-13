@@ -108,6 +108,16 @@ function AuthPage() {
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
   const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">("signin");
+  // Exact date the 14-day Pro trial would end for someone signing up now.
+  // Computed after mount so SSR and client markup match.
+  const [trialEndsLabel, setTrialEndsLabel] = React.useState("in 14 days");
+  React.useEffect(() => {
+    const end = new Date(Date.now() + 14 * 86_400_000);
+    setTrialEndsLabel(
+      end.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }),
+    );
+  }, []);
+
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
