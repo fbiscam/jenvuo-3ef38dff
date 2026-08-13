@@ -225,11 +225,6 @@ function PayPage() {
                       <NetworkIcon id={n.id} className="h-8 w-8" />
                       <UsdtIcon className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full ring-2 ring-white" />
                     </span>
-                    {active && (
-                      <span className="ml-auto rounded-full border border-black/10 bg-white px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-black">
-                        Selected
-                      </span>
-                    )}
                   </div>
                   <div className="mt-3 text-sm font-medium text-zinc-900">{n.label}</div>
                   <div className="mt-0.5 text-[12px] text-zinc-500">{n.note}</div>
