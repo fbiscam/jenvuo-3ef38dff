@@ -896,12 +896,12 @@ function DashboardLayout() {
           {[...NAV_GROUPS].map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
               {!sidebarCollapsed && group.label && (
-                <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
+                <div className="sidebar-section-label mb-2 px-2.5 text-[11px] text-[#5f6368]">
                   {group.label}
                 </div>
               )}
-              {sidebarCollapsed && gi > 0 && <div className="mx-3 mb-1 h-px bg-zinc-100" />}
-              <div className="flex flex-col gap-1.5">
+              {sidebarCollapsed && gi > 0 && <div className="mx-3 mb-1 h-px bg-zinc-200" />}
+              <div className="flex flex-col gap-1">
                 {group.items.map((t) => {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                   const iconName = t.icon;
@@ -916,32 +916,32 @@ function DashboardLayout() {
                       resetScroll={false}
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
-                      className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition
-                        ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}
+                      className={`group relative flex items-center rounded-md text-[13px] font-medium transition
+                        ${sidebarCollapsed ? "justify-center px-2 py-2" : "gap-3 px-2.5 py-2"}
                         ${active
-                          ? "bg-zinc-100 text-zinc-900 font-semibold"
-                          : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
+                          ? "bg-[#e8eaed] text-[#202124]"
+                          : "text-[#5f6368] hover:bg-[#f1f3f4] hover:text-[#202124]"}`}
                     >
                       <span
                         className="material-symbols-rounded shrink-0"
                         aria-hidden
                         style={{
-                          fontSize: 21,
+                          fontSize: 20,
                           lineHeight: 1,
-                          color: active ? "#18181b" : (iconColor ?? "#5E5E5E"),
-                          fontVariationSettings: `'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 24`,
+                          color: active ? "#202124" : (iconColor ?? "#5f6368"),
+                          fontVariationSettings: `'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24`,
                         }}
                       >
                         {iconName}
                       </span>
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
-                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
+                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-[#FAFAFA]" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
                           New
                         </span>
                       )}
                       {!sidebarCollapsed && hasUnread && (
-                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
+                        <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-[#FAFAFA]" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
                           New
                         </span>
                       )}
@@ -950,14 +950,29 @@ function DashboardLayout() {
                           New
                         </span>
                       )}
-
-
                     </Link>
                   );
                 })}
               </div>
             </div>
           ))}
+          <a
+            href="https://jenvu.com/changelog"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`group flex items-center rounded-md text-[13px] font-medium text-[#5f6368] transition hover:bg-[#f1f3f4] hover:text-[#202124] ${sidebarCollapsed ? "justify-center px-2 py-2" : "gap-3 px-2.5 py-2"}`}
+            title={sidebarCollapsed ? "Changelog" : undefined}
+          >
+            <span className="material-symbols-rounded shrink-0" aria-hidden style={{ fontSize: 20, lineHeight: 1, color: "#5f6368", fontVariationSettings: `'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24` }}>
+              open_in_new
+            </span>
+            {!sidebarCollapsed && <span className="truncate">Changelog</span>}
+            {!sidebarCollapsed && (
+              <span className="material-symbols-rounded ml-auto shrink-0" aria-hidden style={{ fontSize: 14, lineHeight: 1, color: "#5f6368", fontVariationSettings: `'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20` }}>
+                arrow_outward
+              </span>
+            )}
+          </a>
         </nav>
 
 
