@@ -31,7 +31,7 @@ const TILES: Tile[] = [
   { key: "accuracy", title: "Accuracy Dashboard", desc: "Paper-trade win rate & drift", to: "/dashboard/admin/accuracy" },
   { key: "tuning", title: "Weight Tuning", desc: "Grid search & walk-forward configs", to: "/dashboard/admin/tuning" },
   { key: "tvmm", title: "TV Mismatch Checker", desc: "Telegram chart price drift audit", to: "/dashboard/admin/tv-mismatch" },
-  { key: "bugs", title: "Bug Triage", desc: "Runtime errors + AI diagnosis", to: "/dashboard/admin/bugs" },
+  
   { key: "leadscredits", title: "Leads Credits", desc: "Add credits to Jenvu Leads accounts", to: "/ops-x9k2-7m4n/leads-credits" },
   { key: "payments", title: "Payments & Promos", desc: "Crypto top-ups, approvals & promo codes", to: "/ops-x9k2-7m4n/payments" },
 
