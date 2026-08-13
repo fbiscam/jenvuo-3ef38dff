@@ -238,7 +238,7 @@ function Journal() {
 
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight pl-1">Trades</h2>
+          <h2 className="text-lg font-semibold tracking-tight pl-3">&nbsp;Trades</h2>
           <p className="text-[10px] sm:text-xs text-zinc-500">System = executed via Jenvu signal.<br className="sm:hidden" /> Outside = manually logged.</p>
         </div>
         <div className="flex items-center gap-2">
