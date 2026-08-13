@@ -151,7 +151,7 @@ function FeedBody() {
     const resolved = signals.filter((s) => s.outcome === "win" || s.outcome === "loss");
     const wins = resolved.filter((s) => s.outcome === "win").length;
     const losses = resolved.filter((s) => s.outcome === "loss").length;
-    const pending = total - resolved.length;
+    const pending = signals.filter((s) => s.outcome === "pending").length;
     const rSum = resolved.reduce((sum, s) => sum + (s.realized_r ?? 0), 0);
     const win_rate = resolved.length ? (wins / resolved.length) * 100 : 0;
     const avg_r = resolved.length ? rSum / resolved.length : 0;
