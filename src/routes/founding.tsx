@@ -331,7 +331,7 @@ function FoundingPage() {
         </div>
       </section>
 
-      <SiteFooter />
+      <SiteFooter className="bg-white" />
     </div>
   );
 }
