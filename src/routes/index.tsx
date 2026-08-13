@@ -201,9 +201,34 @@ function HomePage() {
             <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
             <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
             <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
+                Resources <ChevronDown className="h-3.5 w-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-44">
+                <DropdownMenuItem asChild>
+                  <Link to="/broadcasts" className="cursor-pointer text-[13px]">Broadcasts</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/insights" className="cursor-pointer text-[13px]">Insights</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
+                Tools <ChevronDown className="h-3.5 w-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-44">
+                <DropdownMenuItem asChild>
+                  <Link to="/leads" className="cursor-pointer text-[13px]">Leads</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/scam-check" className="cursor-pointer text-[13px]">Scam Check</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
             <Link to="/about" className="hover:text-zinc-900">About</Link>
-
             <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
           </nav>
           <div className="flex items-center gap-2">
