@@ -18,10 +18,11 @@ const briefQuery = (id: string) =>
 
 export const Route = createFileRoute("/brief/$id")({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(briefQuery(params.id)),
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     const b = loaderData as BriefDetail | undefined;
     const title = b ? `${sessionLabel(b.session)}: ${b.headline} — Jenvu AI` : "Killzone brief — Jenvu AI";
     const desc = b?.summary || b?.transcript.slice(0, 160) || "Killzone audio brief on gold from Jenvu AI.";
+    const url = `https://jenvu.com/brief/${params.id}`;
     return {
       meta: [
         { title },
@@ -29,8 +30,32 @@ export const Route = createFileRoute("/brief/$id")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
         { name: "twitter:card", content: "summary_large_image" },
       ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: b
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Article",
+                headline: b.headline,
+                description: desc,
+                datePublished: b.published_at,
+                dateModified: b.published_at,
+                author: { "@type": "Organization", name: "Jenvu" },
+                publisher: {
+                  "@type": "Organization",
+                  name: "Jenvu",
+                  logo: { "@type": "ImageObject", url: "https://jenvu.com/favicon.png" },
+                },
+                mainEntityOfPage: { "@type": "WebPage", "@id": url },
+              }),
+            },
+          ]
+        : [],
     };
   },
   errorComponent: ({ error, reset }) => (
