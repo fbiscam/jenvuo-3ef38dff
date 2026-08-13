@@ -142,7 +142,7 @@ function Billing() {
   }
 
   const plan = currentPlan;
-  const planLabel = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "No plan";
+  const planLabel = trial.active ? "Pro plan $15" : plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "No plan";
   const remaining = credits.balance;
   const pctBase = Math.max(credits.balance, credits.allowance);
   const pct = pctBase > 0 ? Math.min(100, Math.round((remaining / pctBase) * 100)) : 0;
