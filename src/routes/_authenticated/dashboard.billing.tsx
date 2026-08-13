@@ -155,9 +155,9 @@ function Billing() {
           <div>
             <div className="mt-2 flex items-center gap-3">
               <h2 className="pl-1 mt-2 text-2xl font-semibold">&nbsp;{planLabel}</h2>
-              {credits.state?.trial?.active ? (
+              {trial.active ? (
                 <span className="rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
-                  Trial · {credits.state.trial.daysLeft}d left
+                  Trial · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"}
                 </span>
               ) : plan ? (
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-800">
@@ -171,10 +171,13 @@ function Billing() {
             </div>
 
             <p className="mt-2 max-w-xl text-[12px] leading-snug sm:text-sm sm:leading-normal text-zinc-500">
-              {plan
-                ? "Your plan renews automatically. Manage billing via the customer portal."
-                : "Choose a plan to activate your wallet and unlock signals."}
+              {trial.active
+                ? `Your free Pro trial ends on ${trial.endsAtLabel}. Upgrade any time to keep Pro features after that date.`
+                : plan
+                  ? "Your plan renews automatically. Manage billing via the customer portal."
+                  : "Choose a plan to activate your wallet and unlock signals."}
             </p>
+
           </div>
           {plan ? (
             <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
