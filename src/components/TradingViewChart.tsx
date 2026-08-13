@@ -28,7 +28,18 @@ const XAU_TV_MAP: Record<string, string> = {
   XAUJPY: "OANDA:XAUJPY",
   XAUAUD: "OANDA:XAUAUD",
   XAUCHF: "OANDA:XAUCHF",
+  EURUSD: "OANDA:EURUSD",
+  GBPUSD: "OANDA:GBPUSD",
+  USDJPY: "OANDA:USDJPY",
+  AUDUSD: "OANDA:AUDUSD",
+  USDCHF: "OANDA:USDCHF",
+  USDCAD: "OANDA:USDCAD",
+  XAGUSD: "OANDA:XAGUSD",
+  XPTUSD: "OANDA:XPTUSD",
+  BTCUSD: "BINANCE:BTCUSDT",
+  ETHUSD: "BINANCE:ETHUSDT",
 };
+
 
 /** Map an XAU pair → TradingView symbol. Falls back to XAU/USD. */
 function toTvSymbol(raw?: string): string {

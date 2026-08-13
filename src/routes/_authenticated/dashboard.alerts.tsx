@@ -33,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/alerts")({
 
 type Grade = "A+" | "A" | "B";
 type Direction = "BUY" | "SELL";
-const ALL_PAIRS = ["XAUUSD","XAUEUR","XAUGBP","XAUJPY","XAUAUD","XAUCHF"] as const;
+const ALL_PAIRS = ["XAUUSD","XAUEUR","XAUGBP","XAUJPY","XAUAUD","XAUCHF","EURUSD","GBPUSD","USDJPY","AUDUSD","USDCHF","USDCAD","XAGUSD","XPTUSD","BTCUSD","ETHUSD"] as const;
 const ALL_GRADES: Grade[] = ["A+", "A", "B"];
 const ALL_DIRECTIONS: Direction[] = ["BUY", "SELL"];
 
