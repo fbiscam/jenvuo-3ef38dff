@@ -159,8 +159,6 @@ function PayPage() {
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6 px-1 pb-16" style={SANS}>
       <div className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 sm:p-8">
-        <div className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 left-10 h-56 w-56 rounded-full bg-sky-500/10 blur-3xl" />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
