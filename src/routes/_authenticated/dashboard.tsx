@@ -1033,7 +1033,7 @@ function DashboardLayout() {
                 <img
                   src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
                   alt={fullName || email || "Account avatar"}
-                  className="h-14 w-14 rounded-full object-cover"
+                  className="h-[52px] w-[52px] rounded-full object-cover"
                   loading="lazy"
                 />
               </DropdownMenuTrigger>
