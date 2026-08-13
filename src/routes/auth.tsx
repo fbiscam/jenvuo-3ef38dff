@@ -31,7 +31,7 @@ async function waitForMfaElevation(): Promise<boolean> {
 }
 
 
-type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string; mfa?: "1" };
+type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string; mfa?: "1"; mode?: "signup" };
 
 function sanitizeRedirect(r?: string): string {
   if (!r || typeof r !== "string") return "/dashboard";
@@ -50,6 +50,7 @@ export const Route = createFileRoute("/auth")({
     emailChanged: search.emailChanged === "1" ? "1" : undefined,
     newEmail: typeof search.newEmail === "string" ? search.newEmail : undefined,
     mfa: search.mfa === "1" ? "1" : undefined,
+    mode: search.mode === "signup" ? "signup" : undefined,
   }),
   beforeLoad: async ({ search }) => {
     if (typeof window !== "undefined") {
@@ -107,7 +108,9 @@ function AuthPage() {
   const verifyRecoveryCode = useServerFn(confirmRecoveryOtp);
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
-  const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">("signin");
+  const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">(
+    search.mode === "signup" ? "signup" : "signin",
+  );
   // Exact date the 14-day Pro trial would end for someone signing up now.
   // Computed after mount so SSR and client markup match.
   const [trialEndsLabel, setTrialEndsLabel] = React.useState("in 14 days");

@@ -288,11 +288,12 @@ function HomePage() {
                     Sign In
                   </Link>
                   <Link
-                    to="/founding"
+                    to="/auth"
+                    search={{ mode: "signup" }}
                     onClick={() => setMobileMenuOpen(false)}
                     className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
                   >
-                    Apply Now
+                    Sign Up
                   </Link>
                 </div>
               )}
