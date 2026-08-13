@@ -297,24 +297,31 @@ function PayPage() {
         </section>
       ) : (
 
-        <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+        <section className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-24px_rgba(0,0,0,0.25)] sm:p-7">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-[13px] uppercase tracking-[0.14em] text-zinc-400">{net.chain}</div>
-              <div className="mt-1 text-2xl font-semibold text-zinc-900">
-                {Number(order.pay_amount_usd).toFixed(2)} USDT
-              </div>
-              <div className="mt-1 text-[13px] text-zinc-500">
-                Send this exact amount — the cents identify your payment.
+            <div className="flex items-center gap-3">
+              <span className="relative inline-flex">
+                <NetworkIcon id={order.network} className="h-11 w-11" />
+                <UsdtIcon className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full ring-2 ring-white" />
+              </span>
+              <div>
+                <div className="text-[12px] uppercase tracking-[0.16em] text-zinc-400">{net.chain}</div>
+                <div className="mt-0.5 text-2xl font-semibold text-zinc-900">
+                  {Number(order.pay_amount_usd).toFixed(2)} USDT
+                </div>
+                <div className="mt-1 text-[13px] text-zinc-500">
+                  Send this exact amount — the cents identify your payment.
+                </div>
               </div>
             </div>
             {order.status === "pending" && (
-              <div className="rounded-xl bg-zinc-900 px-4 py-2 text-center text-white">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-300">Time left</div>
-                <div className="font-mono text-xl">{mm}:{ss}</div>
+              <div className="rounded-2xl bg-gradient-to-br from-zinc-950 to-zinc-800 px-5 py-3 text-center text-white">
+                <div className="text-[10px] uppercase tracking-[0.2em] text-white/50">Time left</div>
+                <div className="font-mono text-2xl tabular-nums">{mm}:{ss}</div>
               </div>
             )}
           </div>
+
 
           <div className="mt-5 grid gap-5 sm:grid-cols-[160px_1fr]">
             <img
