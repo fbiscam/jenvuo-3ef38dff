@@ -142,7 +142,7 @@ function Billing() {
   }
 
   const plan = currentPlan;
-  const planLabel = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "No plan";
+  const planLabel = trial.active ? "Pro plan $15" : plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "No plan";
   const remaining = credits.balance;
   const pctBase = Math.max(credits.balance, credits.allowance);
   const pct = pctBase > 0 ? Math.min(100, Math.round((remaining / pctBase) * 100)) : 0;
@@ -182,7 +182,11 @@ function Billing() {
             </p>
 
           </div>
-          {plan ? (
+          {trial.active ? (
+            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+              Upgrade to Pro
+            </Link>
+          ) : plan ? (
             <Link to="/pricing" className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
               Manage plan
             </Link>
