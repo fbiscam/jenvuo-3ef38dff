@@ -1,0 +1,400 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+import {
+  quoteTopup,
+  createTopupOrder,
+  submitTxHash,
+  listMyOrders,
+  cancelOrder,
+  redeemFreeCode,
+} from "@/lib/payments.functions";
+import {
+  NETWORKS,
+  PRESET_AMOUNTS,
+  networkMeta,
+  statusLabel,
+  type NetworkId,
+  type PaymentOrder,
+  type Quote,
+} from "@/lib/payments/shared";
+
+export const Route = createFileRoute("/_authenticated/dashboard/pay")({
+  head: () => ({
+    meta: [
+      { title: "Add Funds · Crypto Top-Up · Jenvu" },
+      { name: "description", content: "Top up your Jenvu scan wallet with USDT on Tron, BNB Smart Chain or Ethereum. Instant on-chain verification." },
+      { property: "og:title", content: "Add Funds · Crypto Top-Up · Jenvu" },
+      { property: "og:description", content: "Top up your Jenvu scan wallet with USDT. Instant on-chain verification." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
+  component: PayPage,
+});
+
+const SANS = { fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 } as const;
+
+function useCountdown(iso: string | null | undefined) {
+  const [left, setLeft] = useState(0);
+  useEffect(() => {
+    if (!iso) return;
+    const tick = () => setLeft(Math.max(0, Math.floor((new Date(iso).getTime() - Date.now()) / 1000)));
+    tick();
+    const t = setInterval(tick, 1000);
+    return () => clearInterval(t);
+  }, [iso]);
+  return left;
+}
+
+function PayPage() {
+  const quoteFn = useServerFn(quoteTopup);
+  const createFn = useServerFn(createTopupOrder);
+  const submitFn = useServerFn(submitTxHash);
+  const listFn = useServerFn(listMyOrders);
+  const cancelFn = useServerFn(cancelOrder);
+  const redeemFn = useServerFn(redeemFreeCode);
+
+  const [amount, setAmount] = useState<number>(25);
+  const [custom, setCustom] = useState("");
+  const [network, setNetwork] = useState<NetworkId>("trc20");
+  const [code, setCode] = useState("");
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [order, setOrder] = useState<PaymentOrder | null>(null);
+  const [hash, setHash] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [orders, setOrders] = useState<PaymentOrder[]>([]);
+  const qSeq = useRef(0);
+
+  const effAmount = useMemo(() => {
+    const c = Number(custom);
+    return custom.trim() && Number.isFinite(c) ? Math.round(c * 100) / 100 : amount;
+  }, [amount, custom]);
+
+  const loadOrders = useCallback(async () => {
+    try {
+      setOrders(await listFn());
+    } catch { /* ignore */ }
+  }, [listFn]);
+
+  useEffect(() => { void loadOrders(); }, [loadOrders]);
+
+  useEffect(() => {
+    const seq = ++qSeq.current;
+    const t = setTimeout(async () => {
+      try {
+        const q = await quoteFn({ data: { amountUsd: effAmount, code: code.trim() || null } });
+        if (seq === qSeq.current) setQuote(q);
+      } catch { /* ignore */ }
+    }, 250);
+    return () => clearTimeout(t);
+  }, [effAmount, code, quoteFn]);
+
+  const secondsLeft = useCountdown(order?.status === "pending" ? order.expires_at : null);
+  useEffect(() => {
+    if (order?.status === "pending" && secondsLeft === 0 && order.expires_at && new Date(order.expires_at).getTime() < Date.now()) {
+      setOrder((o) => (o ? { ...o, status: "expired" } : o));
+    }
+  }, [secondsLeft, order?.status, order?.expires_at]);
+
+  async function onCreate() {
+    if (effAmount < 5) return toast.error("Minimum top-up is $5.");
+    setBusy(true);
+    try {
+      const res: any = await createFn({ data: { amountUsd: effAmount, network, code: code.trim() || null } });
+      if (!res.ok) return toast.error(res.error);
+      setOrder(res.order);
+      setHash("");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not start the payment.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onSubmitHash() {
+    if (!order) return;
+    if (hash.trim().length < 10) return toast.error("Enter the full transaction ID.");
+    setBusy(true);
+    try {
+      const res: any = await submitFn({ data: { orderId: order.id, txHash: hash.trim() } });
+      if (!res.ok) return toast.error(res.error);
+      if (res.status === "approved") {
+        toast.success("Payment verified — credits added to your wallet.");
+        setOrder({ ...order, status: "approved", tx_hash: hash.trim() });
+      } else {
+        toast.message("Sent for review", { description: res.detail ?? "Our team will confirm shortly." });
+        setOrder({ ...order, status: "needs_review", tx_hash: hash.trim() });
+      }
+      void loadOrders();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not submit the transaction.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onRedeem() {
+    if (!code.trim()) return toast.error("Enter a promo code.");
+    setBusy(true);
+    try {
+      const res: any = await redeemFn({ data: { code: code.trim() } });
+      if (!res.ok) return toast.error(res.error);
+      toast.success(`$${Number(res.credited).toFixed(2)} added to your wallet.`);
+      setCode("");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not redeem this code.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const net = networkMeta(order?.network ?? network);
+  const mm = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
+  const ss = String(secondsLeft % 60).padStart(2, "0");
+
+  return (
+    <div className="mx-auto w-full max-w-4xl space-y-6 px-1 pb-16" style={SANS}>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900">Add funds</h1>
+          <p className="mt-1 text-sm text-zinc-500">Pay with USDT — credits land in your scan wallet after verification.</p>
+        </div>
+        <Link to="/dashboard/billing" className="rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
+          Billing
+        </Link>
+      </div>
+
+      {!order || order.status === "expired" ? (
+        <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+          <div className="text-[13px] font-medium uppercase tracking-[0.14em] text-zinc-400">Amount</div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {PRESET_AMOUNTS.map((a) => (
+              <button
+                key={a}
+                onClick={() => { setAmount(a); setCustom(""); }}
+                className={`rounded-xl border px-4 py-2.5 text-sm transition ${
+                  !custom.trim() && amount === a
+                    ? "border-zinc-900 bg-zinc-900 text-white"
+                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+                }`}
+              >
+                ${a}
+              </button>
+            ))}
+            <input
+              value={custom}
+              onChange={(e) => setCustom(e.target.value.replace(/[^0-9.]/g, ""))}
+              placeholder="Custom $"
+              inputMode="decimal"
+              className="w-32 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-zinc-400"
+            />
+          </div>
+
+          <div className="mt-6 text-[13px] font-medium uppercase tracking-[0.14em] text-zinc-400">Network</div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            {NETWORKS.map((n) => (
+              <button
+                key={n.id}
+                onClick={() => setNetwork(n.id)}
+                className={`rounded-xl border p-3 text-left transition ${
+                  network === n.id ? "border-zinc-900 ring-1 ring-zinc-900" : "border-zinc-200 hover:border-zinc-300"
+                }`}
+              >
+                <div className="text-sm font-medium text-zinc-900">{n.label}</div>
+                <div className="mt-0.5 text-[12px] text-zinc-500">{n.note}</div>
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-6 text-[13px] font-medium uppercase tracking-[0.14em] text-zinc-400">Promo code</div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              placeholder="e.g. EXTRA5"
+              className="w-48 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm uppercase outline-none focus:border-zinc-400"
+            />
+            <button
+              onClick={onRedeem}
+              disabled={busy}
+              className="rounded-xl border border-zinc-200 px-3 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+            >
+              Redeem free credit
+            </button>
+            {quote?.error && <span className="text-[13px] text-red-600">{quote.error}</span>}
+            {!quote?.error && quote?.promoCode && (
+              <span className="text-[13px] text-emerald-700">
+                {quote.promoType === "discount"
+                  ? `You pay $${quote.payUsd.toFixed(2)} and receive $${quote.creditUsd.toFixed(2)}`
+                  : quote.promoType === "free"
+                    ? `Free credit code — hit "Redeem free credit"`
+                    : `+$${quote.bonusUsd.toFixed(2)} bonus applied`}
+              </span>
+            )}
+          </div>
+
+          <div className="mt-7 flex flex-wrap items-end justify-between gap-4 border-t border-zinc-100 pt-5">
+            <div>
+              <div className="text-[13px] text-zinc-500">You pay</div>
+              <div className="text-2xl font-semibold text-zinc-900">${(quote?.payUsd ?? effAmount).toFixed(2)}</div>
+              <div className="mt-1 text-[13px] text-zinc-500">
+                You receive <span className="font-medium text-zinc-900">${(quote?.creditUsd ?? effAmount).toFixed(2)}</span> in scan credits
+              </div>
+            </div>
+            <button
+              onClick={onCreate}
+              disabled={busy || !!quote?.error}
+              className="rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50"
+            >
+              Continue to payment
+            </button>
+          </div>
+        </section>
+      ) : (
+        <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-[13px] uppercase tracking-[0.14em] text-zinc-400">{net.chain}</div>
+              <div className="mt-1 text-2xl font-semibold text-zinc-900">
+                {Number(order.pay_amount_usd).toFixed(2)} USDT
+              </div>
+              <div className="mt-1 text-[13px] text-zinc-500">
+                Send this exact amount — the cents identify your payment.
+              </div>
+            </div>
+            {order.status === "pending" && (
+              <div className="rounded-xl bg-zinc-900 px-4 py-2 text-center text-white">
+                <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-300">Time left</div>
+                <div className="font-mono text-xl">{mm}:{ss}</div>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-5 grid gap-5 sm:grid-cols-[160px_1fr]">
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(order.deposit_address)}`}
+              alt={`${net.chain} deposit address QR code`}
+              className="h-40 w-40 rounded-xl border border-zinc-200 bg-white p-2"
+              loading="lazy"
+            />
+            <div>
+              <div className="text-[13px] text-zinc-500">Deposit address ({net.label})</div>
+              <div className="mt-1 flex items-center gap-2">
+                <code className="flex-1 break-all rounded-lg bg-zinc-50 px-3 py-2 text-[13px] text-zinc-900">
+                  {order.deposit_address}
+                </code>
+                <button
+                  onClick={() => { void navigator.clipboard.writeText(order.deposit_address); toast.success("Address copied"); }}
+                  className="rounded-lg border border-zinc-200 px-3 py-2 text-sm hover:bg-zinc-50"
+                >
+                  Copy
+                </button>
+              </div>
+              <div className="mt-3 text-[13px] text-zinc-500">
+                Credits on approval: <span className="font-medium text-zinc-900">${Number(order.credit_usd).toFixed(2)}</span>
+                {Number(order.bonus_usd) > 0 && <> · bonus ${Number(order.bonus_usd).toFixed(2)}</>}
+              </div>
+              <div className="mt-1 text-[12px] text-amber-700">
+                Only send {net.asset} on {net.chain}. Other assets or networks cannot be recovered.
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 border-t border-zinc-100 pt-5">
+            <div className="text-[13px] font-medium text-zinc-900">
+              Status: <span className="text-zinc-600">{statusLabel(order.status)}</span>
+            </div>
+            {order.status === "approved" ? (
+              <p className="mt-2 text-[13px] text-emerald-700">
+                Payment confirmed — ${Number(order.credit_usd).toFixed(2)} added to your wallet.
+              </p>
+            ) : order.status === "needs_review" ? (
+              <p className="mt-2 text-[13px] text-zinc-600">
+                We couldn't auto-confirm it yet. Our team reviews it manually and you'll get an email either way.
+              </p>
+            ) : (
+              <>
+                <p className="mt-2 text-[13px] text-zinc-600">After sending, paste the transaction ID (hash) below.</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <input
+                    value={hash}
+                    onChange={(e) => setHash(e.target.value.trim())}
+                    placeholder="Transaction ID / hash"
+                    className="min-w-0 flex-1 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-zinc-400"
+                  />
+                  <button
+                    onClick={onSubmitHash}
+                    disabled={busy}
+                    className="rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+                  >
+                    Verify payment
+                  </button>
+                </div>
+              </>
+            )}
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={async () => {
+                  if (order.status === "pending") await cancelFn({ data: { orderId: order.id } });
+                  setOrder(null);
+                  void loadOrders();
+                }}
+                className="text-[13px] text-zinc-500 underline underline-offset-4 hover:text-zinc-900"
+              >
+                {order.status === "pending" ? "Cancel and start over" : "Make another payment"}
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+        <h2 className="text-[15px] font-semibold text-zinc-900">Payment history</h2>
+        {orders.length === 0 ? (
+          <p className="mt-2 text-[13px] text-zinc-500">No payments yet.</p>
+        ) : (
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-left text-[13px]">
+              <thead className="text-zinc-400">
+                <tr>
+                  <th className="py-2 pr-3 font-normal">Date</th>
+                  <th className="py-2 pr-3 font-normal">Paid</th>
+                  <th className="py-2 pr-3 font-normal">Credit</th>
+                  <th className="py-2 pr-3 font-normal">Network</th>
+                  <th className="py-2 pr-3 font-normal">Status</th>
+                </tr>
+              </thead>
+              <tbody className="text-zinc-700">
+                {orders.map((o) => (
+                  <tr key={o.id} className="border-t border-zinc-100">
+                    <td className="py-2 pr-3">{new Date(o.created_at).toLocaleDateString()}</td>
+                    <td className="py-2 pr-3">${Number(o.pay_amount_usd).toFixed(2)}</td>
+                    <td className="py-2 pr-3">${Number(o.credit_usd).toFixed(2)}</td>
+                    <td className="py-2 pr-3">{networkMeta(o.network).label}</td>
+                    <td className="py-2 pr-3">
+                      <span
+                        className={
+                          o.status === "approved"
+                            ? "text-emerald-700"
+                            : o.status === "rejected"
+                              ? "text-red-600"
+                              : "text-zinc-500"
+                        }
+                      >
+                        {statusLabel(o.status)}
+                      </span>
+                      {o.reject_reason && <div className="text-[12px] text-red-500">{o.reject_reason}</div>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
