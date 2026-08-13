@@ -323,7 +323,8 @@ function HomePage() {
                 search={isAuthed ? undefined : { mode: "signup" }}
                 className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
               >
-                {isAuthed ? "Launch Voice Agent" : "Start 14 day trial"}
+                {isAuthed ? "Launch Voice Agent" : "Start 14 days trial"}
+                <br className="sm:hidden" />
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
               <Link

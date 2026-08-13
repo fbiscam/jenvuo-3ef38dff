@@ -8,7 +8,7 @@ import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { Play, Pause, Headphones, Rss } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 
-const briefsQuery = queryOptions({
+export const briefsQuery = queryOptions({
   queryKey: ["briefs", "list"],
   queryFn: () => listBriefs({ data: { limit: 30 } }),
 });
