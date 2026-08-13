@@ -80,17 +80,26 @@ export const Route = createFileRoute('/api/public/hooks/news-alerts')({
           if (data.users.length < 1000) break
         }
 
-        const { data: prefRows } = await admin
-          .from('alert_preferences')
-          .select('user_id, alerts_enabled, email_enabled')
-          .in('user_id', userIds.slice(0, 1000))
-        const prefs = new Map(
-          ((prefRows ?? []) as Array<{
+        // Preferences must cover EVERY user, not just the first page —
+        // otherwise opted-out accounts past index 1000 keep getting pinged.
+        const prefs = new Map<
+          string,
+          { user_id: string; alerts_enabled: boolean; email_enabled: boolean }
+        >()
+        for (let i = 0; i < userIds.length; i += 500) {
+          const chunk = userIds.slice(i, i + 500)
+          const { data: prefRows } = await admin
+            .from('alert_preferences')
+            .select('user_id, alerts_enabled, email_enabled')
+            .in('user_id', chunk)
+          for (const r of (prefRows ?? []) as Array<{
             user_id: string
             alerts_enabled: boolean
             email_enabled: boolean
-          }>).map((r) => [r.user_id, r]),
-        )
+          }>) {
+            prefs.set(r.user_id, r)
+          }
+        }
         const notifyIds = userIds.filter((id) => prefs.get(id)?.alerts_enabled !== false)
         const emailIds = notifyIds.filter((id) => prefs.get(id)?.email_enabled !== false)
 
