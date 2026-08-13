@@ -204,7 +204,7 @@ function PricingPage() {
                   <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                 </th>
                 {[
-                  { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", to: "/founding" as const, dark: false, accent: true, key: "pro" },
+                  { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", to: "/auth" as const, search: { mode: "signup" as const }, dark: false, accent: true, key: "pro" },
                   { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", to: "/founding" as const, dark: true, key: "elite" },
                   { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", to: "/founding" as const, dark: false, key: "ultra" },
                 ].map((p) => {
@@ -215,7 +215,9 @@ function PricingPage() {
                     ? "Locked in trial"
                     : isLoggedIn
                       ? "Upgrade"
-                      : "Apply now";
+                      : p.key === "pro"
+                        ? "Start Free Trial"
+                        : "Buy Now";
                   return (
                   <th
                     key={p.name}
@@ -263,6 +265,7 @@ function PricingPage() {
                     ) : (
                       <Link
                         to={p.to}
+                        search={p.search}
                         className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
                           p.accent || p.dark
                             ? "bg-zinc-900 text-white hover:bg-black"

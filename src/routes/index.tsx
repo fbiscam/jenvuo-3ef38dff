@@ -708,9 +708,9 @@ function HomePage() {
                     <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                   </th>
                   {[
-                    { name: "Pro", price: "$15", tag: "Active", accent: true, key: "pro" },
-                    { name: "Elite", price: "$50", tag: "Desk", dark: true, key: "elite" },
-                    { name: "Ultra", price: "$100", tag: "Fund / Desk+", key: "ultra" },
+                    { name: "Pro", price: "$15", tag: "Active", accent: true, key: "pro", to: "/auth" as const, search: { mode: "signup" as const } },
+                    { name: "Elite", price: "$50", tag: "Desk", dark: true, key: "elite", to: "/founding" as const },
+                    { name: "Ultra", price: "$100", tag: "Fund / Desk+", key: "ultra", to: "/founding" as const },
                   ].map((p) => {
                     const isCurrent = currentPlan === p.key;
                     const isLoggedIn = currentPlan !== null;
@@ -721,7 +721,9 @@ function HomePage() {
                         ? "Locked in trial"
                         : isLoggedIn
                           ? "Upgrade"
-                          : "Apply now";
+                          : p.key === "pro"
+                            ? "Start Free Trial"
+                            : "Buy Now";
                     return (
                     <th
                       key={p.name}
@@ -768,7 +770,8 @@ function HomePage() {
                         </button>
                       ) : (
                         <Link
-                          to="/founding"
+                          to={p.to}
+                          search={p.search}
                           className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
                             p.accent || p.dark
                               ? "bg-zinc-900 text-white hover:bg-black"
