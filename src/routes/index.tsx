@@ -182,7 +182,7 @@ function HomePage() {
   }, [mobileMenuOpen]);
   return (
     <>
-    <div className={`jenvu-zoom min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+    <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
@@ -866,7 +866,7 @@ function HomePage() {
 
 
       {/* COMPARISON */}
-      <section className="border-t border-zinc-100 bg-white">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <h2 className="text-left text-xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
             Why traders move to JENVU.
@@ -923,7 +923,7 @@ function HomePage() {
 
 
       {/* INTEGRATIONS */}
-      <section className="border-t border-zinc-100 bg-white">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
           <div className="flex flex-col md:flex-row items-start justify-between gap-6">
             <div className="text-left md:text-left">
@@ -947,7 +947,7 @@ function HomePage() {
 
 
       {/* FAQ */}
-      <section className="bg-white border-t border-zinc-100">
+      <section className="bg-white/40 border-t border-zinc-100">
 
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
@@ -996,10 +996,10 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="bg-white border-t border-zinc-100 overflow-hidden">
+      <section className="bg-white/40 border-t border-zinc-100 overflow-hidden">
 
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
+          <div className="rounded-2xl border border-zinc-200 bg-[#FAFAFA] p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
             <div className="max-w-xl text-left md:text-left">
               <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal.&nbsp;<br />
