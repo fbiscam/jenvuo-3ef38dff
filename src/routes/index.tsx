@@ -288,9 +288,7 @@ function HomePage() {
             </div>
             <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-zinc-900">
               {[
-                { to: "/signal", label: "Signal Engine" },
                 { to: "/signals-live", label: "Signals Live" },
-                { to: "/ai-engine", label: "AI Engine" },
               ].map((it) => (
                 <Link
                   key={it.to}
@@ -303,6 +301,8 @@ function HomePage() {
               ))}
               <div className="mt-1 px-3 py-2 text-[12px] font-medium uppercase tracking-wider text-zinc-500">Resources</div>
               {[
+                { to: "/signal", label: "Signal Engine" },
+                { to: "/ai-engine", label: "AI Engine" },
                 { to: "/broadcasts", label: "Broadcasts" },
                 { to: "/insights", label: "Insights" },
               ].map((it) => (
