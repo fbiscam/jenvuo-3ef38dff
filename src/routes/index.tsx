@@ -179,6 +179,8 @@ function HomePage() {
   const { user: authUser } = useAuthUser();
   const isAuthed = !!authUser;
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [resourcesOpen, setResourcesOpen] = React.useState(false);
+  const [toolsOpen, setToolsOpen] = React.useState(false);
   React.useEffect(() => {
     if (mobileMenuOpen) {
       const prev = document.body.style.overflow;
