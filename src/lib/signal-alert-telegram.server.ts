@@ -277,15 +277,26 @@ function buildCaption(a: EnqueueAlertEmailsArgs, reason: string, sizeLine?: stri
   return caption
 }
 
+function actionKeyboard(alertId: string) {
+  return {
+    inline_keyboard: [[
+      { text: '✅ Trade Done', callback_data: `td:${alertId}` },
+      { text: '🔖 Save Signal', callback_data: `sv:${alertId}` },
+    ]],
+  }
+}
+
 async function sendOne(botToken: string, chatId: string, a: EnqueueAlertEmailsArgs, reason: string, sizeLine?: string): Promise<void> {
   const photo = await buildChartUrl(a)
   const caption = buildCaption(a, reason, sizeLine)
+  const reply_markup = actionKeyboard(a.alertId)
   try {
     await tgApi(botToken, 'sendPhoto', {
       chat_id: chatId,
       photo,
       caption,
       parse_mode: 'HTML',
+      reply_markup,
     })
   } catch {
     // Fallback: if photo URL fails (e.g. quickchart hiccup), still deliver text.
@@ -294,9 +305,11 @@ async function sendOne(botToken: string, chatId: string, a: EnqueueAlertEmailsAr
       text: caption,
       parse_mode: 'HTML',
       disable_web_page_preview: true,
+      reply_markup,
     })
   }
 }
+
 
 export async function sendSignalAlertTelegrams(a: EnqueueAlertEmailsArgs): Promise<{ sent: number }> {
   const botToken = process.env.TELEGRAM_BOT_TOKEN
