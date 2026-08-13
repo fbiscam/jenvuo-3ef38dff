@@ -237,7 +237,8 @@ function FeedBody() {
 
       {/* STATS — only show once at least 1 signal exists */}
       {signals.length > 0 && (
-      <section className="mx-auto max-w-6xl px-5 sm:px-6 py-8">
+      <section aria-labelledby="live-stats-heading" className="mx-auto max-w-6xl px-5 sm:px-6 py-8">
+        <h2 id="live-stats-heading" className="sr-only">Live performance stats</h2>
         <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
           <StatCard
             icon={<Trophy className="h-4 w-4" />}
@@ -301,7 +302,8 @@ function FeedBody() {
       )}
 
       {/* FILTERS */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-6">
+      <section aria-labelledby="signal-filters-heading" className="mx-auto max-w-6xl px-5 sm:px-6">
+        <h2 id="signal-filters-heading" className="sr-only">Filter signals</h2>
         <div className="rounded-2xl border border-zinc-200 bg-white p-2.5 sm:p-4">
           <div className="-mx-0.5 flex items-center gap-2 overflow-x-auto pb-0.5 sm:flex-wrap sm:overflow-visible">
             <div className="shrink-0 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 sm:text-[11px]">
@@ -333,7 +335,8 @@ function FeedBody() {
       </section>
 
       {/* SIGNAL LIST */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-6 py-6">
+      <section aria-labelledby="signal-list-heading" className="mx-auto max-w-6xl px-5 sm:px-6 py-6">
+        <h2 id="signal-list-heading" className="sr-only">Signal history</h2>
         {filtered.length === 0 ? (
           <div className="rounded-2xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
             No signals yet. New signals will appear here as they fire.
