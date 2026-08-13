@@ -4,12 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { CloudOrb } from "@/components/CloudOrb";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 
 
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -17,7 +11,7 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 
-import { Check, Sparkles, Zap, Crown, Minus, Menu, X, ChevronDown } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Minus, Menu, X } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 
 export const Route = createFileRoute("/")({
@@ -179,8 +173,6 @@ function HomePage() {
   const { user: authUser } = useAuthUser();
   const isAuthed = !!authUser;
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-  const [resourcesOpen, setResourcesOpen] = React.useState(false);
-  const [toolsOpen, setToolsOpen] = React.useState(false);
   React.useEffect(() => {
     if (mobileMenuOpen) {
       const prev = document.body.style.overflow;
@@ -200,38 +192,12 @@ function HomePage() {
           </Link>
 
           <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
+            <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
             <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
-            <div
-              className="relative"
-              onMouseEnter={() => setResourcesOpen(true)}
-              onMouseLeave={() => setResourcesOpen(false)}
-            >
-              <button type="button" className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
-                Resources <ChevronDown className="h-3.5 w-3.5" />
-              </button>
-              <div className={`absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 bg-white transition-opacity duration-150 ${resourcesOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-                <div className="mt-1 rounded-md border border-zinc-200 bg-white p-1 shadow-lg">
-                  <Link to="/signal" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Signal Engine</Link>
-                  <Link to="/ai-engine" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">AI Engine</Link>
-                  <Link to="/broadcasts" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Broadcasts</Link>
-                  <Link to="/insights" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Insights</Link>
-                </div>
-              </div>
-            </div>
-            <div className="group relative">
-              <button type="button" className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
-                Tools <ChevronDown className="h-3.5 w-3.5" />
-              </button>
-              <div className="absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 bg-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">
-                <div className="mt-1 rounded-md border border-zinc-200 bg-white p-1 shadow-lg">
-                  <Link to="/leads" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Leads</Link>
-                  <Link to="/scam-check" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Scam Check</Link>
-                </div>
-              </div>
-            </div>
-
+            <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
             <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
             <Link to="/about" className="hover:text-zinc-900">About</Link>
+
             <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
           </nav>
           <div className="flex items-center gap-2">
@@ -287,48 +253,9 @@ function HomePage() {
             </div>
             <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-zinc-900">
               {[
-                { to: "/signals-live", label: "Signals Live" },
-              ].map((it) => (
-                <Link
-                  key={it.to}
-                  to={it.to}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-lg px-3 py-3 hover:bg-zinc-50"
-                >
-                  {it.label}
-                </Link>
-              ))}
-              <div className="mt-1 px-3 py-2 text-[12px] font-medium uppercase tracking-wider text-zinc-500">Resources</div>
-              {[
                 { to: "/signal", label: "Signal Engine" },
+                { to: "/signals-live", label: "Signals Live" },
                 { to: "/ai-engine", label: "AI Engine" },
-                { to: "/broadcasts", label: "Broadcasts" },
-                { to: "/insights", label: "Insights" },
-              ].map((it) => (
-                <Link
-                  key={it.to}
-                  to={it.to}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-lg px-3 py-3 pl-6 hover:bg-zinc-50"
-                >
-                  {it.label}
-                </Link>
-              ))}
-              <div className="mt-1 px-3 py-2 text-[12px] font-medium uppercase tracking-wider text-zinc-500">Tools</div>
-              {[
-                { to: "/leads", label: "Leads" },
-                { to: "/scam-check", label: "Scam Check" },
-              ].map((it) => (
-                <Link
-                  key={it.to}
-                  to={it.to}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-lg px-3 py-3 pl-6 hover:bg-zinc-50"
-                >
-                  {it.label}
-                </Link>
-              ))}
-              {[
                 { to: "/founding", label: "Founding" },
                 { to: "/about", label: "About" },
                 { to: "/contact", label: "Contact" },
