@@ -58,7 +58,7 @@ function RiskPage() {
     <div className="h-full max-w-5xl mx-auto px-4 py-2 flex flex-col overflow-hidden" style={{ fontFamily: "Urbanist, system-ui, sans-serif" }}>
       <div className="mb-2">
         <h1 className="pl-1 text-lg font-semibold text-black">Risk Management</h1>
-        <p className="text-[11px] text-gray-600 mt-0.5">
+        <p className="text-xs text-gray-700 mt-0.5">
           Position size and daily loss guard. Applies to signal cards and Telegram alerts.
         </p>
       </div>
@@ -69,7 +69,7 @@ function RiskPage() {
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-medium text-black mb-0.5">Account balance (USD)</label>
+              <label className="block text-xs font-medium text-black mb-0.5">Account balance (USD)</label>
               <input
                 type="number"
                 min={0}
@@ -81,7 +81,7 @@ function RiskPage() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-black mb-0.5">Risk per trade (%)</label>
+              <label className="block text-xs font-medium text-black mb-0.5">Risk per trade (%)</label>
               <input
                 type="number"
                 min={0.1}
@@ -91,7 +91,7 @@ function RiskPage() {
                 onChange={(e) => setRiskPct(Number(e.target.value))}
                 className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-black bg-white text-sm"
               />
-              <p className="text-[10px] text-gray-500 mt-0.5">
+              <p className="text-xs text-gray-700 mt-0.5">
                 Example: $5 stop on XAU/USD → ~{suggested} lot
               </p>
             </div>
@@ -105,13 +105,13 @@ function RiskPage() {
                 />
                 Enable daily loss kill-switch
               </label>
-              <p className="text-[10px] text-gray-500 mt-0.5">
+              <p className="text-xs text-gray-700 mt-0.5">
                 When today's realized losses hit the limit, new signal alerts and charges are paused until 00:00 UTC.
               </p>
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-[11px] font-medium text-black mb-0.5">Daily loss limit (USD)</label>
+              <label className="block text-xs font-medium text-black mb-0.5">Daily loss limit (USD)</label>
               <input
                 type="number"
                 min={0}
