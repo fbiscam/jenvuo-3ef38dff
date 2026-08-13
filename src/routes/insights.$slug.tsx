@@ -26,9 +26,10 @@ const insightDetailQueryOptions = (slug: string) => queryOptions({
       .from("insights")
       .select("*")
       .eq("slug", slug)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw notFound();
     return data as Insight;
   },
 });
