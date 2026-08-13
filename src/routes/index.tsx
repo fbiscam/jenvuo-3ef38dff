@@ -923,7 +923,7 @@ function HomePage() {
 
 
       {/* INTEGRATIONS */}
-      <section className="border-t border-zinc-100 bg-white/40">
+      <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
           <div className="flex flex-col md:flex-row items-start justify-between gap-6">
             <div className="text-left md:text-left">
