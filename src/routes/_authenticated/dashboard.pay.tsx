@@ -158,31 +158,31 @@ function PayPage() {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6 px-1 pb-16" style={SANS}>
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 p-6 sm:p-8">
-        <div className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full bg-emerald-500/20 blur-3xl" />
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 sm:p-8">
+        <div className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 left-10 h-56 w-56 rounded-full bg-sky-500/10 blur-3xl" />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <UsdtIcon className="h-8 w-8" />
-              <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] uppercase tracking-[0.16em] text-white/70">
+              <span className="rounded-full border border-black/10 bg-black/5 px-2.5 py-1 text-[11px] uppercase tracking-[0.16em] text-black/60">
                 USDT top-up
               </span>
             </div>
-            <h1 className="mt-4 text-3xl font-semibold text-white">Add funds</h1>
-            <p className="mt-2 max-w-md text-sm text-white/60">
+            <h1 className="mt-4 text-3xl font-semibold text-black">Add funds</h1>
+            <p className="mt-2 max-w-md text-sm text-black/60">
               Send USDT on Tron, BNB Smart Chain or Ethereum — credits land in your scan wallet right after on-chain verification.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2">
-              <TronIcon className="h-8 w-8 rounded-full ring-2 ring-zinc-900" />
-              <BnbIcon className="h-8 w-8 rounded-full ring-2 ring-zinc-900" />
-              <EthIcon className="h-8 w-8 rounded-full ring-2 ring-zinc-900" />
+              <TronIcon className="h-8 w-8 rounded-full ring-2 ring-white" />
+              <BnbIcon className="h-8 w-8 rounded-full ring-2 ring-white" />
+              <EthIcon className="h-8 w-8 rounded-full ring-2 ring-white" />
             </div>
             <Link
               to="/dashboard/billing"
-              className="rounded-xl border border-white/15 bg-white/5 px-3.5 py-2 text-sm text-white/80 transition hover:bg-white/10"
+              className="rounded-xl border border-black/10 bg-black/5 px-3.5 py-2 text-sm text-black/80 transition hover:bg-black/10"
             >
               Billing
             </Link>
