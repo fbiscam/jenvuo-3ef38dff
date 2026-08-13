@@ -1386,14 +1386,16 @@ function AuthPage() {
                       <div className="mt-4 pt-3 border-t border-zinc-100">
                         <p className="text-sm text-zinc-500 leading-relaxed">
                           New here?{" "}
-                          <a
-                            href="/founding"
+                          <button
+                            type="button"
+                            onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
                             className="font-medium text-zinc-900 underline-offset-2 hover:underline"
                           >
-                            Apply to the Founding Program →
-                          </a>
+                            Start your 14-day Pro trial →
+                          </button>
                         </p>
                       </div>
+
                     </>
                   )}
 
