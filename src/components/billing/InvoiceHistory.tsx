@@ -34,6 +34,8 @@ async function loadLogo(): Promise<string | null> {
   }
 }
 
+type JsPDF = import("jspdf").jsPDF;
+
 async function loadFontBase64(path: string): Promise<string | null> {
   try {
     const res = await fetch(path);
