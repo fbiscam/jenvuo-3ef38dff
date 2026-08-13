@@ -333,7 +333,7 @@ function HomePage() {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[#FAFAFA] rounded-xl overflow-hidden border border-zinc-200 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)]">
               {[
                 ["Markets", "XAU"],
                 ["Frameworks", "ICT, SMC"],
