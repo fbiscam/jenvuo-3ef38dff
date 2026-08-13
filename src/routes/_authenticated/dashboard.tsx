@@ -918,11 +918,18 @@ function DashboardLayout() {
                           ? "bg-zinc-100 text-zinc-900 font-semibold"
                           : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
-                      <Icon
-                        className={`shrink-0 h-[19px] w-[19px] transition ${active ? "text-zinc-900" : "text-zinc-500 group-hover:text-zinc-900"}`}
-                        strokeWidth={active ? 2.1 : 1.7}
+                      <span
+                        className="material-symbols-rounded shrink-0"
                         aria-hidden
-                      />
+                        style={{
+                          fontSize: 21,
+                          lineHeight: 1,
+                          color: active ? "#18181b" : "#5E5E5E",
+                          fontVariationSettings: `'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 24`,
+                        }}
+                      >
+                        {iconName}
+                      </span>
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
                         <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
