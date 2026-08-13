@@ -107,20 +107,31 @@ function FounderPage() {
         <div className="relative">
           <div className="aspect-square overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100">
             <img
-              src="/haseeb-ijaz-founder.jpg"
+              src={founderPhoto.url}
               alt="Haseeb Ijaz — Founder of Jenvu"
               className="h-full w-full object-cover"
               width={1024}
               height={1024}
             />
           </div>
-          <div className="mt-4 flex items-center gap-3 rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white">
-              <Award className="h-5 w-5" />
+          <div className="mt-4 space-y-3">
+            <div className="flex items-center gap-3 rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white">
+                <Award className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-zinc-900">Founded at age {FOUNDING_STORY.foundedAge}</p>
+                <p className={`text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>Jenvu · Voice Trading Desk</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-zinc-900">Founded at age {FOUNDING_STORY.foundedAge}</p>
-              <p className={`text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>Jenvu · Voice Trading Desk</p>
+            <div className="flex items-center gap-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500 text-white">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-zinc-900">Pakistan No. #1 Scams Awareness Provider</p>
+                <p className={`text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>Protecting traders online</p>
+              </div>
             </div>
           </div>
         </div>
