@@ -1070,12 +1070,21 @@ function DashboardLayout() {
           <div className="flex flex-col items-end gap-2">
             <Link
               to="/dashboard/profile"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-900"
+              className="group inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white py-1 pl-1 pr-3 transition hover:bg-zinc-50"
               aria-label="Profile"
-              title="Profile"
+              title={fullName || email || "Profile"}
             >
-              <User className="h-4 w-4" />
+              <img
+                src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
+                alt={fullName || email || "Account avatar"}
+                className="h-7 w-7 rounded-full object-cover"
+                loading="lazy"
+              />
+              <span className="max-w-[140px] truncate text-[12px] font-medium text-zinc-700 group-hover:text-zinc-900">
+                {fullName || email || "Profile"}
+              </span>
             </Link>
+
             <div className="flex items-center gap-2">
               <button
                 type="button"
