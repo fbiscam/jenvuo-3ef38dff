@@ -316,13 +316,7 @@ function PayPage() {
           </div>
 
 
-          <div className="mt-5 grid gap-5 sm:grid-cols-[160px_1fr]">
-            <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(order.deposit_address)}`}
-              alt={`${net.chain} deposit address QR code`}
-              className="h-40 w-40 rounded-xl border border-zinc-200 bg-white p-2"
-              loading="lazy"
-            />
+          <div className="mt-5 space-y-5">
             <div>
               <div className="text-[13px] text-zinc-500">Deposit address ({net.label})</div>
               <div className="mt-1 flex items-center gap-2">
