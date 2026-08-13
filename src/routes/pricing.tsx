@@ -260,7 +260,7 @@ function PricingPage() {
                       </button>
                     ) : (
                       <Link
-                        to={p.to}
+                        to={to}
                         search={p.search}
                         className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
                           p.accent || p.dark
