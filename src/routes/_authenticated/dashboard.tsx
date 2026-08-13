@@ -1019,13 +1019,67 @@ function DashboardLayout() {
         <>
         {/* Identity row */}
 
-        <div className="flex flex-wrap items-start justify-between gap-4 lg:items-end" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
-          <div className="min-w-0">
-            <div className="text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>Account home</div>
-            <h1 className="pl-1 mt-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+        <div className="space-y-1" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+          <div className="text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>Account home</div>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h1 className="pl-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span>{email || fullName}</span><span>'s Account</span>
             </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className="group inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white py-1 pl-1 pr-3 transition hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                aria-label="Profile menu"
+                title={fullName || email || "Profile"}
+              >
+                <img
+                  src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
+                  alt={fullName || email || "Account avatar"}
+                  className="h-7 w-7 rounded-full object-cover"
+                  loading="lazy"
+                />
+                <span className="max-w-[140px] truncate text-[12px] font-medium text-zinc-700 group-hover:text-zinc-900">
+                  {fullName || email || "Profile"}
+                </span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="flex items-center gap-3 px-3 py-2.5">
+                  <img
+                    src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
+                    alt={fullName || email || "Account avatar"}
+                    className="h-9 w-9 rounded-full object-cover"
+                  />
+                  <div className="min-w-0">
+                    <p className="truncate text-[13px] font-medium text-zinc-900">{fullName || "Trader"}</p>
+                    <p className="truncate text-[11px] text-zinc-500">{email || ""}</p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/profile" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
+                    <User className="h-4 w-4 text-zinc-500" /> Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/billing" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
+                    <CreditCard className="h-4 w-4 text-zinc-500" /> Billing
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/security" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
+                    <ShieldCheck className="h-4 w-4 text-zinc-500" /> Security
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={signOut}
+                  className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700 focus:text-rose-600"
+                >
+                  <LogOut className="h-4 w-4 text-zinc-500" /> Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span className="inline-flex items-center gap-2">
                 <span>{greetingText}, {fullName || "Trader"}</span>
                 <span className="hidden sm:inline text-zinc-300">·</span>
@@ -1054,66 +1108,7 @@ function DashboardLayout() {
 
               </Link>
             </div>
-          </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className="group inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white py-1 pl-1 pr-3 transition hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-300"
-              aria-label="Profile menu"
-              title={fullName || email || "Profile"}
-            >
-              <img
-                src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
-                alt={fullName || email || "Account avatar"}
-                className="h-7 w-7 rounded-full object-cover"
-                loading="lazy"
-              />
-              <span className="max-w-[140px] truncate text-[12px] font-medium text-zinc-700 group-hover:text-zinc-900">
-                {fullName || email || "Profile"}
-              </span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="flex items-center gap-3 px-3 py-2.5">
-                <img
-                  src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
-                  alt={fullName || email || "Account avatar"}
-                  className="h-9 w-9 rounded-full object-cover"
-                />
-                <div className="min-w-0">
-                  <p className="truncate text-[13px] font-medium text-zinc-900">{fullName || "Trader"}</p>
-                  <p className="truncate text-[11px] text-zinc-500">{email || ""}</p>
-                </div>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link to="/dashboard/profile" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
-                  <User className="h-4 w-4 text-zinc-500" /> Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/dashboard/billing" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
-                  <CreditCard className="h-4 w-4 text-zinc-500" /> Billing
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/dashboard/security" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
-                  <ShieldCheck className="h-4 w-4 text-zinc-500" /> Security
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={signOut}
-                className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700 focus:text-rose-600"
-              >
-                <LogOut className="h-4 w-4 text-zinc-500" /> Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
         </div>
-
-
-
 
         {/* Analytics header */}
         <div className="-mt-2 flex items-start justify-between">
