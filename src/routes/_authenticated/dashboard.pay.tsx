@@ -423,7 +423,12 @@ function PayPage() {
                     <td className="py-2 pr-3">{new Date(o.created_at).toLocaleDateString()}</td>
                     <td className="py-2 pr-3">${Number(o.pay_amount_usd).toFixed(2)}</td>
                     <td className="py-2 pr-3">${Number(o.credit_usd).toFixed(2)}</td>
-                    <td className="py-2 pr-3">{networkMeta(o.network).label}</td>
+                    <td className="py-2 pr-3">
+                      <span className="inline-flex items-center gap-1.5">
+                        <NetworkIcon id={o.network} className="h-4 w-4" />
+                        {networkMeta(o.network).label}
+                      </span>
+                    </td>
                     <td className="py-2 pr-3">
                       <span
                         className={
