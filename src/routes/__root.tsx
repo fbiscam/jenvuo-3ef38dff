@@ -193,9 +193,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    {/* suppressHydrationWarning: the inline Material Symbols script below adds the
-        `ms-icons-ready` class to <html> before React hydrates, which is an
-        intentional pre-hydration attribute change. */}
+    // suppressHydrationWarning: the inline Material Symbols script below adds
+    // the `ms-icons-ready` class to <html> before React hydrates.
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
