@@ -187,7 +187,7 @@ function NotificationsPage() {
     const url = explicit ?? (n.type === "signal_alert" || categoryOf(n) === "signals" ? "/dashboard/alerts" : undefined);
     const inner = (
       <div className={cn(
-        "group relative flex gap-3 rounded-2xl bg-white px-4 py-3.5 shadow-sm transition",
+        "group relative flex gap-3 rounded-2xl bg-white px-4 py-3.5 transition",
         unread
           ? "hover:bg-zinc-50"
           : "hover:bg-zinc-50",
@@ -327,7 +327,7 @@ function NotificationsPage() {
             <Loader2 className="h-5 w-5 animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-zinc-200 p-14 text-center">
+          <div className="rounded-2xl p-14 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">
               <Bell className="h-5 w-5" />
             </div>
