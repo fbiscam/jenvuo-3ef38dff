@@ -113,7 +113,7 @@ export default function SiteFooter() {
 
 
       {/* Main grid */}
-      <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10">
+      <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10 bg-[#FAFAFA]">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-10">
           {/* Brand */}
           <div className="col-span-2 md:col-span-2 space-y-4">
