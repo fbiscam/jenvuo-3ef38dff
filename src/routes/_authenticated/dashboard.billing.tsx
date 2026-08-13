@@ -182,7 +182,11 @@ function Billing() {
             </p>
 
           </div>
-          {plan ? (
+          {trial.active ? (
+            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+              Upgrade to Pro
+            </Link>
+          ) : plan ? (
             <Link to="/pricing" className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
               Manage plan
             </Link>
