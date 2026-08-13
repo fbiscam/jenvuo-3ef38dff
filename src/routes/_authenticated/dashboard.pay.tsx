@@ -287,7 +287,7 @@ function PayPage() {
             <button
               onClick={onCreate}
               disabled={busy || !!quote?.error}
-              className="rounded-2xl bg-zinc-900 px-6 py-3.5 text-sm font-medium text-white shadow-[0_14px_30px_-16px_rgba(0,0,0,0.9)] transition hover:bg-zinc-800 disabled:opacity-50"
+              className="rounded-2xl border border-black/10 bg-white px-6 py-3.5 text-sm font-medium text-black transition hover:bg-black/5 disabled:opacity-50"
             >
               Continue to payment
             </button>
