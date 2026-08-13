@@ -84,8 +84,6 @@ async function embedGoogleSans(doc: JsPDF) {
   return { hasFont: Boolean(normal) };
 }
 
-type JsPDF = import("jspdf").jsPDF;
-
 export default function InvoiceHistory() {
   const listFn = useServerFn(listMyOrders);
   const [email, setEmail] = useState<string>("");
