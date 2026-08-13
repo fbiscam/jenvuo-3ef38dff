@@ -38,6 +38,8 @@ const FOUNDING_STORY = {
 const SKILL_PILLARS = [
   {
     icon: <TrendingUp className="h-5 w-5" />,
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
     title: "Institutional Structure",
     skills: [
       "Market Structure (BOS/CHoCH)",
@@ -49,6 +51,8 @@ const SKILL_PILLARS = [
   },
   {
     icon: <Target className="h-5 w-5" />,
+    color: "text-amber-600",
+    bg: "bg-amber-50",
     title: "Precision Timing",
     skills: [
       "Killzone Timing",
@@ -60,6 +64,8 @@ const SKILL_PILLARS = [
   },
   {
     icon: <Shield className="h-5 w-5" />,
+    color: "text-blue-600",
+    bg: "bg-blue-50",
     title: "Risk & Capital",
     skills: [
       "Risk-Reward Engineering",
@@ -71,6 +77,8 @@ const SKILL_PILLARS = [
   },
   {
     icon: <Brain className="h-5 w-5" />,
+    color: "text-purple-600",
+    bg: "bg-purple-50",
     title: "AI & Quantitative",
     skills: [
       "LLM Orchestration",
@@ -82,6 +90,8 @@ const SKILL_PILLARS = [
   },
   {
     icon: <Cpu className="h-5 w-5" />,
+    color: "text-rose-600",
+    bg: "bg-rose-50",
     title: "Engineering & Growth",
     skills: [
       "Python & Quant Scripting",
@@ -93,6 +103,8 @@ const SKILL_PILLARS = [
   },
   {
     icon: <Search className="h-5 w-5" />,
+    color: "text-cyan-600",
+    bg: "bg-cyan-50",
     title: "Marketing & Research",
     skills: [
       "Market Research & Validation",
@@ -196,7 +208,7 @@ function FounderPage() {
               className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
             >
               <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-900 text-white">
+                <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${pillar.bg} ${pillar.color}`}>
                   {pillar.icon}
                 </div>
                 <h3 className="font-semibold text-zinc-900">{pillar.title}</h3>
