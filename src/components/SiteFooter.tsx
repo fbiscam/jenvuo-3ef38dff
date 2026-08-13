@@ -84,6 +84,7 @@ const columns = [
       { to: "/dashboard", label: "Dashboard" },
       { to: "/auth", label: "Sign In" },
       { to: "/help", label: "Help Center" },
+      { to: "/leads", label: "Leads" },
       { to: "/about", label: "About" },
       { to: "/contact", label: "Contact" },
     ],
