@@ -151,7 +151,7 @@ function Billing() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="mt-2 flex items-center gap-3">
-              <h2 className="pl-1 mt-1 text-2xl font-semibold">&nbsp;{planLabel}</h2>
+              <h2 className="pl-1 mt-2 text-2xl font-semibold">&nbsp;{planLabel}</h2>
               {plan ? (
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-800">
                   Active
