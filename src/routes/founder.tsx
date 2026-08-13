@@ -190,47 +190,6 @@ function FounderPage() {
         </div>
       </section>
 
-      {/* 25 Skills */}
-      <section className="space-y-6">
-        <div className="border-t border-zinc-100 pt-8">
-          <h2 className={`text-2xl font-semibold tracking-tight text-zinc-900 ${SANS}`}>
-            25 skills & techniques
-          </h2>
-          <p className="mt-2 max-w-2xl text-zinc-600">
-            The stack Haseeb used to architect Jenvu — from institutional market structure to AI orchestration, product marketing, market research and growth execution.
-          </p>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SKILL_PILLARS.map((pillar) => (
-            <div
-              key={pillar.title}
-              className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-            >
-              <div className="mb-4 flex items-center gap-3">
-                <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${pillar.bg} ${pillar.color}`}>
-                  {pillar.icon}
-                </div>
-                <h3 className="font-semibold text-zinc-900">{pillar.title}</h3>
-              </div>
-              <ul className="space-y-2 text-sm text-zinc-700">
-                {pillar.skills.map((skill) => (
-                  <li key={skill} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-400" />
-                    {skill}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3">
-          <p className={`text-center text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>
-            Total skill stack: {ALL_SKILLS.length} disciplines across trading, AI, engineering & marketing
-          </p>
-        </div>
-      </section>
 
       {/* Scams Awareness */}
       <section className="rounded-2xl border border-amber-100 bg-amber-50/60 p-6 sm:p-8">
