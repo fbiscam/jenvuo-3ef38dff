@@ -80,25 +80,13 @@ export const Route = createFileRoute("/signal")({
 });
 
 /* ---------- helpers ---------- */
-const XAU_PAIRS = [
-  "XAUUSD", "XAUEUR", "XAUGBP", "XAUJPY", "XAUAUD", "XAUCHF",
-  "EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCHF", "USDCAD",
-  "XAGUSD", "XPTUSD", "BTCUSD", "ETHUSD",
-] as const;
+const XAU_PAIRS = ["XAUUSD", "XAUEUR", "XAUGBP", "XAUJPY", "XAUAUD", "XAUCHF"] as const;
 const XAU_LABELS: Record<string, string> = {
   XAUUSD: "XAU/USD", XAUEUR: "XAU/EUR", XAUGBP: "XAU/GBP",
   XAUJPY: "XAU/JPY", XAUAUD: "XAU/AUD", XAUCHF: "XAU/CHF",
-  EURUSD: "EUR/USD", GBPUSD: "GBP/USD", USDJPY: "USD/JPY",
-  AUDUSD: "AUD/USD", USDCHF: "USD/CHF", USDCAD: "USD/CAD",
-  XAGUSD: "XAG/USD", XPTUSD: "XPT/USD",
-  BTCUSD: "BTC/USD", ETHUSD: "ETH/USD",
 };
-const CRYPTO_PAIRS = new Set(["BTCUSD", "ETHUSD"]);
-function isMarketOpen(sym: string, d: Date = new Date()): boolean {
-  // Crypto trades 24/7.
-  const s = (sym || "").toUpperCase().replace(/[^A-Z]/g, "");
-  if (CRYPTO_PAIRS.has(s)) return true;
-  // Gold / FX market: closed Fri 22:00 UTC → Sun 22:00 UTC
+function isMarketOpen(_sym: string, d: Date = new Date()): boolean {
+  // Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
   const day = d.getUTCDay();
   const h = d.getUTCHours();
   if (day === 6) return false;
@@ -106,7 +94,6 @@ function isMarketOpen(sym: string, d: Date = new Date()): boolean {
   if (day === 0 && h < 22) return false;
   return true;
 }
-
 
 function tagOf(text: string): { tag: string; tone: "violet" | "blue" | "emerald" | "amber" | "rose" | "zinc" } {
   const t = text.toLowerCase();
@@ -1087,7 +1074,7 @@ function SignalPage() {
       {/* XAU PAIR SELECTOR */}
       <div className="border-b border-zinc-100 bg-white/60">
         <div className="mx-auto max-w-[1600px] px-5 py-2 sm:px-6 sm:py-2.5 flex items-center gap-2 overflow-x-auto">
-          <span className={`font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[15px] font-normal normal-case tracking-normal text-zinc-900 shrink-0`}>Pair:</span>
+          <span className={`font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[15px] font-normal normal-case tracking-normal text-zinc-900 shrink-0`}>Gold pair:</span>
           {XAU_PAIRS.map((p) => {
             const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
             const isFree = !credits.isLoading && credits.plan?.id === "free";
@@ -1099,7 +1086,7 @@ function SignalPage() {
                   if (active) return;
                   if (locked) {
                     toast.info("Multi-pair analysis is a Pro feature", {
-                      description: "Free plan is limited to XAU/USD. Upgrade to unlock all pairs — gold crosses, FX majors, silver, platinum and crypto.",
+                      description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
                       action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
                     });
                     return;

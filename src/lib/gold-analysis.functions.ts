@@ -143,60 +143,6 @@ const XAU_ALIASES: Record<string, string> = {
   "GOLDCHF": "XAUCHF", "XAUCHF": "XAUCHF",
 };
 
-// ------------------------------------------------------------
-// NON-GOLD INSTRUMENTS — FX majors, other metals, major crypto.
-// These run through the exact same ICT/SMC + AI pipeline as gold:
-// real OHLC candles (Yahoo / Binance / Coinbase) + live spot ticks.
-// ------------------------------------------------------------
-type ExtraInstrument = {
-  key: string;
-  display: string;
-  kind: "forex" | "metal" | "crypto";
-  decimals: number;
-  quote: string;
-  yahooSymbols?: string[];
-  binanceSymbols?: string[];
-  needsUsdNews: boolean;
-};
-
-const EXTRA_INSTRUMENTS: Record<string, ExtraInstrument> = {
-  // --- FX majors ---
-  EURUSD: { key: "FX:EURUSD", display: "EUR/USD", kind: "forex", decimals: 5, quote: "USD", yahooSymbols: ["EURUSD=X"], needsUsdNews: true },
-  GBPUSD: { key: "FX:GBPUSD", display: "GBP/USD", kind: "forex", decimals: 5, quote: "USD", yahooSymbols: ["GBPUSD=X"], needsUsdNews: true },
-  USDJPY: { key: "FX:USDJPY", display: "USD/JPY", kind: "forex", decimals: 3, quote: "JPY", yahooSymbols: ["USDJPY=X"], needsUsdNews: true },
-  AUDUSD: { key: "FX:AUDUSD", display: "AUD/USD", kind: "forex", decimals: 5, quote: "USD", yahooSymbols: ["AUDUSD=X"], needsUsdNews: true },
-  USDCHF: { key: "FX:USDCHF", display: "USD/CHF", kind: "forex", decimals: 5, quote: "CHF", yahooSymbols: ["USDCHF=X"], needsUsdNews: true },
-  USDCAD: { key: "FX:USDCAD", display: "USD/CAD", kind: "forex", decimals: 5, quote: "CAD", yahooSymbols: ["USDCAD=X"], needsUsdNews: true },
-  // --- Other metals (gold-api spot + Yahoo/futures fallback) ---
-  XAGUSD: { key: "METAL:XAGUSD", display: "XAG/USD", kind: "metal", decimals: 3, quote: "USD", yahooSymbols: ["XAGUSD=X", "SI=F"], needsUsdNews: true },
-  XPTUSD: { key: "METAL:XPTUSD", display: "XPT/USD", kind: "metal", decimals: 2, quote: "USD", yahooSymbols: ["XPTUSD=X", "PL=F"], needsUsdNews: true },
-  // --- Crypto (24/7) ---
-  BTCUSD: { key: "CRYPTO:BTCUSD", display: "BTC/USD", kind: "crypto", decimals: 2, quote: "USD", binanceSymbols: ["BTCUSDT"], yahooSymbols: ["BTC-USD"], needsUsdNews: false },
-  ETHUSD: { key: "CRYPTO:ETHUSD", display: "ETH/USD", kind: "crypto", decimals: 2, quote: "USD", binanceSymbols: ["ETHUSDT"], yahooSymbols: ["ETH-USD"], needsUsdNews: false },
-};
-
-const EXTRA_ALIASES: Record<string, string> = {
-  EUR: "EURUSD", EURO: "EURUSD", EURUSDT: "EURUSD", FIBER: "EURUSD",
-  GBP: "GBPUSD", CABLE: "GBPUSD", POUND: "GBPUSD",
-  JPY: "USDJPY", YEN: "USDJPY", JPYUSD: "USDJPY",
-  AUD: "AUDUSD", AUSSIE: "AUDUSD",
-  CHF: "USDCHF", SWISSY: "USDCHF", FRANC: "USDCHF",
-  CAD: "USDCAD", LOONIE: "USDCAD",
-  XAG: "XAGUSD", SILVER: "XAGUSD", SILVERUSD: "XAGUSD", CHANDI: "XAGUSD",
-  XPT: "XPTUSD", PLATINUM: "XPTUSD",
-  BTC: "BTCUSD", BITCOIN: "BTCUSD", BTCUSDT: "BTCUSD",
-  ETH: "ETHUSD", ETHEREUM: "ETHUSD", ETHUSDT: "ETHUSD",
-};
-
-/** Every symbol the analysis pipeline can scan (gold pairs + FX + metals + crypto). */
-export const SUPPORTED_PAIR_LIST = [...Object.keys(XAU_PAIRS), ...Object.keys(EXTRA_INSTRUMENTS)];
-
-export function isCryptoSymbol(sym: string): boolean {
-  const cleaned = (sym || "").toUpperCase().replace(/[\s_\-/]/g, "");
-  const key = EXTRA_ALIASES[cleaned] ?? cleaned;
-  return EXTRA_INSTRUMENTS[key]?.kind === "crypto";
-}
-
 export function resolveInstrument(input: string): ResolvedInstrument {
   const raw = (input || "").trim();
   const cleaned = raw.toUpperCase().replace(/[\s_\-/]/g, "");
@@ -217,25 +163,7 @@ export function resolveInstrument(input: string): ResolvedInstrument {
     };
   }
 
-  // FX majors / silver / platinum / crypto — same pipeline, own data sources.
-  const extraKey = EXTRA_ALIASES[cleaned] ?? (EXTRA_INSTRUMENTS[cleaned] ? cleaned : null);
-  if (extraKey && EXTRA_INSTRUMENTS[extraKey]) {
-    const e = EXTRA_INSTRUMENTS[extraKey];
-    return {
-      raw: raw || extraKey,
-      key: e.key,
-      display: e.display,
-      kind: e.kind,
-      decimals: e.decimals,
-      yahooSymbols: e.yahooSymbols,
-      binanceSymbols: e.binanceSymbols,
-      quote: e.quote,
-      needsUsdNews: e.needsUsdNews,
-    };
-  }
-
   const key = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : "XAUUSD");
-
   const p = XAU_PAIRS[key];
   // Gold spot from gold-api.com covers XAU/USD; cross-quote pairs derive
   // from XAU/USD × the currency rate at getLiveTick time. Yahoo cross-pair
@@ -374,21 +302,8 @@ function inferInstrumentFromText(text: string): string {
   if (/\b(XAUJPY|GOLD\s*JPY|GOLD\s*YEN)\b/.test(q)) return "XAUJPY";
   if (/\b(XAUAUD|GOLD\s*AUD)\b/.test(q)) return "XAUAUD";
   if (/\b(XAUCHF|GOLD\s*CHF|GOLD\s*FRANC)\b/.test(q)) return "XAUCHF";
-  // FX majors
-  if (/\bEUR\s*\/?\s*USD\b|\bEURUSD\b|\bFIBER\b/.test(q)) return "EURUSD";
-  if (/\bGBP\s*\/?\s*USD\b|\bGBPUSD\b|\bCABLE\b/.test(q)) return "GBPUSD";
-  if (/\bUSD\s*\/?\s*JPY\b|\bUSDJPY\b/.test(q)) return "USDJPY";
-  if (/\bAUD\s*\/?\s*USD\b|\bAUDUSD\b|\bAUSSIE\b/.test(q)) return "AUDUSD";
-  if (/\bUSD\s*\/?\s*CHF\b|\bUSDCHF\b|\bSWISSY\b/.test(q)) return "USDCHF";
-  if (/\bUSD\s*\/?\s*CAD\b|\bUSDCAD\b|\bLOONIE\b/.test(q)) return "USDCAD";
-  // Metals + crypto
-  if (/\bXAG\s*\/?\s*USD\b|\bXAGUSD\b|\bSILVER\b|\bCHANDI\b/.test(q)) return "XAGUSD";
-  if (/\bXPT\s*\/?\s*USD\b|\bXPTUSD\b|\bPLATINUM\b/.test(q)) return "XPTUSD";
-  if (/\bBTC\s*\/?\s*USDT?\b|\bBTCUSD\b|\bBITCOIN\b/.test(q)) return "BTCUSD";
-  if (/\bETH\s*\/?\s*USDT?\b|\bETHUSD\b|\bETHEREUM\b/.test(q)) return "ETHUSD";
   return "XAUUSD";
 }
-
 
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
@@ -681,7 +596,7 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 // force a rigid "WAIT on XAU/USD: …" reply, so they are intentionally excluded.
 function isTradingSetupIntent(q: string): boolean {
   const n = normalizeQuery(q);
-  return /\b(analyze|analysis|setup|signal|entry|stop\s*loss|take\s*profit|\btp\b|\bsl\b|order\s*block|fvg|liquidity|bos|choch|killzone|scalp|swing\s+trade|give\s+me\s+(a|the)\s+trade|find\s+(a|me)\s+trade|best\s+trade|any\s+trade|trade\s+idea|trade\s+plan|a\+\s*setup|xauusd|xaueur|xaugbp|xaujpy|xauaud|xauchf|eurusd|gbpusd|usdjpy|audusd|usdchf|usdcad|xagusd|xptusd|btcusd|ethusd|silver|platinum|bitcoin|ethereum)\b/i.test(n);
+  return /\b(analyze|analysis|setup|signal|entry|stop\s*loss|take\s*profit|\btp\b|\bsl\b|order\s*block|fvg|liquidity|bos|choch|killzone|scalp|swing\s+trade|give\s+me\s+(a|the)\s+trade|find\s+(a|me)\s+trade|best\s+trade|any\s+trade|trade\s+idea|trade\s+plan|a\+\s*setup|xauusd|xaueur|xaugbp|xaujpy|xauaud|xauchf)\b/i.test(n);
 }
 
 async function _analyzeGoldCompute(
@@ -1545,7 +1460,7 @@ async function fetchFxProxyRate(symbol: string): Promise<number | null> {
 // spot feed shows and is refreshed every few seconds.
 async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | null> {
   if (inst.kind !== "metal") return null;
-  const base = /^METAL:([A-Z]{3})/.exec(inst.key)?.[1] ?? "XAU";
+  const base = inst.key === "METAL:XAGUSD" ? "XAG" : "XAU";
   try {
     const res = await fetchWithTimeout(`https://api.gold-api.com/price/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },

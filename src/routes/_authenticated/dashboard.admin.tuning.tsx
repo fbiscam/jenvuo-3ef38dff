@@ -224,7 +224,7 @@ function TuningPage() {
               onChange={(e) => setSymbol(e.target.value)}
               className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900"
             >
-              {["XAUUSD","XAUEUR","XAUGBP","XAUJPY","XAUAUD","XAUCHF","EURUSD","GBPUSD","USDJPY","AUDUSD","USDCHF","USDCAD","XAGUSD","XPTUSD","BTCUSD","ETHUSD"].map((s) => (
+              {["XAUUSD","XAUEUR","XAUGBP","XAUJPY","XAUAUD","XAUCHF"].map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
