@@ -1724,7 +1724,7 @@ export const getNewsRisk = createServerFn({ method: "POST" })
     }
     const news = await fetchGoldNewsInline();
     const upcoming = news.filter((n) => n.minutesUntil >= -15 && n.minutesUntil <= 240);
-    const imminentHigh = upcoming.find((n) => n.impact === "High" && n.minutesUntil >= -15 && n.minutesUntil <= 60);
+    const imminentHigh = upcoming.find((n) => n.impact === "High" && n.minutesUntil >= -10 && n.minutesUntil <= 60);
     const severity: "low" | "medium" | "high" = imminentHigh
       ? "high"
       : upcoming.some((n) => n.impact === "High")
@@ -1947,7 +1947,7 @@ export async function computeSignalPlan(
     const pdl = Math.min(...prev24.map((c) => c.l));
 
     const upcomingNews = news.filter((n) => n.minutesUntil >= -15 && n.minutesUntil <= 240);
-    const imminentHigh = news.find((n) => n.impact === "High" && n.minutesUntil >= -15 && n.minutesUntil <= 60);
+    const imminentHigh = news.find((n) => n.impact === "High" && n.minutesUntil >= -10 && n.minutesUntil <= 60);
 
     const dec = inst.decimals;
     const fmt = (arr: Candle[]) =>
