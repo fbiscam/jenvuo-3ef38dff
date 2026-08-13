@@ -1878,6 +1878,72 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_orders: {
+        Row: {
+          auto_result: Json | null
+          bonus_usd: number
+          created_at: string
+          credit_usd: number
+          credited_usd: number | null
+          decided_at: string | null
+          decided_by: string | null
+          deposit_address: string
+          email: string | null
+          expires_at: string
+          id: string
+          network: string
+          pay_amount_usd: number
+          promo_code: string | null
+          reject_reason: string | null
+          status: string
+          submitted_at: string | null
+          tx_hash: string | null
+          user_id: string
+        }
+        Insert: {
+          auto_result?: Json | null
+          bonus_usd?: number
+          created_at?: string
+          credit_usd: number
+          credited_usd?: number | null
+          decided_at?: string | null
+          decided_by?: string | null
+          deposit_address: string
+          email?: string | null
+          expires_at?: string
+          id?: string
+          network: string
+          pay_amount_usd: number
+          promo_code?: string | null
+          reject_reason?: string | null
+          status?: string
+          submitted_at?: string | null
+          tx_hash?: string | null
+          user_id: string
+        }
+        Update: {
+          auto_result?: Json | null
+          bonus_usd?: number
+          created_at?: string
+          credit_usd?: number
+          credited_usd?: number | null
+          decided_at?: string | null
+          decided_by?: string | null
+          deposit_address?: string
+          email?: string | null
+          expires_at?: string
+          id?: string
+          network?: string
+          pay_amount_usd?: number
+          promo_code?: string | null
+          reject_reason?: string | null
+          status?: string
+          submitted_at?: string | null
+          tx_hash?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       plans: {
         Row: {
           annual_discount_pct: number | null
@@ -1968,6 +2034,81 @@ export type Database = {
           plan?: string
           saved_last_seen_at?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          expires_at: string | null
+          max_bonus_usd: number | null
+          min_topup_usd: number
+          note: string | null
+          per_user_limit: number
+          type: string
+          usage_limit: number | null
+          used_count: number
+          value: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          expires_at?: string | null
+          max_bonus_usd?: number | null
+          min_topup_usd?: number
+          note?: string | null
+          per_user_limit?: number
+          type: string
+          usage_limit?: number | null
+          used_count?: number
+          value: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          expires_at?: string | null
+          max_bonus_usd?: number | null
+          min_topup_usd?: number
+          note?: string | null
+          per_user_limit?: number
+          type?: string
+          usage_limit?: number | null
+          used_count?: number
+          value?: number
+        }
+        Relationships: []
+      }
+      promo_redemptions: {
+        Row: {
+          bonus_usd: number
+          code: string
+          created_at: string
+          id: string
+          order_id: string | null
+          pay_amount_usd: number
+          user_id: string
+        }
+        Insert: {
+          bonus_usd?: number
+          code: string
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          pay_amount_usd?: number
+          user_id: string
+        }
+        Update: {
+          bonus_usd?: number
+          code?: string
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          pay_amount_usd?: number
+          user_id?: string
         }
         Relationships: []
       }
