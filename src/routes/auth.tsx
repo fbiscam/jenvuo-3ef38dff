@@ -1055,7 +1055,11 @@ function AuthPage() {
                         <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-[12.5px] leading-snug text-zinc-700">
                           <span className="font-semibold text-zinc-900">14 days of Pro, free.</span>{" "}
                           $15 of scan credits, realtime alerts and the full ICT engine — no card required.
+                          <div className={`mt-1.5 text-[11.5px] text-zinc-500 ${MONO}`}>
+                            Trial ends {trialEndsLabel}
+                          </div>
                         </div>
+
 
                         <div>
                           <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
