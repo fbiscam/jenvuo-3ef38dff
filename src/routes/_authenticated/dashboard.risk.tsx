@@ -55,10 +55,10 @@ function RiskPage() {
   const suggested = Math.max(0.01, Math.round(((Number(balance) * Number(riskPct)) / 100 / (stopDistExample * 100)) * 100) / 100);
 
   return (
-    <div className="h-full max-w-5xl mx-auto px-6 py-4 flex flex-col overflow-hidden" style={{ fontFamily: "Urbanist, system-ui, sans-serif" }}>
-      <div className="mb-3">
-        <h1 className="pl-1 text-xl font-semibold text-black">Risk Management</h1>
-        <p className="text-xs text-gray-600 mt-0.5">
+    <div className="h-full max-w-5xl mx-auto px-4 py-2 flex flex-col overflow-hidden" style={{ fontFamily: "Urbanist, system-ui, sans-serif" }}>
+      <div className="mb-2">
+        <h1 className="pl-1 text-lg font-semibold text-black">Risk Management</h1>
+        <p className="text-[11px] text-gray-600 mt-0.5">
           Position size and daily loss guard. Applies to signal cards and Telegram alerts.
         </p>
       </div>
@@ -66,22 +66,22 @@ function RiskPage() {
       {loading ? (
         <div className="text-sm text-gray-500">Loading…</div>
       ) : (
-        <div className="flex-1 min-h-0 bg-white border border-gray-200 rounded-xl p-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex-1 min-h-0 bg-white border border-gray-200 rounded-xl p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-black mb-1">Account balance (USD)</label>
+              <label className="block text-[11px] font-medium text-black mb-0.5">Account balance (USD)</label>
               <input
                 type="number"
                 min={0}
                 step={50}
                 value={balance}
                 onChange={(e) => setBalance(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black bg-white text-sm"
+                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-black bg-white text-sm"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-black mb-1">Risk per trade (%)</label>
+              <label className="block text-[11px] font-medium text-black mb-0.5">Risk per trade (%)</label>
               <input
                 type="number"
                 min={0.1}
@@ -89,14 +89,14 @@ function RiskPage() {
                 step={0.1}
                 value={riskPct}
                 onChange={(e) => setRiskPct(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black bg-white text-sm"
+                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-black bg-white text-sm"
               />
-              <p className="text-[11px] text-gray-500 mt-1">
+              <p className="text-[10px] text-gray-500 mt-0.5">
                 Example: $5 stop on XAU/USD → ~{suggested} lot
               </p>
             </div>
 
-            <div className="md:col-span-2 border-t border-gray-100 pt-4">
+            <div className="md:col-span-2 border-t border-gray-100 pt-2">
               <label className="flex items-center gap-2 text-sm font-medium text-black">
                 <input
                   type="checkbox"
@@ -105,13 +105,13 @@ function RiskPage() {
                 />
                 Enable daily loss kill-switch
               </label>
-              <p className="text-[11px] text-gray-500 mt-1">
+              <p className="text-[10px] text-gray-500 mt-0.5">
                 When today's realized losses hit the limit, new signal alerts and charges are paused until 00:00 UTC.
               </p>
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-xs font-medium text-black mb-1">Daily loss limit (USD)</label>
+              <label className="block text-[11px] font-medium text-black mb-0.5">Daily loss limit (USD)</label>
               <input
                 type="number"
                 min={0}
@@ -120,16 +120,16 @@ function RiskPage() {
                 disabled={!killSwitch}
                 value={dailyLimit}
                 onChange={(e) => setDailyLimit(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black bg-white text-sm disabled:bg-gray-50 disabled:text-gray-400"
+                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-black bg-white text-sm disabled:bg-gray-50 disabled:text-gray-400"
               />
             </div>
           </div>
 
-          <div className="flex justify-end mt-5">
+          <div className="flex justify-end mt-3">
             <button
               onClick={onSave}
               disabled={saving}
-              className="px-4 py-2 rounded-lg bg-black text-white text-sm disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg bg-black text-white text-sm disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save settings"}
             </button>
