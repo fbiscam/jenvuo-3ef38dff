@@ -231,7 +231,7 @@ function FounderPage() {
               Pakistan's No. #1 Scams Awareness Provider
             </h2>
             <p className="text-zinc-700 leading-relaxed">
-              Haseeb is on a mission to make Pakistan's trading community the safest in the region. Through Jenvu's free Scam Check Tool, public awareness campaigns and real-time fraud alerts, he helps traders spot fake signal sellers, Ponzi schemes, copy-trading fraud and account-management scams before they lose a single rupee.
+              Haseeb is on a mission to make Pakistan's trading community the safest in the region. Through Jenvu's free Scam Check Tool, public awareness campaigns and real-time fraud alerts, he helps traders spot fake signal sellers.
             </p>
             <div className="flex flex-wrap gap-3 pt-1">
               <Link
