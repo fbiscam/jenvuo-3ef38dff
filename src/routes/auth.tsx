@@ -1458,7 +1458,7 @@ function AuthPage() {
 
                 <div className="mt-auto grid grid-cols-2 gap-px bg-zinc-100 rounded-xl overflow-hidden border border-zinc-100">
                   {[
-                    ["Markets", "32+"],
+                    ["Markets", "XAU"],
                     ["Latency", "14ms"],
                   ].map(([k, v]) => (
                     <div key={k} className="bg-white p-4 text-center">
