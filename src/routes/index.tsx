@@ -947,7 +947,7 @@ function HomePage() {
 
 
       {/* FAQ */}
-      <section className="border-t border-zinc-100">
+      <section className="bg-white border-t border-zinc-100">
 
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
