@@ -197,7 +197,6 @@ function HomePage() {
             <Link to="/pricing" className="hover:text-zinc-900">Pricing</Link>
             <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
             <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
-            <Link to="/founder" className="hover:text-zinc-900">Founder</Link>
             <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
 
           </nav>
@@ -259,7 +258,6 @@ function HomePage() {
                 { to: "/pricing", label: "Pricing" },
                 { to: "/founding", label: "Founding" },
                 { to: "/insights", label: "Insights" },
-                { to: "/founder", label: "Founder" },
                 { to: "/contact", label: "Contact" },
               ].map((it) => (
 

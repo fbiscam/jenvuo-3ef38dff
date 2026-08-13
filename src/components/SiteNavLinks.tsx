@@ -6,7 +6,6 @@ export const SITE_NAV_LINKS = [
   { to: "/signals-live", label: "Signals Live" },
   { to: "/pricing", label: "Pricing" },
   { to: "/insights", label: "Insights" },
-  { to: "/founder", label: "Founder" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
