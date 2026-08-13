@@ -91,6 +91,17 @@ const SKILL_PILLARS = [
       "Go-to-Market Execution",
     ],
   },
+  {
+    icon: <Search className="h-5 w-5" />,
+    title: "Marketing & Research",
+    skills: [
+      "Market Research & Validation",
+      "Product Marketing & Positioning",
+      "Community Growth",
+      "Scams Awareness & Education",
+      "Competitive Intelligence",
+    ],
+  },
 ];
 
 const ALL_SKILLS = SKILL_PILLARS.flatMap((p) => p.skills);
