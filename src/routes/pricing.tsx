@@ -5,6 +5,7 @@ import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
+import { useTrial } from "@/hooks/useTrial";
 
 import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 import pricingVoice from "@/assets/pricing-voice.jpg";
@@ -131,9 +132,13 @@ export const FAQ = [
 function PricingPage() {
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
+  const trial = useTrial();
+  const signedOut = currentPlan === null;
   const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
-  const priceOf = (t: { id: string; price: number }) =>
-    billing === "annual" && t.price > 0 ? Math.round((t.price * 12 * 0.83) / 10) * 10 : t.price;
+  const priceOf = (t: { id: string; price: number }) => {
+    const base = signedOut && t.id === "pro" ? 5 : t.price;
+    return billing === "annual" && base > 0 ? Math.round((base * 12 * 0.83) / 10) * 10 : base;
+  };
   const suffix = billing === "annual" ? "/yr" : "/mo";
   return (
     <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased md:[zoom:1.375]`}>
@@ -199,14 +204,17 @@ function PricingPage() {
                   <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                 </th>
                 {[
-                  { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", anonTo: "/auth" as const, search: { mode: "signup" as const }, dark: false, accent: true, key: "pro" },
+                  { name: "Pro", price: signedOut ? (billing === "annual" ? "$50" : "$5") : (billing === "annual" ? "$150" : "$15"), tag: "Active", anonTo: "/auth" as const, search: { mode: "signup" as const }, dark: false, accent: true, key: "pro" },
                   { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", anonTo: "/founding" as const, dark: true, key: "elite" },
                   { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", anonTo: "/founding" as const, dark: false, key: "ultra" },
                 ].map((p) => {
-                  const isCurrent = currentPlan === p.key;
+                  const trialPro = trial.active && p.key === "pro";
+                  const isCurrent = currentPlan === p.key && !trialPro;
                   const isLoggedIn = currentPlan !== null;
-                  const disabled = isLoggedIn && !isCurrent && upgradeLock.locked;
-                  const cta = disabled
+                  const disabled = !trialPro && isLoggedIn && !isCurrent && upgradeLock.locked;
+                  const cta = trialPro
+                    ? "Upgrade to Pro"
+                    : disabled
                     ? "Locked in trial"
                     : isLoggedIn
                       ? "Upgrade"
