@@ -579,7 +579,7 @@ function HomePage() {
       </section>
 
       {/* COVERAGE */}
-      <section className="border-t border-zinc-100 bg-white">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
             <div className="text-left lg:col-span-4 lg:text-left">
@@ -611,7 +611,7 @@ function HomePage() {
       </section>
 
       {/* CHANGELOG */}
-      <section className="border-t border-zinc-100 bg-white">
+      <section className="border-t border-zinc-100 bg-white/40">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="mb-8 flex flex-col items-start justify-start gap-2 text-left sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:text-left">
             <div>
@@ -947,7 +947,7 @@ function HomePage() {
 
 
       {/* FAQ */}
-      <section className="bg-white/40 border-t border-zinc-100">
+      <section className="border-t border-zinc-100">
 
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
@@ -996,7 +996,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="bg-white/40 border-t border-zinc-100 overflow-hidden">
+      <section className="border-t border-zinc-100 overflow-hidden">
 
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
           <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
