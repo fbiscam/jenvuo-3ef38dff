@@ -19,6 +19,7 @@ import {
   type PaymentOrder,
   type Quote,
 } from "@/lib/payments/shared";
+import { UsdtIcon, TronIcon, BnbIcon, EthIcon, NetworkIcon } from "@/components/pay/CoinIcons";
 
 export const Route = createFileRoute("/_authenticated/dashboard/pay")({
   head: () => ({
