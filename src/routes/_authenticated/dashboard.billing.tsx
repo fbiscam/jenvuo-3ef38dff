@@ -499,11 +499,7 @@ function Billing() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/50 p-6 text-center">
-        <p className="text-xs text-zinc-500">
-          Invoices and payment method management will be available once billing is fully activated.
-        </p>
-      </section>
+      <InvoiceHistory />
     </div>
   );
 }
