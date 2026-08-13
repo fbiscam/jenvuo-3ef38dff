@@ -401,7 +401,7 @@ function PayPage() {
         </section>
       )}
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-24px_rgba(0,0,0,0.25)]">
         <h2 className="text-[15px] font-semibold text-zinc-900">Payment history</h2>
         {orders.length === 0 ? (
           <p className="mt-2 text-[13px] text-zinc-500">No payments yet.</p>
