@@ -531,7 +531,7 @@ function HomePage() {
             <span className="sm:hidden">Built like a trading desk<br />spoken just like a real partner</span>
             <span className="hidden sm:inline">Built like a trading desk, spoken like a partner.</span>
           </h2>
-          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
+          <div className="mt-12 grid gap-px bg-[#FAFAFA] border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
             {[
               {
                 k: "01",
