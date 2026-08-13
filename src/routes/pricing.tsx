@@ -1,3 +1,4 @@
+import SiteNavLinks from "@/components/SiteNavLinks";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
 import SiteFooter from "@/components/SiteFooter";
@@ -144,13 +145,7 @@ function PricingPage() {
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
-          <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm">
-            <Link to="/signal" className="text-zinc-600 hover:text-zinc-900">Signal Engine</Link>
-            <Link to="/ai-engine" className="text-zinc-600 hover:text-zinc-900">AI Engine</Link>
-            <Link to="/pricing" className="font-medium text-zinc-900">Pricing</Link>
-            <Link to="/insights" className="text-zinc-600 hover:text-zinc-900">Insights</Link>
-            <Link to="/contact" className="text-zinc-600 hover:text-zinc-900">Contact</Link>
-          </nav>
+          <SiteNavLinks active="/pricing" />
           <HeaderAuthButtons />
 
         </div>

@@ -1,3 +1,5 @@
+import SiteNavLinks from "@/components/SiteNavLinks";
+import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import SiteFooter from "@/components/SiteFooter";
 
@@ -115,24 +117,8 @@ function DownloadPage() {
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
               <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
             </Link>
-            <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900">
-              <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
-              <Link to="/ai-engine" className="hover:text-zinc-900">AI Engine</Link>
-              <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
-              <Link to="/about" className="hover:text-zinc-900">About</Link>
-              <Link to="/download" className="hover:text-zinc-900">Download</Link>
-              <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
-            </nav>
-            <div className="flex shrink-0 items-center gap-2">
-              <Link
-                to="/app"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 sm:gap-2 sm:px-3.5 sm:text-sm"
-              >
-                <span className="sm:hidden">Launch</span>
-                <span className="hidden sm:inline">Launch Agent</span>
-                <span className={`${MONO} text-[10px] opacity-70`}>↗</span>
-              </Link>
-            </div>
+            <SiteNavLinks active="/download" />
+            <HeaderAuthButtons />
           </div>
         </header>
 
