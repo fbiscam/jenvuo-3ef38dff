@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
-import { Zap, Shield, Award, AlertTriangle } from "lucide-react";
+import { Shield, Award, AlertTriangle } from "lucide-react";
 import founderPhoto from "@/assets/haseeb-ijaz-founder.png.asset.json";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
@@ -90,21 +90,6 @@ function FounderPage() {
               {p}
             </p>
           ))}
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Link
-              to="/signal"
-              className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
-            >
-              <Zap className="h-4 w-4" />
-              Try the Signal Engine
-            </Link>
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50 transition-colors"
-            >
-              Contact Haseeb
-            </Link>
-          </div>
         </div>
       </section>
 
