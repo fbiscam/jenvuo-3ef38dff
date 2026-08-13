@@ -208,7 +208,7 @@ function FounderPage() {
               className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
             >
               <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-900 text-white">
+                <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${pillar.bg} ${pillar.color}`}>
                   {pillar.icon}
                 </div>
                 <h3 className="font-semibold text-zinc-900">{pillar.title}</h3>
