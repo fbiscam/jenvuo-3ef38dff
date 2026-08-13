@@ -161,13 +161,7 @@ function PayPage() {
       <div className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 sm:p-8">
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <UsdtIcon className="h-8 w-8" />
-              <span className="rounded-full border border-black/10 bg-black/5 px-2.5 py-1 text-[11px] uppercase tracking-[0.16em] text-black/60">
-                USDT top-up
-              </span>
-            </div>
-            <h1 className="mt-4 text-3xl font-semibold text-black">Add funds</h1>
+            <h1 className="text-3xl font-semibold text-black">Add funds</h1>
             <p className="mt-2 max-w-md text-sm text-black/60">
               Send USDT on Tron, BNB Smart Chain or Ethereum — credits land in your scan wallet right after on-chain verification.
             </p>
