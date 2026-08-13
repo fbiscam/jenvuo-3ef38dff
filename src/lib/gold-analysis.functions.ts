@@ -616,7 +616,7 @@ async function _analyzeGoldCompute(
         // If the plan returned WAIT, fall through to the LLM chat path so the
         // user hears a conversational answer, not a terse "WAIT on XAU/USD: …".
         if (plan.trade.direction !== "WAIT") {
-          // Only expose entry/SL/TP at or above the 75% platform-wide
+          // Only expose entry/SL/TP at or above the shared platform-wide
           // confidence floor. Below that we still return the analysis but
           // hide the trade block.
           const highConviction = (plan.trade.confidence ?? 0) >= MIN_CONFIDENCE;
@@ -637,8 +637,8 @@ async function _analyzeGoldCompute(
             marketStructure: `${plan.alignmentLabel} · ${plan.setupGrade} (${plan.setupScore}/100)`,
             spokenSummary: highConviction
               ? plan.trade.summary
-              : `Confidence only ${plan.trade.confidence}% — waiting for a 75%+ high-conviction setup before issuing entry, SL and TP.`,
-            fullAnalysis: `${plan.htfNarrative}\n\n${plan.ltfNarrative}\n\n${highConviction ? plan.trade.summary : "Setup is forming but confidence is below the 75% threshold. Entry, SL and TP are withheld until conviction rises."}\nInvalidation: ${plan.trade.invalidation}`,
+              : `Confidence only ${plan.trade.confidence}% — waiting for a ${MIN_CONFIDENCE}%+ high-conviction setup before issuing entry, SL and TP.`,
+            fullAnalysis: `${plan.htfNarrative}\n\n${plan.ltfNarrative}\n\n${highConviction ? plan.trade.summary : `Setup is forming but confidence is below the ${MIN_CONFIDENCE}% threshold. Entry, SL and TP are withheld until conviction rises.`}\nInvalidation: ${plan.trade.invalidation}`,
             timeframe: data.timeframe,
             currentPrice: plan.currentPrice,
             generatedAt: new Date().toISOString(),
@@ -2649,7 +2649,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
           } else if (verdict === "DOWNGRADE") {
             __seniorReviewStatus = "downgraded";
             // Soft-reduce: shave ~10 points off score so borderline setups
-            // fall below the 75% broadcast gate but strong ones still fire.
+            // fall below the 70% broadcast gate but strong ones still fire.
             setupScore = Math.max(50, setupScore - 10);
             setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
             setupChecks.unshift({

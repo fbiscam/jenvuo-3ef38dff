@@ -91,6 +91,35 @@ export async function charge(
   return Number(data ?? 0)
 }
 
+/**
+ * Charge once per (user, ref) inside a window. Provider results are cached, so
+ * re-running the exact same search must not bill the user a second time.
+ */
+export async function chargeOnce(
+  userId: string,
+  kind: string,
+  credits: number,
+  ref: string,
+  windowMinutes: number,
+  meta: Record<string, unknown> = {},
+) {
+  const db = await admin()
+  const since = new Date(Date.now() - windowMinutes * 60_000).toISOString()
+  const { data: prior } = await db
+    .from('lg_usage_events')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('kind', kind)
+    .eq('ref_id', ref)
+    .gte('created_at', since)
+    .limit(1)
+  if (prior && prior.length > 0) {
+    const { remaining } = await creditState(userId)
+    return remaining
+  }
+  return await charge(userId, kind, credits, ref, meta)
+}
+
 /** Cached provider fetch. `ttlMinutes` controls how long results stay warm. */
 export async function cached<T>(
   provider: string,
