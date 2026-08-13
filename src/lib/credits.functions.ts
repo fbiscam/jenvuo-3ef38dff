@@ -95,8 +95,20 @@ export const getCreditState = createServerFn({ method: "GET" })
     const plan = (planRow as any) ?? { id: "free", name: "Free", price_usd: 0, wallet_usd: 1.00, feature_journal: false, feature_realtime_alerts: false, feature_full_ict: false, feature_scanner: false };
     const walletUsd = Number(plan.wallet_usd ?? 0);
 
+    const trialEndsAt = (sub as any)?.trial_ends_at as string | null | undefined;
+    const trialActive = !!(sub as any)?.is_trial && !!trialEndsAt && new Date(trialEndsAt).getTime() > Date.now();
+    const trial = {
+      active: trialActive,
+      endsAt: trialActive ? trialEndsAt! : null,
+      daysLeft: trialActive
+        ? Math.max(0, Math.ceil((new Date(trialEndsAt!).getTime() - Date.now()) / 86_400_000))
+        : 0,
+    };
+
     return {
+      trial,
       plan: { id: plan.id, name: plan.name, price_usd: Number(plan.price_usd ?? 0), wallet_usd: walletUsd },
+
       features: {
         journal: !!plan.feature_journal,
         realtime_alerts: !!plan.feature_realtime_alerts,
