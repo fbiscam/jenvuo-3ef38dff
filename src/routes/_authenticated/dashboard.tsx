@@ -1024,56 +1024,6 @@ function DashboardLayout() {
             <h1 className="pl-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span>{email || fullName}</span><span>'s Account</span>
             </h1>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                className="mr-5 mt-2 flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
-                aria-label="Profile menu"
-                title={fullName || email || "Profile"}
-              >
-                <img
-                  src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
-                  alt={fullName || email || "Account avatar"}
-                  className="h-[52px] w-[52px] rounded-full object-cover"
-                  loading="lazy"
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="flex items-center gap-3 px-3 py-2.5">
-                  <img
-                    src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
-                    alt={fullName || email || "Account avatar"}
-                    className="h-9 w-9 rounded-full object-cover"
-                  />
-                  <div className="min-w-0">
-                    <p className="truncate text-[13px] font-medium text-zinc-900">{fullName || "Trader"}</p>
-                    <p className="truncate text-[11px] text-zinc-500">{email || ""}</p>
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard/profile" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
-                    <User className="h-4 w-4 text-zinc-500" /> Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard/billing" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
-                    <CreditCard className="h-4 w-4 text-zinc-500" /> Billing
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard/security" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
-                    <ShieldCheck className="h-4 w-4 text-zinc-500" /> Security
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={signOut}
-                  className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700 focus:text-rose-600"
-                >
-                  <LogOut className="h-4 w-4 text-zinc-500" /> Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span className="inline-flex items-center gap-2">
