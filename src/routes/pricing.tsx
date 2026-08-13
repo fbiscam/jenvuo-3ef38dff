@@ -204,14 +204,17 @@ function PricingPage() {
                   <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                 </th>
                 {[
-                  { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", anonTo: "/auth" as const, search: { mode: "signup" as const }, dark: false, accent: true, key: "pro" },
+                  { name: "Pro", price: signedOut ? (billing === "annual" ? "$50" : "$5") : (billing === "annual" ? "$150" : "$15"), tag: "Active", anonTo: "/auth" as const, search: { mode: "signup" as const }, dark: false, accent: true, key: "pro" },
                   { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", anonTo: "/founding" as const, dark: true, key: "elite" },
                   { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", anonTo: "/founding" as const, dark: false, key: "ultra" },
                 ].map((p) => {
-                  const isCurrent = currentPlan === p.key;
+                  const trialPro = trial.active && p.key === "pro";
+                  const isCurrent = currentPlan === p.key && !trialPro;
                   const isLoggedIn = currentPlan !== null;
-                  const disabled = isLoggedIn && !isCurrent && upgradeLock.locked;
-                  const cta = disabled
+                  const disabled = !trialPro && isLoggedIn && !isCurrent && upgradeLock.locked;
+                  const cta = trialPro
+                    ? "Upgrade to Pro"
+                    : disabled
                     ? "Locked in trial"
                     : isLoggedIn
                       ? "Upgrade"
