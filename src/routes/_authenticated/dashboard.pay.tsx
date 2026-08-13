@@ -308,9 +308,9 @@ function PayPage() {
               </div>
             </div>
             {order.status === "pending" && (
-              <div className="rounded-2xl bg-gradient-to-br from-zinc-950 to-zinc-800 px-5 py-3 text-center text-white">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-white/50">Time left</div>
-                <div className="font-mono text-2xl tabular-nums">{mm}:{ss}</div>
+              <div className="rounded-2xl border border-black/10 bg-white px-5 py-3 text-center text-black">
+                <div className="text-[10px] uppercase tracking-[0.2em] text-black/60">Time left</div>
+                <div className="font-mono text-2xl tabular-nums text-red-600">{mm}:{ss}</div>
               </div>
             )}
           </div>
