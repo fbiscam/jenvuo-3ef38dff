@@ -201,11 +201,15 @@ function HomePage() {
 
           <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
             <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
-            <div className="group relative">
+            <div
+              className="relative"
+              onMouseEnter={() => setResourcesOpen(true)}
+              onMouseLeave={() => setResourcesOpen(false)}
+            >
               <button type="button" className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
                 Resources <ChevronDown className="h-3.5 w-3.5" />
               </button>
-              <div className="absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 bg-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">
+              <div className={`absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 bg-white transition-opacity duration-150 ${resourcesOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
                 <div className="mt-1 rounded-md border border-zinc-200 bg-white p-1 shadow-lg">
                   <Link to="/signal" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Signal Engine</Link>
                   <Link to="/ai-engine" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">AI Engine</Link>
