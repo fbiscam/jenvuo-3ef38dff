@@ -185,7 +185,7 @@ function FounderPage() {
             25 skills & techniques
           </h2>
           <p className="mt-2 max-w-2xl text-zinc-600">
-            The stack Haseeb used to architect Jenvu — from institutional market structure to AI orchestration and product execution.
+            The stack Haseeb used to architect Jenvu — from institutional market structure to AI orchestration, product marketing, market research and growth execution.
           </p>
         </div>
 
@@ -215,7 +215,7 @@ function FounderPage() {
 
         <div className="rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3">
           <p className={`text-center text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>
-            Total skill stack: {ALL_SKILLS.length} disciplines
+            Total skill stack: {ALL_SKILLS.length} disciplines across trading, AI, engineering & marketing
           </p>
         </div>
       </section>
