@@ -132,9 +132,13 @@ export const FAQ = [
 function PricingPage() {
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
+  const trial = useTrial();
+  const signedOut = currentPlan === null;
   const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
-  const priceOf = (t: { id: string; price: number }) =>
-    billing === "annual" && t.price > 0 ? Math.round((t.price * 12 * 0.83) / 10) * 10 : t.price;
+  const priceOf = (t: { id: string; price: number }) => {
+    const base = signedOut && t.id === "pro" ? 5 : t.price;
+    return billing === "annual" && base > 0 ? Math.round((base * 12 * 0.83) / 10) * 10 : base;
+  };
   const suffix = billing === "annual" ? "/yr" : "/mo";
   return (
     <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased md:[zoom:1.375]`}>
