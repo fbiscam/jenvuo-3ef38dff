@@ -451,7 +451,7 @@ function PricingPage() {
         </div>
 
         {/* CUSTOM AMOUNT */}
-        <CustomTopUp />
+        <CustomTopUp signedOut={signedOut} />
 
         
       </section>
@@ -502,7 +502,7 @@ function Cell({ value, highlight }: { value: Mark; highlight?: boolean }) {
   return <td className={`${base} ${MONO} text-[11px] uppercase tracking-wider text-zinc-700`}>{value}</td>;
 }
 
-function CustomTopUp() {
+function CustomTopUp({ signedOut }: { signedOut: boolean }) {
   const [amount, setAmount] = React.useState<number>(15);
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
   const estSignals = Math.floor(safe / 0.2);
@@ -530,12 +530,23 @@ function CustomTopUp() {
             <div className={`text-2xl font-bold tabular-nums ${MONO}`}>${safe}</div>
             <div className="text-[11px] text-zinc-500">wallet · ~{estSignals} signals</div>
           </div>
-          <Link
-            to="/contact"
-            className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
-          >
-            Continue
-          </Link>
+          {signedOut ? (
+            <Link
+              to="/auth"
+              search={{ mode: "signup" as const }}
+              className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
+            >
+              Buy Now
+            </Link>
+          ) : (
+            <Link
+              to="/dashboard/pay"
+              search={{ amount: safe }}
+              className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
+            >
+              Buy Now
+            </Link>
+          )}
         </div>
       </div>
       {amount < 5 && (
