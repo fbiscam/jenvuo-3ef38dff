@@ -374,8 +374,21 @@ function inferInstrumentFromText(text: string): string {
   if (/\b(XAUJPY|GOLD\s*JPY|GOLD\s*YEN)\b/.test(q)) return "XAUJPY";
   if (/\b(XAUAUD|GOLD\s*AUD)\b/.test(q)) return "XAUAUD";
   if (/\b(XAUCHF|GOLD\s*CHF|GOLD\s*FRANC)\b/.test(q)) return "XAUCHF";
+  // FX majors
+  if (/\bEUR\s*\/?\s*USD\b|\bEURUSD\b|\bFIBER\b/.test(q)) return "EURUSD";
+  if (/\bGBP\s*\/?\s*USD\b|\bGBPUSD\b|\bCABLE\b/.test(q)) return "GBPUSD";
+  if (/\bUSD\s*\/?\s*JPY\b|\bUSDJPY\b/.test(q)) return "USDJPY";
+  if (/\bAUD\s*\/?\s*USD\b|\bAUDUSD\b|\bAUSSIE\b/.test(q)) return "AUDUSD";
+  if (/\bUSD\s*\/?\s*CHF\b|\bUSDCHF\b|\bSWISSY\b/.test(q)) return "USDCHF";
+  if (/\bUSD\s*\/?\s*CAD\b|\bUSDCAD\b|\bLOONIE\b/.test(q)) return "USDCAD";
+  // Metals + crypto
+  if (/\bXAG\s*\/?\s*USD\b|\bXAGUSD\b|\bSILVER\b|\bCHANDI\b/.test(q)) return "XAGUSD";
+  if (/\bXPT\s*\/?\s*USD\b|\bXPTUSD\b|\bPLATINUM\b/.test(q)) return "XPTUSD";
+  if (/\bBTC\s*\/?\s*USDT?\b|\bBTCUSD\b|\bBITCOIN\b/.test(q)) return "BTCUSD";
+  if (/\bETH\s*\/?\s*USDT?\b|\bETHUSD\b|\bETHEREUM\b/.test(q)) return "ETHUSD";
   return "XAUUSD";
 }
+
 
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
@@ -1532,7 +1545,7 @@ async function fetchFxProxyRate(symbol: string): Promise<number | null> {
 // spot feed shows and is refreshed every few seconds.
 async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | null> {
   if (inst.kind !== "metal") return null;
-  const base = inst.key === "METAL:XAGUSD" ? "XAG" : "XAU";
+  const base = /^METAL:([A-Z]{3})/.exec(inst.key)?.[1] ?? "XAU";
   try {
     const res = await fetchWithTimeout(`https://api.gold-api.com/price/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
