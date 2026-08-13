@@ -80,13 +80,25 @@ export const Route = createFileRoute("/signal")({
 });
 
 /* ---------- helpers ---------- */
-const XAU_PAIRS = ["XAUUSD", "XAUEUR", "XAUGBP", "XAUJPY", "XAUAUD", "XAUCHF"] as const;
+const XAU_PAIRS = [
+  "XAUUSD", "XAUEUR", "XAUGBP", "XAUJPY", "XAUAUD", "XAUCHF",
+  "EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCHF", "USDCAD",
+  "XAGUSD", "XPTUSD", "BTCUSD", "ETHUSD",
+] as const;
 const XAU_LABELS: Record<string, string> = {
   XAUUSD: "XAU/USD", XAUEUR: "XAU/EUR", XAUGBP: "XAU/GBP",
   XAUJPY: "XAU/JPY", XAUAUD: "XAU/AUD", XAUCHF: "XAU/CHF",
+  EURUSD: "EUR/USD", GBPUSD: "GBP/USD", USDJPY: "USD/JPY",
+  AUDUSD: "AUD/USD", USDCHF: "USD/CHF", USDCAD: "USD/CAD",
+  XAGUSD: "XAG/USD", XPTUSD: "XPT/USD",
+  BTCUSD: "BTC/USD", ETHUSD: "ETH/USD",
 };
-function isMarketOpen(_sym: string, d: Date = new Date()): boolean {
-  // Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
+const CRYPTO_PAIRS = new Set(["BTCUSD", "ETHUSD"]);
+function isMarketOpen(sym: string, d: Date = new Date()): boolean {
+  // Crypto trades 24/7.
+  const s = (sym || "").toUpperCase().replace(/[^A-Z]/g, "");
+  if (CRYPTO_PAIRS.has(s)) return true;
+  // Gold / FX market: closed Fri 22:00 UTC → Sun 22:00 UTC
   const day = d.getUTCDay();
   const h = d.getUTCHours();
   if (day === 6) return false;
@@ -94,6 +106,7 @@ function isMarketOpen(_sym: string, d: Date = new Date()): boolean {
   if (day === 0 && h < 22) return false;
   return true;
 }
+
 
 function tagOf(text: string): { tag: string; tone: "violet" | "blue" | "emerald" | "amber" | "rose" | "zinc" } {
   const t = text.toLowerCase();
