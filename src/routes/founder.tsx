@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
-import { Zap, Shield, Award, Megaphone, AlertTriangle } from "lucide-react";
+import { Zap, Shield, Award, AlertTriangle } from "lucide-react";
 import founderPhoto from "@/assets/haseeb-ijaz-founder.png.asset.json";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
@@ -109,37 +109,6 @@ function FounderPage() {
       </section>
 
 
-      {/* Scams Awareness */}
-      <section className="rounded-2xl border border-amber-100 bg-amber-50/60 p-6 sm:p-8">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
-            <Megaphone className="h-6 w-6" />
-          </div>
-          <div className="space-y-3">
-            <h2 className={`text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl ${SANS}`}>
-              Pakistan's No. #1 Scams Awareness Provider
-            </h2>
-            <p className="text-zinc-700 leading-relaxed">
-              Haseeb is on a mission to make Pakistan's trading community the safest in the region. Through Jenvu's free Scam Check Tool, public awareness campaigns and real-time fraud alerts, he helps traders spot fake signal sellers.
-            </p>
-            <div className="flex flex-wrap gap-3 pt-1">
-              <Link
-                to="/scam-tool"
-                className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-amber-600 transition-colors"
-              >
-                <Shield className="h-4 w-4" />
-                Check a Scam Now
-              </Link>
-              <Link
-                to="/contact"
-                className="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 hover:bg-amber-50 transition-colors"
-              >
-                Report a Scam
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Philosophy */}
       <section className="space-y-4">
