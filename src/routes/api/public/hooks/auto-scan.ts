@@ -795,7 +795,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               );
               const riskMap = await getPersonalRiskMap(userIds, { entry, sl });
               const kz = plan.killzone ? ` · ${plan.killzone}` : "";
-              const title = `${grade} ${dir} · ${pair} · ${session}${kz}`;
+              const newsTag = newsContext ? ` · 📰 ${newsContext.title}` : "";
+              const title = `${grade} ${dir} · ${pair} · ${session}${kz}${newsTag}`;
               const rows = userIds.map((uid) => {
                 const personal = riskMap.get(uid);
                 const sizeNote = personal?.size?.note ?? "";
