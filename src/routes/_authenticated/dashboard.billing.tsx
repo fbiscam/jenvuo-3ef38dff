@@ -183,7 +183,7 @@ function Billing() {
 
           </div>
           {plan ? (
-            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+            <Link to="/pricing" className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
               Manage plan
             </Link>
           ) : (
