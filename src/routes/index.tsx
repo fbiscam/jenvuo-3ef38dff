@@ -204,17 +204,15 @@ function HomePage() {
             <div className={isAuthed ? "" : "hidden md:block"}>
               <HeaderAuthButtons />
             </div>
-            {!isAuthed && (
-              <button
-                type="button"
-                aria-label="Open menu"
-                aria-expanded={mobileMenuOpen}
-                onClick={() => setMobileMenuOpen(true)}
-                className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
-              >
-                <Menu className="h-4 w-4" />
-              </button>
-            )}
+            <button
+              type="button"
+              aria-label="Open menu"
+              aria-expanded={mobileMenuOpen}
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
           </div>
 
 
@@ -235,8 +233,7 @@ function HomePage() {
 
       </header>
 
-      {/* Mobile menu (signed-out users) */}
-      {!isAuthed && mobileMenuOpen && (
+      {mobileMenuOpen && (
         <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true">
           <div className="absolute inset-0 bg-zinc-900/40" onClick={() => setMobileMenuOpen(false)} />
           <div className="absolute inset-x-0 top-0 bg-white border-b border-zinc-100 shadow-lg">
@@ -272,22 +269,33 @@ function HomePage() {
                   {it.label}
                 </Link>
               ))}
-              <div className="mt-2 grid grid-cols-2 gap-2 px-3">
+              {isAuthed ? (
                 <Link
-                  to="/auth"
+                  to="/app"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 hover:bg-zinc-50"
+                  className="mx-3 mt-3 inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
                 >
-                  Sign In
+                  Launch
+                  <span className={`${MONO} text-[10px] opacity-70 ml-1.5`}>↗</span>
                 </Link>
-                <Link
-                  to="/founding"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-                >
-                  Apply Now
-                </Link>
-              </div>
+              ) : (
+                <div className="mt-2 grid grid-cols-2 gap-2 px-3">
+                  <Link
+                    to="/auth"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 hover:bg-zinc-50"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/founding"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                  >
+                    Apply Now
+                  </Link>
+                </div>
+              )}
             </nav>
           </div>
         </div>
