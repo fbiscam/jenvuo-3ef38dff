@@ -199,38 +199,31 @@ function HomePage() {
 
           <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
             <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
+            <div className="group relative">
+              <button type="button" className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
                 Resources <ChevronDown className="h-3.5 w-3.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-44">
-                <DropdownMenuItem asChild>
-                  <Link to="/signal" className="cursor-pointer text-[13px]">Signal Engine</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/ai-engine" className="cursor-pointer text-[13px]">AI Engine</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/broadcasts" className="cursor-pointer text-[13px]">Broadcasts</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/insights" className="cursor-pointer text-[13px]">Insights</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
+              </button>
+              <div className="invisible absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 pt-3 opacity-0 transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                <div className="rounded-md border border-zinc-200 bg-white p-1 shadow-lg">
+                  <Link to="/signal" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Signal Engine</Link>
+                  <Link to="/ai-engine" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">AI Engine</Link>
+                  <Link to="/broadcasts" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Broadcasts</Link>
+                  <Link to="/insights" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Insights</Link>
+                </div>
+              </div>
+            </div>
+            <div className="group relative">
+              <button type="button" className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
                 Tools <ChevronDown className="h-3.5 w-3.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-44">
-                <DropdownMenuItem asChild>
-                  <Link to="/leads" className="cursor-pointer text-[13px]">Leads</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/scam-check" className="cursor-pointer text-[13px]">Scam Check</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </button>
+              <div className="invisible absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 pt-3 opacity-0 transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                <div className="rounded-md border border-zinc-200 bg-white p-1 shadow-lg">
+                  <Link to="/leads" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Leads</Link>
+                  <Link to="/scam-check" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Scam Check</Link>
+                </div>
+              </div>
+            </div>
+
             <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
             <Link to="/about" className="hover:text-zinc-900">About</Link>
             <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
