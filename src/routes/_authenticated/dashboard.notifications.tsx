@@ -187,7 +187,7 @@ function NotificationsPage() {
     const url = explicit ?? (n.type === "signal_alert" || categoryOf(n) === "signals" ? "/dashboard/alerts" : undefined);
     const inner = (
       <div className={cn(
-        "group relative flex gap-3 rounded-2xl bg-white px-4 py-3.5 shadow-sm transition",
+        "group relative flex gap-3 rounded-2xl bg-white px-4 py-3.5 transition",
         unread
           ? "hover:bg-zinc-50"
           : "hover:bg-zinc-50",
