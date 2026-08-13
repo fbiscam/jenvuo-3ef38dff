@@ -1026,15 +1026,16 @@ function DashboardLayout() {
             </h1>
             <DropdownMenu>
               <DropdownMenuTrigger
-                className="mr-2 flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                className="mr-4 flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
                 aria-label="Profile menu"
                 title={fullName || email || "Profile"}
               >
                 <img
                   src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
                   alt={fullName || email || "Account avatar"}
-                  className="h-[52px] w-[52px] rounded-full object-cover"
-                  loading="lazy"
+                  className="h-[52px] w-[52px] rounded-full object-cover [image-rendering:-webkit-optimize-contrast]"
+                  loading="eager"
+                  decoding="async"
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
