@@ -184,8 +184,7 @@ function PayPage() {
 
       {!order || order.status === "expired" ? (
         <section className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-24px_rgba(0,0,0,0.25)] sm:p-7">
-          <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-zinc-400">Amount</div>
-          <div className="mt-3 flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap gap-2.5">
             {PRESET_AMOUNTS.map((a) => (
               <button
                 key={a}
