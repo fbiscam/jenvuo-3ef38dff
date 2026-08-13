@@ -12,6 +12,7 @@ import { computePositionSize } from "@/lib/risk-manager";
 import { Bell, BellOff, Loader2, Send } from "lucide-react";
 import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
 import { cn } from "@/lib/utils";
+import { getAlertCutoff } from "@/lib/alert-cutoff";
 import userinfobotLogo from "@/assets/userinfobot.jpg.asset.json";
 import xauLogo from "@/assets/xau-gold.png.asset.json";
 import {
@@ -316,11 +317,14 @@ function AlertPrefs() {
   useEffect(() => {
     let cancelled = false;
     const fetchAlerts = async () => {
-      const { data } = await supabase
+      const cutoff = await getAlertCutoff();
+      let q = supabase
         .from("signal_alerts")
         .select("id, pair, grade, direction, entry, sl, tp, rr, confidence, session, fired_at, models_used")
         .order("fired_at", { ascending: false })
         .limit(50);
+      if (cutoff) q = q.gte("fired_at", cutoff);
+      const { data } = await q;
       if (!cancelled && data) setAlerts(data as FiredAlert[]);
       if (!cancelled) setAlertsLoading(false);
     };

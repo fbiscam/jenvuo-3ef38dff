@@ -244,12 +244,15 @@ function SignalDeskHistory() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
+      const cutoff = await getAlertCutoff();
+      let q = supabase
         .from("signal_alerts")
         .select("id, pair, grade, direction, entry, sl, tp, rr, confidence, session, fired_at")
         .gte("confidence", 50)
         .order("fired_at", { ascending: false })
         .limit(100);
+      if (cutoff) q = q.gte("fired_at", cutoff);
+      const { data } = await q;
       if (!cancelled) { setAlerts((data as DeskAlert[]) ?? []); setLoading(false); }
     })();
     const channel = supabase
@@ -594,6 +597,8 @@ function DashboardLayout() {
 
       const savedQ = supabase.from("saved_signals").select("id", { count: "exact", head: true });
       const alertsQ = supabase.from("signal_alerts").select("id", { count: "exact", head: true });
+      const alertCutoff = await getAlertCutoff();
+      if (alertCutoff) alertsQ.gte("created_at", alertCutoff);
       const journalQ = supabase.from("trade_journal").select("outcome, created_at, pair, direction, entry, stop_loss, take_profit").eq("user_id", u.id);
       if (since) {
         alertsQ.gte("created_at", since);
@@ -739,7 +744,10 @@ function DashboardLayout() {
     let cancelled = false;
     const load = async () => {
       const savedSince = getLastSeen("saved");
-      const alertsSince = getLastSeen("alerts");
+      const signupCutoff = await getAlertCutoff();
+      const lastSeenAlerts = getLastSeen("alerts");
+      const alertsSince =
+        signupCutoff && new Date(signupCutoff) > new Date(lastSeenAlerts) ? signupCutoff : lastSeenAlerts;
       const journalSince = getLastSeen("journal");
       const [s, a, j] = await Promise.all([
         supabase.from("saved_signals").select("id", { count: "exact", head: true }).gt("created_at", savedSince),
