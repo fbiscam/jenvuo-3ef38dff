@@ -48,6 +48,7 @@ import { Route as LeadsIndexRouteImport } from './routes/leads.index'
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
+import { Route as OpsX9k27m4nPaymentsRouteImport } from './routes/ops-x9k2-7m4n.payments'
 import { Route as OpsX9k27m4nLeadsCreditsRouteImport } from './routes/ops-x9k2-7m4n.leads-credits'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as LeadsPeopleRouteImport } from './routes/leads.people'
@@ -306,6 +307,11 @@ const HelpIndexRoute = HelpIndexRouteImport.update({
   id: '/help/',
   path: '/help/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const OpsX9k27m4nPaymentsRoute = OpsX9k27m4nPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
 const OpsX9k27m4nLeadsCreditsRoute = OpsX9k27m4nLeadsCreditsRouteImport.update({
   id: '/leads-credits',
@@ -714,6 +720,7 @@ export interface FileRoutesByFullPath {
   '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
+  '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -813,6 +820,7 @@ export interface FileRoutesByTo {
   '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
+  '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
@@ -919,6 +927,7 @@ export interface FileRoutesById {
   '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
+  '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -1025,6 +1034,7 @@ export interface FileRouteTypes {
     | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
+    | '/ops-x9k2-7m4n/payments'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -1124,6 +1134,7 @@ export interface FileRouteTypes {
     | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
+    | '/ops-x9k2-7m4n/payments'
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
@@ -1229,6 +1240,7 @@ export interface FileRouteTypes {
     | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
+    | '/ops-x9k2-7m4n/payments'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -1623,6 +1635,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/help/'
       preLoaderRoute: typeof HelpIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/ops-x9k2-7m4n/payments': {
+      id: '/ops-x9k2-7m4n/payments'
+      path: '/payments'
+      fullPath: '/ops-x9k2-7m4n/payments'
+      preLoaderRoute: typeof OpsX9k27m4nPaymentsRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
     }
     '/ops-x9k2-7m4n/leads-credits': {
       id: '/ops-x9k2-7m4n/leads-credits'
@@ -2215,12 +2234,14 @@ const LeadsRouteWithChildren = LeadsRoute._addFileChildren(LeadsRouteChildren)
 interface OpsX9k27m4nRouteChildren {
   OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
   OpsX9k27m4nLeadsCreditsRoute: typeof OpsX9k27m4nLeadsCreditsRoute
+  OpsX9k27m4nPaymentsRoute: typeof OpsX9k27m4nPaymentsRoute
   OpsX9k27m4nIndexRoute: typeof OpsX9k27m4nIndexRoute
 }
 
 const OpsX9k27m4nRouteChildren: OpsX9k27m4nRouteChildren = {
   OpsX9k27m4nHubRoute: OpsX9k27m4nHubRoute,
   OpsX9k27m4nLeadsCreditsRoute: OpsX9k27m4nLeadsCreditsRoute,
+  OpsX9k27m4nPaymentsRoute: OpsX9k27m4nPaymentsRoute,
   OpsX9k27m4nIndexRoute: OpsX9k27m4nIndexRoute,
 }
 
