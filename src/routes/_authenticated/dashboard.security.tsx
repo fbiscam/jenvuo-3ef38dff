@@ -41,7 +41,7 @@ function SecurityPage() {
       </div>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="pl-1 text-base font-semibold">Password</h2>
+        <h2 className="pl-1 text-base font-semibold">&nbsp;Password</h2>
         <p className="mt-1 text-sm text-zinc-500">
           We'll email a secure single-use link to {email || "your account email"} so you can set a new password.
         </p>
