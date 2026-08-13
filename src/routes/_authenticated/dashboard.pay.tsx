@@ -238,8 +238,7 @@ function PayPage() {
             })}
           </div>
 
-          <div className="mt-7 text-[12px] font-medium uppercase tracking-[0.16em] text-zinc-400">Promo code</div>
-          <div className="mt-3 flex flex-wrap items-center gap-2.5">
+          <div className="mt-7 flex flex-wrap items-center gap-2.5">
             <input
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
