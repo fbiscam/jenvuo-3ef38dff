@@ -23,6 +23,7 @@ import {
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
+  Users, Target, Clock, Brain, Lock, FileCheck,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
@@ -67,49 +68,46 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type OpenTrade = { pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null };
 type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number; closedWins: number; closedDecided: number; openTrades: OpenTrade[] };
 
-type TabItem = { to: string; label: string; icon: string; iconColor?: string; exact?: boolean; countKey?: keyof Counts };
+type TabItem = { to: string; label: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; exact?: boolean; countKey?: keyof Counts };
 
 const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard", label: "Account Overview", icon: "space_dashboard", exact: true, countKey: "saved" },
-      { to: "/app", label: "Launch AI", icon: "auto_awesome" },
-      { to: "/dashboard/workspace", label: "Saved Signals", icon: "bookmarks" },
-      { to: "/dashboard/alerts", label: "Signal Alerts", icon: "notifications_active", countKey: "alerts7d" },
-      
-      { to: "/dashboard/notifications", label: "Notifications", icon: "notifications" },
+      { to: "/dashboard", label: "Account Overview", icon: LayoutGrid, exact: true, countKey: "saved" },
+      { to: "/app", label: "Launch AI", icon: Sparkles },
+      { to: "/dashboard/workspace", label: "Saved Signals", icon: Bookmark },
+      { to: "/dashboard/alerts", label: "Signal Alerts", icon: BellRing, countKey: "alerts7d" },
+      { to: "/dashboard/notifications", label: "Notifications", icon: Bell },
     ],
   },
   {
     label: "Trades & Insights",
     items: [
-      { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
-      { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats" },
-      { to: "/dashboard/risk", label: "Risk Manager", icon: "balance" },
-      { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3" },
+      { to: "/dashboard/journal", label: "Trades", icon: TrendingUp, countKey: "journalTotal" },
+      { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+      { to: "/dashboard/risk", label: "Risk Manager", icon: Gauge },
+      { to: "/dashboard/referrals", label: "Referrals", icon: Users },
     ],
   },
   {
     label: "Tools & Market",
     items: [
-      { to: "/signal", label: "Signal Desk", icon: "radar" },
-      { to: "/killzones", label: "Killzones", icon: "schedule" },
-      { to: "/ai-engine", label: "AI Engine", icon: "neurology" },
-      { to: "/insights", label: "Insights", icon: "menu_book" },
-      { to: "/pricing", label: "Pricing", icon: "local_offer" },
-      
+      { to: "/signal", label: "Signal Desk", icon: Target },
+      { to: "/killzones", label: "Killzones", icon: Clock },
+      { to: "/ai-engine", label: "AI Engine", icon: Brain },
+      { to: "/insights", label: "Insights", icon: BookOpen },
+      { to: "/pricing", label: "Pricing", icon: Tag },
     ],
-
   },
   {
     label: "Account & Billing",
     items: [
-      { to: "/dashboard/billing", label: "Billing", icon: "account_balance_wallet" },
-      { to: "/dashboard/documents", label: "Documents", icon: "verified_user" },
-      { to: "/dashboard/profile", label: "Profile", icon: "person_pin" },
-      { to: "/dashboard/security", label: "Security", icon: "encrypted" },
-      { to: "/help", label: "Help Center", icon: "lightbulb" },
+      { to: "/dashboard/billing", label: "Billing", icon: Wallet },
+      { to: "/dashboard/documents", label: "Documents", icon: FileCheck },
+      { to: "/dashboard/profile", label: "Profile", icon: User },
+      { to: "/dashboard/security", label: "Security", icon: Lock },
+      { to: "/help", label: "Help Center", icon: Lightbulb },
     ],
   },
 ];
@@ -870,7 +868,7 @@ function DashboardLayout() {
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
         style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
       >
-        <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
+        <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; }`}</style>
         {/* Brand */}
         <div className={`flex h-11 shrink-0 items-center gap-2.5 bg-[#FAFAFA] ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
@@ -904,8 +902,7 @@ function DashboardLayout() {
               <div className="flex flex-col gap-1.5">
                 {group.items.map((t) => {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
-                  const iconName = t.icon;
-                  const iconColor = t.iconColor;
+                  const Icon = t.icon;
                   const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
                   const isNotifs = t.to === "/dashboard/notifications";
                   const hasUnread = isNotifs && unreadNotifs > 0 && !active;
@@ -922,18 +919,11 @@ function DashboardLayout() {
                           ? "bg-zinc-100 text-zinc-900 font-semibold"
                           : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
-                      <span
-                        className="material-symbols-rounded shrink-0"
+                      <Icon
+                        className={`shrink-0 h-[19px] w-[19px] transition ${active ? "text-zinc-900" : "text-zinc-500 group-hover:text-zinc-900"}`}
+                        strokeWidth={active ? 2.1 : 1.7}
                         aria-hidden
-                        style={{
-                          fontSize: 21,
-                          lineHeight: 1,
-                          color: active ? "#18181b" : (iconColor ?? "#5E5E5E"),
-                          fontVariationSettings: `'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 24`,
-                        }}
-                      >
-                        {iconName}
-                      </span>
+                      />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
                         <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
