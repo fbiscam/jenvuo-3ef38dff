@@ -30,7 +30,8 @@ const FOUNDING_STORY = {
   bio: [
     "Haseeb Ijaz started Jenvu at age 21 with a single conviction: institutional-grade gold analysis should not be locked behind a Bloomberg terminal or a Wall Street desk.",
     "He spent years dissecting ICT, SMC, liquidity engineering and market structure across XAU/USD and every major gold cross-pair. The patterns were repeatable, but the execution tools were fragmented. So he built the desk he wished he had at 18 — voice-native, AI-augmented, and ruthlessly honest about risk.",
-    "Today, Jenvu combines 25 proprietary skills and techniques into a single terminal that speaks in real time, draws institutional logic on the chart, and tells traders exactly when to step aside.",
+    "Beyond the terminal, Haseeb has sharpened 25 proprietary skills and techniques spanning market research, product marketing, community building and AI-driven growth. That same research discipline is why Jenvu learns faster with every scan.",
+    "Today, Jenvu combines those 25 disciplines into a single terminal that speaks in real time, draws institutional logic on the chart, and tells traders exactly when to step aside.",
   ],
 };
 
