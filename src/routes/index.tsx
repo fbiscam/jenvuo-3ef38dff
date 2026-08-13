@@ -170,6 +170,7 @@ function HomePage() {
   const ticker = useLiveTicker();
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
+  const trial = useTrial();
   const { user: authUser } = useAuthUser();
   const isAuthed = !!authUser;
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
