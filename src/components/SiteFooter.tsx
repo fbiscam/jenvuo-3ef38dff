@@ -97,8 +97,10 @@ const columns = [
       { to: "/refund", label: "Refund Policy" },
       { to: "/cancellation", label: "Cancellation" },
       { to: "/disclaimer", label: "Risk Disclaimer" },
+      { to: "/scam-tool", label: "Scam Tool" },
     ],
   },
+
 
 ] as const;
 
