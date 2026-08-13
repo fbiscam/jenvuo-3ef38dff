@@ -3,6 +3,7 @@ import { useServerFn } from '@tanstack/react-start'
 import { supabase } from '@/integrations/supabase/client'
 import { listSignalAlerts, type SignalAlertRow } from '@/lib/signal-alerts.functions'
 import { getAlertsEnabled } from '@/lib/alert-toggle.functions'
+import { getAlertCutoff } from '@/lib/alert-cutoff'
 
 const SEEN_KEY = 'jenvu_seen_alert_id'
 const ALERTS_ENABLED_CACHE_KEY = 'jenvu_alerts_enabled'
@@ -103,7 +104,8 @@ export function useSignalAlerts(pair: string = 'XAUUSD') {
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    fetcher({ data: { limit: 20, pair } })
+    getAlertCutoff()
+      .then((since) => fetcher({ data: { limit: 20, pair, since: since ?? undefined } }))
       .then((res) => {
         if (cancelled) return
         const list = res.alerts ?? []

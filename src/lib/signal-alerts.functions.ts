@@ -31,10 +31,11 @@ function publicClient() {
 
 export const listSignalAlerts = createServerFn({ method: 'GET' })
   .inputValidator((d: unknown) => {
-    const o = (d ?? {}) as { limit?: number; pair?: string }
+    const o = (d ?? {}) as { limit?: number; pair?: string; since?: string }
     return {
       limit: Math.min(Math.max(Number(o.limit) || 20, 1), 50),
       pair: typeof o.pair === 'string' && o.pair ? o.pair.toUpperCase() : null,
+      since: typeof o.since === 'string' && o.since ? o.since : null,
     }
   })
   .handler(async ({ data }) => {
@@ -47,6 +48,7 @@ export const listSignalAlerts = createServerFn({ method: 'GET' })
       .order('fired_at', { ascending: false })
       .limit(data.limit)
     if (data.pair) q = q.eq('pair', data.pair)
+    if (data.since) q = q.gte('fired_at', data.since)
     const { data: rows, error } = await q
     if (error) return { alerts: [] as SignalAlertRow[], error: error.message }
     return { alerts: (rows ?? []) as SignalAlertRow[] }
