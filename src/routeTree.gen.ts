@@ -29,6 +29,7 @@ import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as JenvuOpsX9k2RouteImport } from './routes/jenvu-ops-x9k2'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as FoundingRouteImport } from './routes/founding'
+import { Route as FounderRouteImport } from './routes/founder'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as DevelopmentRouteImport } from './routes/development'
@@ -212,6 +213,11 @@ const InsightsRoute = InsightsRouteImport.update({
 const FoundingRoute = FoundingRouteImport.update({
   id: '/founding',
   path: '/founding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FounderRoute = FounderRouteImport.update({
+  id: '/founder',
+  path: '/founder',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DownloadRoute = DownloadRouteImport.update({
@@ -685,6 +691,7 @@ export interface FileRoutesByFullPath {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
+  '/founder': typeof FounderRoute
   '/founding': typeof FoundingRoute
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
@@ -790,6 +797,7 @@ export interface FileRoutesByTo {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
+  '/founder': typeof FounderRoute
   '/founding': typeof FoundingRoute
   '/killzones': typeof KillzonesRoute
   '/leads-signin': typeof LeadsSigninRoute
@@ -892,6 +900,7 @@ export interface FileRoutesById {
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
   '/download': typeof DownloadRoute
+  '/founder': typeof FounderRoute
   '/founding': typeof FoundingRoute
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
@@ -999,6 +1008,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
+    | '/founder'
     | '/founding'
     | '/insights'
     | '/jenvu-ops-x9k2'
@@ -1104,6 +1114,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
+    | '/founder'
     | '/founding'
     | '/killzones'
     | '/leads-signin'
@@ -1205,6 +1216,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/disclaimer'
     | '/download'
+    | '/founder'
     | '/founding'
     | '/insights'
     | '/jenvu-ops-x9k2'
@@ -1312,6 +1324,7 @@ export interface RootRouteChildren {
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
   DownloadRoute: typeof DownloadRoute
+  FounderRoute: typeof FounderRoute
   FoundingRoute: typeof FoundingRoute
   InsightsRoute: typeof InsightsRouteWithChildren
   JenvuOpsX9k2Route: typeof JenvuOpsX9k2RouteWithChildren
@@ -1501,6 +1514,13 @@ declare module '@tanstack/react-router' {
       path: '/founding'
       fullPath: '/founding'
       preLoaderRoute: typeof FoundingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/founder': {
+      id: '/founder'
+      path: '/founder'
+      fullPath: '/founder'
+      preLoaderRoute: typeof FounderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/download': {
@@ -2264,6 +2284,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
   DownloadRoute: DownloadRoute,
+  FounderRoute: FounderRoute,
   FoundingRoute: FoundingRoute,
   InsightsRoute: InsightsRouteWithChildren,
   JenvuOpsX9k2Route: JenvuOpsX9k2RouteWithChildren,
