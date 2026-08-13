@@ -1060,7 +1060,7 @@ function DashboardLayout() {
         {/* Analytics header */}
         <div className="-mt-2 flex items-center justify-between">
           <div />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger
                 className="flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
@@ -1070,7 +1070,7 @@ function DashboardLayout() {
                 <img
                   src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
                   alt={fullName || email || "Account avatar"}
-                  className="h-[4.5rem] w-[4.5rem] rounded-full object-cover"
+                  className="h-14 w-14 rounded-full object-cover"
                   loading="lazy"
                 />
               </DropdownMenuTrigger>
