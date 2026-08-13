@@ -27,6 +27,7 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import PageLoading from "@/components/PageLoading";
 import { killzoneForPair, getPairProfile } from "@/lib/analysis/engine";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { MIN_CONFIDENCE } from "@/lib/signals/qualification";
 
 
 
@@ -522,7 +523,7 @@ function SignalPage() {
       // killzone gate is disabled server-side (signals fire any session), so
       // it must not be re-applied here — that mismatch was rejecting perfectly
       // valid scans on some accounts/sessions while others went through.
-      const AUTO_MIN_CONF = 70;
+      const AUTO_MIN_CONF = MIN_CONFIDENCE;
       const dir = p.trade?.direction;
       const conf = Number(p.trade?.confidence ?? 0);
       const htfBias = String((p as unknown as { htfBias?: string }).htfBias ?? "neutral");
@@ -1473,7 +1474,7 @@ function SignalPage() {
                   <NewsCountdownChip plan={plan} />
 
                   {(() => {
-                    const LOW_CONF = 65;
+                    const LOW_CONF = MIN_CONFIDENCE;
                     const isLowConf = (t.confidence ?? 0) < LOW_CONF;
                     const dec = plan.instrument.decimals;
                     const riskAbs = Math.abs(t.entry - t.sl);
@@ -1755,7 +1756,7 @@ function SignalPage() {
               )}
 
               {/* Live trade tracker */}
-              {plan && t && t.direction !== "WAIT" && !marketClosed && (
+              {plan && t && t.direction !== "WAIT" && !marketClosed && (t.confidence ?? 0) >= MIN_CONFIDENCE && (
                 <TradeTrackerCard
                   plan={plan}
                   livePrice={livePrice}
