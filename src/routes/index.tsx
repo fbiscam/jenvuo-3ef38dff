@@ -287,6 +287,45 @@ function HomePage() {
                 { to: "/signal", label: "Signal Engine" },
                 { to: "/signals-live", label: "Signals Live" },
                 { to: "/ai-engine", label: "AI Engine" },
+              ].map((it) => (
+                <Link
+                  key={it.to}
+                  to={it.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-lg px-3 py-3 hover:bg-zinc-50"
+                >
+                  {it.label}
+                </Link>
+              ))}
+              <div className="mt-1 px-3 py-2 text-[12px] font-medium uppercase tracking-wider text-zinc-500">Resources</div>
+              {[
+                { to: "/broadcasts", label: "Broadcasts" },
+                { to: "/insights", label: "Insights" },
+              ].map((it) => (
+                <Link
+                  key={it.to}
+                  to={it.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-lg px-3 py-3 pl-6 hover:bg-zinc-50"
+                >
+                  {it.label}
+                </Link>
+              ))}
+              <div className="mt-1 px-3 py-2 text-[12px] font-medium uppercase tracking-wider text-zinc-500">Tools</div>
+              {[
+                { to: "/leads", label: "Leads" },
+                { to: "/scam-check", label: "Scam Check" },
+              ].map((it) => (
+                <Link
+                  key={it.to}
+                  to={it.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-lg px-3 py-3 pl-6 hover:bg-zinc-50"
+                >
+                  {it.label}
+                </Link>
+              ))}
+              {[
                 { to: "/founding", label: "Founding" },
                 { to: "/about", label: "About" },
                 { to: "/contact", label: "Contact" },
