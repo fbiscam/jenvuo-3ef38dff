@@ -87,7 +87,7 @@ function SignalsLivePage() {
             <Link to="/signals-live" className="font-semibold text-emerald-700">Live Feed</Link>
             <Link to="/briefs" className="hover:text-zinc-900">Briefs</Link>
             <Link to="/pricing" className="hover:text-zinc-900">Pricing</Link>
-            <Link to="/about" className="hover:text-zinc-900">About</Link>
+            <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
           </nav>
           <HeaderAuthButtons />
         </div>
