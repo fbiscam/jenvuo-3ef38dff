@@ -198,7 +198,7 @@ function PayPage() {
                 onClick={() => { setAmount(a); setCustom(""); }}
                 className={`min-w-[86px] rounded-2xl border px-4 py-3 text-sm font-medium transition ${
                   !custom.trim() && amount === a
-                    ? "border-zinc-900 bg-zinc-900 text-white shadow-[0_10px_24px_-14px_rgba(0,0,0,0.9)]"
+                    ? "border-black/15 bg-[#FAFAFA] text-black"
                     : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-900/30 hover:bg-zinc-50"
                 }`}
               >
