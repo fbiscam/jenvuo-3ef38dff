@@ -516,7 +516,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center rounded-md border border-zinc-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-amber-400">
-            <span className="px-3 text-sm text-zinc-500 border-r border-zinc-200 bg-zinc-50">$</span>
+            <span className="px-3 text-sm text-zinc-500 border-r border-zinc-200 bg-white">$</span>
             <input
               type="number"
               min={5}
