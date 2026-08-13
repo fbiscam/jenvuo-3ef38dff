@@ -327,7 +327,7 @@ function NotificationsPage() {
             <Loader2 className="h-5 w-5 animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-zinc-200 p-14 text-center">
+          <div className="rounded-2xl p-14 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">
               <Bell className="h-5 w-5" />
             </div>
