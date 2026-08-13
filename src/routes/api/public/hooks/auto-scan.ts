@@ -177,12 +177,23 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           }
         }
 
-        // News hard-pause: skip broadcasts if a high-impact USD/XAU red-folder
-        // event lands within ±30 minutes of now. Volatility around NFP, CPI,
-        // FOMC etc. invalidates ICT/SMC setups — better to sit out than to
-        // fire on stop-runs.
+        // News-aware scanning (CPI / NFP / FOMC etc.).
+        // Instead of sitting out the whole event window, we split it in phases:
+        //   pre      — event upcoming (blackout..pause window): no broadcast,
+        //              spreads widen and pre-positioning gets stop-hunted.
+        //   blackout — within ±N min of the print: no broadcast at all.
+        //   post     — up to `news_post_window_min` after the print: KEEP
+        //              scanning. The post-news reaction (displacement + FVG
+        //              retrace) is one of the cleanest ICT setups; we simply
+        //              demand a slightly higher confidence and tag the alert.
         const newsPauseMin = Number(cfg.news_pause_min ?? 30);
-        let newsPaused: { title: string; minutes: number } | null = null;
+        const newsBlackoutMin = Number(cfg.news_blackout_min ?? 10);
+        const newsPostWindowMin = Number(cfg.news_post_window_min ?? 90);
+        const newsPostMinConf = Number(cfg.news_post_min_conf ?? 72);
+        let newsBlocked: { title: string; minutes: number; phase: string } | null = null;
+        let newsContext:
+          | { title: string; minutesAgo: number; impact: string }
+          | null = null;
         try {
           const res = await fetch(
             "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
@@ -199,22 +210,46 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             for (const e of raw) {
               if (e.country !== "USD" && e.country !== "XAU") continue;
               if (!/High/i.test(e.impact)) continue;
-              const mins = Math.abs((new Date(e.date).getTime() - now) / 60000);
-              if (mins <= newsPauseMin) {
-                newsPaused = { title: e.title, minutes: Math.round(mins) };
+              const deltaMin = (new Date(e.date).getTime() - now) / 60000;
+              if (Math.abs(deltaMin) <= newsBlackoutMin) {
+                newsBlocked = {
+                  title: e.title,
+                  minutes: Math.round(deltaMin),
+                  phase: "blackout",
+                };
                 break;
+              }
+              if (deltaMin > 0 && deltaMin <= newsPauseMin) {
+                newsBlocked = {
+                  title: e.title,
+                  minutes: Math.round(deltaMin),
+                  phase: "pre_event",
+                };
+                break;
+              }
+              if (deltaMin < 0 && Math.abs(deltaMin) <= newsPostWindowMin) {
+                const ago = Math.round(Math.abs(deltaMin));
+                if (!newsContext || ago < newsContext.minutesAgo) {
+                  newsContext = { title: e.title, minutesAgo: ago, impact: "High" };
+                }
               }
             }
           }
         } catch {
           // Fail open — don't block scans if news feed is down.
         }
-        if (newsPaused) {
+        if (newsBlocked) {
           return Response.json({
             ok: true,
             skipped: "news_pause",
-            event: newsPaused,
+            phase: newsBlocked.phase,
+            event: newsBlocked,
           });
+        }
+        // Post-news reaction mode: keep scanning but raise the bar a touch.
+        if (newsContext) {
+          minConf = Math.max(minConf, Math.min(Math.max(newsPostMinConf, 70), 85));
+          singleHitMinConf = Math.max(minConf, 78);
         }
 
         const results: Array<Record<string, unknown>> = [];
