@@ -48,6 +48,7 @@ import { Route as LeadsIndexRouteImport } from './routes/leads.index'
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
+import { Route as OpsX9k27m4nPaymentsRouteImport } from './routes/ops-x9k2-7m4n.payments'
 import { Route as OpsX9k27m4nLeadsCreditsRouteImport } from './routes/ops-x9k2-7m4n.leads-credits'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as LeadsPeopleRouteImport } from './routes/leads.people'
@@ -76,6 +77,7 @@ import { Route as AuthenticatedDashboardSecurityRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
 import { Route as AuthenticatedDashboardReferralsRouteImport } from './routes/_authenticated/dashboard.referrals'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
+import { Route as AuthenticatedDashboardPayRouteImport } from './routes/_authenticated/dashboard.pay'
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
@@ -306,6 +308,11 @@ const HelpIndexRoute = HelpIndexRouteImport.update({
   path: '/help/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OpsX9k27m4nPaymentsRoute = OpsX9k27m4nPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
 const OpsX9k27m4nLeadsCreditsRoute = OpsX9k27m4nLeadsCreditsRouteImport.update({
   id: '/leads-credits',
   path: '/leads-credits',
@@ -451,6 +458,12 @@ const AuthenticatedDashboardProfileRoute =
   AuthenticatedDashboardProfileRouteImport.update({
     id: '/profile',
     path: '/profile',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardPayRoute =
+  AuthenticatedDashboardPayRouteImport.update({
+    id: '/pay',
+    path: '/pay',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardNotificationsRoute =
@@ -707,6 +720,7 @@ export interface FileRoutesByFullPath {
   '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
+  '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -718,6 +732,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
+  '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
@@ -805,6 +820,7 @@ export interface FileRoutesByTo {
   '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
+  '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
@@ -816,6 +832,7 @@ export interface FileRoutesByTo {
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
+  '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
@@ -910,6 +927,7 @@ export interface FileRoutesById {
   '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
+  '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -921,6 +939,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
+  '/_authenticated/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/_authenticated/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
@@ -1015,6 +1034,7 @@ export interface FileRouteTypes {
     | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
+    | '/ops-x9k2-7m4n/payments'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -1026,6 +1046,7 @@ export interface FileRouteTypes {
     | '/dashboard/documents'
     | '/dashboard/journal'
     | '/dashboard/notifications'
+    | '/dashboard/pay'
     | '/dashboard/profile'
     | '/dashboard/referrals'
     | '/dashboard/risk'
@@ -1113,6 +1134,7 @@ export interface FileRouteTypes {
     | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
+    | '/ops-x9k2-7m4n/payments'
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
@@ -1124,6 +1146,7 @@ export interface FileRouteTypes {
     | '/dashboard/documents'
     | '/dashboard/journal'
     | '/dashboard/notifications'
+    | '/dashboard/pay'
     | '/dashboard/profile'
     | '/dashboard/referrals'
     | '/dashboard/risk'
@@ -1217,6 +1240,7 @@ export interface FileRouteTypes {
     | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
+    | '/ops-x9k2-7m4n/payments'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -1228,6 +1252,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/journal'
     | '/_authenticated/dashboard/notifications'
+    | '/_authenticated/dashboard/pay'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/referrals'
     | '/_authenticated/dashboard/risk'
@@ -1611,6 +1636,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ops-x9k2-7m4n/payments': {
+      id: '/ops-x9k2-7m4n/payments'
+      path: '/payments'
+      fullPath: '/ops-x9k2-7m4n/payments'
+      preLoaderRoute: typeof OpsX9k27m4nPaymentsRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
     '/ops-x9k2-7m4n/leads-credits': {
       id: '/ops-x9k2-7m4n/leads-credits'
       path: '/leads-credits'
@@ -1805,6 +1837,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/dashboard/profile'
       preLoaderRoute: typeof AuthenticatedDashboardProfileRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/pay': {
+      id: '/_authenticated/dashboard/pay'
+      path: '/pay'
+      fullPath: '/dashboard/pay'
+      preLoaderRoute: typeof AuthenticatedDashboardPayRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/notifications': {
@@ -2062,6 +2101,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
+  AuthenticatedDashboardPayRoute: typeof AuthenticatedDashboardPayRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
   AuthenticatedDashboardRiskRoute: typeof AuthenticatedDashboardRiskRoute
@@ -2090,6 +2130,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
     AuthenticatedDashboardNotificationsRoute:
       AuthenticatedDashboardNotificationsRoute,
+    AuthenticatedDashboardPayRoute: AuthenticatedDashboardPayRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
     AuthenticatedDashboardReferralsRoute: AuthenticatedDashboardReferralsRoute,
     AuthenticatedDashboardRiskRoute: AuthenticatedDashboardRiskRoute,
@@ -2193,12 +2234,14 @@ const LeadsRouteWithChildren = LeadsRoute._addFileChildren(LeadsRouteChildren)
 interface OpsX9k27m4nRouteChildren {
   OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
   OpsX9k27m4nLeadsCreditsRoute: typeof OpsX9k27m4nLeadsCreditsRoute
+  OpsX9k27m4nPaymentsRoute: typeof OpsX9k27m4nPaymentsRoute
   OpsX9k27m4nIndexRoute: typeof OpsX9k27m4nIndexRoute
 }
 
 const OpsX9k27m4nRouteChildren: OpsX9k27m4nRouteChildren = {
   OpsX9k27m4nHubRoute: OpsX9k27m4nHubRoute,
   OpsX9k27m4nLeadsCreditsRoute: OpsX9k27m4nLeadsCreditsRoute,
+  OpsX9k27m4nPaymentsRoute: OpsX9k27m4nPaymentsRoute,
   OpsX9k27m4nIndexRoute: OpsX9k27m4nIndexRoute,
 }
 
