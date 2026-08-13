@@ -208,8 +208,7 @@ function PayPage() {
             />
           </div>
 
-          <div className="mt-7 text-[12px] font-medium uppercase tracking-[0.16em] text-zinc-400">Network</div>
-          <div className="mt-3 grid gap-2.5 sm:grid-cols-3">
+          <div className="mt-7 grid gap-2.5 sm:grid-cols-3">
             {NETWORKS.map((n) => {
               const active = network === n.id;
               return (
