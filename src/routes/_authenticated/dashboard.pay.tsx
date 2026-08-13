@@ -226,7 +226,7 @@ function PayPage() {
                       <UsdtIcon className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full ring-2 ring-white" />
                     </span>
                     {active && (
-                      <span className="ml-auto rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-white">
+                      <span className="ml-auto rounded-full border border-black/10 bg-white px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-black">
                         Selected
                       </span>
                     )}
