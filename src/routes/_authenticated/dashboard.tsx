@@ -23,6 +23,7 @@ import {
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
+  Users, Target, Clock, Brain, Lock, FileCheck,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
@@ -67,49 +68,46 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type OpenTrade = { pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null };
 type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number; closedWins: number; closedDecided: number; openTrades: OpenTrade[] };
 
-type TabItem = { to: string; label: string; icon: string; iconColor?: string; exact?: boolean; countKey?: keyof Counts };
+type TabItem = { to: string; label: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; exact?: boolean; countKey?: keyof Counts };
 
 const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard", label: "Account Overview", icon: "space_dashboard", exact: true, countKey: "saved" },
-      { to: "/app", label: "Launch AI", icon: "auto_awesome" },
-      { to: "/dashboard/workspace", label: "Saved Signals", icon: "bookmarks" },
-      { to: "/dashboard/alerts", label: "Signal Alerts", icon: "notifications_active", countKey: "alerts7d" },
-      
-      { to: "/dashboard/notifications", label: "Notifications", icon: "notifications" },
+      { to: "/dashboard", label: "Account Overview", icon: LayoutGrid, exact: true, countKey: "saved" },
+      { to: "/app", label: "Launch AI", icon: Sparkles },
+      { to: "/dashboard/workspace", label: "Saved Signals", icon: Bookmark },
+      { to: "/dashboard/alerts", label: "Signal Alerts", icon: BellRing, countKey: "alerts7d" },
+      { to: "/dashboard/notifications", label: "Notifications", icon: Bell },
     ],
   },
   {
     label: "Trades & Insights",
     items: [
-      { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
-      { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats" },
-      { to: "/dashboard/risk", label: "Risk Manager", icon: "balance" },
-      { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3" },
+      { to: "/dashboard/journal", label: "Trades", icon: TrendingUp, countKey: "journalTotal" },
+      { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+      { to: "/dashboard/risk", label: "Risk Manager", icon: Gauge },
+      { to: "/dashboard/referrals", label: "Referrals", icon: Users },
     ],
   },
   {
     label: "Tools & Market",
     items: [
-      { to: "/signal", label: "Signal Desk", icon: "radar" },
-      { to: "/killzones", label: "Killzones", icon: "schedule" },
-      { to: "/ai-engine", label: "AI Engine", icon: "neurology" },
-      { to: "/insights", label: "Insights", icon: "menu_book" },
-      { to: "/pricing", label: "Pricing", icon: "local_offer" },
-      
+      { to: "/signal", label: "Signal Desk", icon: Target },
+      { to: "/killzones", label: "Killzones", icon: Clock },
+      { to: "/ai-engine", label: "AI Engine", icon: Brain },
+      { to: "/insights", label: "Insights", icon: BookOpen },
+      { to: "/pricing", label: "Pricing", icon: Tag },
     ],
-
   },
   {
     label: "Account & Billing",
     items: [
-      { to: "/dashboard/billing", label: "Billing", icon: "account_balance_wallet" },
-      { to: "/dashboard/documents", label: "Documents", icon: "verified_user" },
-      { to: "/dashboard/profile", label: "Profile", icon: "person_pin" },
-      { to: "/dashboard/security", label: "Security", icon: "encrypted" },
-      { to: "/help", label: "Help Center", icon: "lightbulb" },
+      { to: "/dashboard/billing", label: "Billing", icon: Wallet },
+      { to: "/dashboard/documents", label: "Documents", icon: FileCheck },
+      { to: "/dashboard/profile", label: "Profile", icon: User },
+      { to: "/dashboard/security", label: "Security", icon: Lock },
+      { to: "/help", label: "Help Center", icon: Lightbulb },
     ],
   },
 ];
