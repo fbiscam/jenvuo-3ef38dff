@@ -152,7 +152,26 @@ function OpsPayments() {
     }
   }
 
+  async function copy(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied.");
+    } catch {
+      toast.error("Copy failed.");
+    }
+  }
+
+  const q = query.trim().toLowerCase();
+  const visible: Row[] = (rows ?? []).filter((r) =>
+    !q
+      ? true
+      : [r.email, r.user_email, r.user_id, r.id, r.tx_hash, r.promo_code, r.deposit_address]
+          .filter(Boolean)
+          .some((v) => String(v).toLowerCase().includes(q)),
+  );
+
   const input = "rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400";
+
 
   return (
     <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS}`}>
