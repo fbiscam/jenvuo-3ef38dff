@@ -1003,6 +1003,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           mode: manualMode ? "manual" : "auto",
           started_at: runStartedAt,
           min_conf: minConf,
+          news_reaction: newsContext,
           pairs_checked: workingPairs,
           pairs_configured: pairs,
           scan_batch_size: scanBatchSize,
