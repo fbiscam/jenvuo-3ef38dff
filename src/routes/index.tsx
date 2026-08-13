@@ -216,7 +216,7 @@ function HomePage() {
               <button type="button" className="inline-flex items-center gap-1 hover:text-zinc-900 focus:outline-none">
                 Tools <ChevronDown className="h-3.5 w-3.5" />
               </button>
-              <div className="invisible absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 bg-white opacity-0 transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <div className="absolute left-1/2 top-full z-50 w-44 -translate-x-1/2 bg-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">
                 <div className="mt-1 rounded-md border border-zinc-200 bg-white p-1 shadow-lg">
                   <Link to="/leads" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Leads</Link>
                   <Link to="/scam-check" className="block rounded px-3 py-2 text-[13px] hover:bg-zinc-100">Scam Check</Link>
