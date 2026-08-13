@@ -65,7 +65,7 @@ function SecurityPage() {
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="pl-1 text-base font-semibold">Trusted Devices</h2>
+        <h2 className="pl-1 text-base font-semibold">&nbsp;Trusted devices</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Browsers you've marked as trusted skip the 2FA step on sign-in.&nbsp;
         </p>
