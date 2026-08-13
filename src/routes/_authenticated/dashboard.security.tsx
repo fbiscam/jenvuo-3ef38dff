@@ -55,7 +55,7 @@ function SecurityPage() {
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="pl-1 text-base font-semibold">Two-Factor Authentication</h2>
+        <h2 className="pl-1 text-base font-semibold">&nbsp;Two-factor authentication</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Require a six-digit code from your authenticator app every time you sign in.
         </p>
