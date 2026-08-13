@@ -270,7 +270,7 @@ function Profile() {
 
 
       <section className="rounded-2xl border border-rose-200 bg-rose-50/40 p-6">
-        <h2 className="pl-1 text-base font-semibold text-rose-700">Danger zone</h2>
+        <h2 className="pl-1 text-base font-semibold text-rose-700">&nbsp;Danger zone</h2>
         <p className="mt-1 text-sm text-rose-600/80">Deleting your account is permanent and cannot be undone.</p>
         {!confirmDelete ? (
           <button onClick={() => setConfirmDelete(true)} className="mt-4 rounded-lg border border-rose-300 bg-white px-4 py-2 text-sm font-medium text-rose-700 hover:bg-rose-50">
