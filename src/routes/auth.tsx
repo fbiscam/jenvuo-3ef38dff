@@ -1065,17 +1065,6 @@ function AuthPage() {
                       </form>
                     ) : (
                       <form onSubmit={signUp} className="mt-4 space-y-3">
-                        <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 sm:px-3 py-2 sm:py-2.5 text-[11px] sm:text-[12px] md:text-[12.5px] leading-snug text-zinc-700 overflow-hidden">
-                          <span className="md:whitespace-nowrap block md:inline">
-                            <span className="font-semibold text-zinc-900">14 days of Pro, free.</span>{" "}
-                            $15 of scan credits, realtime alerts
-                            <br className="md:hidden" />{" "}
-                            and the full ICT engine — no card required.
-                          </span>
-                          <div className={`mt-1.5 text-[11.5px] text-zinc-500 ${MONO}`}>
-                            Trial ends {trialEndsLabel}
-                          </div>
-                        </div>
 
 
                         <div>
