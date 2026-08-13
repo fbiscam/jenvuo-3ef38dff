@@ -1812,6 +1812,42 @@ export type Database = {
         }
         Relationships: []
       }
+      news_event_notifications: {
+        Row: {
+          country: string | null
+          created_at: string
+          emails_enqueued: number
+          event_at: string | null
+          event_key: string
+          id: string
+          impact: string | null
+          recipients: number
+          title: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          emails_enqueued?: number
+          event_at?: string | null
+          event_key: string
+          id?: string
+          impact?: string | null
+          recipients?: number
+          title: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          emails_enqueued?: number
+          event_at?: string | null
+          event_key?: string
+          id?: string
+          impact?: string | null
+          recipients?: number
+          title?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string

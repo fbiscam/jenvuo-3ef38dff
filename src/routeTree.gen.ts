@@ -93,6 +93,7 @@ import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/publ
 import { Route as ApiPublicHooksReindexInsightsRouteImport } from './routes/api/public/hooks/reindex-insights'
 import { Route as ApiPublicHooksPaperTradeResolverRouteImport } from './routes/api/public/hooks/paper-trade-resolver'
 import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/api/public/hooks/notify-subscribers'
+import { Route as ApiPublicHooksNewsAlertsRouteImport } from './routes/api/public/hooks/news-alerts'
 import { Route as ApiPublicHooksMonthlyRetuneRouteImport } from './routes/api/public/hooks/monthly-retune'
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
@@ -551,6 +552,12 @@ const ApiPublicHooksNotifySubscribersRoute =
     path: '/api/public/hooks/notify-subscribers',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksNewsAlertsRoute =
+  ApiPublicHooksNewsAlertsRouteImport.update({
+    id: '/api/public/hooks/news-alerts',
+    path: '/api/public/hooks/news-alerts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksMonthlyRetuneRoute =
   ApiPublicHooksMonthlyRetuneRouteImport.update({
     id: '/api/public/hooks/monthly-retune',
@@ -733,6 +740,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/monthly-retune': typeof ApiPublicHooksMonthlyRetuneRoute
+  '/api/public/hooks/news-alerts': typeof ApiPublicHooksNewsAlertsRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
@@ -829,6 +837,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/monthly-retune': typeof ApiPublicHooksMonthlyRetuneRoute
+  '/api/public/hooks/news-alerts': typeof ApiPublicHooksNewsAlertsRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
@@ -932,6 +941,7 @@ export interface FileRoutesById {
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/monthly-retune': typeof ApiPublicHooksMonthlyRetuneRoute
+  '/api/public/hooks/news-alerts': typeof ApiPublicHooksNewsAlertsRoute
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
@@ -1035,6 +1045,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/monthly-retune'
+    | '/api/public/hooks/news-alerts'
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
@@ -1131,6 +1142,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/monthly-retune'
+    | '/api/public/hooks/news-alerts'
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
@@ -1233,6 +1245,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/monthly-retune'
+    | '/api/public/hooks/news-alerts'
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
@@ -1295,6 +1308,7 @@ export interface RootRouteChildren {
   ApiPublicHooksGenerateBriefRoute: typeof ApiPublicHooksGenerateBriefRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
   ApiPublicHooksMonthlyRetuneRoute: typeof ApiPublicHooksMonthlyRetuneRoute
+  ApiPublicHooksNewsAlertsRoute: typeof ApiPublicHooksNewsAlertsRoute
   ApiPublicHooksNotifySubscribersRoute: typeof ApiPublicHooksNotifySubscribersRoute
   ApiPublicHooksPaperTradeResolverRoute: typeof ApiPublicHooksPaperTradeResolverRoute
   ApiPublicHooksReindexInsightsRoute: typeof ApiPublicHooksReindexInsightsRoute
@@ -1899,6 +1913,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksNotifySubscribersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/news-alerts': {
+      id: '/api/public/hooks/news-alerts'
+      path: '/api/public/hooks/news-alerts'
+      fullPath: '/api/public/hooks/news-alerts'
+      preLoaderRoute: typeof ApiPublicHooksNewsAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/monthly-retune': {
       id: '/api/public/hooks/monthly-retune'
       path: '/api/public/hooks/monthly-retune'
@@ -2213,6 +2234,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksGenerateBriefRoute: ApiPublicHooksGenerateBriefRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
   ApiPublicHooksMonthlyRetuneRoute: ApiPublicHooksMonthlyRetuneRoute,
+  ApiPublicHooksNewsAlertsRoute: ApiPublicHooksNewsAlertsRoute,
   ApiPublicHooksNotifySubscribersRoute: ApiPublicHooksNotifySubscribersRoute,
   ApiPublicHooksPaperTradeResolverRoute: ApiPublicHooksPaperTradeResolverRoute,
   ApiPublicHooksReindexInsightsRoute: ApiPublicHooksReindexInsightsRoute,
