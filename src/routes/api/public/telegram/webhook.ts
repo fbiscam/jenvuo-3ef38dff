@@ -376,6 +376,44 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
           // Ack the button press so Telegram removes the loading spinner
           await tg(botToken, "answerCallbackQuery", { callback_query_id: cbq.id });
 
+          // --- Alert action buttons: Trade Done / Save Signal ---
+          if (cbData.startsWith("td:") || cbData.startsWith("sv:")) {
+            const alertId = cbData.slice(3);
+            try {
+              const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+              const { data: link } = await supabaseAdmin
+                .from("telegram_alert_links")
+                .select("user_id")
+                .eq("chat_id", String(cbChatId))
+                .maybeSingle();
+              if (!link?.user_id) {
+                await tg(botToken, "sendMessage", {
+                  chat_id: cbChatId,
+                  text: "🔒 This chat isn't linked to a Jenvu account yet. Type /help to link.",
+                });
+              } else {
+                const actions = await import("@/lib/telegram-signal-actions.server");
+                const result = cbData.startsWith("td:")
+                  ? await actions.telegramTradeDone(link.user_id as string, alertId)
+                  : await actions.telegramSaveSignal(link.user_id as string, alertId);
+                await tg(botToken, "sendMessage", {
+                  chat_id: cbChatId,
+                  text: result.message,
+                  parse_mode: "HTML",
+                  reply_to_message_id: cbq.message.message_id,
+                });
+              }
+            } catch (err) {
+              console.error("[telegram-webhook] alert action error", err);
+              await tg(botToken, "sendMessage", {
+                chat_id: cbChatId,
+                text: "⚠️ Action failed. Please try again in a moment.",
+              });
+            }
+            return Response.json({ ok: true });
+          }
+
+
           if (cbData.startsWith("scan:")) {
             const pair = cbData.slice(5).toUpperCase();
             try {
