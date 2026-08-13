@@ -866,7 +866,7 @@ function HomePage() {
 
 
       {/* COMPARISON */}
-      <section className="border-t border-zinc-100 bg-white/40">
+      <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <h2 className="text-left text-xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
             Why traders move to JENVU.
