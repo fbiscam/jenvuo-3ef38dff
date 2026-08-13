@@ -716,6 +716,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 confirmed_hit: true,
                 killzone_passed: killzonePassed,
                 cooldown_passed: true,
+                news_reaction: newsContext ?? null,
               },
               broadcast_alert_id: inserted.id,
               outcome: "pending",
