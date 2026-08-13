@@ -152,7 +152,6 @@ function Billing() {
 
   return (
     <div className="space-y-10">
-      <TrialBanner />
       {/* CURRENT PLAN */}
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
