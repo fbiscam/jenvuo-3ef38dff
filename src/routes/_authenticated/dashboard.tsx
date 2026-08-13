@@ -1056,8 +1056,22 @@ function DashboardLayout() {
             </div>
           </div>
 
-
-
+          <Link
+            to="/dashboard/profile"
+            className="group inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white py-1 pl-1 pr-3 transition hover:bg-zinc-50"
+            aria-label="Profile"
+            title={fullName || email || "Profile"}
+          >
+            <img
+              src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
+              alt={fullName || email || "Account avatar"}
+              className="h-7 w-7 rounded-full object-cover"
+              loading="lazy"
+            />
+            <span className="max-w-[140px] truncate text-[12px] font-medium text-zinc-700 group-hover:text-zinc-900">
+              {fullName || email || "Profile"}
+            </span>
+          </Link>
 
         </div>
 
@@ -1068,22 +1082,6 @@ function DashboardLayout() {
         <div className="-mt-2 flex items-start justify-between">
           <div />
           <div className="flex flex-col items-end gap-2">
-            <Link
-              to="/dashboard/profile"
-              className="group inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white py-1 pl-1 pr-3 transition hover:bg-zinc-50"
-              aria-label="Profile"
-              title={fullName || email || "Profile"}
-            >
-              <img
-                src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
-                alt={fullName || email || "Account avatar"}
-                className="h-7 w-7 rounded-full object-cover"
-                loading="lazy"
-              />
-              <span className="max-w-[140px] truncate text-[12px] font-medium text-zinc-700 group-hover:text-zinc-900">
-                {fullName || email || "Profile"}
-              </span>
-            </Link>
 
             <div className="flex items-center gap-2">
               <button
