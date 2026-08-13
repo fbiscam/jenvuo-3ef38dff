@@ -437,9 +437,15 @@ function PricingPage() {
                 <span className="text-xs text-zinc-500">wallet</span>
               </div>
               <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · ~{Math.floor(p.price / 0.2)} signals</div>
-              <Link to="/contact" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
-                Notify me
-              </Link>
+              {signedOut ? (
+                <Link to="/auth" search={{ mode: "signup" as const }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
+                  Buy Now
+                </Link>
+              ) : (
+                <Link to="/dashboard/pay" search={{ amount: p.price }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
+                  Buy Now
+                </Link>
+              )}
             </div>
           ))}
         </div>
