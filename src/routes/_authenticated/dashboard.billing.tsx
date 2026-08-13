@@ -157,7 +157,7 @@ function Billing() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="mt-2 flex items-center gap-3">
-              <h2 className="pl-1 mt-2 text-2xl font-semibold">&nbsp;{planLabel}</h2>
+              <h2 className="pl-1 mt-2 text-2xl font-semibold">&nbsp; {planLabel}</h2>
               {trial.active ? (
                 <span className="rounded-full border border-red-200 bg-white px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-red-600">
                   Trial · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"}
