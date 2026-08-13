@@ -23,7 +23,21 @@ export const PAIR_PRICE_RANGE: Record<string, [number, number]> = {
   XAUAUD: [700, 30_000],
   XAUCHF: [400, 20_000],
   XAUJPY: [100_000, 2_000_000],
+  // FX majors
+  EURUSD: [0.5, 2],
+  GBPUSD: [0.8, 2.5],
+  USDJPY: [50, 300],
+  AUDUSD: [0.3, 1.5],
+  USDCHF: [0.4, 2],
+  USDCAD: [0.7, 2.5],
+  // Other metals
+  XAGUSD: [5, 300],
+  XPTUSD: [300, 10_000],
+  // Crypto
+  BTCUSD: [1_000, 1_000_000],
+  ETHUSD: [50, 100_000],
 };
+
 
 export function isPriceScaleValid(pair: string, price: number): boolean {
   const range = PAIR_PRICE_RANGE[pair.toUpperCase()];
