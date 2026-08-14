@@ -104,6 +104,14 @@ async function fetchCandles(sym: string, from: number, to: number): Promise<Cand
 // Spot-scale gold klines from Binance gold tokens (5m). PAXG tracks spot
 // within ~$1; XAUT is the backup.
 async function fetchTokenCandles(symbol: string, from: number, to: number): Promise<Candles | null> {
+  const key = `bin:${symbol}:${Math.floor(from / 900)}:${Math.floor(to / 900)}`;
+  if (candleCache.has(key)) return candleCache.get(key) ?? null;
+  const out = await fetchTokenCandlesRaw(symbol, from, to);
+  candleCache.set(key, out);
+  return out;
+}
+
+async function fetchTokenCandlesRaw(symbol: string, from: number, to: number): Promise<Candles | null> {
   try {
     const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=5m&startTime=${from * 1000}&endTime=${to * 1000}&limit=1000`;
     const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
@@ -176,6 +184,9 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"
         );
+
+        // Fresh price cache each run so we never score against stale candles.
+        candleCache.clear();
 
         // Fetch pending paper trades older than 30 minutes so recent
         // ones still have time to reach a target.
