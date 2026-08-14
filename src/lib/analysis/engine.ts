@@ -397,12 +397,20 @@ export function buildTrade(
   }
 
 
+  // Cap the ticket size. A structural stop that lands slightly beyond the cap
+  // gets TIGHTENED to the cap (keeps the signal, keeps SL/TP readable); only a
+  // wildly wide structure (> 1.8x the cap) is rejected outright.
   const maxRisk = lastPrice * profile.maxRiskPct;
-  if (risk > maxRisk) {
+  if (risk > maxRisk * 1.8) {
     return {
       direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
       reason: `Risk from entry to protected stop is ${(risk / lastPrice * 100).toFixed(2)}%, too wide for ${assetKind}. Wait for a tighter re-entry.`,
     };
+  }
+  if (risk > maxRisk) {
+    sl = dir === "BUY" ? entry - maxRisk : entry + maxRisk;
+    risk = maxRisk;
+    notes.push(`SL tightened to max ticket risk (${(profile.maxRiskPct * 100).toFixed(2)}% of price)`);
   }
 
   // TP1/2/3 based on R-multiples first, so partials always exist.
