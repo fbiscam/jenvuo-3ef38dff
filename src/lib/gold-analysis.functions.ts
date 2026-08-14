@@ -3604,4 +3604,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// testkrlo achsa sa ya issue again na aya aur jab lovable ma account log in hota ha to scan shi hota ha lekin jab outside kisi aur chrome ma kara to scan shi nhi hota isko ach sa theek kro
+// Fix the scan flow so it works when I open my account in a different Chrome profile, not only inside the current logged-in Lovable session.
