@@ -94,6 +94,7 @@ import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/publi
 import { Route as ApiPublicTelegramAdminRouteImport } from './routes/api/public/telegram/admin'
 import { Route as ApiPublicHooksSignalReversalMonitorRouteImport } from './routes/api/public/hooks/signal-reversal-monitor'
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
+import { Route as ApiPublicHooksScanDebugRouteImport } from './routes/api/public/hooks/scan-debug'
 import { Route as ApiPublicHooksReindexInsightsRouteImport } from './routes/api/public/hooks/reindex-insights'
 import { Route as ApiPublicHooksPaperTradeResolverRouteImport } from './routes/api/public/hooks/paper-trade-resolver'
 import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/api/public/hooks/notify-subscribers'
@@ -559,6 +560,11 @@ const ApiPublicHooksScanSignalsRoute =
     path: '/api/public/hooks/scan-signals',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksScanDebugRoute = ApiPublicHooksScanDebugRouteImport.update({
+  id: '/api/public/hooks/scan-debug',
+  path: '/api/public/hooks/scan-debug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksReindexInsightsRoute =
   ApiPublicHooksReindexInsightsRouteImport.update({
     id: '/api/public/hooks/reindex-insights',
@@ -773,6 +779,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
+  '/api/public/hooks/scan-debug': typeof ApiPublicHooksScanDebugRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/telegram/admin': typeof ApiPublicTelegramAdminRoute
@@ -874,6 +881,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
+  '/api/public/hooks/scan-debug': typeof ApiPublicHooksScanDebugRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/telegram/admin': typeof ApiPublicTelegramAdminRoute
@@ -982,6 +990,7 @@ export interface FileRoutesById {
   '/api/public/hooks/notify-subscribers': typeof ApiPublicHooksNotifySubscribersRoute
   '/api/public/hooks/paper-trade-resolver': typeof ApiPublicHooksPaperTradeResolverRoute
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
+  '/api/public/hooks/scan-debug': typeof ApiPublicHooksScanDebugRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/telegram/admin': typeof ApiPublicTelegramAdminRoute
@@ -1090,6 +1099,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
+    | '/api/public/hooks/scan-debug'
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/telegram/admin'
@@ -1191,6 +1201,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
+    | '/api/public/hooks/scan-debug'
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/telegram/admin'
@@ -1298,6 +1309,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/notify-subscribers'
     | '/api/public/hooks/paper-trade-resolver'
     | '/api/public/hooks/reindex-insights'
+    | '/api/public/hooks/scan-debug'
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/telegram/admin'
@@ -1363,6 +1375,7 @@ export interface RootRouteChildren {
   ApiPublicHooksNotifySubscribersRoute: typeof ApiPublicHooksNotifySubscribersRoute
   ApiPublicHooksPaperTradeResolverRoute: typeof ApiPublicHooksPaperTradeResolverRoute
   ApiPublicHooksReindexInsightsRoute: typeof ApiPublicHooksReindexInsightsRoute
+  ApiPublicHooksScanDebugRoute: typeof ApiPublicHooksScanDebugRoute
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   ApiPublicHooksSignalReversalMonitorRoute: typeof ApiPublicHooksSignalReversalMonitorRoute
   ApiPublicTelegramAdminRoute: typeof ApiPublicTelegramAdminRoute
@@ -1971,6 +1984,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksScanSignalsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/scan-debug': {
+      id: '/api/public/hooks/scan-debug'
+      path: '/api/public/hooks/scan-debug'
+      fullPath: '/api/public/hooks/scan-debug'
+      preLoaderRoute: typeof ApiPublicHooksScanDebugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/reindex-insights': {
       id: '/api/public/hooks/reindex-insights'
       path: '/api/public/hooks/reindex-insights'
@@ -2323,6 +2343,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksNotifySubscribersRoute: ApiPublicHooksNotifySubscribersRoute,
   ApiPublicHooksPaperTradeResolverRoute: ApiPublicHooksPaperTradeResolverRoute,
   ApiPublicHooksReindexInsightsRoute: ApiPublicHooksReindexInsightsRoute,
+  ApiPublicHooksScanDebugRoute: ApiPublicHooksScanDebugRoute,
   ApiPublicHooksScanSignalsRoute: ApiPublicHooksScanSignalsRoute,
   ApiPublicHooksSignalReversalMonitorRoute:
     ApiPublicHooksSignalReversalMonitorRoute,
