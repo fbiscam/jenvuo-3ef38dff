@@ -100,6 +100,71 @@ async function fetchCandles(sym: string, from: number, to: number): Promise<Cand
   return out;
 }
 
+// Backup FX source. Yahoo rate-limits our egress IPs hard, and when the FX
+// leg failed the whole cross-pair ticket stayed "pending" forever (that is
+// why XAUCHF / XAUJPY tickets never got a result). fxratesapi serves free
+// hourly closes; we forward-fill them onto the 5m gold buckets.
+const FX_FALLBACK: Record<string, { code: string; invert: boolean }> = {
+  "EURUSD=X": { code: "EUR", invert: true },
+  "GBPUSD=X": { code: "GBP", invert: true },
+  "AUDUSD=X": { code: "AUD", invert: true },
+  "USDJPY=X": { code: "JPY", invert: false },
+  "USDCHF=X": { code: "CHF", invert: false },
+};
+
+async function fetchFxFallback(sym: string, from: number, to: number): Promise<Candles | null> {
+  const spec = FX_FALLBACK[sym];
+  if (!spec) return null;
+  try {
+    const url =
+      `https://api.fxratesapi.com/timeseries?start_date=${new Date(from * 1000).toISOString()}` +
+      `&end_date=${new Date(to * 1000).toISOString()}&base=USD&currencies=${spec.code}&accuracy=hour&resolution=1h`;
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      success?: boolean;
+      rates?: Record<string, Record<string, number>>;
+    };
+    if (!json.success || !json.rates) return null;
+    const hourly = Object.entries(json.rates)
+      .map(([iso, r]) => {
+        const raw = r?.[spec.code];
+        if (!Number.isFinite(raw) || !raw) return null;
+        const rate = spec.invert ? 1 / raw : raw;
+        return { ts: Math.floor(new Date(iso).getTime() / 1000), rate };
+      })
+      .filter((x): x is { ts: number; rate: number } => x !== null)
+      .sort((a, b) => a.ts - b.ts);
+    if (!hourly.length) return null;
+
+    // Forward-fill each hourly close across its twelve 5m buckets.
+    const ts: number[] = [];
+    const highs: number[] = [];
+    const lows: number[] = [];
+    let idx = 0;
+    for (let t = from - (from % 300); t <= to; t += 300) {
+      while (idx + 1 < hourly.length && hourly[idx + 1].ts <= t) idx++;
+      const rate = hourly[idx].rate;
+      ts.push(t);
+      highs.push(rate);
+      lows.push(rate);
+    }
+    return { ts, highs, lows };
+  } catch {
+    return null;
+  }
+}
+
+/** FX leg with Yahoo primary and hourly fallback. */
+async function fetchFxCandles(sym: string, from: number, to: number): Promise<Candles | null> {
+  const key = `fx:${sym}:${Math.floor(from / 900)}:${Math.floor(to / 900)}`;
+  if (candleCache.has(key)) return candleCache.get(key) ?? null;
+  let out = await fetchCandles(sym, from, to);
+  if (!out || !out.ts.length) out = await fetchFxFallback(sym, from, to);
+  candleCache.set(key, out);
+  return out;
+}
+
 
 // Spot-scale gold klines from Binance gold tokens (5m). PAXG tracks spot
 // within ~$1; XAUT is the backup.
