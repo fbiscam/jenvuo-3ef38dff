@@ -103,6 +103,14 @@ export function resolveTradeOutcome(input: ResolveInput): ResolveResult {
 
   let entryHit = false;
   let maxFavorableR = 0;
+  // Set once price runs TP1: half booked, stop trails to breakeven.
+  let tp1Hit = false;
+
+  const tp1Price = isBuy ? entry + riskDist * TP1_R : entry - riskDist * TP1_R;
+  const bankedR = TP1_SIZE * TP1_R;
+  // Breakeven exit is entry itself; allow a hair of slippage tolerance so a
+  // wick that merely kisses entry does not close the runner.
+  const beTol = Math.max(riskDist * 0.01, entry * 0.00002);
 
   for (const c of input.candles) {
     const hi = c.high;
@@ -114,14 +122,47 @@ export function resolveTradeOutcome(input: ResolveInput): ResolveResult {
       else continue;
     }
 
-    const touchedSL = isBuy ? lo <= sl : hi >= sl;
     const touchedTP = isBuy ? hi >= tp : lo <= tp;
+    const touchedTP1 = isBuy ? hi >= tp1Price : lo <= tp1Price;
+    // Before TP1 the hard stop is SL; after TP1 the stop sits at breakeven.
+    const stopPrice = tp1Hit ? entry : sl;
+    const touchedStop = tp1Hit
+      ? (isBuy ? lo <= entry - beTol : hi >= entry + beTol)
+      : (isBuy ? lo <= sl : hi >= sl);
+    void stopPrice;
 
     const excR = isBuy ? (hi - entry) / riskDist : (entry - lo) / riskDist;
     if (excR > maxFavorableR) maxFavorableR = excR;
 
-    // Same-candle ambiguity resolves conservatively as a loss.
-    if (touchedSL) {
+    // Full target beats everything on the same candle once TP1 is banked.
+    if (touchedTP && (tp1Hit || !touchedStop)) {
+      const rewardR = Math.abs(tp - entry) / riskDist;
+      const realized = tp1Hit
+        ? bankedR + (1 - TP1_SIZE) * rewardR
+        : bankedR + (1 - TP1_SIZE) * rewardR;
+      return {
+        outcome: "win",
+        realizedR: Number(realized.toFixed(3)),
+        entryHit: true,
+        maxFavorableR: Math.max(maxFavorableR, rewardR),
+        reason: "tp_hit",
+        method: RESOLUTION_METHOD,
+      };
+    }
+
+    if (touchedStop) {
+      if (tp1Hit) {
+        // Runner stopped at breakeven — the TP1 partial is still real money.
+        return {
+          outcome: "win",
+          realizedR: Number(bankedR.toFixed(3)),
+          entryHit: true,
+          maxFavorableR,
+          reason: "tp1_banked_breakeven_stop",
+          method: RESOLUTION_METHOD,
+        };
+      }
+      // Same-candle ambiguity resolves conservatively as a loss.
       return {
         outcome: "loss",
         realizedR: -1,
@@ -131,17 +172,8 @@ export function resolveTradeOutcome(input: ResolveInput): ResolveResult {
         method: RESOLUTION_METHOD,
       };
     }
-    if (touchedTP) {
-      const rewardR = Math.abs(tp - entry) / riskDist;
-      return {
-        outcome: "win",
-        realizedR: Number(rewardR.toFixed(3)),
-        entryHit: true,
-        maxFavorableR: Math.max(maxFavorableR, rewardR),
-        reason: "tp_hit",
-        method: RESOLUTION_METHOD,
-      };
-    }
+
+    if (!tp1Hit && touchedTP1) tp1Hit = true;
   }
 
   if (input.ageHours < windowH) {
@@ -150,7 +182,11 @@ export function resolveTradeOutcome(input: ResolveInput): ResolveResult {
       realizedR: null,
       entryHit,
       maxFavorableR,
-      reason: entryHit ? "entered_still_open" : "awaiting_entry",
+      reason: !entryHit
+        ? "awaiting_entry"
+        : tp1Hit
+          ? "tp1_banked_runner_open"
+          : "entered_still_open",
       method: RESOLUTION_METHOD,
     };
   }
@@ -166,6 +202,18 @@ export function resolveTradeOutcome(input: ResolveInput): ResolveResult {
     };
   }
 
+  if (tp1Hit) {
+    // Window closed with the runner still alive: book the partial, flat the rest.
+    return {
+      outcome: "win",
+      realizedR: Number(bankedR.toFixed(3)),
+      entryHit: true,
+      maxFavorableR,
+      reason: "tp1_banked_window_closed",
+      method: RESOLUTION_METHOD,
+    };
+  }
+
   return {
     outcome: "expired",
     realizedR: Number(Math.max(-1, Math.min(1, maxFavorableR)).toFixed(3)),
@@ -175,6 +223,7 @@ export function resolveTradeOutcome(input: ResolveInput): ResolveResult {
     method: RESOLUTION_METHOD,
   };
 }
+
 
 /** Only true TP/SL results count toward win rate. */
 export function countsTowardWinRate(outcome: string | null | undefined): boolean {
