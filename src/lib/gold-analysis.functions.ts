@@ -12,7 +12,8 @@ import {
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
-  MODEL_CHAIN, SENIOR_REVIEW_CHAIN, MACRO_CONTEXT_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
+  MODEL_CHAIN, SENIOR_REVIEW_CHAIN, MACRO_CONTEXT_CHAIN, CROSS_CHECK_CHAIN,
+  getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
 } from "@/lib/ai-gateway";
 import { MIN_CONFIDENCE } from "@/lib/signals/qualification";
 
