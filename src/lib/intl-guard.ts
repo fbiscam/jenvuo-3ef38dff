@@ -61,12 +61,13 @@ export function installIntlGuard(): void {
       | (new (locales?: unknown, options?: unknown) => unknown)
       | undefined;
     if (typeof Ctor !== "function") continue;
+    const Base = Ctor as new (locales?: unknown, options?: unknown) => unknown;
     const Patched = function (this: unknown, locales?: unknown, options?: unknown) {
       const loc = hasLocale(locales) ? locales : FALLBACK;
       try {
-        return new (Ctor as never)(loc as never, options as never);
+        return new Base(loc, options);
       } catch {
-        return new (Ctor as never)(FALLBACK as never, options as never);
+        return new Base(FALLBACK, options);
       }
     } as unknown as typeof Ctor;
     (Patched as unknown as Record<string, unknown>).prototype = (Ctor as unknown as Record<string, unknown>).prototype;
