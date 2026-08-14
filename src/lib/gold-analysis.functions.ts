@@ -3602,4 +3602,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// ICT/SMC Engine + Bluesmind GPT-5.2 Chat for narration and review. Nvidia API removed.
+// ICT/SMC Engine + Bluesmind GPT-5.2 Chat. Confidence floors at 30/25% (single/multi-veto). 50% baseline restored.
