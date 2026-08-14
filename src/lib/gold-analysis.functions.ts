@@ -1930,7 +1930,7 @@ function buildFeedFallbackPlan(args: {
       sl: 0,
       tp: 0,
       rr: 0,
-      confidence: 25,
+      confidence: 15,
       summary: `WAIT on ${inst.display}: ${reasonText}`,
       invalidation: "No trade is valid until real-time candles are restored.",
     },
@@ -1940,7 +1940,7 @@ function buildFeedFallbackPlan(args: {
     multiTf: ["4H", "1H", "15M", "5M"].map((tf) => ({ tf: tf as TfBias["tf"], bias: "neutral", score: 50, label: "Feed fallback" })),
     alignmentScore: 50,
     alignmentLabel: "Feed fallback / Waiting",
-    setupScore: 25,
+    setupScore: 15,
     setupGrade: "C",
     setupChecks: [
       { key: "live_quote", label: "Live quote available", pass: true, reason: priceText },
