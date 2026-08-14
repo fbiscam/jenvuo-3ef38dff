@@ -3602,4 +3602,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// ICT/SMC Engine + Bluesmind GPT-5.2 Chat. Confidence floors at 30/25% (single/multi-veto). 50% baseline restored.
+// ICT/SMC Engine + Bluesmind GPT-5.2 Chat. Confidence floors at 49/45% (single/multi-veto) to maintain the ~50% baseline.
