@@ -2685,7 +2685,7 @@ RANGE ${swingLow.toFixed(dec)}–${swingHigh.toFixed(dec)} | EQ ${equilibrium.to
 ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | iFVG ${ifvgs.length}`;
 
         const xRes = await callChatCompletion({
-          models: [...DEEPSEEK_REVIEW_CHAIN],
+          models: ["bmind/gpt-5.2-chat"],
           messages: [
             { role: "system", content: xSystem },
             { role: "user", content: xUser },
@@ -2809,7 +2809,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
         // Senior review — best-available mode.
         // Uses SENIOR_REVIEW_CHAIN (best → most reliable) from ai-gateway.
         // Sequential fallback: strongest live model wins; if all throttled, review skips.
-        const seniorChain = SENIOR_REVIEW_CHAIN;
+        const seniorChain = ["bmind/gpt-5.2-chat"];
 
         let reviewResult: { content: string; model: string; usage: any } | null = null;
         let reviewError: any = null;
@@ -3602,4 +3602,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// yar signal desk ma koyi bhi pair shi trha analyze nhi ho rha ha bar bar 35% confidence show kr rha ha isko theek kro
+// ICT/SMC Engine + Bluesmind GPT-5.2 Chat for narration and review. Nvidia API removed.
