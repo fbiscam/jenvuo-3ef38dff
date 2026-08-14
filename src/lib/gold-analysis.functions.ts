@@ -2304,9 +2304,15 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       const mainDelta = htf[htf.length - 1].c - htf[Math.max(0, htf.length - 6)].c;
       // Gold inverse; USD-quote forex depends — for USDXXX same direction, for XXXUSD inverse
       const inverse = inst.kind === "metal" || /^[A-Z]{3}USD$/i.test(inst.raw || "");
-      dxyConfirms = inverse
-        ? (dxyDelta > 0 && mainDelta < 0) || (dxyDelta < 0 && mainDelta > 0)
-        : (dxyDelta > 0 && mainDelta > 0) || (dxyDelta < 0 && mainDelta < 0);
+      // If either market is flat (delta=0), we cannot confirm OR contradict.
+      // Set to null so the engine ignores it instead of triggering a hard veto.
+      if (Math.abs(dxyDelta) < 1e-8 || Math.abs(mainDelta) < 1e-8) {
+        dxyConfirms = null;
+      } else {
+        dxyConfirms = inverse
+          ? (dxyDelta > 0 && mainDelta < 0) || (dxyDelta < 0 && mainDelta > 0)
+          : (dxyDelta > 0 && mainDelta > 0) || (dxyDelta < 0 && mainDelta < 0);
+      }
     }
 
     // SMT divergence — same signal but window-based (checks timing of extremes)
