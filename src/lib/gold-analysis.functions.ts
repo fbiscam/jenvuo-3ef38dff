@@ -3601,4 +3601,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// acha ab check kro kisi bhi account par koyi bhi issue na aya manual scan shi analyze ho khi bhi login ho account
+// manual scan nhi ho rha ha shi trha issue arha ha hr account ma hrdafa confidence 35% show krta ha hr pair ma isko theek kro acha sa
