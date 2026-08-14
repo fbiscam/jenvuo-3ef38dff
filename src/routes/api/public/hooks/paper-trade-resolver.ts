@@ -41,9 +41,25 @@ const PAIR_SPECS: Record<string, PairSpec> = {
 
 type Candles = { ts: number[]; highs: number[]; lows: number[] };
 
-async function fetchCandles(sym: string, from: number, to: number): Promise<Candles | null> {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?period1=${from}&period2=${to}&interval=5m`;
-  const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+// Per-run cache: a single pass resolves many trades that share the same FX
+// leg (USDCHF, EURUSD ...). Without this we hammered Yahoo once per trade and
+// got rate-limited, which left every cross pair stuck on "pending" forever.
+const candleCache = new Map<string, Candles | null>();
+
+async function fetchYahooOnce(
+  host: string,
+  sym: string,
+  from: number,
+  to: number,
+): Promise<Candles | null> {
+  const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?period1=${from}&period2=${to}&interval=5m`;
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+      Accept: "application/json",
+    },
+  });
   if (!res.ok) return null;
   const json = (await res.json()) as {
     chart: {
@@ -58,8 +74,32 @@ async function fetchCandles(sym: string, from: number, to: number): Promise<Cand
   const q = r?.indicators?.quote?.[0];
   const highs = q?.high ?? [];
   const lows = q?.low ?? [];
+  if (!ts.length) return null;
   return { ts, highs, lows };
 }
+
+async function fetchCandles(sym: string, from: number, to: number): Promise<Candles | null> {
+  // Bucket the window so trades fired minutes apart still share a cache key.
+  const key = `${sym}:${Math.floor(from / 900)}:${Math.floor(to / 900)}`;
+  if (candleCache.has(key)) return candleCache.get(key) ?? null;
+
+  const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
+  let out: Candles | null = null;
+  for (let attempt = 0; attempt < hosts.length * 2 && !out; attempt++) {
+    const host = hosts[attempt % hosts.length];
+    try {
+      out = await fetchYahooOnce(host, sym, from, to);
+    } catch {
+      out = null;
+    }
+    if (!out && attempt < hosts.length * 2 - 1) {
+      await new Promise((r) => setTimeout(r, 250 * (attempt + 1)));
+    }
+  }
+  candleCache.set(key, out);
+  return out;
+}
+
 
 // Spot-scale gold klines from Binance gold tokens (5m). PAXG tracks spot
 // within ~$1; XAUT is the backup.
