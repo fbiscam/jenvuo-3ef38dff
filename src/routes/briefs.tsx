@@ -30,7 +30,23 @@ export const Route = createFileRoute("/briefs")({
         content: "Audio briefs on gold delivered every killzone by Jenvu AI.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://jenvu.com/briefs" },
       { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://jenvu.com/briefs" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Daily Killzone Briefs",
+          description:
+            "Institutional-grade audio briefs on gold for the London, New York, and Asia killzones.",
+          url: "https://jenvu.com/briefs",
+          isPartOf: { "@type": "WebSite", name: "Jenvu", url: "https://jenvu.com/" },
+        }),
+      },
     ],
   }),
   errorComponent: ({ error, reset }) => (

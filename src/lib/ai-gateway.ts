@@ -404,13 +404,12 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // hops to GPT-5.2 Chat.
 
 export const MODEL_CHAIN = {
-  intent: ["bmind/gpt-5.5", "bmind/gpt-5-mini", "bmind/gpt-5.2-chat", "bmind/gpt-4o-mini"],
+  intent: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
   narration: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
   seniorReview: [
     "bmind/gpt-5.5",
     "bmind/gpt-5.2-chat",
     "bmind/gpt-5-mini",
-    "bmind/gpt-4.1-mini",
     "bmind/gpt-4o-mini",
   ],
   macroContext: [
@@ -443,4 +442,24 @@ export const SENIOR_REVIEW_CHAIN = [
 
 
 
+
+
+// -------- Stage 2: DeepSeek V4 SMC review chain ----------------------------
+// A SECOND opinion from a DIFFERENT model family than the GPT senior review,
+// so the desk never relies on one vendor's bias. Primary is DeepSeek V4 on the
+// NVIDIA Integrate API (`nvapi/…`, verified routable Aug 2026) — Bluesminds'
+// own deepseek-v4-* ids are end-of-life, so they are not used. Fallbacks stay
+// on GLM / Nemotron so the stage still answers if NVIDIA is throttled.
+// This stage is ENRICHMENT ONLY — it can agree (small confidence lift) or
+// flag a risk note, but it can never veto or downgrade, so alert volume
+// stays exactly the same as before.
+export const DEEPSEEK_REVIEW_CHAIN = [
+  "nvapi/deepseek-ai/deepseek-v4-flash-0731",
+  "bmind/z-ai/glm-5.2",
+  "bmind/nvidia/nemotron-3-super-120b-a12b",
+  "bmind/gpt-5.2-chat",
+] as const;
+
+/** @deprecated legacy alias — use DEEPSEEK_REVIEW_CHAIN */
+export const CROSS_CHECK_CHAIN = DEEPSEEK_REVIEW_CHAIN;
 

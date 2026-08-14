@@ -260,14 +260,15 @@ const RISK_PROFILE: Record<
     maxRiskPct: number;
   }
 > = {
-  crypto: { pctBuffer: 0.0025, minRiskPct: 0.0030, atrMult: 0.90, maxDistPct: 0.0120, entryWindowPct: 0.0040, maxRiskPct: 0.0250 },
-  // Metals widened after live review: 0.18% stops on gold sat inside normal
-  // NY-session noise, so post-liquidity-grab entries were getting wicked out
-  // before the intended leg. ~0.35% min risk ≈ 1.1x ATR on XAU/USD.
-  metal:  { pctBuffer: 0.0020, minRiskPct: 0.0035, atrMult: 1.10, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0150 },
-  forex:  { pctBuffer: 0.0005, minRiskPct: 0.0008, atrMult: 0.45, maxDistPct: 0.0035, entryWindowPct: 0.0015, maxRiskPct: 0.0080 },
-  index:  { pctBuffer: 0.0010, minRiskPct: 0.0015, atrMult: 0.65, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0150 },
-  stock:  { pctBuffer: 0.0015, minRiskPct: 0.0020, atrMult: 0.65, maxDistPct: 0.0080, entryWindowPct: 0.0030, maxRiskPct: 0.0180 },
+  crypto: { pctBuffer: 0.0020, minRiskPct: 0.0025, atrMult: 0.70, maxDistPct: 0.0120, entryWindowPct: 0.0040, maxRiskPct: 0.0140 },
+  // Metals: live tickets were coming out with 1.0-1.25% stops (≈ $50 on gold)
+  // and 3R targets ≈ $150 — unusable size for retail accounts. Tightened so a
+  // normal XAU ticket sits around 0.25-0.35% risk (≈ $12-$16) and the 3R target
+  // stays under ~1.1%. Still ≈ 0.7x ATR, so it clears routine session noise.
+  metal:  { pctBuffer: 0.0012, minRiskPct: 0.0022, atrMult: 0.70, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0055 },
+  forex:  { pctBuffer: 0.0004, minRiskPct: 0.0007, atrMult: 0.40, maxDistPct: 0.0035, entryWindowPct: 0.0015, maxRiskPct: 0.0045 },
+  index:  { pctBuffer: 0.0008, minRiskPct: 0.0012, atrMult: 0.50, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0080 },
+  stock:  { pctBuffer: 0.0012, minRiskPct: 0.0018, atrMult: 0.55, maxDistPct: 0.0080, entryWindowPct: 0.0030, maxRiskPct: 0.0110 },
 
 };
 
@@ -396,12 +397,20 @@ export function buildTrade(
   }
 
 
+  // Cap the ticket size. A structural stop that lands slightly beyond the cap
+  // gets TIGHTENED to the cap (keeps the signal, keeps SL/TP readable); only a
+  // wildly wide structure (> 1.8x the cap) is rejected outright.
   const maxRisk = lastPrice * profile.maxRiskPct;
-  if (risk > maxRisk) {
+  if (risk > maxRisk * 1.8) {
     return {
       direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
       reason: `Risk from entry to protected stop is ${(risk / lastPrice * 100).toFixed(2)}%, too wide for ${assetKind}. Wait for a tighter re-entry.`,
     };
+  }
+  if (risk > maxRisk) {
+    sl = dir === "BUY" ? entry - maxRisk : entry + maxRisk;
+    risk = maxRisk;
+    notes.push(`SL tightened to max ticket risk (${(profile.maxRiskPct * 100).toFixed(2)}% of price)`);
   }
 
   // TP1/2/3 based on R-multiples first, so partials always exist.
@@ -695,9 +704,9 @@ export function scoreSetup(args: {
   // Vetoes: single = soft (-8), multi (2+) = harsh (-15 each). Prevents a lone
   // false-positive gate from killing an otherwise strong setup.
   if (vetos.length === 1) {
-    score = Math.max(35, score - 8);
+    score = Math.max(38, score - 8);
   } else if (vetos.length >= 2) {
-    score = Math.max(25, score - vetos.length * 15);
+    score = Math.max(28, score - vetos.length * 15);
   }
 
   // Grade thresholds — A reserved for genuinely high-conviction setups

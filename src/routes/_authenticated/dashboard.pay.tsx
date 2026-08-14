@@ -33,6 +33,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/pay")({
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { amount?: number } => {
+    const raw = Number(search['amount']);
+    if (!Number.isFinite(raw) || raw <= 0) return {};
+    return { amount: Math.min(1000, Math.round(raw * 100) / 100) };
+  },
   component: PayPage,
 });
 
@@ -58,8 +63,13 @@ function PayPage() {
   const cancelFn = useServerFn(cancelOrder);
   const redeemFn = useServerFn(redeemFreeCode);
 
-  const [amount, setAmount] = useState<number>(25);
-  const [custom, setCustom] = useState("");
+  const { amount: presetFromUrl } = Route.useSearch();
+  const [amount, setAmount] = useState<number>(
+    presetFromUrl && PRESET_AMOUNTS.includes(presetFromUrl) ? presetFromUrl : 25,
+  );
+  const [custom, setCustom] = useState(
+    presetFromUrl && !PRESET_AMOUNTS.includes(presetFromUrl) ? String(presetFromUrl) : "",
+  );
   const [network, setNetwork] = useState<NetworkId>("trc20");
   const [code, setCode] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -161,7 +171,7 @@ function PayPage() {
       <div className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 sm:p-8">
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-semibold text-black">Add funds</h1>
+            <h1 className="text-3xl font-semibold text-black">&nbsp;Add funds</h1>
             <p className="mt-2 max-w-md text-sm text-black/60">
               Send USDT on Tron, BNB Smart Chain or Ethereum — credits land in your scan wallet right after on-chain verification.
             </p>
@@ -174,7 +184,7 @@ function PayPage() {
             </div>
             <Link
               to="/dashboard/billing"
-              className="rounded-xl border border-black/10 bg-black/5 px-3.5 py-2 text-sm text-black/80 transition hover:bg-black/10"
+              className="rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-sm font-medium text-black shadow-sm transition hover:bg-zinc-50"
             >
               Billing
             </Link>
@@ -225,11 +235,6 @@ function PayPage() {
                       <NetworkIcon id={n.id} className="h-8 w-8" />
                       <UsdtIcon className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full ring-2 ring-white" />
                     </span>
-                    {active && (
-                      <span className="ml-auto rounded-full border border-black/10 bg-white px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-black">
-                        Selected
-                      </span>
-                    )}
                   </div>
                   <div className="mt-3 text-sm font-medium text-zinc-900">{n.label}</div>
                   <div className="mt-0.5 text-[12px] text-zinc-500">{n.note}</div>
@@ -264,7 +269,7 @@ function PayPage() {
             )}
           </div>
 
-          <div className="mt-7 flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-zinc-50 p-5">
+          <div className="mt-7 flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-white p-5">
             <div>
               <div className="flex items-center gap-2">
                 <UsdtIcon className="h-7 w-7" />
@@ -293,7 +298,7 @@ function PayPage() {
                 <UsdtIcon className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full ring-2 ring-white" />
               </span>
               <div>
-                <div className="text-[12px] uppercase tracking-[0.16em] text-zinc-400">{net.chain}</div>
+                
                 <div className="mt-0.5 text-2xl font-semibold text-zinc-900">
                   {Number(order.pay_amount_usd).toFixed(2)} USDT
                 </div>
@@ -303,21 +308,15 @@ function PayPage() {
               </div>
             </div>
             {order.status === "pending" && (
-              <div className="rounded-2xl bg-gradient-to-br from-zinc-950 to-zinc-800 px-5 py-3 text-center text-white">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-white/50">Time left</div>
-                <div className="font-mono text-2xl tabular-nums">{mm}:{ss}</div>
+              <div className="rounded-2xl border border-black/10 bg-white px-5 py-3 text-center text-black">
+                <div className="text-[10px] uppercase tracking-[0.2em] text-black/60">Time left</div>
+                <div className="font-mono text-2xl tabular-nums text-red-600">{mm}:{ss}</div>
               </div>
             )}
           </div>
 
 
-          <div className="mt-5 grid gap-5 sm:grid-cols-[160px_1fr]">
-            <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(order.deposit_address)}`}
-              alt={`${net.chain} deposit address QR code`}
-              className="h-40 w-40 rounded-xl border border-zinc-200 bg-white p-2"
-              loading="lazy"
-            />
+          <div className="mt-5 space-y-5">
             <div>
               <div className="text-[13px] text-zinc-500">Deposit address ({net.label})</div>
               <div className="mt-1 flex items-center gap-2">
@@ -390,7 +389,7 @@ function PayPage() {
       )}
 
       <section className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-24px_rgba(0,0,0,0.25)]">
-        <h2 className="text-[15px] font-semibold text-zinc-900">Payment history</h2>
+        <h2 className="text-[15px] font-semibold text-zinc-900">&nbsp; Payment history</h2>
         {orders.length === 0 ? (
           <p className="mt-2 text-[13px] text-zinc-500">No payments yet.</p>
         ) : (
