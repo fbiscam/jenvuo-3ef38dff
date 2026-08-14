@@ -27,7 +27,7 @@ import {
 //   div  → XAU/foreign = spot / fx  (EURUSD, GBPUSD, AUDUSD)
 //   mul  → XAU/foreign = spot * fx  (USDJPY, USDCHF)
 //   none → XAUUSD, use spot directly
-type PairSpec = { fx?: string; op: "none" | "mul" | "div" };
+type PairSpec = { fx?: string; op: "none" | "mul" | "div" | "direct"; yahoo?: string };
 const PAIR_SPECS: Record<string, PairSpec> = {
   XAUUSD: { op: "none" },
   XAUEUR: { fx: "EURUSD=X", op: "div" },
@@ -35,6 +35,15 @@ const PAIR_SPECS: Record<string, PairSpec> = {
   XAUJPY: { fx: "USDJPY=X", op: "mul" },
   XAUAUD: { fx: "AUDUSD=X", op: "div" },
   XAUCHF: { fx: "USDCHF=X", op: "mul" },
+  // Non-gold tickets are priced straight off their own feed.
+  EURUSD: { op: "direct", yahoo: "EURUSD=X" },
+  GBPUSD: { op: "direct", yahoo: "GBPUSD=X" },
+  AUDUSD: { op: "direct", yahoo: "AUDUSD=X" },
+  USDJPY: { op: "direct", yahoo: "USDJPY=X" },
+  USDCHF: { op: "direct", yahoo: "USDCHF=X" },
+  NAS100: { op: "direct", yahoo: "^NDX" },
+  US30: { op: "direct", yahoo: "^DJI" },
+  SPX500: { op: "direct", yahoo: "^GSPC" },
 };
 
 
@@ -297,7 +306,16 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
             let lows: number[] = [];
             let priceSource = "";
 
-            if (spec.op === "none" || !spec.fx) {
+            if (spec.op === "direct" && spec.yahoo) {
+              const own = await fetchFxCandles(spec.yahoo, from, to);
+              if (!own || !own.ts.length) {
+                results.push({ id: t.id, action: "fetch_failed", sym: spec.yahoo });
+                continue;
+              }
+              priceSource = spec.yahoo;
+              highs = own.highs.filter((n) => typeof n === "number");
+              lows = own.lows.filter((n) => typeof n === "number");
+            } else if (spec.op === "none" || !spec.fx) {
               const spot = await fetchSpotGoldCandles(from, to, Number(t.entry));
               if (!spot) {
                 results.push({ id: t.id, action: "fetch_failed", sym: "spot" });
