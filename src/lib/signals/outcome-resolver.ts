@@ -125,11 +125,9 @@ export function resolveTradeOutcome(input: ResolveInput): ResolveResult {
     const touchedTP = isBuy ? hi >= tp : lo <= tp;
     const touchedTP1 = isBuy ? hi >= tp1Price : lo <= tp1Price;
     // Before TP1 the hard stop is SL; after TP1 the stop sits at breakeven.
-    const stopPrice = tp1Hit ? entry : sl;
     const touchedStop = tp1Hit
       ? (isBuy ? lo <= entry - beTol : hi >= entry + beTol)
       : (isBuy ? lo <= sl : hi >= sl);
-    void stopPrice;
 
     const excR = isBuy ? (hi - entry) / riskDist : (entry - lo) / riskDist;
     if (excR > maxFavorableR) maxFavorableR = excR;
@@ -137,9 +135,9 @@ export function resolveTradeOutcome(input: ResolveInput): ResolveResult {
     // Full target beats everything on the same candle once TP1 is banked.
     if (touchedTP && (tp1Hit || !touchedStop)) {
       const rewardR = Math.abs(tp - entry) / riskDist;
-      const realized = tp1Hit
-        ? bankedR + (1 - TP1_SIZE) * rewardR
-        : bankedR + (1 - TP1_SIZE) * rewardR;
+      // Price necessarily traded through TP1 on the way to TP, so the
+      // partial is always banked alongside the runner's full reward.
+      const realized = bankedR + (1 - TP1_SIZE) * rewardR;
       return {
         outcome: "win",
         realizedR: Number(realized.toFixed(3)),
