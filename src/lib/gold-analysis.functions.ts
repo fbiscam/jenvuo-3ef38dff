@@ -3604,4 +3604,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// Senior review chain (GPT-5.5 → GPT-5.2 Chat → GPT-5 Mini) verified. manual scan logic adjusted for cross-profile stability; damping increased to prevent stuck 35% on flat market re-scans.
+// yar ya check kro 35% Confience arha ha hr dafa hr pair ma r account ma ya bug ha ya issue ha
