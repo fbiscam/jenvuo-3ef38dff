@@ -1930,7 +1930,7 @@ function buildFeedFallbackPlan(args: {
       sl: 0,
       tp: 0,
       rr: 0,
-      confidence: 25,
+      confidence: 15,
       summary: `WAIT on ${inst.display}: ${reasonText}`,
       invalidation: "No trade is valid until real-time candles are restored.",
     },
@@ -1940,7 +1940,7 @@ function buildFeedFallbackPlan(args: {
     multiTf: ["4H", "1H", "15M", "5M"].map((tf) => ({ tf: tf as TfBias["tf"], bias: "neutral", score: 50, label: "Feed fallback" })),
     alignmentScore: 50,
     alignmentLabel: "Feed fallback / Waiting",
-    setupScore: 25,
+    setupScore: 15,
     setupGrade: "C",
     setupChecks: [
       { key: "live_quote", label: "Live quote available", pass: true, reason: priceText },
@@ -3041,7 +3041,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         }
 
       }
-      let rawConf = Math.min(95, Math.max(setupScore, blended, 25));
+      let rawConf = Math.min(95, Math.max(setupScore, blended, 10));
 
       // Confidence smoothing memory — prevents a fresh scan from swinging
       // wildly (e.g. 75% now, 55% five minutes later) when structure hasn't
@@ -3065,12 +3065,10 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
             const prev = Number(mem.smoothed_conf);
             if (Number.isFinite(prev) && ageMin <= 15) {
               // EMA: weight previous higher to damp jitter
-              smoothed = Math.round(prev * 0.70 + rawConf * 0.30);
-              // Cap drop to 6 points within the window (tighter damping)
-              if (smoothed < prev - 6) smoothed = prev - 6;
-              // Cap rise to 8 points so pops also settle in
-              if (smoothed > prev + 8) smoothed = prev + 8;
-              smoothed = Math.min(95, Math.max(25, smoothed));
+              smoothed = Math.round(prev * 0.40 + rawConf * 0.60);
+              // Damping removed to prevent sticking; allow full reflection of real market data.
+              // We rely on the EMA blend and the rawConf floor (10) instead.
+              smoothed = Math.min(95, Math.max(10, smoothed));
             }
           }
           await supabaseAdmin
