@@ -2709,6 +2709,74 @@ Run the full 25-year desk-head review internally through the elite lens above, t
       }
     }
 
+    // ============ STAGE 2b: INDEPENDENT CROSS-CHECK (2nd model family) ======
+    // Order of the desk pipeline: (1) ICT/SMC rules engine → (2) GPT senior
+    // review → (2b) an INDEPENDENT model from another family (GLM-5.2 /
+    // Nemotron) that re-reads the same setup against pure SMC rules.
+    // Strictly enrichment: it may CONFIRM (tiny +confidence lift, max +4) or
+    // attach a risk note, but it can NEVER veto or downgrade — so the number
+    // of alerts delivered stays exactly the same as today.
+    let __crossCheckModel: string | null = null;
+    if (built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE) {
+      try {
+        const xSystem = `You are an independent ICT/SMC audit desk (second opinion, different house than the primary analyst). Audit the setup ONLY against core Smart Money rules: liquidity sweep before entry, displacement creating the FVG/OB, premium/discount side correctness, HTF↔LTF alignment, zone freshness, killzone timing, and R:R sanity.
+Reply ONLY as JSON: {"agrees":true|false,"smc_score":<0-100>,"note":"<one short sentence, most important rule that passes or fails>"}`;
+        const xUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
+PRICE: ${last.c.toFixed(dec)} | HTF ${htfA.trend} / LTF ${ltfA.trend} | KILLZONE ${kz.killzone}
+RANGE ${swingLow.toFixed(dec)}–${swingHigh.toFixed(dec)} | EQ ${equilibrium.toFixed(dec)} | side: ${inPremium ? "PREMIUM" : "DISCOUNT"}
+ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | iFVG ${ifvgs.length}`;
+
+        const xRes = await callChatCompletion({
+          models: [...CROSS_CHECK_CHAIN],
+          messages: [
+            { role: "system", content: xSystem },
+            { role: "user", content: xUser },
+          ],
+          jsonMode: true,
+          maxTokens: 200,
+          timeoutMs: 12000,
+          priority: false,
+          retriesPerModel: 1,
+          stage: "cross-check",
+        });
+
+        if (xRes) {
+          __crossCheckModel = xRes.model;
+          __totalPromptTokens += xRes.usage?.promptTokens ?? 0;
+          __totalCompletionTokens += xRes.usage?.completionTokens ?? 0;
+          import("@/lib/ai-cost-log.server")
+            .then((m) => m.logAiCost({ userId: __userId, stage: "cross-check", model: xRes.model, usage: xRes.usage }))
+            .catch(() => {});
+          const px: any = tryParseJsonLoose(xRes.content) || {};
+          const agrees = px.agrees === true;
+          const smcScore = Number(px.smc_score);
+          const note = String(px.note ?? "").slice(0, 220).trim();
+          const short = xRes.model.split("/").pop() ?? xRes.model;
+          if (agrees) {
+            // Confidence can only go UP here, and only slightly.
+            const lift = Number.isFinite(smcScore) && smcScore >= 80 ? 4 : 2;
+            setupScore = Math.min(95, setupScore + lift);
+            setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
+            setupChecks.push({
+              key: "cross_check_agree",
+              label: `✓ Independent SMC cross-check agrees (${short})`,
+              pass: true,
+              reason: note || "Second model confirms the Smart Money rule set for this setup.",
+            });
+          } else {
+            setupChecks.push({
+              key: "cross_check_note",
+              label: `• Independent SMC cross-check — risk note (${short})`,
+              pass: false,
+              reason: note || "Second model flagged a weaker rule on this setup (informational only — signal still delivered).",
+            });
+          }
+        }
+      } catch (e) {
+        console.warn("cross-check failed:", (e as Error)?.message ?? e);
+      }
+    }
+
     // ============ STAGE 3: MACRO / NEWS NARRATIVE (Bluesminds) ============
     // Lightweight AI layer that reads the current macro/news backdrop and
     // tells the trader if the fundamental context SUPPORTS or CONFLICTS with
