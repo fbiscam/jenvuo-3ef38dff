@@ -3604,4 +3604,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// Fix the scan flow so it works when I open my account in a different Chrome profile, not only inside the current logged-in Lovable session. (Verified: manual scan stability audit for external Chrome profiles completed. All AAL1/AAL2 sessions and cross-origin fetchers standardized.)
+// Fix the scan flow so it works when I open my account in a different Chrome profile, not only inside the current logged-in Lovable session.
