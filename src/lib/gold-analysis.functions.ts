@@ -3598,4 +3598,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// manual scan nhi ho rha ha shi trha issue arha ha hr account ma hrdafa confidence 35% show krta ha hr pair ma isko theek kro acha sa (Resolved: fixed pre-veto trade direction and score mapping)
+// manual scan nhi ho rha ha shi trha issue arha ha hr account ma hrdafa confidence 35% show krta ha hr pair ma isko theek kro acha sa (Resolved: fixed DXY scale and confidence smoothing floor)
