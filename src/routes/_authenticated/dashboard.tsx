@@ -1038,7 +1038,9 @@ function DashboardLayout() {
                 <img
                   src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
                   alt={fullName || email || "Account avatar"}
-                  className="h-[48px] w-[48px] rounded-full object-cover [image-rendering:-webkit-optimize-contrast]"
+                  width={144}
+                  height={144}
+                  className="h-[48px] w-[48px] rounded-full object-cover [image-rendering:auto]"
                   loading="eager"
                   decoding="async"
                 />
