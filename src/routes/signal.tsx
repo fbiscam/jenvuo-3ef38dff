@@ -2806,12 +2806,6 @@ function SignalVoiceAgent({
           <SignalOrb status={status} pulse={orbPulse} />
         </button>
       </div>
-      <p className={cn(
-        "text-center text-[13px] font-normal tracking-normal normal-case font-['Google_Sans','Product_Sans',system-ui,sans-serif] transition-opacity",
-        analyzing ? "text-zinc-500 opacity-100" : "opacity-0 h-0 overflow-hidden",
-      )}>
-        Analyzing market — please wait
-      </p>
 
 
 
