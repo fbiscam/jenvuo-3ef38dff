@@ -382,6 +382,17 @@ function coinbaseProductFromSymbol(sym: string): string | null {
 }
 
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
+  const dedupeKey = `Y:${symbols.join("|")}:${tf}`;
+  const running = inflightCandles.get(dedupeKey);
+  if (running) return running;
+  const p = fetchFromYahooSymbolsRaw(symbols, tf).finally(() => {
+    inflightCandles.delete(dedupeKey);
+  });
+  inflightCandles.set(dedupeKey, p);
+  return p;
+}
+
+async function fetchFromYahooSymbolsRaw(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
   const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
@@ -392,7 +403,8 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
             Accept: "application/json",
           },
-        });
+        }, CANDLE_FETCH_TIMEOUT_MS);
+
         if (!res.ok) throw new Error(`Yahoo ${sym}: ${res.status}`);
         const json: any = await res.json();
         const result = json?.chart?.result?.[0];
