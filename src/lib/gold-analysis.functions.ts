@@ -2535,7 +2535,78 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     }
 
 
-    // ============ STAGE 2: SENIOR TRADER DEEP REVIEW ============
+    // ============ STAGE 2: DEEPSEEK V4 SMC REVIEW (NVIDIA) ==================
+    // Desk pipeline order: (1) ICT/SMC rules engine → (2) DeepSeek V4 on the
+    // NVIDIA Integrate API → (3) GPT senior review → (2c) consensus.
+    // DeepSeek re-reads the same setup against pure Smart Money rules. It can
+    // AGREE (small confidence lift, max +4) or attach a risk note, but it can
+    // never veto, so the number of signals delivered stays the same as before.
+    let __crossCheckModel: string | null = null;
+    let __dsAgrees: boolean | null = null;
+    let __consensus: "full" | "split" | null = null;
+    if (built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE) {
+      try {
+        const xSystem = `You are an independent ICT/SMC audit desk (second opinion, different house than the primary analyst). Audit the setup ONLY against core Smart Money rules: liquidity sweep before entry, displacement creating the FVG/OB, premium/discount side correctness, HTF↔LTF alignment, zone freshness, killzone timing, and R:R sanity.
+Reply ONLY as JSON: {"agrees":true|false,"smc_score":<0-100>,"note":"<one short sentence, most important rule that passes or fails>"}`;
+        const xUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
+PRICE: ${last.c.toFixed(dec)} | HTF ${htfA.trend} / LTF ${ltfA.trend} | KILLZONE ${kz.killzone}
+RANGE ${swingLow.toFixed(dec)}–${swingHigh.toFixed(dec)} | EQ ${equilibrium.toFixed(dec)} | side: ${inPremium ? "PREMIUM" : "DISCOUNT"}
+ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | iFVG ${ifvgs.length}`;
+
+        const xRes = await callChatCompletion({
+          models: [...DEEPSEEK_REVIEW_CHAIN],
+          messages: [
+            { role: "system", content: xSystem },
+            { role: "user", content: xUser },
+          ],
+          jsonMode: true,
+          maxTokens: 200,
+          timeoutMs: 14000,
+          priority: false,
+          retriesPerModel: 1,
+          stage: "deepseek-review",
+        });
+
+        if (xRes) {
+          __crossCheckModel = xRes.model;
+          __totalPromptTokens += xRes.usage?.promptTokens ?? 0;
+          __totalCompletionTokens += xRes.usage?.completionTokens ?? 0;
+          import("@/lib/ai-cost-log.server")
+            .then((m) => m.logAiCost({ userId: __userId, stage: "deepseek-review", model: xRes.model, usage: xRes.usage }))
+            .catch(() => {});
+          const px: any = tryParseJsonLoose(xRes.content) || {};
+          const agrees = px.agrees === true;
+          __dsAgrees = agrees;
+          const smcScore = Number(px.smc_score);
+          const note = String(px.note ?? "").slice(0, 220).trim();
+          const short = xRes.model.includes("deepseek") ? "DeepSeek V4" : (xRes.model.split("/").pop() ?? xRes.model);
+          if (agrees) {
+            // Confidence can only go UP here, and only slightly.
+            const lift = Number.isFinite(smcScore) && smcScore >= 80 ? 4 : 2;
+            setupScore = Math.min(95, setupScore + lift);
+            setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
+            setupChecks.push({
+              key: "cross_check_agree",
+              label: `✓ ${short} SMC review agrees`,
+              pass: true,
+              reason: note || "Second model confirms the Smart Money rule set for this setup.",
+            });
+          } else {
+            setupChecks.push({
+              key: "cross_check_note",
+              label: `• ${short} SMC review — risk note`,
+              pass: false,
+              reason: note || "Second model flagged a weaker rule on this setup (informational only — signal still delivered).",
+            });
+          }
+        }
+      } catch (e) {
+        console.warn("deepseek-review failed:", (e as Error)?.message ?? e);
+      }
+    }
+
+    // ============ STAGE 3: SENIOR TRADER DEEP REVIEW (GPT) ============
+
     // Runs the pro model (DeepSeek V4 Pro) as a "25-year veteran" second
     // opinion on any live A / A+ setup — it can veto, downgrade, or confirm.
     // Gated by plan: only paid plans (pro/elite/ultra) get DeepSeek senior
