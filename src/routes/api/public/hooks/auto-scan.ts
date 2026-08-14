@@ -303,7 +303,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           try {
             const plan = scanPlanCache.get(pair) ?? await computeSignalPlan({ symbol: pair }, null);
             const dir = plan.trade?.direction;
-            let conf = Number(plan.trade?.confidence ?? 0);
+            const conf = Number(plan.trade?.confidence ?? 0);
             const now = new Date();
 
             if (dir !== "BUY" && dir !== "SELL") {
@@ -519,9 +519,6 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               // broadcasting a mixed signal.
               if (freshDir === dir && freshConf >= minConf) {
                 broadcastPlan = fresh;
-                // Keep confidence, grade and persisted analytics attached to
-                // the same freshly re-quoted setup as entry/SL/TP.
-                conf = freshConf;
               } else {
                 await supabaseAdmin
                   .from("auto_scan_state")
@@ -598,7 +595,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               // than to silently drop every signal on a transient upstream error.
             }
 
-            const setupScore = Math.round(broadcastPlan.setupScore ?? conf);
+            const setupScore = Math.round(plan.setupScore ?? conf);
             // Grade must reflect the displayed blended confidence, not the raw
             // setup score — otherwise a 71% signal shows as grade "C".
             const gradeBasis = Math.round(conf);

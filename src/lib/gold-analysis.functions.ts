@@ -12,8 +12,7 @@ import {
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
-  MODEL_CHAIN, SENIOR_REVIEW_CHAIN, MACRO_CONTEXT_CHAIN, DEEPSEEK_REVIEW_CHAIN,
-  getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
+  MODEL_CHAIN, SENIOR_REVIEW_CHAIN, MACRO_CONTEXT_CHAIN, getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
 } from "@/lib/ai-gateway";
 import { MIN_CONFIDENCE } from "@/lib/signals/qualification";
 
@@ -308,20 +307,8 @@ function inferInstrumentFromText(text: string): string {
 
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 30_000;
-// Hard ceiling for reusing a stale candle set when every provider is throttled.
-// Analysis always overlays the live tick on the last bar, so a slightly older
-// structure is far better than the synthetic sine-wave fallback (which forces
-// the whole scan into quote-only "WAIT" mode).
-const CACHE_STALE_MAX = 10 * 60_000;
-// Candle fetches are deduplicated: one scan pulls 5 timeframes and cross-pairs
-// derive from XAU/USD + an FX proxy, so without this the same Yahoo endpoint is
-// hit ~30x per scan and starts 429-ing — that was the "some pairs analyze, some
-// don't" behaviour.
-const inflightCandles = new Map<string, Promise<Candle[]>>();
-const CANDLE_FETCH_TIMEOUT_MS = 7000;
+const CACHE_TTL = 12_000;
 const syntheticCandleKeys = new Set<string>();
-
 const TF_MS: Record<string, number> = {
   "1m": 60_000,
   "5m": 5 * 60_000,
@@ -368,15 +355,8 @@ function buildSyntheticCandles(inst: ResolvedInstrument, tf: string, price: numb
 async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 1800): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
-  let res: Response | null = null;
   try {
-    res = await fetch(input, { ...init, signal: init.signal ?? controller.signal });
-    return res;
-  } catch (err: any) {
-    if (res?.body) {
-      try { await res.body.cancel(); } catch { /* ignore */ }
-    }
-    throw err;
+    return await fetch(input, { ...init, signal: init.signal ?? controller.signal });
   } finally {
     clearTimeout(timer);
   }
@@ -389,138 +369,62 @@ function coinbaseProductFromSymbol(sym: string): string | null {
 }
 
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
-  const dedupeKey = `Y:${symbols.join("|")}:${tf}`;
-  const hit = candleCache.get(dedupeKey);
-  if (hit && Date.now() - hit.at < CACHE_TTL) return hit.data;
-  const running = inflightCandles.get(dedupeKey);
-  if (running) return running;
-  const p = fetchFromYahooSymbolsRaw(symbols, tf)
-    .then((data) => {
-      // Shared legs (XAU/USD + FX proxies) are reused by every cross-pair, so
-      // caching them here keeps a six-pair auto-scan to a handful of requests.
-      candleCache.set(dedupeKey, { at: Date.now(), data });
-      return data;
-    })
-    .finally(() => {
-      inflightCandles.delete(dedupeKey);
-    });
-  inflightCandles.set(dedupeKey, p);
-  return p;
-}
-
-
-async function fetchFromYahooSymbolsRaw(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-
-  // Worker deadlock protection: avoid massive parallel fetch bursts.
-  // Sequential per symbol, but racing hosts for each.
-  let lastErr: any = null;
-
-  for (const sym of symbols) {
-    const urls = hosts.map(host =>
-      `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${cfg.interval}&range=${cfg.range}`
-    );
-
-    const controllers = urls.map(() => new AbortController());
-    const fetchers = urls.map(async (url, idx) => {
-      const res = await fetchWithTimeout(url, {
-        signal: controllers[idx].signal,
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-          Accept: "application/json",
-        },
-      }, CANDLE_FETCH_TIMEOUT_MS);
-
-      if (!res.ok) {
-        if (res.body) await res.body.cancel().catch(() => {});
-        throw new Error(`Yahoo ${sym}: ${res.status}`);
-      }
-
-      const json: any = await res.json();
-      const result = json?.chart?.result?.[0];
-      if (!result) throw new Error("No price data");
-
-      const ts: number[] = result.timestamp ?? [];
-      const q = result.indicators?.quote?.[0] ?? {};
-      const candles: Candle[] = [];
-      for (let i = 0; i < ts.length; i++) {
-        const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i], v = q.volume?.[i] ?? 0;
-        if (o == null || h == null || l == null || c == null) continue;
-        candles.push({ t: ts[i] * 1000, o, h, l, c, v });
-      }
-      if (candles.length < 10) throw new Error("Too few Yahoo candles");
-      return candles.slice(-200);
-    });
-
-    try {
-      const winner = await Promise.any(fetchers);
-      // Cancel all other in-flight requests for this symbol
-      controllers.forEach(c => c.abort());
-      return winner;
-    } catch (e: any) {
-      lastErr = e;
-      // Continue to next symbol if this one failed on all hosts
-    }
+  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
+        const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=${cfg.interval}&range=${cfg.range}`;
+        const res = await fetchWithTimeout(url, {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+            Accept: "application/json",
+          },
+        });
+        if (!res.ok) throw new Error(`Yahoo ${sym}: ${res.status}`);
+        const json: any = await res.json();
+        const result = json?.chart?.result?.[0];
+        if (!result) throw new Error("No price data");
+        const ts: number[] = result.timestamp ?? [];
+        const q = result.indicators?.quote?.[0] ?? {};
+        const candles: Candle[] = [];
+        for (let i = 0; i < ts.length; i++) {
+          const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i], v = q.volume?.[i] ?? 0;
+          if (o == null || h == null || l == null || c == null) continue;
+          candles.push({ t: ts[i] * 1000, o, h, l, c, v });
+        }
+        if (candles.length >= 10) return candles.slice(-200);
+        throw new Error("Too few Yahoo candles");
+  }));
+  try {
+    return await Promise.any(attempts);
+  } catch (e) {
+    throw e instanceof Error ? e : new Error("Yahoo unavailable");
   }
-
-  throw lastErr instanceof Error ? lastErr : new Error("Yahoo unavailable");
 }
 
 async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<Candle[]> {
-  const dedupeKey = `B:${symbols.join("|")}:${tf}`;
-  const running = inflightCandles.get(dedupeKey);
-  if (running) return running;
-  const p = fetchFromBinanceSymbolsRaw(symbols, tf).finally(() => {
-    inflightCandles.delete(dedupeKey);
-  });
-  inflightCandles.set(dedupeKey, p);
-  return p;
-}
-
-async function fetchFromBinanceSymbolsRaw(symbols: string[], tf: string): Promise<Candle[]> {
   const map: Record<string, string> = {
     "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m",
     "1h": "1h", "4h": "4h", "1d": "1d",
   };
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
-  let lastErr: any = null;
-
-  for (const sym of symbols) {
-    const urls = hosts.map(host => `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`);
-    const controllers = urls.map(() => new AbortController());
-    
-    const fetchers = urls.map(async (url, idx) => {
-      const res = await fetchWithTimeout(url, { 
-        signal: controllers[idx].signal,
-        headers: { "User-Agent": "Mozilla/5.0" } 
-      }, CANDLE_FETCH_TIMEOUT_MS);
-
-      if (!res.ok) {
-        if (res.body) await res.body.cancel().catch(() => {});
-        throw new Error(`Binance ${sym}: ${res.status}`);
-      }
-
-      const rows: any[] = await res.json();
-      const candles: Candle[] = rows.map((r) => ({
-        t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
-      })).filter((c) => isFinite(c.c));
-      
-      if (candles.length < 10) throw new Error("Too few Binance candles");
-      return candles.slice(-200);
-    });
-
-    try {
-      const winner = await Promise.any(fetchers);
-      controllers.forEach(c => c.abort());
-      return winner;
-    } catch (e: any) {
-      lastErr = e;
-    }
+  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
+        const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        if (!res.ok) throw new Error(`Binance ${sym}: ${res.status}`);
+        const rows: any[] = await res.json();
+        const candles: Candle[] = rows.map((r) => ({
+          t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
+        })).filter((c) => isFinite(c.c));
+        if (candles.length >= 10) return candles.slice(-200);
+        throw new Error("Too few Binance candles");
+  }));
+  try {
+    return await Promise.any(attempts);
+  } catch (e) {
+    throw e instanceof Error ? e : new Error("Binance unavailable");
   }
-
-  throw lastErr instanceof Error ? lastErr : new Error("Binance unavailable");
 }
 
 async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<Candle[]> {
@@ -540,7 +444,7 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
     try {
       const res = await fetchWithTimeout(`https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
-      }, CANDLE_FETCH_TIMEOUT_MS);
+      });
       if (!res.ok) { lastErr = new Error(`Coinbase ${product}: ${res.status}`); continue; }
       const rows: any[] = await res.json();
       const candles: Candle[] = rows
@@ -646,28 +550,8 @@ export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: strin
   const cacheKey = `${inst.key}:${tf}`;
   const cached = candleCache.get(cacheKey);
   const now = Date.now();
-  if (cached && now - cached.at < CACHE_TTL && !syntheticCandleKeys.has(cacheKey)) return cached.data;
+  if (cached && now - cached.at < CACHE_TTL) return cached.data;
 
-  // One in-flight fetch per instrument+timeframe. A single scan (manual or
-  // auto) asks for 1h/15m/4h/5m at once and auto-scan runs six pairs together;
-  // without this the providers see a burst and throttle, which is exactly what
-  // made some pairs analyze properly and others drop to quote-only mode.
-  const running = inflightCandles.get(cacheKey);
-  if (running) return running;
-  const job = fetchInstrumentCandlesRaw(inst, tf, cacheKey, cached, now).finally(() => {
-    inflightCandles.delete(cacheKey);
-  });
-  inflightCandles.set(cacheKey, job);
-  return job;
-}
-
-async function fetchInstrumentCandlesRaw(
-  inst: ResolvedInstrument,
-  tf: string,
-  cacheKey: string,
-  cached: { at: number; data: Candle[] } | undefined,
-  now: number,
-): Promise<Candle[]> {
   const pairKey = inst.key.startsWith("METAL:") ? inst.key.slice("METAL:".length) : inst.key;
   const hasProxy = !!XAU_PAIRS[pairKey]?.usdProxy;
 
@@ -681,39 +565,26 @@ async function fetchInstrumentCandlesRaw(
   if (inst.kind !== "metal" && inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
 
   let lastErr: any = null;
-  // Two passes: a throttled provider usually recovers within a second, and one
-  // retry is far cheaper than serving the user a "provider delayed" scan.
-  for (let pass = 0; pass < 2; pass++) {
-    if (pass > 0) await new Promise((r) => setTimeout(r, 450));
-    for (const f of tries) {
-      try {
-        const data = await f();
-        if (data.length >= 20) {
-          candleCache.set(cacheKey, { at: Date.now(), data });
-          syntheticCandleKeys.delete(cacheKey);
-          return data;
-        }
-        lastErr = new Error("too few candles");
-      } catch (e) { lastErr = e; }
-    }
+  for (const f of tries) {
+    try {
+      const data = await f();
+      candleCache.set(cacheKey, { at: now, data });
+      syntheticCandleKeys.delete(cacheKey);
+      return data;
+    } catch (e) { lastErr = e; }
   }
-  // Real (if slightly stale) structure beats synthetic candles: the scan
-  // overlays the live tick on the last bar anyway.
-  if (cached && cached.data.length >= 20 && !syntheticCandleKeys.has(cacheKey) && now - cached.at < CACHE_STALE_MAX) {
-    return cached.data;
-  }
+  if (cached) return cached.data;
   const quote = await resolveLiveTick(inst).catch(() => null);
   if (quote?.price && Number.isFinite(quote.price) && quote.price > 0) {
     const synthetic = buildSyntheticCandles(inst, tf, quote.price);
     if (synthetic.length >= 20) {
-      candleCache.set(cacheKey, { at: Date.now(), data: synthetic });
+      candleCache.set(cacheKey, { at: now, data: synthetic });
       syntheticCandleKeys.add(cacheKey);
       return synthetic;
     }
   }
   throw lastErr ?? new Error(`No data source available for ${inst.display}`);
 }
-
 
 async function fetchGoldCandles(tf: string): Promise<Candle[]> {
   return fetchInstrumentCandles(resolveInstrument("XAUUSD"), tf);
@@ -1930,7 +1801,7 @@ function buildFeedFallbackPlan(args: {
       sl: 0,
       tp: 0,
       rr: 0,
-      confidence: 15,
+      confidence: 25,
       summary: `WAIT on ${inst.display}: ${reasonText}`,
       invalidation: "No trade is valid until real-time candles are restored.",
     },
@@ -1940,7 +1811,7 @@ function buildFeedFallbackPlan(args: {
     multiTf: ["4H", "1H", "15M", "5M"].map((tf) => ({ tf: tf as TfBias["tf"], bias: "neutral", score: 50, label: "Feed fallback" })),
     alignmentScore: 50,
     alignmentLabel: "Feed fallback / Waiting",
-    setupScore: 15,
+    setupScore: 25,
     setupGrade: "C",
     setupChecks: [
       { key: "live_quote", label: "Live quote available", pass: true, reason: priceText },
@@ -2304,15 +2175,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       const mainDelta = htf[htf.length - 1].c - htf[Math.max(0, htf.length - 6)].c;
       // Gold inverse; USD-quote forex depends — for USDXXX same direction, for XXXUSD inverse
       const inverse = inst.kind === "metal" || /^[A-Z]{3}USD$/i.test(inst.raw || "");
-      // If either market is flat (delta=0), we cannot confirm OR contradict.
-      // Set to null so the engine ignores it instead of triggering a hard veto.
-      if (Math.abs(dxyDelta) < 1e-8 || Math.abs(mainDelta) < 1e-8) {
-        dxyConfirms = null;
-      } else {
-        dxyConfirms = inverse
-          ? (dxyDelta > 0 && mainDelta < 0) || (dxyDelta < 0 && mainDelta > 0)
-          : (dxyDelta > 0 && mainDelta > 0) || (dxyDelta < 0 && mainDelta < 0);
-      }
+      dxyConfirms = inverse
+        ? (dxyDelta > 0 && mainDelta < 0) || (dxyDelta < 0 && mainDelta > 0)
+        : (dxyDelta > 0 && mainDelta > 0) || (dxyDelta < 0 && mainDelta < 0);
     }
 
     // SMT divergence — same signal but window-based (checks timing of extremes)
@@ -2338,16 +2203,6 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const ifvgs = detectIFVGs(ltf, ltfA.fvgs);
 
     const built = buildTrade(htfA, ltfA, pools, last.c, atr, inst.kind as any);
-    // Keep the directional market read separate from trade executability.
-    // buildTrade correctly returns WAIT when the nearest entry pocket is too
-    // far away, but scoring that WAIT object makes every directional factor
-    // false and collapses every XAU pair to the same ~16% confidence. Score the
-    // actual HTF/LTF bias while still returning WAIT and hiding all levels.
-    const analysisDirection: "BUY" | "SELL" | "WAIT" =
-      htfA.trend === "bullish" ? "BUY" :
-      htfA.trend === "bearish" ? "SELL" :
-      ltfA.trend === "bullish" ? "BUY" :
-      ltfA.trend === "bearish" ? "SELL" : "WAIT";
 
     // ============ DETERMINISTIC INTELLIGENCE PANELS ============
     // Synthesize htfLock / selfCritique / scenarios from the rules engine so
@@ -2522,12 +2377,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // be computed on the real setup, otherwise every vetoed pair collapses to
     // the same flat floor score (the "always 26%" bug) and confidence stops
     // telling the user anything about the actual market.
-    const preVetoTrade = {
-      ...built,
-      direction: built.direction === "WAIT" ? (analysisDirection || "WAIT") : built.direction,
-      // Ensure RR is never zero for the scoring engine when a directional bias exists
-      rr: built.direction === "WAIT" && (analysisDirection && analysisDirection !== "WAIT") ? Math.max(built.rr, 2) : (built.rr || 0),
-    };
+    const preVetoTrade = { ...built };
     if (built.direction !== "WAIT") {
       const wantDir = built.direction === "BUY" ? "bullish" : "bearish";
       const ltfStructureConfirms = ltfA.trend === wantDir || ltfA.lastStructure?.dir === wantDir;
@@ -2553,7 +2403,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       // or an aligned LTF MSS was being discarded and every pair returned WAIT.
       // Freshness, HTF alignment, confidence, two-hit confirmation and live
       // re-quote gates still run before an auto alert can be broadcast.
-      const needed = 0; // Relaxed: Allow directional analysis to flow into the scoring engine even before zone tap.
+      const needed = 1;
 
       if (confirmations < needed) {
         executionVetoReason = built.entryType === "LIMIT"
@@ -2666,82 +2516,11 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     }
 
 
-    // ============ STAGE 2: DEEPSEEK V4 SMC REVIEW (NVIDIA) ==================
-    // Desk pipeline order: (1) ICT/SMC rules engine → (2) DeepSeek V4 on the
-    // NVIDIA Integrate API → (3) GPT senior review → (2c) consensus.
-    // DeepSeek re-reads the same setup against pure Smart Money rules. It can
-    // AGREE (small confidence lift, max +4) or attach a risk note, but it can
-    // never veto, so the number of signals delivered stays the same as before.
-    let __crossCheckModel: string | null = null;
-    let __dsAgrees: boolean | null = null;
-    let __consensus: "full" | "split" | null = null;
-    if (built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE) {
-      try {
-        const xSystem = `You are an independent ICT/SMC audit desk (second opinion, different house than the primary analyst). Audit the setup ONLY against core Smart Money rules: liquidity sweep before entry, displacement creating the FVG/OB, premium/discount side correctness, HTF↔LTF alignment, zone freshness, killzone timing, and R:R sanity.
-Reply ONLY as JSON: {"agrees":true|false,"smc_score":<0-100>,"note":"<one short sentence, most important rule that passes or fails>"}`;
-        const xUser = `SETUP: ${built.direction} ${inst.display} @ ${built.entry.toFixed(dec)}, SL ${built.sl.toFixed(dec)}, TP ${built.tp.toFixed(dec)}, R:R 1:${built.rr.toFixed(2)}
-PRICE: ${last.c.toFixed(dec)} | HTF ${htfA.trend} / LTF ${ltfA.trend} | KILLZONE ${kz.killzone}
-RANGE ${swingLow.toFixed(dec)}–${swingHigh.toFixed(dec)} | EQ ${equilibrium.toFixed(dec)} | side: ${inPremium ? "PREMIUM" : "DISCOUNT"}
-ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | iFVG ${ifvgs.length}`;
-
-        const xRes = await callChatCompletion({
-          models: [...DEEPSEEK_REVIEW_CHAIN],
-          messages: [
-            { role: "system", content: xSystem },
-            { role: "user", content: xUser },
-          ],
-          jsonMode: true,
-          maxTokens: 200,
-          timeoutMs: 14000,
-          priority: false,
-          retriesPerModel: 1,
-          stage: "deepseek-review",
-        });
-
-        if (xRes) {
-          __crossCheckModel = xRes.model;
-          __totalPromptTokens += xRes.usage?.promptTokens ?? 0;
-          __totalCompletionTokens += xRes.usage?.completionTokens ?? 0;
-          import("@/lib/ai-cost-log.server")
-            .then((m) => m.logAiCost({ userId: __userId, stage: "deepseek-review", model: xRes.model, usage: xRes.usage }))
-            .catch(() => {});
-          const px: any = tryParseJsonLoose(xRes.content) || {};
-          const agrees = px.agrees === true;
-          __dsAgrees = agrees;
-          const smcScore = Number(px.smc_score);
-          const note = String(px.note ?? "").slice(0, 220).trim();
-          const short = xRes.model.includes("deepseek") ? "DeepSeek V4" : (xRes.model.split("/").pop() ?? xRes.model);
-          if (agrees) {
-            // Confidence can only go UP here, and only slightly.
-            const lift = Number.isFinite(smcScore) && smcScore >= 80 ? 4 : 2;
-            setupScore = Math.min(95, setupScore + lift);
-            setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
-            setupChecks.push({
-              key: "cross_check_agree",
-              label: `✓ ${short} SMC review agrees`,
-              pass: true,
-              reason: note || "Second model confirms the Smart Money rule set for this setup.",
-            });
-          } else {
-            setupChecks.push({
-              key: "cross_check_note",
-              label: `• ${short} SMC review — risk note`,
-              pass: false,
-              reason: note || "Second model flagged a weaker rule on this setup (informational only — signal still delivered).",
-            });
-          }
-        }
-      } catch (e) {
-        console.warn("deepseek-review failed:", (e as Error)?.message ?? e);
-      }
-    }
-
-    // ============ STAGE 3: SENIOR TRADER DEEP REVIEW (GPT) ============
-
-    // Runs GPT (5.5 → 5.2 chat) as a "25-year veteran" third opinion on any
-    // live A / A+ setup, after the ICT/SMC engine and the DeepSeek V4 review —
-    // it can veto, downgrade, or confirm.
-    // Gated by plan: only paid plans (pro/elite/ultra) get the senior review.
+    // ============ STAGE 2: SENIOR TRADER DEEP REVIEW ============
+    // Runs the pro model (DeepSeek V4 Pro) as a "25-year veteran" second
+    // opinion on any live A / A+ setup — it can veto, downgrade, or confirm.
+    // Gated by plan: only paid plans (pro/elite/ultra) get DeepSeek senior
+    // review per pricing page. Free plan = GPT-5.4 only.
     // Failure here should NEVER block the plan — Stage-1 result stands.
     let __planAllowsSenior = false;
     let __planId: string = "free";
@@ -2838,7 +2617,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             key: "senior_review_attempted",
             label: "⚠ Senior review attempted",
             pass: false,
-            reason: "Senior review chain (GPT-5.5 → GPT-5.2 Chat → GPT-5 Mini → GPT-4.1 Mini → GPT-4o Mini) attempted but all providers throttled; the ICT/SMC engine plus DeepSeek V4 review still applied and the signal was delivered.",
+            reason: "Senior review chain (Claude 4.5 → DeepSeek V4 Pro → Grok 4.5 → Claude 3.7 → GPT-5 Mini → GPT-4.1 Mini → GPT-4o Mini → DeepSeek V4 Flash) attempted but all providers throttled; primary narration still applied and signal delivered.",
           });
         } else {
           const mdl = reviewResult.model;
@@ -2910,36 +2689,6 @@ Run the full 25-year desk-head review internally through the elite lens above, t
         console.warn("senior-review failed:", __seniorReviewError);
       }
     }
-
-    // ============ STAGE 2c: THREE-WAY CONSENSUS =============================
-    // The desk only calls a setup "consensus" when the ICT/SMC rules engine,
-    // DeepSeek V4 and the GPT senior review all point the same way. Consensus
-    // adds a confidence lift (so the best trades clear the alert gate more
-    // comfortably); a split opinion never removes the signal — it only leaves
-    // the score where the first two stages put it, so alert volume is unchanged.
-    if (built.direction !== "WAIT" && __dsAgrees != null) {
-      const seniorOk = __seniorReviewStatus === "confirmed" || __seniorReviewStatus === "completed";
-      if (__dsAgrees === true && seniorOk) {
-        setupScore = Math.min(96, setupScore + 3);
-        setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
-        __consensus = "full";
-        setupChecks.unshift({
-          key: "ai_consensus",
-          label: "✓ Full consensus — ICT/SMC engine + DeepSeek V4 + GPT senior review agree",
-          pass: true,
-          reason: `All three stages back this ${built.direction} at grade ${setupGrade} (${setupScore}/100). Alert and signal use this same confidence.`,
-        });
-      } else {
-        __consensus = "split";
-        setupChecks.push({
-          key: "ai_consensus_split",
-          label: "• Partial consensus — one reviewer is less convinced",
-          pass: false,
-          reason: "The rules engine setup stands, but DeepSeek V4 and the GPT senior review did not fully align. Signal is still delivered at the confidence shown; size accordingly.",
-        });
-      }
-    }
-
 
     // ============ STAGE 3: MACRO / NEWS NARRATIVE (Bluesminds) ============
     // Lightweight AI layer that reads the current macro/news backdrop and
@@ -3041,7 +2790,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         }
 
       }
-      let rawConf = Math.min(95, Math.max(setupScore, blended, 24));
+      let rawConf = Math.min(95, Math.max(setupScore, blended));
 
       // Confidence smoothing memory — prevents a fresh scan from swinging
       // wildly (e.g. 75% now, 55% five minutes later) when structure hasn't
@@ -3065,10 +2814,12 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
             const prev = Number(mem.smoothed_conf);
             if (Number.isFinite(prev) && ageMin <= 15) {
               // EMA: weight previous higher to damp jitter
-              smoothed = Math.round(prev * 0.40 + rawConf * 0.60);
-              // Damping removed to prevent sticking; allow full reflection of real market data.
-              // We rely on the EMA blend and the rawConf floor (10) instead.
-              smoothed = Math.min(95, Math.max(24, smoothed));
+              smoothed = Math.round(prev * 0.55 + rawConf * 0.45);
+              // Cap drop to 8 points within the window
+              if (smoothed < prev - 8) smoothed = prev - 8;
+              // Cap rise to 10 points so pops also settle in
+              if (smoothed > prev + 10) smoothed = prev + 10;
+              smoothed = Math.min(95, Math.max(0, smoothed));
             }
           }
           await supabaseAdmin
@@ -3491,7 +3242,6 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           if (s.includes("gemini-2.5-pro")) return "Gemini 2.5 Pro";
           if (s.includes("grok")) return "Grok 4.5";
           if (s.includes("deepseek-v4-pro")) return "DeepSeek V4 Pro";
-          if (s.includes("deepseek-v4-flash-0731")) return "DeepSeek V4";
           if (s.includes("deepseek-v4-flash")) return "DeepSeek V4 Flash";
           if (s.includes("deepseek")) return "DeepSeek";
           if (s.includes("gpt-5.2-chat") || s.includes("gpt-5.2")) return "ChatGPT 5.2";
@@ -3602,4 +3352,6 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// yar signal desk ma koyi bhi pair shi trha analyze nhi ho rha ha bar bar 35% confidence show kr rha ha isko theek kro
+// touch Sat Jul  4 10:17:15 UTC 2026
+// 1783160288
+// 1783160330
