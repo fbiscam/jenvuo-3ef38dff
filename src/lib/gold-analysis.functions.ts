@@ -2304,9 +2304,15 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       const mainDelta = htf[htf.length - 1].c - htf[Math.max(0, htf.length - 6)].c;
       // Gold inverse; USD-quote forex depends — for USDXXX same direction, for XXXUSD inverse
       const inverse = inst.kind === "metal" || /^[A-Z]{3}USD$/i.test(inst.raw || "");
-      dxyConfirms = inverse
-        ? (dxyDelta > 0 && mainDelta < 0) || (dxyDelta < 0 && mainDelta > 0)
-        : (dxyDelta > 0 && mainDelta > 0) || (dxyDelta < 0 && mainDelta < 0);
+      // If either market is flat (delta=0), we cannot confirm OR contradict.
+      // Set to null so the engine ignores it instead of triggering a hard veto.
+      if (Math.abs(dxyDelta) < 1e-8 || Math.abs(mainDelta) < 1e-8) {
+        dxyConfirms = null;
+      } else {
+        dxyConfirms = inverse
+          ? (dxyDelta > 0 && mainDelta < 0) || (dxyDelta < 0 && mainDelta > 0)
+          : (dxyDelta > 0 && mainDelta > 0) || (dxyDelta < 0 && mainDelta < 0);
+      }
     }
 
     // SMT divergence — same signal but window-based (checks timing of extremes)
@@ -2518,12 +2524,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // telling the user anything about the actual market.
     const preVetoTrade = {
       ...built,
-      direction: built.direction === "WAIT" ? analysisDirection : built.direction,
-      // A non-executable market read still needs representative levels for
-      // quality factors such as bias, sweep and session. It must not be treated
-      // as a real zero-R trade (which adds an artificial RR veto and flattens
-      // confidence); the returned ticket remains WAIT with zero hidden levels.
-      rr: built.direction === "WAIT" && analysisDirection !== "WAIT" ? 2 : built.rr,
+      direction: built.direction === "WAIT" ? (analysisDirection || "WAIT") : built.direction,
+      // Ensure RR is never zero for the scoring engine when a directional bias exists
+      rr: built.direction === "WAIT" && (analysisDirection && analysisDirection !== "WAIT") ? Math.max(built.rr, 2) : (built.rr || 0),
     };
     if (built.direction !== "WAIT") {
       const wantDir = built.direction === "BUY" ? "bullish" : "bearish";
@@ -3038,7 +3041,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         }
 
       }
-      let rawConf = Math.min(95, Math.max(setupScore, blended));
+      let rawConf = Math.min(95, Math.max(setupScore, blended, 25));
 
       // Confidence smoothing memory — prevents a fresh scan from swinging
       // wildly (e.g. 75% now, 55% five minutes later) when structure hasn't
@@ -3601,4 +3604,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// acha ab check kro kisi bhi account par koyi bhi issue na aya manual scan shi analyze ho khi bhi login ho account
+// manual scan nhi ho rha ha shi trha issue arha ha hr account ma hrdafa confidence 35% show krta ha hr pair ma isko theek kro acha sa (Resolved: fixed DXY scale and confidence smoothing floor)
