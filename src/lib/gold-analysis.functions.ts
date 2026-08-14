@@ -3604,4 +3604,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// manual scan nhi ho rha ha shi trha issue arha ha hr account ma hrdafa confidence 35% show krta ha hr pair ma isko theek kro acha sa (Resolved: fixed DXY scale and confidence smoothing floor)
+// testkrlo achsa sa ya issue again na aya aur jab lovable ma account log in hota ha to scan shi hota ha lekin jab outside kisi aur chrome ma kara to scan shi nhi hota isko ach sa theek kro
