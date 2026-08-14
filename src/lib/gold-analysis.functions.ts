@@ -383,14 +383,24 @@ function coinbaseProductFromSymbol(sym: string): string | null {
 
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
   const dedupeKey = `Y:${symbols.join("|")}:${tf}`;
+  const hit = candleCache.get(dedupeKey);
+  if (hit && Date.now() - hit.at < CACHE_TTL) return hit.data;
   const running = inflightCandles.get(dedupeKey);
   if (running) return running;
-  const p = fetchFromYahooSymbolsRaw(symbols, tf).finally(() => {
-    inflightCandles.delete(dedupeKey);
-  });
+  const p = fetchFromYahooSymbolsRaw(symbols, tf)
+    .then((data) => {
+      // Shared legs (XAU/USD + FX proxies) are reused by every cross-pair, so
+      // caching them here keeps a six-pair auto-scan to a handful of requests.
+      candleCache.set(dedupeKey, { at: Date.now(), data });
+      return data;
+    })
+    .finally(() => {
+      inflightCandles.delete(dedupeKey);
+    });
   inflightCandles.set(dedupeKey, p);
   return p;
 }
+
 
 async function fetchFromYahooSymbolsRaw(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
