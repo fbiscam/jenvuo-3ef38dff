@@ -3041,7 +3041,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         }
 
       }
-      let rawConf = Math.min(95, Math.max(setupScore, blended, 25));
+      let rawConf = Math.min(95, Math.max(setupScore, blended, 10));
 
       // Confidence smoothing memory — prevents a fresh scan from swinging
       // wildly (e.g. 75% now, 55% five minutes later) when structure hasn't
@@ -3070,7 +3070,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
               if (smoothed < prev - 6) smoothed = prev - 6;
               // Cap rise to 8 points so pops also settle in
               if (smoothed > prev + 8) smoothed = prev + 8;
-              smoothed = Math.min(95, Math.max(25, smoothed));
+              smoothed = Math.min(95, Math.max(10, smoothed));
             }
           }
           await supabaseAdmin
