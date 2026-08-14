@@ -307,7 +307,7 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
               highs = spot.candles.highs.filter((n) => typeof n === "number");
               lows = spot.candles.lows.filter((n) => typeof n === "number");
             } else {
-              const fx = await fetchCandles(spec.fx, from, to);
+              const fx = await fetchFxCandles(spec.fx, from, to);
               if (!fx || !fx.ts.length) {
                 results.push({ id: t.id, action: "fetch_failed", sym: spec.fx });
                 continue;
