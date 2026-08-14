@@ -481,7 +481,7 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
     try {
       const res = await fetchWithTimeout(`https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
-      });
+      }, CANDLE_FETCH_TIMEOUT_MS);
       if (!res.ok) { lastErr = new Error(`Coinbase ${product}: ${res.status}`); continue; }
       const rows: any[] = await res.json();
       const candles: Candle[] = rows
