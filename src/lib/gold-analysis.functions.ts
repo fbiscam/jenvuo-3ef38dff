@@ -308,8 +308,20 @@ function inferInstrumentFromText(text: string): string {
 
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 12_000;
+const CACHE_TTL = 30_000;
+// Hard ceiling for reusing a stale candle set when every provider is throttled.
+// Analysis always overlays the live tick on the last bar, so a slightly older
+// structure is far better than the synthetic sine-wave fallback (which forces
+// the whole scan into quote-only "WAIT" mode).
+const CACHE_STALE_MAX = 10 * 60_000;
+// Candle fetches are deduplicated: one scan pulls 5 timeframes and cross-pairs
+// derive from XAU/USD + an FX proxy, so without this the same Yahoo endpoint is
+// hit ~30x per scan and starts 429-ing — that was the "some pairs analyze, some
+// don't" behaviour.
+const inflightCandles = new Map<string, Promise<Candle[]>>();
+const CANDLE_FETCH_TIMEOUT_MS = 7000;
 const syntheticCandleKeys = new Set<string>();
+
 const TF_MS: Record<string, number> = {
   "1m": 60_000,
   "5m": 5 * 60_000,
