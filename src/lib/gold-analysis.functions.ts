@@ -3604,4 +3604,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// ya kaya issue ha isko check kro isko solve kro
+// Add a scan diagnostics panel that shows confidence calculation inputs and the exact stage where confidence changes for each account.
