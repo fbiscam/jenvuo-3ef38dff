@@ -485,23 +485,42 @@ async function fetchFromBinanceSymbolsRaw(symbols: string[], tf: string): Promis
   };
   const interval = map[tf] ?? "15m";
   const hosts = ["api.binance.com", "data-api.binance.vision"];
-  const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
-        const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
-        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } }, CANDLE_FETCH_TIMEOUT_MS);
+  let lastErr: any = null;
 
-        if (!res.ok) throw new Error(`Binance ${sym}: ${res.status}`);
-        const rows: any[] = await res.json();
-        const candles: Candle[] = rows.map((r) => ({
-          t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
-        })).filter((c) => isFinite(c.c));
-        if (candles.length >= 10) return candles.slice(-200);
-        throw new Error("Too few Binance candles");
-  }));
-  try {
-    return await Promise.any(attempts);
-  } catch (e) {
-    throw e instanceof Error ? e : new Error("Binance unavailable");
+  for (const sym of symbols) {
+    const urls = hosts.map(host => `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`);
+    const controllers = urls.map(() => new AbortController());
+    
+    const fetchers = urls.map(async (url, idx) => {
+      const res = await fetchWithTimeout(url, { 
+        signal: controllers[idx].signal,
+        headers: { "User-Agent": "Mozilla/5.0" } 
+      }, CANDLE_FETCH_TIMEOUT_MS);
+
+      if (!res.ok) {
+        if (res.body) await res.body.cancel().catch(() => {});
+        throw new Error(`Binance ${sym}: ${res.status}`);
+      }
+
+      const rows: any[] = await res.json();
+      const candles: Candle[] = rows.map((r) => ({
+        t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5],
+      })).filter((c) => isFinite(c.c));
+      
+      if (candles.length < 10) throw new Error("Too few Binance candles");
+      return candles.slice(-200);
+    });
+
+    try {
+      const winner = await Promise.any(fetchers);
+      controllers.forEach(c => c.abort());
+      return winner;
+    } catch (e: any) {
+      lastErr = e;
+    }
   }
+
+  throw lastErr instanceof Error ? lastErr : new Error("Binance unavailable");
 }
 
 async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<Candle[]> {
