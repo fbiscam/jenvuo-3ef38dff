@@ -308,8 +308,20 @@ function inferInstrumentFromText(text: string): string {
 
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const CACHE_TTL = 12_000;
+const CACHE_TTL = 30_000;
+// Hard ceiling for reusing a stale candle set when every provider is throttled.
+// Analysis always overlays the live tick on the last bar, so a slightly older
+// structure is far better than the synthetic sine-wave fallback (which forces
+// the whole scan into quote-only "WAIT" mode).
+const CACHE_STALE_MAX = 10 * 60_000;
+// Candle fetches are deduplicated: one scan pulls 5 timeframes and cross-pairs
+// derive from XAU/USD + an FX proxy, so without this the same Yahoo endpoint is
+// hit ~30x per scan and starts 429-ing — that was the "some pairs analyze, some
+// don't" behaviour.
+const inflightCandles = new Map<string, Promise<Candle[]>>();
+const CANDLE_FETCH_TIMEOUT_MS = 7000;
 const syntheticCandleKeys = new Set<string>();
+
 const TF_MS: Record<string, number> = {
   "1m": 60_000,
   "5m": 5 * 60_000,
@@ -370,6 +382,27 @@ function coinbaseProductFromSymbol(sym: string): string | null {
 }
 
 async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Candle[]> {
+  const dedupeKey = `Y:${symbols.join("|")}:${tf}`;
+  const hit = candleCache.get(dedupeKey);
+  if (hit && Date.now() - hit.at < CACHE_TTL) return hit.data;
+  const running = inflightCandles.get(dedupeKey);
+  if (running) return running;
+  const p = fetchFromYahooSymbolsRaw(symbols, tf)
+    .then((data) => {
+      // Shared legs (XAU/USD + FX proxies) are reused by every cross-pair, so
+      // caching them here keeps a six-pair auto-scan to a handful of requests.
+      candleCache.set(dedupeKey, { at: Date.now(), data });
+      return data;
+    })
+    .finally(() => {
+      inflightCandles.delete(dedupeKey);
+    });
+  inflightCandles.set(dedupeKey, p);
+  return p;
+}
+
+
+async function fetchFromYahooSymbolsRaw(symbols: string[], tf: string): Promise<Candle[]> {
   const cfg = YAHOO_INTERVAL[tf] ?? YAHOO_INTERVAL["15m"];
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
   const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
@@ -380,7 +413,8 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
             Accept: "application/json",
           },
-        });
+        }, CANDLE_FETCH_TIMEOUT_MS);
+
         if (!res.ok) throw new Error(`Yahoo ${sym}: ${res.status}`);
         const json: any = await res.json();
         const result = json?.chart?.result?.[0];
@@ -404,6 +438,17 @@ async function fetchFromYahooSymbols(symbols: string[], tf: string): Promise<Can
 }
 
 async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<Candle[]> {
+  const dedupeKey = `B:${symbols.join("|")}:${tf}`;
+  const running = inflightCandles.get(dedupeKey);
+  if (running) return running;
+  const p = fetchFromBinanceSymbolsRaw(symbols, tf).finally(() => {
+    inflightCandles.delete(dedupeKey);
+  });
+  inflightCandles.set(dedupeKey, p);
+  return p;
+}
+
+async function fetchFromBinanceSymbolsRaw(symbols: string[], tf: string): Promise<Candle[]> {
   const map: Record<string, string> = {
     "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m",
     "1h": "1h", "4h": "4h", "1d": "1d",
@@ -412,7 +457,8 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
   const hosts = ["api.binance.com", "data-api.binance.vision"];
   const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
         const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
-        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } }, CANDLE_FETCH_TIMEOUT_MS);
+
         if (!res.ok) throw new Error(`Binance ${sym}: ${res.status}`);
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
@@ -445,7 +491,7 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
     try {
       const res = await fetchWithTimeout(`https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}`, {
         headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
-      });
+      }, CANDLE_FETCH_TIMEOUT_MS);
       if (!res.ok) { lastErr = new Error(`Coinbase ${product}: ${res.status}`); continue; }
       const rows: any[] = await res.json();
       const candles: Candle[] = rows
@@ -551,8 +597,28 @@ export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: strin
   const cacheKey = `${inst.key}:${tf}`;
   const cached = candleCache.get(cacheKey);
   const now = Date.now();
-  if (cached && now - cached.at < CACHE_TTL) return cached.data;
+  if (cached && now - cached.at < CACHE_TTL && !syntheticCandleKeys.has(cacheKey)) return cached.data;
 
+  // One in-flight fetch per instrument+timeframe. A single scan (manual or
+  // auto) asks for 1h/15m/4h/5m at once and auto-scan runs six pairs together;
+  // without this the providers see a burst and throttle, which is exactly what
+  // made some pairs analyze properly and others drop to quote-only mode.
+  const running = inflightCandles.get(cacheKey);
+  if (running) return running;
+  const job = fetchInstrumentCandlesRaw(inst, tf, cacheKey, cached, now).finally(() => {
+    inflightCandles.delete(cacheKey);
+  });
+  inflightCandles.set(cacheKey, job);
+  return job;
+}
+
+async function fetchInstrumentCandlesRaw(
+  inst: ResolvedInstrument,
+  tf: string,
+  cacheKey: string,
+  cached: { at: number; data: Candle[] } | undefined,
+  now: number,
+): Promise<Candle[]> {
   const pairKey = inst.key.startsWith("METAL:") ? inst.key.slice("METAL:".length) : inst.key;
   const hasProxy = !!XAU_PAIRS[pairKey]?.usdProxy;
 
@@ -566,26 +632,39 @@ export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: strin
   if (inst.kind !== "metal" && inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
 
   let lastErr: any = null;
-  for (const f of tries) {
-    try {
-      const data = await f();
-      candleCache.set(cacheKey, { at: now, data });
-      syntheticCandleKeys.delete(cacheKey);
-      return data;
-    } catch (e) { lastErr = e; }
+  // Two passes: a throttled provider usually recovers within a second, and one
+  // retry is far cheaper than serving the user a "provider delayed" scan.
+  for (let pass = 0; pass < 2; pass++) {
+    if (pass > 0) await new Promise((r) => setTimeout(r, 450));
+    for (const f of tries) {
+      try {
+        const data = await f();
+        if (data.length >= 20) {
+          candleCache.set(cacheKey, { at: Date.now(), data });
+          syntheticCandleKeys.delete(cacheKey);
+          return data;
+        }
+        lastErr = new Error("too few candles");
+      } catch (e) { lastErr = e; }
+    }
   }
-  if (cached) return cached.data;
+  // Real (if slightly stale) structure beats synthetic candles: the scan
+  // overlays the live tick on the last bar anyway.
+  if (cached && cached.data.length >= 20 && !syntheticCandleKeys.has(cacheKey) && now - cached.at < CACHE_STALE_MAX) {
+    return cached.data;
+  }
   const quote = await resolveLiveTick(inst).catch(() => null);
   if (quote?.price && Number.isFinite(quote.price) && quote.price > 0) {
     const synthetic = buildSyntheticCandles(inst, tf, quote.price);
     if (synthetic.length >= 20) {
-      candleCache.set(cacheKey, { at: now, data: synthetic });
+      candleCache.set(cacheKey, { at: Date.now(), data: synthetic });
       syntheticCandleKeys.add(cacheKey);
       return synthetic;
     }
   }
   throw lastErr ?? new Error(`No data source available for ${inst.display}`);
 }
+
 
 async function fetchGoldCandles(tf: string): Promise<Candle[]> {
   return fetchInstrumentCandles(resolveInstrument("XAUUSD"), tf);
