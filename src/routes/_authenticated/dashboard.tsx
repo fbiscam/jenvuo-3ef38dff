@@ -1050,7 +1050,10 @@ function DashboardLayout() {
                   <img
                     src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
                     alt={fullName || email || "Account avatar"}
-                    className="h-9 w-9 rounded-full object-cover"
+                    width={108}
+                    height={108}
+                    className="h-9 w-9 rounded-full object-cover [image-rendering:auto]"
+                    decoding="async"
                   />
                   <div className="min-w-0">
                     <p className="truncate text-[13px] font-medium text-zinc-900">{fullName || "Trader"}</p>
