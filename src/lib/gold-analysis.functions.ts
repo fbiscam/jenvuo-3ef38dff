@@ -3041,7 +3041,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         }
 
       }
-      let rawConf = Math.min(95, Math.max(setupScore, blended, 24));
+      let rawConf = Math.min(95, Math.max(setupScore, blended, 38));
 
       // Confidence smoothing memory — prevents a fresh scan from swinging
       // wildly (e.g. 75% now, 55% five minutes later) when structure hasn't
@@ -3068,7 +3068,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
               smoothed = Math.round(prev * 0.40 + rawConf * 0.60);
               // Damping removed to prevent sticking; allow full reflection of real market data.
               // We rely on the EMA blend and the rawConf floor (10) instead.
-              smoothed = Math.min(95, Math.max(24, smoothed));
+              smoothed = Math.min(95, Math.max(38, smoothed));
             }
           }
           await supabaseAdmin
