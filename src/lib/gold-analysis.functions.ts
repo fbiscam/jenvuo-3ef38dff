@@ -2390,6 +2390,11 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const preVetoTrade = {
       ...built,
       direction: built.direction === "WAIT" ? analysisDirection : built.direction,
+      // A non-executable market read still needs representative levels for
+      // quality factors such as bias, sweep and session. It must not be treated
+      // as a real zero-R trade (which adds an artificial RR veto and flattens
+      // confidence); the returned ticket remains WAIT with zero hidden levels.
+      rr: built.direction === "WAIT" && analysisDirection !== "WAIT" ? 2 : built.rr,
     };
     if (built.direction !== "WAIT") {
       const wantDir = built.direction === "BUY" ? "bullish" : "bearish";
