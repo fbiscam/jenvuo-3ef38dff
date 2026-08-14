@@ -704,9 +704,9 @@ export function scoreSetup(args: {
   // Vetoes: single = soft (-8), multi (2+) = harsh (-15 each). Prevents a lone
   // false-positive gate from killing an otherwise strong setup.
   if (vetos.length === 1) {
-    score = Math.max(15, score - 8);
+    score = Math.max(24, score - 8);
   } else if (vetos.length >= 2) {
-    score = Math.max(10, score - vetos.length * 15);
+    score = Math.max(20, score - vetos.length * 15);
   }
 
   // Grade thresholds — A reserved for genuinely high-conviction setups
