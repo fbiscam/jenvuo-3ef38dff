@@ -3065,7 +3065,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
             const prev = Number(mem.smoothed_conf);
             if (Number.isFinite(prev) && ageMin <= 15) {
               // EMA: weight previous higher to damp jitter
-              smoothed = Math.round(prev * 0.70 + rawConf * 0.30);
+              smoothed = Math.round(prev * 0.40 + rawConf * 0.60);
               // Cap drop to 6 points within the window (tighter damping)
               if (smoothed < prev - 6) smoothed = prev - 6;
               // Cap rise to 8 points so pops also settle in
