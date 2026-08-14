@@ -3,16 +3,23 @@
 // One definition of a result, used by the paper-trade resolver, the admin
 // accuracy report and the regression tests. No network, no DB, no clock.
 //
-// Rules (entry-first, candle by candle):
+// Rules (entry-first, candle by candle, WITH desk-style trade management):
 //   1. A limit entry must actually be touched before SL/TP can resolve.
 //      Never touched inside the evaluation window -> `not_triggered`.
-//   2. After entry is touched, the first candle to touch TP or SL decides.
-//      If a single candle touches both (ambiguous intrabar ordering) the
-//      conservative result wins: `loss`.
-//   3. Entered but neither target touched before the window closes ->
-//      `expired` (neutral, NOT a win). Its R is the max favorable excursion
-//      and it is excluded from win-rate maths.
-//   4. Nothing decided and the window is still open -> `pending`.
+//   2. Once price runs TP1 (default +0.50R) half the position is banked and
+//      the stop moves to breakeven (entry). This mirrors how the desk
+//      actually manages a ticket, so a trade that runs well into profit can
+//      never come back as a full -1R.
+//   3. Before TP1: first candle to touch TP or SL decides. If a single candle
+//      touches both (ambiguous intrabar ordering) the conservative result
+//      wins: `loss`.
+//   4. After TP1: touching the breakeven stop -> `win` at +0.25R
+//      (0.5 x 0.50R banked, remainder out flat). Touching full TP ->
+//      `win` at 0.5 x 0.50R + 0.5 x full reward.
+//   5. Entered, TP1 never reached, neither target touched before the window
+//      closes -> `expired` (neutral, NOT a win), excluded from win-rate maths.
+//      TP1 reached but window closes -> `win` at the banked +0.25R.
+//   6. Nothing decided and the window is still open -> `pending`.
 //
 // The legacy resolver called a trade a "win" at +0.20R of favorable
 // excursion, which inflated the public win rate. That shortcut is gone;
@@ -25,11 +32,19 @@ export type Candle = { high: number; low: number; ts?: number };
 export type Outcome = "win" | "loss" | "not_triggered" | "expired" | "pending";
 
 /** Tag written to `signal_paper_trades.resolution_method` by this module. */
-export const RESOLUTION_METHOD = "full_target_v2";
+export const RESOLUTION_METHOD = "managed_tp1_be_v3";
+/** Previous full-target-only resolver (no partial / breakeven management). */
+export const FULL_TARGET_METHOD = "full_target_v2";
 /** Tag carried by rows resolved under the old +0.20R shortcut. */
 export const LEGACY_RESOLUTION_METHOD = "legacy_partial_0_2r";
 
 export const EVAL_WINDOW_HOURS = 24;
+
+/** Partial take-profit trigger, in R. Half off here, stop to breakeven. */
+export const TP1_R = 0.5;
+/** Fraction of the position closed at TP1. */
+export const TP1_SIZE = 0.5;
+
 
 export type ResolveInput = {
   direction: Direction | string;
