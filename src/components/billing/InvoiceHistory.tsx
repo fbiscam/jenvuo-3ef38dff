@@ -15,10 +15,6 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
 }
 
-function fmtDateLong(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
-}
-
 async function loadLogo(): Promise<string | null> {
   try {
     const res = await fetch("/favicon.png");
@@ -32,56 +28,6 @@ async function loadLogo(): Promise<string | null> {
   } catch {
     return null;
   }
-}
-
-type JsPDF = import("jspdf").jsPDF;
-
-async function loadFontBase64(path: string): Promise<string | null> {
-  try {
-    const res = await fetch(path);
-    if (!res.ok) return null;
-    const blob = await res.blob();
-    return await new Promise((resolve) => {
-      const fr = new FileReader();
-      fr.onload = () => {
-        const dataUrl = String(fr.result);
-        const base64 = dataUrl.split(",")[1];
-        resolve(base64 ?? null);
-      };
-      fr.onerror = () => resolve(null);
-      fr.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
-}
-
-async function embedGoogleSans(doc: JsPDF) {
-  const [normal, medium, semibold, bold] = await Promise.all([
-    loadFontBase64("/fonts/googlesans-400.ttf"),
-    loadFontBase64("/fonts/googlesans-500.ttf"),
-    loadFontBase64("/fonts/googlesans-600.ttf"),
-    loadFontBase64("/fonts/googlesans-700.ttf"),
-  ]);
-
-  if (normal) {
-    doc.addFileToVFS("GoogleSansNormal.ttf", normal);
-    doc.addFont("GoogleSansNormal.ttf", "GoogleSans", "normal");
-  }
-  if (medium) {
-    doc.addFileToVFS("GoogleSansMedium.ttf", medium);
-    doc.addFont("GoogleSansMedium.ttf", "GoogleSans", "medium");
-  }
-  if (semibold) {
-    doc.addFileToVFS("GoogleSansSemiBold.ttf", semibold);
-    doc.addFont("GoogleSansSemiBold.ttf", "GoogleSans", "semibold");
-  }
-  if (bold) {
-    doc.addFileToVFS("GoogleSansBold.ttf", bold);
-    doc.addFont("GoogleSansBold.ttf", "GoogleSans", "bold");
-  }
-
-  return { hasFont: Boolean(normal) };
 }
 
 export default function InvoiceHistory() {
@@ -111,148 +57,125 @@ export default function InvoiceHistory() {
       const doc = new jsPDF({ unit: "pt", format: "a4" });
       const W = doc.internal.pageSize.getWidth();
       const L = 48;
-      const R = W - L;
       const net = networkMeta(o.network);
-      const { hasFont } = await embedGoogleSans(doc);
-      const F = hasFont ? "GoogleSans" : "helvetica";
 
-      const date = fmtDateLong(o.decided_at ?? o.created_at);
-      const paid = Number(o.pay_amount_usd);
-      const bonus = Number(o.bonus_usd);
-      const credit = Number(o.credit_usd);
-
-      // Clean white background, no heavy band.
-      let y = 56;
-
-      // Logo + brand
+      // Header band
+      doc.setFillColor(250, 250, 250);
+      doc.rect(0, 0, W, 110, "F");
       if (logo) {
         try {
-          doc.addImage(logo, "PNG", L, y, 40, 40);
+          doc.addImage(logo, "PNG", L, 32, 40, 40);
         } catch {
           /* ignore */
         }
       }
-      doc.setFont(F, "semibold");
-      doc.setFontSize(20);
-      doc.setTextColor(18, 18, 18);
-      doc.text("Jenvu", L + (logo ? 52 : 0), y + 22);
-
-      doc.setFont(F, "normal");
+      doc.setTextColor(10, 10, 10);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text("Jenvu", L + (logo ? 52 : 0), 52);
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.text("jenvu.com · support@jenvu.net", L + (logo ? 52 : 0), y + 40);
+      doc.setTextColor(110, 110, 110);
+      doc.text("jenvu.com · support@jenvu.net", L + (logo ? 52 : 0), 68);
 
-      // Invoice title
-      doc.setFont(F, "semibold");
-      doc.setFontSize(15);
-      doc.setTextColor(18, 18, 18);
-      doc.text("INVOICE", R, y + 12, { align: "right" });
-      doc.setFont(F, "normal");
+      doc.setTextColor(10, 10, 10);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("INVOICE", W - L, 52, { align: "right" });
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.text(`${invoiceNo(o)} · ${date}`, R, y + 30, { align: "right" });
+      doc.setTextColor(110, 110, 110);
+      doc.text(invoiceNo(o), W - L, 68, { align: "right" });
+      doc.text(`Issued ${fmtDate(o.decided_at ?? o.created_at)}`, W - L, 82, { align: "right" });
 
-      y = 130;
-
-      // From / To cards
-      doc.setDrawColor(235, 235, 235);
-      doc.setFillColor(252, 252, 252);
-      doc.roundedRect(L, y, 210, 74, 8, 8, "F");
-      doc.roundedRect(L + 230, y, 210, 74, 8, 8, "F");
-
-      doc.setFont(F, "semibold");
+      // Billed to
+      let y = 150;
       doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text("BILLED TO", L + 14, y + 18);
-      doc.text("PAYMENT METHOD", L + 244, y + 18);
-
-      doc.setFont(F, "medium");
+      doc.setTextColor(140, 140, 140);
+      doc.text("BILLED TO", L, y);
+      doc.text("PAYMENT", W / 2, y);
       doc.setFontSize(10);
-      doc.setTextColor(30, 30, 30);
-      doc.text(email || "Account holder", L + 14, y + 38);
-      doc.text(`${net.asset} on ${net.chain}`, L + 244, y + 38);
-
-      doc.setFont(F, "normal");
+      doc.setTextColor(20, 20, 20);
+      doc.text(email || "Account holder", L, y + 16);
+      doc.text(`${net.asset} · ${net.chain}`, W / 2, y + 16);
       doc.setFontSize(8);
-      doc.setTextColor(120, 120, 120);
-      doc.text("Jenvu account credit top-up", L + 14, y + 54);
+      doc.setTextColor(110, 110, 110);
+      doc.text("Jenvu account credit top-up", L, y + 30);
       if (o.tx_hash) {
-        doc.text(`Tx ${o.tx_hash.slice(0, 24)}${o.tx_hash.length > 24 ? "…" : ""}`, L + 244, y + 54);
+        doc.text(`Tx ${o.tx_hash.slice(0, 22)}${o.tx_hash.length > 22 ? "…" : ""}`, W / 2, y + 30);
       }
 
-      y = 232;
-
-      // Line items
-      doc.setFont(F, "semibold");
+      // Table
+      y += 62;
+      doc.setDrawColor(230, 230, 230);
+      doc.line(L, y, W - L, y);
+      y += 18;
       doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
+      doc.setTextColor(140, 140, 140);
       doc.text("DESCRIPTION", L, y);
-      doc.text("AMOUNT", R, y, { align: "right" });
-      y += 14;
-      doc.setDrawColor(235, 235, 235);
-      doc.line(L, y, R, y);
+      doc.text("AMOUNT", W - L, y, { align: "right" });
+      y += 10;
+      doc.line(L, y, W - L, y);
 
-      doc.setFont(F, "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(30, 30, 30);
-      y += 26;
-      doc.text("Account credit top-up", L, y);
-      doc.text(`$${paid.toFixed(2)}`, R, y, { align: "right" });
-
-      if (bonus > 0) {
-        y += 22;
-        doc.setTextColor(100, 100, 100);
-        doc.text(`Bonus credit${o.promo_code ? ` (${o.promo_code})` : ""}`, L, y);
-        doc.text(`$${bonus.toFixed(2)}`, R, y, { align: "right" });
+      const rows: Array<[string, string]> = [
+        ["Account credit top-up", `$${Number(o.pay_amount_usd).toFixed(2)}`],
+      ];
+      if (Number(o.bonus_usd) > 0) {
+        rows.push([`Bonus credit${o.promo_code ? ` (${o.promo_code})` : ""}`, `$${Number(o.bonus_usd).toFixed(2)}`]);
       }
 
-      y += 28;
-      doc.line(L, y, R, y);
+      doc.setTextColor(20, 20, 20);
+      doc.setFontSize(10);
+      for (const [label, amt] of rows) {
+        y += 22;
+        doc.text(label, L, y);
+        doc.text(amt, W - L, y, { align: "right" });
+      }
 
-      // Totals
-      y += 20;
-      doc.setFont(F, "normal");
+      y += 16;
+      doc.setDrawColor(230, 230, 230);
+      doc.line(L, y, W - L, y);
+      y += 24;
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.text("Amount paid", R - 130, y, { align: "right" });
-      doc.setFont(F, "semibold");
+      doc.setTextColor(110, 110, 110);
+      doc.text("Paid", W - L - 120, y, { align: "right" });
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
-      doc.setTextColor(18, 18, 18);
-      doc.text(`$${paid.toFixed(2)} USD`, R, y, { align: "right" });
-
-      y += 22;
-      doc.setFont(F, "normal");
+      doc.setTextColor(10, 10, 10);
+      doc.text(`$${Number(o.pay_amount_usd).toFixed(2)} USD`, W - L, y, { align: "right" });
+      y += 20;
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.text("Credited to balance", R - 130, y, { align: "right" });
-      doc.setFont(F, "bold");
+      doc.setTextColor(110, 110, 110);
+      doc.text("Credited to balance", W - L - 120, y, { align: "right" });
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
       doc.setTextColor(16, 122, 76);
-      doc.text(`$${credit.toFixed(2)} USD`, R, y, { align: "right" });
+      doc.text(`$${Number(o.credit_usd).toFixed(2)} USD`, W - L, y, { align: "right" });
 
-      // Paid badge
-      y += 48;
-      doc.setFillColor(240, 249, 244);
-      doc.roundedRect(L, y - 14, 72, 26, 10, 10, "F");
-      doc.setFont(F, "bold");
+      // Paid stamp
+      y += 40;
+      doc.setFillColor(240, 250, 245);
+      doc.roundedRect(L, y - 14, 78, 22, 6, 6, "F");
       doc.setFontSize(9);
       doc.setTextColor(16, 122, 76);
-      doc.text("PAID", L + 36, y + 2, { align: "center" });
+      doc.setFont("helvetica", "bold");
+      doc.text("PAID", L + 39, y + 1, { align: "center" });
 
       // Footer
       const H = doc.internal.pageSize.getHeight();
-      y = H - 78;
       doc.setDrawColor(235, 235, 235);
-      doc.line(L, y, R, y);
-      doc.setFont(F, "normal");
+      doc.line(L, H - 78, W - L, H - 78);
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(150, 150, 150);
       doc.text(
         "Thank you for your payment. Credits are applied to your Jenvu account balance immediately after approval.",
         L,
-        y + 22,
+        H - 58,
       );
-      doc.text("support@jenvu.net · This invoice was generated electronically and is valid without signature.", L, y + 38);
+      doc.text("Jenvu · support@jenvu.net · This invoice was generated electronically and is valid without signature.", L, H - 44);
 
       doc.save(`${invoiceNo(o)}.pdf`);
     } finally {
@@ -264,7 +187,7 @@ export default function InvoiceHistory() {
     <section className="rounded-2xl border border-zinc-200 bg-white p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-zinc-900">&nbsp; Invoices</h2>
+          <h2 className="text-sm font-semibold text-zinc-900">Invoices</h2>
           <p className="mt-0.5 text-xs text-zinc-500">Successful payments with downloadable PDF receipts.</p>
         </div>
       </div>

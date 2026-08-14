@@ -5,7 +5,6 @@ import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
-import { useTrial } from "@/hooks/useTrial";
 
 import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
 import pricingVoice from "@/assets/pricing-voice.jpg";
@@ -132,13 +131,9 @@ export const FAQ = [
 function PricingPage() {
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
-  const trial = useTrial();
-  const signedOut = currentPlan === null;
   const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
-  const priceOf = (t: { id: string; price: number }) => {
-    const base = signedOut && t.id === "pro" ? 5 : t.price;
-    return billing === "annual" && base > 0 ? Math.round((base * 12 * 0.83) / 10) * 10 : base;
-  };
+  const priceOf = (t: { id: string; price: number }) =>
+    billing === "annual" && t.price > 0 ? Math.round((t.price * 12 * 0.83) / 10) * 10 : t.price;
   const suffix = billing === "annual" ? "/yr" : "/mo";
   return (
     <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased md:[zoom:1.375]`}>
@@ -204,24 +199,20 @@ function PricingPage() {
                   <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                 </th>
                 {[
-                  { name: "Pro", price: signedOut ? (billing === "annual" ? "$50" : "$5") : (billing === "annual" ? "$150" : "$15"), tag: "Active", anonTo: "/auth" as const, search: { mode: "signup" as const }, dark: false, accent: true, key: "pro" },
-                  { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", anonTo: "/founding" as const, dark: true, key: "elite" },
-                  { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", anonTo: "/founding" as const, dark: false, key: "ultra" },
+                  { name: "Pro", price: billing === "annual" ? "$150" : "$15", tag: "Active", to: "/auth" as const, search: { mode: "signup" as const }, dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", to: "/founding" as const, dark: true, key: "elite" },
+                  { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", to: "/founding" as const, dark: false, key: "ultra" },
                 ].map((p) => {
-                  const trialPro = trial.active && p.key === "pro";
-                  const isCurrent = currentPlan === p.key && !trialPro;
+                  const isCurrent = currentPlan === p.key;
                   const isLoggedIn = currentPlan !== null;
-                  const disabled = !trialPro && isLoggedIn && !isCurrent && upgradeLock.locked;
-                  const cta = trialPro
-                    ? "Upgrade to Pro"
-                    : disabled
+                  const disabled = isLoggedIn && !isCurrent && upgradeLock.locked;
+                  const cta = disabled
                     ? "Locked in trial"
                     : isLoggedIn
                       ? "Upgrade"
                       : p.key === "pro"
                         ? "Start Free Trial"
                         : "Buy Now";
-                  const to = isLoggedIn ? "/dashboard/pay" : p.anonTo;
                   return (
                   <th
                     key={p.name}
@@ -268,7 +259,7 @@ function PricingPage() {
                       </button>
                     ) : (
                       <Link
-                        to={to}
+                        to={p.to}
                         search={p.search}
                         className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
                           p.accent || p.dark
@@ -287,6 +278,7 @@ function PricingPage() {
 
             <tbody>
               {([
+                { f: "AFTER RAISING $100 IN REVENUE - PRICING", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
                 { f: "Monthly wallet (USD)", b: "$15", c: "$50", d: "$100" },
 
                 { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
@@ -437,21 +429,15 @@ function PricingPage() {
                 <span className="text-xs text-zinc-500">wallet</span>
               </div>
               <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · ~{Math.floor(p.price / 0.2)} signals</div>
-              {signedOut ? (
-                <Link to="/auth" search={{ mode: "signup" as const }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
-                  Buy Now
-                </Link>
-              ) : (
-                <Link to="/dashboard/pay" search={{ amount: p.price }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
-                  Buy Now
-                </Link>
-              )}
+              <Link to="/contact" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
+                Notify me
+              </Link>
             </div>
           ))}
         </div>
 
         {/* CUSTOM AMOUNT */}
-        <CustomTopUp signedOut={signedOut} />
+        <CustomTopUp />
 
         
       </section>
@@ -502,7 +488,7 @@ function Cell({ value, highlight }: { value: Mark; highlight?: boolean }) {
   return <td className={`${base} ${MONO} text-[11px] uppercase tracking-wider text-zinc-700`}>{value}</td>;
 }
 
-function CustomTopUp({ signedOut }: { signedOut: boolean }) {
+function CustomTopUp() {
   const [amount, setAmount] = React.useState<number>(15);
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
   const estSignals = Math.floor(safe / 0.2);
@@ -516,7 +502,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center rounded-md border border-zinc-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-amber-400">
-            <span className="px-3 text-sm text-zinc-500 border-r border-zinc-200 bg-white">$</span>
+            <span className="px-3 text-sm text-zinc-500 border-r border-zinc-200 bg-zinc-50">$</span>
             <input
               type="number"
               min={5}
@@ -530,23 +516,12 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
             <div className={`text-2xl font-bold tabular-nums ${MONO}`}>${safe}</div>
             <div className="text-[11px] text-zinc-500">wallet · ~{estSignals} signals</div>
           </div>
-          {signedOut ? (
-            <Link
-              to="/auth"
-              search={{ mode: "signup" as const }}
-              className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
-            >
-              Buy Now
-            </Link>
-          ) : (
-            <Link
-              to="/dashboard/pay"
-              search={{ amount: safe }}
-              className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
-            >
-              Buy Now
-            </Link>
-          )}
+          <Link
+            to="/contact"
+            className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
+          >
+            Continue
+          </Link>
         </div>
       </div>
       {amount < 5 && (

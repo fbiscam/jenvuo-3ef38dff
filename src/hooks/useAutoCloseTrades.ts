@@ -49,21 +49,18 @@ export function useAutoCloseTrades() {
   );
   const livePrices = useLivePrices(symbols);
 
-  // Auto-fill pending → open using real limit-order semantics: a BUY limit
-  // fills as soon as price trades AT OR BELOW entry, a SELL limit at or above.
-  // The old version needed price to sit inside a ±0.02% band at the exact
-  // 3s poll tick, so fast pullbacks through entry were missed entirely and
-  // the trade stayed "pending" while the market ran to target.
+  // Auto-fill pending → open only when live price is *at* entry AND hasn't
+  // already blown past the SL/TP. Prevents instant fake losses when the
+  // market has already moved far from the alert's entry by the time the
+  // user logs it as a trade.
   useEffect(() => {
     const filling = openTrades.filter((t) => {
       if (t.outcome !== "pending" || t.entry == null) return false;
       const px = livePrices[t.pair.toUpperCase()];
       if (px == null) return false;
-      // Small tolerance so a near-touch still counts as a fill.
+      // Tight tolerance: 0.02% of entry (≈132 pts on XAUJPY @ 661k, ≈0.8 on XAUUSD @ 4000).
       const tol = Math.max(t.entry * 0.0002, 0.01);
-      const touched =
-        t.direction === "long" ? px <= t.entry + tol : px >= t.entry - tol;
-      if (!touched) return false;
+      if (Math.abs(px - t.entry) > tol) return false;
       // Refuse to fill if price has already crossed SL or TP —
       // that trade never actually filled in the real market.
       if (t.stop_loss != null) {
@@ -76,7 +73,6 @@ export function useAutoCloseTrades() {
       }
       return true;
     });
-
     if (!filling.length) return;
     (async () => {
       for (const t of filling) {

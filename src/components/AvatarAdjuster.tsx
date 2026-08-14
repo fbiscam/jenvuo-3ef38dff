@@ -74,17 +74,12 @@ export default function AvatarAdjuster({ file, onCancel, onDone }: Props) {
     if (!img) return;
     setSaving(true);
     try {
-      // Export at HD: up to 1024px, never upscaling beyond what the source can fill.
-      const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-      const sourceCap = Math.round((Math.min(img.naturalWidth, img.naturalHeight) / Math.max(1, zoom)) * zoom);
-      const OUT = Math.max(512, Math.min(1024, Math.round(Math.max(BOX * dpr * 2, Math.min(1024, sourceCap)))));
+      const OUT = 512;
       const canvas = document.createElement("canvas");
       canvas.width = OUT;
       canvas.height = OUT;
-      const ctx = canvas.getContext("2d", { alpha: false });
+      const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Canvas not supported");
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "high";
       ctx.fillStyle = "#f4f4f5";
       ctx.fillRect(0, 0, OUT, OUT);
       // Map on-screen coords to output coords: 1px on-screen = (OUT/BOX)px output
@@ -98,7 +93,7 @@ export default function AvatarAdjuster({ file, onCancel, onDone }: Props) {
         canvas.toBlob(
           (b) => (b ? resolve(b) : reject(new Error("Export failed"))),
           "image/jpeg",
-          0.96,
+          0.9,
         ),
       );
       onDone(blob);

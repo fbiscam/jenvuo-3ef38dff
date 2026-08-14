@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
+import TrialBanner from "@/components/TrialBanner";
 import { useTrial } from "@/hooks/useTrial";
 import InvoiceHistory from "@/components/billing/InvoiceHistory";
 
@@ -142,7 +143,7 @@ function Billing() {
   }
 
   const plan = currentPlan;
-  const planLabel = trial.active ? "Pro plan $15" : plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "No plan";
+  const planLabel = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "No plan";
   const remaining = credits.balance;
   const pctBase = Math.max(credits.balance, credits.allowance);
   const pct = pctBase > 0 ? Math.min(100, Math.round((remaining / pctBase) * 100)) : 0;
@@ -152,14 +153,15 @@ function Billing() {
 
   return (
     <div className="space-y-10">
+      <TrialBanner />
       {/* CURRENT PLAN */}
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="mt-2 flex items-center gap-3">
-              <h2 className="pl-1 mt-2 text-2xl font-semibold">&nbsp; {planLabel}</h2>
+              <h2 className="pl-1 mt-2 text-2xl font-semibold">&nbsp;{planLabel}</h2>
               {trial.active ? (
-                <span className="rounded-full border border-red-200 bg-white px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-red-600">
+                <span className="rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
                   Trial · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"}
                 </span>
               ) : plan ? (
@@ -173,7 +175,7 @@ function Billing() {
               )}
             </div>
 
-            <p className="mt-2 max-w-xl text-[12px] leading-snug sm:max-w-none sm:text-sm sm:leading-normal sm:whitespace-nowrap text-zinc-500">
+            <p className="mt-2 max-w-xl text-[12px] leading-snug sm:text-sm sm:leading-normal text-zinc-500">
               {trial.active
                 ? `Your free Pro trial ends on ${trial.endsAtLabel}. Upgrade any time to keep Pro features after that date.`
                 : plan
@@ -182,16 +184,12 @@ function Billing() {
             </p>
 
           </div>
-          {trial.active ? (
-            <Link to="/dashboard/pay" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
-              Upgrade to Pro
-            </Link>
-          ) : plan ? (
-            <Link to="/dashboard/pay" className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
+          {plan ? (
+            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
               Manage plan
             </Link>
           ) : (
-            <Link to="/dashboard/pay" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
+            <Link to="/pricing" className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800">
               Choose plan
             </Link>
           )}
@@ -212,7 +210,7 @@ function Billing() {
             )}
             <p className="mt-2 text-[12.5px] text-zinc-500">Flat $0.20 per real BUY/SELL signal, or $0.25 for premium confirmation scans. WAIT / no-trade scans are free.</p>
           </div>
-          <Link to="/dashboard/pay" className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-normal text-zinc-900 hover:bg-zinc-50">
+          <Link to="/dashboard/pay" className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-normal text-white hover:bg-zinc-800">
             Add funds
           </Link>
         </div>
@@ -375,9 +373,9 @@ function Billing() {
                   <span className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">Invite Only Pricing</span>
                 </th>
                 {[
-                  { name: "Pro", price: "$15", tag: "Active", to: "/dashboard/pay" as const, cta: "Upgrade now", dark: false, accent: true, key: "pro" },
-                  { name: "Elite", price: "$50", tag: "Desk", to: "/dashboard/pay" as const, cta: "Upgrade now", dark: true, key: "elite" },
-                  { name: "Ultra", price: "$100", tag: "Fund / Desk+", to: "/dashboard/pay" as const, cta: "Upgrade now", dark: false, key: "ultra" },
+                  { name: "Pro", price: "$15", tag: "Active", to: "/founding" as const, cta: "Upgrade now", dark: false, accent: true, key: "pro" },
+                  { name: "Elite", price: "$50", tag: "Desk", to: "/founding" as const, cta: "Upgrade now", dark: true, key: "elite" },
+                  { name: "Ultra", price: "$100", tag: "Fund / Desk+", to: "/founding" as const, cta: "Upgrade now", dark: false, key: "ultra" },
                 ].map((p) => {
                   const isCurrent = plan === p.key;
                   return (

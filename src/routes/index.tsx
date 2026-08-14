@@ -1,6 +1,4 @@
 import * as React from "react";
-{/* aj signal kew nhi arha check kr kaya issue ha */}
-
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CloudOrb } from "@/components/CloudOrb";
@@ -9,7 +7,6 @@ import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 
 
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { useTrial } from "@/hooks/useTrial";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
@@ -173,7 +170,6 @@ function HomePage() {
   const ticker = useLiveTicker();
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
-  const trial = useTrial();
   const { user: authUser } = useAuthUser();
   const isAuthed = !!authUser;
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
@@ -715,17 +711,14 @@ function HomePage() {
                     <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
                   </th>
                   {[
-                    { name: "Pro", price: currentPlan === null ? "$5" : "$15", tag: "Active", accent: true, key: "pro", to: "/auth" as const, search: { mode: "signup" as const } },
+                    { name: "Pro", price: "$15", tag: "Active", accent: true, key: "pro", to: "/auth" as const, search: { mode: "signup" as const } },
                     { name: "Elite", price: "$50", tag: "Desk", dark: true, key: "elite", to: "/founding" as const },
                     { name: "Ultra", price: "$100", tag: "Fund / Desk+", key: "ultra", to: "/founding" as const },
                   ].map((p) => {
-                    const trialPro = trial.active && p.key === "pro";
-                    const isCurrent = currentPlan === p.key && !trialPro;
+                    const isCurrent = currentPlan === p.key;
                     const isLoggedIn = currentPlan !== null;
-                    const disabled = !trialPro && isLoggedIn && !isCurrent && upgradeLock.locked;
-                    const cta = trialPro
-                      ? "Upgrade to Pro"
-                      : isCurrent
+                    const disabled = isLoggedIn && !isCurrent && upgradeLock.locked;
+                    const cta = isCurrent
                       ? "Active"
                       : disabled
                         ? "Locked in trial"

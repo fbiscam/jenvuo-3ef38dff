@@ -74,8 +74,6 @@ function OpsPayments() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ ...emptyPromo });
-  const [query, setQuery] = useState("");
-
 
   const load = useCallback(async () => {
     try {
@@ -154,26 +152,7 @@ function OpsPayments() {
     }
   }
 
-  async function copy(text: string) {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success("Copied.");
-    } catch {
-      toast.error("Copy failed.");
-    }
-  }
-
-  const q = query.trim().toLowerCase();
-  const visible: Row[] = (rows ?? []).filter((r) =>
-    !q
-      ? true
-      : [r.email, r.user_email, r.user_id, r.id, r.tx_hash, r.promo_code, r.deposit_address]
-          .filter(Boolean)
-          .some((v) => String(v).toLowerCase().includes(q)),
-  );
-
   const input = "rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400";
-
 
   return (
     <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS}`}>
@@ -199,150 +178,102 @@ function OpsPayments() {
 
         {tab === "orders" && (
           <>
-            <div className="mt-4 flex flex-wrap items-center gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               {FILTERS.map((f) => (
                 <button
                   key={f.id}
                   onClick={() => setFilter(f.id)}
                   className={`rounded-full px-3 py-1.5 text-[13px] transition ${
-                    filter === f.id ? "bg-zinc-900 text-white" : "border border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                    filter === f.id ? "bg-zinc-100 text-zinc-900" : "text-zinc-500 hover:text-zinc-900"
                   }`}
                 >
                   {f.label}
                 </button>
               ))}
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search email, TX ID, order ID, promo…"
-                className={`${input} ml-auto w-full sm:w-80`}
-              />
             </div>
 
-            {rows && rows.length > 0 && (
-              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {[
-                  { k: "Orders", v: String(visible.length) },
-                  { k: "Paid total", v: `$${visible.reduce((s, r) => s + Number(r.pay_amount_usd || 0), 0).toFixed(2)}` },
-                  { k: "Credit total", v: `$${visible.reduce((s, r) => s + Number(r.credit_usd || 0), 0).toFixed(2)}` },
-                  { k: "Awaiting action", v: String(visible.filter((r) => !["approved", "rejected"].includes(String(r.status))).length) },
-                ].map((s) => (
-                  <div key={s.k} className="rounded-xl border border-zinc-200 px-4 py-3">
-                    <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">{s.k}</div>
-                    <div className="mt-1 text-lg font-medium text-zinc-900">{s.v}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-4 space-y-3">
-              {visible.map((r) => {
-                const net = networkMeta(String(r.network));
-                const status = String(r.status ?? "");
-                const pill =
-                  status === "approved"
-                    ? "bg-emerald-50 text-emerald-700"
-                    : status === "rejected"
-                      ? "bg-red-50 text-red-600"
-                      : status === "expired"
-                        ? "bg-zinc-100 text-zinc-500"
-                        : "bg-amber-50 text-amber-700";
-                return (
-                  <div key={r.id} className="rounded-2xl border border-zinc-200 p-4">
-                    <div className="flex flex-wrap items-start gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={`rounded-full px-2.5 py-1 text-[11px] uppercase tracking-[0.1em] ${pill}`}>
-                            {status.replace("_", " ") || "unknown"}
-                          </span>
-                          <span className="text-[13px] font-medium text-zinc-900 break-all">
-                            {r.email ?? r.user_email ?? String(r.user_id ?? "").slice(0, 8)}
-                          </span>
-                          <span className="text-[12px] text-zinc-400">{new Date(r.created_at).toLocaleString()}</span>
-                        </div>
-                        <div className="mt-1 text-[12px] text-zinc-500">
-                          {net.label} · order <span className="font-mono">{String(r.id).slice(0, 8)}</span>
-                          {r.user_id && <> · user <span className="font-mono">{String(r.user_id)}</span></>}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-medium text-zinc-900">${Number(r.pay_amount_usd || 0).toFixed(2)}</div>
-                        <div className="text-[12px] text-zinc-500">
-                          credit ${Number(r.credit_usd || 0).toFixed(2)}
-                          {Number(r.bonus_usd) > 0 && <span className="text-emerald-700"> (+${Number(r.bonus_usd).toFixed(2)})</span>}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-3 rounded-xl bg-zinc-50 px-3 py-2.5">
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Transaction ID</div>
-                      {r.tx_hash ? (
-                        <div className="mt-1 flex flex-wrap items-center gap-2">
-                          <code className="min-w-0 flex-1 break-all font-mono text-[12.5px] text-zinc-900">{String(r.tx_hash)}</code>
-                          <button onClick={() => void copy(String(r.tx_hash))} className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px] hover:bg-zinc-50">
-                            Copy
-                          </button>
-                          <a href={net.explorerTx(String(r.tx_hash))} target="_blank" rel="noreferrer" className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px] hover:bg-zinc-50">
-                            Explorer
-                          </a>
-                        </div>
-                      ) : (
-                        <div className="mt-1 text-[12.5px] text-zinc-400">Not submitted yet</div>
-                      )}
-                    </div>
-
-                    <div className="mt-3 grid gap-2 text-[12.5px] sm:grid-cols-2 lg:grid-cols-4">
-                      <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Deposit address</div>
-                        <div className="break-all font-mono text-zinc-700">{r.deposit_address ?? "—"}</div>
-                      </div>
-                      <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Promo</div>
-                        <div className="text-zinc-700">{r.promo_code ?? "—"}</div>
-                      </div>
-                      <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Expires</div>
-                        <div className="text-zinc-700">{r.expires_at ? new Date(r.expires_at).toLocaleString() : "—"}</div>
-                      </div>
-                      <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Auto check</div>
-                        <div className="text-zinc-700">{r.auto_result?.reason ?? "—"}</div>
-                      </div>
-                    </div>
-
-                    {r.reject_reason && (
-                      <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-[12.5px] text-red-700">Rejected: {r.reject_reason}</div>
-                    )}
-
-                    {status !== "approved" && (
-                      <div className="mt-3 flex gap-2">
-                        <button
-                          disabled={busy === r.id}
-                          onClick={() => void decide(r.id, "approve")}
-                          className="rounded-lg bg-emerald-600 px-3.5 py-2 text-[13px] text-white hover:bg-emerald-700 disabled:opacity-50"
-                        >
-                          Approve & credit
-                        </button>
-                        {status !== "rejected" && (
-                          <button
-                            disabled={busy === r.id}
-                            onClick={() => void decide(r.id, "reject")}
-                            className="rounded-lg border border-zinc-200 px-3.5 py-2 text-[13px] text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full text-left text-[13px]">
+                <thead className="text-zinc-400">
+                  <tr>
+                    <th className="py-2 pr-3 font-normal">Created</th>
+                    <th className="py-2 pr-3 font-normal">User</th>
+                    <th className="py-2 pr-3 font-normal">Paid</th>
+                    <th className="py-2 pr-3 font-normal">Credit</th>
+                    <th className="py-2 pr-3 font-normal">Promo</th>
+                    <th className="py-2 pr-3 font-normal">Network / TX</th>
+                    <th className="py-2 pr-3 font-normal">Auto check</th>
+                    <th className="py-2 pr-3 font-normal">Status</th>
+                    <th className="py-2 pr-3 font-normal"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(rows ?? []).map((r) => {
+                    const net = networkMeta(String(r.network));
+                    return (
+                      <tr key={r.id} className="border-t border-zinc-100 align-top">
+                        <td className="py-2.5 pr-3 text-zinc-500">{new Date(r.created_at).toLocaleString()}</td>
+                        <td className="py-2.5 pr-3">{r.email ?? r.user_id?.slice(0, 8)}</td>
+                        <td className="py-2.5 pr-3">${Number(r.pay_amount_usd).toFixed(2)}</td>
+                        <td className="py-2.5 pr-3">
+                          ${Number(r.credit_usd).toFixed(2)}
+                          {Number(r.bonus_usd) > 0 && <span className="text-emerald-700"> (+{Number(r.bonus_usd).toFixed(2)})</span>}
+                        </td>
+                        <td className="py-2.5 pr-3">{r.promo_code ?? "—"}</td>
+                        <td className="py-2.5 pr-3">
+                          <div>{net.label}</div>
+                          {r.tx_hash ? (
+                            <a href={net.explorerTx(r.tx_hash)} target="_blank" rel="noreferrer" className="break-all text-[12px] text-blue-600 underline">
+                              {String(r.tx_hash).slice(0, 22)}…
+                            </a>
+                          ) : (
+                            <span className="text-[12px] text-zinc-400">no tx yet</span>
+                          )}
+                        </td>
+                        <td className="py-2.5 pr-3 max-w-[220px] text-[12px] text-zinc-500">
+                          {r.auto_result?.reason ?? "—"}
+                        </td>
+                        <td className="py-2.5 pr-3">
+                          <span
+                            className={
+                              r.status === "approved" ? "text-emerald-700" : r.status === "rejected" ? "text-red-600" : "text-zinc-600"
+                            }
                           >
-                            Reject
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-              {rows && visible.length === 0 && <p className="py-8 text-center text-sm text-zinc-400">No payments in this view.</p>}
-              {!rows && <p className="py-8 text-center text-sm text-zinc-400">Loading…</p>}
+                            {r.status}
+                          </span>
+                          {r.reject_reason && <div className="text-[12px] text-red-500">{r.reject_reason}</div>}
+                        </td>
+                        <td className="py-2.5 pr-3">
+                          {r.status !== "approved" && (
+                            <div className="flex gap-1.5">
+                              <button
+                                disabled={busy === r.id}
+                                onClick={() => void decide(r.id, "approve")}
+                                className="rounded-lg bg-emerald-600 px-2.5 py-1.5 text-[12px] text-white hover:bg-emerald-700 disabled:opacity-50"
+                              >
+                                Approve
+                              </button>
+                              {r.status !== "rejected" && (
+                                <button
+                                  disabled={busy === r.id}
+                                  onClick={() => void decide(r.id, "reject")}
+                                  className="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-[12px] text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+                                >
+                                  Reject
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              {rows && rows.length === 0 && <p className="py-8 text-center text-sm text-zinc-400">No payments in this view.</p>}
             </div>
           </>
         )}
-
 
         {tab === "promos" && (
           <>

@@ -15,12 +15,6 @@ import { PwaTabBar } from "@/components/PwaTabBar";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { installIntlGuard } from "../lib/intl-guard";
-
-// Machines with a malformed system locale (e.g. `en-US@posix`) make every
-// default-locale date/number format throw and crash the page. Neutralise it
-// before any component renders.
-installIntlGuard();
 
 function NotFoundComponent() {
   return (

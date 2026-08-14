@@ -1038,9 +1038,7 @@ function DashboardLayout() {
                 <img
                   src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
                   alt={fullName || email || "Account avatar"}
-                  width={144}
-                  height={144}
-                  className="h-[48px] w-[48px] rounded-full object-cover [image-rendering:auto]"
+                  className="h-[48px] w-[48px] rounded-full object-cover [image-rendering:-webkit-optimize-contrast]"
                   loading="eager"
                   decoding="async"
                 />
@@ -1050,10 +1048,7 @@ function DashboardLayout() {
                   <img
                     src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
                     alt={fullName || email || "Account avatar"}
-                    width={108}
-                    height={108}
-                    className="h-9 w-9 rounded-full object-cover [image-rendering:auto]"
-                    decoding="async"
+                    className="h-9 w-9 rounded-full object-cover"
                   />
                   <div className="min-w-0">
                     <p className="truncate text-[13px] font-medium text-zinc-900">{fullName || "Trader"}</p>

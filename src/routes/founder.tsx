@@ -127,7 +127,7 @@ function FounderPage() {
             Start trading with the same edge.
           </h2>
           <p className="mt-3 text-zinc-600">
-            Join the desk Haseeb built. 14 days of Pro free, $5 of scan credits, and no card required.
+            Join the desk Haseeb built. 14 days of Pro free, $15 of scan credits, and no card required.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link

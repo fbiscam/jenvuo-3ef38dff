@@ -33,7 +33,7 @@ async function waitForMfaElevation(): Promise<boolean> {
 
 type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string; mfa?: "1"; mode?: "signup" };
 
-export function sanitizeRedirect(r?: string): string {
+function sanitizeRedirect(r?: string): string {
   if (!r || typeof r !== "string") return "/dashboard";
   if (!r.startsWith("/") || r.startsWith("//")) return "/dashboard";
   // Strip query/hash — TanStack's navigate({ to }) expects a route path only.

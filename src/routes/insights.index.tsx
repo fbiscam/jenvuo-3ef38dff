@@ -59,20 +59,7 @@ export const Route = createFileRoute("/insights/")({
       { name: "twitter:description", content: "Daily gold analysis, ICT and SMC briefings from the Jenvu desk." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/insights" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          name: "Market Insights",
-          description:
-            "Daily gold analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
-          url: "https://jenvu.com/insights",
-          isPartOf: { "@type": "WebSite", name: "Jenvu", url: "https://jenvu.com/" },
-        }),
-      },
-    ],
+
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(insightsQueryOptions),
   component: InsightsPage,
