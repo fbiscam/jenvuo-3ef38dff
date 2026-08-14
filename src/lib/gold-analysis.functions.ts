@@ -368,8 +368,15 @@ function buildSyntheticCandles(inst: ResolvedInstrument, tf: string, price: numb
 async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 1800): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let res: Response | null = null;
   try {
-    return await fetch(input, { ...init, signal: init.signal ?? controller.signal });
+    res = await fetch(input, { ...init, signal: init.signal ?? controller.signal });
+    return res;
+  } catch (err: any) {
+    if (res?.body) {
+      try { await res.body.cancel(); } catch { /* ignore */ }
+    }
+    throw err;
   } finally {
     clearTimeout(timer);
   }
