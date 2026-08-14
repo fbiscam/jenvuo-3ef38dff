@@ -2667,9 +2667,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
 
     // ============ STAGE 2: DEEPSEEK V4 SMC REVIEW (NVIDIA) ==================
-    // Desk pipeline order: (1) ICT/SMC rules engine → (2) DeepSeek V4 on the
-    // NVIDIA Integrate API → (3) GPT senior review → (2c) consensus.
-    // DeepSeek re-reads the same setup against pure Smart Money rules. It can
+    // Desk pipeline order: (1) ICT/SMC rules engine → (2) GPT-5.2 Chat SMC review
+    // → (3) GPT senior review → (2c) consensus.
+    // GPT-5.2 Chat re-reads the same setup against pure Smart Money rules. It can
     // AGREE (small confidence lift, max +4) or attach a risk note, but it can
     // never veto, so the number of signals delivered stays the same as before.
     let __crossCheckModel: string | null = null;
@@ -2685,7 +2685,7 @@ RANGE ${swingLow.toFixed(dec)}–${swingHigh.toFixed(dec)} | EQ ${equilibrium.to
 ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | iFVG ${ifvgs.length}`;
 
         const xRes = await callChatCompletion({
-          models: [...DEEPSEEK_REVIEW_CHAIN],
+          models: ["bmind/gpt-5.2-chat"],
           messages: [
             { role: "system", content: xSystem },
             { role: "user", content: xUser },
@@ -2710,7 +2710,7 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
           __dsAgrees = agrees;
           const smcScore = Number(px.smc_score);
           const note = String(px.note ?? "").slice(0, 220).trim();
-          const short = xRes.model.includes("deepseek") ? "DeepSeek V4" : (xRes.model.split("/").pop() ?? xRes.model);
+          const short = "GPT-5.2 Chat";
           if (agrees) {
             // Confidence can only go UP here, and only slightly.
             const lift = Number.isFinite(smcScore) && smcScore >= 80 ? 4 : 2;
@@ -2809,7 +2809,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
         // Senior review — best-available mode.
         // Uses SENIOR_REVIEW_CHAIN (best → most reliable) from ai-gateway.
         // Sequential fallback: strongest live model wins; if all throttled, review skips.
-        const seniorChain = SENIOR_REVIEW_CHAIN;
+        const seniorChain = ["bmind/gpt-5.2-chat"];
 
         let reviewResult: { content: string; model: string; usage: any } | null = null;
         let reviewError: any = null;
@@ -2838,7 +2838,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             key: "senior_review_attempted",
             label: "⚠ Senior review attempted",
             pass: false,
-            reason: "Senior review chain (GPT-5.5 → GPT-5.2 Chat → GPT-5 Mini → GPT-4.1 Mini → GPT-4o Mini) attempted but all providers throttled; the ICT/SMC engine plus DeepSeek V4 review still applied and the signal was delivered.",
+            reason: "Senior review (GPT-5.2 Chat) attempted but provider throttled; the ICT/SMC engine plus SMC review still applied and the signal was delivered.",
           });
         } else {
           const mdl = reviewResult.model;
@@ -2925,7 +2925,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
         __consensus = "full";
         setupChecks.unshift({
           key: "ai_consensus",
-          label: "✓ Full consensus — ICT/SMC engine + DeepSeek V4 + GPT senior review agree",
+          label: "✓ Full consensus — ICT/SMC engine + GPT-5.2 Chat reviews agree",
           pass: true,
           reason: `All three stages back this ${built.direction} at grade ${setupGrade} (${setupScore}/100). Alert and signal use this same confidence.`,
         });
@@ -2935,7 +2935,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
           key: "ai_consensus_split",
           label: "• Partial consensus — one reviewer is less convinced",
           pass: false,
-          reason: "The rules engine setup stands, but DeepSeek V4 and the GPT senior review did not fully align. Signal is still delivered at the confidence shown; size accordingly.",
+          reason: "The rules engine setup stands, but GPT-5.2 Chat reviewers did not fully align. Signal is still delivered at the confidence shown; size accordingly.",
         });
       }
     }
@@ -2963,7 +2963,7 @@ ${newsLines}
 IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(imminentHigh.minutesUntil)}m` : "none"}`;
 
         const macroRes = await callChatCompletion({
-          models: [...MACRO_CONTEXT_CHAIN],
+          models: ["bmind/gpt-5.2-chat"],
           messages: [
             { role: "system", content: macroSystem },
             { role: "user", content: macroUser },
@@ -3602,4 +3602,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// yar signal desk ma koyi bhi pair shi trha analyze nhi ho rha ha bar bar 35% confidence show kr rha ha isko theek kro
+// ICT/SMC Engine + Bluesmind GPT-5.2 Chat for narration and review. Nvidia API removed.
