@@ -1,5 +1,5 @@
 import * as React from "react";
-{/* aj signal kew nhi arha check kr kaya issue ha */}
+{/* ak extension banao jo add kara user chome ma aur wo ICT/SMC Par work kra aur trading view account pka charts par analyzing krta rha aur jab koyi signal illa to alert baja */}
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
