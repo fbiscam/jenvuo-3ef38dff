@@ -3066,10 +3066,8 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
             if (Number.isFinite(prev) && ageMin <= 15) {
               // EMA: weight previous higher to damp jitter
               smoothed = Math.round(prev * 0.40 + rawConf * 0.60);
-              // Cap drop to 6 points within the window (tighter damping)
-              if (smoothed < prev - 6) smoothed = prev - 6;
-              // Cap rise to 8 points so pops also settle in
-              if (smoothed > prev + 8) smoothed = prev + 8;
+              // Damping removed to prevent sticking; allow full reflection of real market data.
+              // We rely on the EMA blend and the rawConf floor (10) instead.
               smoothed = Math.min(95, Math.max(10, smoothed));
             }
           }
