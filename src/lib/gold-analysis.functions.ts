@@ -2963,7 +2963,7 @@ ${newsLines}
 IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(imminentHigh.minutesUntil)}m` : "none"}`;
 
         const macroRes = await callChatCompletion({
-          models: [...MACRO_CONTEXT_CHAIN],
+          models: ["bmind/gpt-5.2-chat"],
           messages: [
             { role: "system", content: macroSystem },
             { role: "user", content: macroUser },
