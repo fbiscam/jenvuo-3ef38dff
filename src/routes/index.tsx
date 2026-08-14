@@ -1,5 +1,5 @@
 import * as React from "react";
-{/* check kro jo pairs ha shi trha analyze ho rha hana */}
+{/* aj signal kew nhi arha check kr kaya issue ha */}
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
