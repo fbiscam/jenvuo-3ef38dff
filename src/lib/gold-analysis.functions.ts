@@ -2553,7 +2553,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       // or an aligned LTF MSS was being discarded and every pair returned WAIT.
       // Freshness, HTF alignment, confidence, two-hit confirmation and live
       // re-quote gates still run before an auto alert can be broadcast.
-      const needed = 1;
+      const needed = 0; // Relaxed: Allow directional analysis to flow into the scoring engine even before zone tap.
 
       if (confirmations < needed) {
         executionVetoReason = built.entryType === "LIMIT"

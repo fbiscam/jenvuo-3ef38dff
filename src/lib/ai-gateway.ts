@@ -404,13 +404,12 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // hops to GPT-5.2 Chat.
 
 export const MODEL_CHAIN = {
-  intent: ["bmind/gpt-5.5", "bmind/gpt-5-mini", "bmind/gpt-5.2-chat", "bmind/gpt-4o-mini"],
+  intent: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
   narration: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
   seniorReview: [
     "bmind/gpt-5.5",
     "bmind/gpt-5.2-chat",
     "bmind/gpt-5-mini",
-    "bmind/gpt-4.1-mini",
     "bmind/gpt-4o-mini",
   ],
   macroContext: [
