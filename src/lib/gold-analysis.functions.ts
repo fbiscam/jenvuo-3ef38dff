@@ -2203,6 +2203,16 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const ifvgs = detectIFVGs(ltf, ltfA.fvgs);
 
     const built = buildTrade(htfA, ltfA, pools, last.c, atr, inst.kind as any);
+    // Keep the directional market read separate from trade executability.
+    // buildTrade correctly returns WAIT when the nearest entry pocket is too
+    // far away, but scoring that WAIT object makes every directional factor
+    // false and collapses every XAU pair to the same ~16% confidence. Score the
+    // actual HTF/LTF bias while still returning WAIT and hiding all levels.
+    const analysisDirection: "BUY" | "SELL" | "WAIT" =
+      htfA.trend === "bullish" ? "BUY" :
+      htfA.trend === "bearish" ? "SELL" :
+      ltfA.trend === "bullish" ? "BUY" :
+      ltfA.trend === "bearish" ? "SELL" : "WAIT";
 
     // ============ DETERMINISTIC INTELLIGENCE PANELS ============
     // Synthesize htfLock / selfCritique / scenarios from the rules engine so
@@ -2377,7 +2387,15 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // be computed on the real setup, otherwise every vetoed pair collapses to
     // the same flat floor score (the "always 26%" bug) and confidence stops
     // telling the user anything about the actual market.
-    const preVetoTrade = { ...built };
+    const preVetoTrade = {
+      ...built,
+      direction: built.direction === "WAIT" ? analysisDirection : built.direction,
+      // A non-executable market read still needs representative levels for
+      // quality factors such as bias, sweep and session. It must not be treated
+      // as a real zero-R trade (which adds an artificial RR veto and flattens
+      // confidence); the returned ticket remains WAIT with zero hidden levels.
+      rr: built.direction === "WAIT" && analysisDirection !== "WAIT" ? 2 : built.rr,
+    };
     if (built.direction !== "WAIT") {
       const wantDir = built.direction === "BUY" ? "bullish" : "bearish";
       const ltfStructureConfirms = ltfA.trend === wantDir || ltfA.lastStructure?.dir === wantDir;
