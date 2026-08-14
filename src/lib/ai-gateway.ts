@@ -444,3 +444,19 @@ export const SENIOR_REVIEW_CHAIN = [
 
 
 
+
+// -------- Stage 2b: independent cross-check chain --------------------------
+// A SECOND opinion from a DIFFERENT model family than the GPT senior review,
+// so the desk never relies on one vendor's bias. Verified on this Bluesminds
+// workspace (Aug 2026 probe): `z-ai/glm-5.2` and
+// `nvidia/nemotron-3-super-120b-a12b` answer; gemini/claude/grok are not
+// routable here, and deepseek-v4-* / qwen3.5-397b are end-of-life.
+// This stage is ENRICHMENT ONLY — it can agree (small confidence lift) or
+// flag a risk note, but it can never veto or downgrade, so alert volume
+// stays exactly the same as before.
+export const CROSS_CHECK_CHAIN = [
+  "bmind/z-ai/glm-5.2",
+  "bmind/nvidia/nemotron-3-super-120b-a12b",
+  "bmind/z-ai/glm-5.1",
+  "bmind/gpt-5.2-chat",
+] as const;
