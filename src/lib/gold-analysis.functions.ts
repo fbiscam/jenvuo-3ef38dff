@@ -3604,4 +3604,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// Add a scan diagnostics panel that shows confidence calculation inputs and the exact stage where confidence changes for each account.
+// yar signal desk ma koyi bhi pair shi trha analyze nhi ho rha ha bar bar 35% confidence show kr rha ha isko theek kro
