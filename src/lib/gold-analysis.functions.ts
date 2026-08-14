@@ -587,8 +587,28 @@ export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: strin
   const cacheKey = `${inst.key}:${tf}`;
   const cached = candleCache.get(cacheKey);
   const now = Date.now();
-  if (cached && now - cached.at < CACHE_TTL) return cached.data;
+  if (cached && now - cached.at < CACHE_TTL && !syntheticCandleKeys.has(cacheKey)) return cached.data;
 
+  // One in-flight fetch per instrument+timeframe. A single scan (manual or
+  // auto) asks for 1h/15m/4h/5m at once and auto-scan runs six pairs together;
+  // without this the providers see a burst and throttle, which is exactly what
+  // made some pairs analyze properly and others drop to quote-only mode.
+  const running = inflightCandles.get(cacheKey);
+  if (running) return running;
+  const job = fetchInstrumentCandlesRaw(inst, tf, cacheKey, cached, now).finally(() => {
+    inflightCandles.delete(cacheKey);
+  });
+  inflightCandles.set(cacheKey, job);
+  return job;
+}
+
+async function fetchInstrumentCandlesRaw(
+  inst: ResolvedInstrument,
+  tf: string,
+  cacheKey: string,
+  cached: { at: number; data: Candle[] } | undefined,
+  now: number,
+): Promise<Candle[]> {
   const pairKey = inst.key.startsWith("METAL:") ? inst.key.slice("METAL:".length) : inst.key;
   const hasProxy = !!XAU_PAIRS[pairKey]?.usdProxy;
 
@@ -602,26 +622,39 @@ export async function fetchInstrumentCandles(inst: ResolvedInstrument, tf: strin
   if (inst.kind !== "metal" && inst.yahooSymbols?.length) tries.push(() => fetchFromYahooSymbols(inst.yahooSymbols!, tf));
 
   let lastErr: any = null;
-  for (const f of tries) {
-    try {
-      const data = await f();
-      candleCache.set(cacheKey, { at: now, data });
-      syntheticCandleKeys.delete(cacheKey);
-      return data;
-    } catch (e) { lastErr = e; }
+  // Two passes: a throttled provider usually recovers within a second, and one
+  // retry is far cheaper than serving the user a "provider delayed" scan.
+  for (let pass = 0; pass < 2; pass++) {
+    if (pass > 0) await new Promise((r) => setTimeout(r, 450));
+    for (const f of tries) {
+      try {
+        const data = await f();
+        if (data.length >= 20) {
+          candleCache.set(cacheKey, { at: Date.now(), data });
+          syntheticCandleKeys.delete(cacheKey);
+          return data;
+        }
+        lastErr = new Error("too few candles");
+      } catch (e) { lastErr = e; }
+    }
   }
-  if (cached) return cached.data;
+  // Real (if slightly stale) structure beats synthetic candles: the scan
+  // overlays the live tick on the last bar anyway.
+  if (cached && cached.data.length >= 20 && !syntheticCandleKeys.has(cacheKey) && now - cached.at < CACHE_STALE_MAX) {
+    return cached.data;
+  }
   const quote = await resolveLiveTick(inst).catch(() => null);
   if (quote?.price && Number.isFinite(quote.price) && quote.price > 0) {
     const synthetic = buildSyntheticCandles(inst, tf, quote.price);
     if (synthetic.length >= 20) {
-      candleCache.set(cacheKey, { at: now, data: synthetic });
+      candleCache.set(cacheKey, { at: Date.now(), data: synthetic });
       syntheticCandleKeys.add(cacheKey);
       return synthetic;
     }
   }
   throw lastErr ?? new Error(`No data source available for ${inst.display}`);
 }
+
 
 async function fetchGoldCandles(tf: string): Promise<Candle[]> {
   return fetchInstrumentCandles(resolveInstrument("XAUUSD"), tf);
