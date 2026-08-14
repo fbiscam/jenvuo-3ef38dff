@@ -428,6 +428,17 @@ async function fetchFromYahooSymbolsRaw(symbols: string[], tf: string): Promise<
 }
 
 async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<Candle[]> {
+  const dedupeKey = `B:${symbols.join("|")}:${tf}`;
+  const running = inflightCandles.get(dedupeKey);
+  if (running) return running;
+  const p = fetchFromBinanceSymbolsRaw(symbols, tf).finally(() => {
+    inflightCandles.delete(dedupeKey);
+  });
+  inflightCandles.set(dedupeKey, p);
+  return p;
+}
+
+async function fetchFromBinanceSymbolsRaw(symbols: string[], tf: string): Promise<Candle[]> {
   const map: Record<string, string> = {
     "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m",
     "1h": "1h", "4h": "4h", "1d": "1d",
@@ -436,7 +447,8 @@ async function fetchFromBinanceSymbols(symbols: string[], tf: string): Promise<C
   const hosts = ["api.binance.com", "data-api.binance.vision"];
   const attempts = hosts.flatMap((host) => symbols.map(async (sym) => {
         const url = `https://${host}/api/v3/klines?symbol=${sym}&interval=${interval}&limit=200`;
-        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } }, CANDLE_FETCH_TIMEOUT_MS);
+
         if (!res.ok) throw new Error(`Binance ${sym}: ${res.status}`);
         const rows: any[] = await res.json();
         const candles: Candle[] = rows.map((r) => ({
