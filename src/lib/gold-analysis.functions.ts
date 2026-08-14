@@ -2607,10 +2607,10 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
 
     // ============ STAGE 3: SENIOR TRADER DEEP REVIEW (GPT) ============
 
-    // Runs the pro model (DeepSeek V4 Pro) as a "25-year veteran" second
-    // opinion on any live A / A+ setup — it can veto, downgrade, or confirm.
-    // Gated by plan: only paid plans (pro/elite/ultra) get DeepSeek senior
-    // review per pricing page. Free plan = GPT-5.4 only.
+    // Runs GPT (5.5 → 5.2 chat) as a "25-year veteran" third opinion on any
+    // live A / A+ setup, after the ICT/SMC engine and the DeepSeek V4 review —
+    // it can veto, downgrade, or confirm.
+    // Gated by plan: only paid plans (pro/elite/ultra) get the senior review.
     // Failure here should NEVER block the plan — Stage-1 result stands.
     let __planAllowsSenior = false;
     let __planId: string = "free";
@@ -2707,7 +2707,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             key: "senior_review_attempted",
             label: "⚠ Senior review attempted",
             pass: false,
-            reason: "Senior review chain (Claude 4.5 → DeepSeek V4 Pro → Grok 4.5 → Claude 3.7 → GPT-5 Mini → GPT-4.1 Mini → GPT-4o Mini → DeepSeek V4 Flash) attempted but all providers throttled; primary narration still applied and signal delivered.",
+            reason: "Senior review chain (GPT-5.5 → GPT-5.2 Chat → GPT-5 Mini → GPT-4.1 Mini → GPT-4o Mini) attempted but all providers throttled; the ICT/SMC engine plus DeepSeek V4 review still applied and the signal was delivered.",
           });
         } else {
           const mdl = reviewResult.model;
@@ -3362,6 +3362,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           if (s.includes("gemini-2.5-pro")) return "Gemini 2.5 Pro";
           if (s.includes("grok")) return "Grok 4.5";
           if (s.includes("deepseek-v4-pro")) return "DeepSeek V4 Pro";
+          if (s.includes("deepseek-v4-flash-0731")) return "DeepSeek V4";
           if (s.includes("deepseek-v4-flash")) return "DeepSeek V4 Flash";
           if (s.includes("deepseek")) return "DeepSeek";
           if (s.includes("gpt-5.2-chat") || s.includes("gpt-5.2")) return "ChatGPT 5.2";
