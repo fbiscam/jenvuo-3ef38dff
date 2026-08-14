@@ -27,7 +27,7 @@ import {
 //   div  → XAU/foreign = spot / fx  (EURUSD, GBPUSD, AUDUSD)
 //   mul  → XAU/foreign = spot * fx  (USDJPY, USDCHF)
 //   none → XAUUSD, use spot directly
-type PairSpec = { fx?: string; op: "none" | "mul" | "div" };
+type PairSpec = { fx?: string; op: "none" | "mul" | "div" | "direct"; yahoo?: string };
 const PAIR_SPECS: Record<string, PairSpec> = {
   XAUUSD: { op: "none" },
   XAUEUR: { fx: "EURUSD=X", op: "div" },
@@ -35,15 +35,40 @@ const PAIR_SPECS: Record<string, PairSpec> = {
   XAUJPY: { fx: "USDJPY=X", op: "mul" },
   XAUAUD: { fx: "AUDUSD=X", op: "div" },
   XAUCHF: { fx: "USDCHF=X", op: "mul" },
+  // Non-gold tickets are priced straight off their own feed.
+  EURUSD: { op: "direct", yahoo: "EURUSD=X" },
+  GBPUSD: { op: "direct", yahoo: "GBPUSD=X" },
+  AUDUSD: { op: "direct", yahoo: "AUDUSD=X" },
+  USDJPY: { op: "direct", yahoo: "USDJPY=X" },
+  USDCHF: { op: "direct", yahoo: "USDCHF=X" },
+  NAS100: { op: "direct", yahoo: "^NDX" },
+  US30: { op: "direct", yahoo: "^DJI" },
+  SPX500: { op: "direct", yahoo: "^GSPC" },
 };
 
 
 
 type Candles = { ts: number[]; highs: number[]; lows: number[] };
 
-async function fetchCandles(sym: string, from: number, to: number): Promise<Candles | null> {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?period1=${from}&period2=${to}&interval=5m`;
-  const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+// Per-run cache: a single pass resolves many trades that share the same FX
+// leg (USDCHF, EURUSD ...). Without this we hammered Yahoo once per trade and
+// got rate-limited, which left every cross pair stuck on "pending" forever.
+const candleCache = new Map<string, Candles | null>();
+
+async function fetchYahooOnce(
+  host: string,
+  sym: string,
+  from: number,
+  to: number,
+): Promise<Candles | null> {
+  const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?period1=${from}&period2=${to}&interval=5m`;
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+      Accept: "application/json",
+    },
+  });
   if (!res.ok) return null;
   const json = (await res.json()) as {
     chart: {
@@ -58,12 +83,109 @@ async function fetchCandles(sym: string, from: number, to: number): Promise<Cand
   const q = r?.indicators?.quote?.[0];
   const highs = q?.high ?? [];
   const lows = q?.low ?? [];
+  if (!ts.length) return null;
   return { ts, highs, lows };
 }
+
+async function fetchCandles(sym: string, from: number, to: number): Promise<Candles | null> {
+  // Bucket the window so trades fired minutes apart still share a cache key.
+  const key = `${sym}:${Math.floor(from / 900)}:${Math.floor(to / 900)}`;
+  if (candleCache.has(key)) return candleCache.get(key) ?? null;
+
+  const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
+  let out: Candles | null = null;
+  for (let attempt = 0; attempt < hosts.length * 2 && !out; attempt++) {
+    const host = hosts[attempt % hosts.length];
+    try {
+      out = await fetchYahooOnce(host, sym, from, to);
+    } catch {
+      out = null;
+    }
+    if (!out && attempt < hosts.length * 2 - 1) {
+      await new Promise((r) => setTimeout(r, 250 * (attempt + 1)));
+    }
+  }
+  candleCache.set(key, out);
+  return out;
+}
+
+// Backup FX source. Yahoo rate-limits our egress IPs hard, and when the FX
+// leg failed the whole cross-pair ticket stayed "pending" forever (that is
+// why XAUCHF / XAUJPY tickets never got a result). fxratesapi serves free
+// hourly closes; we forward-fill them onto the 5m gold buckets.
+const FX_FALLBACK: Record<string, { code: string; invert: boolean }> = {
+  "EURUSD=X": { code: "EUR", invert: true },
+  "GBPUSD=X": { code: "GBP", invert: true },
+  "AUDUSD=X": { code: "AUD", invert: true },
+  "USDJPY=X": { code: "JPY", invert: false },
+  "USDCHF=X": { code: "CHF", invert: false },
+};
+
+async function fetchFxFallback(sym: string, from: number, to: number): Promise<Candles | null> {
+  const spec = FX_FALLBACK[sym];
+  if (!spec) return null;
+  try {
+    const url =
+      `https://api.fxratesapi.com/timeseries?start_date=${new Date(from * 1000).toISOString()}` +
+      `&end_date=${new Date(to * 1000).toISOString()}&base=USD&currencies=${spec.code}&accuracy=hour&resolution=1h`;
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      success?: boolean;
+      rates?: Record<string, Record<string, number>>;
+    };
+    if (!json.success || !json.rates) return null;
+    const hourly = Object.entries(json.rates)
+      .map(([iso, r]) => {
+        const raw = r?.[spec.code];
+        if (!Number.isFinite(raw) || !raw) return null;
+        const rate = spec.invert ? 1 / raw : raw;
+        return { ts: Math.floor(new Date(iso).getTime() / 1000), rate };
+      })
+      .filter((x): x is { ts: number; rate: number } => x !== null)
+      .sort((a, b) => a.ts - b.ts);
+    if (!hourly.length) return null;
+
+    // Forward-fill each hourly close across its twelve 5m buckets.
+    const ts: number[] = [];
+    const highs: number[] = [];
+    const lows: number[] = [];
+    let idx = 0;
+    for (let t = from - (from % 300); t <= to; t += 300) {
+      while (idx + 1 < hourly.length && hourly[idx + 1].ts <= t) idx++;
+      const rate = hourly[idx].rate;
+      ts.push(t);
+      highs.push(rate);
+      lows.push(rate);
+    }
+    return { ts, highs, lows };
+  } catch {
+    return null;
+  }
+}
+
+/** FX leg with Yahoo primary and hourly fallback. */
+async function fetchFxCandles(sym: string, from: number, to: number): Promise<Candles | null> {
+  const key = `fx:${sym}:${Math.floor(from / 900)}:${Math.floor(to / 900)}`;
+  if (candleCache.has(key)) return candleCache.get(key) ?? null;
+  let out = await fetchCandles(sym, from, to);
+  if (!out || !out.ts.length) out = await fetchFxFallback(sym, from, to);
+  candleCache.set(key, out);
+  return out;
+}
+
 
 // Spot-scale gold klines from Binance gold tokens (5m). PAXG tracks spot
 // within ~$1; XAUT is the backup.
 async function fetchTokenCandles(symbol: string, from: number, to: number): Promise<Candles | null> {
+  const key = `bin:${symbol}:${Math.floor(from / 900)}:${Math.floor(to / 900)}`;
+  if (candleCache.has(key)) return candleCache.get(key) ?? null;
+  const out = await fetchTokenCandlesRaw(symbol, from, to);
+  candleCache.set(key, out);
+  return out;
+}
+
+async function fetchTokenCandlesRaw(symbol: string, from: number, to: number): Promise<Candles | null> {
   try {
     const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=5m&startTime=${from * 1000}&endTime=${to * 1000}&limit=1000`;
     const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
@@ -137,6 +259,9 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
           "@/integrations/supabase/client.server"
         );
 
+        // Fresh price cache each run so we never score against stale candles.
+        candleCache.clear();
+
         // Fetch pending paper trades older than 30 minutes so recent
         // ones still have time to reach a target.
         const cutoff = new Date(Date.now() - 30 * 60_000).toISOString();
@@ -181,7 +306,16 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
             let lows: number[] = [];
             let priceSource = "";
 
-            if (spec.op === "none" || !spec.fx) {
+            if (spec.op === "direct" && spec.yahoo) {
+              const own = await fetchFxCandles(spec.yahoo, from, to);
+              if (!own || !own.ts.length) {
+                results.push({ id: t.id, action: "fetch_failed", sym: spec.yahoo });
+                continue;
+              }
+              priceSource = spec.yahoo;
+              highs = own.highs.filter((n) => typeof n === "number");
+              lows = own.lows.filter((n) => typeof n === "number");
+            } else if (spec.op === "none" || !spec.fx) {
               const spot = await fetchSpotGoldCandles(from, to, Number(t.entry));
               if (!spot) {
                 results.push({ id: t.id, action: "fetch_failed", sym: "spot" });
@@ -191,7 +325,7 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
               highs = spot.candles.highs.filter((n) => typeof n === "number");
               lows = spot.candles.lows.filter((n) => typeof n === "number");
             } else {
-              const fx = await fetchCandles(spec.fx, from, to);
+              const fx = await fetchFxCandles(spec.fx, from, to);
               if (!fx || !fx.ts.length) {
                 results.push({ id: t.id, action: "fetch_failed", sym: spec.fx });
                 continue;
