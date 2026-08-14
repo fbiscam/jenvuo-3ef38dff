@@ -40,6 +40,7 @@ const MODEL_PRICING: Record<string, Price> = {
   "dsofficial/deepseek-chat": { in: 0.27, out: 1.10 },
   // NVIDIA integrate (free tier)
   "nvapi/deepseek-ai/deepseek-v4-pro": { in: 0, out: 0 },
+  "nvapi/deepseek-ai/deepseek-v4-flash-0731": { in: 0, out: 0 },
   "nvapi/openai/gpt-oss-120b": { in: 0, out: 0 },
 
   // Google
