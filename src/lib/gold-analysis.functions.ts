@@ -3604,4 +3604,4 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// yar ya check kro 35% Confience arha ha hr dafa hr pair ma r account ma ya bug ha ya issue ha
+// ya kaya issue ha isko check kro isko solve kro
