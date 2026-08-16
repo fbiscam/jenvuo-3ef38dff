@@ -43,6 +43,7 @@ export const Route = createFileRoute("/signal")({
   head: () => ({
     meta: [
       { title: "Gold Signal Desk — Jenvu" },
+      { name: "robots", content: "noindex, follow" },
       {
         name: "description",
         content:

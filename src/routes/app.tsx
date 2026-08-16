@@ -46,6 +46,7 @@ export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
       { title: "Voice Terminal — Jenvu" },
+      { name: "robots", content: "noindex, follow" },
       {
         name: "description",
         content:
