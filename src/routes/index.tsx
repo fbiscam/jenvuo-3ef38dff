@@ -732,7 +732,7 @@ function HomePage() {
                         : isLoggedIn
                           ? "Upgrade"
                           : p.key === "pro"
-                            ? "Start 14 days Free Trial"
+                            ? "Start\u00A0 Free Trial"
                             : "Buy Now";
                     return (
                     <th
