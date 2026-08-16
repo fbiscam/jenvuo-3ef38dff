@@ -715,7 +715,7 @@ function HomePage() {
                     <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Pricing Plans</span>
                   </th>
                   {[
-                    { name: "Pro", price: currentPlan === null ? "$5" : "$15", tag: "Active", accent: true, key: "pro", to: "/auth" as const, search: { mode: "signup" as const } },
+                    { name: "Pro", price: currentPlan === null ? "$5" : "$15", tag: "", accent: true, key: "pro", to: "/auth" as const, search: { mode: "signup" as const } },
                     { name: "Elite", price: "$50", tag: "Desk", dark: true, key: "elite", to: "/founding" as const },
                     { name: "Ultra", price: "$100", tag: "Fund / Desk+", key: "ultra", to: "/founding" as const },
                   ].map((p) => {
