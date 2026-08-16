@@ -780,8 +780,8 @@ function HomePage() {
                         </button>
                       ) : (
                         <Link
-                          to={p.to}
-                          search={p.search}
+                          to={isLoggedIn ? "/dashboard/pay" : p.to}
+                          search={isLoggedIn ? undefined : p.search}
                           className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
                             p.accent || p.dark
                               ? "bg-zinc-900 text-white hover:bg-black"
