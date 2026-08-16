@@ -25,7 +25,7 @@ function fmtUTC(iso: string, kind: "full" | "compact") {
     : `${hh}:${mm} UTC · ${mo} ${day}`;
 }
 
-const insightsQueryOptions = queryOptions({
+export const insightsQueryOptions = queryOptions({
   queryKey: ["insights"],
   queryFn: async () => {
     const { data, error } = await supabase
