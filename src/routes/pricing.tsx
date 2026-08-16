@@ -201,7 +201,7 @@ function PricingPage() {
             <thead>
               <tr className="border-b border-zinc-200">
                 <th className="p-6 text-left align-bottom">
-                  <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Invite Only Access</span>
+                  <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Pricing Plan</span>
                 </th>
                 {[
                   { name: "Pro", price: signedOut ? (billing === "annual" ? "$50" : "$5") : (billing === "annual" ? "$150" : "$15"), tag: "Active", anonTo: "/auth" as const, search: { mode: "signup" as const }, dark: false, accent: true, key: "pro" },
