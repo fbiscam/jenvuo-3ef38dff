@@ -78,7 +78,7 @@ export const Route = createFileRoute("/auth")({
         content:
           "Sign in to your Jenvu account to access the voice-native institutional gold trading terminal — live ICT/SMC analysis for every XAU cross-pair.",
       },
-      { name: "robots", content: "index, follow" },
+      { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "Sign in to your Desk" },
       { property: "og:description", content: "Access your voice-native institutional trading terminal." },
       { property: "og:url", content: "https://jenvu.com/auth" },

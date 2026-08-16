@@ -17,9 +17,9 @@ export const Route = createFileRoute("/sitemap.xml")({
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/founding", changefreq: "daily", priority: "0.95" },
-          { path: "/app", changefreq: "weekly", priority: "0.9" },
-          { path: "/signal", changefreq: "daily", priority: "0.9" },
-          { path: "/auth", changefreq: "monthly", priority: "0.5" },
+          // /app, /signal and /auth are auth-gated: they render a thin sign-in
+          // shell to crawlers, which Google reports as Soft 404. Excluded on purpose.
+
           { path: "/download", changefreq: "weekly", priority: "0.8" },
           { path: "/pricing", changefreq: "weekly", priority: "0.9" },
           { path: "/insights", changefreq: "daily", priority: "0.9" },
