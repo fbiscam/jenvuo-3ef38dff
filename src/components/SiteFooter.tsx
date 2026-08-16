@@ -136,7 +136,7 @@ export default function SiteFooter({ className }: { className?: string }) {
             <div className="flex items-center gap-2.5 pt-1">
               {[
                 {
-                  href: "https://x.com/jenvuai",
+                  href: "https://x.com/jenvu",
                   label: "X (Twitter)",
                   icon: (
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">
@@ -145,7 +145,7 @@ export default function SiteFooter({ className }: { className?: string }) {
                   ),
                 },
                 {
-                  href: "https://instagram.com/jenvuai",
+                  href: "https://www.instagram.com/jenvucompany/",
                   label: "Instagram",
                   icon: (
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
@@ -156,11 +156,20 @@ export default function SiteFooter({ className }: { className?: string }) {
                   ),
                 },
                 {
-                  href: "https://facebook.com/jenvuai",
+                  href: "https://www.facebook.com/jenvucompany",
                   label: "Facebook",
                   icon: (
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">
                       <path d="M22 12a10 10 0 1 0-11.563 9.877v-6.988H7.898V12h2.539V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.889h-2.33v6.988A10.002 10.002 0 0 0 22 12Z" />
+                    </svg>
+                  ),
+                },
+                {
+                  href: "https://t.me/Jenvu_Bot",
+                  label: "Telegram",
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">
+                      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0Zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635Z" />
                     </svg>
                   ),
                 },
