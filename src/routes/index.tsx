@@ -715,7 +715,7 @@ function HomePage() {
                     <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Pricing Plans</span>
                   </th>
                   {[
-                    { name: "Pro", price: currentPlan === null ? "$5" : "$15", tag: "Active", accent: true, key: "pro", to: "/auth" as const, search: { mode: "signup" as const } },
+                    { name: "Pro", price: currentPlan === null ? "$5" : "$15", tag: "", accent: true, key: "pro", to: "/auth" as const, search: { mode: "signup" as const } },
                     { name: "Elite", price: "$50", tag: "Desk", dark: true, key: "elite", to: "/founding" as const },
                     { name: "Ultra", price: "$100", tag: "Fund / Desk+", key: "ultra", to: "/founding" as const },
                   ].map((p) => {
@@ -758,7 +758,7 @@ function HomePage() {
                           <span className="text-[11px] text-zinc-500 price-font">/credits</span>
                         )}
                       </div>
-                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
+                      {p.tag && <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>}
 
                       {isCurrent ? (
                         <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
