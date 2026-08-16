@@ -716,7 +716,7 @@ function HomePage() {
                   </th>
                   {[
                     { name: "Pro", price: currentPlan === null ? "$5" : "$15", tag: "", accent: true, key: "pro", to: "/auth" as const, search: { mode: "signup" as const } },
-                    { name: "Elite", price: "$50", tag: "Desk", dark: true, key: "elite", to: "/founding" as const },
+                    { name: "Elite", price: "$50", tag: "", dark: true, key: "elite", to: "/founding" as const },
                     { name: "Ultra", price: "$100", tag: "Fund / Desk+", key: "ultra", to: "/founding" as const },
                   ].map((p) => {
                     const trialPro = trial.active && p.key === "pro";
