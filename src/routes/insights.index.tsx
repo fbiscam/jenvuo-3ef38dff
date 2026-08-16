@@ -185,7 +185,7 @@ function InsightsPage() {
         </header>
 
         {/* HERO SECTION - FEATURED ARTICLE */}
-        {featured && (
+        {featured ? (
           <section className="border-b border-zinc-100 bg-zinc-50/50">
             <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-16">
               <div className="grid lg:grid-cols-12 gap-8 lg:items-center">
@@ -228,6 +228,17 @@ function InsightsPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </section>
+        ) : (
+          <section className="border-b border-zinc-100 bg-zinc-50/50">
+            <div className="mx-auto max-w-6xl px-5 sm:px-6 py-10 sm:py-14">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-tight">
+                Market Insights
+              </h1>
+              <p className="mt-4 text-base sm:text-lg text-zinc-600 leading-relaxed max-w-2xl">
+                Daily gold analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.
+              </p>
             </div>
           </section>
         )}

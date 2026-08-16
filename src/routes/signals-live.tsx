@@ -309,7 +309,7 @@ function FeedBody() {
             <div className="shrink-0 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 sm:text-[11px]">
               <Filter className="h-3.5 w-3.5" /> Filters
             </div>
-            <select value={pairFilter} onChange={(e) => setPairFilter(e.target.value)} className="shrink-0 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-700">
+            <select aria-label="Filter by pair" value={pairFilter} onChange={(e) => setPairFilter(e.target.value)} className="shrink-0 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-700">
               <option value="ALL">All pairs</option>
               {pairs.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
