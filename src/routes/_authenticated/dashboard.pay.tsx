@@ -96,8 +96,12 @@ function PayPage() {
 
   const currentPrice = useMemo(() => {
     const p = PLANS.find(x => x.id === currentPlan);
+    // If we're in a trial, we treat current price as 0 so all paid plans are available for upgrade.
+    // If not in trial, lower plans are disabled to prevent accidental downgrades via the pay page.
+    if (trial.active) return 0;
     return p ? p.price : 0;
-  }, [currentPlan]);
+  }, [currentPlan, trial.active]);
+
 
   useEffect(() => {
     if (mode === "upgrade" && !selectedPlanId) {
@@ -261,8 +265,9 @@ function PayPage() {
           {mode === "upgrade" ? (
             <div className="grid gap-4 sm:grid-cols-3">
               {PLANS.map((p) => {
-                const isCurrent = currentPlan === p.id;
-                const isLower = p.price < currentPrice;
+                const isCurrent = !trial.active && currentPlan === p.id;
+                const isLower = !trial.active && p.price < currentPrice;
+
                 const selected = selectedPlanId === p.id;
                 
                 return (
@@ -387,9 +392,10 @@ function PayPage() {
                 )}
               </div>
               {trial.active && mode === "upgrade" && (
-                <div className="mt-2 text-[11px] text-red-600 font-medium">
+                <div className="mt-2 text-[11px] text-indigo-600 font-medium bg-indigo-50 px-2 py-1 rounded-lg inline-block">
                   Note: This will end your free trial and activate your paid plan.
                 </div>
+
               )}
             </div>
 
