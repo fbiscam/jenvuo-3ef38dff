@@ -19,7 +19,7 @@ export const getAlertsEnabled = createServerFn({ method: 'GET' })
     return { 
       enabled: pref ? (pref as any).alerts_enabled !== false : true,
       whatsappEnabled: pref ? !!(pref as any).whatsapp_enabled : false,
-      whatsappNumber: prof?.whatsapp_number || null
+      whatsappNumber: (prof as any)?.whatsapp_number || null
     }
   })
 
