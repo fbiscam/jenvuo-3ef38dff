@@ -211,11 +211,14 @@ function PayPage() {
       <div className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 sm:p-8">
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-semibold text-black">&nbsp;Add funds</h1>
+            <h1 className="text-3xl font-semibold text-black">&nbsp;{mode === "upgrade" ? "Upgrade plan" : "Add funds"}</h1>
             <p className="mt-2 max-w-md text-sm text-black/60">
-              Send USDT on Tron, BNB Smart Chain or Ethereum — credits land in your scan wallet right after on-chain verification.
+              {mode === "upgrade" 
+                ? "Select a plan to unlock advanced features. Pay via USDT on Tron, BNB Smart Chain or Ethereum."
+                : "Send USDT on Tron, BNB Smart Chain or Ethereum — credits land in your scan wallet right after on-chain verification."}
             </p>
           </div>
+
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2">
               <TronIcon className="h-8 w-8 rounded-full ring-2 ring-white" />
@@ -383,14 +386,19 @@ function PayPage() {
                   <>You receive <span className="font-medium text-zinc-900">${(quote?.creditUsd ?? effAmount).toFixed(2)}</span> in scan credits</>
                 )}
               </div>
-
+              {trial.active && mode === "upgrade" && (
+                <div className="mt-2 text-[11px] text-red-600 font-medium">
+                  Note: This will end your free trial and activate your paid plan.
+                </div>
+              )}
             </div>
+
             <button
               onClick={onCreate}
-              disabled={busy || !!quote?.error}
+              disabled={busy || !!quote?.error || (mode === "upgrade" && !selectedPlanId)}
               className="rounded-2xl border border-black/10 bg-white px-6 py-3.5 text-sm font-medium text-black transition hover:bg-black/5 disabled:opacity-50"
             >
-              Continue to payment
+              {mode === "upgrade" ? "Upgrade now" : "Continue to payment"}
             </button>
           </div>
         </section>
