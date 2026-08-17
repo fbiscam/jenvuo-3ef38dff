@@ -12,7 +12,7 @@ export const getAlertsEnabled = createServerFn({ method: 'GET' })
       .maybeSingle()
     const { data: prof } = await supabase
       .from('profiles')
-      .select('whatsapp_number')
+      .select('*')
       .eq('id', userId)
       .maybeSingle()
     
