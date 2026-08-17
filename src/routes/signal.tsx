@@ -1026,7 +1026,7 @@ function SignalPage() {
               <button
                 onClick={() => {
                   try {
-                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            jo confidence on both side 75% kro minimum aur is sa upar ho to alerts aya proper aur verify krlana");
+                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Load the security issues from the scan results and fix the selected issues.");
                     window.speechSynthesis.speak(u);
                   } catch {}
                   setVoiceBlocked(false);
