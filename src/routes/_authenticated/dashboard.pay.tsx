@@ -446,7 +446,7 @@ function PayPage() {
               </div>
               <div className="mt-1.5 text-[13px] text-zinc-500">
                 {order.is_upgrade ? (
-                  <>Upgrade to <span className="font-medium text-zinc-900">{order.target_plan_id}</span> plan</>
+                  <>Upgrade to <span className="font-medium text-zinc-900 uppercase">{order.target_plan_id}</span> plan</>
                 ) : (
                   <>Credits on approval: <span className="font-medium text-zinc-900">${Number(order.credit_usd).toFixed(2)}</span>
                   {Number(order.bonus_usd) > 0 && <> · bonus ${Number(order.bonus_usd).toFixed(2)}</>}</>
