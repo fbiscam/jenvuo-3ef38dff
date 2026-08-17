@@ -3097,6 +3097,65 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
   );
 }
 
+function WhatsAppModal({ 
+  open, 
+  onOpenChange, 
+  initialNumber, 
+  onSave, 
+  saving 
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void; 
+  initialNumber: string; 
+  onSave: (enabled: boolean, number?: string) => void; 
+  saving: boolean;
+}) {
+  const [num, setNum] = useState(initialNumber);
+  useEffect(() => { setNum(initialNumber); }, [initialNumber]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm bg-white border-zinc-200 text-zinc-900">
+        <DialogHeader>
+          <DialogTitle className="text-zinc-900">WhatsApp Alerts</DialogTitle>
+          <DialogDescription className="text-zinc-600">
+            Receive real-time signal alerts directly to your WhatsApp.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-zinc-700">WhatsApp Number</label>
+            <input
+              type="tel"
+              value={num}
+              onChange={(e) => setNum(e.target.value)}
+              placeholder="+1234567890"
+              className="w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-900/10 transition"
+            />
+            <p className="text-[10px] text-zinc-500">Include country code (e.g. +44...)</p>
+          </div>
+        </div>
+        <DialogFooter className="flex gap-2 sm:justify-between">
+          <button
+            onClick={() => onSave(false)}
+            disabled={saving}
+            className="rounded-lg border border-zinc-200 px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
+          >
+            Disable
+          </button>
+          <button
+            onClick={() => onSave(true, num)}
+            disabled={saving || num.length < 8}
+            className="rounded-lg bg-zinc-900 text-white px-4 py-2 text-xs font-medium hover:bg-zinc-800 disabled:opacity-50"
+          >
+            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto" /> : "Enable WhatsApp"}
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function Stat({ label, value, tone }: { label: string; value: string; tone?: "win" | "loss" }) {
   return (
     <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-2 py-1.5">
