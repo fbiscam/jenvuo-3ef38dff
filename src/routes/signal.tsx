@@ -1270,7 +1270,10 @@ function SignalPage() {
                 </div>
               )}
               <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case text-center pl-2">
-                ICT&nbsp; & SMC Execution Feed
+                '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+                                        
+                                            
+                                            ya feature signal alert page ma add kro
               </h3>
               {!plan && (
                 analysisError ? (
