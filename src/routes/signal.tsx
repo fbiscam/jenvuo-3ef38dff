@@ -1026,7 +1026,7 @@ function SignalPage() {
               <button
                 onClick={() => {
                   try {
-                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            ab ya issue kisi bhi account par na ao makesure");
+                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            jo credits ha wo after 31 days bad expire ho jaya implement kro");
                     window.speechSynthesis.speak(u);
                   } catch {}
                   setVoiceBlocked(false);
