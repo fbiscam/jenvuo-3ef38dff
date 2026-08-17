@@ -1046,19 +1046,19 @@ function DashboardLayout() {
                   decoding="async"
                 />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="flex items-center gap-3 px-3 py-2.5">
+              <DropdownMenuContent align="end" className="w-60">
+                <div className="flex items-center gap-3 px-3.5 py-3">
                   <img
                     src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
                     alt={fullName || email || "Account avatar"}
                     width={108}
                     height={108}
-                    className="h-9 w-9 rounded-full object-cover [image-rendering:auto]"
+                    className="h-10 w-10 rounded-full object-cover [image-rendering:auto]"
                     decoding="async"
                   />
                   <div className="min-w-0">
-                    <p className="truncate text-[13px] font-medium text-zinc-900">{fullName || "Trader"}</p>
-                    <p className="truncate text-[11px] text-zinc-500">{email || ""}</p>
+                    <p className="truncate text-[14px] font-medium text-zinc-900">{fullName || "Trader"}</p>
+                    <p className="truncate text-[12px] text-zinc-500">{email || ""}</p>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
