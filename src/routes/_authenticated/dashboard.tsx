@@ -1030,22 +1030,31 @@ function DashboardLayout() {
             <h1 className="pl-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span>{email || fullName}</span><span>'s Account</span>
             </h1>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                className="mr-4 hidden sm:flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
-                aria-label="Profile menu"
-                title={fullName || email || "Profile"}
+            <div className="flex items-center gap-2">
+              <span
+                className="inline-flex items-center rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-white"
+                style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 500 }}
               >
-                <img
-                  src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
-                  alt={fullName || email || "Account avatar"}
-                  width={144}
-                  height={144}
-                  className="h-[48px] w-[48px] rounded-full object-cover [image-rendering:auto]"
-                  loading="eager"
-                  decoding="async"
-                />
-              </DropdownMenuTrigger>
+                {currentPlan
+                  ? currentPlan.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+                  : "Free"}
+              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className="mr-4 hidden sm:flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                  aria-label="Profile menu"
+                  title={fullName || email || "Profile"}
+                >
+                  <img
+                    src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
+                    alt={fullName || email || "Account avatar"}
+                    width={144}
+                    height={144}
+                    className="h-[48px] w-[48px] rounded-full object-cover [image-rendering:auto]"
+                    loading="eager"
+                    decoding="async"
+                  />
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-60">
                 <div className="flex items-center gap-3 px-3.5 py-3">
                   <img
@@ -1086,6 +1095,7 @@ function DashboardLayout() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          </div>
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span className="inline-flex items-center gap-2">
