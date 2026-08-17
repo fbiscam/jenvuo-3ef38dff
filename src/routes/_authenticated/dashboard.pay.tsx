@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCredits } from "@/hooks/useCredits";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -111,10 +112,6 @@ function PayPage() {
   }, [amount, custom, mode, selectedPlanId]);
 
 
-  const effAmount = useMemo(() => {
-    const c = Number(custom);
-    return custom.trim() && Number.isFinite(c) ? Math.round(c * 100) / 100 : amount;
-  }, [amount, custom]);
 
   const loadOrders = useCallback(async () => {
     try {
@@ -436,10 +433,15 @@ function PayPage() {
                   Copy
                 </button>
               </div>
-              <div className="mt-3 text-[13px] text-zinc-500">
-                Credits on approval: <span className="font-medium text-zinc-900">${Number(order.credit_usd).toFixed(2)}</span>
-                {Number(order.bonus_usd) > 0 && <> · bonus ${Number(order.bonus_usd).toFixed(2)}</>}
+              <div className="mt-1.5 text-[13px] text-zinc-500">
+                {order.is_upgrade ? (
+                  <>Upgrade to <span className="font-medium text-zinc-900">{order.target_plan_id}</span> plan</>
+                ) : (
+                  <>Credits on approval: <span className="font-medium text-zinc-900">${Number(order.credit_usd).toFixed(2)}</span>
+                  {Number(order.bonus_usd) > 0 && <> · bonus ${Number(order.bonus_usd).toFixed(2)}</>}</>
+                )}
               </div>
+
               <div className="mt-1 text-[12px] text-amber-700">
                 Only send {net.asset} on {net.chain}. Other assets or networks cannot be recovered.
               </div>
