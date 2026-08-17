@@ -1548,12 +1548,12 @@ function SignalPage() {
                   </div>
 
                   {/* Position sizing calculator */}
-                  {(isBuy || isSell) && (t.confidence ?? 0) >= 60 && (
+                  {(isBuy || isSell) && (t.confidence ?? 0) >= MIN_CONFIDENCE && (
                     <PositionSizer plan={plan} />
                   )}
 
                   {/* Trade Management — final recommendation only */}
-                  {(isBuy || isSell) && (t.confidence ?? 0) >= 60 && (
+                  {(isBuy || isSell) && (t.confidence ?? 0) >= MIN_CONFIDENCE && (
                     <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2.5 font-['Urbanist',sans-serif] text-[13px] font-medium text-emerald-950 leading-relaxed space-y-2">
                       <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex items-center gap-1.5 font-['Urbanist',sans-serif] font-semibold text-emerald-800 uppercase tracking-wide text-[10px] sm:text-[11px]">
@@ -1601,7 +1601,7 @@ function SignalPage() {
 
 
                   {/* Take Trade / Save Signal — only when valid trade plan (conf ≥ 70, entry/SL/TP present) */}
-                  {(isBuy || isSell) && t.confidence >= 60 && Number.isFinite(t.entry) && Number.isFinite(t.sl) && Number.isFinite(t.tp) && t.entry > 0 && t.sl > 0 && t.tp > 0 && (
+                  {(isBuy || isSell) && t.confidence >= MIN_CONFIDENCE && Number.isFinite(t.entry) && Number.isFinite(t.sl) && Number.isFinite(t.tp) && t.entry > 0 && t.sl > 0 && t.tp > 0 && (
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       type="button"
