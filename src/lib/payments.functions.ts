@@ -56,6 +56,8 @@ export const createTopupOrder = createServerFn({ method: "POST" })
         credit_usd: quote.creditUsd,
         bonus_usd: quote.bonusUsd,
         promo_code: quote.promoCode,
+        target_plan_id: data.planId || null,
+        is_upgrade: !!data.planId,
         expires_at: new Date(Date.now() + 5 * 60_000).toISOString(),
       })
       .select("*")
@@ -131,7 +133,7 @@ export const listMyOrders = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<PaymentOrder[]> => {
     const { data } = await context.supabase
       .from("payment_orders")
-      .select("id, network, deposit_address, pay_amount_usd, credit_usd, bonus_usd, promo_code, tx_hash, status, reject_reason, created_at, expires_at, decided_at")
+      .select("id, network, deposit_address, pay_amount_usd, credit_usd, bonus_usd, promo_code, tx_hash, status, reject_reason, created_at, expires_at, decided_at, target_plan_id, is_upgrade")
       .order("created_at", { ascending: false })
       .limit(30);
     return (data ?? []) as unknown as PaymentOrder[];
