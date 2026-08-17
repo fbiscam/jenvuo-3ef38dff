@@ -212,7 +212,7 @@ function Metric({
 
 function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof ShieldCheck; title: string; right?: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex items-center justify-between rounded-t-xl border-b border-zinc-200 bg-[#F8F8F8] px-4 py-2.5 ${className}`}>
+    <div className={`flex items-center justify-between rounded-t-xl border-b border-zinc-100 bg-white px-4 py-2.5 ${className}`}>
       <div className="flex items-center gap-2 text-[13px] font-medium text-zinc-700">
         <Icon className="h-4 w-4 text-zinc-500" />
         {title}
@@ -225,7 +225,7 @@ function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`overflow-hidden rounded-xl border border-zinc-200 bg-white ${className}`}>
+    <div className={`overflow-hidden rounded-xl border border-zinc-100 bg-white shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] ${className}`}>
       {children}
     </div>
   );
@@ -857,7 +857,7 @@ function DashboardLayout() {
   }, [displayRemaining, credits.isLoading, credits.allowance]);
 
   return (
-    <div className={`flex min-h-screen bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
+    <div className={`flex min-h-screen bg-[#FDFDFD] text-zinc-900 font-['Urbanist',ui-sans-serif,system-ui,-apple-system,sans-serif] antialiased jenvu-zoom-dashboard selection:bg-zinc-100 selection:text-zinc-900`}>
 
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -872,18 +872,18 @@ function DashboardLayout() {
       {!embedMode && (
       /* Sidebar (Firebase-style) */
       <aside
-        className={`dashboard-sidebar-root max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out
+        className={`dashboard-sidebar-root max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-100 bg-[#FDFDFD] transition-[width,transform] duration-200 ease-out
           ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"}
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
-        style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
+        style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 400 }}
       >
-        <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
+        <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Urbanist", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; } ::selection { background: #F4F4F5 !important; color: #18181B !important; }`}</style>
         {/* Brand */}
-        <div className={`flex h-11 shrink-0 items-center gap-2.5 bg-white ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
+        <div className={`flex h-11 shrink-0 items-center gap-2.5 bg-[#FDFDFD] ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
             <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             {!sidebarCollapsed && (
-              <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: '"Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif', fontWeight: 500 }}>Jenvu</span>
+              <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 600 }}>Jenvu</span>
             )}
           </Link>
           <button
@@ -898,7 +898,7 @@ function DashboardLayout() {
 
         {/* Nav */}
 
-        <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-white px-2 py-2">
+        <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-[#FDFDFD] px-2 py-2">
 
           {[...NAV_GROUPS].map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-2 pt-3 border-t border-zinc-200" : ""}>
@@ -922,10 +922,10 @@ function DashboardLayout() {
                       resetScroll={false}
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
-                      className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition
+                      className={`group relative flex items-center rounded-lg text-[12.5px] font-medium transition
                         ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}
                         ${active
-                          ? "bg-zinc-100 text-zinc-900 font-semibold"
+                          ? "bg-zinc-100 text-zinc-900 font-semibold shadow-sm"
                           : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
                       <span
@@ -969,7 +969,7 @@ function DashboardLayout() {
 
 
         {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
-        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-white py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}>
+        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-100 bg-[#FDFDFD] py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}>
           {!sidebarCollapsed && (
             <button
               type="button"
@@ -1002,7 +1002,7 @@ function DashboardLayout() {
 
 
       {/* Right column */}
-      <div className={`dashboard-right-col flex min-w-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
+      <div className={`dashboard-right-col flex min-w-0 flex-1 flex-col bg-[#FDFDFD] ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
       {/* Mobile menu toggle (floating) */}
       {!embedMode && (
@@ -1010,7 +1010,7 @@ function DashboardLayout() {
         type="button"
         aria-label="Open menu"
         onClick={() => setMobileNavOpen(true)}
-        className="fixed top-3 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
+        className="fixed top-3 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-100 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
       >
         <Menu className="h-4 w-4" />
       </button>
@@ -1018,22 +1018,22 @@ function DashboardLayout() {
 
 
 
-      <main className="mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
+      <main className="mx-auto w-full max-w-7xl flex-1 bg-[#FDFDFD] px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
 
 
         {pathname === "/dashboard" ? (
         <>
         {/* Identity row */}
-        <div className="space-y-1" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
-          <div className="text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>Account home</div>
+        <div className="space-y-1" style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 400 }}>
+          <div className="text-[12px] text-zinc-500" style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 400 }}>Account home</div>
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <h1 className="pl-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+            <h1 className="pl-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 600 }}>
               <span>{email || fullName}</span><span>'s Account</span>
             </h1>
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger
-                  className="mr-4 hidden sm:flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                  className="mr-4 hidden sm:flex items-center justify-center overflow-hidden rounded-full border border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-200 shadow-sm"
                   aria-label="Profile menu"
                   title={fullName || email || "Profile"}
                 >
@@ -1047,7 +1047,7 @@ function DashboardLayout() {
                     decoding="async"
                   />
                 </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-60">
+              <DropdownMenuContent align="end" className="w-60 border-zinc-100 shadow-xl">
                 <div className="flex items-center gap-3 px-3.5 py-3">
                   <img
                     src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
@@ -1062,7 +1062,7 @@ function DashboardLayout() {
                     <p className="truncate text-[12px] text-zinc-500">{email || ""}</p>
                   </div>
                 </div>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-zinc-100" />
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard/profile" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
                     <User className="h-4 w-4 text-zinc-500" /> Profile
@@ -1078,7 +1078,7 @@ function DashboardLayout() {
                     <ShieldCheck className="h-4 w-4 text-zinc-500" /> Security
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-zinc-100" />
                 <DropdownMenuItem
                   onClick={signOut}
                   className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700 focus:text-rose-600"
@@ -1089,7 +1089,7 @@ function DashboardLayout() {
             </DropdownMenu>
           </div>
           </div>
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-zinc-500" style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 400 }}>
               <span className="inline-flex items-center gap-2">
                 <span>{greetingText}, {fullName || "Trader"}</span>
                 <span className="hidden sm:inline text-zinc-300">·</span>
@@ -1154,10 +1154,10 @@ function DashboardLayout() {
         </div>
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
-        <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3" style={{ fontFamily: '"Urbanist", system-ui, sans-serif' }}>
           <Card>
             <CardHeader icon={ShieldCheck} title="Wallet & Plan" />
-            <div className="flex divide-x divide-zinc-200">
+            <div className="flex divide-x divide-zinc-100/50">
               <Metric
                 label={`Balance · ${planTier}`}
                 value={credits.isLoading ? "…" : `$${Number(credits.balance || 0).toFixed(2)}`}
@@ -1178,7 +1178,7 @@ function DashboardLayout() {
 
           <Card>
             <CardHeader icon={Gauge} title="Performance" />
-            <div className="flex divide-x divide-zinc-200">
+            <div className="flex divide-x divide-zinc-100/50">
               <Metric
                 label="Win rate"
                 value={liveWinRate != null ? `${liveWinRate}%` : "0.0%"}
@@ -1199,7 +1199,7 @@ function DashboardLayout() {
 
           <Card>
             <CardHeader icon={Activity} title="Activity" />
-            <div className="flex divide-x divide-zinc-200">
+            <div className="flex divide-x divide-zinc-100/50">
               <Metric
                 label="Saved A+ setups"
                 value={counts.saved}
@@ -1219,7 +1219,7 @@ function DashboardLayout() {
         </section>
 
         {/* Row 2 — Market Pulse + two CTA cards */}
-        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3" style={{ fontFamily: '"Urbanist", system-ui, sans-serif' }}>
           <Card className="flex flex-col">
             <CardHeader
               icon={LineChart}
@@ -1272,7 +1272,7 @@ function DashboardLayout() {
         </section>
 
         {/* Row 3 — Quick Actions + Pro Tip + Referral */}
-        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3" style={{ fontFamily: '"Urbanist", system-ui, sans-serif' }}>
           <Card className="hover-lift flex flex-col">
             <CardHeader icon={LayoutGrid} title="Quick Actions" />
             <QuickActions />
@@ -1364,10 +1364,10 @@ function BestTimeWidget() {
   const nextZone = withState.filter((z) => !z.active).sort((a, b) => a.startMs - b.startMs)[0];
 
   const toneMap: Record<Killzone["quality"], { dot: string; text: string; bar: string; pill: string }> = {
-    best:  { dot: "bg-emerald-500", text: "text-emerald-700", bar: "bg-emerald-500", pill: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-    good:  { dot: "bg-sky-500",     text: "text-sky-700",     bar: "bg-sky-500",     pill: "bg-sky-50 text-sky-700 border-sky-200" },
-    ok:    { dot: "bg-amber-500",   text: "text-amber-700",   bar: "bg-amber-500",   pill: "bg-amber-50 text-amber-700 border-amber-200" },
-    avoid: { dot: "bg-zinc-400",    text: "text-zinc-600",    bar: "bg-zinc-400",    pill: "bg-zinc-100 text-zinc-600 border-zinc-200" },
+    best:  { dot: "bg-emerald-500", text: "text-emerald-700", bar: "bg-emerald-500", pill: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+    good:  { dot: "bg-sky-500",     text: "text-sky-700",     bar: "bg-sky-500",     pill: "bg-sky-50 text-sky-700 border-sky-100" },
+    ok:    { dot: "bg-amber-500",   text: "text-amber-700",   bar: "bg-amber-500",   pill: "bg-amber-50 text-amber-700 border-amber-100" },
+    avoid: { dot: "bg-zinc-400",    text: "text-zinc-600",    bar: "bg-zinc-400",    pill: "bg-zinc-50 text-zinc-600 border-zinc-100" },
   };
 
   return (
@@ -1380,7 +1380,7 @@ function BestTimeWidget() {
         {withState.map((z) => (
           <div
             key={z.name}
-            className={`flex items-center justify-between rounded-md border px-3 py-2 ${z.active ? "border-zinc-300 bg-zinc-50" : "border-zinc-200 bg-white"}`}
+            className={`flex items-center justify-between rounded-md border px-3 py-2 ${z.active ? "border-zinc-200 bg-zinc-50/50" : "border-zinc-100 bg-white"}`}
           >
             <div className="flex min-w-0 items-center gap-2.5">
               <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${toneMap[z.quality].dot}`} />
@@ -1607,9 +1607,9 @@ function ReferralSnapshot() {
 
 
   return (
-    <div className="flex flex-1 flex-col gap-3 px-5 py-5" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+    <div className="flex flex-1 flex-col gap-3 px-5 py-5" style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 400 }}>
 
-      <div className="flex divide-x divide-zinc-200 rounded-md border border-zinc-200 bg-white">
+      <div className="flex divide-x divide-zinc-100 rounded-md border border-zinc-100 bg-white">
         <div className="flex-1 px-3 py-2">
           <div className="text-[10px] uppercase tracking-wide text-zinc-500">Referrals</div>
           <div className="text-[16px] font-semibold text-zinc-900">{count}</div>
@@ -1622,7 +1622,7 @@ function ReferralSnapshot() {
 
       <div>
         <div className="text-[10px] uppercase tracking-wide text-zinc-500">Your link</div>
-        <div className="mt-1 flex items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5">
+        <div className="mt-1 flex items-center gap-2 rounded-md border border-zinc-100 bg-zinc-50/50 px-2.5 py-1.5">
           <span className="flex-1 truncate text-[11.5px] text-zinc-700">{link || "Generating…"}</span>
           <button
             type="button"
@@ -1635,7 +1635,7 @@ function ReferralSnapshot() {
                 setTimeout(() => setCopied(false), 1500);
               });
             }}
-            className="rounded border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
+            className="rounded border border-zinc-100 bg-white px-2 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
           >
             {copied ? "Copied" : "Copy"}
           </button>
