@@ -1609,7 +1609,7 @@ function ReferralSnapshot() {
   return (
     <div className="flex flex-1 flex-col gap-3 px-5 py-5" style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 400 }}>
 
-      <div className="flex divide-x divide-zinc-200 rounded-md border border-zinc-200 bg-white">
+      <div className="flex divide-x divide-zinc-100 rounded-md border border-zinc-100 bg-white">
         <div className="flex-1 px-3 py-2">
           <div className="text-[10px] uppercase tracking-wide text-zinc-500">Referrals</div>
           <div className="text-[16px] font-semibold text-zinc-900">{count}</div>
@@ -1622,7 +1622,7 @@ function ReferralSnapshot() {
 
       <div>
         <div className="text-[10px] uppercase tracking-wide text-zinc-500">Your link</div>
-        <div className="mt-1 flex items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5">
+        <div className="mt-1 flex items-center gap-2 rounded-md border border-zinc-100 bg-zinc-50/50 px-2.5 py-1.5">
           <span className="flex-1 truncate text-[11.5px] text-zinc-700">{link || "Generating…"}</span>
           <button
             type="button"
@@ -1635,7 +1635,7 @@ function ReferralSnapshot() {
                 setTimeout(() => setCopied(false), 1500);
               });
             }}
-            className="rounded border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
+            className="rounded border border-zinc-100 bg-white px-2 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
           >
             {copied ? "Copied" : "Copy"}
           </button>
