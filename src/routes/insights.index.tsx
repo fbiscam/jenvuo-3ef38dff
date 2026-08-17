@@ -30,7 +30,7 @@ export const insightsQueryOptions = queryOptions({
   queryFn: async () => {
     const { data, error } = await supabase
       .from("insights")
-      .select("*")
+      .select("id, title, slug, excerpt, content, category, image_url, is_breaking, published_at, created_at, updated_at, indexed_at")
       .order("published_at", { ascending: false });
 
     if (error) throw error;
