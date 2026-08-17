@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { useTrial } from "@/hooks/useTrial";
 import InvoiceHistory from "@/components/billing/InvoiceHistory";
+import { Download } from "lucide-react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import xaiLogo from "@/assets/xai-logo.png";
 
