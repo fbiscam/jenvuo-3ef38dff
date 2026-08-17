@@ -20,6 +20,7 @@ const createSchema = z.object({
   amountUsd: z.number().min(5).max(10000),
   network: z.enum(["trc20", "bep20", "erc20"]),
   code: z.string().max(40).optional().nullable(),
+  planId: z.string().max(40).optional().nullable(),
 });
 
 export const createTopupOrder = createServerFn({ method: "POST" })
