@@ -269,7 +269,7 @@ function PayPage() {
             <div className="grid gap-4 sm:grid-cols-3">
               {PLANS.map((p) => {
                 const isCurrent = !trial.active && currentPlan === p.id;
-                const isLower = !trial.active && p.price < currentPrice;
+                const isLower = false; // Allow users to select any plan including Pro/Elite even if on Ultra
 
                 const selected = selectedPlanId === p.id;
                 
