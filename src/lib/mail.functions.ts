@@ -239,7 +239,7 @@ export const sendMail = createServerFn({ method: "POST" })
       _to_address: data.to,
       _subject: data.subject,
       _body: data.body,
-      _from_address: data.from ?? null,
+      _from_address: data.from ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { id: id as string };

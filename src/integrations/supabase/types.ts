@@ -3389,20 +3389,15 @@ export type Database = {
           local_part: string
         }[]
       }
-      mail_send:
-        | {
-            Args: { _body: string; _subject: string; _to_address: string }
-            Returns: string
-          }
-        | {
-            Args: {
-              _body: string
-              _from_address?: string
-              _subject: string
-              _to_address: string
-            }
-            Returns: string
-          }
+      mail_send: {
+        Args: {
+          _body: string
+          _from_address?: string
+          _subject: string
+          _to_address: string
+        }
+        Returns: string
+      }
       mail_system_send: {
         Args: {
           _body: string
