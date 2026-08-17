@@ -64,6 +64,11 @@ function PayPage() {
   const redeemFn = useServerFn(redeemFreeCode);
 
   const { amount: presetFromUrl } = Route.useSearch();
+  const credits = useCredits();
+  const currentPlan = credits.plan;
+  const [mode, setMode] = useState<"topup" | "upgrade">("upgrade");
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+
   const [amount, setAmount] = useState<number>(
     presetFromUrl && PRESET_AMOUNTS.includes(presetFromUrl) ? presetFromUrl : 25,
   );
@@ -78,6 +83,33 @@ function PayPage() {
   const [busy, setBusy] = useState(false);
   const [orders, setOrders] = useState<PaymentOrder[]>([]);
   const qSeq = useRef(0);
+
+  const PLANS = [
+    { id: "pro", name: "Pro", price: 15, features: ["Realtime Alerts", "Journal Access", "Multi-Timeframe Bias"] },
+    { id: "elite", name: "Elite", price: 50, features: ["Multi-pair Scanner", "Custom Alert Rules", "AI Model Analysis"] },
+    { id: "ultra", name: "Ultra", price: 100, features: ["Priority Support", "Advanced Signals", "Full ICT Narration"] },
+  ];
+
+  const currentPrice = useMemo(() => {
+    const p = PLANS.find(x => x.id === currentPlan);
+    return p ? p.price : 0;
+  }, [currentPlan]);
+
+  useEffect(() => {
+    if (mode === "upgrade" && !selectedPlanId) {
+      const next = PLANS.find(p => p.price > currentPrice);
+      if (next) setSelectedPlanId(next.id);
+    }
+  }, [mode, currentPlan, currentPrice, selectedPlanId]);
+
+  const effAmount = useMemo(() => {
+    if (mode === "upgrade" && selectedPlanId) {
+      return PLANS.find(p => p.id === selectedPlanId)?.price ?? amount;
+    }
+    const c = Number(custom);
+    return custom.trim() && Number.isFinite(c) ? Math.round(c * 100) / 100 : amount;
+  }, [amount, custom, mode, selectedPlanId]);
+
 
   const effAmount = useMemo(() => {
     const c = Number(custom);
@@ -114,7 +146,14 @@ function PayPage() {
     if (effAmount < 5) return toast.error("Minimum top-up is $5.");
     setBusy(true);
     try {
-      const res: any = await createFn({ data: { amountUsd: effAmount, network, code: code.trim() || null } });
+      const res: any = await createFn({ 
+        data: { 
+          amountUsd: effAmount, 
+          network, 
+          code: code.trim() || null,
+          planId: mode === "upgrade" ? selectedPlanId : null
+        } 
+      });
       if (!res.ok) return toast.error(res.error);
       setOrder(res.order);
       setHash("");
@@ -124,6 +163,7 @@ function PayPage() {
       setBusy(false);
     }
   }
+
 
   async function onSubmitHash() {
     if (!order) return;
@@ -194,28 +234,89 @@ function PayPage() {
 
       {!order || order.status === "expired" ? (
         <section className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-24px_rgba(0,0,0,0.25)] sm:p-7">
-          <div className="flex flex-wrap gap-2.5">
-            {PRESET_AMOUNTS.map((a) => (
+          <div className="mb-8 flex justify-center">
+            <div className="inline-flex rounded-2xl bg-zinc-100 p-1">
               <button
-                key={a}
-                onClick={() => { setAmount(a); setCustom(""); }}
-                className={`min-w-[86px] rounded-2xl border px-4 py-3 text-sm font-medium transition ${
-                  !custom.trim() && amount === a
-                    ? "border-black/15 bg-[#FAFAFA] text-black"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-900/30 hover:bg-zinc-50"
+                onClick={() => setMode("upgrade")}
+                className={`rounded-xl px-6 py-2 text-sm font-medium transition ${
+                  mode === "upgrade" ? "bg-white text-black shadow-sm" : "text-zinc-500 hover:text-zinc-900"
                 }`}
               >
-                ${a}
+                Upgrade Plan
               </button>
-            ))}
-            <input
-              value={custom}
-              onChange={(e) => setCustom(e.target.value.replace(/[^0-9.]/g, ""))}
-              placeholder="Custom $"
-              inputMode="decimal"
-              className="w-32 rounded-2xl border border-zinc-200 px-3 py-3 text-sm outline-none transition focus:border-zinc-900/40 focus:ring-2 focus:ring-zinc-900/10"
-            />
+              <button
+                onClick={() => setMode("topup")}
+                className={`rounded-xl px-6 py-2 text-sm font-medium transition ${
+                  mode === "topup" ? "bg-white text-black shadow-sm" : "text-zinc-500 hover:text-zinc-900"
+                }`}
+              >
+                Top-up Credits
+              </button>
+            </div>
           </div>
+
+          {mode === "upgrade" ? (
+            <div className="grid gap-4 sm:grid-cols-3">
+              {PLANS.map((p) => {
+                const isCurrent = currentPlan === p.id;
+                const isLower = p.price < currentPrice;
+                const selected = selectedPlanId === p.id;
+                
+                return (
+                  <button
+                    key={p.id}
+                    disabled={isCurrent || isLower}
+                    onClick={() => setSelectedPlanId(p.id)}
+                    className={`relative flex flex-col rounded-2xl border p-5 text-left transition ${
+                      selected
+                        ? "border-zinc-900 bg-zinc-50 ring-1 ring-zinc-900"
+                        : "border-zinc-200 bg-white hover:border-zinc-300"
+                    } ${(isCurrent || isLower) ? "opacity-50 grayscale cursor-not-allowed" : ""}`}
+                  >
+                    {isCurrent && (
+                      <span className="absolute -top-2.5 right-4 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
+                        Current
+                      </span>
+                    )}
+                    <div className="text-sm font-semibold text-zinc-900">{p.name}</div>
+                    <div className="mt-1 text-2xl font-bold text-black">${p.price}</div>
+                    <div className="mt-4 flex-1 space-y-2">
+                      {p.features.map((f, i) => (
+                        <div key={i} className="flex items-center gap-2 text-[11px] text-zinc-500">
+                          <div className="h-1 w-1 rounded-full bg-zinc-400" />
+                          {f}
+                        </div>
+                      ))}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-2.5">
+              {PRESET_AMOUNTS.map((a) => (
+                <button
+                  key={a}
+                  onClick={() => { setAmount(a); setCustom(""); }}
+                  className={`min-w-[86px] rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+                    !custom.trim() && amount === a
+                      ? "border-black/15 bg-[#FAFAFA] text-black"
+                      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-900/30 hover:bg-zinc-50"
+                  }`}
+                >
+                  ${a}
+                </button>
+              ))}
+              <input
+                value={custom}
+                onChange={(e) => setCustom(e.target.value.replace(/[^0-9.]/g, ""))}
+                placeholder="Custom $"
+                inputMode="decimal"
+                className="w-32 rounded-2xl border border-zinc-200 px-3 py-3 text-sm outline-none transition focus:border-zinc-900/40 focus:ring-2 focus:ring-zinc-900/10"
+              />
+            </div>
+          )}
+
 
           <div className="mt-7 grid gap-2.5 sm:grid-cols-3">
             {NETWORKS.map((n) => {
@@ -276,8 +377,13 @@ function PayPage() {
                 <span className="text-3xl font-semibold text-zinc-900">${(quote?.payUsd ?? effAmount).toFixed(2)}</span>
               </div>
               <div className="mt-1.5 text-[13px] text-zinc-500">
-                You receive <span className="font-medium text-zinc-900">${(quote?.creditUsd ?? effAmount).toFixed(2)}</span> in scan credits
+                {mode === "upgrade" ? (
+                  <>Upgrade to <span className="font-medium text-zinc-900">{PLANS.find(p => p.id === selectedPlanId)?.name}</span> plan</>
+                ) : (
+                  <>You receive <span className="font-medium text-zinc-900">${(quote?.creditUsd ?? effAmount).toFixed(2)}</span> in scan credits</>
+                )}
               </div>
+
             </div>
             <button
               onClick={onCreate}
