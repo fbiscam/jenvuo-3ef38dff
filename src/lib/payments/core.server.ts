@@ -172,6 +172,47 @@ export async function bumpPromoUsage(code: string) {
     .eq("code", code);
 }
 
+/** Upgrade the user's plan to the best tier their paid amount covers, and end any trial. */
+export async function applyPlanForPayment(userId: string, paidUsd: number) {
+  const { data: plans } = await supabaseAdmin
+    .from("plans")
+    .select("id, price_usd")
+    .order("price_usd", { ascending: true });
+  const tiers = (plans ?? []).filter((p: any) => Number(p.price_usd) > 0);
+  // Best plan whose price is covered by the payment (small tolerance for rounding).
+  const earned = tiers.filter((p: any) => paidUsd + 0.01 >= Number(p.price_usd)).pop() as any;
+  if (!earned) return null;
+
+  const { data: sub } = await supabaseAdmin
+    .from("user_subscriptions")
+    .select("plan_id, is_trial")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  const priceOf = (id: string | null | undefined) =>
+    Number((tiers.find((p: any) => p.id === id) as any)?.price_usd ?? 0);
+  const onTrial = !!(sub as any)?.is_trial;
+  const currentPrice = onTrial ? -1 : priceOf((sub as any)?.plan_id);
+
+  // Never downgrade a real paid plan.
+  if (currentPrice > Number(earned.price_usd)) return null;
+
+  const payload = {
+    user_id: userId,
+    plan_id: earned.id,
+    status: "active",
+    is_trial: false,
+    trial_ends_at: null,
+    updated_at: new Date().toISOString(),
+  };
+  if (sub) {
+    await supabaseAdmin.from("user_subscriptions").update(payload).eq("user_id", userId);
+  } else {
+    await supabaseAdmin.from("user_subscriptions").insert(payload);
+  }
+  return earned.id as string;
+}
+
 /** Approve an order: credit the wallet once, log redemption, mark approved. */
 export async function approveOrder(orderId: string, by: string) {
   const { data: order } = await supabaseAdmin
@@ -183,6 +224,7 @@ export async function approveOrder(orderId: string, by: string) {
   if (order.status === "approved") return { ok: true as const, alreadyDone: true };
 
   const credit = Number(order.credit_usd);
+
   await creditWallet({
     userId: order.user_id,
     amount: credit,
