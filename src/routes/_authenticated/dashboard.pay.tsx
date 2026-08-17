@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
+import { useTrial } from "@/hooks/useTrial";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -66,9 +67,11 @@ function PayPage() {
 
   const { amount: presetFromUrl } = Route.useSearch();
   const credits = useCredits();
-  const currentPlan = credits.plan && typeof credits.plan === 'object' ? credits.plan.id : credits.plan;
+  const currentPlan = credits.plan && typeof credits.plan === 'object' ? (credits.plan as any).id : credits.plan;
+  const trial = useTrial();
   const [mode, setMode] = useState<"topup" | "upgrade">("upgrade");
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+
 
   const [amount, setAmount] = useState<number>(
     presetFromUrl && PRESET_AMOUNTS.includes(presetFromUrl) ? presetFromUrl : 25,
