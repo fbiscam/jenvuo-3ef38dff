@@ -327,8 +327,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // Killzone gate: automated signals must land in a killzone unless ≥85% conf.
             // This prevents "false signals" during slow off-session hours.
             const kz = String(plan.killzone ?? "").trim();
-            const inKillzone = kz.length > 0 && !/^(none|off|outside)$/i.test(kz);
-            if (!inKillzone && conf < 85) {
+            const killzonePassed = kz.length > 0 && !/^(none|off|outside)$/i.test(kz);
+            if (!killzonePassed && conf < 85) {
               await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
               results.push({ pair, action: "outside_killzone", conf });
               continue;
