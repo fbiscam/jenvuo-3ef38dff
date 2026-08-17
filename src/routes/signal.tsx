@@ -2272,10 +2272,7 @@ function SetupScoreCard({ plan }: { plan: SignalPlan }) {
         {/* Header row: label + score */}
         <div className="flex items-center justify-between">
           <span className={`text-[12px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal text-zinc-900`}>
-            '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
-                                        
-                                            
-                                            connect whatsapp busines API
+            A+ Setup Score
           </span>
           <span className={`text-base font-bold tabular-nums ${MONO} text-zinc-900`}>
             {displayScore}
