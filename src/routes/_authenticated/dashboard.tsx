@@ -940,7 +940,7 @@ function DashboardLayout() {
                       >
                         {iconName}
                       </span>
-                      {!sidebarCollapsed && <span className="truncate">75% Confidence krdo signal ka hr jaga par</span>}
+                      {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
                         <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
                           New
