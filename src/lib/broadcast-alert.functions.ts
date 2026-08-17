@@ -40,7 +40,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
 
     const scoreForGrade = Math.round(data.setupScore ?? data.confidence)
     const grade: z.infer<typeof BroadcastSchema>['grade'] =
-      scoreForGrade >= 90 ? 'A+' : scoreForGrade >= 70 ? 'A' : scoreForGrade >= 65 ? 'B' : 'C'
+      scoreForGrade >= 90 ? 'A+' : scoreForGrade >= 75 ? 'A' : scoreForGrade >= 65 ? 'B' : 'C'
 
     // 1. Insert into signal_alerts
     const { data: inserted, error: insertErr } = await supabaseAdmin
