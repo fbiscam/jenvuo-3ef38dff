@@ -857,7 +857,7 @@ function DashboardLayout() {
   }, [displayRemaining, credits.isLoading, credits.allowance]);
 
   return (
-    <div className={`flex min-h-screen bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
+    <div className={`flex min-h-screen bg-[#FDFDFD] text-zinc-900 font-['Urbanist',ui-sans-serif,system-ui,-apple-system,sans-serif] antialiased jenvu-zoom-dashboard`}>
 
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -922,10 +922,10 @@ function DashboardLayout() {
                       resetScroll={false}
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
-                      className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition
+                      className={`group relative flex items-center rounded-lg text-[12.5px] font-medium transition
                         ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}
                         ${active
-                          ? "bg-zinc-100 text-zinc-900 font-semibold"
+                          ? "bg-zinc-100 text-zinc-900 font-semibold shadow-sm"
                           : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
                       <span
@@ -1002,7 +1002,7 @@ function DashboardLayout() {
 
 
       {/* Right column */}
-      <div className={`dashboard-right-col flex min-w-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
+      <div className={`dashboard-right-col flex min-w-0 flex-1 flex-col bg-[#FDFDFD] ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
       {/* Mobile menu toggle (floating) */}
       {!embedMode && (
@@ -1018,16 +1018,16 @@ function DashboardLayout() {
 
 
 
-      <main className="mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
+      <main className="mx-auto w-full max-w-7xl flex-1 bg-[#FDFDFD] px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
 
 
         {pathname === "/dashboard" ? (
         <>
         {/* Identity row */}
-        <div className="space-y-1" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
-          <div className="text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>Account home</div>
+        <div className="space-y-1" style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 400 }}>
+          <div className="text-[12px] text-zinc-500" style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 400 }}>Account home</div>
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <h1 className="pl-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+            <h1 className="pl-1 truncate text-[16px] tracking-tight text-zinc-900 sm:text-[30px]" style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 600 }}>
               <span>{email || fullName}</span><span>'s Account</span>
             </h1>
             <div className="flex items-center gap-2">
