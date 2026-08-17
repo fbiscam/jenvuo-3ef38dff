@@ -110,40 +110,40 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
     }
     const recipients: Array<{ email: string }> = recipientEmails.map((email) => ({ email }))
 
-
-
     // 3. deliver WhatsApp alerts
     try {
-      const { data: waUsers } = await supabaseAdmin
-        .from('alert_preferences')
-        .select('user_id')
-        .eq('whatsapp_enabled', true)
-        .in('user_id', notifyUserIds)
-      
-      if (waUsers && waUsers.length > 0) {
-        const uids = waUsers.map(u => u.user_id)
-        const { data: profiles } = await supabaseAdmin
-          .from('profiles')
-          .select('id, whatsapp_number')
-          .in('id', uids)
+      if (notifyUserIds.length > 0) {
+        const { data: waUsers } = await supabaseAdmin
+          .from('alert_preferences')
+          .select('user_id')
+          .eq('whatsapp_enabled', true)
+          .in('user_id', notifyUserIds)
         
-        const { sendWhatsAppMessage } = await import('./whatsapp-provider.server')
-        const waMsg = [
-            \`🚀 Jenvu \${grade} \${data.direction} · \${pair}\`,
-            \`Entry: \${round(data.entry)}\`,
-            \`SL: \${round(data.sl)}\`,
-            \`TP: \${round(data.tp)}\`,
-            \`Confidence: \${Math.round(data.confidence)}%\`,
-            rationale ? \`\nRationale: \${rationale.slice(0, 100)}...\` : '',
-            \`\nDesk: https://jenvu.com/signal\`
-        ].filter(Boolean).join('\n')
+        if (waUsers && waUsers.length > 0) {
+          const uids = waUsers.map(u => u.user_id)
+          const { data: profiles } = await supabaseAdmin
+            .from('profiles')
+            .select('id, whatsapp_number')
+            .in('id', uids)
+          
+          const { sendWhatsAppMessage } = await import('./whatsapp-provider.server')
+          const waMsg = [
+              `🚀 Jenvu ${grade} ${data.direction} · ${pair}`,
+              `Entry: ${round(data.entry)}`,
+              `SL: ${round(data.sl)}`,
+              `TP: ${round(data.tp)}`,
+              `Confidence: ${Math.round(data.confidence)}%`,
+              data.rationale ? `\nRationale: ${data.rationale.slice(0, 100)}...` : '',
+              `\nDesk: https://jenvu.com/signal`
+          ].filter(Boolean).join('\n')
 
-        for (const prof of (profiles || [])) {
-          const num = (prof as any).whatsapp_number
-          if (num && num.length > 5) {
-            await sendWhatsAppMessage(num, waMsg).catch(err => 
-              console.error('[WhatsApp] Broadcast failed for', prof.id, err.message)
-            )
+          for (const prof of (profiles || [])) {
+            const num = (prof as any).whatsapp_number
+            if (num && num.length > 5) {
+              await sendWhatsAppMessage(num, waMsg).catch(err => 
+                console.error('[WhatsApp] Broadcast failed for', prof.id, err.message)
+              )
+            }
           }
         }
       }
@@ -152,7 +152,6 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
     }
 
     // 4. Insert in-app notifications for allow-listed users only
-
     if (notifyUserIds.length > 0) {
       const { getPersonalRiskMap } = await import('@/lib/personal-risk.server')
       const riskMap = await getPersonalRiskMap(notifyUserIds, {
@@ -261,7 +260,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       }
     }
 
-    // 4. Queue emails
+    // 5. Queue emails
     let enqueued = 0
     let telegramSent = 0
     try {
