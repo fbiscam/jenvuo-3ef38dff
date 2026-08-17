@@ -1154,7 +1154,7 @@ function DashboardLayout() {
         </div>
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
-        <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3" style={{ fontFamily: '"Urbanist", system-ui, sans-serif' }}>
           <Card>
             <CardHeader icon={ShieldCheck} title="Wallet & Plan" />
             <div className="flex divide-x divide-zinc-200">
@@ -1219,7 +1219,7 @@ function DashboardLayout() {
         </section>
 
         {/* Row 2 — Market Pulse + two CTA cards */}
-        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3" style={{ fontFamily: '"Urbanist", system-ui, sans-serif' }}>
           <Card className="flex flex-col">
             <CardHeader
               icon={LineChart}
@@ -1272,7 +1272,7 @@ function DashboardLayout() {
         </section>
 
         {/* Row 3 — Quick Actions + Pro Tip + Referral */}
-        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3" style={{ fontFamily: '"Urbanist", system-ui, sans-serif' }}>
           <Card className="hover-lift flex flex-col">
             <CardHeader icon={LayoutGrid} title="Quick Actions" />
             <QuickActions />
