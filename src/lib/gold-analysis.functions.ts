@@ -2634,7 +2634,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       });
     }
 
-    const SENIOR_REVIEW_MIN_RULE_SCORE = 62;
+    const SENIOR_REVIEW_MIN_RULE_SCORE = 75;
 
     // ---- WISDOM: Regime-based downgrade ----
     // If the tape is unfavorable (choppy/ranging/volatile), a textbook A+ is
@@ -3036,7 +3036,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           blended = Math.min(blended, setupScore + 10);
         } else if (setupScore < 60) {
           blended = Math.min(blended, setupScore + 14);
-        } else if (setupScore < 70) {
+        } else if (setupScore < 75) {
           blended = Math.min(blended, setupScore + 16);
         }
 

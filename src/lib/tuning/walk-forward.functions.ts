@@ -24,7 +24,7 @@ export const runWalkForwardValidation = createServerFn({ method: "POST" })
   .inputValidator((input: { configId: string; symbol?: string; threshold?: number }) => ({
     configId: String(input.configId),
     symbol: String(input.symbol || "XAUUSD").toUpperCase(),
-    threshold: typeof input.threshold === "number" ? input.threshold : 62,
+    threshold: typeof input.threshold === "number" ? input.threshold : 75,
   }))
   .handler(async ({ context, data }) => {
     const { data: isAdmin, error: rErr } = await context.supabase
