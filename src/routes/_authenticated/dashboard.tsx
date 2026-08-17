@@ -1096,6 +1096,7 @@ function DashboardLayout() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          </div>
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
               <span className="inline-flex items-center gap-2">
                 <span>{greetingText}, {fullName || "Trader"}</span>
