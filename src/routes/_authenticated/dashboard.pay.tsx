@@ -66,7 +66,7 @@ function PayPage() {
 
   const { amount: presetFromUrl } = Route.useSearch();
   const credits = useCredits();
-  const currentPlan = credits.plan;
+  const currentPlan = credits.plan && typeof credits.plan === 'object' ? credits.plan.id : credits.plan;
   const [mode, setMode] = useState<"topup" | "upgrade">("upgrade");
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
