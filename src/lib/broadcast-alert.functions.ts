@@ -42,6 +42,13 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
     const grade: z.infer<typeof BroadcastSchema>['grade'] =
       scoreForGrade >= 90 ? 'A+' : scoreForGrade >= 75 ? 'A' : scoreForGrade >= 65 ? 'B' : 'C'
 
+    // Killzone gate: even manual broadcasts must be in a killzone unless ≥85% conf.
+    const kz = String(data.killzone ?? '').trim()
+    const inKillzone = kz.length > 0 && !/^(none|off|outside)$/i.test(kz)
+    if (!inKillzone && scoreForGrade < 85) {
+      throw new Error(`Broadcast blocked: Setup is outside killzone (${kz || 'None'}) and confidence (${scoreForGrade}%) is below the 85% "A+" override floor.`)
+    }
+
     // 1. Insert into signal_alerts
     const { data: inserted, error: insertErr } = await supabaseAdmin
       .from('signal_alerts')
