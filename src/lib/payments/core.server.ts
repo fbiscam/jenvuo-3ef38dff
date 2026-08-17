@@ -173,14 +173,27 @@ export async function bumpPromoUsage(code: string) {
 }
 
 /** Upgrade the user's plan to the best tier their paid amount covers, and end any trial. */
-export async function applyPlanForPayment(userId: string, paidUsd: number) {
+export async function applyPlanForPayment(userId: string, paidUsd: number, targetPlanId?: string | null) {
   const { data: plans } = await supabaseAdmin
     .from("plans")
     .select("id, price_usd")
     .order("price_usd", { ascending: true });
   const tiers = (plans ?? []).filter((p: any) => Number(p.price_usd) > 0);
-  // Best plan whose price is covered by the payment (small tolerance for rounding).
-  const earned = tiers.filter((p: any) => paidUsd + 0.01 >= Number(p.price_usd)).pop() as any;
+
+  let earned: any = null;
+  if (targetPlanId) {
+    earned = tiers.find((p: any) => p.id === targetPlanId);
+    // Safety check: if they paid enough for it, use it.
+    if (earned && paidUsd + 0.01 < Number(earned.price_usd)) {
+      earned = null; // didn't pay enough for the target
+    }
+  }
+
+  // Fallback to auto-detection if no specific target or target was underpaid
+  if (!earned) {
+    earned = tiers.filter((p: any) => paidUsd + 0.01 >= Number(p.price_usd)).pop() as any;
+  }
+
   if (!earned) return null;
 
   const { data: sub } = await supabaseAdmin
@@ -252,7 +265,7 @@ export async function approveOrder(orderId: string, by: string) {
 
   // Paid amount (excluding promo bonus) decides the plan tier.
   try {
-    await applyPlanForPayment(order.user_id, Number(order.pay_amount_usd ?? credit));
+    await applyPlanForPayment(order.user_id, Number(order.pay_amount_usd ?? credit), order.target_plan_id);
   } catch (e) {
     console.error("plan upgrade on approval failed", (e as Error)?.message);
   }

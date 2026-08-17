@@ -73,6 +73,8 @@ export type PaymentOrder = {
   credit_usd: number;
   bonus_usd: number;
   promo_code: string | null;
+  target_plan_id: string | null;
+  is_upgrade: boolean;
   tx_hash: string | null;
   status: OrderStatus;
   reject_reason: string | null;
