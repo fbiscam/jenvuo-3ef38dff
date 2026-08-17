@@ -372,7 +372,7 @@ function Billing() {
             <thead>
               <tr className="border-b border-zinc-200">
                 <th className="p-6 text-left align-bottom">
-                  <span className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">Invite Only Pricing</span>
+                  <span className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">Pricing Plans</span>
                 </th>
                 {[
                   { name: "Pro", price: "$15", tag: "Active", to: "/dashboard/pay" as const, cta: "Upgrade now", dark: false, accent: true, key: "pro" },
