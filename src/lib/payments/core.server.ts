@@ -207,8 +207,9 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
   const onTrial = !!(sub as any)?.is_trial;
   const currentPrice = onTrial ? -1 : priceOf((sub as any)?.plan_id);
 
-  // Never downgrade a real paid plan.
-  if (currentPrice > Number(earned.price_usd)) return null;
+  // Downgrades are now allowed via manual selection on the pay page.
+  // We only block auto-downgrades if the system is guessing based on payment amount.
+  if (!targetPlanId && currentPrice > Number(earned.price_usd)) return null;
 
   const payload = {
     user_id: userId,
