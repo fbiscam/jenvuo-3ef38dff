@@ -265,8 +265,9 @@ function PayPage() {
           {mode === "upgrade" ? (
             <div className="grid gap-4 sm:grid-cols-3">
               {PLANS.map((p) => {
-                const isCurrent = currentPlan === p.id;
-                const isLower = p.price < currentPrice;
+                const isCurrent = !trial.active && currentPlan === p.id;
+                const isLower = !trial.active && p.price < currentPrice;
+
                 const selected = selectedPlanId === p.id;
                 
                 return (
