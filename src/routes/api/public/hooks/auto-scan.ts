@@ -143,10 +143,10 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           : pairs.slice(batchSlot * scanBatchSize, batchSlot * scanBatchSize + scanBatchSize);
         // Runtime config can lag behind code deploys. Keep a quality floor so
         // stale permissive settings cannot send B/C retracement calls again.
-        const configuredMinConf = Number(cfg.min_conf ?? 70);
+        const configuredMinConf = Number(cfg.min_conf ?? 75);
         let minConf = Math.max(
-          70,
-          Math.min(Number.isFinite(configuredMinConf) ? configuredMinConf : 70, 80),
+          75,
+          Math.min(Number.isFinite(configuredMinConf) ? configuredMinConf : 75, 80),
         );
         const confirmWindowMin = Math.min(
           Number(cfg.confirm_window_min ?? 45) || 45,
