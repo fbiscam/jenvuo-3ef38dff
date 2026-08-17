@@ -1031,14 +1031,6 @@ function DashboardLayout() {
               <span>{email || fullName}</span><span>'s Account</span>
             </h1>
             <div className="flex items-center gap-2">
-              <span
-                className="inline-flex items-center rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-white"
-                style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 500 }}
-              >
-                {currentPlan
-                  ? currentPlan.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-                  : "Free"}
-              </span>
               <DropdownMenu>
                 <DropdownMenuTrigger
                   className="mr-4 hidden sm:flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
