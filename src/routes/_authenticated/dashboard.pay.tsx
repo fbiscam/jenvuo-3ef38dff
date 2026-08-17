@@ -392,9 +392,10 @@ function PayPage() {
                 )}
               </div>
               {trial.active && mode === "upgrade" && (
-                <div className="mt-2 text-[11px] text-red-600 font-medium">
+                <div className="mt-2 text-[11px] text-indigo-600 font-medium bg-indigo-50 px-2 py-1 rounded-lg inline-block">
                   Note: This will end your free trial and activate your paid plan.
                 </div>
+
               )}
             </div>
 
