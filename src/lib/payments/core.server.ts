@@ -250,6 +250,15 @@ export async function approveOrder(orderId: string, by: string) {
     await bumpPromoUsage(order.promo_code);
   }
 
+  // Paid amount (excluding promo bonus) decides the plan tier.
+  try {
+    await applyPlanForPayment(order.user_id, Number(order.pay_amount_usd ?? credit));
+  } catch (e) {
+    console.error("plan upgrade on approval failed", (e as Error)?.message);
+  }
+
+
+
   await supabaseAdmin
     .from("payment_orders")
     .update({
