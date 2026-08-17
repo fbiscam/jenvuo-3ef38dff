@@ -1891,12 +1891,14 @@ export type Database = {
           email: string | null
           expires_at: string
           id: string
+          is_upgrade: boolean | null
           network: string
           pay_amount_usd: number
           promo_code: string | null
           reject_reason: string | null
           status: string
           submitted_at: string | null
+          target_plan_id: string | null
           tx_hash: string | null
           user_id: string
         }
@@ -1912,12 +1914,14 @@ export type Database = {
           email?: string | null
           expires_at?: string
           id?: string
+          is_upgrade?: boolean | null
           network: string
           pay_amount_usd: number
           promo_code?: string | null
           reject_reason?: string | null
           status?: string
           submitted_at?: string | null
+          target_plan_id?: string | null
           tx_hash?: string | null
           user_id: string
         }
@@ -1933,16 +1937,26 @@ export type Database = {
           email?: string | null
           expires_at?: string
           id?: string
+          is_upgrade?: boolean | null
           network?: string
           pay_amount_usd?: number
           promo_code?: string | null
           reject_reason?: string | null
           status?: string
           submitted_at?: string | null
+          target_plan_id?: string | null
           tx_hash?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "payment_orders_target_plan_id_fkey"
+            columns: ["target_plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       plans: {
         Row: {
