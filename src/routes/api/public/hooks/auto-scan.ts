@@ -324,12 +324,15 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               continue;
             }
 
-            // Killzone gate DISABLED — user requested signals fire any time
-            // a valid setup meets confidence, regardless of session window.
-            // We still record whether the setup actually landed inside a
-            // killzone so scan history / accuracy analytics stay truthful.
+            // Killzone gate: automated signals must land in a killzone unless ≥85% conf.
+            // This prevents "false signals" during slow off-session hours.
             const kz = String(plan.killzone ?? "").trim();
-            const killzonePassed = kz.length > 0 && !/^(none|off|outside)$/i.test(kz);
+            const inKillzone = kz.length > 0 && !/^(none|off|outside)$/i.test(kz);
+            if (!inKillzone && conf < 85) {
+              await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
+              results.push({ pair, action: "outside_killzone", conf });
+              continue;
+            }
 
 
             // HTF bias alignment gate — never fire against higher-timeframe trend.

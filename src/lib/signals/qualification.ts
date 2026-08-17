@@ -67,6 +67,7 @@ export type QualifyInput = {
   htfBias?: string | null;
   /** UTC hour of the scan, used for the session-relaxed HTF gate. */
   utcHour: number;
+  inKillzone?: boolean;
   minConf?: number;
   minRR?: number;
 };
@@ -109,6 +110,13 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
     conf >= 80;
   if (!aligned) {
     return { ok: false, reason: "htf_bias_conflict", detail: { htfBias, dir, conf } };
+  }
+
+  // Killzone gate: restrict broadcasts to designated killzones unless ≥85% confidence.
+  // Outside killzones, price action is often "noisy" or "false" (retrace vs expansion).
+  const inKillzone = !!input.inKillzone;
+  if (!inKillzone && conf < 85) {
+    return { ok: false, reason: "outside_killzone", detail: { conf } };
   }
 
   const entry = Number(input.entry);
