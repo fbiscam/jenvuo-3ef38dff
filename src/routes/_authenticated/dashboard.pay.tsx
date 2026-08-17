@@ -269,6 +269,7 @@ function PayPage() {
             <div className="grid gap-4 sm:grid-cols-3">
               {PLANS.map((p) => {
                 const isCurrent = !trial.active && currentPlan === p.id;
+                const isCurrentInActiveOrder = order?.status === "approved" && order.target_plan_id === p.id;
                 const isLower = false;
 
                 const selected = selectedPlanId === p.id;
@@ -276,17 +277,22 @@ function PayPage() {
                 return (
                   <button
                     key={p.id}
-                    disabled={isCurrent || isLower}
+                    disabled={isCurrent || isCurrentInActiveOrder || isLower}
                     onClick={() => setSelectedPlanId(p.id)}
                     className={`relative flex flex-col rounded-2xl border p-5 text-left transition ${
                       selected
                         ? "border-zinc-900 bg-zinc-50 ring-1 ring-zinc-900"
                         : "border-zinc-200 bg-white hover:border-zinc-300"
-                    } ${(isCurrent || isLower) ? "opacity-50 grayscale cursor-not-allowed" : ""}`}
+                    } ${(isCurrent || isCurrentInActiveOrder || isLower) ? "opacity-50 grayscale cursor-not-allowed" : ""}`}
                   >
                     {isCurrent && (
                       <span className="absolute -top-2.5 right-4 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
                         Current
+                      </span>
+                    )}
+                    {isCurrentInActiveOrder && (
+                      <span className="absolute -top-2.5 right-4 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-800">
+                        Active
                       </span>
                     )}
                     <div className="text-sm font-semibold text-zinc-900">{p.name}</div>
