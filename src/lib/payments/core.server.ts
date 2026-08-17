@@ -184,7 +184,9 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
   if (targetPlanId) {
     earned = tiers.find((p: any) => p.id === targetPlanId);
     // Safety check: if they paid enough for it, use it.
-    if (earned && paidUsd + 0.01 < Number(earned.price_usd)) {
+    // We compare against the plan's wallet_usd value which represents its cost.
+    const required = Number(earned?.price_usd ?? 0);
+    if (earned && paidUsd + 0.01 < required) {
       earned = null; // didn't pay enough for the target
     }
   }
@@ -202,14 +204,9 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
     .eq("user_id", userId)
     .maybeSingle();
 
-  const priceOf = (id: string | null | undefined) =>
-    Number((tiers.find((p: any) => p.id === id) as any)?.price_usd ?? 0);
-  const onTrial = !!(sub as any)?.is_trial;
-  const currentPrice = onTrial ? -1 : priceOf((sub as any)?.plan_id);
-
-  // Downgrades are now allowed via manual selection on the pay page.
-  // We only block auto-downgrades if the system is guessing based on payment amount.
-  if (!targetPlanId && currentPrice > Number(earned.price_usd)) return null;
+  // Downgrades are allowed when manually targeted via targetPlanId.
+  // We only skip if the "earned" plan matches what they already have.
+  if (sub?.plan_id === earned.id && !(sub as any).is_trial) return null;
 
   const payload = {
     user_id: userId,
