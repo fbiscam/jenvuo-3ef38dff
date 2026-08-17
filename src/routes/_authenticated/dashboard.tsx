@@ -1010,7 +1010,7 @@ function DashboardLayout() {
         type="button"
         aria-label="Open menu"
         onClick={() => setMobileNavOpen(true)}
-        className="fixed top-3 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
+        className="fixed top-3 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-100 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
       >
         <Menu className="h-4 w-4" />
       </button>
@@ -1033,7 +1033,7 @@ function DashboardLayout() {
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger
-                  className="mr-4 hidden sm:flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                  className="mr-4 hidden sm:flex items-center justify-center overflow-hidden rounded-full border border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-200 shadow-sm"
                   aria-label="Profile menu"
                   title={fullName || email || "Profile"}
                 >
@@ -1047,7 +1047,7 @@ function DashboardLayout() {
                     decoding="async"
                   />
                 </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-60">
+              <DropdownMenuContent align="end" className="w-60 border-zinc-100 shadow-xl">
                 <div className="flex items-center gap-3 px-3.5 py-3">
                   <img
                     src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
@@ -1062,7 +1062,7 @@ function DashboardLayout() {
                     <p className="truncate text-[12px] text-zinc-500">{email || ""}</p>
                   </div>
                 </div>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-zinc-100" />
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard/profile" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
                     <User className="h-4 w-4 text-zinc-500" /> Profile
@@ -1078,7 +1078,7 @@ function DashboardLayout() {
                     <ShieldCheck className="h-4 w-4 text-zinc-500" /> Security
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-zinc-100" />
                 <DropdownMenuItem
                   onClick={signOut}
                   className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700 focus:text-rose-600"
@@ -1157,7 +1157,7 @@ function DashboardLayout() {
         <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3" style={{ fontFamily: '"Urbanist", system-ui, sans-serif' }}>
           <Card>
             <CardHeader icon={ShieldCheck} title="Wallet & Plan" />
-            <div className="flex divide-x divide-zinc-200">
+            <div className="flex divide-x divide-zinc-100">
               <Metric
                 label={`Balance · ${planTier}`}
                 value={credits.isLoading ? "…" : `$${Number(credits.balance || 0).toFixed(2)}`}
@@ -1178,7 +1178,7 @@ function DashboardLayout() {
 
           <Card>
             <CardHeader icon={Gauge} title="Performance" />
-            <div className="flex divide-x divide-zinc-200">
+            <div className="flex divide-x divide-zinc-100">
               <Metric
                 label="Win rate"
                 value={liveWinRate != null ? `${liveWinRate}%` : "0.0%"}
@@ -1199,7 +1199,7 @@ function DashboardLayout() {
 
           <Card>
             <CardHeader icon={Activity} title="Activity" />
-            <div className="flex divide-x divide-zinc-200">
+            <div className="flex divide-x divide-zinc-100">
               <Metric
                 label="Saved A+ setups"
                 value={counts.saved}
