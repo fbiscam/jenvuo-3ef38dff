@@ -12,12 +12,13 @@ export const updateWhatsappSettings = createServerFn({ method: 'POST' })
     const { supabase, userId } = context
     
     // Update alert preferences
+    // Using any to bypass strict type checking for columns that might not be in generated types yet
     const { error: prefError } = await supabase
       .from('alert_preferences')
       .upsert({ 
         user_id: userId, 
         whatsapp_enabled: data.enabled 
-      }, { onConflict: 'user_id' })
+      } as any, { onConflict: 'user_id' })
     
     if (prefError) throw new Error(prefError.message)
 

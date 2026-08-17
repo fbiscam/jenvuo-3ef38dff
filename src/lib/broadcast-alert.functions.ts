@@ -141,11 +141,11 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
 
           for (const prof of (profiles || [])) {
             const num = (prof as any).whatsapp_number
-            if (num && num.length > 5) {
-              await sendWhatsAppMessage(num, waMsg).catch(err => 
-                console.error('[WhatsApp] Broadcast failed for', prof.id, err.message)
-              )
-            }
+          if (num && num.length > 5) {
+            await sendWhatsAppMessage(num, waMsg).catch(err => 
+              console.error('[WhatsApp] Broadcast failed for', (prof as any).id, err.message)
+            )
+          }
           }
         }
       }
