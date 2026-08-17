@@ -235,7 +235,8 @@ function Billing() {
             scanId: string | null;
             metadata: Record<string, unknown> | null;
           };
-          const rows: Row[] = (credits.state?.recent ?? [])
+
+          const allRows: Row[] = useMemo(() => (credits.state?.recent ?? [])
             .filter((r) => r.delta < 0)
             .map((r) => ({
               id: r.id,
@@ -248,11 +249,63 @@ function Billing() {
               completionTokens: r.completion_tokens ?? null,
               scanId: (r.metadata?.scanId as string | undefined) ?? null,
               metadata: (r.metadata as Record<string, unknown> | undefined) ?? null,
-            }));
-          if (rows.length === 0) return null;
-          const shown = showAllActivity ? rows : rows.slice(0, 12);
+            })), [credits.state?.recent]);
+
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+          const last30DaysRows = allRows.filter(r => new Date(r.created_at) >= thirtyDaysAgo);
+          const olderRows = allRows.filter(r => new Date(r.created_at) < thirtyDaysAgo);
+
+          const handleDownloadOlder = () => {
+            const doc = new jsPDF();
+            doc.text("Billing History (Older than 30 days)", 14, 15);
+            
+            const tableData = olderRows.map(r => {
+              const d = new Date(r.created_at);
+              const meta = (r.metadata as any) ?? {};
+              const rawModel = meta.actual_senior_model ?? meta.actual_model ?? r.model ?? meta.model ?? null;
+              const modelLabel = rawModel ? formatModelLabel(rawModel) : "—";
+              const side = (meta.signal ?? meta.side ?? "").toString().toUpperCase() || "—";
+              const cost = Math.abs(r.delta).toFixed(4);
+              
+              return [
+                d.toLocaleDateString(),
+                modelLabel,
+                side,
+                r.scanId ? r.scanId.slice(0, 8) : "—",
+                `$${cost}`
+              ];
+            });
+
+            autoTable(doc, {
+              startY: 20,
+              head: [['Date', 'Model', 'Signal', 'Scan ID', 'Cost']],
+              body: tableData,
+            });
+
+            doc.save(`billing_history_older_${new Date().toISOString().split('T')[0]}.pdf`);
+          };
+
+          if (last30DaysRows.length === 0 && olderRows.length === 0) return null;
+
+          const shown = showAllActivity ? last30DaysRows : last30DaysRows.slice(0, 12);
+          
           return (
             <div className="mt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-sm font-medium text-zinc-900">Recent Scans (Last 30 Days)</h4>
+                {olderRows.length > 0 && (
+                  <button
+                    onClick={handleDownloadOlder}
+                    className="flex items-center gap-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Download older history (PDF)
+                  </button>
+                )}
+              </div>
+
               <div className="overflow-x-auto rounded-lg border border-zinc-200">
                 <table className="w-full min-w-[640px] text-xs border-collapse">
                   <thead>
@@ -277,10 +330,7 @@ function Billing() {
                       const actualSeniorModel = (meta.actual_senior_model as string | undefined) ?? null;
                       const rawModel = actualModel ?? r.model ?? (meta.model as string | undefined) ?? null;
                       const prettyFromMeta = actualModel ? undefined : (meta.model_label as string | undefined);
-                      // Prefer the model that actually ran (ai_cost_log match).
-                      // Fall back to metadata's planned senior model so the
-                      // history still shows Grok 4.5 / DeepSeek pills even when
-                      // the senior call errored or timed out.
+                      
                       const seniorRaw = actualSeniorModel ?? (meta.senior_model as string | undefined) ?? null;
                       const seniorPrettyFromMeta = meta.senior_model_label as string | undefined;
                       const seniorPretty = actualSeniorModel
@@ -290,7 +340,7 @@ function Billing() {
                         ? formatModelLabel(actualModel)
                         : (prettyFromMeta ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—")))
                         ?? "—";
-                      // Show only ONE model per scan: prefer the senior review model that actually ran; otherwise the primary.
+                      
                       const displayRaw = actualSeniorModel ?? rawModel;
                       const displayLabel = actualSeniorModel ? (seniorPretty ?? formatModelLabel(actualSeniorModel)) : modelLabel;
                       const modelWithSenior = displayLabel;
@@ -337,11 +387,11 @@ function Billing() {
                   </tbody>
                 </table>
               </div>
-              {rows.length > 12 && (
+              {last30DaysRows.length > 12 && (
                 <div className="mt-3 flex justify-center">
                   <button type="button" onClick={() => setShowAllActivity((v) => !v)}
                     className="text-xs font-medium text-zinc-700 hover:text-zinc-900">
-                    {showAllActivity ? "Show less" : `Show more (${rows.length - 12})`}
+                    {showAllActivity ? "Show less" : `Show more (${last30DaysRows.length - 12})`}
                   </button>
                 </div>
               )}
