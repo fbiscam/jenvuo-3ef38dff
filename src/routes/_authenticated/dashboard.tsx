@@ -857,7 +857,7 @@ function DashboardLayout() {
   }, [displayRemaining, credits.isLoading, credits.allowance]);
 
   return (
-    <div className={`flex min-h-screen bg-[#FDFDFD] text-zinc-900 font-['Urbanist',ui-sans-serif,system-ui,-apple-system,sans-serif] antialiased jenvu-zoom-dashboard`}>
+    <div className={`flex min-h-screen bg-[#FDFDFD] text-zinc-900 font-['Urbanist',ui-sans-serif,system-ui,-apple-system,sans-serif] antialiased jenvu-zoom-dashboard selection:bg-zinc-100 selection:text-zinc-900`}>
 
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -877,7 +877,7 @@ function DashboardLayout() {
           ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
         style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 400 }}
       >
-        <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Urbanist", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
+        <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Urbanist", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; } ::selection { background: #F4F4F5 !important; color: #18181B !important; }`}</style>
         {/* Brand */}
         <div className={`flex h-11 shrink-0 items-center gap-2.5 bg-[#FDFDFD] ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
@@ -1157,7 +1157,7 @@ function DashboardLayout() {
         <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3" style={{ fontFamily: '"Urbanist", system-ui, sans-serif' }}>
           <Card>
             <CardHeader icon={ShieldCheck} title="Wallet & Plan" />
-            <div className="flex divide-x divide-zinc-100">
+            <div className="flex divide-x divide-zinc-100/50">
               <Metric
                 label={`Balance · ${planTier}`}
                 value={credits.isLoading ? "…" : `$${Number(credits.balance || 0).toFixed(2)}`}
@@ -1178,7 +1178,7 @@ function DashboardLayout() {
 
           <Card>
             <CardHeader icon={Gauge} title="Performance" />
-            <div className="flex divide-x divide-zinc-100">
+            <div className="flex divide-x divide-zinc-100/50">
               <Metric
                 label="Win rate"
                 value={liveWinRate != null ? `${liveWinRate}%` : "0.0%"}
@@ -1199,7 +1199,7 @@ function DashboardLayout() {
 
           <Card>
             <CardHeader icon={Activity} title="Activity" />
-            <div className="flex divide-x divide-zinc-100">
+            <div className="flex divide-x divide-zinc-100/50">
               <Metric
                 label="Saved A+ setups"
                 value={counts.saved}
