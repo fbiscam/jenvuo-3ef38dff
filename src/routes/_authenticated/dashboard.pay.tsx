@@ -96,8 +96,12 @@ function PayPage() {
 
   const currentPrice = useMemo(() => {
     const p = PLANS.find(x => x.id === currentPlan);
+    // If we're in a trial, we treat current price as 0 so all paid plans are available for upgrade.
+    // If not in trial, lower plans are disabled to prevent accidental downgrades via the pay page.
+    if (trial.active) return 0;
     return p ? p.price : 0;
-  }, [currentPlan]);
+  }, [currentPlan, trial.active]);
+
 
   useEffect(() => {
     if (mode === "upgrade" && !selectedPlanId) {
