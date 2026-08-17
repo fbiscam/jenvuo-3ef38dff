@@ -940,7 +940,7 @@ function DashboardLayout() {
                       >
                         {iconName}
                       </span>
-                      {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
+                      {!sidebarCollapsed && <span className="truncate">'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            hi</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
                         <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
                           New
