@@ -115,16 +115,18 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       if (notifyUserIds.length > 0) {
         const { data: waUsers } = await supabaseAdmin
           .from('alert_preferences')
-          .select('user_id')
-          .eq('whatsapp_enabled', true)
+          .select('user_id, whatsapp_enabled' as any)
           .in('user_id', notifyUserIds)
         
-        if (waUsers && waUsers.length > 0) {
-          const uids = waUsers.map(u => u.user_id)
+        const enabledUids = (waUsers || [])
+          .filter((u: any) => u.whatsapp_enabled === true)
+          .map((u: any) => u.user_id)
+        
+        if (enabledUids.length > 0) {
           const { data: profiles } = await supabaseAdmin
             .from('profiles')
-            .select('id, whatsapp_number')
-            .in('id', uids)
+            .select('id, whatsapp_number' as any)
+            .in('id', enabledUids)
           
           const { sendWhatsAppMessage } = await import('./whatsapp-provider.server')
           const waMsg = [

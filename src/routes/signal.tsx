@@ -235,8 +235,12 @@ function SignalPage() {
   const broadcastFn = useServerFn(broadcastCurrentSignal);
   const getAlertsEnabledFn = useServerFn(getAlertsEnabled);
   const setAlertsEnabledFn = useServerFn(setAlertsEnabled);
+  
   const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
+  const [waOn, setWaOn] = useState<boolean>(false);
+  const [waNum, setWaNum] = useState<string>("");
   const [alertsSaving, setAlertsSaving] = useState(false);
+  const [showWaModal, setShowWaModal] = useState(false);
 
   useEffect(() => {
     if (!authUser) return;
@@ -244,7 +248,11 @@ function SignalPage() {
       try {
         const r = await getAlertsEnabledFn({});
         setAlertsOn(!!r.enabled);
-      } catch { setAlertsOn(true); }
+        setWaOn(!!r.whatsappEnabled);
+        setWaNum(r.whatsappNumber || "");
+      } catch { 
+        setAlertsOn(true); 
+      }
     })();
   }, [authUser, getAlertsEnabledFn]);
 
@@ -262,6 +270,26 @@ function SignalPage() {
       setAlertsSaving(false);
     }
   }, [alertsOn, alertsSaving, setAlertsEnabledFn]);
+
+  const toggleWhatsApp = useCallback(async (enabled: boolean, number?: string) => {
+    setAlertsSaving(true);
+    try {
+      await setAlertsEnabledFn({ 
+        data: { 
+          whatsappEnabled: enabled, 
+          whatsappNumber: number ?? waNum 
+        } 
+      });
+      setWaOn(enabled);
+      if (number) setWaNum(number);
+      toast.success(enabled ? "WhatsApp alerts connected" : "WhatsApp alerts disabled");
+      setShowWaModal(false);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not update WhatsApp settings");
+    } finally {
+      setAlertsSaving(false);
+    }
+  }, [waNum, setAlertsEnabledFn]);
 
   type BroadcastedAlert = {
     id: string;
