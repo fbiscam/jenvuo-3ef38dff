@@ -268,10 +268,17 @@ function OpsPayments() {
                       <div className="text-right">
                         <div className="text-lg font-medium text-zinc-900">${Number(r.pay_amount_usd || 0).toFixed(2)}</div>
                         <div className="text-[12px] text-zinc-500">
-                          credit ${Number(r.credit_usd || 0).toFixed(2)}
-                          {Number(r.bonus_usd) > 0 && <span className="text-emerald-700"> (+${Number(r.bonus_usd).toFixed(2)})</span>}
+                          {r.is_upgrade ? (
+                            <span className="font-semibold text-indigo-600 uppercase">Upgrade: {r.target_plan_id}</span>
+                          ) : (
+                            <>
+                              credit ${Number(r.credit_usd || 0).toFixed(2)}
+                              {Number(r.bonus_usd) > 0 && <span className="text-emerald-700"> (+${Number(r.bonus_usd).toFixed(2)})</span>}
+                            </>
+                          )}
                         </div>
                       </div>
+
                     </div>
 
                     <div className="mt-3 rounded-xl bg-zinc-50 px-3 py-2.5">
