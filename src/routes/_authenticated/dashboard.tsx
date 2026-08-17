@@ -1364,10 +1364,10 @@ function BestTimeWidget() {
   const nextZone = withState.filter((z) => !z.active).sort((a, b) => a.startMs - b.startMs)[0];
 
   const toneMap: Record<Killzone["quality"], { dot: string; text: string; bar: string; pill: string }> = {
-    best:  { dot: "bg-emerald-500", text: "text-emerald-700", bar: "bg-emerald-500", pill: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-    good:  { dot: "bg-sky-500",     text: "text-sky-700",     bar: "bg-sky-500",     pill: "bg-sky-50 text-sky-700 border-sky-200" },
-    ok:    { dot: "bg-amber-500",   text: "text-amber-700",   bar: "bg-amber-500",   pill: "bg-amber-50 text-amber-700 border-amber-200" },
-    avoid: { dot: "bg-zinc-400",    text: "text-zinc-600",    bar: "bg-zinc-400",    pill: "bg-zinc-100 text-zinc-600 border-zinc-200" },
+    best:  { dot: "bg-emerald-500", text: "text-emerald-700", bar: "bg-emerald-500", pill: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+    good:  { dot: "bg-sky-500",     text: "text-sky-700",     bar: "bg-sky-500",     pill: "bg-sky-50 text-sky-700 border-sky-100" },
+    ok:    { dot: "bg-amber-500",   text: "text-amber-700",   bar: "bg-amber-500",   pill: "bg-amber-50 text-amber-700 border-amber-100" },
+    avoid: { dot: "bg-zinc-400",    text: "text-zinc-600",    bar: "bg-zinc-400",    pill: "bg-zinc-50 text-zinc-600 border-zinc-100" },
   };
 
   return (
@@ -1380,7 +1380,7 @@ function BestTimeWidget() {
         {withState.map((z) => (
           <div
             key={z.name}
-            className={`flex items-center justify-between rounded-md border px-3 py-2 ${z.active ? "border-zinc-300 bg-zinc-50" : "border-zinc-200 bg-white"}`}
+            className={`flex items-center justify-between rounded-md border px-3 py-2 ${z.active ? "border-zinc-200 bg-zinc-50/50" : "border-zinc-100 bg-white"}`}
           >
             <div className="flex min-w-0 items-center gap-2.5">
               <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${toneMap[z.quality].dot}`} />
