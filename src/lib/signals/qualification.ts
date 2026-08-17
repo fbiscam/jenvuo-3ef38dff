@@ -9,7 +9,7 @@
 export type Direction = "BUY" | "SELL";
 
 /** Global quality floor. Runtime config may raise it, never lower it. */
-export const MIN_CONFIDENCE = 75;
+export const MIN_CONFIDENCE = 70;
 /** Broadcast tickets must carry at least a 2R target. */
 export const MIN_RR = 2;
 /** A live tick older than this must not be used for gating decisions. */
@@ -36,7 +36,7 @@ export function isPriceScaleValid(pair: string, price: number): boolean {
 export function gradeFor(confidence: number): "A+" | "A" | "B" | "C" {
   const c = Math.round(confidence);
   if (c >= 88) return "A+";
-  if (c >= 75) return "A";
+  if (c >= 70) return "A";
   if (c >= 65) return "B";
   return "C";
 }
