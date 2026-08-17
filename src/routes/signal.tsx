@@ -1601,7 +1601,7 @@ function SignalPage() {
 
 
                   {/* Take Trade / Save Signal — only when valid trade plan (conf ≥ 70, entry/SL/TP present) */}
-                  {(isBuy || isSell) && t.confidence >= 60 && Number.isFinite(t.entry) && Number.isFinite(t.sl) && Number.isFinite(t.tp) && t.entry > 0 && t.sl > 0 && t.tp > 0 && (
+                  {(isBuy || isSell) && t.confidence >= MIN_CONFIDENCE && Number.isFinite(t.entry) && Number.isFinite(t.sl) && Number.isFinite(t.tp) && t.entry > 0 && t.sl > 0 && t.tp > 0 && (
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       type="button"
