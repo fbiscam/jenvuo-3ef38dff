@@ -43,7 +43,7 @@ export const setAlertsEnabled = createServerFn({ method: 'POST' })
     if (data.whatsappNumber !== undefined) {
       const { error } = await supabase
         .from('profiles')
-        .update({ whatsapp_number: data.whatsappNumber })
+        .update({ whatsapp_number: data.whatsappNumber } as any)
         .eq('id', userId)
       if (error) throw new Error(error.message)
     }
