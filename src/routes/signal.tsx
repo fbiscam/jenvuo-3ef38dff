@@ -1026,7 +1026,7 @@ function SignalPage() {
               <button
                 onClick={() => {
                   try {
-                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            jo sidebar ma Signal page uska Name Launch AI kro aur usko Account overview ka nicha la kar ao");
+                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Sidebar majo insights page aur referrals page ha wo tools & market section ma lao");
                     window.speechSynthesis.speak(u);
                   } catch {}
                   setVoiceBlocked(false);
