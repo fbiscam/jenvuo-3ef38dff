@@ -3571,7 +3571,9 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       }
     }
     return enrichedPlan;
+  }
 }
+
 
 export const getSignalPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
