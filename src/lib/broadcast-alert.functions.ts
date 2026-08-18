@@ -385,6 +385,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       recipients: recipients.length,
       enqueued,
       telegram_sent: telegramSent,
+      whatsapp_sent: whatsappSent,
       notified_in_app: notifyUserIds.length,
     }
   })
