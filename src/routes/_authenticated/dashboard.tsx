@@ -86,10 +86,8 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     items: [
       { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
       { to: "/signal", label: "Signal Desk", icon: "radar" },
-      { to: "/insights", label: "Insights", icon: "menu_book" },
       { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats" },
       { to: "/dashboard/risk", label: "Risk Manager", icon: "balance" },
-      { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3" },
     ],
   },
   {
@@ -98,6 +96,8 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/app", label: "Signals", icon: "auto_awesome" },
       { to: "/killzones", label: "Killzones", icon: "schedule" },
       { to: "/ai-engine", label: "AI Engine", icon: "neurology" },
+      { to: "/insights", label: "Insights", icon: "menu_book" },
+      { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3" },
       { to: "/pricing", label: "Pricing", icon: "local_offer" },
     ],
   },
