@@ -3207,6 +3207,42 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_alert_links: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_error: string | null
+          phone_number: string
+          updated_at: string | null
+          user_id: string
+          verification_code: string | null
+          verified_at: string | null
+          whatsapp_enabled: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_error?: string | null
+          phone_number: string
+          updated_at?: string | null
+          user_id: string
+          verification_code?: string | null
+          verified_at?: string | null
+          whatsapp_enabled?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_error?: string | null
+          phone_number?: string
+          updated_at?: string | null
+          user_id?: string
+          verification_code?: string | null
+          verified_at?: string | null
+          whatsapp_enabled?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       v_scan_charge_mismatches: {
