@@ -56,7 +56,11 @@ export async function sendSignalAlertWhatsApp(a: SignalAlertArgs): Promise<{ sen
     .neq('plan_id', 'free')
   
   let paidIds = Array.from(new Set((paidRows ?? []).map((r) => r.user_id)))
-  paidIds = await filterAlertsEnabledUserIds(paidIds, { grade: a.grade, pair: a.pair, direction: a.direction })
+  paidIds = await filterAlertsEnabledUserIds(paidIds, { 
+    grade: a.grade as any, 
+    pair: a.pair, 
+    direction: a.direction as any 
+  })
   
   if (paidIds.length === 0) return { sent: 0 }
 
