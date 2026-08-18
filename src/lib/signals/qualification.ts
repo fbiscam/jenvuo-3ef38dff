@@ -112,10 +112,10 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
     return { ok: false, reason: "htf_bias_conflict", detail: { htfBias, dir, conf } };
   }
 
-  // Killzone gate: restrict broadcasts to designated killzones unless ≥85% confidence.
+  // Killzone gate: restrict broadcasts to designated killzones unless ≥75% confidence.
   // Outside killzones, price action is often "noisy" or "false" (retrace vs expansion).
   const inKillzone = !!input.inKillzone;
-  if (!inKillzone && conf < 85) {
+  if (!inKillzone && conf < 75) {
     return { ok: false, reason: "outside_killzone", detail: { conf } };
   }
 
