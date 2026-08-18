@@ -100,7 +100,7 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
   if (conf < minConf) return { ok: false, reason: "below_threshold", detail: { conf, minConf } };
 
   // HTF bias alignment. Neutral bias passes during London + NY (7–20 UTC),
-  // and a ≥80% conviction setup may trade against bias (reversal signals).
+  // and a ≥75% conviction setup may trade against bias (reversal signals).
   const htfBias = String(input.htfBias ?? "neutral");
   const activeSession = input.utcHour >= 7 && input.utcHour < 20;
   const aligned =
