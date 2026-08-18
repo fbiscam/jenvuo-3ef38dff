@@ -23,7 +23,11 @@ async function whatsappApi(method: string, payload: Record<string, unknown>): Pr
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID
   
   if (!token || !phoneNumberId) {
-    throw new Error('WhatsApp API credentials missing (WHATSAPP_API_TOKEN / WHATSAPP_PHONE_NUMBER_ID)')
+    // During local development or if secrets aren't set, we log but don't crash the whole signal pipeline.
+    // The UI will show a descriptive error to the user if they try to connect.
+    const msg = 'WhatsApp API credentials missing (WHATSAPP_API_TOKEN / WHATSAPP_PHONE_NUMBER_ID). Please add them to your environment secrets.'
+    console.error(`[WhatsApp] ${msg}`)
+    throw new Error(msg)
   }
 
   const res = await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/${method}`, {
