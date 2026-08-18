@@ -1026,7 +1026,7 @@ function SignalPage() {
               <button
                 onClick={() => {
                   try {
-                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            jo abhi signal milla XAU/EUR ka usko check kro aur SL/TP Update kro sara accounts sa");
+                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            trade section ma jab user trade log krta hato jo trade entry mathi wo pending ma chala jati ar pending wali entry la lati jo kal trade milli XAU/USD in london session wo win gayi thi jiss jiss wo trade logged ki wo win kro");
                     window.speechSynthesis.speak(u);
                   } catch {}
                   setVoiceBlocked(false);
@@ -1611,12 +1611,15 @@ function SignalPage() {
                         setLogging(true);
                         const { data: u } = await supabase.auth.getUser();
                         if (!u.user) { toast.error("Sign in to log trades"); setLogging(false); return; }
-                        // Decide market vs limit: if entry is away from current price, it's a limit order.
+                        // Decide market vs limit. A ticket counts as FILLED (open) when
+                        // live price is at the entry band OR has already traded through
+                        // entry in the fill direction — otherwise good tickets sat in
+                        // "pending" forever while the market ran to target.
                         const px = plan.currentPrice;
-                        const tolMarket = px * 0.0005;
+                        const tolMarket = Math.max(px * 0.0015, 0.01);
                         const atMarket =
-                          (isBuy && px <= t.entry + tolMarket && px >= t.entry - tolMarket) ||
-                          (isSell && px >= t.entry - tolMarket && px <= t.entry + tolMarket);
+                          (isBuy && px <= t.entry + tolMarket) ||
+                          (isSell && px >= t.entry - tolMarket);
                         const initialOutcome = atMarket ? "open" : "pending";
                         const { data, error } = await supabase.from("trade_journal").insert({
                           user_id: u.user.id,
