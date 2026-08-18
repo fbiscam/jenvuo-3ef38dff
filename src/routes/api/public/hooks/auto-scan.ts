@@ -360,9 +360,9 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               (dir === "BUY" && htfBias === "bullish") ||
               (dir === "SELL" && htfBias === "bearish") ||
               (isActiveSession && htfBias === "neutral") ||
-              // High-conviction override: a ≥80% setup fires even against
+              // High-conviction override: a ≥75% setup fires even against
               // HTF bias — that's the whole point of a reversal signal.
-              conf >= 80;
+              conf >= 75;
             if (!aligned) {
               await supabaseAdmin
                 .from("auto_scan_state")
