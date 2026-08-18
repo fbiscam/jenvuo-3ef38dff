@@ -265,7 +265,7 @@ const RISK_PROFILE: Record<
   // and 3R targets ≈ $150 — unusable size for retail accounts. Tightened so a
   // normal XAU ticket sits around 0.25-0.35% risk (≈ $12-$16) and the 3R target
   // stays under ~1.1%. Still ≈ 0.7x ATR, so it clears routine session noise.
-  metal:  { pctBuffer: 0.0012, minRiskPct: 0.0022, atrMult: 0.70, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0055 },
+  metal:  { pctBuffer: 0.0008, minRiskPct: 0.0016, atrMult: 0.50, maxDistPct: 0.0045, entryWindowPct: 0.0020, maxRiskPct: 0.0040 },
   forex:  { pctBuffer: 0.0004, minRiskPct: 0.0007, atrMult: 0.40, maxDistPct: 0.0035, entryWindowPct: 0.0015, maxRiskPct: 0.0045 },
   index:  { pctBuffer: 0.0008, minRiskPct: 0.0012, atrMult: 0.50, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0080 },
   stock:  { pctBuffer: 0.0012, minRiskPct: 0.0018, atrMult: 0.55, maxDistPct: 0.0080, entryWindowPct: 0.0030, maxRiskPct: 0.0110 },
