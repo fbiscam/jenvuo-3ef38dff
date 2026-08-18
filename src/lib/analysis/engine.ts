@@ -715,7 +715,7 @@ export function scoreSetup(args: {
   const grade: "A+" | "A" | "B" | "C" =
     vetos.length >= 2 ? "C" :
     score >= 90 ? "A+" :
-    score >= 80 ? "A" :
+    score >= 75 ? "A" :
     score >= 65 ? "B" : "C";
 
 

@@ -144,10 +144,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         // Runtime config can lag behind code deploys. Keep a quality floor so
         // stale permissive settings cannot send B/C retracement calls again.
         const configuredMinConf = Number(cfg.min_conf ?? 75);
-        let minConf = Math.max(
-          75,
-          Math.min(Number.isFinite(configuredMinConf) ? configuredMinConf : 75, 80),
-        );
+        let minConf = 75;
         const confirmWindowMin = Math.min(
           Number(cfg.confirm_window_min ?? 45) || 45,
           45,
@@ -158,9 +155,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           120,
         );
         const maxPerDay = Math.max(Number(cfg.max_broadcasts_per_day ?? 12) || 12, 12);
-        // 78%+ can broadcast immediately. 70–77% must survive the confirmation
-        // window, so one-candle liquidity grabs do not alert everyone.
-        let singleHitMinConf = Math.max(minConf, 78);
+        // 75%+ can broadcast immediately.
+        let singleHitMinConf = Math.max(minConf, 75);
 
         // Global daily rate limit — manual scans bypass so the user's
         // deliberate analyze still fires when the pool cap is hit.
@@ -248,8 +244,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         }
         // Post-news reaction mode: keep scanning but raise the bar a touch.
         if (newsContext) {
-          minConf = Math.max(minConf, Math.min(Math.max(newsPostMinConf, 70), 85));
-          singleHitMinConf = Math.max(minConf, 78);
+          minConf = 75;
+          singleHitMinConf = 75;
         }
 
         const results: Array<Record<string, unknown>> = [];
@@ -337,7 +333,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               kz.length > 0 &&
               !/(outside|none|off|no killzone|inactive|closed)/i.test(kzLower) &&
               /(london|new york|ny|asia|tokyo|frankfurt|silver bullet|killzone)/i.test(kzLower);
-            if (!killzonePassed && conf < 85) {
+            if (!killzonePassed && conf < 75) {
               await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
               results.push({ pair, action: "outside_killzone", conf, killzone: kz });
               continue;
@@ -361,9 +357,9 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               (dir === "BUY" && htfBias === "bullish") ||
               (dir === "SELL" && htfBias === "bearish") ||
               (isActiveSession && htfBias === "neutral") ||
-              // High-conviction override: a ≥80% setup fires even against
+              // High-conviction override: a ≥75% setup fires even against
               // HTF bias — that's the whole point of a reversal signal.
-              conf >= 80;
+              conf >= 75;
             if (!aligned) {
               await supabaseAdmin
                 .from("auto_scan_state")
