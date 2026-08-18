@@ -100,22 +100,22 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
   if (conf < minConf) return { ok: false, reason: "below_threshold", detail: { conf, minConf } };
 
   // HTF bias alignment. Neutral bias passes during London + NY (7–20 UTC),
-  // and a ≥80% conviction setup may trade against bias (reversal signals).
+  // and a ≥75% conviction setup may trade against bias (reversal signals).
   const htfBias = String(input.htfBias ?? "neutral");
   const activeSession = input.utcHour >= 7 && input.utcHour < 20;
   const aligned =
     (dir === "BUY" && htfBias === "bullish") ||
     (dir === "SELL" && htfBias === "bearish") ||
     (activeSession && htfBias === "neutral") ||
-    conf >= 80;
+    conf >= 75;
   if (!aligned) {
     return { ok: false, reason: "htf_bias_conflict", detail: { htfBias, dir, conf } };
   }
 
-  // Killzone gate: restrict broadcasts to designated killzones unless ≥85% confidence.
+  // Killzone gate: restrict broadcasts to designated killzones unless ≥75% confidence.
   // Outside killzones, price action is often "noisy" or "false" (retrace vs expansion).
   const inKillzone = !!input.inKillzone;
-  if (!inKillzone && conf < 85) {
+  if (!inKillzone && conf < 75) {
     return { ok: false, reason: "outside_killzone", detail: { conf } };
   }
 
