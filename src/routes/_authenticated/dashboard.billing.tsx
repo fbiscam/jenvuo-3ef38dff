@@ -131,7 +131,7 @@ function Billing() {
 
   const [showAllActivity, setShowAllActivity] = useState(false);
 
-  // Moved hook to top level to avoid Rules of Hooks violation
+  // Always define hooks in the same order
   const allRows: BillingRow[] = useMemo(() => (credits.state?.recent ?? [])
     .filter((r) => r.delta < 0)
     .map((r) => ({
@@ -162,6 +162,7 @@ function Billing() {
     allRows.filter(r => new Date(r.created_at) < thirtyDaysAgo),
     [allRows, thirtyDaysAgo]
   );
+
 
   const handleDownloadOlder = () => {
     const doc = new jsPDF();
