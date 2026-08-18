@@ -11,9 +11,6 @@ import autoTable from "jspdf-autotable";
 
 import xaiLogo from "@/assets/xai-logo.png";
 
-
-
-
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   component: Billing,
 });
@@ -107,9 +104,7 @@ const MATRIX_ROWS: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark; isHeadi
   { f: "Trade journal", b: true, c: true, d: true },
   { f: "Email + push alerts", b: true, c: true, d: true },
   { f: "Multi-pair scanner", b: false, c: true, d: true, badge: "new" },
-
   { f: "Custom alert rules", b: false, c: true, d: true },
-
   { f: "Priority desk support", b: false, c: false, d: true },
 ];
 
@@ -136,7 +131,7 @@ function Billing() {
 
   const [showAllActivity, setShowAllActivity] = useState(false);
 
-  // Moved hook to top level to avoid Rules of Hooks violation (early return below)
+  // Moved hook to top level to avoid Rules of Hooks violation
   const allRows: BillingRow[] = useMemo(() => (credits.state?.recent ?? [])
     .filter((r) => r.delta < 0)
     .map((r) => ({
@@ -198,9 +193,7 @@ function Billing() {
     doc.save(`billing_history_older_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
-  // Only show skeleton on the very first load — once we've resolved plan/credits
-  // once, keep showing the previous values during background refetches so the
-  // Balance doesn't blink on realtime updates or tab focus.
+  // Only show skeleton on the very first load
   const isLoading = currentPlan === null || (credits.isLoading && !credits.state);
 
   if (isLoading) {
@@ -226,8 +219,7 @@ function Billing() {
   const pct = pctBase > 0 ? Math.min(100, Math.round((remaining / pctBase) * 100)) : 0;
   const resetsAt = credits.state?.periodResetsAt ? new Date(credits.state.periodResetsAt) : null;
 
-
-
+  const shown = showAllActivity ? last30DaysRows : last30DaysRows.slice(0, 12);
 
   return (
     <div className="space-y-10">
@@ -281,7 +273,6 @@ function Billing() {
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400, textTransform: "none", letterSpacing: "normal" }}>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            
             <div className="mt-2 flex items-baseline gap-2 flex-nowrap whitespace-nowrap">
               <span className="text-3xl sm:text-4xl tabular-nums" style={{ fontWeight: 400 }}>${Number(remaining).toFixed(2)}</span>
               <span className="text-[11px] sm:text-sm text-zinc-500">/ ${Number(credits.allowance).toFixed(2)} · {plan.toUpperCase()}&nbsp;</span>
@@ -298,215 +289,111 @@ function Billing() {
         <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
           <div className="h-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
         </div>
-        {(() => {
-          const visibleRows = showAllActivity ? last30DaysRows : last30DaysRows.slice(0, 12);
-
-          if (last30DaysRows.length === 0) {
-            return (
-              <div className="mt-8 flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-200 py-12 text-center">
-                <p className="text-sm text-zinc-500">No activity in the last 30 days.</p>
-                {olderRows.length > 0 && (
-                  <button 
-                    onClick={handleDownloadOlder}
-                    className="mt-4 inline-flex items-center gap-2 rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black transition"
-                  >
-                    <Download className="h-3 w-3" />
-                    Download older history (PDF)
-                  </button>
-                )}
-              </div>
-            );
-          }
-
-          return (
-            <div className="mt-8">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>Recent Activity</h4>
-                {olderRows.length > 0 && (
-                  <button 
-                    onClick={handleDownloadOlder}
-                    className="inline-flex items-center gap-2 text-[10px] font-medium text-zinc-600 hover:text-zinc-900 transition"
-                  >
-                    <Download className="h-3 w-3" />
-                    Archive ({olderRows.length} records)
-                  </button>
-                )}
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-zinc-100 text-[10px] uppercase tracking-wider text-zinc-400">
-                      <th className="px-3 py-2 font-medium">Model</th>
-                      <th className="px-3 py-2 font-medium">Result</th>
-                      <th className="px-3 py-2 font-medium">Date</th>
-                      <th className="px-3 py-2 font-medium">Side</th>
-                      <th className="px-3 py-2 font-medium">Scan ID</th>
-                      <th className="px-3 py-2 text-right font-medium">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-50">
-                    {visibleRows.map((r) => {
-                      const d = new Date(r.created_at);
-                      const dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                      const timeStr = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
-                      const amt = Math.abs(r.delta);
-                      
-                      const meta = (r.metadata as any) ?? {};
-                      const actualModel = meta.actual_model ?? null;
-                      const actualSeniorModel = meta.actual_senior_model ?? null;
-                      const seniorRaw = meta.senior_model ?? null;
-                      const seniorPrettyFromMeta = meta.senior_model_label ?? meta.senior_label ?? null;
-                      const rawModel = r.model ?? meta.model ?? null;
-                      const prettyFromMeta = meta.model_label ?? meta.label ?? null;
-
-                      const seniorPretty = actualSeniorModel 
-                        ? formatModelLabel(actualSeniorModel) 
-                        : (seniorPrettyFromMeta ?? (seniorRaw ? formatModelLabel(seniorRaw) : undefined));
-                      
-                      const modelLabel = actualModel 
-                        ? formatModelLabel(actualModel)
-                        : (prettyFromMeta ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—")))
-                      
-                      const modelWithSenior = actualSeniorModel ? (seniorPretty ?? formatModelLabel(actualSeniorModel)) : modelLabel;
-                      const displayRaw = actualSeniorModel ? actualSeniorModel : (actualModel ?? rawModel);
-
-                      const sideLabel = (meta.signal ?? meta.side ?? "").toString().toUpperCase() || "SCAN";
-                      const sideClass = sideLabel === "BUY"
-                        ? "bg-emerald-100 text-emerald-700"
-                        : sideLabel === "SELL"
-                          ? "bg-rose-100 text-rose-700"
-                          : sideLabel === "WAIT"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-zinc-100 text-zinc-500";
-                      const gradeRaw = (meta.grade ?? meta.letter_grade ?? meta.rating ?? "").toString().toUpperCase();
-                      const confRaw = meta.confidence ?? meta.confidence_score ?? meta.score;
-                      const confNum = typeof confRaw === "number" ? confRaw : (confRaw ? Number(confRaw) : NaN);
-                      const confPct = Number.isFinite(confNum) ? (confNum <= 1 ? Math.round(confNum * 100) : Math.round(confNum)) : null;
-                      const gradeLabel = gradeRaw || (confPct !== null ? `${confPct}%` : "—");
-                      const gradeClass = gradeRaw.startsWith("A")
-                        ? "bg-emerald-100 text-emerald-700"
-                        : gradeRaw.startsWith("B")
-                          ? "bg-sky-100 text-sky-700"
-                          : gradeRaw.startsWith("C")
-                            ? "bg-amber-100 text-amber-700"
-                            : gradeRaw
-                              ? "bg-rose-100 text-rose-700"
-                              : "bg-zinc-100 text-zinc-500";
-
-                      return (
-                        <tr key={r.id} className="hover:bg-zinc-50/60">
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}><ModelWithLogo raw={displayRaw} label={modelWithSenior} /></td>
-                          <td className="whitespace-nowrap px-3 py-2">
-                            <span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${gradeClass}`}>
-                              {gradeLabel}
-                            </span>
-                          </td>
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums text-zinc-500`}>{dateStr} · {timeStr}</td>
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums`}><span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${sideClass}`}>{sideLabel}</span></td>
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] text-zinc-500`}>{r.scanId ? r.scanId.slice(0, 8) : "—"}</td>
-                          <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums font-semibold text-rose-600">−${amt.toFixed(4)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              {last30DaysRows.length > 12 && (
-                <div className="mt-3 flex justify-center">
-                  <button type="button" onClick={() => setShowAllActivity((v) => !v)}
-                    className="text-xs font-medium text-zinc-700 hover:text-zinc-900">
-                    {showAllActivity ? "Show less" : `Show more (${last30DaysRows.length - 12})`}
-                  </button>
-                </div>
+        
+        {last30DaysRows.length > 0 || olderRows.length > 0 ? (
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-medium text-zinc-900">Recent Scans (Last 30 Days)</h4>
+              {olderRows.length > 0 && (
+                <button
+                  onClick={handleDownloadOlder}
+                  className="flex items-center gap-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Download older history (PDF)
+                </button>
               )}
             </div>
-          );
-        })()}
-                      const d = new Date(r.created_at);
-                      const userTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : undefined;
-                      const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: userTz });
-                      const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", timeZone: userTz, timeZoneName: "short" });
-                      const amt = Math.abs(r.delta);
-                      const meta = (r.metadata as any) ?? {};
-                      const actualModel = (meta.actual_model as string | undefined) ?? null;
-                      const actualSeniorModel = (meta.actual_senior_model as string | undefined) ?? null;
-                      const rawModel = actualModel ?? r.model ?? (meta.model as string | undefined) ?? null;
-                      const prettyFromMeta = actualModel ? undefined : (meta.model_label as string | undefined);
-                      
-                      const seniorRaw = actualSeniorModel ?? (meta.senior_model as string | undefined) ?? null;
-                      const seniorPrettyFromMeta = meta.senior_model_label as string | undefined;
-                      const seniorPretty = actualSeniorModel
-                        ? formatModelLabel(actualSeniorModel)
-                        : (seniorPrettyFromMeta ?? (seniorRaw ? formatModelLabel(seniorRaw) : undefined));
-                      const modelLabel = actualModel
-                        ? formatModelLabel(actualModel)
-                        : (prettyFromMeta ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—")))
-                        ?? "—";
-                      
-                      const displayRaw = actualSeniorModel ?? rawModel;
-                      const displayLabel = actualSeniorModel ? (seniorPretty ?? formatModelLabel(actualSeniorModel)) : modelLabel;
-                      const modelWithSenior = displayLabel;
 
-                      const sideRaw = (meta.signal ?? meta.side ?? meta.direction ?? meta.action ?? "").toString().toUpperCase();
-                      const sideLabel = sideRaw === "BUY" || sideRaw === "SELL" || sideRaw === "WAIT" ? sideRaw : "—";
-                      const sideClass = sideLabel === "BUY"
-                        ? "bg-emerald-100 text-emerald-700"
-                        : sideLabel === "SELL"
-                          ? "bg-rose-100 text-rose-700"
-                          : sideLabel === "WAIT"
-                            ? "bg-amber-100 text-amber-700"
+            <div className="overflow-x-auto rounded-lg border border-zinc-200">
+              <table className="w-full min-w-[640px] text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-zinc-200 bg-zinc-50/60 text-left">
+                    <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Model</th>
+                    <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Grade</th>
+                    <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Date</th>
+                    <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Signal</th>
+                    <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Scan</th>
+                    <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium text-right`}>Cost</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100">
+                  {shown.map((r) => {
+                    const d = new Date(r.created_at);
+                    const userTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : undefined;
+                    const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: userTz });
+                    const timeStr = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", timeZone: userTz });
+                    const amt = Math.abs(r.delta);
+                    const meta = (r.metadata as any) ?? {};
+                    const actualModel = (meta.actual_model as string | undefined) ?? null;
+                    const actualSeniorModel = (meta.actual_senior_model as string | undefined) ?? null;
+                    const rawModel = actualModel ?? r.model ?? (meta.model as string | undefined) ?? null;
+                    
+                    const seniorRaw = actualSeniorModel ?? (meta.senior_model as string | undefined) ?? null;
+                    const seniorPrettyFromMeta = meta.senior_model_label as string | undefined;
+                    const seniorPretty = actualSeniorModel
+                      ? formatModelLabel(actualSeniorModel)
+                      : (seniorPrettyFromMeta ?? (seniorRaw ? formatModelLabel(seniorRaw) : undefined));
+                    const modelLabel = actualModel
+                      ? formatModelLabel(actualModel)
+                      : (meta.model_label ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—")));
+                    
+                    const displayRaw = actualSeniorModel ?? rawModel;
+                    const displayLabel = actualSeniorModel ? (seniorPretty ?? formatModelLabel(actualSeniorModel)) : modelLabel;
+
+                    const sideRaw = (meta.signal ?? meta.side ?? meta.direction ?? meta.action ?? "").toString().toUpperCase();
+                    const sideLabel = sideRaw === "BUY" || sideRaw === "SELL" || sideRaw === "WAIT" ? sideRaw : "—";
+                    const sideClass = sideLabel === "BUY"
+                      ? "bg-emerald-100 text-emerald-700"
+                      : sideLabel === "SELL"
+                        ? "bg-rose-100 text-rose-700"
+                        : sideLabel === "WAIT"
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-zinc-100 text-zinc-500";
+                    const gradeRaw = (meta.grade ?? meta.letter_grade ?? meta.rating ?? "").toString().toUpperCase();
+                    const confRaw = meta.confidence ?? meta.confidence_score ?? meta.score;
+                    const confNum = typeof confRaw === "number" ? confRaw : (confRaw ? Number(confRaw) : NaN);
+                    const confPct = Number.isFinite(confNum) ? (confNum <= 1 ? Math.round(confNum * 100) : Math.round(confNum)) : null;
+                    const gradeLabel = gradeRaw || (confPct !== null ? `${confPct}%` : "—");
+                    const gradeClass = gradeRaw.startsWith("A")
+                      ? "bg-emerald-100 text-emerald-700"
+                      : gradeRaw.startsWith("B")
+                        ? "bg-sky-100 text-sky-700"
+                        : gradeRaw.startsWith("C")
+                          ? "bg-amber-100 text-amber-700"
+                          : gradeRaw
+                            ? "bg-rose-100 text-rose-700"
                             : "bg-zinc-100 text-zinc-500";
-                      const gradeRaw = (meta.grade ?? meta.letter_grade ?? meta.rating ?? "").toString().toUpperCase();
-                      const confRaw = meta.confidence ?? meta.confidence_score ?? meta.score;
-                      const confNum = typeof confRaw === "number" ? confRaw : (confRaw ? Number(confRaw) : NaN);
-                      const confPct = Number.isFinite(confNum) ? (confNum <= 1 ? Math.round(confNum * 100) : Math.round(confNum)) : null;
-                      const gradeLabel = gradeRaw || (confPct !== null ? `${confPct}%` : "—");
-                      const gradeClass = gradeRaw.startsWith("A")
-                        ? "bg-emerald-100 text-emerald-700"
-                        : gradeRaw.startsWith("B")
-                          ? "bg-sky-100 text-sky-700"
-                          : gradeRaw.startsWith("C")
-                            ? "bg-amber-100 text-amber-700"
-                            : gradeRaw
-                              ? "bg-rose-100 text-rose-700"
-                              : "bg-zinc-100 text-zinc-500";
 
-                      return (
-                        <tr key={r.id} className="hover:bg-zinc-50/60">
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}><ModelWithLogo raw={displayRaw} label={modelWithSenior} /></td>
-                          <td className="whitespace-nowrap px-3 py-2">
-                            <span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${gradeClass}`}>
-                              {gradeLabel}
-                            </span>
-                          </td>
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums text-zinc-500`}>{dateStr} · {timeStr}</td>
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums`}><span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${sideClass}`}>{sideLabel}</span></td>
-                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] text-zinc-500`}>{r.scanId ? r.scanId.slice(0, 8) : "—"}</td>
-                          <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums font-semibold text-rose-600">−${amt.toFixed(4)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              {last30DaysRows.length > 12 && (
-                <div className="mt-3 flex justify-center">
-                  <button type="button" onClick={() => setShowAllActivity((v) => !v)}
-                    className="text-xs font-medium text-zinc-700 hover:text-zinc-900">
-                    {showAllActivity ? "Show less" : `Show more (${last30DaysRows.length - 12})`}
-                  </button>
-                </div>
-              )}
+                    return (
+                      <tr key={r.id} className="hover:bg-zinc-50/60">
+                        <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}><ModelWithLogo raw={displayRaw} label={displayLabel} /></td>
+                        <td className="whitespace-nowrap px-3 py-2">
+                          <span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${gradeClass}`}>
+                            {gradeLabel}
+                          </span>
+                        </td>
+                        <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums text-zinc-500`}>{dateStr} · {timeStr}</td>
+                        <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums`}><span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${sideClass}`}>{sideLabel}</span></td>
+                        <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] text-zinc-500`}>{r.scanId ? r.scanId.slice(0, 8) : "—"}</td>
+                        <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums font-semibold text-rose-600">−${amt.toFixed(4)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          );
-        })()}
+            {last30DaysRows.length > 12 && (
+              <div className="mt-3 flex justify-center">
+                <button type="button" onClick={() => setShowAllActivity((v) => !v)}
+                  className="text-xs font-medium text-zinc-700 hover:text-zinc-900">
+                  {showAllActivity ? "Show less" : `Show more (${last30DaysRows.length - 12})`}
+                </button>
+              </div>
+            )}
+          </div>
+        ) : null}
       </section>
-
-
-
-
-
-
 
       {/* COMPARISON MATRIX */}
       <section>
