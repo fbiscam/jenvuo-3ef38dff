@@ -134,7 +134,6 @@ function AlertPrefs() {
   const canConnectTelegram = chatIdValid && !telegramSaving;
   const phoneValid = /^\+?\d{10,18}$/.test(whatsappPhone.trim());
   const canConnectWhatsapp = phoneValid && !whatsappSaving;
-  const canConnectTelegram = chatIdValid && !telegramSaving;
 
   const [risk, setRisk] = useState<{ balance: number; pct: number } | null>(null);
   useEffect(() => {
