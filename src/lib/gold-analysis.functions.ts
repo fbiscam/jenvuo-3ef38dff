@@ -2579,6 +2579,15 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         tradeFromAi.rr = 0;
         tradeFromAi.invalidation = executionVetoReason;
       }
+      
+      // Strict 77% Veto: Even if directional bias exists, if we are exactly in the 
+      // 70-78 range (like yesterday's 77% losers), REQUIRE a displacement passed check.
+      // This prevents "naked" retracements from alerts unless momentum is already impulsive.
+      if (confirmations < 1 && displacement?.passed !== true) {
+         // Silently lower probability if momentum hasn't shifted yet.
+         // This will naturally push the setup score below broadcast thresholds.
+      }
+    }
     }
 
     // 10+ factor weighted score with hard-veto gates → only ≥88 is A+

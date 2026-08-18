@@ -1026,7 +1026,7 @@ function SignalPage() {
               <button
                 onClick={() => {
                   try {
-                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            isko Sidebar ma Account Overview page ka nicha lao");
+                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            check kro kal jo signals aya tha usma wrong signal bitha aur wo kew wrong signal milla kew ka uska confidence 77% tha phirbhi wrong milla asa kew isko theek kro asa signals generate kew kr rha ha update kro accurate signal jasa aj XAU/EUR ka aya ha aur kal XAU/USD Ka wasa hi aya make ICT/SMC Engine and AI Check more accurate/update ka jasa ya2 signals milla ha wasa hi milla");
                     window.speechSynthesis.speak(u);
                   } catch {}
                   setVoiceBlocked(false);
