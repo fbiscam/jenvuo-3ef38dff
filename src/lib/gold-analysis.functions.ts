@@ -2733,7 +2733,7 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
           const short = "GPT-5.2 Chat";
           if (agrees) {
             // Confidence can only go UP here, and only slightly.
-            const lift = Number.isFinite(smcScore) && smcScore >= 75 ? 4 : 2;
+            const lift = Number.isFinite(smcScore) && smcScore >= 80 ? 4 : 2;
             setupScore = Math.min(95, setupScore + lift);
             setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
             setupChecks.push({
@@ -2890,7 +2890,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
           } else if (verdict === "DOWNGRADE") {
             __seniorReviewStatus = "downgraded";
             // Soft-reduce: shave ~10 points off score so borderline setups
-            // fall below the 75% broadcast gate but strong ones still fire.
+            // fall below the 70% broadcast gate but strong ones still fire.
             setupScore = Math.max(50, setupScore - 10);
             setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
             setupChecks.unshift({

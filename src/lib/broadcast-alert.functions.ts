@@ -225,12 +225,9 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
     // 4. Queue emails
     let enqueued = 0
     let telegramSent = 0
-    let whatsappSent = 0
     try {
       const { sendSignalAlertTelegrams } = await import('@/lib/signal-alert-telegram.server')
-      const { sendSignalAlertWhatsApp } = await import('@/lib/whatsapp-alert.server')
-      
-      const alertData = {
+      const r = await sendSignalAlertTelegrams({
         alertId: inserted.id,
         firedAt: inserted.fired_at,
         pair,
@@ -246,23 +243,10 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
         killzone: data.killzone ?? null,
         htfBias: data.htfBias ?? null,
         rationale: data.rationale ?? null,
-      }
-
-      const [tgRes, waRes] = await Promise.all([
-        sendSignalAlertTelegrams(alertData).catch(e => {
-          console.error('[broadcast] telegram alerts failed:', e?.message)
-          return { sent: 0 }
-        }),
-        sendSignalAlertWhatsApp(alertData).catch(e => {
-          console.error('[broadcast] whatsapp alerts failed:', e?.message)
-          return { sent: 0 }
-        })
-      ])
-      
-      telegramSent = tgRes.sent
-      whatsappSent = waRes.sent
+      })
+      telegramSent = r.sent
     } catch (e) {
-      console.error('[broadcast] social alerts failed:', (e as Error)?.message)
+      console.error('[broadcast] telegram alerts failed:', (e as Error)?.message)
     }
     if (recipients.length > 0) {
       const { default: React } = await import('react')
@@ -385,7 +369,6 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       recipients: recipients.length,
       enqueued,
       telegram_sent: telegramSent,
-      whatsapp_sent: whatsappSent,
       notified_in_app: notifyUserIds.length,
     }
   })
