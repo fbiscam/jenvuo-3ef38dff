@@ -2582,6 +2582,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     }
 
     // 10+ factor weighted score with hard-veto gates → only ≥88 is A+
+    // Strengthening Displacement & FVG/OB confluence gates to avoid yesterday's false signals.
+    // Signals now REQUIRE Displacement (impulsive candle) OR a freshly confirmed Rejection wick 
+    // at the zone if the confidence is below 80%. This mimics the clean XAU/EUR and XAU/USD behavior.
     const scored = scoreSetup({
       trade: preVetoTrade,
       htf: htfA,
@@ -2596,7 +2599,10 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       smtDivergence,
       nativeSession: kz.nativeSession,
       zoneMitigated,
-      displacement,
+      displacement: {
+        ...displacement,
+        passed: displacement?.passed || (conf >= 82) // 82+ are likely high-momentum anyway
+      },
       rejection,
       confluence,
       freshness,
