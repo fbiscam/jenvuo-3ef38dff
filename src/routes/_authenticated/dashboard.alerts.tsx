@@ -107,6 +107,11 @@ function AlertPrefs() {
   const setTelegramEnabledFn = useServerFn(setTelegramAlertEnabled);
   const disconnectTelegramFn = useServerFn(disconnectTelegramAlertLink);
   const getRisk = useServerFn(getRiskSettings);
+  const getWhatsappLinkFn = useServerFn(getWhatsappAlertLink);
+  const connectWhatsappFn = useServerFn(connectWhatsappAlertLink);
+  const setWhatsappEnabledFn = useServerFn(setWhatsappAlertEnabled);
+  const disconnectWhatsappFn = useServerFn(disconnectWhatsappAlertLink);
+
   const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
   const [alertsSaving, setAlertsSaving] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState("");
@@ -116,7 +121,19 @@ function AlertPrefs() {
   const [telegramError, setTelegramError] = useState<string | null>(null);
   const [telegramSaving, setTelegramSaving] = useState(false);
   const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false);
+
+  const [whatsappPhone, setWhatsappPhone] = useState("");
+  const [whatsappLinked, setWhatsappLinked] = useState(false);
+  const [whatsappEnabled, setWhatsappEnabled] = useState(true);
+  const [whatsappVerifiedAt, setWhatsappVerifiedAt] = useState<string | null>(null);
+  const [whatsappError, setWhatsappError] = useState<string | null>(null);
+  const [whatsappSaving, setWhatsappSaving] = useState(false);
+  const [whatsappDisconnectConfirmOpen, setWhatsappDisconnectConfirmOpen] = useState(false);
+
   const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
+  const canConnectTelegram = chatIdValid && !telegramSaving;
+  const phoneValid = /^\+?\d{10,18}$/.test(whatsappPhone.trim());
+  const canConnectWhatsapp = phoneValid && !whatsappSaving;
   const canConnectTelegram = chatIdValid && !telegramSaving;
 
   const [risk, setRisk] = useState<{ balance: number; pct: number } | null>(null);
@@ -180,6 +197,21 @@ function AlertPrefs() {
       }
     })();
   }, [getTelegramLinkFn]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await getWhatsappLinkFn({});
+        setWhatsappLinked(!!r.linked);
+        setWhatsappPhone(r.phoneNumber ?? "");
+        setWhatsappEnabled(r.enabled !== false);
+        setWhatsappVerifiedAt(r.verifiedAt ?? null);
+        setWhatsappError(r.lastError ?? null);
+      } catch {
+        setWhatsappError("Could not load WhatsApp settings");
+      }
+    })();
+  }, [getWhatsappLinkFn]);
 
   const toggleAlerts = useCallback(async () => {
     if (alertsOn === null || alertsSaving) return;
@@ -246,6 +278,56 @@ function AlertPrefs() {
       setTelegramSaving(false);
     }
   }, [disconnectTelegramFn]);
+
+  const connectWhatsapp = useCallback(async () => {
+    if (!canConnectWhatsapp) return;
+    setWhatsappSaving(true);
+    setWhatsappError(null);
+    try {
+      const r = await connectWhatsappFn({ data: { phoneNumber: whatsappPhone.trim() } });
+      setWhatsappLinked(true);
+      setWhatsappEnabled(true);
+      setWhatsappVerifiedAt(new Date().toISOString());
+      setWhatsappPhone(r.phoneNumber);
+      toast.success("WhatsApp connected", { description: "A test message was sent to your number." });
+    } catch (e: any) {
+      const message = e?.message ?? "Could not connect WhatsApp";
+      setWhatsappError(message);
+      toast.error("WhatsApp connect failed", { description: message });
+    } finally {
+      setWhatsappSaving(false);
+    }
+  }, [canConnectWhatsapp, connectWhatsappFn, whatsappPhone]);
+
+  const toggleWhatsapp = useCallback(async (enabled: boolean) => {
+    setWhatsappEnabled(enabled);
+    try {
+      await setWhatsappEnabledFn({ data: { enabled } });
+      toast.success(enabled ? "WhatsApp alerts enabled" : "WhatsApp alerts disabled");
+    } catch (e: any) {
+      setWhatsappEnabled(!enabled);
+      toast.error(e?.message ?? "Could not update WhatsApp");
+    }
+  }, [setWhatsappEnabledFn]);
+
+  const disconnectWhatsapp = useCallback(async () => {
+    setWhatsappSaving(true);
+    setWhatsappError(null);
+    try {
+      await disconnectWhatsappFn({});
+      setWhatsappLinked(false);
+      setWhatsappEnabled(true);
+      setWhatsappVerifiedAt(null);
+      setWhatsappPhone("");
+      toast.success("WhatsApp disconnected", { description: "You will no longer receive alerts on WhatsApp." });
+    } catch (e: any) {
+      const message = e?.message ?? "Could not disconnect WhatsApp";
+      setWhatsappError(message);
+      toast.error("WhatsApp disconnect failed", { description: message });
+    } finally {
+      setWhatsappSaving(false);
+    }
+  }, [disconnectWhatsappFn]);
 
 
   const takeTrade = async (a: FiredAlert) => {
