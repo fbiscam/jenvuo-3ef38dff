@@ -432,12 +432,12 @@ export function buildTrade(
     tp = rMax;
   } else {
     const distR = Math.abs(nearestLiquidity - entry) / risk;
-    if (distR < 2) {
+    if (distR < 1.5) {
       tp = rMin;
-      notes.push("TP extended to 2R (liquidity target too close)");
-    } else if (distR > 3) {
+      notes.push("TP extended to 1.5R (liquidity target too close)");
+    } else if (distR > 2.5) {
       tp = rMax;
-      notes.push("TP capped at 3R (liquidity target too far)");
+      notes.push("TP capped at 2.5R (liquidity target too far)");
     } else {
       tp = nearestLiquidity;
     }
@@ -562,9 +562,9 @@ export function scoreSetup(args: {
     if (kind === "metal" && dxyConfirms === false) {
       vetos.push({ key: "dxy_contra", label: "DXY contradicts trade direction", reason: "DXY not confirming inverse move — high failure risk on metals" });
     }
-    // 4. R:R < 1.5
-    if (trade.rr < 1.5) {
-      vetos.push({ key: "rr_low", label: "R:R below 1.5", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
+    // 4. R:R < 1.2
+    if (trade.rr < 1.2) {
+      vetos.push({ key: "rr_low", label: "R:R below 1.2", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
     }
   }
 
