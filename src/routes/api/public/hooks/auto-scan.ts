@@ -336,7 +336,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               kz.length > 0 &&
               !/(outside|none|off|no killzone|inactive|closed)/i.test(kzLower) &&
               /(london|new york|ny|asia|tokyo|frankfurt|silver bullet|killzone)/i.test(kzLower);
-            if (!killzonePassed && conf < 85) {
+            if (!killzonePassed && conf < 75) {
               await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
               results.push({ pair, action: "outside_killzone", conf, killzone: kz });
               continue;
