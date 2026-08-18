@@ -118,7 +118,10 @@ export function resolveTradeOutcome(input: ResolveInput): ResolveResult {
     if (!Number.isFinite(hi) || !Number.isFinite(lo)) continue;
 
     if (!entryHit) {
-      if (isBuy ? lo <= entry + tol : hi >= entry - tol) entryHit = true;
+      // Entry threshold: price must trade AT or THROUGH the limit.
+      // We allow a tiny tolerance (0.005%) for exchange rounding jitter.
+      const entryTol = entry * 0.00005;
+      if (isBuy ? lo <= entry + entryTol : hi >= entry - entryTol) entryHit = true;
       else continue;
     }
 
