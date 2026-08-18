@@ -1026,7 +1026,7 @@ function SignalPage() {
               <button
                 onClick={() => {
                   try {
-                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            trade section ma jab user trade log krta hato jo trade entry mathi wo pending ma chala jati ar pending wali entry la lati jo kal trade milli XAU/USD in london session wo win gayi thi jiss jiss wo trade logged ki wo win kro");
+                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            jo tumna SL/TP Update keya wo calcaulation aur ICT/SMC Engine base hana jo proper banana chaheya wohi show hoga ? make sure");
                     window.speechSynthesis.speak(u);
                   } catch {}
                   setVoiceBlocked(false);
