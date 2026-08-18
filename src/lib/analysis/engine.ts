@@ -358,9 +358,10 @@ export function buildTrade(
   const zoneHeight = Math.abs(zone.priceHigh - zone.priceLow);
 
   // SL buffer — asset-aware. max(pct × price, atrMult × ATR, 0.5 × zoneHeight)
+  // Tightened buffer (0.33x zone height floor) for ultra-precision SL placement
   const pctBuffer = lastPrice * profile.pctBuffer;
   const atrBuffer = atr && atr > 0 ? atr * profile.atrMult : 0;
-  const zoneBuffer = zoneHeight * 0.5;
+  const zoneBuffer = zoneHeight * 0.33;
   const buffer = Math.max(pctBuffer, atrBuffer, zoneBuffer);
   let sl = dir === "BUY" ? zone.priceLow - buffer : zone.priceHigh + buffer;
 
@@ -418,13 +419,14 @@ export function buildTrade(
   const tp2 = dir === "BUY" ? entry + risk * 2 : entry - risk * 2;
 
   // Final TP = nearest unswept opposing liquidity pool, but CAPPED at 3R and floored at 2R.
+  // Using institutional targets (Draw on Liquidity) aligned with 1.5R - 3.0R ICT range.
   const targetSide: "buy" | "sell" = dir === "BUY" ? "buy" : "sell";
   const liquidityTargets = pools
     .filter(p => p.side === targetSide && !p.swept && (dir === "BUY" ? p.price > entry : p.price < entry))
     .sort((a, b) => Math.abs(a.price - entry) - Math.abs(b.price - entry));
   const nearestLiquidity = liquidityTargets[0]?.price;
 
-  const rMax = dir === "BUY" ? entry + risk * 2.5 : entry - risk * 2.5;
+  const rMax = dir === "BUY" ? entry + risk * 3.0 : entry - risk * 3.0;
   const rMin = dir === "BUY" ? entry + risk * 1.5 : entry - risk * 1.5;
 
   let tp: number;
@@ -435,9 +437,9 @@ export function buildTrade(
     if (distR < 1.5) {
       tp = rMin;
       notes.push("TP extended to 1.5R (liquidity target too close)");
-    } else if (distR > 2.5) {
+    } else if (distR > 3.0) {
       tp = rMax;
-      notes.push("TP capped at 2.5R (liquidity target too far)");
+      notes.push("TP capped at 3.0R (liquidity target too far)");
     } else {
       tp = nearestLiquidity;
     }
