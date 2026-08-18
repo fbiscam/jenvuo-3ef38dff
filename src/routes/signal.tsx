@@ -1026,7 +1026,7 @@ function SignalPage() {
               <button
                 onClick={() => {
                   try {
-                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            acha sidebar signal desk page ha wo Trades & Insights section ma kro aur Signals live page sidebar ma Tools & Market ma add kro");
+                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            acha kal jo trades lose ma gayi wo check kro kew gayi kaya issue tha wrong signal kew milla");
                     window.speechSynthesis.speak(u);
                   } catch {}
                   setVoiceBlocked(false);

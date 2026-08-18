@@ -326,13 +326,23 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
 
             // Killzone gate: automated signals must land in a killzone unless ≥85% conf.
             // This prevents "false signals" during slow off-session hours.
+            // NOTE: the engine writes labels like "Outside Killzone" / "No Killzone",
+            // so an anchored ^(none|off|outside)$ test silently passed them through.
+            // Yesterday's XAU/EUR losers both carried killzone="Outside Killzone"
+            // yet gates.killzone_passed=true because of exactly that. Match on
+            // substrings instead, and require a known killzone name.
             const kz = String(plan.killzone ?? "").trim();
-            const killzonePassed = kz.length > 0 && !/^(none|off|outside)$/i.test(kz);
+            const kzLower = kz.toLowerCase();
+            const killzonePassed =
+              kz.length > 0 &&
+              !/(outside|none|off|no killzone|inactive|closed)/i.test(kzLower) &&
+              /(london|new york|ny|asia|tokyo|frankfurt|silver bullet|killzone)/i.test(kzLower);
             if (!killzonePassed && conf < 85) {
               await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
-              results.push({ pair, action: "outside_killzone", conf });
+              results.push({ pair, action: "outside_killzone", conf, killzone: kz });
               continue;
             }
+
 
 
             // HTF bias alignment gate — never fire against higher-timeframe trend.
@@ -406,6 +416,24 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // fire even if bias hasn't flipped since the previous session.
             // Manual mode bypasses this — the user explicitly asked to scan
             // this pair; silencing it defeats the point of the button.
+            // Hard per-pair burst lock: yesterday XAU/EUR fired twice 42s apart
+            // (two overlapping runs) and BOTH tickets lost. Regardless of
+            // direction/killzone, never emit two alerts for the same pair
+            // inside 10 minutes.
+            if (!manualMode) {
+              const burstSince = new Date(now.getTime() - 10 * 60_000).toISOString();
+              const { data: burst } = await supabaseAdmin
+                .from("signal_alerts")
+                .select("id")
+                .eq("pair", pair)
+                .gte("fired_at", burstSince)
+                .limit(1);
+              if (burst?.length) {
+                results.push({ pair, action: "burst_lock", recent_alert_id: burst[0].id });
+                continue;
+              }
+            }
+
             if (!manualMode) {
               const currentKz = String(plan.killzone ?? "");
               const duplicateSince = new Date(
