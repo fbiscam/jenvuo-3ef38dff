@@ -158,9 +158,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           120,
         );
         const maxPerDay = Math.max(Number(cfg.max_broadcasts_per_day ?? 12) || 12, 12);
-        // 78%+ can broadcast immediately. 70–77% must survive the confirmation
-        // window, so one-candle liquidity grabs do not alert everyone.
-        let singleHitMinConf = Math.max(minConf, 78);
+        // 75%+ can broadcast immediately.
+        let singleHitMinConf = Math.max(minConf, 75);
 
         // Global daily rate limit — manual scans bypass so the user's
         // deliberate analyze still fires when the pool cap is hit.
