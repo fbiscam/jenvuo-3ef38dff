@@ -93,7 +93,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "Tools & Market",
     items: [
-      { to: "/app", label: "Signals", icon: "auto_awesome" },
+      { to: "/app", label: "Launch AI", icon: "auto_awesome" },
       { to: "/killzones", label: "Killzones", icon: "schedule" },
       { to: "/ai-engine", label: "AI Engine", icon: "neurology" },
       { to: "/insights", label: "Insights", icon: "menu_book" },
