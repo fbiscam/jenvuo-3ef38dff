@@ -115,6 +115,19 @@ const MATRIX_ROWS: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark; isHeadi
 
 const PLAN_KEY_BY_COL: Record<number, string> = { 0: "pro", 1: "elite", 2: "ultra" };
 
+type BillingRow = {
+  id: string;
+  created_at: string;
+  model: string | null;
+  stage: string | null;
+  reason: string;
+  delta: number;
+  promptTokens: number | null;
+  completionTokens: number | null;
+  scanId: string | null;
+  metadata: Record<string, unknown> | null;
+};
+
 function Billing() {
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
@@ -122,6 +135,68 @@ function Billing() {
   const trial = useTrial();
 
   const [showAllActivity, setShowAllActivity] = useState(false);
+
+  // Moved hook to top level to avoid Rules of Hooks violation (early return below)
+  const allRows: BillingRow[] = useMemo(() => (credits.state?.recent ?? [])
+    .filter((r) => r.delta < 0)
+    .map((r) => ({
+      id: r.id,
+      created_at: r.created_at,
+      model: r.model ?? null,
+      stage: r.stage ?? null,
+      reason: r.reason,
+      delta: Number(r.delta),
+      promptTokens: r.prompt_tokens ?? null,
+      completionTokens: r.completion_tokens ?? null,
+      scanId: (r.metadata?.scanId as string | undefined) ?? null,
+      metadata: (r.metadata as Record<string, unknown> | undefined) ?? null,
+    })), [credits.state?.recent]);
+
+  const thirtyDaysAgo = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+    return d;
+  }, []);
+
+  const last30DaysRows = useMemo(() => 
+    allRows.filter(r => new Date(r.created_at) >= thirtyDaysAgo),
+    [allRows, thirtyDaysAgo]
+  );
+  
+  const olderRows = useMemo(() => 
+    allRows.filter(r => new Date(r.created_at) < thirtyDaysAgo),
+    [allRows, thirtyDaysAgo]
+  );
+
+  const handleDownloadOlder = () => {
+    const doc = new jsPDF();
+    doc.text("Billing History (Older than 30 days)", 14, 15);
+    
+    const tableData = olderRows.map(r => {
+      const d = new Date(r.created_at);
+      const meta = (r.metadata as any) ?? {};
+      const rawModel = meta.actual_senior_model ?? meta.actual_model ?? r.model ?? meta.model ?? null;
+      const modelLabel = rawModel ? formatModelLabel(rawModel) : "—";
+      const side = (meta.signal ?? meta.side ?? "").toString().toUpperCase() || "—";
+      const cost = Math.abs(r.delta).toFixed(4);
+      
+      return [
+        d.toLocaleDateString(),
+        modelLabel,
+        side,
+        r.scanId ? r.scanId.slice(0, 8) : "—",
+        `$${cost}`
+      ];
+    });
+
+    autoTable(doc, {
+      startY: 20,
+      head: [['Date', 'Model', 'Signal', 'Scan ID', 'Cost']],
+      body: tableData,
+    });
+
+    doc.save(`billing_history_older_${new Date().toISOString().split('T')[0]}.pdf`);
+  };
 
   // Only show skeleton on the very first load — once we've resolved plan/credits
   // once, keep showing the previous values during background refetches so the
@@ -150,6 +225,7 @@ function Billing() {
   const pctBase = Math.max(credits.balance, credits.allowance);
   const pct = pctBase > 0 ? Math.min(100, Math.round((remaining / pctBase) * 100)) : 0;
   const resetsAt = credits.state?.periodResetsAt ? new Date(credits.state.periodResetsAt) : null;
+
 
 
 
