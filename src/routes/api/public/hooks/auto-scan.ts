@@ -416,6 +416,24 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // fire even if bias hasn't flipped since the previous session.
             // Manual mode bypasses this — the user explicitly asked to scan
             // this pair; silencing it defeats the point of the button.
+            // Hard per-pair burst lock: yesterday XAU/EUR fired twice 42s apart
+            // (two overlapping runs) and BOTH tickets lost. Regardless of
+            // direction/killzone, never emit two alerts for the same pair
+            // inside 10 minutes.
+            if (!manualMode) {
+              const burstSince = new Date(now.getTime() - 10 * 60_000).toISOString();
+              const { data: burst } = await supabaseAdmin
+                .from("signal_alerts")
+                .select("id")
+                .eq("pair", pair)
+                .gte("fired_at", burstSince)
+                .limit(1);
+              if (burst?.length) {
+                results.push({ pair, action: "burst_lock", recent_alert_id: burst[0].id });
+                continue;
+              }
+            }
+
             if (!manualMode) {
               const currentKz = String(plan.killzone ?? "");
               const duplicateSince = new Date(
