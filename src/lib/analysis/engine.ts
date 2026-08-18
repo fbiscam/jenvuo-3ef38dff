@@ -400,7 +400,7 @@ export function buildTrade(
   // Cap the ticket size. A structural stop that lands slightly beyond the cap
   // gets TIGHTENED to the cap (keeps the signal, keeps SL/TP readable); only a
   // wildly wide structure (> 1.8x the cap) is rejected outright.
-  const maxRisk = lastPrice * profile.maxRiskPct;
+  const maxRisk = lastPrice * (profile.maxRiskPct * 0.75);
   if (risk > maxRisk * 1.8) {
     return {
       direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
@@ -424,8 +424,8 @@ export function buildTrade(
     .sort((a, b) => Math.abs(a.price - entry) - Math.abs(b.price - entry));
   const nearestLiquidity = liquidityTargets[0]?.price;
 
-  const rMax = dir === "BUY" ? entry + risk * 3 : entry - risk * 3;
-  const rMin = dir === "BUY" ? entry + risk * 2 : entry - risk * 2;
+  const rMax = dir === "BUY" ? entry + risk * 2.5 : entry - risk * 2.5;
+  const rMin = dir === "BUY" ? entry + risk * 1.5 : entry - risk * 1.5;
 
   let tp: number;
   if (nearestLiquidity == null) {
