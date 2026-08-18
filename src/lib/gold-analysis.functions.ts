@@ -2890,7 +2890,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
           } else if (verdict === "DOWNGRADE") {
             __seniorReviewStatus = "downgraded";
             // Soft-reduce: shave ~10 points off score so borderline setups
-            // fall below the 70% broadcast gate but strong ones still fire.
+            // fall below the 75% broadcast gate but strong ones still fire.
             setupScore = Math.max(50, setupScore - 10);
             setupGrade = setupScore >= 88 ? "A+" : setupScore >= 75 ? "A" : setupScore >= 65 ? "B" : "C";
             setupChecks.unshift({
