@@ -9,8 +9,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
 import { getRiskSettings } from "@/lib/risk-settings.functions";
 import { computePositionSize } from "@/lib/risk-manager";
-import { Bell, BellOff, Loader2, Send } from "lucide-react";
+import { Bell, BellOff, Loader2, Send, MessageSquare } from "lucide-react";
 import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
+import { connectWhatsappAlertLink, disconnectWhatsappAlertLink, getWhatsappAlertLink, setWhatsappAlertEnabled } from "@/lib/whatsapp-alert.functions";
 import { cn } from "@/lib/utils";
 import { getAlertCutoff } from "@/lib/alert-cutoff";
 import userinfobotLogo from "@/assets/userinfobot.jpg.asset.json";
@@ -106,6 +107,11 @@ function AlertPrefs() {
   const setTelegramEnabledFn = useServerFn(setTelegramAlertEnabled);
   const disconnectTelegramFn = useServerFn(disconnectTelegramAlertLink);
   const getRisk = useServerFn(getRiskSettings);
+  const getWhatsappLinkFn = useServerFn(getWhatsappAlertLink);
+  const connectWhatsappFn = useServerFn(connectWhatsappAlertLink);
+  const setWhatsappEnabledFn = useServerFn(setWhatsappAlertEnabled);
+  const disconnectWhatsappFn = useServerFn(disconnectWhatsappAlertLink);
+
   const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
   const [alertsSaving, setAlertsSaving] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState("");
@@ -115,8 +121,19 @@ function AlertPrefs() {
   const [telegramError, setTelegramError] = useState<string | null>(null);
   const [telegramSaving, setTelegramSaving] = useState(false);
   const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false);
+
+  const [whatsappPhone, setWhatsappPhone] = useState("");
+  const [whatsappLinked, setWhatsappLinked] = useState(false);
+  const [whatsappEnabled, setWhatsappEnabled] = useState(true);
+  const [whatsappVerifiedAt, setWhatsappVerifiedAt] = useState<string | null>(null);
+  const [whatsappError, setWhatsappError] = useState<string | null>(null);
+  const [whatsappSaving, setWhatsappSaving] = useState(false);
+  const [whatsappDisconnectConfirmOpen, setWhatsappDisconnectConfirmOpen] = useState(false);
+
   const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
   const canConnectTelegram = chatIdValid && !telegramSaving;
+  const phoneValid = /^\+?\d{10,18}$/.test(whatsappPhone.trim());
+  const canConnectWhatsapp = phoneValid && !whatsappSaving;
 
   const [risk, setRisk] = useState<{ balance: number; pct: number } | null>(null);
   useEffect(() => {
@@ -179,6 +196,21 @@ function AlertPrefs() {
       }
     })();
   }, [getTelegramLinkFn]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await getWhatsappLinkFn({});
+        setWhatsappLinked(!!r.linked);
+        setWhatsappPhone(r.phoneNumber ?? "");
+        setWhatsappEnabled(r.enabled !== false);
+        setWhatsappVerifiedAt(r.verifiedAt ?? null);
+        setWhatsappError(r.lastError ?? null);
+      } catch {
+        setWhatsappError("Could not load WhatsApp settings");
+      }
+    })();
+  }, [getWhatsappLinkFn]);
 
   const toggleAlerts = useCallback(async () => {
     if (alertsOn === null || alertsSaving) return;
@@ -245,6 +277,56 @@ function AlertPrefs() {
       setTelegramSaving(false);
     }
   }, [disconnectTelegramFn]);
+
+  const connectWhatsapp = useCallback(async () => {
+    if (!canConnectWhatsapp) return;
+    setWhatsappSaving(true);
+    setWhatsappError(null);
+    try {
+      const r = await connectWhatsappFn({ data: { phoneNumber: whatsappPhone.trim() } });
+      setWhatsappLinked(true);
+      setWhatsappEnabled(true);
+      setWhatsappVerifiedAt(new Date().toISOString());
+      setWhatsappPhone(r.phoneNumber);
+      toast.success("WhatsApp connected", { description: "A test message was sent to your number." });
+    } catch (e: any) {
+      const message = e?.message ?? "Could not connect WhatsApp";
+      setWhatsappError(message);
+      toast.error("WhatsApp connect failed", { description: message });
+    } finally {
+      setWhatsappSaving(false);
+    }
+  }, [canConnectWhatsapp, connectWhatsappFn, whatsappPhone]);
+
+  const toggleWhatsapp = useCallback(async (enabled: boolean) => {
+    setWhatsappEnabled(enabled);
+    try {
+      await setWhatsappEnabledFn({ data: { enabled } });
+      toast.success(enabled ? "WhatsApp alerts enabled" : "WhatsApp alerts disabled");
+    } catch (e: any) {
+      setWhatsappEnabled(!enabled);
+      toast.error(e?.message ?? "Could not update WhatsApp");
+    }
+  }, [setWhatsappEnabledFn]);
+
+  const disconnectWhatsapp = useCallback(async () => {
+    setWhatsappSaving(true);
+    setWhatsappError(null);
+    try {
+      await disconnectWhatsappFn({});
+      setWhatsappLinked(false);
+      setWhatsappEnabled(true);
+      setWhatsappVerifiedAt(null);
+      setWhatsappPhone("");
+      toast.success("WhatsApp disconnected", { description: "You will no longer receive alerts on WhatsApp." });
+    } catch (e: any) {
+      const message = e?.message ?? "Could not disconnect WhatsApp";
+      setWhatsappError(message);
+      toast.error("WhatsApp disconnect failed", { description: message });
+    } finally {
+      setWhatsappSaving(false);
+    }
+  }, [disconnectWhatsappFn]);
 
 
   const takeTrade = async (a: FiredAlert) => {
@@ -770,12 +852,99 @@ function AlertPrefs() {
               <div className="mt-2 text-[11px] text-zinc-500">Note: The Chat ID is numbers only. A username like <span className="font-mono">@haseeb</span> will not work here.</div>
             </div>
             )}
-            {telegramError && <div className="mt-2 text-[11px] text-rose-600">{telegramError}</div>}
-
+            {whatsappError && <div className="mt-2 text-[11px] text-rose-600">{whatsappError}</div>}
           </div>
+
+          <div className="rounded-xl border border-zinc-100 p-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <div className="text-sm font-medium text-zinc-900">WhatsApp alerts</div>
+                <div className="text-xs text-zinc-500">
+                  {whatsappLinked
+                    ? `Connected to ${whatsappPhone || "—"}`
+                    : "Enter your phone number with country code (e.g. +923001234567) to receive alerts via WhatsApp."}
+                </div>
+                {whatsappVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Active {formatVerifiedAt(whatsappVerifiedAt)}</div>}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:flex-shrink-0">
+                <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900">
+                  <MessageSquare className="h-4 w-4 text-emerald-600" />
+                  WhatsApp API
+                </div>
+                {whatsappLinked && (
+                  <button
+                    type="button"
+                    onClick={() => toggleWhatsapp(!whatsappEnabled)}
+                    className={cn(
+                      "rounded-full px-3 py-1.5 text-xs font-semibold transition",
+                      whatsappEnabled ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700",
+                    )}
+                  >
+                    {whatsappEnabled ? "ON" : "OFF"}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <input
+                type="text"
+                value={whatsappPhone}
+                onChange={(e) => setWhatsappPhone(e.target.value)}
+                placeholder="+923001234567"
+                className={cn(
+                  "min-w-0 flex-1 sm:flex-none sm:w-56 rounded-lg border px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200",
+                  whatsappPhone && !phoneValid ? "border-rose-200 bg-rose-50" : "border-zinc-200 bg-white",
+                )}
+              />
+              {whatsappLinked && (
+                <button
+                  type="button"
+                  onClick={() => setWhatsappDisconnectConfirmOpen(true)}
+                  disabled={whatsappSaving}
+                  className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50"
+                >
+                  Disconnect
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={connectWhatsapp}
+                disabled={!canConnectWhatsapp}
+                className={cn(
+                  "inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-semibold transition",
+                  canConnectWhatsapp
+                    ? "border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+                    : "cursor-not-allowed border-zinc-200 bg-white text-zinc-400",
+                )}
+              >
+                {whatsappSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {whatsappLinked ? "Update" : "Connect"}
+              </button>
+            </div>
+            {whatsappError && <div className="mt-2 text-[11px] text-rose-600">{whatsappError}</div>}
+          </div>
+
           <button onClick={requestBrowser} className="text-xs font-medium text-zinc-700 underline-offset-2 hover:underline">
             Request browser permission →
           </button>
+          
+          <AlertDialog open={whatsappDisconnectConfirmOpen} onOpenChange={setWhatsappDisconnectConfirmOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Disconnect WhatsApp?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You will no longer receive signal alerts on your phone. You can reconnect at any time.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={disconnectWhatsapp} className="bg-rose-600 hover:bg-rose-700">
+                  Disconnect
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </section>
 
