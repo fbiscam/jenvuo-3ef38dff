@@ -100,11 +100,11 @@ function Journal() {
       if (t.outcome !== "pending" || t.entry == null) return false;
       const px = livePrices[t.pair.toUpperCase()];
       if (px == null) return false;
-      // Fill only when live price is within a tight tolerance of entry —
-      // direction-based inequalities misfired for stop entries and trades
-      // whose price had already moved past entry.
+      // Real limit-order semantics: a BUY fills as soon as price trades at or
+      // below entry, a SELL at or above. A tolerance band alone missed fast
+      // pullbacks and left filled trades stuck in "pending".
       const tol = Math.max(t.entry * 0.0005, 0.01);
-      return Math.abs(px - t.entry) <= tol;
+      return t.direction === "long" ? px <= t.entry + tol : px >= t.entry - tol;
     });
     if (filling.length === 0) return;
     (async () => {
