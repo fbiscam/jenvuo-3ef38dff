@@ -400,7 +400,7 @@ export function buildTrade(
   // Cap the ticket size. A structural stop that lands slightly beyond the cap
   // gets TIGHTENED to the cap (keeps the signal, keeps SL/TP readable); only a
   // wildly wide structure (> 1.8x the cap) is rejected outright.
-  const maxRisk = lastPrice * profile.maxRiskPct;
+  const maxRisk = lastPrice * (profile.maxRiskPct * 0.75);
   if (risk > maxRisk * 1.8) {
     return {
       direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
@@ -424,20 +424,20 @@ export function buildTrade(
     .sort((a, b) => Math.abs(a.price - entry) - Math.abs(b.price - entry));
   const nearestLiquidity = liquidityTargets[0]?.price;
 
-  const rMax = dir === "BUY" ? entry + risk * 3 : entry - risk * 3;
-  const rMin = dir === "BUY" ? entry + risk * 2 : entry - risk * 2;
+  const rMax = dir === "BUY" ? entry + risk * 2.5 : entry - risk * 2.5;
+  const rMin = dir === "BUY" ? entry + risk * 1.5 : entry - risk * 1.5;
 
   let tp: number;
   if (nearestLiquidity == null) {
     tp = rMax;
   } else {
     const distR = Math.abs(nearestLiquidity - entry) / risk;
-    if (distR < 2) {
+    if (distR < 1.5) {
       tp = rMin;
-      notes.push("TP extended to 2R (liquidity target too close)");
-    } else if (distR > 3) {
+      notes.push("TP extended to 1.5R (liquidity target too close)");
+    } else if (distR > 2.5) {
       tp = rMax;
-      notes.push("TP capped at 3R (liquidity target too far)");
+      notes.push("TP capped at 2.5R (liquidity target too far)");
     } else {
       tp = nearestLiquidity;
     }
@@ -562,9 +562,9 @@ export function scoreSetup(args: {
     if (kind === "metal" && dxyConfirms === false) {
       vetos.push({ key: "dxy_contra", label: "DXY contradicts trade direction", reason: "DXY not confirming inverse move — high failure risk on metals" });
     }
-    // 4. R:R < 1.5
-    if (trade.rr < 1.5) {
-      vetos.push({ key: "rr_low", label: "R:R below 1.5", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
+    // 4. R:R < 1.2
+    if (trade.rr < 1.2) {
+      vetos.push({ key: "rr_low", label: "R:R below 1.2", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
     }
   }
 
