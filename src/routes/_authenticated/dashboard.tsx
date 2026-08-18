@@ -75,7 +75,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/dashboard", label: "Account Overview", icon: "space_dashboard", exact: true, countKey: "saved" },
-      { to: "/app", label: "Launch AI", icon: "auto_awesome" },
+      
       { to: "/dashboard/workspace", label: "Saved Signals", icon: "bookmarks" },
       { to: "/dashboard/alerts", label: "Signal Alerts", icon: "notifications_active", countKey: "alerts7d" },
       { to: "/dashboard/notifications", label: "Notifications", icon: "notifications" },
@@ -85,6 +85,8 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "Trades & Insights",
     items: [
       { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
+      { to: "/signal", label: "Signal Desk", icon: "radar" },
+      { to: "/insights", label: "Insights", icon: "menu_book" },
       { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats" },
       { to: "/dashboard/risk", label: "Risk Manager", icon: "balance" },
       { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3" },
@@ -93,10 +95,9 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "Tools & Market",
     items: [
-      { to: "/signal", label: "Signal Desk", icon: "radar" },
+      { to: "/app", label: "Signals", icon: "auto_awesome" },
       { to: "/killzones", label: "Killzones", icon: "schedule" },
       { to: "/ai-engine", label: "AI Engine", icon: "neurology" },
-      { to: "/insights", label: "Insights", icon: "menu_book" },
       { to: "/pricing", label: "Pricing", icon: "local_offer" },
     ],
   },
