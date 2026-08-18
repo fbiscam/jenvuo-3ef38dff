@@ -2583,9 +2583,14 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       // 70-78 range (like yesterday's 77% losers), REQUIRE a displacement passed check.
       // This prevents "naked" retracements from alerts unless momentum is already impulsive.
       if (confirmations < 1 && displacement?.passed !== true) {
-         // Silently lower probability if momentum hasn't shifted yet.
+         // Force a WAIT state for mid-range signals lacking impulsive momentum
+         built.direction = "WAIT" as typeof built.direction;
+         built.reason = "Blocked: No impulsive displacement/LTF confirmation found for mid-range setup.";
+         tradeFromAi.direction = "WAIT";
+         tradeFromAi.invalidation = built.reason;
       }
     }
+
 
 
     // 10+ factor weighted score with hard-veto gates → only ≥88 is A+
