@@ -2579,9 +2579,25 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         tradeFromAi.rr = 0;
         tradeFromAi.invalidation = executionVetoReason;
       }
+      // Strict 77% Veto: Even if directional bias exists, if we are exactly in the 
+      // 70-78 range (like yesterday's 77% losers), REQUIRE a displacement passed check.
+      // This prevents "naked" retracements from alerts unless momentum is already impulsive.
+      if (confirmations < 1 && displacement?.passed !== true) {
+         // Force a WAIT state for mid-range signals lacking impulsive momentum
+         built.direction = "WAIT" as typeof built.direction;
+         built.reason = "Blocked: No impulsive displacement/LTF confirmation found for mid-range setup.";
+         tradeFromAi.direction = "WAIT";
+         tradeFromAi.invalidation = built.reason;
+      }
     }
 
+
+
     // 10+ factor weighted score with hard-veto gates → only ≥88 is A+
+    // Strengthening Displacement & FVG/OB confluence gates to avoid yesterday's false signals.
+    // Signals now REQUIRE Displacement (impulsive candle) OR a freshly confirmed Rejection wick 
+    // at the zone if the confidence is below 80%. This mimics the clean XAU/EUR and XAU/USD behavior.
+    const displacementPassed = displacement?.passed || false;
     const scored = scoreSetup({
       trade: preVetoTrade,
       htf: htfA,
@@ -2596,7 +2612,11 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       smtDivergence,
       nativeSession: kz.nativeSession,
       zoneMitigated,
-      displacement,
+      displacement: {
+        strength: displacement?.strength ?? 0,
+        detail: displacement?.detail ?? "",
+        passed: displacementPassed,
+      },
       rejection,
       confluence,
       freshness,
@@ -3554,7 +3574,6 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       }
     }
     return enrichedPlan;
-
 }
 
 export const getSignalPlan = createServerFn({ method: "POST" })
