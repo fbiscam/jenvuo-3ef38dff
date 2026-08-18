@@ -2585,7 +2585,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // Strengthening Displacement & FVG/OB confluence gates to avoid yesterday's false signals.
     // Signals now REQUIRE Displacement (impulsive candle) OR a freshly confirmed Rejection wick 
     // at the zone if the confidence is below 80%. This mimics the clean XAU/EUR and XAU/USD behavior.
-    const displacementPassed = displacement?.passed || (preVetoTrade.confidence >= 82);
+    const displacementPassed = displacement?.passed || false;
     const scored = scoreSetup({
       trade: preVetoTrade,
       htf: htfA,
