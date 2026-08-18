@@ -75,7 +75,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/dashboard", label: "Account Overview", icon: "space_dashboard", exact: true, countKey: "saved" },
-      
+      { to: "/signal", label: "Launch AI", icon: "radar" },
       { to: "/dashboard/workspace", label: "Saved Signals", icon: "bookmarks" },
       { to: "/dashboard/alerts", label: "Signal Alerts", icon: "notifications_active", countKey: "alerts7d" },
       { to: "/dashboard/notifications", label: "Notifications", icon: "notifications" },
@@ -85,7 +85,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "Trades & Insights",
     items: [
       { to: "/dashboard/journal", label: "Trades", icon: "candlestick_chart", countKey: "journalTotal" },
-      { to: "/signal", label: "Signal Desk", icon: "radar" },
       { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats" },
       { to: "/dashboard/risk", label: "Risk Manager", icon: "balance" },
     ],
