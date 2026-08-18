@@ -144,10 +144,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         // Runtime config can lag behind code deploys. Keep a quality floor so
         // stale permissive settings cannot send B/C retracement calls again.
         const configuredMinConf = Number(cfg.min_conf ?? 75);
-        let minConf = Math.max(
-          75,
-          Math.min(Number.isFinite(configuredMinConf) ? configuredMinConf : 75, 80),
-        );
+        let minConf = 75;
         const confirmWindowMin = Math.min(
           Number(cfg.confirm_window_min ?? 45) || 45,
           45,
@@ -247,8 +244,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         }
         // Post-news reaction mode: keep scanning but raise the bar a touch.
         if (newsContext) {
-          minConf = Math.max(minConf, Math.min(Math.max(newsPostMinConf, 70), 85));
-          singleHitMinConf = Math.max(minConf, 78);
+          minConf = 75;
+          singleHitMinConf = 75;
         }
 
         const results: Array<Record<string, unknown>> = [];
