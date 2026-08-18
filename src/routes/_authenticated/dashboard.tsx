@@ -75,7 +75,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/dashboard", label: "Account Overview", icon: "space_dashboard", exact: true, countKey: "saved" },
-      
+      { to: "/app", label: "Launch AI", icon: "auto_awesome" },
       { to: "/dashboard/workspace", label: "Saved Signals", icon: "bookmarks" },
       { to: "/dashboard/alerts", label: "Signal Alerts", icon: "notifications_active", countKey: "alerts7d" },
       { to: "/dashboard/notifications", label: "Notifications", icon: "notifications" },
@@ -93,7 +93,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "Tools & Market",
     items: [
-      { to: "/app", label: "Launch AI", icon: "auto_awesome" },
       { to: "/killzones", label: "Killzones", icon: "schedule" },
       { to: "/ai-engine", label: "AI Engine", icon: "neurology" },
       { to: "/insights", label: "Insights", icon: "menu_book" },
