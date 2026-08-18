@@ -299,103 +299,129 @@ function Billing() {
           <div className="h-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
         </div>
         {(() => {
-          type Row = {
-            id: string;
-            created_at: string;
-            model: string | null;
-            stage: string | null;
-            reason: string;
-            delta: number;
-            promptTokens: number | null;
-            completionTokens: number | null;
-            scanId: string | null;
-            metadata: Record<string, unknown> | null;
-          };
+          const visibleRows = showAllActivity ? last30DaysRows : last30DaysRows.slice(0, 12);
 
-          const allRows: Row[] = useMemo(() => (credits.state?.recent ?? [])
-            .filter((r) => r.delta < 0)
-            .map((r) => ({
-              id: r.id,
-              created_at: r.created_at,
-              model: r.model ?? null,
-              stage: r.stage ?? null,
-              reason: r.reason,
-              delta: Number(r.delta),
-              promptTokens: r.prompt_tokens ?? null,
-              completionTokens: r.completion_tokens ?? null,
-              scanId: (r.metadata?.scanId as string | undefined) ?? null,
-              metadata: (r.metadata as Record<string, unknown> | undefined) ?? null,
-            })), [credits.state?.recent]);
-
-          const thirtyDaysAgo = new Date();
-          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-          const last30DaysRows = allRows.filter(r => new Date(r.created_at) >= thirtyDaysAgo);
-          const olderRows = allRows.filter(r => new Date(r.created_at) < thirtyDaysAgo);
-
-          const handleDownloadOlder = () => {
-            const doc = new jsPDF();
-            doc.text("Billing History (Older than 30 days)", 14, 15);
-            
-            const tableData = olderRows.map(r => {
-              const d = new Date(r.created_at);
-              const meta = (r.metadata as any) ?? {};
-              const rawModel = meta.actual_senior_model ?? meta.actual_model ?? r.model ?? meta.model ?? null;
-              const modelLabel = rawModel ? formatModelLabel(rawModel) : "—";
-              const side = (meta.signal ?? meta.side ?? "").toString().toUpperCase() || "—";
-              const cost = Math.abs(r.delta).toFixed(4);
-              
-              return [
-                d.toLocaleDateString(),
-                modelLabel,
-                side,
-                r.scanId ? r.scanId.slice(0, 8) : "—",
-                `$${cost}`
-              ];
-            });
-
-            autoTable(doc, {
-              startY: 20,
-              head: [['Date', 'Model', 'Signal', 'Scan ID', 'Cost']],
-              body: tableData,
-            });
-
-            doc.save(`billing_history_older_${new Date().toISOString().split('T')[0]}.pdf`);
-          };
-
-          if (last30DaysRows.length === 0 && olderRows.length === 0) return null;
-
-          const shown = showAllActivity ? last30DaysRows : last30DaysRows.slice(0, 12);
-          
-          return (
-            <div className="mt-6">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm font-medium text-zinc-900">Recent Scans (Last 30 Days)</h4>
+          if (last30DaysRows.length === 0) {
+            return (
+              <div className="mt-8 flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-200 py-12 text-center">
+                <p className="text-sm text-zinc-500">No activity in the last 30 days.</p>
                 {olderRows.length > 0 && (
-                  <button
+                  <button 
                     onClick={handleDownloadOlder}
-                    className="flex items-center gap-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                    className="mt-4 inline-flex items-center gap-2 rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black transition"
                   >
-                    <Download className="h-3.5 w-3.5" />
+                    <Download className="h-3 w-3" />
                     Download older history (PDF)
                   </button>
                 )}
               </div>
+            );
+          }
 
-              <div className="overflow-x-auto rounded-lg border border-zinc-200">
-                <table className="w-full min-w-[640px] text-xs border-collapse">
+          return (
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>Recent Activity</h4>
+                {olderRows.length > 0 && (
+                  <button 
+                    onClick={handleDownloadOlder}
+                    className="inline-flex items-center gap-2 text-[10px] font-medium text-zinc-600 hover:text-zinc-900 transition"
+                  >
+                    <Download className="h-3 w-3" />
+                    Archive ({olderRows.length} records)
+                  </button>
+                )}
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-zinc-200 bg-zinc-50/60 text-left">
-                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Model</th>
-                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Grade</th>
-                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Date</th>
-                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Signal</th>
-                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium`}>Scan</th>
-                      <th className={`${MONO} px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-500 font-medium text-right`}>Cost</th>
+                    <tr className="border-b border-zinc-100 text-[10px] uppercase tracking-wider text-zinc-400">
+                      <th className="px-3 py-2 font-medium">Model</th>
+                      <th className="px-3 py-2 font-medium">Result</th>
+                      <th className="px-3 py-2 font-medium">Date</th>
+                      <th className="px-3 py-2 font-medium">Side</th>
+                      <th className="px-3 py-2 font-medium">Scan ID</th>
+                      <th className="px-3 py-2 text-right font-medium">Amount</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-100">
-                    {shown.map((r) => {
+                  <tbody className="divide-y divide-zinc-50">
+                    {visibleRows.map((r) => {
+                      const d = new Date(r.created_at);
+                      const dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                      const timeStr = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+                      const amt = Math.abs(r.delta);
+                      
+                      const meta = (r.metadata as any) ?? {};
+                      const actualModel = meta.actual_model ?? null;
+                      const actualSeniorModel = meta.actual_senior_model ?? null;
+                      const seniorRaw = meta.senior_model ?? null;
+                      const seniorPrettyFromMeta = meta.senior_model_label ?? meta.senior_label ?? null;
+                      const rawModel = r.model ?? meta.model ?? null;
+                      const prettyFromMeta = meta.model_label ?? meta.label ?? null;
+
+                      const seniorPretty = actualSeniorModel 
+                        ? formatModelLabel(actualSeniorModel) 
+                        : (seniorPrettyFromMeta ?? (seniorRaw ? formatModelLabel(seniorRaw) : undefined));
+                      
+                      const modelLabel = actualModel 
+                        ? formatModelLabel(actualModel)
+                        : (prettyFromMeta ?? (rawModel ? formatModelLabel(rawModel) : (r.reason === "signal" ? "legacy (pre-USD billing)" : "—")))
+                      
+                      const modelWithSenior = actualSeniorModel ? (seniorPretty ?? formatModelLabel(actualSeniorModel)) : modelLabel;
+                      const displayRaw = actualSeniorModel ? actualSeniorModel : (actualModel ?? rawModel);
+
+                      const sideLabel = (meta.signal ?? meta.side ?? "").toString().toUpperCase() || "SCAN";
+                      const sideClass = sideLabel === "BUY"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : sideLabel === "SELL"
+                          ? "bg-rose-100 text-rose-700"
+                          : sideLabel === "WAIT"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-zinc-100 text-zinc-500";
+                      const gradeRaw = (meta.grade ?? meta.letter_grade ?? meta.rating ?? "").toString().toUpperCase();
+                      const confRaw = meta.confidence ?? meta.confidence_score ?? meta.score;
+                      const confNum = typeof confRaw === "number" ? confRaw : (confRaw ? Number(confRaw) : NaN);
+                      const confPct = Number.isFinite(confNum) ? (confNum <= 1 ? Math.round(confNum * 100) : Math.round(confNum)) : null;
+                      const gradeLabel = gradeRaw || (confPct !== null ? `${confPct}%` : "—");
+                      const gradeClass = gradeRaw.startsWith("A")
+                        ? "bg-emerald-100 text-emerald-700"
+                        : gradeRaw.startsWith("B")
+                          ? "bg-sky-100 text-sky-700"
+                          : gradeRaw.startsWith("C")
+                            ? "bg-amber-100 text-amber-700"
+                            : gradeRaw
+                              ? "bg-rose-100 text-rose-700"
+                              : "bg-zinc-100 text-zinc-500";
+
+                      return (
+                        <tr key={r.id} className="hover:bg-zinc-50/60">
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[11px] font-medium text-zinc-900`}><ModelWithLogo raw={displayRaw} label={modelWithSenior} /></td>
+                          <td className="whitespace-nowrap px-3 py-2">
+                            <span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${gradeClass}`}>
+                              {gradeLabel}
+                            </span>
+                          </td>
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums text-zinc-500`}>{dateStr} · {timeStr}</td>
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] tabular-nums`}><span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${sideClass}`}>{sideLabel}</span></td>
+                          <td className={`${MONO} whitespace-nowrap px-3 py-2 text-[10px] text-zinc-500`}>{r.scanId ? r.scanId.slice(0, 8) : "—"}</td>
+                          <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums font-semibold text-rose-600">−${amt.toFixed(4)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {last30DaysRows.length > 12 && (
+                <div className="mt-3 flex justify-center">
+                  <button type="button" onClick={() => setShowAllActivity((v) => !v)}
+                    className="text-xs font-medium text-zinc-700 hover:text-zinc-900">
+                    {showAllActivity ? "Show less" : `Show more (${last30DaysRows.length - 12})`}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
                       const d = new Date(r.created_at);
                       const userTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : undefined;
                       const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: userTz });
