@@ -107,7 +107,7 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
     (dir === "BUY" && htfBias === "bullish") ||
     (dir === "SELL" && htfBias === "bearish") ||
     (activeSession && htfBias === "neutral") ||
-    conf >= 80;
+    conf >= 75;
   if (!aligned) {
     return { ok: false, reason: "htf_bias_conflict", detail: { htfBias, dir, conf } };
   }
