@@ -49,6 +49,13 @@ export function sessionFor(utcHour: number): string {
   return "After Hours";
 }
 
+/** Recognize only active trading-session labels; "Outside Killzone" must fail. */
+export function isActiveKillzone(label: string | null | undefined): boolean {
+  const value = String(label ?? "").trim().toLowerCase();
+  if (!value || /(outside|none|off|no killzone|inactive|closed)/i.test(value)) return false;
+  return /(london|new york|ny\b|asia|tokyo|frankfurt|silver bullet|killzone)/i.test(value);
+}
+
 /** Gold trades Sunday 22:00 UTC → Friday 21:00 UTC. */
 export function isMarketClosed(now: Date): boolean {
   const dow = now.getUTCDay();
@@ -112,10 +119,11 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
     return { ok: false, reason: "htf_bias_conflict", detail: { htfBias, dir, conf } };
   }
 
-  // Killzone gate: restrict broadcasts to designated killzones unless ≥75% confidence.
-  // Outside killzones, price action is often "noisy" or "false" (retrace vs expansion).
+  // Killzone is mandatory in addition to the 75% quality floor. Confidence
+  // must not bypass the session gate, otherwise every qualifying setup would
+  // automatically make this protection ineffective.
   const inKillzone = !!input.inKillzone;
-  if (!inKillzone && conf < 75) {
+  if (!inKillzone) {
     return { ok: false, reason: "outside_killzone", detail: { conf } };
   }
 
