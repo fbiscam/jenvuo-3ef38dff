@@ -81,6 +81,7 @@ export const Route = createFileRoute("/signal")({
 });
 
 /* ---------- helpers ---------- */
+function isMarketOpen(_sym: string, d: Date = new Date()): boolean {
   // Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
   const day = d.getUTCDay();
   const h = d.getUTCHours();
