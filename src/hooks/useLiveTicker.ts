@@ -6,21 +6,11 @@ export type TickerRow = [string, string, string];
 
 export const DEFAULT_TICKER_ROWS: TickerRow[] = [
   ["XAU/USD", "—", "…"],
-  ["XAU/EUR", "—", "…"],
-  ["XAU/GBP", "—", "…"],
-  ["XAU/JPY", "—", "…"],
-  ["XAU/AUD", "—", "…"],
-  ["XAU/CHF", "—", "…"],
   ["DXY", "—", "…"],
 ];
 
 const SYMBOL_MAP: Record<string, string> = {
   "XAU/USD": "XAUUSD",
-  "XAU/EUR": "XAUEUR",
-  "XAU/GBP": "XAUGBP",
-  "XAU/JPY": "XAUJPY",
-  "XAU/AUD": "XAUAUD",
-  "XAU/CHF": "XAUCHF",
   DXY: "DXY",
 };
 
