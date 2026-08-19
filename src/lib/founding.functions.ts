@@ -490,7 +490,11 @@ export const listFoundingApplications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<FoundingApplication[]> => {
     await assertAdmin(context.supabase, context.userId);
-    const { data, error } = await context.supabase
+    // Internal review columns (admin_notes, ip_address, user_agent) are not
+    // readable by the `authenticated` role — admins read them via service role
+    // after the explicit admin check above.
+    const admin = await getServiceClient();
+    const { data, error } = await admin
       .from("founding_applications" as any)
       .select("*")
       .order("created_at", { ascending: false })
