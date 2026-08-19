@@ -138,7 +138,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         // Runtime config can lag behind code deploys. Keep a quality floor so
         // stale permissive settings cannot send B/C retracement calls again.
         const configuredMinConf = Number(cfg.min_conf ?? MIN_CONFIDENCE);
-        const minConf = Math.max(
+        let minConf = Math.max(
           MIN_CONFIDENCE,
           Number.isFinite(configuredMinConf) ? configuredMinConf : MIN_CONFIDENCE,
         );
@@ -153,7 +153,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         );
         const maxPerDay = Math.max(Number(cfg.max_broadcasts_per_day ?? 12) || 12, 12);
         // 75%+ can broadcast immediately.
-        const singleHitMinConf = Math.max(minConf, MIN_CONFIDENCE);
+        let singleHitMinConf = Math.max(minConf, MIN_CONFIDENCE);
 
         // Global daily rate limit — manual scans bypass so the user's
         // deliberate analyze still fires when the pool cap is hit.
@@ -241,8 +241,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         }
         // Post-news reaction mode: keep scanning but raise the bar a touch.
         if (newsContext) {
-          minConf = 75;
-          singleHitMinConf = 75;
+          minConf = Math.max(minConf, MIN_CONFIDENCE);
+          singleHitMinConf = Math.max(singleHitMinConf, MIN_CONFIDENCE);
         }
 
         const results: Array<Record<string, unknown>> = [];
@@ -709,7 +709,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               gates: {
                 min_conf: minConf,
                 confirmed_hit: true,
-                killzone_passed: killzonePassed,
+                killzone_passed: isActiveKillzone(plan.killzone),
                 cooldown_passed: true,
                 news_reaction: newsContext ?? null,
               },
