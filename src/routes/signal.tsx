@@ -81,12 +81,6 @@ export const Route = createFileRoute("/signal")({
 });
 
 /* ---------- helpers ---------- */
-const XAU_PAIRS = ["XAUUSD"] as const;
-const XAU_LABELS: Record<string, string> = {
-  XAUUSD: "XAU/USD", XAUEUR: "XAU/EUR", XAUGBP: "XAU/GBP",
-  XAUJPY: "XAU/JPY", XAUAUD: "XAU/AUD", XAUCHF: "XAU/CHF",
-};
-function isMarketOpen(_sym: string, d: Date = new Date()): boolean {
   // Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
   const day = d.getUTCDay();
   const h = d.getUTCHours();
