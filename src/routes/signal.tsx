@@ -27,7 +27,7 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import PageLoading from "@/components/PageLoading";
 import { killzoneForPair, getPairProfile } from "@/lib/analysis/engine";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { MIN_CONFIDENCE } from "@/lib/signals/qualification";
+import { isActiveKillzone, MIN_CONFIDENCE, qualifySignal } from "@/lib/signals/qualification";
 
 
 
@@ -519,31 +519,34 @@ function SignalPage() {
       }
       const p = withSignalIntelligence(result.plan);
 
-      // Mirror the auto-scan pipeline gates EXACTLY so a manual scan never
-      // reports a rejection the shared broadcaster would not apply. The
-      // killzone gate is disabled server-side (signals fire any session), so
-      // it must not be re-applied here — that mismatch was rejecting perfectly
-      // valid scans on some accounts/sessions while others went through.
-      const AUTO_MIN_CONF = MIN_CONFIDENCE;
+      // Use the same qualification function as the scheduled worker so manual
+      // and automated scans cannot drift on confidence, HTF or Killzone rules.
       const dir = p.trade?.direction;
       const conf = Number(p.trade?.confidence ?? 0);
       const htfBias = String((p as unknown as { htfBias?: string }).htfBias ?? "neutral");
       const utcH = new Date().getUTCHours();
-      const isActiveSession = utcH >= 7 && utcH < 20;
-      const aligned =
-        (dir === "BUY" && htfBias === "bullish") ||
-        (dir === "SELL" && htfBias === "bearish") ||
-        (isActiveSession && htfBias === "neutral") ||
-        conf >= 80;
-
-      let gateBlock: string | null = null;
-      if (dir !== "BUY" && dir !== "SELL") {
-        gateBlock = "No directional setup right now — market is in HOLD. Auto-scan pipeline would skip this too.";
-      } else if (conf < AUTO_MIN_CONF) {
-        gateBlock = `Confidence ${Math.round(conf)}% is below the ${AUTO_MIN_CONF}% minimum. No trade this scan — wait for the next qualifying setup.`;
-      } else if (!aligned) {
-        gateBlock = `${dir} conflicts with HTF bias (${htfBias}). Pipeline rejects counter-trend setups — waiting for alignment.`;
-      }
+      const qualification = qualifySignal({
+        pair: sym,
+        direction: dir,
+        confidence: conf,
+        entry: Number(p.trade?.entry),
+        sl: Number(p.trade?.sl),
+        tpCandidates: [p.trade?.tp, p.trade?.tp3, p.trade?.tp2, p.trade?.tp1],
+        htfBias,
+        utcHour: utcH,
+        inKillzone: isActiveKillzone(p.killzone),
+      });
+      const gateBlock = qualification.ok
+        ? null
+        : qualification.reason === "no_direction"
+          ? "No directional setup right now — market is in HOLD. Auto-scan pipeline would skip this too."
+          : qualification.reason === "below_threshold"
+            ? `Confidence ${Math.round(conf)}% is below the ${MIN_CONFIDENCE}% minimum. No trade this scan — wait for the next qualifying setup.`
+            : qualification.reason === "outside_killzone"
+              ? `Outside an active Killzone (${p.killzone || "n/a"}). Wait for London, New York, or Asia Killzone.`
+              : qualification.reason === "htf_bias_conflict"
+                ? `${dir} conflicts with HTF bias (${htfBias}). Pipeline rejects counter-trend setups — waiting for alignment.`
+                : "Trade levels did not pass the shared signal safety checks.";
 
       // Always show the panel + intelligence so the user can still inspect
       // structure/context, but suppress the broadcast when any gate fails.

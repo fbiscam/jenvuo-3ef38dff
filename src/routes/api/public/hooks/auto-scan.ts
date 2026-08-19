@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { computeSignalPlan, getLiveTick } from "@/lib/gold-analysis.functions";
+import { isActiveKillzone, MIN_CONFIDENCE, qualifySignal } from "@/lib/signals/qualification";
 
 // Auto-scan broadcast worker. Called every 5 min by pg_cron.
 // Auth: x-cron-secret (private CRON_SECRET) for cron + app-internal callers,
@@ -136,8 +137,11 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           : pairs.slice(batchSlot * scanBatchSize, batchSlot * scanBatchSize + scanBatchSize);
         // Runtime config can lag behind code deploys. Keep a quality floor so
         // stale permissive settings cannot send B/C retracement calls again.
-        const configuredMinConf = Number(cfg.min_conf ?? 75);
-        let minConf = 75;
+        const configuredMinConf = Number(cfg.min_conf ?? MIN_CONFIDENCE);
+        const minConf = Math.max(
+          MIN_CONFIDENCE,
+          Number.isFinite(configuredMinConf) ? configuredMinConf : MIN_CONFIDENCE,
+        );
         const confirmWindowMin = Math.min(
           Number(cfg.confirm_window_min ?? 45) || 45,
           45,
@@ -149,7 +153,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         );
         const maxPerDay = Math.max(Number(cfg.max_broadcasts_per_day ?? 12) || 12, 12);
         // 75%+ can broadcast immediately.
-        let singleHitMinConf = Math.max(minConf, 75);
+        const singleHitMinConf = Math.max(minConf, MIN_CONFIDENCE);
 
         // Global daily rate limit — manual scans bypass so the user's
         // deliberate analyze still fires when the pool cap is hit.
@@ -304,61 +308,29 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               continue;
             }
 
-            if (conf < minConf) {
-              await supabaseAdmin
-                .from("auto_scan_state")
-                .delete()
-                .eq("pair", pair);
-              results.push({ pair, action: "below_threshold", conf });
-              continue;
-            }
-
-            // Killzone gate: automated signals must land in a killzone unless ≥85% conf.
-            // This prevents "false signals" during slow off-session hours.
-            // NOTE: the engine writes labels like "Outside Killzone" / "No Killzone",
-            // so an anchored ^(none|off|outside)$ test silently passed them through.
-            // Yesterday's XAU/EUR losers both carried killzone="Outside Killzone"
-            // yet gates.killzone_passed=true because of exactly that. Match on
-            // substrings instead, and require a known killzone name.
             const kz = String(plan.killzone ?? "").trim();
-            const kzLower = kz.toLowerCase();
-            const killzonePassed =
-              kz.length > 0 &&
-              !/(outside|none|off|no killzone|inactive|closed)/i.test(kzLower) &&
-              /(london|new york|ny|asia|tokyo|frankfurt|silver bullet|killzone)/i.test(kzLower);
-            if (!killzonePassed && conf < 75) {
-              await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
-              results.push({ pair, action: "outside_killzone", conf, killzone: kz });
-              continue;
-            }
-
-
-
-            // HTF bias alignment gate — never fire against higher-timeframe trend.
-            // Today's losses were SELLs into a bullish macro rally; this guard
-            // blocks counter-trend trades even when the LTF setup looks clean.
-            // NY-AM relaxed gate: during 12–16 UTC (London/NY overlap) neutral
-            // HTF bias is allowed through — this window regularly produces the
-            // day's cleanest setups and a rigid bias gate was silencing them.
             const htfBias = String((plan as { htfBias?: string }).htfBias ?? "neutral");
-            const utcHourNow = now.getUTCHours();
-            // Neutral HTF passes through in London + NY sessions (7–20 UTC),
-            // not just NY-AM. Prior gate silenced clean London-session setups
-            // whenever the 4H trend was undecided.
-            const isActiveSession = utcHourNow >= 7 && utcHourNow < 20;
-            const aligned =
-              (dir === "BUY" && htfBias === "bullish") ||
-              (dir === "SELL" && htfBias === "bearish") ||
-              (isActiveSession && htfBias === "neutral") ||
-              // High-conviction override: a ≥75% setup fires even against
-              // HTF bias — that's the whole point of a reversal signal.
-              conf >= 75;
-            if (!aligned) {
-              await supabaseAdmin
-                .from("auto_scan_state")
-                .delete()
-                .eq("pair", pair);
-              results.push({ pair, action: "htf_bias_conflict", conf, dir, htfBias });
+            const qualification = qualifySignal({
+              pair,
+              direction: dir,
+              confidence: conf,
+              entry: Number(plan.trade?.entry),
+              sl: Number(plan.trade?.sl),
+              tpCandidates: [plan.trade?.tp, plan.trade?.tp3, plan.trade?.tp2, plan.trade?.tp1],
+              htfBias,
+              utcHour: now.getUTCHours(),
+              inKillzone: isActiveKillzone(kz),
+              minConf,
+            });
+            if (!qualification.ok) {
+              await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
+              results.push({
+                pair,
+                action: qualification.reason,
+                conf,
+                killzone: kz,
+                htfBias,
+              });
               continue;
             }
 
