@@ -1029,7 +1029,7 @@ function SignalPage() {
               <button
                 onClick={() => {
                   try {
-                    const u = new SpeechSynthesisUtterance("Welcome to Jenvu. Voice audio is now enabled.");
+                    const u = new SpeechSynthesisUtterance("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            check kro manual scan aur auto scan shi work kr rha ha aj signal kew nhi aua koyi acha sa dekho aur agar bug ha usko fix kro");
                     window.speechSynthesis.speak(u);
                   } catch {}
                   setVoiceBlocked(false);
