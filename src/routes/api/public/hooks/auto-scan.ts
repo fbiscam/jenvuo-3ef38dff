@@ -109,18 +109,11 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         const cfg = settingsMap.get("auto_scan_config") ?? {};
         const rawPairs = manualMode && manualPair
           ? [manualPair]
-          : ((cfg.pairs as string[]) ?? [
-              "XAUUSD",
-              "XAUEUR",
-              "XAUGBP",
-              "XAUJPY",
-              "XAUAUD",
-              "XAUCHF",
-            ]);
+          : ["XAUUSD"];
         // Gold-only: strip any non-XAU symbols even if config has legacy entries
         const pairs = rawPairs.filter(
           (p) =>
-            typeof p === "string" && p.toUpperCase().startsWith("XAU"),
+            typeof p === "string" && p.toUpperCase() === "XAUUSD",
         );
         // Keep cron executions comfortably under the platform timeout. A full
         // six-pair AI sweep can take 40–60s, so the scheduled worker rotates

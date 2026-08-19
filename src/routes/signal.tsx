@@ -70,7 +70,7 @@ export const Route = createFileRoute("/signal")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Institutional ICT/SMC gold signal desk covering XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF with A+ setup grading and voice narration.",
+            "Institutional ICT/SMC gold signal desk focused exclusively on XAU/USD with A+ setup grading and voice narration.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -81,7 +81,7 @@ export const Route = createFileRoute("/signal")({
 });
 
 /* ---------- helpers ---------- */
-const XAU_PAIRS = ["XAUUSD", "XAUEUR", "XAUGBP", "XAUJPY", "XAUAUD", "XAUCHF"] as const;
+const XAU_PAIRS = ["XAUUSD"] as const;
 const XAU_LABELS: Record<string, string> = {
   XAUUSD: "XAU/USD", XAUEUR: "XAU/EUR", XAUGBP: "XAU/GBP",
   XAUJPY: "XAU/JPY", XAUAUD: "XAU/AUD", XAUCHF: "XAU/CHF",
@@ -2825,7 +2825,7 @@ function SignalVoiceAgent({
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && submit()}
-          placeholder={speech.listening ? "Listening…" : "Ask XAU/USD, XAU/EUR, XAU/JPY, XAU/GBP…"}
+          placeholder={speech.listening ? "Listening…" : "Ask about XAU/USD…"}
           disabled={busy || !showInput}
           tabIndex={showInput ? 0 : -1}
           className="flex-1 bg-transparent text-[12px] text-zinc-900 placeholder:text-zinc-400 outline-none"
