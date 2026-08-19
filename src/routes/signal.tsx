@@ -81,11 +81,6 @@ export const Route = createFileRoute("/signal")({
 });
 
 /* ---------- helpers ---------- */
-const XAU_PAIRS = ["XAUUSD"] as const;
-const XAU_LABELS: Record<string, string> = {
-  XAUUSD: "XAU/USD", XAUEUR: "XAU/EUR", XAUGBP: "XAU/GBP",
-  XAUJPY: "XAU/JPY", XAUAUD: "XAU/AUD", XAUCHF: "XAU/CHF",
-};
 function isMarketOpen(_sym: string, d: Date = new Date()): boolean {
   // Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
   const day = d.getUTCDay();
@@ -1075,52 +1070,6 @@ function SignalPage() {
         </div>
       </header>
 
-      {/* XAU PAIR SELECTOR */}
-      <div className="border-b border-zinc-100 bg-white/60">
-        <div className="mx-auto max-w-[1600px] px-5 py-2 sm:px-6 sm:py-2.5 flex items-center gap-2 overflow-x-auto">
-          <span className={`font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[15px] font-normal normal-case tracking-normal text-zinc-900 shrink-0`}>Gold pair:</span>
-          {XAU_PAIRS.map((p) => {
-            const active = (plan?.instrument.symbol || symbol || "XAUUSD").toUpperCase().replace(/[^A-Z]/g, "") === p;
-            const isFree = !credits.isLoading && credits.plan?.id === "free";
-            const locked = isFree && p !== "XAUUSD";
-            return (
-              <button
-                key={p}
-                onClick={() => {
-                  if (active) return;
-                  if (locked) {
-                    toast.info("Multi-pair analysis is a Pro feature", {
-                      description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
-                      action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
-                    });
-                    return;
-                  }
-                  abortRef.current = true;
-                  try { speech.stopSpeaking(); } catch {}
-                  setPlaying(false);
-                  setActiveTf(null);
-                  setPlan(null);
-                  setLoading(true);
-                  setStep(-1);
-                  navigate({ to: "/signal", search: { symbol: p }, replace: true });
-                }}
-                className={cn(
-                  "shrink-0 h-7 px-2.5 rounded-md font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-[13px] font-normal tracking-normal transition border inline-flex items-center gap-1",
-                  active
-                    ? "bg-zinc-50 text-zinc-900 border-zinc-400 ring-1 ring-zinc-300 shadow-sm font-medium"
-                    : locked
-                      ? "bg-white text-zinc-400 border-zinc-200 hover:bg-zinc-50 cursor-pointer"
-                      : "bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-50",
-                )}
-                title={locked ? "Pro feature — upgrade to unlock" : undefined}
-              >
-                {locked && <Lock className="h-3 w-3" />}
-                {XAU_LABELS[p]}
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
       {/* LOW BALANCE BANNER — blocks scan when wallet < $0.20 per-signal charge */}
       {!credits.isLoading && credits.balance < 0.20 && (
