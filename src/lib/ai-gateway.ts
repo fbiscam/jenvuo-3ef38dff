@@ -83,7 +83,7 @@ export type UsageInfo = { promptTokens: number; completionTokens: number; totalT
 async function singleAttempt(
   model: string,
   opts: CallChatOptions,
-  apiKey: string,
+  apiKey: string | undefined,
   timeoutMs: number,
 ): Promise<{ content: string; usage: UsageInfo }> {
   const controller = new AbortController();
@@ -128,6 +128,7 @@ async function singleAttempt(
     if (!deepseekKey) throw new AiGatewayError("DEEPSEEK_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${deepseekKey}`;
   } else {
+    if (!apiKey) throw new AiGatewayError("LOVABLE_API_KEY missing on server", 0, true);
     headers["Lovable-API-Key"] = apiKey;
   }
 
@@ -259,9 +260,6 @@ async function singleAttempt(
 // Throws AiGatewayError with `terminal` flag on final failure.
 export async function callChatCompletion(opts: CallChatOptions): Promise<{ content: string; model: string; usage: UsageInfo }> {
   const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new AiGatewayError("LOVABLE_API_KEY missing on server", 0, true);
-
-
   const timeoutMs = opts.timeoutMs ?? 25000;
   const retriesPerModel = Math.max(1, opts.retriesPerModel ?? 3);
   const configured = opts.models.filter(Boolean).filter(providerConfigured);
