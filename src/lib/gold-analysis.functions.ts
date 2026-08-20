@@ -2215,11 +2215,33 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __usedSeniorModel: string | null = null;
     let __totalPromptTokens = 0;
     let __totalCompletionTokens = 0;
-    void system;
-    void user;
-    // Rules-primary mode: the signal is produced by the deterministic ICT/SMC
-    // engine below. AI narration is intentionally skipped here so Bluesminds
-    // outages never block XAU analysis or leave users stuck on Server busy.
+    // The deterministic engine remains the authority for direction and levels,
+    // while a real AI pass reads the current candles for narration and an
+    // independent confidence input. Provider failure soft-fails to the engine.
+    try {
+      const narration = await callChatCompletion({
+        models: [...MODEL_CHAIN.narration],
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        jsonMode: true,
+        maxTokens: 1100,
+        timeoutMs: 15000,
+        priority: true,
+        retriesPerModel: 1,
+        stage: "signal-analysis",
+      });
+      parsed = tryParseJsonLoose(narration.content) || {};
+      __usedNarrationModel = narration.model;
+      __totalPromptTokens += narration.usage.promptTokens;
+      __totalCompletionTokens += narration.usage.completionTokens;
+      void import("@/lib/ai-cost-log.server")
+        .then((m) => m.logAiCost({ userId: __userId, stage: "signal-analysis", model: narration.model, usage: narration.usage }))
+        .catch(() => {});
+    } catch (e) {
+      console.warn("signal-analysis AI pass failed; using deterministic engine:", (e as Error)?.message ?? e);
+    }
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
       ? "high"
@@ -3042,7 +3064,13 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     // Senior review CONFIRM has already boosted setupScore above, so this
     // stage layers AI market context on top for final confidence.
     {
-      const aiConf = Number(marketRegime?.confidence ?? 0);
+      const modelConf = Number(parsed?.trade?.confidence ?? 0);
+      const regimeConf = Number(marketRegime?.confidence ?? 0);
+      // AI reads the same live candle packet; blend it with the deterministic
+      // regime score rather than ignoring the model response entirely.
+      const aiConf = Number.isFinite(modelConf) && modelConf > 0
+        ? Math.round(regimeConf * 0.6 + modelConf * 0.4)
+        : regimeConf;
       let blended = setupScore;
       if (built.direction !== "WAIT" && Number.isFinite(aiConf) && aiConf > setupScore) {
         const gap = aiConf - setupScore;
@@ -3061,7 +3089,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         }
 
       }
-      let rawConf = Math.min(95, Math.max(setupScore, blended, 38));
+      let rawConf = Math.min(95, Math.max(0, setupScore, blended));
 
       // Confidence smoothing memory — prevents a fresh scan from swinging
       // wildly (e.g. 75% now, 55% five minutes later) when structure hasn't
@@ -3088,7 +3116,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
               smoothed = Math.round(prev * 0.40 + rawConf * 0.60);
               // Damping removed to prevent sticking; allow full reflection of real market data.
               // We rely on the EMA blend and the rawConf floor (10) instead.
-              smoothed = Math.min(95, Math.max(38, smoothed));
+              smoothed = Math.min(95, Math.max(0, smoothed));
             }
           }
           await supabaseAdmin
@@ -3602,8 +3630,8 @@ export const getSignalPlan = createServerFn({ method: "POST" })
       if (cached) return { ok: true, plan: ensureSignalIntelligencePayload(cached) } satisfies SignalPlanResult;
     }
 
-    // Billing is handled by the caller (client) via credits.spend("signal") once per scan.
-    // Do NOT charge here — otherwise a single scan would be double/triple-billed.
+    // Billing is performed exactly once inside computeSignalPlan when a real
+    // BUY/SELL is emitted. WAIT scans remain free by product policy.
     try {
       const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId, { scanId: data.scanId });
       const enrichedPlan = ensureSignalIntelligencePayload(plan);
@@ -3621,4 +3649,5 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 
 
-// ICT/SMC Engine + Bluesmind GPT-5.2 Chat. Confidence floors at 38/28% (single/multi-veto) to maintain a dynamic baseline above zero while avoiding the "stuck at 49%" issue.
+// ICT/SMC Engine + live AI candle review. Confidence is calculated from the
+// current setup and model/regime agreement; no fixed display floor is applied.

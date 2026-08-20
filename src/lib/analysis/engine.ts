@@ -703,12 +703,13 @@ export function scoreSetup(args: {
   let score = Math.round((earned / totalWeight) * 100);
   if (imminentHighNews) score = Math.min(score, 55); // hard-block: below 75% broadcast threshold
 
-  // Vetoes: single = soft (-8), multi (2+) = harsh (-15 each). Prevents a lone
-  // false-positive gate from killing an otherwise strong setup.
+  // Vetoes lower the measured score, but never force a magic floor. A hard
+  // 38% minimum made unrelated market conditions repeatedly display exactly
+  // 38%, which looked like a failed/stale analysis instead of a live score.
   if (vetos.length === 1) {
-    score = Math.max(38, score - 8);
+    score = Math.max(0, score - 8);
   } else if (vetos.length >= 2) {
-    score = Math.max(28, score - vetos.length * 15);
+    score = Math.max(0, score - vetos.length * 15);
   }
 
   // Grade thresholds — A reserved for genuinely high-conviction setups
