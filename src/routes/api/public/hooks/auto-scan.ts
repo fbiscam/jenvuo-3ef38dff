@@ -93,7 +93,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               started_at: __runStartedIso,
               finished_at: new Date().toISOString(),
               duration_ms: Date.now() - __runStartedMs,
-              pairs_checked: row.pairs_checked ?? null,
+              pairs_checked: row.pairs_checked ?? undefined,
               skip_reason: row.skip_reason ?? null,
               broadcast_pair: row.broadcast_pair ?? null,
               broadcast_alert_id: row.broadcast_alert_id ?? null,
