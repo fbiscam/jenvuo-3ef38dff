@@ -32,6 +32,9 @@ export type CallChatOptions = {
   maxTokens?: number;
   // Milliseconds per attempt. Defaults to 25000.
   timeoutMs?: number;
+  // Hard wall-clock budget for the whole chain-walk (all models + retries).
+  deadlineMs?: number;
+
   // If true and the model supports priority tier, request fast mode.
   priority?: boolean;
   // Max attempts per model on retryable failures (429, 5xx, timeout).
@@ -262,6 +265,12 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
   const apiKey = process.env.LOVABLE_API_KEY;
   const timeoutMs = opts.timeoutMs ?? 25000;
   const retriesPerModel = Math.max(1, opts.retriesPerModel ?? 3);
+  // Hard wall-clock budget for the whole chain-walk (all models + retries).
+  // Without it a busy provider chain can keep a scan open until the platform
+  // request timeout kills it, which is what made scans "hang" with no result.
+  const deadlineMs = opts.deadlineMs ?? Math.max(timeoutMs + 5000, 45000);
+  const startedAt = Date.now();
+  const remaining = () => deadlineMs - (Date.now() - startedAt);
   const configured = opts.models.filter(Boolean).filter(providerConfigured);
   if (!configured.length) throw new AiGatewayError(`No configured AI provider for ${opts.stage ?? "AI call"}`, 0, true);
   // Skip models that recently returned model_not_found or hard upstream errors.
@@ -277,8 +286,13 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
     const model = models[mi];
     const isLastModel = mi === models.length - 1;
     for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
+      if (remaining() < 3000) {
+        throw lastErr ?? new AiGatewayError("Server busy — please try again in a moment.", 0, false);
+      }
       try {
-        const { content, usage } = await singleAttempt(model, opts, apiKey, timeoutMs);
+        const attemptTimeout = Math.max(4000, Math.min(timeoutMs, remaining() - 1000));
+        const { content, usage } = await singleAttempt(model, opts, apiKey, attemptTimeout);
+
         return { content, model, usage };
       } catch (err) {
         lastErr = err instanceof AiGatewayError
