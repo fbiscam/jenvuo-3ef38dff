@@ -1985,6 +1985,13 @@ export async function computeSignalPlan(
 ): Promise<SignalPlan> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
+    // Whole-scan AI budget. The pipeline runs several sequential AI stages;
+    // without a shared clock their individual timeouts stack up (50s+) and the
+    // user sees nothing at all. Each optional stage is skipped once the budget
+    // is spent, so the deterministic ICT/SMC result always renders fast.
+    const __scanStartedMs = Date.now();
+    const __aiLeft = () => 34000 - (Date.now() - __scanStartedMs);
+
     let inst = resolveInstrument(data.symbol);
 
     // FREE plan: server-side lock to XAU/USD only. Cross-pairs are Pro-tier.
@@ -2232,10 +2239,10 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         ],
         jsonMode: true,
         maxTokens: 1100,
-        timeoutMs: 20000,
-        deadlineMs: 40000,
+        timeoutMs: 12000,
+        deadlineMs: 16000,
         priority: true,
-        retriesPerModel: 2,
+        retriesPerModel: 1,
         stage: "signal-analysis",
       });
       parsed = tryParseJsonLoose(narration.content) || {};
@@ -2728,7 +2735,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __crossCheckModel: string | null = null;
     let __dsAgrees: boolean | null = null;
     let __consensus: "full" | "split" | null = null;
-    if (built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE) {
+    if (built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE && __aiLeft() > 9000) {
       try {
         const xSystem = `You are an independent ICT/SMC audit desk (second opinion, different house than the primary analyst). Audit the setup ONLY against core Smart Money rules: liquidity sweep before entry, displacement creating the FVG/OB, premium/discount side correctness, HTF↔LTF alignment, zone freshness, killzone timing, and R:R sanity.
 Reply ONLY as JSON: {"agrees":true|false,"smc_score":<0-100>,"note":"<one short sentence, most important rule that passes or fails>"}`;
@@ -2745,7 +2752,8 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
           ],
           jsonMode: true,
           maxTokens: 200,
-          timeoutMs: 14000,
+          timeoutMs: 7000,
+          deadlineMs: 9000,
           priority: false,
           retriesPerModel: 1,
           stage: "deepseek-review",
@@ -2875,9 +2883,10 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             ],
             jsonMode: true,
             maxTokens: 320,
-            timeoutMs: 20000,
+            timeoutMs: Math.max(6000, Math.min(11000, __aiLeft() - 3000)),
+            deadlineMs: Math.max(7000, __aiLeft() - 1500),
             priority: true,
-            retriesPerModel: 2,
+            retriesPerModel: 1,
             stage: "senior-review",
           });
         } catch (err) {
@@ -3001,7 +3010,8 @@ Run the full 25-year desk-head review internally through the elite lens above, t
     // Triggers whenever there is (a) a live BUY/SELL setup, or (b) upcoming
     // USD/gold news within the window. Soft-fails on any error.
     let __macroContext: SignalPlan["macroContext"] = undefined;
-    const __macroShouldRun = built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null;
+    const __macroShouldRun =
+      (built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null) && __aiLeft() > 7000;
     if (__macroShouldRun) {
       try {
         const newsLines = upcomingNews.slice(0, 5).map((n) =>
@@ -3023,7 +3033,8 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           ],
           jsonMode: true,
           maxTokens: 160,
-          timeoutMs: 12000,
+          timeoutMs: 6000,
+          deadlineMs: 7000,
           priority: false,
           retriesPerModel: 1,
           stage: "macro-context",
