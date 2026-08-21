@@ -2218,53 +2218,40 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // The deterministic engine remains the authority for direction and levels,
     // while a real AI pass reads the current candles for narration and an
     // independent confidence input. Provider failure soft-fails to the engine.
-    // Retry the whole AI pass with exponential backoff when the gateway is
-    // transiently busy (429/5xx/timeout), so a "Server busy" blip on the first
-    // try still lands a real AI analysis on the next attempt.
-    {
-      const rounds = 3;
-      let lastAiErr: unknown = null;
-      for (let round = 1; round <= rounds; round++) {
-        try {
-          const narration = await callChatCompletion({
-            models: [...MODEL_CHAIN.narration],
-            messages: [
-              { role: "system", content: system },
-              { role: "user", content: user },
-            ],
-            jsonMode: true,
-            maxTokens: 1100,
-            timeoutMs: 20000,
-            priority: true,
-            retriesPerModel: 2,
-            stage: "signal-analysis",
-          });
-          parsed = tryParseJsonLoose(narration.content) || {};
-          __usedNarrationModel = narration.model;
-          __totalPromptTokens += narration.usage.promptTokens;
-          __totalCompletionTokens += narration.usage.completionTokens;
-          void import("@/lib/ai-cost-log.server")
-            .then((m) => m.logAiCost({ userId: __userId, stage: "signal-analysis", model: narration.model, usage: narration.usage }))
-            .catch(() => {});
-          lastAiErr = null;
-          break;
-        } catch (e) {
-          lastAiErr = e;
-          const status = (e as AiGatewayError)?.status ?? 0;
-          const terminal = (e as AiGatewayError)?.terminal === true;
-          const retryable = !terminal && (status === 0 || status === 429 || status >= 500);
-          if (!retryable || round === rounds) break;
-          const backoff = Math.min(6000, 900 * Math.pow(2, round - 1)) + Math.floor(Math.random() * 300);
-          await new Promise((r) => setTimeout(r, backoff));
-        }
-      }
-      if (lastAiErr) {
-        console.warn(
-          "signal-analysis AI pass failed after retries; using deterministic engine:",
-          (lastAiErr as Error)?.message ?? lastAiErr,
-        );
-      }
+    // callChatCompletion already owns bounded retries, provider fallback and a
+    // hard wall-clock deadline. Do NOT wrap it in another retry loop: nested
+    // retries multiplied the worst case (3 rounds x chain-walk x per-model
+    // retries), which kept manual scans hanging and made scheduled auto-scans
+    // exceed the request timeout with no result at all.
+    try {
+      const narration = await callChatCompletion({
+        models: [...MODEL_CHAIN.narration],
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        jsonMode: true,
+        maxTokens: 1100,
+        timeoutMs: 20000,
+        deadlineMs: 40000,
+        priority: true,
+        retriesPerModel: 2,
+        stage: "signal-analysis",
+      });
+      parsed = tryParseJsonLoose(narration.content) || {};
+      __usedNarrationModel = narration.model;
+      __totalPromptTokens += narration.usage.promptTokens;
+      __totalCompletionTokens += narration.usage.completionTokens;
+      void import("@/lib/ai-cost-log.server")
+        .then((m) => m.logAiCost({ userId: __userId, stage: "signal-analysis", model: narration.model, usage: narration.usage }))
+        .catch(() => {});
+    } catch (e) {
+      console.warn(
+        "signal-analysis AI pass failed; using deterministic engine:",
+        (e as Error)?.message ?? e,
+      );
     }
+
 
 
     const newsSeverity: "low" | "medium" | "high" = imminentHigh
