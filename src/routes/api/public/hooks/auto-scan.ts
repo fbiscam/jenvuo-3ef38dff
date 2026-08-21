@@ -75,6 +75,36 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           "@/integrations/supabase/client.server"
         );
 
+        // Every invocation is recorded so silent failures are visible in
+        // `auto_scan_runs` instead of leaving the table empty forever.
+        const __runStartedMs = Date.now();
+        const __runStartedIso = new Date().toISOString();
+        const logRun = async (row: {
+          skip_reason?: string | null;
+          pairs_checked?: string[] | null;
+          broadcast_pair?: string | null;
+          broadcast_alert_id?: string | null;
+          error?: string | null;
+          results?: unknown;
+        }) => {
+          try {
+            await supabaseAdmin.from("auto_scan_runs").insert({
+              mode: manualMode ? "manual" : "auto",
+              started_at: __runStartedIso,
+              finished_at: new Date().toISOString(),
+              duration_ms: Date.now() - __runStartedMs,
+              pairs_checked: row.pairs_checked ?? undefined,
+              skip_reason: row.skip_reason ?? null,
+              broadcast_pair: row.broadcast_pair ?? null,
+              broadcast_alert_id: row.broadcast_alert_id ?? null,
+              error: row.error ?? null,
+              results: (row.results ?? null) as never,
+            });
+          } catch {
+            // Diagnostics only — never fail a scan because logging failed.
+          }
+        };
+
         // Read settings
         const { data: settings } = await supabaseAdmin
           .from("system_settings")
@@ -91,6 +121,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         const enabled =
           (settingsMap.get("auto_scan_enabled")?.enabled as boolean) ?? false;
         if (!enabled && !manualMode) {
+          await logRun({ skip_reason: "disabled" });
           return Response.json({ ok: true, skipped: "disabled" });
         }
 
@@ -104,6 +135,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           (dow === 5 && utcHour >= 21) || // Friday after 21:00 UTC
           (dow === 0 && utcHour < 22); // Sunday before 22:00 UTC
         if (marketClosed) {
+          await logRun({ skip_reason: "market_closed" });
           return Response.json({ ok: true, skipped: "market_closed" });
         }
 
@@ -166,6 +198,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             .not("alert_id", "is", null)
             .gte("created_at", dayStart.toISOString());
           if ((todayCount ?? 0) >= maxPerDay) {
+            await logRun({ skip_reason: "daily_cap" });
             return Response.json({ ok: true, skipped: "daily_cap" });
           }
         }
@@ -232,6 +265,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           // Fail open — don't block scans if news feed is down.
         }
         if (newsBlocked) {
+          await logRun({ skip_reason: "news_pause" });
           return Response.json({
             ok: true,
             skipped: "news_pause",
@@ -992,6 +1026,16 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // Heartbeat is diagnostic only; never fail the scan because of it.
           }
         }
+
+        const __broadcastRow = results.find((r) => r.action === "broadcast") as
+          | { pair?: string; alert_id?: string }
+          | undefined;
+        await logRun({
+          pairs_checked: workingPairs,
+          broadcast_pair: __broadcastRow?.pair ?? null,
+          broadcast_alert_id: __broadcastRow?.alert_id ?? null,
+          results,
+        });
 
         return Response.json({
           ok: true,
