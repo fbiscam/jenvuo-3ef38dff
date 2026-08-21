@@ -125,7 +125,7 @@ export type ResolvedInstrument = {
 type XauQuote = "USD" | "EUR" | "GBP" | "JPY" | "AUD" | "CHF";
 
 const XAU_PAIRS: Record<string, { display: string; decimals: number; yahoo: string; quote: XauQuote; usdProxy?: { symbol: string; inverse: boolean } }> = {
-  XAUUSD: { display: "XAU/USD", decimals: 2, yahoo: "XAUUSD=X", quote: "USD" },
+  XAUUSD: { display: "XAU/USD", decimals: 2, yahoo: "GC=F", quote: "USD" },
   XAUEUR: { display: "XAU/EUR", decimals: 2, yahoo: "XAUEUR=X", quote: "EUR", usdProxy: { symbol: "EURUSD=X", inverse: false } },
   XAUGBP: { display: "XAU/GBP", decimals: 2, yahoo: "XAUGBP=X", quote: "GBP", usdProxy: { symbol: "GBPUSD=X", inverse: false } },
   XAUJPY: { display: "XAU/JPY", decimals: 0, yahoo: "XAUJPY=X", quote: "JPY", usdProxy: { symbol: "USDJPY=X", inverse: true } },
@@ -171,7 +171,7 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   // (XAUEUR=X, etc.) is kept as a fallback for both quote and candles.
   // Do NOT include XAUUSD=X / GC=F in yahooSymbols for cross-pairs —
   // fetchYahooQuote would silently return USD-scale prices otherwise.
-  const yahooSymbols = key === "XAUUSD" ? [p.yahoo, "GC=F"] : [p.yahoo];
+  const yahooSymbols = key === "XAUUSD" ? [p.yahoo, "XAUUSD=X"] : [p.yahoo];
   return {
     raw: raw || key,
     key: `METAL:${key}`,
@@ -581,7 +581,7 @@ async function fetchCrossPairCandlesFromProxy(
   //    so Binance is the reliable fallback that keeps analysis real.
   let xauUsd: Candle[] = [];
   try {
-    xauUsd = await fetchFromYahooSymbols(["XAUUSD=X", "GC=F"], tf);
+    xauUsd = await fetchFromYahooSymbols(["GC=F", "XAUUSD=X"], tf);
   } catch { /* try binance */ }
   if (!xauUsd.length) {
     try {
@@ -1930,8 +1930,8 @@ function buildFeedFallbackPlan(args: {
       sl: 0,
       tp: 0,
       rr: 0,
-      confidence: 15,
-      summary: `WAIT on ${inst.display}: ${reasonText}`,
+      confidence: 0,
+      summary: `Feed unavailable — analysis not run on ${inst.display}. ${reasonText}`,
       invalidation: "No trade is valid until real-time candles are restored.",
     },
     session,
@@ -1939,8 +1939,8 @@ function buildFeedFallbackPlan(args: {
     newsRisk: { severity: "low", warning: "News check skipped while feed is in fallback mode.", events: [] },
     multiTf: ["4H", "1H", "15M", "5M"].map((tf) => ({ tf: tf as TfBias["tf"], bias: "neutral", score: 50, label: "Feed fallback" })),
     alignmentScore: 50,
-    alignmentLabel: "Feed fallback / Waiting",
-    setupScore: 15,
+    alignmentLabel: "Feed unavailable — analysis not run",
+    setupScore: 0,
     setupGrade: "C",
     setupChecks: [
       { key: "live_quote", label: "Live quote available", pass: true, reason: priceText },
