@@ -32,6 +32,9 @@ export type CallChatOptions = {
   maxTokens?: number;
   // Milliseconds per attempt. Defaults to 25000.
   timeoutMs?: number;
+  // Hard wall-clock budget for the whole chain-walk (all models + retries).
+  deadlineMs?: number;
+
   // If true and the model supports priority tier, request fast mode.
   priority?: boolean;
   // Max attempts per model on retryable failures (429, 5xx, timeout).
