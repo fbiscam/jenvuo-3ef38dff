@@ -857,7 +857,7 @@ function DashboardLayout() {
   }, [displayRemaining, credits.isLoading, credits.allowance]);
 
   return (
-    <div className={`flex min-h-screen bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
+    <div className={`flex min-h-screen bg-[#FAFAFA] text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
 
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
