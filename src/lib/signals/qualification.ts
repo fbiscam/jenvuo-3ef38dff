@@ -10,12 +10,8 @@ export type Direction = "BUY" | "SELL";
 
 /**
  * Global quality floor. Runtime config may raise it, never lower it.
- * Aug 2026 audit: with a 75 floor the engine produced ZERO alerts for 5 days
- * (191 scans, avg conf 31, best 66) because the anti-inflation cap keeps the
- * blended score well under 75. 68 keeps a B+/A quality bar while letting real
- * setups fire again.
  */
-export const MIN_CONFIDENCE = 68;
+export const MIN_CONFIDENCE = 75;
 /** Broadcast tickets must carry at least a 2R target. */
 export const MIN_RR = 2;
 /** A live tick older than this must not be used for gating decisions. */
