@@ -11,7 +11,7 @@ import { getRiskSettings } from "@/lib/risk-settings.functions";
 import { computePositionSize } from "@/lib/risk-manager";
 import { Bell, BellOff, Loader2, Send, MessageSquare } from "lucide-react";
 import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
-import { connectWhatsappAlertLink, disconnectWhatsappAlertLink, getWhatsappAlertLink, setWhatsappAlertEnabled } from "@/lib/whatsapp-alert.functions";
+import { connectWhatsappAlertLink, disconnectWhatsappAlertLink, getWhatsappAlertLink, setWhatsappAlertEnabled, verifyWhatsappAlertCode } from "@/lib/whatsapp-alert.functions";
 import { cn } from "@/lib/utils";
 import { getAlertCutoff } from "@/lib/alert-cutoff";
 import userinfobotLogo from "@/assets/userinfobot.jpg.asset.json";
@@ -109,6 +109,7 @@ function AlertPrefs() {
   const getRisk = useServerFn(getRiskSettings);
   const getWhatsappLinkFn = useServerFn(getWhatsappAlertLink);
   const connectWhatsappFn = useServerFn(connectWhatsappAlertLink);
+  const verifyWhatsappFn = useServerFn(verifyWhatsappAlertCode);
   const setWhatsappEnabledFn = useServerFn(setWhatsappAlertEnabled);
   const disconnectWhatsappFn = useServerFn(disconnectWhatsappAlertLink);
 
@@ -129,6 +130,9 @@ function AlertPrefs() {
   const [whatsappError, setWhatsappError] = useState<string | null>(null);
   const [whatsappSaving, setWhatsappSaving] = useState(false);
   const [whatsappDisconnectConfirmOpen, setWhatsappDisconnectConfirmOpen] = useState(false);
+  const [whatsappCode, setWhatsappCode] = useState("");
+  const [whatsappPending, setWhatsappPending] = useState(false);
+  const [whatsappSender, setWhatsappSender] = useState<string | null>(null);
 
   const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
   const canConnectTelegram = chatIdValid && !telegramSaving;
@@ -206,6 +210,8 @@ function AlertPrefs() {
         setWhatsappEnabled(r.enabled !== false);
         setWhatsappVerifiedAt(r.verifiedAt ?? null);
         setWhatsappError(r.lastError ?? null);
+        setWhatsappPending(!!r.pendingVerification);
+        setWhatsappSender(r.senderNumber ?? null);
       } catch {
         setWhatsappError("Could not load WhatsApp settings");
       }
@@ -284,11 +290,10 @@ function AlertPrefs() {
     setWhatsappError(null);
     try {
       const r = await connectWhatsappFn({ data: { phoneNumber: whatsappPhone.trim() } });
-      setWhatsappLinked(true);
-      setWhatsappEnabled(true);
-      setWhatsappVerifiedAt(new Date().toISOString());
       setWhatsappPhone(r.phoneNumber);
-      toast.success("WhatsApp connected", { description: "A test message was sent to your number." });
+      setWhatsappPending(true);
+      setWhatsappCode("");
+      toast.success("Code sent on WhatsApp", { description: "Enter the 6-digit code to activate alerts." });
     } catch (e: any) {
       const message = e?.message ?? "Could not connect WhatsApp";
       setWhatsappError(message);
@@ -297,6 +302,28 @@ function AlertPrefs() {
       setWhatsappSaving(false);
     }
   }, [canConnectWhatsapp, connectWhatsappFn, whatsappPhone]);
+
+  const verifyWhatsapp = useCallback(async () => {
+    const code = whatsappCode.replace(/\D/g, "");
+    if (code.length < 4) return;
+    setWhatsappSaving(true);
+    setWhatsappError(null);
+    try {
+      await verifyWhatsappFn({ data: { code } });
+      setWhatsappPending(false);
+      setWhatsappLinked(true);
+      setWhatsappEnabled(true);
+      setWhatsappVerifiedAt(new Date().toISOString());
+      setWhatsappCode("");
+      toast.success("WhatsApp verified", { description: "Signal alerts will now arrive on WhatsApp." });
+    } catch (e: any) {
+      const message = e?.message ?? "Could not verify code";
+      setWhatsappError(message);
+      toast.error("Verification failed", { description: message });
+    } finally {
+      setWhatsappSaving(false);
+    }
+  }, [verifyWhatsappFn, whatsappCode]);
 
   const toggleWhatsapp = useCallback(async (enabled: boolean) => {
     setWhatsappEnabled(enabled);
@@ -318,6 +345,8 @@ function AlertPrefs() {
       setWhatsappEnabled(true);
       setWhatsappVerifiedAt(null);
       setWhatsappPhone("");
+      setWhatsappPending(false);
+      setWhatsappCode("");
       toast.success("WhatsApp disconnected", { description: "You will no longer receive alerts on WhatsApp." });
     } catch (e: any) {
       const message = e?.message ?? "Could not disconnect WhatsApp";
@@ -862,7 +891,7 @@ function AlertPrefs() {
                 <div className="text-xs text-zinc-500">
                   {whatsappLinked
                     ? `Connected to ${whatsappPhone || "—"}`
-                    : "Enter your phone number with country code (e.g. +923001234567) to receive alerts via WhatsApp."}
+                    : "Enter your phone number with country code (e.g. +923001234567). We'll send a verification code on WhatsApp."}
                 </div>
                 {whatsappVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Active {formatVerifiedAt(whatsappVerifiedAt)}</div>}
               </div>
@@ -919,9 +948,34 @@ function AlertPrefs() {
                 )}
               >
                 {whatsappSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                {whatsappLinked ? "Update" : "Connect"}
+                {whatsappLinked ? "Update" : whatsappPending ? "Resend code" : "Connect"}
               </button>
             </div>
+
+            {whatsappPending && !whatsappLinked && (
+              <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                <div className="w-full text-[12px] text-emerald-800">
+                  We sent a 6-digit code to your WhatsApp{whatsappSender ? ` from ${whatsappSender}` : ""}. Enter it below to activate alerts.
+                </div>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={whatsappCode}
+                  onChange={(e) => setWhatsappCode(e.target.value)}
+                  placeholder="123456"
+                  className="w-32 rounded-lg border border-emerald-200 bg-white px-3 py-1.5 text-sm tracking-widest outline-none focus:ring-2 focus:ring-emerald-200"
+                />
+                <button
+                  type="button"
+                  onClick={verifyWhatsapp}
+                  disabled={whatsappSaving || whatsappCode.replace(/\D/g, "").length < 4}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                >
+                  {whatsappSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  Verify
+                </button>
+              </div>
+            )}
             {whatsappError && <div className="mt-2 text-[11px] text-rose-600">{whatsappError}</div>}
           </div>
 
