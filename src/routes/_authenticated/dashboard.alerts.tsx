@@ -9,7 +9,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
 import { getRiskSettings } from "@/lib/risk-settings.functions";
 import { computePositionSize } from "@/lib/risk-manager";
-import { Bell, BellOff, Loader2, Send, MessageSquare } from "lucide-react";
+import { Bell, BellOff, Loader2, Send } from "lucide-react";
 import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
 import { connectWhatsappAlertLink, disconnectWhatsappAlertLink, getWhatsappAlertLink, setWhatsappAlertEnabled, verifyWhatsappAlertCode } from "@/lib/whatsapp-alert.functions";
 import { cn } from "@/lib/utils";
