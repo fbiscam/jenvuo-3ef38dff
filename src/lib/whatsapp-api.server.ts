@@ -129,7 +129,13 @@ export async function sendWhatsappTemplate(
 }
 
 export const OTP_TEMPLATE = { name: 'jenvu_verify_code', language: 'en_US' }
-export const ALERT_TEMPLATE = { name: 'jenvu_signal_alert', language: 'en_US' }
+/**
+ * Primary alert template. Meta re-categorised the older `jenvu_signal_alert`
+ * as MARKETING (the opt-out wording made it promotional), so we prefer the
+ * transactional UTILITY template and only fall back to the old one.
+ */
+export const ALERT_TEMPLATE = { name: 'jenvu_signal_update', language: 'en_US' }
+export const LEGACY_ALERT_TEMPLATE = { name: 'jenvu_signal_alert', language: 'en_US' }
 
 /** Sends the 6-digit verification code using the approved authentication template. */
 export async function sendWhatsappOtp(to: string, code: string) {
