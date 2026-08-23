@@ -121,11 +121,11 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
     return { ok: false, reason: "htf_bias_conflict", detail: { htfBias, dir, conf } };
   }
 
-  // Killzone is mandatory in addition to the 75% quality floor. Confidence
-  // must not bypass the session gate, otherwise every qualifying setup would
-  // automatically make this protection ineffective.
+  // Killzone gate: normally mandatory, but a very high conviction setup
+  // (≥85%) may still fire outside a session so users are not blind for the
+  // ~7 hours a day XAU/USD has no active killzone.
   const inKillzone = !!input.inKillzone;
-  if (!inKillzone) {
+  if (!inKillzone && conf < 85) {
     return { ok: false, reason: "outside_killzone", detail: { conf } };
   }
 
