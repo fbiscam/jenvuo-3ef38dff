@@ -3209,6 +3209,8 @@ export type Database = {
       }
       whatsapp_alert_links: {
         Row: {
+          code_attempts: number
+          code_expires_at: string | null
           created_at: string | null
           id: string
           last_error: string | null
@@ -3220,6 +3222,8 @@ export type Database = {
           whatsapp_enabled: boolean | null
         }
         Insert: {
+          code_attempts?: number
+          code_expires_at?: string | null
           created_at?: string | null
           id?: string
           last_error?: string | null
@@ -3231,6 +3235,8 @@ export type Database = {
           whatsapp_enabled?: boolean | null
         }
         Update: {
+          code_attempts?: number
+          code_expires_at?: string | null
           created_at?: string | null
           id?: string
           last_error?: string | null

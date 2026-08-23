@@ -18,38 +18,6 @@ interface SignalAlertArgs {
   htfBias?: string | null
 }
 
-async function whatsappApi(method: string, payload: Record<string, unknown>): Promise<any> {
-  const token = process.env.WHATSAPP_API_TOKEN
-  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID
-  
-  if (!token || !phoneNumberId) {
-    // During local development or if secrets aren't set, we log but don't crash the whole signal pipeline.
-    // The UI will show a descriptive error to the user if they try to connect.
-    const msg = 'WhatsApp API credentials missing (WHATSAPP_API_TOKEN / WHATSAPP_PHONE_NUMBER_ID). Please add them to your environment secrets.'
-    console.error(`[WhatsApp] ${msg}`)
-    throw new Error(msg)
-  }
-
-  const res = await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/${method}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  })
-
-  const body = await res.json()
-  if (!res.ok) {
-    throw new Error(body.error?.message || `WhatsApp API error: ${res.status}`)
-  }
-  return body
-}
-
-function escapeText(text: string): string {
-  // WhatsApp formatting: *bold*, _italic_, ~strikethrough~, ```code```
-  return text.replace(/[*_~`]/g, '\\$&')
-}
 
 export async function sendSignalAlertWhatsApp(a: SignalAlertArgs): Promise<{ sent: number }> {
   // 1. Get recipients who have WhatsApp enabled and verified
@@ -99,18 +67,20 @@ export async function sendSignalAlertWhatsApp(a: SignalAlertArgs): Promise<{ sen
     `View details: https://jenvu.com/signal?alertId=${a.alertId}`
   ].filter(Boolean).join('\n')
 
+  const templateParams: [string, string] = [
+    `${a.direction} ${a.pair} (Grade ${a.grade})`,
+    `Entry ${round(a.entry)}, SL ${round(a.sl)}, TP ${round(a.tp)}, R:R ${a.rr.toFixed(2)}, Confidence ${Math.round(a.confidence)}%`,
+  ]
+
+  const { sendWhatsappAlertMessage } = await import('./whatsapp-api.server')
+
   let sent = 0
   for (const row of rows) {
     try {
-      // For now, we use a simple text message. 
-      // NOTE: For production WhatsApp Business API, you usually need an approved template 
-      // if it's been >24h since the user last messaged you.
-      await whatsappApi('messages', {
-        messaging_product: 'whatsapp',
-        to: row.phone_number,
-        type: 'text',
-        text: { body: messageBody }
-      })
+      // Free-form text works inside the 24h window; otherwise the approved
+      // utility template is used automatically.
+      await sendWhatsappAlertMessage(row.phone_number, messageBody, templateParams)
+
       
       sent++
       await supabaseAdmin
