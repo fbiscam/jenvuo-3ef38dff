@@ -18,11 +18,6 @@ interface SignalAlertArgs {
   htfBias?: string | null
 }
 
-function escapeText(text: string): string {
-  // WhatsApp formatting: *bold*, _italic_, ~strikethrough~, ```code```
-  return text.replace(/[*_~`]/g, '\\$&')
-}
-
 
 export async function sendSignalAlertWhatsApp(a: SignalAlertArgs): Promise<{ sent: number }> {
   // 1. Get recipients who have WhatsApp enabled and verified
