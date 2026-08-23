@@ -204,9 +204,14 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
     .eq("user_id", userId)
     .maybeSingle();
 
-  // Downgrades are allowed when manually targeted via targetPlanId.
-  // We only skip if the "earned" plan matches what they already have.
+  // Downgrades are allowed only when explicitly targeted via targetPlanId.
+  // A plain wallet top-up (no target) must never demote a higher tier.
   if (sub?.plan_id === earned.id && !(sub as any).is_trial) return null;
+  if (!targetPlanId) {
+    const priceOf = (id?: string | null) =>
+      Number((plans ?? []).find((p: any) => p.id === id)?.price_usd ?? 0);
+    if (priceOf(sub?.plan_id) > Number(earned.price_usd)) return null;
+  }
 
   const payload = {
     user_id: userId,
