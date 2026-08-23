@@ -982,7 +982,7 @@ function AlertPrefs() {
           </div>
 
           <button onClick={requestBrowser} className="text-xs font-medium text-zinc-700 underline-offset-2 hover:underline">
-            Request browser permission →
+            {"\u00a0 \u00a0 \u00a0"}Request browser permission →
           </button>
           
           <AlertDialog open={whatsappDisconnectConfirmOpen} onOpenChange={setWhatsappDisconnectConfirmOpen}>
