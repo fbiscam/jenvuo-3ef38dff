@@ -163,7 +163,18 @@ export async function sendWhatsappAlertMessage(
         templateParams,
       )
     } catch (e2) {
-      throw new Error(`${msg} | template fallback: ${(e2 as Error).message}`)
+      try {
+        return await sendWhatsappTemplate(
+          to,
+          LEGACY_ALERT_TEMPLATE.name,
+          LEGACY_ALERT_TEMPLATE.language,
+          templateParams,
+        )
+      } catch (e3) {
+        throw new Error(
+          `${msg} | template: ${(e2 as Error).message} | legacy: ${(e3 as Error).message}`,
+        )
+      }
     }
   }
 }
