@@ -18,38 +18,11 @@ interface SignalAlertArgs {
   htfBias?: string | null
 }
 
-async function whatsappApi(method: string, payload: Record<string, unknown>): Promise<any> {
-  const token = process.env.WHATSAPP_API_TOKEN
-  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID
-  
-  if (!token || !phoneNumberId) {
-    // During local development or if secrets aren't set, we log but don't crash the whole signal pipeline.
-    // The UI will show a descriptive error to the user if they try to connect.
-    const msg = 'WhatsApp API credentials missing (WHATSAPP_API_TOKEN / WHATSAPP_PHONE_NUMBER_ID). Please add them to your environment secrets.'
-    console.error(`[WhatsApp] ${msg}`)
-    throw new Error(msg)
-  }
-
-  const res = await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/${method}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  })
-
-  const body = await res.json()
-  if (!res.ok) {
-    throw new Error(body.error?.message || `WhatsApp API error: ${res.status}`)
-  }
-  return body
-}
-
 function escapeText(text: string): string {
   // WhatsApp formatting: *bold*, _italic_, ~strikethrough~, ```code```
   return text.replace(/[*_~`]/g, '\\$&')
 }
+
 
 export async function sendSignalAlertWhatsApp(a: SignalAlertArgs): Promise<{ sent: number }> {
   // 1. Get recipients who have WhatsApp enabled and verified
