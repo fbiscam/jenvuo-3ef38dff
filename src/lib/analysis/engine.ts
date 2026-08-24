@@ -401,13 +401,19 @@ export function buildTrade(
   // Cap the ticket size. A structural stop that lands slightly beyond the cap
   // gets TIGHTENED to the cap (keeps the signal, keeps SL/TP readable); only a
   // wildly wide structure (> 1.8x the cap) is rejected outright.
-  const maxRisk = lastPrice * (profile.maxRiskPct * 0.75);
-  if (risk > maxRisk * 1.8) {
+  // Do NOT reject a setup just because the structural stop is wider than the
+  // preferred ticket size — the anti-stop-hunt guard routinely pushes SL beyond
+  // a liquidity pool, which used to blow past the cap and force a permanent
+  // WAIT ("market is on HOLD" on every scan). Only a genuinely absurd stop
+  // (> 2.5x the cap) is rejected; everything else is tightened to the cap below.
+  const maxRisk = lastPrice * profile.maxRiskPct;
+  if (risk > maxRisk * 2.5) {
     return {
       direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null,
       reason: `Risk from entry to protected stop is ${(risk / lastPrice * 100).toFixed(2)}%, too wide for ${assetKind}. Wait for a tighter re-entry.`,
     };
   }
+
   if (risk > maxRisk) {
     sl = dir === "BUY" ? entry - maxRisk : entry + maxRisk;
     risk = maxRisk;
