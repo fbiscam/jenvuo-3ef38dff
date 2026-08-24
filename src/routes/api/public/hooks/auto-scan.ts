@@ -1010,6 +1010,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               alert_id: inserted.id,
               notified,
               emailed,
+              whatsapp_sent: whatsappSent,
+
               charged,
               conf,
               dir,
