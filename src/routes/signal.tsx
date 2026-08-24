@@ -1534,7 +1534,7 @@ function SignalPage() {
 
                   {/* 30% threshold nudge */}
                   {(isBuy || isSell) && rMultiple >= 0.6 && rMultiple < 1.0 && trackerStatus !== "WIN" && trackerStatus !== "LOSS" && (
-                    <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-[11px] text-amber-900 leading-snug">
+                    <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 leading-snug">
                       <span className="mt-0.5 shrink-0">💡</span>
                       <span>
                         Current profit ≈ <b>{rMultiple.toFixed(2)}R</b> — near the <b>30%-of-investment</b> threshold. <b>Close 50% now</b> and move SL to entry. Locking in profit is smarter than chasing TP2.
