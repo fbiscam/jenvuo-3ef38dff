@@ -714,6 +714,36 @@ function SignalPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan?.instrument.symbol]);
 
+  /* ---------- LIVE CANDLE REFRESH (every 60s) ---------- */
+  const fetchCandles = useServerFn(getChartCandles);
+  const [candlesUpdatedAt, setCandlesUpdatedAt] = useState<number | null>(null);
+  useEffect(() => {
+    if (!plan) return;
+    let stopped = false;
+    const symbol = plan.instrument.symbol;
+    const tick = async () => {
+      if (document.hidden) return;
+      try {
+        const r: any = await fetchCandles({ data: { symbol } });
+        if (stopped || !r?.ok) return;
+        setPlan((prev) =>
+          prev && prev.instrument.symbol === symbol
+            ? {
+                ...prev,
+                htfCandles: r.htfCandles?.length ? r.htfCandles : prev.htfCandles,
+                ltfCandles: r.ltfCandles?.length ? r.ltfCandles : prev.ltfCandles,
+              }
+            : prev,
+        );
+        setCandlesUpdatedAt(r.at ?? Date.now());
+      } catch { /* keep last candles */ }
+    };
+    const id = setInterval(tick, 60_000);
+    tick();
+    return () => { stopped = true; clearInterval(id); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan?.instrument.symbol]);
+
   /* ---------- BACKTEST STATS (per plan) ---------- */
   const fetchBacktest = useServerFn(getBacktestStats);
   const [backtest, setBacktest] = useState<BacktestStats | null>(null);
