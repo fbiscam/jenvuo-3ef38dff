@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
+import { getSignalPlan, getNewsRisk, getChartCandles, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
 import { getBacktestStats, type BacktestStats } from "@/lib/backtest.functions";
 import { runHistoricalBacktest, type HistoricalBacktestResult } from "@/lib/backtest-historical.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
