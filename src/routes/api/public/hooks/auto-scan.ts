@@ -948,6 +948,35 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               console.error("auto-scan email enqueue failed", e);
             }
 
+            // WhatsApp fan-out to verified, opted-in paid subscribers
+            let whatsappSent = 0;
+            try {
+              const { sendSignalAlertWhatsApp } = await import(
+                "@/lib/whatsapp-alert.server"
+              );
+              const wa = await sendSignalAlertWhatsApp({
+                alertId: inserted.id,
+                pair,
+                grade,
+                direction: dir,
+                entry,
+                sl,
+                tp,
+                rr,
+                confidence: conf,
+                decimals: dec,
+                session,
+                killzone: plan.killzone ?? null,
+                htfBias: plan.htfBias ?? null,
+                rationale: `${manualMode ? "Manual scan" : "Auto-scan"} · ${plan.alignmentLabel ?? ""}`.slice(0, 500),
+              });
+              whatsappSent = wa.sent;
+            } catch (e) {
+              console.error("auto-scan whatsapp fan-out failed", e);
+            }
+
+
+
             // Ledger entry (system pool cost per broadcast)
             await supabaseAdmin.from("auto_scan_pool_ledger").insert({
               pair,
