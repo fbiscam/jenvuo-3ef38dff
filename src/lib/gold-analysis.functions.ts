@@ -3673,33 +3673,3 @@ export const getSignalPlan = createServerFn({ method: "POST" })
 
 // ICT/SMC Engine + live AI candle review. Confidence is calculated from the
 // current setup and model/regime agreement; no fixed display floor is applied.
-
-// ---------------------------------------------------------------------------
-// Lightweight chart-candle refresh. No AI, no billing, no plan cache — the
-// /signal charts poll this so the candles stay current even when the plan
-// itself is served from the 3-minute cache or a locked signal.
-// ---------------------------------------------------------------------------
-export const getChartCandles = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => {
-    const obj = (d ?? {}) as { symbol?: string };
-    return { symbol: typeof obj.symbol === "string" && obj.symbol.trim() ? obj.symbol : "XAUUSD" };
-  })
-  .handler(async ({ data }) => {
-    try {
-      const inst = resolveInstrument(data.symbol);
-      const [h4, m15] = await Promise.all([
-        fetchInstrumentCandles(inst, "4h").catch(() => [] as Candle[]),
-        fetchInstrumentCandles(inst, "15m").catch(() => [] as Candle[]),
-      ]);
-      if (h4.length < 20 && m15.length < 20) return { ok: false as const };
-      return {
-        ok: true as const,
-        htfCandles: h4.slice(-160).map(toDTO),
-        ltfCandles: m15.slice(-200).map(toDTO),
-        at: Date.now(),
-      };
-    } catch {
-      return { ok: false as const };
-    }
-  });

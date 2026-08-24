@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { getSignalPlan, getNewsRisk, getChartCandles, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
+import { getSignalPlan, getNewsRisk, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
 import { getBacktestStats, type BacktestStats } from "@/lib/backtest.functions";
 import { runHistoricalBacktest, type HistoricalBacktestResult } from "@/lib/backtest-historical.functions";
 import { askSignalAgent } from "@/lib/signal-agent.functions";
@@ -709,36 +709,6 @@ function SignalPage() {
       } catch {}
     };
     const id = setInterval(tick, 3 * 60 * 1000);
-    tick();
-    return () => { stopped = true; clearInterval(id); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plan?.instrument.symbol]);
-
-  /* ---------- LIVE CANDLE REFRESH (every 60s) ---------- */
-  const fetchCandles = useServerFn(getChartCandles);
-  const [candlesUpdatedAt, setCandlesUpdatedAt] = useState<number | null>(null);
-  useEffect(() => {
-    if (!plan) return;
-    let stopped = false;
-    const symbol = plan.instrument.symbol;
-    const tick = async () => {
-      if (document.hidden) return;
-      try {
-        const r: any = await fetchCandles({ data: { symbol } });
-        if (stopped || !r?.ok) return;
-        setPlan((prev) =>
-          prev && prev.instrument.symbol === symbol
-            ? {
-                ...prev,
-                htfCandles: r.htfCandles?.length ? r.htfCandles : prev.htfCandles,
-                ltfCandles: r.ltfCandles?.length ? r.ltfCandles : prev.ltfCandles,
-              }
-            : prev,
-        );
-        setCandlesUpdatedAt(r.at ?? Date.now());
-      } catch { /* keep last candles */ }
-    };
-    const id = setInterval(tick, 60_000);
     tick();
     return () => { stopped = true; clearInterval(id); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
