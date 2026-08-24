@@ -1533,7 +1533,7 @@ function SignalPage() {
 
 
                   {/* 30% threshold nudge */}
-                  {(isBuy || isSell) && rMultiple >= 0.6 && rMultiple < 1.0 && trackerStatus !== "WIN" && trackerStatus !== "LOSS" && (
+                  {(isBuy || isSell) && (t.confidence ?? 0) >= MIN_CONFIDENCE && rMultiple >= 0.6 && rMultiple < 1.0 && trackerStatus === "RUNNING" && (
                     <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 leading-snug">
                       <span className="mt-0.5 shrink-0">💡</span>
                       <span>
