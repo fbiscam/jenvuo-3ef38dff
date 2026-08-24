@@ -183,7 +183,24 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
       if (overlayRef.current) overlayRef.current.innerHTML = "";
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [candles, dark]);
+  }, [dark]);
+
+  // Candles refresh (live polling) — update the series in place instead of
+  // recreating the chart, so drawn markings/zones survive the update.
+  useEffect(() => {
+    const s = seriesRef.current;
+    if (!s || !candles.length) return;
+    try {
+      s.setData(candles.map((c) => ({ ...c, time: Number(c.time) as Time })));
+    } catch { return; }
+    const lastC = candles[candles.length - 1];
+    const prevC = candles[candles.length - 2];
+    if (lastC && prevC) bucketSecRef.current = Math.max(1, Number(lastC.time) - Number(prevC.time));
+    liveBarRef.current = lastC
+      ? { time: Number(lastC.time), open: lastC.open, high: lastC.high, low: lastC.low, close: lastC.close }
+      : null;
+    try { (chartRef.current as any)?.__redrawBoxes?.(); } catch { /* noop */ }
+  }, [candles]);
 
   useImperativeHandle(ref, () => ({
     updateLivePrice: (price: number, tSeconds?: number) => {
