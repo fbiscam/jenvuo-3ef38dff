@@ -218,9 +218,18 @@ function Profile() {
             <input
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm"
+              disabled={nameLocked}
+              className={[
+                "mt-1 block w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm",
+                nameLocked ? "cursor-not-allowed bg-zinc-50 text-zinc-500" : "",
+              ].join(" ")}
               placeholder="Your name"
             />
+            {nameLocked && (
+              <span className="mt-1 block text-[11px] font-normal text-zinc-500">
+                Locked — your name is verified against your identity documents. Contact support to change it.
+              </span>
+            )}
           </label>
           <label className="block text-xs font-medium text-zinc-600">
             Email
@@ -230,10 +239,11 @@ function Profile() {
               className="mt-1 block w-full cursor-not-allowed rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500"
             />
           </label>
-          <button onClick={saveProfile} disabled={saving} className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50">
+          <button onClick={saveProfile} disabled={saving || nameLocked} className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50">
             {saving ? "Saving…" : "Save changes"}
           </button>
         </div>
+
       </section>
 
       <section id="change-email" className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-white p-6">
