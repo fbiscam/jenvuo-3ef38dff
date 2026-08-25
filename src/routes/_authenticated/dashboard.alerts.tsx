@@ -587,7 +587,7 @@ function AlertPrefs() {
           {alertsLoading ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">Loading alerts…</div>
           ) : alerts.length === 0 ? (
-            <div className="px-2 py-8 text-center text-xs text-zinc-500">No alerts have fired yet. Sit tight — the scanner runs every 15 minutes.</div>
+            <div className="px-2 py-8 text-center text-xs text-zinc-500">No alerts have fired yet. Sit tight — the scanner runs every 5 minutes.</div>
           ) : (
             <>
             {/* Mobile card list */}
