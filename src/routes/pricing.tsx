@@ -218,9 +218,7 @@ function PricingPage() {
                     ? "Locked in trial"
                     : isLoggedIn
                       ? "Upgrade"
-                      : p.key === "pro"
-                        ? "Start Free Trial"
-                        : "Buy Now";
+                      : "Apply Now";
                   const to = isLoggedIn ? "/dashboard/pay" : p.anonTo;
                   return (
                   <th
