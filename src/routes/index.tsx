@@ -287,7 +287,7 @@ function HomePage() {
                     onClick={() => setMobileMenuOpen(false)}
                     className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
                   >
-                    Sign Up
+                    Apply
                   </Link>
                 </div>
               )}
@@ -316,7 +316,7 @@ function HomePage() {
                 to={isAuthed ? "/app" : "/founding"}
                 className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
               >
-                {isAuthed ? "Launch Voice Agent" : "Start 14 days trial"}
+                {isAuthed ? "Launch Voice Agent" : "Apply for access"}
                 <br className="sm:hidden" />
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
