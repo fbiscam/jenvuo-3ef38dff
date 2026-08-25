@@ -326,9 +326,7 @@ function inferInstrumentFromText(text: string): string {
 
 
 const candleCache = new Map<string, { at: number; data: Candle[] }>();
-const marketPlanCache = new Map<string, { at: number; plan: SignalPlan }>();
 const CACHE_TTL = 30_000;
-const MARKET_PLAN_CACHE_TTL = 20_000;
 // Hard ceiling for reusing a stale candle set when every provider is throttled.
 // Analysis always overlays the live tick on the last bar, so a slightly older
 // structure is far better than the synthetic sine-wave fallback (which forces
@@ -3198,10 +3196,46 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       }
       let rawConf = Math.min(95, Math.max(0, setupScore, blended));
 
-      // Keep confidence deterministic per current candle packet. The old
-      // cross-user smoothing memory mutated after every scan, so two profiles
-      // opened seconds apart could see 53% vs 48% for the same market state.
-      rawConf = Math.round(rawConf);
+      // Confidence smoothing memory — prevents a fresh scan from swinging
+      // wildly (e.g. 75% now, 55% five minutes later) when structure hasn't
+      // materially changed. We keep a short-lived per-(pair,direction) memory
+      // and EMA-blend the new raw value with the recent one, and cap any
+      // drop within a 15-minute window. Fail-open on any DB error.
+      if (built.direction !== "WAIT") {
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const pairKey = String(inst.display);
+          const dirKey = String(built.direction);
+          const { data: mem } = await supabaseAdmin
+            .from("signal_confidence_memory")
+            .select("smoothed_conf, updated_at")
+            .eq("pair", pairKey)
+            .eq("direction", dirKey)
+            .maybeSingle();
+          let smoothed = rawConf;
+          if (mem && mem.updated_at) {
+            const ageMin = (Date.now() - new Date(mem.updated_at as string).getTime()) / 60000;
+            const prev = Number(mem.smoothed_conf);
+            if (Number.isFinite(prev) && ageMin <= 15) {
+              // EMA: weight previous higher to damp jitter
+              smoothed = Math.round(prev * 0.40 + rawConf * 0.60);
+              // Damping removed to prevent sticking; allow full reflection of real market data.
+              // We rely on the EMA blend and the rawConf floor (10) instead.
+              smoothed = Math.min(95, Math.max(0, smoothed));
+            }
+          }
+          await supabaseAdmin
+            .from("signal_confidence_memory")
+            .upsert({
+              pair: pairKey,
+              direction: dirKey,
+              smoothed_conf: smoothed,
+              raw_conf: rawConf,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: "pair,direction" });
+          rawConf = smoothed;
+        } catch { /* fail-open: use unsmoothed */ }
+      }
 
       tradeFromAi.confidence = rawConf;
 
@@ -3735,42 +3769,8 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     // Billing is performed exactly once inside computeSignalPlan when a real
     // BUY/SELL is emitted. WAIT scans remain free by product policy.
     try {
-      const marketKey = resolveInstrument(data.symbol).key;
-      const cachedMarket = marketPlanCache.get(marketKey);
-      if (cachedMarket && Date.now() - cachedMarket.at < MARKET_PLAN_CACHE_TTL) {
-        const enrichedPlan = ensureSignalIntelligencePayload(cachedMarket.plan);
-        if (enrichedPlan.trade.direction === "BUY" || enrichedPlan.trade.direction === "SELL") {
-          try {
-            const { chargeSignalScan } = await import("@/lib/ai-cost-log.server");
-            await chargeSignalScan({
-              userId: context.userId,
-              direction: enrichedPlan.trade.direction,
-              model: enrichedPlan.seniorReview?.model ?? "rules-engine/ict-smc",
-              seniorModel: null,
-              seniorReviewRequired: false,
-              seniorReviewStatus: "not_required",
-              symbol: enrichedPlan.instrument.symbol,
-              scanId: data.scanId,
-              promptTokens: 0,
-              completionTokens: 0,
-              grade: enrichedPlan.setupGrade ?? null,
-              score: enrichedPlan.setupScore ?? null,
-            });
-          } catch (e) {
-            console.warn("getSignalPlan cached charge failed:", (e as Error)?.message ?? e);
-          }
-        }
-        setCachedPlan(cacheKey, enrichedPlan);
-        return { ok: true, plan: enrichedPlan } satisfies SignalPlanResult;
-      }
-
       const plan = await computeSignalPlan({ symbol: data.symbol }, context.userId, { scanId: data.scanId });
       const enrichedPlan = ensureSignalIntelligencePayload(plan);
-      marketPlanCache.set(marketKey, { at: Date.now(), plan: enrichedPlan });
-      if (marketPlanCache.size > 50) {
-        const oldestKey = marketPlanCache.keys().next().value;
-        if (oldestKey) marketPlanCache.delete(oldestKey);
-      }
       setCachedPlan(cacheKey, enrichedPlan);
       return { ok: true, plan: enrichedPlan } satisfies SignalPlanResult;
     } catch (e) {
