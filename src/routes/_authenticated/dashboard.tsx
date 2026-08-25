@@ -438,6 +438,7 @@ function useLocalHour(): number {
 
 function DashboardLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const verification = useVerification();
   const [email, setEmail] = useState<string>("");
   const [fullName, setFullName] = useState<string>(() => {
     if (typeof window === "undefined") return "";
@@ -1297,6 +1298,8 @@ function DashboardLayout() {
         <div className="h-12" />
         </>
 
+        ) : verificationLocked ? (
+          <VerificationLocked />
         ) : (
           <Outlet />
         )}
