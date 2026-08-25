@@ -11,7 +11,7 @@ const TF_MAP: Record<string, string> = {
 };
 
 type Props = {
-  /** XAU pair symbol like XAUUSD, XAUEUR, XAUGBP, XAUJPY, XAUAUD, XAUCHF. */
+  /** XAU pair symbol — XAUUSD only. */
   symbol?: string;
   /** Chart timeframe key (e.g. "15m"). */
   timeframe?: string;

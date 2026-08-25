@@ -283,8 +283,6 @@ export function normalizeQuery(text: string): string {
 
 function inferInstrumentFromText(text: string): string {
   const q = normalizeQuery(text).toUpperCase();
-  if (/\b(XAUGBP|GOLD\s*GBP|GOLD\s*POUND)\b/.test(q)) return "XAUGBP";
-  if (/\b(XAUAUD|GOLD\s*AUD)\b/.test(q)) return "XAUAUD";
   return "XAUUSD";
 }
 
@@ -1705,9 +1703,6 @@ async function resolveLiveTick(inst: ResolvedInstrument): Promise<LiveTick | nul
           if (xauUsd && xauUsd > 0) {
             const check = await assertCrossPairFxValue(inst.key, q.price, xauUsd);
             if (!check.ok) continue;
-          } else if (q.price < 10_000 && inst.key === "METAL:XAUJPY") {
-            warnCrossPairScale(inst.key, `XAU/USD guard baseline unavailable; rejecting suspicious quote ${q.price.toFixed(2)}`);
-            continue;
           }
         }
         tickCache.set(inst.key, { at: now, tick: q });
