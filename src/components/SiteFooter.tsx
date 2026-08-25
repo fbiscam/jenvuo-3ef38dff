@@ -122,11 +122,11 @@ export default function SiteFooter({ className }: { className?: string }) {
             <Link to="/" className="flex items-center gap-2.5">
               <img
                 src="/favicon.png"
-                alt="JENVU AI"
+                alt="Jenvu"
                 className="h-7 w-7 rounded object-contain"
               />
               <span className="text-zinc-900 font-semibold tracking-tight text-lg">
-                JENVU AI
+                Jenvu
               </span>
             </Link>
             <p className="text-sm text-zinc-600 leading-relaxed max-w-sm whitespace-pre-line">
