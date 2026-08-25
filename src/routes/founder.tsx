@@ -131,11 +131,10 @@ function FounderPage() {
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link
-              to="/auth"
-              search={{ mode: "signup" }}
+              to="/founding"
               className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 transition-colors"
             >
-              Start 14 days Free Trial
+              Apply for access
             </Link>
             <Link
               to="/pricing"

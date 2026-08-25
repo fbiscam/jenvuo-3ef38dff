@@ -108,9 +108,10 @@ function AuthPage() {
   const verifyRecoveryCode = useServerFn(confirmRecoveryOtp);
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
-  const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">(
-    search.mode === "signup" ? "signup" : "signin",
-  );
+  // Public sign-up is closed — access is granted through the Founding Trader
+  // Program only. `?mode=signup` no longer opens a sign-up form.
+  const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">("signin");
+
   // Exact date the 14-day Pro trial would end for someone signing up now.
   // Computed after mount so SSR and client markup match.
   const [trialEndsLabel, setTrialEndsLabel] = React.useState("in 14 days");
@@ -868,7 +869,7 @@ function AuthPage() {
                 <div className="max-w-lg lg:mx-0">
 
                   <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl lg:text-4xl">
-                    {mode === "signin" ? "Sign in to your desk." : "Create your desk."}
+                    Sign in to your desk.
                   </h1>
                   <p className="mt-2 text-sm text-zinc-600 leading-relaxed sm:text-base">
                     Voice-native institutional intelligence, on call.
@@ -893,25 +894,17 @@ function AuthPage() {
 
 
 
-                  {/* Tabs — hidden during MFA challenge */}
+                  {/* Sign-up is closed — access via Founding Trader Program */}
                   {!mfaChallenge && (
-                    <div className="mt-4 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
-                      <button
-                        type="button"
-                        onClick={() => { setMode("signin"); setErrorMsg(null); }}
-                        className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signin" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
-                      >
-                        Sign in
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
-                        className={`px-4 py-1.5 text-sm rounded-md transition ${mode === "signup" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800"}`}
-                      >
-                        Sign up
-                      </button>
+                    <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-600">
+                      Public sign-up is closed. Access is granted through the{" "}
+                      <Link to="/founding" className="font-medium text-zinc-900 underline-offset-2 hover:underline">
+                        Founding Trader Program
+                      </Link>
+                      {" "}— apply and we'll email you once your seat is approved.
                     </div>
                   )}
+
 
                   {mfaChallenge ? (
                     <form onSubmit={verifyMfa} className="mt-4 space-y-3">
@@ -1396,13 +1389,13 @@ function AuthPage() {
                       <div className="mt-4 pt-3 border-t border-zinc-100">
                         <p className="text-sm text-zinc-500 leading-relaxed">
                           New here?{" "}
-                          <button
-                            type="button"
-                            onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
+                          <Link
+                            to="/founding"
                             className="font-medium text-zinc-900 underline-offset-2 hover:underline"
                           >
-                            Start your 14-day Pro trial →
-                          </button>
+                            Apply to the Founding Trader Program →
+                          </Link>
+
                         </p>
                       </div>
 

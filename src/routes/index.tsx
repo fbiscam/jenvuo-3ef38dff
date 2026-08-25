@@ -283,12 +283,11 @@ function HomePage() {
                     Sign In
                   </Link>
                   <Link
-                    to="/auth"
-                    search={{ mode: "signup" }}
+                    to="/founding"
                     onClick={() => setMobileMenuOpen(false)}
                     className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
                   >
-                    Sign Up
+                    Apply
                   </Link>
                 </div>
               )}
@@ -314,11 +313,10 @@ function HomePage() {
             </p>
             <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
               <Link
-                to={isAuthed ? "/app" : "/auth"}
-                search={isAuthed ? undefined : { mode: "signup" }}
+                to={isAuthed ? "/app" : "/founding"}
                 className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
               >
-                {isAuthed ? "Launch Voice Agent" : "Start 14 days trial"}
+                {isAuthed ? "Launch Voice Agent" : "Apply for access"}
                 <br className="sm:hidden" />
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
@@ -705,7 +703,7 @@ function HomePage() {
                     <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Pricing Plans</span>
                   </th>
                   {[
-                    { name: "Pro", price: currentPlan === null ? "$5" : "$15", tag: "Active", accent: true, key: "pro", to: "/auth" as const, search: { mode: "signup" as const } },
+                    { name: "Pro", price: currentPlan === null ? "$5" : "$15", tag: "Active", accent: true, key: "pro", to: "/founding" as const, search: undefined },
                     { name: "Elite", price: "$50", tag: "Desk", dark: true, key: "elite", to: "/founding" as const },
                     { name: "Ultra", price: "$100", tag: "Fund / Desk+", key: "ultra", to: "/founding" as const },
                   ].map((p) => {
