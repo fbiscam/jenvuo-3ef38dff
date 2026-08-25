@@ -70,6 +70,12 @@ type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "—", "…"],
   ["DXY", "—", "…"],
+  ["US10Y", "—", "…"],
+  ["XAG/USD", "—", "…"],
+  ["EUR/USD", "—", "…"],
+  ["USD/JPY", "—", "…"],
+  ["S&P 500", "—", "…"],
+  ["WTI Oil", "—", "…"],
 ];
 
 
@@ -78,6 +84,12 @@ const INITIAL_TICKER: TickerRow[] = [
 const SYMBOL_MAP: Record<string, string> = {
   "XAU/USD": "XAUUSD",
   "DXY": "DXY",
+  "US10Y": "US10Y",
+  "XAG/USD": "XAGUSD",
+  "EUR/USD": "EURUSD",
+  "USD/JPY": "USDJPY",
+  "S&P 500": "SPX",
+  "WTI Oil": "WTI",
 };
 
 
