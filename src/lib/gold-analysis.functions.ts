@@ -3364,12 +3364,28 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       );
     }
     if (idxPD != null) {
+      // Never contradict the actual trade: a BUY narrated as "favor sells"
+      // made the plan look like the entry was on the wrong side.
+      const pdSide = inPremium ? "premium half" : "discount half";
+      const pdAdvice =
+        built.direction === "BUY"
+          ? inPremium
+            ? "buying the premium, so only a reclaim of a demand zone justifies longs"
+            : "buys are favored from discount"
+          : built.direction === "SELL"
+            ? inPremium
+              ? "sells are favored from premium"
+              : "selling the discount, so only a supply rejection justifies shorts"
+            : inPremium
+              ? "favor sells / fade rallies"
+              : "favor buys / fade dips";
       push(
         pickAiSay(/premium|discount|equilibrium/i,
-          `Equilibrium of the range is ${fmtPx(equilibrium)}. Price in the ${inPremium ? "premium half — favor sells / fade rallies" : "discount half — favor buys / fade dips"}.`),
+          `Equilibrium of the range is ${fmtPx(equilibrium)}. Price in the ${pdSide} — ${pdAdvice}.`),
         idxPD, "htf",
       );
     }
+
     if (liqM) {
       const liqPx = liqM.price ?? equilibrium;
       push(
