@@ -15,7 +15,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/profile")({
 
 function Profile() {
   const navigate = useNavigate();
+  const { verified } = useVerification();
+  const nameLocked = verified;
   const [userId, setUserId] = useState<string | null>(null);
+
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [saving, setSaving] = useState(false);
