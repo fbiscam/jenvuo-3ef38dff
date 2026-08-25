@@ -2309,33 +2309,35 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // retries), which kept manual scans hanging and made scheduled auto-scans
     // exceed the request timeout with no result at all.
     const runAiNarration = false;
-    if (runAiNarration) try {
-      const narration = await callChatCompletion({
-        models: [...MODEL_CHAIN.narration],
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-        jsonMode: true,
-        maxTokens: 1100,
-        timeoutMs: 12000,
-        deadlineMs: 16000,
-        priority: true,
-        retriesPerModel: 1,
-        stage: "signal-analysis",
-      });
-      parsed = tryParseJsonLoose(narration.content) || {};
-      __usedNarrationModel = narration.model;
-      __totalPromptTokens += narration.usage.promptTokens;
-      __totalCompletionTokens += narration.usage.completionTokens;
-      void import("@/lib/ai-cost-log.server")
-        .then((m) => m.logAiCost({ userId: __userId, stage: "signal-analysis", model: narration.model, usage: narration.usage }))
-        .catch(() => {});
-    } catch (e) {
-      console.warn(
-        "signal-analysis AI pass failed; using deterministic engine:",
-        (e as Error)?.message ?? e,
-      );
+    if (runAiNarration) {
+      try {
+        const narration = await callChatCompletion({
+          models: [...MODEL_CHAIN.narration],
+          messages: [
+            { role: "system", content: system },
+            { role: "user", content: user },
+          ],
+          jsonMode: true,
+          maxTokens: 1100,
+          timeoutMs: 12000,
+          deadlineMs: 16000,
+          priority: true,
+          retriesPerModel: 1,
+          stage: "signal-analysis",
+        });
+        parsed = tryParseJsonLoose(narration.content) || {};
+        __usedNarrationModel = narration.model;
+        __totalPromptTokens += narration.usage.promptTokens;
+        __totalCompletionTokens += narration.usage.completionTokens;
+        void import("@/lib/ai-cost-log.server")
+          .then((m) => m.logAiCost({ userId: __userId, stage: "signal-analysis", model: narration.model, usage: narration.usage }))
+          .catch(() => {});
+      } catch (e) {
+        console.warn(
+          "signal-analysis AI pass failed; using deterministic engine:",
+          (e as Error)?.message ?? e,
+        );
+      }
     }
 
 
