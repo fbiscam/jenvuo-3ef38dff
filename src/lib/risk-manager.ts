@@ -1,5 +1,5 @@
 // Risk manager: pure functions for position sizing and daily loss limits.
-// Used by signal cards, Telegram alerts, and auto-scan kill-switch gate.
+// Used by signal cards, WhatsApp alerts, and auto-scan kill-switch gate.
 //
 // XAU pairs are quoted per troy ounce. Standard contract = 100 oz / lot.
 // So $ risk per lot per unit of price move = 100 * |entry - sl| (in quote currency).

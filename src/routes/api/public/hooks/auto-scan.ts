@@ -877,7 +877,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // `userIds`). Users who disabled alerts are not in `userIds`
             // and are not charged. Idempotent via unique per-user scanId.
             //
-            // Charges MUST run before the slower email/telegram fan-out —
+            // Charges MUST run before the slower email/WhatsApp fan-out —
             // otherwise the Worker can hit its CPU/wall budget mid-scan
             // (the Auth Admin API call per recipient dominates the tail)
             // and users get the alert without being billed.

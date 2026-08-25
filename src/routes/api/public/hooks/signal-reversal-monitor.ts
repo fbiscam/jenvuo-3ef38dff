@@ -5,7 +5,7 @@ import { getLiveTick, computeSignalPlan } from "@/lib/gold-analysis.functions";
 // For each recently broadcast signal (pending paper trade in the last 4h),
 // checks live price + fresh direction. If the setup has invalidated
 // (SL hit OR fresh scan flips direction with decent conf), sends a
-// reversal alert (in-app notification + telegram + email) to the same
+// reversal alert (in-app notification + WhatsApp + email) to the same
 // paid subscribers, and auto-closes matching open trade_journal entries
 // with the current locked P/L so profit is "reserved".
 
@@ -248,72 +248,6 @@ export const Route = createFileRoute(
               }
             }
 
-            // 3) Telegram fan-out
-            let tgSent = 0;
-            try {
-              const botToken = process.env.TELEGRAM_BOT_TOKEN;
-              if (botToken && userIds.length > 0) {
-                const { data: links } = await supabaseAdmin
-                  .from("telegram_alert_links")
-                  .select("user_id, chat_id")
-                  .in("user_id", userIds)
-                  .eq("telegram_enabled", true)
-                  .not("verified_at", "is", null);
-                const rows = (links ?? []) as Array<{
-                  user_id: string;
-                  chat_id: string;
-                }>;
-                const statusLine =
-                  displayR >= 0.05
-                    ? `<b>Profit locked:</b> ${displayR.toFixed(2)}R`
-                    : displayR <= -0.05
-                      ? `<b>Loss locked:</b> ${displayR.toFixed(2)}R`
-                      : `<b>Breakeven</b>`;
-                const headline =
-                  reason === "sl_hit"
-                    ? `⚠️ Signal invalidated`
-                    : `🔄 Signal reversed`;
-                const msg = [
-                  headline,
-                  ``,
-                  `<b>${t.direction} · ${t.pair}</b>`,
-                  `Entry: <b>${entry.toFixed(2)}</b>`,
-                  `Price now: <b>${lp.toFixed(2)}</b>`,
-                  statusLine,
-                  reason === "flipped"
-                    ? `New bias confidence: <b>${Math.round(flipConf)}%</b>`
-                    : `SL was: <b>${sl.toFixed(2)}</b>`,
-                  ``,
-                  `Trade auto-closed to reserve current P/L.`,
-                ].join("\n");
-                for (const row of rows) {
-                  try {
-                    await fetch(
-                      `https://api.telegram.org/bot${botToken}/sendMessage`,
-                      {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          chat_id: row.chat_id,
-                          text: msg,
-                          parse_mode: "HTML",
-                          disable_web_page_preview: true,
-                        }),
-                      },
-                    );
-                    tgSent++;
-                  } catch {
-                    // ignore per-recipient failure
-                  }
-                }
-              }
-            } catch (e) {
-              console.warn(
-                "reversal telegram failed",
-                (e as Error)?.message,
-              );
-            }
-
             // 3b) WhatsApp fan-out — same audience, verified numbers only
             let waSent = 0;
             try {
@@ -508,7 +442,6 @@ export const Route = createFileRoute(
               reason,
               locked_r: displayR,
               notified,
-              tg_sent: tgSent,
               wa_sent: waSent,
 
               emailed,

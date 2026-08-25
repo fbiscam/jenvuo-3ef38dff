@@ -553,7 +553,7 @@ function SignalPage() {
       } else {
         setBroadcastStatus({ kind: "sent", pair: sym.toUpperCase(), conf: Math.round(conf), at: Date.now() });
         // Fire the shared auto-scan broadcast pipeline (fan-out to paid subscribers,
-        // Telegram, email, in-app) using the same gates as scheduled scans.
+        // WhatsApp, email, in-app) using the same gates as scheduled scans.
         // Runs in the background — never blocks the on-screen result.
         void triggerManualBroadcast({ data: { pair: sym.toUpperCase() } }).catch(
           (e) => console.error("manual broadcast failed", e),
@@ -1209,7 +1209,7 @@ function SignalPage() {
                           {`Broadcast sent · ${broadcastStatus.pair} · ${broadcastStatus.conf}%`}
                         </div>
                         <div className="mt-0.5 opacity-90">
-                          Alert fanned out to paid subscribers, Telegram, email, and in-app.
+                          Alert fanned out to paid subscribers, WhatsApp, email, and in-app.
                         </div>
                       </div>
                     </div>
@@ -1753,10 +1753,10 @@ function SignalPage() {
                 const dot = invalid ? "bg-rose-500" : done ? "bg-emerald-500" : "bg-emerald-500 animate-pulse";
                 const label = invalid ? "Signal invalidated" : done ? "Target reached" : "Signal still valid";
                 const detail = invalid
-                  ? `Stop-loss level (${t.sl.toFixed(plan.instrument.decimals)}) was reached — this setup is closed. An invalidation alert has been sent to WhatsApp, Telegram and email.`
+                  ? `Stop-loss level (${t.sl.toFixed(plan.instrument.decimals)}) was reached — this setup is closed. An invalidation alert has been sent to WhatsApp and email.`
                   : done
                     ? `Take-profit (${t.tp.toFixed(plan.instrument.decimals)}) was reached. Trade closed in profit.`
-                    : `Price ${livePrice ? livePrice.toFixed(plan.instrument.decimals) : "—"} is still on the right side of the stop (${t.sl.toFixed(plan.instrument.decimals)}). We re-check every 2 minutes — if the stop is hit or the bias flips, you get an instant WhatsApp / Telegram / email invalidation alert.`;
+                    : `Price ${livePrice ? livePrice.toFixed(plan.instrument.decimals) : "—"} is still on the right side of the stop (${t.sl.toFixed(plan.instrument.decimals)}). We re-check every 2 minutes — if the stop is hit or the bias flips, you get an instant WhatsApp / email invalidation alert.`;
                 return (
                   <div className={cn("rounded-lg border p-3 space-y-1.5", tone)}>
                     <div className="flex items-center gap-1.5">

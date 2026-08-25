@@ -95,7 +95,7 @@ function TvMismatchPage() {
           <div>
             <h1 className="pl-1 text-2xl font-semibold text-slate-900">TradingView Mismatch Checker</h1>
             <p className="mt-1 text-sm text-slate-500">
-              Compares our Yahoo-computed XAU/USD candles (used in Telegram signal images) against an
+              Compares our Yahoo-computed XAU/USD candles (used in signal chart images) against an
               independent live reference (gold-api spot × ECB FX) and reports drift.
             </p>
           </div>
@@ -165,7 +165,7 @@ function TvMismatchPage() {
 
         <p className="mt-4 text-xs text-slate-400">
           Reference sources: gold-api.com (XAU spot) and open.er-api.com (ECB FX rates). Small drift &lt; 0.25% is
-          normal (spot vs futures basis). Drift ≥ 0.75% indicates the Telegram chart may not match TradingView.
+          normal (spot vs futures basis). Drift ≥ 0.75% indicates our chart may not match TradingView.
         </p>
       </div>
     </div>
