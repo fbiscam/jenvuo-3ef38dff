@@ -2308,7 +2308,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // retries multiplied the worst case (3 rounds x chain-walk x per-model
     // retries), which kept manual scans hanging and made scheduled auto-scans
     // exceed the request timeout with no result at all.
-    try {
+    const runAiNarration = false;
+    if (runAiNarration) try {
       const narration = await callChatCompletion({
         models: [...MODEL_CHAIN.narration],
         messages: [
