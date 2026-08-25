@@ -509,6 +509,8 @@ export const Route = createFileRoute(
               locked_r: displayR,
               notified,
               tg_sent: tgSent,
+              wa_sent: waSent,
+
               emailed,
               trades_closed: closedTrades,
             });
