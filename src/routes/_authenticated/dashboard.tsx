@@ -934,7 +934,7 @@ function DashboardLayout() {
                       className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition
                         ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}
                         ${active
-                          ? "bg-[#EBEBEB] text-zinc-900 font-semibold"
+                          ? "bg-[#F8F8F8] text-zinc-900 font-semibold"
                           : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
                       <span
