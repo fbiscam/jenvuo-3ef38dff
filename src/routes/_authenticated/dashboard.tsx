@@ -1044,7 +1044,9 @@ function DashboardLayout() {
                     className="h-[48px] w-[48px] rounded-full object-cover [image-rendering:auto]"
                     loading="eager"
                     decoding="async"
+                    onError={() => { writeCachedAvatar(null); setAvatarUrl(null); }}
                   />
+
                 </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-60">
                 <div className="flex items-center gap-3 px-3.5 py-3">
