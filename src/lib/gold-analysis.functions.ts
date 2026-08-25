@@ -3711,7 +3711,7 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     if (!scenarioHasContent) plan.scenarios = defaultScenarios;
     const enrichedPlan = ensureSignalIntelligencePayload(plan);
 
-    // Flat per-scan billing: $0.40 only when we actually emit a BUY/SELL.
+    // Flat per-scan billing: $0.20 only when we actually emit a BUY/SELL.
     // WAIT / no-trade returns are free. MUST be awaited — Cloudflare Workers
     // cancel post-response async work, so fire-and-forget charges get dropped.
     const __scanId = billing?.scanId ?? ((globalThis as any).crypto?.randomUUID?.() ?? `scan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`);

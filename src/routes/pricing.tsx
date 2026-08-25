@@ -413,7 +413,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time top-ups that never expire. $1 top-up = $1 wallet — same as plans. Each real signal costs $0.40.</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time top-ups that never expire. $1 top-up = $1 wallet — same as plans. Each real signal costs $0.20.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -434,7 +434,7 @@ function PricingPage() {
                 <span className="text-3xl tabular-nums price-font">${p.price}</span>
                 <span className="text-xs text-zinc-500">wallet</span>
               </div>
-              <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · ~{Math.floor(p.price / 0.4)} signals</div>
+              <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · ~{Math.floor(p.price / 0.2)} signals</div>
               {signedOut ? (
                 <Link to="/founding" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
                   Buy Now
@@ -502,15 +502,15 @@ function Cell({ value, highlight }: { value: Mark; highlight?: boolean }) {
 
 function CustomTopUp({ signedOut }: { signedOut: boolean }) {
   const [amount, setAmount] = React.useState<number>(15);
-        const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
-  const estSignals = Math.floor(safe / 0.4);
+  const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
+  const estSignals = Math.floor(safe / 0.2);
   return (
     <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 sm:p-7">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
         <div>
           
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Each real signal costs $0.40. Balance never expires.</p>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Each real signal costs $0.20. Balance never expires.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center rounded-md border border-zinc-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-amber-400">

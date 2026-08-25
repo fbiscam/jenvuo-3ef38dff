@@ -137,8 +137,8 @@ const SIGNALS = [
   { pair: "XAUUSD", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
 ] as const;
 
-export type TickerRow = [string, string, string];
-export const INITIAL_TICKER: TickerRow[] = [
+type TickerRow = [string, string, string];
+const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "—", "…"],
   ["DXY", "—", "…"],
   ["US10Y", "—", "…"],
@@ -152,7 +152,7 @@ export const INITIAL_TICKER: TickerRow[] = [
 
 // Server-fn symbol map — routes through getMarketSnapshot to bypass browser
 // CORS restrictions on Yahoo Finance and return authoritative live prices.
-export const SYMBOL_MAP: Record<string, string> = {
+const SYMBOL_MAP: Record<string, string> = {
   "XAU/USD": "XAUUSD",
   "DXY": "DXY",
   "US10Y": "US10Y",
@@ -173,7 +173,7 @@ function fmtPrice(n: number): string {
 
 const TICKER_CACHE_KEY = "jenvu:ticker:v1";
 
-export function snapshotsToRows(
+function snapshotsToRows(
   results: Array<{ symbol: string; snapshot: { price: number; changePct: number | null } | null }>,
   prev: TickerRow[],
 ): TickerRow[] {

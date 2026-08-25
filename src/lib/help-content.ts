@@ -337,7 +337,7 @@ export const collections: Collection[] = [
         summary: "Free, Pro, Elite and Ultra — wallets, scan estimates and features.",
         updatedAt: "2026-07-10",
         body: [
-          { type: "p", content: "Jenvu uses a USD-wallet subscription model. Every plan comes with a monthly USD wallet — each signal scan deducts a flat $0.40 per scan. Only successful BUY / SELL scans are billed; WAIT results and errors are free." },
+          { type: "p", content: "Jenvu uses a USD-wallet subscription model. Every plan comes with a monthly USD wallet — each signal scan deducts a flat $0.20 per scan. Only successful BUY / SELL scans are billed; WAIT results and errors are free." },
 
           { type: "h2", content: "Free" },
           { type: "ul", items: [
@@ -387,7 +387,7 @@ export const collections: Collection[] = [
         summary: "Only BUY / SELL signals draw from your USD wallet.",
         updatedAt: "2026-07-10",
         body: [
-          { type: "p", content: "Scans deduct a flat $0.40 per successful BUY / SELL signal from your USD wallet. WAIT signals and errors are free." },
+          { type: "p", content: "Scans deduct a flat $0.20 per successful BUY / SELL signal from your USD wallet. WAIT signals and errors are free." },
 
           { type: "h2", content: "What counts as a scan" },
           { type: "ul", items: [

@@ -196,7 +196,7 @@ function AlertPrefs() {
       await setAlertsEnabledFn({ data: { enabled: next } });
       setAlertsOn(next);
       try { window.localStorage.setItem('jenvu_alerts_enabled', next ? '1' : '0'); } catch { /* ignore */ }
-      toast.success(next ? "Alerts enabled · $0.40 will be charged per signal" : "Alerts disabled · no charges, no notifications");
+      toast.success(next ? "Alerts enabled · $0.20 will be charged per signal" : "Alerts disabled · no charges, no notifications");
     } catch (e: any) {
       toast.error(e?.message ?? "Could not update alerts");
     } finally {
@@ -472,7 +472,7 @@ function AlertPrefs() {
                 disabled={alertsSaving}
                 className="shrink-0 h-8 w-8 inline-flex items-center justify-center rounded-lg border-0 bg-transparent hover:bg-zinc-50 transition disabled:opacity-50"
                 title={alertsOn
-                  ? "Alerts ON · $0.40 charged per signal. Click to turn off."
+                  ? "Alerts ON · $0.20 charged per signal. Click to turn off."
                   : "Alerts OFF · no notifications, no charges. Click to turn on."}
               >
                 {alertsSaving ? (
