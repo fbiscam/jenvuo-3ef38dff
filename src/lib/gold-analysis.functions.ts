@@ -2637,6 +2637,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // have short-term confirmation: LTF structure/MSS in the trade direction,
     // or a real sweep + rejection/Turtle Soup/CE reaction at the entry pocket.
     let executionVetoReason: string | null = null;
+    let sniperPendingConfirmation = false;
     // Snapshot of the trade BEFORE any execution veto. The weighted score must
     // be computed on the real setup, otherwise every vetoed pair collapses to
     // the same flat floor score (the "always 26%" bug) and confidence stops
@@ -2698,7 +2699,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         tradeFromAi.rr = 0;
         tradeFromAi.invalidation = executionVetoReason;
       }
-      const sniperPendingConfirmation = confirmations < 1 && displacement?.passed !== true;
+      sniperPendingConfirmation = confirmations < 1 && displacement?.passed !== true;
       if (sniperPendingConfirmation) {
         tradeFromAi.invalidation = "Pending confirmation: wait for displacement or an LTF rejection/MSS at the sniper entry zone.";
       }
@@ -2750,7 +2751,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const setupChecks: SetupCheck[] = scored.factors.map(f => ({
       key: f.key, label: `${f.label} (${f.weight})`, pass: f.pass, reason: f.detail,
     }));
-    if (typeof sniperPendingConfirmation !== "undefined" && sniperPendingConfirmation) {
+    if (sniperPendingConfirmation) {
       setupChecks.unshift({
         key: "sniper_pending_confirmation",
         label: "Sniper entry pending confirmation",
