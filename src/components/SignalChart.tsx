@@ -238,7 +238,6 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
           lineWidth: 1,
           lineStyle: LineStyle.Solid,
           axisLabelVisible: true,
-          title: "LAST",
         });
       } catch {}
     },
@@ -398,8 +397,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
           color = m.kind === "bullish" ? COLORS.breakerBull : COLORS.breakerBear;
           border = m.kind === "bullish" ? "#14b8a6" : "#d946ef";
         }
-        el.style.cssText = `position:absolute;background:${color};border:1px dashed ${border};border-radius:3px;pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:10px;color:${dark ? "#fff" : "#000"};padding:2px 4px;font-weight:600;`;
-        el.textContent = m.label;
+        el.style.cssText = `position:absolute;background:${color};border:1px dashed ${border};border-radius:3px;pointer-events:none;opacity:0;transition:opacity 600ms ease;`;
         overlayRef.current.appendChild(el);
         boxesRef.current.push({ marking: m, el, transient });
         (chart as any).__redrawBoxes?.();
@@ -417,8 +415,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
         const border =
           m.type === "premiumZone" ? "rgba(244,63,94,0.4)" :
           m.type === "discountZone" ? "rgba(16,185,129,0.4)" : "rgba(234,179,8,0.6)";
-        el.style.cssText = `position:absolute;background:${color};border-top:1px dashed ${border};border-bottom:1px dashed ${border};pointer-events:none;opacity:0;transition:opacity 600ms ease;font-size:9px;color:${dark ? "#fff" : "#000"};padding:1px 6px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;`;
-        el.textContent = m.label;
+        el.style.cssText = `position:absolute;background:${color};border-top:1px dashed ${border};border-bottom:1px dashed ${border};pointer-events:none;opacity:0;transition:opacity 600ms ease;`;
         overlayRef.current.appendChild(el);
         boxesRef.current.push({ marking: m, el, transient });
         (chart as any).__redrawBoxes?.();
@@ -470,20 +467,9 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
 
       const line = s.createPriceLine({
         price, color, lineWidth, lineStyle: style,
-        axisLabelVisible: true, title,
+        axisLabelVisible: false,
       });
       linesRef.current.push({ line, transient });
-
-      // Floating on-chart label so every marking is named right on the chart (like FVG/OB boxes).
-      if (overlayRef.current && Number.isFinite(price)) {
-        const lbl = document.createElement("div");
-        lbl.style.cssText = `position:absolute;pointer-events:none;font-size:10px;font-weight:700;letter-spacing:0.03em;padding:2px 6px;border-radius:3px;background:${color};color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.25);opacity:0;transition:opacity 400ms ease;white-space:nowrap;transform:translateY(-2px);`;
-        lbl.textContent = title;
-        overlayRef.current.appendChild(lbl);
-        labelsRef.current.push({ marking: m, price, color, el: lbl, transient });
-        (chart as any).__redrawBoxes?.();
-        requestAnimationFrame(() => { lbl.style.opacity = "1"; });
-      }
     },
   }));
 
