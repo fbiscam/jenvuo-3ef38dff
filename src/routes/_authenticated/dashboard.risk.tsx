@@ -55,7 +55,7 @@ function RiskPage() {
   const suggested = Math.max(0.01, Math.round(((Number(balance) * Number(riskPct)) / 100 / (stopDistExample * 100)) * 100) / 100);
 
   return (
-    <div className="h-full max-w-5xl mx-auto px-4 py-2 flex flex-col overflow-hidden" style={{ fontFamily: "Urbanist, system-ui, sans-serif" }}>
+    <div className="max-w-5xl mx-auto px-4 py-2 flex flex-col overflow-hidden h-[calc(100dvh-7rem)] max-h-[calc(100dvh-7rem)]" style={{ fontFamily: "Urbanist, system-ui, sans-serif" }}>
       <div className="mb-2">
         <h1 className="pl-1 text-lg font-semibold text-black">Risk Management</h1>
         <p className="text-xs text-gray-700 mt-0.5">
