@@ -10,11 +10,9 @@ import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions
 import { getRiskSettings } from "@/lib/risk-settings.functions";
 import { computePositionSize } from "@/lib/risk-manager";
 import { Bell, BellOff, Loader2, Send } from "lucide-react";
-import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled } from "@/lib/telegram-alert.functions";
 import { connectWhatsappAlertLink, disconnectWhatsappAlertLink, getWhatsappAlertLink, setWhatsappAlertEnabled, verifyWhatsappAlertCode } from "@/lib/whatsapp-alert.functions";
 import { cn } from "@/lib/utils";
 import { getAlertCutoff } from "@/lib/alert-cutoff";
-import userinfobotLogo from "@/assets/userinfobot.jpg.asset.json";
 import xauLogo from "@/assets/xau-gold.png.asset.json";
 import {
   AlertDialog,
@@ -102,10 +100,6 @@ function AlertPrefs() {
   const [loggingId, setLoggingId] = useState<string | null>(null);
   const getAlertsEnabledFn = useServerFn(getAlertsEnabled);
   const setAlertsEnabledFn = useServerFn(setAlertsEnabled);
-  const getTelegramLinkFn = useServerFn(getTelegramAlertLink);
-  const connectTelegramFn = useServerFn(connectTelegramAlertLink);
-  const setTelegramEnabledFn = useServerFn(setTelegramAlertEnabled);
-  const disconnectTelegramFn = useServerFn(disconnectTelegramAlertLink);
   const getRisk = useServerFn(getRiskSettings);
   const getWhatsappLinkFn = useServerFn(getWhatsappAlertLink);
   const connectWhatsappFn = useServerFn(connectWhatsappAlertLink);
@@ -115,13 +109,6 @@ function AlertPrefs() {
 
   const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
   const [alertsSaving, setAlertsSaving] = useState(false);
-  const [telegramChatId, setTelegramChatId] = useState("");
-  const [telegramLinked, setTelegramLinked] = useState(false);
-  const [telegramEnabled, setTelegramEnabled] = useState(true);
-  const [telegramVerifiedAt, setTelegramVerifiedAt] = useState<string | null>(null);
-  const [telegramError, setTelegramError] = useState<string | null>(null);
-  const [telegramSaving, setTelegramSaving] = useState(false);
-  const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false);
 
   const [whatsappPhone, setWhatsappPhone] = useState("");
   const [whatsappLinked, setWhatsappLinked] = useState(false);
@@ -134,8 +121,6 @@ function AlertPrefs() {
   const [whatsappPending, setWhatsappPending] = useState(false);
   const [whatsappSender, setWhatsappSender] = useState<string | null>(null);
 
-  const chatIdValid = /^-?\d{5,20}$/.test(telegramChatId.trim());
-  const canConnectTelegram = chatIdValid && !telegramSaving;
   const phoneValid = /^\+?\d{10,18}$/.test(whatsappPhone.trim());
   const canConnectWhatsapp = phoneValid && !whatsappSaving;
 
@@ -189,21 +174,6 @@ function AlertPrefs() {
   useEffect(() => {
     (async () => {
       try {
-        const r = await getTelegramLinkFn({});
-        setTelegramLinked(!!r.linked);
-        setTelegramChatId(r.chatId ?? "");
-        setTelegramEnabled(r.enabled !== false);
-        setTelegramVerifiedAt(r.verifiedAt ?? null);
-        setTelegramError(r.lastError ?? null);
-      } catch {
-        setTelegramError("Could not load Telegram settings");
-      }
-    })();
-  }, [getTelegramLinkFn]);
-
-  useEffect(() => {
-    (async () => {
-      try {
         const r = await getWhatsappLinkFn({});
         setWhatsappLinked(!!r.linked);
         setWhatsappPhone(r.phoneNumber ?? "");
@@ -233,56 +203,6 @@ function AlertPrefs() {
       setAlertsSaving(false);
     }
   }, [alertsOn, alertsSaving, setAlertsEnabledFn]);
-
-  const connectTelegram = useCallback(async () => {
-    if (!canConnectTelegram) return;
-    setTelegramSaving(true);
-    setTelegramError(null);
-    try {
-      const r = await connectTelegramFn({ data: { chatId: telegramChatId.trim() } });
-      setTelegramLinked(true);
-      setTelegramEnabled(true);
-      setTelegramVerifiedAt(new Date().toISOString());
-      setTelegramChatId(r.chatId);
-      toast.success("Telegram connected", { description: "A test message was sent to your chat." });
-    } catch (e: any) {
-      const message = e?.message ?? "Could not connect Telegram";
-      setTelegramError(message);
-      toast.error("Telegram connect failed", { description: message });
-    } finally {
-      setTelegramSaving(false);
-    }
-  }, [canConnectTelegram, connectTelegramFn, telegramChatId]);
-
-  const toggleTelegram = useCallback(async (enabled: boolean) => {
-    setTelegramEnabled(enabled);
-    try {
-      await setTelegramEnabledFn({ data: { enabled } });
-      toast.success(enabled ? "Telegram alerts enabled" : "Telegram alerts disabled");
-    } catch (e: any) {
-      setTelegramEnabled(!enabled);
-      toast.error(e?.message ?? "Could not update Telegram");
-    }
-  }, [setTelegramEnabledFn]);
-
-  const disconnectTelegram = useCallback(async () => {
-    setTelegramSaving(true);
-    setTelegramError(null);
-    try {
-      await disconnectTelegramFn({});
-      setTelegramLinked(false);
-      setTelegramEnabled(true);
-      setTelegramVerifiedAt(null);
-      setTelegramChatId("");
-      toast.success("Telegram disconnected", { description: "You will no longer receive alerts on Telegram." });
-    } catch (e: any) {
-      const message = e?.message ?? "Could not disconnect Telegram";
-      setTelegramError(message);
-      toast.error("Telegram disconnect failed", { description: message });
-    } finally {
-      setTelegramSaving(false);
-    }
-  }, [disconnectTelegramFn]);
 
   const connectWhatsapp = useCallback(async () => {
     if (!canConnectWhatsapp) return;
@@ -781,112 +701,6 @@ function AlertPrefs() {
           <div className="rounded-xl border border-zinc-100 p-3">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <div className="text-sm font-medium text-zinc-900">Telegram alerts</div>
-                <div className="text-xs text-zinc-500">
-                  {telegramLinked
-                    ? `Connected to chat ${telegramChatId || "—"}`
-                    : "Open @Jenvu_Bot on Telegram and tap Start, then paste your numeric chat ID below."}
-                </div>
-                {telegramVerifiedAt && <div className="mt-1 text-[11px] text-emerald-600">Verified {formatVerifiedAt(telegramVerifiedAt)}</div>}
-              </div>
-              <div className="flex flex-wrap items-center gap-2 sm:flex-shrink-0">
-                <a
-                  href="https://t.me/userinfobot"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
-                >
-                  <img src={userinfobotLogo.url} alt="Userinfobot" className="h-4 w-4 rounded-full object-cover" />
-                  Open @userinfobot
-                </a>
-                <a
-                  href="https://t.me/Jenvu_Bot"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-50"
-                >
-                  <svg viewBox="0 0 240 240" className="h-4 w-4" aria-hidden="true">
-                    <defs>
-                      <linearGradient id="tg-grad" x1="120" y1="0" x2="120" y2="240" gradientUnits="userSpaceOnUse">
-                        <stop offset="0" stopColor="#2AABEE" />
-                        <stop offset="1" stopColor="#229ED9" />
-                      </linearGradient>
-                    </defs>
-                    <circle cx="120" cy="120" r="120" fill="url(#tg-grad)" />
-                    <path fill="#fff" d="M53.6 116.7c34.9-15.2 58.2-25.2 69.9-30.1 33.3-13.8 40.2-16.2 44.7-16.3 1 0 3.2.2 4.7 1.4 1.2 1 1.5 2.3 1.7 3.3.2 1 .4 3.2.2 4.9-1.8 19.4-9.9 66.5-14 88.2-1.7 9.2-5.1 12.3-8.4 12.6-7.2.7-12.6-4.7-19.5-9.2-10.8-7.1-16.9-11.5-27.4-18.4-12.1-8-4.3-12.4 2.7-19.6 1.8-1.9 33.6-30.8 34.2-33.4.1-.3.1-1.5-.6-2.1-.7-.6-1.7-.4-2.5-.2-1.1.2-18.5 11.8-52.4 34.6-5 3.4-9.5 5.1-13.5 5-4.4-.1-13-2.5-19.3-4.6-7.8-2.5-14-3.9-13.5-8.2.3-2.3 3.4-4.6 9-6.9z" />
-                  </svg>
-                  Open Telegram
-                </a>
-                {telegramLinked && (
-                  <button
-                    type="button"
-                    onClick={() => toggleTelegram(!telegramEnabled)}
-                    className={cn(
-                      "rounded-full px-3 py-1.5 text-xs font-semibold transition",
-                      telegramEnabled ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700",
-                    )}
-                  >
-                    {telegramEnabled ? "ON" : "OFF"}
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <input
-                type="text"
-                inputMode="numeric"
-                value={telegramChatId}
-                onChange={(e) => setTelegramChatId(e.target.value.replace(/[^\d-]/g, ""))}
-                placeholder="Chat ID (e.g. 123456789)"
-                className={cn(
-                  "min-w-0 flex-1 sm:flex-none sm:w-56 rounded-lg border px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200",
-                  telegramChatId && !chatIdValid ? "border-rose-200 bg-rose-50" : "border-zinc-200 bg-white",
-                )}
-              />
-              {telegramLinked && (
-                <button
-                  type="button"
-                  onClick={() => setDisconnectConfirmOpen(true)}
-                  disabled={telegramSaving}
-                  className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50"
-                >
-                  Disconnect
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={connectTelegram}
-                disabled={!canConnectTelegram}
-                className={cn(
-                  "inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-semibold transition",
-                  canConnectTelegram
-                    ? "border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
-                    : "cursor-not-allowed border-zinc-200 bg-white text-zinc-400",
-                )}
-              >
-                {telegramSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                {telegramLinked ? "Reconnect" : "Connect"}
-              </button>
-            </div>
-            {!telegramLinked && (
-            <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-3" style={{ fontFamily: '"Google Sans", "Product Sans", system-ui, sans-serif' }}>
-              <div className="text-xs font-semibold text-zinc-900">Where do I get my Chat ID?</div>
-              <ol className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-zinc-700">
-                <li><span className="font-semibold">1.</span> Tap the blue button above to open <span className="font-mono text-zinc-900">@Jenvu_Bot</span> and press <span className="font-semibold">Start</span> (required — otherwise the bot cannot message you).</li>
-                <li><span className="font-semibold">2.</span> In Telegram, search for <span className="font-mono text-zinc-900">@userinfobot</span> and press <span className="font-semibold">Start</span> in that chat as well.</li>
-                <li><span className="font-semibold">3.</span> It will instantly send you your <span className="font-mono text-zinc-900">Id</span> — a numeric value like <span className="font-mono">123456789</span>.</li>
-                <li><span className="font-semibold">4.</span> Copy that number, paste it into the field above and press <span className="font-semibold">Connect</span> — a test message will arrive right away.</li>
-              </ol>
-              <div className="mt-2 text-[11px] text-zinc-500">Note: The Chat ID is numbers only. A username like <span className="font-mono">@haseeb</span> will not work here.</div>
-            </div>
-            )}
-            {whatsappError && <div className="mt-2 text-[11px] text-rose-600">{whatsappError}</div>}
-          </div>
-
-          <div className="rounded-xl border border-zinc-100 p-3">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
                 <div className="text-sm font-medium text-zinc-900">WhatsApp alerts</div>
                 <div className="text-xs text-zinc-500">
                   {whatsappLinked
@@ -1073,31 +887,6 @@ function AlertPrefs() {
       <div className="flex justify-end text-xs text-zinc-400">
         {saving ? "Saving…" : "Changes are saved automatically"}
       </div>
-
-      <AlertDialog open={disconnectConfirmOpen} onOpenChange={setDisconnectConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Disconnect Telegram alerts?</AlertDialogTitle>
-            <AlertDialogDescription>
-              You'll stop receiving signal alerts and confirmations on Telegram. You can reconnect anytime by pasting your Chat ID again.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={telegramSaving}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={telegramSaving}
-              onClick={async (e) => {
-                e.preventDefault();
-                await disconnectTelegram();
-                setDisconnectConfirmOpen(false);
-              }}
-              className="bg-rose-600 text-white hover:bg-rose-700"
-            >
-              {telegramSaving ? "Disconnecting…" : "Disconnect"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
     </UpgradeOverlay>
   );
