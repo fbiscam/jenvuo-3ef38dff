@@ -581,17 +581,16 @@ function DashboardLayout() {
         const path = (data as { avatar_url?: string | null } | null)?.avatar_url;
         if (!path) {
           setAvatarUrl(null);
-          try { localStorage.removeItem("jenvu:profile:avatarUrl"); } catch {}
+          writeCachedAvatar(null);
           return;
         }
-        const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
-        if (!cancelled) {
-          setAvatarUrl(signed?.signedUrl ?? null);
-          try {
-            if (signed?.signedUrl) localStorage.setItem("jenvu:profile:avatarUrl", signed.signedUrl);
-          } catch {}
+        const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, AVATAR_TTL_SECONDS);
+        if (!cancelled && signed?.signedUrl) {
+          setAvatarUrl(signed.signedUrl);
+          writeCachedAvatar(signed.signedUrl);
         }
       });
+
 
       const days = RANGE_DAYS[range];
       const since = days != null ? new Date(Date.now() - days * 24 * 3600 * 1000).toISOString() : null;
