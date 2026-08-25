@@ -126,7 +126,7 @@ export default function SiteFooter({ className }: { className?: string }) {
                 className="h-7 w-7 rounded object-contain"
               />
               <span className="text-zinc-900 font-semibold tracking-tight text-lg">
-                Jenvu
+                Jenvu AI
               </span>
             </Link>
             <p className="text-sm text-zinc-600 leading-relaxed max-w-sm whitespace-pre-line">
