@@ -169,7 +169,13 @@ function AdminDocumentsPage() {
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <div className="text-sm font-semibold text-zinc-900">{row.full_name}</div>
+                  {row.profile_full_name && row.profile_full_name.trim() && (
+                    <div className="text-[11px] text-zinc-600">
+                      Profile name: <span className="text-zinc-900 font-medium">{row.profile_full_name}</span>
+                    </div>
+                  )}
                   <div className="text-xs text-zinc-500">{row.email}</div>
+
                   <div className="text-[11px] text-zinc-500 mt-1">
                     Plan requested: <span className="text-zinc-700 uppercase">{row.requested_plan || "—"}</span> ·
                     Submitted{" "}
