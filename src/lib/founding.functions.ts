@@ -1104,6 +1104,7 @@ export type AdminDocSubmission = {
   application_id: string;
   email: string;
   full_name: string;
+  profile_full_name: string | null;
   requested_plan: string | null;
   status: string;
   document_status: string;
@@ -1115,6 +1116,7 @@ export type AdminDocSubmission = {
   documents_info_requested_at: string | null;
   files: FoundingDocFile[];
 };
+
 
 export const adminListDocumentSubmissions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
