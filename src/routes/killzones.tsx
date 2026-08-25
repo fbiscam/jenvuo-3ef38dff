@@ -140,8 +140,6 @@ function statusFor(profile: PairProfile, now: Date) {
 
 function KillzonesPage() {
   const navigate = useNavigate();
-  const currentPlan = useCurrentPlan();
-  const isFreePlan = currentPlan === "free";
   const [now, setNow] = useState<Date | null>(null);
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<(typeof CATEGORIES)[number]>("All");
@@ -349,13 +347,6 @@ function KillzonesPage() {
                       <button
                         key={profile.key}
                         onClick={() => {
-                          if (locked) {
-                            toast.info("Multi-pair analysis is a Pro feature", {
-                              description: "Free plan is limited to XAU/USD. Upgrade to unlock all XAU cross-pairs.",
-                              action: { label: "Upgrade", onClick: () => navigate({ to: "/pricing" }) },
-                            });
-                            return;
-                          }
                           navigate({ to: "/signal", search: { symbol: profile.key } as never });
                         }}
                         className={`group text-left rounded-[22px] border p-4 ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 ${
