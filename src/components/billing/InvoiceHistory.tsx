@@ -87,10 +87,20 @@ async function embedGoogleSans(doc: JsPDF) {
 export default function InvoiceHistory() {
   const listFn = useServerFn(listMyOrders);
   const [email, setEmail] = useState<string>("");
+  const [fullName, setFullName] = useState<string>("");
   const [busy, setBusy] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
+    supabase.auth.getUser().then(async ({ data }) => {
+      setEmail(data.user?.email ?? "");
+      if (!data.user) return;
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", data.user.id)
+        .maybeSingle();
+      setFullName(prof?.full_name ?? "");
+    });
   }, []);
 
   const { data } = useQuery({
@@ -121,144 +131,138 @@ export default function InvoiceHistory() {
       const bonus = Number(o.bonus_usd);
       const credit = Number(o.credit_usd);
 
-      // Clean white background, no heavy band.
-      let y = 56;
-
-      // Logo + brand
+      // ── Header: big INVOICE title left, company block + logo right ──────
       if (logo) {
         try {
-          doc.addImage(logo, "PNG", L, y, 40, 40);
+          doc.addImage(logo, "PNG", R - 34, 30, 34, 34);
         } catch {
           /* ignore */
         }
       }
-      doc.setFont(F, "semibold");
-      doc.setFontSize(20);
-      doc.setTextColor(18, 18, 18);
-      doc.text("Jenvu", L + (logo ? 52 : 0), y + 22);
+
+      doc.setFont(F, "bold");
+      doc.setFontSize(30);
+      doc.setTextColor(17, 17, 17);
+      doc.text("INVOICE", L, 108);
 
       doc.setFont(F, "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.text("jenvu.com · support@jenvu.net", L + (logo ? 52 : 0), y + 40);
-
-      // Invoice title
-      doc.setFont(F, "semibold");
-      doc.setFontSize(15);
-      doc.setTextColor(18, 18, 18);
-      doc.text("INVOICE", R, y + 12, { align: "right" });
-      doc.setFont(F, "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.text(`${invoiceNo(o)} · ${date}`, R, y + 30, { align: "right" });
-
-      y = 130;
-
-      // From / To cards
-      doc.setDrawColor(235, 235, 235);
-      doc.setFillColor(252, 252, 252);
-      doc.roundedRect(L, y, 210, 74, 8, 8, "F");
-      doc.roundedRect(L + 230, y, 210, 74, 8, 8, "F");
-
-      doc.setFont(F, "semibold");
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text("BILLED TO", L + 14, y + 18);
-      doc.text("PAYMENT METHOD", L + 244, y + 18);
-
-      doc.setFont(F, "medium");
+      doc.setFontSize(13);
+      doc.setTextColor(17, 17, 17);
+      doc.text("Jenvu", R, 96, { align: "right" });
       doc.setFontSize(10);
-      doc.setTextColor(30, 30, 30);
-      doc.text(email || "Account holder", L + 14, y + 38);
-      doc.text(`${net.asset} on ${net.chain}`, L + 244, y + 38);
+      doc.setTextColor(60, 60, 60);
+      doc.text("jenvu.com · support@jenvu.net", R, 116, { align: "right" });
+      doc.text("Florida, United States", R, 131, { align: "right" });
+
+      // ── Grey band: invoice for (left) / meta (right) ─────────────────────
+      const bandY = 172;
+      const bandH = 152;
+      doc.setFillColor(226, 232, 238);
+      doc.rect(0, bandY, W, bandH, "F");
 
       doc.setFont(F, "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(120, 120, 120);
-      doc.text("Jenvu account credit top-up", L + 14, y + 54);
+      doc.setFontSize(10);
+      doc.setTextColor(40, 40, 40);
+      doc.text("Invoice for", L, bandY + 34);
+
+      doc.setFontSize(16);
+      doc.setTextColor(17, 17, 17);
+      doc.text(fullName || email || "Account holder", L, bandY + 72);
+
+      doc.setFontSize(10);
+      doc.setTextColor(50, 50, 50);
+      doc.text(email || "—", L, bandY + 100);
+      doc.text("Jenvu account credit top-up", L, bandY + 116);
+
+      const metaLabelX = R - 250;
+      const metaValueX = R - 230;
+      const metaRows: [string, string][] = [
+        ["Invoice number", invoiceNo(o)],
+        ["Invoice date", date],
+        ["Payment method", `${net.asset} on ${net.chain}`],
+      ];
       if (o.tx_hash) {
-        doc.text(`Tx ${o.tx_hash.slice(0, 24)}${o.tx_hash.length > 24 ? "…" : ""}`, L + 244, y + 54);
+        metaRows.push([
+          "Transaction",
+          `${o.tx_hash.slice(0, 18)}${o.tx_hash.length > 18 ? "…" : ""}`,
+        ]);
       }
+      let my = bandY + 52;
+      metaRows.forEach(([label, value]) => {
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        doc.text(label, metaLabelX, my, { align: "right" });
+        doc.setTextColor(17, 17, 17);
+        doc.text(value, metaValueX, my);
+        my += 22;
+      });
 
-      y = 232;
+      // ── Line item table ─────────────────────────────────────────────────
+      let y = bandY + bandH + 48;
+      doc.setFont(F, "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(17, 17, 17);
+      doc.text("Date", L, y);
+      doc.text("Description", L + 250, y);
+      doc.text("Total amount in (USD $)", R, y, { align: "right" });
 
-      // Line items
-      doc.setFont(F, "semibold");
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text("DESCRIPTION", L, y);
-      doc.text("AMOUNT", R, y, { align: "right" });
       y += 14;
-      doc.setDrawColor(235, 235, 235);
+      doc.setDrawColor(30, 30, 30);
+      doc.setLineWidth(1);
       doc.line(L, y, R, y);
 
       doc.setFont(F, "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(30, 30, 30);
-      y += 26;
-      doc.text("Account credit top-up", L, y);
+      doc.setFontSize(11);
+      y += 30;
+      doc.text(date, L, y);
+      doc.text("Account credit top-up", L + 250, y);
       doc.text(`$${paid.toFixed(2)}`, R, y, { align: "right" });
 
       if (bonus > 0) {
-        y += 22;
-        doc.setTextColor(100, 100, 100);
-        doc.text(`Bonus credit${o.promo_code ? ` (${o.promo_code})` : ""}`, L, y);
+        y += 26;
+        doc.text(date, L, y);
+        doc.text(`Bonus credit${o.promo_code ? ` (${o.promo_code})` : ""}`, L + 250, y);
         doc.text(`$${bonus.toFixed(2)}`, R, y, { align: "right" });
       }
 
-      y += 28;
+      y += 24;
       doc.line(L, y, R, y);
 
-      // Totals
-      y += 20;
+      // ── Total ───────────────────────────────────────────────────────────
+      y += 34;
       doc.setFont(F, "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.text("Amount paid", R - 130, y, { align: "right" });
-      doc.setFont(F, "semibold");
       doc.setFontSize(12);
-      doc.setTextColor(18, 18, 18);
-      doc.text(`$${paid.toFixed(2)} USD`, R, y, { align: "right" });
+      doc.setTextColor(17, 17, 17);
+      doc.text("Total", R - 160, y, { align: "right" });
+      doc.text(`$${paid.toFixed(2)}`, R, y, { align: "right" });
 
-      y += 22;
-      doc.setFont(F, "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.text("Credited to balance", R - 130, y, { align: "right" });
-      doc.setFont(F, "bold");
-      doc.setFontSize(11);
-      doc.setTextColor(16, 122, 76);
-      doc.text(`$${credit.toFixed(2)} USD`, R, y, { align: "right" });
+      y += 26;
+      doc.setFontSize(10);
+      doc.setTextColor(80, 80, 80);
+      doc.text("Credited to balance", R - 160, y, { align: "right" });
+      doc.text(`$${credit.toFixed(2)}`, R, y, { align: "right" });
 
-      // Paid badge
-      y += 48;
-      doc.setFillColor(240, 249, 244);
-      doc.roundedRect(L, y - 14, 72, 26, 10, 10, "F");
-      doc.setFont(F, "bold");
-      doc.setFontSize(9);
-      doc.setTextColor(16, 122, 76);
-      doc.text("PAID", L + 36, y + 2, { align: "center" });
-
-      // Footer
+      // ── Footer ──────────────────────────────────────────────────────────
       const H = doc.internal.pageSize.getHeight();
-      y = H - 78;
-      doc.setDrawColor(235, 235, 235);
-      doc.line(L, y, R, y);
-      doc.setFont(F, "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
+      doc.setFontSize(9);
+      doc.setTextColor(140, 140, 140);
       doc.text(
-        "Thank you for your payment. Credits are applied to your Jenvu account balance immediately after approval.",
+        "Paid in full. Credits are applied to your Jenvu account balance immediately after approval.",
         L,
-        y + 22,
+        H - 64,
       );
-      doc.text("support@jenvu.net · This invoice was generated electronically and is valid without signature.", L, y + 38);
+      doc.text(
+        "support@jenvu.net · This invoice was generated electronically and is valid without signature.",
+        L,
+        H - 48,
+      );
 
       doc.save(`${invoiceNo(o)}.pdf`);
     } finally {
       setBusy(null);
     }
   }
+
 
   return (
     <section className="rounded-2xl border border-zinc-200 bg-white p-5">
