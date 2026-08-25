@@ -17,6 +17,7 @@ import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
 import { getDefaultAvatar } from "@/lib/default-avatar";
+import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
 
 
 import {
@@ -442,10 +443,8 @@ function DashboardLayout() {
     if (typeof window === "undefined") return "";
     return localStorage.getItem("jenvu:profile:fullName") ?? "";
   });
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem("jenvu:profile:avatarUrl");
-  });
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(() => readCachedAvatar());
+
 
   const [counts, setCounts] = useState<Counts>({ saved: 0, alerts7d: 0, journalWinRate: null, journalTotal: 0, closedWins: 0, closedDecided: 0, openTrades: [] });
   const [newCounts, setNewCounts] = useState<{ saved: number; alerts7d: number; journalTotal: number }>({ saved: 0, alerts7d: 0, journalTotal: 0 });
@@ -582,17 +581,16 @@ function DashboardLayout() {
         const path = (data as { avatar_url?: string | null } | null)?.avatar_url;
         if (!path) {
           setAvatarUrl(null);
-          try { localStorage.removeItem("jenvu:profile:avatarUrl"); } catch {}
+          writeCachedAvatar(null);
           return;
         }
-        const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
-        if (!cancelled) {
-          setAvatarUrl(signed?.signedUrl ?? null);
-          try {
-            if (signed?.signedUrl) localStorage.setItem("jenvu:profile:avatarUrl", signed.signedUrl);
-          } catch {}
+        const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, AVATAR_TTL_SECONDS);
+        if (!cancelled && signed?.signedUrl) {
+          setAvatarUrl(signed.signedUrl);
+          writeCachedAvatar(signed.signedUrl);
         }
       });
+
 
       const days = RANGE_DAYS[range];
       const since = days != null ? new Date(Date.now() - days * 24 * 3600 * 1000).toISOString() : null;
@@ -647,14 +645,15 @@ function DashboardLayout() {
           const path = row.avatar_url;
           if (!path) {
             setAvatarUrl(null);
-            try { localStorage.removeItem("jenvu:profile:avatarUrl"); } catch {}
+            writeCachedAvatar(null);
           } else {
-            const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+            const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, AVATAR_TTL_SECONDS);
             if (signed?.signedUrl) {
               setAvatarUrl(signed.signedUrl);
-              try { localStorage.setItem("jenvu:profile:avatarUrl", signed.signedUrl); } catch {}
+              writeCachedAvatar(signed.signedUrl);
             }
           }
+
         },
       )
       .subscribe();
@@ -1045,7 +1044,9 @@ function DashboardLayout() {
                     className="h-[48px] w-[48px] rounded-full object-cover [image-rendering:auto]"
                     loading="eager"
                     decoding="async"
+                    onError={() => { writeCachedAvatar(null); setAvatarUrl(null); }}
                   />
+
                 </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-60">
                 <div className="flex items-center gap-3 px-3.5 py-3">

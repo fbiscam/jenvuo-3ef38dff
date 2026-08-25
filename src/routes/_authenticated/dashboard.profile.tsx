@@ -6,6 +6,7 @@ import { deleteMyAccount } from "@/lib/delete-account.functions";
 import { requestEmailChange } from "@/lib/email-change.functions";
 import { getMyMailAddress } from "@/lib/mail.functions";
 import AvatarAdjuster from "@/components/AvatarAdjuster";
+import { writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: Profile,
@@ -32,10 +33,12 @@ function Profile() {
   const [mailAddress, setMailAddress] = useState<string | null>(null);
 
   const refreshAvatarUrl = async (path: string | null) => {
-    if (!path) { setAvatarUrl(null); return; }
-    const { data } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+    if (!path) { setAvatarUrl(null); writeCachedAvatar(null); return; }
+    const { data } = await supabase.storage.from("avatars").createSignedUrl(path, AVATAR_TTL_SECONDS);
     setAvatarUrl(data?.signedUrl ?? null);
+    writeCachedAvatar(data?.signedUrl ?? null);
   };
+
 
   useEffect(() => {
     (async () => {
