@@ -69,6 +69,7 @@ function DocumentsPage() {
   });
 
   const rejected = row?.document_status === "rejected";
+  const isVerified = row?.document_status === "verified";
   const needsInfo = row?.document_status === "needs_info";
   const currentIdx = rejected || needsInfo ? 0 : statusIndex(row?.document_status);
   const canUpload =
@@ -146,10 +147,16 @@ function DocumentsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 font-['Google_Sans',_'Inter',_system-ui,_sans-serif]">
-      <div className="mb-6">
+    <div
+      className={`mx-auto max-w-3xl px-4 font-['Google_Sans',_'Inter',_system-ui,_sans-serif] ${
+        isVerified
+          ? "py-4 h-[calc(100dvh-7rem)] max-h-[calc(100dvh-7rem)] overflow-hidden flex flex-col"
+          : "py-8"
+      }`}
+    >
+      <div className={isVerified ? "mb-3" : "mb-6"}>
         <h1 className="pl-1 text-2xl font-semibold text-zinc-900 mt-1">Earning proof</h1>
-        <p className="text-sm text-zinc-600 mt-2">
+        <p className={`text-sm text-zinc-600 ${isVerified ? "mt-1" : "mt-2"}`}>
           Upload screenshots or a short recording of recent earnings — billing activates only after our team verifies your proof.
         </p>
       </div>
@@ -171,8 +178,8 @@ function DocumentsPage() {
       ) : (
         <>
           {/* Stepper */}
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-            <ol className="space-y-4">
+          <div className={`rounded-2xl border border-zinc-200 bg-white ${isVerified ? "p-4" : "p-6"}`}>
+            <ol className={isVerified ? "space-y-2" : "space-y-4"}>
               {STEPS.map((step, i) => {
                 const done = i < currentIdx || (i === currentIdx && row?.document_status === "verified");
                 const active = i === currentIdx && !rejected && !needsInfo && row?.document_status !== "verified";
@@ -196,7 +203,7 @@ function DocumentsPage() {
                         <div className={["w-px flex-1 mt-1", done ? "bg-emerald-500" : "bg-zinc-300"].join(" ")} />
                       )}
                     </div>
-                    <div className="flex-1 pb-4">
+                    <div className={`flex-1 ${isVerified ? "pb-2" : "pb-4"}`}>
                       <div className="text-sm font-semibold text-zinc-900">{step.label}</div>
                       <div className="text-xs text-zinc-600">{step.desc}</div>
                       {active && step.key === "received" && row.documents_submitted_at && (
