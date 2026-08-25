@@ -178,8 +178,8 @@ function DocumentsPage() {
       ) : (
         <>
           {/* Stepper */}
-          <div className={`rounded-2xl border border-zinc-200 bg-white p-6`}>
-            <ol className="space-y-4">
+          <div className={`rounded-2xl border border-zinc-200 bg-white ${isVerified ? "p-4" : "p-6"}`}>
+            <ol className={isVerified ? "space-y-2" : "space-y-4"}>
               {STEPS.map((step, i) => {
                 const done = i < currentIdx || (i === currentIdx && row?.document_status === "verified");
                 const active = i === currentIdx && !rejected && !needsInfo && row?.document_status !== "verified";
@@ -203,7 +203,7 @@ function DocumentsPage() {
                         <div className={["w-px flex-1 mt-1", done ? "bg-emerald-500" : "bg-zinc-300"].join(" ")} />
                       )}
                     </div>
-                    <div className={`flex-1 pb-4`}>
+                    <div className={`flex-1 ${isVerified ? "pb-2" : "pb-4"}`}>
                       <div className="text-sm font-semibold text-zinc-900">{step.label}</div>
                       <div className="text-xs text-zinc-600">{step.desc}</div>
                       {active && step.key === "received" && row.documents_submitted_at && (
