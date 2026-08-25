@@ -197,7 +197,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
         console.error('[broadcast] system-mail alerts failed:', (e as Error)?.message)
       }
 
-      // Per-recipient billing: charge $0.20 to every paid user who received
+      // Per-recipient billing: charge $0.40 to every paid user who received
       // this broadcast (mirrors auto-scan billing). Idempotent via unique
       // per-user scanId so retries never double-charge.
       try {

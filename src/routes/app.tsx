@@ -297,8 +297,8 @@ function Home() {
       if (analyzeIntent) {
         const symbol = detectSymbol(query);
         // Pre-flight low-balance guard — block before hitting the server.
-        if (!credits.isLoading && credits.balance < 0.20) {
-          const msg = `Your balance is $${credits.balance.toFixed(2)}. You need at least $0.20 to run a signal scan.`;
+        if (!credits.isLoading && credits.balance < 0.40) {
+          const msg = `Your balance is $${credits.balance.toFixed(2)}. You need at least $0.40 to run a signal scan.`;
           toast.error("Balance too low", {
             description: `${msg} Add funds to continue.`,
             action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
