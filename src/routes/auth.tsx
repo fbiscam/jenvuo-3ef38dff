@@ -897,9 +897,9 @@ function AuthPage() {
                   {/* Sign-up is closed — access via Founding Trader Program */}
                   {!mfaChallenge && (
                     <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-600">
-                      Public sign-up is closed. Access is granted through the{"\u00a0\n"}
+                      Public sign-up is closed. Access is granted through the{" "}
                       <Link to="/founding" className="font-medium text-zinc-900 underline-offset-2 hover:underline">
-                        Founding Trader Program
+                        Founding{"\n"}Trader Program
                       </Link>
                       {" "}— apply and we'll email you once your seat is approved.
                     </div>
