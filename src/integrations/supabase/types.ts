@@ -3276,6 +3276,7 @@ export type Database = {
           session_token: string
         }[]
       }
+      current_profile_plan: { Args: { _user_id: string }; Returns: string }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
