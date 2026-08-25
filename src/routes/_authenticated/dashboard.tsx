@@ -468,6 +468,13 @@ function DashboardLayout() {
   }, []);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [isAdminUser, setIsAdminUser] = useState(false);
+  // Unverified accounts may only use Dashboard, Profile, Security and Documents.
+  const verificationLocked =
+    !isAdminUser &&
+    !verification.loading &&
+    !!verification.status &&
+    !verification.verified &&
+    !isVerificationAllowedPath(pathname);
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
