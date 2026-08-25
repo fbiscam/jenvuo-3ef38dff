@@ -47,12 +47,7 @@ type Candle = { x: number; o: number; h: number; l: number; c: number }
 // For non-USD quote pairs, multiply by USD/QUOTE (or divide by QUOTE/USD).
 type CrossFx = { symbol: string; invert: boolean } | null
 const PAIR_FX: Record<string, CrossFx> = {
-  XAUUSD: null,
-  XAUEUR: { symbol: 'EURUSD=X', invert: true },   // divide by EURUSD
-  XAUGBP: { symbol: 'GBPUSD=X', invert: true },   // divide by GBPUSD
-  XAUJPY: { symbol: 'USDJPY=X', invert: false },  // multiply by USDJPY
-  XAUAUD: { symbol: 'AUDUSD=X', invert: true },   // divide by AUDUSD
-  XAUCHF: { symbol: 'USDCHF=X', invert: false },  // multiply by USDCHF
+  XAUUSD: null,   // divide by EURUSD   // divide by GBPUSD  // multiply by USDJPY   // divide by AUDUSD  // multiply by USDCHF
 }
 
 async function yahooFetch(sym: string, tf: string): Promise<{ candles: Candle[]; last: number } | null> {
