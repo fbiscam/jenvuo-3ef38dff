@@ -1078,6 +1078,7 @@ export type SignalPlan = {
   markings: Marking[];
   trade: {
     direction: "BUY" | "SELL" | "WAIT";
+    entryType?: "MARKET" | "LIMIT";
     entry: number;
     sl: number;
     tp: number;
@@ -2067,7 +2068,7 @@ export async function computeSignalPlan(
     // user sees nothing at all. Each optional stage is skipped once the budget
     // is spent, so the deterministic ICT/SMC result always renders fast.
     const __scanStartedMs = Date.now();
-    const __aiLeft = () => 34000 - (Date.now() - __scanStartedMs);
+    const __aiLeft = () => 9000 - (Date.now() - __scanStartedMs);
 
     let inst = resolveInstrument(data.symbol);
 
@@ -2548,6 +2549,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     const tradeFromAi = {
       direction: built.direction,
+      entryType: built.entryType,
       entry: roundedEntry,
       sl: roundedSl,
       tp: roundedTp,
@@ -2696,15 +2698,14 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         tradeFromAi.rr = 0;
         tradeFromAi.invalidation = executionVetoReason;
       }
-      // Strict 77% Veto: Even if directional bias exists, if we are exactly in the 
-      // 70-78 range (like yesterday's 77% losers), REQUIRE a displacement passed check.
-      // This prevents "naked" retracements from alerts unless momentum is already impulsive.
       if (confirmations < 1 && displacement?.passed !== true) {
-         // Force a WAIT state for mid-range signals lacking impulsive momentum
-         built.direction = "WAIT" as typeof built.direction;
-         built.reason = "Blocked: No impulsive displacement/LTF confirmation found for mid-range setup.";
-         tradeFromAi.direction = "WAIT";
-         tradeFromAi.invalidation = built.reason;
+        setupChecks.unshift({
+          key: "sniper_pending_confirmation",
+          label: "Sniper entry pending confirmation",
+          pass: false,
+          reason: "Limit-zone signal is visible, but auto-alert waits for displacement or LTF confirmation before broadcasting.",
+        });
+        tradeFromAi.invalidation = "Pending confirmation: wait for displacement or an LTF rejection/MSS at the sniper entry zone.";
       }
     }
 
@@ -2812,7 +2813,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __crossCheckModel: string | null = null;
     let __dsAgrees: boolean | null = null;
     let __consensus: "full" | "split" | null = null;
-    if (built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE && __aiLeft() > 9000) {
+    if (built.direction !== "WAIT" && setupScore >= 88 && __aiLeft() > 4500) {
       try {
         const xSystem = `You are an independent ICT/SMC audit desk (second opinion, different house than the primary analyst). Audit the setup ONLY against core Smart Money rules: liquidity sweep before entry, displacement creating the FVG/OB, premium/discount side correctness, HTF↔LTF alignment, zone freshness, killzone timing, and R:R sanity.
 Reply ONLY as JSON: {"agrees":true|false,"smc_score":<0-100>,"note":"<one short sentence, most important rule that passes or fails>"}`;
@@ -2829,8 +2830,8 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
           ],
           jsonMode: true,
           maxTokens: 200,
-          timeoutMs: 7000,
-          deadlineMs: 9000,
+          timeoutMs: 5000,
+          deadlineMs: 6000,
           priority: false,
           retriesPerModel: 1,
           stage: "deepseek-review",
@@ -2903,10 +2904,7 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
     // Runs whenever the rules engine produces a live BUY/SELL and the score
     // is above SENIOR_REVIEW_MIN_RULE_SCORE (62). Failure soft-fails — the
     // rules result still stands so a throttled AI provider never drops a signal.
-    __requiresSeniorReview =
-      __planAllowsSenior &&
-      built.direction !== "WAIT" &&
-      setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
+    __requiresSeniorReview = false;
 
     if (__requiresSeniorReview) {
       try {
@@ -3088,7 +3086,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
     // USD/gold news within the window. Soft-fails on any error.
     let __macroContext: SignalPlan["macroContext"] = undefined;
     const __macroShouldRun =
-      (built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null) && __aiLeft() > 7000;
+      (built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null) && setupScore >= 88 && __aiLeft() > 3500;
     if (__macroShouldRun) {
       try {
         const newsLines = upcomingNews.slice(0, 5).map((n) =>
@@ -3110,8 +3108,8 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           ],
           jsonMode: true,
           maxTokens: 160,
-          timeoutMs: 6000,
-          deadlineMs: 7000,
+          timeoutMs: 3500,
+          deadlineMs: 4500,
           priority: false,
           retriesPerModel: 1,
           stage: "macro-context",
