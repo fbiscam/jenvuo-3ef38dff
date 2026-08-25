@@ -3309,8 +3309,23 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
       return i >= 0 ? i : null;
     };
     const usedAiSays = new Set<string>();
+    // Hard guard: AI narration must never advise the opposite side of the
+    // engine's actual trade (a BUY narrated as "favor sells" reads like the
+    // entry was placed on the wrong side of the range).
+    const contradictsDirection = (text: string) => {
+      const t = text.toLowerCase();
+      if (built.direction === "BUY") {
+        return /(favor|favour|prefer|look for|bias toward|target)s?\s+(sell|short)|fade rallies|sells are favored|short setups?/.test(t);
+      }
+      if (built.direction === "SELL") {
+        return /(favor|favour|prefer|look for|bias toward|target)s?\s+(buy|long)|fade dips|buys are favored|long setups?/.test(t);
+      }
+      return false;
+    };
     const pickAiSay = (re: RegExp, fallback: string) => {
-      const hit = aiNarration.find((n) => re.test(n.say) && !usedAiSays.has(n.say));
+      const hit = aiNarration.find(
+        (n) => re.test(n.say) && !usedAiSays.has(n.say) && !contradictsDirection(n.say),
+      );
       if (hit?.say && hit.say.length > 8) {
         usedAiSays.add(hit.say);
         return hit.say;
