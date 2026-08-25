@@ -1231,9 +1231,6 @@ function SignalPage() {
                   </div>
                 </div>
               )}
-              <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case text-center pl-2">
-                ICT&nbsp; & SMC Execution Feed
-              </h3>
               {!plan && (
                 analysisError ? (
                   <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
