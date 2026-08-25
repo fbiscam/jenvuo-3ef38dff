@@ -258,7 +258,7 @@ function SignalPage() {
     try {
       await setAlertsEnabledFn({ data: { enabled: next } });
       setAlertsOn(next);
-      toast.success(next ? "Alerts enabled · $0.20 will be charged per signal" : "Alerts disabled · no charges, no notifications");
+      toast.success(next ? "Alerts enabled · $0.40 will be charged per signal" : "Alerts disabled · no charges, no notifications");
     } catch (e: any) {
       toast.error(e?.message ?? "Could not update alerts");
     } finally {
@@ -1081,8 +1081,8 @@ function SignalPage() {
             ) : (
               <button
                 onClick={load}
-                disabled={loading || (!credits.isLoading && credits.balance < 0.20)}
-                title={!credits.isLoading && credits.balance < 0.20 ? "Balance too low — add funds to run an analysis" : "Run a fresh AI analysis"}
+                disabled={loading || (!credits.isLoading && credits.balance < 0.40)}
+                title={!credits.isLoading && credits.balance < 0.40 ? "Balance too low — add funds to run an analysis" : "Run a fresh AI analysis"}
                 className="shrink-0 h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
@@ -1109,14 +1109,14 @@ function SignalPage() {
       </header>
 
 
-      {/* LOW BALANCE BANNER — blocks scan when wallet < $0.20 per-signal charge */}
-      {!credits.isLoading && credits.balance < 0.20 && (
+      {/* LOW BALANCE BANNER — blocks scan when wallet < $0.40 per-signal charge */}
+      {!credits.isLoading && credits.balance < 0.40 && (
         <div className="border-b border-red-200 bg-red-50">
           <div className="mx-auto max-w-[1600px] px-5 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-2 text-[14px] text-red-900" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
             <div className="flex items-center gap-2">
               <span className="text-[11px] px-2 py-0.5 rounded-sm bg-red-600 text-white font-normal" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif' }}>Low balance</span>
               <span>
-                Your balance is <strong className="tabular-nums">${credits.balance.toFixed(2)}</strong> — you need at least <strong>$0.20</strong> per signal scan. Add funds to continue.
+                Your balance is <strong className="tabular-nums">${credits.balance.toFixed(2)}</strong> — you need at least <strong>$0.40</strong> per signal scan. Add funds to continue.
               </span>
             </div>
             <Link to="/dashboard/billing" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[13px] font-medium text-white hover:bg-black">
@@ -1444,7 +1444,7 @@ function SignalPage() {
                               : "bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100",
                           )}
                           title={alertsOn
-                            ? "Alerts ON · $0.20 charged per signal. Click to turn off."
+                            ? "Alerts ON · $0.40 charged per signal. Click to turn off."
                             : "Alerts OFF · no notifications, no charges. Click to turn on."}
                         >
                           {alertsSaving ? (

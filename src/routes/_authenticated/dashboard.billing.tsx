@@ -261,7 +261,7 @@ function Billing() {
             {resetsAt && (
               <p className="mt-1 text-xs text-zinc-500">Next billing date: {resetsAt.toLocaleDateString()}</p>
             )}
-            <p className="mt-2 text-[12.5px] text-zinc-500">Flat $0.20 per real BUY/SELL signal, or $0.25 for premium confirmation scans. WAIT / no-trade scans are free.</p>
+            <p className="mt-2 text-[12.5px] text-zinc-500">Flat $0.40 per real BUY/SELL signal, or $0.25 for premium confirmation scans. WAIT / no-trade scans are free.</p>
           </div>
           <Link to="/dashboard/pay" className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-normal text-zinc-900 hover:bg-zinc-50">
             Add funds
