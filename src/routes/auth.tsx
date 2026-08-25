@@ -869,7 +869,7 @@ function AuthPage() {
                 <div className="max-w-lg lg:mx-0">
 
                   <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl lg:text-4xl">
-                    {mode === "signin" ? "Sign in to your desk." : "Create your desk."}
+                    Sign in to your desk.
                   </h1>
                   <p className="mt-2 text-sm text-zinc-600 leading-relaxed sm:text-base">
                     Voice-native institutional intelligence, on call.
