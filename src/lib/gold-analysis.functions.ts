@@ -176,9 +176,12 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   // never tradable setups). Used by the ticker + macro confluence panels.
   const ctx = GOLD_CORRELATED[cleaned];
   if (ctx) {
+    // Silver must carry the canonical METAL:XAGUSD key so the metal spot
+    // provider requests XAG (a CTX: key silently returned the XAU price).
+    const isSilver = cleaned === "XAGUSD" || cleaned === "SILVER";
     return {
       raw: raw || cleaned,
-      key: `CTX:${cleaned}`,
+      key: isSilver ? "METAL:XAGUSD" : `CTX:${cleaned}`,
       display: ctx.display,
       kind: ctx.kind,
       decimals: ctx.decimals,
@@ -1527,6 +1530,46 @@ async function fetchYahooQuoteViaChart(sym: string): Promise<LiveTick | null> {
   return null;
 }
 
+// Live price + true previous daily close straight from Yahoo chart meta.
+// Used by the ticker so % change is real (never derived from synthetic candles).
+const dayStatsCache = new Map<string, { at: number; stats: { price: number; prevClose: number | null } }>();
+const DAY_STATS_TTL = 15_000;
+
+async function fetchYahooDayStats(symbols: string[]): Promise<{ price: number; prevClose: number | null } | null> {
+  const cacheKey = symbols.join(",");
+  const now = Date.now();
+  const cached = dayStatsCache.get(cacheKey);
+  if (cached && now - cached.at < DAY_STATS_TTL) return cached.stats;
+  const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
+  for (const host of hosts) {
+    for (const sym of symbols) {
+      try {
+        const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?interval=5m&range=2d`;
+        const res = await fetchWithTimeout(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+        if (!res.ok) continue;
+        const j: any = await res.json();
+        const r = j?.chart?.result?.[0];
+        const meta = r?.meta;
+        let price = typeof meta?.regularMarketPrice === "number" ? meta.regularMarketPrice : null;
+        if (price == null || !isFinite(price) || price <= 0) {
+          const closes: number[] = r?.indicators?.quote?.[0]?.close ?? [];
+          for (let i = closes.length - 1; i >= 0; i--) {
+            if (typeof closes[i] === "number" && isFinite(closes[i]) && closes[i] > 0) { price = closes[i]; break; }
+          }
+        }
+        if (price == null || !isFinite(price) || price <= 0) continue;
+        const pc = typeof meta?.chartPreviousClose === "number"
+          ? meta.chartPreviousClose
+          : typeof meta?.previousClose === "number" ? meta.previousClose : null;
+        const stats = { price, prevClose: pc && isFinite(pc) && pc > 0 ? pc : null };
+        dayStatsCache.set(cacheKey, { at: now, stats });
+        return stats;
+      } catch { /* try next */ }
+    }
+  }
+  return cached?.stats ?? null;
+}
+
 async function fetchYahooQuote(symbols: string[]): Promise<LiveTick | null> {
   const hosts = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
   for (const host of hosts) {
@@ -1829,20 +1872,25 @@ export const getMarketSnapshotsBatch = createServerFn({ method: "POST" })
       data.symbols.map(async (symbol) => {
         try {
           const inst = resolveInstrument(symbol);
-          const [quote, daily] = await Promise.all([
+          const [quote, dayStats] = await Promise.all([
             resolveLiveTick(inst).catch(() => null),
-            fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]),
+            inst.yahooSymbols?.length
+              ? fetchYahooDayStats(inst.yahooSymbols).catch(() => null)
+              : Promise.resolve(null),
           ]);
-          let price: number | null = null;
-          let prevClose: number | null = null;
-          if (daily.length >= 2) {
-            price = daily[daily.length - 1].c;
-            prevClose = daily[daily.length - 2].c;
-          } else if (daily.length === 1) {
-            price = daily[0].c;
-            prevClose = daily[0].o;
+          let price: number | null = dayStats?.price ?? null;
+          let prevClose: number | null = dayStats?.prevClose ?? null;
+          if (quote?.price && isFinite(quote.price) && quote.price > 0) price = quote.price;
+          if (price == null) {
+            const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
+            if (daily.length >= 2) {
+              price = daily[daily.length - 1].c;
+              prevClose = prevClose ?? daily[daily.length - 2].c;
+            } else if (daily.length === 1) {
+              price = daily[0].c;
+              prevClose = prevClose ?? daily[0].o;
+            }
           }
-          if (quote?.price && isFinite(quote.price)) price = quote.price;
           if (price == null) return { symbol, snapshot: null };
           return {
             symbol,

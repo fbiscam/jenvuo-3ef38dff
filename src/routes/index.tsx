@@ -52,6 +52,23 @@ export const Route = createFileRoute("/")({
     ],
   }),
 
+  // Prices are fetched on the server so the ticker is already populated in the
+  // very first paint (no "—…" placeholders while the client warms up).
+  loader: async () => {
+    try {
+      const symbols = INITIAL_TICKER
+        .map(([label]) => SYMBOL_MAP[label])
+        .filter((s): s is string => !!s);
+      const res = await Promise.race([
+        getMarketSnapshotsBatch({ data: { symbols } }),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 6_000)),
+      ]);
+      if (!res?.results) return { tickerRows: INITIAL_TICKER };
+      return { tickerRows: snapshotsToRows(res.results, INITIAL_TICKER) };
+    } catch {
+      return { tickerRows: INITIAL_TICKER };
+    }
+  },
   component: HomePage,
 });
 
@@ -100,9 +117,47 @@ function fmtPrice(n: number): string {
   return n.toFixed(4);
 }
 
+const TICKER_CACHE_KEY = "jenvu:ticker:v1";
+
+function snapshotsToRows(
+  results: Array<{ symbol: string; snapshot: { price: number; changePct: number | null } | null }>,
+  prev: TickerRow[],
+): TickerRow[] {
+  const bySym = new Map(
+    results
+      .filter((r) => r.snapshot && Number.isFinite(r.snapshot.price))
+      .map((r) => [r.symbol, r.snapshot!]),
+  );
+  return prev.map(([label, price, delta]) => {
+    const sym = SYMBOL_MAP[label];
+    const d = sym ? bySym.get(sym) : undefined;
+    if (!d) return [label, price, delta] as TickerRow;
+    const sign = (d.changePct ?? 0) >= 0 ? "+" : "";
+    const deltaOut = d.changePct == null ? delta : `${sign}${d.changePct.toFixed(2)}%`;
+    return [label, fmtPrice(d.price), deltaOut] as TickerRow;
+  });
+}
+
 function useLiveTicker(): TickerRow[] {
-  const [rows, setRows] = React.useState<TickerRow[]>(INITIAL_TICKER);
+  const loaderData = Route.useLoaderData() as { tickerRows?: TickerRow[] } | undefined;
+  const [rows, setRows] = React.useState<TickerRow[]>(
+    loaderData?.tickerRows?.length ? loaderData.tickerRows : INITIAL_TICKER,
+  );
   const fetchBatch = useServerFn(getMarketSnapshotsBatch);
+
+  // Instant paint on repeat visits / client navigations.
+  React.useEffect(() => {
+    if (loaderData?.tickerRows?.length) return;
+    try {
+      const raw = sessionStorage.getItem(TICKER_CACHE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as TickerRow[];
+        if (Array.isArray(parsed) && parsed.length) setRows(parsed);
+      }
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   React.useEffect(() => {
     let alive = true;
     const symbols = INITIAL_TICKER
@@ -113,21 +168,11 @@ function useLiveTicker(): TickerRow[] {
       try {
         const res = await fetchBatch({ data: { symbols } });
         if (!alive || !res?.results) return;
-        const dataBySym = new Map(
-          res.results
-            .filter((r) => r.snapshot && Number.isFinite(r.snapshot.price))
-            .map((r) => [r.symbol, r.snapshot!]),
-        );
-        setRows((prev) =>
-          prev.map(([label, price, delta]) => {
-            const sym = SYMBOL_MAP[label];
-            const d = sym ? dataBySym.get(sym) : undefined;
-            if (!d) return [label, price, delta];
-            const sign = (d.changePct ?? 0) >= 0 ? "+" : "";
-            const deltaOut = d.changePct == null ? delta : `${sign}${d.changePct.toFixed(2)}%`;
-            return [label, fmtPrice(d.price), deltaOut];
-          }),
-        );
+        setRows((prev) => {
+          const next = snapshotsToRows(res.results, prev);
+          try { sessionStorage.setItem(TICKER_CACHE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+          return next;
+        });
       } catch {
         /* ignore */
       }
