@@ -645,14 +645,15 @@ function DashboardLayout() {
           const path = row.avatar_url;
           if (!path) {
             setAvatarUrl(null);
-            try { localStorage.removeItem("jenvu:profile:avatarUrl"); } catch {}
+            writeCachedAvatar(null);
           } else {
-            const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+            const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, AVATAR_TTL_SECONDS);
             if (signed?.signedUrl) {
               setAvatarUrl(signed.signedUrl);
-              try { localStorage.setItem("jenvu:profile:avatarUrl", signed.signedUrl); } catch {}
+              writeCachedAvatar(signed.signedUrl);
             }
           }
+
         },
       )
       .subscribe();
