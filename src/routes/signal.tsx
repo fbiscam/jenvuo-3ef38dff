@@ -1297,22 +1297,22 @@ function SignalPage() {
             <div className="lg:col-span-6 bg-white flex flex-col gap-px">
               {/* Multi-TF alignment strip */}
               {plan && (
-                <div className="bg-white px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-3 border-b border-zinc-100">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[10px] font-bold ${MONO} tracking-widest uppercase text-zinc-500 mr-1`}>
+                <div className="bg-white px-4 sm:px-5 pt-3.5 pb-2.5 flex items-center justify-between gap-3 border-b border-zinc-100">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className={`text-[11px] font-bold ${MONO} tracking-widest uppercase text-zinc-500 mr-1`}>
                       MTF
                     </span>
                     {plan.multiTf.map((b) => (
                       <TfPill key={b.tf} tfBias={b} />
                     ))}
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] ${MONO} tracking-widest uppercase text-zinc-500`}>
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <span className={`text-[11px] ${MONO} tracking-widest uppercase text-zinc-500`}>
                       {plan.alignmentLabel}
                     </span>
-                    <div className="w-24 h-1.5 bg-gradient-to-r from-rose-100 via-zinc-100 to-emerald-100 rounded-full relative overflow-hidden">
+                    <div className="w-28 h-2 bg-gradient-to-r from-rose-100 via-zinc-100 to-emerald-100 rounded-full relative overflow-hidden">
                       <div
-                        className="absolute top-1/2 -translate-y-1/2 w-2 h-3 bg-zinc-900 rounded-sm"
+                        className="absolute top-1/2 -translate-y-1/2 w-2.5 h-3.5 bg-zinc-900 rounded-sm"
                         style={{ left: `${Math.max(0, Math.min(96, plan.alignmentScore))}%` }}
                       />
                     </div>
@@ -1908,12 +1908,12 @@ function TfPill({ tfBias }: { tfBias: SignalPlan["multiTf"][number] }) {
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-semibold tracking-wider uppercase",
+        "inline-flex items-center gap-1.5 px-2 py-1 rounded border text-[11px] font-semibold tracking-wider uppercase",
         MONO, tone,
       )}
     >
       <span className="opacity-70">{tfBias.tf}</span>
-      <Icon className="h-3 w-3" />
+      <Icon className="h-3.5 w-3.5" />
       <span className="tabular-nums opacity-60">{tfBias.score}</span>
     </motion.span>
   );
