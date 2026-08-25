@@ -1741,7 +1741,35 @@ function SignalPage() {
                 </div>
               )}
 
+              {/* Setup validity — tells the user if the signal is still valid */}
+              {plan && t && t.direction !== "WAIT" && !marketClosed && (t.confidence ?? 0) >= MIN_CONFIDENCE && (() => {
+                const invalid = trackerStatus === "LOSS";
+                const done = trackerStatus === "WIN";
+                const tone = invalid
+                  ? "border-rose-200 bg-rose-50/50"
+                  : done
+                    ? "border-emerald-200 bg-emerald-50/50"
+                    : "border-emerald-200 bg-emerald-50/30";
+                const dot = invalid ? "bg-rose-500" : done ? "bg-emerald-500" : "bg-emerald-500 animate-pulse";
+                const label = invalid ? "Signal invalidated" : done ? "Target reached" : "Signal still valid";
+                const detail = invalid
+                  ? `Stop-loss level (${t.sl.toFixed(plan.instrument.decimals)}) was reached — this setup is closed. An invalidation alert has been sent to WhatsApp, Telegram and email.`
+                  : done
+                    ? `Take-profit (${t.tp.toFixed(plan.instrument.decimals)}) was reached. Trade closed in profit.`
+                    : `Price ${livePrice ? livePrice.toFixed(plan.instrument.decimals) : "—"} is still on the right side of the stop (${t.sl.toFixed(plan.instrument.decimals)}). We re-check every 2 minutes — if the stop is hit or the bias flips, you get an instant WhatsApp / Telegram / email invalidation alert.`;
+                return (
+                  <div className={cn("rounded-lg border p-3 space-y-1.5", tone)}>
+                    <div className="flex items-center gap-1.5">
+                      <span className={cn("w-1.5 h-1.5 rounded-full", dot)} />
+                      <span className="font-['Urbanist',sans-serif] text-[13px] font-semibold tracking-wide text-zinc-900">{label}</span>
+                    </div>
+                    <p className="text-[12px] leading-snug text-zinc-700">{detail}</p>
+                  </div>
+                );
+              })()}
+
               {/* Live trade tracker */}
+
               {plan && t && t.direction !== "WAIT" && !marketClosed && (t.confidence ?? 0) >= MIN_CONFIDENCE && (
                 <TradeTrackerCard
                   plan={plan}
