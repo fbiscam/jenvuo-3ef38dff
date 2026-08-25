@@ -2698,13 +2698,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         tradeFromAi.rr = 0;
         tradeFromAi.invalidation = executionVetoReason;
       }
-      if (confirmations < 1 && displacement?.passed !== true) {
-        setupChecks.unshift({
-          key: "sniper_pending_confirmation",
-          label: "Sniper entry pending confirmation",
-          pass: false,
-          reason: "Limit-zone signal is visible, but auto-alert waits for displacement or LTF confirmation before broadcasting.",
-        });
+      const sniperPendingConfirmation = confirmations < 1 && displacement?.passed !== true;
+      if (sniperPendingConfirmation) {
         tradeFromAi.invalidation = "Pending confirmation: wait for displacement or an LTF rejection/MSS at the sniper entry zone.";
       }
     }
@@ -2755,6 +2750,14 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const setupChecks: SetupCheck[] = scored.factors.map(f => ({
       key: f.key, label: `${f.label} (${f.weight})`, pass: f.pass, reason: f.detail,
     }));
+    if (typeof sniperPendingConfirmation !== "undefined" && sniperPendingConfirmation) {
+      setupChecks.unshift({
+        key: "sniper_pending_confirmation",
+        label: "Sniper entry pending confirmation",
+        pass: false,
+        reason: "Limit-zone signal is visible, but auto-alert waits for displacement or LTF confirmation before broadcasting.",
+      });
+    }
     // Add veto reasons as failed checks so the UI shows why an A+ was rejected
     for (const v of scored.vetos) {
       setupChecks.unshift({ key: `veto_${v.key}`, label: `⛔ ${v.label}`, pass: false, reason: v.reason });
