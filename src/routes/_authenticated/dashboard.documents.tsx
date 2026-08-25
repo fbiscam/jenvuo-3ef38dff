@@ -69,7 +69,6 @@ function DocumentsPage() {
   });
 
   const rejected = row?.document_status === "rejected";
-  const isVerified = row?.document_status === "verified";
   const needsInfo = row?.document_status === "needs_info";
   const currentIdx = rejected || needsInfo ? 0 : statusIndex(row?.document_status);
   const canUpload =
