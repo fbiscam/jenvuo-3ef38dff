@@ -134,6 +134,24 @@ const XAU_ALIASES: Record<string, string> = {
   GOLD: "XAUUSD", XAU: "XAUUSD", XAUUSD: "XAUUSD",
 };
 
+// Markets whose moves directly affect the XAU/USD price. These are context
+// feeds only — Jenvu still trades XAU/USD exclusively.
+const GOLD_CORRELATED: Record<
+  string,
+  { display: string; kind: InstrumentKind; decimals: number; yahooSymbols: string[] }
+> = {
+  US10Y: { display: "US10Y", kind: "index", decimals: 2, yahooSymbols: ["^TNX"] },
+  TNX: { display: "US10Y", kind: "index", decimals: 2, yahooSymbols: ["^TNX"] },
+  XAGUSD: { display: "XAG/USD", kind: "metal", decimals: 3, yahooSymbols: ["SI=F", "XAGUSD=X"] },
+  SILVER: { display: "XAG/USD", kind: "metal", decimals: 3, yahooSymbols: ["SI=F", "XAGUSD=X"] },
+  EURUSD: { display: "EUR/USD", kind: "forex", decimals: 4, yahooSymbols: ["EURUSD=X"] },
+  USDJPY: { display: "USD/JPY", kind: "forex", decimals: 3, yahooSymbols: ["JPY=X"] },
+  SPX: { display: "S&P 500", kind: "index", decimals: 2, yahooSymbols: ["ES=F", "^GSPC"] },
+  WTI: { display: "WTI Oil", kind: "index", decimals: 2, yahooSymbols: ["CL=F"] },
+  USOIL: { display: "WTI Oil", kind: "index", decimals: 2, yahooSymbols: ["CL=F"] },
+};
+
+
 export function resolveInstrument(input: string): ResolvedInstrument {
   const raw = (input || "").trim();
   const cleaned = raw.toUpperCase().replace(/[\s_\-/]/g, "");
@@ -153,6 +171,23 @@ export function resolveInstrument(input: string): ResolvedInstrument {
       needsUsdNews: false,
     };
   }
+
+  // Instruments that materially drive the XAU/USD price (context only —
+  // never tradable setups). Used by the ticker + macro confluence panels.
+  const ctx = GOLD_CORRELATED[cleaned];
+  if (ctx) {
+    return {
+      raw: raw || cleaned,
+      key: `CTX:${cleaned}`,
+      display: ctx.display,
+      kind: ctx.kind,
+      decimals: ctx.decimals,
+      yahooSymbols: ctx.yahooSymbols,
+      quote: "USD",
+      needsUsdNews: false,
+    };
+  }
+
 
   const key = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : "XAUUSD");
   const p = XAU_PAIRS[key];
