@@ -314,6 +314,38 @@ export const Route = createFileRoute(
               );
             }
 
+            // 3b) WhatsApp fan-out — same audience, verified numbers only
+            let waSent = 0;
+            try {
+              if (userIds.length > 0) {
+                const { sendSignalStatusWhatsApp } = await import(
+                  "@/lib/whatsapp-alert.server"
+                );
+                const wa = await sendSignalStatusWhatsApp({
+                  alertId: t.broadcast_alert_id,
+                  pair: t.pair,
+                  grade: (t.grade as string) ?? null,
+                  direction: t.direction,
+                  entry,
+                  sl,
+                  priceNow: lp,
+                  lockedR: displayR,
+                  decimals: 2,
+                  reason,
+                  flipConfidence: reason === "flipped" ? flipConf : null,
+                  userIds,
+                });
+                waSent = wa.sent;
+              }
+            } catch (e) {
+              console.warn(
+                "reversal whatsapp fan-out failed",
+                (e as Error)?.message,
+              );
+            }
+
+
+
             // 4) Email fan-out (plain text via queue)
             let emailed = 0;
             try {
