@@ -176,9 +176,12 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   // never tradable setups). Used by the ticker + macro confluence panels.
   const ctx = GOLD_CORRELATED[cleaned];
   if (ctx) {
+    // Silver must carry the canonical METAL:XAGUSD key so the metal spot
+    // provider requests XAG (a CTX: key silently returned the XAU price).
+    const isSilver = cleaned === "XAGUSD" || cleaned === "SILVER";
     return {
       raw: raw || cleaned,
-      key: `CTX:${cleaned}`,
+      key: isSilver ? "METAL:XAGUSD" : `CTX:${cleaned}`,
       display: ctx.display,
       kind: ctx.kind,
       decimals: ctx.decimals,
