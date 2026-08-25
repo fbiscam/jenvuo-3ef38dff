@@ -13,13 +13,13 @@ export const Route = createFileRoute("/killzones")({
       {
         name: "description",
         content:
-          "Live ICT/SMC killzone times for all XAU gold cross-pairs (XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD, XAU/CHF) — shown in UTC and your local timezone with real-time IN/OUT status.",
+          "Live ICT/SMC killzone times for XAU/USD gold — shown in UTC and your local timezone with real-time IN/OUT status.",
       },
       { property: "og:title", content: "Gold Killzone Times Tracker" },
       {
         property: "og:description",
         content:
-          "Live ICT/SMC killzone times for all XAU gold cross-pairs — shown in UTC and your local timezone with real-time IN/OUT status.",
+          "Live ICT/SMC killzone times for XAU/USD gold — shown in UTC and your local timezone with real-time IN/OUT status.",
       },
       { property: "og:url", content: "https://jenvu.com/killzones" },
       { property: "og:type", content: "website" },
@@ -36,11 +36,6 @@ type Category = "XAU";
 
 const META: Record<string, { name: string; category: Category; region: string; flag: string }> = {
   XAUUSD: { name: "Gold / US Dollar", category: "XAU", region: "London / New York", flag: "🥇" },
-  XAUEUR: { name: "Gold / Euro", category: "XAU", region: "London / Frankfurt", flag: "🇪🇺" },
-  XAUGBP: { name: "Gold / British Pound", category: "XAU", region: "London", flag: "🇬🇧" },
-  XAUJPY: { name: "Gold / Japanese Yen", category: "XAU", region: "Tokyo / London", flag: "🇯🇵" },
-  XAUAUD: { name: "Gold / Australian Dollar", category: "XAU", region: "Sydney / London", flag: "🇦🇺" },
-  XAUCHF: { name: "Gold / Swiss Franc", category: "XAU", region: "Zurich / London", flag: "🇨🇭" },
 };
 
 const CATEGORIES: (Category | "All")[] = ["All", "XAU"];
@@ -349,7 +344,7 @@ function KillzonesPage() {
                     const st = statusFor(profile, nowRef);
                     const marketOpen = now ? isMarketOpen(nowRef) : false;
 
-                    const locked = isFreePlan && profile.key !== "XAUUSD";
+                    const locked = false;
                     return (
                       <button
                         key={profile.key}
