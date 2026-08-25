@@ -1,6 +1,6 @@
 // Server-only helper: batch fetch per-user risk settings and compute
 // suggested position size for a given signal (entry/SL). Used to
-// personalize signal alerts (email, telegram, in-app) with each user's
+// personalize signal alerts (email, WhatsApp, in-app) with each user's
 // own lot size based on their account balance and risk% from
 // /dashboard/risk.
 import { supabaseAdmin } from '@/integrations/supabase/client.server'

@@ -59,7 +59,7 @@ function RiskPage() {
       <div className="mb-2">
         <h1 className="pl-1 text-lg font-semibold text-black">Risk Management</h1>
         <p className="text-xs text-gray-700 mt-0.5">
-          Position size and daily loss guard. Applies to signal cards and Telegram alerts.
+          Position size and daily loss guard. Applies to signal cards and WhatsApp alerts.
         </p>
       </div>
 

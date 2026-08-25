@@ -373,7 +373,7 @@ function FeedBody() {
       <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 text-center">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Want these signals the moment they fire?</h2>
-          <p className="mt-2 text-sm text-zinc-600">Sign in to Jenvu, upgrade a plan, and get alerts via email, browser, and Telegram.</p>
+          <p className="mt-2 text-sm text-zinc-600">Sign in to Jenvu, upgrade a plan, and get alerts via email, browser, and WhatsApp.</p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
             <Link to="/pricing" className="rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800">See pricing</Link>
             <Link to="/auth" className="rounded-full border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-800 hover:border-zinc-400">Sign in</Link>

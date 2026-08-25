@@ -25,13 +25,6 @@ export interface EnqueueAlertEmailsArgs {
 }
 
 export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promise<{ enqueued: number }> {
-  try {
-    const { sendSignalAlertTelegrams } = await import('@/lib/signal-alert-telegram.server')
-    await sendSignalAlertTelegrams(a)
-  } catch (e) {
-    console.error('telegram alert delivery failed', (e as Error)?.message)
-  }
-
   // Recipients = every active paid-plan user's email (no opt-in required).
   const { data: paidRows } = await supabaseAdmin
     .from('user_subscriptions')

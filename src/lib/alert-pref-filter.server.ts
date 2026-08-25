@@ -1,7 +1,7 @@
 // Server-only helper: filter user ids down to those who want an alert for a
 // specific signal (alerts_enabled + quiet hours + per-user grade/pair/direction filters).
 // The per-user filter columns are stored under email_grades/email_pairs/email_directions
-// for historical reasons, but now apply to ALL alert channels (browser, telegram, email).
+// for historical reasons, but now apply to ALL alert channels (browser, WhatsApp, email).
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
 
 export interface SignalFilter {
