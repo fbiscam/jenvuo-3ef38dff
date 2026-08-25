@@ -1041,64 +1041,21 @@ function DashboardLayout() {
               <span>{email || fullName}</span><span>'s Account</span>
             </h1>
             <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  className="mr-4 hidden sm:flex items-center justify-center overflow-hidden rounded-full focus:outline-none focus:ring-2 focus:ring-zinc-300"
-                  aria-label="Profile menu"
-                  title={fullName || email || "Profile"}
-                >
-                  <img
-                    src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
-                    alt={fullName || email || "Account avatar"}
-                    width={144}
-                    height={144}
-                    className="h-[48px] w-[48px] rounded-full object-cover [image-rendering:auto]"
-                    loading="eager"
-                    decoding="async"
-                    onError={() => { writeCachedAvatar(null); setAvatarUrl(null); }}
-                  />
-
-                </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-60">
-                <div className="flex items-center gap-3 px-3.5 py-3">
-                  <img
-                    src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
-                    alt={fullName || email || "Account avatar"}
-                    width={108}
-                    height={108}
-                    className="h-10 w-10 rounded-full object-cover [image-rendering:auto]"
-                    decoding="async"
-                  />
-                  <div className="min-w-0">
-                    <p className="truncate text-[14px] font-medium text-zinc-900">{fullName || "Trader"}</p>
-                    <p className="truncate text-[12px] text-zinc-500">{email || ""}</p>
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard/profile" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
-                    <User className="h-4 w-4 text-zinc-500" /> Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard/billing" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
-                    <CreditCard className="h-4 w-4 text-zinc-500" /> Billing
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard/security" className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700">
-                    <ShieldCheck className="h-4 w-4 text-zinc-500" /> Security
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={signOut}
-                  className="flex cursor-pointer items-center gap-2 text-[12px] text-zinc-700 focus:text-rose-600"
-                >
-                  <LogOut className="h-4 w-4 text-zinc-500" /> Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              <div
+                className="mr-4 hidden sm:flex items-center justify-center overflow-hidden rounded-full"
+                title={fullName || email || "Profile"}
+              >
+                <img
+                  src={avatarUrl || getDefaultAvatar(email || fullName || "anon")}
+                  alt={fullName || email || "Account avatar"}
+                  width={144}
+                  height={144}
+                  className="h-[48px] w-[48px] rounded-full object-cover [image-rendering:auto]"
+                  loading="eager"
+                  decoding="async"
+                  onError={() => { writeCachedAvatar(null); setAvatarUrl(null); }}
+                />
+              </div>
           </div>
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px] text-zinc-500" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
