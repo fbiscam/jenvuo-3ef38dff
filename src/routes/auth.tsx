@@ -1389,13 +1389,13 @@ function AuthPage() {
                       <div className="mt-4 pt-3 border-t border-zinc-100">
                         <p className="text-sm text-zinc-500 leading-relaxed">
                           New here?{" "}
-                          <button
-                            type="button"
-                            onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
+                          <Link
+                            to="/founding"
                             className="font-medium text-zinc-900 underline-offset-2 hover:underline"
                           >
-                            Start your 14-day Pro trial →
-                          </button>
+                            Apply to the Founding Trader Program →
+                          </Link>
+
                         </p>
                       </div>
 
