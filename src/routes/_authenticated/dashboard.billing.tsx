@@ -90,26 +90,6 @@ function formatModelLabel(rawModel: string | null | undefined): string {
   return bare.replace(/^gpt-/, "GPT ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-type Mark = boolean | string;
-
-const MATRIX_ROWS: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }> = [
-  { f: "Price", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
-  { f: "Wallet balance", b: "$15", c: "$50", d: "$100" },
-  { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
-  { f: "Signal latency", b: "Realtime", c: "Realtime", d: "Realtime" },
-  { f: "AI models", b: "__MODELS_PLUS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },
-  { f: "A+ signal access", b: true, c: true, d: true },
-  { f: "ICT / SMC narration", b: true, c: true, d: true },
-  { f: "Multi-timeframe bias", b: true, c: true, d: true },
-  { f: "Trade journal", b: true, c: true, d: true },
-  { f: "Email + push alerts", b: true, c: true, d: true },
-  { f: "Multi-pair scanner", b: false, c: true, d: true, badge: "new" },
-  { f: "Custom alert rules", b: false, c: true, d: true },
-  { f: "Priority desk support", b: false, c: false, d: true },
-];
-
-const PLAN_KEY_BY_COL: Record<number, string> = { 0: "pro", 1: "elite", 2: "ultra" };
-
 type BillingRow = {
   id: string;
   created_at: string;
