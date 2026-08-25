@@ -13,7 +13,7 @@ import {
 export const Route = createFileRoute("/_authenticated/dashboard/admin/documents")({
   head: () => ({
     meta: [
-      { title: "Earning proof submissions — Admin" },
+      { title: "Identity verification submissions — Admin" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -131,8 +131,8 @@ function AdminDocumentsPage() {
     <div className="mx-auto max-w-6xl px-4 py-8 font-['Google_Sans',_'Inter',_system-ui,_sans-serif]">
       <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="pl-1 text-2xl font-semibold text-zinc-900">Earning proof submissions</h1>
-          <p className="text-sm text-zinc-600 mt-1">Review uploads and approve or reject users' earning proof.</p>
+          <h1 className="pl-1 text-2xl font-semibold text-zinc-900">Identity verification submissions</h1>
+          <p className="text-sm text-zinc-600 mt-1">Review ID and driving license uploads and approve or reject users.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           {["all", "received", "pending", "needs_info", "verified", "rejected"].map((s) => (
@@ -207,28 +207,30 @@ function AdminDocumentsPage() {
                 </div>
               )}
 
-              {row.files.length === 0 ? (
+              {row.files.filter((f) => f.doc_kind !== "earning_proof").length === 0 ? (
                 <div className="mt-4 text-xs text-zinc-500 italic">No files uploaded.</div>
               ) : (
                 <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                  {row.files.map((f) => (
-                    <div key={f.id} className="space-y-1">
-                      <FilePreview file={f} />
-                      <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-700">
-                        {f.doc_kind === "identity"
-                          ? "ID verification"
-                          : f.doc_kind === "driving_license"
-                            ? "Driving license"
-                            : "Earning proof"}
+                  {row.files
+                    .filter((f) => f.doc_kind !== "earning_proof")
+                    .map((f) => (
+                      <div key={f.id} className="space-y-1">
+                        <FilePreview file={f} />
+                        <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-700">
+                          {f.doc_kind === "identity"
+                            ? "ID verification"
+                            : f.doc_kind === "driving_license"
+                              ? "Driving license"
+                              : "Document"}
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 truncate">
+                          <FileTypeIcon mime={f.mime_type} />
+                          <span className="truncate" title={f.original_name || undefined}>
+                            {f.original_name || f.storage_path.split("/").pop()}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 truncate">
-                        <FileTypeIcon mime={f.mime_type} />
-                        <span className="truncate" title={f.original_name || undefined}>
-                          {f.original_name || f.storage_path.split("/").pop()}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               )}
 

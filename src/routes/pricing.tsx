@@ -257,8 +257,8 @@ function PricingPage() {
                         aria-disabled="true"
                         title={
                           upgradeLock.reason === "docs_pending"
-                            ? "Upgrades unlock after your earning proof is verified and your 30-day trial ends."
-                            : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your earning proof is verified.`
+                            ? "Upgrades unlock after your ID and driving license are verified and your 30-day trial ends."
+                            : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your ID and driving license are verified.`
                         }
                         className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center rounded-md border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-500"
                       >

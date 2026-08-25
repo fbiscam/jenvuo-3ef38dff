@@ -15,22 +15,21 @@ import {
 } from "@/lib/founding.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/documents")({
-  head: () => ({ meta: [{ title: "Earning proof — Jenvu" }] }),
+  head: () => ({ meta: [{ title: "Identity verification — Jenvu" }] }),
   component: DocumentsPage,
 });
 
 const STEPS: { key: string; label: string; desc: string }[] = [
-  { key: "not_submitted", label: "Upload", desc: "Add screenshots or a screen-recording of your recent trading earnings." },
-  { key: "received", label: "Received", desc: "Your files are uploaded and queued for review." },
-  { key: "pending", label: "Under review", desc: "Our team is reviewing your earning proof." },
-  { key: "verified", label: "Verified", desc: "Approved — billing is now active on your account." },
+  { key: "not_submitted", label: "Upload", desc: "Add clear photos of your ID and driving license." },
+  { key: "received", label: "Received", desc: "Your documents are uploaded and queued for review." },
+  { key: "pending", label: "Under review", desc: "Our team is reviewing your identity documents." },
+  { key: "verified", label: "Verified", desc: "Approved — full platform access is now unlocked." },
 ];
 
-type DocKind = "identity" | "driving_license" | "earning_proof";
+type DocKind = "identity" | "driving_license";
 const DOC_KINDS: { key: DocKind; label: string; desc: string; required: boolean }[] = [
   { key: "identity", label: "ID verification", desc: "Passport or national ID — clear photo of the front (and back if applicable).", required: true },
   { key: "driving_license", label: "Driving license", desc: "Front side of your driving license, fully readable.", required: true },
-  { key: "earning_proof", label: "Earning proof", desc: "Optional — screenshots or a recording of recent trading earnings.", required: false },
 ];
 
 const MAX_BYTES = 100 * 1024 * 1024; // 100 MB per file
@@ -244,9 +243,9 @@ function DocumentsPage() {
 
           {rejected && (
             <div className="mt-4 rounded-2xl border border-red-200 bg-white p-5" style={{ fontFamily: '"Google Sans", "Google Sans Text", "Product Sans", Roboto, Arial, sans-serif' }}>
-              <div className="text-sm font-semibold text-red-800">Earning proof rejected</div>
+              <div className="text-sm font-semibold text-red-800">Documents rejected</div>
               <div className="text-sm text-yellow-600 mt-1">
-                {row.documents_rejected_reason || "Please re-upload clearer or more recent proof."}
+                {row.documents_rejected_reason || "Please re-upload clearer or more recent ID and driving license."}
               </div>
               {row.documents_rejected_at && (
                 <div className="text-[11px] text-black mt-2">
@@ -254,7 +253,7 @@ function DocumentsPage() {
                 </div>
               )}
               <div className="text-xs mt-3 font-medium text-black">
-                You can re-submit right away — just upload updated proof below.
+                You can re-submit right away — just upload updated ID and driving license below.
               </div>
             </div>
           )}
@@ -268,7 +267,7 @@ function DocumentsPage() {
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {DOC_KINDS.map((k) => {
-                  const uploaded = files.some((f) => (f.doc_kind || "earning_proof") === k.key);
+                  const uploaded = files.some((f) => f.doc_kind === k.key);
                   return (
                     <button
                       key={k.key}

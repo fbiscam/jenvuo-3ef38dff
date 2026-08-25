@@ -60,7 +60,7 @@ export function useUpgradeLock(): UpgradeLock {
       const trialActive = !!trialEnd && now < trialEnd;
       const docsVerified = docStatus === "verified";
 
-      // Unlocks as soon as earning proof is verified — no need to wait
+      // Unlocks as soon as identity documents are verified — no need to wait
       // for the full 30-day trial to elapse.
       const locked = !docsVerified;
       const reason: UpgradeLock["reason"] = !docsVerified ? "docs_pending" : null;
