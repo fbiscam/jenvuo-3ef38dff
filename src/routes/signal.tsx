@@ -1253,7 +1253,7 @@ function SignalPage() {
                   </div>
                 )
               )}
-              <div ref={feedScrollRef} className="space-y-3 overflow-y-auto pr-1 max-h-[520px]">
+              <div ref={feedScrollRef} className="space-y-4 overflow-y-auto pr-1 max-h-[640px]">
                 {plan?.narration.map((n, i) => {
                   const { tag, tone } = tagOf(n.say);
                   const active = i === step;
@@ -1263,28 +1263,28 @@ function SignalPage() {
                       key={i}
                       data-step={i}
                       className={cn(
-                        "px-3.5 py-3 rounded-xl border transition-all",
+                        "px-5 py-4 rounded-2xl border transition-all",
                         toneCardClass[tone],
                         active
-                          ? "shadow-[0_4px_16px_-6px_rgba(0,0,0,0.12)] ring-1 ring-zinc-900/10"
+                          ? "shadow-[0_6px_24px_-8px_rgba(0,0,0,0.14)] ring-1 ring-zinc-900/10"
                           : past
                             ? "opacity-70"
                             : "opacity-60",
                       )}
                     >
-                      <div className="flex items-center justify-between gap-3 mb-2">
-                        <span className="text-[12px] font-bold tracking-tight text-zinc-900">{sym}</span>
-                        <span className={`text-[11px] ${MONO} text-zinc-500 tabular-nums`}>{hhmmss()}</span>
+                      <div className="flex items-center justify-between gap-3 mb-3">
+                        <span className="text-[13px] font-bold tracking-tight text-zinc-900">{sym}</span>
+                        <span className={`text-[12px] ${MONO} text-zinc-500 tabular-nums`}>{hhmmss()}</span>
                       </div>
-                      <div className="mb-1.5">
+                      <div className="mb-2">
                         <span className={cn(
-                          "inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider",
+                          "inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold tracking-wider",
                           toneClass[tone],
                         )}>
                           {tag}
                         </span>
                       </div>
-                      <p className="text-[13px] text-zinc-800 leading-snug">{n.say}</p>
+                      <p className="text-[14.5px] text-zinc-800 leading-relaxed">{n.say}</p>
                     </div>
                   );
                 })}
