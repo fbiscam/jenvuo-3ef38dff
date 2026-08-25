@@ -30,11 +30,6 @@ import {
 type PairSpec = { fx?: string; op: "none" | "mul" | "div" | "direct"; yahoo?: string };
 const PAIR_SPECS: Record<string, PairSpec> = {
   XAUUSD: { op: "none" },
-  XAUEUR: { fx: "EURUSD=X", op: "div" },
-  XAUGBP: { fx: "GBPUSD=X", op: "div" },
-  XAUJPY: { fx: "USDJPY=X", op: "mul" },
-  XAUAUD: { fx: "AUDUSD=X", op: "div" },
-  XAUCHF: { fx: "USDCHF=X", op: "mul" },
   // Non-gold tickets are priced straight off their own feed.
   EURUSD: { op: "direct", yahoo: "EURUSD=X" },
   GBPUSD: { op: "direct", yahoo: "GBPUSD=X" },

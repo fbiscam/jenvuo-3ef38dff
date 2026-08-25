@@ -1233,11 +1233,6 @@ function DashboardLayout() {
             />
             <div className="flex-1 overflow-y-auto scrollbar-auto-hide">
               <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
-              <TickerRow label="XAU / EUR" symbol="XAUEUR" decimals={2} />
-              <TickerRow label="XAU / GBP" symbol="XAUGBP" decimals={2} />
-              <TickerRow label="XAU / JPY" symbol="XAUJPY" decimals={0} />
-              <TickerRow label="XAU / AUD" symbol="XAUAUD" decimals={2} />
-              <TickerRow label="XAU / CHF" symbol="XAUCHF" decimals={2} />
               <TickerRow label="DXY" symbol="DXY" decimals={3} />
             </div>
           </Card>

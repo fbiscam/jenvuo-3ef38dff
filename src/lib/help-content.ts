@@ -45,7 +45,7 @@ export const collections: Collection[] = [
         slug: "what-is-jenvu",
         title: "What is Jenvu AI?",
         summary:
-          "Jenvu is a voice-native gold trading agent covering every XAU cross-pair — built on ICT and SMC playbooks.",
+          "Jenvu is a voice-native gold trading agent focused on XAU/USD — built on ICT and SMC playbooks.",
         updatedAt: "2026-06-30",
         body: [
           { type: "p", content: "Jenvu AI is a voice-first market intelligence terminal. You speak — it listens, analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, narrates its read in real time, and renders the chart with marked zones so you can see exactly what it sees." },
@@ -54,7 +54,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "What you can do with Jenvu" },
           { type: "ul", items: [
             "Talk to the agent like a desk analyst — push-to-talk, no typing required.",
-            "Generate A+ setups on demand for every XAU cross-pair.",
+            "Generate A+ setups on demand for XAU/USD.",
             "Watch the AI mark structure, FVGs, order blocks and liquidity directly on the chart.",
             "Save signals to your dashboard and receive alerts when new A+ setups are detected.",
             "Get news context, killzone awareness and bias confirmation before risking capital.",
@@ -113,7 +113,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Step by step" },
           { type: "ol", items: [
             "Open the Signal Desk from the top navigation.",
-            "Pick a gold pair — XAUUSD, XAUEUR, XAUGBP, XAUJPY, XAUAUD or XAUCHF.",
+            "Confirm the instrument — XAU/USD (the only pair Jenvu trades).",
             "Hit 'Analyze'. The 1H and 15M charts load and the agent starts narrating.",
             "Wait while the 7-stage pipeline runs — usually 10–25 seconds.",
             "If the final score is 85+, the setup is graded A+ and entry, stop and targets appear.",
@@ -137,23 +137,18 @@ export const collections: Collection[] = [
       {
         slug: "supported-assets",
         title: "Which assets does Jenvu support?",
-        summary: "Gold only — every XAU cross-pair, from XAU/USD to XAU/CHF.",
+        summary: "Gold only — XAU/USD, nothing else.",
         updatedAt: "2026-06-30",
         body: [
           { type: "p", content: "Jenvu is a dedicated gold desk. The analysis engine is tuned for bullion — London fix mechanics, DXY correlation, COMEX/COT positioning and central-bank buying flows — and it refuses to trade anything that isn't gold." },
 
           { type: "h2", content: "Supported instruments" },
-          { type: "h3", content: "Gold cross-pairs" },
+          { type: "h3", content: "Gold" },
           { type: "ul", items: [
             "XAU/USD — primary bullion benchmark.",
-            "XAU/EUR — European gold demand.",
-            "XAU/GBP — LBMA London fix.",
-            "XAU/JPY — Tokyo bullion session.",
-            "XAU/AUD — Asia-Pacific miners.",
-            "XAU/CHF — Swiss safe-haven flows.",
           ]},
 
-          { type: "note", tone: "info", content: "Ask for BTC, EUR/USD, NAS100 or any non-gold asset and Jenvu will politely decline and redirect you to a gold cross-pair." },
+          { type: "note", tone: "info", content: "Ask for BTC, EUR/USD, NAS100 or any other asset and Jenvu will politely decline and redirect you to XAU/USD." },
         ],
       },
     ],
@@ -274,7 +269,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Why deterministic + LLM" },
           { type: "p", content: "Pure LLM signals hallucinate. Pure rule-based signals can't explain themselves. Jenvu's hybrid keeps the analysis grounded in measurable price action while letting the agent speak to you like a human analyst." },
 
-          { type: "note", tone: "info", content: "Scoring weights are tuned per XAU cross — DXY correlation matters most on XAU/USD, Tokyo liquidity on XAU/JPY, LBMA fix flows on XAU/GBP and XAU/EUR." },
+          { type: "note", tone: "info", content: "Scoring weights are tuned specifically for XAU/USD — DXY correlation, real yields and LBMA London fix flows carry the most weight." },
         ],
       },
       {
@@ -359,7 +354,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "$15 wallet per month (~35 scans).",
             "Unlimited voice queries.",
-            "Full signal engine on all supported XAU cross-pairs.",
+            "Full XAU/USD signal engine.",
             "Realtime A+ email & push alerts (no delay).",
             "Full ICT / SMC narration, trade journal & analytics.",
             "Multi-timeframe bias engine.",
@@ -370,7 +365,7 @@ export const collections: Collection[] = [
             "$50 wallet per month (~85 scans).",
             "Everything in Pro.",
             "Priority A+ alerts (< 30 seconds).",
-            "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF).",
+            "Dedicated XAU/USD scanner with DXY overlay.",
             "API access, webhooks and custom alert rules.",
             "Dedicated onboarding & SLA.",
           ]},

@@ -88,7 +88,7 @@ const TIERS = [
       "Everything in Pro",
       "Institutional-grade signal engine",
       "Priority A+ alerts (< 30s)",
-      "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF)",
+      "Dedicated XAU/USD scanner with DXY overlay",
       "API access & webhooks",
       "Custom alert rules",
       "Dedicated onboarding & SLA",
@@ -103,7 +103,7 @@ const FEATURE_BLOCKS = [
   { img: pricingIct, tag: "02 / ICT · SMC", title: "ICT & SMC narration", desc: "Fair value gaps, order blocks, liquidity sweeps and BOS — all called live on chart.", tone: "Pro · Elite · Ultra" },
   { img: pricingAlerts, tag: "03 / ALERTS", title: "Realtime A+ alerts", desc: "Email + push the instant a 4★ confluence setup forms. No noise. Only A+.", tone: "Pro · Elite" },
   { img: pricingJournal, tag: "04 / JOURNAL", title: "Trade journal & analytics", desc: "Auto-log every trade. Track equity curve, win rate, RR and emotional state.", tone: "Pro · Elite · Ultra" },
-  { img: pricingScanner, tag: "05 / SCANNER", title: "XAU cross-pair scanner", desc: "Bias engine across every XAU cross plus DXY — synced timeframes.", tone: "Elite" },
+  { img: pricingScanner, tag: "05 / SCANNER", title: "XAU/USD scanner", desc: "Bias engine on XAU/USD plus DXY overlay — synced timeframes.", tone: "Elite" },
   { img: pricingApi, tag: "06 / API", title: "API access & webhooks", desc: "Pipe signals into your stack. JSON webhooks, REST endpoints, custom rules.", tone: "Elite" },
 ];
 
@@ -126,7 +126,7 @@ export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an institutional-grade analysis tool. Every setup is for educational purposes. You remain responsible for your trades."],
   ["When does billing go live?", "We're finalising our payment infrastructure. Join the waitlist via the CTA above — you'll be notified the moment Pro is purchasable."],
   ["Can I cancel anytime?", "Yes. Subscriptions are month-to-month with no lock-in. You'll keep access until the end of the billing cycle."],
-  ["What markets are covered?", "Gold only. Jenvu trades every XAU cross-pair: XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF — with DXY overlay for confluence."],
+  ["What markets are covered?", "Gold only. Jenvu trades XAU/USD exclusively — with DXY overlay for confluence."],
 ];
 
 function PricingPage() {

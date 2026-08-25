@@ -54,11 +54,6 @@ const HELP_TEXT = [
 
 const SCAN_PAIRS: Array<{ code: string; label: string }> = [
   { code: "XAUUSD", label: "XAU/USD" },
-  { code: "XAUEUR", label: "XAU/EUR" },
-  { code: "XAUGBP", label: "XAU/GBP" },
-  { code: "XAUJPY", label: "XAU/JPY" },
-  { code: "XAUAUD", label: "XAU/AUD" },
-  { code: "XAUCHF", label: "XAU/CHF" },
 ];
 
 function scanKeyboard() {

@@ -118,28 +118,27 @@ function ClientGate({ children, fallback }: { children: React.ReactNode; fallbac
 function FeedBody() {
   const [days, setDays] = useState(30);
   const { data, refetch, isFetching } = useSuspenseQuery(feedQuery(days));
-  const [pairFilter, setPairFilter] = useState<string>("ALL");
   const [outcomeFilter, setOutcomeFilter] = useState<"all" | "win" | "loss" | "pending">("all");
   const [dirFilter, setDirFilter] = useState<"all" | "BUY" | "SELL">("all");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const signals = useMemo(
-    () => data.signals.filter((s) => new Date(s.fired_at).getTime() >= SIGNALS_START_AT),
+    () => data.signals.filter(
+      (s) => new Date(s.fired_at).getTime() >= SIGNALS_START_AT && (s.pair ?? "XAUUSD") === "XAUUSD",
+    ),
     [data.signals],
   );
-  const pairs = useMemo(() => Array.from(new Set(signals.map((s) => s.pair))).sort(), [signals]);
 
   const filtered = useMemo(() => signals.filter((s) => {
-    if (pairFilter !== "ALL" && s.pair !== pairFilter) return false;
     if (outcomeFilter !== "all" && s.outcome !== outcomeFilter) return false;
     if (dirFilter !== "all" && s.direction !== dirFilter) return false;
     return true;
-  }), [signals, pairFilter, outcomeFilter, dirFilter]);
+  }), [signals, outcomeFilter, dirFilter]);
 
   // Reset visible count whenever filters change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [pairFilter, outcomeFilter, dirFilter, days]);
+  }, [outcomeFilter, dirFilter, days]);
 
   const shownCount = Math.min(visibleCount, filtered.length);
   const pageItems = filtered.slice(0, shownCount);
@@ -309,10 +308,7 @@ function FeedBody() {
             <div className="shrink-0 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 sm:text-[11px]">
               <Filter className="h-3.5 w-3.5" /> Filters
             </div>
-            <select aria-label="Filter by pair" value={pairFilter} onChange={(e) => setPairFilter(e.target.value)} className="shrink-0 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-700">
-              <option value="ALL">All pairs</option>
-              {pairs.map((p) => <option key={p} value={p}>{p}</option>)}
-            </select>
+            <span className="shrink-0 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-zinc-700">XAU/USD</span>
             <div className="shrink-0 inline-flex rounded-lg border border-zinc-200 p-0.5">
               {(["all", "BUY", "SELL"] as const).map((d) => (
                 <button key={d} onClick={() => setDirFilter(d)} className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${dirFilter === d ? (d === "BUY" ? "bg-emerald-600 text-white" : d === "SELL" ? "bg-rose-600 text-white" : "bg-zinc-900 text-white") : "text-zinc-600 hover:text-zinc-900"}`}>

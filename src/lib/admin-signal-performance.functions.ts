@@ -50,11 +50,6 @@ async function ensureAdmin(userId: string) {
 
 const YAHOO_MAP: Record<string, string> = {
   XAUUSD: "XAUUSD=X",
-  XAUEUR: "XAUEUR=X",
-  XAUGBP: "XAUGBP=X",
-  XAUJPY: "XAUJPY=X",
-  XAUAUD: "XAUAUD=X",
-  XAUCHF: "XAUCHF=X",
 };
 
 async function fetchCandles(pair: string, range: string): Promise<Candle[]> {

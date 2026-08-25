@@ -20,11 +20,6 @@ export const MAX_TICK_AGE_MS = 5 * 60_000;
 /** Plausible quote ranges — a cross priced outside these is a scale bug. */
 export const PAIR_PRICE_RANGE: Record<string, [number, number]> = {
   XAUUSD: [500, 20_000],
-  XAUEUR: [500, 20_000],
-  XAUGBP: [400, 20_000],
-  XAUAUD: [700, 30_000],
-  XAUCHF: [400, 20_000],
-  XAUJPY: [100_000, 2_000_000],
 };
 
 export function isPriceScaleValid(pair: string, price: number): boolean {

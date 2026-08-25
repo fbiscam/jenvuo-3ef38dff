@@ -2,11 +2,6 @@ import { useEffect, useRef } from "react";
 
 const XAU_TV_MAP: Record<string, string> = {
   XAUUSD: "OANDA:XAUUSD",
-  XAUEUR: "OANDA:XAUEUR",
-  XAUGBP: "OANDA:XAUGBP",
-  XAUJPY: "OANDA:XAUJPY",
-  XAUAUD: "OANDA:XAUAUD",
-  XAUCHF: "OANDA:XAUCHF",
 };
 
 function toTv(raw?: string): string {

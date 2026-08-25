@@ -28,11 +28,6 @@ type CrossFx = { symbol: string; invert: boolean } | null;
 
 const PAIR_FX: Record<string, CrossFx> = {
   XAUUSD: null,
-  XAUEUR: { symbol: "EURUSD=X", invert: true },
-  XAUGBP: { symbol: "GBPUSD=X", invert: true },
-  XAUJPY: { symbol: "USDJPY=X", invert: false },
-  XAUAUD: { symbol: "AUDUSD=X", invert: true },
-  XAUCHF: { symbol: "USDCHF=X", invert: false },
 };
 
 async function yahooFetch(sym: string, tf = "15m"): Promise<{ candles: Candle[]; last: number } | null> {

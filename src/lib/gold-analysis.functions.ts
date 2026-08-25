@@ -126,22 +126,12 @@ type XauQuote = "USD" | "EUR" | "GBP" | "JPY" | "AUD" | "CHF";
 
 const XAU_PAIRS: Record<string, { display: string; decimals: number; yahoo: string; quote: XauQuote; usdProxy?: { symbol: string; inverse: boolean } }> = {
   XAUUSD: { display: "XAU/USD", decimals: 2, yahoo: "GC=F", quote: "USD" },
-  XAUEUR: { display: "XAU/EUR", decimals: 2, yahoo: "XAUEUR=X", quote: "EUR", usdProxy: { symbol: "EURUSD=X", inverse: false } },
-  XAUGBP: { display: "XAU/GBP", decimals: 2, yahoo: "XAUGBP=X", quote: "GBP", usdProxy: { symbol: "GBPUSD=X", inverse: false } },
-  XAUJPY: { display: "XAU/JPY", decimals: 0, yahoo: "XAUJPY=X", quote: "JPY", usdProxy: { symbol: "USDJPY=X", inverse: true } },
-  XAUAUD: { display: "XAU/AUD", decimals: 2, yahoo: "XAUAUD=X", quote: "AUD", usdProxy: { symbol: "AUDUSD=X", inverse: false } },
-  XAUCHF: { display: "XAU/CHF", decimals: 2, yahoo: "XAUCHF=X", quote: "CHF", usdProxy: { symbol: "USDCHF=X", inverse: true } },
 };
 
 export const XAU_PAIR_LIST = Object.keys(XAU_PAIRS);
 
 const XAU_ALIASES: Record<string, string> = {
   GOLD: "XAUUSD", XAU: "XAUUSD", XAUUSD: "XAUUSD",
-  "GOLDEUR": "XAUEUR", "GOLDEURO": "XAUEUR", "XAUEUR": "XAUEUR",
-  "GOLDGBP": "XAUGBP", "GOLDPOUND": "XAUGBP", "XAUGBP": "XAUGBP",
-  "GOLDJPY": "XAUJPY", "GOLDYEN": "XAUJPY", "XAUJPY": "XAUJPY",
-  "GOLDAUD": "XAUAUD", "XAUAUD": "XAUAUD",
-  "GOLDCHF": "XAUCHF", "XAUCHF": "XAUCHF",
 };
 
 export function resolveInstrument(input: string): ResolvedInstrument {
@@ -190,11 +180,6 @@ export function resolveInstrument(input: string): ResolvedInstrument {
 // certainly means the FX conversion failed and we are quoting raw XAU/USD.
 // We reject the tick and emit a loud warning so the bug is visible in logs.
 const XAU_CROSS_RATIO_BANDS: Record<string, { min: number; max: number; label: string }> = {
-  "METAL:XAUEUR": { min: 0.75, max: 1.15, label: "XAU/EUR (≈ XAU/USD × 0.85–1.05)" },
-  "METAL:XAUGBP": { min: 0.65, max: 1.05, label: "XAU/GBP (≈ XAU/USD × 0.72–0.92)" },
-  "METAL:XAUJPY": { min: 80,   max: 220,  label: "XAU/JPY (≈ XAU/USD × 130–170)" },
-  "METAL:XAUAUD": { min: 1.15, max: 1.85, label: "XAU/AUD (≈ XAU/USD × 1.3–1.7)" },
-  "METAL:XAUCHF": { min: 0.65, max: 1.05, label: "XAU/CHF (≈ XAU/USD × 0.75–0.95)" },
 };
 
 // Throttled warning so we don't flood logs when a bad quote persists.
@@ -298,11 +283,6 @@ export function normalizeQuery(text: string): string {
 
 function inferInstrumentFromText(text: string): string {
   const q = normalizeQuery(text).toUpperCase();
-  if (/\b(XAUEUR|GOLD\s*EUR|GOLD\s*EURO)\b/.test(q)) return "XAUEUR";
-  if (/\b(XAUGBP|GOLD\s*GBP|GOLD\s*POUND)\b/.test(q)) return "XAUGBP";
-  if (/\b(XAUJPY|GOLD\s*JPY|GOLD\s*YEN)\b/.test(q)) return "XAUJPY";
-  if (/\b(XAUAUD|GOLD\s*AUD)\b/.test(q)) return "XAUAUD";
-  if (/\b(XAUCHF|GOLD\s*CHF|GOLD\s*FRANC)\b/.test(q)) return "XAUCHF";
   return "XAUUSD";
 }
 
@@ -560,7 +540,7 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
   throw lastErr ?? new Error("Coinbase unavailable");
 }
 
-// For XAU cross-pairs (XAU/EUR, GBP, JPY, AUD, CHF), Yahoo's direct
+// For XAU/USD, Yahoo's direct
 // XAUEUR=X etc. endpoints are flaky and often 429. Derive real OHLC by
 // fetching XAU/USD candles + the FX proxy candles on the same timeframe,
 // aligning by timestamp bucket, and converting per bar. This gives the
@@ -1723,9 +1703,6 @@ async function resolveLiveTick(inst: ResolvedInstrument): Promise<LiveTick | nul
           if (xauUsd && xauUsd > 0) {
             const check = await assertCrossPairFxValue(inst.key, q.price, xauUsd);
             if (!check.ok) continue;
-          } else if (q.price < 10_000 && inst.key === "METAL:XAUJPY") {
-            warnCrossPairScale(inst.key, `XAU/USD guard baseline unavailable; rejecting suspicious quote ${q.price.toFixed(2)}`);
-            continue;
           }
         }
         tickCache.set(inst.key, { at: now, tick: q });

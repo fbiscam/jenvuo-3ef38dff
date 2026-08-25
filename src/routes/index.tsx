@@ -61,19 +61,14 @@ const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]
 /* ---------- mock data ---------- */
 const SIGNALS = [
   { pair: "XAUUSD", t: "14:20:02", tag: "SWEEP", note: "Liquidity grab on London high", tone: "ink" },
-  { pair: "XAUEUR", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
-  { pair: "XAUGBP", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
-  { pair: "XAUJPY", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
+  { pair: "XAUUSD", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
+  { pair: "XAUUSD", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
+  { pair: "XAUUSD", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
 ] as const;
 
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
   ["XAU/USD", "—", "…"],
-  ["XAU/EUR", "—", "…"],
-  ["XAU/GBP", "—", "…"],
-  ["XAU/JPY", "—", "…"],
-  ["XAU/AUD", "—", "…"],
-  ["XAU/CHF", "—", "…"],
   ["DXY", "—", "…"],
 ];
 
@@ -82,11 +77,6 @@ const INITIAL_TICKER: TickerRow[] = [
 // CORS restrictions on Yahoo Finance and return authoritative live prices.
 const SYMBOL_MAP: Record<string, string> = {
   "XAU/USD": "XAUUSD",
-  "XAU/EUR": "XAUEUR",
-  "XAU/GBP": "XAUGBP",
-  "XAU/JPY": "XAUJPY",
-  "XAU/AUD": "XAUAUD",
-  "XAU/CHF": "XAUCHF",
   "DXY": "DXY",
 };
 
@@ -563,8 +553,8 @@ function HomePage() {
               },
               {
                 k: "05",
-                t: "Every XAU Cross",
-                d: "XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF one terminal.",
+                t: "One Pair, Total Focus",
+                d: "XAU/USD only — the entire desk is tuned to a single instrument.",
               },
               {
                 k: "06",
@@ -973,7 +963,7 @@ function HomePage() {
               {[
                 {
                   q: "Which pairs does JENVU cover?",
-                  a: "JENVU is a gold-only desk. It trades every XAU cross: XAU/USD, XAU/EUR, XAU/GBP, XAU/JPY, XAU/AUD and XAU/CHF — nothing else.",
+                  a: "JENVU is a gold-only desk focused entirely on XAU/USD — nothing else.",
                 },
                 {
                   q: "Does it execute trades automatically?",

@@ -50,11 +50,11 @@ export const Route = createFileRoute("/app")({
       {
         name: "description",
         content:
-          "Speak to Jenvu and get live institutional ICT/SMC analysis for every XAU gold cross-pair — A+ setups, structured entries, stops and targets narrated in real time.",
+          "Speak to Jenvu and get live institutional ICT/SMC analysis for XAU/USD gold — A+ setups, structured entries, stops and targets narrated in real time.",
       },
-      { name: "keywords", content: "voice gold trading agent, XAU voice analysis, ICT gold agent, SMC bullion AI, XAUUSD voice signals, XAUEUR, XAUJPY, XAUGBP" },
+      { name: "keywords", content: "voice gold trading agent, XAU/USD voice analysis, ICT gold agent, SMC bullion AI, XAUUSD voice signals" },
       { property: "og:title", content: "Voice Gold Trading Terminal — Jenvu" },
-      { property: "og:description", content: "Voice-native institutional bullion desk covering every XAU cross-pair." },
+      { property: "og:description", content: "Voice-native institutional bullion desk focused on XAU/USD." },
       { property: "og:url", content: "https://jenvu.com/app" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -73,7 +73,7 @@ export const Route = createFileRoute("/app")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Voice-native AI gold trading terminal that narrates institutional ICT/SMC analysis for every XAU cross-pair in real time.",
+            "Voice-native AI gold trading terminal that narrates institutional ICT/SMC analysis for XAU/USD in real time.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -107,17 +107,6 @@ function parseTimeframe(text: string, fallback: string): string {
 }
 
 const SYMBOL_KEYWORDS: Array<{ rx: RegExp; sym: string }> = [
-  // XAU cross-pairs (fiat)
-  { rx: /\b(gold\s*(?:in\s*)?(?:eur|euro))\b/i, sym: "XAUEUR" },
-  { rx: /\b(gold\s*(?:in\s*)?(?:gbp|pound|sterling))\b/i, sym: "XAUGBP" },
-  { rx: /\b(gold\s*(?:in\s*)?(?:jpy|yen))\b/i, sym: "XAUJPY" },
-  { rx: /\b(gold\s*(?:in\s*)?(?:aud|aussie|australian))\b/i, sym: "XAUAUD" },
-  { rx: /\b(gold\s*(?:in\s*)?(?:chf|swiss|franc))\b/i, sym: "XAUCHF" },
-  { rx: /\bxau\s*\/?\s*eur\b/i, sym: "XAUEUR" },
-  { rx: /\bxau\s*\/?\s*gbp\b/i, sym: "XAUGBP" },
-  { rx: /\bxau\s*\/?\s*jpy\b/i, sym: "XAUJPY" },
-  { rx: /\bxau\s*\/?\s*aud\b/i, sym: "XAUAUD" },
-  { rx: /\bxau\s*\/?\s*chf\b/i, sym: "XAUCHF" },
   // Silver
   { rx: /\b(silver|xag(?:\/?usd)?|chandi)\b/i, sym: "XAGUSD" },
   // Crypto
@@ -272,9 +261,9 @@ function Home() {
     // Gold-only guard: if user references a non-XAU instrument, refuse politely.
     if (analyzeIntent || openChartIntent) {
       const symbol = detectSymbol(query);
-      const mentionsNonGold = /\b(silver|xag|btc|bitcoin|eth|ether|solana|\bsol\b|xrp|ripple|eur\s*\/?\s*usd|gbp\s*\/?\s*usd|usd\s*\/?\s*jpy|aud\s*\/?\s*usd|nzd\s*\/?\s*usd|usd\s*\/?\s*cad|usd\s*\/?\s*chf|dxy|dollar\s*index|cable|euro\s*dollar|dollar\s*yen)\b/i.test(q);
-      if (!symbol.startsWith("XAU") || mentionsNonGold) {
-        const reply = "I can only analyze gold pairs. Please ask about XAU/USD or another XAU cross-pair.";
+      const mentionsNonGold = /\b(xau\s*\/?\s*(?:eur|gbp|jpy|aud|chf)|gold\s*(?:in\s*)?(?:eur|euro|gbp|pound|sterling|jpy|yen|aud|chf|franc)|silver|xag|btc|bitcoin|eth|ether|solana|\bsol\b|xrp|ripple|eur\s*\/?\s*usd|gbp\s*\/?\s*usd|usd\s*\/?\s*jpy|aud\s*\/?\s*usd|nzd\s*\/?\s*usd|usd\s*\/?\s*cad|usd\s*\/?\s*chf|dxy|dollar\s*index|cable|euro\s*dollar|dollar\s*yen)\b/i.test(q);
+      if (symbol !== "XAUUSD" || mentionsNonGold) {
+        const reply = "I only analyze XAU/USD gold. Please ask about XAU/USD.";
         speech.speak(reply, () => {
           speech.resumeIfWanted();
           armSleep();

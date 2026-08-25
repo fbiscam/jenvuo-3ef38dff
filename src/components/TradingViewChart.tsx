@@ -11,7 +11,7 @@ const TF_MAP: Record<string, string> = {
 };
 
 type Props = {
-  /** XAU pair symbol like XAUUSD, XAUEUR, XAUGBP, XAUJPY, XAUAUD, XAUCHF. */
+  /** XAU pair symbol — XAUUSD only. */
   symbol?: string;
   /** Chart timeframe key (e.g. "15m"). */
   timeframe?: string;
@@ -23,11 +23,6 @@ type Props = {
 
 const XAU_TV_MAP: Record<string, string> = {
   XAUUSD: "OANDA:XAUUSD",
-  XAUEUR: "OANDA:XAUEUR",
-  XAUGBP: "OANDA:XAUGBP",
-  XAUJPY: "OANDA:XAUJPY",
-  XAUAUD: "OANDA:XAUAUD",
-  XAUCHF: "OANDA:XAUCHF",
 };
 
 /** Map an XAU pair → TradingView symbol. Falls back to XAU/USD. */
