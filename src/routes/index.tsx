@@ -16,6 +16,60 @@ import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 
 import { Check, Sparkles, Zap, Crown, Minus, Menu, X } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
+/* ---------- hero background banners (desktop / tablet only) ---------- */
+function HeroBanners() {
+  return (
+    <div className="pointer-events-none absolute inset-0 hidden md:block overflow-hidden">
+      {/* Left vertical term strip */}
+      <div className="absolute left-0 top-0 h-full w-16 border-r border-zinc-100/80 bg-gradient-to-r from-zinc-50/60 to-transparent">
+        <div className={`flex h-full flex-col items-center justify-center gap-8 ${MONO} text-[10px] tracking-[0.2em] text-zinc-300`}>
+          {["ICT", "SMC", "BOS", "FVG", "SWEEP"].map((term) => (
+            <span key={term} className="rotate-180 whitespace-nowrap" style={{ writingMode: "vertical-rl" }}>
+              {term}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Right side candlestick chart panel */}
+      <div className="absolute right-0 top-0 h-full w-[28%] max-w-[360px] border-l border-zinc-100/80 bg-gradient-to-l from-zinc-50/80 via-zinc-50/40 to-transparent">
+        <svg className="absolute inset-0 h-full w-full opacity-[0.18]" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-zinc-900" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+          {/* Trend line */}
+          <path d="M 0 75% Q 25% 60%, 50% 55% T 100% 35%" fill="none" stroke="currentColor" strokeWidth="2" className="text-zinc-900" />
+          {/* Candlesticks */}
+          <g className="text-zinc-900">
+            <rect x="18%" y="62%" width="3%" height="12%" fill="currentColor" />
+            <line x1="19.5%" y1="58%" x2="19.5%" y2="78%" stroke="currentColor" strokeWidth="1" />
+            <rect x="34%" y="55%" width="3%" height="9%" fill="currentColor" />
+            <line x1="35.5%" y1="50%" x2="35.5%" y2="70%" stroke="currentColor" strokeWidth="1" />
+            <rect x="50%" y="48%" width="3%" height="14%" fill="currentColor" />
+            <line x1="51.5%" y1="44%" x2="51.5%" y2="68%" stroke="currentColor" strokeWidth="1" />
+            <rect x="66%" y="38%" width="3%" height="10%" fill="currentColor" />
+            <line x1="67.5%" y1="35%" x2="67.5%" y2="52%" stroke="currentColor" strokeWidth="1" />
+            <rect x="82%" y="30%" width="3%" height="11%" fill="currentColor" />
+            <line x1="83.5%" y1="25%" x2="83.5%" y2="46%" stroke="currentColor" strokeWidth="1" />
+          </g>
+        </svg>
+      </div>
+
+      {/* Floating badge dots */}
+      <div className="absolute right-[30%] top-[12%] hidden lg:flex items-center gap-2 rounded-full border border-zinc-200 bg-white/90 px-3 py-1.5 shadow-sm">
+        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+        <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-600`}>Live Market Feed</span>
+      </div>
+      <div className="absolute left-[20%] bottom-[18%] hidden lg:flex items-center gap-2 rounded-full border border-zinc-200 bg-white/90 px-3 py-1.5 shadow-sm">
+        <span className="h-2 w-2 rounded-full bg-zinc-900" />
+        <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-600`}>XAU/USD Terminal</span>
+      </div>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -357,7 +411,9 @@ function HomePage() {
       <main>
       {/* HERO */}
       <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
+        <HeroBanners />
         <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
+
           <div className="text-left lg:col-span-7 lg:text-left">
 
             <h1 className="mt-5 max-w-3xl text-[28px] font-semibold tracking-tight leading-[1.1] sm:text-[42px] md:text-[56px] lg:mx-0 text-zinc-900">
