@@ -1424,11 +1424,6 @@ function SignalPage() {
                               {isBuy ? "LONG" : "SHORT"}
                             </span>
                           )}
-                          {(isBuy || isSell) && t.entryType === "LIMIT" && (
-                            <span className={`text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded border border-amber-200 bg-amber-50 text-amber-700`}>
-                              SNIPER LIMIT
-                            </span>
-                          )}
                         </>
                       )}
                     </div>
@@ -1485,7 +1480,7 @@ function SignalPage() {
                         )}
                         {(isBuy || isSell) && !isLowConf && (
                           <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-lg overflow-hidden border border-zinc-100">
-                            <KV label={t.entryType === "LIMIT" ? "Sniper Entry" : "Entry"} value={t.entry.toFixed(dec)} sub={t.entryType === "LIMIT" ? "limit zone" : undefined} />
+                            <KV label="Entry" value={t.entry.toFixed(dec)} />
                             <KV label="R:R" value={`1:${t.rr.toFixed(2)}`} />
                             <KV
                               label="Stop"
@@ -1503,9 +1498,9 @@ function SignalPage() {
                         )}
 
                         {!isBuy && !isSell && (
-                          <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 text-[13px] text-zinc-700">
-                            <div className="font-semibold mb-0.5 text-[13px]">No directional bias</div>
-                            <div className="text-[12px] text-zinc-500">Market is currently ranging — wait for a clear HTF bias before entering.</div>
+                          <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 text-[12px] text-zinc-700">
+                            <div className="font-semibold mb-0.5">No directional bias</div>
+                            <div className="text-[11px] text-zinc-500">Market is currently ranging — wait for a clear HTF bias before entering.</div>
                           </div>
                         )}
                       </>
