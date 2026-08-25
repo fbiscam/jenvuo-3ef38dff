@@ -946,6 +946,7 @@ export type FoundingDocFile = {
   mime_type: string;
   file_size: number;
   original_name: string | null;
+  doc_kind?: string | null;
   created_at: string;
   signed_url?: string | null;
 };
@@ -995,6 +996,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
       mime_type: z.string().min(3).max(120),
       file_size: z.number().int().min(1).max(500 * 1024 * 1024),
       original_name: z.string().max(255).optional(),
+      doc_kind: z.enum(["identity", "driving_license", "earning_proof"]).optional(),
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -1013,6 +1015,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
       mime_type: data.mime_type,
       file_size: data.file_size,
       original_name: data.original_name ?? null,
+      doc_kind: data.doc_kind ?? "earning_proof",
     });
     if (error) throw new Error(error.message);
     // Bump application to "received" (unless verified)
@@ -1072,7 +1075,7 @@ export const listMyDocumentFiles = createServerFn({ method: "GET" })
     const admin = await getServiceClient();
     const { data, error } = await admin
       .from("founding_documents" as any)
-      .select("id, application_id, storage_path, mime_type, file_size, original_name, created_at")
+      .select("id, application_id, storage_path, mime_type, file_size, original_name, doc_kind, created_at")
       .eq("application_id", app.id)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -1131,7 +1134,7 @@ export const adminListDocumentSubmissions = createServerFn({ method: "GET" })
     const ids = list.map((a) => a.id);
     const { data: files } = await admin
       .from("founding_documents" as any)
-      .select("id, application_id, storage_path, mime_type, file_size, original_name, created_at")
+      .select("id, application_id, storage_path, mime_type, file_size, original_name, doc_kind, created_at")
       .in("application_id", ids)
       .order("created_at", { ascending: false });
     const signed = await signPaths(admin, (files ?? []) as any);

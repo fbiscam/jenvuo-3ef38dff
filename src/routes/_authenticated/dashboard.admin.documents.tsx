@@ -214,6 +214,13 @@ function AdminDocumentsPage() {
                   {row.files.map((f) => (
                     <div key={f.id} className="space-y-1">
                       <FilePreview file={f} />
+                      <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-700">
+                        {f.doc_kind === "identity"
+                          ? "ID verification"
+                          : f.doc_kind === "driving_license"
+                            ? "Driving license"
+                            : "Earning proof"}
+                      </div>
                       <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 truncate">
                         <FileTypeIcon mime={f.mime_type} />
                         <span className="truncate" title={f.original_name || undefined}>

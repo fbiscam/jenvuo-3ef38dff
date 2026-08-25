@@ -1282,6 +1282,7 @@ export type Database = {
         Row: {
           application_id: string
           created_at: string
+          doc_kind: string
           file_size: number
           id: string
           mime_type: string
@@ -1292,6 +1293,7 @@ export type Database = {
         Insert: {
           application_id: string
           created_at?: string
+          doc_kind?: string
           file_size?: number
           id?: string
           mime_type: string
@@ -1302,6 +1304,7 @@ export type Database = {
         Update: {
           application_id?: string
           created_at?: string
+          doc_kind?: string
           file_size?: number
           id?: string
           mime_type?: string

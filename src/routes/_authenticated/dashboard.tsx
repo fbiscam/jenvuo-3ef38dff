@@ -1,6 +1,8 @@
 import { getAlertCutoff } from "@/lib/alert-cutoff";
 import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { useVerification, isVerificationAllowedPath } from "@/hooks/useVerification";
+import { VerificationBanner, VerificationLocked } from "@/components/VerificationGate";
 import xaiLogo from "@/assets/xai-logo.png";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -438,6 +440,7 @@ function useLocalHour(): number {
 
 function DashboardLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const verification = useVerification();
   const [email, setEmail] = useState<string>("");
   const [fullName, setFullName] = useState<string>(() => {
     if (typeof window === "undefined") return "";
@@ -465,6 +468,13 @@ function DashboardLayout() {
   }, []);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [isAdminUser, setIsAdminUser] = useState(false);
+  // Unverified accounts may only use Dashboard, Profile, Security and Documents.
+  const verificationLocked =
+    !isAdminUser &&
+    !verification.loading &&
+    !!verification.status &&
+    !verification.verified &&
+    !isVerificationAllowedPath(pathname);
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const localHour = useLocalHour();
@@ -1019,6 +1029,7 @@ function DashboardLayout() {
 
       <main className="mx-auto w-full max-w-7xl flex-1 bg-[#FAFAFA] px-5 pt-14 pb-7 sm:px-8 sm:pt-7">
 
+        <VerificationBanner isAdmin={isAdminUser} />
 
         {pathname === "/dashboard" ? (
         <>
@@ -1297,6 +1308,8 @@ function DashboardLayout() {
         <div className="h-12" />
         </>
 
+        ) : verificationLocked ? (
+          <VerificationLocked />
         ) : (
           <Outlet />
         )}
