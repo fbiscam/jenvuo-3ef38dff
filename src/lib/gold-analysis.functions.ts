@@ -3735,7 +3735,7 @@ export const getSignalPlan = createServerFn({ method: "POST" })
     // Billing is performed exactly once inside computeSignalPlan when a real
     // BUY/SELL is emitted. WAIT scans remain free by product policy.
     try {
-      const marketKey = `${resolveInstrument(data.symbol).key}:${Math.floor(Date.now() / MARKET_PLAN_CACHE_TTL)}`;
+      const marketKey = resolveInstrument(data.symbol).key;
       const cachedMarket = marketPlanCache.get(marketKey);
       if (cachedMarket && Date.now() - cachedMarket.at < MARKET_PLAN_CACHE_TTL) {
         const enrichedPlan = ensureSignalIntelligencePayload(cachedMarket.plan);
