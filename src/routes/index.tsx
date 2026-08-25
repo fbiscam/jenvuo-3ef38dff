@@ -151,21 +151,11 @@ function useLiveTicker(): TickerRow[] {
       try {
         const res = await fetchBatch({ data: { symbols } });
         if (!alive || !res?.results) return;
-        const dataBySym = new Map(
-          res.results
-            .filter((r) => r.snapshot && Number.isFinite(r.snapshot.price))
-            .map((r) => [r.symbol, r.snapshot!]),
-        );
-        setRows((prev) =>
-          prev.map(([label, price, delta]) => {
-            const sym = SYMBOL_MAP[label];
-            const d = sym ? dataBySym.get(sym) : undefined;
-            if (!d) return [label, price, delta];
-            const sign = (d.changePct ?? 0) >= 0 ? "+" : "";
-            const deltaOut = d.changePct == null ? delta : `${sign}${d.changePct.toFixed(2)}%`;
-            return [label, fmtPrice(d.price), deltaOut];
-          }),
-        );
+        setRows((prev) => {
+          const next = snapshotsToRows(res.results, prev);
+          try { sessionStorage.setItem(TICKER_CACHE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+          return next;
+        });
       } catch {
         /* ignore */
       }
