@@ -342,7 +342,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 pair,
                 action: "cleared_wait",
                 conf,
-                reason: String(plan.trade?.reason ?? plan.trade?.summary ?? "").slice(0, 240),
+                reason: String(plan.trade?.summary ?? "").slice(0, 240),
               });
               continue;
             }
