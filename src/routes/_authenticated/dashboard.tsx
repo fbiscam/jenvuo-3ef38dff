@@ -1245,6 +1245,12 @@ function DashboardLayout() {
             <div className="flex-1 overflow-y-auto scrollbar-auto-hide">
               <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
               <TickerRow label="DXY" symbol="DXY" decimals={3} />
+              <TickerRow label="US10Y" symbol="US10Y" decimals={3} />
+              <TickerRow label="XAG / USD" symbol="XAGUSD" decimals={3} />
+              <TickerRow label="EUR / USD" symbol="EURUSD" decimals={4} />
+              <TickerRow label="USD / JPY" symbol="USDJPY" decimals={3} />
+              <TickerRow label="S&P 500" symbol="SPX" decimals={2} />
+              <TickerRow label="WTI Oil" symbol="WTI" decimals={2} />
             </div>
           </Card>
 
