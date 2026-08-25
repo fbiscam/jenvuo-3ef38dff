@@ -274,7 +274,7 @@ function Billing() {
         {last30DaysRows.length > 0 || olderRows.length > 0 ? (
           <div className="mt-6">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-medium text-zinc-900">Recent Scans (Last 30 Days)</h4>
+              <h4 className="text-sm font-medium text-zinc-900">  Recent scans (last 30 days)</h4>
               {olderRows.length > 0 && (
                 <button
                   onClick={handleDownloadOlder}
