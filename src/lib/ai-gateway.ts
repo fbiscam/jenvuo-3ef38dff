@@ -87,11 +87,8 @@ async function singleAttempt(
   model: string,
   opts: CallChatOptions,
   apiKey: string | undefined,
-  timeoutMs: number,
+  _timeoutMs: number,
 ): Promise<{ content: string; usage: UsageInfo }> {
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), timeoutMs);
-
   // Route by prefix:
   //   `blackboxai/*` → Blackbox API
   //   `nvapi/*`      → NVIDIA Integrate API (strip prefix to get real model id)
@@ -185,16 +182,10 @@ async function singleAttempt(
       method: "POST",
       headers,
       body: JSON.stringify(body),
-      signal: controller.signal,
     });
   } catch (err: any) {
-    clearTimeout(t);
-    if (err?.name === "AbortError") {
-      throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
-    }
     throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
   }
-  clearTimeout(t);
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");

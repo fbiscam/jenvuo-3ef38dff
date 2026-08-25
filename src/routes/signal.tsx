@@ -1424,6 +1424,11 @@ function SignalPage() {
                               {isBuy ? "LONG" : "SHORT"}
                             </span>
                           )}
+                          {(isBuy || isSell) && t.entryType === "LIMIT" && (
+                            <span className={`text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded border border-amber-200 bg-amber-50 text-amber-700`}>
+                              SNIPER LIMIT
+                            </span>
+                          )}
                         </>
                       )}
                     </div>
@@ -1480,7 +1485,7 @@ function SignalPage() {
                         )}
                         {(isBuy || isSell) && !isLowConf && (
                           <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-lg overflow-hidden border border-zinc-100">
-                            <KV label="Entry" value={t.entry.toFixed(dec)} />
+                            <KV label={t.entryType === "LIMIT" ? "Sniper Entry" : "Entry"} value={t.entry.toFixed(dec)} sub={t.entryType === "LIMIT" ? "limit zone" : undefined} />
                             <KV label="R:R" value={`1:${t.rr.toFixed(2)}`} />
                             <KV
                               label="Stop"
