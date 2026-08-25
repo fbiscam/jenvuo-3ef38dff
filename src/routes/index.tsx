@@ -719,9 +719,7 @@ function HomePage() {
                         ? "Locked in trial"
                         : isLoggedIn
                           ? "Upgrade"
-                          : p.key === "pro"
-                            ? "Start\u00A0 Free Trial"
-                            : "Buy Now";
+                          : "Apply Now";
                     return (
                     <th
                       key={p.name}
