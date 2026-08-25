@@ -2818,7 +2818,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __crossCheckModel: string | null = null;
     let __dsAgrees: boolean | null = null;
     let __consensus: "full" | "split" | null = null;
-    if (built.direction !== "WAIT" && setupScore >= 88 && __aiLeft() > 4500) {
+    const runOptionalAiReviews = false;
+    if (runOptionalAiReviews && built.direction !== "WAIT" && setupScore >= 88 && __aiLeft() > 4500) {
       try {
         const xSystem = `You are an independent ICT/SMC audit desk (second opinion, different house than the primary analyst). Audit the setup ONLY against core Smart Money rules: liquidity sweep before entry, displacement creating the FVG/OB, premium/discount side correctness, HTF↔LTF alignment, zone freshness, killzone timing, and R:R sanity.
 Reply ONLY as JSON: {"agrees":true|false,"smc_score":<0-100>,"note":"<one short sentence, most important rule that passes or fails>"}`;
@@ -3091,7 +3092,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
     // USD/gold news within the window. Soft-fails on any error.
     let __macroContext: SignalPlan["macroContext"] = undefined;
     const __macroShouldRun =
-      (built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null) && setupScore >= 88 && __aiLeft() > 3500;
+      runOptionalAiReviews && (built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null) && setupScore >= 88 && __aiLeft() > 3500;
     if (__macroShouldRun) {
       try {
         const newsLines = upcomingNews.slice(0, 5).map((n) =>
