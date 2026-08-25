@@ -154,6 +154,23 @@ export function resolveInstrument(input: string): ResolvedInstrument {
     };
   }
 
+  // Instruments that materially drive the XAU/USD price (context only —
+  // never tradable setups). Used by the ticker + macro confluence panels.
+  const ctx = GOLD_CORRELATED[cleaned];
+  if (ctx) {
+    return {
+      raw: raw || cleaned,
+      key: `CTX:${cleaned}`,
+      display: ctx.display,
+      kind: ctx.kind,
+      decimals: ctx.decimals,
+      yahooSymbols: ctx.yahooSymbols,
+      quote: "USD",
+      needsUsdNews: false,
+    };
+  }
+
+
   const key = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : "XAUUSD");
   const p = XAU_PAIRS[key];
   // Gold spot from gold-api.com covers XAU/USD; cross-quote pairs derive
