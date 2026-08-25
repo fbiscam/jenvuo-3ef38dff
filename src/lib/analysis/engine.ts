@@ -360,6 +360,9 @@ export function buildTrade(
   }
 
   const notes: string[] = [];
+  if (rangeFallback) {
+    notes.push("Range play: both timeframes ranging, trading back from the range extreme toward equilibrium");
+  }
   const zoneMid = (zone.priceLow + zone.priceHigh) / 2;
   const zoneDistance = distanceFromExecutionZone(zone.priceLow, zone.priceHigh);
   const distPct = zoneDistance / lastPrice;
