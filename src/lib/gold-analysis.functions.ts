@@ -1872,20 +1872,25 @@ export const getMarketSnapshotsBatch = createServerFn({ method: "POST" })
       data.symbols.map(async (symbol) => {
         try {
           const inst = resolveInstrument(symbol);
-          const [quote, daily] = await Promise.all([
+          const [quote, dayStats] = await Promise.all([
             resolveLiveTick(inst).catch(() => null),
-            fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]),
+            inst.yahooSymbols?.length
+              ? fetchYahooDayStats(inst.yahooSymbols).catch(() => null)
+              : Promise.resolve(null),
           ]);
-          let price: number | null = null;
-          let prevClose: number | null = null;
-          if (daily.length >= 2) {
-            price = daily[daily.length - 1].c;
-            prevClose = daily[daily.length - 2].c;
-          } else if (daily.length === 1) {
-            price = daily[0].c;
-            prevClose = daily[0].o;
+          let price: number | null = dayStats?.price ?? null;
+          let prevClose: number | null = dayStats?.prevClose ?? null;
+          if (quote?.price && isFinite(quote.price) && quote.price > 0) price = quote.price;
+          if (price == null) {
+            const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
+            if (daily.length >= 2) {
+              price = daily[daily.length - 1].c;
+              prevClose = prevClose ?? daily[daily.length - 2].c;
+            } else if (daily.length === 1) {
+              price = daily[0].c;
+              prevClose = prevClose ?? daily[0].o;
+            }
           }
-          if (quote?.price && isFinite(quote.price)) price = quote.price;
           if (price == null) return { symbol, snapshot: null };
           return {
             symbol,
