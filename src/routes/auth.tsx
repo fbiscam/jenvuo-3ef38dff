@@ -108,9 +108,10 @@ function AuthPage() {
   const verifyRecoveryCode = useServerFn(confirmRecoveryOtp);
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
-  const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">(
-    search.mode === "signup" ? "signup" : "signin",
-  );
+  // Public sign-up is closed — access is granted through the Founding Trader
+  // Program only. `?mode=signup` no longer opens a sign-up form.
+  const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">("signin");
+
   // Exact date the 14-day Pro trial would end for someone signing up now.
   // Computed after mount so SSR and client markup match.
   const [trialEndsLabel, setTrialEndsLabel] = React.useState("in 14 days");
