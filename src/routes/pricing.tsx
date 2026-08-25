@@ -204,7 +204,7 @@ function PricingPage() {
                   <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Pricing Plan</span>
                 </th>
                 {[
-                  { name: "Pro", price: signedOut ? (billing === "annual" ? "$50" : "$5") : (billing === "annual" ? "$150" : "$15"), tag: "Active", anonTo: "/auth" as const, search: { mode: "signup" as const }, dark: false, accent: true, key: "pro" },
+                  { name: "Pro", price: signedOut ? (billing === "annual" ? "$50" : "$5") : (billing === "annual" ? "$150" : "$15"), tag: "Active", anonTo: "/founding" as const, search: undefined, dark: false, accent: true, key: "pro" },
                   { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", anonTo: "/founding" as const, dark: true, key: "elite" },
                   { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", anonTo: "/founding" as const, dark: false, key: "ultra" },
                 ].map((p) => {
@@ -438,7 +438,7 @@ function PricingPage() {
               </div>
               <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · ~{Math.floor(p.price / 0.2)} signals</div>
               {signedOut ? (
-                <Link to="/auth" search={{ mode: "signup" as const }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
+                <Link to="/founding" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
                   Buy Now
                 </Link>
               ) : (
@@ -532,8 +532,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
           </div>
           {signedOut ? (
             <Link
-              to="/auth"
-              search={{ mode: "signup" as const }}
+              to="/founding"
               className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
             >
               Buy Now
