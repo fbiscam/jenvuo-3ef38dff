@@ -1126,7 +1126,7 @@ export const adminListDocumentSubmissions = createServerFn({ method: "GET" })
     const { data: apps, error } = await admin
       .from("founding_applications" as any)
       .select(
-        "id, email, full_name, requested_plan, status, document_status, documents_submitted_at, documents_note, documents_rejected_reason, documents_rejected_at, documents_info_request, documents_info_requested_at",
+        "id, user_id, email, full_name, requested_plan, status, document_status, documents_submitted_at, documents_note, documents_rejected_reason, documents_rejected_at, documents_info_request, documents_info_requested_at",
       )
       .neq("document_status", "not_submitted")
       .order("documents_submitted_at", { ascending: false, nullsFirst: false })
@@ -1147,10 +1147,23 @@ export const adminListDocumentSubmissions = createServerFn({ method: "GET" })
       arr.push(f);
       byApp.set(f.application_id, arr);
     });
+
+    // Account profile names (what the user set on their profile page)
+    const userIds = list.map((a) => a.user_id).filter(Boolean) as string[];
+    const nameByUser = new Map<string, string | null>();
+    if (userIds.length) {
+      const { data: profs } = await admin
+        .from("profiles" as any)
+        .select("id, full_name")
+        .in("id", userIds);
+      (profs ?? []).forEach((p: any) => nameByUser.set(p.id, p.full_name ?? null));
+    }
+
     return list.map((a) => ({
       application_id: a.id,
       email: a.email,
       full_name: a.full_name,
+      profile_full_name: a.user_id ? nameByUser.get(a.user_id) ?? null : null,
       requested_plan: a.requested_plan,
       status: a.status,
       document_status: a.document_status,
@@ -1162,4 +1175,5 @@ export const adminListDocumentSubmissions = createServerFn({ method: "GET" })
       documents_info_requested_at: a.documents_info_requested_at,
       files: byApp.get(a.id) ?? [],
     }));
+
   });
