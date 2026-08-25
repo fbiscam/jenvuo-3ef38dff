@@ -254,7 +254,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Got it, ${n} — documents received`,
           "Documents · Submitted",
-          `<p style="margin:0 0 12px">Thanks for sending over your earning proof. Your document(s) have safely landed in our review queue.</p>
+          `<p style="margin:0 0 12px">Thanks for sending over your identity documents. Your document(s) have safely landed in our review queue.</p>
            <p style="margin:0 0 12px">A real person on our team will look through everything and update your status here — usually within <strong>48 hours</strong>.</p>
            <p style="margin:0">No action needed from your side right now. We'll email you the moment there's a decision.</p>`,
           { label: "Open Documents page", href: `${APP_URL}/dashboard/documents` },
@@ -278,7 +278,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Congratulations, ${n} 🎉`,
           "Documents · Approved",
-          `<p style="margin:0 0 12px">Your earning-proof documents have been reviewed and <strong>approved</strong>. Your Founding Trader account is fully verified.</p>
+          `<p style="margin:0 0 12px">Your identity documents have been reviewed and <strong>approved</strong>. Your Founding Trader account is fully verified.</p>
            <p style="margin:0 0 12px">Billing continues on your <strong>${escapeHtml(meta.label)}</strong> plan as expected. Nothing else is required from your side.</p>
            <p style="margin:0">Thanks for keeping the program transparent.</p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
@@ -290,8 +290,8 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Documents need an update, ${n}`,
           "Documents · Action Required",
-          `<p style="margin:0 0 12px">We reviewed your earning-proof submission and unfortunately we can't verify it as-is. You can re-upload updated documents right away from your Documents page — there's no waiting period.</p>
-           <p style="margin:0 0 12px">If the admin left a reason, you'll see it on your Documents page. Common asks: a clearer screenshot, a fuller statement, or a screen-recording that shows the account name.</p>
+          `<p style="margin:0 0 12px">We reviewed your identity document submission and unfortunately we can't verify it as-is. You can re-upload updated documents right away from your Documents page — there's no waiting period.</p>
+           <p style="margin:0 0 12px">If the admin left a reason, you'll see it on your Documents page. Common asks: a clearer photo, both sides of your ID, or a fully readable driving license.</p>
            <p style="margin:0">Reply to this email if you need help.</p>`,
           { label: "Re-upload documents", href: `${APP_URL}/dashboard/documents` },
         ),
@@ -302,7 +302,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Quick follow-up, ${n}`,
           "Documents · More Info Needed",
-          `<p style="margin:0 0 12px">Our reviewer looked at your earning-proof submission and needs a small update before it can be approved.</p>
+          `<p style="margin:0 0 12px">Our reviewer looked at your identity document submission and needs a small update before it can be approved.</p>
            <p style="margin:0 0 12px">Head to your Documents page — you'll see the exact note from the reviewer and can upload the missing piece there. No need to redo everything, just address the ask.</p>
            <p style="margin:0">Reply to this email if anything is unclear.</p>`,
           { label: "View reviewer note", href: `${APP_URL}/dashboard/documents` },
@@ -937,7 +937,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/* ---------------- Earning proof file uploads ---------------- */
+/* ---------------- Identity document file uploads ---------------- */
 
 export type FoundingDocFile = {
   id: string;
@@ -996,7 +996,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
       mime_type: z.string().min(3).max(120),
       file_size: z.number().int().min(1).max(500 * 1024 * 1024),
       original_name: z.string().max(255).optional(),
-      doc_kind: z.enum(["identity", "driving_license", "earning_proof"]).optional(),
+      doc_kind: z.enum(["identity", "driving_license"]),
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -1015,7 +1015,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
       mime_type: data.mime_type,
       file_size: data.file_size,
       original_name: data.original_name ?? null,
-      doc_kind: data.doc_kind ?? "earning_proof",
+      doc_kind: data.doc_kind,
     });
     if (error) throw new Error(error.message);
     // Bump application to "received" (unless verified)
@@ -1052,7 +1052,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
             body: [
               `Hi ${name},`,
               ``,
-              `Thanks for sending over your earning proof — your document(s) are safely in our review queue.`,
+              `Thanks for sending over your identity documents — your document(s) are safely in our review queue.`,
               ``,
               `A real person on our team will review and update your status here, usually within 48 hours.`,
               ``,
@@ -1077,6 +1077,7 @@ export const listMyDocumentFiles = createServerFn({ method: "GET" })
       .from("founding_documents" as any)
       .select("id, application_id, storage_path, mime_type, file_size, original_name, doc_kind, created_at")
       .eq("application_id", app.id)
+      .neq("doc_kind", "earning_proof")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return await signPaths(admin, (data ?? []) as any);

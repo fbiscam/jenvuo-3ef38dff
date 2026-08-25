@@ -174,7 +174,7 @@ export const spendCredits = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
 
     // Document gate: after 30 days from approval, unverified users must
-    // submit earning-proof documents before running any scan.
+    // submit identity documents before running any scan.
     const { data: authData } = await supabase.auth.getUser();
     const email = authData?.user?.email ?? null;
     if (email) {
