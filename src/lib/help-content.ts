@@ -45,7 +45,7 @@ export const collections: Collection[] = [
         slug: "what-is-jenvu",
         title: "What is Jenvu AI?",
         summary:
-          "Jenvu is a voice-native gold trading agent covering every XAU cross-pair — built on ICT and SMC playbooks.",
+          "Jenvu is a voice-native gold trading agent focused on XAU/USD — built on ICT and SMC playbooks.",
         updatedAt: "2026-06-30",
         body: [
           { type: "p", content: "Jenvu AI is a voice-first market intelligence terminal. You speak — it listens, analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, narrates its read in real time, and renders the chart with marked zones so you can see exactly what it sees." },
@@ -54,7 +54,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "What you can do with Jenvu" },
           { type: "ul", items: [
             "Talk to the agent like a desk analyst — push-to-talk, no typing required.",
-            "Generate A+ setups on demand for every XAU cross-pair.",
+            "Generate A+ setups on demand for XAU/USD.",
             "Watch the AI mark structure, FVGs, order blocks and liquidity directly on the chart.",
             "Save signals to your dashboard and receive alerts when new A+ setups are detected.",
             "Get news context, killzone awareness and bias confirmation before risking capital.",
@@ -365,7 +365,7 @@ export const collections: Collection[] = [
             "$50 wallet per month (~85 scans).",
             "Everything in Pro.",
             "Priority A+ alerts (< 30 seconds).",
-            "All-XAU cross-pair scanner (USD · EUR · GBP · JPY · AUD · CHF).",
+            "Dedicated XAU/USD scanner with DXY overlay.",
             "API access, webhooks and custom alert rules.",
             "Dedicated onboarding & SLA.",
           ]},
