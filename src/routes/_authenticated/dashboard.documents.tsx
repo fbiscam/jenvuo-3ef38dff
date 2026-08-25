@@ -26,6 +26,13 @@ const STEPS: { key: string; label: string; desc: string }[] = [
   { key: "verified", label: "Verified", desc: "Approved — billing is now active on your account." },
 ];
 
+type DocKind = "identity" | "driving_license" | "earning_proof";
+const DOC_KINDS: { key: DocKind; label: string; desc: string; required: boolean }[] = [
+  { key: "identity", label: "ID verification", desc: "Passport or national ID — clear photo of the front (and back if applicable).", required: true },
+  { key: "driving_license", label: "Driving license", desc: "Front side of your driving license, fully readable.", required: true },
+  { key: "earning_proof", label: "Earning proof", desc: "Optional — screenshots or a recording of recent trading earnings.", required: false },
+];
+
 const MAX_BYTES = 100 * 1024 * 1024; // 100 MB per file
 const ACCEPT = "image/*,video/*,.pdf";
 
@@ -56,6 +63,7 @@ function DocumentsPage() {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<string>("");
   const [pending, setPending] = useState<File[]>([]);
+  const [docKind, setDocKind] = useState<DocKind>("identity");
 
   const { data: row, isLoading } = useQuery<DocumentStatusRow | null>({
     queryKey: ["my-document-status"],
@@ -71,9 +79,7 @@ function DocumentsPage() {
   const rejected = row?.document_status === "rejected";
   const needsInfo = row?.document_status === "needs_info";
   const currentIdx = rejected || needsInfo ? 0 : statusIndex(row?.document_status);
-  const canUpload =
-    !!row &&
-    (row.document_status === "not_submitted" || needsInfo || rejected);
+  const canUpload = !!row && row.document_status !== "verified";
 
   const removeMut = useMutation({
     mutationFn: (id: string) => remove({ data: { id } } as any),
@@ -130,6 +136,7 @@ function DocumentsPage() {
             mime_type: file.type || "application/octet-stream",
             file_size: file.size,
             original_name: file.name,
+            doc_kind: docKind,
           },
         } as any);
       }
@@ -150,9 +157,9 @@ function DocumentsPage() {
       className="mx-auto max-w-3xl px-4 py-8 font-['Google_Sans',_'Inter',_system-ui,_sans-serif]"
     >
       <div className="mb-6">
-        <h1 className="pl-1 text-2xl font-semibold text-zinc-900 mt-1">Earning proof</h1>
+        <h1 className="pl-1 text-2xl font-semibold text-zinc-900 mt-1">Identity verification</h1>
         <p className={`text-sm text-zinc-600 mt-2`}>
-          Upload screenshots or a short recording of recent earnings — billing activates only after our team verifies your proof.
+          Submit your ID verification and driving license. Signals, alerts and account changes unlock as soon as our team approves your documents.
         </p>
       </div>
 
@@ -255,9 +262,34 @@ function DocumentsPage() {
           {/* Uploader */}
           {canUpload && (
             <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6">
-              <div className="text-sm font-semibold text-zinc-900">Upload earning proof</div>
+              <div className="text-sm font-semibold text-zinc-900">Upload documents</div>
               <p className="text-xs text-zinc-600 mt-1">
                 Images (JPG, PNG), videos (MP4, MOV) or PDFs — up to 100 MB each.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {DOC_KINDS.map((k) => {
+                  const uploaded = files.some((f) => (f.doc_kind || "earning_proof") === k.key);
+                  return (
+                    <button
+                      key={k.key}
+                      type="button"
+                      onClick={() => setDocKind(k.key)}
+                      className={[
+                        "rounded-xl border px-3 py-2 text-xs font-semibold transition",
+                        docKind === k.key
+                          ? "border-zinc-900 bg-zinc-900 text-white"
+                          : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50",
+                      ].join(" ")}
+                    >
+                      {k.label}
+                      {k.required && !uploaded ? " *" : ""}
+                      {uploaded ? " ✓" : ""}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-xs text-zinc-600">
+                {DOC_KINDS.find((k) => k.key === docKind)?.desc}
               </p>
               <div
                 onDragOver={(e) => {
