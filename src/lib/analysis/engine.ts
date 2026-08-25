@@ -291,15 +291,34 @@ export function buildTrade(
   // Direction is anchored on HTF bias (institutional bias). In ICT / SMC an
   // opposing LTF leg is a pullback INTO the HTF-aligned zone, so LTF
   // disagreement is expected on retracement setups — it is not a WAIT reason.
-  // If HTF is ranging, fall back to LTF direction. Both ranging → WAIT.
-  const dir: "BUY" | "SELL" | "WAIT" =
+  // If HTF is ranging, fall back to LTF direction. When BOTH are ranging we no
+  // longer hard-WAIT: gold spends most of the day in a range, and a permanent
+  // WAIT meant "market is on HOLD" on ~80% of scans. Instead we take the
+  // classic ICT range play — price in premium → look for SELL back to
+  // equilibrium, price in discount → look for BUY. The setup still has to pass
+  // the zone, risk and confidence gates downstream, and the ranging structure
+  // keeps its confidence score low, so only clean range reversals survive.
+  let rangeFallback = false;
+  let dir: "BUY" | "SELL" | "WAIT" =
     htf.trend === "bullish" ? "BUY" :
     htf.trend === "bearish" ? "SELL" :
     ltf.trend === "bullish" ? "BUY" :
     ltf.trend === "bearish" ? "SELL" : "WAIT";
 
   if (dir === "WAIT") {
-    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF and LTF are both ranging — no directional bias to trade." };
+    const rangeHigh = htf.swingHigh;
+    const rangeLow = htf.swingLow;
+    const span = rangeHigh - rangeLow;
+    if (span > 0 && Number.isFinite(lastPrice) && lastPrice > 0) {
+      const pos = (lastPrice - rangeLow) / span; // 0 = range low, 1 = range high
+      // Only act from the outer thirds of the range; mid-range is genuine chop.
+      if (pos >= 0.62) { dir = "SELL"; rangeFallback = true; }
+      else if (pos <= 0.38) { dir = "BUY"; rangeFallback = true; }
+    }
+  }
+
+  if (dir === "WAIT") {
+    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: "HTF and LTF are both ranging and price sits mid-range — no edge, waiting for a sweep of the range extreme." };
   }
 
   // Collect all UNMITIGATED LTF FVG/OB on the trade side, regardless of whether
@@ -341,6 +360,9 @@ export function buildTrade(
   }
 
   const notes: string[] = [];
+  if (rangeFallback) {
+    notes.push("Range play: both timeframes ranging, trading back from the range extreme toward equilibrium");
+  }
   const zoneMid = (zone.priceLow + zone.priceHigh) / 2;
   const zoneDistance = distanceFromExecutionZone(zone.priceLow, zone.priceHigh);
   const distPct = zoneDistance / lastPrice;
