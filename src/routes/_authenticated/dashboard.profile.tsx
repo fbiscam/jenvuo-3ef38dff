@@ -7,6 +7,8 @@ import { requestEmailChange } from "@/lib/email-change.functions";
 import { getMyMailAddress } from "@/lib/mail.functions";
 import AvatarAdjuster from "@/components/AvatarAdjuster";
 import { writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
+import { useVerification } from "@/hooks/useVerification";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: Profile,
