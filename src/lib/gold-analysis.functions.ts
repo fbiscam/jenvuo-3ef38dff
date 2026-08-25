@@ -1154,9 +1154,26 @@ function ensureSignalIntelligencePayload(plan: SignalPlan): SignalPlan {
     ? plan.currentPrice
     : Math.max(Number(trade?.entry) || 0, Number(trade?.tp) || 0, 1);
   const findLevel = (re: RegExp) => keyLevels.find((k) => re.test(String(k.label)))?.price;
-  const swingHigh = findLevel(/swing high|pdh|high/i) ?? Math.max(current, Number(trade?.tp) || current) * 1.003;
-  const swingLow = findLevel(/swing low|pdl|low/i) ?? Math.min(current, Number(trade?.tp) || current) * 0.997;
-  const equilibrium = findLevel(/equilibrium|eq/i) ?? (swingHigh + swingLow) / 2;
+  // Single source of truth: the premium/discount zones actually drawn on the
+  // chart. Reading the range off keyLevels label-matching used to pick up a
+  // different swing than the zones, so the narration quoted a range and an
+  // equilibrium that contradicted the plotted boxes (and the trade direction).
+  const pdMarkings = Array.isArray(plan.markings) ? plan.markings : [];
+  const premiumZone = pdMarkings.find((m: any) => m?.type === "premiumZone") as any;
+  const discountZone = pdMarkings.find((m: any) => m?.type === "discountZone") as any;
+  const zoneHigh = Number(premiumZone?.priceHigh);
+  const zoneLow = Number(discountZone?.priceLow);
+  const zoneEq = Number(premiumZone?.priceLow ?? discountZone?.priceHigh);
+  const swingHigh = Number.isFinite(zoneHigh) && zoneHigh > 0
+    ? zoneHigh
+    : findLevel(/swing high|pdh|high/i) ?? Math.max(current, Number(trade?.tp) || current) * 1.003;
+  const swingLow = Number.isFinite(zoneLow) && zoneLow > 0
+    ? zoneLow
+    : findLevel(/swing low|pdl|low/i) ?? Math.min(current, Number(trade?.tp) || current) * 0.997;
+  const equilibrium = Number.isFinite(zoneEq) && zoneEq > 0
+    ? zoneEq
+    : findLevel(/equilibrium|eq/i) ?? (swingHigh + swingLow) / 2;
+
   const htfBias: SignalPlan["htfBias"] = plan.htfBias === "bullish" || plan.htfBias === "bearish" ? plan.htfBias : "neutral";
   const ltfBias = multiTf.find((tf) => tf.tf === "15M")?.bias ?? htfBias;
   const ltfAligned = htfBias !== "neutral" && ltfBias === htfBias;
