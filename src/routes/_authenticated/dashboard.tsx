@@ -1206,7 +1206,7 @@ function DashboardLayout() {
               <TickerRow label="EUR / USD" symbol="EURUSD" decimals={4} />
               <TickerRow label="USD / JPY" symbol="USDJPY" decimals={3} />
               <TickerRow label="S&P 500" symbol="SPX" decimals={2} />
-              <TickerRow label="WTI Oil" symbol="WTI" decimals={2} />
+              
             </div>
           </Card>
 
