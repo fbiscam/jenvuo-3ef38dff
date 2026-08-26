@@ -844,7 +844,6 @@ function DashboardLayout() {
   const displayRemaining = Math.min(credits.balance || 0, credits.allowance || 0);
   const remainingPct = credits.allowance ? Math.min(100, Math.round((displayRemaining / credits.allowance) * 100)) : 0;
   const usedPct = credits.allowance ? Math.max(0, 100 - remainingPct) : 0;
-  const balanceTone: "blue" | "rose" | "zinc" = remainingPct < 30 ? "rose" : remainingPct < 60 ? "zinc" : "blue";
 
   // Track scan changes to show up/down trend.
   // Default: if any scans have been consumed (remaining < allowance) => downtrend (red).
@@ -863,6 +862,8 @@ function DashboardLayout() {
     }
     prevRemainingRef.current = displayRemaining;
   }, [displayRemaining, credits.isLoading, credits.allowance]);
+
+  const balanceTone: "emerald" | "rose" | "zinc" = scansTrend === "down" ? "rose" : scansTrend === "up" ? "emerald" : "zinc";
 
   return (
     <div className={`flex min-h-screen bg-[#FAFAFA] text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
