@@ -920,7 +920,7 @@ function SignalPage() {
         <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
           <div className="mx-auto flex max-w-[900px] items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
             <button
-              onClick={() => navigate({ to: "/app" })}
+              onClick={() => navigate({ to: "/dashboard" })}
               aria-label="Back to dashboard"
               className="h-8 shrink-0 inline-flex items-center gap-1.5 px-2 sm:px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
             >
@@ -1040,7 +1040,7 @@ function SignalPage() {
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4 min-w-0">
           <button
-            onClick={() => { stop(); navigate({ to: "/app" }); }}
+            onClick={() => { stop(); navigate({ to: "/dashboard" }); }}
             className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back
@@ -1826,7 +1826,7 @@ function SignalPage() {
 
 
               <Link
-                to="/app"
+                to="/dashboard"
                 className="w-full inline-flex items-center justify-center py-3 bg-white text-zinc-900 text-[14px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] tracking-normal rounded-lg border border-zinc-200 hover:bg-zinc-50 transition-colors normal-case"
               >
                 Execute Voice Trade
