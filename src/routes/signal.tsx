@@ -916,7 +916,7 @@ function SignalPage() {
   // Broadcasted alert view (from notification click) — no AI, no credits.
   if (alertId) {
     return (
-      <div className="min-h-dvh w-full bg-[#FAFAFA] text-slate-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
+      <div className="min-h-dvh w-full bg-white text-slate-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
         <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
           <div className="mx-auto flex max-w-[900px] items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
             <button
@@ -1034,7 +1034,7 @@ function SignalPage() {
   }
 
   return (
-    <div className="signal-page-root min-h-dvh w-full bg-[#FAFAFA] text-slate-900 antialiased" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+    <div className="signal-page-root min-h-dvh w-full bg-white text-slate-900 antialiased" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
       <style>{`.signal-page-root, .signal-page-root * { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; }`}</style>
       {/* HEADER */}
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
