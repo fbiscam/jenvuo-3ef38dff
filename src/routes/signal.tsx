@@ -1185,7 +1185,7 @@ function SignalPage() {
           </div>
 
           {/* body grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-white">
             {/* LEFT — ICT execution feed */}
             <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-4 min-h-[280px]">
               {/* Voice AI Agent — orb + chat, can mark on chart */}
