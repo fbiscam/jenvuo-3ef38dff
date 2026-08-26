@@ -398,8 +398,13 @@ export function buildTrade(
     .sort((a, b) => Math.abs(a.price - entry) - Math.abs(b.price - entry));
   const guardPool = stopSidePools.find((p) => {
     const d = Math.abs(entry - p.price);
-    // Only respect pools inside a sane stop range (≤ 2.5% of price).
-    return d > 0 && d <= lastPrice * 0.025;
+    // A liquidity pool is useful as stop protection only when it is still
+    // executable inside this asset's ticket-risk envelope. The old 2.5%
+    // allowance routinely selected an HTF extreme $70–$90 away on gold,
+    // pushed an otherwise valid 0.3–0.6% stop out to 1.5–1.8%, and made every
+    // manual/automatic scan return WAIT. Distant pools remain valid targets,
+    // but must not distort the protective stop for the current entry.
+    return d > 0 && d <= lastPrice * profile.maxRiskPct;
   });
   if (guardPool) {
     const poolStop = dir === "BUY" ? guardPool.price - buffer : guardPool.price + buffer;
