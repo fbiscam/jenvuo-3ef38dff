@@ -488,7 +488,7 @@ function SignalPage() {
           await speakWait(p.trade.summary);
           const hasLevels =
             Number.isFinite(p.trade.entry) && Number.isFinite(p.trade.sl) && Number.isFinite(p.trade.tp);
-          if ((p.trade.confidence ?? 0) >= 70 && hasLevels && p.trade.direction !== "WAIT") {
+          if ((p.trade.confidence ?? 0) >= MIN_CONFIDENCE && hasLevels && p.trade.direction !== "WAIT") {
             toast.success(`Setup ready · ${p.setupGrade}`);
           }
         }
@@ -1406,7 +1406,7 @@ function SignalPage() {
                   <div className="flex items-end justify-between">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className={`font-['Urbanist',sans-serif] text-[12px] font-semibold tracking-wide uppercase text-zinc-900`}>Trade Plan</span>
-                      {(t.confidence ?? 0) >= 70 && (
+                      {(t.confidence ?? 0) >= MIN_CONFIDENCE && (
                         <>
                           <span className={cn(
                             `text-[10px] ${MONO} font-bold tracking-widest uppercase px-1.5 py-0.5 rounded`,
@@ -2500,7 +2500,7 @@ function TradeTrackerCard({
       )}
 
       {/* Trade Management Ladder — only when a real trade plan is issued (confidence ≥ 70) */}
-      {(plan.trade?.confidence ?? 0) >= 70 && plan.trade?.direction !== "WAIT" && (
+      {(plan.trade?.confidence ?? 0) >= MIN_CONFIDENCE && plan.trade?.direction !== "WAIT" && (
         <TradeManagementLadder plan={plan} rMultiple={rMultiple} status={status} />
       )}
 
