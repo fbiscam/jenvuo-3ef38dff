@@ -863,6 +863,8 @@ function DashboardLayout() {
     prevRemainingRef.current = displayRemaining;
   }, [displayRemaining, credits.isLoading, credits.allowance]);
 
+  const balanceTone: "emerald" | "rose" | "zinc" = scansTrend === "down" ? "rose" : scansTrend === "up" ? "emerald" : "zinc";
+
   return (
     <div className={`flex min-h-screen bg-[#FAFAFA] text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
 
