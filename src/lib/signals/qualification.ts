@@ -11,7 +11,7 @@ export type Direction = "BUY" | "SELL";
 /**
  * Global quality floor. Runtime config may raise it, never lower it.
  */
-export const MIN_CONFIDENCE = 70;
+export const MIN_CONFIDENCE = 75;
 /** Broadcast tickets must carry at least a 2R target. */
 export const MIN_RR = 2;
 /** A live tick older than this must not be used for gating decisions. */
