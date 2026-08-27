@@ -183,7 +183,10 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           Number(cfg.same_direction_lock_min ?? 120) || 120,
           120,
         );
-        const maxPerDay = Math.max(Number(cfg.max_broadcasts_per_day ?? 12) || 12, 12);
+        // Quality over quantity: at most 2 broadcasts per UTC day. Runtime
+        // config may lower this, never raise it.
+        const maxPerDay = Math.min(Math.max(Number(cfg.max_broadcasts_per_day ?? 2) || 2, 1), 2);
+
         // 75%+ can broadcast immediately.
         let singleHitMinConf = Math.max(minConf, MIN_CONFIDENCE);
 
