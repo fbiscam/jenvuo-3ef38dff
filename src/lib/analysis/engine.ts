@@ -383,7 +383,7 @@ export function buildTrade(
   // Tightened buffer (0.33x zone height floor) for ultra-precision SL placement
   const pctBuffer = lastPrice * profile.pctBuffer;
   const atrBuffer = atr && atr > 0 ? atr * profile.atrMult : 0;
-  const zoneBuffer = zoneHeight * 0.33;
+  const zoneBuffer = zoneHeight * 0.20;
   const buffer = Math.max(pctBuffer, atrBuffer, zoneBuffer);
   let sl = dir === "BUY" ? zone.priceLow - buffer : zone.priceHigh + buffer;
 
