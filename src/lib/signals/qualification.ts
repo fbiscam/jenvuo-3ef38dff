@@ -257,6 +257,8 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
     grade: gradeFor(conf),
     session: sessionFor(input.utcHour),
     tpAdjusted,
+    confluences: cf.passed,
+
   };
 }
 
