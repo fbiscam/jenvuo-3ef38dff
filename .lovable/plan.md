@@ -1,6 +1,9 @@
-# Signal Accuracy Upgrade Plan
+# Signal Accuracy Upgrade Plan — Target 85% Win Rate
 
-Pehle ek seedhi baat: 100% accuracy market mein possible nahi — ek 25-saal ka veteran trader bhi 55-65% win rate par kaam karta hai, profit accuracy se nahi, **quality + risk/reward + discipline** se aata hai. Is plan ka goal: kam signals, har signal high-conviction, aur galat signal ka nuksan chhota.
+Goal: **85% accuracy** — yani sirf woh setups broadcast hon jo historically 85 mein se 85 nahi, par 85/100 baar jeetein. Yeh sirf ek tarah se possible hai: signal count bohot kam karke (hafte mein ~2-5), aur har signal ko multi-layer confirmation + calibration se guzaar kar. Beech ke "borderline 75%" signals — jo abhi wrong nikal rahe hain — poori tarah band ho jayenge.
+
+Honest note: 85% ek measurable target hai, guarantee nahi. Isliye plan mein har change ke baad stored history par replay karke actual hit-rate measure kiya jayega, aur threshold tab tak upar khisakaya jayega jab tak rolling 30-din ka win-rate 85% par na baithe.
+
 
 ## Current state (verified)
 
