@@ -538,18 +538,30 @@ function SignalPage() {
         htfBias,
         utcHour: utcH,
         inKillzone: isActiveKillzone(p.killzone),
+        checks: (p as unknown as { setupChecks?: Array<{ key: string; pass: boolean }> }).setupChecks ?? null,
+        regime: (p as unknown as { marketRegime?: { regime?: string } }).marketRegime?.regime ?? null,
       });
+      const rejectDetail = qualification.ok ? null : (qualification.detail ?? null);
       const gateBlock = qualification.ok
         ? null
         : qualification.reason === "no_direction"
           ? "No directional setup right now — market is in HOLD. Auto-scan pipeline would skip this too."
           : qualification.reason === "below_threshold"
             ? `Confidence ${Math.round(conf)}% is below the ${MIN_CONFIDENCE}% minimum. No trade this scan — wait for the next qualifying setup.`
-            : qualification.reason === "outside_killzone"
-              ? `Outside an active Killzone (${p.killzone || "n/a"}). Wait for London, New York, or Asia Killzone.`
-              : qualification.reason === "htf_bias_conflict"
-                ? `${dir} conflicts with HTF bias (${htfBias}). Pipeline rejects counter-trend setups — waiting for alignment.`
-                : "Trade levels did not pass the shared signal safety checks.";
+            : qualification.reason === "insufficient_confluence"
+              ? `Only ${(rejectDetail?.passed as string[] | undefined)?.length ?? 0}/5 core confluences confirmed (missing: ${((rejectDetail?.failed as string[] | undefined) ?? []).join(", ") || "n/a"}). At least 4 are required.`
+              : qualification.reason === "hard_veto"
+                ? `Hard veto active (${((rejectDetail?.vetoes as string[] | undefined) ?? []).join(", ").replace(/veto_/g, "") || "engine veto"}) — stand aside.`
+                : qualification.reason === "regime_choppy"
+                  ? "Choppy tape — no trades in this regime. Waiting for a clean trending/ranging structure."
+                  : qualification.reason === "regime_low_quality"
+                    ? `Ranging/volatile tape needs ≥90% conviction; this setup is ${Math.round(conf)}%.`
+                    : qualification.reason === "outside_killzone"
+                      ? `Outside an active Killzone (${p.killzone || "n/a"}). Wait for London or New York Killzone.`
+                      : qualification.reason === "htf_bias_conflict"
+                        ? `${dir} conflicts with HTF bias (${htfBias}). Pipeline rejects counter-trend setups — waiting for alignment.`
+                        : "Trade levels did not pass the shared signal safety checks.";
+
 
       // Always show the panel + intelligence so the user can still inspect
       // structure/context, but suppress the broadcast when any gate fails.

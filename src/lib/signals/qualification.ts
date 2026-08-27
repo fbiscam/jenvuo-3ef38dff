@@ -10,12 +10,73 @@ export type Direction = "BUY" | "SELL";
 
 /**
  * Global quality floor. Runtime config may raise it, never lower it.
+ * Raised 75 → 85: the 75-84 band was the source of the losing tickets.
  */
-export const MIN_CONFIDENCE = 75;
+export const MIN_CONFIDENCE = 85;
+/** Counter-trend (against HTF bias) needs near-perfect conviction. */
+export const COUNTER_TREND_MIN_CONFIDENCE = 92;
+/** Outside an active killzone only an exceptional setup may fire. */
+export const OUTSIDE_KILLZONE_MIN_CONFIDENCE = 95;
+/** Ranging tape needs more conviction; choppy tape is blocked outright. */
+export const RANGING_MIN_CONFIDENCE = 90;
+/** Mandatory ICT confluences out of the tracked checklist. */
+export const MIN_CONFLUENCES = 4;
 /** Broadcast tickets must carry at least a 2R target. */
 export const MIN_RR = 2;
 /** A live tick older than this must not be used for gating decisions. */
 export const MAX_TICK_AGE_MS = 5 * 60_000;
+
+/** Setup checks coming from the scoring engine (`plan.setupChecks`). */
+export type SetupCheckLike = { key: string; pass: boolean; label?: string };
+
+/**
+ * Core ICT confluence buckets. A bucket passes when ANY of its member
+ * checks passed, so alternative detectors for the same idea still count.
+ */
+export const CONFLUENCE_BUCKETS: Record<string, string[]> = {
+  bias: ["bias", "htf_poi"],
+  sweep: ["sweep", "turtle", "eqhl"],
+  structure: ["structure", "displacement"],
+  poi: ["zone", "confluence", "mitigation", "ce"],
+  pd: ["pd", "rejection"],
+};
+
+export type ConfluenceSummary = {
+  passed: string[];
+  failed: string[];
+  count: number;
+  biasAligned: boolean;
+  sweepConfirmed: boolean;
+  structureConfirmed: boolean;
+  /** Hard engine vetoes (setupChecks pushed with a `veto_` prefix). */
+  vetoes: string[];
+};
+
+export function summarizeConfluences(checks: SetupCheckLike[] | null | undefined): ConfluenceSummary {
+  const list = Array.isArray(checks) ? checks : [];
+  const byKey = new Map(list.map((c) => [String(c.key), !!c.pass]));
+  const passed: string[] = [];
+  const failed: string[] = [];
+  for (const [bucket, keys] of Object.entries(CONFLUENCE_BUCKETS)) {
+    const known = keys.filter((k) => byKey.has(k));
+    // Unknown bucket (detector not computed) counts as NOT passed — fail closed.
+    const ok = known.some((k) => byKey.get(k) === true);
+    (ok ? passed : failed).push(bucket);
+  }
+  const vetoes = list
+    .filter((c) => String(c.key).startsWith("veto_") || String(c.key).endsWith("_veto"))
+    .map((c) => String(c.key));
+  return {
+    passed,
+    failed,
+    count: passed.length,
+    biasAligned: passed.includes("bias"),
+    sweepConfirmed: passed.includes("sweep"),
+    structureConfirmed: passed.includes("structure"),
+    vetoes,
+  };
+}
+
 
 /** Plausible quote ranges — a cross priced outside these is a scale bug. */
 export const PAIR_PRICE_RANGE: Record<string, [number, number]> = {
@@ -32,9 +93,10 @@ export function isPriceScaleValid(pair: string, price: number): boolean {
 
 export function gradeFor(confidence: number): "A+" | "A" | "B" | "C" {
   const c = Math.round(confidence);
-  if (c >= 88) return "A+";
-  if (c >= 75) return "A";
-  if (c >= 65) return "B";
+  if (c >= 92) return "A+";
+  if (c >= 85) return "A";
+  if (c >= 70) return "B";
+
   return "C";
 }
 
@@ -74,7 +136,14 @@ export type QualifyInput = {
   inKillzone?: boolean;
   minConf?: number;
   minRR?: number;
+  /** Engine setup checks — used for the mandatory confluence gate. */
+  checks?: SetupCheckLike[] | null;
+  /** Market regime from the engine ("trending" | "ranging" | "choppy" | "volatile"). */
+  regime?: string | null;
+  /** Skip the confluence/regime layer (used by back-tests/replays). */
+  skipConfluenceGate?: boolean;
 };
+
 
 export type QualifyReject = { ok: false; reason: string; detail?: Record<string, unknown> };
 export type QualifyPass = {
@@ -90,6 +159,8 @@ export type QualifyPass = {
   session: string;
   /** True when TP was stretched up to the 2R floor. */
   tpAdjusted: boolean;
+  /** Which core ICT confluences backed this ticket. */
+  confluences: string[];
 };
 export type QualifyResult = QualifyPass | QualifyReject;
 
@@ -103,26 +174,51 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
   if (!Number.isFinite(conf)) return { ok: false, reason: "no_confidence" };
   if (conf < minConf) return { ok: false, reason: "below_threshold", detail: { conf, minConf } };
 
-  // HTF bias alignment. Neutral bias passes during London + NY (7–20 UTC),
-  // and a ≥75% conviction setup may trade against bias (reversal signals).
+  // ---- Confluence + veto layer (the 85% accuracy gate) ----
+  const gateOn = !input.skipConfluenceGate;
+  const cf = summarizeConfluences(input.checks);
+  if (gateOn && Array.isArray(input.checks) && input.checks.length > 0) {
+    if (cf.vetoes.length > 0) {
+      return { ok: false, reason: "hard_veto", detail: { vetoes: cf.vetoes } };
+    }
+    if (cf.count < MIN_CONFLUENCES) {
+      return {
+        ok: false,
+        reason: "insufficient_confluence",
+        detail: { passed: cf.passed, failed: cf.failed, need: MIN_CONFLUENCES },
+      };
+    }
+  }
+
+  // Regime discipline: choppy tape never trades; ranging needs extra conviction.
+  const regime = String(input.regime ?? "").toLowerCase();
+  if (gateOn && regime) {
+    if (regime === "choppy") {
+      return { ok: false, reason: "regime_choppy", detail: { regime } };
+    }
+    if ((regime === "ranging" || regime === "volatile") && conf < RANGING_MIN_CONFIDENCE) {
+      return { ok: false, reason: "regime_low_quality", detail: { regime, conf, need: RANGING_MIN_CONFIDENCE } };
+    }
+  }
+
+  // HTF bias alignment is now mandatory. A counter-trend / neutral-bias setup
+  // only survives at ≥92% conviction WITH a confirmed sweep and structure shift.
   const htfBias = String(input.htfBias ?? "neutral");
-  const activeSession = input.utcHour >= 7 && input.utcHour < 20;
-  const aligned =
-    (dir === "BUY" && htfBias === "bullish") ||
-    (dir === "SELL" && htfBias === "bearish") ||
-    (activeSession && htfBias === "neutral") ||
-    conf >= 75;
-  if (!aligned) {
+  const strictlyAligned =
+    (dir === "BUY" && htfBias === "bullish") || (dir === "SELL" && htfBias === "bearish");
+  const exceptional =
+    conf >= COUNTER_TREND_MIN_CONFIDENCE &&
+    (!gateOn || (cf.sweepConfirmed && cf.structureConfirmed));
+  if (!strictlyAligned && !exceptional) {
     return { ok: false, reason: "htf_bias_conflict", detail: { htfBias, dir, conf } };
   }
 
-  // Killzone gate: normally mandatory, but a very high conviction setup
-  // (≥85%) may still fire outside a session so users are not blind for the
-  // ~7 hours a day XAU/USD has no active killzone.
+  // Killzone gate: mandatory. Only a ≥95% setup may fire outside a session.
   const inKillzone = !!input.inKillzone;
-  if (!inKillzone && conf < 85) {
+  if (!inKillzone && conf < OUTSIDE_KILLZONE_MIN_CONFIDENCE) {
     return { ok: false, reason: "outside_killzone", detail: { conf } };
   }
+
 
   const entry = Number(input.entry);
   const sl = Number(input.sl);
@@ -162,6 +258,8 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
     grade: gradeFor(conf),
     session: sessionFor(input.utcHour),
     tpAdjusted,
+    confluences: cf.passed,
+
   };
 }
 
