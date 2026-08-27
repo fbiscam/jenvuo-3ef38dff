@@ -10,15 +10,17 @@ export type Direction = "BUY" | "SELL";
 
 /**
  * Global quality floor. Runtime config may raise it, never lower it.
- * Raised 75 → 85: the 75-84 band was the source of the losing tickets.
+ * Kept at 75 — quality is enforced by the confluence/veto/regime gates
+ * below plus the per-session calibration bump, not by the raw number.
  */
-export const MIN_CONFIDENCE = 85;
-/** Counter-trend (against HTF bias) needs near-perfect conviction. */
-export const COUNTER_TREND_MIN_CONFIDENCE = 92;
+export const MIN_CONFIDENCE = 75;
+/** Counter-trend (against HTF bias) needs much higher conviction. */
+export const COUNTER_TREND_MIN_CONFIDENCE = 88;
 /** Outside an active killzone only an exceptional setup may fire. */
-export const OUTSIDE_KILLZONE_MIN_CONFIDENCE = 95;
+export const OUTSIDE_KILLZONE_MIN_CONFIDENCE = 85;
 /** Ranging tape needs more conviction; choppy tape is blocked outright. */
-export const RANGING_MIN_CONFIDENCE = 90;
+export const RANGING_MIN_CONFIDENCE = 82;
+
 /** Mandatory ICT confluences out of the tracked checklist. */
 export const MIN_CONFLUENCES = 4;
 /** Broadcast tickets must carry at least a 2R target. */

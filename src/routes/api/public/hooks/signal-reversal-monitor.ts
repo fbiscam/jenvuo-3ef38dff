@@ -35,8 +35,9 @@ export const Route = createFileRoute(
         const { data: watching, error } = await supabaseAdmin
           .from("signal_paper_trades")
           .select(
-            "id, pair, direction, entry, sl, tp, rr, confidence, grade, broadcast_alert_id, fired_at",
+            "id, pair, direction, entry, sl, tp, rr, confidence, grade, broadcast_alert_id, fired_at, gates",
           )
+
           .eq("outcome", "pending")
           .is("reversal_notified_at", null)
           .gte("fired_at", cutoff)
@@ -73,6 +74,45 @@ export const Route = createFileRoute(
             // Unrealized R
             const moveFav = isBuy ? lp - entry : entry - lp;
             const rNow = moveFav / riskDist;
+
+            // ---- Pre-fill ticket invalidation ----
+            // A limit ticket that never filled is worthless once price walks
+            // ~40% of the risk distance the WRONG way, or once a high-impact
+            // news event goes live. Cancel it instead of leaving a stale
+            // ticket that later "fills" into a losing move.
+            const gates = (t.gates ?? {}) as Record<string, unknown>;
+            const alreadyFilled = gates.filled === true;
+            const touchedEntry = isBuy ? lp <= entry : lp >= entry;
+            if (!alreadyFilled && touchedEntry) {
+              await supabaseAdmin
+                .from("signal_paper_trades")
+                .update({ gates: { ...gates, filled: true, filled_at: new Date().toISOString() } })
+                .eq("id", t.id);
+            } else if (!alreadyFilled) {
+              const adverseR = -rNow; // positive when price ran away from entry toward SL side
+              const newsLive = await isHighImpactNewsLive();
+              if (adverseR >= 0.4 || newsLive) {
+                await supabaseAdmin
+                  .from("signal_paper_trades")
+                  .update({
+                    outcome: "cancelled",
+                    realized_r: 0,
+                    resolved_at: new Date().toISOString(),
+                    resolution_method: newsLive ? "cancelled_news" : "cancelled_prefill_drift",
+                    notes: newsLive
+                      ? "Cancelled before fill — high-impact news window opened."
+                      : `Cancelled before fill — price moved ${Math.round(adverseR * 100)}% of risk toward SL without triggering entry.`,
+                  })
+                  .eq("id", t.id);
+                results.push({
+                  id: t.id,
+                  action: newsLive ? "cancelled_news" : "cancelled_prefill_drift",
+                  adverse_r: Number(adverseR.toFixed(2)),
+                });
+                continue;
+              }
+            }
+
 
             // TP hit → resolve as win, no reversal
             const tpHit = isBuy ? lp >= tp : lp <= tp;

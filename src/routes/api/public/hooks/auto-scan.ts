@@ -190,6 +190,36 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         // 75%+ can broadcast immediately.
         let singleHitMinConf = Math.max(minConf, MIN_CONFIDENCE);
 
+        // ---- Rolling 30-day calibration ----
+        // Sessions that are under-performing the 85% target automatically
+        // demand extra confidence before anything may broadcast in them.
+        let calibration: Awaited<ReturnType<typeof import("@/lib/signals/calibration.server").computeCalibration>> | null =
+          null;
+        let calibrationBump = 0;
+        try {
+          const { computeCalibration, sessionConfidenceBump } = await import(
+            "@/lib/signals/calibration.server"
+          );
+          calibration = await computeCalibration(supabaseAdmin as never, 30);
+          const hourNow = new Date().getUTCHours();
+          const currentSession =
+            hourNow >= 12 && hourNow < 16
+              ? "overlap"
+              : hourNow >= 12
+                ? "new_york"
+                : hourNow >= 7
+                  ? "london"
+                  : "asia";
+          calibrationBump = sessionConfidenceBump(calibration, currentSession);
+          if (calibrationBump > 0) {
+            minConf = minConf + calibrationBump;
+            singleHitMinConf = singleHitMinConf + calibrationBump;
+          }
+        } catch {
+          // Calibration is an optimisation — never block scanning on it.
+        }
+
+
         // Global daily rate limit — manual scans bypass so the user's
         // deliberate analyze still fires when the pool cap is hit.
         const dayStart = new Date();
@@ -785,7 +815,12 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 killzone_passed: isActiveKillzone(plan.killzone),
                 cooldown_passed: true,
                 news_reaction: newsContext ?? null,
+                // Per-factor calibration input + UI badges.
+                confluences: qualification.ok ? qualification.confluences : [],
+                calibration_bump: calibrationBump,
+                filled: false,
               },
+
               broadcast_alert_id: inserted.id,
               outcome: "pending",
               models_used: dedupedModels,
