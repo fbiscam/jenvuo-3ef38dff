@@ -815,7 +815,12 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 killzone_passed: isActiveKillzone(plan.killzone),
                 cooldown_passed: true,
                 news_reaction: newsContext ?? null,
+                // Per-factor calibration input + UI badges.
+                confluences: qualification.ok ? qualification.confluences : [],
+                calibration_bump: calibrationBump,
+                filled: false,
               },
+
               broadcast_alert_id: inserted.id,
               outcome: "pending",
               models_used: dedupedModels,
