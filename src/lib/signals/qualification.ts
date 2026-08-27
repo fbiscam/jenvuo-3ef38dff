@@ -10,12 +10,73 @@ export type Direction = "BUY" | "SELL";
 
 /**
  * Global quality floor. Runtime config may raise it, never lower it.
+ * Raised 75 → 85: the 75-84 band was the source of the losing tickets.
  */
-export const MIN_CONFIDENCE = 75;
+export const MIN_CONFIDENCE = 85;
+/** Counter-trend (against HTF bias) needs near-perfect conviction. */
+export const COUNTER_TREND_MIN_CONFIDENCE = 92;
+/** Outside an active killzone only an exceptional setup may fire. */
+export const OUTSIDE_KILLZONE_MIN_CONFIDENCE = 95;
+/** Ranging tape needs more conviction; choppy tape is blocked outright. */
+export const RANGING_MIN_CONFIDENCE = 90;
+/** Mandatory ICT confluences out of the tracked checklist. */
+export const MIN_CONFLUENCES = 4;
 /** Broadcast tickets must carry at least a 2R target. */
 export const MIN_RR = 2;
 /** A live tick older than this must not be used for gating decisions. */
 export const MAX_TICK_AGE_MS = 5 * 60_000;
+
+/** Setup checks coming from the scoring engine (`plan.setupChecks`). */
+export type SetupCheckLike = { key: string; pass: boolean; label?: string };
+
+/**
+ * Core ICT confluence buckets. A bucket passes when ANY of its member
+ * checks passed, so alternative detectors for the same idea still count.
+ */
+export const CONFLUENCE_BUCKETS: Record<string, string[]> = {
+  bias: ["bias", "htf_poi"],
+  sweep: ["sweep", "turtle", "eqhl"],
+  structure: ["structure", "displacement"],
+  poi: ["zone", "confluence", "mitigation", "ce"],
+  pd: ["pd", "rejection"],
+};
+
+export type ConfluenceSummary = {
+  passed: string[];
+  failed: string[];
+  count: number;
+  biasAligned: boolean;
+  sweepConfirmed: boolean;
+  structureConfirmed: boolean;
+  /** Hard engine vetoes (setupChecks pushed with a `veto_` prefix). */
+  vetoes: string[];
+};
+
+export function summarizeConfluences(checks: SetupCheckLike[] | null | undefined): ConfluenceSummary {
+  const list = Array.isArray(checks) ? checks : [];
+  const byKey = new Map(list.map((c) => [String(c.key), !!c.pass]));
+  const passed: string[] = [];
+  const failed: string[] = [];
+  for (const [bucket, keys] of Object.entries(CONFLUENCE_BUCKETS)) {
+    const known = keys.filter((k) => byKey.has(k));
+    // Unknown bucket (detector not computed) counts as NOT passed — fail closed.
+    const ok = known.some((k) => byKey.get(k) === true);
+    (ok ? passed : failed).push(bucket);
+  }
+  const vetoes = list
+    .filter((c) => String(c.key).startsWith("veto_") || String(c.key).endsWith("_veto"))
+    .map((c) => String(c.key));
+  return {
+    passed,
+    failed,
+    count: passed.length,
+    biasAligned: passed.includes("bias"),
+    sweepConfirmed: passed.includes("sweep"),
+    structureConfirmed: passed.includes("structure"),
+    vetoes,
+  };
+}
+
 
 /** Plausible quote ranges — a cross priced outside these is a scale bug. */
 export const PAIR_PRICE_RANGE: Record<string, [number, number]> = {
