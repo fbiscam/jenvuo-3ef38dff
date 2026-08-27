@@ -1377,15 +1377,6 @@ function SignalPage() {
                   ) : null}
 
                 </div>
-                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-800 font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
-                  <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
-                  <LegendDot color="bg-sky-500/70" label="OB" />
-                  <LegendDot color="bg-amber-500/70" label="Liquidity" />
-                  <LegendDot color="bg-violet-500/70" label="EQH/EQL" />
-                  <LegendDot color="bg-yellow-400/70" label="OTE" />
-                  <LegendDot color="bg-rose-400/40" label="Premium" />
-                  <LegendDot color="bg-emerald-400/40" label="Discount" />
-                </div>
               </div>
             </div>
 
