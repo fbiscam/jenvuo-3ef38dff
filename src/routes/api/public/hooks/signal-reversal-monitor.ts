@@ -11,6 +11,47 @@ import { getLiveTick, computeSignalPlan } from "@/lib/gold-analysis.functions";
 
 const WATCH_HOURS = 4;
 const FLIP_MIN_CONF = 62;
+// Pre-fill invalidation: how close (in +/- minutes) a high-impact release must
+// be for us to treat the news window as "live" and cancel unfilled tickets.
+const NEWS_WINDOW_MIN = 15;
+
+let newsCache: { at: number; live: boolean } | null = null;
+
+/**
+ * True when a high-impact USD/major event is within +/-15 minutes.
+ * Uses the same Forex Factory weekly feed as the auto-scan hook.
+ * Fails open (returns false) so a feed outage never cancels tickets.
+ */
+async function isHighImpactNewsLive(): Promise<boolean> {
+  const now = Date.now();
+  if (newsCache && now - newsCache.at < 60_000) return newsCache.live;
+  let live = false;
+  try {
+    const res = await fetch(
+      "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+      { headers: { "User-Agent": "Mozilla/5.0" } },
+    );
+    if (res.ok) {
+      const raw = (await res.json()) as Array<{
+        title: string;
+        country: string;
+        date: string;
+        impact: string;
+      }>;
+      live = raw.some((e) => {
+        if (String(e.impact ?? "").toLowerCase() !== "high") return false;
+        const t = new Date(e.date).getTime();
+        if (!Number.isFinite(t)) return false;
+        return Math.abs(t - now) <= NEWS_WINDOW_MIN * 60_000;
+      });
+    }
+  } catch {
+    live = false;
+  }
+  newsCache = { at: now, live };
+  return live;
+}
+
 
 export const Route = createFileRoute(
   "/api/public/hooks/signal-reversal-monitor",
