@@ -492,6 +492,34 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               }
             }
 
+            // Open-ticket guard (the 2026-08-26 loss):
+            // 09:20 London BUY was still live when a second BUY fired at 12:00
+            // in the NY AM killzone at virtually the same price. The killzone
+            // changed, so the same-direction lock let it through, and the
+            // stacked re-entry got swept for -1R while the original ticket
+            // banked TP1. Never open a second ticket in the same direction on
+            // the same pair while the previous one is still unresolved.
+            if (!manualMode) {
+              const openSince = new Date(now.getTime() - 24 * 60 * 60_000).toISOString();
+              const { data: openTicket } = await supabaseAdmin
+                .from("signal_paper_trades")
+                .select("id, fired_at")
+                .eq("pair", pair)
+                .eq("direction", dir)
+                .eq("outcome", "pending")
+                .gte("fired_at", openSince)
+                .order("fired_at", { ascending: false })
+                .limit(1);
+              if (openTicket?.length) {
+                results.push({
+                  pair,
+                  action: "open_ticket_same_direction",
+                  dir,
+                  open_trade_id: openTicket[0].id,
+                });
+                continue;
+              }
+            }
 
 
             // Two-hit confirmation: first qualifying scan only arms the signal.
