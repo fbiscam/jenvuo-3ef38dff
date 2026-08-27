@@ -1489,9 +1489,9 @@ function SignalPage() {
                         )}
 
                         {!isBuy && !isSell && (
-                          <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 text-[12px] text-zinc-700">
-                            <div className="font-semibold mb-0.5">No directional bias</div>
-                            <div className="text-[11px] text-zinc-500">Market is currently ranging — wait for a clear HTF bias before entering.</div>
+                          <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 text-[14px] text-zinc-700">
+                            <div className="font-semibold mb-1">No directional bias</div>
+                            <div className="text-[13px] text-zinc-500">Market is currently ranging — wait for a clear HTF bias before entering.</div>
                           </div>
                         )}
                       </>
