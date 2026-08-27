@@ -1377,15 +1377,6 @@ function SignalPage() {
                   ) : null}
 
                 </div>
-                <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-800 font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1`}>
-                  <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
-                  <LegendDot color="bg-sky-500/70" label="OB" />
-                  <LegendDot color="bg-amber-500/70" label="Liquidity" />
-                  <LegendDot color="bg-violet-500/70" label="EQH/EQL" />
-                  <LegendDot color="bg-yellow-400/70" label="OTE" />
-                  <LegendDot color="bg-rose-400/40" label="Premium" />
-                  <LegendDot color="bg-emerald-400/40" label="Discount" />
-                </div>
               </div>
             </div>
 
@@ -1835,7 +1826,7 @@ function SignalPage() {
           </div>
 
           {/* status bar */}
-          <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-white flex justify-center sm:justify-between items-center gap-3">
+          <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-white flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-2 sm:gap-3">
             <div className="flex gap-4 sm:gap-6 items-center">
               <div className="flex items-center gap-1.5">
                 <span className={`text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900`}>STATE</span>
@@ -1848,9 +1839,15 @@ function SignalPage() {
                 </span>
               </div>
             </div>
-            <span className={`hidden sm:inline text-[13px] font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal text-zinc-900 tracking-normal truncate`}>
-              Pro Version 2.04.1 · ICT/SMC Engine
-            </span>
+            <div className={`text-[9px] ${MONO} tracking-widest uppercase text-zinc-800 font-semibold flex flex-wrap gap-x-3 gap-y-1 items-center justify-center sm:justify-end`}>
+              <LegendDot color="bg-emerald-500/70" label="FVG/BOS" />
+              <LegendDot color="bg-sky-500/70" label="OB" />
+              <LegendDot color="bg-amber-500/70" label="Liquidity" />
+              <LegendDot color="bg-violet-500/70" label="EQH/EQL" />
+              <LegendDot color="bg-yellow-400/70" label="OTE" />
+              <LegendDot color="bg-rose-400/40" label="Premium" />
+              <LegendDot color="bg-emerald-400/40" label="Discount" />
+            </div>
           </div>
         </div>
       </main>
