@@ -35,8 +35,9 @@ export const Route = createFileRoute(
         const { data: watching, error } = await supabaseAdmin
           .from("signal_paper_trades")
           .select(
-            "id, pair, direction, entry, sl, tp, rr, confidence, grade, broadcast_alert_id, fired_at",
+            "id, pair, direction, entry, sl, tp, rr, confidence, grade, broadcast_alert_id, fired_at, gates",
           )
+
           .eq("outcome", "pending")
           .is("reversal_notified_at", null)
           .gte("fired_at", cutoff)
