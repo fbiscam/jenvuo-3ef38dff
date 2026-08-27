@@ -135,7 +135,14 @@ export type QualifyInput = {
   inKillzone?: boolean;
   minConf?: number;
   minRR?: number;
+  /** Engine setup checks — used for the mandatory confluence gate. */
+  checks?: SetupCheckLike[] | null;
+  /** Market regime from the engine ("trending" | "ranging" | "choppy" | "volatile"). */
+  regime?: string | null;
+  /** Skip the confluence/regime layer (used by back-tests/replays). */
+  skipConfluenceGate?: boolean;
 };
+
 
 export type QualifyReject = { ok: false; reason: string; detail?: Record<string, unknown> };
 export type QualifyPass = {
