@@ -93,9 +93,10 @@ export function isPriceScaleValid(pair: string, price: number): boolean {
 
 export function gradeFor(confidence: number): "A+" | "A" | "B" | "C" {
   const c = Math.round(confidence);
-  if (c >= 88) return "A+";
-  if (c >= 75) return "A";
-  if (c >= 65) return "B";
+  if (c >= 92) return "A+";
+  if (c >= 85) return "A";
+  if (c >= 70) return "B";
+
   return "C";
 }
 
