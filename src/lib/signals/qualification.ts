@@ -158,6 +158,8 @@ export type QualifyPass = {
   session: string;
   /** True when TP was stretched up to the 2R floor. */
   tpAdjusted: boolean;
+  /** Which core ICT confluences backed this ticket. */
+  confluences: string[];
 };
 export type QualifyResult = QualifyPass | QualifyReject;
 
@@ -171,26 +173,51 @@ export function qualifySignal(input: QualifyInput): QualifyResult {
   if (!Number.isFinite(conf)) return { ok: false, reason: "no_confidence" };
   if (conf < minConf) return { ok: false, reason: "below_threshold", detail: { conf, minConf } };
 
-  // HTF bias alignment. Neutral bias passes during London + NY (7–20 UTC),
-  // and a ≥75% conviction setup may trade against bias (reversal signals).
+  // ---- Confluence + veto layer (the 85% accuracy gate) ----
+  const gateOn = !input.skipConfluenceGate;
+  const cf = summarizeConfluences(input.checks);
+  if (gateOn && Array.isArray(input.checks) && input.checks.length > 0) {
+    if (cf.vetoes.length > 0) {
+      return { ok: false, reason: "hard_veto", detail: { vetoes: cf.vetoes } };
+    }
+    if (cf.count < MIN_CONFLUENCES) {
+      return {
+        ok: false,
+        reason: "insufficient_confluence",
+        detail: { passed: cf.passed, failed: cf.failed, need: MIN_CONFLUENCES },
+      };
+    }
+  }
+
+  // Regime discipline: choppy tape never trades; ranging needs extra conviction.
+  const regime = String(input.regime ?? "").toLowerCase();
+  if (gateOn && regime) {
+    if (regime === "choppy") {
+      return { ok: false, reason: "regime_choppy", detail: { regime } };
+    }
+    if ((regime === "ranging" || regime === "volatile") && conf < RANGING_MIN_CONFIDENCE) {
+      return { ok: false, reason: "regime_low_quality", detail: { regime, conf, need: RANGING_MIN_CONFIDENCE } };
+    }
+  }
+
+  // HTF bias alignment is now mandatory. A counter-trend / neutral-bias setup
+  // only survives at ≥92% conviction WITH a confirmed sweep and structure shift.
   const htfBias = String(input.htfBias ?? "neutral");
-  const activeSession = input.utcHour >= 7 && input.utcHour < 20;
-  const aligned =
-    (dir === "BUY" && htfBias === "bullish") ||
-    (dir === "SELL" && htfBias === "bearish") ||
-    (activeSession && htfBias === "neutral") ||
-    conf >= 75;
-  if (!aligned) {
+  const strictlyAligned =
+    (dir === "BUY" && htfBias === "bullish") || (dir === "SELL" && htfBias === "bearish");
+  const exceptional =
+    conf >= COUNTER_TREND_MIN_CONFIDENCE &&
+    (!gateOn || (cf.sweepConfirmed && cf.structureConfirmed));
+  if (!strictlyAligned && !exceptional) {
     return { ok: false, reason: "htf_bias_conflict", detail: { htfBias, dir, conf } };
   }
 
-  // Killzone gate: normally mandatory, but a very high conviction setup
-  // (≥85%) may still fire outside a session so users are not blind for the
-  // ~7 hours a day XAU/USD has no active killzone.
+  // Killzone gate: mandatory. Only a ≥95% setup may fire outside a session.
   const inKillzone = !!input.inKillzone;
-  if (!inKillzone && conf < 85) {
+  if (!inKillzone && conf < OUTSIDE_KILLZONE_MIN_CONFIDENCE) {
     return { ok: false, reason: "outside_killzone", detail: { conf } };
   }
+
 
   const entry = Number(input.entry);
   const sl = Number(input.sl);
