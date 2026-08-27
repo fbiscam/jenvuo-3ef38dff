@@ -360,7 +360,10 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               utcHour: now.getUTCHours(),
               inKillzone: isActiveKillzone(kz),
               minConf,
+              checks: (plan as unknown as { setupChecks?: Array<{ key: string; pass: boolean }> }).setupChecks ?? null,
+              regime: (plan as unknown as { marketRegime?: { regime?: string } }).marketRegime?.regime ?? null,
             });
+
             if (!qualification.ok) {
               await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
               results.push({
