@@ -260,15 +260,15 @@ const RISK_PROFILE: Record<
     maxRiskPct: number;
   }
 > = {
-  crypto: { pctBuffer: 0.0020, minRiskPct: 0.0025, atrMult: 0.70, maxDistPct: 0.0120, entryWindowPct: 0.0040, maxRiskPct: 0.0140 },
-  // Metals: live tickets were coming out with 1.0-1.25% stops (≈ $50 on gold)
-  // and 3R targets ≈ $150 — unusable size for retail accounts. Tightened so a
-  // normal XAU ticket sits around 0.25-0.35% risk (≈ $12-$16) and the 3R target
-  // stays under ~1.1%. Still ≈ 0.7x ATR, so it clears routine session noise.
-  metal:  { pctBuffer: 0.0008, minRiskPct: 0.0016, atrMult: 0.50, maxDistPct: 0.0045, entryWindowPct: 0.0020, maxRiskPct: 0.0060 },
-  forex:  { pctBuffer: 0.0004, minRiskPct: 0.0007, atrMult: 0.40, maxDistPct: 0.0035, entryWindowPct: 0.0015, maxRiskPct: 0.0045 },
-  index:  { pctBuffer: 0.0008, minRiskPct: 0.0012, atrMult: 0.50, maxDistPct: 0.0060, entryWindowPct: 0.0025, maxRiskPct: 0.0080 },
-  stock:  { pctBuffer: 0.0012, minRiskPct: 0.0018, atrMult: 0.55, maxDistPct: 0.0080, entryWindowPct: 0.0030, maxRiskPct: 0.0110 },
+  crypto: { pctBuffer: 0.0012, minRiskPct: 0.0015, atrMult: 0.45, maxDistPct: 0.0090, entryWindowPct: 0.0030, maxRiskPct: 0.0075 },
+  // Metals: tickets were still printing ~0.6% stops (≈ $28 on gold) with 3R
+  // targets ≈ $85. Tightened again so a normal XAU ticket sits around
+  // 0.12-0.30% risk (≈ $6-$14) and the 3R target stays under ~0.9%.
+  metal:  { pctBuffer: 0.0005, minRiskPct: 0.0010, atrMult: 0.32, maxDistPct: 0.0035, entryWindowPct: 0.0015, maxRiskPct: 0.0032 },
+  forex:  { pctBuffer: 0.0003, minRiskPct: 0.0005, atrMult: 0.28, maxDistPct: 0.0025, entryWindowPct: 0.0012, maxRiskPct: 0.0025 },
+  index:  { pctBuffer: 0.0005, minRiskPct: 0.0008, atrMult: 0.32, maxDistPct: 0.0040, entryWindowPct: 0.0018, maxRiskPct: 0.0045 },
+  stock:  { pctBuffer: 0.0008, minRiskPct: 0.0012, atrMult: 0.35, maxDistPct: 0.0055, entryWindowPct: 0.0022, maxRiskPct: 0.0060 },
+
 
 };
 
@@ -383,7 +383,7 @@ export function buildTrade(
   // Tightened buffer (0.33x zone height floor) for ultra-precision SL placement
   const pctBuffer = lastPrice * profile.pctBuffer;
   const atrBuffer = atr && atr > 0 ? atr * profile.atrMult : 0;
-  const zoneBuffer = zoneHeight * 0.33;
+  const zoneBuffer = zoneHeight * 0.20;
   const buffer = Math.max(pctBuffer, atrBuffer, zoneBuffer);
   let sl = dir === "BUY" ? zone.priceLow - buffer : zone.priceHigh + buffer;
 
