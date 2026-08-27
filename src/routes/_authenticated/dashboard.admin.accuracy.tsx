@@ -118,6 +118,62 @@ function AccuracyPage() {
             />
           </div>
 
+          <Section title="Gate replay — before vs after">
+            <div className="p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => runReplay(Math.min(days, 180))}
+                  disabled={replayLoading}
+                  className="inline-flex items-center gap-1.5 rounded-md border bg-white px-3 py-1.5 text-sm hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <RefreshCw className={`h-4 w-4 ${replayLoading ? "animate-spin" : ""}`} />
+                  Replay last {Math.min(days, 180)}d through current gates
+                </button>
+              </div>
+              {replay && (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <Kpi
+                      label="Before — win rate"
+                      value={pct(replay.before.winRate)}
+                      hint={`${replay.before.taken} resolved · avg R ${r(replay.before.avgR)}`}
+                    />
+                    <Kpi
+                      label="After — win rate"
+                      value={pct(replay.after.winRate)}
+                      hint={`${replay.after.taken} kept · avg R ${r(replay.after.avgR)}`}
+                      accent={replay.after.winRate >= replay.before.winRate ? "good" : "bad"}
+                    />
+                    <Kpi
+                      label="Delta"
+                      value={`${((replay.after.winRate - replay.before.winRate) * 100).toFixed(1)} pts`}
+                      accent={replay.after.winRate >= replay.before.winRate ? "good" : "bad"}
+                    />
+                    <Kpi
+                      label="Filtered out"
+                      value={String(replay.before.taken - replay.after.taken)}
+                      hint="signals current gates would block"
+                    />
+                  </div>
+                  {replay.filteredOut.length > 0 && (
+                    <Table
+                      cols={["Blocked by", "Count", "Would-be wins", "Would-be losses"]}
+                      rows={replay.filteredOut.map((f) => [
+                        f.reason.replace(/_/g, " "),
+                        f.count,
+                        f.wins,
+                        f.losses,
+                      ])}
+                    />
+                  )}
+                  <p className="text-xs text-gray-500">{replay.note}</p>
+                </>
+              )}
+            </div>
+          </Section>
+
+
+
           <Section title="By grade">
             <Table
               cols={["Grade", "Total", "Wins", "Losses", "Timeout", "Pending", "Win rate", "Avg R"]}
