@@ -3148,9 +3148,7 @@ function HistoricalBacktestPanel({ symbol }: { symbol: string }) {
         </DialogContent>
       </Dialog>
 
-        </div>
-      </div>
-    </SidebarProvider>
+    </>
   );
 }
 
