@@ -27,7 +27,7 @@ import {
 const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Signal Desk", url: "/signal", icon: Radar },
-  { title: "Saved Signals", url: "/dashboard/workspace", icon: Bookmarks },
+  { title: "Saved Signals", url: "/dashboard/workspace", icon: Bookmark },
   { title: "Alerts", url: "/dashboard/alerts", icon: Bell },
   { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
   { title: "Killzones", url: "/killzones", icon: Clock },
