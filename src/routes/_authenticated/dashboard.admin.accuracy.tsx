@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AlertTriangle, TrendingUp, RefreshCw } from "lucide-react";
 import { getAccuracyReport } from "@/lib/tuning/accuracy.functions";
+import { replayGateVerification, type ReplayResult } from "@/lib/tuning/replay.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/accuracy")({
   head: () => ({
@@ -26,9 +27,23 @@ function r(n: number) {
 
 function AccuracyPage() {
   const fetchReport = useServerFn(getAccuracyReport);
+  const fetchReplay = useServerFn(replayGateVerification);
   const [report, setReport] = useState<Report | null>(null);
   const [days, setDays] = useState(90);
   const [loading, setLoading] = useState(false);
+  const [replay, setReplay] = useState<ReplayResult | null>(null);
+  const [replayLoading, setReplayLoading] = useState(false);
+
+  const runReplay = async (d: number) => {
+    setReplayLoading(true);
+    try {
+      setReplay(await fetchReplay({ data: { days: d } }));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Replay failed");
+    } finally {
+      setReplayLoading(false);
+    }
+  };
 
   const load = async (d: number) => {
     setLoading(true);
