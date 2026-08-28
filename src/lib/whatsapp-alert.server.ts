@@ -34,7 +34,10 @@ export async function sendSignalAlertWhatsApp(a: SignalAlertArgs): Promise<{ sen
     direction: a.direction as any 
   })
   
-  if (paidIds.length === 0) return { sent: 0 }
+  if (paidIds.length === 0) {
+    console.warn('[WhatsApp] no eligible paid/opted-in users for alert', a.alertId)
+    return { sent: 0 }
+  }
 
   const { data: links } = await supabaseAdmin
     .from('whatsapp_alert_links')
@@ -44,6 +47,12 @@ export async function sendSignalAlertWhatsApp(a: SignalAlertArgs): Promise<{ sen
     .not('verified_at', 'is', null)
 
   const rows = (links ?? []) as Array<{ user_id: string; phone_number: string }>
+  if (rows.length === 0) {
+    console.warn(
+      `[WhatsApp] alert ${a.alertId}: 0 recipients — ${paidIds.length} eligible users but none have a verified + enabled WhatsApp link.`,
+    )
+  }
+
   if (rows.length === 0) return { sent: 0 }
 
   // 2. Format message
