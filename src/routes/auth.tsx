@@ -896,7 +896,7 @@ function AuthPage() {
 
                   {/* Sign-up is closed — access via Founding Trader Program */}
                   {!mfaChallenge && (
-                    <div className="mt-4 rounded-lg border border-yellow-300 bg-yellow-100 px-4 py-3 text-[13px] text-yellow-900">
+                    <div className="mt-4 rounded-lg border border-yellow-300 bg-white px-4 py-3 text-[13px] text-yellow-900">
                       Public sign-up is closed. Access is granted through the{" "}
                       <Link to="/founding" className="font-medium text-zinc-900 underline-offset-2 hover:underline">
                         Founding{"\n"}Trader Program
