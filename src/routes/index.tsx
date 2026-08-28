@@ -665,7 +665,7 @@ function HomePage() {
               {
                 k: "05",
                 t: "One Pair, Total Focus",
-                d: "XAU/USD only — the entire desk is tuned to a single instrument.",
+                d: "XAU/USD only — the entire desk is tuned to a single instrument, news, market insights.",
               },
               {
                 k: "06",
