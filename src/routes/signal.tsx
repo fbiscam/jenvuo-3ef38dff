@@ -1064,9 +1064,12 @@ function SignalPage() {
   }
 
   return (
-    <div className="signal-page-root min-h-dvh w-full bg-white text-slate-900 antialiased" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
-      <style>{`.signal-page-root, .signal-page-root * { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; }`}</style>
-      {/* HEADER */}
+    <SidebarProvider>
+      <div className="signal-page-root min-h-dvh w-full bg-white text-slate-900 antialiased flex" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}>
+        <AppSidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <style>{`.signal-page-root, .signal-page-root * { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; }`}</style>
+          {/* HEADER */}
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="relative mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4 min-w-0">
           <button
