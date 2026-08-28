@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Radar,
-  Bookmarks,
+  Bookmark,
   Bell,
   BarChart3,
   Clock,
