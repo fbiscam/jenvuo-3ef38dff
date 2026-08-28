@@ -1443,7 +1443,7 @@ function SignalPage() {
             </div>
 
             {/* RIGHT — intelligence */}
-            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 space-y-6 overflow-y-auto max-h-[820px]">
+            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100 space-y-6 self-start h-fit">
               <h3 className="text-[15px] font-normal font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] text-zinc-900 tracking-normal normal-case">
                 Intelligence Dashboard
               </h3>
