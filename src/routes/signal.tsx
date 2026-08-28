@@ -28,6 +28,7 @@ import PageLoading from "@/components/PageLoading";
 import { killzoneForPair, getPairProfile } from "@/lib/analysis/engine";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { isActiveKillzone, MIN_CONFIDENCE, qualifySignal } from "@/lib/signals/qualification";
+import { getSignalPerformance, type SignalPerformance } from "@/lib/signals/stats.functions";
 import { useVerification } from "@/hooks/useVerification";
 import { VerificationLocked } from "@/components/VerificationGate";
 
