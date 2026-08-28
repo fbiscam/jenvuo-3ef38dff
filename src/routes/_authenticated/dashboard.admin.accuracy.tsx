@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AlertTriangle, TrendingUp, RefreshCw } from "lucide-react";
 import { getAccuracyReport } from "@/lib/tuning/accuracy.functions";
+import { replayGateVerification, type ReplayResult } from "@/lib/tuning/replay.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/accuracy")({
   head: () => ({
