@@ -1918,7 +1918,9 @@ function SignalPage() {
         </div>
       </main>
 
-    </div>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 
 }
