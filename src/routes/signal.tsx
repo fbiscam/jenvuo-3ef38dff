@@ -578,6 +578,11 @@ function SignalPage() {
       // Always show the panel + intelligence so the user can still inspect
       // structure/context, but suppress the broadcast when any gate fails.
       setPlan(p);
+      setPassedConfluences(
+        qualification.ok
+          ? ((qualification as unknown as { confluences?: string[] }).confluences ?? [])
+          : ((rejectDetail?.passed as string[] | undefined) ?? []),
+      );
       if (gateBlock) {
         setAnalysisError(gateBlock);
         setBroadcastStatus({ kind: "blocked", pair: sym.toUpperCase(), reason: gateBlock, at: Date.now() });
