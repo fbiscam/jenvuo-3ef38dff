@@ -220,6 +220,17 @@ function SignalPage() {
     | { kind: "blocked"; pair: string; reason: string; at: number }
     | null
   >(null);
+  const [passedConfluences, setPassedConfluences] = useState<string[]>([]);
+  const [perf, setPerf] = useState<SignalPerformance | null>(null);
+  const loadPerf = useServerFn(getSignalPerformance);
+  useEffect(() => {
+    let alive = true;
+    loadPerf({ data: { days: 30 } })
+      .then((p) => { if (alive) setPerf(p); })
+      .catch(() => {});
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const activeScanRef = useRef<string | null>(null);
   const [analyzeElapsed, setAnalyzeElapsed] = useState(0);
   useEffect(() => {
