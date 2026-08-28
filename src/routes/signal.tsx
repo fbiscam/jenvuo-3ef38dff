@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw, Pause, AlertTriangle, Check, X, Activity, TrendingUp, TrendingDown, Minus, Sparkles, Send, Mic, Lock, CheckCircle2, Bell, BellOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { getSignalPlan, getNewsRisk, getChartCandles, type SignalPlan, type Marking } from "@/lib/gold-analysis.functions";
@@ -11,7 +11,6 @@ import { askSignalAgent } from "@/lib/signal-agent.functions";
 import { broadcastCurrentSignal } from "@/lib/broadcast-alert.functions";
 import { runManualScanBroadcast } from "@/lib/manual-scan-broadcast.functions";
 import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
-import { Bell, BellOff } from "lucide-react";
 import SignalChart, { type SignalChartHandle } from "@/components/SignalChart";
 
 import { stopAllBrowserSpeech, useSpeech } from "@/hooks/useSpeech";
@@ -31,6 +30,8 @@ import { isActiveKillzone, MIN_CONFIDENCE, qualifySignal } from "@/lib/signals/q
 import { getSignalPerformance, type SignalPerformance } from "@/lib/signals/stats.functions";
 import { useVerification } from "@/hooks/useVerification";
 import { VerificationLocked } from "@/components/VerificationGate";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 
 
