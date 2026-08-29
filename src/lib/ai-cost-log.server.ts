@@ -18,6 +18,9 @@ const MODEL_PRICING: Record<string, Price> = {
   "openai/gpt-5-mini": { in: 0.25, out: 2.0 },
   "openai/gpt-5-nano": { in: 0.05, out: 0.4 },
   // Bluesminds mirrors OpenAI list prices
+  "bmind/gpt-5.6-sol": { in: 1.25, out: 10.0 },
+  "bmind/gpt-5.6-terra": { in: 0.6, out: 4.0 },
+  "bmind/gpt-5.6-luna": { in: 0.2, out: 1.6 },
   "bmind/gpt-5.5": { in: 1.25, out: 10.0 },
   "bmind/gpt-5.5-pro": { in: 3.0, out: 15.0 },
   "bmind/gpt-5.4": { in: 1.1, out: 8.8 },

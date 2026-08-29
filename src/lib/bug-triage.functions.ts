@@ -102,7 +102,7 @@ Given error telemetry, produce:
 Respond as strict JSON: {"root_cause": string, "suggested_fix": string}.`
 
     const result = await callChatCompletion({
-      models: ['bmind/gpt-5.5', 'openai/gpt-5.5', 'openai/gpt-5.4-mini'],
+      models: ['bmind/gpt-5.6-sol', 'bmind/gpt-5.2-chat', 'bmind/gpt-5-mini'],
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: context_text.slice(0, 12000) },
