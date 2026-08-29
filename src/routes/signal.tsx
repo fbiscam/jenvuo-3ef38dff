@@ -1523,15 +1523,23 @@ function SignalPage() {
                     const riskPct = t.entry ? (riskAbs / t.entry) * 100 : 0;
                     const rewardPct = t.entry ? (rewardAbs / t.entry) * 100 : 0;
                     const fmtDist = (n: number) => n >= 100 ? n.toFixed(0) : n.toFixed(dec);
+                    const seniorFailed = plan.setupChecks.some((c) => c.key === "senior_review_unavailable");
+                    const seniorFailReason = plan.setupChecks.find((c) => c.key === "senior_review_unavailable")?.reason;
                     return (
                       <>
-                        {isLowConf && (isBuy || isSell) && (
+                        {seniorFailed && (
+                          <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 font-['Urbanist',sans-serif] text-[13px] font-medium text-rose-900 leading-relaxed">
+                            <div className="font-semibold text-[14px] mb-1">Senior review unavailable — trade plan withheld</div>
+                            <div>{seniorFailReason ?? "No model in the senior review chain responded. Entry / Stop / Target are hidden until a senior review completes. Please re-run the scan."}</div>
+                          </div>
+                        )}
+                        {!seniorFailed && isLowConf && (isBuy || isSell) && (
                           <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 font-['Urbanist',sans-serif] text-[13px] font-medium text-amber-900 leading-relaxed">
                             <div className="font-semibold text-[14px] mb-1">Low-confidence setup — no entry shown</div>
                             <div>Confidence {t.confidence ?? 0}% is below the {LOW_CONF}% minimum. Entry / Stop / Target are hidden until a setup with best grades forms. Wait for the next scan.</div>
                           </div>
                         )}
-                        {(isBuy || isSell) && !isLowConf && (
+                        {(isBuy || isSell) && !isLowConf && !seniorFailed && (
                           <div className="grid grid-cols-2 gap-px bg-zinc-100 rounded-lg overflow-hidden border border-zinc-100">
                             <KV label="Entry" value={t.entry.toFixed(dec)} />
                             <KV label="R:R" value={`1:${t.rr.toFixed(2)}`} />
@@ -1550,12 +1558,13 @@ function SignalPage() {
                           </div>
                         )}
 
-                        {!isBuy && !isSell && (
+                        {!isBuy && !isSell && !seniorFailed && (
                           <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 text-[14px] text-zinc-700">
                             <div className="font-semibold mb-1">No directional bias</div>
                             <div className="text-[13px] text-zinc-500">Market is currently ranging — wait for a clear HTF bias before entering.</div>
                           </div>
                         )}
+
                       </>
                     );
                   })()}
