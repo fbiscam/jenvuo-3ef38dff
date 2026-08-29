@@ -62,6 +62,7 @@ function providerConfigured(model: string): boolean {
   if (model.startsWith("nvapi/")) return Boolean(process.env.NVIDIA_API_KEY);
   if (model.startsWith("bmind/")) return Boolean(process.env.BLUESMINDS_API_KEY);
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
+  if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
   return Boolean(process.env.LOVABLE_API_KEY);
 }
 
@@ -102,12 +103,16 @@ async function singleAttempt(
   const isNvidia = model.startsWith("nvapi/");
   const isBmind = model.startsWith("bmind/");
   const isDsOfficial = model.startsWith("dsofficial/");
+  const isOai = model.startsWith("oai/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
   const nvidiaKey = process.env.NVIDIA_API_KEY;
   const bmindKey = process.env.BLUESMINDS_API_KEY;
   const deepseekKey = process.env.DEEPSEEK_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
 
-  const endpoint = isBlackbox
+  const endpoint = isOai
+    ? "https://api.openai.com/v1/chat/completions"
+    : isBlackbox
     ? "https://api.blackbox.ai/v1/chat/completions"
     : isNvidia
     ? "https://integrate.api.nvidia.com/v1/chat/completions"
@@ -130,6 +135,9 @@ async function singleAttempt(
   } else if (isDsOfficial) {
     if (!deepseekKey) throw new AiGatewayError("DEEPSEEK_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${deepseekKey}`;
+  } else if (isOai) {
+    if (!openaiKey) throw new AiGatewayError("OPENAI_API_KEY missing on server", 0, true);
+    headers["Authorization"] = `Bearer ${openaiKey}`;
   } else {
     if (!apiKey) throw new AiGatewayError("LOVABLE_API_KEY missing on server", 0, true);
     headers["Lovable-API-Key"] = apiKey;
@@ -137,7 +145,9 @@ async function singleAttempt(
 
 
   // Strip provider prefixes to expose the real upstream model id.
-  const wireModel = isNvidia
+  const wireModel = isOai
+    ? model.slice("oai/".length)
+    : isNvidia
     ? model.slice("nvapi/".length)
     : isBmind
     ? model.slice("bmind/".length)
@@ -165,15 +175,16 @@ async function singleAttempt(
     ...(isGpt5Family ? {} : { temperature: 0, top_p: 1 }),
   };
   // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
-  if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isDsOfficial) body.response_format = { type: "json_object" };
+  if (opts.jsonMode && isOai) body.response_format = { type: "json_object" };
+  else if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isDsOfficial && !isOai) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
-    if (!isBlackbox && !isNvidia && !isBmind && !isDsOfficial && model.startsWith("openai/gpt-5")) {
+    if ((isOai && /^gpt-5/i.test(wireModel)) || (!isBlackbox && !isNvidia && !isBmind && !isDsOfficial && !isOai && model.startsWith("openai/gpt-5"))) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (!isBlackbox && !isNvidia && !isBmind && !isDsOfficial && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
+  if (!isBlackbox && !isNvidia && !isBmind && !isDsOfficial && !isOai && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
     body.service_tier = "priority";
   }
 
@@ -198,7 +209,7 @@ async function singleAttempt(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    const terminal = (isBlackbox || isNvidia || isBmind || isDsOfficial)
+    const terminal = (isBlackbox || isNvidia || isBmind || isDsOfficial || isOai)
       ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400 || res.status === 401 || res.status === 404)
       : !(res.status === 429 || res.status >= 500);
 
@@ -416,25 +427,29 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // hops to GPT-5.2 Chat.
 
 export const MODEL_CHAIN = {
-  intent: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
-  narration: ["bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
+  intent: ["oai/gpt-5.1", "oai/gpt-4.1", "bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
+  narration: ["oai/gpt-5.1", "oai/gpt-4.1", "bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
   seniorReview: [
+    "oai/gpt-5.1",
+    "oai/gpt-4.1",
     "bmind/gpt-5.5",
     "bmind/gpt-5.2-chat",
     "bmind/gpt-5-mini",
     "bmind/gpt-4o-mini",
   ],
   macroContext: [
+    "oai/gpt-5.1",
     "bmind/gpt-5.5",
     "bmind/gpt-5.2-chat",
     "bmind/gpt-5-mini",
     "bmind/gpt-4o-mini",
     "bmind/gpt-4.1-mini",
   ],
-  chat: ["bmind/gpt-5.5", "bmind/gpt-5-mini", "bmind/gpt-5.2-chat"],
+  chat: ["oai/gpt-5.1", "oai/gpt-4.1", "bmind/gpt-5.5", "bmind/gpt-5-mini", "bmind/gpt-5.2-chat"],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = [
+  "oai/gpt-5.1",
   "bmind/gpt-5.5",
   "bmind/gpt-5.2-chat",
   "bmind/gpt-5-mini",
@@ -445,6 +460,8 @@ export const MACRO_CONTEXT_CHAIN = [
 
 
 export const SENIOR_REVIEW_CHAIN = [
+  "oai/gpt-5.1",
+  "oai/gpt-4.1",
   "bmind/gpt-5.5",
   "bmind/gpt-5.2-chat",
   "bmind/gpt-5-mini",
@@ -466,6 +483,7 @@ export const SENIOR_REVIEW_CHAIN = [
 // flag a risk note, but it can never veto or downgrade, so alert volume
 // stays exactly the same as before.
 export const DEEPSEEK_REVIEW_CHAIN = [
+  "oai/gpt-5.1",
   "nvapi/deepseek-ai/deepseek-v4-flash-0731",
   "bmind/z-ai/glm-5.2",
   "bmind/nvidia/nemotron-3-super-120b-a12b",
