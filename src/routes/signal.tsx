@@ -1864,6 +1864,7 @@ function SignalPage() {
               >
                 Execute Voice Trade
               </Link>
+              </div>
             </div>
           </div>
 
