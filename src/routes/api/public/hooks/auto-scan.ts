@@ -327,7 +327,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           const preScans = await Promise.allSettled(
             workingPairs.map(async (p) => ({
               pair: p,
-              plan: await computeSignalPlan({ symbol: p }, null),
+              plan: await computeSignalPlan({ symbol: p }, null, { systemScan: true }),
             })),
           );
           for (const item of preScans) {
@@ -361,7 +361,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
 
         for (const pair of workingPairs) {
           try {
-            const plan = scanPlanCache.get(pair) ?? await computeSignalPlan({ symbol: pair }, null);
+            const plan = scanPlanCache.get(pair) ?? await computeSignalPlan({ symbol: pair }, null, { systemScan: true });
             const dir = plan.trade?.direction;
             let conf = Number(plan.trade?.confidence ?? 0);
             const now = new Date();
@@ -605,7 +605,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             // reflect the freshest market snapshot, not the top-of-loop one.
             let broadcastPlan = plan;
             try {
-              const fresh = await computeSignalPlan({ symbol: pair }, null);
+              const fresh = await computeSignalPlan({ symbol: pair }, null, { systemScan: true });
               const freshDir = fresh.trade?.direction;
               const freshConf = Number(fresh.trade?.confidence ?? 0);
               // Only accept the requote if direction still matches and
