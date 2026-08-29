@@ -418,20 +418,16 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // chain-walk skips a known-dead endpoint instead of paying its timeout.
 // TTLs: 15 min for "model_not_found" (not provisioned), 5 min for flaky
 // upstream. If every candidate is cooling, we still try the whole chain.
-// NOTE (Aug 2026 provider audit): on this Bluesminds workspace only
-// `gpt-5.5`, `gpt-5.2-chat`, `gpt-5-mini` and `gpt-4o-mini` are routable.
-// `claude-sonnet-4.5`, `claude-3.7-sonnet`, `grok-4.5` -> 503 model_not_found;
-// `deepseek-v4-pro` / `deepseek-v4-flash` -> 410 end-of-life. Those dead ids
-// were burning a full timeout on every scan, so they are removed from the
-// chains. GPT-5.5 stays primary everywhere; when its upstream 504s the runner
-// hops to GPT-5.2 Chat.
+// NOTE (Aug 29 2026 live audit against the Bluesminds key): routable + fast =
+// `gpt-5.6-sol` (best), `gpt-5.6-luna` (fastest), `gpt-5.2-chat`, `gpt-5-mini`,
+// `gpt-4o`. `gpt-5.5` / `gpt-5.6-terra` / `kimi-k2.5` time out (>60s) and
+// `deepseek-v4-pro` returns a bad upstream body, so they are out of the chains.
 
 export const MODEL_CHAIN = {
-  intent: ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o"],
-  narration: ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o"],
+  intent: ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o"],
+  narration: ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o"],
   seniorReview: [
     "bmind/gpt-5.6-sol",
-    "bmind/gpt-5.2-chat",
     "bmind/gpt-5.2-chat",
     "bmind/gpt-5-mini",
     "bmind/gpt-4o",
@@ -441,7 +437,7 @@ export const MODEL_CHAIN = {
     "bmind/gpt-5.2-chat",
     "bmind/gpt-5-mini",
     "bmind/gpt-4o",
-    ],
+  ],
   chat: ["bmind/gpt-5.6-sol", "bmind/gpt-5.6-luna", "bmind/gpt-5-mini", "bmind/gpt-5.2-chat"],
 } as const;
 
@@ -450,22 +446,14 @@ export const MACRO_CONTEXT_CHAIN = [
   "bmind/gpt-5.2-chat",
   "bmind/gpt-5-mini",
   "bmind/gpt-4o",
-  "bmind/gpt-4.1-mini",
 ] as const;
-
-
 
 export const SENIOR_REVIEW_CHAIN = [
   "bmind/gpt-5.6-sol",
   "bmind/gpt-5.2-chat",
-  "bmind/gpt-5.2-chat",
   "bmind/gpt-5-mini",
   "bmind/gpt-4o",
 ] as const;
-
-
-
-
 
 // -------- Stage 2: DeepSeek V4 SMC review chain ----------------------------
 // A SECOND opinion from a DIFFERENT model family than the GPT senior review,
