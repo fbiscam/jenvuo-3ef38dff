@@ -1261,38 +1261,6 @@ function SignalPage() {
                 </div>
               )}
 
-              {(perf || passedConfluences.length > 0) && (
-                <div className="rounded-xl border border-gray-200 bg-white p-3 text-xs font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif]">
-                  {perf && perf.resolved > 0 && (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-semibold text-emerald-800">
-                        {Math.round(perf.winRate * 100)}% win rate · {perf.windowDays}d
-                      </span>
-                      <span className="rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 font-semibold text-blue-800">
-                        Avg {perf.avgR >= 0 ? "+" : ""}{perf.avgR.toFixed(2)}R
-                      </span>
-                      <span className="text-gray-500">{perf.resolved} resolved signals</span>
-                    </div>
-                  )}
-                  {passedConfluences.length > 0 && (
-                    <div className="mt-2">
-                      <div className="mb-1 text-[10px] uppercase tracking-wide text-gray-500">
-                        Confluences passed ({passedConfluences.length}/5)
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {passedConfluences.map((c) => (
-                          <span
-                            key={c}
-                            className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[11px] capitalize text-gray-700"
-                          >
-                            {c.replace(/_/g, " ")}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
               {!plan && (
                 analysisError ? (
                   <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
