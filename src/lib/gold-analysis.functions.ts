@@ -2822,7 +2822,10 @@ RANGE ${swingLow.toFixed(dec)}–${swingHigh.toFixed(dec)} | EQ ${equilibrium.to
 ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | iFVG ${ifvgs.length}`;
 
         const xRes = await callChatCompletion({
-          models: ["bmind/gpt-5.2-chat"],
+          // Independent second opinion: DeepSeek V4 first, then GPT-5.6 Luna,
+          // Nemotron, GPT-5.2 Chat. It was pinned to gpt-5.2-chat, which is why
+          // the UI always showed "5.2 Chat" for the second review.
+          models: [...DEEPSEEK_REVIEW_CHAIN],
           messages: [
             { role: "system", content: xSystem },
             { role: "user", content: xUser },
@@ -2947,7 +2950,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
         // Senior review — best-available mode.
         // Uses SENIOR_REVIEW_CHAIN (best → most reliable) from ai-gateway.
         // Sequential fallback: strongest live model wins; if all throttled, review skips.
-        const seniorChain = ["bmind/gpt-5.2-chat"];
+        const seniorChain = [...SENIOR_REVIEW_CHAIN];
 
         let reviewResult: { content: string; model: string; usage: any } | null = null;
         let reviewError: any = null;
