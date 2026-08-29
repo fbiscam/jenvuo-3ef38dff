@@ -60,7 +60,7 @@ function sleep(ms: number) {
 function providerConfigured(model: string): boolean {
   if (model.startsWith("blackboxai/")) return Boolean(process.env.BLACKBOX_API_KEY);
   if (model.startsWith("nvapi/")) return Boolean(process.env.NVIDIA_API_KEY);
-  if (model.startsWith("bmind/")) return Boolean(process.env.BLUESMINDS_API_KEY);
+  if (model.startsWith("bmind/")) return Boolean(process.env.BLUESMINDS_API_KEY || process.env.OPENAI_API_KEY);
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
   if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
   return Boolean(process.env.LOVABLE_API_KEY);
@@ -106,7 +106,7 @@ async function singleAttempt(
   const isOai = model.startsWith("oai/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
   const nvidiaKey = process.env.NVIDIA_API_KEY;
-  const bmindKey = process.env.BLUESMINDS_API_KEY;
+  const bmindKey = process.env.BLUESMINDS_API_KEY || process.env.OPENAI_API_KEY;
   const deepseekKey = process.env.DEEPSEEK_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
 
@@ -427,46 +427,40 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // hops to GPT-5.2 Chat.
 
 export const MODEL_CHAIN = {
-  intent: ["oai/gpt-5.1", "oai/gpt-4.1", "bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
-  narration: ["oai/gpt-5.1", "oai/gpt-4.1", "bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
+  intent: ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o"],
+  narration: ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o"],
   seniorReview: [
-    "oai/gpt-5.1",
-    "oai/gpt-4.1",
-    "bmind/gpt-5.5",
+    "bmind/gpt-5.6-sol",
+    "bmind/gpt-5.2-chat",
     "bmind/gpt-5.2-chat",
     "bmind/gpt-5-mini",
-    "bmind/gpt-4o-mini",
+    "bmind/gpt-4o",
   ],
   macroContext: [
-    "oai/gpt-5.1",
-    "bmind/gpt-5.5",
+    "bmind/gpt-5.6-sol",
     "bmind/gpt-5.2-chat",
     "bmind/gpt-5-mini",
-    "bmind/gpt-4o-mini",
-    "bmind/gpt-4.1-mini",
-  ],
-  chat: ["oai/gpt-5.1", "oai/gpt-4.1", "bmind/gpt-5.5", "bmind/gpt-5-mini", "bmind/gpt-5.2-chat"],
+    "bmind/gpt-4o",
+    ],
+  chat: ["bmind/gpt-5.6-sol", "bmind/gpt-5.6-luna", "bmind/gpt-5-mini", "bmind/gpt-5.2-chat"],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = [
-  "oai/gpt-5.1",
-  "bmind/gpt-5.5",
+  "bmind/gpt-5.6-sol",
   "bmind/gpt-5.2-chat",
   "bmind/gpt-5-mini",
-  "bmind/gpt-4o-mini",
+  "bmind/gpt-4o",
   "bmind/gpt-4.1-mini",
 ] as const;
 
 
 
 export const SENIOR_REVIEW_CHAIN = [
-  "oai/gpt-5.1",
-  "oai/gpt-4.1",
-  "bmind/gpt-5.5",
+  "bmind/gpt-5.6-sol",
+  "bmind/gpt-5.2-chat",
   "bmind/gpt-5.2-chat",
   "bmind/gpt-5-mini",
-  "bmind/gpt-4.1-mini",
-  "bmind/gpt-4o-mini",
+  "bmind/gpt-4o",
 ] as const;
 
 
@@ -483,10 +477,9 @@ export const SENIOR_REVIEW_CHAIN = [
 // flag a risk note, but it can never veto or downgrade, so alert volume
 // stays exactly the same as before.
 export const DEEPSEEK_REVIEW_CHAIN = [
-  "oai/gpt-5.1",
   "nvapi/deepseek-ai/deepseek-v4-flash-0731",
-  "bmind/z-ai/glm-5.2",
-  "bmind/nvidia/nemotron-3-super-120b-a12b",
+  "bmind/gpt-5.6-luna",
+  "bmind/nvidia/llama-3.3-nemotron-super-49b-v1.5",
   "bmind/gpt-5.2-chat",
 ] as const;
 
