@@ -2894,7 +2894,12 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
     let __requiresSeniorReview = false;
     let __seniorReviewStatus: "not_required" | "completed" | "confirmed" | "downgraded" | "vetoed" | "failed" = "not_required";
     let __seniorReviewError: string | null = null;
-    if (__userId) {
+    if (billing?.systemScan) {
+      // Auto-scan / broadcast worker runs with no user context, but a signal
+      // that goes out to every subscriber MUST pass the senior review gate.
+      __planAllowsSenior = true;
+      __planId = "system";
+    } else if (__userId) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: sub } = await supabaseAdmin
