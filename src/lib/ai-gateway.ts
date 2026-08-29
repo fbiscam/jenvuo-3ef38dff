@@ -60,7 +60,7 @@ function sleep(ms: number) {
 function providerConfigured(model: string): boolean {
   if (model.startsWith("blackboxai/")) return Boolean(process.env.BLACKBOX_API_KEY);
   if (model.startsWith("nvapi/")) return Boolean(process.env.NVIDIA_API_KEY);
-  if (model.startsWith("bmind/")) return Boolean(process.env.BLUESMINDS_API_KEY || process.env.OPENAI_API_KEY);
+  if (model.startsWith("bmind/")) return Boolean(process.env.OPENAI_API_KEY || process.env.BLUESMINDS_API_KEY);
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
   if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
   return Boolean(process.env.LOVABLE_API_KEY);
@@ -106,7 +106,9 @@ async function singleAttempt(
   const isOai = model.startsWith("oai/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
   const nvidiaKey = process.env.NVIDIA_API_KEY;
-  const bmindKey = process.env.BLUESMINDS_API_KEY || process.env.OPENAI_API_KEY;
+  // The newest Bluesminds key was saved under OPENAI_API_KEY, so prefer it and
+  // fall back to the legacy BLUESMINDS_API_KEY.
+  const bmindKey = process.env.OPENAI_API_KEY || process.env.BLUESMINDS_API_KEY;
   const deepseekKey = process.env.DEEPSEEK_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
 
