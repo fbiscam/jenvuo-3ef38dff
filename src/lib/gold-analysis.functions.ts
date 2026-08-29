@@ -3058,6 +3058,22 @@ Run the full 25-year desk-head review internally through the elite lens above, t
       }
     }
 
+    // ---- HARD GATE: senior review must actually run -------------------------
+    // If every model in SENIOR_REVIEW_CHAIN failed, we do NOT show a trade plan.
+    // The setup is flipped to WAIT and the score capped below the broadcast gate.
+    if (__requiresSeniorReview && __seniorReviewStatus === "failed") {
+      built.direction = "WAIT" as typeof built.direction;
+      setupScore = Math.min(setupScore, 49);
+      setupGrade = "C";
+      setupChecks.unshift({
+        key: "senior_review_unavailable",
+        label: "⛔ Senior review unavailable — trade plan withheld",
+        pass: false,
+        reason: `No model in the senior review chain responded${__seniorReviewError ? ` (${__seniorReviewError})` : ""}. A setup is never published without a completed senior review, so entry/SL/TP are hidden. Re-run the scan in a moment.`,
+      });
+    }
+
+
     // ============ STAGE 2c: THREE-WAY CONSENSUS =============================
     // The desk only calls a setup "consensus" when the ICT/SMC rules engine,
     // DeepSeek V4 and the GPT senior review all point the same way. Consensus
