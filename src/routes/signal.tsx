@@ -1785,17 +1785,18 @@ function SignalPage() {
 
               {/* Market closed notice — replaces tracker/trade card */}
               {marketClosed && plan && (
-                <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 space-y-2">
-                  <div className={`flex items-center gap-1.5 text-[10px] ${MONO} tracking-widest uppercase text-zinc-700`}>
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3.5 space-y-2.5">
+                  <div className={`flex items-center gap-1.5 text-xs ${MONO} tracking-widest uppercase text-zinc-700`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
                     Market Closed
                   </div>
-                  <p className="text-[11px] text-zinc-700 leading-snug">
+                  <p className="text-[13px] text-zinc-700 leading-relaxed">
                     {plan.instrument.symbol} session is closed. The AI has not issued a live entry / SL / TP — only key levels, FVGs and OBs from the last session are shown for reference. The plan will auto-revalidate as soon as the session opens.
                   </p>
-                  <p className={`text-[10px] ${MONO} text-zinc-500 uppercase tracking-wider`}>
+                  <p className={`text-[11px] ${MONO} text-zinc-500 uppercase tracking-wider`}>
                     Opens Sun 22:00 UTC
                   </p>
+
                 </div>
               )}
 
