@@ -118,41 +118,72 @@ export const Route = createFileRoute(
 
             // ---- Pre-fill ticket invalidation ----
             // A limit ticket that never filled is worthless once price walks
-            // ~40% of the risk distance the WRONG way, or once a high-impact
-            // news event goes live. Cancel it instead of leaving a stale
-            // ticket that later "fills" into a losing move.
+            // ~40% of the risk distance away from the entry, or once a
+            // high-impact news event goes live. Cancel it instead of leaving a
+            // stale ticket that later "fills" into a losing move.
             const gates = (t.gates ?? {}) as Record<string, unknown>;
             const alreadyFilled = gates.filled === true;
-            const touchedEntry = isBuy ? lp <= entry : lp >= entry;
-            if (!alreadyFilled && touchedEntry) {
-              await supabaseAdmin
-                .from("signal_paper_trades")
-                .update({ gates: { ...gates, filled: true, filled_at: new Date().toISOString() } })
-                .eq("id", t.id);
-            } else if (!alreadyFilled) {
-              const adverseR = -rNow; // positive when price ran away from entry toward SL side
-              const newsLive = await isHighImpactNewsLive();
-              if (adverseR >= 0.4 || newsLive) {
+
+            if (!alreadyFilled) {
+              // Which side of the entry price the market sat on when we first
+              // watched this ticket. Without it we cannot tell a limit order
+              // (price must come back to entry) from a stop entry (price must
+              // run through entry) — the old code assumed "limit" and flagged
+              // every stop ticket as instantly filled.
+              const approach =
+                gates.approach === "below" || gates.approach === "above"
+                  ? (gates.approach as "below" | "above")
+                  : null;
+
+              if (!approach) {
+                const side = lp < entry ? "below" : "above";
                 await supabaseAdmin
                   .from("signal_paper_trades")
-                  .update({
-                    outcome: "cancelled",
-                    realized_r: 0,
-                    resolved_at: new Date().toISOString(),
-                    resolution_method: newsLive ? "cancelled_news" : "cancelled_prefill_drift",
-                    notes: newsLive
-                      ? "Cancelled before fill — high-impact news window opened."
-                      : `Cancelled before fill — price moved ${Math.round(adverseR * 100)}% of risk toward SL without triggering entry.`,
-                  })
+                  .update({ gates: { ...gates, approach: side } })
                   .eq("id", t.id);
-                results.push({
-                  id: t.id,
-                  action: newsLive ? "cancelled_news" : "cancelled_prefill_drift",
-                  adverse_r: Number(adverseR.toFixed(2)),
-                });
+                results.push({ id: t.id, action: "approach_recorded" });
+                continue;
+              }
+
+              // Filled once price crosses entry coming from the recorded side.
+              const touchedEntry = approach === "below" ? lp >= entry : lp <= entry;
+              if (touchedEntry) {
+                await supabaseAdmin
+                  .from("signal_paper_trades")
+                  .update({ gates: { ...gates, filled: true, filled_at: new Date().toISOString() } })
+                  .eq("id", t.id);
+              } else {
+                // Drift = how far price walked AWAY from the unfilled entry,
+                // measured in R. Direction-agnostic on purpose: an unfilled
+                // ticket is equally dead whichever way price ran.
+                const driftR = Math.abs(lp - entry) / riskDist;
+                const newsLive = await isHighImpactNewsLive();
+                if (driftR >= 0.4 || newsLive) {
+                  await supabaseAdmin
+                    .from("signal_paper_trades")
+                    .update({
+                      outcome: "cancelled",
+                      realized_r: 0,
+                      resolved_at: new Date().toISOString(),
+                      resolution_method: newsLive ? "cancelled_news" : "cancelled_prefill_drift",
+                      notes: newsLive
+                        ? "Cancelled before fill — high-impact news window opened."
+                        : `Cancelled before fill — price drifted ${Math.round(driftR * 100)}% of risk away from entry without triggering it.`,
+                    })
+                    .eq("id", t.id);
+                  results.push({
+                    id: t.id,
+                    action: newsLive ? "cancelled_news" : "cancelled_prefill_drift",
+                    drift_r: Number(driftR.toFixed(2)),
+                  });
+                  continue;
+                }
+                // Not filled yet and not stale — nothing else to evaluate.
+                results.push({ id: t.id, action: "awaiting_fill" });
                 continue;
               }
             }
+
 
 
             // TP hit → resolve as win, no reversal
