@@ -2851,7 +2851,12 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
           __dsAgrees = agrees;
           const smcScore = Number(px.smc_score);
           const note = String(px.note ?? "").slice(0, 220).trim();
-          const short = "GPT-5.2 Chat";
+          // Show whichever model actually answered, not a hardcoded name.
+          const short = (xRes.model.split("/").pop() ?? xRes.model)
+            .replace(/^gpt-/i, "GPT-")
+            .replace(/-chat$/i, " Chat")
+            .replace(/-sol$/i, " Sol")
+            .replace(/-luna$/i, " Luna");
           if (agrees) {
             // Confidence can only go UP here, and only slightly.
             const lift = Number.isFinite(smcScore) && smcScore >= 75 ? 4 : 2;
@@ -2980,7 +2985,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             key: "senior_review_attempted",
             label: "⚠ Senior review attempted",
             pass: false,
-            reason: "Senior review (GPT-5.2 Chat) attempted but provider throttled; the ICT/SMC engine plus SMC review still applied and the signal was delivered.",
+            reason: "Senior review attempted but every model in the chain was throttled; the ICT/SMC engine plus SMC review still applied and the signal was delivered.",
           });
         } else {
           const mdl = reviewResult.model;
