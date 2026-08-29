@@ -60,7 +60,7 @@ function sleep(ms: number) {
 function providerConfigured(model: string): boolean {
   if (model.startsWith("blackboxai/")) return Boolean(process.env.BLACKBOX_API_KEY);
   if (model.startsWith("nvapi/")) return Boolean(process.env.NVIDIA_API_KEY);
-  if (model.startsWith("bmind/")) return Boolean(process.env.BLUESMINDS_API_KEY);
+  if (model.startsWith("bmind/")) return Boolean(process.env.OPENAI_API_KEY || process.env.BLUESMINDS_API_KEY);
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
   if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
   return Boolean(process.env.LOVABLE_API_KEY);
@@ -106,7 +106,9 @@ async function singleAttempt(
   const isOai = model.startsWith("oai/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
   const nvidiaKey = process.env.NVIDIA_API_KEY;
-  const bmindKey = process.env.BLUESMINDS_API_KEY;
+  // The newest Bluesminds key was saved under OPENAI_API_KEY, so prefer it and
+  // fall back to the legacy BLUESMINDS_API_KEY.
+  const bmindKey = process.env.OPENAI_API_KEY || process.env.BLUESMINDS_API_KEY;
   const deepseekKey = process.env.DEEPSEEK_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
 
@@ -418,60 +420,42 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // chain-walk skips a known-dead endpoint instead of paying its timeout.
 // TTLs: 15 min for "model_not_found" (not provisioned), 5 min for flaky
 // upstream. If every candidate is cooling, we still try the whole chain.
-// NOTE (Aug 2026 provider audit): on this Bluesminds workspace only
-// `gpt-5.5`, `gpt-5.2-chat`, `gpt-5-mini` and `gpt-4o-mini` are routable.
-// `claude-sonnet-4.5`, `claude-3.7-sonnet`, `grok-4.5` -> 503 model_not_found;
-// `deepseek-v4-pro` / `deepseek-v4-flash` -> 410 end-of-life. Those dead ids
-// were burning a full timeout on every scan, so they are removed from the
-// chains. GPT-5.5 stays primary everywhere; when its upstream 504s the runner
-// hops to GPT-5.2 Chat.
+// NOTE (Aug 29 2026 live audit against the Bluesminds key): routable + fast =
+// `gpt-5.6-sol` (best), `gpt-5.6-luna` (fastest), `gpt-5.2-chat`, `gpt-5-mini`,
+// `gpt-4o`. `gpt-5.5` / `gpt-5.6-terra` / `kimi-k2.5` time out (>60s) and
+// `deepseek-v4-pro` returns a bad upstream body, so they are out of the chains.
 
 export const MODEL_CHAIN = {
-  intent: ["oai/gpt-5.1", "oai/gpt-4.1", "bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
-  narration: ["oai/gpt-5.1", "oai/gpt-4.1", "bmind/gpt-5.5", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o-mini"],
+  intent: ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o"],
+  narration: ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o"],
   seniorReview: [
-    "oai/gpt-5.1",
-    "oai/gpt-4.1",
-    "bmind/gpt-5.5",
+    "bmind/gpt-5.6-sol",
     "bmind/gpt-5.2-chat",
     "bmind/gpt-5-mini",
-    "bmind/gpt-4o-mini",
+    "bmind/gpt-4o",
   ],
   macroContext: [
-    "oai/gpt-5.1",
-    "bmind/gpt-5.5",
+    "bmind/gpt-5.6-sol",
     "bmind/gpt-5.2-chat",
     "bmind/gpt-5-mini",
-    "bmind/gpt-4o-mini",
-    "bmind/gpt-4.1-mini",
+    "bmind/gpt-4o",
   ],
-  chat: ["oai/gpt-5.1", "oai/gpt-4.1", "bmind/gpt-5.5", "bmind/gpt-5-mini", "bmind/gpt-5.2-chat"],
+  chat: ["bmind/gpt-5.6-sol", "bmind/gpt-5.6-luna", "bmind/gpt-5-mini", "bmind/gpt-5.2-chat"],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = [
-  "oai/gpt-5.1",
-  "bmind/gpt-5.5",
+  "bmind/gpt-5.6-sol",
   "bmind/gpt-5.2-chat",
   "bmind/gpt-5-mini",
-  "bmind/gpt-4o-mini",
-  "bmind/gpt-4.1-mini",
+  "bmind/gpt-4o",
 ] as const;
-
-
 
 export const SENIOR_REVIEW_CHAIN = [
-  "oai/gpt-5.1",
-  "oai/gpt-4.1",
-  "bmind/gpt-5.5",
+  "bmind/gpt-5.6-sol",
   "bmind/gpt-5.2-chat",
   "bmind/gpt-5-mini",
-  "bmind/gpt-4.1-mini",
-  "bmind/gpt-4o-mini",
+  "bmind/gpt-4o",
 ] as const;
-
-
-
-
 
 // -------- Stage 2: DeepSeek V4 SMC review chain ----------------------------
 // A SECOND opinion from a DIFFERENT model family than the GPT senior review,
@@ -483,10 +467,9 @@ export const SENIOR_REVIEW_CHAIN = [
 // flag a risk note, but it can never veto or downgrade, so alert volume
 // stays exactly the same as before.
 export const DEEPSEEK_REVIEW_CHAIN = [
-  "oai/gpt-5.1",
   "nvapi/deepseek-ai/deepseek-v4-flash-0731",
-  "bmind/z-ai/glm-5.2",
-  "bmind/nvidia/nemotron-3-super-120b-a12b",
+  "bmind/gpt-5.6-luna",
+  "bmind/nvidia/llama-3.3-nemotron-super-49b-v1.5",
   "bmind/gpt-5.2-chat",
 ] as const;
 

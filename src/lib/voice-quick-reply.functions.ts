@@ -6,10 +6,10 @@ import { callChatCompletion, AiGatewayError } from "@/lib/ai-gateway";
 // fallbacks) and plain text — no candles, no JSON schema — so replies land
 // in ~1–3s instead of the heavy analyze pipeline (~15–25s).
 const FAST_MODELS = [
+  "bmind/gpt-5.6-luna",
   "bmind/gpt-5-mini",
   "bmind/gpt-5.2-chat",
-  "bmind/gpt-4o-mini",
-  "bmind/gpt-5.5",
+  "bmind/gpt-4o",
 ];
 
 const SYSTEM = `You are Jenvu — a friendly voice trading assistant.
