@@ -2058,7 +2058,7 @@ function buildFeedFallbackPlan(args: {
 export async function computeSignalPlan(
   data: { symbol: string },
   __userId: string | null = null,
-  billing?: { scanId?: string | null },
+  billing?: { scanId?: string | null; systemScan?: boolean },
 ): Promise<SignalPlan> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
