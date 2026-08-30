@@ -2067,7 +2067,10 @@ export async function computeSignalPlan(
     // user sees nothing at all. Each optional stage is skipped once the budget
     // is spent, so the deterministic ICT/SMC result always renders fast.
     const __scanStartedMs = Date.now();
-    const __aiLeft = () => 34000 - (Date.now() - __scanStartedMs);
+    // Measured Aug 30 2026: gpt-5.6-sol needs ~15s for the 1.1k-token JSON
+    // narration, so the old 34s total / 12s narration budget timed out on
+    // EVERY published scan ("Server busy" → deterministic engine → HOLD).
+    const __aiLeft = () => 90000 - (Date.now() - __scanStartedMs);
 
     let inst = resolveInstrument(data.symbol);
 
