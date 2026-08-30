@@ -425,52 +425,34 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // `gpt-4o`. `gpt-5.5` / `gpt-5.6-terra` / `kimi-k2.5` time out (>60s) and
 // `deepseek-v4-pro` returns a bad upstream body, so they are out of the chains.
 
+// Live-probed Aug 30 2026: only `gpt-5.6-sol`, `gpt-5.2-chat` and `gpt-4o`
+// answer on Bluesminds. `gpt-5.6-luna`, `gpt-5.6-terra`, `gpt-5.5`,
+// `gpt-5-mini`, `kimi-k2.5`, `gemma-4-26b`, `gpt-oss-20b` hang until timeout,
+// `deepseek-v4-pro` 500s, the nemotron/llama ids are 410 Gone, and the NVIDIA
+// deepseek endpoint never responds. Dead ids are removed from every chain so a
+// scan no longer burns 30–60s per dead hop before falling back.
+const WORKING_BMIND = ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-4o"] as const;
+
 export const MODEL_CHAIN = {
-  intent: ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o"],
-  narration: ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-5-mini", "bmind/gpt-4o"],
-  seniorReview: [
-    "bmind/gpt-5.6-sol",
-    "bmind/gpt-5.2-chat",
-    "bmind/gpt-5-mini",
-    "bmind/gpt-4o",
-  ],
-  macroContext: [
-    "bmind/gpt-5.6-sol",
-    "bmind/gpt-5.2-chat",
-    "bmind/gpt-5-mini",
-    "bmind/gpt-4o",
-  ],
-  chat: ["bmind/gpt-5.6-sol", "bmind/gpt-5.6-luna", "bmind/gpt-5-mini", "bmind/gpt-5.2-chat"],
+  intent: WORKING_BMIND,
+  narration: WORKING_BMIND,
+  seniorReview: WORKING_BMIND,
+  macroContext: WORKING_BMIND,
+  chat: WORKING_BMIND,
 } as const;
 
-export const MACRO_CONTEXT_CHAIN = [
-  "bmind/gpt-5.6-sol",
-  "bmind/gpt-5.2-chat",
-  "bmind/gpt-5-mini",
-  "bmind/gpt-4o",
-] as const;
+export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
 
-export const SENIOR_REVIEW_CHAIN = [
-  "bmind/gpt-5.6-sol",
-  "bmind/gpt-5.2-chat",
-  "bmind/gpt-5-mini",
-  "bmind/gpt-4o",
-] as const;
+export const SENIOR_REVIEW_CHAIN = WORKING_BMIND;
 
-// -------- Stage 2: DeepSeek V4 SMC review chain ----------------------------
-// A SECOND opinion from a DIFFERENT model family than the GPT senior review,
-// so the desk never relies on one vendor's bias. Primary is DeepSeek V4 on the
-// NVIDIA Integrate API (`nvapi/…`, verified routable Aug 2026) — Bluesminds'
-// own deepseek-v4-* ids are end-of-life, so they are not used. Fallbacks stay
-// on GLM / Nemotron so the stage still answers if NVIDIA is throttled.
-// This stage is ENRICHMENT ONLY — it can agree (small confidence lift) or
-// flag a risk note, but it can never veto or downgrade, so alert volume
-// stays exactly the same as before.
+// -------- Stage 2: independent SMC second-opinion chain --------------------
+// A SECOND pass that must not reuse the senior-review primary, so the desk
+// never rubber-stamps its own answer. This stage is ENRICHMENT ONLY — it can
+// agree (small confidence lift) or flag a risk note, but never vetoes.
 export const DEEPSEEK_REVIEW_CHAIN = [
-  "nvapi/deepseek-ai/deepseek-v4-flash-0731",
-  "bmind/gpt-5.6-luna",
-  "bmind/nvidia/llama-3.3-nemotron-super-49b-v1.5",
   "bmind/gpt-5.2-chat",
+  "bmind/gpt-4o",
+  "bmind/gpt-5.6-sol",
 ] as const;
 
 /** @deprecated legacy alias — use DEEPSEEK_REVIEW_CHAIN */

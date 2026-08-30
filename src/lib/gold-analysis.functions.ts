@@ -2067,7 +2067,10 @@ export async function computeSignalPlan(
     // user sees nothing at all. Each optional stage is skipped once the budget
     // is spent, so the deterministic ICT/SMC result always renders fast.
     const __scanStartedMs = Date.now();
-    const __aiLeft = () => 34000 - (Date.now() - __scanStartedMs);
+    // Measured Aug 30 2026: gpt-5.6-sol needs ~15s for the 1.1k-token JSON
+    // narration, so the old 34s total / 12s narration budget timed out on
+    // EVERY published scan ("Server busy" → deterministic engine → HOLD).
+    const __aiLeft = () => 90000 - (Date.now() - __scanStartedMs);
 
     let inst = resolveInstrument(data.symbol);
 
@@ -2316,8 +2319,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         ],
         jsonMode: true,
         maxTokens: 1100,
-        timeoutMs: 12000,
-        deadlineMs: 16000,
+        timeoutMs: 30000,
+        deadlineMs: 40000,
         priority: true,
         retriesPerModel: 1,
         stage: "signal-analysis",
@@ -2812,7 +2815,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __crossCheckModel: string | null = null;
     let __dsAgrees: boolean | null = null;
     let __consensus: "full" | "split" | null = null;
-    if (built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE && __aiLeft() > 9000) {
+    if (built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE && __aiLeft() > 16000) {
       try {
         const xSystem = `You are an independent ICT/SMC audit desk (second opinion, different house than the primary analyst). Audit the setup ONLY against core Smart Money rules: liquidity sweep before entry, displacement creating the FVG/OB, premium/discount side correctness, HTF↔LTF alignment, zone freshness, killzone timing, and R:R sanity.
 Reply ONLY as JSON: {"agrees":true|false,"smc_score":<0-100>,"note":"<one short sentence, most important rule that passes or fails>"}`;
@@ -2832,8 +2835,8 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
           ],
           jsonMode: true,
           maxTokens: 200,
-          timeoutMs: 7000,
-          deadlineMs: 9000,
+          timeoutMs: 18000,
+          deadlineMs: 22000,
           priority: false,
           retriesPerModel: 1,
           stage: "deepseek-review",
@@ -2973,8 +2976,8 @@ Run the full 25-year desk-head review internally through the elite lens above, t
             ],
             jsonMode: true,
             maxTokens: 320,
-            timeoutMs: Math.max(6000, Math.min(11000, __aiLeft() - 3000)),
-            deadlineMs: Math.max(7000, __aiLeft() - 1500),
+            timeoutMs: Math.max(12000, Math.min(28000, __aiLeft() - 5000)),
+            deadlineMs: Math.max(14000, Math.min(35000, __aiLeft() - 2000)),
             priority: true,
             retriesPerModel: 1,
             stage: "senior-review",
@@ -3117,7 +3120,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
     // USD/gold news within the window. Soft-fails on any error.
     let __macroContext: SignalPlan["macroContext"] = undefined;
     const __macroShouldRun =
-      (built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null) && __aiLeft() > 7000;
+      (built.direction !== "WAIT" || upcomingNews.length > 0 || imminentHigh != null) && __aiLeft() > 14000;
     if (__macroShouldRun) {
       try {
         const newsLines = upcomingNews.slice(0, 5).map((n) =>
@@ -3139,8 +3142,8 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
           ],
           jsonMode: true,
           maxTokens: 160,
-          timeoutMs: 6000,
-          deadlineMs: 7000,
+          timeoutMs: 12000,
+          deadlineMs: 14000,
           priority: false,
           retriesPerModel: 1,
           stage: "macro-context",
