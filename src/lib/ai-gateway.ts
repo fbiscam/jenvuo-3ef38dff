@@ -432,10 +432,14 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // deepseek endpoint never responds. Dead ids are removed from every chain so a
 // scan no longer burns 30–60s per dead hop before falling back.
 const WORKING_BMIND = ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-4o"] as const;
+// Narration must return before the deterministic plan is presented. GPT-4o is
+// the consistently low-latency route on Bluesminds, while GPT-5.6 Sol remains
+// first for the mandatory senior review where maximum scrutiny matters.
+const FAST_NARRATION_BMIND = ["bmind/gpt-4o", "bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat"] as const;
 
 export const MODEL_CHAIN = {
   intent: WORKING_BMIND,
-  narration: WORKING_BMIND,
+  narration: FAST_NARRATION_BMIND,
   seniorReview: WORKING_BMIND,
   macroContext: WORKING_BMIND,
   chat: WORKING_BMIND,
