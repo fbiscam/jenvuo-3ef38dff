@@ -383,7 +383,7 @@ function buildSyntheticCandles(inst: ResolvedInstrument, tf: string, price: numb
   return candles;
 }
 
-async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 1800): Promise<Response> {
+async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 6000): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   let res: Response | null = null;
@@ -2044,7 +2044,10 @@ function buildFeedFallbackPlan(args: {
         "Re-analyze once the candle feed is restored.",
         `Loss of live quote around ${priceText} would remove the only reference we have.`,
       ],
-      confidenceSelfScore: 2,
+      // This is a data-unavailable state, not a low-confidence market call.
+      // Keeping it at zero prevents the UI from presenting a misleading 20–21%
+      // "analysis" when no real candle analysis was performed.
+      confidenceSelfScore: 0,
     },
     scenarios: {
       bearish: { probability: 33, path: `Rejection near ${inst.kind === "crypto" ? "" : "$"}${htfHigh.toFixed(dec)} could resume downside once real candles print.`, keyLevel: +htfHigh.toFixed(dec) },
