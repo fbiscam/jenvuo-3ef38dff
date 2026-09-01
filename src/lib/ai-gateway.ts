@@ -21,6 +21,8 @@ const PRIORITY_TIER_MODELS = new Set([
   "openai/gpt-5.4",
   "openai/gpt-5.4-mini",
   "openai/gpt-5.5",
+  "google/gemini-3.7-flash",
+  "google/gemini-3.1-pro-preview",
 ]);
 
 export type CallChatOptions = {
@@ -431,11 +433,25 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // `deepseek-v4-pro` 500s, the nemotron/llama ids are 410 Gone, and the NVIDIA
 // deepseek endpoint never responds. Dead ids are removed from every chain so a
 // scan no longer burns 30–60s per dead hop before falling back.
-const WORKING_BMIND = ["bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat", "bmind/gpt-4o"] as const;
+const WORKING_BMIND = [
+  "bmind/gpt-5.6-sol",
+  "bmind/gpt-5.2-chat",
+  "bmind/gpt-4o",
+  // Workspace-safe fallbacks. These use LOVABLE_API_KEY, so a stale or
+  // unavailable Bluesminds route cannot silently remove AI review in another
+  // browser or production worker.
+  "google/gemini-3.1-pro-preview",
+  "google/gemini-3.7-flash",
+] as const;
 // Narration must return before the deterministic plan is presented. GPT-4o is
 // the consistently low-latency route on Bluesminds, while GPT-5.6 Sol remains
 // first for the mandatory senior review where maximum scrutiny matters.
-const FAST_NARRATION_BMIND = ["bmind/gpt-4o", "bmind/gpt-5.6-sol", "bmind/gpt-5.2-chat"] as const;
+const FAST_NARRATION_BMIND = [
+  "bmind/gpt-4o",
+  "google/gemini-3.7-flash",
+  "bmind/gpt-5.6-sol",
+  "bmind/gpt-5.2-chat",
+] as const;
 
 export const MODEL_CHAIN = {
   intent: WORKING_BMIND,
@@ -455,6 +471,7 @@ export const SENIOR_REVIEW_CHAIN = WORKING_BMIND;
 // agree (small confidence lift) or flag a risk note, but never vetoes.
 export const DEEPSEEK_REVIEW_CHAIN = [
   "bmind/gpt-5.2-chat",
+  "google/gemini-3.7-flash",
   "bmind/gpt-4o",
   "bmind/gpt-5.6-sol",
 ] as const;
