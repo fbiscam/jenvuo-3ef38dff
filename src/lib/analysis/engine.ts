@@ -367,10 +367,17 @@ export function buildTrade(
   const zoneDistance = distanceFromExecutionZone(zone.priceLow, zone.priceHigh);
   const distPct = zoneDistance / lastPrice;
 
-  // Reject only truly stale/distant zones. Otherwise choose MARKET vs LIMIT.
-  if (distPct > profile.maxDistPct) {
-    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest ${zone.kind} is ${(distPct * 100).toFixed(2)}% from live price — outside chase range, wait for pullback.` };
+  // Reject only truly stale/distant zones. The static % cap alone was rejecting
+  // every gold setup on volatile days (nearest FVG sat 1.0-1.6% away while the
+  // metal cap is 0.35%), which produced whole days with zero signals. A pending
+  // LIMIT order into a valid POI is normal ICT execution, so the allowance is
+  // volatility-aware: max(static cap, 3x ATR), hard-capped at 2% of price.
+  const atrAllowance = atr && atr > 0 ? (atr * 3) / lastPrice : 0;
+  const maxDistPct = Math.min(0.02, Math.max(profile.maxDistPct, atrAllowance));
+  if (distPct > maxDistPct) {
+    return { direction: "WAIT", entryType: "MARKET", entry: 0, sl: 0, tp: 0, rr: 0, zone: null, reason: `Nearest ${zone.kind} is ${(distPct * 100).toFixed(2)}% from live price — outside chase range (max ${(maxDistPct * 100).toFixed(2)}%), wait for pullback.` };
   }
+
 
   const marketWindow = Math.max(lastPrice * profile.entryWindowPct, atr && atr > 0 ? atr * 0.20 : 0);
   const entryType: "MARKET" | "LIMIT" = zoneDistance <= marketWindow ? "MARKET" : "LIMIT";
