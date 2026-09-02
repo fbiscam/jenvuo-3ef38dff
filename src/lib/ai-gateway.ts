@@ -468,7 +468,15 @@ const FAST_NARRATION_BMIND = [
 // Senior review runs on Bluesminds GPT-4o ONLY (desk decision). No fallback
 // hops: if 4o cannot answer, the hard review gate holds the setup at WAIT
 // rather than letting a different model sign off the trade.
-const SENIOR_REVIEW_BMIND_4O = ["bmind/gpt-4o"] as const;
+// Sep 2 2026: keeping a single-provider chain meant a Bluesminds quota outage
+// silently killed EVERY signal (hard review gate -> score capped at 49). The
+// workspace Gemini routes are kept as last-resort fallbacks so a billing issue
+// on one provider cannot zero out the whole trading day.
+const SENIOR_REVIEW_BMIND_4O = [
+  "bmind/gpt-4o",
+  "google/gemini-3.1-pro-preview",
+  "google/gemini-3.7-flash",
+] as const;
 
 export const MODEL_CHAIN = {
   intent: WORKING_BMIND,
