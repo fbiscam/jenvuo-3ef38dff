@@ -112,7 +112,7 @@ function AutoScanAdminPage() {
   if (loading) return <div className="text-sm text-zinc-500">Loading…</div>;
   if (!allowed)
     return (
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 text-sm text-red-600 flex items-center gap-2">
+      <div className="rounded-xl border border-zinc-200 bg-white p-6 text-sm text-red-600 flex items-center gap-2">
         <ShieldCheck className="h-4 w-4" /> Admins only
       </div>
     );
@@ -153,7 +153,7 @@ function AutoScanAdminPage() {
         <div className="absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] text-white/70">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] text-white/70">
               <Activity className="h-3 w-3" /> Auto-Scan Ops
             </div>
             <h1 className="pl-1 mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">Auto-Scan Monitor</h1>
@@ -164,7 +164,7 @@ function AutoScanAdminPage() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={load}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-white hover:bg-white/10"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white px-3 py-2 text-xs font-medium text-white hover:bg-white"
             >
               <RefreshCw className="h-3.5 w-3.5" /> Refresh
             </button>
@@ -380,7 +380,7 @@ function PerformanceDashboard({
   }, [perf]);
 
   return (
-    <section className="rounded-3xl border border-zinc-200 bg-white overflow-hidden shadow-sm">
+    <section className="rounded-xl border border-zinc-200 bg-white overflow-hidden shadow-sm">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 bg-gradient-to-r from-amber-50 via-white to-emerald-50 px-5 py-4">
         <div className="flex items-center gap-2.5">
@@ -400,9 +400,7 @@ function PerformanceDashboard({
               <button
                 key={d}
                 onClick={() => onDaysChange(d)}
-                className={`px-2.5 py-1 text-[11px] font-medium rounded-lg transition ${
-                  days === d ? "bg-zinc-900 text-white" : "text-zinc-600 hover:bg-zinc-50"
-                }`}
+                className={`px-2.5 py-1 text-[11px] font-medium rounded-lg transition ${ days === d ? "bg-zinc-900 text-white" : "text-zinc-600 hover:bg-zinc-50" }`}
               >
                 {d}d
               </button>
@@ -638,7 +636,7 @@ function OutcomePill({ outcome }: { outcome: "WIN" | "LOSS" | "OPEN" }) {
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+    <section className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
       <div className="flex items-baseline justify-between gap-3 px-4 sm:px-5 py-3 border-b border-zinc-100">
         <h2 className="pl-1 text-sm font-semibold text-zinc-900">{title}</h2>
         {hint && <span className="text-[11px] text-zinc-500">{hint}</span>}
@@ -668,7 +666,7 @@ function HeroStat({
   const dot =
     accent === "emerald" ? "bg-emerald-400" : accent === "red" ? "bg-red-400" : "bg-white/40";
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur px-4 py-3">
+    <div className="rounded-xl border border-white/10 bg-white backdrop-blur px-4 py-3">
       <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.15em] text-white/60">
         {icon}
         <span>{label}</span>

@@ -153,19 +153,19 @@ function AdminDocumentsPage() {
       </div>
 
       {isLoading ? (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 text-sm text-zinc-500">Loading…</div>
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 text-sm text-zinc-500">Loading…</div>
       ) : error ? (
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-sm text-red-700">
           {(error as Error).message}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 text-sm text-zinc-500">
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 text-sm text-zinc-500">
           No submissions yet.
         </div>
       ) : (
         <div className="space-y-4">
           {filtered.map((row) => (
-            <div key={row.application_id} className="rounded-2xl border border-zinc-200 bg-white p-5">
+            <div key={row.application_id} className="rounded-xl border border-zinc-200 bg-white p-5">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <div className="text-sm font-semibold text-zinc-900">{row.full_name}</div>

@@ -12,11 +12,11 @@ let cachedSenderId: string | null = null
 let cachedDisplayNumber: string | null = null
 
 function creds() {
-  const token = process.env['WHATSAPP_API_TOKEN']
+  const token = process.env['WHATSAPP_ACCESS_TOKEN'] || process.env['WHATSAPP_API_TOKEN']
   const configuredId = process.env['WHATSAPP_PHONE_NUMBER_ID']
   if (!token || !configuredId) {
     throw new Error(
-      'WhatsApp is not configured (WHATSAPP_API_TOKEN / WHATSAPP_PHONE_NUMBER_ID missing).',
+      'WhatsApp is not configured (WHATSAPP_ACCESS_TOKEN / WHATSAPP_PHONE_NUMBER_ID missing).',
     )
   }
   return { token, configuredId }
@@ -143,38 +143,39 @@ export async function sendWhatsappOtp(to: string, code: string) {
 }
 
 /**
- * Sends an alert: tries free-form text first (works inside the 24h window and
- * keeps full formatting), then falls back to the approved utility template.
+ * Sends an alert.
+ *
+ * The approved UTILITY template is used FIRST: free-form text is only
+ * delivered inside the 24h customer-service window — outside it Meta still
+ * returns 200 ("accepted") but silently drops the message, which is why
+ * alerts looked "sent" while nothing arrived on the phone.
+ *
+ * After the template lands, the detailed free-form text is sent as a
+ * best-effort follow-up (it reopens/uses the 24h window when available).
  */
 export async function sendWhatsappAlertMessage(
   to: string,
   text: string,
   templateParams: [string, string],
 ) {
+  const errors: string[] = []
+  for (const tpl of [ALERT_TEMPLATE, LEGACY_ALERT_TEMPLATE]) {
+    try {
+      const res = await sendWhatsappTemplate(to, tpl.name, tpl.language, templateParams)
+      // Best-effort rich detail message; ignore failures.
+      try {
+        await sendWhatsappText(to, text)
+      } catch {
+        /* outside 24h window */
+      }
+      return res
+    } catch (e) {
+      errors.push(`${tpl.name}: ${(e as Error).message}`)
+    }
+  }
   try {
     return await sendWhatsappText(to, text)
   } catch (e) {
-    const msg = (e as Error).message
-    try {
-      return await sendWhatsappTemplate(
-        to,
-        ALERT_TEMPLATE.name,
-        ALERT_TEMPLATE.language,
-        templateParams,
-      )
-    } catch (e2) {
-      try {
-        return await sendWhatsappTemplate(
-          to,
-          LEGACY_ALERT_TEMPLATE.name,
-          LEGACY_ALERT_TEMPLATE.language,
-          templateParams,
-        )
-      } catch (e3) {
-        throw new Error(
-          `${msg} | template: ${(e2 as Error).message} | legacy: ${(e3 as Error).message}`,
-        )
-      }
-    }
+    throw new Error(`${errors.join(' | ')} | text: ${(e as Error).message}`)
   }
 }

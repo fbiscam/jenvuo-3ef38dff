@@ -217,7 +217,7 @@ function KillzonesPage() {
 
   return (
     <div className="killzones-root min-h-dvh w-full bg-[#FAFAFA] text-slate-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
-      <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white">
         <div className="relative mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
           <button
             onClick={() => {
@@ -242,10 +242,10 @@ function KillzonesPage() {
             <span className="truncate text-[22px] tracking-tight leading-none select-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </div>
           <Link
-            to="/signal"
+            to="/signals-live"
             className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 transition"
           >
-            <Radar className="h-3.5 w-3.5" /> Signal Desk
+            <Radar className="h-3.5 w-3.5" /> Live Signals
           </Link>
         </div>
       </header>
@@ -266,17 +266,17 @@ function KillzonesPage() {
 
         {/* Live clock strip */}
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <div className="rounded-[22px] border border-zinc-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-12px_rgba(16,24,40,0.10)] ring-1 ring-white/60">
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 ring-1 ring-white/60">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>UTC</div>
             <div className={`${MONO} text-xl sm:text-2xl font-semibold mt-1`}>{utcNow}</div>
           </div>
-          <div className="rounded-[22px] border border-zinc-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-12px_rgba(16,24,40,0.10)] ring-1 ring-white/60">
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 ring-1 ring-white/60">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
               Local · {tzShort}
             </div>
             <div className={`${MONO} text-xl sm:text-2xl font-semibold mt-1`}>{localNow}</div>
           </div>
-          <div className="col-span-2 sm:col-span-1 rounded-[22px] border border-zinc-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-12px_rgba(16,24,40,0.10)] ring-1 ring-white/60">
+          <div className="col-span-2 sm:col-span-1 rounded-xl border border-zinc-200 bg-white p-4 ring-1 ring-white/60">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
               {ipCity ? "Detected location" : "Timezone"}
             </div>
@@ -307,11 +307,7 @@ function KillzonesPage() {
               <button
                 key={c}
                 onClick={() => setCat(c)}
-                className={`h-8 px-3 rounded-lg border text-[12px] font-medium transition ${
-                  cat === c
-                    ? "border-zinc-900 bg-zinc-900 text-white"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
-                }`}
+                className={`h-8 px-3 rounded-lg border text-[12px] font-medium transition ${ cat === c ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50" }`}
               >
                 {c}
               </button>
@@ -345,13 +341,9 @@ function KillzonesPage() {
                       <button
                         key={profile.key}
                         onClick={() => {
-                          navigate({ to: "/signal", search: { symbol: profile.key } as never });
+                          navigate({ to: "/signals-live", });
                         }}
-                        className={`group text-left rounded-[22px] border p-4 ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 ${
-                          locked
-                            ? "border-zinc-200/70 bg-zinc-50/60 shadow-[0_1px_2px_rgba(16,24,40,0.03),0_8px_20px_-12px_rgba(16,24,40,0.08)] hover:border-zinc-300/70"
-                            : "border-zinc-200/70 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-12px_rgba(16,24,40,0.10)] hover:border-zinc-300/70 hover:shadow-[0_2px_4px_rgba(16,24,40,0.05),0_18px_40px_-16px_rgba(16,24,40,0.14)]"
-                        }`}
+                        className={`group text-left rounded-xl border p-4 ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 ${ locked ? "border-zinc-200 bg-zinc-50/60 hover:border-zinc-300/70" : "border-zinc-200 bg-white hover:border-zinc-300/70 " }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
@@ -373,13 +365,7 @@ function KillzonesPage() {
                             </div>
                           </div>
                           <div
-                            className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md ${MONO} text-[10px] uppercase tracking-wider ${
-                              !marketOpen
-                                ? "bg-amber-50 text-amber-700 border border-amber-200"
-                                : st.inKillzone
-                                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                  : "bg-zinc-50 text-zinc-600 border border-zinc-200"
-                            }`}
+                            className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md ${MONO} text-[10px] uppercase tracking-wider ${ !marketOpen ? "bg-amber-50 text-amber-700 border border-amber-200" : st.inKillzone ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-zinc-50 text-zinc-600 border border-zinc-200" }`}
                           >
                             <span
                               className={`h-1.5 w-1.5 rounded-full ${
@@ -401,11 +387,7 @@ function KillzonesPage() {
                             return (
                               <div
                                 key={kz.name}
-                                className={`flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[11px] ${
-                                  active
-                                    ? "bg-emerald-50/60 border border-emerald-100"
-                                    : "bg-zinc-50/70 border border-zinc-100"
-                                }`}
+                                className={`flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[11px] ${ active ? "bg-emerald-50/60 border border-emerald-100" : "bg-zinc-50/70 border border-zinc-100" }`}
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
                                   <Clock className="h-3 w-3 text-zinc-400 shrink-0" />
@@ -448,7 +430,7 @@ function KillzonesPage() {
             );
           })}
           {rows.length === 0 && (
-            <div className="rounded-[22px] border border-dashed border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+            <div className="rounded-xl border border-dashed border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
               No instruments match your search.
             </div>
           )}

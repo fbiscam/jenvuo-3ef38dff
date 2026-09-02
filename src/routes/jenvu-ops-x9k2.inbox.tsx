@@ -357,9 +357,7 @@ function AdminInbox() {
 
         {/* Middle — conversation list */}
         <aside
-          className={`flex w-full shrink-0 flex-col border-r border-neutral-200 bg-white md:w-[360px] ${
-            activeId ? "hidden md:flex" : "flex"
-          }`}
+          className={`flex w-full shrink-0 flex-col border-r border-neutral-200 bg-white md:w-[360px] ${ activeId ? "hidden md:flex" : "flex" }`}
         >
           <div className="flex h-14 items-center gap-3 border-b border-neutral-200 px-5">
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400 capitalize">{filter}</span>
@@ -580,11 +578,7 @@ function AdminInbox() {
                         )}
                         <div className={`flex ${isAdminMsg ? "justify-end" : "justify-start"}`}>
                           <div
-                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-sm px-4 py-3 text-[13.5px] leading-relaxed ${
-                              isAdminMsg
-                                ? "bg-neutral-100 text-zinc-900"
-                                : "border border-neutral-200 bg-white text-zinc-900"
-                            }`}
+                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-sm px-4 py-3 text-[13.5px] leading-relaxed ${ isAdminMsg ? "bg-neutral-100 text-zinc-900" : "border border-neutral-200 bg-white text-zinc-900" }`}
                           >
                             {m.content}
                           </div>
@@ -637,7 +631,7 @@ function AdminInbox() {
                                 className="fixed inset-0 z-10 cursor-default"
                                 aria-label="Close"
                               />
-                              <div className="absolute bottom-full left-0 z-20 mb-1.5 w-80 overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
+                              <div className="absolute bottom-full left-0 z-20 mb-1.5 w-80 overflow-hidden rounded-xl border border-zinc-200 bg-white ring-1 ring-black/5">
                                 <div className="border-b border-zinc-100 bg-zinc-50/60 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">
                                   Quick replies
                                 </div>
@@ -693,11 +687,11 @@ function AdminInbox() {
 
         {/* Details rail */}
         {activeSession && (
-          <aside className="hidden w-64 shrink-0 flex-col border-l border-zinc-900/[0.06] bg-white/40 p-4 backdrop-blur-sm xl:flex">
+          <aside className="hidden w-64 shrink-0 flex-col border-l border-zinc-900/[0.06] bg-white p-4 xl:flex">
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
               Visitor
             </div>
-            <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/5 bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+            <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/5 bg-white p-3">
               <div className={`relative grid h-11 w-11 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[13px] font-semibold text-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10`}>
                 {initials(activeSession.guest_name, activeSession.guest_email)}
               </div>
@@ -732,7 +726,7 @@ function AdminInbox() {
             <div className="mt-6 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
               Activity
             </div>
-            <div className="mt-2 rounded-xl border border-black/5 bg-white p-3 text-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+            <div className="mt-2 rounded-xl border border-black/5 bg-white p-3 text-[12px]">
               <div className="flex items-center justify-between">
                 <span className="text-zinc-500">Messages</span>
                 <span className="font-mono tabular-nums font-semibold text-zinc-900">
@@ -765,7 +759,7 @@ function Shortcut({ k, label }: { k: string; label: string }) {
 function Kbd({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <kbd
-      className={`inline-flex h-4 min-w-[16px] items-center justify-center rounded border border-zinc-200 bg-white px-1 font-mono text-[10px] font-medium text-zinc-600 shadow-[0_1px_0_rgba(0,0,0,0.04)] ${className}`}
+      className={`inline-flex h-4 min-w-[16px] items-center justify-center rounded border border-zinc-200 bg-white px-1 font-mono text-[10px] font-medium text-zinc-600 ${className}`}
     >
       {children}
     </kbd>

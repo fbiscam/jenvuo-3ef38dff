@@ -797,7 +797,7 @@ function AuthPage() {
 
 
       {/* NAV */}
-      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -832,7 +832,7 @@ function AuthPage() {
       {/* MAIN CONTENT */}
       <main className="flex-1 min-h-0 overflow-hidden flex flex-col items-center justify-center p-2 sm:p-3">
         <div className="w-full max-w-6xl max-h-full overflow-hidden">
-          <div className="rounded-2xl border border-zinc-200 bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] overflow-hidden max-h-[calc(100dvh-9rem)] flex flex-col">
+          <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden max-h-[calc(100dvh-9rem)] flex flex-col">
 
             {/* terminal header */}
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-3">

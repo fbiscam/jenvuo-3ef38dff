@@ -106,7 +106,7 @@ function FoundingPage() {
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 founding-zoom" style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif" }}>
-      <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white/85 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
           <Link to="/" className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -126,7 +126,7 @@ function FoundingPage() {
 
 
 
-        <div className="mx-auto mt-8 max-w-md rounded-2xl border border-zinc-200 bg-white p-5">
+        <div className="mx-auto mt-8 max-w-md rounded-xl border border-zinc-200 bg-white p-5">
           <div className="flex items-center justify-between text-xs text-zinc-500">
             <span>Seats claimed this month</span>
             <span className="font-medium text-zinc-900">{seats.filled} / {seats.total}</span>
@@ -150,7 +150,7 @@ function FoundingPage() {
             { icon: DollarSign, title: "Pay after profit", body: "First month Elite is free. Billing activates only after $100 verified profit." },
             { icon: Shield, title: "Aligned incentives", body: "We win when you win. Our job is to make you stable, not to milk subscriptions." },
           ].map((b) => (
-            <div key={b.title} className="rounded-2xl border border-zinc-200 bg-white p-5">
+            <div key={b.title} className="rounded-xl border border-zinc-200 bg-white p-5">
               <b.icon className="h-5 w-5 text-zinc-700" />
               <div className="mt-3 text-sm font-semibold">{b.title}</div>
               <div className="mt-1.5 text-[13px] leading-relaxed text-zinc-600">{b.body}</div>
@@ -160,7 +160,7 @@ function FoundingPage() {
       </section>
 
       <section className="mx-auto max-w-4xl px-5 pb-10 sm:pb-14">
-        <div className="rounded-3xl border border-zinc-200 bg-white p-5 sm:p-7">
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 sm:p-7">
 
           <h2 className="text-xl font-semibold">How it works</h2>
           <ol className="mt-5 space-y-4 text-[14px]">
@@ -189,7 +189,7 @@ function FoundingPage() {
       </section>
 
       <section id="apply" className="mx-auto max-w-2xl px-5 pb-16 sm:pb-24">
-        <div className="rounded-3xl border border-zinc-200 bg-white p-5 sm:p-7">
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 sm:p-7">
 
           <h2 className="text-xl font-semibold">Apply for a founding seat</h2>
           <p className="mt-1.5 text-[13px] text-zinc-500">
@@ -206,7 +206,7 @@ function FoundingPage() {
                 role="dialog"
                 aria-modal="true"
               >
-                <div className="relative w-full max-w-md rounded-3xl border border-zinc-200 bg-white p-8 text-center shadow-2xl animate-in zoom-in-95 duration-300">
+                <div className="relative w-full max-w-md rounded-xl border border-zinc-200 bg-white p-8 text-center shadow-2xl animate-in zoom-in-95 duration-300">
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
                     <Check className="h-7 w-7 text-emerald-600" />
                   </div>
@@ -264,11 +264,7 @@ function FoundingPage() {
                         key={p.id}
                         type="button"
                         onClick={() => setPlan(p.id)}
-                        className={`rounded-xl border px-3 py-2.5 text-left transition ${
-                          active
-                            ? "border-zinc-900 bg-white text-zinc-900 shadow-sm"
-                            : "border-zinc-200 bg-white text-zinc-900 hover:border-zinc-400"
-                        }`}
+                        className={`rounded-xl border px-3 py-2.5 text-left transition ${ active ? "border-zinc-900 bg-white text-zinc-900 shadow-sm" : "border-zinc-200 bg-white text-zinc-900 hover:border-zinc-400" }`}
                       >
                         <div className="text-[13px] font-semibold">{p.label}</div>
                         <div className={`text-[11px] ${active ? "text-zinc-600" : "text-zinc-500"}`}>{p.desc}</div>

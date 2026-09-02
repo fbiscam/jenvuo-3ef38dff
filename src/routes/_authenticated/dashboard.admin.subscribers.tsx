@@ -109,7 +109,7 @@ function AdminSubscribersPage() {
         />
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-200 bg-white">
         <table className="min-w-[540px] w-full text-sm">
           <thead className="bg-zinc-50 text-left text-xs uppercase tracking-wide text-zinc-500">
             <tr>

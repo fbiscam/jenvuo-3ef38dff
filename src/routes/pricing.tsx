@@ -144,7 +144,7 @@ function PricingPage() {
     <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased md:[zoom:1.375]`}>
 
       {/* HEADER */}
-      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -188,7 +188,7 @@ function PricingPage() {
 
 
 
-        <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+        <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
 
           <table className="w-full min-w-[760px] text-sm border-collapse">
             <colgroup>
@@ -268,11 +268,7 @@ function PricingPage() {
                       <Link
                         to={to}
                         search={p.search}
-                        className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
-                          p.accent || p.dark
-                            ? "bg-zinc-900 text-white hover:bg-black"
-                            : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
-                        }`}
+                        className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${ p.accent || p.dark ? "bg-zinc-900 text-white hover:bg-black" : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50" }`}
                       >
                         {cta}
                       </Link>
@@ -380,7 +376,7 @@ function PricingPage() {
             {FEATURE_BLOCKS.map((b) => (
               <article
                 key={b.tag}
-                className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.2)] transition"
+                className="group relative overflow-hidden rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 transition"
               >
                 <div className="px-6 pt-6">
                   <span className={`${MONO} inline-block text-[9px] uppercase tracking-wider px-2 py-1 rounded-sm bg-white text-zinc-900 border border-zinc-200`}>
@@ -413,7 +409,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time top-ups that never expire. $1 top-up = $1 wallet — same as plans. Each real signal costs $0.20.</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time top-ups that never expire. $1 top-up = $1 wallet — same as plans. Each real signal costs $0.30.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -423,7 +419,7 @@ function PricingPage() {
             { price: 25, sub: "Trader", accent: true },
             { price: 50, sub: "Power" },
           ].map((p) => (
-            <div key={p.price} className={`rounded-2xl border ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
+            <div key={p.price} className={`rounded-xl border ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
               <div className="flex items-center justify-between">
                 <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>{p.sub}</span>
                 {p.accent && (
@@ -462,7 +458,7 @@ function PricingPage() {
             
             <h3 className="mt-3 text-3xl font-semibold tracking-tight">Frequently asked</h3>
           </div>
-          <div className="divide-y divide-zinc-200 rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+          <div className="divide-y divide-zinc-200 rounded-xl border border-zinc-200 bg-white overflow-hidden">
             {FAQ.map(([q, a]) => (
               <details key={q} className="group p-5 hover:bg-zinc-50/50 transition">
                 <summary className="cursor-pointer list-none flex items-center justify-between gap-4 text-sm font-medium text-zinc-900">
@@ -505,12 +501,12 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
   const estSignals = Math.floor(safe / 0.2);
   return (
-    <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 sm:p-7">
+    <div className="mt-8 rounded-xl border border-zinc-200 bg-white p-6 sm:p-7">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
         <div>
           
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Each real signal costs $0.20. Balance never expires.</p>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Each real signal costs $0.30. Balance never expires.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center rounded-md border border-zinc-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-amber-400">

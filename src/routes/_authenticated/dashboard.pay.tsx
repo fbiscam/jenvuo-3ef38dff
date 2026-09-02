@@ -215,7 +215,7 @@ function PayPage() {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6 px-1 pb-16" style={SANS}>
-      <div className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 sm:p-8">
+      <div className="relative overflow-hidden rounded-xl border border-border bg-white p-6 sm:p-8">
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold text-black">&nbsp;{mode === "upgrade" ? "Upgrade plan" : "Add funds"}</h1>
@@ -243,22 +243,18 @@ function PayPage() {
       </div>
 
       {!order || order.status === "expired" ? (
-        <section className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-24px_rgba(0,0,0,0.25)] sm:p-7">
+        <section className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-7">
           <div className="mb-8 flex justify-center">
             <div className="inline-flex rounded-2xl bg-zinc-100 p-1">
               <button
                 onClick={() => setMode("upgrade")}
-                className={`rounded-xl px-6 py-2 text-sm font-medium transition ${
-                  mode === "upgrade" ? "bg-white text-black shadow-sm" : "text-zinc-500 hover:text-zinc-900"
-                }`}
+                className={`rounded-xl px-6 py-2 text-sm font-medium transition ${ mode === "upgrade" ? "bg-white text-black shadow-sm" : "text-zinc-500 hover:text-zinc-900" }`}
               >
                 Upgrade Plan
               </button>
               <button
                 onClick={() => setMode("topup")}
-                className={`rounded-xl px-6 py-2 text-sm font-medium transition ${
-                  mode === "topup" ? "bg-white text-black shadow-sm" : "text-zinc-500 hover:text-zinc-900"
-                }`}
+                className={`rounded-xl px-6 py-2 text-sm font-medium transition ${ mode === "topup" ? "bg-white text-black shadow-sm" : "text-zinc-500 hover:text-zinc-900" }`}
               >
                 Top-up Credits
               </button>
@@ -279,11 +275,7 @@ function PayPage() {
                     key={p.id}
                     disabled={isCurrent || isCurrentInActiveOrder || isLower}
                     onClick={() => setSelectedPlanId(p.id)}
-                    className={`relative flex flex-col rounded-2xl border p-5 text-left transition ${
-                      selected
-                        ? "border-zinc-900 bg-zinc-50 ring-1 ring-zinc-900"
-                        : "border-zinc-200 bg-white hover:border-zinc-300"
-                    } ${(isCurrent || isCurrentInActiveOrder || isLower) ? "opacity-50 grayscale cursor-not-allowed" : ""}`}
+                    className={`relative flex flex-col rounded-xl border p-5 text-left transition ${ selected ? "border-zinc-900 bg-zinc-50 ring-1 ring-zinc-900" : "border-zinc-200 bg-white hover:border-zinc-300" } ${(isCurrent || isCurrentInActiveOrder || isLower) ? "opacity-50 grayscale cursor-not-allowed" : ""}`}
                   >
                     {isCurrent && (
                       <span className="absolute -top-2.5 right-4 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
@@ -315,11 +307,7 @@ function PayPage() {
                 <button
                   key={a}
                   onClick={() => { setAmount(a); setCustom(""); }}
-                  className={`min-w-[86px] rounded-2xl border px-4 py-3 text-sm font-medium transition ${
-                    !custom.trim() && amount === a
-                      ? "border-black/15 bg-[#FAFAFA] text-black"
-                      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-900/30 hover:bg-zinc-50"
-                  }`}
+                  className={`min-w-[86px] rounded-xl border px-4 py-3 text-sm font-medium transition ${ !custom.trim() && amount === a ? "border-black/15 bg-[#FAFAFA] text-black" : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-900/30 hover:bg-zinc-50" }`}
                 >
                   ${a}
                 </button>
@@ -342,11 +330,7 @@ function PayPage() {
                 <button
                   key={n.id}
                   onClick={() => setNetwork(n.id)}
-                  className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition ${
-                    active
-                      ? "border-zinc-900 bg-zinc-50/80 ring-1 ring-zinc-900"
-                      : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50/60"
-                  }`}
+                  className={`group relative overflow-hidden rounded-xl border p-4 text-left transition ${ active ? "border-zinc-900 bg-zinc-50/80 ring-1 ring-zinc-900" : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50/60" }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="relative inline-flex">
@@ -371,7 +355,7 @@ function PayPage() {
             <button
               onClick={onRedeem}
               disabled={busy}
-              className="rounded-2xl border border-zinc-200 px-4 py-3 text-sm text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50"
+              className="rounded-xl border border-zinc-200 px-4 py-3 text-sm text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50"
             >
               Redeem free credit
             </button>
@@ -387,7 +371,7 @@ function PayPage() {
             )}
           </div>
 
-          <div className="mt-7 flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-white p-5">
+          <div className="mt-7 flex flex-wrap items-end justify-between gap-4 rounded-xl bg-white p-5">
             <div>
               <div className="flex items-center gap-2">
                 <UsdtIcon className="h-7 w-7" />
@@ -411,7 +395,7 @@ function PayPage() {
             <button
               onClick={onCreate}
               disabled={busy || !!quote?.error || (mode === "upgrade" && !selectedPlanId)}
-              className="rounded-2xl border border-black/10 bg-white px-6 py-3.5 text-sm font-medium text-black transition hover:bg-black/5 disabled:opacity-50"
+              className="rounded-xl border border-black/10 bg-white px-6 py-3.5 text-sm font-medium text-black transition hover:bg-black/5 disabled:opacity-50"
             >
               {mode === "upgrade" ? "Upgrade now" : "Continue to payment"}
             </button>
@@ -419,7 +403,7 @@ function PayPage() {
         </section>
       ) : (
 
-        <section className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-24px_rgba(0,0,0,0.25)] sm:p-7">
+        <section className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-7">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="relative inline-flex">
@@ -437,7 +421,7 @@ function PayPage() {
               </div>
             </div>
             {order.status === "pending" && (
-              <div className="rounded-2xl border border-black/10 bg-white px-5 py-3 text-center text-black">
+              <div className="rounded-xl border border-black/10 bg-white px-5 py-3 text-center text-black">
                 <div className="text-[10px] uppercase tracking-[0.2em] text-black/60">Time left</div>
                 <div className="font-mono text-2xl tabular-nums text-red-600">{mm}:{ss}</div>
               </div>
@@ -522,7 +506,7 @@ function PayPage() {
         </section>
       )}
 
-      <section className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_-24px_rgba(0,0,0,0.25)]">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <h2 className="text-[15px] font-semibold text-zinc-900">&nbsp; Payment history</h2>
         {orders.length === 0 ? (
           <p className="mt-2 text-[13px] text-zinc-500">No payments yet.</p>

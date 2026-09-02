@@ -45,7 +45,7 @@ function CollectionPage() {
   return (
     <>
       <div className={`jenvu-zoom min-h-dvh bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -73,7 +73,7 @@ function CollectionPage() {
         </section>
 
         <main className="mx-auto max-w-3xl px-5 sm:px-6 py-12 sm:py-16">
-          <ul className="divide-y divide-zinc-100 rounded-2xl border border-zinc-200 bg-white">
+          <ul className="divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
             {collection.articles.map((a: Article) => (
               <li key={a.slug}>
                 <Link

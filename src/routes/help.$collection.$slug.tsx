@@ -79,7 +79,7 @@ function ArticlePage() {
   return (
     <>
       <div className={`jenvu-zoom min-h-dvh bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -141,7 +141,7 @@ function ArticlePage() {
           </article>
 
           {/* Feedback */}
-          <div className="mt-12 rounded-2xl border border-zinc-200 bg-zinc-50 p-6 flex items-center justify-between gap-4 flex-wrap">
+          <div className="mt-12 rounded-xl border border-zinc-200 bg-zinc-50 p-6 flex items-center justify-between gap-4 flex-wrap">
             <div>
               <div className="text-sm font-medium text-zinc-900">Was this article helpful?</div>
               <div className="text-xs text-zinc-600">Your feedback helps us improve.</div>
@@ -158,7 +158,7 @@ function ArticlePage() {
               <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
                 Related articles
               </div>
-              <ul className="mt-4 divide-y divide-zinc-100 rounded-2xl border border-zinc-200 bg-white">
+              <ul className="mt-4 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
                 {related.map((a) => (
                   <li key={a.slug}>
                     <Link

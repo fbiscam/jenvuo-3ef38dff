@@ -183,9 +183,7 @@ function OpsPayments() {
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`rounded-lg px-3.5 py-2 text-sm capitalize transition ${
-                tab === t ? "bg-zinc-900 text-white" : "border border-zinc-200 text-zinc-700 hover:bg-zinc-50"
-              }`}
+              className={`rounded-lg px-3.5 py-2 text-sm capitalize transition ${ tab === t ? "bg-zinc-900 text-white" : "border border-zinc-200 text-zinc-700 hover:bg-zinc-50" }`}
             >
               {t === "config" ? "Deposit addresses" : t}
             </button>
@@ -204,9 +202,7 @@ function OpsPayments() {
                 <button
                   key={f.id}
                   onClick={() => setFilter(f.id)}
-                  className={`rounded-full px-3 py-1.5 text-[13px] transition ${
-                    filter === f.id ? "bg-zinc-900 text-white" : "border border-zinc-200 text-zinc-600 hover:bg-zinc-50"
-                  }`}
+                  className={`rounded-full px-3 py-1.5 text-[13px] transition ${ filter === f.id ? "bg-zinc-900 text-white" : "border border-zinc-200 text-zinc-600 hover:bg-zinc-50" }`}
                 >
                   {f.label}
                 </button>

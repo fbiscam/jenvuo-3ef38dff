@@ -292,7 +292,7 @@ function Journal() {
           </button>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+        <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
           <table className="w-full min-w-[780px] text-sm">
 
             <thead className="bg-zinc-50 text-center font-mono text-[10px] uppercase tracking-wider text-zinc-500">
@@ -495,7 +495,7 @@ function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t:
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={submit}
-        className="w-full max-w-lg rounded-2xl bg-white shadow-xl"
+        className="w-full max-w-lg rounded-xl bg-white shadow-xl"
       >
         <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-3">
           <div>

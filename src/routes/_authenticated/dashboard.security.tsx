@@ -40,7 +40,7 @@ function SecurityPage() {
         </p>
       </div>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <h2 className="pl-1 text-base font-semibold">&nbsp;Password</h2>
         <p className="mt-1 text-sm text-zinc-500">
           We'll email a secure single-use link to {email || "your account email"} so you can set a new password.
@@ -54,7 +54,7 @@ function SecurityPage() {
         </button>
       </section>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <h2 className="pl-1 text-base font-semibold">&nbsp;Two-factor authentication</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Require a six-digit code from your authenticator app every time you sign in.
@@ -64,7 +64,7 @@ function SecurityPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <h2 className="pl-1 text-base font-semibold">&nbsp;Trusted devices</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Browsers you've marked as trusted skip the 2FA step on sign-in.&nbsp;
@@ -74,7 +74,7 @@ function SecurityPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <h2 className="pl-1 text-base font-semibold">&nbsp;Session</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Signing out clears your local session on this browser.&nbsp;

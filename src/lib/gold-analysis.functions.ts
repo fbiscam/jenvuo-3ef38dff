@@ -9,6 +9,8 @@ import {
   detectSilverBullet, detectPowerOf3, detectMitigationAtEntry,
   detectCETap, detectLiquidityVoidAtEntry, detectMomentumDivergence,
   detectVolumeSpikeOnBreak, detectMidnightOpenBias,
+  computeSessionOpens, detectAsianRange, detectDailyOpenSide, detectAtrRoom,
+  detectLtfMomentum, detectRangePosition, detectSwingRoom,
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
@@ -1868,8 +1870,23 @@ export const getMarketSnapshotsBatch = createServerFn({ method: "POST" })
     return { symbols: symbols.length ? symbols : ["XAUUSD"] };
   })
   .handler(async ({ data }) => {
-    const results = await Promise.all(
-      data.symbols.map(async (symbol) => {
+    // Process symbols sequentially. Each snapshot may contact more than one
+    // upstream provider, and fanning out the whole ticker can exceed the
+    // server runtime's outbound connection limit and stall unrelated pages.
+    const results: Array<{
+      symbol: string;
+      snapshot: {
+        price: number;
+        prevClose: number | null;
+        changePct: number | null;
+        decimals: number;
+        display: string;
+        kind: ResolvedInstrument["kind"];
+        t: number;
+      } | null;
+    }> = [];
+    for (const symbol of data.symbols) {
+      const result = await (async () => {
         try {
           const inst = resolveInstrument(symbol);
           const [quote, dayStats] = await Promise.all([
@@ -1907,8 +1924,9 @@ export const getMarketSnapshotsBatch = createServerFn({ method: "POST" })
         } catch {
           return { symbol, snapshot: null };
         }
-      }),
-    );
+      })();
+      results.push(result);
+    }
     return { results };
   });
 
@@ -2635,6 +2653,16 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const volumeSpike = detectVolumeSpikeOnBreak(htf, htfStructureEvents);
     const midnightOpen = detectMidnightOpenBias(htf, built.direction);
 
+    // ---- Expert-tier signals (takes the desk past 30 experts) ----
+    const __tp1 = built.tp1 ?? built.tp;
+    const __opens = computeSessionOpens(htf);
+    const asianRange = detectAsianRange(ltf, last.c, built.direction);
+    const dailyOpenSide = detectDailyOpenSide(__opens.dailyOpen, last.c, built.direction);
+    const atrRoom = detectAtrRoom(ltf, built.entry, __tp1);
+    const ltfMomentum = detectLtfMomentum(ltf, built.direction);
+    const rangePosition = detectRangePosition(ltf, built.entry);
+    const swingRoom = detectSwingRoom(ltfA.swings, built.entry, __tp1, built.direction);
+
     // ---- Capital-protection gate: no naked retracement calls ----
     // Yesterday's bad trades came from treating an HTF pullback zone as a live
     // signal before the lower timeframe confirmed. From now on a BUY/SELL must
@@ -2754,6 +2782,12 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
       momentumDivergence,
       volumeSpike,
       midnightOpen,
+      asianRange,
+      dailyOpenSide,
+      atrRoom,
+      ltfMomentum,
+      rangePosition,
+      swingRoom,
     });
     let setupScore = scored.score;
     let setupGrade = scored.grade;

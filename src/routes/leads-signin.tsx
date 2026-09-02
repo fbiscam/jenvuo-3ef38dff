@@ -51,7 +51,7 @@ function SignIn() {
       >
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-[420px] rounded-xl border border-zinc-200 bg-white p-8 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)]"
+        className="w-full max-w-[420px] rounded-xl border border-zinc-200 bg-white p-8"
       >
         <div className="flex flex-col items-center text-center">
           <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 rounded-md object-contain" />

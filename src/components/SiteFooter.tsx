@@ -61,7 +61,7 @@ const columns = [
     links: [
       { to: "/", label: "Home" },
       { to: "/app", label: "Voice Agent" },
-      { to: "/signal", label: "Signal Desk" },
+      { to: "/signals-live", label: "Live Signals" },
       { to: "/broadcasts", label: "Broadcast" },
       { to: "/pricing", label: "Pricing" },
       { to: "/download", label: "Download App" },
@@ -72,7 +72,7 @@ const columns = [
     links: [
       { to: "/insights", label: "Market Insights" },
       { to: "/killzones", label: "Killzone Times" },
-      { to: "/scam-check", label: "Scam Check" },
+      { to: "/insights", label: "Our Insights" },
       { to: "/ai-engine", label: "AI Engine" },
       { to: "/llm", label: "Language Model" },
       { to: "/development", label: "Development" },
@@ -205,7 +205,7 @@ export default function SiteFooter({ className }: { className?: string }) {
               </div>
               <ul className="space-y-2">
                 {col.links.map((l) => (
-                  <li key={l.to}>
+                  <li key={`${l.to}:${l.label}`}>
                     <Link
                       to={l.to}
                       className="text-sm text-zinc-800 hover:text-black transition-colors whitespace-nowrap"

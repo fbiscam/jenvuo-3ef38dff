@@ -68,7 +68,7 @@ function UsagePage() {
 
   if (isError || !data) {
     return (
-      <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center">
+      <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
         <p className="text-sm text-zinc-600">Failed to load usage data.</p>
         <button onClick={() => refetch()} className="mt-3 rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white">
           Retry
@@ -102,7 +102,7 @@ function UsagePage() {
         />
       </div>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <div className="flex items-baseline justify-between">
           <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Balance</div>
           <div className="text-sm text-zinc-600 tabular-nums">
@@ -114,7 +114,7 @@ function UsagePage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <div className="flex items-center justify-between">
           <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Last 30 days</div>
           <div className="flex items-center gap-3 text-[11px] text-zinc-500">
@@ -143,7 +143,7 @@ function UsagePage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <div className="flex items-center justify-between">
           <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Activity log</div>
           <div className="text-[11px] text-zinc-500">{data.ledger.length} entries · model + cost per row</div>
@@ -208,7 +208,7 @@ function StatCard({ label, value, sub, accent }: {
 }) {
   const dot = { emerald: "bg-emerald-500", rose: "bg-rose-500", blue: "bg-blue-500", zinc: "bg-zinc-400" }[accent];
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4">
+    <div className="rounded-xl border border-zinc-200 bg-white p-4">
       <div className="flex items-center gap-2">
         <span className={`inline-block h-1.5 w-1.5 rounded-full ${dot}`} />
         <span className={`${MONO} text-[10px] uppercase tracking-[0.2em] text-zinc-500`}>{label}</span>

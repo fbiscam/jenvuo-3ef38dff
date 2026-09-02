@@ -189,7 +189,7 @@ function Card({
   children?: React.ReactNode
 }) {
   return (
-    <div className="rounded-3xl border border-zinc-200 bg-zinc-50/60 p-8 sm:p-10">
+    <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-8 sm:p-10">
       <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
         {title}
       </h1>

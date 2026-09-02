@@ -276,14 +276,14 @@ function Home() {
       if (openChartIntent) {
         speech.stopSpeaking();
         speech.pauseListening();
-        navigate({ to: "/signal", search: { symbol }, replace: true });
+        navigate({ to: "/signals-live", replace: true });
         return;
       }
 
-      // Analyze / signal / setup / trade-idea intent → open the full Signal Desk
+      // Analyze / signal / setup / trade-idea intent → open the full Live Signals
       speech.stopSpeaking();
       speech.pauseListening();
-      navigate({ to: "/signal", search: { symbol }, replace: true });
+      navigate({ to: "/signals-live", replace: true });
       return;
     }
 
@@ -297,8 +297,8 @@ function Home() {
       if (analyzeIntent) {
         const symbol = detectSymbol(query);
         // Pre-flight low-balance guard — block before hitting the server.
-        if (!credits.isLoading && credits.balance < 0.20) {
-          const msg = `Your balance is $${credits.balance.toFixed(2)}. You need at least $0.20 to run a signal scan.`;
+        if (!credits.isLoading && credits.balance < 0.30) {
+          const msg = `Your balance is $${credits.balance.toFixed(2)}. You need at least $0.30 to run a signal scan.`;
           toast.error("Balance too low", {
             description: `${msg} Add funds to continue.`,
             action: { label: "Add funds", onClick: () => (window.location.href = "/dashboard/billing") },
@@ -439,7 +439,7 @@ function Home() {
   return (
     <div className={cn(`overflow-hidden flex flex-col ${SANS} antialiased overscroll-none`, "bg-white text-zinc-900")} style={{ zoom: 1.1, height: "calc(100dvh / 1.1)", width: "calc(100vw / 1.1)" }}>
       {/* HEADER (matches homepage) */}
-      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md shrink-0">
+      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white shrink-0">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -749,7 +749,7 @@ function VoicePicker({ value, onChange }: { value: VoicePresetKey; onChange: (k:
         <Sliders className="h-4 w-4" />
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-60 rounded-2xl border border-neutral-200 bg-white shadow-xl p-2 z-30 animate-in fade-in slide-in-from-top-1">
+        <div className="absolute right-0 mt-2 w-60 rounded-xl border border-neutral-200 bg-white shadow-xl p-2 z-30 animate-in fade-in slide-in-from-top-1">
           <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
             Voice
           </div>

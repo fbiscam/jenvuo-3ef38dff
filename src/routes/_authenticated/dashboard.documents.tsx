@@ -163,9 +163,9 @@ function DocumentsPage() {
       </div>
 
       {isLoading ? (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 text-sm text-zinc-500">Loading…</div>
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 text-sm text-zinc-500">Loading…</div>
       ) : !row ? (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6">
+        <div className="rounded-xl border border-zinc-200 bg-white p-6">
           <div className="text-sm text-zinc-700">
             We couldn't find a Founding application linked to your account email. Please apply first.
           </div>
@@ -179,7 +179,7 @@ function DocumentsPage() {
       ) : (
         <>
           {/* Stepper */}
-          <div className={`rounded-2xl border border-zinc-200 bg-white p-6`}>
+          <div className={`rounded-xl border border-zinc-200 bg-white p-6`}>
             <ol className="space-y-4">
               {STEPS.map((step, i) => {
                 const done = i < currentIdx || (i === currentIdx && row?.document_status === "verified");
@@ -242,7 +242,7 @@ function DocumentsPage() {
           )}
 
           {rejected && (
-            <div className="mt-4 rounded-2xl border border-red-200 bg-white p-5" style={{ fontFamily: '"Google Sans", "Google Sans Text", "Product Sans", Roboto, Arial, sans-serif' }}>
+            <div className="mt-4 rounded-xl border border-red-200 bg-white p-5" style={{ fontFamily: '"Google Sans", "Google Sans Text", "Product Sans", Roboto, Arial, sans-serif' }}>
               <div className="text-sm font-semibold text-red-800">Documents rejected</div>
               <div className="text-sm text-yellow-600 mt-1">
                 {row.documents_rejected_reason || "Please re-upload clearer or more recent ID and driving license."}
@@ -260,7 +260,7 @@ function DocumentsPage() {
 
           {/* Uploader */}
           {canUpload && (
-            <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6">
+            <div className="mt-6 rounded-xl border border-zinc-200 bg-white p-6">
               <div className="text-sm font-semibold text-zinc-900">Upload documents</div>
               <p className="text-xs text-zinc-600 mt-1">
                 Images (JPG, PNG), videos (MP4, MOV) or PDFs — up to 100 MB each.
@@ -367,7 +367,7 @@ function DocumentsPage() {
 
           {/* Uploaded files list */}
           {canUpload && files.length > 0 && (
-            <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6">
+            <div className="mt-6 rounded-xl border border-zinc-200 bg-white p-6">
               <div className="text-sm font-semibold text-zinc-900 mb-3">
                 Uploaded files ({files.length})
               </div>

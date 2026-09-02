@@ -130,11 +130,7 @@ function AdminMessagesPage() {
                 key={f.key}
                 type="button"
                 onClick={() => setFilter(f.key)}
-                className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition ${
-                  active
-                    ? "border border-zinc-900 bg-white text-zinc-900"
-                    : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
-                }`}
+                className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition ${ active ? "border border-zinc-900 bg-white text-zinc-900" : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50" }`}
               >
                 {f.label}
                 <span className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${active ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600"}`}>
@@ -204,7 +200,7 @@ function AdminMessagesPage() {
           onClick={() => setSelected(null)}
         >
           <div
-            className="relative w-full max-w-2xl rounded-2xl bg-white shadow-xl"
+            className="relative w-full max-w-2xl rounded-xl bg-white shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4 border-b border-zinc-100 px-6 py-4">

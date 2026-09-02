@@ -111,7 +111,7 @@ function DownloadPage() {
     <>
       <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
         {/* NAV — matches homepage */}
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -141,7 +141,7 @@ function DownloadPage() {
               return (
                 <div
                   key={p.key}
-                  className="rounded-2xl border border-zinc-200 bg-white shadow-[0_24px_60px_-28px_rgba(0,0,0,0.10)] overflow-hidden flex flex-col"
+                  className="rounded-xl border border-zinc-200 bg-white overflow-hidden flex flex-col"
                 >
                   <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-100">
                     <div className="flex items-center gap-2">
@@ -219,7 +219,7 @@ function DownloadPage() {
             <span className="h-px w-6 bg-zinc-300" />
             CHANGELOG
           </div>
-          <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+          <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
             {CHANGELOG.map((c, i) => (
               <div
                 key={c.v}
