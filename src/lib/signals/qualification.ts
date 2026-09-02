@@ -10,10 +10,12 @@ export type Direction = "BUY" | "SELL";
 
 /**
  * Global quality floor. Runtime config may raise it, never lower it.
- * Kept at 75 — quality is enforced by the confluence/veto/regime gates
- * below plus the per-session calibration bump, not by the raw number.
+ * Set to 70 so 1-2 genuinely clean setups per day can release, while
+ * accuracy stays protected by the confluence/veto/regime gates below
+ * (counter-trend 88, outside-killzone 85, ranging 82) plus the
+ * per-session calibration bump.
  */
-export const MIN_CONFIDENCE = 75;
+export const MIN_CONFIDENCE = 70;
 /** Counter-trend (against HTF bias) needs much higher conviction. */
 export const COUNTER_TREND_MIN_CONFIDENCE = 88;
 /** Outside an active killzone only an exceptional setup may fire. */
