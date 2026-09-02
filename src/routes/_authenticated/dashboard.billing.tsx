@@ -180,7 +180,7 @@ function Billing() {
   if (isLoading) {
     return (
       <div className="space-y-10">
-        <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
+        <section className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-8">
           <div className="h-10 w-32 animate-pulse rounded bg-zinc-100" />
           <div className="mt-4 h-2 w-full animate-pulse rounded-full bg-zinc-100" />
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -205,7 +205,7 @@ function Billing() {
   return (
     <div className="space-y-10">
       {/* CURRENT PLAN */}
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="mt-2 flex items-center gap-3">
@@ -251,7 +251,7 @@ function Billing() {
       </section>
 
       {/* WALLET BALANCE */}
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400, textTransform: "none", letterSpacing: "normal" }}>
+      <section className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-8" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400, textTransform: "none", letterSpacing: "normal" }}>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="mt-2 flex items-baseline gap-2 flex-nowrap whitespace-nowrap">
@@ -261,7 +261,7 @@ function Billing() {
             {resetsAt && (
               <p className="mt-1 text-xs text-zinc-500">Next billing date: {resetsAt.toLocaleDateString()}</p>
             )}
-            <p className="mt-2 text-[12.5px] text-zinc-500">Flat $0.20 per real BUY/SELL signal, or $0.25 for premium confirmation scans. WAIT / no-trade scans are free.</p>
+            <p className="mt-2 text-[12.5px] text-zinc-500">Flat $0.30 per real BUY/SELL signal. WAIT / no-trade scans are free.</p>
           </div>
           <Link to="/dashboard/pay" className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-normal text-zinc-900 hover:bg-zinc-50">
             Add funds

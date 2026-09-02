@@ -13,9 +13,36 @@ import { useTrial } from "@/hooks/useTrial";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
+import { getXauProjection } from "@/lib/home-projection.functions";
+import { TerminalWorkstation } from "@/components/TerminalWorkstation";
+import {
+  getCorrelatedMarkets,
+  type CorrelatedBoard,
+  type CorrelatedMarket,
+} from "@/lib/correlated-markets.functions";
 
-import { Check, Sparkles, Zap, Crown, Minus, Menu, X } from "lucide-react";
-import xaiLogo from "@/assets/xai-logo.png";
+/* Neutral skeleton rows shown until the live macro feed hydrates. */
+const CORR_PLACEHOLDER: CorrelatedMarket[] = [
+  { symbol: "DXY", display: "DXY", note: "USD strength — inverse driver" },
+  { symbol: "US10Y", display: "US10Y", note: "Real yields — inverse driver" },
+  { symbol: "XAGUSD", display: "XAG/USD", note: "Silver beta — confirms metals" },
+  { symbol: "EURUSD", display: "EUR/USD", note: "USD leg — positive driver" },
+  { symbol: "USDJPY", display: "USD/JPY", note: "Carry / risk — inverse driver" },
+  { symbol: "SPX", display: "S&P 500", note: "Risk appetite — rotation cue" },
+  { symbol: "WTI", display: "WTI Oil", note: "Inflation impulse — positive" },
+].map((m) => ({
+  ...m,
+  price: 0,
+  decimals: 2,
+  changePct: 0,
+  high: 0,
+  low: 0,
+  rangePos: 50,
+  series: [],
+  correlation: 0,
+  impact: "neutral" as const,
+}));
+
 /* ---------- hero background banners (desktop / tablet only) ---------- */
 function HeroBanners() {
   return (
@@ -29,8 +56,6 @@ function HeroBanners() {
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
-          {/* Trend line */}
-          <path d="M 0 75% Q 25% 60%, 50% 55% T 100% 35%" fill="none" stroke="currentColor" strokeWidth="2" className="text-zinc-400" />
           {/* Candlesticks */}
           <g>
             {/* Bullish */}
@@ -70,6 +95,10 @@ function HeroBanners() {
   );
 }
 
+import { Check, Sparkles, Zap, Crown, Minus, Menu, X } from "lucide-react";
+
+import xaiLogo from "@/assets/xai-logo.png";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -106,23 +135,20 @@ export const Route = createFileRoute("/")({
     ],
   }),
 
-  // Prices are fetched on the server so the ticker is already populated in the
-  // very first paint (no "—…" placeholders while the client warms up).
+  // Keep SSR independent from third-party market feeds. Live prices hydrate
+  // after first paint, so a slow provider can never prevent the page loading.
+  // The XAU projection is primed server-side (5-min cache) so the very first
+  // paint shows the real live price instead of a stale placeholder.
   loader: async () => {
-    try {
-      const symbols = INITIAL_TICKER
-        .map(([label]) => SYMBOL_MAP[label])
-        .filter((s): s is string => !!s);
-      const res = await Promise.race([
-        getMarketSnapshotsBatch({ data: { symbols } }),
-        new Promise<null>((resolve) => setTimeout(() => resolve(null), 6_000)),
-      ]);
-      if (!res?.results) return { tickerRows: INITIAL_TICKER };
-      return { tickerRows: snapshotsToRows(res.results, INITIAL_TICKER) };
-    } catch {
-      return { tickerRows: INITIAL_TICKER };
-    }
+    const [projection, board] = await Promise.all([
+      getXauProjection().catch(() => null),
+      getCorrelatedMarkets().catch(() => null),
+    ]);
+    return { tickerRows: INITIAL_TICKER, projection, board };
   },
+  errorComponent: ({ error }) => (
+    <div role="alert" className="p-8 text-sm text-zinc-600">{(error as Error)?.message ?? "Something went wrong."}</div>
+  ),
   component: HomePage,
 });
 
@@ -231,8 +257,10 @@ function useLiveTicker(): TickerRow[] {
         /* ignore */
       }
     };
+    // One refresh per minute is sufficient for the compact homepage ticker and
+    // avoids exhausting the server runtime's outbound connection limit.
     fetchPrices();
-    const id = setInterval(fetchPrices, 3_000);
+    const id = setInterval(fetchPrices, 60_000);
     return () => {
       alive = false;
       clearInterval(id);
@@ -269,9 +297,66 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ---------- page ---------- */
+/* Live macro board: markets that materially move the XAU/USD price. */
+function useCorrelatedMarkets(initial: CorrelatedBoard | null): CorrelatedBoard | null {
+  const [data, setData] = React.useState<CorrelatedBoard | null>(initial);
+  const fetchBoard = useServerFn(getCorrelatedMarkets);
+
+  React.useEffect(() => {
+    let alive = true;
+    let inFlight = false;
+    const run = async () => {
+      if (inFlight) return; // never stack requests on the 5s tick
+      inFlight = true;
+      try {
+        const res = await fetchBoard();
+        if (alive && res) setData(res as CorrelatedBoard);
+      } catch { /* keep last known values */ } finally { inFlight = false; }
+    };
+    run();
+    const id = setInterval(run, 1_000);
+    return () => { alive = false; clearInterval(id); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return data;
+}
+
+/* Tiny low/high sparkline for one correlated market row. */
+function Sparkline({ series, up }: { series: number[]; up: boolean }) {
+  if (!series || series.length < 3) {
+    return <div className="h-8 w-full rounded bg-zinc-50" />;
+  }
+  const lo = Math.min(...series);
+  const hi = Math.max(...series);
+  const span = hi - lo || 1;
+  const W = 120;
+  const H = 32;
+  const pts = series.map((v, i) => {
+    const x = (i / (series.length - 1)) * W;
+    const y = H - 3 - ((v - lo) / span) * (H - 6);
+    return `${Math.round(x * 100) / 100},${Math.round(y * 100) / 100}`;
+  });
+  const stroke = up ? "#10b981" : "#ef4444";
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-8 w-[110px]" preserveAspectRatio="none" aria-hidden="true">
+      <polyline
+        points={`0,${H} ${pts.join(" ")} ${W},${H}`}
+        fill={up ? "rgba(16,185,129,0.10)" : "rgba(239,68,68,0.10)"}
+        stroke="none"
+      />
+      <polyline points={pts.join(" ")} fill="none" stroke={stroke} strokeWidth="1.6" strokeLinejoin="round" />
+      <circle cx={W} cy={pts[pts.length - 1].split(",")[1]} r="2" fill={stroke} />
+    </svg>
+  );
+}
+
 function HomePage() {
   const ticker = useLiveTicker();
+  const initialProjection = (Route.useLoaderData() as { projection?: import("@/lib/home-projection.functions").XauProjection | null } | undefined)?.projection ?? null;
+  const board = useCorrelatedMarkets(
+    (Route.useLoaderData() as { board?: CorrelatedBoard | null } | undefined)?.board ?? null,
+  );
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
   const trial = useTrial();
@@ -289,7 +374,7 @@ function HomePage() {
     <>
     <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
-      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
         <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -297,7 +382,7 @@ function HomePage() {
           </Link>
 
           <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
-            <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
+            <Link to="/signals-live" className="hover:text-zinc-900">Live Signals</Link>
             <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
             <Link to="/pricing" className="hover:text-zinc-900">Pricing</Link>
             <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
@@ -358,7 +443,7 @@ function HomePage() {
             </div>
             <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-zinc-900">
               {[
-                { to: "/signal", label: "Signal Engine" },
+                { to: "/signals-live", label: "Live Signals" },
                 { to: "/signals-live", label: "Signals Live" },
                 { to: "/pricing", label: "Pricing" },
                 { to: "/founding", label: "Founding" },
@@ -412,6 +497,7 @@ function HomePage() {
       {/* HERO */}
       <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
         <HeroBanners />
+
         <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
 
           <div className="text-left lg:col-span-7 lg:text-left">
@@ -434,7 +520,7 @@ function HomePage() {
                 <span className={`${MONO} text-xs opacity-80`}>→</span>
               </Link>
               <Link
-                to={isAuthed ? "/signal" : "/auth"}
+                to={isAuthed ? "/signals-live" : "/auth"}
                 className="hover-glow inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
               >
                 See Signal Engine
@@ -461,176 +547,11 @@ function HomePage() {
 
 
       {/* TERMINAL WORKSTATION */}
-      <section className="mx-auto max-w-6xl px-5 mt-8 pb-14 sm:px-6 sm:mt-10 sm:pb-20">
-
-        <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
-          {/* terminal header */}
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex gap-1.5 shrink-0">
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
-              </div>
-              <span className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
-                Jenvu // SYSTEM_ACTIVE
-              </span>
-            </div>
-            <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] sm:text-[11px] font-medium text-emerald-600 tracking-tight">
-                  <span className="sm:hidden">LIVE</span>
-                  <span className="hidden sm:inline">LIVE FEED</span>
-                </span>
-              </div>
-              <div className="hidden sm:block h-4 w-px bg-zinc-200" />
-              <span className={`hidden sm:inline text-[11px] ${MONO} text-zinc-900`}>LATENCY · 14MS</span>
-            </div>
-          </div>
-
-          {/* body */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100">
-            {/* LEFT — ICT feed */}
-            <div className="lg:col-span-3 bg-white p-5 sm:p-6 flex flex-col gap-5 sm:gap-6">
-              <h2 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase`}>
-                ICT Execution Feed
-              </h2>
-              <div className="space-y-3">
-                {SIGNALS.map((s) => (
-                  <div
-                    key={s.pair + s.t}
-                    className={`p-3 rounded-lg border ${
-                      s.tone === "green"
-                        ? "border-emerald-100/70 bg-emerald-50/30"
-                        : "border-zinc-100 bg-white/40"
-                    } space-y-2`}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs font-semibold">{s.pair}</span>
-                      <span className={`text-[10px] ${MONO} text-zinc-900`}>{s.t}</span>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <TagPill tag={s.tag} tone={s.tone} />
-                      <span className={`text-xs ${s.tone === "green" ? "text-zinc-900" : "text-zinc-900"}`}>
-                        {s.note}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* CENTER — Orb */}
-            <div className="lg:col-span-6 bg-white flex flex-col items-center justify-center p-6 sm:p-10 lg:p-12 relative overflow-hidden min-h-[330px] sm:min-h-[440px]">
-              <div
-                className="absolute inset-0 opacity-[0.04] pointer-events-none"
-                style={{
-                  backgroundImage: "radial-gradient(#000 0.6px, transparent 0.6px)",
-                  backgroundSize: "24px 24px",
-                }}
-              />
-              <div className="relative z-10 flex flex-col items-center">
-                <div className="relative h-44 w-44 sm:h-56 sm:w-56">
-                  <div className="absolute inset-0 rounded-full border border-zinc-100 animate-[spin_18s_linear_infinite]" />
-                  <div className="absolute inset-5 rounded-full border border-zinc-200/60 animate-[spin_24s_linear_infinite_reverse]" />
-                  <div className="absolute inset-9">
-                    <CloudOrb status="speaking" pulse={1} />
-                  </div>
-                </div>
-                <div className="mt-8 text-center sm:mt-10">
-                  <p className={`text-xs font-medium tracking-[0.25em] ${MONO} text-zinc-900 uppercase mb-3`}>
-                    Listening for commands
-                  </p>
-                  <div className="flex items-end justify-center gap-1 h-6">
-                    {[2, 4, 5, 3, 4, 2, 2].map((h, i) => (
-                      <div
-                        key={i}
-                        className={`w-1 rounded-full ${i < 5 ? "bg-zinc-900" : "bg-zinc-200"}`}
-                        style={{
-                          height: `${h * 4}px`,
-                          animation: i < 5 ? `bounce 1s infinite ${i * 0.12}s` : undefined,
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* RIGHT — intelligence */}
-            <div className="lg:col-span-3 bg-white p-5 sm:p-6 lg:border-l border-zinc-100">
-              <h2 className={`text-[10px] font-bold ${MONO} text-zinc-900 tracking-widest uppercase mb-4`}>
-                Intelligence Dashboard
-              </h2>
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-end">
-                    <span className={`text-[10px] ${MONO} text-zinc-900 uppercase`}>DXY Index</span>
-                    <span className="text-xs font-semibold">104.22</span>
-                  </div>
-                  <div className="h-16 w-full bg-white rounded border border-zinc-100 flex items-end p-2 gap-0.5">
-                    {[50, 66, 75, 33, 50, 66, 50, 80, 40].map((h, i) => (
-                      <div
-                        key={i}
-                        className={`flex-1 rounded-t-sm ${
-                          h > 70 ? "bg-zinc-900" : h > 50 ? "bg-zinc-400" : "bg-zinc-200"
-                        }`}
-                        style={{ height: `${h}%` }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-zinc-900">Institutional Sentiment</span>
-                    <span className="text-xs font-medium text-emerald-600">Bullish</span>
-                  </div>
-                  <div className="w-full h-1 bg-zinc-100 rounded-full overflow-hidden flex">
-                    <div className="w-3/4 bg-emerald-500" />
-                    <div className="w-1/4 bg-zinc-200" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 mt-3">
-                    <div className="p-2 border border-zinc-100 rounded-lg">
-                      <p className={`text-[10px] ${MONO} text-zinc-900`}>PDH</p>
-                      <p className={`text-xs ${MONO} font-medium`}>1.0922</p>
-                    </div>
-                    <div className="p-2 border border-zinc-100 rounded-lg">
-                      <p className={`text-[10px] ${MONO} text-zinc-900`}>PDL</p>
-                      <p className={`text-xs ${MONO} font-medium`}>1.0810</p>
-                    </div>
-                  </div>
-                </div>
-
-                <Link
-                  to="/app"
-                  className={`w-full inline-flex items-center justify-center mt-2 py-3 bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-800 transition-colors uppercase`}
-                >
-                  Execute Voice Trade
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* status bar */}
-          <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-white flex justify-start sm:justify-between items-center gap-3">
-            <div className="flex gap-4 sm:gap-6 items-center">
-              <div className="flex items-center gap-1.5">
-                <span className={`text-[10px] ${MONO} text-zinc-900`}>CPU</span>
-                <span className={`text-[10px] ${MONO}`}>04%</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className={`text-[10px] ${MONO} text-zinc-900`}>MEM</span>
-                <span className={`text-[10px] ${MONO}`}>1.2GB</span>
-              </div>
-            </div>
-            <span className={`hidden sm:inline text-[10px] ${MONO} text-zinc-900 tracking-tighter truncate`}>
-              PRO_VERSION_2.04.1 // SECURE_ENCRYPTION_ENABLED
-            </span>
-          </div>
-        </div>
-      </section>
+      <TerminalWorkstation
+        bordered={false}
+        initialProjection={initialProjection}
+        className="mx-auto max-w-6xl px-5 mt-8 pb-14 sm:px-6 sm:mt-10 sm:pb-20"
+      />
 
       {/* CAPABILITIES */}
       <section className="border-t border-zinc-100">
@@ -687,40 +608,9 @@ function HomePage() {
         </div>
       </section>
 
-      {/* COVERAGE */}
-      <section className="border-t border-zinc-100 bg-white/40">
-        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
-            <div className="text-left lg:col-span-4 lg:text-left">
-              
-              <h2 className="mt-4 text-xl font-semibold tracking-tight sm:text-3xl">
-                One terminal.&nbsp;<br className="hidden sm:inline" />Every gold cross.
-              </h2>
-              <p className="mt-4 text-zinc-900 leading-relaxed">
-                Jenvu routes liquidity, structure and news context across every XAU pair&nbsp;
-              </p>
-            </div>
-            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
-              {[
-                ["XAU / USD", "Primary bullion benchmark"],
-                ["XAU / EUR", "European gold demand"],
-                ["XAU / GBP", "LBMA London fix"],
-                ["XAU / JPY", "Tokyo bullion session"],
-                ["XAU / AUD", "Asia-Pacific miners"],
-                ["XAU / CHF", "Swiss safe-haven flows"],
-              ].map(([k, v]) => (
-                <div key={k} className="bg-white p-5 text-left sm:text-left">
-                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>{k}</div>
-                  <div className="mt-2 text-sm font-medium tracking-tight whitespace-nowrap">{v}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* CHANGELOG */}
-      <section className="border-t border-zinc-100 bg-white/40">
+      <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <div className="mb-8 flex flex-col items-start justify-start gap-2 text-left sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:text-left">
             <div>
@@ -728,7 +618,7 @@ function HomePage() {
             </div>
             <span className={`${MONO} text-[11px] text-zinc-900`}>v2.04.1 · stable</span>
           </div>
-          <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+          <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
             {[
               ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions.", "Killzone narration for London & NY."],
               ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts.", "FVG + OB auto-markup on 1H/15m."],
@@ -770,23 +660,90 @@ function HomePage() {
 
           </div>
 
-          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-4">
-            {[
-              { k: "01", t: "Speak", d: "Push-to-talk and ask in plain English anything.", dm: "Push-to-talk in plain English." },
-              { k: "02", t: "Reason", d: "JENVU pulls structure, ICT/SMC, DXY and news.", dm: "Structure, ICT/SMC, DXY, news." },
-              { k: "03", t: "Mark Up", d: "Charts auto-annotate FVG, OB, BOS and sweeps.", dm: "Auto-marks FVG, OB, BOS, sweeps." },
-              { k: "04", t: "Narrate", d: "Hear an A, A+, B, C plans: entry, SL, TP, R:R.", dm: "A/A+/B/C plans: entry, SL, TP." },
-            ].map((s) => (
-              <div key={s.k} className="bg-white p-6 text-left sm:p-7">
-                <div className={`flex items-center justify-between ${MONO} text-[10px] tracking-widest uppercase text-zinc-900`}>
-                  <span>{s.k}</span>
-                  <span className="h-px w-10 bg-zinc-900" />
-                </div>
-                <h3 className="mt-5 text-base font-semibold tracking-tight sm:text-lg">{s.t}</h3>
-                <p className="mt-2 text-sm text-zinc-900 leading-relaxed sm:line-clamp-2 sm:min-h-[2.75rem]"><span className="sm:hidden whitespace-nowrap block overflow-hidden text-ellipsis text-[13px]">{s.dm}</span><span className="hidden sm:inline">{s.d}</span></p>
-              </div>
-            ))}
+          {/* CORRELATED MARKETS — live prices that move XAU/USD */}
+          <div className="mt-12 overflow-hidden rounded-xl border border-zinc-100 bg-white">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-100 px-5 py-3.5">
+              <h3 className={`text-[10px] font-bold ${MONO} uppercase tracking-widest text-zinc-900`}>
+                Markets that move XAU/USD
+              </h3>
+              <span className={`flex items-center gap-2 text-[9px] ${MONO} uppercase tracking-widest text-zinc-400`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${board ? "bg-emerald-500 animate-pulse" : "bg-zinc-300"}`} />
+                {board ? "live · 24h range" : "connecting feed"}
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] border-collapse text-sm">
+                <thead>
+                  <tr className={`text-left text-[9px] ${MONO} uppercase tracking-widest text-zinc-400`}>
+                    <th className="px-5 py-2.5 font-medium">Market</th>
+                    <th className="px-3 py-2.5 text-right font-medium">Price</th>
+                    <th className="px-3 py-2.5 text-right font-medium">24h</th>
+                    <th className="px-3 py-2.5 font-medium">Low / High</th>
+                    <th className="px-3 py-2.5 font-medium">Trend</th>
+                    <th className="px-5 py-2.5 text-right font-medium">Gold impact</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(board?.markets ?? CORR_PLACEHOLDER).map((m) => {
+                    const live = !!board;
+                    const up = m.changePct >= 0;
+                    return (
+                      <tr key={m.symbol} className="border-t border-zinc-100 align-middle">
+                        <td className="px-5 py-3.5">
+                          <div className="text-[13px] font-semibold tracking-tight text-zinc-900">{m.display}</div>
+                          <div className="mt-0.5 text-[11px] leading-tight text-zinc-500">{m.note}</div>
+                        </td>
+                        <td className={`px-3 py-3.5 text-right text-[13px] font-semibold ${MONO} text-zinc-900`}>
+                          {live
+                            ? m.price.toLocaleString("en-US", {
+                                minimumFractionDigits: Math.min(m.decimals, 3),
+                                maximumFractionDigits: Math.min(m.decimals, 3),
+                              })
+                            : "—"}
+                        </td>
+                        <td className={`px-3 py-3.5 text-right text-[13px] font-semibold ${MONO} ${live ? (up ? "text-emerald-600" : "text-red-500") : "text-zinc-300"}`}>
+                          {live ? `${up ? "+" : ""}${m.changePct.toFixed(2)}%` : "—"}
+                        </td>
+                        <td className="px-3 py-3.5">
+                          <div className="w-[132px]">
+                            <div className="relative h-1 w-full rounded-full bg-zinc-100">
+                              <span
+                                className={`absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-white ${up ? "bg-emerald-500" : "bg-red-500"}`}
+                                style={{ left: `calc(${live ? Math.min(96, Math.max(2, m.rangePos)) : 50}% - 5px)` }}
+                              />
+                            </div>
+                            <div className={`mt-1.5 flex justify-between text-[9px] ${MONO} text-zinc-400`}>
+                              <span>{live ? m.low.toLocaleString("en-US") : "—"}</span>
+                              <span>{live ? m.high.toLocaleString("en-US") : "—"}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-3 py-3.5">
+                          <Sparkline series={m.series} up={up} />
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-bold ${MONO} uppercase tracking-widest ${ !live ? "bg-zinc-50 text-zinc-400" : m.impact === "bullish" ? "bg-emerald-50 text-emerald-700" : m.impact === "bearish" ? "bg-red-50 text-red-600" : "bg-zinc-100 text-zinc-500" }`}
+                          >
+                            {live ? m.impact : "—"}
+                          </span>
+                          <div className={`mt-1 text-[9px] ${MONO} text-zinc-400`}>
+                            corr {live ? (m.correlation > 0 ? "+" : "") + m.correlation.toFixed(2) : "—"}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={`border-t border-zinc-100 px-5 py-3 text-[9px] ${MONO} uppercase tracking-widest text-zinc-400`}>
+              Correlation vs XAU/USD hourly returns · context feeds only — Jenvu trades XAU/USD exclusively
+            </div>
           </div>
+
         </div>
       </section>
 
@@ -801,7 +758,7 @@ function HomePage() {
             </h2>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+          <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
             <table className="w-full min-w-[760px] text-sm border-collapse">
               <colgroup>
                 <col className="w-[34%]" />
@@ -881,11 +838,7 @@ function HomePage() {
                         <Link
                           to={isLoggedIn ? "/dashboard/pay" : p.to}
                           search={isLoggedIn ? undefined : p.search}
-                          className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${
-                            p.accent || p.dark
-                              ? "bg-zinc-900 text-white hover:bg-black"
-                              : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50"
-                          }`}
+                          className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${ p.accent || p.dark ? "bg-zinc-900 text-white hover:bg-black" : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50" }`}
                         >
                           {cta}
                         </Link>
@@ -903,11 +856,11 @@ function HomePage() {
                   { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
                   { f: "Signal latency", b: "Realtime", c: "Realtime", d: "Realtime" },
                   { f: "A+ signal access", b: true, c: true, d: true },
-                  { f: "ICT / SMC narration", b: true, c: true, d: true },
+                  { f: "ICT / SMC narration", b: true, c: true, d: true, badge: "New" },
                   { f: "Multi-timeframe bias", b: true, c: true, d: true },
                   { f: "Trade journal", b: true, c: true, d: true },
                   { f: "Email + push alerts", b: true, c: true, d: true },
-                  { f: "Multi-pair scanner", b: false, c: true, d: true, badge: "new" },
+                  
                   { f: "Custom alert rules", b: false, c: true, d: true },
                   { f: "Priority desk support", b: false, c: false, d: true },
                 ] as ReadonlyArray<{ f: string; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
@@ -962,7 +915,7 @@ function HomePage() {
               ["ICT setups marked live on the chart, with voice — I stopped second-guessing my entries.", "M. Chen", "Independent · Singapore"],
               ["Gold execution is on another level. The killzone + sweep logic is exactly how I trade.", "S. Patel", "Family Office · London"],
             ].map(([q, n, r]) => (
-              <figure key={n} className="rounded-2xl border border-zinc-200 bg-white p-6">
+              <figure key={n} className="rounded-xl border border-zinc-200 bg-white p-6">
                 <blockquote className="text-sm leading-relaxed text-zinc-700">"{q}"</blockquote>
                 <figcaption className="mt-4 flex items-center justify-between text-xs">
                   <div>
@@ -979,12 +932,12 @@ function HomePage() {
 
 
       {/* COMPARISON */}
-      <section className="border-t border-zinc-100 bg-white/40">
+      <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
           <h2 className="text-left text-xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
             Why traders move to JENVU.
           </h2>
-          <div className="mt-10 rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+          <div className="mt-10 rounded-xl border border-zinc-200 bg-white overflow-hidden">
             <div className={`hidden md:grid grid-cols-4 px-6 py-4 border-b border-zinc-200 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
               <span>Capability</span>
               <span className="text-center">Generic AI</span>
@@ -1036,7 +989,7 @@ function HomePage() {
 
 
       {/* INTEGRATIONS */}
-      <section className="border-t border-zinc-100 bg-white/40">
+      <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
           <div className="flex flex-col md:flex-row items-start justify-between gap-6">
             <div className="text-left md:text-left">
@@ -1112,7 +1065,7 @@ function HomePage() {
       <section className="border-t border-zinc-100 overflow-hidden">
 
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)]">
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8">
             <div className="max-w-xl text-left md:text-left">
               <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
                 Boot the terminal.&nbsp;<br />
@@ -1132,7 +1085,7 @@ function HomePage() {
                   Launch Voice Agent
                 </Link>
                 <Link
-                  to="/signal"
+                  to="/signals-live"
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
                 >
                   Open Signal Engine

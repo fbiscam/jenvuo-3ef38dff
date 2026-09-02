@@ -206,7 +206,7 @@ function AdminFoundingPage() {
   }
 
   const stat = (label: string, value: number, Icon: any, tone: string) => (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4">
+    <div className="rounded-xl border border-zinc-200 bg-white p-4">
       <div className="flex items-center justify-between">
         <span className="text-[11px] uppercase tracking-widest text-zinc-500">{label}</span>
         <Icon className={`h-4 w-4 ${tone}`} />
@@ -302,7 +302,7 @@ function AdminFoundingPage() {
         {/* List */}
         <div className="mt-5 space-y-3">
           {filtered.length === 0 && (
-            <div className="rounded-2xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
+            <div className="rounded-xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
               No applications match your filters.
             </div>
           )}
@@ -311,7 +311,7 @@ function AdminFoundingPage() {
             return (
               <div
                 key={r.id}
-                className="rounded-2xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-300"
+                className="rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-300"
               >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="min-w-0 flex-1">

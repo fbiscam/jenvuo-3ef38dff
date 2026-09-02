@@ -65,17 +65,17 @@ function SavedSignals() {
 
   if (!rows.length) {
     return (
-      <div className="rounded-2xl border border-zinc-200 bg-white p-10 text-center">
+      <div className="rounded-xl border border-zinc-200 bg-white p-10 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-zinc-200 bg-white">
           <Bookmark className="h-6 w-6 text-zinc-700" />
         </div>
         <h3 className="mt-4 text-lg font-semibold tracking-tight">No saved setups yet</h3>
         <p className="mx-auto mt-1.5 max-w-md text-sm text-zinc-500 sm:max-w-none sm:whitespace-nowrap">
-          On the Signal Desk, tap <span className="font-medium text-zinc-700">Save Signal</span> to keep an A+ setup here for later.
+          On the Live Signals, tap <span className="font-medium text-zinc-700">Save Signal</span> to keep an A+ setup here for later.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-          <Link to="/signal" className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">
-            Open Signal Desk <ExternalLink className="h-3.5 w-3.5" />
+          <Link to="/signals-live" className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">
+            Open Live Signals <ExternalLink className="h-3.5 w-3.5" />
           </Link>
           <Link to="/dashboard/alerts" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">
             Set alert preferences
@@ -106,7 +106,7 @@ function SavedSignals() {
 
         if (!snap && !a) return null;
         return (
-          <article key={r.id} className="group rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)] transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.18)]">
+          <article key={r.id} className="group rounded-xl border border-zinc-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-zinc-300">
             <header className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold tracking-wider text-white ${grade === "A+" ? "bg-gradient-to-r from-amber-500 to-amber-600 shadow-sm shadow-amber-500/30" : "bg-zinc-900"}`}>{grade}</span>
@@ -156,7 +156,7 @@ function SavedSignals() {
                 {session ? `${session} · ` : ""}
                 Saved {new Date(r.created_at).toLocaleDateString()}
               </span>
-              {snap && <Link to="/signal" search={{ symbol: pair, savedId: r.id }} className="text-zinc-600 hover:text-zinc-900">Re-open →</Link>}
+              {snap && <Link to="/signals-live" className="text-zinc-600 hover:text-zinc-900">Re-open →</Link>}
             </footer>
           </article>
         );

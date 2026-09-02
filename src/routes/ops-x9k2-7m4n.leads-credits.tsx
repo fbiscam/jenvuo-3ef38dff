@@ -98,7 +98,7 @@ function LeadsCredits() {
   return (
     <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
       <main className="mx-auto max-w-6xl px-5 py-8 sm:px-6">
-        <div className="rounded-[22px] border border-zinc-200/70 bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10)]">
+        <div className="rounded-xl border border-zinc-200 bg-white p-5">
           <span className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
             leads · credits
           </span>
@@ -136,7 +136,7 @@ function LeadsCredits() {
           {filtered.map((r) => (
             <div
               key={r.user_id}
-              className="rounded-[20px] border border-zinc-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-14px_rgba(16,24,40,0.10)]"
+              className="rounded-xl border border-zinc-200 bg-white p-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">

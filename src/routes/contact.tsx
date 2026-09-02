@@ -116,7 +116,7 @@ function ContactPage() {
     <>
       <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
         {/* NAV */}
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -144,7 +144,7 @@ function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6 lg:gap-8">
             {/* LEFT — info */}
             <aside className="space-y-6">
-              <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.08)]">
+              <div className="rounded-xl border border-zinc-200 bg-white p-6">
                 <div className="flex items-center gap-1.5">
                   <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />
                   <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />
@@ -161,7 +161,7 @@ function ContactPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6">
+              <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-6">
                 <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
                   what to expect
                 </div>
@@ -182,7 +182,7 @@ function ContactPage() {
             </aside>
 
             {/* RIGHT — form */}
-            <section className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.08)]">
+            <section className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-8">
               <div className="flex items-center justify-between">
                 <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
                   new transmission

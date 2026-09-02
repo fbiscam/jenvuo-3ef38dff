@@ -196,7 +196,7 @@ function AlertPrefs() {
       await setAlertsEnabledFn({ data: { enabled: next } });
       setAlertsOn(next);
       try { window.localStorage.setItem('jenvu_alerts_enabled', next ? '1' : '0'); } catch { /* ignore */ }
-      toast.success(next ? "Alerts enabled · $0.20 will be charged per signal" : "Alerts disabled · no charges, no notifications");
+      toast.success(next ? "Alerts enabled · $0.30 will be charged per signal" : "Alerts disabled · no charges, no notifications");
     } catch (e: any) {
       toast.error(e?.message ?? "Could not update alerts");
     } finally {
@@ -459,7 +459,7 @@ function AlertPrefs() {
     >
     <div className="max-w-6xl space-y-6">
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-base font-semibold text-black normal-case pl-3">&nbsp;Recent alerts</h2>
@@ -472,7 +472,7 @@ function AlertPrefs() {
                 disabled={alertsSaving}
                 className="shrink-0 h-8 w-8 inline-flex items-center justify-center rounded-lg border-0 bg-transparent hover:bg-zinc-50 transition disabled:opacity-50"
                 title={alertsOn
-                  ? "Alerts ON · $0.20 charged per signal. Click to turn off."
+                  ? "Alerts ON · $0.30 charged per signal. Click to turn off."
                   : "Alerts OFF · no notifications, no charges. Click to turn on."}
               >
                 {alertsSaving ? (
@@ -682,7 +682,7 @@ function AlertPrefs() {
 
 
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <h2 className="pl-3 text-base font-semibold text-black normal-case">&nbsp;Delivery channels</h2>
         <p className="mt-1 text-sm text-zinc-500">Choose how new A+ setups reach you.</p>
         <div className="mt-5 space-y-3">
@@ -711,9 +711,11 @@ function AlertPrefs() {
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:flex-shrink-0">
                 <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900">
-                  <svg className="h-4 w-4 text-[#25D366]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.702A7.944 7.944 0 0 0 12 4.5a7.944 7.944 0 0 0-6.65 3.605 7.95 7.95 0 0 0 1.09 9.937l.11.11-.443 1.617 1.66-.436.107.063A7.947 7.947 0 0 0 20 12a7.944 7.944 0 0 0-3.95-5.32M12 2.5a9.5 9.5 0 0 1 9.5 9.5 9.5 9.5 0 0 1-5.59 8.655l.09-.036-2.24.588.597-2.18-.075-.047A9.5 9.5 0 0 1 12 2.5z" />
-                  </svg>
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#25D366]">
+                    <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M12.04 2C6.49 2 2 6.49 2 12.04c0 1.81.49 3.56 1.41 5.08L2.23 22l4.96-1.16A9.93 9.93 0 0 0 12.04 22c5.55 0 10.04-4.49 10.04-10.04S17.59 2 12.04 2m4.91 13.79c-.22.61-1.25 1.23-1.74 1.31-.47.08-.91.22-3.06-.64-2.59-1.08-4.24-3.84-4.37-4.02-.13-.18-1.04-1.38-1.04-2.64s.66-1.87.89-2.13c.22-.25.49-.32.66-.32.17 0 .34 0 .49.01.16.01.37-.06.58.44.21.51.72 1.79.79 1.92.07.13.11.28.02.45-.09.17-.14.27-.27.42-.13.15-.27.31-.38.42-.13.14-.26.29-.11.56.15.28.69 1.13 1.49 1.84 1.02.91 1.88 1.2 2.14 1.33.26.13.41.11.56-.06.15-.18.65-.75.82-1.01.17-.26.34-.22.56-.13.22.09 1.43.67 1.68.79.25.12.42.18.48.28.06.1.06.56-.16 1.17z" />
+                    </svg>
+                  </div>
                   WhatsApp API
                 </div>
                 {whatsappLinked && (
@@ -818,7 +820,7 @@ function AlertPrefs() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <h2 className="pl-3 text-base font-semibold text-black normal-case">&nbsp;Conviction filter</h2>
         <p className="mt-1 text-sm text-zinc-500">Only fire when confidence meets this threshold.</p>
         <div className="mt-4 inline-flex flex-wrap gap-1 rounded-lg border border-zinc-200 p-1">
@@ -843,9 +845,7 @@ function AlertPrefs() {
                   try { window.localStorage.setItem("jenvu:minConfidence", String(opt.key)); } catch { /* ignore */ }
                   setPrefs((p) => ({ ...p, min_grade: opt.key >= 75 ? "A+" : "A" }));
                 }}
-                className={`px-4 py-1.5 text-sm font-medium rounded-md transition ${
-                  isActive ? "bg-emerald-600 text-white" : "bg-white text-zinc-600 hover:text-zinc-900"
-                }`}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition ${ isActive ? "bg-emerald-600 text-white" : "bg-white text-zinc-600 hover:text-zinc-900" }`}
               >
                 {opt.label}
               </button>
@@ -859,7 +859,7 @@ function AlertPrefs() {
 
 
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6">
         <h2 className="pl-3 text-base font-semibold text-black normal-case">&nbsp;Quiet hours</h2>
         <p className="mt-1 text-sm text-zinc-500">No alerts will be sent during this window (your local time).</p>
         <div className="mt-4 grid grid-cols-2 gap-3">

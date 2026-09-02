@@ -89,14 +89,14 @@ function sessionLabel(s: BriefDetail["session"]) {
 function BriefPage() {
   return (
     <div className="jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased">
-      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
           <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm">
-            <Link to="/signal">Signal Engine</Link>
+            <Link to="/signals-live">Live Signals</Link>
             <Link to="/briefs" className="font-semibold">Briefs</Link>
             <Link to="/founding">Founding</Link>
             <Link to="/insights">Insights</Link>
@@ -201,7 +201,7 @@ function BriefBody() {
       <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">{brief.headline}</h1>
       {brief.summary && <p className="mt-3 text-zinc-600 leading-relaxed">{brief.summary}</p>}
 
-      <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_10px_30px_-18px_rgba(0,0,0,0.15)]">
+      <div className="mt-8 rounded-xl border border-zinc-200 bg-white p-5">
         <div className="flex items-center gap-4">
           <button
             onClick={toggle}
@@ -227,9 +227,7 @@ function BriefBody() {
             <button
               key={s}
               onClick={() => setSpeed(s)}
-              className={`rounded-full px-2.5 py-1 ring-1 ring-inset ${
-                speed === s ? "bg-zinc-900 text-white ring-zinc-900" : "bg-white text-zinc-700 ring-zinc-200 hover:bg-zinc-50"
-              }`}
+              className={`rounded-full px-2.5 py-1 ring-1 ring-inset ${ speed === s ? "bg-zinc-900 text-white ring-zinc-900" : "bg-white text-zinc-700 ring-zinc-200 hover:bg-zinc-50" }`}
             >
               {s}×
             </button>
@@ -248,7 +246,7 @@ function BriefBody() {
         <audio ref={audioRef} src={brief.audio_url} preload="metadata" />
       </div>
 
-      <details className="mt-8 rounded-2xl border border-zinc-200 bg-white p-5 open:pb-6">
+      <details className="mt-8 rounded-xl border border-zinc-200 bg-white p-5 open:pb-6">
         <summary className="cursor-pointer text-sm font-medium text-zinc-800">Read transcript</summary>
         <div className="mt-4 whitespace-pre-wrap text-zinc-700 leading-relaxed">{brief.transcript}</div>
       </details>

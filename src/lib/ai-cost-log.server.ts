@@ -63,9 +63,9 @@ export function estimateCostUsd(model: string, promptTokens: number, completionT
 }
 
 // Flat charge per real signal (BUY/SELL only). WAIT/no-trade scans are free.
-export const SIGNAL_SCAN_CHARGE_USD = 0.20;
-// Flat $0.20 per BUY/SELL scan — senior review included at no extra cost.
-export const SIGNAL_SCAN_CHARGE_WITH_SENIOR_USD = 0.20;
+export const SIGNAL_SCAN_CHARGE_USD = 0.30;
+// Flat $0.30 per BUY/SELL scan — senior review included at no extra cost.
+export const SIGNAL_SCAN_CHARGE_WITH_SENIOR_USD = 0.30;
 
 // Pretty label for the AI model used, shown in billing history.
 export function formatModelLabel(rawModel: string | null | undefined): string {

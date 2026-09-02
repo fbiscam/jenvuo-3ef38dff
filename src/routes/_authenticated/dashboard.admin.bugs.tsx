@@ -78,7 +78,7 @@ function BugTriagePage() {
   return (
     <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
       <main className="mx-auto max-w-6xl px-5 py-8 sm:px-6">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.08)] sm:p-6">
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h1 className="pl-1 text-xl font-semibold tracking-tight sm:text-2xl">Bug Triage</h1>
@@ -100,11 +100,7 @@ function BugTriagePage() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`rounded-full px-3 py-1 text-xs capitalize transition ${
-                  statusFilter === s
-                    ? 'bg-zinc-900 text-white'
-                    : 'border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50'
-                }`}
+                className={`rounded-full px-3 py-1 text-xs capitalize transition ${ statusFilter === s ? 'bg-zinc-900 text-white' : 'border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50' }`}
               >
                 {s}
               </button>
@@ -115,7 +111,7 @@ function BugTriagePage() {
         <div className="mt-4 space-y-3">
           {isLoading && <div className="text-sm text-zinc-500">Loading…</div>}
           {!isLoading && groups.length === 0 && (
-            <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
+            <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
               No errors in this bucket. 🎉
             </div>
           )}
@@ -123,7 +119,7 @@ function BugTriagePage() {
           {groups.map((g) => {
             const isOpen = expanded === g.fingerprint
             return (
-              <div key={g.fingerprint} className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-[0_8px_20px_-16px_rgba(0,0,0,0.08)] sm:p-5">
+              <div key={g.fingerprint} className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5">
                 <button
                   onClick={() => setExpanded(isOpen ? null : g.fingerprint)}
                   className="flex w-full items-start justify-between gap-3 text-left"

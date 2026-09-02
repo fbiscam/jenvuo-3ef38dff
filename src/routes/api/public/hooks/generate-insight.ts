@@ -69,15 +69,17 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        // Daily cap: 2 articles in last 24h
+        // Daily cap: 1 article per 24h (bypass with ?force=1 for manual publishing)
+        const force = new URL(request.url).searchParams.get("force") === "1";
         const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
         const { count: recentCount } = await supabaseAdmin
           .from("insights")
           .select("id", { count: "exact", head: true })
           .gte("created_at", since);
-        if ((recentCount ?? 0) >= 1) {
+        if (!force && (recentCount ?? 0) >= 1) {
           return Response.json({ skipped: "daily-cap-reached", recentCount });
         }
+
 
         // Pick a topic not used in 30 days (or never used), highest priority first
         const cutoff = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
@@ -96,21 +98,38 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
         const topic = topics[0];
 
         // Article prompt — Europe-focused SEO to grow EU organic traffic
-        const sys = `You are a senior institutional trading analyst writing for Jenvu — an AI gold trading terminal. Write a comprehensive, factually accurate, SEO-optimized markdown article targeted at European retail and prop-firm traders (UK, Germany, France, Italy, Spain, Netherlands, Poland, Switzerland). Naturally weave in high-intent European search terms (London killzone, Frankfurt open, XAU/EUR, XAU/GBP, London session gold, prop firm challenge, MT5 gold signals, ICT concepts, smart money concepts) without keyword stuffing. Style: precise, professional, no fluff, no hype, no emojis. Use ICT/SMC concepts correctly. Include H2/H3 headings, bullet lists where useful, and a final ## FAQ section with 3 Q&A pairs answering long-tail European queries. 900-1300 words. Use British English spelling.`;
+        // Optional language directive stored on the topic angle, e.g. "LANG:de | goldpreis outlook"
+        const langMatch = /LANG:([a-z]{2})/i.exec(topic.angle || "");
+        const langCode = (langMatch?.[1] || "en").toLowerCase();
+        const langNames: Record<string, string> = {
+          en: "British English",
+          de: "German (Germany)",
+          fr: "French (France)",
+          es: "Spanish (Spain)",
+          it: "Italian (Italy)",
+          nl: "Dutch (Netherlands)",
+          pl: "Polish (Poland)",
+        };
+        const langName = langNames[langCode] || "British English";
+
+        const sys = `You are a senior institutional trading analyst writing for Jenvu — an AI gold trading terminal. Write a comprehensive, factually accurate, SEO-optimized markdown article targeted at European retail and prop-firm traders (UK, Germany, France, Italy, Spain, Netherlands, Poland, Switzerland). Write the ENTIRE article, title, slug and excerpt in ${langName}. Target the primary keyword exactly as given plus its natural long-tail and question variants, and weave in high-intent European search terms (London killzone, Frankfurt open, XAU/EUR, XAU/GBP, London session gold, prop firm challenge, MT5 gold signals, ICT concepts, smart money concepts) without keyword stuffing. Cover gold, crypto and macro/news angles accurately when the topic calls for them, and reference European market hours, regulation (FCA, BaFin, ESMA/MiCA) and EUR/GBP pricing where relevant. Style: precise, professional, no fluff, no hype, no emojis, no invented statistics, prices, testimonials or guarantees — describe drivers and method instead of quoting live numbers. Use ICT/SMC concepts correctly. Include H2/H3 headings, bullet lists or a comparison table where they answer better than prose, and a final FAQ section with 3 Q&A pairs answering long-tail European queries. 900-1300 words.`;
 
         const userPrompt = `Write a complete article on: "${topic.keyword}"
 Angle: ${topic.angle || "comprehensive guide"}
 Category: ${topic.category}
+Language: ${langName}
+Primary keyword must appear in the title, the first 100 words, and at least one H2.
 
 Return STRICT JSON only, no prose, with this exact shape:
 {
   "title": "<60-char SEO title with the primary keyword, optimized for Google Europe SERPs>",
-  "slug": "<url-safe-slug>",
+  "slug": "<url-safe-slug, always lowercase ascii>",
   "excerpt": "<150-160 char meta description with primary keyword and a European trading hook>",
   "content": "<full markdown article 900-1300 words with ## H2 sections, lists, and a final ## FAQ section. Use internal links to /signal, /app, /insights, /download where natural>"
 }`;
 
-        const bmindKey = process.env.BLUESMINDS_API_KEY;
+
+        const bmindKey = process.env.BLUESMIND_API_KEY || process.env.BLUESMINDS_API_KEY;
         if (!bmindKey) {
           return new Response(JSON.stringify({ error: "no-bluesminds-key" }), { status: 500 });
         }
@@ -142,6 +161,7 @@ Return STRICT JSON only, no prose, with this exact shape:
         // Bluesminds only — no external fallback. If all models are down,
         // skip this run; the next scheduled cron will retry a few hours later.
         const chain: Array<{ model: string }> = [
+          { model: "gpt-4o" },
           { model: "gpt-5.5" },
           { model: "gpt-5.2-chat" },
           { model: "deepseek-v4-pro" },
@@ -210,16 +230,12 @@ Return STRICT JSON only, no prose, with this exact shape:
           return Response.json({ skipped: "duplicate-slug", slug });
         }
 
-        const stockImages = [
-          "https://images.unsplash.com/photo-1605792657660-596af9009e82?w=1600&q=80",
-          "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1600&q=80",
-          "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1600&q=80",
-          "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80",
-          "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1600&q=80",
-          "https://images.unsplash.com/photo-1642790551116-18e150f248e3?w=1600&q=80",
-          "https://images.unsplash.com/photo-1620266757065-5814239881fd?w=1600&q=80",
-        ];
-        const image_url = stockImages[Math.floor(Math.random() * stockImages.length)];
+        // AI-generated cover image (Bluesminds writes the text; the image comes
+        // from Lovable AI's image model since Bluesminds has no image model).
+        const { generateInsightCover } = await import("@/lib/insight-image.server");
+        const image_url =
+          (await generateInsightCover({ title, category: topic.category, slug })) ??
+          "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80";
 
         const { data: inserted, error: insErr } = await supabaseAdmin
           .from("insights")

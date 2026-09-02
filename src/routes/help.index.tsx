@@ -62,7 +62,7 @@ function HelpCenterPage() {
     <>
       <div className={`jenvu-zoom min-h-dvh bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
         {/* NAV */}
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -97,11 +97,11 @@ function HelpCenterPage() {
                   }
                 }}
                 placeholder="Search for articles..."
-                className="w-full rounded-full border border-zinc-200 bg-white py-3 pl-11 pr-4 text-sm shadow-[0_8px_30px_-12px_rgba(0,0,0,0.12)] outline-none focus:border-zinc-400 transition"
+                className="w-full rounded-full border border-zinc-200 bg-white py-3 pl-11 pr-4 text-sm outline-none focus:border-zinc-400 transition"
                 aria-label="Search help articles"
               />
               {q.trim() && (
-                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-zinc-200 bg-white text-left shadow-[0_24px_60px_-24px_rgba(0,0,0,0.18)]">
+                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-zinc-200 bg-white text-left">
                   {results.length === 0 ? (
                     <div className="px-4 py-6 text-sm text-zinc-500">
                       No articles match "{q}".
@@ -180,7 +180,7 @@ function HelpCenterPage() {
 
         {/* CONTACT CTA */}
         <section className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
-          <div className="rounded-2xl border border-zinc-200 bg-white text-zinc-900 p-8 sm:p-12 flex flex-col md:flex-row items-start md:items-start justify-between gap-6">
+          <div className="rounded-xl border border-zinc-200 bg-white text-zinc-900 p-8 sm:p-12 flex flex-col md:flex-row items-start md:items-start justify-between gap-6">
             <div>
               <h3 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
                 Talk to a human.
@@ -212,7 +212,7 @@ function CollectionCard({ c }: { c: Collection }) {
     <Link
       to="/help/$collection"
       params={{ collection: c.slug }}
-      className="group rounded-2xl border border-zinc-200 bg-white p-6 hover:border-zinc-900 hover:shadow-[0_24px_60px_-30px_rgba(0,0,0,0.2)] transition"
+      className="group rounded-xl border border-zinc-200 bg-white p-6 hover:border-zinc-900 transition"
     >
       <div className="flex items-center gap-3">
         <div className="grid place-items-center h-10 w-10 rounded-xl bg-white border border-zinc-200 text-zinc-900">

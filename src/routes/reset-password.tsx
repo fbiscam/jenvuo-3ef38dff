@@ -92,7 +92,7 @@ function ResetPasswordPage() {
 
   return (
     <main className="min-h-screen bg-zinc-50 flex items-center justify-center px-4 py-12" style={{ fontFamily: '"Google Sans", "Google Sans Text", system-ui, -apple-system, sans-serif' }}>
-      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-sm">
+      <div className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-sm">
         <h1 className="text-xl font-semibold text-zinc-900">Reset your password</h1>
         <p className="mt-1 text-sm text-zinc-500">
           Choose a new password for your Jenvu account.

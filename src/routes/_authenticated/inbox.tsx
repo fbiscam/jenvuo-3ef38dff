@@ -230,9 +230,7 @@ function InboxPage() {
                       <button
                         type="button"
                         onClick={() => openMessage(m)}
-                        className={`flex w-full items-start gap-2 px-4 py-3 text-left transition ${
-                          active ? "bg-sky-50" : "hover:bg-zinc-50"
-                        }`}
+                        className={`flex w-full items-start gap-2 px-4 py-3 text-left transition ${ active ? "bg-sky-50" : "hover:bg-zinc-50" }`}
                       >
                         <div className={`mt-1 h-2 w-2 shrink-0 rounded-full ${unread ? "bg-sky-500" : "bg-transparent"}`} />
                         <div className="min-w-0 flex-1">

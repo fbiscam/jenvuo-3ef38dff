@@ -186,11 +186,7 @@ function ScamCheckPage() {
                 key={t.kind}
                 type="button"
                 onClick={() => switchTab(t.kind)}
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition ${
-                  active
-                    ? "border-slate-900 bg-slate-900 text-white"
-                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
-                }`}
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition ${ active ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900" }`}
               >
                 <Icon className="h-4 w-4" />
                 {t.label}
@@ -200,7 +196,7 @@ function ScamCheckPage() {
         </div>
 
         {/* Input */}
-        <form onSubmit={onSubmit} className="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form onSubmit={onSubmit} className="mt-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           {kind === "text" ? (
             <textarea
               value={value}
@@ -243,7 +239,7 @@ function ScamCheckPage() {
 
         {/* Result */}
         {result && v && (
-          <section className={`mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm ring-1 ${v.ring}`}>
+          <section className={`mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm ring-1 ${v.ring}`}>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex items-start gap-3">
                 <div className={`rounded-xl ${v.bg} p-2.5`}>

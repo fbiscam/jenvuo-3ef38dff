@@ -99,7 +99,7 @@ function formatDuration(sec: number | null) {
 function BriefsPage() {
   return (
     <div className="jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased">
-      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -204,7 +204,7 @@ function BriefRow({ brief }: { brief: BriefListItem }) {
   const pct = dur && dur > 0 ? Math.min(100, (t / dur) * 100) : 0;
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-[0_10px_30px_-18px_rgba(0,0,0,0.15)]">
+    <div className="rounded-xl border border-zinc-200 bg-white p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-xs">

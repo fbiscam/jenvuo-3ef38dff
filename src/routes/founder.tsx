@@ -121,7 +121,7 @@ function FounderPage() {
       </section>
 
       {/* CTA */}
-      <section className="rounded-2xl bg-white p-6 sm:p-10 text-zinc-900 border border-zinc-200">
+      <section className="rounded-xl bg-white p-6 sm:p-10 text-zinc-900 border border-zinc-200">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className={`text-2xl font-semibold tracking-tight sm:text-3xl ${SANS}`}>
             Start trading with the same edge.

@@ -2,9 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense, useMemo, useState, useEffect } from "react";
 
+import { useAuthUser } from "@/hooks/useAuthUser";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
-import { TrendingUp, TrendingDown, Trophy, Flame, Clock, Filter, RefreshCw, Sparkles, CheckCircle2, XCircle, Circle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { TrendingUp, TrendingDown, Trophy, Flame, Clock, Filter, RefreshCw, Sparkles, CheckCircle2, XCircle, Circle, Bookmark } from "lucide-react";
+import eyeIcon from "@/assets/eye-icon.png.asset.json";
 
 type Signal = {
   id: string;
@@ -76,15 +80,14 @@ export const Route = createFileRoute("/signals-live")({
 function SignalsLivePage() {
   return (
     <div className="min-h-dvh bg-[#FAFAFA] text-zinc-900 antialiased md:[zoom:1.35]" style={{ fontFamily: '"Google Sans","Product Sans","DM Sans",system-ui,sans-serif' }}>
-      <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white">
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontWeight: 500 }}>Jenvu</span>
           </Link>
           <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900">
-            <Link to="/signal" className="hover:text-zinc-900">Signal Engine</Link>
-            <Link to="/signals-live" className="font-semibold text-emerald-700">Live Feed</Link>
+            <Link to="/signals-live" className="font-semibold text-emerald-700">Live Signals</Link>
             <Link to="/briefs" className="hover:text-zinc-900">Briefs</Link>
             <Link to="/pricing" className="hover:text-zinc-900">Pricing</Link>
             <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
@@ -106,7 +109,7 @@ function SignalsLivePage() {
 }
 
 const SIGNALS_START_AT = new Date("2026-07-23T00:00:00Z").getTime();
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 9;
 
 function ClientGate({ children, fallback }: { children: React.ReactNode; fallback: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -272,7 +275,7 @@ function FeedBody() {
         {/* Best pair / session */}
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           {bestPair && (
-            <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5">
+            <div className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5">
               <div className="flex items-center justify-between">
                 <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Top pair</div>
                 <div className="font-mono text-xs text-zinc-400">{bestPair.total} trades</div>
@@ -285,7 +288,7 @@ function FeedBody() {
             </div>
           )}
           {bestSession && (
-            <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5">
+            <div className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5">
               <div className="flex items-center justify-between">
                 <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Best session</div>
                 <div className="font-mono text-xs text-zinc-400">{bestSession.total} trades</div>
@@ -303,7 +306,7 @@ function FeedBody() {
       {/* FILTERS */}
       <section aria-labelledby="signal-filters-heading" className="mx-auto max-w-6xl px-5 sm:px-6">
         <h2 id="signal-filters-heading" className="sr-only">Filter signals</h2>
-        <div className="rounded-2xl border border-zinc-200 bg-white p-2.5 sm:p-4">
+        <div className="rounded-xl border border-zinc-200 bg-white p-2.5 sm:p-4">
           <div className="-mx-0.5 flex items-center gap-2 overflow-x-auto pb-0.5 sm:flex-wrap sm:overflow-visible">
             <div className="shrink-0 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 sm:text-[11px]">
               <Filter className="h-3.5 w-3.5" /> Filters
@@ -334,7 +337,7 @@ function FeedBody() {
       <section aria-labelledby="signal-list-heading" className="mx-auto max-w-6xl px-5 sm:px-6 py-6">
         <h2 id="signal-list-heading" className="sr-only">Signal history</h2>
         {filtered.length === 0 ? (
-          <div className="rounded-2xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
+          <div className="rounded-xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
             No signals yet. New signals will appear here as they fire.
           </div>
         ) : (
@@ -387,7 +390,7 @@ function FeedBody() {
 function StatCard({ icon, label, value, hint, accent }: { icon: React.ReactNode; label: string; value: string; hint: string; accent: "emerald" | "rose" | "zinc" }) {
   const ac = accent === "emerald" ? "text-emerald-700 bg-emerald-50 border-emerald-200" : accent === "rose" ? "text-rose-700 bg-rose-50 border-rose-200" : "text-zinc-700 bg-zinc-50 border-zinc-200";
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5">
+    <div className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5">
       <div className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${ac}`}>
         {icon} {label}
       </div>
@@ -398,6 +401,8 @@ function StatCard({ icon, label, value, hint, accent }: { icon: React.ReactNode;
 }
 
 function SignalCard({ s }: { s: Signal }) {
+  const { user } = useAuthUser();
+  const isSignedIn = !!user;
   const isBuy = s.direction === "BUY";
   const isWin = s.outcome === "win";
   const isLoss = s.outcome === "loss";
@@ -427,7 +432,7 @@ function SignalCard({ s }: { s: Signal }) {
 
   const fired = new Date(s.fired_at);
   return (
-    <li className={`group relative flex flex-col rounded-2xl border bg-white p-4 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-16px_rgba(0,0,0,0.15)] ${isWin ? "border-emerald-200" : isLoss ? "border-rose-200" : isSkipped ? "border-amber-200" : "border-zinc-200"}`}>
+    <li className={`group relative flex flex-col rounded-xl border bg-white p-4 transition hover:-translate-y-0.5 ${isWin ? "border-emerald-200" : isLoss ? "border-rose-200" : isSkipped ? "border-amber-200" : "border-zinc-200"}`}>
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
         <div className="min-w-0 flex flex-wrap items-center gap-1.5">
           <span className={`shrink-0 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${isBuy ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
@@ -445,19 +450,39 @@ function SignalCard({ s }: { s: Signal }) {
       </header>
 
 
-      <dl className="mt-3 grid grid-cols-4 gap-1.5 text-center">
-        {([
-          ["Entry", s.entry, "text-zinc-800"],
-          ["SL", s.sl, "text-rose-600"],
-          ["TP", s.tp, "text-emerald-600"],
-          ["RR", s.rr ? `${Number(s.rr).toFixed(1)}` : "—", "text-zinc-800"],
-        ] as const).map(([k, v, c]) => (
-          <div key={k} className="min-w-0 rounded-md bg-zinc-50 px-1 py-1.5 ring-1 ring-inset ring-zinc-200/70">
-            <dt className="font-mono text-[9px] uppercase tracking-wider text-zinc-500">{k}</dt>
-            <dd className={`mt-0.5 font-mono text-[11px] truncate ${c}`}>{v ?? "—"}</dd>
+      <div className="relative mt-3">
+        <dl className={`grid grid-cols-4 gap-1.5 text-center ${!isSignedIn ? "blur-[4px] select-none" : ""}`}>
+          {([
+            ["Entry", s.entry, "text-zinc-800"],
+            ["SL", s.sl, "text-rose-600"],
+            ["TP", s.tp, "text-emerald-600"],
+            ["RR", s.rr ? `${Number(s.rr).toFixed(1)}` : "—", "text-zinc-800"],
+          ] as const).map(([k, v, c]) => (
+            <div key={k} className="relative min-w-0 rounded-md bg-zinc-50 px-1 py-1.5 ring-1 ring-inset ring-zinc-200/70">
+              <dt className="font-mono text-[9px] uppercase tracking-wider text-zinc-500">{k}</dt>
+              <dd className={`mt-0.5 font-mono text-[11px] truncate ${c}`}>{v ?? "—"}</dd>
+            </div>
+          ))}
+        </dl>
+        {!isSignedIn && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-lg bg-white opacity-100 backdrop-blur-[4px] transition-opacity duration-300">
+            <img
+              src={eyeIcon.url}
+              alt="Sign in to view"
+              className="h-8 w-8 animate-[pulse_1.6s_cubic-bezier(0.4,0,0.6,1)_infinite] drop-shadow-sm"
+            />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-900">
+              Sign In For full view
+            </p>
+            <Link
+              to="/auth"
+              className="rounded-full bg-zinc-900 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition-transform duration-200 hover:scale-105"
+            >
+              Sign In
+            </Link>
           </div>
-        ))}
-      </dl>
+        )}
+      </div>
 
       <footer className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px]">
         <div className="flex flex-wrap items-center gap-1.5 text-zinc-500">
@@ -473,7 +498,110 @@ function SignalCard({ s }: { s: Signal }) {
           <span className="font-mono text-[10px] text-zinc-400">{relativeTime(fired)}</span>
         </div>
       </footer>
+
+      <SignalActions s={s} />
     </li>
+  );
+}
+
+function SignalActions({ s }: { s: Signal }) {
+  const [busy, setBusy] = useState<"trade" | "save" | null>(null);
+  const [traded, setTraded] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const requireUser = async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) {
+      toast.error("Sign in required", { description: "Please sign in to track this signal." });
+      return null;
+    }
+    return data.user.id;
+  };
+
+  const tradeDone = async () => {
+    setBusy("trade");
+    try {
+      const userId = await requireUser();
+      if (!userId) return;
+      const { error } = await supabase.from("trade_journal").insert({
+        user_id: userId,
+        pair: s.pair || "XAUUSD",
+        direction: s.direction.toUpperCase() === "BUY" ? "long" : "short",
+        entry: s.entry,
+        stop_loss: s.sl,
+        take_profit: s.tp,
+        outcome: s.outcome === "win" || s.outcome === "loss" ? s.outcome : "open",
+        pnl:
+          s.outcome === "win" && s.entry != null && s.tp != null
+            ? (s.direction.toUpperCase() === "BUY" ? s.tp - s.entry : s.entry - s.tp)
+            : s.outcome === "loss" && s.entry != null && s.sl != null
+              ? (s.direction.toUpperCase() === "BUY" ? s.sl - s.entry : s.entry - s.sl)
+              : null,
+        source: "system",
+        opened_at: s.fired_at ?? new Date().toISOString(),
+        closed_at: s.outcome === "win" || s.outcome === "loss" ? (s.resolved_at ?? new Date().toISOString()) : null,
+        notes: `Taken from Live Signals · ${s.grade ?? ""} ${s.confidence ?? "—"}% ${s.session ?? ""}`.trim(),
+      });
+      if (error) throw error;
+      setTraded(true);
+      toast.success("Trade added to your journal", { description: "Open Dashboard → Trades to manage it." });
+    } catch (e) {
+      toast.error("Could not add trade", { description: e instanceof Error ? e.message : "Please try again." });
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const saveSignal = async () => {
+    setBusy("save");
+    try {
+      const userId = await requireUser();
+      if (!userId) return;
+      const { error } = await supabase.from("saved_signals").insert({
+        user_id: userId,
+        alert_id: s.id,
+        snapshot: {
+          pair: s.pair,
+          direction: s.direction,
+          entry: s.entry,
+          stop_loss: s.sl,
+          take_profit: s.tp,
+          rr: s.rr,
+          confidence: s.confidence,
+          session: s.session,
+        },
+      });
+      if (error) throw error;
+      setSaved(true);
+      toast.success("Signal saved", { description: "Find it under Saved Signals in your dashboard." });
+    } catch (e) {
+      toast.error("Could not save signal", { description: e instanceof Error ? e.message : "Please try again." });
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <div className="mt-3 grid grid-cols-2 gap-2 border-t border-zinc-100 pt-3">
+      <button
+        type="button"
+        onClick={tradeDone}
+        disabled={busy !== null || traded}
+        className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-zinc-800 disabled:opacity-50"
+      >
+        <CheckCircle2 className="h-3.5 w-3.5" />
+        {traded ? "In journal" : busy === "trade" ? "Adding…" : "Trade Done"}
+      </button>
+      <button
+        type="button"
+        onClick={saveSignal}
+        disabled={busy !== null || saved}
+        className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[11px] font-semibold text-zinc-800 transition hover:border-zinc-400 disabled:opacity-50"
+      >
+        <Bookmark className="h-3.5 w-3.5" />
+        {saved ? "Saved" : busy === "save" ? "Saving…" : "Save Signal"}
+      </button>
+    </div>
   );
 }
 

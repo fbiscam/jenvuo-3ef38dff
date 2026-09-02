@@ -62,7 +62,7 @@ function OpsLogin() {
       <main className="mx-auto flex min-h-dvh max-w-md items-center justify-center px-5 py-16 sm:px-6">
         <form
           onSubmit={onSubmit}
-          className="w-full rounded-2xl border border-zinc-200 bg-white p-6 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.08)] sm:p-8"
+          className="w-full rounded-xl border border-zinc-200 bg-white p-6 sm:p-8"
         >
           <div className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />

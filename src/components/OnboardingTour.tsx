@@ -20,9 +20,9 @@ const STEPS: Step[] = [
   },
   {
     title: "Institutional signal engine",
-    body: "Signal Desk runs ICT/SMC scans across XAU/USD, EUR, GBP, JPY, AUD, CHF with 64% confidence gate and killzone timing.",
+    body: "Live Signals runs ICT/SMC scans across XAU/USD, EUR, GBP, JPY, AUD, CHF with 64% confidence gate and killzone timing.",
     icon: Radar,
-    cta: { to: "/signal", label: "Open Signal Desk" },
+    cta: { to: "/signals-live", label: "Open Live Signals" },
   },
   {
     title: "Risk sized to your balance",
@@ -69,7 +69,7 @@ export function OnboardingTour() {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-[0_24px_60px_-20px_rgba(24,24,27,0.25)] animate-scale-in"
+        className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-6 animate-scale-in"
       >
         <div className="mb-4 flex items-start justify-between">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-900">

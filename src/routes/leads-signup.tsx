@@ -76,7 +76,7 @@ function SignUp() {
         style={{ fontFamily: JENVU_SANS }}
         className="lg-console flex min-h-dvh items-center justify-center bg-[#FAFAFA] px-5 py-16 text-zinc-900 antialiased"
       >
-        <div className="w-full max-w-[420px] rounded-xl border border-zinc-200 bg-white p-8 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)] text-center">
+        <div className="w-full max-w-[420px] rounded-xl border border-zinc-200 bg-white p-8 text-center">
           <img src="/favicon.png" alt="Jenvu" className="mx-auto h-10 w-10 rounded object-contain" />
           <h1 className="mt-4 text-[22px] font-semibold tracking-tight">Confirm your email</h1>
           <p className="mt-2 text-[13px] leading-relaxed text-zinc-600">
@@ -101,7 +101,7 @@ function SignUp() {
       >
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-[420px] rounded-xl border border-zinc-200 bg-white p-8 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)]"
+        className="w-full max-w-[420px] rounded-xl border border-zinc-200 bg-white p-8"
       >
         <div className="flex flex-col items-center text-center">
           <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 rounded-md object-contain" />

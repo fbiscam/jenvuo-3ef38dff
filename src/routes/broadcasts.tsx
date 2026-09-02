@@ -85,7 +85,7 @@ function BroadcastsPage() {
             {rows.map((r) => (
               <li
                 key={r.id}
-                className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-[0_12px_30px_-24px_rgba(0,0,0,0.08)]"
+                className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5"
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <span className={`inline-flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 text-xs font-semibold ${gradeStyle(r.grade)}`}>

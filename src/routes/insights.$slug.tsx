@@ -144,7 +144,7 @@ function InsightDetailPage() {
     <>
       <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
         {/* NAV */}
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div
             className="absolute left-0 top-0 h-[3px] bg-gradient-to-r from-red-500 via-amber-500 to-emerald-500 transition-[width] duration-150 ease-out"
             style={{ width: `${progress}%` }}
@@ -184,12 +184,12 @@ function InsightDetailPage() {
 
           <div className="aspect-[21/9] rounded-2xl overflow-hidden mb-12 border border-zinc-100 shadow-xl bg-zinc-100">
             <img
-              src={insight.image_url || `https://source.unsplash.com/1600x900/?gold,trading,${encodeURIComponent(insight.category)}`}
+              src={insight.image_url || "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80"}
               alt={insight.title}
               onError={(e) => {
                 const t = e.currentTarget;
                 t.onerror = null;
-                t.src = `https://source.unsplash.com/1600x900/?gold,finance,${encodeURIComponent(insight.category)}`;
+                t.src = "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80";
               }}
               className="w-full h-full object-cover"
             />

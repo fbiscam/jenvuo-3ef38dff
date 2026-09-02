@@ -107,7 +107,7 @@ function ReferralsPage() {
       </div>
 
       {/* Share card */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <div className="rounded-xl border border-zinc-200 bg-white p-6">
         <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
           Your referral link
         </div>
@@ -262,11 +262,7 @@ function ReferralHistory({ referrals }: { referrals: ReferralInfo["referrals"] }
                   key={f.key}
                   type="button"
                   onClick={() => setFilter(f.key)}
-                  className={`inline-flex items-center justify-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition sm:gap-1.5 sm:px-2.5 sm:text-[12px] ${
-                    active
-                      ? "border border-zinc-900 bg-white text-zinc-900"
-                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
-                  }`}
+                  className={`inline-flex items-center justify-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition sm:gap-1.5 sm:px-2.5 sm:text-[12px] ${ active ? "border border-zinc-900 bg-white text-zinc-900" : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50" }`}
                 >
                   <span className="truncate">{f.label}</span>
                   <span

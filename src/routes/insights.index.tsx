@@ -148,7 +148,7 @@ function InsightsPage() {
     <>
       <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
         {/* NAV */}
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -215,12 +215,12 @@ function InsightsPage() {
                 <div className="lg:col-span-5">
                   <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-zinc-200 border border-zinc-200 shadow-2xl relative group">
                     <img
-                      src={featured.image_url || `https://source.unsplash.com/1600x1200/?gold,trading,${encodeURIComponent(featured.category)}`}
+                      src={featured.image_url || "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80"}
                       alt={featured.title}
                       onError={(e) => {
                         const t = e.currentTarget;
                         t.onerror = null;
-                        t.src = `https://source.unsplash.com/1600x1200/?gold,finance`;
+                        t.src = "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80";
                       }}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
@@ -280,13 +280,13 @@ function InsightsPage() {
                         onError={(e) => {
                           const t = e.currentTarget;
                           t.onerror = null;
-                          t.src = `https://source.unsplash.com/1200x800/?gold,trading,finance,${encodeURIComponent(item.category)}`;
+                          t.src = "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80";
                         }}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
                       <img
-                        src={`https://source.unsplash.com/1200x800/?gold,trading,${encodeURIComponent(item.category)}`}
+                        src={"https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80"}
                         alt={item.title}
                         loading="lazy"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -335,11 +335,7 @@ function InsightsPage() {
                   key={n}
                   onClick={() => goToPage(n)}
                   aria-current={n === currentPage ? "page" : undefined}
-                  className={`min-w-[36px] rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                    n === currentPage
-                      ? "bg-zinc-900 text-white"
-                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
-                  }`}
+                  className={`min-w-[36px] rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${ n === currentPage ? "bg-zinc-900 text-white" : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50" }`}
                 >
                   {n}
                 </button>
@@ -356,7 +352,7 @@ function InsightsPage() {
 
 
           {/* LOAD MORE / NEWSLETTER */}
-          <div className="mt-20 rounded-3xl bg-zinc-50 border border-zinc-200 p-8 sm:p-12 text-center text-zinc-900 relative overflow-hidden">
+          <div className="mt-20 rounded-xl bg-zinc-50 border border-zinc-200 p-8 sm:p-12 text-center text-zinc-900 relative overflow-hidden">
             <div className="absolute inset-0 opacity-[0.07]" style={{
               backgroundImage: "radial-gradient(#000 0.5px, transparent 0.5px)",
               backgroundSize: "20px 20px"
