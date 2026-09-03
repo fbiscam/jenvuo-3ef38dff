@@ -1,7 +1,8 @@
-// Per-scan billing for the XAU/USD terminal (homepage + dashboard).
+// Signal-alert billing for the XAU/USD terminal (homepage + dashboard).
 //
-// Every auto-scan cycle charges the signed-in account a flat fee. When the
-// wallet balance runs out, the terminal hides live analysis data.
+// The fee is charged ONLY when a scan produced a real signal alert. Ordinary
+// scan cycles (hold / cleared-wait) are free. When the wallet balance runs
+// out, the terminal hides live analysis data.
 
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -30,6 +31,21 @@ export const billTerminalScan = createServerFn({ method: "POST" })
         .maybeSingle();
       return Number(row?.balance ?? 0);
     };
+
+    // Server-side proof that this scan really produced a signal alert.
+    // Without it a client could bill itself on a plain hold cycle.
+    const { data: cached } = await supabaseAdmin
+      .from("xau_projection_cache")
+      .select("payload")
+      .eq("id", "xauusd")
+      .maybeSingle();
+    const payload = (cached?.payload ?? null) as { signal?: { status?: string }; updatedAt?: string } | null;
+    const hasAlert = payload?.signal?.status === "active";
+    if (!hasAlert || (data.scanId && payload?.updatedAt && String(payload.updatedAt) !== data.scanId)) {
+      const balance = await readBalance();
+      return { balance, blocked: false, charged: false, fee: TERMINAL_SCAN_FEE_USD };
+    }
+
 
     // Idempotency: one charge per scan id per user.
     if (data.scanId) {
