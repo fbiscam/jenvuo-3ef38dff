@@ -380,7 +380,11 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
     d1: num(j.targets?.d1, base.targets.d1, d1lo, d1hi),
     w1: num(j.targets?.w1, base.targets.w1, w1lo, w1hi),
   };
-  const invalidation = num(j.invalidation, base.invalidation, w1lo, w1hi);
+  // Invalidation is a stop level, not a weekly swing: keep it within ±1% of
+  // price so the AI can never hand back a 3%+ "stop".
+  const [invLo, invHi] = band(0.01);
+  const invalidation = num(j.invalidation, base.invalidation, invLo, invHi);
+
   const rr = num(j.rr, base.rr, 0.5, 9);
   const narrative =
     typeof j.narrative === "string" && j.narrative.trim()
