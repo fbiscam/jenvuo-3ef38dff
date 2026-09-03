@@ -221,6 +221,12 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
   return projection;
 }
 
+/** Risk geometry guard rails for XAU/USD (SL distance as % of price). */
+const SL_MIN_PCT = 0.0015; // 0.15% — below this the stop is inside spread/noise
+const SL_MAX_PCT = 0.0075; // 0.75% — above this it is not an ICT/SMC invalidation
+const MIN_RR = 2;
+const MAX_RR = 5;
+
 /** Trade signal is only released at >= 70% confidence with a directional bias. */
 function buildSignal(a: {
   price: number;
@@ -231,32 +237,67 @@ function buildSignal(a: {
   rr: number;
   narrative: string;
 }): XauTradeSignal {
-  if (a.bias === "neutral" || a.confidence < SIGNAL_MIN_CONFIDENCE) {
-    return {
-      status: "wait",
-      direction: null,
-      entry: null,
-      sl: null,
-      tp: null,
-      rr: null,
-      confidence: a.confidence,
-      reason:
-        a.bias === "neutral"
-          ? "No directional edge — structure is mixed across timeframes. Standing down."
-          : `Confidence ${a.confidence}% is below the ${SIGNAL_MIN_CONFIDENCE}% release threshold. ${a.narrative}`,
-    };
+  const hold = (reason: string, conf = a.confidence): XauTradeSignal => ({
+    status: "wait",
+    direction: null,
+    entry: null,
+    sl: null,
+    tp: null,
+    rr: null,
+    confidence: conf,
+    reason,
+  });
+
+  if (a.bias === "neutral") {
+    return hold("No directional edge — structure is mixed across timeframes. Standing down.");
   }
+  if (a.confidence < SIGNAL_MIN_CONFIDENCE) {
+    return hold(`Confidence ${a.confidence}% is below the ${SIGNAL_MIN_CONFIDENCE}% release threshold. ${a.narrative}`);
+  }
+
+  const long = a.bias === "bullish";
+  const entry = round2(a.price);
+
+  // --- Stop loss: must sit on the correct side of entry and inside the
+  // allowed risk band. A 150-point / 3.4% "invalidation" is not a stop.
+  let risk = Math.abs(entry - a.invalidation);
+  const wrongSide = long ? a.invalidation >= entry : a.invalidation <= entry;
+  const minRisk = entry * SL_MIN_PCT;
+  const maxRisk = entry * SL_MAX_PCT;
+  if (wrongSide || !Number.isFinite(risk) || risk < minRisk) risk = minRisk;
+  if (risk > maxRisk) risk = maxRisk;
+  const sl = round2(long ? entry - risk : entry + risk);
+
+  // --- Take profit: derived from real risk, never from an AI-supplied RR.
+  let reward = Math.abs(a.target - entry);
+  const tpWrongSide = long ? a.target <= entry : a.target >= entry;
+  if (tpWrongSide || !Number.isFinite(reward)) reward = 0;
+  let rr = risk > 0 ? reward / risk : 0;
+  if (rr > MAX_RR) {
+    rr = MAX_RR;
+    reward = risk * MAX_RR;
+  }
+  if (rr < MIN_RR) {
+    // Do not stretch a target the structure does not support — stand down.
+    return hold(
+      `Setup rejected: reward-to-risk ${rr.toFixed(2)}R is below the ${MIN_RR}R minimum (stop ${risk.toFixed(2)}, target ${reward.toFixed(2)}). ${a.narrative}`,
+    );
+  }
+
+  const tp = round2(long ? entry + reward : entry - reward);
+
   return {
     status: "active",
-    direction: a.bias === "bullish" ? "long" : "short",
-    entry: a.price,
-    sl: a.invalidation,
-    tp: a.target,
-    rr: a.rr,
+    direction: long ? "long" : "short",
+    entry,
+    sl,
+    tp,
+    rr: Math.round(rr * 100) / 100,
     confidence: a.confidence,
     reason: a.narrative,
   };
 }
+
 
 
 async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): Promise<XauProjection> {
