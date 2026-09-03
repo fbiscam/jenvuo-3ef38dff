@@ -35,19 +35,21 @@ function useXauProjection(
       try {
         const res = await fetchProjection();
         if (alive && res) setData(res as XauProjection);
-        // Per-scan fee for signed-in accounts only. Skip entirely when there
-        // is no session, otherwise the server fn throws a 401.
-        if (res) {
+        // Fee is charged ONLY when the scan actually produced a signal alert.
+        // Plain scans (hold / cleared-wait cycles) are free.
+        const proj = res as XauProjection | null;
+        if (proj && proj.signal?.status === "active") {
           const { data: sess } = await supabase.auth.getSession();
           if (sess.session) {
             try {
-              const state = await bill({ data: { scanId: String((res as XauProjection).updatedAt) } });
+              const state = await bill({ data: { scanId: String(proj.updatedAt) } });
               if (alive && state) setBlocked(Boolean(state.blocked));
             } catch {
               /* billing unavailable — do not gate the panel */
             }
           }
         }
+
 
       } catch {
         /* keep last known values */
