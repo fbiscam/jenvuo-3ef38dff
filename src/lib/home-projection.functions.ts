@@ -99,7 +99,7 @@ async function writeShared(data: XauProjection, bias: { bias: XauProjection["bia
     const db = await adminClient();
     await db.from("xau_projection_cache").upsert({
       id: CACHE_ID,
-      payload: data as unknown as Record<string, unknown>,
+      payload: data as unknown as import("@/integrations/supabase/types").Json,
       bias: bias.bias,
       bias_at: new Date(bias.at).toISOString(),
       updated_at: new Date().toISOString(),
