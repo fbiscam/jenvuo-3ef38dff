@@ -3219,6 +3219,30 @@ export type Database = {
         }
         Relationships: []
       }
+      xau_projection_cache: {
+        Row: {
+          bias: string | null
+          bias_at: string | null
+          id: string
+          payload: Json
+          updated_at: string
+        }
+        Insert: {
+          bias?: string | null
+          bias_at?: string | null
+          id: string
+          payload: Json
+          updated_at?: string
+        }
+        Update: {
+          bias?: string | null
+          bias_at?: string | null
+          id?: string
+          payload?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       v_scan_charge_mismatches: {
