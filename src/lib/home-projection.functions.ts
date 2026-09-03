@@ -378,6 +378,20 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
 export const getXauProjection = createServerFn({ method: "GET" }).handler(
   async (): Promise<XauProjection | null> => {
     if (cache && Date.now() - cache.at < TTL_MS) return cache.data;
+    // Cold isolate (or expired local cache): consult the shared DB cache so
+    // every visitor sees the same price/bias/confidence.
+    const shared = await readShared();
+    if (shared) {
+      const sharedAt = new Date(shared.updated_at).getTime();
+      if (shared.bias && shared.bias_at) {
+        biasState = { bias: shared.bias, at: new Date(shared.bias_at).getTime() };
+      }
+      if (Number.isFinite(sharedAt) && Date.now() - sharedAt < TTL_MS) {
+        cache = { at: sharedAt, data: shared.payload };
+        return shared.payload;
+      }
+      if (!cache) cache = { at: sharedAt || 0, data: shared.payload };
+    }
     try {
       const inst = resolveInstrument("XAUUSD");
       const [c1h, c4h, c1d] = await Promise.all([
@@ -397,6 +411,8 @@ export const getXauProjection = createServerFn({ method: "GET" }).handler(
         /* engine-only fallback */
       }
       cache = { at: Date.now(), data };
+      await writeShared(data, biasState ?? { bias: data.bias, at: Date.now() });
+
       // Qualifying (>=70%) signals go to the live signals feed + WhatsApp
       // broadcast. Publishing is cooldown-guarded and never blocks the read.
       if (data.signal.status === "active" && data.signal.direction && data.signal.entry && data.signal.sl && data.signal.tp) {
