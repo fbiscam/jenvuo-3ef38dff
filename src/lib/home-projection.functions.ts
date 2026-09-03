@@ -59,8 +59,55 @@ const SIGNAL_MIN_CONFIDENCE = 70;
 const BIAS_HOLD_MS = 15 * 60_000;
 const BIAS_FLIP_SCORE = 2.0;
 
+// In-memory cache is only a per-isolate fast path. Production runs on many
+// short-lived worker isolates, so the authoritative cache lives in the
+// database — otherwise every visitor (and every 45s refresh) would trigger a
+// fresh analysis on a cold isolate and see a different price/bias/confidence.
 let cache: { at: number; data: XauProjection } | null = null;
 let biasState: { bias: XauProjection["bias"]; at: number } | null = null;
+
+const CACHE_ID = "xauusd";
+
+async function adminClient() {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return supabaseAdmin;
+}
+
+type SharedRow = {
+  payload: XauProjection;
+  bias: XauProjection["bias"] | null;
+  bias_at: string | null;
+  updated_at: string;
+};
+
+async function readShared(): Promise<SharedRow | null> {
+  try {
+    const db = await adminClient();
+    const { data } = await db
+      .from("xau_projection_cache")
+      .select("payload, bias, bias_at, updated_at")
+      .eq("id", CACHE_ID)
+      .maybeSingle();
+    return (data as SharedRow | null) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeShared(data: XauProjection, bias: { bias: XauProjection["bias"]; at: number }) {
+  try {
+    const db = await adminClient();
+    await db.from("xau_projection_cache").upsert({
+      id: CACHE_ID,
+      payload: data as unknown as Record<string, unknown>,
+      bias: bias.bias,
+      bias_at: new Date(bias.at).toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+  } catch {
+    /* cache write must never break the read */
+  }
+}
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
