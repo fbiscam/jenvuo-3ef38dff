@@ -198,6 +198,20 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
     `Equilibrium ${keyLevel}, 1H ATR ${round2(atr)}, ${kz.killzone} killzone.`;
 
   const rrSafe = Number.isFinite(rr) ? clamp(rr, 0.5, 9) : 2;
+  const signal = buildSignal({
+    price: round2(price),
+    bias,
+    confidence,
+    invalidation,
+    target: targets.d1,
+    rr: rrSafe,
+    narrative,
+    aligned: alignment,
+    structureStop,
+  });
+  // The headline read-out must never be higher than the conviction the signal
+  // engine actually accepted — otherwise the UI shows 86% next to "WAIT".
+  const shownConfidence = signal.confidence;
   const projection: XauProjection = {
     price: round2(price),
     changePct,
@@ -205,8 +219,8 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
     candles,
     bias,
     longPct,
-    confidence,
-    confidenceSeries,
+    confidence: shownConfidence,
+    confidenceSeries: confSeries(shownConfidence),
     targets,
     invalidation,
     keyLevel,
@@ -217,23 +231,20 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
     narrative,
     aligned: alignment,
     structureStop,
-    signal: buildSignal({
-      price: round2(price),
-      bias,
-      confidence,
-      invalidation,
-      target: targets.d1,
-      rr: rrSafe,
-      narrative,
-      aligned: alignment,
-      structureStop,
-    }),
+    signal,
     model: "engine",
     updatedAt: Date.now(),
     nextScanMs: TTL_MS,
   };
   return projection;
 }
+
+function confSeries(confidence: number) {
+  return Array.from({ length: 9 }, (_, i) =>
+    Math.round(clamp(confidence - 24 + i * 3 + (i % 2 === 0 ? 2 : -2), 30, 98)),
+  );
+}
+
 
 /** Risk geometry guard rails for XAU/USD (SL distance as % of price). */
 const SL_MIN_PCT = 0.0015; // 0.15% — below this the stop is inside spread/noise
