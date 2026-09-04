@@ -210,6 +210,8 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
     session: kz.session,
     killzone: kz.killzone,
     narrative,
+    aligned: alignment,
+    structureStop,
     signal: buildSignal({
       price: round2(price),
       bias,
@@ -218,6 +220,8 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
       target: targets.d1,
       rr: rrSafe,
       narrative,
+      aligned: alignment,
+      structureStop,
     }),
     model: "engine",
     updatedAt: Date.now(),
