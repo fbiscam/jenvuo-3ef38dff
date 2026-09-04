@@ -449,6 +449,9 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
       target: targets.d1,
       rr,
       narrative,
+      aligned: base.aligned,
+      // Keep the engine's structural stop — the AI does not get to move it.
+      structureStop: base.structureStop,
     }),
     model,
     updatedAt: Date.now(),
