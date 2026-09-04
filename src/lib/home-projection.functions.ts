@@ -153,7 +153,9 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
       52 + strength * 26 + (alignment ? 8 : 0) + (kz.inKillzone ? 5 : 0) +
         ((regime as any)?.type === "trending" || String(regime).includes("trend") ? 4 : 0),
       45,
-      93,
+      // Without full HTF/MTF/LTF alignment the structure does not justify a
+      // high-conviction read — this is what produced 86-91% "fake" reads.
+      alignment ? 88 : 69,
     ),
   );
 
