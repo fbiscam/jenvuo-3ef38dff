@@ -481,7 +481,7 @@ export const getXauProjection = createServerFn({ method: "GET" }).handler(
     // Cold isolate (or expired local cache): consult the shared DB cache so
     // every visitor sees the same price/bias/confidence.
     const shared = await readShared();
-    if (shared) {
+    if (shared && isCoherent(shared.payload)) {
       const sharedAt = new Date(shared.updated_at).getTime();
       if (shared.bias && shared.bias_at) {
         biasState = { bias: shared.bias, at: new Date(shared.bias_at).getTime() };
@@ -492,6 +492,7 @@ export const getXauProjection = createServerFn({ method: "GET" }).handler(
       }
       if (!cache) cache = { at: sharedAt || 0, data: shared.payload };
     }
+
     try {
       const inst = resolveInstrument("XAUUSD");
       const [c1h, c4h, c1d] = await Promise.all([
