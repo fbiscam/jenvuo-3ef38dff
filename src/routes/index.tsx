@@ -314,7 +314,7 @@ function useCorrelatedMarkets(initial: CorrelatedBoard | null): CorrelatedBoard 
       } catch { /* keep last known values */ } finally { inFlight = false; }
     };
     run();
-    const id = setInterval(run, 1_000);
+    const id = setInterval(run, 5_000);
     return () => { alive = false; clearInterval(id); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
