@@ -405,7 +405,12 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
   const aiBias = j.bias === "bullish" || j.bias === "bearish" || j.bias === "neutral" ? j.bias : base.bias;
   const bias: XauProjection["bias"] =
     base.bias === "neutral" ? aiBias : aiBias === base.bias ? aiBias : base.bias;
-  const confidence = Math.round(num(j.confidence, base.confidence, 40, 96));
+  // The AI may confirm or lower the engine's conviction, never inflate it:
+  // an 86-91% "AI confidence" on unaligned structure is exactly the fake read
+  // we are eliminating.
+  const confidence = Math.round(
+    clamp(num(j.confidence, base.confidence, 40, 96), 40, Math.min(base.confidence + 3, base.aligned ? 88 : 69)),
+  );
   const targets = {
     h1: num(j.targets?.h1, base.targets.h1, h1lo, h1hi),
     h4: num(j.targets?.h4, base.targets.h4, h4lo, h4hi),
