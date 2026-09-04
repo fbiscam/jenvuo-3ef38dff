@@ -50,6 +50,7 @@ export type XauProjection = {
   structureStop?: number;
   model: string;
   updatedAt: number;
+  nextScanMs: number;
 };
 
 // Auto-scan window: engine + BluesMind gpt-4o review refresh every 45s.
