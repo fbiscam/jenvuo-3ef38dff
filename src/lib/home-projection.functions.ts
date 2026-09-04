@@ -271,9 +271,11 @@ function buildSignal(a: {
     sl: null,
     tp: null,
     rr: null,
-    confidence: conf,
+    // A rejected setup is by definition not a >=70% conviction read.
+    confidence: Math.min(conf, SIGNAL_MIN_CONFIDENCE - 1),
     reason,
   });
+
 
   if (a.bias === "neutral") {
     return hold("No directional edge — structure is mixed across timeframes. Standing down.");
