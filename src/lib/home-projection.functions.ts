@@ -45,6 +45,9 @@ export type XauProjection = {
   killzone: string;
   narrative: string;
   signal: XauTradeSignal;
+  /** Structural context used to validate a release (not rendered directly). */
+  aligned?: boolean;
+  structureStop?: number;
   model: string;
   updatedAt: number;
   nextScanMs: number;
@@ -150,7 +153,9 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
       52 + strength * 26 + (alignment ? 8 : 0) + (kz.inKillzone ? 5 : 0) +
         ((regime as any)?.type === "trending" || String(regime).includes("trend") ? 4 : 0),
       45,
-      93,
+      // Without full HTF/MTF/LTF alignment the structure does not justify a
+      // high-conviction read — this is what produced 86-91% "fake" reads.
+      alignment ? 88 : 69,
     ),
   );
 
@@ -162,6 +167,11 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
   };
   const invalidation = round2(
     dir > 0 ? Math.min(a1.swingLow, price - atr * 1.4) : Math.max(a1.swingHigh, price + atr * 1.4),
+  );
+  // The real ICT invalidation: just beyond the last 1H swing, with a small
+  // ATR buffer for the wick. This — not an ATR multiple — is the stop.
+  const structureStop = round2(
+    dir > 0 ? a1.swingLow - atr * 0.15 : a1.swingHigh + atr * 0.15,
   );
   const keyLevel = round2(a4.equilibrium);
   const reward = Math.abs(targets.d1 - price);
@@ -205,6 +215,8 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
     session: kz.session,
     killzone: kz.killzone,
     narrative,
+    aligned: alignment,
+    structureStop,
     signal: buildSignal({
       price: round2(price),
       bias,
@@ -213,6 +225,8 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
       target: targets.d1,
       rr: rrSafe,
       narrative,
+      aligned: alignment,
+      structureStop,
     }),
     model: "engine",
     updatedAt: Date.now(),
@@ -236,6 +250,8 @@ function buildSignal(a: {
   target: number;
   rr: number;
   narrative: string;
+  aligned?: boolean;
+  structureStop?: number;
 }): XauTradeSignal {
   const hold = (reason: string, conf = a.confidence): XauTradeSignal => ({
     status: "wait",
@@ -251,6 +267,12 @@ function buildSignal(a: {
   if (a.bias === "neutral") {
     return hold("No directional edge — structure is mixed across timeframes. Standing down.");
   }
+  if (a.aligned === false) {
+    return hold(
+      `No release: 1H / 4H / 1D structure is not aligned, so this is not a high-conviction setup. ${a.narrative}`,
+      Math.min(a.confidence, 69),
+    );
+  }
   if (a.confidence < SIGNAL_MIN_CONFIDENCE) {
     return hold(`Confidence ${a.confidence}% is below the ${SIGNAL_MIN_CONFIDENCE}% release threshold. ${a.narrative}`);
   }
@@ -258,14 +280,24 @@ function buildSignal(a: {
   const long = a.bias === "bullish";
   const entry = round2(a.price);
 
-  // --- Stop loss: must sit on the correct side of entry and inside the
-  // allowed risk band. A 150-point / 3.4% "invalidation" is not a stop.
-  let risk = Math.abs(entry - a.invalidation);
-  const wrongSide = long ? a.invalidation >= entry : a.invalidation <= entry;
+  // --- Stop loss: the last structural swing beyond entry (real invalidation).
+  // If that level is not inside the allowed risk band we stand down instead of
+  // clamping the stop to an arbitrary distance — a clamped stop is a fake stop.
+  const stopLevel =
+    a.structureStop !== undefined && Number.isFinite(a.structureStop) ? a.structureStop : a.invalidation;
+  const wrongSide = long ? stopLevel >= entry : stopLevel <= entry;
+  let risk = Math.abs(entry - stopLevel);
   const minRisk = entry * SL_MIN_PCT;
   const maxRisk = entry * SL_MAX_PCT;
-  if (wrongSide || !Number.isFinite(risk) || risk < minRisk) risk = minRisk;
-  if (risk > maxRisk) risk = maxRisk;
+  if (wrongSide || !Number.isFinite(risk)) {
+    return hold(`Setup rejected: invalidation ${stopLevel} sits on the wrong side of entry ${entry}. ${a.narrative}`);
+  }
+  if (risk > maxRisk) {
+    return hold(
+      `Setup rejected: structural stop is ${((risk / entry) * 100).toFixed(2)}% away — wider than the ${(SL_MAX_PCT * 100).toFixed(2)}% risk cap. Waiting for a tighter invalidation. ${a.narrative}`,
+    );
+  }
+  if (risk < minRisk) risk = minRisk; // wick buffer only
   const sl = round2(long ? entry - risk : entry + risk);
 
   // --- Take profit: derived from real risk, never from an AI-supplied RR.
@@ -373,7 +405,12 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
   const aiBias = j.bias === "bullish" || j.bias === "bearish" || j.bias === "neutral" ? j.bias : base.bias;
   const bias: XauProjection["bias"] =
     base.bias === "neutral" ? aiBias : aiBias === base.bias ? aiBias : base.bias;
-  const confidence = Math.round(num(j.confidence, base.confidence, 40, 96));
+  // The AI may confirm or lower the engine's conviction, never inflate it:
+  // an 86-91% "AI confidence" on unaligned structure is exactly the fake read
+  // we are eliminating.
+  const confidence = Math.round(
+    clamp(num(j.confidence, base.confidence, 40, 96), 40, Math.min(base.confidence + 3, base.aligned ? 88 : 69)),
+  );
   const targets = {
     h1: num(j.targets?.h1, base.targets.h1, h1lo, h1hi),
     h4: num(j.targets?.h4, base.targets.h4, h4lo, h4hi),
@@ -412,6 +449,9 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
       target: targets.d1,
       rr,
       narrative,
+      aligned: base.aligned,
+      // Keep the engine's structural stop — the AI does not get to move it.
+      structureStop: base.structureStop,
     }),
     model,
     updatedAt: Date.now(),
