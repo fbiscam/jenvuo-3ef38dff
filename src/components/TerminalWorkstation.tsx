@@ -279,9 +279,9 @@ export function TerminalWorkstation({
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex gap-1.5 shrink-0">
-              <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
-              <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
-              <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
+              <div className="h-2.5 w-2.5 rounded-full bg-rose-500 ring-1 ring-rose-200" />
+              <div className="h-2.5 w-2.5 rounded-full bg-amber-400 ring-1 ring-amber-200" />
+              <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 ring-1 ring-emerald-200" />
             </div>
             <span
               className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}
