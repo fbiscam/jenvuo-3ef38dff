@@ -33,7 +33,7 @@ const NewsEventEmail = ({
   minutesUntil = 60,
   forecast = '',
   previous = '',
-  signalUrl = `${SITE}/signal`,
+  signalUrl = `${SITE}/signals-live`,
 }: Props) => (
   <Html lang="en" dir="ltr">
     <EmailHead />
@@ -116,6 +116,6 @@ export const template: TemplateEntry = {
     minutesUntil: 45,
     forecast: '0.3%',
     previous: '0.2%',
-    signalUrl: 'https://jenvu.com/signal',
+    signalUrl: 'https://jenvu.com/signals-live',
   },
 }
