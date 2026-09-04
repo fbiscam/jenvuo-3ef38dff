@@ -250,6 +250,8 @@ function buildSignal(a: {
   target: number;
   rr: number;
   narrative: string;
+  aligned?: boolean;
+  structureStop?: number;
 }): XauTradeSignal {
   const hold = (reason: string, conf = a.confidence): XauTradeSignal => ({
     status: "wait",
@@ -265,6 +267,12 @@ function buildSignal(a: {
   if (a.bias === "neutral") {
     return hold("No directional edge — structure is mixed across timeframes. Standing down.");
   }
+  if (a.aligned === false) {
+    return hold(
+      `No release: 1H / 4H / 1D structure is not aligned, so this is not a high-conviction setup. ${a.narrative}`,
+      Math.min(a.confidence, 69),
+    );
+  }
   if (a.confidence < SIGNAL_MIN_CONFIDENCE) {
     return hold(`Confidence ${a.confidence}% is below the ${SIGNAL_MIN_CONFIDENCE}% release threshold. ${a.narrative}`);
   }
@@ -272,14 +280,24 @@ function buildSignal(a: {
   const long = a.bias === "bullish";
   const entry = round2(a.price);
 
-  // --- Stop loss: must sit on the correct side of entry and inside the
-  // allowed risk band. A 150-point / 3.4% "invalidation" is not a stop.
-  let risk = Math.abs(entry - a.invalidation);
-  const wrongSide = long ? a.invalidation >= entry : a.invalidation <= entry;
+  // --- Stop loss: the last structural swing beyond entry (real invalidation).
+  // If that level is not inside the allowed risk band we stand down instead of
+  // clamping the stop to an arbitrary distance — a clamped stop is a fake stop.
+  const stopLevel =
+    a.structureStop !== undefined && Number.isFinite(a.structureStop) ? a.structureStop : a.invalidation;
+  const wrongSide = long ? stopLevel >= entry : stopLevel <= entry;
+  let risk = Math.abs(entry - stopLevel);
   const minRisk = entry * SL_MIN_PCT;
   const maxRisk = entry * SL_MAX_PCT;
-  if (wrongSide || !Number.isFinite(risk) || risk < minRisk) risk = minRisk;
-  if (risk > maxRisk) risk = maxRisk;
+  if (wrongSide || !Number.isFinite(risk)) {
+    return hold(`Setup rejected: invalidation ${stopLevel} sits on the wrong side of entry ${entry}. ${a.narrative}`);
+  }
+  if (risk > maxRisk) {
+    return hold(
+      `Setup rejected: structural stop is ${((risk / entry) * 100).toFixed(2)}% away — wider than the ${(SL_MAX_PCT * 100).toFixed(2)}% risk cap. Waiting for a tighter invalidation. ${a.narrative}`,
+    );
+  }
+  if (risk < minRisk) risk = minRisk; // wick buffer only
   const sl = round2(long ? entry - risk : entry + risk);
 
   // --- Take profit: derived from real risk, never from an AI-supplied RR.
