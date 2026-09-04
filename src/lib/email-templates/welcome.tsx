@@ -74,7 +74,7 @@ const WelcomeEmail = ({
             </Text>
             <Text style={listItem}>
               2. Visit the{' '}
-              <Link href={`${siteUrl}/signal`} style={linkStyle}>Signal page</Link>{' '}
+              <Link href={`${siteUrl}/signals-live`} style={linkStyle}>Signal page</Link>{' '}
               — analyze XAU/USD, EUR, GBP in one click.
             </Text>
             <Text style={listItem}>
