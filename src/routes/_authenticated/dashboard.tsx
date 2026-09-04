@@ -1066,7 +1066,7 @@ function DashboardLayout() {
 
         {/* Live market terminal */}
         <div className="mt-4">
-          <TerminalWorkstation bordered={false} headingClassName="mt-2 ml-1" />
+          <TerminalWorkstation headingClassName="mt-2 ml-1" />
         </div>
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
