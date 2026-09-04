@@ -474,6 +474,15 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
 }
 
 
+/**
+ * Rejects cache rows written by an older build where the headline confidence
+ * could sit at 86% while the trade signal was on WAIT.
+ */
+function isCoherent(p: XauProjection | null | undefined): boolean {
+  if (!p || typeof p.confidence !== "number") return false;
+  if (p.signal?.status === "active") return true;
+  return p.confidence < SIGNAL_MIN_CONFIDENCE;
+}
 
 export const getXauProjection = createServerFn({ method: "GET" }).handler(
   async (): Promise<XauProjection | null> => {
