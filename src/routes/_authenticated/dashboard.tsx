@@ -229,7 +229,7 @@ function CardHeader({ icon: Icon, title, right, className = "" }: { icon: typeof
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`overflow-hidden bg-white ${className}`}>
+    <div className={`overflow-hidden rounded-xl border border-zinc-200 bg-white ring-1 ring-white/60 ${className}`}>
       {children}
     </div>
   );
