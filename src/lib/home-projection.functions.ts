@@ -441,36 +441,38 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
       ? j.narrative.trim().slice(0, 240)
       : base.narrative;
 
+  const signal = buildSignal({
+    price: base.price,
+    bias,
+    confidence,
+    invalidation,
+    target: targets.d1,
+    rr,
+    narrative,
+    aligned: base.aligned,
+    // Keep the engine's structural stop — the AI does not get to move it.
+    structureStop: base.structureStop,
+  });
+  const shownConfidence = signal.confidence;
+
   return {
     ...base,
     bias,
     longPct: Math.round(num(j.longPct, base.longPct, 2, 98)),
-    confidence,
-    confidenceSeries: Array.from({ length: 9 }, (_, i) =>
-      Math.round(clamp(confidence - 24 + i * 3 + (i % 2 === 0 ? 2 : -2), 30, 98)),
-    ),
+    confidence: shownConfidence,
+    confidenceSeries: confSeries(shownConfidence),
     targets,
     invalidation,
     keyLevel: num(j.keyLevel, base.keyLevel, w1lo, w1hi),
     rr,
     narrative,
-    signal: buildSignal({
-      price: base.price,
-      bias,
-      confidence,
-      invalidation,
-      target: targets.d1,
-      rr,
-      narrative,
-      aligned: base.aligned,
-      // Keep the engine's structural stop — the AI does not get to move it.
-      structureStop: base.structureStop,
-    }),
+    signal,
     model,
     updatedAt: Date.now(),
     nextScanMs: TTL_MS,
   };
 }
+
 
 
 export const getXauProjection = createServerFn({ method: "GET" }).handler(
