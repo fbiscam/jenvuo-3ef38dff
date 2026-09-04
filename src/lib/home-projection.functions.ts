@@ -198,6 +198,20 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
     `Equilibrium ${keyLevel}, 1H ATR ${round2(atr)}, ${kz.killzone} killzone.`;
 
   const rrSafe = Number.isFinite(rr) ? clamp(rr, 0.5, 9) : 2;
+  const signal = buildSignal({
+    price: round2(price),
+    bias,
+    confidence,
+    invalidation,
+    target: targets.d1,
+    rr: rrSafe,
+    narrative,
+    aligned: alignment,
+    structureStop,
+  });
+  // The headline read-out must never be higher than the conviction the signal
+  // engine actually accepted — otherwise the UI shows 86% next to "WAIT".
+  const shownConfidence = signal.confidence;
   const projection: XauProjection = {
     price: round2(price),
     changePct,
@@ -205,8 +219,8 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
     candles,
     bias,
     longPct,
-    confidence,
-    confidenceSeries,
+    confidence: shownConfidence,
+    confidenceSeries: confSeries(shownConfidence),
     targets,
     invalidation,
     keyLevel,
@@ -217,23 +231,20 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
     narrative,
     aligned: alignment,
     structureStop,
-    signal: buildSignal({
-      price: round2(price),
-      bias,
-      confidence,
-      invalidation,
-      target: targets.d1,
-      rr: rrSafe,
-      narrative,
-      aligned: alignment,
-      structureStop,
-    }),
+    signal,
     model: "engine",
     updatedAt: Date.now(),
     nextScanMs: TTL_MS,
   };
   return projection;
 }
+
+function confSeries(confidence: number) {
+  return Array.from({ length: 9 }, (_, i) =>
+    Math.round(clamp(confidence - 24 + i * 3 + (i % 2 === 0 ? 2 : -2), 30, 98)),
+  );
+}
+
 
 /** Risk geometry guard rails for XAU/USD (SL distance as % of price). */
 const SL_MIN_PCT = 0.0015; // 0.15% — below this the stop is inside spread/noise
@@ -260,9 +271,11 @@ function buildSignal(a: {
     sl: null,
     tp: null,
     rr: null,
-    confidence: conf,
+    // A rejected setup is by definition not a >=70% conviction read.
+    confidence: Math.min(conf, SIGNAL_MIN_CONFIDENCE - 1),
     reason,
   });
+
 
   if (a.bias === "neutral") {
     return hold("No directional edge — structure is mixed across timeframes. Standing down.");
@@ -428,31 +441,32 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
       ? j.narrative.trim().slice(0, 240)
       : base.narrative;
 
+  const signal = buildSignal({
+    price: base.price,
+    bias,
+    confidence,
+    invalidation,
+    target: targets.d1,
+    rr,
+    narrative,
+    aligned: base.aligned,
+    // Keep the engine's structural stop — the AI does not get to move it.
+    structureStop: base.structureStop,
+  });
+  const shownConfidence = signal.confidence;
+
   return {
     ...base,
     bias,
     longPct: Math.round(num(j.longPct, base.longPct, 2, 98)),
-    confidence,
-    confidenceSeries: Array.from({ length: 9 }, (_, i) =>
-      Math.round(clamp(confidence - 24 + i * 3 + (i % 2 === 0 ? 2 : -2), 30, 98)),
-    ),
+    confidence: shownConfidence,
+    confidenceSeries: confSeries(shownConfidence),
     targets,
     invalidation,
     keyLevel: num(j.keyLevel, base.keyLevel, w1lo, w1hi),
     rr,
     narrative,
-    signal: buildSignal({
-      price: base.price,
-      bias,
-      confidence,
-      invalidation,
-      target: targets.d1,
-      rr,
-      narrative,
-      aligned: base.aligned,
-      // Keep the engine's structural stop — the AI does not get to move it.
-      structureStop: base.structureStop,
-    }),
+    signal,
     model,
     updatedAt: Date.now(),
     nextScanMs: TTL_MS,
@@ -460,13 +474,23 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
 }
 
 
+/**
+ * Rejects cache rows written by an older build where the headline confidence
+ * could sit at 86% while the trade signal was on WAIT.
+ */
+function isCoherent(p: XauProjection | null | undefined): boolean {
+  if (!p || typeof p.confidence !== "number") return false;
+  if (p.signal?.status === "active") return true;
+  return p.confidence < SIGNAL_MIN_CONFIDENCE;
+}
+
 export const getXauProjection = createServerFn({ method: "GET" }).handler(
   async (): Promise<XauProjection | null> => {
     if (cache && Date.now() - cache.at < TTL_MS) return cache.data;
     // Cold isolate (or expired local cache): consult the shared DB cache so
     // every visitor sees the same price/bias/confidence.
     const shared = await readShared();
-    if (shared) {
+    if (shared && isCoherent(shared.payload)) {
       const sharedAt = new Date(shared.updated_at).getTime();
       if (shared.bias && shared.bias_at) {
         biasState = { bias: shared.bias, at: new Date(shared.bias_at).getTime() };
@@ -477,6 +501,7 @@ export const getXauProjection = createServerFn({ method: "GET" }).handler(
       }
       if (!cache) cache = { at: sharedAt || 0, data: shared.payload };
     }
+
     try {
       const inst = resolveInstrument("XAUUSD");
       const [c1h, c4h, c1d] = await Promise.all([
