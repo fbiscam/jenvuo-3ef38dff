@@ -45,9 +45,11 @@ export type XauProjection = {
   killzone: string;
   narrative: string;
   signal: XauTradeSignal;
+  /** Structural context used to validate a release (not rendered directly). */
+  aligned?: boolean;
+  structureStop?: number;
   model: string;
   updatedAt: number;
-  nextScanMs: number;
 };
 
 // Auto-scan window: engine + BluesMind gpt-4o review refresh every 45s.
