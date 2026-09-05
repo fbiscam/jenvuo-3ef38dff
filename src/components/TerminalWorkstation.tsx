@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import xauLogoAsset from "@/assets/xau-logo.png.asset.json";
 import {
@@ -10,7 +9,6 @@ import {
 } from "@/lib/home-projection.functions";
 import { billTerminalScan } from "@/lib/xau-scan-billing.functions";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthUser } from "@/hooks/useAuthUser";
 import { ema } from "@/lib/candle/indicators";
 
 
@@ -302,8 +300,6 @@ export function TerminalWorkstation({
   const proj = React.useMemo(() => buildProjectionView(visible), [visible]);
   const trend = React.useMemo(() => buildTrendView(visible), [visible]);
 
-  const { user: authUser } = useAuthUser();
-  const showTradePlan = !!authUser;
 
   const wrapperClass = bordered
     ? "rounded-xl border border-zinc-200 bg-white shadow-sm overflow-hidden"
@@ -549,72 +545,9 @@ export function TerminalWorkstation({
                   ))}
                 </div>
 
-                {/* ICT/SMC trade signal — released at >= 70% confidence (signed-in users only) */}
-                {showTradePlan ? (
-                <div className="rounded-lg border border-zinc-200 p-3">
-                  <div className="flex items-center justify-between">
-                    <span className={`text-[10px] ${MONO} uppercase tracking-widest text-zinc-500`}>
-                      Trade Signal
-                    </span>
-                    <span
-                      className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
-                        proj.signal?.status === "active"
-                          ? proj.signal.direction === "short"
-                            ? "bg-red-50 text-red-600"
-                            : "bg-emerald-50 text-emerald-700"
-                          : "bg-zinc-100 text-zinc-500"
-                      }`}
-                    >
-                      {proj.signal?.status === "active"
-                        ? `${proj.signal.direction?.toUpperCase()} · ${proj.signal.confidence}%`
-                        : "WAIT"}
-                    </span>
-                  </div>
-                  {proj.signal?.status === "active" ? (
-                    <dl className="mt-2 grid grid-cols-4 gap-1.5">
-                      {(
-                        [
-                          ["Entry", proj.signal.entry],
-                          ["SL", proj.signal.sl],
-                          ["TP", proj.signal.tp],
-                          ["R:R", proj.signal.rr ? `1:${proj.signal.rr.toFixed(1)}` : "—"],
-                        ] as [string, string | number | null][]
-                      ).map(([k, v]) => (
-                        <div key={k} className="rounded-md bg-zinc-50 px-1.5 py-1">
-                          <dt className={`text-[9px] ${MONO} uppercase text-zinc-500`}>{k}</dt>
-                          <dd className={`text-[11px] ${MONO} font-medium text-zinc-900`}>{v ?? "—"}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  ) : null}
-                  <p className="mt-2 text-[11px] leading-snug text-zinc-500">
-                    {proj.signal?.reason ?? "Waiting for the first ICT/SMC scan…"}
-                  </p>
-                  <p className={`mt-2 text-[9px] ${MONO} uppercase tracking-widest text-zinc-400`}>
-                    Auto-scan · 45s{proj.model ? ` · ${proj.model}` : ""}
-                  </p>
-                </div>
-                ) : (
-                  <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
-                    <p className={`text-[10px] ${MONO} uppercase tracking-widest text-zinc-500`}>Trade Signal</p>
-                    <p className="mt-2 text-[11px] leading-snug text-zinc-500">
-                      Sign in to unlock live ICT/SMC trade plans with entry, stop-loss and target levels.
-                    </p>
-                    <Link
-                      to="/auth"
-                      className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-[11px] font-medium text-white hover:bg-zinc-800"
-                    >
-                      Sign In to View Plan
-                    </Link>
-                  </div>
-                )}
-
-                <Link
-                  to="/signals-live"
-                  className={`w-full inline-flex items-center justify-center mt-2 py-3 bg-[#FAFAFA] text-black border border-black/20 text-[11px] font-semibold tracking-[0.18em] rounded-lg hover:bg-zinc-200 transition-colors uppercase`}
-                >
-                  View Live Signals
-                </Link>
+                <p className={`text-[9px] ${MONO} uppercase tracking-widest text-zinc-400`}>
+                  Auto-scan · 45s{proj.model ? ` · ${proj.model}` : ""}
+                </p>
               </div>
             </div>
           </div>
