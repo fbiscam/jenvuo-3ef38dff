@@ -14,7 +14,7 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 import { getXauProjection } from "@/lib/home-projection.functions";
-import { TrendPanel } from "@/components/candle/TrendPanel";
+import { TerminalWorkstation } from "@/components/TerminalWorkstation";
 import {
   getCorrelatedMarkets,
   type CorrelatedBoard,
@@ -547,9 +547,11 @@ function HomePage() {
 
 
       {/* TERMINAL WORKSTATION */}
-      <div className="mx-auto max-w-6xl px-5 mt-8 pb-14 sm:px-6 sm:mt-10 sm:pb-20">
-        <TrendPanel />
-      </div>
+      <TerminalWorkstation
+        bordered={false}
+        initialProjection={initialProjection}
+        className="mx-auto max-w-6xl px-5 mt-8 pb-14 sm:px-6 sm:mt-10 sm:pb-20"
+      />
 
       {/* CAPABILITIES */}
       <section className="border-t border-zinc-100">
