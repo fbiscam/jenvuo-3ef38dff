@@ -11,6 +11,8 @@ import {
 import { billTerminalScan } from "@/lib/xau-scan-billing.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { ema } from "@/lib/candle/indicators";
+
 
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
