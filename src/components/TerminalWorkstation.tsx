@@ -498,6 +498,31 @@ export function TerminalWorkstation({
                 </div>
 
                 <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-zinc-900">Trend Direction</span>
+                    <span
+                      className={`text-xs font-medium ${
+                        trend.up ? "text-emerald-600" : trend.down ? "text-red-600" : "text-zinc-500"
+                      }`}
+                    >
+                      {trend.dir}
+                    </span>
+                  </div>
+                  <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-100">
+                    <div
+                      className={trend.up ? "h-full bg-emerald-500" : trend.down ? "h-full bg-red-500" : "h-full bg-zinc-400"}
+                      style={{ width: `${trend.strength}%` }}
+                    />
+                  </div>
+                  <div className={`flex justify-between text-[10px] ${MONO} text-zinc-400`}>
+                    <span>EMA9 {trend.e9 ? trend.e9.toFixed(2) : "—"}</span>
+                    <span>EMA21 {trend.e21 ? trend.e21.toFixed(2) : "—"}</span>
+                  </div>
+                </div>
+
+
+
+                <div className="space-y-2">
                   <div className="flex items-end justify-between">
                     <span className={`text-[10px] ${MONO} uppercase text-zinc-500`}>Model Confidence</span>
                     <span className="text-xs font-semibold">{proj.confidence}%</span>
