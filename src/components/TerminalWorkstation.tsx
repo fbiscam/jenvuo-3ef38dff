@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import xauLogoAsset from "@/assets/xau-logo.png.asset.json";
 import {
@@ -10,7 +9,6 @@ import {
 } from "@/lib/home-projection.functions";
 import { billTerminalScan } from "@/lib/xau-scan-billing.functions";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthUser } from "@/hooks/useAuthUser";
 import { ema } from "@/lib/candle/indicators";
 
 
