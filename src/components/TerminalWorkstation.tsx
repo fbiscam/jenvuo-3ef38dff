@@ -300,6 +300,8 @@ export function TerminalWorkstation({
   // Wallet balance exhausted → live analysis data is hidden.
   const visible = blocked ? null : projection;
   const proj = React.useMemo(() => buildProjectionView(visible), [visible]);
+  const trend = React.useMemo(() => buildTrendView(visible), [visible]);
+
   const { user: authUser } = useAuthUser();
   const showTradePlan = !!authUser;
 
