@@ -245,6 +245,44 @@ function buildProjectionView(p: XauProjection | null) {
   };
 }
 
+/** EMA 9/21 trend read from the live projection series (no signals, direction only). */
+function buildTrendView(p: XauProjection | null) {
+  const closes =
+    p?.candles?.length && p.candles.length >= 10
+      ? p.candles.map((c) => c.c)
+      : (p?.series ?? []);
+  if (closes.length < 12) {
+    return { dir: "—", strength: 0, e9: null as number | null, e21: null as number | null, up: false, down: false };
+  }
+  const a = ema(closes, 9);
+  const b = ema(closes, 21 > closes.length ? Math.max(5, Math.floor(closes.length / 2)) : 21);
+  const i = closes.length - 1;
+  const last9 = a[i] ?? null;
+  const last21 = b[i] ?? null;
+  if (last9 == null || last21 == null) {
+    return { dir: "—", strength: 0, e9: last9, e21: last21, up: false, down: false };
+  }
+  const gapPct = ((last9 - last21) / last21) * 100;
+  const prev9 = a[Math.max(0, i - 5)] ?? last9;
+  const slopePct = prev9 ? ((last9 - prev9) / prev9) * 100 : 0;
+  const strength = Math.max(
+    0,
+    Math.min(100, Math.round((Math.abs(gapPct) / 0.25) * 60 + (Math.abs(slopePct) / 0.25) * 40)),
+  );
+  if (Math.abs(gapPct) < 0.02) {
+    return { dir: "FLAT", strength: Math.min(strength, 35), e9: last9, e21: last21, up: false, down: false };
+  }
+  return {
+    dir: gapPct > 0 ? "UP" : "DOWN",
+    strength,
+    e9: last9,
+    e21: last21,
+    up: gapPct > 0,
+    down: gapPct < 0,
+  };
+}
+
+
 export function TerminalWorkstation({
   bordered = true,
   className = "",
