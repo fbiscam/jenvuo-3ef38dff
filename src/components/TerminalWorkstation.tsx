@@ -302,8 +302,6 @@ export function TerminalWorkstation({
   const proj = React.useMemo(() => buildProjectionView(visible), [visible]);
   const trend = React.useMemo(() => buildTrendView(visible), [visible]);
 
-  const { user: authUser } = useAuthUser();
-  const showTradePlan = !!authUser;
 
   const wrapperClass = bordered
     ? "rounded-xl border border-zinc-200 bg-white shadow-sm overflow-hidden"
