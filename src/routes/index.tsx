@@ -353,7 +353,7 @@ function Sparkline({ series, up }: { series: number[]; up: boolean }) {
 
 function HomePage() {
   const ticker = useLiveTicker();
-  const initialProjection = (Route.useLoaderData() as { projection?: import("@/lib/home-projection.functions").XauProjection | null } | undefined)?.projection ?? null;
+  // (home projection retained by loader; panel fetches its own candles)
   const board = useCorrelatedMarkets(
     (Route.useLoaderData() as { board?: CorrelatedBoard | null } | undefined)?.board ?? null,
   );
