@@ -14,7 +14,7 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 import { getXauProjection } from "@/lib/home-projection.functions";
-import { NextCandlePanel } from "@/components/candle/NextCandlePanel";
+import { TerminalWorkstation } from "@/components/TerminalWorkstation";
 import {
   getCorrelatedMarkets,
   type CorrelatedBoard,
@@ -353,7 +353,7 @@ function Sparkline({ series, up }: { series: number[]; up: boolean }) {
 
 function HomePage() {
   const ticker = useLiveTicker();
-  // (home projection retained by loader; panel fetches its own candles)
+  const initialProjection = (Route.useLoaderData() as { projection?: import("@/lib/home-projection.functions").XauProjection | null } | undefined)?.projection ?? null;
   const board = useCorrelatedMarkets(
     (Route.useLoaderData() as { board?: CorrelatedBoard | null } | undefined)?.board ?? null,
   );
@@ -547,8 +547,9 @@ function HomePage() {
 
 
       {/* TERMINAL WORKSTATION */}
-      <NextCandlePanel
+      <TerminalWorkstation
         bordered={false}
+        initialProjection={initialProjection}
         className="mx-auto max-w-6xl px-5 mt-8 pb-14 sm:px-6 sm:mt-10 sm:pb-20"
       />
 
