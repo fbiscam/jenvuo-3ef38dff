@@ -11,6 +11,8 @@ import {
 import { billTerminalScan } from "@/lib/xau-scan-billing.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { ema } from "@/lib/candle/indicators";
+
 
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
@@ -245,6 +247,44 @@ function buildProjectionView(p: XauProjection | null) {
   };
 }
 
+/** EMA 9/21 trend read from the live projection series (no signals, direction only). */
+function buildTrendView(p: XauProjection | null) {
+  const closes =
+    p?.candles?.length && p.candles.length >= 10
+      ? p.candles.map((c) => c.c)
+      : (p?.series ?? []);
+  if (closes.length < 12) {
+    return { dir: "—", strength: 0, e9: null as number | null, e21: null as number | null, up: false, down: false };
+  }
+  const a = ema(closes, 9);
+  const b = ema(closes, 21 > closes.length ? Math.max(5, Math.floor(closes.length / 2)) : 21);
+  const i = closes.length - 1;
+  const last9 = a[i] ?? null;
+  const last21 = b[i] ?? null;
+  if (last9 == null || last21 == null) {
+    return { dir: "—", strength: 0, e9: last9, e21: last21, up: false, down: false };
+  }
+  const gapPct = ((last9 - last21) / last21) * 100;
+  const prev9 = a[Math.max(0, i - 5)] ?? last9;
+  const slopePct = prev9 ? ((last9 - prev9) / prev9) * 100 : 0;
+  const strength = Math.max(
+    0,
+    Math.min(100, Math.round((Math.abs(gapPct) / 0.25) * 60 + (Math.abs(slopePct) / 0.25) * 40)),
+  );
+  if (Math.abs(gapPct) < 0.02) {
+    return { dir: "FLAT", strength: Math.min(strength, 35), e9: last9, e21: last21, up: false, down: false };
+  }
+  return {
+    dir: gapPct > 0 ? "UP" : "DOWN",
+    strength,
+    e9: last9,
+    e21: last21,
+    up: gapPct > 0,
+    down: gapPct < 0,
+  };
+}
+
+
 export function TerminalWorkstation({
   bordered = true,
   className = "",
@@ -260,6 +300,8 @@ export function TerminalWorkstation({
   // Wallet balance exhausted → live analysis data is hidden.
   const visible = blocked ? null : projection;
   const proj = React.useMemo(() => buildProjectionView(visible), [visible]);
+  const trend = React.useMemo(() => buildTrendView(visible), [visible]);
+
   const { user: authUser } = useAuthUser();
   const showTradePlan = !!authUser;
 
@@ -454,6 +496,31 @@ export function TerminalWorkstation({
                     <span>{100 - proj.longPct}% short</span>
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-zinc-900">Trend Direction</span>
+                    <span
+                      className={`text-xs font-medium ${
+                        trend.up ? "text-emerald-600" : trend.down ? "text-red-600" : "text-zinc-500"
+                      }`}
+                    >
+                      {trend.dir}
+                    </span>
+                  </div>
+                  <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-100">
+                    <div
+                      className={trend.up ? "h-full bg-emerald-500" : trend.down ? "h-full bg-red-500" : "h-full bg-zinc-400"}
+                      style={{ width: `${trend.strength}%` }}
+                    />
+                  </div>
+                  <div className={`flex justify-between text-[10px] ${MONO} text-zinc-400`}>
+                    <span>EMA9 {trend.e9 ? trend.e9.toFixed(2) : "—"}</span>
+                    <span>EMA21 {trend.e21 ? trend.e21.toFixed(2) : "—"}</span>
+                  </div>
+                </div>
+
+
 
                 <div className="space-y-2">
                   <div className="flex items-end justify-between">
