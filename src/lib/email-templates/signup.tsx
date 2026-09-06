@@ -17,6 +17,8 @@ interface SignupEmailProps {
   siteUrl: string
   recipient: string
   confirmationUrl: string
+  token?: string
+  showLink?: boolean
 }
 
 export const SignupEmail = ({
@@ -24,6 +26,8 @@ export const SignupEmail = ({
   siteUrl,
   recipient,
   confirmationUrl,
+  token,
+  showLink = true,
 }: SignupEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head>
