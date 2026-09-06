@@ -1,15 +1,15 @@
 import * as React from 'react'
+
 import {
   Body,
+  Button,
   Container,
+  Head,
   Heading,
   Html,
-  Link,
   Preview,
-  Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 interface MagicLinkEmailProps {
   siteName: string
@@ -21,31 +21,59 @@ export const MagicLinkEmail = ({
   confirmationUrl,
 }: MagicLinkEmailProps) => (
   <Html lang="en" dir="ltr">
-    <EmailHead />
-    <Preview>Your one-tap login link for {siteName}</Preview>
-    <Body style={s.main}>
-      <Container style={s.container}>
-        <LogoHeader tagline="JENVU · MAGIC LINK" />
-        <Section style={s.card}>
-          <Text style={s.eyebrow}>AUTH // ONE_TAP_LOGIN</Text>
-          <Heading as="h1" style={s.h1}>
-            Your login link.
-          </Heading>
-          <Text style={s.text}>
-            Tap the button below to sign in to {siteName}. This link is
-            single-use and expires shortly.
-          </Text>
-          <Link href={confirmationUrl} style={s.button}>
-            Sign In →
-          </Link>
-          <Text style={{ ...s.footer, marginTop: '24px' }}>
-            Didn't request this? Ignore this email — no session is created without your tap.
-          </Text>
-
-        </Section>
+    <Head>
+      <style>{darkModeCss}</style>
+    </Head>
+    <Preview>Your login link for {siteName}</Preview>
+    <Body style={main}>
+      <Container style={container}>
+        <Heading style={h1}>Your login link</Heading>
+        <Text style={text}>
+          Click the button below to log in to {siteName}. This link will expire
+          shortly.
+        </Text>
+        <Button className="dm-btn" style={button} href={confirmationUrl}>
+          Log In
+        </Button>
+        <Text style={footer}>
+          If you didn't request this link, you can safely ignore this email.
+        </Text>
       </Container>
     </Body>
   </Html>
 )
 
 export default MagicLinkEmail
+
+const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
+const container = { padding: '20px 25px' }
+const h1 = {
+  fontSize: '22px',
+  fontWeight: 'bold' as const,
+  color: '#000000',
+  margin: '0 0 20px',
+}
+const text = {
+  fontSize: '14px',
+  color: '#55575d',
+  lineHeight: '1.5',
+  margin: '0 0 25px',
+}
+const button = {
+  backgroundColor: '#000000',
+  color: '#ffffff',
+  fontSize: '14px',
+  border: '1px solid #000000',
+  borderRadius: '8px',
+  padding: '12px 20px',
+  textDecoration: 'none',
+}
+const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+// Rendered as a text child, which React may HTML-escape: keep this CSS free of >, &, and quotes.
+const darkModeCss = `
+  @media (prefers-color-scheme: dark) {
+    .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+  }
+  [data-ogsc] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+  [data-ogsb] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+`
