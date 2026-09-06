@@ -14,11 +14,16 @@ import {
 interface RecoveryEmailProps {
   siteName: string
   confirmationUrl: string
+  recipient?: string
+  token?: string
+  showLink?: boolean
 }
 
 export const RecoveryEmail = ({
   siteName,
   confirmationUrl,
+  token,
+  showLink = true,
 }: RecoveryEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head>
@@ -32,9 +37,12 @@ export const RecoveryEmail = ({
           We received a request to reset your password for {siteName}. Click
           the button below to choose a new password.
         </Text>
-        <Button className="dm-btn" style={button} href={confirmationUrl}>
-          Reset Password
-        </Button>
+        {token ? <Text style={codeStyle}>{token}</Text> : null}
+        {showLink ? (
+          <Button className="dm-btn" style={button} href={confirmationUrl}>
+            Reset Password
+          </Button>
+        ) : null}
         <Text style={footer}>
           If you didn't request a password reset, you can safely ignore this
           email. Your password will not be changed.
@@ -78,3 +86,10 @@ const darkModeCss = `
   [data-ogsc] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
   [data-ogsb] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
 `
+const codeStyle = {
+  fontSize: '28px',
+  fontWeight: 'bold' as const,
+  letterSpacing: '6px',
+  color: '#000000',
+  margin: '0 0 25px',
+}
