@@ -49,11 +49,14 @@ export const SignupEmail = ({
           <Link href={`mailto:${recipient}`} style={link}>
             {recipient}
           </Link>
-          ) by clicking the button below:
+          ){token ? ' using the code below:' : ' by clicking the button below:'}
         </Text>
-        <Button className="dm-btn" style={button} href={confirmationUrl}>
-          Verify Email
-        </Button>
+        {token ? <Text style={codeStyle}>{token}</Text> : null}
+        {showLink ? (
+          <Button className="dm-btn" style={button} href={confirmationUrl}>
+            Verify Email
+          </Button>
+        ) : null}
         <Text style={footer}>
           If you didn't create an account, you can safely ignore this email.
         </Text>
