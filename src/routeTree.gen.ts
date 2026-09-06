@@ -60,13 +60,11 @@ import { Route as LeadsActivityRouteImport } from './routes/leads.activity'
 import { Route as LeadsAccountRouteImport } from './routes/leads.account'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
-import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BriefIdRouteImport } from './routes/brief.$id'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
-import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as LeadsAdminUsersRouteImport } from './routes/leads.admin.users'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
@@ -85,9 +83,7 @@ import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAlertsRouteImport } from './routes/_authenticated/dashboard.alerts'
-import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicInsightImageSplatRouteImport } from './routes/api/public/insight-image.$'
@@ -369,11 +365,6 @@ const InsightsSlugRoute = InsightsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => InsightsRoute,
 } as any)
-const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
-  id: '/email/unsubscribe',
-  path: '/email/unsubscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const BriefIdRoute = BriefIdRouteImport.update({
   id: '/brief/$id',
   path: '/brief/$id',
@@ -400,11 +391,6 @@ const AuthenticatedDashboardIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
-  id: '/lovable/email/suppression',
-  path: '/lovable/email/suppression',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LovableEmailEventsRoute = LovableEmailEventsRouteImport.update({
   id: '/lovable/email/events',
   path: '/lovable/email/events',
@@ -508,22 +494,10 @@ const AuthenticatedDashboardAlertsRoute =
     path: '/alerts',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const LovableEmailTransactionalSendRoute =
-  LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
     path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
@@ -716,7 +690,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
-  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -752,7 +725,6 @@ export interface FileRoutesByFullPath {
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
-  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
@@ -781,9 +753,7 @@ export interface FileRoutesByFullPath {
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -817,7 +787,6 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
-  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -853,7 +822,6 @@ export interface FileRoutesByTo {
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
-  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
   '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
@@ -882,9 +850,7 @@ export interface FileRoutesByTo {
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -925,7 +891,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
-  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -961,7 +926,6 @@ export interface FileRoutesById {
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
-  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/_authenticated/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
@@ -990,9 +954,7 @@ export interface FileRoutesById {
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1033,7 +995,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/inbox'
     | '/brief/$id'
-    | '/email/unsubscribe'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1069,7 +1030,6 @@ export interface FileRouteTypes {
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
-    | '/lovable/email/suppression'
     | '/dashboard/'
     | '/help/$collection/'
     | '/dashboard/admin/accuracy'
@@ -1098,9 +1058,7 @@ export interface FileRouteTypes {
     | '/api/public/insight-image/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
-    | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1134,7 +1092,6 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/inbox'
     | '/brief/$id'
-    | '/email/unsubscribe'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1170,7 +1127,6 @@ export interface FileRouteTypes {
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
-    | '/lovable/email/suppression'
     | '/dashboard'
     | '/help/$collection'
     | '/dashboard/admin/accuracy'
@@ -1199,9 +1155,7 @@ export interface FileRouteTypes {
     | '/api/public/insight-image/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
-    | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
@@ -1241,7 +1195,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
     | '/brief/$id'
-    | '/email/unsubscribe'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1277,7 +1230,6 @@ export interface FileRouteTypes {
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
-    | '/lovable/email/suppression'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
     | '/_authenticated/dashboard/admin/accuracy'
@@ -1306,9 +1258,7 @@ export interface FileRouteTypes {
     | '/api/public/insight-image/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
-    | '/lovable/email/transactional/send'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1347,13 +1297,11 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   BriefIdRoute: typeof BriefIdRoute
-  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   HelpIndexRoute: typeof HelpIndexRoute
   ApiPublicPodcastDotxmlRoute: typeof ApiPublicPodcastDotxmlRoute
   ApiPublicSignalsFeedRoute: typeof ApiPublicSignalsFeedRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
   LovableEmailEventsRoute: typeof LovableEmailEventsRoute
-  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   HelpCollectionIndexRoute: typeof HelpCollectionIndexRoute
   ApiPublicBriefAudioIdRoute: typeof ApiPublicBriefAudioIdRoute
   ApiPublicHooksAutoScanRoute: typeof ApiPublicHooksAutoScanRoute
@@ -1370,9 +1318,7 @@ export interface RootRouteChildren {
   ApiPublicInsightImageSplatRoute: typeof ApiPublicInsightImageSplatRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
-  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
-  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1734,13 +1680,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsSlugRouteImport
       parentRoute: typeof InsightsRoute
     }
-    '/email/unsubscribe': {
-      id: '/email/unsubscribe'
-      path: '/email/unsubscribe'
-      fullPath: '/email/unsubscribe'
-      preLoaderRoute: typeof EmailUnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/brief/$id': {
       id: '/brief/$id'
       path: '/brief/$id'
@@ -1775,13 +1714,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/lovable/email/suppression': {
-      id: '/lovable/email/suppression'
-      path: '/lovable/email/suppression'
-      fullPath: '/lovable/email/suppression'
-      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/events': {
       id: '/lovable/email/events'
@@ -1909,25 +1841,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAlertsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/lovable/email/transactional/send': {
-      id: '/lovable/email/transactional/send'
-      path: '/lovable/email/transactional/send'
-      fullPath: '/lovable/email/transactional/send'
-      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
       fullPath: '/lovable/email/transactional/preview'
       preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/auth/webhook': {
@@ -2309,13 +2227,11 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   BriefIdRoute: BriefIdRoute,
-  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   HelpIndexRoute: HelpIndexRoute,
   ApiPublicPodcastDotxmlRoute: ApiPublicPodcastDotxmlRoute,
   ApiPublicSignalsFeedRoute: ApiPublicSignalsFeedRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
   LovableEmailEventsRoute: LovableEmailEventsRoute,
-  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   HelpCollectionIndexRoute: HelpCollectionIndexRoute,
   ApiPublicBriefAudioIdRoute: ApiPublicBriefAudioIdRoute,
   ApiPublicHooksAutoScanRoute: ApiPublicHooksAutoScanRoute,
@@ -2334,9 +2250,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicInsightImageSplatRoute: ApiPublicInsightImageSplatRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
-  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
-  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
