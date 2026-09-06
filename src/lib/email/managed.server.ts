@@ -42,7 +42,7 @@ export async function sendManagedEmail(args: ManagedSendArgs): Promise<ManagedSe
         sender_domain: SENDER_DOMAIN,
         subject: args.subject,
         html: args.html,
-        text: args.text,
+        text: args.text ?? args.html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
         purpose: 'transactional',
         label: args.label,
         idempotency_key: args.idempotencyKey || crypto.randomUUID(),
