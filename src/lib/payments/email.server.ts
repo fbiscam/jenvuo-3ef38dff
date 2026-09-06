@@ -2,7 +2,6 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { networkMeta } from "./shared";
 
-const SENDER_DOMAIN = "notify.jenvu.com";
 const FROM = "Jenvu Billing <billing@notify.jenvu.com>";
 
 type OrderLike = {
@@ -82,31 +81,16 @@ export async function sendPaymentEmail(args: {
   }
 
   const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-  const messageId = crypto.randomUUID();
-
-  await supabaseAdmin.from("email_send_log").insert({
-    message_id: messageId,
-    template_name: `payment-${args.kind}`,
-    recipient_email: to,
-    status: "pending",
+  const { sendManagedEmailLogged } = await import("@/lib/email/managed.server");
+  const ok = await sendManagedEmailLogged(supabaseAdmin, {
+    to,
+    from: FROM,
+    subject,
+    html,
+    text,
+    label: `payment-${args.kind}`,
+    templateName: `payment-${args.kind}`,
+    idempotencyKey: `payment-${args.kind}-${args.order.id}`,
   });
-
-  const { error } = await supabaseAdmin.rpc("enqueue_email", {
-    queue_name: "transactional_emails",
-    payload: {
-      message_id: messageId,
-      to,
-      from: FROM,
-      sender_domain: SENDER_DOMAIN,
-      subject,
-      html,
-      text,
-      purpose: "transactional",
-      label: `payment-${args.kind}`,
-      idempotency_key: `payment-${args.kind}-${args.order.id}`,
-      queued_at: new Date().toISOString(),
-    } as never,
-  });
-  if (error) return { ok: false };
-  return { ok: true };
+  return { ok };
 }

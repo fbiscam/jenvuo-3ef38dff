@@ -2,7 +2,6 @@ import { createServerFn } from '@tanstack/react-start'
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
 import { z } from 'zod'
 
-const SENDER_DOMAIN = 'notify.jenvu.com'
 const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.com>'
 
 const BroadcastSchema = z.object({
@@ -284,41 +283,10 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       }
 
 
+      const { sendManagedEmailLogged } = await import('@/lib/email/managed.server')
+
       for (const { email } of recipients) {
         const normalized = email.toLowerCase()
-        const { data: suppressed } = await supabaseAdmin
-          .from('suppressed_emails')
-          .select('id')
-          .eq('email', normalized)
-          .maybeSingle()
-        if (suppressed) continue
-
-        let token: string | null = null
-        const { data: existing } = await supabaseAdmin
-          .from('email_unsubscribe_tokens')
-          .select('token, used_at')
-          .eq('email', normalized)
-          .maybeSingle()
-        if (existing && !existing.used_at) {
-          token = existing.token
-        } else if (!existing) {
-          const bytes = new Uint8Array(32)
-          crypto.getRandomValues(bytes)
-          token = Array.from(bytes)
-            .map((b) => b.toString(16).padStart(2, '0'))
-            .join('')
-          await supabaseAdmin
-            .from('email_unsubscribe_tokens')
-            .upsert({ token, email: normalized }, { onConflict: 'email', ignoreDuplicates: true })
-          const { data: stored } = await supabaseAdmin
-            .from('email_unsubscribe_tokens')
-            .select('token')
-            .eq('email', normalized)
-            .maybeSingle()
-          token = stored?.token ?? token
-        } else {
-          continue
-        }
 
         // Personalize this recipient's email with their risk-manager sizing
         const uid = emailToUserId.get(normalized)
@@ -338,35 +306,17 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
         const subject =
           typeof template.subject === 'function' ? template.subject(templateData) : template.subject
 
-        const messageId = crypto.randomUUID()
-        const idempotencyKey = `alert-${inserted.id}-${normalized}`
-
-        await supabaseAdmin.from('email_send_log').insert({
-          message_id: messageId,
-          template_name: 'signal-alert',
-          recipient_email: normalized,
-          status: 'pending',
+        const ok = await sendManagedEmailLogged(supabaseAdmin, {
+          to: normalized,
+          from: FROM,
+          subject,
+          html,
+          text,
+          label: 'signal-alert',
+          templateName: 'signal-alert',
+          idempotencyKey: `alert-${inserted.id}-${normalized}`,
         })
-
-
-        const { error: enqErr } = await supabaseAdmin.rpc('enqueue_email', {
-          queue_name: 'transactional_emails',
-          payload: {
-            message_id: messageId,
-            to: normalized,
-            from: FROM,
-            sender_domain: SENDER_DOMAIN,
-            subject,
-            html,
-            text,
-            purpose: 'transactional',
-            label: 'signal-alert',
-            idempotency_key: idempotencyKey,
-            unsubscribe_token: token,
-            queued_at: new Date().toISOString(),
-          },
-        })
-        if (!enqErr) enqueued++
+        if (ok) enqueued++
       }
     }
 

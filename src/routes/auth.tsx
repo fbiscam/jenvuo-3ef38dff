@@ -14,7 +14,7 @@ import {
 } from "@/lib/custom-auth.functions";
 import { applyReferralCode } from "@/lib/referrals.functions";
 import { registerTrustedDevice, verifyTrustedDevice } from "@/lib/trusted-devices.functions";
-import { sendTransactionalEmail } from "@/lib/email/send";
+import { sendWelcomeEmail } from "@/lib/email/welcome.functions";
 import { createUserNotification } from "@/lib/notifications.functions";
 
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
@@ -653,12 +653,9 @@ function AuthPage() {
     }
     toast.success("Email verified — welcome to Jenvu"); flashInfo("Email verified — welcome to Jenvu");
     // Fire-and-forget welcome email
-    void sendTransactionalEmail({
-      templateName: "welcome",
-      recipientEmail: email,
-      idempotencyKey: `welcome-${email.toLowerCase()}`,
-      templateData: { fullName, siteUrl: window.location.origin },
-    });
+    void sendWelcomeEmail({
+      data: { fullName, siteUrl: window.location.origin },
+    }).catch(() => {});
     // Mirror the welcome email as an in-app notification
     void createUserNotification({
       data: {

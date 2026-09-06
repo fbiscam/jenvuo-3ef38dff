@@ -35,7 +35,6 @@ interface Props {
   sizeRiskUsd?: string
   sizeBalance?: string
   sizeRiskPct?: string
-  unsubscribe_token?: string
 }
 
 const SITE = 'https://jenvu.com'
@@ -69,11 +68,7 @@ const Email = ({
   sizeRiskUsd,
   sizeBalance,
   sizeRiskPct,
-  unsubscribe_token,
 }: Props) => {
-  const unsubUrl = unsubscribe_token
-    ? `${SITE}/unsubscribe?token=${encodeURIComponent(unsubscribe_token)}`
-    : `${SITE}/unsubscribe`
   const dirColor = direction === 'BUY' ? '#059669' : '#dc2626'
   const hasSize = !!sizeLots
   return (
@@ -206,7 +201,6 @@ const Email = ({
               You're receiving this because you subscribed to A+ setup alerts at jenvu.com/signals-live.
             </Text>
             <Text style={footerMeta}>
-              <Link href={unsubUrl} style={unsubLink}>Unsubscribe</Link>
               {' · '}
               <Link href={`${SITE}/dashboard/notifications`} style={unsubLink}>Manage alerts</Link>
             </Text>

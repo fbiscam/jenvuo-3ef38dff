@@ -45,7 +45,6 @@ export type FoundingApplication = {
 
 const SUPPORT_INBOX = "support@jenvu.com";
 const FROM_ADDRESS = "Jenvu Founding <founding@jenvu.com>";
-const SENDER_DOMAIN = "notify.jenvu.com";
 const APP_URL = "https://jenvu.com";
 
 function escapeHtml(s: string) {
@@ -66,28 +65,6 @@ function htmlToText(html: string) {
     .replace(/&quot;/g, '"')
     .replace(/\n{3,}/g, "\n\n")
     .trim();
-}
-
-async function getOrCreateUnsubToken(admin: any, email: string): Promise<string> {
-  const normalized = email.toLowerCase();
-  const { data: existing } = await admin
-    .from("email_unsubscribe_tokens")
-    .select("token, used_at")
-    .eq("email", normalized)
-    .maybeSingle();
-  if (existing?.token && !existing.used_at) return existing.token as string;
-  const bytes = new Uint8Array(32);
-  crypto.getRandomValues(bytes);
-  const token = Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
-  await admin
-    .from("email_unsubscribe_tokens")
-    .upsert({ token, email: normalized }, { onConflict: "email", ignoreDuplicates: true });
-  const { data: stored } = await admin
-    .from("email_unsubscribe_tokens")
-    .select("token")
-    .eq("email", normalized)
-    .maybeSingle();
-  return (stored?.token as string) ?? token;
 }
 
 const PLAN_META: Record<string, { label: string; wallet: string; amount: string; blurb: string }> = {
@@ -319,30 +296,17 @@ async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: s
   const messageId = crypto.randomUUID();
   const idempotencyKey = dedupeKey ? `founding-${kind}-${dedupeKey}` : `founding-${kind}-${messageId}`;
   try {
-    const unsubscribeToken = await getOrCreateUnsubToken(admin, to);
-    await admin.from("email_send_log").insert({
-      message_id: messageId,
-      template_name: `founding-${kind}`,
-      recipient_email: to,
-      status: "pending",
-    });
-    await admin.rpc("enqueue_email", {
-      queue_name: "transactional_emails",
-      payload: {
-        message_id: messageId,
-        to,
-        from: FROM_ADDRESS,
-        sender_domain: SENDER_DOMAIN,
-        subject,
-        html,
-        text,
-        reply_to: SUPPORT_INBOX,
-        purpose: "transactional",
-        label: `founding-${kind}`,
-        idempotency_key: idempotencyKey,
-        unsubscribe_token: unsubscribeToken,
-        queued_at: new Date().toISOString(),
-      },
+    const { sendManagedEmailLogged } = await import("@/lib/email/managed.server");
+    await sendManagedEmailLogged(admin, {
+      to,
+      from: FROM_ADDRESS,
+      subject,
+      html,
+      text,
+      label: `founding-${kind}`,
+      templateName: `founding-${kind}`,
+      idempotencyKey,
+      replyTo: SUPPORT_INBOX,
     });
   } catch (e) {
     console.error(`[founding] applicant email (${kind}) failed:`, (e as Error)?.message);
@@ -444,30 +408,17 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
           </div></body></html>`;
         const text = `New founding application\n\n${data.full_name} <${data.email}>\nWhatsApp: ${data.whatsapp_number}\nRequested plan: ${data.requested_plan.toUpperCase()}\nCountry: ${data.country || "—"}\nBroker: ${data.broker || "—"}\nExperience: ${data.experience_years ?? "—"} yrs\nMonthly volume: $${data.monthly_volume_usd ?? "—"}\nMyFxBook: ${data.myfxbook_url || "—"}\n\n${data.why_joining}`;
         const messageId = crypto.randomUUID();
-        const adminUnsubToken = await getOrCreateUnsubToken(admin, SUPPORT_INBOX);
-        await admin.from("email_send_log").insert({
-          message_id: messageId,
-          template_name: "founding-application",
-          recipient_email: SUPPORT_INBOX,
-          status: "pending",
-        });
-        await admin.rpc("enqueue_email", {
-          queue_name: "transactional_emails",
-          payload: {
-            message_id: messageId,
-            to: SUPPORT_INBOX,
-            from: FROM_ADDRESS,
-            sender_domain: SENDER_DOMAIN,
-            subject: `[Founding] ${data.full_name} — ${data.requested_plan.toUpperCase()}`,
-            html,
-            text,
-            reply_to: data.email,
-            purpose: "transactional",
-            label: "founding-application",
-            idempotency_key: `founding-${messageId}`,
-            unsubscribe_token: adminUnsubToken,
-            queued_at: new Date().toISOString(),
-          },
+        const { sendManagedEmailLogged } = await import("@/lib/email/managed.server");
+        await sendManagedEmailLogged(admin, {
+          to: SUPPORT_INBOX,
+          from: FROM_ADDRESS,
+          subject: `[Founding] ${data.full_name} — ${data.requested_plan.toUpperCase()}`,
+          html,
+          text,
+          label: "founding-application",
+          templateName: "founding-application",
+          idempotencyKey: `founding-${messageId}`,
+          replyTo: data.email,
         });
       } catch (e) {
         console.error("[founding] notify failed:", (e as Error)?.message);

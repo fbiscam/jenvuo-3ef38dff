@@ -1,16 +1,16 @@
 import * as React from 'react'
+
 import {
   Body,
+  Button,
   Container,
+  Head,
   Heading,
-  Hr,
   Html,
   Link,
   Preview,
-  Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s, COLORS, MONO } from './_shared'
 
 interface SignupEmailProps {
   siteName: string
@@ -28,91 +28,82 @@ export const SignupEmail = ({
   confirmationUrl,
   token,
   showLink = true,
-}: SignupEmailProps) => {
-  const code = token || '••••••'
-  return (
-    <Html lang="en" dir="ltr">
-      <EmailHead />
-      <Preview>Your Jenvu verification code: {code} — activate your desk.</Preview>
-      <Body style={s.main}>
-        <Container style={s.container}>
-          <LogoHeader tagline="JENVU · AUTH SESSION" />
-          <Section style={s.card}>
-            <Text style={s.eyebrow}>VERIFY_EMAIL // ACTIVATE_DESK</Text>
-            <Heading as="h1" style={s.h1}>
-              Confirm your desk.
-            </Heading>
-            <Text style={s.text}>
-              Welcome to <strong style={{ color: COLORS.ink }}>{siteName}</strong>.
-              Enter the 6-digit code below on the sign-up screen to activate
-              voice-native institutional intelligence for{' '}
-              <span style={mono}>{recipient}</span>.
-            </Text>
-
-            <Section style={s.codeBox}>
-              <Text style={s.codeLabel}>YOUR VERIFICATION CODE</Text>
-              <Text style={s.codeValue}>{code}</Text>
-              <Text style={s.codeExpiry}>Expires in 15 minutes · One-time use</Text>
-            </Section>
-
-            <Text style={stepsHeading}>HOW TO USE</Text>
-            <Text style={step}>
-              <strong style={stepNum}>1.</strong> Return to the JENVU sign-up tab.
-            </Text>
-            <Text style={step}>
-              <strong style={stepNum}>2.</strong> Enter the 6-digit code above.
-            </Text>
-            <Text style={step}>
-              <strong style={stepNum}>3.</strong> Your desk activates — no link required.
-            </Text>
-
-            {showLink && (
-              <>
-                <Hr style={s.hr} />
-
-                <Text style={stepsHeading}>OR ONE-TAP LINK</Text>
-                <Text style={s.text}>
-                  Prefer a link? Tap below to verify and open your desk directly.
-                </Text>
-                <Link href={confirmationUrl} style={s.button}>
-                  Verify & Open Desk →
-                </Link>
-              </>
-            )}
-
-            <Hr style={s.hr} />
-
-            <Text style={s.footer}>
-              Didn't sign up? Ignore this email — no account is created without a verified code.
-            </Text>
-
-            <Text style={s.legal}>
-              JENVU · Voice-native gold trading intelligence · {siteUrl.replace(/^https?:\/\//, '')}
-            </Text>
-          </Section>
-        </Container>
-      </Body>
-    </Html>
-  )
-}
+}: SignupEmailProps) => (
+  <Html lang="en" dir="ltr">
+    <Head>
+      <style>{darkModeCss}</style>
+    </Head>
+    <Preview>Confirm your email for {siteName}</Preview>
+    <Body style={main}>
+      <Container style={container}>
+        <Heading style={h1}>Confirm your email</Heading>
+        <Text style={text}>
+          Thanks for signing up for{' '}
+          <Link href={siteUrl} style={link}>
+            <strong>{siteName}</strong>
+          </Link>
+          !
+        </Text>
+        <Text style={text}>
+          Please confirm your email address (
+          <Link href={`mailto:${recipient}`} style={link}>
+            {recipient}
+          </Link>
+          ){token ? ' using the code below:' : ' by clicking the button below:'}
+        </Text>
+        {token ? <Text style={codeStyle}>{token}</Text> : null}
+        {showLink ? (
+          <Button className="dm-btn" style={button} href={confirmationUrl}>
+            Verify Email
+          </Button>
+        ) : null}
+        <Text style={footer}>
+          If you didn't create an account, you can safely ignore this email.
+        </Text>
+      </Container>
+    </Body>
+  </Html>
+)
 
 export default SignupEmail
 
-const mono = { color: COLORS.muted, fontFamily: MONO, fontSize: '13px' }
-const stepsHeading = {
-  fontFamily: MONO,
-  fontSize: '10px',
-  fontWeight: 700 as const,
-  letterSpacing: '0.2em',
-  color: COLORS.muted,
-  textTransform: 'uppercase' as const,
-  margin: '4px 0 10px',
+const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
+const container = { padding: '20px 25px' }
+const h1 = {
+  fontSize: '22px',
+  fontWeight: 'bold' as const,
+  color: '#000000',
+  margin: '0 0 20px',
 }
-const step = {
-  fontFamily: "'Google Sans','Google Sans Normal',Arial,sans-serif",
+const text = {
   fontSize: '14px',
-  color: '#3f3f46',
-  lineHeight: '1.6',
-  margin: '0 0 6px',
+  color: '#55575d',
+  lineHeight: '1.5',
+  margin: '0 0 25px',
 }
-const stepNum = { fontFamily: MONO, color: COLORS.ink, marginRight: '6px' }
+const link = { color: 'inherit', textDecoration: 'underline' }
+const button = {
+  backgroundColor: '#000000',
+  color: '#ffffff',
+  fontSize: '14px',
+  border: '1px solid #000000',
+  borderRadius: '8px',
+  padding: '12px 20px',
+  textDecoration: 'none',
+}
+const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+// Rendered as a text child, which React may HTML-escape: keep this CSS free of >, &, and quotes.
+const darkModeCss = `
+  @media (prefers-color-scheme: dark) {
+    .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+  }
+  [data-ogsc] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+  [data-ogsb] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+`
+const codeStyle = {
+  fontSize: '28px',
+  fontWeight: 'bold' as const,
+  letterSpacing: '6px',
+  color: '#000000',
+  margin: '0 0 25px',
+}

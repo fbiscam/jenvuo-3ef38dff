@@ -1,85 +1,95 @@
 import * as React from 'react'
+
 import {
   Body,
+  Button,
   Container,
+  Head,
   Heading,
   Html,
-  Link,
   Preview,
-  Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s, COLORS } from './_shared'
 
 interface RecoveryEmailProps {
   siteName: string
   confirmationUrl: string
-  token?: string
   recipient?: string
+  token?: string
   showLink?: boolean
-  showCode?: boolean
 }
 
 export const RecoveryEmail = ({
   siteName,
   confirmationUrl,
   token,
-  recipient,
   showLink = true,
-  showCode,
-}: RecoveryEmailProps) => {
-  const code = token || '••••••'
-  const displayCode = showCode ?? Boolean(token)
-  const bodyLine = displayCode && showLink
-    ? 'Click the button below to open the reset page, or use the 6-digit code.'
-    : displayCode
-      ? 'Use the 6-digit code below on the reset screen.'
-      : 'Click the button below to open the reset page and choose a new password.'
-  return (
-    <Html lang="en" dir="ltr">
-      <EmailHead />
-      <Preview>Reset your {siteName} password{displayCode ? ` · code ${code}` : ''}</Preview>
-      <Body style={s.main}>
-        <Container style={s.container}>
-          <LogoHeader tagline="JENVU · PASSWORD RESET" />
-          <Section style={s.card}>
-            <Text style={s.eyebrow}>SECURITY // PASSWORD_RESET</Text>
-            <Heading as="h1" style={s.h1}>
-              Reset your password.
-            </Heading>
-            <Text style={s.text}>
-              We received a request to reset the password for{' '}
-              <strong style={{ color: COLORS.ink }}>
-                {recipient || 'your account'}
-              </strong>
-              . {bodyLine}
-            </Text>
-
-            {showLink && (
-              <Link href={confirmationUrl} style={s.button}>
-                Reset your password →
-              </Link>
-            )}
-
-            {displayCode && (
-              <Section style={s.codeBox}>
-                <Text style={s.codeLabel}>RESET CODE</Text>
-                <Text style={s.codeValue}>{code}</Text>
-                <Text style={s.codeExpiry}>Expires in 15 minutes · One-time use</Text>
-              </Section>
-            )}
-
-
-
-            <Text style={{ ...s.footer, marginTop: '24px' }}>
-              Didn't request this? Ignore this email — your password stays the same.
-            </Text>
-
-          </Section>
-        </Container>
-      </Body>
-    </Html>
-  )
-}
+}: RecoveryEmailProps) => (
+  <Html lang="en" dir="ltr">
+    <Head>
+      <style>{darkModeCss}</style>
+    </Head>
+    <Preview>Reset your password for {siteName}</Preview>
+    <Body style={main}>
+      <Container style={container}>
+        <Heading style={h1}>Reset your password</Heading>
+        <Text style={text}>
+          We received a request to reset your password for {siteName}. Click
+          the button below to choose a new password.
+        </Text>
+        {token ? <Text style={codeStyle}>{token}</Text> : null}
+        {showLink ? (
+          <Button className="dm-btn" style={button} href={confirmationUrl}>
+            Reset Password
+          </Button>
+        ) : null}
+        <Text style={footer}>
+          If you didn't request a password reset, you can safely ignore this
+          email. Your password will not be changed.
+        </Text>
+      </Container>
+    </Body>
+  </Html>
+)
 
 export default RecoveryEmail
+
+const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
+const container = { padding: '20px 25px' }
+const h1 = {
+  fontSize: '22px',
+  fontWeight: 'bold' as const,
+  color: '#000000',
+  margin: '0 0 20px',
+}
+const text = {
+  fontSize: '14px',
+  color: '#55575d',
+  lineHeight: '1.5',
+  margin: '0 0 25px',
+}
+const button = {
+  backgroundColor: '#000000',
+  color: '#ffffff',
+  fontSize: '14px',
+  border: '1px solid #000000',
+  borderRadius: '8px',
+  padding: '12px 20px',
+  textDecoration: 'none',
+}
+const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+// Rendered as a text child, which React may HTML-escape: keep this CSS free of >, &, and quotes.
+const darkModeCss = `
+  @media (prefers-color-scheme: dark) {
+    .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+  }
+  [data-ogsc] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+  [data-ogsb] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+`
+const codeStyle = {
+  fontSize: '28px',
+  fontWeight: 'bold' as const,
+  letterSpacing: '6px',
+  color: '#000000',
+  margin: '0 0 25px',
+}

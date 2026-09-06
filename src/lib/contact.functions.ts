@@ -14,7 +14,6 @@ export type ContactInputType = z.infer<typeof ContactInput>;
 
 const SUPPORT_INBOX = "support@jenvu.com";
 const FROM_ADDRESS = "Jenvu Contact <contact@jenvu.com>";
-const SENDER_DOMAIN = "notify.jenvu.com";
 
 function escapeHtml(s: string): string {
   return s
@@ -79,29 +78,17 @@ export const submitContactMessage = createServerFn({ method: "POST" })
           auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
         });
         const { html, text } = buildNotification(data);
-        const messageId = crypto.randomUUID();
-        await admin.from("email_send_log").insert({
-          message_id: messageId,
-          template_name: "contact-notification",
-          recipient_email: SUPPORT_INBOX,
-          status: "pending",
-        });
-        await admin.rpc("enqueue_email", {
-          queue_name: "transactional_emails",
-          payload: {
-            message_id: messageId,
-            to: SUPPORT_INBOX,
-            from: FROM_ADDRESS,
-            sender_domain: SENDER_DOMAIN,
-            subject: `[Contact] ${data.subject}`,
-            html,
-            text,
-            reply_to: data.email,
-            purpose: "transactional",
-            label: "contact-notification",
-            idempotency_key: `contact-${messageId}`,
-            queued_at: new Date().toISOString(),
-          },
+        const { sendManagedEmailLogged } = await import("@/lib/email/managed.server");
+        await sendManagedEmailLogged(admin, {
+          to: SUPPORT_INBOX,
+          from: FROM_ADDRESS,
+          subject: `[Contact] ${data.subject}`,
+          html,
+          text,
+          label: "contact-notification",
+          templateName: "contact-notification",
+          idempotencyKey: `contact-${crypto.randomUUID()}`,
+          replyTo: data.email,
         });
       } catch (e) {
         console.error("[contact] notify enqueue failed:", (e as Error)?.message);
