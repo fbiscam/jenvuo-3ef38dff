@@ -2,7 +2,6 @@
 // Used by manual admin broadcast and auto-scan cron.
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
 
-const SENDER_DOMAIN = 'notify.jenvu.com'
 const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.com>'
 
 export interface EnqueueAlertEmailsArgs {
@@ -112,41 +111,6 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
   const perRecipient = async (email: string): Promise<boolean> => {
     try {
       const normalized = email.toLowerCase()
-      const { data: suppressed } = await supabaseAdmin
-        .from('suppressed_emails')
-        .select('id')
-        .eq('email', normalized)
-        .maybeSingle()
-      if (suppressed) return false
-
-      let token: string | null = null
-      const { data: existing } = await supabaseAdmin
-        .from('email_unsubscribe_tokens')
-        .select('token, used_at')
-        .eq('email', normalized)
-        .maybeSingle()
-      if (existing && !existing.used_at) {
-        token = existing.token
-      } else if (!existing) {
-        const bytes = new Uint8Array(32)
-        crypto.getRandomValues(bytes)
-        token = Array.from(bytes)
-          .map((b) => b.toString(16).padStart(2, '0'))
-          .join('')
-        await supabaseAdmin
-          .from('email_unsubscribe_tokens')
-          .upsert({ token, email: normalized }, { onConflict: 'email', ignoreDuplicates: true })
-        const { data: stored } = await supabaseAdmin
-          .from('email_unsubscribe_tokens')
-          .select('token')
-          .eq('email', normalized)
-          .maybeSingle()
-        token = stored?.token ?? token
-      } else {
-        // Token exists but was used (user unsubscribed) → skip.
-        return false
-      }
-
       const personal = riskByEmail.get(normalized)
       const size = personal?.size ?? null
       const templateData = {
@@ -156,7 +120,6 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
         sizeRiskUsd: size ? size.riskUsd.toFixed(2) : undefined,
         sizeBalance: personal ? personal.balance.toFixed(2) : undefined,
         sizeRiskPct: personal ? personal.riskPct.toFixed(2) : undefined,
-        unsubscribe_token: token,
       }
       const element = React.createElement(template.component, templateData)
       const html = await render(element)
@@ -164,36 +127,19 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
       const subject =
         typeof template.subject === 'function' ? template.subject(templateData) : template.subject
 
-      const messageId = crypto.randomUUID()
-      const idempotencyKey = `alert-${a.alertId}-${normalized}`
-
-      await supabaseAdmin.from('email_send_log').insert({
-        message_id: messageId,
-        template_name: 'signal-alert',
-        recipient_email: normalized,
-        status: 'pending',
+      const { sendManagedEmailLogged } = await import('@/lib/email/managed.server')
+      return await sendManagedEmailLogged(supabaseAdmin, {
+        to: normalized,
+        from: FROM,
+        subject,
+        html,
+        text,
+        label: 'signal-alert',
+        templateName: 'signal-alert',
+        idempotencyKey: `alert-${a.alertId}-${normalized}`,
       })
-
-      const { error: enqErr } = await supabaseAdmin.rpc('enqueue_email', {
-        queue_name: 'transactional_emails',
-        payload: {
-          message_id: messageId,
-          to: normalized,
-          from: FROM,
-          sender_domain: SENDER_DOMAIN,
-          subject,
-          html,
-          text,
-          purpose: 'transactional',
-          label: 'signal-alert',
-          idempotency_key: idempotencyKey,
-          unsubscribe_token: token,
-          queued_at: new Date().toISOString(),
-        },
-      })
-      return !enqErr
     } catch (err) {
-      console.error('signal-alert enqueue failed for', email, (err as Error)?.message)
+      console.error('signal-alert send failed for', email, (err as Error)?.message)
       return false
     }
   }
