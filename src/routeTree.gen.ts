@@ -67,6 +67,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as LeadsAdminUsersRouteImport } from './routes/leads.admin.users'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
 import { Route as ApiPublicSignalsFeedRouteImport } from './routes/api/public/signals-feed'
@@ -402,6 +403,11 @@ const AuthenticatedDashboardIndexRoute =
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailEventsRoute = LovableEmailEventsRouteImport.update({
+  id: '/lovable/email/events',
+  path: '/lovable/email/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeadsAdminUsersRoute = LeadsAdminUsersRouteImport.update({
@@ -745,6 +751,7 @@ export interface FileRoutesByFullPath {
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
@@ -845,6 +852,7 @@ export interface FileRoutesByTo {
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
@@ -952,6 +960,7 @@ export interface FileRoutesById {
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
@@ -1059,6 +1068,7 @@ export interface FileRouteTypes {
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
     | '/leads/admin/users'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/dashboard/'
     | '/help/$collection/'
@@ -1159,6 +1169,7 @@ export interface FileRouteTypes {
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
     | '/leads/admin/users'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/dashboard'
     | '/help/$collection'
@@ -1265,6 +1276,7 @@ export interface FileRouteTypes {
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
     | '/leads/admin/users'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
@@ -1340,6 +1352,7 @@ export interface RootRouteChildren {
   ApiPublicPodcastDotxmlRoute: typeof ApiPublicPodcastDotxmlRoute
   ApiPublicSignalsFeedRoute: typeof ApiPublicSignalsFeedRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
+  LovableEmailEventsRoute: typeof LovableEmailEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   HelpCollectionIndexRoute: typeof HelpCollectionIndexRoute
   ApiPublicBriefAudioIdRoute: typeof ApiPublicBriefAudioIdRoute
@@ -1768,6 +1781,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/events': {
+      id: '/lovable/email/events'
+      path: '/lovable/email/events'
+      fullPath: '/lovable/email/events'
+      preLoaderRoute: typeof LovableEmailEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leads/admin/users': {
@@ -2294,6 +2314,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicPodcastDotxmlRoute: ApiPublicPodcastDotxmlRoute,
   ApiPublicSignalsFeedRoute: ApiPublicSignalsFeedRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
+  LovableEmailEventsRoute: LovableEmailEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   HelpCollectionIndexRoute: HelpCollectionIndexRoute,
   ApiPublicBriefAudioIdRoute: ApiPublicBriefAudioIdRoute,
