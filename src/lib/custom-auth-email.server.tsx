@@ -24,30 +24,6 @@ function generateUnsubToken(): string {
   return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-async function getOrCreateUnsubscribeToken(
-  supabaseAdmin: any,
-  email: string,
-): Promise<string> {
-  const normalized = email.toLowerCase()
-  const { data: existing } = await supabaseAdmin
-    .from('email_unsubscribe_tokens')
-    .select('token, used_at')
-    .eq('email', normalized)
-    .maybeSingle()
-  if (existing && !existing.used_at) return existing.token
-  if (existing && existing.used_at) return existing.token
-
-  const token = generateUnsubToken()
-  await supabaseAdmin
-    .from('email_unsubscribe_tokens')
-    .upsert({ token, email: normalized }, { onConflict: 'email', ignoreDuplicates: true })
-  const { data: stored } = await supabaseAdmin
-    .from('email_unsubscribe_tokens')
-    .select('token')
-    .eq('email', normalized)
-    .maybeSingle()
-  return stored?.token ?? token
-}
 
 export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomAuthEmailInput) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
@@ -83,8 +59,6 @@ export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomA
   const text = await render(element, { plainText: true })
   const subject = type === 'signup' ? 'Confirm your email' : 'Reset your password'
 
-  const unsubscribeToken = await getOrCreateUnsubscribeToken(supabaseAdmin, to)
-
   await supabaseAdmin.from('email_send_log').insert({
     message_id: messageId,
     template_name: type,
@@ -109,7 +83,6 @@ export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomA
         purpose: 'transactional',
         label: type,
         idempotency_key: idempotencyKey,
-        unsubscribe_token: unsubscribeToken,
       },
 
 
