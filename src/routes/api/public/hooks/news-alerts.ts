@@ -174,80 +174,21 @@ export const Route = createFileRoute('/api/public/hooks/news-alerts')({
                 ? template.subject(templateData)
                 : template.subject
 
+            const { sendManagedEmailLogged } = await import('@/lib/email/managed.server')
             for (const uid of emailIds) {
               const normalized = emailById.get(uid)
               if (!normalized) continue
-
-              const { data: suppressed } = await admin
-                .from('suppressed_emails')
-                .select('id')
-                .eq('email', normalized)
-                .maybeSingle()
-              if (suppressed) continue
-
-              let token: string | null = null
-              const { data: existing } = await admin
-                .from('email_unsubscribe_tokens')
-                .select('token, used_at')
-                .eq('email', normalized)
-                .maybeSingle()
-              if (existing && !existing.used_at) {
-                token = existing.token
-              } else if (!existing) {
-                const bytes = new Uint8Array(32)
-                crypto.getRandomValues(bytes)
-                token = Array.from(bytes)
-                  .map((b) => b.toString(16).padStart(2, '0'))
-                  .join('')
-                await admin
-                  .from('email_unsubscribe_tokens')
-                  .upsert({ token, email: normalized }, { onConflict: 'email', ignoreDuplicates: true })
-                const { data: stored } = await admin
-                  .from('email_unsubscribe_tokens')
-                  .select('token')
-                  .eq('email', normalized)
-                  .maybeSingle()
-                token = stored?.token ?? token
-              } else {
-                continue
-              }
-
-              const messageId = crypto.randomUUID()
-              await admin.from('email_send_log').insert({
-                message_id: messageId,
-                template_name: 'news-event',
-                recipient_email: normalized,
-                status: 'pending',
+              const ok = await sendManagedEmailLogged(admin, {
+                to: normalized,
+                from: FROM,
+                subject,
+                html,
+                text,
+                label: 'news-event',
+                templateName: 'news-event',
+                idempotencyKey: `news-${eventKey}-${normalized}`.slice(0, 200),
               })
-
-              const { error: enqueueError } = await admin.rpc('enqueue_email', {
-                queue_name: 'transactional_emails',
-                payload: {
-                  message_id: messageId,
-                  to: normalized,
-                  from: FROM,
-                  sender_domain: SENDER_DOMAIN,
-                  subject,
-                  html,
-                  text,
-                  purpose: 'transactional',
-                  label: 'news-event',
-                  idempotency_key: `news-${eventKey}-${normalized}`.slice(0, 200),
-                  unsubscribe_token: token,
-                  queued_at: new Date().toISOString(),
-                },
-              })
-              if (enqueueError) {
-                await admin.from('email_send_log').insert({
-                  message_id: messageId,
-                  template_name: 'news-event',
-                  recipient_email: normalized,
-                  status: 'failed',
-                  error_message: enqueueError.message ?? 'enqueue_failed',
-                })
-              } else {
-                enqueued++
-              }
+              if (ok) enqueued++
             }
           }
 
