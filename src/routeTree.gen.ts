@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalsLiveRouteImport } from './routes/signals-live'
@@ -111,11 +110,6 @@ import { Route as AuthenticatedDashboardAdminBugsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardAdminAutoScanRouteImport } from './routes/_authenticated/dashboard.admin.auto-scan'
 import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './routes/_authenticated/dashboard.admin.accuracy'
 
-const UnsubscribeRoute = UnsubscribeRouteImport.update({
-  id: '/unsubscribe',
-  path: '/unsubscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -686,7 +680,6 @@ export interface FileRoutesByFullPath {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
-  '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
@@ -784,7 +777,6 @@ export interface FileRoutesByTo {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
-  '/unsubscribe': typeof UnsubscribeRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
   '/insights/$slug': typeof InsightsSlugRoute
@@ -887,7 +879,6 @@ export interface FileRoutesById {
   '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
-  '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/brief/$id': typeof BriefIdRoute
@@ -991,7 +982,6 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
-    | '/unsubscribe'
     | '/dashboard'
     | '/inbox'
     | '/brief/$id'
@@ -1089,7 +1079,6 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
-    | '/unsubscribe'
     | '/inbox'
     | '/brief/$id'
     | '/insights/$slug'
@@ -1191,7 +1180,6 @@ export interface FileRouteTypes {
     | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
-    | '/unsubscribe'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
     | '/brief/$id'
@@ -1295,7 +1283,6 @@ export interface RootRouteChildren {
   SignalsLiveRoute: typeof SignalsLiveRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
-  UnsubscribeRoute: typeof UnsubscribeRoute
   BriefIdRoute: typeof BriefIdRoute
   HelpIndexRoute: typeof HelpIndexRoute
   ApiPublicPodcastDotxmlRoute: typeof ApiPublicPodcastDotxmlRoute
@@ -1323,13 +1310,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/unsubscribe': {
-      id: '/unsubscribe'
-      path: '/unsubscribe'
-      fullPath: '/unsubscribe'
-      preLoaderRoute: typeof UnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -2225,7 +2205,6 @@ const rootRouteChildren: RootRouteChildren = {
   SignalsLiveRoute: SignalsLiveRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
-  UnsubscribeRoute: UnsubscribeRoute,
   BriefIdRoute: BriefIdRoute,
   HelpIndexRoute: HelpIndexRoute,
   ApiPublicPodcastDotxmlRoute: ApiPublicPodcastDotxmlRoute,
