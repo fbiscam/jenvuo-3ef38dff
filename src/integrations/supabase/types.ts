@@ -3301,15 +3301,6 @@ export type Database = {
         }[]
       }
       current_profile_plan: { Args: { _user_id: string }; Returns: string }
-      delete_email: {
-        Args: { message_id: number; queue_name: string }
-        Returns: boolean
-      }
-      email_queue_dispatch: { Args: never; Returns: undefined }
-      enqueue_email: {
-        Args: { payload: Json; queue_name: string }
-        Returns: number
-      }
       error_fingerprint: {
         Args: { _message: string; _stack: string }
         Returns: string
@@ -3445,15 +3436,6 @@ export type Database = {
         Returns: string
       }
       mark_chat_read: { Args: { _session_id: string }; Returns: undefined }
-      move_to_dlq: {
-        Args: {
-          dlq_name: string
-          message_id: number
-          payload: Json
-          source_queue: string
-        }
-        Returns: number
-      }
       post_admin_message: {
         Args: { _content: string; _session_id: string }
         Returns: string
@@ -3461,14 +3443,6 @@ export type Database = {
       post_guest_message: {
         Args: { _content: string; _token: string }
         Returns: string
-      }
-      read_email_batch: {
-        Args: { batch_size: number; queue_name: string; vt: number }
-        Returns: {
-          message: Json
-          msg_id: number
-          read_ct: number
-        }[]
       }
       resync_all_credit_lots: { Args: never; Returns: number }
       revoke_pro_trial: {

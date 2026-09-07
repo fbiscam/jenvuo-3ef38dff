@@ -34,10 +34,18 @@ export const RecoveryEmail = ({
       <Container style={container}>
         <Heading style={h1}>Reset your password</Heading>
         <Text style={text}>
-          We received a request to reset your password for {siteName}. Click
-          the button below to choose a new password.
+          We received a request to reset your password for {siteName}.{' '}
+          {showLink
+            ? 'Click the button below to choose a new password.'
+            : 'Enter the reset code below on the password reset page to choose a new password.'}
         </Text>
-        {token ? <Text style={codeStyle}>{token}</Text> : null}
+        {token ? (
+          <>
+            <Text style={codeLabel}>RESET CODE</Text>
+            <Text style={codeStyle}>{token}</Text>
+            <Text style={text}>This code expires in 15 minutes.</Text>
+          </>
+        ) : null}
         {showLink ? (
           <Button className="dm-btn" style={button} href={confirmationUrl}>
             Reset Password
@@ -92,4 +100,11 @@ const codeStyle = {
   letterSpacing: '6px',
   color: '#000000',
   margin: '0 0 25px',
+}
+const codeLabel = {
+  fontSize: '11px',
+  fontWeight: 'bold' as const,
+  letterSpacing: '2px',
+  color: '#999999',
+  margin: '0 0 6px',
 }
