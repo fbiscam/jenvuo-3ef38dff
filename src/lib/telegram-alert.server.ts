@@ -105,9 +105,24 @@ export async function sendTelegramMessage(chatId: string, text: string): Promise
   }
 }
 
+/** Chat IDs of users who connected their own Telegram account. */
+async function userChatIds(): Promise<string[]> {
+  try {
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+    const { data } = await (supabaseAdmin as any)
+      .from('telegram_alert_links')
+      .select('chat_id')
+      .eq('telegram_enabled', true)
+      .not('verified_at', 'is', null)
+    return ((data ?? []) as { chat_id: string }[]).map((r) => String(r.chat_id))
+  } catch {
+    return []
+  }
+}
+
 /** Broadcast a signal to every configured Telegram chat. Never throws. */
 export async function sendSignalAlertTelegram(a: TelegramSignal): Promise<{ sent: number }> {
-  const ids = chatIds()
+  const ids = Array.from(new Set([...chatIds(), ...(await userChatIds())]))
   if (ids.length === 0) {
     console.warn('[Telegram] no TELEGRAM_CHAT_IDS configured — skipping broadcast')
     return { sent: 0 }
