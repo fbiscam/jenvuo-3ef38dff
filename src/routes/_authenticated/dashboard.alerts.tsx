@@ -124,6 +124,108 @@ function AlertPrefs() {
   const phoneValid = /^\+?\d{10,18}$/.test(whatsappPhone.trim());
   const canConnectWhatsapp = phoneValid && !whatsappSaving;
 
+  const getTelegramLinkFn = useServerFn(getTelegramAlertLink);
+  const connectTelegramFn = useServerFn(connectTelegramAlertLink);
+  const verifyTelegramFn = useServerFn(verifyTelegramAlertCode);
+  const setTelegramEnabledFn = useServerFn(setTelegramAlertEnabled);
+  const disconnectTelegramFn = useServerFn(disconnectTelegramAlertLink);
+
+  const [tgChatId, setTgChatId] = useState("");
+  const [tgLinked, setTgLinked] = useState(false);
+  const [tgEnabled, setTgEnabled] = useState(true);
+  const [tgVerifiedAt, setTgVerifiedAt] = useState<string | null>(null);
+  const [tgError, setTgError] = useState<string | null>(null);
+  const [tgSaving, setTgSaving] = useState(false);
+  const [tgPending, setTgPending] = useState(false);
+  const [tgCode, setTgCode] = useState("");
+  const [tgDisconnectOpen, setTgDisconnectOpen] = useState(false);
+  const tgChatIdValid = /^-?\d{3,20}$/.test(tgChatId.trim());
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await getTelegramLinkFn({});
+        setTgLinked(!!r.linked);
+        setTgChatId(r.chatId ?? "");
+        setTgEnabled(r.enabled !== false);
+        setTgVerifiedAt(r.verifiedAt ?? null);
+        setTgError(r.lastError ?? null);
+        setTgPending(!!r.pendingVerification);
+      } catch {
+        setTgError("Could not load Telegram settings");
+      }
+    })();
+  }, [getTelegramLinkFn]);
+
+  const connectTelegram = useCallback(async () => {
+    if (!tgChatIdValid || tgSaving) return;
+    setTgSaving(true);
+    setTgError(null);
+    try {
+      await connectTelegramFn({ data: { chatId: tgChatId.trim() } });
+      setTgPending(true);
+      toast.success("Code sent on Telegram", { description: "Enter the 6-digit code to activate alerts." });
+    } catch (e: any) {
+      const message = e?.message ?? "Could not connect Telegram";
+      setTgError(message);
+      toast.error("Telegram connect failed", { description: message });
+    } finally {
+      setTgSaving(false);
+    }
+  }, [connectTelegramFn, tgChatId, tgChatIdValid, tgSaving]);
+
+  const verifyTelegram = useCallback(async () => {
+    if (tgSaving) return;
+    setTgSaving(true);
+    setTgError(null);
+    try {
+      await verifyTelegramFn({ data: { code: tgCode.trim() } });
+      setTgLinked(true);
+      setTgEnabled(true);
+      setTgPending(false);
+      setTgCode("");
+      setTgVerifiedAt(new Date().toISOString());
+      toast.success("Telegram verified", { description: "Signal alerts will now arrive on Telegram." });
+    } catch (e: any) {
+      const message = e?.message ?? "Could not verify code";
+      setTgError(message);
+      toast.error("Verification failed", { description: message });
+    } finally {
+      setTgSaving(false);
+    }
+  }, [tgCode, tgSaving, verifyTelegramFn]);
+
+  const toggleTelegram = useCallback(async (enabled: boolean) => {
+    setTgSaving(true);
+    try {
+      await setTelegramEnabledFn({ data: { enabled } });
+      setTgEnabled(enabled);
+      toast.success(enabled ? "Telegram alerts enabled" : "Telegram alerts disabled");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not update Telegram");
+    } finally {
+      setTgSaving(false);
+    }
+  }, [setTelegramEnabledFn]);
+
+  const disconnectTelegram = useCallback(async () => {
+    setTgSaving(true);
+    try {
+      await disconnectTelegramFn({});
+      setTgLinked(false);
+      setTgEnabled(false);
+      setTgPending(false);
+      setTgVerifiedAt(null);
+      setTgChatId("");
+      toast.success("Telegram disconnected");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not disconnect Telegram");
+    } finally {
+      setTgSaving(false);
+      setTgDisconnectOpen(false);
+    }
+  }, [disconnectTelegramFn]);
+
   const [risk, setRisk] = useState<{ balance: number; pct: number } | null>(null);
   useEffect(() => {
     let cancelled = false;
