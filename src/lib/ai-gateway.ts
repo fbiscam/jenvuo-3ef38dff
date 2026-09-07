@@ -495,10 +495,10 @@ export const SENIOR_REVIEW_CHAIN = SENIOR_REVIEW_BMIND_4O;
 // never rubber-stamps its own answer. This stage is ENRICHMENT ONLY — it can
 // agree (small confidence lift) or flag a risk note, but never vetoes.
 export const DEEPSEEK_REVIEW_CHAIN = [
-  "bmind/gpt-5.2-chat",
-  "bmind/gpt-4o",
   "google/gemini-3.7-flash",
   "google/gemini-3.1-pro-preview",
+  "bmind/gpt-5.2-chat",
+  "bmind/gpt-4o",
 ] as const;
 
 /** @deprecated legacy alias — use DEEPSEEK_REVIEW_CHAIN */
