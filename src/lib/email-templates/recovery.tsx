@@ -101,3 +101,10 @@ const codeStyle = {
   color: '#000000',
   margin: '0 0 25px',
 }
+const codeLabel = {
+  fontSize: '11px',
+  fontWeight: 'bold' as const,
+  letterSpacing: '2px',
+  color: '#999999',
+  margin: '0 0 6px',
+}
