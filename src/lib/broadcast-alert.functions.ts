@@ -251,6 +251,12 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
       })
 
       whatsappSent = waRes.sent
+
+      const { sendSignalAlertTelegram } = await import('@/lib/telegram-alert.server')
+      await sendSignalAlertTelegram(alertData).catch((e) => {
+        console.error('[broadcast] telegram alerts failed:', e?.message)
+        return { sent: 0 }
+      })
     } catch (e) {
       console.error('[broadcast] social alerts failed:', (e as Error)?.message)
     }
