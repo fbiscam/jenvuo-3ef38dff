@@ -310,10 +310,15 @@ function buildSignal(a: {
     return hold(`Setup rejected: invalidation ${stopLevel} sits on the wrong side of entry ${entry}. ${a.narrative}`);
   }
   if (risk > maxRisk) {
-    return hold(
-      `Setup rejected: structural stop is ${((risk / entry) * 100).toFixed(2)}% away — wider than the ${(SL_MAX_PCT * 100).toFixed(2)}% risk cap. Waiting for a tighter invalidation. ${a.narrative}`,
-    );
+    if (risk > entry * SL_HARD_MAX_PCT) {
+      return hold(
+        `Setup rejected: structural stop is ${((risk / entry) * 100).toFixed(2)}% away — beyond the ${(SL_HARD_MAX_PCT * 100).toFixed(2)}% hard limit. Waiting for a tighter invalidation. ${a.narrative}`,
+      );
+    }
+    // Between the soft cap and the hard limit we trade the structural stop
+    // itself — clamping it to the soft cap would place a fake invalidation.
   }
+
   if (risk < minRisk) risk = minRisk; // wick buffer only
   const sl = round2(long ? entry - risk : entry + risk);
 
