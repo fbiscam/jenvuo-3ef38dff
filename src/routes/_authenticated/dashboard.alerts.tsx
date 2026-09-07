@@ -907,11 +907,12 @@ function AlertPrefs() {
                 <div className="text-xs text-zinc-500">
                   {tgLinked
                     ? `Connected to chat ${tgChatId || "—"}`
-                    : "Open Telegram, start a chat with our bot, then send /start to @userinfobot to get your numeric chat ID and paste it here."}
+                    : "Connect your Telegram to receive every signal alert instantly."}
                 </div>
                 {tgVerifiedAt && (
                   <div className="mt-1 text-[11px] text-emerald-600">Active {formatVerifiedAt(tgVerifiedAt)}</div>
                 )}
+
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:flex-shrink-0">
                 <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900">
