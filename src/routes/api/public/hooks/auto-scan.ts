@@ -1049,6 +1049,31 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               console.error("auto-scan whatsapp fan-out failed", e);
             }
 
+            // Telegram broadcast
+            try {
+              const { sendSignalAlertTelegram } = await import(
+                "@/lib/telegram-alert.server"
+              );
+              await sendSignalAlertTelegram({
+                alertId: inserted.id,
+                pair,
+                grade,
+                direction: dir,
+                entry,
+                sl,
+                tp,
+                rr,
+                confidence: conf,
+                decimals: dec,
+                session,
+                killzone: plan.killzone ?? null,
+                htfBias: plan.htfBias ?? null,
+                rationale: `${manualMode ? "Manual scan" : "Auto-scan"} · ${plan.alignmentLabel ?? ""}`.slice(0, 500),
+              });
+            } catch (e) {
+              console.error("auto-scan telegram fan-out failed", e);
+            }
+
 
 
             // Ledger entry (system pool cost per broadcast)

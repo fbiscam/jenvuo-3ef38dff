@@ -168,11 +168,15 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
   const invalidation = round2(
     dir > 0 ? Math.min(a1.swingLow, price - atr * 1.4) : Math.max(a1.swingHigh, price + atr * 1.4),
   );
-  // The real ICT invalidation: just beyond the last 1H swing, with a small
-  // ATR buffer for the wick. This — not an ATR multiple — is the stop.
+  // The real ICT invalidation: just beyond the most recent 1H swing (last 12
+  // candles, not the whole 80-candle range), with a small ATR wick buffer.
+  const recent = c1h.slice(-12);
+  const recentLow = Math.min(...recent.map((c) => c.l));
+  const recentHigh = Math.max(...recent.map((c) => c.h));
   const structureStop = round2(
-    dir > 0 ? a1.swingLow - atr * 0.15 : a1.swingHigh + atr * 0.15,
+    dir > 0 ? recentLow - atr * 0.15 : recentHigh + atr * 0.15,
   );
+
   const keyLevel = round2(a4.equilibrium);
   const reward = Math.abs(targets.d1 - price);
   const risk = Math.max(atr * 0.5, Math.abs(price - invalidation));
@@ -248,7 +252,8 @@ function confSeries(confidence: number) {
 
 /** Risk geometry guard rails for XAU/USD (SL distance as % of price). */
 const SL_MIN_PCT = 0.0015; // 0.15% — below this the stop is inside spread/noise
-const SL_MAX_PCT = 0.0075; // 0.75% — above this it is not an ICT/SMC invalidation
+const SL_MAX_PCT = 0.0075; // 0.75% — soft cap, preferred ICT/SMC invalidation band
+const SL_HARD_MAX_PCT = 0.015; // 1.5% — beyond this the structure is too loose to trade
 const MIN_RR = 2;
 const MAX_RR = 5;
 
@@ -306,10 +311,15 @@ function buildSignal(a: {
     return hold(`Setup rejected: invalidation ${stopLevel} sits on the wrong side of entry ${entry}. ${a.narrative}`);
   }
   if (risk > maxRisk) {
-    return hold(
-      `Setup rejected: structural stop is ${((risk / entry) * 100).toFixed(2)}% away — wider than the ${(SL_MAX_PCT * 100).toFixed(2)}% risk cap. Waiting for a tighter invalidation. ${a.narrative}`,
-    );
+    if (risk > entry * SL_HARD_MAX_PCT) {
+      return hold(
+        `Setup rejected: structural stop is ${((risk / entry) * 100).toFixed(2)}% away — beyond the ${(SL_HARD_MAX_PCT * 100).toFixed(2)}% hard limit. Waiting for a tighter invalidation. ${a.narrative}`,
+      );
+    }
+    // Between the soft cap and the hard limit we trade the structural stop
+    // itself — clamping it to the soft cap would place a fake invalidation.
   }
+
   if (risk < minRisk) risk = minRisk; // wick buffer only
   const sl = round2(long ? entry - risk : entry + risk);
 

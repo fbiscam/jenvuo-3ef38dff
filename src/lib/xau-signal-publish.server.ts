@@ -106,6 +106,28 @@ export async function publishXauSignal(
       console.warn("publishXauSignal broadcast failed:", (e as Error)?.message ?? e);
     }
 
+    try {
+      const { sendSignalAlertTelegram } = await import("@/lib/telegram-alert.server");
+      await sendSignalAlertTelegram({
+        alertId: inserted.id,
+        pair,
+        grade,
+        direction: dir,
+        entry: input.entry,
+        sl: input.sl,
+        tp: input.tp,
+        rr: input.rr,
+        confidence: Math.round(input.confidence),
+        decimals: 2,
+        rationale: input.rationale ?? null,
+        session: input.session ?? null,
+        killzone: input.killzone ?? null,
+        htfBias: input.htfBias ?? null,
+      });
+    } catch (e) {
+      console.warn("publishXauSignal telegram failed:", (e as Error)?.message ?? e);
+    }
+
     return { published: true, alertId: inserted.id, sent };
   } catch (e) {
     console.warn("publishXauSignal failed:", (e as Error)?.message ?? e);
