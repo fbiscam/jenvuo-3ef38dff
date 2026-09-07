@@ -2697,6 +2697,45 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_alert_links: {
+        Row: {
+          chat_id: string
+          code_attempts: number
+          code_expires_at: string | null
+          created_at: string
+          last_error: string | null
+          telegram_enabled: boolean
+          updated_at: string
+          user_id: string
+          verification_code: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          chat_id: string
+          code_attempts?: number
+          code_expires_at?: string | null
+          created_at?: string
+          last_error?: string | null
+          telegram_enabled?: boolean
+          updated_at?: string
+          user_id: string
+          verification_code?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          chat_id?: string
+          code_attempts?: number
+          code_expires_at?: string | null
+          created_at?: string
+          last_error?: string | null
+          telegram_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+          verification_code?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       tool_lead_searches: {
         Row: {
           created_at: string
