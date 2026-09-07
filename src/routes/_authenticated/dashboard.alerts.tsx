@@ -952,7 +952,39 @@ function AlertPrefs() {
               </div>
             </div>
 
+            {!tgLinked && (
+              <ol className="mt-3 space-y-1.5 rounded-lg border border-zinc-100 bg-zinc-50 p-3 text-[12px] leading-relaxed text-zinc-700">
+                <li>
+                  1. Open our bot{" "}
+                  <a
+                    href={tgBotUsername ? `https://t.me/${tgBotUsername}` : "https://t.me"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-sky-700 underline underline-offset-2"
+                  >
+                    {tgBotUsername ? `@${tgBotUsername}` : "Telegram bot"}
+                  </a>{" "}
+                  and press <span className="font-semibold">Start</span>.
+                </li>
+                <li>
+                  2. Open{" "}
+                  <a
+                    href="https://t.me/userinfobot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-sky-700 underline underline-offset-2"
+                  >
+                    @userinfobot
+                  </a>{" "}
+                  and send <span className="font-semibold">/start</span> — it replies with your numeric chat ID.
+                </li>
+                <li>3. Paste that chat ID below and press Connect.</li>
+                <li>4. Enter the 6-digit code the bot sends you to activate alerts.</li>
+              </ol>
+            )}
+
             <div className="mt-4 flex flex-wrap items-center gap-2">
+
               <input
                 type="text"
                 inputMode="numeric"
