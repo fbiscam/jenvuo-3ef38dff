@@ -915,12 +915,18 @@ function AlertPrefs() {
 
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:flex-shrink-0">
-                <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900">
+                <a
+                  href={tgBotUsername ? `https://t.me/${tgBotUsername}` : "https://t.me"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 transition hover:bg-zinc-50"
+                >
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#229ED9]">
                     <Send className="h-3.5 w-3.5 text-white" />
                   </div>
-                  Telegram Bot
-                </div>
+                  {tgBotUsername ? `@${tgBotUsername}` : "Telegram Bot"}
+                </a>
+
                 {tgLinked && (
                   <button
                     type="button"
