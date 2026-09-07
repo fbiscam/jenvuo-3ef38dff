@@ -140,7 +140,10 @@ function AlertPrefs() {
   const [tgPending, setTgPending] = useState(false);
   const [tgCode, setTgCode] = useState("");
   const [tgDisconnectOpen, setTgDisconnectOpen] = useState(false);
+  const [tgBotUsername, setTgBotUsername] = useState<string | null>(null);
   const tgChatIdValid = /^-?\d{3,20}$/.test(tgChatId.trim());
+
+  const getTelegramBotInfoFn = useServerFn(getTelegramBotInfo);
 
   useEffect(() => {
     (async () => {
@@ -155,8 +158,15 @@ function AlertPrefs() {
       } catch {
         setTgError("Could not load Telegram settings");
       }
+      try {
+        const b = await getTelegramBotInfoFn({});
+        setTgBotUsername(b?.username ?? null);
+      } catch {
+        setTgBotUsername(null);
+      }
     })();
-  }, [getTelegramLinkFn]);
+  }, [getTelegramLinkFn, getTelegramBotInfoFn]);
+
 
   const connectTelegram = useCallback(async () => {
     if (!tgChatIdValid || tgSaving) return;
