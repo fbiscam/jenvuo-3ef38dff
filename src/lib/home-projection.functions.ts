@@ -252,7 +252,8 @@ function confSeries(confidence: number) {
 
 /** Risk geometry guard rails for XAU/USD (SL distance as % of price). */
 const SL_MIN_PCT = 0.0015; // 0.15% — below this the stop is inside spread/noise
-const SL_MAX_PCT = 0.0075; // 0.75% — above this it is not an ICT/SMC invalidation
+const SL_MAX_PCT = 0.0075; // 0.75% — soft cap, preferred ICT/SMC invalidation band
+const SL_HARD_MAX_PCT = 0.015; // 1.5% — beyond this the structure is too loose to trade
 const MIN_RR = 2;
 const MAX_RR = 5;
 
