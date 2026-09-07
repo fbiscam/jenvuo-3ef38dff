@@ -11,7 +11,7 @@ import { getRiskSettings } from "@/lib/risk-settings.functions";
 import { computePositionSize } from "@/lib/risk-manager";
 import { Bell, BellOff, Loader2, Send } from "lucide-react";
 import { connectWhatsappAlertLink, disconnectWhatsappAlertLink, getWhatsappAlertLink, setWhatsappAlertEnabled, verifyWhatsappAlertCode } from "@/lib/whatsapp-alert.functions";
-import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled, verifyTelegramAlertCode } from "@/lib/telegram-alert.functions";
+import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, getTelegramBotInfo, setTelegramAlertEnabled, verifyTelegramAlertCode } from "@/lib/telegram-alert.functions";
 import { cn } from "@/lib/utils";
 import { getAlertCutoff } from "@/lib/alert-cutoff";
 import xauLogo from "@/assets/xau-gold.png.asset.json";
@@ -140,7 +140,10 @@ function AlertPrefs() {
   const [tgPending, setTgPending] = useState(false);
   const [tgCode, setTgCode] = useState("");
   const [tgDisconnectOpen, setTgDisconnectOpen] = useState(false);
+  const [tgBotUsername, setTgBotUsername] = useState<string | null>(null);
   const tgChatIdValid = /^-?\d{3,20}$/.test(tgChatId.trim());
+
+  const getTelegramBotInfoFn = useServerFn(getTelegramBotInfo);
 
   useEffect(() => {
     (async () => {
@@ -155,8 +158,15 @@ function AlertPrefs() {
       } catch {
         setTgError("Could not load Telegram settings");
       }
+      try {
+        const b = await getTelegramBotInfoFn({});
+        setTgBotUsername(b?.username ?? null);
+      } catch {
+        setTgBotUsername(null);
+      }
     })();
-  }, [getTelegramLinkFn]);
+  }, [getTelegramLinkFn, getTelegramBotInfoFn]);
+
 
   const connectTelegram = useCallback(async () => {
     if (!tgChatIdValid || tgSaving) return;
@@ -907,19 +917,26 @@ function AlertPrefs() {
                 <div className="text-xs text-zinc-500">
                   {tgLinked
                     ? `Connected to chat ${tgChatId || "—"}`
-                    : "Open Telegram, start a chat with our bot, then send /start to @userinfobot to get your numeric chat ID and paste it here."}
+                    : "Connect your Telegram to receive every signal alert instantly."}
                 </div>
                 {tgVerifiedAt && (
                   <div className="mt-1 text-[11px] text-emerald-600">Active {formatVerifiedAt(tgVerifiedAt)}</div>
                 )}
+
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:flex-shrink-0">
-                <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900">
+                <a
+                  href={tgBotUsername ? `https://t.me/${tgBotUsername}` : "https://t.me"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 transition hover:bg-zinc-50"
+                >
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#229ED9]">
                     <Send className="h-3.5 w-3.5 text-white" />
                   </div>
-                  Telegram Bot
-                </div>
+                  {tgBotUsername ? `@${tgBotUsername}` : "Telegram Bot"}
+                </a>
+
                 {tgLinked && (
                   <button
                     type="button"
@@ -935,7 +952,39 @@ function AlertPrefs() {
               </div>
             </div>
 
+            {!tgLinked && (
+              <ol className="mt-3 space-y-1.5 rounded-lg border border-zinc-100 bg-zinc-50 p-3 text-[12px] leading-relaxed text-zinc-700">
+                <li>
+                  1. Open our bot{" "}
+                  <a
+                    href={tgBotUsername ? `https://t.me/${tgBotUsername}` : "https://t.me"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-sky-700 underline underline-offset-2"
+                  >
+                    {tgBotUsername ? `@${tgBotUsername}` : "Telegram bot"}
+                  </a>{" "}
+                  and press <span className="font-semibold">Start</span>.
+                </li>
+                <li>
+                  2. Open{" "}
+                  <a
+                    href="https://t.me/userinfobot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-sky-700 underline underline-offset-2"
+                  >
+                    @userinfobot
+                  </a>{" "}
+                  and send <span className="font-semibold">/start</span> — it replies with your numeric chat ID.
+                </li>
+                <li>3. Paste that chat ID below and press Connect.</li>
+                <li>4. Enter the 6-digit code the bot sends you to activate alerts.</li>
+              </ol>
+            )}
+
             <div className="mt-4 flex flex-wrap items-center gap-2">
+
               <input
                 type="text"
                 inputMode="numeric"

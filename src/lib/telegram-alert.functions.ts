@@ -157,3 +157,19 @@ export const disconnectTelegramAlertLink = createServerFn({ method: 'POST' })
     if (error) throw new Error(error.message)
     return { ok: true }
   })
+
+/** Returns the bot's public @username so the UI can render a t.me deep link. */
+export const getTelegramBotInfo = createServerFn({ method: 'GET' })
+  .middleware([requireSupabaseAuth])
+  .handler(async () => {
+    const botToken = process.env['TELEGRAM_BOT_TOKEN']
+    if (!botToken) return { username: null as string | null }
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${botToken}/getMe`)
+      const json: any = await res.json()
+      if (!res.ok || !json?.ok) return { username: null as string | null }
+      return { username: (json.result?.username as string | undefined) ?? null }
+    } catch {
+      return { username: null as string | null }
+    }
+  })
