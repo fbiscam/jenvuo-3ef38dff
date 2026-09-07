@@ -11,6 +11,7 @@ import { getRiskSettings } from "@/lib/risk-settings.functions";
 import { computePositionSize } from "@/lib/risk-manager";
 import { Bell, BellOff, Loader2, Send } from "lucide-react";
 import { connectWhatsappAlertLink, disconnectWhatsappAlertLink, getWhatsappAlertLink, setWhatsappAlertEnabled, verifyWhatsappAlertCode } from "@/lib/whatsapp-alert.functions";
+import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, setTelegramAlertEnabled, verifyTelegramAlertCode } from "@/lib/telegram-alert.functions";
 import { cn } from "@/lib/utils";
 import { getAlertCutoff } from "@/lib/alert-cutoff";
 import xauLogo from "@/assets/xau-gold.png.asset.json";
