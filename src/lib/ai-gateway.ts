@@ -448,35 +448,35 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // answer; `bmind/gpt-5.6-sol` still hangs until timeout, so it is removed from
 // every chain — it only burned 45s+ per hop and pushed the senior review past
 // its deadline, which flipped good setups to WAIT via the hard review gate.
+// Re-probed Sep 7 2026 with the NEW Bluesminds key: /v1/models lists 19 ids and
+// contains NO gpt-4o / gpt-5.2-chat (both return 503 model_not_found), while
+// `gpt-5.5` and `kimi-k2.5` hang for 60s into a 504 and the llama ids are 410
+// Gone. So Bluesminds currently has no usable route: it is demoted to LAST hop
+// everywhere and the workspace Gemini routes lead, otherwise every scan burned
+// 60s+ per dead hop and pushed the senior review past its deadline (-> WAIT).
 const WORKING_BMIND = [
-  "bmind/gpt-4o",
-  "bmind/gpt-5.2-chat",
-  // Workspace-safe fallbacks. These use LOVABLE_API_KEY, so a stale or
-  // unavailable Bluesminds route cannot silently remove AI review in another
-  // browser or production worker.
   "google/gemini-3.1-pro-preview",
   "google/gemini-3.7-flash",
-] as const;
-// Narration must return before the deterministic plan is presented. GPT-4o is
-// the consistently low-latency route on Bluesminds.
-const FAST_NARRATION_BMIND = [
+  // Kept last so the desk auto-recovers if the Bluesminds account regains
+  // GPT-4o access, without slowing scans while it is unavailable.
   "bmind/gpt-4o",
+] as const;
+// Narration must return before the deterministic plan is presented.
+const FAST_NARRATION_BMIND = [
   "google/gemini-3.7-flash",
-  "bmind/gpt-5.2-chat",
+  "google/gemini-3.1-pro-preview",
+  "bmind/gpt-4o",
 ] as const;
 
-// Senior review runs on Bluesminds GPT-4o ONLY (desk decision). No fallback
-// hops: if 4o cannot answer, the hard review gate holds the setup at WAIT
-// rather than letting a different model sign off the trade.
-// Sep 2 2026: keeping a single-provider chain meant a Bluesminds quota outage
-// silently killed EVERY signal (hard review gate -> score capped at 49). The
-// workspace Gemini routes are kept as last-resort fallbacks so a billing issue
-// on one provider cannot zero out the whole trading day.
+// Senior review: Bluesminds GPT-4o remains the desk's preferred reviewer, but
+// while that route is unavailable the Gemini routes sign off so a provider
+// outage cannot zero out the whole trading day via the hard review gate.
 const SENIOR_REVIEW_BMIND_4O = [
-  "bmind/gpt-4o",
   "google/gemini-3.1-pro-preview",
   "google/gemini-3.7-flash",
+  "bmind/gpt-4o",
 ] as const;
+
 
 export const MODEL_CHAIN = {
   intent: WORKING_BMIND,
