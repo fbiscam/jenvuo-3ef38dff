@@ -61,23 +61,38 @@ function escapeHtml(s: string) {
 export async function sendTelegramMessage(chatId: string, text: string): Promise<void> {
   const lovableKey = process.env['LOVABLE_API_KEY']
   const telegramKey = process.env['TELEGRAM_API_KEY']
-  if (!lovableKey || !telegramKey) {
-    throw new Error('Telegram is not connected (missing LOVABLE_API_KEY / TELEGRAM_API_KEY)')
+  const botToken = process.env['TELEGRAM_BOT_TOKEN']
+
+  const payload = {
+    chat_id: chatId,
+    text,
+    parse_mode: 'HTML',
+    disable_web_page_preview: true,
   }
-  const res = await fetch(`${GATEWAY_URL}/sendMessage`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${lovableKey}`,
-      'X-Connection-Api-Key': telegramKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text,
-      parse_mode: 'HTML',
-      disable_web_page_preview: true,
-    }),
-  })
+
+  let res: Response
+  if (botToken) {
+    // Direct Bot API (BotFather token stored as a secret)
+    res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+  } else if (lovableKey && telegramKey) {
+    // Lovable connector gateway
+    res = await fetch(`${GATEWAY_URL}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${lovableKey}`,
+        'X-Connection-Api-Key': telegramKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+  } else {
+    throw new Error('Telegram is not configured (need TELEGRAM_BOT_TOKEN or a Telegram connection)')
+  }
+
   const body = await res.text()
   if (!res.ok) {
     throw new Error(`Telegram send failed [${res.status}]: ${body}`)
