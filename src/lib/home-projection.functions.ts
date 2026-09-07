@@ -168,11 +168,15 @@ function buildEngineProjection(c1h: Candle[], c4h: Candle[], c1d: Candle[]): Xau
   const invalidation = round2(
     dir > 0 ? Math.min(a1.swingLow, price - atr * 1.4) : Math.max(a1.swingHigh, price + atr * 1.4),
   );
-  // The real ICT invalidation: just beyond the last 1H swing, with a small
-  // ATR buffer for the wick. This — not an ATR multiple — is the stop.
+  // The real ICT invalidation: just beyond the most recent 1H swing (last 12
+  // candles, not the whole 80-candle range), with a small ATR wick buffer.
+  const recent = c1h.slice(-12);
+  const recentLow = Math.min(...recent.map((c) => c.l));
+  const recentHigh = Math.max(...recent.map((c) => c.h));
   const structureStop = round2(
-    dir > 0 ? a1.swingLow - atr * 0.15 : a1.swingHigh + atr * 0.15,
+    dir > 0 ? recentLow - atr * 0.15 : recentHigh + atr * 0.15,
   );
+
   const keyLevel = round2(a4.equilibrium);
   const reward = Math.abs(targets.d1 - price);
   const risk = Math.max(atr * 0.5, Math.abs(price - invalidation));
