@@ -97,6 +97,8 @@ import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/
 import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
 import { Route as ApiPublicHooksBackfillInsightImagesRouteImport } from './routes/api/public/hooks/backfill-insight-images'
 import { Route as ApiPublicHooksAutoScanRouteImport } from './routes/api/public/hooks/auto-scan'
+import { Route as ApiPublicExtensionVerifyRouteImport } from './routes/api/public/extension/verify'
+import { Route as ApiPublicExtensionAnalyzeRouteImport } from './routes/api/public/extension/analyze'
 import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/brief-audio.$id'
 import { Route as AuthenticatedDashboardAdminTvMismatchRouteImport } from './routes/_authenticated/dashboard.admin.tv-mismatch'
 import { Route as AuthenticatedDashboardAdminTuningRouteImport } from './routes/_authenticated/dashboard.admin.tuning'
@@ -575,6 +577,18 @@ const ApiPublicHooksAutoScanRoute = ApiPublicHooksAutoScanRouteImport.update({
   path: '/api/public/hooks/auto-scan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicExtensionVerifyRoute =
+  ApiPublicExtensionVerifyRouteImport.update({
+    id: '/api/public/extension/verify',
+    path: '/api/public/extension/verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicExtensionAnalyzeRoute =
+  ApiPublicExtensionAnalyzeRouteImport.update({
+    id: '/api/public/extension/analyze',
+    path: '/api/public/extension/analyze',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicBriefAudioIdRoute = ApiPublicBriefAudioIdRouteImport.update({
   id: '/api/public/brief-audio/$id',
   path: '/api/public/brief-audio/$id',
@@ -732,6 +746,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
+  '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
+  '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/backfill-insight-images': typeof ApiPublicHooksBackfillInsightImagesRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
@@ -828,6 +844,8 @@ export interface FileRoutesByTo {
   '/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
+  '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
+  '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/backfill-insight-images': typeof ApiPublicHooksBackfillInsightImagesRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
@@ -931,6 +949,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/_authenticated/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
   '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
+  '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
+  '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/backfill-insight-images': typeof ApiPublicHooksBackfillInsightImagesRoute
   '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
@@ -1034,6 +1054,8 @@ export interface FileRouteTypes {
     | '/dashboard/admin/tuning'
     | '/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
+    | '/api/public/extension/analyze'
+    | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/backfill-insight-images'
     | '/api/public/hooks/generate-brief'
@@ -1130,6 +1152,8 @@ export interface FileRouteTypes {
     | '/dashboard/admin/tuning'
     | '/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
+    | '/api/public/extension/analyze'
+    | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/backfill-insight-images'
     | '/api/public/hooks/generate-brief'
@@ -1232,6 +1256,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/tuning'
     | '/_authenticated/dashboard/admin/tv-mismatch'
     | '/api/public/brief-audio/$id'
+    | '/api/public/extension/analyze'
+    | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/backfill-insight-images'
     | '/api/public/hooks/generate-brief'
@@ -1291,6 +1317,8 @@ export interface RootRouteChildren {
   LovableEmailEventsRoute: typeof LovableEmailEventsRoute
   HelpCollectionIndexRoute: typeof HelpCollectionIndexRoute
   ApiPublicBriefAudioIdRoute: typeof ApiPublicBriefAudioIdRoute
+  ApiPublicExtensionAnalyzeRoute: typeof ApiPublicExtensionAnalyzeRoute
+  ApiPublicExtensionVerifyRoute: typeof ApiPublicExtensionVerifyRoute
   ApiPublicHooksAutoScanRoute: typeof ApiPublicHooksAutoScanRoute
   ApiPublicHooksBackfillInsightImagesRoute: typeof ApiPublicHooksBackfillInsightImagesRoute
   ApiPublicHooksGenerateBriefRoute: typeof ApiPublicHooksGenerateBriefRoute
@@ -1926,6 +1954,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksAutoScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/extension/verify': {
+      id: '/api/public/extension/verify'
+      path: '/api/public/extension/verify'
+      fullPath: '/api/public/extension/verify'
+      preLoaderRoute: typeof ApiPublicExtensionVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/extension/analyze': {
+      id: '/api/public/extension/analyze'
+      path: '/api/public/extension/analyze'
+      fullPath: '/api/public/extension/analyze'
+      preLoaderRoute: typeof ApiPublicExtensionAnalyzeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/brief-audio/$id': {
       id: '/api/public/brief-audio/$id'
       path: '/api/public/brief-audio/$id'
@@ -2213,6 +2255,8 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailEventsRoute: LovableEmailEventsRoute,
   HelpCollectionIndexRoute: HelpCollectionIndexRoute,
   ApiPublicBriefAudioIdRoute: ApiPublicBriefAudioIdRoute,
+  ApiPublicExtensionAnalyzeRoute: ApiPublicExtensionAnalyzeRoute,
+  ApiPublicExtensionVerifyRoute: ApiPublicExtensionVerifyRoute,
   ApiPublicHooksAutoScanRoute: ApiPublicHooksAutoScanRoute,
   ApiPublicHooksBackfillInsightImagesRoute:
     ApiPublicHooksBackfillInsightImagesRoute,
