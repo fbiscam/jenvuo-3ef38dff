@@ -1793,6 +1793,11 @@ async function resolveLiveTick(inst: ResolvedInstrument): Promise<LiveTick | nul
   return cached?.tick ?? null;
 }
 
+/** Server-side fresh quote used by signal publishers before persisting an alert. */
+export async function fetchLiveInstrumentTick(inst: ResolvedInstrument): Promise<LiveTick | null> {
+  return resolveLiveTick(inst);
+}
+
 
 export const getLiveTick = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => {

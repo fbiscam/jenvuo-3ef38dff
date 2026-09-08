@@ -13,7 +13,11 @@ import {
   killzoneOf,
   type Candle,
 } from "./analysis/engine";
-import { fetchInstrumentCandles, resolveInstrument } from "./gold-analysis.functions";
+import {
+  fetchInstrumentCandles,
+  fetchLiveInstrumentTick,
+  resolveInstrument,
+} from "./gold-analysis.functions";
 import { callChatCompletion, tryParseJsonLoose } from "./ai-gateway";
 
 export type XauTradeSignal = {
@@ -514,12 +518,26 @@ export const getXauProjection = createServerFn({ method: "GET" }).handler(
 
     try {
       const inst = resolveInstrument("XAUUSD");
-      const [c1h, c4h, c1d] = await Promise.all([
+      const [c1h, c4h, c1d, liveTick] = await Promise.all([
         fetchInstrumentCandles(inst, "1h"),
         fetchInstrumentCandles(inst, "4h").catch(() => [] as Candle[]),
         fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]),
+        fetchLiveInstrumentTick(inst).catch(() => null),
       ]);
       if (!c1h || c1h.length < 30) return cache?.data ?? null;
+      const currentPrice = liveTick?.price;
+      if (currentPrice && Number.isFinite(currentPrice) && currentPrice > 0) {
+        const lastIndex = c1h.length - 1;
+        const last = c1h[lastIndex];
+        if (last) {
+          c1h[lastIndex] = {
+            ...last,
+            c: currentPrice,
+            h: Math.max(last.h, currentPrice),
+            l: Math.min(last.l, currentPrice),
+          };
+        }
+      }
       const h4 = c4h.length >= 30 ? c4h : c1h;
       const d1 = c1d.length >= 30 ? c1d : h4;
 
