@@ -664,33 +664,41 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             }
             const rr = riskDist > 0 ? rewardDist / riskDist : 0;
 
-            // Freshness gate: refuse to broadcast if live price has already
-            // drifted more than 40% of the risk distance toward SL (stale
-            // entry) or already blown past TP. This prevents "SELL @ 4051
-            // while live is 4072" (entry already at SL) situations caused by
-            // 15-min two-hit confirmation lag on fast-moving markets.
+            // Freshness gate: a MARKET entry must remain within 0.25% of the
+            // fresh quote, regardless of whether price moved toward SL or TP.
+            // A signal that is already well in profit is still not executable
+            // at its advertised entry and must be re-analysed instead.
             try {
               const live = await getLiveTick({ data: { symbol: pair } });
               const lp = Number(live?.price);
-              if (isFinite(lp) && lp > 0 && riskDist > 0) {
-                const towardSL = dir === "BUY" ? entry - lp : lp - entry;
-                const towardTP = dir === "BUY" ? lp - entry : entry - lp;
-                const staleSL = towardSL > 0.4 * riskDist;
-                const pastTP = towardTP > 0.6 * rewardDist;
-                if (staleSL || pastTP) {
-                  results.push({
-                    pair,
-                    action: "skipped_stale_entry",
-                    entry,
-                    live: lp,
-                    reason: staleSL ? "drifted_toward_sl" : "already_past_tp",
-                  });
-                  continue;
-                }
+              if (!isFinite(lp) || lp <= 0) {
+                results.push({ pair, action: "live_price_unavailable" });
+                continue;
+              }
+              const entryDriftPct = Math.abs(entry - lp) / lp;
+              const towardSL = dir === "BUY" ? entry - lp : lp - entry;
+              const towardTP = dir === "BUY" ? lp - entry : entry - lp;
+              const staleMarketEntry = entryDriftPct > 0.0025;
+              const staleSL = riskDist > 0 && towardSL > 0.4 * riskDist;
+              const pastTP = rewardDist > 0 && towardTP > 0.6 * rewardDist;
+              if (staleMarketEntry || staleSL || pastTP) {
+                results.push({
+                  pair,
+                  action: "skipped_stale_entry",
+                  entry,
+                  live: lp,
+                  drift_pct: Number((entryDriftPct * 100).toFixed(3)),
+                  reason: staleMarketEntry
+                    ? "market_entry_moved"
+                    : staleSL
+                      ? "drifted_toward_sl"
+                      : "already_past_tp",
+                });
+                continue;
               }
             } catch {
-              // If live price lookup fails, fall through — better to broadcast
-              // than to silently drop every signal on a transient upstream error.
+              results.push({ pair, action: "live_price_unavailable" });
+              continue;
             }
 
             const setupScore = Math.round(broadcastPlan.setupScore ?? conf);
