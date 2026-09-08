@@ -174,7 +174,12 @@ function AlertPrefs() {
     setTgError(null);
     try {
       await connectTelegramFn({ data: { chatId: tgChatId.trim() } });
+      // The server clears verification + disables alerts until the new code is
+      // confirmed, so the UI must reflect that instead of showing "Connected".
       setTgPending(true);
+      setTgLinked(false);
+      setTgEnabled(false);
+      setTgCode("");
       toast.success("Code sent on Telegram", { description: "Enter the 6-digit code to activate alerts." });
     } catch (e: any) {
       const message = e?.message ?? "Could not connect Telegram";
