@@ -6,10 +6,12 @@
 // Live Signals page and WhatsApp broadcast stay in sync with the terminal.
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { fetchLiveInstrumentTick, resolveInstrument } from "@/lib/gold-analysis.functions";
 import { sendSignalAlertWhatsApp } from "@/lib/whatsapp-alert.server";
 
 const MIN_CONFIDENCE = 70;
 const COOLDOWN_MIN = 45;
+const MAX_ENTRY_DRIFT_PCT = 0.0025;
 
 export type PublishInput = {
   direction: "long" | "short";
@@ -45,6 +47,21 @@ export async function publishXauSignal(
     }
     const dir = input.direction === "long" ? "BUY" : "SELL";
     const pair = "XAUUSD";
+
+    // A signal entry is a market price, so verify it against a fresh spot tick
+    // immediately before persisting/broadcasting. This blocks stale hourly
+    // candle closes from becoming alerts when gold has already moved away.
+    const liveTick = await fetchLiveInstrumentTick(resolveInstrument(pair)).catch(() => null);
+    if (!liveTick?.price || !Number.isFinite(liveTick.price)) {
+      return { published: false, reason: "live_price_unavailable" };
+    }
+    const entryDriftPct = Math.abs(input.entry - liveTick.price) / liveTick.price;
+    if (entryDriftPct > MAX_ENTRY_DRIFT_PCT) {
+      console.warn(
+        `publishXauSignal stale entry blocked: entry=${input.entry}, live=${liveTick.price}, drift=${(entryDriftPct * 100).toFixed(2)}%`,
+      );
+      return { published: false, reason: "stale_entry" };
+    }
     const since = new Date(Date.now() - COOLDOWN_MIN * 60_000).toISOString();
 
     const { data: recent } = await supabaseAdmin
