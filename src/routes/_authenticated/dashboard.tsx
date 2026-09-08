@@ -100,6 +100,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     items: [
       { to: "/killzones", label: "Killzones", icon: "schedule" },
       { to: "/insights", label: "Insights", icon: "menu_book" },
+      { to: "/dashboard/extension", label: "Browser Extension", icon: "extension" },
       { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3" },
       { to: "/pricing", label: "Pricing", icon: "local_offer" },
     ],
