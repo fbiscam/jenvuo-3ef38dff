@@ -129,68 +129,44 @@ Return STRICT JSON only, no prose, with this exact shape:
 }`;
 
 
-        const bmindKey = process.env.BLUESMIND_API_KEY || process.env.BLUESMINDS_API_KEY;
-        if (!bmindKey) {
-          return new Response(JSON.stringify({ error: "no-bluesminds-key" }), { status: 500 });
-        }
-
-        async function callBmind(model: string, timeoutMs: number) {
-          const ctrl = new AbortController();
-          const t = setTimeout(() => ctrl.abort(), timeoutMs);
-          try {
-            return await fetch("https://api.bluesminds.com/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${bmindKey!}`,
-              },
-              body: JSON.stringify({
-                model,
-                messages: [
-                  { role: "system", content: sys },
-                  { role: "user", content: userPrompt },
-                ],
-              }),
-              signal: ctrl.signal,
-            });
-          } finally {
-            clearTimeout(t);
-          }
-        }
-
-        // Bluesminds only — no external fallback. If all models are down,
-        // skip this run; the next scheduled cron will retry a few hours later.
-        const chain: Array<{ model: string }> = [
-          { model: "gpt-4o" },
-          { model: "gpt-5.5" },
-          { model: "gpt-5.2-chat" },
-          { model: "deepseek-v4-pro" },
-          { model: "grok-4.5" },
-          { model: "claude-4.5-sonnet" },
+        // Try Bluesminds first (when configured), then fall back to Lovable AI
+        // models so a provider outage never leaves the Insights section stale.
+        const { callChatCompletion } = await import("@/lib/ai-gateway");
+        const chain = [
+          "bmind/gpt-4o",
+          "bmind/gpt-5.5",
+          "bmind/gpt-oss-20b",
+          "google/gemini-3.8-flash",
+          "openai/gpt-5.4-mini",
+          "google/gemini-3.1-flash-lite",
         ];
 
-        let aiRes: Response | null = null;
+        let raw = "";
         let lastErr = "";
-        for (const step of chain) {
-          try {
-            const r = await callBmind(step.model, 90_000);
-            if (r.ok) { aiRes = r; break; }
-            lastErr = `bmind:${step.model} ${r.status}`;
-            const txt = await r.text().catch(() => "");
-            console.warn("[generate-insight] provider failed", lastErr, txt.slice(0, 200));
-          } catch (e) {
-            lastErr = `bmind:${step.model} ${String(e)}`;
-            console.warn("[generate-insight] provider threw", lastErr);
-          }
+        try {
+          const out = await callChatCompletion({
+            models: chain,
+            messages: [
+              { role: "system", content: sys },
+              { role: "user", content: userPrompt },
+            ],
+            jsonMode: true,
+            timeoutMs: 90_000,
+            deadlineMs: 240_000,
+            retriesPerModel: 2,
+            stage: "generate-insight",
+          });
+          raw = out.content ?? "";
+        } catch (e) {
+          lastErr = String((e as Error)?.message ?? e);
+          console.error("[generate-insight] all providers failed", lastErr);
         }
 
-        if (!aiRes) {
+        if (!raw.trim()) {
           // Do not write an article. Next cron run will retry.
-          return Response.json({ skipped: "bluesminds-unavailable", detail: lastErr, willRetry: true });
+          return Response.json({ skipped: "ai-unavailable", detail: lastErr, willRetry: true });
         }
 
-        const ai = await aiRes.json();
-        let raw: string = ai?.choices?.[0]?.message?.content ?? "{}";
         // Some providers wrap JSON in ```json fences — strip them.
         raw = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
         let parsed: { title?: string; slug?: string; excerpt?: string; content?: string };
