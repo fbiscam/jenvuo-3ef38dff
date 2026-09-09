@@ -1000,7 +1000,7 @@ function DashboardLayout() {
 
 
       {/* Right column */}
-      <div className={`dashboard-right-col flex min-w-0 flex-1 flex-col bg-[#FAFAFA] ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
+      <div className={`dashboard-right-col flex min-w-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
       {/* Mobile menu toggle (floating) */}
       {!embedMode && (
