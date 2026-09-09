@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jenvu</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        
+        <div class="brand-text">
+          <h1>Jenvu</h1>
+          <img class="verified-tick" src="jenvu-tick.png" alt="Verified" width="20" height="20" />
+        </div>
+      </div>
+      <div class="head-right">
+        <button id="newchat" class="hicon" title="Start a new chat" aria-label="New chat">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 3.8l3.7 3.7L8.9 18.8l-4.4.7.7-4.4z"/></svg>
+        </button>
+        <button id="historybtn" class="hicon" title="View past chats" aria-label="Chat history">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></svg>
+        </button>
+        <button id="closebtn" class="hicon" title="Close" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div id="historyPanel" class="history-panel hidden">
+      <div class="history-head">
+        <span>Past chats</span>
+        <button id="historyClose" class="hbtn" aria-label="Close history">✕</button>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </div>
+
+    <main class="content">
+      <section class="market" aria-label="Live gold market pulse">
+        <div class="quote">
+          <div class="quote-left">
+            <span class="currency">$</span><span id="price" class="hprice">—</span>
+            <span id="change" class="hchange">…</span>
+          </div>
+        </div>
+        <div class="chartbox">
+          <canvas id="chart" class="chart" width="600" height="192" role="img" aria-label="Gold price chart"></canvas>
+        </div>
+      </section>
+
+
+
+
+
+      <div id="thread" class="thread"></div>
+
+      <div class="quick" id="quick"></div>
+    </main>
+
+    <div class="composer-wrap">
+      <div id="attached" class="muted small hidden">Chart attached · <button id="clear" class="link">Remove</button></div>
+      <div class="composer">
+        <textarea id="q" rows="1" placeholder="How can I help you today?"></textarea>
+        <div class="composer-bar">
+          <div class="composer-tools">
+            <button id="newchat2" class="icon" title="New chat" aria-label="New chat">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M14.5 8.5 9 14l-.6 2.1 2.1-.6 5.5-5.5a1.2 1.2 0 0 0-1.5-1.5Z"/></svg>
+            </button>
+            <button id="attach" class="icon" title="Attach chart image" aria-label="Attach chart image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5 12.4 19a4.5 4.5 0 0 1-6.4-6.4l7.7-7.7a3 3 0 0 1 4.3 4.3l-7.7 7.7a1.5 1.5 0 0 1-2.2-2.2l7-7"/></svg>
+            </button>
+            <button id="share" class="icon" title="Share screen" aria-label="Share screen">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </button>
+          </div>
+          <div class="composer-right">
+            <span class="model-pill">Jenvu AI <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+            <button id="send" class="send" title="Send" aria-label="Send message">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7M12 19V5"/></svg>
+            </button>
+          </div>
+        </div>
+        <input id="file" type="file" accept="image/*" hidden />
+      </div>
+      
+    </div>
+
+    <video id="vid" autoplay muted playsinline class="hidden"></video>
+    <canvas id="cv" class="hidden"></canvas>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

@@ -112,7 +112,27 @@ function ExtensionPage() {
     }
   };
 
+  const [downloading, setDownloading] = useState(false);
+  const onDownload = async () => {
+    setDownloading(true);
+    try {
+      const res = await fetch("/jenvu-extension-v1.8.1.zip");
+      if (!res.ok) throw new Error(`Download failed: ${res.status}`);
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "jenvu-extension-v1.8.1.zip";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Download failed");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const activeKeys = keys.filter((k) => !k.revoked_at);
+
 
   return (
     <div className="space-y-5">
@@ -137,9 +157,17 @@ function ExtensionPage() {
             <li><span className="font-medium text-zinc-900">4.</span> Click <span className="font-medium">Load unpacked</span> and select the unzipped folder.</li>
             <li><span className="font-medium text-zinc-900">5.</span> Pin the Jenvu icon to your toolbar and open it.</li>
           </ol>
+          <button
+            onClick={onDownload}
+            disabled={downloading}
+            className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-3.5 py-2 text-[13px] font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+          >
+            <Download className="h-3.5 w-3.5" /> {downloading ? "Preparing…" : "Download extension (v1.8.1)"}
+          </button>
           <p className="mt-3 text-[12px] text-zinc-500">
             The extension only talks to <span className={MONO}>{origin}</span>. It never stores your password — only the key you paste.
           </p>
+
         </Card>
 
         <Card title="Step 2 — Create your API key" icon={<KeyRound className="h-3.5 w-3.5" />}>
