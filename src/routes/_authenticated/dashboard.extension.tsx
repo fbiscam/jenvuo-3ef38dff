@@ -112,7 +112,27 @@ function ExtensionPage() {
     }
   };
 
+  const [downloading, setDownloading] = useState(false);
+  const onDownload = async () => {
+    setDownloading(true);
+    try {
+      const res = await fetch("/jenvu-extension-v1.8.1.zip");
+      if (!res.ok) throw new Error(`Download failed: ${res.status}`);
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "jenvu-extension-v1.8.1.zip";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Download failed");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const activeKeys = keys.filter((k) => !k.revoked_at);
+
 
   return (
     <div className="space-y-5">
