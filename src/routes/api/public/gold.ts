@@ -35,7 +35,7 @@ async function loadMarket(symbol: string, timeframe: string) {
   return {
     inst,
     candles,
-    ticker: { symbol: inst.symbol ?? symbol, price: last, changePercent },
+    ticker: { symbol: inst.display, price: last, changePercent },
     chart: candles.slice(-120).map((c: any) => ({ c: Number(c.close ?? c.c) })),
     technicals: { trend, ema9: fast, ema21: slow, high: Math.max(...closes.slice(-120)), low: Math.min(...closes.slice(-120)) },
   }
@@ -73,7 +73,7 @@ async function handle({ request }: { request: Request }) {
       }))
 
       const { content } = await callChatCompletion({
-        models: MODEL_CHAIN.chat ?? MODEL_CHAIN.analysis ?? ['google/gemini-3.7-flash'],
+        models: [...MODEL_CHAIN.chat],
         stage: 'extension-chat',
         maxTokens: 900,
         timeoutMs: 45000,
