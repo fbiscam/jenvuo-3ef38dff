@@ -344,7 +344,7 @@ export function TerminalWorkstation({
         <div className="relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100 select-none">
             {/* LEFT — prediction chart */}
-            <div className="relative lg:col-span-8 bg-white p-5 sm:p-6 flex flex-col min-h-[330px] sm:min-h-[440px] select-none">
+            <div className="relative lg:col-span-8 bg-white p-5 sm:p-6 flex flex-col min-h-[260px] sm:min-h-[340px] select-none">
               <div className="flex flex-1 flex-col">
                 <div className="flex flex-wrap items-end justify-between gap-4">
                   <div>
@@ -381,7 +381,7 @@ export function TerminalWorkstation({
                 </div>
 
                 <div className="relative mt-6 flex-1">
-                  <svg viewBox="0 0 600 240" preserveAspectRatio="none" className="h-full min-h-[190px] w-full">
+                  <svg viewBox="0 0 600 240" preserveAspectRatio="none" className="h-full min-h-[150px] w-full">
                     <defs>
                       <linearGradient id="xauFill" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#1d4ed8" stopOpacity="0.30" />
