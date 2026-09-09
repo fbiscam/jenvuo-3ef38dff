@@ -81,13 +81,13 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     items: [
       { to: "/dashboard", label: "Account Overview", icon: "space_dashboard", exact: true, countKey: "saved" },
       { to: "/ai-engine", label: "AI Engineering", icon: "neurology" },
-      { to: "/dashboard/notifications", label: "Notifications", icon: "notifications" },
     ],
   },
   {
     label: "Trades & Insights",
     items: [
       { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats" },
+      { to: "/dashboard/notifications", label: "Notifications", icon: "notifications" },
     ],
   },
   {
