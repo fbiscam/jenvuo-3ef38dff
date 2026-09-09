@@ -20,7 +20,6 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
 import { getDefaultAvatar } from "@/lib/default-avatar";
 import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
-import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 
 
 
