@@ -69,6 +69,7 @@ import { Route as LeadsAdminUsersRouteImport } from './routes/leads.admin.users'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
 import { Route as ApiPublicSignalsFeedRouteImport } from './routes/api/public/signals-feed'
 import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
+import { Route as ApiPublicGoldRouteImport } from './routes/api/public/gold'
 import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_authenticated/dashboard.workspace'
 import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authenticated/dashboard.usage'
 import { Route as AuthenticatedDashboardSecurityRouteImport } from './routes/_authenticated/dashboard.security'
@@ -413,6 +414,11 @@ const ApiPublicPodcastDotxmlRoute = ApiPublicPodcastDotxmlRouteImport.update({
   path: '/api/public/podcast.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicGoldRoute = ApiPublicGoldRouteImport.update({
+  id: '/api/public/gold',
+  path: '/api/public/gold',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardWorkspaceRoute =
   AuthenticatedDashboardWorkspaceRouteImport.update({
     id: '/workspace',
@@ -735,6 +741,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
+  '/api/public/gold': typeof ApiPublicGoldRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -834,6 +841,7 @@ export interface FileRoutesByTo {
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
+  '/api/public/gold': typeof ApiPublicGoldRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -940,6 +948,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
   '/_authenticated/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
+  '/api/public/gold': typeof ApiPublicGoldRoute
   '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
   '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
@@ -1046,6 +1055,7 @@ export interface FileRouteTypes {
     | '/dashboard/security'
     | '/dashboard/usage'
     | '/dashboard/workspace'
+    | '/api/public/gold'
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
@@ -1145,6 +1155,7 @@ export interface FileRouteTypes {
     | '/dashboard/security'
     | '/dashboard/usage'
     | '/dashboard/workspace'
+    | '/api/public/gold'
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
@@ -1250,6 +1261,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/security'
     | '/_authenticated/dashboard/usage'
     | '/_authenticated/dashboard/workspace'
+    | '/api/public/gold'
     | '/api/public/podcast.xml'
     | '/api/public/signals-feed'
     | '/help/$collection/$slug'
@@ -1324,6 +1336,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   BriefIdRoute: typeof BriefIdRoute
   HelpIndexRoute: typeof HelpIndexRoute
+  ApiPublicGoldRoute: typeof ApiPublicGoldRoute
   ApiPublicPodcastDotxmlRoute: typeof ApiPublicPodcastDotxmlRoute
   ApiPublicSignalsFeedRoute: typeof ApiPublicSignalsFeedRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
@@ -1769,6 +1782,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/podcast.xml'
       fullPath: '/api/public/podcast.xml'
       preLoaderRoute: typeof ApiPublicPodcastDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/gold': {
+      id: '/api/public/gold'
+      path: '/api/public/gold'
+      fullPath: '/api/public/gold'
+      preLoaderRoute: typeof ApiPublicGoldRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/workspace': {
@@ -2271,6 +2291,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   BriefIdRoute: BriefIdRoute,
   HelpIndexRoute: HelpIndexRoute,
+  ApiPublicGoldRoute: ApiPublicGoldRoute,
   ApiPublicPodcastDotxmlRoute: ApiPublicPodcastDotxmlRoute,
   ApiPublicSignalsFeedRoute: ApiPublicSignalsFeedRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
