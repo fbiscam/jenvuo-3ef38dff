@@ -93,7 +93,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/insights", label: "Insights", icon: "menu_book" },
-      { to: "/dashboard/extension", label: "Browser Extension", icon: "extension" },
+      { to: "/dashboard/extension", label: "Extension", icon: "extension" },
       { to: "/pricing", label: "Pricing", icon: "local_offer" },
     ],
   },
