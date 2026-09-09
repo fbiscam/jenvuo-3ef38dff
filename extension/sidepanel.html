@@ -36,6 +36,16 @@
       <div id="historyList" class="history-list"></div>
     </div>
 
+    <div id="keyGate" class="key-gate hidden">
+      <p class="key-msg">Sign in with your Jenvu API key. Create one in your Jenvu dashboard under <b>Browser Extension</b>.</p>
+      <input id="keyInput" class="key-input" type="password" placeholder="jenvu_ext_..." autocomplete="off" />
+      <div class="key-row">
+        <button id="keySave" class="key-btn">Connect</button>
+        <a class="key-link" href="https://jenvu.com/dashboard/extension" target="_blank" rel="noreferrer">Get a key</a>
+      </div>
+      <p id="keyErr" class="key-err"></p>
+    </div>
+
     <main class="content">
       <section class="market" aria-label="Live gold market pulse">
         <div class="quote">

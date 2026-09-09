@@ -1,11 +1,43 @@
 const ENDPOINTS =
   location.protocol === "chrome-extension:"
     ? [
-        "https://project--487a19c8-f685-4f68-a76a-1104b70083c3-dev.lovable.app/api/public/gold",
-        "https://project--487a19c8-f685-4f68-a76a-1104b70083c3.lovable.app/api/public/gold",
+        "https://jenvu.com/api/public/gold",
+        "https://project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app/api/public/gold",
+        "https://project--06cd4260-299b-4286-8096-c43f2f596dee-dev.lovable.app/api/public/gold",
       ]
     : ["/api/public/gold"];
 let API = ENDPOINTS[0];
+
+/* ---------- Jenvu API key ---------- */
+const KEY_STORE = "jenvu_api_key_v1";
+let apiKey = null;
+
+function readKey() {
+  return new Promise((resolve) => {
+    try {
+      if (typeof chrome !== "undefined" && chrome.storage?.local) {
+        chrome.storage.local.get(KEY_STORE, (r) => resolve(r?.[KEY_STORE] || null));
+      } else {
+        resolve(localStorage.getItem(KEY_STORE));
+      }
+    } catch { resolve(null); }
+  });
+}
+
+function writeKey(value) {
+  try {
+    if (typeof chrome !== "undefined" && chrome.storage?.local) chrome.storage.local.set({ [KEY_STORE]: value });
+    else localStorage.setItem(KEY_STORE, value);
+  } catch { /* ignore */ }
+}
+
+function showKeyGate(show, message) {
+  const gate = document.getElementById("keyGate");
+  if (!gate) return;
+  gate.classList.toggle("hidden", !show);
+  const err = document.getElementById("keyErr");
+  if (err) err.textContent = message || "";
+}
 
 
 const TIMEFRAMES = ["15m", "1h", "4h", "1d"];
@@ -436,12 +468,19 @@ async function post(body, signal) {
       try {
         const res = await fetch(url, {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: {
+            "content-type": "application/json",
+            ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
+          },
           body: JSON.stringify(body),
           cache: "no-store",
           signal,
         });
         const json = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          showKeyGate(true, json.error || "Your API key is invalid or revoked.");
+          throw new Error(json.error || "Sign in with your Jenvu API key.");
+        }
         if (!res.ok) {
           const error = new Error(json.error || `Request failed (${res.status})`);
           error.retryable = res.status === 429 || res.status >= 500;
@@ -950,9 +989,35 @@ try {
     }
   });
 } catch { /* extension storage is unavailable in web preview */ }
-loadSnapshot();
-setInterval(loadSnapshot, 5000);
-document.addEventListener("visibilitychange", () => { if (!document.hidden) loadSnapshot(); });
+(async () => {
+  apiKey = await readKey();
+  showKeyGate(!apiKey, "");
+  const save = document.getElementById("keySave");
+  const input = document.getElementById("keyInput");
+  if (save && input) {
+    save.onclick = async () => {
+      const value = (input.value || "").trim();
+      if (!value.startsWith("jenvu_ext_")) { showKeyGate(true, "Key must start with jenvu_ext_"); return; }
+      save.disabled = true;
+      apiKey = value;
+      try {
+        await post({ action: "snapshot", timeframe });
+        writeKey(value);
+        input.value = "";
+        showKeyGate(false, "");
+        loadSnapshot();
+      } catch (e) {
+        apiKey = null;
+        showKeyGate(true, e.message || "Could not connect.");
+      } finally {
+        save.disabled = false;
+      }
+    };
+  }
+  if (apiKey) loadSnapshot();
+})();
+setInterval(() => { if (apiKey) loadSnapshot(); }, 5000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden && apiKey) loadSnapshot(); });
 
 // Restore last active chat (or start fresh)
 store.get().then((data) => {

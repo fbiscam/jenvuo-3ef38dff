@@ -11,8 +11,9 @@
     "activeTab"
   ],
   "host_permissions": [
-    "https://project--487a19c8-f685-4f68-a76a-1104b70083c3.lovable.app/*",
-    "https://project--487a19c8-f685-4f68-a76a-1104b70083c3-dev.lovable.app/*",
+    "https://jenvu.com/*",
+    "https://project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app/*",
+    "https://project--06cd4260-299b-4286-8096-c43f2f596dee-dev.lovable.app/*",
     "https://*.tradingview.com/*"
   ],
   "action": {
