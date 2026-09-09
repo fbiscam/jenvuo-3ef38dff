@@ -98,7 +98,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     ],
   },
   {
-    label: "Account & Billing",
+    label: "",
     items: [
       { to: "/dashboard/billing", label: "Billing", icon: "account_balance_wallet" },
       { to: "/dashboard/pay", label: "Payments", icon: "payments" },
