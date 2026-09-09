@@ -80,7 +80,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/dashboard", label: "Account Overview", icon: "space_dashboard", exact: true, countKey: "saved" },
-      { to: "/ai-engine", label: "AI Engineering", icon: "neurology" },
     ],
   },
   {
@@ -95,7 +94,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     items: [
       { to: "/insights", label: "Insights", icon: "menu_book" },
       { to: "/dashboard/extension", label: "Browser Extension", icon: "extension" },
-      { to: "/dashboard/referrals", label: "Referrals", icon: "diversity_3" },
       { to: "/pricing", label: "Pricing", icon: "local_offer" },
     ],
   },
