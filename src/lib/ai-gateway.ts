@@ -10,7 +10,14 @@
 // This module has NO Supabase / Node-only imports, so it can be top-level
 // imported from *.functions.ts without leaking a server-only surface.
 
-export type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
+export type ChatContentPart =
+  | { type: "text"; text: string }
+  | { type: "image_url"; image_url: { url: string; detail?: "low" | "high" | "auto" } };
+
+export type ChatMessage = {
+  role: "system" | "user" | "assistant";
+  content: string | ChatContentPart[];
+};
 
 // Models that support the OpenAI priority serving tier (fast mode).
 // Anything else must not send service_tier: "priority".
@@ -174,7 +181,7 @@ async function singleAttempt(
   // produces the same confidence within a short window. Seed derives from the
   // conversation content bucketed to the current minute — prevents 61% → 55%
   // flip-flop on back-to-back scans of the same setup.
-  const seedBase = (opts.messages.map((m) => m.content).join("|") + "|" + Math.floor(Date.now() / 60000));
+  const seedBase = (opts.messages.map((m) => typeof m.content === "string" ? m.content : JSON.stringify(m.content)).join("|") + "|" + Math.floor(Date.now() / 60000));
   let seed = 0;
   for (let i = 0; i < seedBase.length; i++) seed = ((seed << 5) - seed + seedBase.charCodeAt(i)) | 0;
   seed = Math.abs(seed) || 1;
