@@ -1016,7 +1016,7 @@ function DashboardLayout() {
 
 
 
-      <main className="mx-auto w-full max-w-7xl flex-1 bg-[#FAFAFA] px-5 pt-14 pb-7 sm:px-8 sm:pt-7" style={{ zoom: 0.9 }}>
+      <main className="mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7" style={{ zoom: 0.9 }}>
 
         <VerificationBanner isAdmin={isAdminUser} />
 
