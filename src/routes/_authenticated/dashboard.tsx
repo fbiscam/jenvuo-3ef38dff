@@ -90,7 +90,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     ],
   },
   {
-    label: "Tools & Market",
+    label: "",
     items: [
       { to: "/insights", label: "Insights", icon: "menu_book" },
       { to: "/dashboard/extension", label: "Browser Extension", icon: "extension" },
