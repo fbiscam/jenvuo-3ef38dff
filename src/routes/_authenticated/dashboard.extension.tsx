@@ -136,17 +136,6 @@ function ExtensionPage() {
 
   return (
     <div className="space-y-5">
-      <header className="rounded-xl border border-zinc-200 bg-white p-5">
-        <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-zinc-500">
-          <Puzzle className="h-3.5 w-3.5" /> Browser extension
-        </div>
-        <h1 className="mt-2 text-xl font-semibold text-zinc-900">Jenvu XAU/USD Analyst Extension</h1>
-        <p className="mt-1.5 max-w-2xl text-[13px] leading-relaxed text-zinc-600">
-          The extension runs the same ICT/SMC engine as your dashboard: live gold price, market structure,
-          liquidity, order blocks and an AI second review — straight from your browser toolbar. Install it,
-          create a key below, paste the key into the extension and you are signed in.
-        </p>
-      </header>
 
       <div className="grid gap-5 lg:grid-cols-2">
         <Card title="Step 1 — Install" icon={<Download className="h-3.5 w-3.5" />}>
