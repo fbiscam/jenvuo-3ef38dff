@@ -20,6 +20,7 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
 import { getDefaultAvatar } from "@/lib/default-avatar";
 import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
+import { TerminalWorkstation } from "@/components/TerminalWorkstation";
 
 
 
@@ -1056,6 +1057,10 @@ function DashboardLayout() {
 
 
 
+        {/* Live market terminal */}
+        <div className="mt-4">
+          <TerminalWorkstation headingClassName="mt-2 ml-1" />
+        </div>
 
         {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
         <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
