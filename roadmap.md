@@ -4,3 +4,4 @@
 - [x] Port Hello Hub homepage sections and required assets
 - [x] Align dashboard, sign-in, and shared navigation with Hello Hub
 - [x] Verify the updated pages and type safety
+- [ ] Replace the homepage review video with a company growth chart
