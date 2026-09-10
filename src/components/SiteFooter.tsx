@@ -137,7 +137,7 @@ export default function SiteFooter({ className }: { className?: string }) {
 
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col gap-5 border-t border-zinc-200 pt-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-zinc-500">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-zinc-700">
             <span>© {year} Jenvu AI, Inc.</span>
             <Link to="/privacy" className="hover:text-zinc-900">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-zinc-900">Terms of Use</Link>
