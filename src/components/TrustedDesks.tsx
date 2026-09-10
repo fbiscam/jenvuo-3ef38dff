@@ -234,12 +234,22 @@ function PerformanceChart({ desk }: { desk: Desk }) {
 export default function TrustedDesks() {
   const [active, setActive] = React.useState(0);
   const [playing, setPlaying] = React.useState(true);
+  const logoRailRef = React.useRef<HTMLDivElement | null>(null);
+  const logoButtonRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
 
   React.useEffect(() => {
     if (!playing) return;
     const t = setInterval(() => setActive((i) => (i + 1) % DESKS.length), 6000);
     return () => clearInterval(t);
   }, [playing]);
+
+  React.useEffect(() => {
+    const rail = logoRailRef.current;
+    const button = logoButtonRefs.current[active];
+    if (!rail || !button || rail.scrollWidth <= rail.clientWidth) return;
+    const left = button.offsetLeft - (rail.clientWidth - button.offsetWidth) / 2;
+    rail.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+  }, [active]);
 
   const desk = DESKS[active] ?? DESKS[0];
 
@@ -259,10 +269,11 @@ export default function TrustedDesks() {
       <div className="relative mt-8 overflow-hidden border-y border-zinc-200 bg-white">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-white to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-white to-transparent" />
-        <div className="flex gap-3 overflow-x-auto px-4 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div ref={logoRailRef} className="flex gap-3 overflow-x-auto px-4 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {DESKS.map((d, i) => (
             <button
               key={d.id}
+              ref={(node) => { logoButtonRefs.current[i] = node; }}
               type="button"
               onClick={() => setActive(i)}
               className={`flex shrink-0 items-center gap-3 rounded-lg border px-4 py-3 text-sm font-semibold transition-colors ${
