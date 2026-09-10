@@ -12,6 +12,7 @@ export type LedgerRow = {
   prompt_tokens?: number | null;
   completion_tokens?: number | null;
   raw_cost_usd?: number | null;
+  metadata?: Record<string, unknown> | null;
 };
 
 export type DailyBucket = { date: string; spent: number; earned: number };
@@ -42,7 +43,7 @@ export const getUsageStats = createServerFn({ method: "GET" })
         .maybeSingle(),
       supabase
         .from("credit_ledger")
-        .select("id, delta, reason, balance_after, created_at, model, stage, prompt_tokens, completion_tokens, raw_cost_usd")
+        .select("id, delta, reason, balance_after, created_at, model, stage, prompt_tokens, completion_tokens, raw_cost_usd, metadata")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(200),
@@ -80,6 +81,7 @@ export const getUsageStats = createServerFn({ method: "GET" })
       prompt_tokens: r.prompt_tokens ?? null,
       completion_tokens: r.completion_tokens ?? null,
       raw_cost_usd: r.raw_cost_usd == null ? null : Number(r.raw_cost_usd),
+      metadata: (r.metadata as Record<string, unknown> | null) ?? null,
     }));
 
     // Period window

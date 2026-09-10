@@ -18,8 +18,12 @@ async function handle({ request }: { request: Request }) {
   }
 
   try {
-    const plan = await computeSignalPlan({ symbol }, auth.userId)
-    return extJson({ ok: true, plan })
+    const requestId = request.headers.get('x-request-id') || crypto.randomUUID()
+    const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
+    const entitlement = await getExtensionEntitlement(auth.userId)
+    if (!entitlement.allowed) return extJson({ ok: false, error: entitlement.error, code: entitlement.status === 402 ? 'LOW_BALANCE' : 'PLAN_REQUIRED', balance: entitlement.balance }, entitlement.status)
+    const plan = await computeSignalPlan({ symbol }, auth.userId, { scanId: requestId, extensionBilling: { keyId: auth.keyId, keyName: auth.name } })
+    return extJson({ ok: true, plan, requestId })
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Analysis failed.'
     return extJson({ ok: false, error: message }, 502)

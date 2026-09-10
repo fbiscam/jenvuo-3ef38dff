@@ -2084,7 +2084,7 @@ function buildFeedFallbackPlan(args: {
 export async function computeSignalPlan(
   data: { symbol: string },
   __userId: string | null = null,
-  billing?: { scanId?: string | null; systemScan?: boolean },
+  billing?: { scanId?: string | null; systemScan?: boolean; extensionBilling?: { keyId: string; keyName: string } },
 ): Promise<SignalPlan> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
@@ -3783,7 +3783,16 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     // WAIT / no-trade returns are free. MUST be awaited — Cloudflare Workers
     // cancel post-response async work, so fire-and-forget charges get dropped.
     const __scanId = billing?.scanId ?? ((globalThis as any).crypto?.randomUUID?.() ?? `scan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`);
-    if (enrichedPlan.trade.direction === "BUY" || enrichedPlan.trade.direction === "SELL") {
+    if (billing?.extensionBilling) {
+      const calls = [
+        ...(__usedNarrationModel ? [{ model: __usedNarrationModel, usage: { promptTokens: __totalPromptTokens, completionTokens: __totalCompletionTokens }, stage: "extension-full-analysis" }] : []),
+        ...(__usedSeniorModel ? [{ model: __usedSeniorModel, usage: { promptTokens: 0, completionTokens: 0 }, stage: "extension-senior-review" }] : []),
+      ];
+      if (calls.length < 2) throw new Error("Extension analysis requires a completed primary and senior AI review.");
+      const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
+      const charged = await chargeExtensionUsage({ userId: __userId as string, keyId: billing.extensionBilling.keyId, keyName: billing.extensionBilling.keyName, requestId: __scanId, action: "full_analysis", calls });
+      if (!charged.ok) throw new Error(charged.error ?? "Extension usage could not be charged.");
+    } else if (enrichedPlan.trade.direction === "BUY" || enrichedPlan.trade.direction === "SELL") {
       try {
         const { chargeSignalScan } = await import("@/lib/ai-cost-log.server");
         await chargeSignalScan({

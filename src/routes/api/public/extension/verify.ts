@@ -23,7 +23,9 @@ async function handle({ request }: { request: Request }) {
     if (sub?.plan_id && (sub.status === 'active' || sub.status === 'trialing')) plan = String(sub.plan_id)
   } catch { /* optional */ }
 
-  return extJson({ ok: true, user: { id: auth.userId, email, plan }, key: { id: auth.keyId, name: auth.name } })
+  const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
+  const access = await getExtensionEntitlement(auth.userId)
+  return extJson({ ok: true, user: { id: auth.userId, email, plan }, key: { id: auth.keyId, name: auth.name }, access: { keyLimit: access.keyLimit, wallet: access.wallet, balance: access.balance, aiEnabled: access.allowed } })
 }
 
 export const Route = createFileRoute('/api/public/extension/verify')({
