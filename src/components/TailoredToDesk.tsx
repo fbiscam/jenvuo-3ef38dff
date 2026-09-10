@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Bot, CornerDownRight, Github, Globe2, Grid3X3, ShieldCheck } from "lucide-react";
-import jenvuLogoAsset from "@/assets/jenvu-round-logo.png.asset.json";
+import jenvuLogoAsset from "@/assets/jenvu-workflow-logo.png.asset.json";
 
 const BUILDS = [
   { id: "v30499", time: "Updated 09.10.26, 09:50", status: "Queued" },
