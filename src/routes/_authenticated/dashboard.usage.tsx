@@ -120,11 +120,22 @@ function UsagePage() {
     const avgCost = spendRows.length ? spent / spendRows.length : 0;
     const lastActivity = rows[0]?.created_at ?? null;
     const hasSpend = spent > 0 || earned > 0;
+    const keySpend = new Map<string, { spend: number; requests: number }>();
+    for (const row of spendRows) {
+      if (row.reason !== "extension_api" || !row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata)) continue;
+      const keyId = typeof row.metadata.api_key_id === "string" ? row.metadata.api_key_id : null;
+      if (!keyId) continue;
+      const current = keySpend.get(keyId) ?? { spend: 0, requests: 0 };
+      current.spend += Math.abs(row.delta);
+      current.requests += 1;
+      keySpend.set(keyId, current);
+    }
     return {
       rows, spendRows, earnRows, spent, earned, totalTokens, inputTokens, outputTokens,
       days, avgCost, lastActivity, hasSpend,
       tokenSeries: days.map((d) => d.tokens),
       requestSeries: days.map((d) => d.requests),
+      keySpend,
     };
   }, [data, rangeDays, model]);
 
@@ -328,20 +339,36 @@ function UsagePage() {
           {/* Recent extension keys */}
           <section className="border-b border-zinc-200 px-1 pb-5">
             <div className="flex items-center justify-between gap-3">
-              <div className="text-[13px] font-medium text-zinc-900">APIs</div>
-              <span className="text-[11px] tabular-nums text-zinc-400">Max 4</span>
+              <div>
+                <div className="text-[13px] font-medium text-zinc-900">Recent API keys</div>
+                <div className="mt-0.5 text-[11.5px] text-zinc-500">Latest four · spend for {rangeLabel.toLowerCase()}</div>
+              </div>
+              <span className="text-[11px] tabular-nums text-zinc-400">{data.recentExtensionKeys.length} shown</span>
             </div>
             {data.recentExtensionKeys.length === 0 ? (
-              <p className="py-6 text-center text-[13px] text-zinc-500">No API keys yet.</p>
+              <p className="py-6 text-center text-[13px] text-zinc-500">No extension API keys yet.</p>
             ) : (
-              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {data.recentExtensionKeys.slice(0, 4).map((key) => (
-                  <div key={key.id} className="min-w-0 rounded-md border border-zinc-200 bg-white px-3 py-2.5">
-                    <code className="block truncate font-mono text-[12px] font-medium text-blue-700">
-                      {key.keyPrefix}••••••••••
-                    </code>
-                  </div>
-                ))}
+              <div className="mt-3 divide-y divide-zinc-100">
+                {data.recentExtensionKeys.map((key, index) => {
+                  const usage = derived.keySpend.get(key.id) ?? { spend: 0, requests: 0 };
+                  return (
+                    <div key={key.id} className="flex items-center justify-between gap-3 py-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <code className="truncate font-mono text-[11.5px] text-zinc-800">{key.keyPrefix}••••••••••</code>
+                          {index === 0 && <span className="rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-medium text-blue-700">Newest</span>}
+                        </div>
+                        <div className="mt-1 truncate text-[10.5px] text-zinc-400">
+                          {key.name} · {usage.requests} request{usage.requests === 1 ? "" : "s"} · {key.revokedAt ? "Revoked" : "Active"}
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <div className="text-[12px] font-semibold tabular-nums text-zinc-900">{fmtUsd(usage.spend, 2)}</div>
+                        <div className="mt-0.5 text-[10px] text-zinc-400">Spend</div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </section>
