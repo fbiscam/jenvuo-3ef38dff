@@ -1320,11 +1320,12 @@ function AuthPage() {
                     <>
                       <form onSubmit={signIn} className="mt-4 space-y-4">
                         <div>
-                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label htmlFor="signin-email" className="mb-2 block text-[14px] font-medium text-zinc-900">
                             Email
                           </label>
                           <input
                             type="email"
+                            id="signin-email"
                             required
                             autoComplete="username"
                             value={email}
@@ -1335,12 +1336,13 @@ function AuthPage() {
                         </div>
 
                         <div>
-                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label htmlFor="signin-password" className="mb-2 block text-[14px] font-medium text-zinc-900">
                             Password
                           </label>
                           <div className="relative">
                             <input
                               type={showPassword ? "text" : "password"}
+                              id="signin-password"
                               required
                               autoComplete="current-password"
                               value={password}
