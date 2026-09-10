@@ -124,7 +124,7 @@ export default function SiteFooter({ className }: { className?: string }) {
                   <li key={`${l.to}:${l.label}`}>
                     <Link
                       to={l.to}
-                      className="text-[13px] text-zinc-600 transition-colors hover:text-zinc-900"
+                      className="text-[13px] font-medium text-zinc-700 transition-colors hover:text-zinc-950"
                     >
                       {l.label}
                     </Link>
