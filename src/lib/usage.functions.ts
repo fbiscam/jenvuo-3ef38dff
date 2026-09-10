@@ -18,6 +18,13 @@ export type LedgerRow = {
 
 export type DailyBucket = { date: string; spent: number; earned: number };
 export type ReasonBucket = { reason: string; scans: number };
+export type RecentExtensionKey = {
+  id: string;
+  name: string;
+  keyPrefix: string;
+  createdAt: string;
+  revokedAt: string | null;
+};
 
 export type UsageStats = {
   balance: number;
@@ -29,6 +36,7 @@ export type UsageStats = {
   daily: DailyBucket[];
   byReason: ReasonBucket[];
   ledger: LedgerRow[];
+  recentExtensionKeys: RecentExtensionKey[];
 };
 
 export const getUsageStats = createServerFn({ method: "GET" })
@@ -36,7 +44,7 @@ export const getUsageStats = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<UsageStats> => {
     const { supabase, userId } = context;
 
-    const [{ data: bal }, { data: ledger }, { data: sub }] = await Promise.all([
+    const [{ data: bal }, { data: ledger }, { data: sub }, { data: extensionKeys }] = await Promise.all([
       supabase
         .from("credit_balances")
         .select("balance, monthly_allowance, period_resets_at")
@@ -53,6 +61,12 @@ export const getUsageStats = createServerFn({ method: "GET" })
         .select("plan_id")
         .eq("user_id", userId)
         .maybeSingle(),
+      supabase
+        .from("extension_api_keys")
+        .select("id, name, key_prefix, created_at, revoked_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(4),
     ]);
 
     // Allowance mirrors the plan wallet when the balance row has none set,
@@ -133,5 +147,12 @@ export const getUsageStats = createServerFn({ method: "GET" })
       daily: Array.from(dayMap.values()),
       byReason,
       ledger: rows,
+      recentExtensionKeys: (extensionKeys ?? []).map((key) => ({
+        id: key.id,
+        name: key.name,
+        keyPrefix: key.key_prefix,
+        createdAt: key.created_at,
+        revokedAt: key.revoked_at,
+      })),
     };
   });
