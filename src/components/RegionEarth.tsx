@@ -48,6 +48,8 @@ function DottedGlobe() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(canvas);
     window.addEventListener("resize", resize);
 
     const draw = (now: number) => {
@@ -110,6 +112,7 @@ function DottedGlobe() {
     return () => {
       running = false;
       cancelAnimationFrame(raf);
+      resizeObserver.disconnect();
       window.removeEventListener("resize", resize);
     };
   }, []);
