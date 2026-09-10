@@ -15,11 +15,6 @@ import face3 from "@/assets/review-user-3.jpg";
 import face4 from "@/assets/review-user-4.jpg";
 import face5 from "@/assets/review-user-5.jpg";
 import face6 from "@/assets/review-user-6.jpg";
-import webullLogo from "@/assets/webull-logo.png.asset.json";
-import trading212Logo from "@/assets/trading212-logo.png.asset.json";
-import trustWalletLogo from "@/assets/trustwallet-logo.png.asset.json";
-import etoroLogo from "@/assets/etoro-logo.png.asset.json";
-import metaTraderLogo from "@/assets/metatrader-logo.png.asset.json";
 
 type Desk = {
   id: string;
@@ -59,7 +54,6 @@ const DESKS: Desk[] = [
   {
     id: "webull",
     name: "Webull",
-    logo: webullLogo.url,
     brandClass: "td-brand-webull",
     avatar: face3,
     quote:
@@ -70,7 +64,6 @@ const DESKS: Desk[] = [
   {
     id: "trading212",
     name: "Trading 212",
-    logo: trading212Logo.url,
     brandClass: "td-brand-trading212",
     avatar: face4,
     quote:
@@ -81,7 +74,6 @@ const DESKS: Desk[] = [
   {
     id: "trustwallet",
     name: "Trust Wallet",
-    logo: trustWalletLogo.url,
     brandClass: "td-brand-trustwallet",
     avatar: face5,
     quote:
@@ -123,7 +115,6 @@ const DESKS: Desk[] = [
   {
     id: "etoro",
     name: "eToro",
-    logo: etoroLogo.url,
     brandClass: "td-brand-etoro",
     avatar: face3,
     quote: "The consistent review format makes every setup easier to compare, explain and share across the desk.",
@@ -133,7 +124,6 @@ const DESKS: Desk[] = [
   {
     id: "metatrader",
     name: "MetaTrader 5",
-    logo: metaTraderLogo.url,
     brandClass: "td-brand-metatrader",
     avatar: face4,
     quote: "Voice-first analysis keeps attention on execution while the engine tracks the market structure in real time.",
@@ -158,7 +148,11 @@ function Mark({ desk, large = false }: { desk: Desk; large?: boolean }) {
           loading="lazy"
           className={`${large ? "h-11 w-11" : "h-7 w-7"} object-contain`}
         />
-      ) : null}
+      ) : (
+        <span className={`font-semibold tracking-tight ${large ? "text-base" : "text-xs"}`}>
+          {desk.name.slice(0, 2).toUpperCase()}
+        </span>
+      )}
     </span>
   );
 }
