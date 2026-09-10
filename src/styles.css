@@ -90,6 +90,12 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-brand-openai: var(--brand-openai);
+  --color-brand-gemini: var(--brand-gemini);
+  --color-brand-deepseek: var(--brand-deepseek);
+  --color-brand-claude: var(--brand-claude);
+  --color-home-accent: var(--home-accent);
+  --color-home-accent-soft: var(--home-accent-soft);
 }
 
 :root {
@@ -131,6 +137,13 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.9 0.013 255.508);
   --sidebar-ring: oklch(0.5 0.05 256.788);
+  --brand-openai: oklch(0.64 0.115 167);
+  --brand-gemini: oklch(0.62 0.23 285);
+  --brand-deepseek: oklch(0.59 0.22 271);
+  --brand-claude: oklch(0.7 0.12 55);
+  --home-accent: #fd540f;
+  --home-accent-soft: oklch(0.95 0.04 60);
+  --home-accent-canvas: rgb(255 244 237);
 }
 
 .dark {
@@ -166,6 +179,13 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 15%);
   --sidebar-ring: oklch(0.65 0.03 264.364);
+  --brand-openai: oklch(0.72 0.13 167);
+  --brand-gemini: oklch(0.72 0.2 285);
+  --brand-deepseek: oklch(0.7 0.18 271);
+  --brand-claude: oklch(0.75 0.11 55);
+  --home-accent: #fd540f;
+  --home-accent-soft: oklch(0.32 0.10 55);
+  --home-accent-canvas: rgb(45 24 12);
 }
 
 
@@ -233,6 +253,16 @@
 }
 .animate-fade-in { animation: jenvu-fade-in 180ms ease-out both; }
 .animate-scale-in { animation: jenvu-scale-in 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+
+@keyframes cfhero-float {
+  0%, 100% { transform: translateY(0) rotate(var(--cfhero-rot, 0deg)); }
+  50% { transform: translateY(-12px) rotate(var(--cfhero-rot, 0deg)); }
+}
+
+@keyframes jenvu-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
 
 @keyframes otp-shake {
   0%, 100% { transform: translateX(0); }
@@ -621,6 +651,19 @@ html[data-pwa="1"] .pwa-tabbar {
   border-color: rgba(0,0,0,0.08) !important;
 }
 
+/* Analytics section: borderless, no shadow — flush on the page */
+.jenvu-zoom-dashboard main .analytics-section,
+.jenvu-zoom-dashboard main .analytics-section .bg-white {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Hero section: borderless, no shadow — flush on the page */
+.jenvu-zoom-dashboard main .dashboard-hero {
+  border: none !important;
+  box-shadow: none !important;
+}
+
 .jenvu-zoom-dashboard main h1,
 .jenvu-zoom-dashboard main h2,
 .jenvu-zoom-dashboard main h3,
@@ -704,4 +747,54 @@ html[data-pwa="1"] .pwa-tabbar {
 html:not(.ms-icons-ready) .material-symbols-rounded {
   visibility: hidden;
   color: transparent;
+}
+
+/* Region: Earth animated globe overlay */
+@keyframes ge-dash {
+  from { stroke-dashoffset: 240; }
+  to { stroke-dashoffset: 0; }
+}
+.ge-arc {
+  animation: ge-dash 3.2s ease-in-out infinite;
+}
+.ge-arc-2 {
+  animation-delay: 0.6s;
+}
+@keyframes ge-ping {
+  0% { transform: scale(1); opacity: 0.6; }
+  70%, 100% { transform: scale(2.1); opacity: 0; }
+}
+.ge-ping {
+  animation: ge-ping 2.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.tailored-accent-glow {
+  background: radial-gradient(circle at 30% 20%, color-mix(in oklab, var(--home-accent) 16%, transparent), transparent 60%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ge-arc, .ge-ping { animation: none; }
+}
+
+/* Trusted desks logo marquee */
+@keyframes td-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.td-marquee {
+  animation: td-marquee 28s linear infinite;
+}
+.td-marquee:hover {
+  animation-play-state: paused;
+}
+.td-brand-tradingview { color: #2962ff; }
+.td-brand-binance { color: #f0b90b; }
+.td-brand-webull { color: #1652f0; }
+.td-brand-trading212 { color: #00a3ff; }
+.td-brand-trustwallet { color: #3375bb; }
+.td-brand-coinbase { color: #0052ff; }
+.td-brand-robinhood { color: #00c805; }
+.td-brand-revolut { color: #191c1f; }
+.td-brand-etoro { color: #6aa84f; }
+.td-brand-metatrader { color: #2784c8; }
+@media (prefers-reduced-motion: reduce) {
+  .td-marquee { animation: none; }
 }

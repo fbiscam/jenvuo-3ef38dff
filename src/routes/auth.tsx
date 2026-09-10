@@ -2,10 +2,12 @@ import * as React from "react";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Mail, Lock, ArrowRight, User, Loader2, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, ArrowRight, User, Loader2, Eye, EyeOff, Globe } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { FaApple, FaGithub } from "react-icons/fa";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { CloudOrb } from "@/components/CloudOrb";
+import authPanel from "@/assets/auth-panel.jpg.asset.json";
 import {
   confirmRecoveryOtp,
   confirmSignupOtp,
@@ -96,11 +98,7 @@ export const Route = createFileRoute("/auth")({
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
-/* ---------- live ticker ---------- */
-import { useLiveTicker } from "@/hooks/useLiveTicker";
-
 function AuthPage() {
-  const tickerRows = useLiveTicker();
   const navigate = useNavigate();
   const sendSignupOtp = useServerFn(requestSignupOtp);
   const verifySignupCode = useServerFn(confirmSignupOtp);
@@ -393,6 +391,20 @@ function AuthPage() {
       <span>{label}</span>
     </>
   );
+
+  const signInWithProvider = async (provider: "google" | "apple" | "github") => {
+    setErrorMsg(null);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/auth` },
+      });
+      if (error) throw error;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "This sign-in method is not enabled yet.";
+      toast.error(`${provider} sign-in unavailable`, { description: msg });
+    }
+  };
 
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -789,88 +801,67 @@ function AuthPage() {
 
 
   return (
-    <>
-    <div className={`jenvu-auth-zoom h-dvh w-full overflow-hidden bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white flex flex-col`}>
+    <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white lg:flex`}>
 
-
-      {/* NAV */}
-      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
-        <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
-          <Link to="/" className="flex min-w-0 items-center gap-2.5">
-            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+      {/* LEFT — form column */}
+      <div className="flex min-h-dvh w-full flex-col lg:w-[46%]">
+        <div className="px-6 pt-6 sm:px-10 sm:pt-8">
+          <Link to="/" aria-label="Jenvu home" className="inline-flex">
+            <img src="/favicon.png" alt="Jenvu" className="h-9 w-9 rounded-md object-contain" />
           </Link>
-
-          <div className="flex shrink-0 items-center gap-2">
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-100 bg-white ${MONO} text-[10px] tracking-wider uppercase text-zinc-900`}>
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="relative rounded-full bg-emerald-500 h-1.5 w-1.5" />
-              </span>
-              AUTH_TERMINAL // ONLINE
-            </div>
-          </div>
         </div>
-        {/* ticker strip */}
-        <div className="border-t border-zinc-100 overflow-hidden">
-          <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap animate-ticker`}>
-            {[...tickerRows, ...tickerRows].map(([s, p, d], i) => (
-              <span key={i} className="flex items-center gap-2">
-                <span className="text-zinc-900 font-medium">{s}</span>
-                <span>{p}</span>
-                <span className={d.startsWith("-") ? "text-red-500" : "text-emerald-600"}>{d}</span>
-                <span className="text-zinc-200">•</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      </header>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 min-h-0 overflow-hidden flex flex-col items-center justify-center p-2 sm:p-3">
-        <div className="w-full max-w-6xl max-h-full overflow-hidden">
-          <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden max-h-[calc(100dvh-9rem)] flex flex-col">
+        <div className="flex flex-1 items-start justify-center px-6 pb-16 pt-10 sm:pt-14">
+          <div className="w-full max-w-[340px]">
+            <h1 className="text-center text-[26px] font-semibold tracking-tight text-zinc-900">
+              {mfaChallenge
+                ? "Two-factor authentication"
+                : mode === "forgot"
+                  ? "Reset your password"
+                  : mode === "signup"
+                    ? "Create your account"
+                    : "Sign in to Jenvu"}
+            </h1>
 
-            {/* terminal header */}
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 border-b border-zinc-100 bg-white sm:flex sm:justify-between sm:px-6 sm:py-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex gap-1.5 shrink-0">
-                  <div className={`w-2.5 h-2.5 rounded-full ${flashMsg ? "bg-emerald-500 animate-pulse" : "bg-zinc-200"}`} />
-                  <div className={`w-2.5 h-2.5 rounded-full ${flashMsg ? "bg-emerald-500 animate-pulse" : "bg-zinc-200"}`} />
-                  <div className={`w-2.5 h-2.5 rounded-full ${flashMsg ? "bg-emerald-500 animate-pulse" : "bg-zinc-200"}`} />
-                </div>
-                {flashMsg ? (
-                  <span
-                    key={flashMsg}
-                    className={`ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest uppercase text-emerald-700 truncate animate-terminal-blink`}
+            {(mode === "signin" || mode === "signup") && !mfaChallenge && !otpStep && (
+              <>
+                <div className="mt-6 grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void signInWithProvider("google")}
+                    className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
                   >
-                    ▸ {flashMsg}
-                  </span>
-                ) : (
-                  <span className={`hidden sm:inline ml-2 sm:ml-4 text-[10px] sm:text-[11px] ${MONO} tracking-widest text-zinc-900 uppercase truncate`}>
-                    Jenvu // AUTH_SESSION
-                  </span>
-                )}
-              </div>
-              <div className="flex shrink-0 items-center gap-4">
-                <span className={`text-[11px] ${MONO} ${flashMsg ? "text-emerald-600 animate-terminal-blink" : "text-zinc-400"}`}>
-                  {flashMsg ? "TRANSMITTING…" : "ENCRYPTION · AES-256"}
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-100 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
-              {/* LEFT — FORM */}
-              <div className="lg:col-span-7 bg-white p-4 sm:p-5 lg:p-6 lg:overflow-y-auto">
-
-                <div className="max-w-lg lg:mx-0">
-
-                  <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl lg:text-4xl">
-                    Sign in to your desk.
-                  </h1>
-                  <p className="mt-2 text-sm text-zinc-600 leading-relaxed sm:text-base">
-                    Voice-native institutional intelligence, on call.
-                  </p>
+                    <FcGoogle className="h-4 w-4" /> Google
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void signInWithProvider("apple")}
+                    className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
+                  >
+                    <FaApple className="h-4 w-4" /> Apple
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void signInWithProvider("github")}
+                    className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
+                  >
+                    <FaGithub className="h-4 w-4" /> GitHub
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toast.info("Enterprise SSO is available on desk plans — contact us to enable it.")}
+                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
+                >
+                  <Lock className="h-3.5 w-3.5" /> Continue with SSO
+                </button>
+                <div className="my-5 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-zinc-200" />
+                  <span className="text-[11px] uppercase tracking-wider text-zinc-400">OR</span>
+                  <div className="h-px flex-1 bg-zinc-200" />
+                </div>
+              </>
+            )}
 
                   {emailChangedBanner && (
                     <div
@@ -892,7 +883,7 @@ function AuthPage() {
 
 
                   {/* Sign-up is closed — access via Founding Trader Program */}
-                  {!mfaChallenge && (
+                  {mode === "signup" && !otpStep && (
                     <div className="mt-4 rounded-lg border border-yellow-300 bg-white px-4 py-3 text-[13px] text-yellow-900">
                       Public sign-up is closed. Access is granted through the{" "}
                       <Link to="/founding" className="font-medium text-zinc-900 underline-offset-2 hover:underline">
@@ -1383,98 +1374,77 @@ function AuthPage() {
                         </button>
                       </form>
 
-                      <div className="mt-4 pt-3 border-t border-zinc-100">
-                        <p className="text-sm text-zinc-500 leading-relaxed">
-                          New here?{" "}
-                          <Link
-                            to="/founding"
-                            className="font-medium text-zinc-900 underline-offset-2 hover:underline"
-                          >
-                            Apply to the Founding Trader Program →
-                          </Link>
-
-                        </p>
-                      </div>
-
                     </>
                   )}
 
-
-
-                </div>
-              </div>
-
-
-              {/* RIGHT — VISUAL */}
-              <div className="hidden lg:flex lg:col-span-5 bg-white flex-col p-5 lg:p-6 border-t lg:border-t-0 lg:border-l border-zinc-100">
-                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[200px]">
-                  <div
-                    className="absolute inset-0 opacity-[0.04] pointer-events-none"
-                    style={{
-                      backgroundImage: "radial-gradient(#000 0.6px, transparent 0.6px)",
-                      backgroundSize: "24px 24px",
-                    }}
-                  />
-                  <div className="relative z-10 flex flex-col items-center">
-                    <div className="relative h-32 w-32 lg:h-36 lg:w-36">
-                      <div className="absolute inset-0 rounded-full border border-zinc-100 animate-[spin_18s_linear_infinite]" />
-                      <div className="absolute inset-4 rounded-full border border-zinc-200/60 animate-[spin_24s_linear_infinite_reverse]" />
-                      <div className="absolute inset-7">
-                        <CloudOrb status="speaking" pulse={1} />
-                      </div>
+                  {mode === "signin" && !mfaChallenge && (
+                    <div className="mt-6 space-y-1.5 text-center text-[13px] text-zinc-500">
+                      <p>
+                        Don't have an account?{" "}
+                        <Link to="/founding" className="font-medium text-zinc-900 underline underline-offset-2">
+                          Sign up
+                        </Link>
+                      </p>
+                      <p>
+                        Forgot your password?{" "}
+                        <button
+                          type="button"
+                          onClick={() => { setMode("forgot"); setForgotStep("email"); setErrorMsg(null); setOtpCode(""); }}
+                          className="font-medium text-zinc-900 underline underline-offset-2"
+                        >
+                          Reset it
+                        </button>
+                      </p>
                     </div>
+                  )}
 
-                    
-                    <div className="mt-4 text-center space-y-2">
-                      <div className={`flex items-center justify-center gap-2 ${MONO} text-[10px] tracking-[0.2em] text-zinc-400 uppercase`}>
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
-                        LIVE_NARRATION
-                      </div>
-                      <div className={`h-10 flex items-center justify-center ${MONO} text-[11px] text-zinc-900 text-center max-w-[200px] leading-relaxed`}>
-                        <RotatingStatus />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-auto grid grid-cols-2 gap-px bg-zinc-100 rounded-xl overflow-hidden border border-zinc-100">
-                  {[
-                    ["Markets", "XAU"],
-                    ["Latency", "14ms"],
-                  ].map(([k, v]) => (
-                    <div key={k} className="bg-white p-4 text-center">
-                      <div className={`${MONO} text-[9px] uppercase tracking-widest text-zinc-400`}>{k}</div>
-                      <div className="mt-1 text-sm font-semibold text-zinc-900">{v}</div>
-                    </div>
-                  ))}
+                  <p className="mt-8 text-center text-[12px] leading-relaxed text-zinc-400">
+                    By continuing, I agree to Jenvu's{" "}
+                    <Link to="/terms" className="underline underline-offset-2">terms</Link> and{" "}
+                    <Link to="/privacy" className="underline underline-offset-2">privacy policy</Link>.
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </main>
 
-      {/* FOOTER */}
+            {/* RIGHT — orange panel */}
+            <div className="relative hidden min-h-dvh w-[54%] overflow-hidden bg-home-accent lg:flex lg:flex-col">
+              <img
+                src={authPanel.url}
+                alt=""
+                aria-hidden
+                width={1280}
+                height={1600}
+                className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-black/20" aria-hidden />
+              <div className="relative z-10 flex items-center justify-end gap-4 px-8 pt-7">
+                <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-white/95">
+                  <Globe className="h-4 w-4" /> English
+                </span>
+                <Link
+                  to="/founding"
+                  className="rounded-md bg-white px-4 py-2 text-[13px] font-semibold text-zinc-900 shadow-sm transition hover:bg-zinc-100"
+                >
+                  Sign up
+                </Link>
+              </div>
+              <div className="relative z-10 flex flex-1 flex-col justify-center px-14 pb-24">
+                <p className={`${MONO} text-[12px] font-medium tracking-wide text-white/90`}>
+                  Jenvu · Founding Trader Program
+                </p>
+                <h2 className="mt-3 max-w-[440px] text-[42px] font-semibold leading-[1.08] tracking-tight text-white">
+                  Where gold traders connect.
+                </h2>
+                <p className="mt-3 text-[15px] text-white/90">Live 24/7 · Every session, every killzone</p>
+                <Link
+                  to="/founding"
+                  className="mt-7 inline-flex w-fit items-center gap-2 rounded-md bg-white px-4 py-2.5 text-[13px] font-semibold text-zinc-900 shadow-sm transition hover:bg-zinc-100"
+                >
+                  <ArrowRight className="h-4 w-4" /> Register now
+                </Link>
+              </div>
+            </div>
     </div>
-    </>
   );
-}
-
-
-function RotatingStatus() {
-  const [idx, setIdx] = React.useState(0);
-  const phrases = [
-    "Mapping liquidity on XAU/USD...",
-    "FVG detected on XAU/JPY 15m...",
-    "Monitoring London fix killzone...",
-    "Analyzing institutional bullion bias...",
-    "Scanning DXY-XAU divergence..."
-  ];
-  
-  React.useEffect(() => {
-    const itv = setInterval(() => setIdx((i: number) => (i + 1) % phrases.length), 3000);
-    return () => clearInterval(itv);
-  }, [phrases.length]);
-
-  return <span className="animate-pulse">{phrases[idx]}</span>;
 }

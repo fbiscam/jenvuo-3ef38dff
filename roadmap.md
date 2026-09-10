@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Verify and resolve the reported TypeScript error
-- [ ] Port Hello Hub homepage sections and required assets
-- [ ] Align dashboard and shared navigation with Hello Hub
+- [x] Verify and resolve the reported TypeScript error
+- [x] Port Hello Hub homepage sections and required assets
+- [x] Align dashboard, sign-in, and shared navigation with Hello Hub
 - [ ] Verify the updated pages and type safety

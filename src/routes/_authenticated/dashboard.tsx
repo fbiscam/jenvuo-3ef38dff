@@ -20,7 +20,9 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { getVoiceHistory, formatRelative, formatDateTime, clearVoiceHistory, type VoiceTurn } from "@/lib/voice-history";
 import { getDefaultAvatar } from "@/lib/default-avatar";
 import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
-import { TerminalWorkstation } from "@/components/TerminalWorkstation";
+
+import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
+import { listExtensionKeys } from "@/lib/extension-keys.functions";
 
 
 
@@ -29,7 +31,11 @@ import {
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
+  Search, ChevronRight, ChevronDown, Rocket, History, Globe,
+  LayoutDashboard, ChartNoAxesCombined, Puzzle, BadgeDollarSign, FileCheck2,
+  LockKeyhole, CircleHelp, type LucideIcon,
 } from "lucide-react";
+import { RiClaudeFill, RiDeepseekFill, RiGeminiFill, RiOpenaiFill } from "react-icons/ri";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
@@ -73,39 +79,36 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type OpenTrade = { pair: string; direction: "long" | "short"; entry: number | null; stop_loss: number | null; take_profit: number | null };
 type Counts = { saved: number; alerts7d: number; journalWinRate: number | null; journalTotal: number; closedWins: number; closedDecided: number; openTrades: OpenTrade[] };
 
-type TabItem = { to: string; label: string; icon: string; exact?: boolean; countKey?: keyof Counts };
+type TabItem = { to: string; label: string; icon: LucideIcon; exact?: boolean; countKey?: keyof Counts };
 
 const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard", label: "Overview", icon: "space_dashboard", exact: true, countKey: "saved" },
+      { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true, countKey: "saved" },
     ],
   },
   {
     label: "",
     items: [
-      { to: "/dashboard/analytics", label: "Analytics", icon: "query_stats" },
-      { to: "/dashboard/notifications", label: "Notifications", icon: "notifications" },
+      { to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined },
     ],
   },
   {
     label: "",
     items: [
-      { to: "/insights", label: "Insights", icon: "menu_book" },
-      { to: "/dashboard/extension", label: "Extension", icon: "extension" },
-      { to: "/pricing", label: "Pricing", icon: "local_offer" },
+      { to: "/dashboard/extension", label: "API Keys", icon: Puzzle },
+      { to: "/pricing", label: "Pricing", icon: Tag },
     ],
   },
   {
     label: "",
     items: [
-      { to: "/dashboard/billing", label: "Billing", icon: "account_balance_wallet" },
-      { to: "/dashboard/pay", label: "Payments", icon: "payments" },
-      { to: "/dashboard/documents", label: "Documents", icon: "verified_user" },
-      { to: "/dashboard/profile", label: "Profile", icon: "person_pin" },
-      { to: "/dashboard/security", label: "Security", icon: "encrypted" },
-      { to: "/help", label: "Help Center", icon: "lightbulb" },
+      { to: "/dashboard/billing", label: "Billing", icon: Wallet },
+      { to: "/dashboard/pay", label: "Payments", icon: BadgeDollarSign },
+      { to: "/dashboard/documents", label: "Documents", icon: FileCheck2 },
+      { to: "/dashboard/security", label: "Security", icon: LockKeyhole },
+      { to: "/help", label: "Help Center", icon: CircleHelp },
     ],
   },
 ];
@@ -289,7 +292,7 @@ function SignalDeskHistory() {
         return (
           <Link
             key={a.id}
-            to="/signals-live"
+            to="/dashboard/notifications"
             className="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-50"
           >
             
@@ -462,7 +465,7 @@ function DashboardLayout() {
   }, []);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [isAdminUser, setIsAdminUser] = useState(false);
-  // Unverified accounts may only use Dashboard, Profile, Security and Documents.
+  // Unverified accounts may only use Dashboard, Security and Documents.
   const verificationLocked =
     !isAdminUser &&
     !verification.loading &&
@@ -860,8 +863,36 @@ function DashboardLayout() {
 
   const balanceTone: "emerald" | "rose" | "zinc" = scansTrend === "down" ? "rose" : scansTrend === "up" ? "emerald" : "zinc";
 
+  // ---------- Extension usage analytics (Cloudflare-style overview) ----------
+  const fetchUsageStats = useServerFn(getUsageStats);
+  const fetchExtensionKeys = useServerFn(listExtensionKeys);
+  const [usageStats, setUsageStats] = useState<UsageStats | null>(null);
+  const [extKeyCount, setExtKeyCount] = useState<number | null>(null);
+  const [usageLoading, setUsageLoading] = useState(false);
+  const [usageRange, setUsageRange] = useState<"24h" | "7d" | "30d">("24h");
+
+  useEffect(() => {
+    if (authLoading || !authUser) return;
+    let cancelled = false;
+    setUsageLoading(true);
+    (async () => {
+      try {
+        const [u, k] = await Promise.all([fetchUsageStats(), fetchExtensionKeys()]);
+        if (cancelled) return;
+        setUsageStats(u);
+        setExtKeyCount(k.ok ? k.keys.filter((x) => !x.revoked_at).length : 0);
+      } catch {
+        // best-effort — cards render empty state
+      } finally {
+        if (!cancelled) setUsageLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authUser?.id, authLoading, refreshTick]);
+
   return (
-    <div className={`flex min-h-screen bg-[#FAFAFA] text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
+    <div className={`flex min-h-screen bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
 
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -876,12 +907,12 @@ function DashboardLayout() {
       {!embedMode && (
       /* Sidebar (Firebase-style) */
       <aside
-        className={`dashboard-sidebar-root max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white transition-[width,transform] duration-200 ease-out ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
+        className={`dashboard-sidebar-root max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-[#FAFAFA] transition-[width,transform] duration-200 ease-out ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
         style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 }}
       >
         <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
         {/* Brand */}
-        <div className={`flex h-11 shrink-0 items-center gap-2.5 bg-white ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
+        <div className={`flex h-11 shrink-0 items-center gap-2.5 bg-[#FAFAFA] ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}>
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
             <img src="/favicon.png" alt="JENVU" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             {!sidebarCollapsed && (
@@ -900,12 +931,12 @@ function DashboardLayout() {
 
         {/* Nav */}
 
-        <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-white px-2 py-2">
+        <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-[#FAFAFA] px-2 py-2">
 
           {[...NAV_GROUPS].map((group, gi) => (
             <div key={group.label} className={gi > 0 ? "mt-2" : ""}>
               {!sidebarCollapsed && group.label && (
-                <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#9B9C9B]">
+                <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#6B6C6B]">
                   {group.label}
                 </div>
               )}
@@ -913,7 +944,7 @@ function DashboardLayout() {
               <div className="flex flex-col gap-1.5">
                 {group.items.map((t) => {
                   const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
-                  const iconName = t.icon;
+                   const Icon = t.icon;
                   const count = t.countKey ? (newCounts as Record<string, number>)[t.countKey] : undefined;
                   const isNotifs = t.to === "/dashboard/notifications";
                   const hasUnread = isNotifs && unreadNotifs > 0 && !active;
@@ -924,20 +955,13 @@ function DashboardLayout() {
                       resetScroll={false}
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
-                      className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB] text-zinc-900 font-semibold" : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"}`}
+                      className={`group relative flex items-center rounded-full text-[12.5px] font-medium transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB] text-zinc-900 font-semibold" : "text-[#3C4043] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
-                      <span
-                        className="material-symbols-rounded shrink-0"
-                        aria-hidden
-                        style={{
-                          fontSize: 21,
-                          lineHeight: 1,
-                          color: active ? "#18181b" : "#5E5E5E",
-                          fontVariationSettings: `'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 24`,
-                        }}
-                      >
-                        {iconName}
-                      </span>
+                      <Icon
+                        className="h-[19px] w-[19px] shrink-0 text-current"
+                        strokeWidth={active ? 2 : 1.75}
+                        aria-hidden="true"
+                      />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
                       {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
                         <span className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white" style={{ height: 16, paddingLeft: 6, paddingRight: 6, fontSize: 9, fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
@@ -967,7 +991,7 @@ function DashboardLayout() {
 
 
         {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
-        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-white py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}>
+        <div className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-[#FAFAFA] py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}>
           {!sidebarCollapsed && (
             <button
               type="button"
@@ -1025,129 +1049,21 @@ function DashboardLayout() {
 
 
 
-        {/* Live market terminal */}
-        <div className="mt-4">
-          <TerminalWorkstation headingClassName="mt-2 ml-1" />
-        </div>
 
-        {/* Row 1 — three analytics cards each with 2 metrics + sparkline */}
-        <section className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card>
-            <CardHeader icon={ShieldCheck} title="Wallet & Plan" />
-            <div className="flex divide-x divide-zinc-200">
-              <Metric
-                label={`Balance · ${planTier}`}
-                value={credits.isLoading ? "…" : `$${Number(credits.balance || 0).toFixed(2)}`}
-                delta={credits.allowance ? `${remainingPct}%` : null}
-                tone={balanceTone}
-                trend={scansTrend}
-                seed={3}
-              />
-              <Metric
-                label="Monthly wallet"
-                value={credits.isLoading ? "…" : `$${Number(credits.allowance || 0).toFixed(2)}`}
-                delta={null}
-                tone="zinc"
-                seed={5}
-              />
-            </div>
-          </Card>
+        {/* Extension usage analytics — Cloudflare-style */}
+        <DashboardHero keysCount={extKeyCount} balance={usageStats ? usageStats.balance : null} />
 
-          <Card>
-            <CardHeader icon={Gauge} title="Performance" />
-            <div className="flex divide-x divide-zinc-200">
-              <Metric
-                label="Win rate"
-                value={liveWinRate != null ? `${liveWinRate}%` : "0.0%"}
-                delta={null}
-                trend={liveWinRate == null ? "flat" : liveWinRate >= 50 ? "up" : "down"}
-                magnitude={liveWinRate != null ? Math.min(60, Math.abs(liveWinRate - 50) + 20) : 0}
-                seed={7}
-              />
-              <Metric
-                label="Journal entries"
-                value={counts.journalTotal}
-                delta={null}
-                tone="zinc"
-                seed={11}
-              />
-            </div>
-          </Card>
-
-          <Card>
-            <CardHeader icon={Activity} title="Activity" />
-            <div className="flex divide-x divide-zinc-200">
-              <Metric
-                label="Saved A+ setups"
-                value={counts.saved}
-                delta={null}
-                tone="blue"
-                seed={13}
-              />
-              <Metric
-                label={`Alerts · ${range}`}
-                value={counts.alerts7d}
-                delta={null}
-                tone="blue"
-                seed={17}
-              />
-            </div>
-          </Card>
-        </section>
-
-        {/* Row 2 — Market Pulse + two CTA cards */}
-        <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card className="flex flex-col">
-            <CardHeader
-              icon={LineChart}
-              title="Market Pulse"
-              right={
-                <Link to="/signals-live" className="inline-flex items-center gap-1 text-[12px] text-zinc-500 hover:text-zinc-900">
-                  <span>12</span> <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              }
-            />
-            <div className="flex-1 overflow-y-auto scrollbar-auto-hide">
-              <TickerRow label="XAU / USD" symbol="XAUUSD" decimals={2} />
-              <TickerRow label="DXY" symbol="DXY" decimals={3} />
-              <TickerRow label="US10Y" symbol="US10Y" decimals={3} />
-              <TickerRow label="XAG / USD" symbol="XAGUSD" decimals={3} />
-              <TickerRow label="EUR / USD" symbol="EURUSD" decimals={4} />
-              <TickerRow label="USD / JPY" symbol="USDJPY" decimals={3} />
-              <TickerRow label="S&P 500" symbol="SPX" decimals={2} />
-              
-            </div>
-          </Card>
+        {/* Extension usage analytics — Cloudflare-style */}
+        <UsageAnalytics
+          stats={usageStats}
+          keysCount={extKeyCount}
+          loading={usageLoading}
+          range={usageRange}
+          onRangeChange={setUsageRange}
+          onRefresh={handleRefresh}
+        />
 
 
-
-          <Card className="flex flex-col">
-            <CardHeader
-              icon={Gauge}
-              title="Best Time to Trade"
-              right={
-                <Link to="/signals-live" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
-                  Open desk <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              }
-            />
-            <BestTimeWidget />
-          </Card>
-
-
-          <Card className="flex flex-col">
-            <CardHeader
-              icon={Activity}
-              title="Live Signals"
-              right={
-                <Link to="/signals-live" className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-700 hover:text-zinc-900">
-                  Open desk <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              }
-            />
-            <SignalDeskHistory />
-          </Card>
-        </section>
 
 
 
@@ -1170,6 +1086,339 @@ function DashboardLayout() {
 }
 
 
+
+/* ---------- Extension usage analytics (Cloudflare-style) ---------- */
+
+type UsageRangeKey = "24h" | "7d" | "30d";
+const USAGE_RANGE_LABELS: Record<UsageRangeKey, string> = {
+  "24h": "Last 24 hours",
+  "7d": "Last 7 days",
+  "30d": "Last 30 days",
+};
+
+type UsagePoint = { label: string; scans: number; spent: number; tokens: number };
+
+function bucketUsage(stats: UsageStats, range: UsageRangeKey): { points: UsagePoint[]; prevScans: number; prevSpent: number } {
+  const hourly = range === "24h";
+  const n = hourly ? 24 : range === "7d" ? 7 : 30;
+  const stepMs = hourly ? 3600_000 : 86_400_000;
+  const now = Date.now();
+  const start = now - n * stepMs;
+
+  const keyOf = (t: number) => Math.floor((t - start) / stepMs);
+  const buckets: UsagePoint[] = Array.from({ length: n }, (_, i) => ({
+    label: hourly
+      ? new Date(start + i * stepMs).toLocaleTimeString(undefined, { hour: "numeric" })
+      : new Date(start + i * stepMs).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+    scans: 0,
+    spent: 0,
+    tokens: 0,
+  }));
+  let prevScans = 0;
+  let prevSpent = 0;
+
+  for (const r of stats.ledger) {
+    const t = new Date(r.created_at).getTime();
+    const spend = r.delta < 0 ? Math.abs(r.delta) : 0;
+    const toks = (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0);
+    if (t >= start) {
+      const b = buckets[keyOf(t)];
+      if (!b) continue;
+      if (spend > 0) b.scans += 1;
+      b.spent += spend;
+      b.tokens += toks;
+    } else if (t >= start - n * stepMs) {
+      if (spend > 0) prevScans += 1;
+      prevSpent += spend;
+    }
+  }
+  return { points: buckets, prevScans, prevSpent };
+}
+
+function deltaPct(cur: number, prev: number): number | null {
+  if (!prev) return cur > 0 ? 100 : null;
+  return ((cur - prev) / prev) * 100;
+}
+
+function fmtUsd2(n: number) {
+  const abs = Math.abs(n);
+  return `$${n.toFixed(abs >= 1 ? 2 : 4)}`;
+}
+
+function UsageLineChart({ values, height = 110, color = "#e01563" }: { values: number[]; height?: number; color?: string }) {
+  const w = 320;
+  const h = height;
+  const max = Math.max(1, ...values);
+  const hasData = values.some((v) => v > 0);
+  const top = 6;
+  const bottom = h - 6;
+  const stepX = values.length > 1 ? w / (values.length - 1) : w;
+  const pts = values.map((v, i) => [i * stepX, bottom - (v / max) * (bottom - top)] as const);
+
+  if (!hasData) {
+    // dashed placeholder segments, like the reference
+    const segs = 8;
+    const segW = w / (segs * 1.6);
+    return (
+      <div className="relative w-full" style={{ height: h }}>
+        <svg viewBox={`0 0 ${w} ${h}`} className="h-full w-full" preserveAspectRatio="none" aria-hidden="true">
+          {Array.from({ length: segs }).map((_, i) => (
+            <line
+              key={i}
+              x1={i * segW * 1.6}
+              x2={i * segW * 1.6 + segW}
+              y1={bottom}
+              y2={bottom}
+              stroke="#d4d4d8"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          ))}
+        </svg>
+      </div>
+    );
+  }
+
+  const last = pts[pts.length - 1]!;
+  return (
+    <div className="relative w-full" style={{ height: h }}>
+      <svg viewBox={`0 0 ${w} ${h}`} className="h-full w-full" preserveAspectRatio="none" aria-hidden="true">
+        <polyline
+          points={pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ")}
+          fill="none"
+          stroke={color}
+          strokeWidth="1.75"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+      <span
+        className="pointer-events-none absolute rounded-full border-[1.5px] bg-white"
+        style={{
+          borderColor: color,
+          width: 8,
+          height: 8,
+          right: 0,
+          top: `${(last[1] / h) * 100}%`,
+          transform: "translateY(-50%)",
+        }}
+      />
+    </div>
+  );
+}
+
+
+
+function UsageStatCard({ title, value, delta, series, tall = false, chartHeight, xLabels, color }: {
+  title: string;
+  value: string;
+  delta?: number | null;
+  series: number[];
+  tall?: boolean;
+  chartHeight?: number;
+  xLabels?: string[];
+  color?: string;
+}) {
+  return (
+    <div className="flex min-h-[118px] flex-col bg-white px-5 py-4">
+      <div className="flex items-start justify-between">
+        <span className="text-[13px] text-zinc-600">{title}</span>
+        {delta != null && (
+          <span className={`inline-flex items-center gap-0.5 text-xs font-medium ${delta >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+            {delta >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingUp className="h-3 w-3 rotate-180" />}
+            {Math.abs(delta).toFixed(1)}%
+          </span>
+        )}
+      </div>
+      <div className="mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-zinc-900 tabular-nums">{value}</div>
+      <div className="mt-auto pt-3">
+        <UsageLineChart values={series} height={chartHeight ?? (tall ? 40 : 32)} color={color} />
+      </div>
+
+      {xLabels && xLabels.length > 1 && (
+        <div className="mt-1 flex justify-between text-[10px] tabular-nums text-zinc-400">
+          <span>{xLabels[0]}</span>
+          <span>{xLabels[xLabels.length - 1]}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+function DashboardHero({ keysCount, balance }: { keysCount: number | null; balance: number | null }) {
+  const [q, setQ] = useState("");
+  const links: { to: string; label: string }[] = [
+    { to: "/dashboard/usage", label: "Wallet usage" },
+    { to: "/dashboard/extension", label: "Extension keys" },
+    { to: "/dashboard/analytics", label: "Analytics" },
+    { to: "/dashboard/security", label: "Security" },
+  ];
+  const filtered = q.trim()
+    ? links.filter((l) => l.label.toLowerCase().includes(q.trim().toLowerCase()))
+    : links;
+
+  return (
+    <section className="dashboard-hero -mx-5 mb-2 bg-white px-5 pb-8 pt-6 sm:-mx-8 sm:px-8">
+      <div className="mx-auto flex max-w-4xl flex-col items-center">
+        <Link
+          to="/dashboard/extension"
+          className="inline-flex items-center gap-2.5 rounded-full border border-zinc-200 bg-white px-3.5 py-2 text-sm text-zinc-950 shadow-sm transition hover:border-zinc-300 hover:shadow"
+        >
+          <span className="font-medium">Senior Review with Top Models</span>
+          <span className="flex items-center gap-1.5" aria-label="ChatGPT, Gemini, Claude, and DeepSeek">
+            <RiOpenaiFill className="h-[18px] w-[18px] text-brand-openai" aria-label="ChatGPT" />
+            <RiGeminiFill className="h-[18px] w-[18px] text-brand-gemini" aria-label="Gemini" />
+            <RiClaudeFill className="h-[18px] w-[18px] text-brand-claude" aria-label="Claude" />
+            <RiDeepseekFill className="h-[18px] w-[18px] text-brand-deepseek" aria-label="DeepSeek" />
+          </span>
+        </Link>
+
+        <h1 className="mt-7 text-center text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
+          What are we building today?
+        </h1>
+
+        <div className="mt-6 flex w-full items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm focus-within:border-zinc-300">
+          <Search className="h-4 w-4 shrink-0 text-zinc-400" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search"
+            className="min-w-0 flex-1 bg-transparent text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
+          />
+          <span className="hidden items-center gap-1 sm:flex">
+            <kbd className="rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-500">Ctrl</kbd>
+            <kbd className="rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-500">K</kbd>
+          </span>
+        </div>
+
+        <div className="mt-6 grid w-full grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-3">
+          <div>
+            <div className="flex items-center justify-between text-sm text-zinc-500">
+              <span className="inline-flex items-center gap-1">Wallet <ChevronRight className="h-3 w-3" /></span>
+              <MoreHorizontal className="h-4 w-4 text-zinc-300" />
+            </div>
+            <Link to="/dashboard/usage" className="mt-3 flex items-center justify-between rounded-md py-2 text-sm text-zinc-900 hover:bg-white">
+              <span className="inline-flex items-center gap-2">
+                <Globe className="h-4 w-4 text-zinc-400" />
+                {balance == null ? "Balance" : `$${balance.toFixed(2)} available`}
+              </span>
+              <ChevronRight className="h-4 w-4 text-zinc-400" />
+            </Link>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between text-sm text-zinc-500">
+              <span className="inline-flex items-center gap-1">Extension <ChevronRight className="h-3 w-3" /></span>
+              <MoreHorizontal className="h-4 w-4 text-zinc-300" />
+            </div>
+            <Link to="/dashboard/extension" className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 py-4 text-sm text-zinc-700 transition hover:bg-zinc-200">
+              <Rocket className="h-4 w-4 text-zinc-500" />
+              {keysCount ? `${keysCount} active key${keysCount > 1 ? "s" : ""}` : "Create your first key"}
+            </Link>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between text-sm text-zinc-500">
+              <span>Recents</span>
+              <MoreHorizontal className="h-4 w-4 text-zinc-300" />
+            </div>
+            <div className="mt-1 divide-y divide-zinc-200">
+              {filtered.length === 0 ? (
+                <p className="py-3 text-sm text-zinc-400">No matches</p>
+              ) : filtered.map((l) => (
+                <Link key={l.to} to={l.to} className="flex items-center justify-between py-3 text-sm text-zinc-500 hover:text-zinc-900">
+                  <span className="inline-flex items-center gap-2">
+                    <History className="h-3.5 w-3.5 text-zinc-400" />
+                    <span className="font-medium text-zinc-900">{l.label}</span>
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-zinc-400" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRefresh }: {
+  stats: UsageStats | null;
+  keysCount: number | null;
+  loading: boolean;
+  range: UsageRangeKey;
+  onRangeChange: (r: UsageRangeKey) => void;
+  onRefresh: () => void;
+}) {
+  const { points, prevScans, prevSpent } = useMemo(
+    () => stats ? bucketUsage(stats, range) : { points: [] as UsagePoint[], prevScans: 0, prevSpent: 0 },
+    [stats, range],
+  );
+
+  const totalScans = points.reduce((s, p) => s + p.scans, 0);
+  const totalSpent = points.reduce((s, p) => s + p.spent, 0);
+  const totalTokens = points.reduce((s, p) => s + p.tokens, 0);
+  const balance = stats ? Math.max(0, Math.min(stats.balance, stats.allowance)) : 0;
+  const remainingPct = stats && stats.allowance > 0 ? (balance / stats.allowance) * 100 : 0;
+  const empty = [0];
+  const scanSeries = points.length ? points.map((p) => p.scans) : empty;
+  const spentSeries = points.length ? points.map((p) => p.spent) : empty;
+  const tokenSeries = points.length ? points.map((p) => p.tokens) : empty;
+
+  return (
+    <section className="analytics-section mt-6 bg-white">
+      <div className="mx-auto w-full max-w-4xl px-1">
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-[17px] font-semibold tracking-tight text-zinc-900">   Analytics</h2>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <select
+              value={range}
+              onChange={(e) => onRangeChange(e.target.value as UsageRangeKey)}
+              aria-label="Time range"
+              className="appearance-none rounded-md border border-zinc-200 bg-white py-1.5 pl-3 pr-8 text-xs font-medium text-zinc-700 shadow-sm outline-none transition hover:border-zinc-300 focus:border-zinc-400"
+            >
+              {(Object.keys(USAGE_RANGE_LABELS) as UsageRangeKey[]).map((k) => (
+                <option key={k} value={k}>{USAGE_RANGE_LABELS[k]}</option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+          </div>
+          <Link
+            to="/dashboard/extension"
+            aria-label="Add extension key"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-500 shadow-sm transition hover:border-zinc-300 hover:text-zinc-900"
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </Link>
+          <button
+            type="button"
+            onClick={onRefresh}
+            aria-label="Refresh usage"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-500 shadow-sm transition hover:border-zinc-300 hover:text-zinc-900"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+          </button>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 overflow-hidden rounded-xl border border-white sm:grid-cols-2 lg:grid-cols-3 [&>*]:border-b [&>*]:border-r [&>*]:border-white">
+        <UsageStatCard title="Extension scans" value={String(totalScans)} delta={deltaPct(totalScans, prevScans)} series={scanSeries} chartHeight={36} color="#e01563" />
+        <UsageStatCard title="Credits spent" value={fmtUsd2(totalSpent)} delta={deltaPct(totalSpent, prevSpent)} series={spentSeries} chartHeight={36} color="#0f9d8f" />
+        <UsageStatCard title="Tokens processed" value={totalTokens >= 1000 ? `${(totalTokens / 1000).toFixed(1)}k` : String(totalTokens)} series={tokenSeries} chartHeight={36} color="#a16207" />
+        <UsageStatCard title="Wallet balance" value={stats ? fmtUsd2(balance) : "…"} series={spentSeries} chartHeight={36} color="#0f9d8f" />
+        <UsageStatCard title="Credits remaining" value={stats ? `${remainingPct.toFixed(1)}%` : "…"} series={[remainingPct]} chartHeight={36} color="#e01563" />
+        <UsageStatCard title="Extension keys" value={keysCount == null ? "…" : String(keysCount)} series={[keysCount ?? 0]} chartHeight={36} color="#0f9d8f" />
+      </div>
+
+
+      </div>
+    </section>
+  );
+}
 
 // Real ICT/SMC Killzones — times in UTC (converted from NY EST reference).
 // Standard institutional trading windows used by prop firms & smart-money traders.
@@ -1309,9 +1558,6 @@ function VoiceAgentHistory() {
         <p className="mt-1 max-w-[260px] text-[12px] text-zinc-500">
           Your voice chats with Jenvu will appear here with timestamps.
         </p>
-        <Link to="/app" className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] font-medium text-zinc-800 hover:bg-zinc-50">
-          Start talking
-        </Link>
       </div>
     );
   }
@@ -1359,7 +1605,7 @@ function VoiceAgentHistory() {
 
 function QuickActions() {
   const actions: { label: string; to: string; icon: typeof Activity; tone: string }[] = [
-    { label: "New Scan",   to: "/signals-live",                 icon: Activity,    tone: "bg-blue-50 text-blue-700 border-blue-100" },
+    { label: "New Scan",   to: "/dashboard/extension",     icon: Activity,    tone: "bg-blue-50 text-blue-700 border-blue-100" },
     { label: "Journal",    to: "/dashboard/journal",       icon: BookOpen,    tone: "bg-emerald-50 text-emerald-700 border-emerald-100" },
     { label: "Killzones",  to: "/killzones",              icon: Calendar,    tone: "bg-amber-50 text-amber-700 border-amber-100" },
     { label: "Insights",   to: "/insights",               icon: LineChart,   tone: "bg-violet-50 text-violet-700 border-violet-100" },
@@ -1373,7 +1619,7 @@ function QuickActions() {
         return (
           <Link
             key={a.to}
-            to={a.to as "/signals-live"}
+            to={a.to as "/dashboard"}
             className="group flex flex-col items-center justify-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2 py-3 text-center transition hover:border-zinc-300 hover:bg-zinc-50"
           >
             <span className={`inline-flex h-8 w-8 items-center justify-center rounded-md border ${a.tone}`}>
